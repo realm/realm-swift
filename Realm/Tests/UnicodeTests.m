@@ -30,7 +30,7 @@ NSString * const kUTF8TestString = @"值значен™👍☞⎠‱௹♣︎☐
     RLMRealm *realm = self.realmWithTestPath;
 
     [realm beginWriteTransaction];
-    [StringObject createInRealm:realm withObject:@[kUTF8TestString]];
+    [StringObject createInRealm:realm withValue:@[kUTF8TestString]];
     [realm commitWriteTransaction];
 
     StringObject *obj1 = [[StringObject allObjectsInRealm:realm] firstObject];
@@ -45,7 +45,7 @@ NSString * const kUTF8TestString = @"值значен™👍☞⎠‱௹♣︎☐
     RLMRealm *realm = self.realmWithTestPath;
 
     [realm beginWriteTransaction];
-    [UTF8Object createInRealm:realm withObject:@[kUTF8TestString]];
+    [UTF8Object createInRealm:realm withValue:@[kUTF8TestString]];
     [realm commitWriteTransaction];
 
     UTF8Object *obj1 = [[UTF8Object allObjectsInRealm:realm] firstObject];

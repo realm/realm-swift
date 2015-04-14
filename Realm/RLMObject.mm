@@ -39,23 +39,23 @@
     return [super init];
 }
 
-- (instancetype)initWithObject:(id)object {
-    return [super initWithObject:object schema:RLMSchema.sharedSchema];
+- (instancetype)initWithValue:(id)object {
+    return [super initWithValue:object schema:RLMSchema.sharedSchema];
 }
 
-+ (instancetype)createInDefaultRealmWithObject:(id)object {
++ (instancetype)createInDefaultRealmWithValue:(id)object {
     return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMCreationOptionsAllowCopy);
 }
 
-+ (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)value {
++ (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMCreationOptionsAllowCopy);
 }
 
-+ (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object {
-    return [self createOrUpdateInRealm:[RLMRealm defaultRealm] withObject:object];
++ (instancetype)createOrUpdateInDefaultRealmWithValue:(id)object {
+    return [self createOrUpdateInRealm:[RLMRealm defaultRealm] withValue:object];
 }
 
-+ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)value {
++ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value {
     // verify primary key
     RLMObjectSchema *schema = [self sharedSchema];
     if (!schema.primaryKeyProperty) {

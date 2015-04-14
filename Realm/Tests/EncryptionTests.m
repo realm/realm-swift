@@ -61,7 +61,7 @@
     @autoreleasepool {
         RLMRealm *realm = [self realmWithKey:key];
         [realm transactionWithBlock:^{
-            [IntObject createInRealm:realm withObject:@[@1]];
+            [IntObject createInRealm:realm withValue:@[@1]];
         }];
     }
 
@@ -112,7 +112,7 @@
     @autoreleasepool {
         RLMRealm *realm = [self realmWithKey:key];
         [realm transactionWithBlock:^{
-            [IntObject createInRealm:realm withObject:@[@1]];
+            [IntObject createInRealm:realm withValue:@[@1]];
         }];
     }
 
@@ -132,7 +132,7 @@
     @autoreleasepool {
         RLMRealm *realm = [self realmWithKey:key];
         [realm transactionWithBlock:^{
-            [IntObject createInRealm:realm withObject:@[@1]];
+            [IntObject createInRealm:realm withValue:@[@1]];
         }];
     }
 
@@ -150,7 +150,7 @@
     @autoreleasepool {
         RLMRealm *realm = [self realmWithKey:key];
         [realm transactionWithBlock:^{
-            [IntObject createInRealm:realm withObject:@[@1]];
+            [IntObject createInRealm:realm withValue:@[@1]];
         }];
         [realm writeCopyToPath:RLMTestRealmPath() error:nil];
     }
@@ -168,7 +168,7 @@
     @autoreleasepool {
         RLMRealm *realm = [self realmWithKey:key];
         [realm transactionWithBlock:^{
-            [IntObject createInRealm:realm withObject:@[@1]];
+            [IntObject createInRealm:realm withValue:@[@1]];
         }];
         [realm writeCopyToPath:RLMTestRealmPath() error:nil];
     }
@@ -188,7 +188,7 @@
     @autoreleasepool {
         RLMRealm *realm = [self realmWithKey:key1];
         [realm transactionWithBlock:^{
-            [IntObject createInRealm:realm withObject:@[@1]];
+            [IntObject createInRealm:realm withValue:@[@1]];
         }];
         [realm writeCopyToPath:RLMTestRealmPath() encryptionKey:key2 error:nil];
     }

@@ -32,8 +32,8 @@
         // open realm in autoreleasepool to create tables and then dispose
         RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
         [realm beginWriteTransaction];
-        [DynamicObject createInRealm:realm withObject:@[@"column1", @1]];
-        [DynamicObject createInRealm:realm withObject:@[@"column2", @2]];
+        [DynamicObject createInRealm:realm withValue:@[@"column1", @1]];
+        [DynamicObject createInRealm:realm withValue:@[@"column2", @2]];
         [realm commitWriteTransaction];
     }
     
@@ -96,8 +96,8 @@
         // open realm in autoreleasepool to create tables and then dispose
         RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
         [realm beginWriteTransaction];
-        [DynamicObject createInRealm:realm withObject:@[@"column1", @1]];
-        [DynamicObject createInRealm:realm withObject:@[@"column2", @2]];
+        [DynamicObject createInRealm:realm withValue:@[@"column1", @1]];
+        [DynamicObject createInRealm:realm withValue:@[@"column2", @2]];
         [realm commitWriteTransaction];
     }
     
@@ -122,8 +122,8 @@
         // open realm in autoreleasepool to create tables and then dispose
         RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
         [realm beginWriteTransaction];
-        [AllTypesObject createInRealm:realm withObject:obj1];
-        [AllTypesObject createInRealm:realm withObject:obj2];
+        [AllTypesObject createInRealm:realm withValue:obj1];
+        [AllTypesObject createInRealm:realm withValue:obj2];
         [realm commitWriteTransaction];
     }
     
@@ -157,8 +157,8 @@
 
     RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
     [dyrealm beginWriteTransaction];
-    RLMObject *stringObject = [dyrealm createObject:StringObject.className withObject:@[@"string"]];
-    [dyrealm createObject:AllTypesObject.className withObject:@[@NO, @2, @2.2f, @2.22, @"string2",
+    RLMObject *stringObject = [dyrealm createObject:StringObject.className withValue:@[@"string"]];
+    [dyrealm createObject:AllTypesObject.className withValue:@[@NO, @2, @2.2f, @2.22, @"string2",
         [NSData dataWithBytes:"b" length:1], NSDate.date, @NO, @22, @0, stringObject]];
     [dyrealm commitWriteTransaction];
 
@@ -174,9 +174,9 @@
 
     RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
     [dyrealm beginWriteTransaction];
-    RLMObject *stringObject = [dyrealm createObject:StringObject.className withObject:@[@"string"]];
-    RLMObject *stringObject1 = [dyrealm createObject:StringObject.className withObject:@[@"string1"]];
-    [dyrealm createObject:ArrayPropertyObject.className withObject:@[@"name", @[stringObject, stringObject1], @[]]];
+    RLMObject *stringObject = [dyrealm createObject:StringObject.className withValue:@[@"string"]];
+    RLMObject *stringObject1 = [dyrealm createObject:StringObject.className withValue:@[@"string1"]];
+    [dyrealm createObject:ArrayPropertyObject.className withValue:@[@"name", @[stringObject, stringObject1], @[]]];
     [dyrealm commitWriteTransaction];
 
     RLMResults *results = [dyrealm allObjects:ArrayPropertyObject.className];

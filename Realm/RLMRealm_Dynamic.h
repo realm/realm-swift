@@ -87,7 +87,7 @@
 
  When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
  */
--(RLMObject *)createObject:(NSString *)className withObject:(id)object;
+-(RLMObject *)createObject:(NSString *)className withValue:(id)object;
 
 @end
 

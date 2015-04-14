@@ -87,7 +87,7 @@
  
  @see [RLMRealm addObject:]:
  */
-- (instancetype)initWithObject:(id)object;
+- (instancetype)initWithValue:(id)object;
 
 
 /**
@@ -103,7 +103,7 @@
  Creates an instance of this object and adds it to the default Realm populating
  the object with the given object.
  
- If nested objects are included in the argument, `createInDefaultRealmWithObject:` will be called
+ If nested objects are included in the argument, `createInDefaultRealmWithValue:` will be called
  on them.
 
  @param object  The object used to populate the object. This can be any key/value coding compliant
@@ -115,7 +115,7 @@
 
  @see   defaultPropertyValues
  */
-+ (instancetype)createInDefaultRealmWithObject:(id)object;
++ (instancetype)createInDefaultRealmWithValue:(id)object;
 
 /**
  Create an RLMObject in a Realm with a given object.
@@ -123,7 +123,7 @@
  Creates an instance of this object and adds it to the given Realm populating
  the object with the given object.
  
- If nested objects are included in the argument, `createInRealm:withObject:` will be called
+ If nested objects are included in the argument, `createInRealm:withValue:` will be called
  on them.
  
  @param realm   The Realm in which this object is persisted.
@@ -136,7 +136,7 @@
  
  @see   defaultPropertyValues
  */
-+ (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object;
++ (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)object;
 
 /**
  Create or update an RLMObject in the default Realm with a given object.
@@ -145,8 +145,8 @@
  an object with the same primary key value in the default RLMRealm its values are updated and the object
  is returned. Otherwise this creates and populates a new instance of this object in the default Realm.
  
- If nested objects are included in the argument, `createOrUpdateInDefaultRealmWithObject:` will be
- called on them if have a primary key (`createInDefaultRealmWithObject:` otherwise).
+ If nested objects are included in the argument, `createOrUpdateInDefaultRealmWithValue:` will be
+ called on them if have a primary key (`createInDefaultRealmWithValue:` otherwise).
  
  This is a no-op if the argument is an RLMObject of the same type already backed by the target realm.
 
@@ -159,7 +159,7 @@
 
  @see   defaultPropertyValues, primaryKey
  */
-+ (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object;
++ (instancetype)createOrUpdateInDefaultRealmWithValue:(id)object;
 
 /**
  Create or update an RLMObject with a given object.
@@ -168,8 +168,8 @@
  an object with the same primary key value in the provided RLMRealm its values are updated and the object
  is returned. Otherwise this creates and populates a new instance of this object in the provided Realm.
  
- If nested objects are included in the argument, `createOrUpdateInRealm:withObject:` will be
- called on them if have a primary key (`createInRealm:withObject:` otherwise).
+ If nested objects are included in the argument, `createOrUpdateInRealm:withValue:` will be
+ called on them if have a primary key (`createInRealm:withValue:` otherwise).
 
  This is a no-op if the argument is an RLMObject of the same type already backed by the target realm.
 
@@ -183,7 +183,7 @@
 
  @see   defaultPropertyValues, primaryKey
  */
-+ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object;
++ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)object;
 
 /**
  The Realm in which this object is persisted. Returns nil for standalone objects.

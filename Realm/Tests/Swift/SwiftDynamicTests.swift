@@ -28,8 +28,8 @@ class SwiftDynamicTests: SwiftTestCase {
             // open realm in autoreleasepool to create tables and then dispose
             let realm = RLMRealm(path: testRealmPath(), readOnly: false, error: nil)
             realm.beginWriteTransaction()
-            SwiftDynamicObject.createInRealm(realm, withObject: ["column1", 1])
-            SwiftDynamicObject.createInRealm(realm, withObject: ["column2", 2])
+            SwiftDynamicObject.createInRealm(realm, withValue: ["column1", 1])
+            SwiftDynamicObject.createInRealm(realm, withValue: ["column2", 2])
             realm.commitWriteTransaction()
         }
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
@@ -54,8 +54,8 @@ class SwiftDynamicTests: SwiftTestCase {
             // open realm in autoreleasepool to create tables and then dispose
             let realm = RLMRealm(path: testRealmPath(), readOnly: false, error: nil)
             realm.beginWriteTransaction()
-            SwiftDynamicObject.createInRealm(realm, withObject: ["column1", 1])
-            SwiftDynamicObject.createInRealm(realm, withObject: ["column2", 2])
+            SwiftDynamicObject.createInRealm(realm, withValue: ["column1", 1])
+            SwiftDynamicObject.createInRealm(realm, withValue: ["column2", 2])
             realm.commitWriteTransaction()
         }
 
@@ -81,8 +81,8 @@ class SwiftDynamicTests: SwiftTestCase {
 //            // open realm in autoreleasepool to create tables and then dispose
 //            let realm =.realmWithTestPath()
 //            realm.beginWriteTransaction()
-//            SwiftAllTypesObject.createInRealm(realm, withObject: obj1)
-//            SwiftAllTypesObject.createInRealm(realm, withObject: obj2)
+//            SwiftAllTypesObject.createInRealm(realm, withValue: obj1)
+//            SwiftAllTypesObject.createInRealm(realm, withValue: obj2)
 //            realm.commitWriteTransaction()
 //        }
 //
@@ -113,8 +113,8 @@ class SwiftDynamicTests: SwiftTestCase {
             // open realm in autoreleasepool to create tables and then dispose
             let realm = RLMRealm(path: testRealmPath(), readOnly: false, error: nil)
             realm.beginWriteTransaction()
-            DynamicObject.createInRealm(realm, withObject: ["column1", 1])
-            DynamicObject.createInRealm(realm, withObject: ["column2", 2])
+            DynamicObject.createInRealm(realm, withValue: ["column1", 1])
+            DynamicObject.createInRealm(realm, withValue: ["column2", 2])
             realm.commitWriteTransaction()
         }
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
@@ -139,8 +139,8 @@ class SwiftDynamicTests: SwiftTestCase {
             // open realm in autoreleasepool to create tables and then dispose
             let realm = RLMRealm(path: testRealmPath(), readOnly: false, error: nil)
             realm.beginWriteTransaction()
-            DynamicObject.createInRealm(realm, withObject: ["column1", 1])
-            DynamicObject.createInRealm(realm, withObject: ["column2", 2])
+            DynamicObject.createInRealm(realm, withValue: ["column1", 1])
+            DynamicObject.createInRealm(realm, withValue: ["column2", 2])
             realm.commitWriteTransaction()
         }
 
@@ -189,8 +189,8 @@ class SwiftDynamicTests: SwiftTestCase {
             // open realm in autoreleasepool to create tables and then dispose
             let realm = self.realmWithTestPath()
             realm.beginWriteTransaction()
-            AllTypesObject.createInRealm(realm, withObject: obj1)
-            AllTypesObject.createInRealm(realm, withObject: obj2)
+            AllTypesObject.createInRealm(realm, withValue: obj1)
+            AllTypesObject.createInRealm(realm, withValue: obj2)
             realm.commitWriteTransaction()
         }
 

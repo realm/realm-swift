@@ -60,8 +60,8 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@(factor).stringValue];
     [realm beginWriteTransaction];
     for (int i = 0; i < 1000 * factor; ++i) {
-        [StringObject createInRealm:realm withObject:@[@"a"]];
-        [StringObject createInRealm:realm withObject:@[@"b"]];
+        [StringObject createInRealm:realm withValue:@[@"a"]];
+        [StringObject createInRealm:realm withValue:@[@"b"]];
     }
     [realm commitWriteTransaction];
 
@@ -87,7 +87,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         RLMRealm *realm = self.realmWithTestPath;
         for (int i = 0; i < 50; ++i) {
             [realm beginWriteTransaction];
-            [StringObject createInRealm:realm withObject:@[@"a"]];
+            [StringObject createInRealm:realm withValue:@[@"a"]];
             [realm commitWriteTransaction];
         }
         [self tearDown];
@@ -99,7 +99,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         RLMRealm *realm = self.realmWithTestPath;
         [realm beginWriteTransaction];
         for (int i = 0; i < 5000; ++i) {
-            [StringObject createInRealm:realm withObject:@[@"a"]];
+            [StringObject createInRealm:realm withValue:@[@"a"]];
         }
         [realm commitWriteTransaction];
         [self tearDown];
@@ -167,7 +167,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
     [realm beginWriteTransaction];
     ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm
-                                                       withObject:@[@"name", [StringObject allObjectsInRealm:realm], @[]]];
+                                                       withValue:@[@"name", [StringObject allObjectsInRealm:realm], @[]]];
     [realm commitWriteTransaction];
 
     [self measureBlock:^{
@@ -182,7 +182,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
     [realm beginWriteTransaction];
     ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm
-                                                       withObject:@[@"name", [StringObject allObjectsInRealm:realm], @[]]];
+                                                       withValue:@[@"name", [StringObject allObjectsInRealm:realm], @[]]];
     [realm commitWriteTransaction];
 
     [self measureBlock:^{
@@ -273,7 +273,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
     for (int i = 0; i < 1000; ++i) {
-        [StringObject createInRealm:realm withObject:@[@(i).stringValue]];
+        [StringObject createInRealm:realm withValue:@[@(i).stringValue]];
     }
     [realm commitWriteTransaction];
 
@@ -288,7 +288,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
     for (int i = 0; i < 1000; ++i) {
-        [IndexedStringObject createInRealm:realm withObject:@[@(i).stringValue]];
+        [IndexedStringObject createInRealm:realm withValue:@[@(i).stringValue]];
     }
     [realm commitWriteTransaction];
 
@@ -304,7 +304,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [realm beginWriteTransaction];
     NSMutableArray *ids = [NSMutableArray arrayWithCapacity:1000];
     for (int i = 0; i < 2000; ++i) {
-        [IntObject createInRealm:realm withObject:@[@(i)]];
+        [IntObject createInRealm:realm withValue:@[@(i)]];
         if (i % 2) {
             [ids addObject:@(i)];
         }
@@ -320,7 +320,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
     for (int i = 0; i < 2000; ++i) {
-        [IntObject createInRealm:realm withObject:@[@(arc4random())]];
+        [IntObject createInRealm:realm withValue:@[@(arc4random())]];
     }
     [realm commitWriteTransaction];
 
@@ -361,7 +361,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
         [realm beginWriteTransaction];
-        IntObject *obj = [IntObject createInRealm:realm withObject:@[@0]];
+        IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
 
         [self startMeasuring];
@@ -378,7 +378,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
         [realm beginWriteTransaction];
-        IntObject *obj = [IntObject createInRealm:realm withObject:@[@0]];
+        IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
 
         RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) { }];
@@ -399,7 +399,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
         [realm beginWriteTransaction];
-        IntObject *obj = [IntObject createInRealm:realm withObject:@[@0]];
+        IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
 
         dispatch_queue_t queue = dispatch_queue_create("background", 0);
@@ -439,7 +439,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
         [realm beginWriteTransaction];
-        IntObject *obj = [IntObject createInRealm:realm withObject:@[@0]];
+        IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
 
         dispatch_queue_t queue = dispatch_queue_create("background", 0);

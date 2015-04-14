@@ -79,9 +79,9 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    [PersonObject createInRealm:realm withObject:@[@"Fiel", @27]];
-    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
-    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withValue:@[@"Fiel", @27]];
+    [PersonObject createInRealm:realm withValue:@[@"Ari", @33]];
+    [PersonObject createInRealm:realm withValue:@[@"Tim", @29]];
     [realm commitWriteTransaction];
 
     // query on realm
@@ -109,10 +109,10 @@
     stringObj.stringCol = @"string";
 
     [realm beginWriteTransaction];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]];
-    [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]];
-    [AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]];
+    [AllTypesObject createInRealm:realm withValue:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]];
+    [AllTypesObject createInRealm:realm withValue:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]];
     [realm commitWriteTransaction];
 
     RLMResults *betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol BETWEEN %@", @[@2, @3]]];
@@ -147,9 +147,9 @@
     stringObj.stringCol = @"string";
 
     [realm beginWriteTransaction];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]];
-    [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]];
+    [AllTypesObject createInRealm:realm withValue:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]];
     [realm commitWriteTransaction];
 
     RLMResults *dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol < %@", date3]];
@@ -171,9 +171,9 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [PersonObject createInRealm:realm withObject:@[@"Fiel", @27]];
-    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
-    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [PersonObject createInRealm:realm withValue:@[@"Fiel", @27]];
+    [PersonObject createInRealm:realm withValue:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withValue:@[@"Ari", @33]];
     [realm commitWriteTransaction];
 
     // query on class
@@ -194,9 +194,9 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [PersonObject createInRealm:realm withObject:@[@"Fiel", @27]];
-    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
-    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [PersonObject createInRealm:realm withValue:@[@"Fiel", @27]];
+    [PersonObject createInRealm:realm withValue:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withValue:@[@"Ari", @33]];
     [realm commitWriteTransaction];
 
     // query on class
@@ -246,15 +246,15 @@
     NSDate *date33 = [date3 dateByAddingTimeInterval:1];
 
     [realm beginWriteTransaction];
-    ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withObject:@{}];
+    ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withValue:@{}];
 
     StringObject *stringObj = [StringObject new];
     stringObj.stringCol = @"string";
     
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @1, @1, stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @2, @"mixed", stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @3, @"mixed", stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @3, @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @1, @1, stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @2, @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @3, @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @3, @"mixed", stringObj]]];
     
     [realm commitWriteTransaction];
 
@@ -301,10 +301,10 @@
 - (void)testSortByMultipleColumns {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    DogObject *a1 = [DogObject createInDefaultRealmWithObject:@[@"a", @1]];
-    DogObject *a2 = [DogObject createInDefaultRealmWithObject:@[@"a", @2]];
-    DogObject *b1 = [DogObject createInDefaultRealmWithObject:@[@"b", @1]];
-    DogObject *b2 = [DogObject createInDefaultRealmWithObject:@[@"b", @2]];
+    DogObject *a1 = [DogObject createInDefaultRealmWithValue:@[@"a", @1]];
+    DogObject *a2 = [DogObject createInDefaultRealmWithValue:@[@"a", @2]];
+    DogObject *b1 = [DogObject createInDefaultRealmWithValue:@[@"b", @1]];
+    DogObject *b2 = [DogObject createInDefaultRealmWithValue:@[@"b", @2]];
     [realm commitWriteTransaction];
 
     bool (^checkOrder)(NSArray *, NSArray *, NSArray *) = ^bool(NSArray *properties, NSArray *ascending, NSArray *dogs) {
@@ -337,15 +337,15 @@
     NSDate *date33 = [date3 dateByAddingTimeInterval:1];
 
     [realm beginWriteTransaction];
-    ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withObject:@{}];
+    ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withValue:@{}];
 
     StringObject *stringObj = [StringObject new];
     stringObj.stringCol = @"string";
 
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @1, @1, stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @2, @"mixed", stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @3, @"mixed", stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @3, @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @1, @1, stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @2, @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @3, @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @3, @"mixed", stringObj]]];
 
     [realm commitWriteTransaction];
 
@@ -357,7 +357,7 @@
         [arrayOfAll.array removeObjectAtIndex:3];
         
         // create extra alltypesobject
-        [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"d", [@"d" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]]];
+        [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"d", [@"d" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]]];
     }];
     XCTAssertEqualObjects([results[0] stringCol], @"d");
     XCTAssertEqualObjects([results[1] stringCol], @"c");
@@ -374,10 +374,10 @@
 
     [realm beginWriteTransaction];
     for (int i = 0; i < 5; ++i) {
-        [IntObject createInRealm:realm withObject:@[@(i)]];
+        [IntObject createInRealm:realm withValue:@[@(i)]];
     }
 
-    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withObject:@[@"name", @[], [IntObject allObjects]]];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[], [IntObject allObjects]]];
     [realm commitWriteTransaction];
 
     RLMResults *asc = [IntObject.allObjects sortedResultsUsingProperty:@"intCol" ascending:YES];
@@ -541,13 +541,13 @@
 
     [realm beginWriteTransaction];
 
-    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"a", @"a"]];
-    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"a", @"A"]];
-    [QueryObject createInRealm:realm withObject:@[@NO,  @NO,  @2, @2, @1.0f,  @3.55f, @99.9, @6.66, @"a", @"ab"]];
-    [QueryObject createInRealm:realm withObject:@[@NO,  @YES, @3, @6, @4.21f, @1.0f,  @1.0,  @7.77, @"a", @"AB"]];
-    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @4, @5, @23.0f, @23.0f, @7.4,  @8.88, @"a", @"b"]];
-    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @15, @8, @1.0f,  @66.0f, @1.01, @9.99, @"a", @"ba"]];
-    [QueryObject createInRealm:realm withObject:@[@NO,  @YES, @15, @15, @1.0f,  @66.0f, @1.01, @9.99, @"a", @"BA"]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"a", @"a"]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"a", @"A"]];
+    [QueryObject createInRealm:realm withValue:@[@NO,  @NO,  @2, @2, @1.0f,  @3.55f, @99.9, @6.66, @"a", @"ab"]];
+    [QueryObject createInRealm:realm withValue:@[@NO,  @YES, @3, @6, @4.21f, @1.0f,  @1.0,  @7.77, @"a", @"AB"]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @YES, @4, @5, @23.0f, @23.0f, @7.4,  @8.88, @"a", @"b"]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @NO,  @15, @8, @1.0f,  @66.0f, @1.01, @9.99, @"a", @"ba"]];
+    [QueryObject createInRealm:realm withValue:@[@NO,  @YES, @15, @15, @1.0f,  @66.0f, @1.01, @9.99, @"a", @"BA"]];
 
     [realm commitWriteTransaction];
 
@@ -739,8 +739,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
+    StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'a'"].count);
@@ -765,8 +765,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
+    StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ENDSWITH 'c'"].count);
@@ -791,8 +791,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
+    StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'a'"].count);
@@ -821,8 +821,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
+    StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol == 'abc'"].count);
@@ -945,7 +945,7 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    [FloatObject createInRealm:realm withObject:@[@1.7f]];
+    [FloatObject createInRealm:realm withValue:@[@1.7f]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > 1"] count]), 1U, @"1 object expected");
@@ -969,7 +969,7 @@
 
     [realm beginWriteTransaction];
     {
-        [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
+        [QueryObject createInRealm:realm withValue:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
 
         RLMResults *resultsQuery = [QueryObject objectsWhere:@"bool1 = YES"];
         RLMResults *resultsTableView = [QueryObject objectsWhere:@"bool1 = YES"];
@@ -988,7 +988,7 @@
         XCTAssertEqual(resultsTableView.count, 0U);
 
         // Add an object that does not match query
-        QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
+        QueryObject *q1 = [QueryObject createInRealm:realm withValue:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
         XCTAssertEqual(resultsQuery.count, 0U);
         XCTAssertEqual(resultsTableView.count, 0U);
 
@@ -998,7 +998,7 @@
         XCTAssertEqual(resultsTableView.count, 1U);
 
         // Add another object that matches
-        [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"", @""]];
+        [QueryObject createInRealm:realm withValue:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"", @""]];
         XCTAssertEqual(resultsQuery.count, 2U);
         XCTAssertEqual(resultsTableView.count, 2U);
     }
@@ -1010,7 +1010,7 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
     [realm commitWriteTransaction];
 
     RLMResults *resultsQuery = [QueryObject objectsWhere:@"bool1 = YES"];
@@ -1034,7 +1034,7 @@
 
     // Add an object that does not match query
     [realm beginWriteTransaction];
-    QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
+    QueryObject *q1 = [QueryObject createInRealm:realm withValue:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(resultsQuery.count, 0U);
@@ -1050,7 +1050,7 @@
 
     // Add another object that matches
     [realm beginWriteTransaction];
-    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"", @""]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"", @""]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(resultsQuery.count, 2U);
@@ -1172,7 +1172,7 @@
     linkToAllTypes.allTypesCol.cBoolCol = YES;
     linkToAllTypes.allTypesCol.longCol = 11;
     linkToAllTypes.allTypesCol.mixedCol = @0;
-    StringObject *obj = [[StringObject alloc] initWithObject:@[@"string"]];
+    StringObject *obj = [[StringObject alloc] initWithValue:@[@"string"]];
     linkToAllTypes.allTypesCol.objectCol = obj;
 
     [realm beginWriteTransaction];
@@ -1263,7 +1263,7 @@
     [realm beginWriteTransaction];
     CircleObject *circle = nil;
     for (int i = 0; i < 5; ++i) {
-        circle = [CircleObject createInRealm:realm withObject:@{@"data": [NSString stringWithFormat:@"%d", i],
+        circle = [CircleObject createInRealm:realm withValue:@{@"data": [NSString stringWithFormat:@"%d", i],
                                                                 @"next": circle ?: NSNull.null}];
     }
     [realm commitWriteTransaction];
@@ -1288,10 +1288,10 @@
     [realm beginWriteTransaction];
     CircleObject *circle = nil;
     for (int i = 0; i < 5; ++i) {
-        circle = [CircleObject createInRealm:realm withObject:@{@"data": [NSString stringWithFormat:@"%d", i],
+        circle = [CircleObject createInRealm:realm withValue:@{@"data": [NSString stringWithFormat:@"%d", i],
                                                                 @"next": circle ?: NSNull.null}];
     }
-    [CircleArrayObject createInRealm:realm withObject:@[[CircleObject allObjectsInRealm:realm]]];
+    [CircleArrayObject createInRealm:realm withValue:@[[CircleObject allObjectsInRealm:realm]]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '4'"].count);
@@ -1320,20 +1320,20 @@
 
     [realm beginWriteTransaction];
 
-    StringObject *stringObj0 = [StringObject createInRealm:realm withObject:@[@"string0"]];
-    StringObject *stringObj1 = [StringObject createInRealm:realm withObject:@[@"string1"]];
-    StringObject *stringObj2 = [StringObject createInRealm:realm withObject:@[@"string2"]];
+    StringObject *stringObj0 = [StringObject createInRealm:realm withValue:@[@"string0"]];
+    StringObject *stringObj1 = [StringObject createInRealm:realm withValue:@[@"string1"]];
+    StringObject *stringObj2 = [StringObject createInRealm:realm withValue:@[@"string2"]];
 
-    AllTypesObject *obj0 = [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @1LL, @1, stringObj0]];
-    AllTypesObject *obj1 = [AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @2LL, @"mixed", stringObj1]];
-    AllTypesObject *obj2 = [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @3LL, @"mixed", stringObj0]];
-    AllTypesObject *obj3 = [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @3LL, @"mixed", stringObj2]];
-    AllTypesObject *obj4 = [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @34359738368LL, @"mixed", NSNull.null]];
+    AllTypesObject *obj0 = [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @1LL, @1, stringObj0]];
+    AllTypesObject *obj1 = [AllTypesObject createInRealm:realm withValue:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @2LL, @"mixed", stringObj1]];
+    AllTypesObject *obj2 = [AllTypesObject createInRealm:realm withValue:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @3LL, @"mixed", stringObj0]];
+    AllTypesObject *obj3 = [AllTypesObject createInRealm:realm withValue:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @3LL, @"mixed", stringObj2]];
+    AllTypesObject *obj4 = [AllTypesObject createInRealm:realm withValue:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @34359738368LL, @"mixed", NSNull.null]];
 
-    [ArrayOfAllTypesObject createInDefaultRealmWithObject:@[@[obj0, obj1]]];
-    [ArrayOfAllTypesObject createInDefaultRealmWithObject:@[@[obj1]]];
-    [ArrayOfAllTypesObject createInDefaultRealmWithObject:@[@[obj0, obj2, obj3]]];
-    [ArrayOfAllTypesObject createInDefaultRealmWithObject:@[@[obj4]]];
+    [ArrayOfAllTypesObject createInDefaultRealmWithValue:@[@[obj0, obj1]]];
+    [ArrayOfAllTypesObject createInDefaultRealmWithValue:@[@[obj1]]];
+    [ArrayOfAllTypesObject createInDefaultRealmWithValue:@[@[obj0, obj2, obj3]]];
+    [ArrayOfAllTypesObject createInDefaultRealmWithValue:@[@[obj4]]];
 
     [realm commitWriteTransaction];
 
@@ -1361,8 +1361,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
-    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [PersonObject createInRealm:realm withValue:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withValue:@[@"Ari", @33]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(2U, [[PersonObject objectsWhere:@"name == 'Ari' or age < 30"] count]);
@@ -1373,8 +1373,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
-    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [PersonObject createInRealm:realm withValue:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withValue:@[@"Ari", @33]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name == 'Ari' and age > 30"] count]);
@@ -1401,8 +1401,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], [NSDate dateWithTimeIntervalSince1970:1], @YES, @1LL, @1, so]];
+    StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], [NSDate dateWithTimeIntervalSince1970:1], @YES, @1LL, @1, so]];
     [realm commitWriteTransaction];
 
     // Tests for each type always follow: none, some, more
@@ -1535,8 +1535,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    ArrayPropertyObject *arr = [ArrayPropertyObject createInRealm:realm withObject:@[@"name", @[], @[]]];
-    [arr.array addObject:[StringObject createInRealm:realm withObject:@[@"value"]]];
+    ArrayPropertyObject *arr = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[], @[]]];
+    [arr.array addObject:[StringObject createInRealm:realm withValue:@[@"value"]]];
     [realm commitWriteTransaction];
 
 
@@ -1551,8 +1551,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
-    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [PersonObject createInRealm:realm withValue:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withValue:@[@"Ari", @33]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name == 'Ari'"] count]);
@@ -1565,7 +1565,7 @@
 
     [realm beginWriteTransaction];
     [CompanyObject createInRealm:realm
-                      withObject:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
+                      withValue:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
                                                       @{@"name": @"Joe",  @"age": @40, @"hired": @YES},
                                                       @{@"name": @"Jill",  @"age": @50, @"hired": @YES}]]];
     [realm commitWriteTransaction];
@@ -1584,9 +1584,9 @@
 
     [realm beginWriteTransaction];
     [CompanyObject createInRealm:realm
-                      withObject:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
+                      withValue:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
                                                       @{@"name": @"Jill",  @"age": @50, @"hired": @YES}]]];
-    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     [realm commitWriteTransaction];
 
     RLMResults *subarray = nil;
@@ -1599,7 +1599,7 @@
     [realm beginWriteTransaction];
     @autoreleasepool {
         __attribute((objc_precise_lifetime)) CompanyObject *co = [CompanyObject allObjects][0];
-        [co.employees addObject:[EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}]];
+        [co.employees addObject:[EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}]];
     }
     [realm commitWriteTransaction];
 
@@ -1612,9 +1612,9 @@
 
     [realm beginWriteTransaction];
     [CompanyObject createInRealm:realm
-                      withObject:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
+                      withValue:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
                                                       @{@"name": @"Jill",  @"age": @40, @"hired": @YES}]]];
-    EmployeeObject *eo = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     [realm commitWriteTransaction];
 
     CompanyObject *co = CompanyObject.allObjects.firstObject;

@@ -86,7 +86,7 @@
     XCTAssertEqual([DogObject allObjectsInRealm:realm].count, 1U);
 
     [realm beginWriteTransaction];
-    OwnerObject *fiel = [OwnerObject createInRealm:realm withObject:@[@"Fiel", [NSNull null]]];
+    OwnerObject *fiel = [OwnerObject createInRealm:realm withValue:@[@"Fiel", [NSNull null]]];
     fiel.dog = [DogObject allObjectsInRealm:realm].firstObject;
     [realm commitWriteTransaction];
 
@@ -130,9 +130,9 @@
     [realm beginWriteTransaction];
     XCTAssertThrows([realm addObject:owner], @"dogName not set on linked object");
 
-    StringObject *to = [StringObject createInRealm:realm withObject:@[@"testObject"]];
+    StringObject *to = [StringObject createInRealm:realm withValue:@[@"testObject"]];
     NSArray *args = @[@"Tim", to];
-    XCTAssertThrows([OwnerObject createInRealm:realm withObject:args], @"Inserting wrong object type should throw");
+    XCTAssertThrows([OwnerObject createInRealm:realm withValue:args], @"Inserting wrong object type should throw");
     [realm commitWriteTransaction];
 }
 
@@ -155,8 +155,8 @@
 - (void)testBidirectionalRelationship {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    CircleObject *obj0 = [[CircleObject alloc] initWithObject:@[@"a", NSNull.null]];
-    CircleObject *obj1 = [[CircleObject alloc] initWithObject:@[@"b", obj0]];
+    CircleObject *obj0 = [[CircleObject alloc] initWithValue:@[@"a", NSNull.null]];
+    CircleObject *obj1 = [[CircleObject alloc] initWithValue:@[@"b", obj0]];
     obj0.next = obj1;
 
     [realm beginWriteTransaction];
@@ -172,8 +172,8 @@
 - (void)testAddingCircularReferenceDoesNotLeakSourceObjects {
     CircleObject __weak *weakObj0, __weak *weakObj1;
     @autoreleasepool {
-        CircleObject *obj0 = [[CircleObject alloc] initWithObject:@[@"a", NSNull.null]];
-        CircleObject *obj1 = [[CircleObject alloc] initWithObject:@[@"b", obj0]];
+        CircleObject *obj0 = [[CircleObject alloc] initWithValue:@[@"a", NSNull.null]];
+        CircleObject *obj1 = [[CircleObject alloc] initWithValue:@[@"b", obj0]];
         obj0.next = obj1;
 
         weakObj0 = obj0;

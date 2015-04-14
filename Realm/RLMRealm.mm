@@ -836,7 +836,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), [RLMSchema.sharedSchema copy], [realm migrationBlock:key]);
 }
 
-- (RLMObject *)createObject:(NSString *)className withObject:(id)object {
+- (RLMObject *)createObject:(NSString *)className withValue:(id)object {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, object, RLMCreationOptionsNone);
 }
 

@@ -76,7 +76,7 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
 
                     When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
  */
--(RLMObject *)createObject:(NSString *)className withObject:(id)object;
+-(RLMObject *)createObject:(NSString *)className withValue:(id)object;
 
 /**
  Delete an object from a Realm during a migration. This can be called within `enumerateObjects:block:`.

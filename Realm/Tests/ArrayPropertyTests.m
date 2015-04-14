@@ -30,14 +30,14 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[], @[]]];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"arrayObject", @[], @[]]];
     XCTAssertNotNil(array.array, @"Should be able to get an empty array");
     XCTAssertEqual(array.array.count, 0U, @"Should start with no array elements");
 
     StringObject *obj = [[StringObject alloc] init];
     obj.stringCol = @"a";
     [array.array addObject:obj];
-    [array.array addObject:[StringObject createInRealm:realm withObject:@[@"b"]]];
+    [array.array addObject:[StringObject createInRealm:realm withValue:@[@"b"]]];
     [array.array addObject:obj];
     [realm commitWriteTransaction];
 
@@ -59,7 +59,7 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[], @[]]];
+    ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withValue:@[@"arrayObject", @[], @[]]];
     XCTAssertNotNil(arObj.array, @"Should be able to get an empty array");
     XCTAssertEqual(arObj.array.count, 0U, @"Should start with no array elements");
 
@@ -67,7 +67,7 @@
     obj.stringCol = @"a";
     RLMArray *array = arObj.array;
     [array addObject:obj];
-    [array addObject:[StringObject createInRealm:realm withObject:@[@"b"]]];
+    [array addObject:[StringObject createInRealm:realm withValue:@[@"b"]]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(array.count, 2U, @"Should have two elements in array");
@@ -78,7 +78,7 @@
 }
 
 - (void)testDeleteStandaloneObjectWithArrayProperty {
-    ArrayPropertyObject *arObj = [[ArrayPropertyObject alloc] initWithObject:@[@"arrayObject", @[@[@"a"]], @[]]];
+    ArrayPropertyObject *arObj = [[ArrayPropertyObject alloc] initWithValue:@[@"arrayObject", @[@[@"a"]], @[]]];
     RLMArray *stringArray = arObj.array;
     XCTAssertFalse(stringArray.isInvalidated, @"stringArray should be valid after creation.");
     arObj = nil;
@@ -89,7 +89,7 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[@[@"a"]], @[]]];
+    ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withValue:@[@"arrayObject", @[@[@"a"]], @[]]];
     RLMArray *stringArray = arObj.array;
     XCTAssertFalse(stringArray.isInvalidated, @"stringArray should be valid after creation.");
     [realm deleteObject:arObj];
@@ -101,7 +101,7 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[@[@"a"]], @[]]];
+    ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withValue:@[@"arrayObject", @[@[@"a"]], @[]]];
     RLMArray *stringArray = arObj.array;
     StringObject *firstObject = stringArray.firstObject;
     [realm deleteObjects:[StringObject allObjectsInRealm:realm]];
@@ -115,8 +115,8 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[], @[]]];
-    StringObject *child1 = [StringObject createInRealm:realm withObject:@[@"a"]];
+    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"arrayObject", @[], @[]]];
+    StringObject *child1 = [StringObject createInRealm:realm withValue:@[@"a"]];
     StringObject *child2 = [[StringObject alloc] init];
     child2.stringCol = @"b";
     [obj.array addObjects:@[child2, child1]];
@@ -131,8 +131,8 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[], @[]]];
-    StringObject *child1 = [StringObject createInRealm:realm withObject:@[@"a"]];
+    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"arrayObject", @[], @[]]];
+    StringObject *child1 = [StringObject createInRealm:realm withValue:@[@"a"]];
     StringObject *child2 = [[StringObject alloc] init];
     child2.stringCol = @"b";
     [obj.array addObject:child2];
@@ -204,7 +204,7 @@
     XCTAssertEqual([intArray.intArray indexOfObject:intObj], 0U, @"Should be first element");
 
     // test standalone with literals
-    __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithObject:@[@"n", @[], @[[[IntObject alloc] initWithObject:@[@1]]]]];
+    __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithValue:@[@"n", @[], @[[[IntObject alloc] initWithValue:@[@1]]]]];
 }
 
 - (void)testReplaceObjectAtIndexInStandaloneArray {
@@ -317,9 +317,9 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
-    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
-    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
 
     // create company
     CompanyObject *company = [[CompanyObject alloc] init];
@@ -342,7 +342,7 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:po2]);
 
     // non realm employee
-    EmployeeObject *notInRealm = [[EmployeeObject alloc] initWithObject:@[@"NoName", @1, @NO]];
+    EmployeeObject *notInRealm = [[EmployeeObject alloc] initWithValue:@[@"NoName", @1, @NO]];
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:notInRealm]);
 
     // invalid object
@@ -366,7 +366,7 @@
 
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
-        EmployeeObject *eo = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+        EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
         [company.employees addObject:eo];
     }
     [realm commitWriteTransaction];
@@ -407,7 +407,7 @@
             // doesn't work
             if (first) {
                 [realm beginWriteTransaction];
-                EmployeeObject *eo = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+                EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
                 [company.employees addObject:eo];
                 [realm commitWriteTransaction];
                 first = false;
@@ -436,7 +436,7 @@
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(i)];
-        EmployeeObject *eo = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
+        EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
         [company.employees addObject:eo];
     }
     [realm commitWriteTransaction];
@@ -450,7 +450,7 @@
     ages = [NSMutableArray array];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(i)];
-        EmployeeObject *eo = [[EmployeeObject alloc] initWithObject:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
+        EmployeeObject *eo = [[EmployeeObject alloc] initWithValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
         [company.employees addObject:eo];
     }
 
@@ -480,7 +480,7 @@
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(20)];
-        EmployeeObject *eo = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
+        EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
         [company.employees addObject:eo];
     }
 
@@ -494,7 +494,7 @@
     ages = [NSMutableArray array];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(20)];
-        EmployeeObject *eo = [[EmployeeObject alloc] initWithObject:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
+        EmployeeObject *eo = [[EmployeeObject alloc] initWithValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
         [company.employees addObject:eo];
     }
 
@@ -541,12 +541,12 @@
 - (void)testSortByMultipleColumns {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    DogObject *a1 = [DogObject createInDefaultRealmWithObject:@[@"a", @1]];
-    DogObject *a2 = [DogObject createInDefaultRealmWithObject:@[@"a", @2]];
-    DogObject *b1 = [DogObject createInDefaultRealmWithObject:@[@"b", @1]];
-    DogObject *b2 = [DogObject createInDefaultRealmWithObject:@[@"b", @2]];
+    DogObject *a1 = [DogObject createInDefaultRealmWithValue:@[@"a", @1]];
+    DogObject *a2 = [DogObject createInDefaultRealmWithValue:@[@"a", @2]];
+    DogObject *b1 = [DogObject createInDefaultRealmWithValue:@[@"b", @1]];
+    DogObject *b2 = [DogObject createInDefaultRealmWithValue:@[@"b", @2]];
 
-    DogArrayObject *array = [DogArrayObject createInDefaultRealmWithObject:@[@[a1, a2, b1, b2]]];
+    DogArrayObject *array = [DogArrayObject createInDefaultRealmWithValue:@[@[a1, a2, b1, b2]]];
     [realm commitWriteTransaction];
 
     bool (^checkOrder)(NSArray *, NSArray *, NSArray *) = ^bool(NSArray *properties, NSArray *ascending, NSArray *dogs) {
@@ -575,9 +575,9 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withObject:@[@"Joe", @40, @YES]];
-    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withObject:@[@"John", @30, @NO]];
-    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withObject:@[@"Jill", @25, @YES]];
+    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@[@"Joe", @40, @YES]];
+    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withValue:@[@"John", @30, @NO]];
+    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@[@"Jill", @25, @YES]];
 
     CompanyObject *company = [[CompanyObject alloc] init];
     company.name = @"name";
@@ -634,7 +634,7 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    CompanyObject *company = [CompanyObject createInDefaultRealmWithObject:@[@"company", @[]]];
+    CompanyObject *company = [CompanyObject createInDefaultRealmWithValue:@[@"company", @[]]];
     for (NSInteger i = 0; i < 1012; ++i) {
         EmployeeObject *person = [[EmployeeObject alloc] init];
         person.name = @"Mary";

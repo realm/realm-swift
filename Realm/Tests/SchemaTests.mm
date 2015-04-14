@@ -156,9 +156,9 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         [self deleteFiles];
         RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
         [realm beginWriteTransaction];
-        [realm createObject:@"SchemaTestClassBase" withObject:@{@"baseCol": @[@0]}];
-        [realm createObject:@"SchemaTestClassFirstChild" withObject:@{@"baseCol": @[@0], @"firstChildCol": @[@0]}];
-        [realm createObject:@"SchemaTestClassSecondChild" withObject:@{@"baseCol": @[@0], @"secondChildCol": @[@0]}];
+        [realm createObject:@"SchemaTestClassBase" withValue:@{@"baseCol": @[@0]}];
+        [realm createObject:@"SchemaTestClassFirstChild" withValue:@{@"baseCol": @[@0], @"firstChildCol": @[@0]}];
+        [realm createObject:@"SchemaTestClassSecondChild" withValue:@{@"baseCol": @[@0], @"secondChildCol": @[@0]}];
         [realm commitWriteTransaction];
     } while (std::next_permutation(testClasses, std::end(testClasses), pred));
 }

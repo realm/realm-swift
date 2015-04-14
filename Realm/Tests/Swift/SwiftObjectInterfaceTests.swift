@@ -105,7 +105,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
     func testMergedDefaultValuesSwiftObject() {
         let realm = self.realmWithTestPath()
         realm.beginWriteTransaction()
-        SwiftDefaultObject.createInRealm(realm, withObject: NSDictionary())
+        SwiftDefaultObject.createInRealm(realm, withValue: NSDictionary())
         realm.commitWriteTransaction()
 
         let object = SwiftDefaultObject.allObjectsInRealm(realm).firstObject() as! SwiftDefaultObject
@@ -120,9 +120,9 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
 
         let realm = RLMRealm.defaultRealm()
         realm.beginWriteTransaction()
-        SwiftStringObject.createInDefaultRealmWithObject(["string"])
+        SwiftStringObject.createInDefaultRealmWithValue(["string"])
 
-        let obj = SwiftStringObjectSubclass.createInDefaultRealmWithObject(["string", "string2"])
+        let obj = SwiftStringObjectSubclass.createInDefaultRealmWithValue(["string", "string2"])
         realm.commitWriteTransaction()
 
         // ensure creation in proper table
@@ -131,7 +131,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
 
         realm.transactionWithBlock { () -> Void in
             // create self referencing subclass
-            var sub = SwiftSelfRefrencingSubclass.createInDefaultRealmWithObject(["string", []])
+            var sub = SwiftSelfRefrencingSubclass.createInDefaultRealmWithValue(["string", []])
             var sub2 = SwiftSelfRefrencingSubclass()
             sub.objects.addObject(sub2)
         }
@@ -162,7 +162,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
     func testCustomAccessors() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        let ca = CustomAccessorsObject.createInRealm(realm, withObject: ["name", 2])
+        let ca = CustomAccessorsObject.createInRealm(realm, withValue: ["name", 2])
         XCTAssertEqual(ca.name!, "name", "name property should be name.")
         ca.age = 99
         XCTAssertEqual(ca.age, Int32(99), "age property should be 99")
@@ -187,15 +187,15 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
     func testCreateOrUpdate() {
         let realm = RLMRealm.defaultRealm()
         realm.beginWriteTransaction()
-        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["string", 1])
+        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithValue(["string", 1])
         let objects = SwiftPrimaryStringObject.allObjects();
         XCTAssertEqual(objects.count, UInt(1), "Should have 1 object");
         XCTAssertEqual((objects[0] as! SwiftPrimaryStringObject).intCol, 1, "Value should be 1");
 
-        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["stringCol": "string2", "intCol": 2])
+        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithValue(["stringCol": "string2", "intCol": 2])
         XCTAssertEqual(objects.count, UInt(2), "Should have 2 objects")
 
-        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["string", 3])
+        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithValue(["string", 3])
         XCTAssertEqual(objects.count, UInt(2), "Should have 2 objects")
         XCTAssertEqual((objects[0] as! SwiftPrimaryStringObject).intCol, 3, "Value should be 3");
 
