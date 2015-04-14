@@ -24,5 +24,5 @@ Pod::Spec.new do |s|
   s.source_files = 'RealmSwift/*.swift'
 
   s.ios.deployment_target   = '8.0'
-  s.osx.deployment_target   = '10.8'
+  s.osx.deployment_target   = '10.9'
 end
