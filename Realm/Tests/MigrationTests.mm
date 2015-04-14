@@ -712,37 +712,35 @@
     [objectSchema.properties[0] setIndexed:YES];
     index.objectSchema = @[objectSchema];
 
-    // create realm file
-    @autoreleasepool { [self realmWithTestPathAndSchema:noIndex]; }
+    auto columnIsIndexed = ^(RLMRealm *realm) {
+        RLMObjectSchema *objectSchema = realm.schema[@"StringObject"];
+        return objectSchema.table->has_search_index([objectSchema.properties[0] column]);
+    };
 
-    // should require a migration to open with indexed schema
-    XCTAssertThrows([self realmWithTestPathAndSchema:index]);
-
-    __block bool migrationApplied = false;
-    [RLMRealm setSchemaVersion:1
-                forRealmAtPath:RLMTestRealmPath()
-            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
-                migrationApplied = true;
-            }];
-
+    // create initial file with no index
     @autoreleasepool {
-        XCTAssertNoThrow([self realmWithTestPathAndSchema:index]);
-        XCTAssertTrue(migrationApplied);
+        XCTAssertFalse(columnIsIndexed([self realmWithTestPathAndSchema:noIndex]));
     }
 
-    // should now require another migration to open with unindexed schema
-    XCTAssertThrows([self realmWithTestPathAndSchema:noIndex]);
-
-    migrationApplied = false;
-    [RLMRealm setSchemaVersion:2
-                forRealmAtPath:RLMTestRealmPath()
-            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
-                migrationApplied = true;
-            }];
-
+    // should add index when opening with indexed schema
     @autoreleasepool {
-        XCTAssertNoThrow([self realmWithTestPathAndSchema:noIndex]);
-        XCTAssertTrue(migrationApplied);
+        XCTAssertTrue(columnIsIndexed([self realmWithTestPathAndSchema:index]));
+    }
+
+    // should remove index when opening with non-indexed schema
+    @autoreleasepool {
+        XCTAssertFalse(columnIsIndexed([self realmWithTestPathAndSchema:noIndex]));
+    }
+
+    // create initial file with index
+    [self deleteFiles];
+    @autoreleasepool {
+        XCTAssertTrue(columnIsIndexed([self realmWithTestPathAndSchema:index]));
+    }
+
+    // should be able to open readonly with mismatched index schema
+    @autoreleasepool {
+        XCTAssertTrue(columnIsIndexed([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]));
     }
 }
 
