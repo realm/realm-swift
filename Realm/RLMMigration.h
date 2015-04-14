@@ -78,6 +78,8 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
  */
 -(RLMObject *)createObject:(NSString *)className withValue:(id)object;
 
+-(RLMObject *)createObject:(NSString *)className withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createObject:WithValue:");
+
 /**
  Delete an object from a Realm during a migration. This can be called within `enumerateObjects:block:`.
 

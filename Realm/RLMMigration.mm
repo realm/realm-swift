@@ -155,6 +155,10 @@
     return [_realm createObject:className withValue:object];
 }
 
+- (RLMObject *)createObject:(NSString *)className withObject:(id)object {
+    return [self createObject:className withValue:object];
+}
+
 - (void)deleteObject:(RLMObject *)object {
     [_realm deleteObject:object];
 }

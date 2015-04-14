@@ -43,16 +43,32 @@
     return [super initWithValue:object schema:RLMSchema.sharedSchema];
 }
 
+- (instancetype)initWithObject:(id)object {
+    return [self initWithValue:object];
+}
+
 + (instancetype)createInDefaultRealmWithValue:(id)object {
     return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMCreationOptionsAllowCopy);
+}
+
++ (instancetype)createInDefaultRealmWithObject:(id)object {
+    return [self createInDefaultRealmWithValue:object];
 }
 
 + (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMCreationOptionsAllowCopy);
 }
 
++ (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object {
+    return [self createInRealm:realm withValue:object];
+}
+
 + (instancetype)createOrUpdateInDefaultRealmWithValue:(id)object {
     return [self createOrUpdateInRealm:[RLMRealm defaultRealm] withValue:object];
+}
+
++ (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object {
+    return [self createOrUpdateInDefaultRealmWithValue:object];
 }
 
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value {
@@ -63,6 +79,10 @@
         @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
     }
     return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMCreationOptionsUpdateOrCreate | RLMCreationOptionsAllowCopy);
+}
+
++ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object {
+    return [self createOrUpdateInRealm:realm withValue:object];
 }
 
 - (id)objectForKeyedSubscript:(NSString *)key {

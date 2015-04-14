@@ -89,6 +89,8 @@
  */
 - (instancetype)initWithValue:(id)object;
 
+- (instancetype)initWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use initWithValue:");
+
 
 /**
  Helper to return the class name for an RLMObject subclass.
@@ -117,6 +119,8 @@
  */
 + (instancetype)createInDefaultRealmWithValue:(id)object;
 
++ (instancetype)createInDefaultRealmWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createInDefaultRealmWithValue:");
+
 /**
  Create an RLMObject in a Realm with a given object.
  
@@ -137,6 +141,8 @@
  @see   defaultPropertyValues
  */
 + (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)object;
+
++ (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createInRealm:withValue:");
 
 /**
  Create or update an RLMObject in the default Realm with a given object.
@@ -161,6 +167,8 @@
  */
 + (instancetype)createOrUpdateInDefaultRealmWithValue:(id)object;
 
++ (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createOrUpdateInDefaultRealmWithValue:");
+
 /**
  Create or update an RLMObject with a given object.
 
@@ -184,6 +192,8 @@
  @see   defaultPropertyValues, primaryKey
  */
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)object;
+
++ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createOrUpdateInRealm:withValue:");
 
 /**
  The Realm in which this object is persisted. Returns nil for standalone objects.
