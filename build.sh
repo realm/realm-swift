@@ -521,10 +521,12 @@ case "$COMMAND" in
     "cocoapods-setup")
         sh build.sh download-core
 
-        # CocoaPods seems to not like symlinks
-        mv core tmp
-        mv $(readlink tmp) core
-        rm tmp
+        # CocoaPods doesn't support symlinks
+        if [ -L core ]; then
+            mv core core-tmp
+            mv $(readlink core-tmp) core
+            rm core-tmp
+        fi
 
         # CocoaPods doesn't support multiple header_mappings_dir, so combine
         # both sets of headers into a single directory
