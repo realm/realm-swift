@@ -94,8 +94,7 @@ static void RLMRealmUpdateIndexes(RLMRealm *realm) {
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         realm::Table *table = objectSchema.table;
         for (RLMProperty *prop in objectSchema.properties) {
-            // FIXME: support other types
-            if (prop.type == RLMPropertyTypeString && prop.indexed != table->has_search_index(prop.column)) {
+            if (prop.indexed != table->has_search_index(prop.column)) {
                 if (!realm.inWriteTransaction) {
                     [realm beginWriteTransaction];
                     commitWriteTransaction = true;
