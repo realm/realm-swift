@@ -144,6 +144,10 @@
     return nil;
 }
 
++ (NSArray *)cascadeProperties {
+    return nil;
+}
+
 + (NSString *)primaryKey {
     return nil;
 }

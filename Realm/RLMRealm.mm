@@ -675,6 +675,17 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)deleteObject:(RLMObject *)object {
+    NSArray *cascadeProperties = [[[object objectSchema] objectClass] cascadeProperties];
+    for (NSString *propertyName in cascadeProperties) {
+        id value = [object valueForKey:propertyName];
+        if (value) {
+            if ([value isKindOfClass:[RLMObject class]]) {
+                [self deleteObject:value];
+            } else if ([value isKindOfClass:[RLMArray class]]) {
+                [self deleteObjects:value];
+            }
+        }
+    }
     RLMDeleteObjectFromRealm(object, self);
 }
 
@@ -683,7 +694,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         // for arrays and standalone delete each individually
         for (id obj in nsArray) {
             if ([obj isKindOfClass:RLMObjectBase.class]) {
-                RLMDeleteObjectFromRealm(obj, self);
+                [self deleteObject:obj];
             }
         }
     }
