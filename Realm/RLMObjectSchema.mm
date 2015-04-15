@@ -20,7 +20,7 @@
 
 #import "RLMArray.h"
 #import "RLMListBase.h"
-#import "RLMObject_Private.h"
+#import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
@@ -28,7 +28,10 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+#import <libkern/OSAtomic.h>
 #import <realm/group.hpp>
+#import <realm/link_view.hpp> // required by row.hpp
+#import <realm/row.hpp>
 
 // private properties
 @interface RLMObjectSchema ()
@@ -39,6 +42,9 @@
 @implementation RLMObjectSchema {
     // table accessor optimization
     realm::TableRef _table;
+
+    @public
+    OSSpinLock _accessorLock;
 }
 
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
@@ -46,6 +52,7 @@
     self.className = objectClassName;
     self.properties = properties;
     self.objectClass = objectClass;
+    _accessorLock = OS_SPINLOCK_INIT;
     return self;
 }
 
@@ -303,6 +310,18 @@
 }
 
 @end
+
+void RLMSetRow(RLMObjectBase *object, RLMObjectSchema *objectSchema, NSUInteger index) {
+    OSSpinLockLock(&objectSchema->_accessorLock);
+    object->_row = (*objectSchema.table)[index];
+    OSSpinLockUnlock(&objectSchema->_accessorLock);
+}
+
+void RLMReleaseRow(RLMObjectBase *object, RLMObjectSchema *objectSchema) {
+    OSSpinLockLock(&objectSchema->_accessorLock);
+    object->_row.detach();
+    OSSpinLockUnlock(&objectSchema->_accessorLock);
+}
 
 realm::TableRef RLMTableForObjectClass(RLMRealm *realm,
                                          NSString *className,

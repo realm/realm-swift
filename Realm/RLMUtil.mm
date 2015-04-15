@@ -265,10 +265,9 @@ NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchem
     }
 
     RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-    realm::Table *table = objectSchema.table;
     for (size_t i = 0; i < count; i++) {
         size_t rowIndex = indexGenerator(i);
-        accessor->_row = (*table)[rowIndex];
+        RLMSetRow(accessor, objectSchema, rowIndex);
         RLMInitializeSwiftListAccessor(accessor);
         [results addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
@@ -281,10 +280,9 @@ void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMOb
         return;
     }
     RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-    realm::Table *table = objectSchema.table;
     for (size_t i = 0; i < count; i++) {
         size_t rowIndex = indexGenerator(i);
-        accessor->_row = (*table)[rowIndex];
+        RLMSetRow(accessor, objectSchema, rowIndex);
         RLMInitializeSwiftListAccessor(accessor);
         [accessor setValue:value forKey:key];
     }

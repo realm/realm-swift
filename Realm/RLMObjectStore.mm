@@ -398,7 +398,7 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
     // get or create row
     bool created;
     auto primaryGetter = [=](RLMProperty *p) { return [object valueForKey:p.getterName]; };
-    object->_row = (*schema.table)[RLMCreateOrGetRowForObject(schema, primaryGetter, options, created)];
+    RLMSetRow(object, schema, RLMCreateOrGetRowForObject(schema, primaryGetter, options, created));
 
     // populate all properties
     for (RLMProperty *prop in schema.properties) {
@@ -466,7 +466,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         // get or create our accessor
         bool created;
         auto primaryGetter = [=](RLMProperty *p) { return array[p.column]; };
-        object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
+        RLMSetRow(object, objectSchema, RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created));
 
         // populate
         NSArray *props = objectSchema.properties;
@@ -483,7 +483,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         // get or create our accessor
         bool created;
         auto primaryGetter = [=](RLMProperty *p) { return [value valueForKey:p.name]; };
-        object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
+        RLMSetRow(object, objectSchema, RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created));
 
         // assume dictionary or object with kvc properties
         NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema, !created);
@@ -599,7 +599,7 @@ RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm
                                        __unsafe_unretained RLMObjectSchema *const objectSchema,
                                        NSUInteger index) {
     RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-    accessor->_row = (*objectSchema.table)[index];
+    RLMSetRow(accessor, objectSchema, index);
     RLMInitializeSwiftListAccessor(accessor);
     return accessor;
 }

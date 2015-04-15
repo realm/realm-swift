@@ -181,6 +181,12 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     }
 }
 
+- (void)dealloc {
+    if (_row) {
+        RLMReleaseRow(self, _objectSchema);
+    }
+}
+
 @end
 
 
