@@ -22,6 +22,8 @@ namespace realm {
     class Table;
     template<typename T> class BasicTableRef;
     typedef BasicTableRef<Table> TableRef;
+    template<typename T> class BasicRow;
+    typedef BasicRow<Table> Row;
 }
 
 // RLMObjectSchema private
@@ -33,6 +35,10 @@ namespace realm {
 - (instancetype)shallowCopy;
 
 @end
+
+realm::Row RLMGetRow(RLMObjectSchema *objectSchema, NSUInteger index);
+
+void RLMReleaseRow(RLMObjectSchema *objectSchema, realm::Row row);
 
 // get the table used to store object of objectClass
 realm::TableRef RLMTableForObjectClass(RLMRealm *realm, NSString *className, bool &created);
