@@ -254,4 +254,20 @@ RLM_ARRAY_TYPE(CircleObject);
 @property (readonly) int readOnlyPropertyMadeReadWriteInClassExtension;
 @end
 
+#pragma mark - CascadeObject
+
+@class CascadeIndividualObject;
+@class CascadeArrayObject;
+RLM_ARRAY_TYPE(CascadeArrayObject);
+
+@interface CascadeTestObject : RLMObject
+@property CascadeIndividualObject *individualObject;
+@property RLMArray<CascadeArrayObject> *array;
+@end
+
+@interface CascadeIndividualObject : RLMObject
+@end
+
+@interface CascadeArrayObject : RLMObject
+@end
 
