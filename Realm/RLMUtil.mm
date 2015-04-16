@@ -101,6 +101,11 @@ static inline bool object_has_valid_type(__unsafe_unretained id const obj)
             [obj isKindOfClass:[NSData class]]);
 }
 
+BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
+    if (property.optional && (!obj || obj == [NSNull null])) {
+        return YES;
+    }
+
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
                                  __unsafe_unretained RLMProperty *const property) {
     switch (property.type) {

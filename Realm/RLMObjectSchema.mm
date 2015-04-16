@@ -188,6 +188,12 @@
         }
     }
 
+    if (NSArray *optionalProperties = [objectUtil getOptionalPropertyNames:swiftObjectInstance]) {
+        for (RLMProperty *property in propArray) {
+            property.optional = [optionalProperties containsObject:property.name];
+        }
+    }
+
     return propArray;
 }
 
@@ -209,7 +215,8 @@
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name
                                                          type:RLMPropertyType(table->get_column_type(col))
                                               objectClassName:nil
-                                                      indexed:table->has_search_index(col)];
+                                                      indexed:table->has_search_index(col)
+                                                     optional:table->is_nullable(col)];
         prop.column = col;
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             // set link type for objects and arrays

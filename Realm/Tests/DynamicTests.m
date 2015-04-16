@@ -83,7 +83,8 @@
     RLMProperty *prop = [[RLMProperty alloc] initWithName:@"a"
                                                      type:RLMPropertyTypeInt
                                           objectClassName:nil
-                                                  indexed:NO];
+                                                  indexed:NO
+                                                 optional:NO];
     RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"TrulyDynamicObject"
                                                                    objectClass:RLMObject.class properties:@[prop]];
     schema.objectSchema = @[objectSchema];

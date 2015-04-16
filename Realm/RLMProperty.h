@@ -54,6 +54,11 @@
 @property (nonatomic, readonly, copy) NSString *objectClassName;
 
 /**
+ Whether this property is optional.
+ */
+@property (nonatomic, readonly) BOOL optional;
+
+/**
  Returns YES if property objects are equal.
  */
 - (BOOL)isEqualToProperty:(RLMProperty *)property;
