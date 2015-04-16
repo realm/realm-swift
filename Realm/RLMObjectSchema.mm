@@ -276,6 +276,7 @@
         p.object_type = prop.objectClassName ? prop.objectClassName.UTF8String : "";
         p.is_indexed = prop.indexed;
         p.is_primary = (prop == _primaryKeyProperty);
+        p.is_nullable = prop.optional;
         objectSchema.properties.push_back(std::move(p));
     }
     return objectSchema;
@@ -291,7 +292,8 @@
         RLMProperty *property = [[RLMProperty alloc] initWithName:@(prop.name.c_str())
                                                              type:(RLMPropertyType)prop.type
                                                   objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
-                                                          indexed:prop.is_indexed];
+                                                          indexed:prop.is_indexed
+                                                         optional:prop.is_nullable];
         property.isPrimary = (prop.name == objectSchema.primary_key);
         [propArray addObject:property];
     }

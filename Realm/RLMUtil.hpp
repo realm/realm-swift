@@ -100,9 +100,9 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
     static_assert(sizeof(NSUInteger) >= sizeof(size_t),
                   "Need runtime overflow check for size_t to NSUInteger conversion");
-    return [[NSString alloc] initWithBytes:stringData.data()
-                                    length:stringData.size()
-                                  encoding:NSUTF8StringEncoding];
+    return stringData.is_null() ? nil : [[NSString alloc] initWithBytes:stringData.data()
+                                                                 length:stringData.size()
+                                                               encoding:NSUTF8StringEncoding];
 }
 
 static inline realm::StringData RLMStringDataWithNSString(__unsafe_unretained NSString *const string) {

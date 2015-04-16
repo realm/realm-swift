@@ -197,7 +197,7 @@ void ObjectStore::update_column_mapping(Group *group, ObjectSchema &target_schem
 }
 
 static inline bool property_has_changed(Property &p1, Property &p2) {
-    return p1.type != p2.type || p1.name != p2.name || p1.object_type != p2.object_type;
+    return p1.type != p2.type || p1.name != p2.name || p1.object_type != p2.object_type || p1.is_nullable != p2.is_nullable;
 }
 
 // set references to tables on targetSchema and create/update any missing or out-of-date tables
@@ -240,7 +240,7 @@ bool ObjectStore::create_tables(Group *group, ObjectStore::Schema &target_schema
                         break;
                     }
                     default:
-                        target_prop.table_column = table->add_column(DataType(target_prop.type), target_prop.name);
+                        target_prop.table_column = table->add_column(DataType(target_prop.type), target_prop.name, target_prop.is_nullable);
                         break;
                 }
                 changed = true;

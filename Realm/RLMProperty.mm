@@ -31,13 +31,15 @@
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
-                  indexed:(BOOL)indexed {
+                     indexed:(BOOL)indexed
+                    optional:(BOOL)optional {
     self = [super init];
     if (self) {
         _name = name;
         _type = type;
         _objectClassName = objectClassName;
         _indexed = indexed;
+        _optional = optional;
         [self setObjcCodeFromType];
         [self updateAccessors];
     }
@@ -121,6 +123,7 @@
             }
             else if (strcmp(code, "@\"NSString\"") == 0) {
                 _type = RLMPropertyTypeString;
+                _optional = YES;
             }
             else if (strcmp(code, "@\"NSDate\"") == 0) {
                 _type = RLMPropertyTypeDate;
@@ -303,6 +306,7 @@
     prop->_setterSel = _setterSel;
     prop->_isPrimary = _isPrimary;
     prop->_swiftListIvar = _swiftListIvar;
+    prop->_optional = _optional;
     
     return prop;
 }
@@ -311,6 +315,7 @@
     return _type == property->_type
         && _indexed == property->_indexed
         && _isPrimary == property->_isPrimary
+        && _optional == property->_optional
         && [_name isEqualToString:property->_name]
         && (_objectClassName == property->_objectClassName  || [_objectClassName isEqualToString:property->_objectClassName]);
 }

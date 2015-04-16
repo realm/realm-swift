@@ -42,6 +42,7 @@
 @property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, readwrite, assign) RLMPropertyType type;
 @property (nonatomic, readwrite) BOOL indexed;
+@property (nonatomic, readwrite) BOOL optional;
 @property (nonatomic, copy) NSString *objectClassName;
 
 // private properties
