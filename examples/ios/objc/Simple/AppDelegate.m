@@ -79,7 +79,10 @@ RLM_ARRAY_TYPE(Dog)
 
     [realm beginWriteTransaction];
     [realm addObject:person];
+    person.name = nil;
     [realm commitWriteTransaction];
+
+    NSLog(@"Person: %@", person);
 
     // Multi-threading
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
