@@ -23,6 +23,7 @@ class PropertyTests: TestCase {
     var primitiveProperty: Property!
     var linkProperty: Property!
     var primaryProperty: Property!
+    var optionalProperty: Property!
 
     override func setUp() {
         super.setUp()
@@ -31,6 +32,7 @@ class PropertyTests: TestCase {
             self.primitiveProperty = schema["SwiftObject"]!["intCol"]!
             self.linkProperty = schema["SwiftOptionalObject"]!["optObjectCol"]!
             self.primaryProperty = schema["SwiftPrimaryStringObject"]!["stringCol"]!
+            self.optionalProperty = schema["SwiftOptionalObject"]!["optStringCol"]!
         }
     }
 
@@ -50,6 +52,11 @@ class PropertyTests: TestCase {
         XCTAssertFalse(primitiveProperty.indexed)
         XCTAssertFalse(linkProperty.indexed)
         XCTAssertTrue(primaryProperty.indexed)
+    }
+
+    func testOptional() {
+        XCTAssertFalse(primitiveProperty.optional)
+        XCTAssertTrue(optionalProperty.optional)
     }
 
     func testObjectClassName() {
