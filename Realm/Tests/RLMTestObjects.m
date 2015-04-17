@@ -161,7 +161,13 @@
 @end
 
 @implementation CascadeIndividualObject : RLMObject
++ (NSString *)primaryKey {
+    return @"identifier";
+}
 @end
 
 @implementation CascadeArrayObject : RLMObject
++ (NSString *)primaryKey {
+    return @"identifier";
+}
 @end

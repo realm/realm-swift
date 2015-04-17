@@ -56,6 +56,56 @@
     [testRealm commitWriteTransaction];
 }
 
+- (void)testLastLinkDeletion {
+    RLMRealm *testRealm = [RLMRealm inMemoryRealmWithIdentifier:@"cascade-delete-test-identifier"];
+    [testRealm beginWriteTransaction];
+    
+    CascadeTestObject *testOb = [CascadeTestObject new];
+    testOb.individualObject = [CascadeIndividualObject new];
+    testOb.individualObject.identifier = [[NSUUID UUID] UUIDString];
+    NSInteger numberOfArrayObs = 3;
+    for (int i = 0; i < numberOfArrayObs; i++) {
+        CascadeArrayObject *ob = [CascadeArrayObject new];
+        ob.identifier = [[NSUUID UUID] UUIDString];
+        [testOb.array addObject:ob];
+    }
+    
+    CascadeTestObject *alternativeRetain = [CascadeTestObject new];
+    alternativeRetain.individualObject = testOb.individualObject;
+    alternativeRetain.array = testOb.array;
+
+    [testRealm addObject:testOb];
+    [testRealm addObject:alternativeRetain];
+    
+    NSInteger indi = [self numberOfObjectsForClass:[CascadeIndividualObject class] inRealm:testRealm];
+    XCTAssert(indi == 1, @"Must be only one object of 'CascadeIndividualObject' class");
+    NSInteger arr = [self numberOfObjectsForClass:[CascadeArrayObject class] inRealm:testRealm];
+    XCTAssert(arr == numberOfArrayObs, @"Not the correct number of array objects!");
+    NSInteger test = [self numberOfObjectsForClass:[CascadeTestObject class] inRealm:testRealm];
+    XCTAssert(test == 2, @"Must be two objects of 'CascadeTestObject' class");
+    
+    
+    [testRealm deleteObject:testOb];
+    
+    indi = [self numberOfObjectsForClass:[CascadeIndividualObject class] inRealm:testRealm];
+    XCTAssert(indi == 1, @"Must be only one object of 'CascadeIndividualObject' class");
+    arr = [self numberOfObjectsForClass:[CascadeArrayObject class] inRealm:testRealm];
+    XCTAssert(arr == numberOfArrayObs, @"Not the correct number of array objects!");
+    test = [self numberOfObjectsForClass:[CascadeTestObject class] inRealm:testRealm];
+    XCTAssert(test == 1, @"Must be one object of 'CascadeTestObject' class");
+    
+    [testRealm deleteObject:alternativeRetain];
+    
+    indi = [self numberOfObjectsForClass:[CascadeIndividualObject class] inRealm:testRealm];
+    XCTAssert(indi == 0, @"Must be only 0 objects of 'CascadeIndividualObject' class");
+    arr = [self numberOfObjectsForClass:[CascadeArrayObject class] inRealm:testRealm];
+    XCTAssert(arr == 0, @"Must be 0 objects of 'CascadeArrayObject' class");
+    test = [self numberOfObjectsForClass:[CascadeTestObject class] inRealm:testRealm];
+    XCTAssert(test == 0, @"Must be 0 objects of 'CascadeTestObject' class");
+    
+    [testRealm commitWriteTransaction];
+}
+
 - (NSInteger)numberOfObjectsForClass:(Class)cls inRealm:(RLMRealm *)realm {
     XCTAssert([cls isSubclassOfClass:[RLMObject class]], @"Must be realm object class");
     RLMResults *results = [cls allObjectsInRealm:realm];

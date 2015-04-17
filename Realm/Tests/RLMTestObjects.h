@@ -266,8 +266,10 @@ RLM_ARRAY_TYPE(CascadeArrayObject);
 @end
 
 @interface CascadeIndividualObject : RLMObject
+@property NSString *identifier;
 @end
 
 @interface CascadeArrayObject : RLMObject
+@property NSString *identifier;
 @end
 

@@ -675,14 +675,38 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)deleteObject:(RLMObject *)object {
-    NSArray *cascadeProperties = [[[object objectSchema] objectClass] cascadeProperties];
+    /*
+     Find other links
+     */
+    RLMObjectSchema *schema = [object objectSchema];
+    NSArray *cascadeProperties = [[schema objectClass] cascadeProperties];
     for (NSString *propertyName in cascadeProperties) {
         id value = [object valueForKey:propertyName];
-        if (value) {
-            if ([value isKindOfClass:[RLMObject class]]) {
+        if ([value isKindOfClass:[RLMObject class]]) {
+            // TODO: This only checks if other parents share this child.  It does not check other tables for references from other classes
+            // Count the number of other parent objects that still have a link to the cascade delete object.
+            NSUInteger links = RLMObjectBaseCountLinkingObjectsOfClass(value, [schema className], propertyName);
+            // TODO: For now, building w/ delete if last linked in mind.  Add options here to just kill
+            // If 1, then object about to be deleted is last link
+            if (links == 1) {
                 [self deleteObject:value];
-            } else if ([value isKindOfClass:[RLMArray class]]) {
-                [self deleteObjects:value];
+            }
+        } else if ([value isKindOfClass:[RLMArray class]]) {
+            // Can't delete values while enumerating RLMArray -- Collect values to remove and delete after enumeration
+            NSMutableArray *deletableValues = [NSMutableArray array];
+            for (RLMObject *ob in (RLMArray *)value) {
+                // TODO: This only checks if other parents share this child.  It does not check other tables for references from other classes
+                // Count the number of other parent objects that still have a link to the cascade delete object.
+                NSUInteger links = RLMObjectBaseCountLinkingObjectsOfClass(ob, [schema className], propertyName);
+                // TODO: For now, building w/ delete if last linked in mind.  Add options here to just kill
+                // If 1, then object about to be deleted is last link
+                if (links == 1) {
+                    [deletableValues addObject:ob];
+                }
+            }
+            
+            for (RLMObject *ob in deletableValues) {
+                [self deleteObject:ob];
             }
         }
     }
