@@ -95,7 +95,9 @@ static void RLMCreateColumn(RLMRealm *realm, realm::Table &table, RLMProperty *p
         case RLMPropertyTypeObject:
         case RLMPropertyTypeArray: {
             realm::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
-            prop.column = table.add_column_link(realm::DataType(prop.type), prop.name.UTF8String, *linkTable);
+            // TODO: -
+            realm::LinkType linktype = prop.cascade ? link_Strong : link_Weak;
+            prop.column = table.add_column_link(realm::DataType(prop.type), prop.name.UTF8String, *linkTable, linktype);
             break;
         }
         default: {
