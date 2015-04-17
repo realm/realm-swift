@@ -30,9 +30,12 @@
     
     CascadeTestObject *testOb = [CascadeTestObject new];
     testOb.individualObject = [CascadeIndividualObject new];
+    testOb.individualObject.identifier = [[NSUUID UUID] UUIDString];
     NSInteger numberOfArrayObs = 3;
     for (int i = 0; i < numberOfArrayObs; i++) {
-        [testOb.array addObject:[CascadeArrayObject new]];
+        CascadeArrayObject *ob = [CascadeArrayObject new];
+        ob.identifier = [[NSUUID UUID] UUIDString];
+        [testOb.array addObject:ob];
     }
     
     [testRealm addObject:testOb];
