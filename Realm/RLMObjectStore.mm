@@ -87,6 +87,33 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
     objectSchema.properties = properties;
 }
 
+// ensure all search indexes for all tables are up-to-date
+// does not need to be called from a write transaction
+static void RLMRealmUpdateIndexes(RLMRealm *realm) {
+    bool commitWriteTransaction = false;
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        realm::Table *table = objectSchema.table;
+        for (RLMProperty *prop in objectSchema.properties) {
+            if (prop.indexed != table->has_search_index(prop.column)) {
+                if (!realm.inWriteTransaction) {
+                    [realm beginWriteTransaction];
+                    commitWriteTransaction = true;
+                }
+                if (prop.indexed) {
+                    table->add_search_index(prop.column);
+                }
+                else {
+                    table->remove_search_index(prop.column);
+                }
+            }
+        }
+    }
+
+    if (commitWriteTransaction) {
+        [realm commitWriteTransaction];
+    }
+}
+
 // create a column for a property in a table
 // NOTE: must be called from within write transaction
 static void RLMCreateColumn(RLMRealm *realm, realm::Table &table, RLMProperty *prop) {
@@ -98,18 +125,9 @@ static void RLMCreateColumn(RLMRealm *realm, realm::Table &table, RLMProperty *p
             prop.column = table.add_column_link(realm::DataType(prop.type), prop.name.UTF8String, *linkTable);
             break;
         }
-        default: {
+        default:
             prop.column = table.add_column(realm::DataType(prop.type), prop.name.UTF8String);
-            if (prop.indexed) {
-                // FIXME - support other types
-                if (prop.type != RLMPropertyTypeString) {
-                    NSLog(@"RLMPropertyAttributeIndexed only supported for 'NSString' properties");
-                }
-                else {
-                    table.add_search_index(prop.column);
-                }
-            }
-        }
+            break;
     }
 }
 
@@ -214,8 +232,10 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
 
         // add missing columns
         for (RLMProperty *prop in objectSchema.properties) {
+            RLMProperty *tableProp = tableSchema[prop.name];
+
             // add any new properties (new name or different type)
-            if (RLMPropertyHasChanged(prop, tableSchema[prop.name])) {
+            if (RLMPropertyHasChanged(prop, tableProp)) {
                 RLMCreateColumn(realm, *objectSchema.table, prop);
                 changed = true;
             }
@@ -269,6 +289,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
     // a write transaction
     if (!RLMMigrationRequired(realm, newVersion) && RLMRealmGetTables(realm, targetSchema)) {
         RLMRealmSetSchema(realm, targetSchema, true);
+        RLMRealmUpdateIndexes(realm);
         return nil;
     }
 
@@ -297,6 +318,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
             }
 
             RLMRealmSetSchemaVersion(realm, newVersion);
+            RLMRealmUpdateIndexes(realm);
             changed = true;
         }
 

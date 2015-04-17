@@ -7,6 +7,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Sorting `RLMResults` is 2-5x faster (typically closer to 2x).
 * Refreshing `RLMRealm` after a write transaction which inserts or modifies
   strings or `NSData` is committed on another thread is significantly faster.
+* Indexes are now added and removed from existing properties when a Realm file
+  is opened, rather than only when properties are first added.
 
 ### Bugfixes
 
