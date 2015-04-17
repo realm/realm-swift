@@ -111,7 +111,7 @@ static inline bool RLMGetBool(__unsafe_unretained RLMObjectBase *const obj, NSUI
     RLMVerifyAttached(obj);
     return obj->_row.get_bool(colIndex);
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, bool val) {
+static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, BOOL val) {
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_bool(colIndex, val);
 }
@@ -423,7 +423,7 @@ static IMP RLMAccessorSetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
         case RLMAccessorCodeLongLong: return RLMMakeSetter<long long>(colIndex, prop.isPrimary);
         case RLMAccessorCodeFloat: return RLMMakeSetter<float>(colIndex, prop.isPrimary);
         case RLMAccessorCodeDouble: return RLMMakeSetter<double>(colIndex, prop.isPrimary);
-        case RLMAccessorCodeBool: return RLMMakeSetter<bool>(colIndex, prop.isPrimary);
+        case RLMAccessorCodeBool: return RLMMakeSetter<BOOL>(colIndex, prop.isPrimary);
         case RLMAccessorCodeString: return RLMMakeSetter<NSString *>(colIndex, prop.isPrimary);
         case RLMAccessorCodeDate: return RLMMakeSetter<NSDate *>(colIndex, prop.isPrimary);
         case RLMAccessorCodeData: return RLMMakeSetter<NSData *>(colIndex, prop.isPrimary);
@@ -672,7 +672,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
             RLMSetValue(obj, col, [val doubleValue]);
             break;
         case RLMAccessorCodeBool:
-            RLMSetValue(obj, col, (bool)[val boolValue]);
+            RLMSetValue(obj, col, [val boolValue]);
             break;
         case RLMAccessorCodeString:
             if (options & RLMCreationOptionsEnforceUnique) {

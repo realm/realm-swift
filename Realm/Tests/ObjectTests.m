@@ -463,6 +463,15 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     XCTAssertTrue([row1.mixedCol isEqual:@"string"],    @"row1.mixedCol");
     XCTAssertEqualObjects(row2.mixedCol, @2,            @"row2.mixedCol");
+
+    [realm transactionWithBlock:^{
+        row1.boolCol = NO;
+        row1.cBoolCol = false;
+        row1.boolCol = (BOOL)6;
+        row1.cBoolCol = (BOOL)6;
+    }];
+    XCTAssertEqual(row1.boolCol, true);
+    XCTAssertEqual(row1.cBoolCol, true);
 }
 
 - (void)testObjectSubclass {
