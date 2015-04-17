@@ -143,12 +143,23 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
 
         let firstObj = SwiftOptionalObject.allObjectsInRealm(realm).firstObject() as! SwiftOptionalObject
         XCTAssertNil(firstObj.optObjectCol)
+        XCTAssertNil(firstObj.optStringCol)
 
         realm.transactionWithBlock {
             firstObj.optObjectCol = SwiftBoolObject()
             firstObj.optObjectCol!.boolCol = true
+
+            firstObj.optStringCol = "Hi!"
         }
         XCTAssertTrue(firstObj.optObjectCol!.boolCol)
+        XCTAssertEqual(firstObj.optStringCol!, "Hi!")
+
+        realm.transactionWithBlock {
+            firstObj.optObjectCol = nil
+            firstObj.optStringCol = nil
+        }
+        XCTAssertNil(firstObj.optObjectCol)
+        XCTAssertNil(firstObj.optStringCol)
     }
 
     func testSwiftClassNameIsDemangled() {
