@@ -1,3 +1,11 @@
+0.91.3 Release notes (2015-04-17)
+=============================================================
+
+### Bugfixes
+
+* Fix `Extra argument 'objectClassName' in call` errors when building via
+  CocoaPods.
+
 0.91.2 Release notes (2015-04-16)
 =============================================================
 
