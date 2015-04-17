@@ -300,3 +300,7 @@
 
 @end
 
+@interface RLMArray (Swift)
+// for use only in Swift class definitions
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+@end
