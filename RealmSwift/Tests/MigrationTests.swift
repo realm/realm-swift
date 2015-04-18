@@ -353,7 +353,7 @@ class MigrationTests: TestCase {
         XCTAssertEqual(object.doubleCol, 10.0)
         XCTAssertEqual(object.binaryCol, NSData(bytes: "b", length: 1))
         XCTAssertEqual(object.dateCol, NSDate(timeIntervalSince1970: 2))
-        XCTAssertEqual(object.objectCol.boolCol, false)
+        XCTAssertEqual(object.objectCol!.boolCol, false)
         XCTAssertEqual(object.arrayCol.count, 2)
         XCTAssertEqual(object.arrayCol[0].boolCol, false)
         XCTAssertEqual(object.arrayCol[1].boolCol, true)
