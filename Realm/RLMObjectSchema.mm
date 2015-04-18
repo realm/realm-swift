@@ -222,6 +222,7 @@
             // set link type for objects and arrays
             realm::TableRef linkTable = table->get_link_target(col);
             prop.objectClassName = RLMClassForTableName(@(linkTable->get_name().data()));
+            prop.optional = true; // Can remove this once `is_nullable` returns `true` for link columns
         }
 
         [propArray addObject:prop];

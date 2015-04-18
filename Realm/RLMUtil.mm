@@ -140,9 +140,6 @@ BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
         case RLMPropertyTypeObject: {
             // only NSNull, nil, or objects which derive from RLMObject and match the given
             // object class are valid
-            if (obj == nil || obj == NSNull.null) {
-                return YES;
-            }
             RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(obj);
             return objBase && [objBase->_objectSchema.className isEqualToString:property.objectClassName];
         }
