@@ -708,7 +708,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
         NSMutableDictionary *dict = [inputValues mutableCopy];
         dict[key] = NSNull.null;
         RLMProperty *prop = realm.schema[@"DefaultObject"][key];
-        if (prop.type == RLMPropertyTypeArray || prop.type == RLMPropertyTypeObject || prop.optional == YES) {
+        if (prop.optional) {
             [realm beginWriteTransaction];
             [DefaultObject createInRealm:realm withValue:dict];
             [realm commitWriteTransaction];
