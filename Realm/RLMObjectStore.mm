@@ -62,6 +62,14 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
                 [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' has been made a primary key.", tableProp.name]];
             }
         }
+        if (tableProp.optional != schemaProp.optional) {
+            if (tableProp.optional) {
+                [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' is no longer optional.", tableProp.name]];
+            }
+            else {
+                [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' has been made optional.", tableProp.name]];
+            }
+        }
 
         // create new property with aligned column
         schemaProp.column = tableProp.column;
