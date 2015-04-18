@@ -190,7 +190,8 @@
 
     if (NSArray *optionalProperties = [objectUtil getOptionalPropertyNames:swiftObjectInstance]) {
         for (RLMProperty *property in propArray) {
-            property.optional = [optionalProperties containsObject:property.name];
+            property.optional = [optionalProperties containsObject:property.name] ||
+                                property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeArray; // remove if/when core supports required link columns
         }
     }
 
