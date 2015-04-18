@@ -171,6 +171,14 @@ std::vector<std::string> ObjectStore::validate_schema(Group *group, ObjectSchema
                 validation_errors.push_back("Property '" + current_prop.name + "' has been made a primary key.");
             }
         }
+        if (current_prop.is_nullable != target_prop->is_nullable) {
+            if (current_prop.is_nullable) {
+                validation_errors.push_back("Property '" + current_prop.name + "' is no longer optional.");
+            }
+            else {
+                validation_errors.push_back("Property '" + current_prop.name + "' has been made optional.");
+            }
+        }
 
         // create new property with aligned column
         target_prop->table_column = current_prop.table_column;
