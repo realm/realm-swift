@@ -280,7 +280,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         }
 
         // FIXME: Add condition to check for Mixed once it can support a nil value.
-        if (!value && prop.type != RLMPropertyTypeObject) {
+        if (!value && prop.type != RLMPropertyTypeObject && !prop.optional) {
             @throw RLMException([NSString stringWithFormat:@"No value or default value specified for property '%@' in '%@'",
                                  prop.name, schema.className]);
         }
