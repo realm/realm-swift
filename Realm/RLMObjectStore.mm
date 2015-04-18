@@ -143,19 +143,7 @@ static void RLMCreateColumn(RLMRealm *realm, realm::Table &table, RLMProperty *p
                 NSLog(@"Optional properties are only supported for String properties");
             }
             prop.column = table.add_column(realm::DataType(prop.type), prop.name.UTF8String, optional);
-            if (prop.indexed) {
-                // FIXME - support other types
-                if (prop.type != RLMPropertyTypeString) {
-                    NSLog(@"RLMPropertyAttributeIndexed only supported for 'NSString' properties");
-                }
-                else {
-                    table.add_search_index(prop.column);
-                }
-            }
         }
-        default:
-            prop.column = table.add_column(realm::DataType(prop.type), prop.name.UTF8String);
-            break;
     }
 }
 
