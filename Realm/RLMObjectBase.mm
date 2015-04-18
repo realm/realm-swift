@@ -125,8 +125,9 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 }
 
 - (id)valueForKey:(NSString *)key {
-    if (_observationInfo && _observationInfo->returnNil && ![key isEqualToString:@"invalidated"])
-        return nil;
+    if (_observationInfo) {
+        return _observationInfo->valueForKey(key, ^{ return [super valueForKey:key]; });
+    }
     return [super valueForKey:key];
 }
 

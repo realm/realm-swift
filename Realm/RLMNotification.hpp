@@ -57,6 +57,8 @@ struct RLMObservationInfo {
     std::vector<RLMRecordedObservation> standaloneObservers;
     bool skipUnregisteringObservers = false;
 
+    NSMutableDictionary *cachedObjects;
+
     RLMObservationInfo(id object);
     RLMObservationInfo(RLMObjectSchema *objectSchema, std::size_t row, id object);
     ~RLMObservationInfo();
@@ -79,6 +81,8 @@ struct RLMObservationInfo {
     void removeObservers();
     // re-add the observers removed with removeObservers
     void restoreObservers();
+
+    id valueForKey(NSString *key, id (^value)());
 
 private:
     void setRow(realm::Table &table, size_t newRow);

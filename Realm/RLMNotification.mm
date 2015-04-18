@@ -143,6 +143,51 @@ void RLMObservationInfo::restoreObservers() {
     standaloneObservers.clear();
 }
 
+id RLMObservationInfo::valueForKey(NSString *key, id (^getValue)()) {
+    if (returnNil && ![key isEqualToString:@"invalidated"]) {
+        return nil;
+    }
+
+    RLMProperty *prop = objectSchema[key];
+    if (!prop) {
+        return getValue();
+    }
+
+    // We need to return the same object each time for observing over keypaths to work
+    if (prop.type == RLMPropertyTypeArray) {
+        RLMArray *value = cachedObjects[key];
+        if (!value) {
+            value = getValue();
+            if (!cachedObjects) {
+                cachedObjects = [NSMutableDictionary new];
+            }
+            cachedObjects[key] = value;
+        }
+        return value;
+    }
+
+    if (prop.type == RLMPropertyTypeObject) {
+        RLMObjectBase *value = cachedObjects[key];
+        if (value && value->_row.get_index() == row.get_link(prop.column)) {
+            return value;
+        }
+        else if (row.is_null_link(prop.column)) {
+            if (value) {
+                [cachedObjects removeObjectForKey:key];
+            }
+            return nil;
+        }
+        value = getValue();
+        if (!cachedObjects) {
+            cachedObjects = [NSMutableDictionary new];
+        }
+        cachedObjects[key] = value;
+        return value;
+    }
+
+    return getValue();
+}
+
 RLMObservationInfo *RLMGetObservationInfo(std::unique_ptr<RLMObservationInfo> const& info,
                                           size_t row,
                                           __unsafe_unretained RLMObjectSchema *objectSchema) {
