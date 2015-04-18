@@ -634,19 +634,22 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [realm beginWriteTransaction];
     
     // Test #1
-    StringObject *stringObject = [[StringObject alloc] init];
-    XCTAssertThrows(([realm addObject:stringObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
+    DateObject *dateObject = [[DateObject alloc] init];
+    XCTAssertThrows(([realm addObject:dateObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
 
     // Test #2
-    stringObject = [[StringObject alloc] init];
-    stringObject.stringCol = @"";
-    XCTAssertNoThrow(([realm addObject:stringObject]), @"Having values in all NSObject properties should not throw exception when being added to realm");
+    dateObject = [[DateObject alloc] init];
+    dateObject.dateCol = [NSDate date];
+    XCTAssertNoThrow(([realm addObject:dateObject]), @"Having values in all NSObject properties should not throw exception when being added to realm");
     
     // Test #3
-//    FIXME: Test should pass
-//    IntObject *intObj = [[IntObject alloc] init];
-//    XCTAssertThrows(([realm addObject:intObj]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
-    
+    IntObject *intObj = [[IntObject alloc] init];
+    XCTAssertNoThrow(([realm addObject:intObj]), @"Having no NSObject properties should not throw exception when being added to realm");
+
+    // Test #4
+    StringObject *stringObject = [[StringObject alloc] init];
+    XCTAssertNoThrow([realm addObject:stringObject], @"Having a nil value for a optional NSObject property should not throw");
+
     [realm commitWriteTransaction];
 }
 

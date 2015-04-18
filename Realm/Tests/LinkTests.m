@@ -123,12 +123,10 @@
 {
     RLMRealm *realm = [self realmWithTestPath];
 
-    OwnerObject *owner = [[OwnerObject alloc] init];
-    owner.name = @"Tim";
-    owner.dog = [[DogObject alloc] init];
-
+    LinkToAllTypesObject *linkObject = [[LinkToAllTypesObject alloc] init];
+    linkObject.allTypesCol = [[AllTypesObject alloc] init];
     [realm beginWriteTransaction];
-    XCTAssertThrows([realm addObject:owner], @"dogName not set on linked object");
+    XCTAssertThrows([realm addObject:linkObject], @"dogName not set on linked object");
 
     StringObject *to = [StringObject createInRealm:realm withValue:@[@"testObject"]];
     NSArray *args = @[@"Tim", to];
