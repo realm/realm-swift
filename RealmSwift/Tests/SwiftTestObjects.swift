@@ -43,7 +43,7 @@ class SwiftObject: Object {
     dynamic var stringCol = "a"
     dynamic var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)!
     dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
-    dynamic var objectCol = SwiftBoolObject()
+    dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
     let arrayCol = List<SwiftBoolObject>()
 
     class func defaultValues() -> [String: AnyObject] {
@@ -78,7 +78,7 @@ class SwiftDogObject: Object {
 
 class SwiftOwnerObject: Object {
     dynamic var name = ""
-    dynamic var dog = SwiftDogObject()
+    dynamic var dog: SwiftDogObject? = SwiftDogObject()
 }
 
 class SwiftAggregateObject: Object {

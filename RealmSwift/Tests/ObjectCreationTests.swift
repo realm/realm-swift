@@ -33,7 +33,7 @@ class ObjectCreationTests: TestCase {
 
         // test realm properties are nil for standalone
         XCTAssertNil(object.realm)
-        XCTAssertNil(object.objectCol.realm)
+        XCTAssertNil(object.objectCol!.realm)
         XCTAssertNil(object.arrayCol.realm)
     }
 
@@ -143,7 +143,7 @@ class ObjectCreationTests: TestCase {
 
         // test realm properties are populated correctly
         XCTAssertEqual(object.realm!, realm)
-        XCTAssertEqual(object.objectCol.realm!, realm)
+        XCTAssertEqual(object.objectCol!.realm!, realm)
         XCTAssertEqual(object.arrayCol.realm!, realm)
     }
 
@@ -358,7 +358,7 @@ class ObjectCreationTests: TestCase {
         Realm().commitWrite()
 
         XCTAssertNotNil(object.realm)
-        XCTAssertEqual(object.objectCol, existingObject)
+        XCTAssertEqual(object.objectCol!, existingObject)
     }
 
     func testAddAndUpdateWithExisingNestedObjects() {
