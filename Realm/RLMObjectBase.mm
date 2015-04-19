@@ -253,7 +253,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
         std::swap(_observationInfo->skipUnregisteringObservers, skipUnregistering);
     }
     [super removeObserver:observer forKeyPath:keyPath context:context];
-    std::swap(_observationInfo->skipUnregisteringObservers, skipUnregistering);
+    _observationInfo->skipUnregisteringObservers = skipUnregistering;
     _observationInfo->removeObserver(observer, keyPath, context);
 }
 

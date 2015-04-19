@@ -46,15 +46,14 @@ RLMObservationInfo::~RLMObservationInfo() {
             next->prev = prev;
     }
     else if (objectSchema) {
-        for (auto it = objectSchema->_observedObjects.begin(), end = objectSchema->_observedObjects.end(); it != end; ++it) {
-            if (*it == this) {
-                if (next)
-                    *it = next;
-                else {
-                    iter_swap(it, std::prev(end));
-                    objectSchema->_observedObjects.pop_back();
-                }
-                return;
+        auto end = objectSchema->_observedObjects.end();
+        auto it = find(objectSchema->_observedObjects.begin(), end, this);
+        if (it != end) {
+            if (next)
+                *it = next;
+            else {
+                iter_swap(it, std::prev(end));
+                objectSchema->_observedObjects.pop_back();
             }
         }
     }
@@ -222,56 +221,69 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
     };
     std::vector<arrayChange> arrayChanges;
 
+    std::vector<std::vector<RLMObservationInfo *> *> observers;
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        if (objectSchema->_observedObjects.empty()) {
+            continue;
+        }
+        size_t ndx = objectSchema.table->get_index_in_group();
+        if (ndx >= observers.size()) {
+            observers.resize(std::max(observers.size() * 2, ndx + 1));
+        }
+        observers[ndx] = &objectSchema->_observedObjects;
+    }
+
     realm.group->set_cascade_notification_handler([&](realm::Group::CascadeNotification const& cs) {
         for (auto const& row : cs.rows) {
-            for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-                if (objectSchema.table->get_index_in_group() != row.table_ndx)
-                    continue;
-                for (auto observer : objectSchema->_observedObjects) {
-                    if (observer->row && observer->row.get_index() == row.row_ndx) {
-                        changes.push_back({observer, @"invalidated"});
-                        for (RLMProperty *prop in objectSchema.properties)
-                            changes.push_back({observer, prop.name});
-                        break;
-                    }
+            if (row.table_ndx > observers.size() || !observers[row.table_ndx]) {
+                continue;
+            }
+
+            for (auto observer : *observers[row.table_ndx]) {
+                if (observer->row && observer->row.get_index() == row.row_ndx) {
+                    changes.push_back({observer, @"invalidated"});
+                    for (RLMProperty *prop in observer->objectSchema.properties)
+                        changes.push_back({observer, prop.name});
+                    break;
                 }
-                break;
             }
         }
         for (auto const& link : cs.links) {
-            for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-                if (objectSchema.table->get_index_in_group() != link.origin_table->get_index_in_group())
-                    continue;
-                for (auto observer : objectSchema->_observedObjects) {
-                    if (observer->row.get_index() != link.origin_row_ndx)
-                        continue;
-                    RLMProperty *prop = objectSchema.properties[link.origin_col_ndx];
-                    NSString *name = prop.name;
-                    if (prop.type != RLMPropertyTypeArray)
-                        changes.push_back({observer, name});
-                    else {
-                        auto linkview = observer->row.get_linklist(prop.column);
-                        arrayChange *c = nullptr;
-                        for (auto& ac : arrayChanges) {
-                            if (ac.info == observer && ac.property == name) {
-                                c = &ac;
-                                break;
-                            }
-                        }
-                        if (!c) {
-                            arrayChanges.push_back({observer, name, [NSMutableIndexSet new]});
-                            c = &arrayChanges.back();
-                        }
+            size_t table_ndx = link.origin_table->get_index_in_group();
+            if (table_ndx >= observers.size() || !observers[table_ndx]) {
+                continue;
+            }
 
-                        size_t start = 0, index;
-                        while ((index = linkview->find(link.old_target_row_ndx, start)) != realm::not_found) {
-                            [c->indexes addIndex:index];
-                            start = index + 1;
-                        }
+            for (auto observer : *observers[table_ndx]) {
+                if (!observer->row || observer->row.get_index() != link.origin_row_ndx) {
+                    continue;
+                }
+
+                RLMProperty *prop = observer->objectSchema.properties[link.origin_col_ndx];
+                NSString *name = prop.name;
+                if (prop.type != RLMPropertyTypeArray) {
+                    changes.push_back({observer, name});
+                    continue;
+                }
+
+                auto linkview = observer->row.get_linklist(prop.column);
+                arrayChange *c = nullptr;
+                for (auto& ac : arrayChanges) {
+                    if (ac.info == observer && ac.property == name) {
+                        c = &ac;
+                        break;
                     }
-                    break;
-               }
-                break;
+                }
+                if (!c) {
+                    arrayChanges.push_back({observer, name, [NSMutableIndexSet new]});
+                    c = &arrayChanges.back();
+                }
+
+                size_t start = 0, index;
+                while ((index = linkview->find(link.old_target_row_ndx, start)) != realm::not_found) {
+                    [c->indexes addIndex:index];
+                    start = index + 1;
+                }
             }
         }
 
