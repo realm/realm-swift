@@ -545,8 +545,6 @@ void RLMClearTable(RLMObjectSchema *objectSchema) {
     for (auto info : objectSchema->_observedObjects) {
         for_each(info, [&](__unsafe_unretained auto o) {
             [o willChangeValueForKey:@"invalidated"];
-            for (RLMProperty *prop in objectSchema.properties)
-                [o willChangeValueForKey:prop.name];
         });
     }
 
@@ -555,11 +553,8 @@ void RLMClearTable(RLMObjectSchema *objectSchema) {
     });
 
     for (auto info : objectSchema->_observedObjects) {
-        info->setReturnNil(true);
         for_each(info, [&](__unsafe_unretained auto o) {
             [o didChangeValueForKey:@"invalidated"];
-            for (RLMProperty *prop in objectSchema.properties)
-                [o didChangeValueForKey:prop.name];
         });
     }
 

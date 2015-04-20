@@ -31,6 +31,7 @@ RLMObservationInfo::RLMObservationInfo(RLMObjectSchema *objectSchema, std::size_
 : object(object)
 , objectSchema(objectSchema)
 {
+    REALM_ASSERT(objectSchema);
     setRow(*objectSchema.table, row);
 }
 
@@ -41,32 +42,45 @@ RLMObservationInfo::RLMObservationInfo(id object)
 
 RLMObservationInfo::~RLMObservationInfo() {
     if (prev) {
+        REALM_ASSERT(prev->next == this);
         prev->next = next;
-        if (next)
+        if (next) {
+            REALM_ASSERT(next->prev == this);
             next->prev = prev;
+        }
     }
     else if (objectSchema) {
         auto end = objectSchema->_observedObjects.end();
         auto it = find(objectSchema->_observedObjects.begin(), end, this);
         if (it != end) {
-            if (next)
+            if (next) {
                 *it = next;
+                next->prev = nullptr;
+            }
             else {
                 iter_swap(it, std::prev(end));
                 objectSchema->_observedObjects.pop_back();
             }
         }
     }
+#ifdef DEBUG
+    object = (__bridge id)(void *)-1;
+    prev = (RLMObservationInfo *)-1;
+    next = (RLMObservationInfo *)-1;
+#endif
 }
 
 void RLMObservationInfo::setRow(realm::Table &table, size_t newRow) {
     REALM_ASSERT(!row);
+    REALM_ASSERT(objectSchema);
     skipUnregisteringObservers = true;
     row = table[newRow];
     for (auto info : objectSchema->_observedObjects) {
         if (info->row && info->row.get_index() == row.get_index()) {
             prev = info;
             next = info->next;
+            if (next)
+                next->prev = this;
             info->next = this;
             return;
         }
@@ -144,7 +158,7 @@ void RLMObservationInfo::restoreObservers() {
 
 id RLMObservationInfo::valueForKey(NSString *key, id (^getValue)()) {
     if (returnNil && ![key isEqualToString:@"invalidated"]) {
-        return nil;
+        return cachedObjects[key];
     }
 
     RLMProperty *prop = objectSchema[key];
@@ -166,15 +180,14 @@ id RLMObservationInfo::valueForKey(NSString *key, id (^getValue)()) {
     }
 
     if (prop.type == RLMPropertyTypeObject) {
+        if (row.is_null_link(prop.column)) {
+            [cachedObjects removeObjectForKey:key];
+            return nil;
+        }
+
         RLMObjectBase *value = cachedObjects[key];
         if (value && value->_row.get_index() == row.get_link(prop.column)) {
             return value;
-        }
-        else if (row.is_null_link(prop.column)) {
-            if (value) {
-                [cachedObjects removeObjectForKey:key];
-            }
-            return nil;
         }
         value = getValue();
         if (!cachedObjects) {
@@ -234,20 +247,6 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
     }
 
     realm.group->set_cascade_notification_handler([&](realm::Group::CascadeNotification const& cs) {
-        for (auto const& row : cs.rows) {
-            if (row.table_ndx > observers.size() || !observers[row.table_ndx]) {
-                continue;
-            }
-
-            for (auto observer : *observers[row.table_ndx]) {
-                if (observer->row && observer->row.get_index() == row.row_ndx) {
-                    changes.push_back({observer, @"invalidated"});
-                    for (RLMProperty *prop in observer->objectSchema.properties)
-                        changes.push_back({observer, prop.name});
-                    break;
-                }
-            }
-        }
         for (auto const& link : cs.links) {
             size_t table_ndx = link.origin_table->get_index_in_group();
             if (table_ndx >= observers.size() || !observers[table_ndx]) {
@@ -287,20 +286,37 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
             }
         }
 
+        NSString *invalidated = @"invalidated";
+        for (auto const& row : cs.rows) {
+            if (row.table_ndx >= observers.size() || !observers[row.table_ndx]) {
+                continue;
+            }
+
+            for (auto observer : *observers[row.table_ndx]) {
+                if (observer->row && observer->row.get_index() == row.row_ndx) {
+                    changes.push_back({observer, invalidated});
+                    break;
+                }
+            }
+        }
+
         for (auto const& change : changes)
             for_each(change.info, [&](auto o) { [o willChangeValueForKey:change.property]; });
         for (auto const& change : arrayChanges)
             for_each(change.info, [&](auto o) { [o willChange:NSKeyValueChangeRemoval valuesAtIndexes:change.indexes forKey:change.property]; });
+        for (auto const& change : changes) {
+            if (change.property == invalidated) {
+                change.info->setReturnNil(true);
+            }
+        }
     });
 
     block();
 
     for (auto const& change : changes) {
-        change.info->setReturnNil(true);
         for_each(change.info, [&](auto o) { [o didChangeValueForKey:change.property]; });
     }
     for (auto const& change : arrayChanges) {
-        change.info->setReturnNil(true);
         for_each(change.info, [&](auto o) { [o didChange:NSKeyValueChangeRemoval valuesAtIndexes:change.indexes forKey:change.property]; });
     }
 
@@ -329,16 +345,11 @@ class TransactLogHandler {
         // all this should maybe be precomputed or cached or something
         for (RLMObjectSchema *objectSchema in schema) {
             for (auto info : objectSchema->_observedObjects) {
+                REALM_ASSERT(info->objectSchema == objectSchema);
                 auto const& row = info->row;
                 if (!row.is_attached()) // FIXME: should maybe try to remove from array on invalidate
                     continue;
                 info->setReturnNil(false);
-                observers.push_back({
-                    row.get_table()->get_index_in_group(),
-                    row.get_index(),
-                    realm::npos,
-                    @"invalidated",
-                    info});
                 for (size_t i = 0; i < objectSchema.properties.count; ++i) {
                     observers.push_back({
                         row.get_table()->get_index_in_group(),
@@ -347,6 +358,20 @@ class TransactLogHandler {
                         [objectSchema.properties[i] name],
                         info});
                 }
+            }
+        }
+
+        for (RLMObjectSchema *objectSchema in schema) {
+            for (auto info : objectSchema->_observedObjects) {
+                auto const& row = info->row;
+                if (!row.is_attached()) // FIXME: should maybe try to remove from array on invalidate
+                    continue;
+                observers.push_back({
+                    row.get_table()->get_index_in_group(),
+                    row.get_index(),
+                    realm::npos,
+                    @"invalidated",
+                    info});
             }
         }
     }
@@ -384,13 +409,9 @@ public:
     void parse_complete() {
         for (auto const& o : observers) {
             if (o.row == realm::not_found) {
-                if (o.column == realm::npos)
-                    for_each(o.info, [&](auto obj) { [obj willChangeValueForKey:o.key]; });
-                else {
-                    o.info->setReturnNil(false);
+                if (o.column == realm::npos) {
                     for_each(o.info, [&](auto obj) { [obj willChangeValueForKey:o.key]; });
                     o.info->setReturnNil(true);
-                    for_each(o.info, [&](auto obj) { [obj didChangeValueForKey:o.key]; });
                 }
             }
             if (!o.changed)

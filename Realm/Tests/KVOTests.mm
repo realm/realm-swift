@@ -153,6 +153,7 @@ public:
         @catch (NSException *e) {
             XCTFail(@"%@", e.description);
         }
+//        assert(_notifications.count == 0);
         XCTAssertEqual(0U, _notifications.count);
     }
 
@@ -751,7 +752,6 @@ public:
         obj.obj.obj.boolCol = YES;
         AssertChanged(r, @NO, @YES);
         [realm cancelWriteTransaction];
-        AssertChanged(r, @YES, NSNull.null);
     }
     @autoreleasepool {
         KVOLinkObject2 *obj = [self createLinkObject];
@@ -865,7 +865,6 @@ public:
     KVORecorder r1(self, obj, @"boolCol");
     KVORecorder r2(self, obj, @"invalidated");
     [self.realm deleteObject:obj];
-    AssertChanged(r1, @NO, NSNull.null);
     AssertChanged(r2, @NO, @YES);
     // should not crash
 }
@@ -877,7 +876,6 @@ public:
     AssertChanged(r, @NO, NSNull.null);
 }
 
-#if 0 // invalidated is sent after property is set to null
 - (void)testDeleteParentOfObservedRLMArray {
     KVOObject *obj = [self createObject];
     KVORecorder r1(self, obj, @"arrayCol");
@@ -887,14 +885,12 @@ public:
     AssertChanged(r2, @NO, @YES);
     AssertChanged(r3, @NO, @YES);
 }
-#endif
 
 - (void)testDeleteAllObjects {
     KVOObject *obj = [self createObject];
     KVORecorder r1(self, obj, @"boolCol");
     KVORecorder r2(self, obj, @"invalidated");
     [self.realm deleteAllObjects];
-    AssertChanged(r1, @NO, NSNull.null);
     AssertChanged(r2, @NO, @YES);
     // should not crash
 }
@@ -904,7 +900,6 @@ public:
     KVORecorder r1(self, obj, @"boolCol");
     KVORecorder r2(self, obj, @"invalidated");
     [self.realm deleteObjects:[KVOObject allObjectsInRealm:self.realm]];
-    AssertChanged(r1, @NO, NSNull.null);
     AssertChanged(r2, @NO, @YES);
     // should not crash
 }
@@ -914,7 +909,6 @@ public:
     KVORecorder r1(self, obj, @"boolCol");
     KVORecorder r2(self, obj, @"invalidated");
     [self.realm deleteObjects:[KVOObject objectsInRealm:self.realm where:@"TRUEPREDICATE"]];
-    AssertChanged(r1, @NO, NSNull.null);
     AssertChanged(r2, @NO, @YES);
     // should not crash
 }
@@ -943,34 +937,40 @@ public:
     KVOLinkObject2 *obj = [self createLinkObject];
     KVOLinkObject1 *linked = obj.obj;
     KVORecorder r(self, obj, @"obj");
+    KVORecorder r2(self, obj, @"obj.invalidated");
     [self.realm deleteObject:linked];
 
     if (NSDictionary *note = AssertNotification(r)) {
         XCTAssertTrue([note[NSKeyValueChangeOldKey] isKindOfClass:[RLMObjectBase class]]);
         XCTAssertEqualObjects(note[NSKeyValueChangeNewKey], NSNull.null);
     }
+    AssertChanged(r2, @NO, NSNull.null);
 }
 
 - (void)testDeleteLinkedToObjectViaTableClear {
     KVOLinkObject2 *obj = [self createLinkObject];
     KVORecorder r(self, obj, @"obj");
+    KVORecorder r2(self, obj, @"obj.invalidated");
     [self.realm deleteObjects:[KVOLinkObject1 allObjectsInRealm:self.realm]];
 
     if (NSDictionary *note = AssertNotification(r)) {
         XCTAssertTrue([note[NSKeyValueChangeOldKey] isKindOfClass:[RLMObjectBase class]]);
         XCTAssertEqualObjects(note[NSKeyValueChangeNewKey], NSNull.null);
     }
+    AssertChanged(r2, @NO, NSNull.null);
 }
 
 - (void)testDeleteLinkedToObjectViaQueryClear {
     KVOLinkObject2 *obj = [self createLinkObject];
     KVORecorder r(self, obj, @"obj");
+    KVORecorder r2(self, obj, @"obj.invalidated");
     [self.realm deleteObjects:[KVOLinkObject1 objectsInRealm:self.realm where:@"TRUEPREDICATE"]];
 
     if (NSDictionary *note = AssertNotification(r)) {
         XCTAssertTrue([note[NSKeyValueChangeOldKey] isKindOfClass:[RLMObjectBase class]]);
         XCTAssertEqualObjects(note[NSKeyValueChangeNewKey], NSNull.null);
     }
+    AssertChanged(r2, @NO, NSNull.null);
 }
 
 - (void)testDeleteObjectInArray {
@@ -1081,6 +1081,7 @@ public:
 
     KVORecorder r(self, obj, @"objectCol");
     [self.realm cancelWriteTransaction];
+
     if (NSDictionary *note = AssertNotification(r)) {
         XCTAssertTrue([note[NSKeyValueChangeOldKey] isKindOfClass:[RLMObjectBase class]]);
         XCTAssertEqualObjects(note[NSKeyValueChangeNewKey], NSNull.null);
@@ -1097,12 +1098,6 @@ public:
     KVORecorder r3(self, obj, @"objectCol.boolCol");
     [self.realm cancelWriteTransaction];
     AssertChanged(r, @NO, @YES);
-    if (NSDictionary *note = AssertNotification(r2)) {
-        XCTAssertTrue([note[NSKeyValueChangeOldKey] isKindOfClass:[RLMObjectBase class]]);
-        XCTAssertEqualObjects(note[NSKeyValueChangeNewKey], NSNull.null);
-    }
-    AssertChanged(r3, @NO, NSNull.null);
-    // FIXME: too many invalidateds being sent
     [self.realm beginWriteTransaction];
 }
 

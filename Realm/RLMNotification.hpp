@@ -64,6 +64,7 @@ struct RLMObservationInfo {
     ~RLMObservationInfo();
 
     void setReturnNil(bool value) {
+        REALM_ASSERT(objectSchema);
         for (auto info = this; info; info = info->next)
             info->returnNil = value;
     }
