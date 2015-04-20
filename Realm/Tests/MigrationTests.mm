@@ -855,4 +855,29 @@
     }
 }
 
+- (void)testRequiredToNullableAutoMigration {
+    RLMSchema *nullable = [[RLMSchema alloc] init];
+    nullable.objectSchema = @[[RLMObjectSchema schemaForObjectClass:StringObject.class]];
+
+    RLMSchema *nonnull = [[RLMSchema alloc] init];
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+    [objectSchema.properties[0] setOptional:NO];
+    nonnull.objectSchema = @[objectSchema];
+
+    // create initial required column
+    @autoreleasepool {
+        RLMRealm *realm = [self realmWithTestPathAndSchema:nonnull];
+        [realm transactionWithBlock:^{
+            [StringObject createInRealm:realm withObject:@[@"string"]];
+        }];
+    }
+
+    @autoreleasepool {
+        [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
+        RLMRealm *realm = [self realmWithTestPathAndSchema:nullable];
+        XCTAssertEqualObjects([[StringObject allObjectsInRealm:realm] valueForKey:@"stringCol"], @[@"string"]);
+        XCTAssertTrue(realm.schema[@"StringObject"][@"stringCol"].optional);
+    }
+}
+
 @end

@@ -29,6 +29,34 @@
 using namespace realm;
 using namespace std;
 
+template <typename T>
+static inline
+T get_value(TableRef table, size_t row, size_t column);
+
+template <typename T>
+static inline
+void set_value(TableRef table, size_t row, size_t column, T value);
+
+template <>
+StringData get_value(TableRef table, size_t row, size_t column) {
+    return table->get_string(column, row);
+}
+
+template <>
+void set_value(TableRef table, size_t row, size_t column, StringData value) {
+    table->set_string(column, row, value);
+}
+
+template <>
+BinaryData get_value(TableRef table, size_t row, size_t column) {
+    return table->get_binary(column, row);
+}
+
+template <>
+void set_value(TableRef table, size_t row, size_t column, BinaryData value) {
+    table->set_binary(column, row, value);
+}
+
 const char * const c_metadataTableName = "metadata";
 const char * const c_versionColumnName = "version";
 const size_t c_versionColumnIndex = 0;
@@ -208,6 +236,22 @@ static inline bool property_has_changed(Property &p1, Property &p2) {
     return p1.type != p2.type || p1.name != p2.name || p1.object_type != p2.object_type || p1.is_nullable != p2.is_nullable;
 }
 
+static bool property_can_be_migrated_to_nullable(Property &old_property, Property &new_property) {
+    return old_property.type == new_property.type &&
+        !old_property.is_nullable && new_property.is_nullable &&
+        new_property.name == old_property.name;
+}
+
+template <typename T>
+static void copy_property_to_property(Property &old_property, Property &new_property, TableRef table) {
+    size_t old_column = old_property.table_column, new_column = new_property.table_column;
+    size_t count = table->size();
+    for (size_t i = 0; i < count; i++) {
+        T old_value = get_value<T>(table, i, old_column);
+        set_value(table, i, new_column, old_value);
+    }
+}
+
 // set references to tables on targetSchema and create/update any missing or out-of-date tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
@@ -251,6 +295,20 @@ bool ObjectStore::create_tables(Group *group, ObjectStore::Schema &target_schema
                         target_prop.table_column = table->add_column(DataType(target_prop.type), target_prop.name, target_prop.is_nullable);
                         break;
                 }
+
+                if (current_prop && property_can_be_migrated_to_nullable(*current_prop, target_prop)) {
+                    switch (target_prop.type) {
+                        case PropertyTypeString:
+                            copy_property_to_property<StringData>(*current_prop, target_prop, table);
+                            break;
+                        case PropertyTypeData:
+                            copy_property_to_property<BinaryData>(*current_prop, target_prop, table);
+                            break;
+                        default:
+                            REALM_UNREACHABLE();
+                    }
+                }
+
                 changed = true;
             }
         }
