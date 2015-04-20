@@ -299,6 +299,7 @@
         if (p1.type != p2.type ||
             p1.column != p2.column ||
             p1.isPrimary != p2.isPrimary ||
+            p1.optional != p2.optional ||
             ![p1.name isEqualToString:p2.name] ||
             !(p1.objectClassName == p2.objectClassName || [p1.objectClassName isEqualToString:p2.objectClassName])) {
             return NO;
