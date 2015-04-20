@@ -226,6 +226,31 @@ static bool RLMPropertyHasChanged(RLMProperty *p1, RLMProperty *p2) {
         || (p1.objectClassName != p2.objectClassName && ![p1.objectClassName isEqualToString:p2.objectClassName]);
 }
 
+static bool RLMPropertyCanBeMigrated(RLMProperty *oldProperty, RLMProperty *newProperty) {
+    if (!oldProperty || !newProperty) {
+        return false;
+    }
+    if (oldProperty.type == newProperty.type && !oldProperty.optional && newProperty.optional && [oldProperty.name isEqualToString:newProperty.name]) {
+        return true;
+    }
+    return false;
+}
+
+
+static void RLMMigratePropertyToProperty(RLMProperty *oldProperty, RLMProperty *newProperty, Table *table) {
+    size_t oldColumn = oldProperty.column;
+    size_t newColumn = newProperty.column;
+    if (oldProperty.type == newProperty.type && newProperty.type == RLMPropertyTypeString) {
+        size_t count = table->size();
+        for (size_t i = 0; i < count; i++) {
+            table->set_string(newColumn, i, table->get_string(oldColumn, i));
+        }
+    }
+    else {
+        @throw RLMException([NSString stringWithFormat:@"Unable to automatically migrate a property of type '%@' to type '%@'", RLMTypeToString(oldProperty.type), RLMTypeToString(newProperty.type)]);
+    }
+}
+
 // set references to tables on targetSchema and create/update any missing or out-of-date tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
@@ -264,7 +289,11 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
         // remove extra columns
         for (int i = (int)tableSchema.properties.count - 1; i >= 0; i--) {
             RLMProperty *prop = tableSchema.properties[i];
-            if (RLMPropertyHasChanged(prop, objectSchema[prop.name])) {
+            RLMProperty *newProp = objectSchema[prop.name];
+            if (RLMPropertyHasChanged(prop, newProp)) {
+                if (RLMPropertyCanBeMigrated(prop, newProp)) {
+                    RLMMigratePropertyToProperty(prop, newProp, objectSchema.table);
+                }
                 objectSchema.table->remove_column(prop.column);
                 changed = true;
             }
