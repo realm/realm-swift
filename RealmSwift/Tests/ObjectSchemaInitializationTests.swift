@@ -34,6 +34,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(boolCol!.name, "boolCol")
         XCTAssertEqual(boolCol!.type, PropertyType.Bool)
         XCTAssertFalse(boolCol!.indexed)
+        XCTAssertFalse(boolCol!.optional)
         XCTAssertNil(boolCol!.objectClassName)
 
         let intCol = objectSchema["intCol"]
@@ -41,6 +42,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(intCol!.name, "intCol")
         XCTAssertEqual(intCol!.type, PropertyType.Int)
         XCTAssertFalse(intCol!.indexed)
+        XCTAssertFalse(intCol!.optional)
         XCTAssertNil(intCol!.objectClassName)
 
         let floatCol = objectSchema["floatCol"]
@@ -48,6 +50,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(floatCol!.name, "floatCol")
         XCTAssertEqual(floatCol!.type, PropertyType.Float)
         XCTAssertFalse(floatCol!.indexed)
+        XCTAssertFalse(floatCol!.optional)
         XCTAssertNil(floatCol!.objectClassName)
 
         let doubleCol = objectSchema["doubleCol"]
@@ -55,6 +58,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(doubleCol!.name, "doubleCol")
         XCTAssertEqual(doubleCol!.type, PropertyType.Double)
         XCTAssertFalse(doubleCol!.indexed)
+        XCTAssertFalse(doubleCol!.optional)
         XCTAssertNil(doubleCol!.objectClassName)
 
         let stringCol = objectSchema["stringCol"]
@@ -62,6 +66,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(stringCol!.name, "stringCol")
         XCTAssertEqual(stringCol!.type, PropertyType.String)
         XCTAssertFalse(stringCol!.indexed)
+        XCTAssertFalse(stringCol!.optional)
         XCTAssertNil(stringCol!.objectClassName)
 
         let binaryCol = objectSchema["binaryCol"]
@@ -69,6 +74,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(binaryCol!.name, "binaryCol")
         XCTAssertEqual(binaryCol!.type, PropertyType.Data)
         XCTAssertFalse(binaryCol!.indexed)
+        XCTAssertFalse(binaryCol!.optional)
         XCTAssertNil(binaryCol!.objectClassName)
 
         let dateCol = objectSchema["dateCol"]
@@ -76,6 +82,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(dateCol!.name, "dateCol")
         XCTAssertEqual(dateCol!.type, PropertyType.Date)
         XCTAssertFalse(dateCol!.indexed)
+        XCTAssertFalse(dateCol!.optional)
         XCTAssertNil(dateCol!.objectClassName)
 
         let objectCol = objectSchema["objectCol"]
@@ -83,6 +90,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(objectCol!.name, "objectCol")
         XCTAssertEqual(objectCol!.type, PropertyType.Object)
         XCTAssertFalse(objectCol!.indexed)
+        XCTAssertTrue(objectCol!.optional)
         XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
 
         let arrayCol = objectSchema["arrayCol"]
@@ -90,6 +98,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(arrayCol!.name, "arrayCol")
         XCTAssertEqual(arrayCol!.type, PropertyType.Array)
         XCTAssertFalse(arrayCol!.indexed)
+        XCTAssertTrue(arrayCol!.optional)
         XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
 
         let dynamicArrayCol = SwiftCompanyObject().objectSchema["employees"]
@@ -133,6 +142,10 @@ class ObjectSchemaInitializationTests: TestCase {
         for propName in SwiftObjectWithUnindexibleProperties.indexedProperties() {
             XCTAssertFalse(unindexibleSchema[propName]!.indexed, "Shouldn't mark unindexible property '\(propName)' as indexed")
         }
+    }
+
+    func testNonNullableOptionalPropertiesAreCoerced() {
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonNullableOptionalProperties.self), "Should throw when marking non-String properties as optional")
     }
 }
 
@@ -188,5 +201,10 @@ class SwiftObjectWithUnindexibleProperties : SwiftFakeObject {
     dynamic override class func indexedProperties() -> [String] {
         return ["boolCol", "intCol", "floatCol", "doubleCol", "binaryCol", "dateCol", "objectCol", "arrayCol"]
     }
+}
+
+class SwiftObjectWithNonNullableOptionalProperties: SwiftFakeObject {
+    dynamic var optBinaryCol: NSData?
+    dynamic var optDateCol: NSDate?
 }
 
