@@ -618,6 +618,45 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [realm commitWriteTransaction];
 }
 
+- (void)testOptionalStringProperties {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    StringObject *so = [[StringObject alloc] init];
+
+    XCTAssertNil(so.stringCol);
+    XCTAssertNil([so valueForKey:@"stringCol"]);
+    XCTAssertNil(so[@"stringCol"]);
+
+    so.stringCol = @"a";
+    XCTAssertEqualObjects(so.stringCol, @"a");
+    XCTAssertEqualObjects([so valueForKey:@"stringCol"], @"a");
+    XCTAssertEqualObjects(so[@"stringCol"], @"a");
+
+    [so setValue:nil forKey:@"stringCol"];
+    XCTAssertNil(so.stringCol);
+    XCTAssertNil([so valueForKey:@"stringCol"]);
+    XCTAssertNil(so[@"stringCol"]);
+
+    [realm transactionWithBlock:^{
+        [realm addObject:so];
+        XCTAssertNil(so.stringCol);
+        XCTAssertNil([so valueForKey:@"stringCol"]);
+        XCTAssertNil(so[@"stringCol"]);
+    }];
+
+    so = [StringObject allObjectsInRealm:realm].firstObject;
+
+    XCTAssertNil(so.stringCol);
+    XCTAssertNil([so valueForKey:@"stringCol"]);
+    XCTAssertNil(so[@"stringCol"]);
+
+    [realm transactionWithBlock:^{
+        so.stringCol = @"b";
+    }];
+    XCTAssertEqualObjects(so.stringCol, @"b");
+    XCTAssertEqualObjects([so valueForKey:@"stringCol"], @"b");
+    XCTAssertEqualObjects(so[@"stringCol"], @"b");
+}
+
 
 #pragma mark - Default Property Values
 
