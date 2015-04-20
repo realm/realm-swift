@@ -1067,6 +1067,12 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     
     // This exception only gets thrown when there is no default vaule and it is for an NSObject property
     XCTAssertThrows(([AggregateObject createInRealm:realm withValue:@{@"boolCol" : @YES}]), @"Missing values in NSDictionary should throw default value exception");
+
+    EmployeeObject *eo = nil;
+    eo = [EmployeeObject createInRealm:realm withValue:@{@"age":@20, @"hired": @YES}];
+    XCTAssertNil(eo.name);
+    eo = [EmployeeObject createInRealm:realm withValue:@{@"name":NSNull.null, @"age":@20, @"hired": @YES}];
+    XCTAssertNil(eo.name);
     
     // This exception gets thrown when count of array does not match with object schema
     XCTAssertThrows(([EmployeeObject createInRealm:realm withValue:@[@27, @YES]]), @"Missing values in NSDictionary should throw default value exception");
@@ -1107,6 +1113,10 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     // Test description in read block
     NSString *objDescription = [[[EmployeeObject objectsWithPredicate:nil] firstObject] description];
     descriptionAsserts(objDescription);
+
+    soInit = [[EmployeeObject alloc] init];
+    soInit.age = 20;
+    XCTAssert([soInit.description rangeOfString:@"(null)"].location != NSNotFound);
 }
 
 - (void)testObjectCycleDescription
@@ -1389,12 +1399,15 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 - (void)testObjectWithKey {
     [RLMRealm.defaultRealm beginWriteTransaction];
     PrimaryStringObject *strObj = [PrimaryStringObject createInDefaultRealmWithValue:@[@"key", @0]];
+    PrimaryStringObject *nullStrObj = [PrimaryStringObject createInDefaultRealmWithValue:@[NSNull.null, @0]];
     PrimaryIntObject *intObj = [PrimaryIntObject createInDefaultRealmWithValue:@[@0]];
     [RLMRealm.defaultRealm commitWriteTransaction];
 
     // no PK
     XCTAssertThrows([StringObject objectForPrimaryKey:@""]);
     XCTAssertThrows([IntObject objectForPrimaryKey:@0]);
+    XCTAssertThrows([StringObject objectForPrimaryKey:NSNull.null]);
+    XCTAssertThrows([IntObject objectForPrimaryKey:NSNull.null]);
 
     // wrong PK type
     XCTAssertThrows([PrimaryStringObject objectForPrimaryKey:@0]);
@@ -1406,6 +1419,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
     // object with key exists
     XCTAssertEqualObjects(strObj, [PrimaryStringObject objectForPrimaryKey:@"key"]);
+    XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectForPrimaryKey:NSNull.null]);
     XCTAssertEqualObjects(intObj, [PrimaryIntObject objectForPrimaryKey:@0]);
 }
 

@@ -561,9 +561,14 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
         return nil;
     }
 
+    if (key == NSNull.null) {
+        key = nil;
+    }
+
     size_t row = realm::not_found;
     if (primaryProperty.type == RLMPropertyTypeString) {
-        if (NSString *str = RLMDynamicCast<NSString>(key)) {
+        NSString *str = RLMDynamicCast<NSString>(key);
+        if (str || !key) {
             row = objectSchema.table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(str));
         }
         else {
