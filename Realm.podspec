@@ -38,7 +38,7 @@ Pod::Spec.new do |s|
   s.header_mappings_dir     = 'include'
   s.xcconfig                = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)' }
-  s.preserve_paths          = %w(build.sh)
+  s.preserve_paths          = %w(build.sh Realm/*.{h,hpp})
 
   s.ios.deployment_target   = '7.0'
   s.ios.vendored_library    = 'core/librealm-ios.a'
