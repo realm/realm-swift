@@ -1718,4 +1718,44 @@
                                       @"Operator 'ENDSWITH' is not supported .* right side");
 }
 
+- (void)testQueryOnNullableStringColumn {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [StringObject createInRealm:realm withObject:@[@"a"]];
+        [StringObject createInRealm:realm withObject:@[NSNull.null]];
+        [StringObject createInRealm:realm withObject:@[@"b"]];
+        [StringObject createInRealm:realm withObject:@[NSNull.null]];
+        [StringObject createInRealm:realm withObject:@[@""]];
+    }];
+
+    XCTAssertEqual(5U, [StringObject allObjectsInRealm:realm].count);
+
+    RLMResults *nilStrings = [StringObject objectsInRealm:realm where:@"stringCol = NULL"];
+    XCTAssertEqual(2U, nilStrings.count);
+    XCTAssertEqualObjects((@[NSNull.null, NSNull.null]), [nilStrings valueForKey:@"stringCol"]);
+
+    RLMResults *nonNilStrings = [StringObject objectsInRealm:realm where:@"stringCol != NULL"];
+    XCTAssertEqual(3U, nonNilStrings.count);
+    XCTAssertEqualObjects((@[@"a", @"b", @""]), [nonNilStrings valueForKey:@"stringCol"]);
+
+    XCTAssertEqual(3U, [StringObject objectsInRealm:realm where:@"stringCol IN {NULL, 'a'}"].count);
+
+    XCTAssertEqual(1U, [StringObject objectsInRealm:realm where:@"stringCol CONTAINS 'a'"].count);
+
+    XCTAssertEqual(0U, [StringObject objectsInRealm:realm where:@"stringCol CONTAINS 'z'"].count);
+
+    XCTAssertEqual(1U, [StringObject objectsInRealm:realm where:@"stringCol = ''"].count);
+
+    RLMResults *sorted = [[StringObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"stringCol" ascending:YES];
+    XCTAssertEqualObjects((@[NSNull.null, NSNull.null, @"", @"a", @"b"]), [sorted valueForKey:@"stringCol"]);
+    XCTAssertEqualObjects((@[@"b", @"a", @"", NSNull.null, NSNull.null]), [[sorted sortedResultsUsingProperty:@"stringCol" ascending:NO] valueForKey:@"stringCol"]);
+
+    [realm transactionWithBlock:^{
+        [realm deleteObject:[StringObject allObjectsInRealm:realm].firstObject];
+    }];
+
+    XCTAssertEqual(2U, nilStrings.count);
+    XCTAssertEqual(2U, nonNilStrings.count);
+}
+
 @end
