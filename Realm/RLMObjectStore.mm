@@ -145,12 +145,7 @@ static void RLMCreateColumn(RLMRealm *realm, realm::Table &table, RLMProperty *p
             break;
         }
         default: {
-            bool optional = prop.optional;
-            if (optional && prop.type != RLMPropertyTypeString) {
-                optional = false;
-                NSLog(@"Optional properties are only supported for String properties");
-            }
-            prop.column = table.add_column(realm::DataType(prop.type), prop.name.UTF8String, optional);
+            prop.column = table.add_column(realm::DataType(prop.type), prop.name.UTF8String, prop.optional);
         }
     }
 }
