@@ -284,8 +284,7 @@ case "$COMMAND" in
         ;;
 
     "ios-dynamic")
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION build -sdk iphoneos"
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION build -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
+        build_combined "iOS Dynamic" "$CONFIGURATION" Realm
         exit 0
         ;;
 
@@ -603,6 +602,14 @@ case "$COMMAND" in
         zip --symlinks -r realm-framework-ios.zip Realm.framework
         ;;
 
+    "package-ios-dynamic")
+        cd tightdb_objc
+        sh build.sh ios-dynamic
+
+        cd build/ios
+        zip --symlinks -r realm-dynamic-framework-ios.zip Realm.framework
+        ;;
+
     "package-osx")
         cd tightdb_objc
         sh build.sh test-osx
@@ -631,7 +638,7 @@ case "$COMMAND" in
         cd ..
 
         mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/osx
-        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/ios
+        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/ios/dynamic
         mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/browser
         mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/Swift
 
@@ -646,12 +653,17 @@ case "$COMMAND" in
         )
 
         (
+            cd ${TEMPDIR}/realm-cocoa-${VERSION}/ios/dynamic
+            unzip ${WORKSPACE}/realm-dynamic-framework-ios.zip
+        )
+
+        (
             cd ${TEMPDIR}/realm-cocoa-${VERSION}/browser
             unzip ${WORKSPACE}/realm-browser.zip
         )
 
         (
-            if [[ $PACKAGE_REALM_SWIFT == true ]]; then
+            if $PACKAGE_REALM_SWIFT; then
               cd ${TEMPDIR}/realm-cocoa-${VERSION}/Swift
               unzip ${WORKSPACE}/realm-swift-source.zip
             fi
@@ -707,6 +719,10 @@ EOF
         echo 'Packaging iOS static'
         sh tightdb_objc/build.sh package-ios-static
         cp tightdb_objc/build/ios/realm-framework-ios.zip .
+
+        echo 'Packaging iOS dynamic'
+        sh tightdb_objc/build.sh package-ios-dynamic
+        cp tightdb_objc/build/ios/realm-dynamic-framework-ios.zip .
 
         echo 'Packaging OS X'
         sh tightdb_objc/build.sh package-osx
