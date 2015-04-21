@@ -1309,9 +1309,15 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"stringCol": @"string2", @"intCol": @2}];
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
 
+    [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"intCol": @5}];
+    [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"intCol": @7}];
+    XCTAssertEqual([PrimaryStringObject objectInRealm:realm forPrimaryKey:NSNull.null].intCol, 7);
+    [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"stringCol": NSNull.null, @"intCol": @11}];
+    XCTAssertEqual([PrimaryStringObject objectInRealm:realm forPrimaryKey:nil].intCol, 11);
+
     // upsert with new secondary property
     [PrimaryStringObject createOrUpdateInDefaultRealmWithValue:@[@"string", @3]];
-    XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
+    XCTAssertEqual([objects count], 3U, @"Should have 3 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 3, @"Value should be 3");
 
     // upsert on non-primary key object should throw
