@@ -181,6 +181,12 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     }
 }
 
+- (void)dealloc {
+    if (_realm && !self.isInvalidated) {
+        RLMCheckThread(_realm);
+    }
+}
+
 @end
 
 
