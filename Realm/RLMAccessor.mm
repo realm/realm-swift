@@ -30,7 +30,7 @@
 #import <objc/runtime.h>
 
 typedef NS_ENUM(char, RLMAccessorCode) {
-    RLMAccessorCodeChar,
+    RLMAccessorCodeByte,
     RLMAccessorCodeShort,
     RLMAccessorCodeInt,
     RLMAccessorCodeLong,
@@ -339,7 +339,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 static IMP RLMAccessorGetter(RLMProperty *prop, RLMAccessorCode accessorCode, NSString *objectClassName) {
     NSUInteger colIndex = prop.column;
     switch (accessorCode) {
-        case RLMAccessorCodeChar:
+        case RLMAccessorCodeByte:
             return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
                 return (char)RLMGetLong(obj, colIndex);
             });
@@ -395,8 +395,6 @@ static IMP RLMAccessorGetter(RLMProperty *prop, RLMAccessorCode accessorCode, NS
             return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
                 return RLMGetAnyProperty(obj, colIndex);
             });
-        default:
-            @throw RLMException(@"Invalid accessor code");
     }
 }
 
@@ -416,7 +414,7 @@ static IMP RLMMakeSetter(NSUInteger colIndex, bool isPrimary) {
 static IMP RLMAccessorSetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
     NSUInteger colIndex = prop.column;
     switch (accessorCode) {
-        case RLMAccessorCodeChar: return RLMMakeSetter<char, long long>(colIndex, prop.isPrimary);
+        case RLMAccessorCodeByte: return RLMMakeSetter<char, long long>(colIndex, prop.isPrimary);
         case RLMAccessorCodeShort: return RLMMakeSetter<short, long long>(colIndex, prop.isPrimary);
         case RLMAccessorCodeInt: return RLMMakeSetter<int, long long>(colIndex, prop.isPrimary);
         case RLMAccessorCodeLong: return RLMMakeSetter<long, long long>(colIndex, prop.isPrimary);
@@ -430,8 +428,6 @@ static IMP RLMAccessorSetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
         case RLMAccessorCodeLink: return RLMMakeSetter<RLMObjectBase *>(colIndex, prop.isPrimary);
         case RLMAccessorCodeArray: return RLMMakeSetter<RLMArray *>(colIndex, prop.isPrimary);
         case RLMAccessorCodeAny: return RLMMakeSetter<id>(colIndex, prop.isPrimary);
-        default:
-            @throw RLMException(@"Invalid accessor code");
     }
 }
 
@@ -548,7 +544,7 @@ static RLMAccessorCode accessorCodeForType(char objcTypeCode, RLMPropertyType rl
             }
         case 'c':
             switch (rlmType) {
-                case RLMPropertyTypeInt: return RLMAccessorCodeChar;
+                case RLMPropertyTypeInt: return RLMAccessorCodeByte;
                 case RLMPropertyTypeBool: return RLMAccessorCodeBool;
                 default: break;
             }
@@ -653,7 +649,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
                    __unsafe_unretained id val, RLMCreationOptions options) {
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
-        case RLMAccessorCodeChar:
+        case RLMAccessorCodeByte:
         case RLMAccessorCodeShort:
         case RLMAccessorCodeInt:
         case RLMAccessorCodeLong:
@@ -697,8 +693,6 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
         case RLMAccessorCodeAny:
             RLMSetValue(obj, col, val);
             break;
-        default:
-            @throw RLMException(@"Invalid accessor code");
     }
 }
 
@@ -711,7 +705,7 @@ id RLMDynamicGet(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained NSS
     }
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
-        case RLMAccessorCodeChar: return @((char)RLMGetLong(obj, col));
+        case RLMAccessorCodeByte: return @((char)RLMGetLong(obj, col));
         case RLMAccessorCodeShort: return @((short)RLMGetLong(obj, col));
         case RLMAccessorCodeInt: return @((int)RLMGetLong(obj, col));
         case RLMAccessorCodeLong: return @((long)RLMGetLong(obj, col));
@@ -725,7 +719,5 @@ id RLMDynamicGet(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained NSS
         case RLMAccessorCodeLink: return RLMGetLink(obj, col, prop.objectClassName);
         case RLMAccessorCodeArray: return RLMGetArray(obj, col, prop.objectClassName);
         case RLMAccessorCodeAny: return RLMGetAnyProperty(obj, col);
-        default:
-            @throw RLMException(@"Invalid accessor code");
     }
 }
