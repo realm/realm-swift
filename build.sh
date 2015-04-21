@@ -130,10 +130,7 @@ build_combined() {
     elif [[ "$module_name" == "RealmSwift" ]]; then
       xcrealmswift "-scheme '$scheme' -configuration $config -sdk iphoneos"
       xcrealmswift "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
-    fi
-
-    # Combine .swiftmodule
-    if [ -d $iphoneos_path/Modules/$module_name.swiftmodule ]; then
+      # Combine .swiftmodule
       cp $iphoneos_path/Modules/$module_name.swiftmodule/* $iphonesimulator_path/Modules/$module_name.swiftmodule/
     fi
 
@@ -284,7 +281,7 @@ case "$COMMAND" in
         ;;
 
     "ios-dynamic")
-        build_combined "iOS Dynamic" "$CONFIGURATION" Realm
+        build_combined "iOS Dynamic" "$CONFIGURATION" Realm "-dynamic"
         exit 0
         ;;
 
@@ -620,14 +617,10 @@ case "$COMMAND" in
 
     "package-swift-source")
         cd tightdb_objc
-        sh build.sh ios-dynamic
-        mkdir -p dynamic_frameworks/iphoneos dynamic_frameworks/iphonesimulator
-        cp -R build/DerivedData/Realm/Build/Products/Release-iphoneos-dynamic/Realm.framework dynamic_frameworks/iphoneos/Realm.framework/
-        cp -R build/DerivedData/Realm/Build/Products/Release-iphonesimulator-dynamic/Realm.framework dynamic_frameworks/iphonesimulator/Realm.framework/
         rm RealmSwift/RealmSwift-Info.plist RealmSwift/Tests/RealmSwiftTests-Info.plist
         cp Realm/Realm-Info.plist RealmSwift/RealmSwift-Info.plist
         cp Realm/Tests/RealmTests-Info.plist RealmSwift/Tests/RealmSwiftTests-Info.plist
-        zip --symlinks -r realm-swift-source.zip RealmSwift.xcodeproj RealmSwift dynamic_frameworks
+        zip --symlinks -r realm-swift-source.zip RealmSwift.xcodeproj RealmSwift
     ;;
 
     "package-release")
