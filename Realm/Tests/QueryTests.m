@@ -1741,6 +1741,8 @@
     XCTAssertEqual(3U, [StringObject objectsInRealm:realm where:@"stringCol IN {NULL, 'a'}"].count);
 
     XCTAssertEqual(1U, [StringObject objectsInRealm:realm where:@"stringCol CONTAINS 'a'"].count);
+    XCTAssertEqual(1U, [StringObject objectsInRealm:realm where:@"stringCol BEGINSWITH 'a'"].count);
+    XCTAssertEqual(1U, [StringObject objectsInRealm:realm where:@"stringCol ENDSWITH 'a'"].count);
 
     XCTAssertEqual(0U, [StringObject objectsInRealm:realm where:@"stringCol CONTAINS 'z'"].count);
 
@@ -1756,6 +1758,14 @@
 
     XCTAssertEqual(2U, nilStrings.count);
     XCTAssertEqual(2U, nonNilStrings.count);
+
+//    FIXME: These tests are currently failing due to a querying bug in core (https://github.com/realm/realm-core/pull/775
+//    XCTAssertEqualObjects([nonNilStrings valueForKey:@"self"], [[StringObject objectsInRealm:realm where:@"stringCol CONTAINS ''"] valueForKey:@"self"]);
+//    XCTAssertEqualObjects([nonNilStrings valueForKey:@"self"], [[StringObject objectsInRealm:realm where:@"stringCol BEGINSWITH ''"] valueForKey:@"self"]);
+//    XCTAssertEqualObjects([nonNilStrings valueForKey:@"self"], [[StringObject objectsInRealm:realm where:@"stringCol ENDSWITH ''"] valueForKey:@"self"]);
+
+    XCTAssertEqualObjects(@[], ([[StringObject objectsInRealm:realm where:@"stringCol CONTAINS %@", @"\0"] valueForKey:@"self"]));
+    XCTAssertEqualObjects([[StringObject allObjectsInRealm:realm] valueForKey:@"stringCol"], ([[StringObject objectsInRealm:realm where:@"stringCol CONTAINS NULL"] valueForKey:@"stringCol"]));
 }
 
 @end
