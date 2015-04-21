@@ -85,10 +85,9 @@ static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyVal
     RLMObservationInfo *info = RLMGetObservationInfo(ar->_observationInfo, ar->_backingLinkView->get_origin_row_index(), ar->_objectSchema);
     if (info) {
         NSIndexSet *indexes = is();
-        NSString *key = ar->_key;
-        for_each(info, [&](__unsafe_unretained id const o) { [o willChange:kind valuesAtIndexes:indexes forKey:key]; });
+        info->willChange(ar->_key, kind, indexes);
         f();
-        for_each(info, [&](__unsafe_unretained id const o) { [o didChange:kind valuesAtIndexes:indexes forKey:key]; });
+        info->didChange(ar->_key, kind, indexes);
     }
     else {
         f();

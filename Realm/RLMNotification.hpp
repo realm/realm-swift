@@ -38,30 +38,45 @@ struct RLMRecordedObservation {
     NSString *key;
 };
 
-struct RLMObservationInfo {
-    RLMObservationInfo *next = nullptr;
-    RLMObservationInfo *prev = nullptr;
-
-    // Row being observed
-    realm::Row row;
-    RLMObjectSchema *objectSchema;
-
-    // Object doing the observing
-    __unsafe_unretained id object;
-    // storage for the observationInfo property on RLMObjectBase
-    void *kvoInfo = nullptr;
-
-    // valueForKey: hack
-    bool returnNil = false;
-    // Recorded observers for a standalone RLMObject; unused for persisted objects
-    std::vector<RLMRecordedObservation> standaloneObservers;
-    bool skipUnregisteringObservers = false;
-
-    NSMutableDictionary *cachedObjects;
-
+class RLMObservationInfo {
+public:
     RLMObservationInfo(id object);
     RLMObservationInfo(RLMObjectSchema *objectSchema, std::size_t row, id object);
     ~RLMObservationInfo();
+
+    realm::Row const& getRow() const {
+        return row;
+    }
+
+    RLMObjectSchema *getObjectSchema() const {
+        return objectSchema;
+    }
+
+    void willChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const {
+        if (indexes) {
+            forEach([=](__unsafe_unretained auto o) {
+                [o willChange:kind valuesAtIndexes:indexes forKey:key];
+            });
+        }
+        else {
+            forEach([=](__unsafe_unretained auto o) {
+                [o willChangeValueForKey:key];
+            });
+        }
+    }
+
+    void didChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const {
+        if (indexes) {
+            forEach([=](__unsafe_unretained auto o) {
+                [o didChange:kind valuesAtIndexes:indexes forKey:key];
+            });
+        }
+        else {
+            forEach([=](__unsafe_unretained auto o) {
+                [o didChangeValueForKey:key];
+            });
+        }
+    }
 
     void setReturnNil(bool value) {
         REALM_ASSERT(objectSchema);
@@ -70,6 +85,10 @@ struct RLMObservationInfo {
     }
 
     void setRow(size_t newRow);
+    bool isForRow(size_t ndx) const {
+        return row && row.get_index() == ndx;
+    }
+
     void recordObserver(realm::Row& row, RLMObjectSchema *objectSchema,
                         id observer, NSString *keyPath,
                         NSKeyValueObservingOptions options, void *context);
@@ -86,22 +105,46 @@ struct RLMObservationInfo {
     id valueForKey(NSString *key, id (^value)());
 
 private:
-    void setRow(realm::Table &table, size_t newRow);
-};
+    RLMObservationInfo *next = nullptr;
+    RLMObservationInfo *prev = nullptr;
 
-template<typename F>
-void for_each(const RLMObservationInfo *info, F&& f) {
-    for (; info; info = info->next)
-        f(info->object);
-}
+    // Row being observed
+    realm::Row row;
+    RLMObjectSchema *objectSchema;
+
+    // Object doing the observing
+    __unsafe_unretained id object;
+
+    // valueForKey: hack
+    bool returnNil = false;
+    // Recorded observers for a standalone RLMObject; unused for persisted objects
+    std::vector<RLMRecordedObservation> standaloneObservers;
+
+    // objects returned from valueForKey() to keep them alive in case observers
+    // are added and so that they can still be accessed after row is detached
+    NSMutableDictionary *cachedObjects;
+
+    void setRow(realm::Table &table, size_t newRow);
+
+    template<typename F>
+    void forEach(F&& f) const {
+        for (auto info = prev; info; info = info->prev)
+            f(info->object);
+        for (auto info = this; info; info = info->next)
+            f(info->object);
+    }
+
+public:
+    bool skipUnregisteringObservers = false;
+    // storage for the observationInfo property on RLMObjectBase
+    void *kvoInfo = nullptr;
+};
 
 // Call the appropriate SharedGroup member function, with change notifications
 void RLMAdvanceRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
 void RLMRollbackAndContinueAsRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
 void RLMPromoteToWrite(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
 
-// call the given block on each observer of the given row
-void RLMForEachObserver(RLMObjectBase *obj, void (^block)(RLMObjectBase*));
 // invoke the block, sending notifications for cascading deletes/link nullifications
 void RLMTrackDeletions(RLMRealm *realm, dispatch_block_t block);
 

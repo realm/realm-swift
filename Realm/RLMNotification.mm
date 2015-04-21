@@ -208,17 +208,12 @@ RLMObservationInfo *RLMGetObservationInfo(std::unique_ptr<RLMObservationInfo> co
     }
 
     for (RLMObservationInfo *info : objectSchema->_observedObjects) {
-        if (info->row.get_index() == row) {
+        if (info->isForRow(row)) {
             return info;
         }
     }
 
     return nullptr;
-}
-
-void RLMForEachObserver(RLMObjectBase *obj, void (^block)(RLMObjectBase*)) {
-    RLMObservationInfo *info = RLMGetObservationInfo(obj->_observationInfo, obj->_row.get_index(), obj->_objectSchema);
-    for_each(info, block);
 }
 
 void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block_t block) {
@@ -254,18 +249,18 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
             }
 
             for (auto observer : *observers[table_ndx]) {
-                if (!observer->row || observer->row.get_index() != link.origin_row_ndx) {
+                if (!observer->isForRow(link.origin_row_ndx)) {
                     continue;
                 }
 
-                RLMProperty *prop = observer->objectSchema.properties[link.origin_col_ndx];
+                RLMProperty *prop = observer->getObjectSchema().properties[link.origin_col_ndx];
                 NSString *name = prop.name;
                 if (prop.type != RLMPropertyTypeArray) {
                     changes.push_back({observer, name});
                     continue;
                 }
 
-                auto linkview = observer->row.get_linklist(prop.column);
+                auto linkview = observer->getRow().get_linklist(prop.column);
                 arrayChange *c = nullptr;
                 for (auto& ac : arrayChanges) {
                     if (ac.info == observer && ac.property == name) {
@@ -293,17 +288,19 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
             }
 
             for (auto observer : *observers[row.table_ndx]) {
-                if (observer->row && observer->row.get_index() == row.row_ndx) {
+                if (observer->isForRow(row.row_ndx)) {
                     changes.push_back({observer, invalidated});
                     break;
                 }
             }
         }
 
-        for (auto const& change : changes)
-            for_each(change.info, [&](auto o) { [o willChangeValueForKey:change.property]; });
-        for (auto const& change : arrayChanges)
-            for_each(change.info, [&](auto o) { [o willChange:NSKeyValueChangeRemoval valuesAtIndexes:change.indexes forKey:change.property]; });
+        for (auto const& change : changes) {
+            change.info->willChange(change.property);
+        }
+        for (auto const& change : arrayChanges) {
+            change.info->willChange(change.property, NSKeyValueChangeRemoval, change.indexes);
+        }
         for (auto const& change : changes) {
             if (change.property == invalidated) {
                 change.info->setReturnNil(true);
@@ -314,10 +311,10 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
     block();
 
     for (auto const& change : changes) {
-        for_each(change.info, [&](auto o) { [o didChangeValueForKey:change.property]; });
+        change.info->didChange(change.property);
     }
     for (auto const& change : arrayChanges) {
-        for_each(change.info, [&](auto o) { [o didChange:NSKeyValueChangeRemoval valuesAtIndexes:change.indexes forKey:change.property]; });
+        change.info->didChange(change.property, NSKeyValueChangeRemoval, change.indexes);
     }
 
     realm.group->set_cascade_notification_handler(nullptr);
@@ -345,8 +342,7 @@ class TransactLogHandler {
         // all this should maybe be precomputed or cached or something
         for (RLMObjectSchema *objectSchema in schema) {
             for (auto info : objectSchema->_observedObjects) {
-                REALM_ASSERT(info->objectSchema == objectSchema);
-                auto const& row = info->row;
+                auto const& row = info->getRow();
                 if (!row.is_attached()) // FIXME: should maybe try to remove from array on invalidate
                     continue;
                 info->setReturnNil(false);
@@ -363,7 +359,7 @@ class TransactLogHandler {
 
         for (RLMObjectSchema *objectSchema in schema) {
             for (auto info : objectSchema->_observedObjects) {
-                auto const& row = info->row;
+                auto const& row = info->getRow();
                 if (!row.is_attached()) // FIXME: should maybe try to remove from array on invalidate
                     continue;
                 observers.push_back({
@@ -378,18 +374,13 @@ class TransactLogHandler {
 
     void notifyObservers() {
         for (auto const& o : observers) {
-            if (o.row == realm::not_found && o.column == realm::npos) {
-                for_each(o.info, [&](auto obj) { [obj didChangeValueForKey:o.key]; });
+            if (o.row == realm::not_found) {
+                if (o.column == realm::npos) { // i.e. invalidated
+                    o.info->didChange(o.key);
+                }
             }
-            if (!o.changed)
-                continue;
-            if (!o.linkviewChangeIndexes)
-                for_each(o.info, [&](auto obj) { [obj didChangeValueForKey:o.key]; });
-            else {
-                for_each(o.info, [&](auto obj) {
-                    [obj didChange:o.linkviewChangeKind valuesAtIndexes:o.linkviewChangeIndexes forKey:o.key];
-                });
-            }
+            else if (o.changed)
+                o.info->didChange(o.key, o.linkviewChangeKind, o.linkviewChangeIndexes);
         }
     }
 
@@ -409,20 +400,13 @@ public:
     void parse_complete() {
         for (auto const& o : observers) {
             if (o.row == realm::not_found) {
-                if (o.column == realm::npos) {
-                    for_each(o.info, [&](auto obj) { [obj willChangeValueForKey:o.key]; });
+                if (o.column == realm::npos) { // i.e. invalidated
+                    o.info->willChange(o.key);
                     o.info->setReturnNil(true);
                 }
             }
-            if (!o.changed)
-                continue;
-            if (!o.linkviewChangeIndexes)
-                for_each(o.info, [&](auto obj) { [obj willChangeValueForKey:o.key]; });
-            else {
-                for_each(o.info, [&](auto obj) {
-                    [obj willChange:o.linkviewChangeKind valuesAtIndexes:o.linkviewChangeIndexes forKey:o.key];
-                });
-            }
+            else if (o.changed)
+                o.info->willChange(o.key, o.linkviewChangeKind, o.linkviewChangeIndexes);
         }
     }
 
@@ -546,7 +530,7 @@ public:
             if (o->multipleLinkviewChanges)
                 return true;
 
-            auto range = NSMakeRange(0, o->info->row.get_linklist(o->column)->size());
+            auto range = NSMakeRange(0, o->info->getRow().get_linklist(o->column)->size());
             if (!o->linkviewChangeIndexes) {
                 o->linkviewChangeIndexes = [NSMutableIndexSet indexSetWithIndexesInRange:range];
                 o->linkviewChangeKind = NSKeyValueChangeRemoval;
