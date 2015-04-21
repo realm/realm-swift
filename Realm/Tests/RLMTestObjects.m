@@ -57,6 +57,12 @@
 }
 @end
 
+@implementation LinkStringObject
+@end
+
+@implementation LinkIndexedStringObject
+@end
+
 #pragma mark AllTypesObject
 
 @implementation AllTypesObject

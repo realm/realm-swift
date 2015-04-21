@@ -85,6 +85,14 @@
 RLM_ARRAY_TYPE(StringObject)
 RLM_ARRAY_TYPE(IntObject)
 
+@interface LinkStringObject : RLMObject
+@property StringObject *objectCol;
+@end
+
+@interface LinkIndexedStringObject : RLMObject
+@property IndexedStringObject *objectCol;
+@end
+
 #pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject
