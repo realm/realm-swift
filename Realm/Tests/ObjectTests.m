@@ -301,8 +301,8 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     soInit.name = nil;
     [realm addObject:soInit];
 
-    soUsingArray = [EmployeeObject createInRealm:realm withObject:@[NSNull.null, @40, @NO]];
-    soUsingDictionary = [EmployeeObject createInRealm:realm withObject:@{@"name": NSNull.null, @"age": @25, @"hired": @YES}];
+    soUsingArray = [EmployeeObject createInRealm:realm withValue:@[NSNull.null, @40, @NO]];
+    soUsingDictionary = [EmployeeObject createInRealm:realm withValue:@{@"name": NSNull.null, @"age": @25, @"hired": @YES}];
 
     [realm commitWriteTransaction];
 
@@ -368,9 +368,9 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertNoThrow([[DefaultObject alloc] initWithValue:@{@"intCol": @1}],
                      "Overriding some default values at initialization should not throw");
 
-    XCTAssertNil(([[EmployeeObject alloc] initWithObject:@[NSNull.null, @30, @YES]].name));
-    XCTAssertNil(([[EmployeeObject alloc] initWithObject:@{@"name" : NSNull.null, @"age" : @30, @"hired" : @YES}].name));
-    XCTAssertNil(([[EmployeeObject alloc] initWithObject:@{@"age" : @30, @"hired" : @YES}].name));
+    XCTAssertNil(([[EmployeeObject alloc] initWithValue:@[NSNull.null, @30, @YES]].name));
+    XCTAssertNil(([[EmployeeObject alloc] initWithValue:@{@"name" : NSNull.null, @"age" : @30, @"hired" : @YES}].name));
+    XCTAssertNil(([[EmployeeObject alloc] initWithValue:@{@"age" : @30, @"hired" : @YES}].name));
 }
 
 -(void)testObjectInitWithObjectTypeObject
@@ -387,6 +387,11 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
     // nested objects should work
     XCTAssertNoThrow([[OwnerObject alloc] initWithValue:(@[@"Alex", dogExt])], @"Should not throw");
+
+    dogExt.dogName = nil;
+    dogExt.breed = nil;
+    dog = [[DogObject alloc] initWithValue:dogExt];
+    XCTAssertNil(dog.dogName);
 }
 
 -(void)testObjectInitWithObjectLiterals {
@@ -487,6 +492,12 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [realm commitWriteTransaction];
     
     XCTAssertEqualObjects(obj0[@"name"], @"newName",  @"Name should be newName");
+
+    [realm beginWriteTransaction];
+    obj0[@"name"] = nil;
+    [realm commitWriteTransaction];
+
+    XCTAssertNil(obj0[@"name"]);
 }
 
 - (void)testDataTypes
