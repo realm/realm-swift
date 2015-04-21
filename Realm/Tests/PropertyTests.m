@@ -36,6 +36,7 @@
                                                 @"\tobjectClassName = StringObject;\n"
                                                 @"\tindexed = NO;\n"
                                                 @"\tisPrimary = NO;\n"
+                                                @"\toptional = YES;\n"
                                                 @"}");
 }
 

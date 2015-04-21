@@ -33,12 +33,14 @@
                                                     @"\t\tobjectClassName = (null);\n"
                                                     @"\t\tindexed = YES;\n"
                                                     @"\t\tisPrimary = YES;\n"
+                                                    @"\t\toptional = YES;\n"
                                                     @"\t}\n"
                                                     @"\tintCol {\n"
                                                     @"\t\ttype = int;\n"
                                                     @"\t\tobjectClassName = (null);\n"
                                                     @"\t\tindexed = NO;\n"
                                                     @"\t\tisPrimary = NO;\n"
+                                                    @"\t\toptional = NO;\n"
                                                     @"\t}\n"
                                                     @"}");
 }
