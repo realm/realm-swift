@@ -294,6 +294,27 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertEqualObjects(soUsingDictionary.name, @"Susi", @"Name should be Susi");
     XCTAssertEqual(soUsingDictionary.age, 25, @"Age should be 25");
     XCTAssertEqual(soUsingDictionary.hired, YES, @"Hired should YES");
+
+    [realm beginWriteTransaction];
+
+    soInit = [[EmployeeObject alloc] init];
+    soInit.name = nil;
+    [realm addObject:soInit];
+
+    soUsingArray = [EmployeeObject createInRealm:realm withObject:@[NSNull.null, @40, @NO]];
+    soUsingDictionary = [EmployeeObject createInRealm:realm withObject:@{@"name": NSNull.null, @"age": @25, @"hired": @YES}];
+
+    [realm commitWriteTransaction];
+
+    XCTAssertNil(soInit.name);
+
+    XCTAssertNil(soUsingArray.name, @"Name should be nil");
+    XCTAssertEqual(soUsingArray.age, 40, @"Age should be 40");
+    XCTAssertEqual(soUsingArray.hired, NO, @"Hired should NO");
+
+    XCTAssertNil(soUsingDictionary.name, @"Name should be nil");
+    XCTAssertEqual(soUsingDictionary.age, 25, @"Age should be 25");
+    XCTAssertEqual(soUsingDictionary.hired, YES, @"Hired should YES");
 }
 
 -(void)testObjectInitWithObjectTypeArray
@@ -346,6 +367,10 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertThrows([[EmployeeObject alloc] initWithValue:@{}], @"Initialization with missing values should throw");
     XCTAssertNoThrow([[DefaultObject alloc] initWithValue:@{@"intCol": @1}],
                      "Overriding some default values at initialization should not throw");
+
+    XCTAssertNil(([[EmployeeObject alloc] initWithObject:@[NSNull.null, @30, @YES]].name));
+    XCTAssertNil(([[EmployeeObject alloc] initWithObject:@{@"name" : NSNull.null, @"age" : @30, @"hired" : @YES}].name));
+    XCTAssertNil(([[EmployeeObject alloc] initWithObject:@{@"age" : @30, @"hired" : @YES}].name));
 }
 
 -(void)testObjectInitWithObjectTypeObject
