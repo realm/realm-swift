@@ -207,6 +207,58 @@
     __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithObject:@[@"n", @[], @[[[IntObject alloc] initWithObject:@[@1]]]]];
 }
 
+- (void)testReplaceObjectAtIndexInStandaloneArray {
+    ArrayPropertyObject *array = [[ArrayPropertyObject alloc] init];
+    array.name = @"name";
+
+    StringObject *stringObj1 = [[StringObject alloc] init];
+    stringObj1.stringCol = @"a";
+    StringObject *stringObj2 = [[StringObject alloc] init];
+    stringObj2.stringCol = @"b";
+    StringObject *stringObj3 = [[StringObject alloc] init];
+    stringObj3.stringCol = @"c";
+    [array.array addObject:stringObj1];
+    [array.array addObject:stringObj2];
+    [array.array addObject:stringObj3];
+
+    IntObject *intObj1 = [[IntObject alloc] init];
+    intObj1.intCol = 0;
+    IntObject *intObj2 = [[IntObject alloc] init];
+    intObj2.intCol = 1;
+    IntObject *intObj3 = [[IntObject alloc] init];
+    intObj3.intCol = 2;
+    [array.intArray addObject:intObj1];
+    [array.intArray addObject:intObj2];
+    [array.intArray addObject:intObj3];
+
+    XCTAssertEqualObjects(array.array[0], stringObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(array.array[1], stringObj2, @"Objects should be equal");
+    XCTAssertEqualObjects(array.array[2], stringObj3, @"Objects should be equal");
+    XCTAssertEqual(array.array.count, 3U, @"Should have 3 elements in string array");
+
+    XCTAssertEqualObjects(array.intArray[0], intObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(array.intArray[1], intObj2, @"Objects should be equal");
+    XCTAssertEqualObjects(array.intArray[2], intObj3, @"Objects should be equal");
+    XCTAssertEqual(array.intArray.count, 3U, @"Should have 3 elements in int array");
+
+    StringObject *stringObj4 = [[StringObject alloc] init];
+    stringObj4.stringCol = @"d";
+
+    [array.array replaceObjectAtIndex:0 withObject:stringObj4];
+    XCTAssertTrue([[array.array objectAtIndex:0] isEqualToObject:stringObj4], @"Objects should be replaced");
+    XCTAssertEqual(array.array.count, 3U, @"Should have 3 elements in int array");
+
+    IntObject *intObj4 = [[IntObject alloc] init];
+    intObj4.intCol = 3;
+
+    [array.intArray replaceObjectAtIndex:1 withObject:intObj4];
+    XCTAssertTrue([[array.intArray objectAtIndex:1] isEqualToObject:intObj4], @"Objects should be replaced");
+    XCTAssertEqual(array.intArray.count, 3U, @"Should have 3 elements in int array");
+
+    XCTAssertThrows([array.array replaceObjectAtIndex:0 withObject:intObj4], @"Throws exception throws when type mismatched");
+    XCTAssertThrows([array.intArray replaceObjectAtIndex:1 withObject:stringObj4], @"Throws exception when type mismatched");
+}
+
 - (void)testDeleteObjectInStandaloneArray {
     ArrayPropertyObject *array = [[ArrayPropertyObject alloc] init];
     array.name = @"name";
