@@ -68,6 +68,14 @@
 @implementation ThreeFieldMigrationObject
 @end
 
+@interface MigrationTwoStringObject : RLMObject
+@property NSString *col1;
+@property NSString *col2;
+@end
+
+@implementation MigrationTwoStringObject
+@end
+
 @interface MigrationTests : RLMTestCase
 @end
 
@@ -857,26 +865,26 @@
 
 - (void)testRequiredToNullableAutoMigration {
     RLMSchema *nullable = [[RLMSchema alloc] init];
-    nullable.objectSchema = @[[RLMObjectSchema schemaForObjectClass:StringObject.class]];
+    nullable.objectSchema = @[[RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class]];
 
     RLMSchema *nonnull = [[RLMSchema alloc] init];
-    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
-    [objectSchema.properties[0] setOptional:NO];
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
+    [objectSchema.properties setValue:@NO forKey:@"optional"];
     nonnull.objectSchema = @[objectSchema];
 
     // create initial required column
     @autoreleasepool {
         RLMRealm *realm = [self realmWithTestPathAndSchema:nonnull];
         [realm transactionWithBlock:^{
-            [StringObject createInRealm:realm withObject:@[@"string"]];
+            [MigrationTwoStringObject createInRealm:realm withObject:@[@"string", @"string2"]];
         }];
     }
 
     @autoreleasepool {
         [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
         RLMRealm *realm = [self realmWithTestPathAndSchema:nullable];
-        XCTAssertEqualObjects([[StringObject allObjectsInRealm:realm] valueForKey:@"stringCol"], @[@"string"]);
-        XCTAssertTrue(realm.schema[@"StringObject"][@"stringCol"].optional);
+        XCTAssertEqualObjects([[MigrationTwoStringObject allObjectsInRealm:realm] valueForKey:@"col2"], @[@"string2"]);
+        XCTAssertTrue(realm.schema[@"MigrationTwoStringObject"][@"col1"].optional);
     }
 }
 
