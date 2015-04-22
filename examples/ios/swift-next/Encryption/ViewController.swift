@@ -107,7 +107,7 @@ class ViewController: UIViewController {
         var dataTypeRef: AnyObject?
         var status = withUnsafeMutablePointer(&dataTypeRef) { SecItemCopyMatching(query, UnsafeMutablePointer($0)) }
         if status == errSecSuccess {
-            return dataTypeRef as NSData
+            return dataTypeRef as! NSData
         }
 
         // No pre-existing key from this application, so generate a new one

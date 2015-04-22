@@ -22,30 +22,30 @@ import Realm
 class SwiftPropertyTypeTest: SwiftTestCase {
     
     func testLongType() {
-        let longNumber = 17179869184
-        let intNumber = 2147483647
-        let negativeLongNumber = -17179869184
-        let updatedLongNumber = 8589934592
+        let longNumber: Int64 = 17179869184
+        let intNumber: Int64 = 2147483647
+        let negativeLongNumber: Int64 = -17179869184
+        let updatedLongNumber: Int64 = 8589934592
         
         let realm = realmWithTestPath()
         
         realm.beginWriteTransaction()
-        SwiftIntObject.createInRealm(realm, withObject: [longNumber])
-        SwiftIntObject.createInRealm(realm, withObject: [intNumber])
-        SwiftIntObject.createInRealm(realm, withObject: [negativeLongNumber])
+        SwiftLongObject.createInRealm(realm, withObject: [NSNumber(longLong: longNumber)])
+        SwiftLongObject.createInRealm(realm, withObject: [NSNumber(longLong: intNumber)])
+        SwiftLongObject.createInRealm(realm, withObject: [NSNumber(longLong: negativeLongNumber)])
         realm.commitWriteTransaction()
         
-        let objects = SwiftIntObject.allObjectsInRealm(realm)
+        let objects = SwiftLongObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, UInt(3), "3 rows expected")
-        XCTAssertEqual((objects[0] as! SwiftIntObject).intCol, longNumber, "2 ^ 34 expected")
-        XCTAssertEqual((objects[1] as! SwiftIntObject).intCol, intNumber, "2 ^ 31 - 1 expected")
-        XCTAssertEqual((objects[2] as! SwiftIntObject).intCol, negativeLongNumber, "-2 ^ 34 expected")
+        XCTAssertEqual((objects[0] as! SwiftLongObject).longCol, longNumber, "2 ^ 34 expected")
+        XCTAssertEqual((objects[1] as! SwiftLongObject).longCol, intNumber, "2 ^ 31 - 1 expected")
+        XCTAssertEqual((objects[2] as! SwiftLongObject).longCol, negativeLongNumber, "-2 ^ 34 expected")
         
         realm.beginWriteTransaction()
-        (objects[0] as! SwiftIntObject).intCol = updatedLongNumber
+        (objects[0] as! SwiftLongObject).longCol = updatedLongNumber
         realm.commitWriteTransaction()
         
-        XCTAssertEqual((objects[0] as! SwiftIntObject).intCol, updatedLongNumber, "After update: 2 ^ 33 expected")
+        XCTAssertEqual((objects[0] as! SwiftLongObject).longCol, updatedLongNumber, "After update: 2 ^ 33 expected")
     }
 
     func testIntSizes() {

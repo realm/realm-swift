@@ -31,6 +31,10 @@ class SwiftIntObject: Object {
     dynamic var intCol = 0
 }
 
+class SwiftLongObject: Object {
+    dynamic var longCol: Int64 = 0
+}
+
 class SwiftObject: Object {
     dynamic var boolCol = false
     dynamic var intCol = 123

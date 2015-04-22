@@ -106,29 +106,29 @@ class ObjectAccessorTests: TestCase {
     }
 
     func testLongType() {
-        let longNumber = 17179869184
-        let intNumber = 2147483647
-        let negativeLongNumber = -17179869184
-        let updatedLongNumber = 8589934592
+        let longNumber: Int64 = 17179869184
+        let intNumber: Int64 = 2147483647
+        let negativeLongNumber: Int64 = -17179869184
+        let updatedLongNumber: Int64 = 8589934592
 
         let realm = realmWithTestPath()
 
         realm.beginWrite()
-        realm.create(SwiftIntObject.self, value: [longNumber])
-        realm.create(SwiftIntObject.self, value: [intNumber])
-        realm.create(SwiftIntObject.self, value: [negativeLongNumber])
+        realm.create(SwiftLongObject.self, value: [NSNumber(longLong: longNumber)])
+        realm.create(SwiftLongObject.self, value: [NSNumber(longLong: intNumber)])
+        realm.create(SwiftLongObject.self, value: [NSNumber(longLong: negativeLongNumber)])
         realm.commitWrite()
 
-        let objects = realm.objects(SwiftIntObject)
+        let objects = realm.objects(SwiftLongObject)
         XCTAssertEqual(objects.count, Int(3), "3 rows expected")
-        XCTAssertEqual(objects[0].intCol, longNumber, "2 ^ 34 expected")
-        XCTAssertEqual(objects[1].intCol, intNumber, "2 ^ 31 - 1 expected")
-        XCTAssertEqual(objects[2].intCol, negativeLongNumber, "-2 ^ 34 expected")
+        XCTAssertEqual(objects[0].longCol, longNumber, "2 ^ 34 expected")
+        XCTAssertEqual(objects[1].longCol, intNumber, "2 ^ 31 - 1 expected")
+        XCTAssertEqual(objects[2].longCol, negativeLongNumber, "-2 ^ 34 expected")
 
         realm.beginWrite()
-        objects[0].intCol = updatedLongNumber
+        objects[0].longCol = updatedLongNumber
         realm.commitWrite()
 
-        XCTAssertEqual(objects[0].intCol, updatedLongNumber, "After update: 2 ^ 33 expected")
+        XCTAssertEqual(objects[0].longCol, updatedLongNumber, "After update: 2 ^ 33 expected")
     }
 }
