@@ -30,7 +30,6 @@
 echo "Stripping frameworks"
 cd "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}"
 
-exit_code=0
 for file in $(find . -type f -perm +111); do
   # Skip non-dynamic libraries
   if ! [[ "$(file "$file")" == *"dynamically linked shared library"* ]]; then
@@ -42,7 +41,7 @@ for file in $(find . -type f -perm +111); do
   for arch in $archs; do
     if ! [[ "${VALID_ARCHS}" == *"$arch"* ]]; then
       # Strip non-valid architectures in-place
-      lipo -remove "$arch" -output "$file" "$file" || exit_code=1
+      lipo -remove "$arch" -output "$file" "$file" || exit 1
       stripped="$stripped $arch"
     fi
   done
@@ -50,5 +49,3 @@ for file in $(find . -type f -perm +111); do
     echo "Stripped $file of architectures:$stripped"
   fi
 done
-
-exit $exit_code
