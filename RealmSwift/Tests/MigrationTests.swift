@@ -284,6 +284,9 @@ class MigrationTests: TestCase {
                 XCTAssertEqual(list[1]["boolCol"] as Bool, false)
                 XCTAssertEqual(list[2]["boolCol"] as Bool, true)
 
+                self.assertThrows(newObj!.valueForKey("noSuchKey"))
+                self.assertThrows(newObj!.setValue(1, forKey: "noSuchKey"))
+
                 // set it again
                 newObj!["arrayCol"] = [falseObj, trueObj]
 
