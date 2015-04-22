@@ -584,6 +584,48 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
+/**
+ Replaces all string columns in this Realm with a string enumeration column and compacts the
+ database file.
+ 
+ Cannot be called from a write transaction.
+
+ Compaction will not occur if other `RLMRealm` instances exist.
+ 
+ While compaction is in progress, attempts by other threads or processes to open the database will
+ wait.
+ 
+ Be warned that resource requirements for compaction is proportional to the amount of live data in
+ the database.
+ 
+ Compaction works by writing the database contents to a temporary database file and then replacing
+ the database with the temporary one. The name of the temporary file is formed by appending
+ `.tmp_compaction_space` to the name of the database.
+
+ @return YES if the compaction succeeded.
+ */
+- (BOOL)compact
+{
+    RLMCheckThread(self);
+    BOOL compactSucceeded = NO;
+    if (!_inWriteTransaction) {
+        try {
+            for (RLMObjectSchema *objectSchema in _schema.objectSchema) {
+                objectSchema.table->optimize();
+            }
+            _sharedGroup->end_read();
+            compactSucceeded = _sharedGroup->compact();
+            _sharedGroup->begin_read();
+        }
+        catch (std::exception& ex) {
+            @throw RLMException(ex);
+        }
+    } else {
+        @throw RLMException(@"Can't compact a Realm within a write transaction");
+    }
+    return compactSucceeded;
+}
+
 - (void)dealloc {
     if (_inWriteTransaction) {
         [self cancelWriteTransaction];
