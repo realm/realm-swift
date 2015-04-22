@@ -282,6 +282,9 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
             // add any new properties (new name or different type)
             if (RLMPropertyHasChanged(prop, tableProp)) {
                 RLMCreateColumn(realm, *objectSchema.table, prop);
+                if (RLMPropertyCanBeMigrated(tableProp, prop)) {
+                    RLMMigratePropertyToProperty(tableProp, prop, objectSchema.table);
+                }
                 changed = true;
             }
         }
@@ -291,9 +294,6 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
             RLMProperty *prop = tableSchema.properties[i];
             RLMProperty *newProp = objectSchema[prop.name];
             if (RLMPropertyHasChanged(prop, newProp)) {
-                if (RLMPropertyCanBeMigrated(prop, newProp)) {
-                    RLMMigratePropertyToProperty(prop, newProp, objectSchema.table);
-                }
                 objectSchema.table->remove_column(prop.column);
                 changed = true;
             }
