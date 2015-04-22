@@ -699,6 +699,38 @@ extern "C" {
     [realm commitWriteTransaction];
 }
 
+- (void)testAddOrUpdateObjectsFromArray {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    PrimaryStringObject *obj = [[PrimaryStringObject alloc] initWithObject:@[@"string1", @1]];
+    [realm addObject:obj];
+
+    PrimaryStringObject *obj2 = [[PrimaryStringObject alloc] initWithObject:@[@"string2", @2]];
+    [realm addObject:obj2];
+
+    PrimaryStringObject *obj3 = [[PrimaryStringObject alloc] initWithObject:@[@"string3", @3]];
+    [realm addObject:obj3];
+
+    RLMResults *objects = [PrimaryStringObject allObjects];
+    XCTAssertEqual([objects count], 3U, @"Should have 3 object");
+    XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
+    XCTAssertEqual([(PrimaryStringObject *)objects[1] intCol], 2, @"Value should be 2");
+    XCTAssertEqual([(PrimaryStringObject *)objects[2] intCol], 3, @"Value should be 3");
+
+    // upsert with array of 2 objects. One is to update the existing value, another is added
+    NSArray *array = @[[[PrimaryStringObject alloc] initWithObject:@[@"string2", @4]],
+                       [[PrimaryStringObject alloc] initWithObject:@[@"string4", @5]]];
+    [realm addOrUpdateObjectsFromArray:array];
+    XCTAssertEqual([objects count], 4U, @"Should have 4 objects");
+    XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
+    XCTAssertEqual([(PrimaryStringObject *)objects[1] intCol], 4, @"Value should be 4");
+    XCTAssertEqual([(PrimaryStringObject *)objects[2] intCol], 3, @"Value should be 3");
+    XCTAssertEqual([(PrimaryStringObject *)objects[3] intCol], 5, @"Value should be 5");
+
+    [realm commitWriteTransaction];
+}
+
 - (void)testDelete {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
