@@ -221,7 +221,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testQueryConstruction() {
         let realm = realmWithTestPath()
-        let predicate = NSPredicate(format: "boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and doubleCol != 7.0 and stringCol IN {'a', 'b', 'c'}")!
+        let predicate = NSPredicate(format: "boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and doubleCol != 7.0 and stringCol IN {'a', 'b', 'c'}")
 
         measureBlock {
             for _ in 0..<100 {
@@ -400,7 +400,7 @@ class SwiftPerformanceTests: TestCase {
                 }
                 dispatch_semaphore_signal(semaphore)
                 while !stop {
-                    NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as NSDate)
+                    NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as! NSDate)
                 }
                 realm.removeNotification(token)
             }
@@ -435,7 +435,7 @@ class SwiftPerformanceTests: TestCase {
                 }
                 dispatch_semaphore_signal(semaphore)
                 while object.intCol < stopValue {
-                    NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as NSDate)
+                    NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as! NSDate)
                 }
                 realm.removeNotification(token)
             }
@@ -450,7 +450,7 @@ class SwiftPerformanceTests: TestCase {
             self.startMeasuring()
             realm.write { _ = object.intCol++ }
             while object.intCol < stopValue {
-                NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as NSDate)
+                NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as! NSDate)
             }
             dispatch_sync(queue) {}
             self.stopMeasuring()

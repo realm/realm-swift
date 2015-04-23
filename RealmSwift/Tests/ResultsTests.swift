@@ -121,9 +121,9 @@ class ResultsTests: TestCase {
     }
 
     func testIndexOfPredicate() {
-        let pred1 = NSPredicate(format: "stringCol = '1'")!
-        let pred2 = NSPredicate(format: "stringCol = '2'")!
-        let pred3 = NSPredicate(format: "stringCol = '3'")!
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "stringCol = '2'")
+        let pred3 = NSPredicate(format: "stringCol = '3'")
 
         XCTAssertEqual(Int(0), results.indexOf(pred1)!)
         XCTAssertEqual(Int(1), results.indexOf(pred2)!)
@@ -141,8 +141,8 @@ class ResultsTests: TestCase {
         XCTAssertEqual(str1, results[0])
         XCTAssertEqual(str2, results[1])
 
-        assertThrows(results[200])
-        assertThrows(results[-200])
+        assertThrows(self.results[200])
+        assertThrows(self.results[-200])
     }
 
     func testFirst() {
@@ -159,10 +159,10 @@ class ResultsTests: TestCase {
 
     func testValueForKey() {
         let expected = map(results) { $0.stringCol }
-        let actual = results.valueForKey("stringCol") as [String]!
+        let actual = results.valueForKey("stringCol") as! [String]!
         XCTAssertEqual(expected, actual)
 
-        XCTAssertEqual(map(results) { $0 }, results.valueForKey("self") as [SwiftStringObject])
+        XCTAssertEqual(map(results) { $0 }, results.valueForKey("self") as! [SwiftStringObject])
     }
 
     func testSetValueForKey() {
@@ -180,9 +180,9 @@ class ResultsTests: TestCase {
     }
 
     func testFilterPredicate() {
-        let pred1 = NSPredicate(format: "stringCol = '1'")!
-        let pred2 = NSPredicate(format: "stringCol = '2'")!
-        let pred3 = NSPredicate(format: "stringCol = '3'")!
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "stringCol = '2'")
+        let pred3 = NSPredicate(format: "stringCol = '3'")
 
         XCTAssertEqual(Int(1), results.filter(pred1).count)
         XCTAssertEqual(Int(1), results.filter(pred2).count)
@@ -198,7 +198,7 @@ class ResultsTests: TestCase {
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
 
-        assertThrows(results.sorted("noSuchCol"))
+        assertThrows(self.results.sorted("noSuchCol"))
     }
 
     func testSortWithDescriptor() {

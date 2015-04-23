@@ -77,7 +77,7 @@ class ViewController: UIViewController {
             let realm = RLMRealm(path: RLMRealm.defaultRealmPath(),
                 encryptionKey: self.getKey(), readOnly: false, error: nil)
 
-            self.log("Saved object: \((EncryptionObject.allObjectsInRealm(realm).firstObject()! as EncryptionObject).stringProp)")
+            self.log("Saved object: \((EncryptionObject.allObjectsInRealm(realm).firstObject() as! EncryptionObject).stringProp)")
         }
     }
 
@@ -103,7 +103,7 @@ class ViewController: UIViewController {
         var dataTypeRef: AnyObject?
         var status = withUnsafeMutablePointer(&dataTypeRef) { SecItemCopyMatching(query, UnsafeMutablePointer($0)) }
         if status == errSecSuccess {
-            return dataTypeRef as NSData
+            return dataTypeRef as! NSData
         }
 
         // No pre-existing key from this application, so generate a new one

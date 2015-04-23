@@ -48,9 +48,9 @@ class TestCase: RLMAutoreleasePoolTestCase {
         RLMRealm.resetRealmState()
     }
 
-    func assertThrows<T>(block: @autoclosure () -> T, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
+    func assertThrows<T>(@autoclosure(escaping) block: () -> T, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
         exceptionThrown = true
-        RLMAssertThrows(self, { _ = block() }, message, fileName, lineNumber);
+        RLMAssertThrows(self, { _ = block() } as dispatch_block_t, message, fileName, lineNumber);
     }
 
     private func realmFilePrefix() -> String {

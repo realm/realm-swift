@@ -140,7 +140,7 @@ public class Object: RLMObjectBase, Equatable, Printable {
     :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
     */
     public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
-        return RLMObjectBaseLinkingObjectsOfClass(self, T.className(), propertyName) as [T]
+        return RLMObjectBaseLinkingObjectsOfClass(self, T.className(), propertyName) as! [T]
     }
 
 
@@ -216,7 +216,7 @@ public class Object: RLMObjectBase, Equatable, Printable {
     private func listProperty(key: String) -> RLMListBase? {
         if let prop = RLMObjectBaseObjectSchema(self)?[key] {
             if prop.type == .Array {
-                return object_getIvar(self, prop.swiftListIvar) as RLMListBase?
+                return object_getIvar(self, prop.swiftListIvar) as! RLMListBase?
             }
         }
         return nil
@@ -303,7 +303,7 @@ public class ObjectUtil: NSObject {
     }
 
     @objc private class func initializeListProperty(object: RLMObjectBase?, property: RLMProperty?, array: RLMArray?) {
-        let list = (object as Object)[property!.name]! as RLMListBase
+        let list = (object as! Object)[property!.name]! as! RLMListBase
         list._rlmArray = array
     }
 }

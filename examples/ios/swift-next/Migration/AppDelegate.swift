@@ -52,10 +52,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func application(application: UIApplication!, didFinishLaunchingWithOptions launchOptions: NSDictionary!) -> Bool {
-        self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
-        self.window!.rootViewController = UIViewController()
-        self.window!.makeKeyAndVisible()
+    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+        window = UIWindow(frame: UIScreen.mainScreen().bounds)
+        window?.rootViewController = UIViewController()
+        window?.makeKeyAndVisible()
 
         // copy over old data files for migration
         let defaultPath = Realm.defaultPath
@@ -73,8 +73,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 migration.enumerate(Person.className()) { oldObject, newObject in
                     if oldSchemaVersion < 1 {
                         // combine name fields into a single field
-                        let firstName = oldObject!["firstName"] as String
-                        let lastName = oldObject!["lastName"] as String
+                        let firstName = oldObject!["firstName"] as! String
+                        let lastName = oldObject!["lastName"] as! String
                         newObject!["fullName"] = "\(firstName) \(lastName)"
                     }
                 }
@@ -82,9 +82,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if oldSchemaVersion < 2 {
                 migration.enumerate(Person.className()) { oldObject, newObject in
                     // give JP a dog
-                    if newObject!["fullName"] as String == "JP McDonald" {
+                    if newObject!["fullName"] as! String == "JP McDonald" {
                         let jpsDog = migration.create(Pet.className(), value: ["Jimbo", "dog"])
-                        let dogs = newObject!["pets"] as List<MigrationObject>
+                        let dogs = newObject!["pets"] as! List<MigrationObject>
                         dogs.append(jpsDog)
                     }
                 }

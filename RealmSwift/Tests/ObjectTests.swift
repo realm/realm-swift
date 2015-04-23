@@ -86,7 +86,7 @@ class ObjectTests: TestCase {
         XCTAssertNil(Object.primaryKey(), "primary key should default to nil")
         XCTAssertNil(SwiftStringObject.primaryKey())
         XCTAssertNil(SwiftStringObject().objectSchema.primaryKeyProperty)
-        XCTAssertEqual(SwiftPrimaryStringObject.primaryKey(), "stringCol")
+        XCTAssertEqual(SwiftPrimaryStringObject.primaryKey()!, "stringCol")
         XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
     }
 
@@ -120,14 +120,14 @@ class ObjectTests: TestCase {
 
     func testValueForKey() {
         let test: (SwiftObject) -> () = { object in
-            XCTAssertEqual(object.valueForKey("boolCol") as Bool!, false)
-            XCTAssertEqual(object.valueForKey("intCol") as Int!, 123)
-            XCTAssertEqual(object.valueForKey("floatCol") as Float!, 1.23 as Float)
-            XCTAssertEqual(object.valueForKey("doubleCol") as Double!, 12.3)
-            XCTAssertEqual(object.valueForKey("stringCol") as String!, "a")
-            XCTAssertEqual(object.valueForKey("binaryCol") as NSData, "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
-            XCTAssertEqual(object.valueForKey("dateCol") as NSDate!, NSDate(timeIntervalSince1970: 1))
-            XCTAssertEqual((object.valueForKey("objectCol")! as SwiftBoolObject).boolCol, false)
+            XCTAssertEqual(object.valueForKey("boolCol") as! Bool!, false)
+            XCTAssertEqual(object.valueForKey("intCol") as! Int!, 123)
+            XCTAssertEqual(object.valueForKey("floatCol") as! Float!, 1.23 as Float)
+            XCTAssertEqual(object.valueForKey("doubleCol") as! Double!, 12.3)
+            XCTAssertEqual(object.valueForKey("stringCol") as! String!, "a")
+            XCTAssertEqual(object.valueForKey("binaryCol") as! NSData, "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
+            XCTAssertEqual(object.valueForKey("dateCol") as! NSDate!, NSDate(timeIntervalSince1970: 1))
+            XCTAssertEqual((object.valueForKey("objectCol")! as! SwiftBoolObject).boolCol, false)
             XCTAssert(object.valueForKey("arrayCol")! is List<SwiftBoolObject>)
         }
 
@@ -140,84 +140,84 @@ class ObjectTests: TestCase {
 
     func setAndTestAllTypes(setter: (SwiftObject, AnyObject?, String) -> (), getter: (SwiftObject, String) -> (AnyObject?), object: SwiftObject) {
         setter(object, true, "boolCol")
-        XCTAssertEqual(getter(object, "boolCol") as Bool!, true)
+        XCTAssertEqual(getter(object, "boolCol") as! Bool!, true)
 
         setter(object, 321, "intCol")
-        XCTAssertEqual(getter(object, "intCol") as Int!, 321)
+        XCTAssertEqual(getter(object, "intCol") as! Int!, 321)
 
         setter(object, 32.1 as Float, "floatCol")
-        XCTAssertEqual(getter(object, "floatCol") as Float!, 32.1 as Float)
+        XCTAssertEqual(getter(object, "floatCol") as! Float!, 32.1 as Float)
 
         setter(object, 3.21, "doubleCol")
-        XCTAssertEqual(getter(object, "doubleCol") as Double!, 3.21)
+        XCTAssertEqual(getter(object, "doubleCol") as! Double!, 3.21)
 
         setter(object, "z", "stringCol")
-        XCTAssertEqual(getter(object, "stringCol") as String!, "z")
+        XCTAssertEqual(getter(object, "stringCol") as! String!, "z")
 
         setter(object, "z".dataUsingEncoding(NSUTF8StringEncoding), "binaryCol")
-        XCTAssertEqual(getter(object, "binaryCol") as NSData, "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
+        XCTAssertEqual(getter(object, "binaryCol") as! NSData, "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
 
         setter(object, NSDate(timeIntervalSince1970: 333), "dateCol")
-        XCTAssertEqual(getter(object, "dateCol") as NSDate!, NSDate(timeIntervalSince1970: 333))
+        XCTAssertEqual(getter(object, "dateCol") as! NSDate!, NSDate(timeIntervalSince1970: 333))
 
         let boolObject = SwiftBoolObject(value: [true])
         setter(object, boolObject, "objectCol")
-        XCTAssertEqual(getter(object, "objectCol") as SwiftBoolObject, boolObject)
-        XCTAssertEqual((getter(object, "objectCol")! as SwiftBoolObject).boolCol, true)
+        XCTAssertEqual(getter(object, "objectCol") as! SwiftBoolObject, boolObject)
+        XCTAssertEqual((getter(object, "objectCol")! as! SwiftBoolObject).boolCol, true)
 
         let list = List<SwiftBoolObject>()
         list.append(boolObject)
         setter(object, list, "arrayCol")
-        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).first!, boolObject)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
 
         list.removeAll();
         setter(object, list, "arrayCol")
-        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).count, 0)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
 
         setter(object, [boolObject], "arrayCol")
-        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).first!, boolObject)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
     }
 
     func dynamicSetAndTestAllTypes(setter: (DynamicObject, AnyObject?, String) -> (), getter: (DynamicObject, String) -> (AnyObject?), object: DynamicObject, boolObject: DynamicObject) {
         setter(object, true, "boolCol")
-        XCTAssertEqual(getter(object, "boolCol") as Bool!, true)
+        XCTAssertEqual(getter(object, "boolCol") as! Bool, true)
 
         setter(object, 321, "intCol")
-        XCTAssertEqual(getter(object, "intCol") as Int!, 321)
+        XCTAssertEqual(getter(object, "intCol") as! Int, 321)
 
         setter(object, 32.1 as Float, "floatCol")
-        XCTAssertEqual(getter(object, "floatCol") as Float!, 32.1 as Float)
+        XCTAssertEqual(getter(object, "floatCol") as! Float, 32.1 as Float)
 
         setter(object, 3.21, "doubleCol")
-        XCTAssertEqual(getter(object, "doubleCol") as Double!, 3.21)
+        XCTAssertEqual(getter(object, "doubleCol") as! Double, 3.21)
 
         setter(object, "z", "stringCol")
-        XCTAssertEqual(getter(object, "stringCol") as String!, "z")
+        XCTAssertEqual(getter(object, "stringCol") as! String, "z")
 
         setter(object, "z".dataUsingEncoding(NSUTF8StringEncoding), "binaryCol")
-        XCTAssertEqual(getter(object, "binaryCol") as NSData, "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
+        XCTAssertEqual(getter(object, "binaryCol") as! NSData, "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
 
         setter(object, NSDate(timeIntervalSince1970: 333), "dateCol")
-        XCTAssertEqual(getter(object, "dateCol") as NSDate!, NSDate(timeIntervalSince1970: 333))
+        XCTAssertEqual(getter(object, "dateCol") as! NSDate, NSDate(timeIntervalSince1970: 333))
 
         setter(object, boolObject, "objectCol")
-        XCTAssertEqual(getter(object, "objectCol") as DynamicObject, boolObject)
-        XCTAssertEqual((getter(object, "objectCol")! as DynamicObject)["boolCol"]! as NSNumber, true as NSNumber)
+        XCTAssertEqual(getter(object, "objectCol") as! DynamicObject, boolObject)
+        XCTAssertEqual((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! NSNumber, true as NSNumber)
 
         setter(object, [boolObject], "arrayCol")
-        XCTAssertEqual((getter(object, "arrayCol") as List<DynamicObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as List<DynamicObject>).first!, boolObject)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
 
-        let list = getter(object, "arrayCol") as List<DynamicObject>
+        let list = getter(object, "arrayCol") as! List<DynamicObject>
         list.removeAll();
         setter(object, list, "arrayCol")
-        XCTAssertEqual((getter(object, "arrayCol") as List<DynamicObject>).count, 0)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 0)
 
         setter(object, [boolObject], "arrayCol")
-        XCTAssertEqual((getter(object, "arrayCol") as List<DynamicObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as List<DynamicObject>).first!, boolObject)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
     }
 
     /// Yields a read-write migration `SwiftObject` to the given block

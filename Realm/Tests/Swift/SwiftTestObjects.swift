@@ -30,6 +30,10 @@ class SwiftIntObject: RLMObject {
     dynamic var intCol = 0
 }
 
+class SwiftLongObject: RLMObject {
+    dynamic var longCol: Int64 = 0
+}
+
 class SwiftObject: RLMObject {
     dynamic var boolCol = false
     dynamic var intCol = 123

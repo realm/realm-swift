@@ -69,9 +69,9 @@ class TableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as Cell
+        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! Cell
 
-        let object = array[UInt(indexPath.row)] as DemoObject
+        let object = array[UInt(indexPath.row)] as! DemoObject
         cell.textLabel?.text = object.title
         cell.detailTextLabel?.text = object.date.description
 
@@ -82,7 +82,7 @@ class TableViewController: UITableViewController {
         if editingStyle == .Delete {
             let realm = RLMRealm.defaultRealm()
             realm.beginWriteTransaction()
-            realm.deleteObject(array[UInt(indexPath.row)] as RLMObject)
+            realm.deleteObject(array[UInt(indexPath.row)] as! RLMObject)
             realm.commitWriteTransaction()
         }
     }
