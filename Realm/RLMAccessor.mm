@@ -554,7 +554,7 @@ static Class RLMCreateAccessorClass(Class objectClass,
     if (!objectClass || !schema || !accessorClassPrefix) {
         @throw RLMException(@"Missing arguments");
     }
-    if (!RLMIsKindOfclass(objectClass, RLMObjectBase.class)) {
+    if (!RLMIsKindOfClass(objectClass, RLMObjectBase.class)) {
         @throw RLMException(@"objectClass must derive from RLMObject or Object");
     }
     

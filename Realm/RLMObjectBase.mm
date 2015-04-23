@@ -187,6 +187,10 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     }
 }
 
++ (BOOL)shouldPersistToRealm {
+    return RLMIsObjectSubclass(self);
+}
+
 @end
 
 

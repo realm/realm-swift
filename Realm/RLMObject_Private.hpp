@@ -27,4 +27,6 @@
     realm::Row _row;
 }
 
++ (BOOL)shouldPersistToRealm;
+
 @end

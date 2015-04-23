@@ -260,6 +260,10 @@ public final class DynamicObject : Object {
     public override func setValue(value: AnyObject?, forUndefinedKey key: String) {
         self[key] = value
     }
+
+    @objc private class func shouldPersistToRealm() -> Bool {
+        return false;
+    }
 }
 
 /// :nodoc:

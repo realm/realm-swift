@@ -323,7 +323,7 @@ void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
 // Determines if class1 descends from class2
 static inline BOOL RLMIsSubclass(Class class1, Class class2) {
     class1 = class_getSuperclass(class1);
-    return RLMIsKindOfclass(class1, class2);
+    return RLMIsKindOfClass(class1, class2);
 }
 
 BOOL RLMIsObjectSubclass(Class klass) {

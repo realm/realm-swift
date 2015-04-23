@@ -157,6 +157,10 @@
 
 @implementation RLMDynamicObject
 
++ (BOOL)shouldPersistToRealm {
+    return NO;
+}
+
 - (id)valueForUndefinedKey:(NSString *)key {
     return RLMDynamicGet(self, key);
 }
