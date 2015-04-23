@@ -27,6 +27,7 @@ extern "C" {
 
 @interface RLMRealm ()
 + (BOOL)isCoreDebug;
+- (BOOL)compact;
 @end
 
 @interface RLMObjectSchema (Private)
@@ -1202,6 +1203,24 @@ extern "C" {
         usleep(100);
 
     [realm path]; // ensure ARC releases the object after the thread has finished
+}
+
+- (void)testCompact
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm transactionWithBlock:^{
+        [StringObject createInRealm:realm withObject:@[@"A"]];
+        [StringObject createInRealm:realm withObject:@[@"A"]];
+    }];
+    auto fileSize = ^(NSString *path) {
+        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+        return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
+    };
+    unsigned long long fileSizeBefore = fileSize(realm.path);
+    XCTAssertTrue([realm compact]);
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 2U);
+    unsigned long long fileSizeAfter = fileSize(realm.path);
+    XCTAssertGreaterThan(fileSizeBefore, fileSizeAfter);
 }
 
 - (void)runBlock:(void (^)())block {
