@@ -357,7 +357,7 @@ case "$COMMAND" in
         ;;
 
     "test-osx")
-        xcrealm "-scheme OSX -configuration $CONFIGURATION test"
+        xcrealm "-scheme OSX -configuration $CONFIGURATION test GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
         exit 0
         ;;
 
