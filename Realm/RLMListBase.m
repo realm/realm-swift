@@ -19,6 +19,10 @@
 #import "RLMListBase.h"
 #import <Realm/RLMArray.h>
 
+@interface RLMArray (KVO)
+- (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes;
+@end
+
 @implementation RLMListBase
 
 - (instancetype)initWithArray:(RLMArray *)array {
@@ -31,6 +35,10 @@
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])buffer count:(NSUInteger)len {
     return [__rlmArray countByEnumeratingWithState:state objects:buffer count:len];
+}
+
+- (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
+    return [__rlmArray objectsAtIndexes:indexes];
 }
 
 @end
