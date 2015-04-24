@@ -800,7 +800,6 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					"REALM_SWIFT=1",
 				);
 				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -831,7 +830,6 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					"REALM_SWIFT=1",
 				);
 				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -853,7 +851,6 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Versions/A/Frameworks";
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"REALM_SWIFT=1",
 					"$(inherited)",
 				);
 				HEADER_SEARCH_PATHS = (
@@ -883,7 +880,6 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Versions/A/Frameworks";
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"REALM_SWIFT=1",
 					"$(inherited)",
 				);
 				HEADER_SEARCH_PATHS = (
@@ -922,7 +918,6 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					"REALM_SWIFT=1",
 				);
 				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -953,7 +948,6 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					"REALM_SWIFT=1",
 				);
 				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -993,7 +987,6 @@
 					"$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Frameworks",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"REALM_SWIFT=1",
 					"$(inherited)",
 				);
 				HEADER_SEARCH_PATHS = (
@@ -1027,7 +1020,6 @@
 					"$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Frameworks",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"REALM_SWIFT=1",
 					"$(inherited)",
 				);
 				HEADER_SEARCH_PATHS = (
