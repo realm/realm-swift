@@ -86,6 +86,9 @@ xcode() {
 }
 
 xc() {
+    if [ "$ACTION" == "clean" ]; then
+        exit 0
+    fi
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcode "$@"
     elif [[ "$XCMODE" == "xcpretty" ]]; then
@@ -121,7 +124,7 @@ build_combined() {
     local binary_path="$module_name"
     local iphoneos_path="$build_products_path/$config-iphoneos$scope_suffix/$product_name"
     local iphonesimulator_path="$build_products_path/$config-iphonesimulator$scope_suffix/$product_name"
-    local out_path="build/ios"
+    local out_path="build/ios$scope_suffix"
 
     # Build for each platform
     if [[ "$module_name" == "Realm" ]]; then
@@ -277,6 +280,13 @@ case "$COMMAND" in
 
     "ios-static")
         build_combined iOS "$CONFIGURATION" Realm
+        exit 0
+        ;;
+
+    "pre-ios-swift")
+        if ! [ -d "build/ios-dynamic" ]; then
+            sh build.sh ios-dynamic
+        fi
         exit 0
         ;;
 

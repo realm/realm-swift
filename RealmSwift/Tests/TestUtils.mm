@@ -18,7 +18,7 @@
 
 #import "TestUtils.h"
 
-#import <Realm/Realm.h>
+@class Realm;
 #import <Realm/RLMRealmUtil.h>
 
 @implementation RLMAutoreleasePoolTestCase
