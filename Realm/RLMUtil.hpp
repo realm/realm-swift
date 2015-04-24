@@ -61,7 +61,7 @@ NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchem
 void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t index));
 
 // C version of isKindOfClass
-static inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
+static inline BOOL RLMIsKindOfClass(Class class1, Class class2) {
     while (class1) {
         if (class1 == class2) return YES;
         class1 = class_getSuperclass(class1);

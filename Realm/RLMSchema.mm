@@ -19,7 +19,7 @@
 #import "RLMSchema_Private.h"
 
 #import "RLMAccessor.h"
-#import "RLMObject.h"
+#import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSwiftSupport.h"
@@ -91,7 +91,8 @@ static NSMutableDictionary *s_localNameToClass;
     s_localNameToClass = [NSMutableDictionary dictionary];
     for (unsigned int i = 0; i < numClasses; i++) {
         Class cls = classes[i];
-        if (!RLMIsObjectSubclass(cls)) {
+        static Class objectBaseClass = [RLMObjectBase class];
+        if (!RLMIsKindOfClass(cls, objectBaseClass) || ![cls shouldPersistToRealm]) {
             continue;
         }
 

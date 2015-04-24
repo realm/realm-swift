@@ -69,6 +69,13 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 @implementation SchemaTests
 
+- (void)testNoSchemaForUnpersistedObjectClasses {
+    RLMSchema *schema = [RLMSchema sharedSchema];
+    XCTAssertNil([schema schemaForClassName:@"RLMObject"]);
+    XCTAssertNil([schema schemaForClassName:@"RLMObjectBase"]);
+    XCTAssertNil([schema schemaForClassName:@"RLMDynamicObject"]);
+}
+
 - (void)testInheritanceInitialization
 {
     Class testClasses[] = {
