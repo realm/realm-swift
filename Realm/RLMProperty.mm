@@ -300,7 +300,7 @@
     prop->_setterSel = _setterSel;
     prop->_isPrimary = _isPrimary;
     prop->_swiftListIvar = _swiftListIvar;
-    
+    prop->_cascade = _cascade;
     return prop;
 }
 

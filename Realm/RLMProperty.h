@@ -54,6 +54,11 @@
 @property (nonatomic, readonly, copy) NSString *objectClassName;
 
 /**
+ *  Used to indicate whether or not this object should be cascaded
+ */
+@property (nonatomic, readonly) BOOL cascade;
+
+/**
  Returns YES if property objects are equal.
  */
 - (BOOL)isEqualToProperty:(RLMProperty *)property;

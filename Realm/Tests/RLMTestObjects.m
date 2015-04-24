@@ -150,3 +150,24 @@
     return nil;
 }
 @end
+
+#pragma mark - CascadeObject
+
+@implementation CascadeTestObject : RLMObject
++ (NSArray *)cascadeProperties {
+    return @[@"individualObject",
+             @"array"];
+}
+@end
+
+@implementation CascadeIndividualObject : RLMObject
++ (NSString *)primaryKey {
+    return @"identifier";
+}
+@end
+
+@implementation CascadeArrayObject : RLMObject
++ (NSString *)primaryKey {
+    return @"identifier";
+}
+@end

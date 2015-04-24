@@ -223,6 +223,13 @@
 + (NSDictionary *)defaultPropertyValues;
 
 /**
+ Implement to indicate properties that should be linked with a cascade relationship.  Meaning if an object is deleted from a realm, all properties declared here will be deleted.
+ 
+ @return an array of property names to remove when the object is removed.
+ */
++ (NSArray *)cascadeProperties;
+
+/**
  Implement to designate a property as the primary key for an RLMObject subclass. Only properties of
  type RLMPropertyTypeString and RLMPropertyTypeInt can be designated as the primary key. Primary key 
  properties enforce uniqueness for each value whenever the property is set which incurs some overhead.

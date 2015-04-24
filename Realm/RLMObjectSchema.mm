@@ -129,6 +129,7 @@
 + (NSArray *)propertiesForClass:(Class)objectClass isSwift:(bool)isSwiftClass {
     Class objectUtil = RLMObjectUtilClass(isSwiftClass);
     NSArray *ignoredProperties = [objectUtil ignoredPropertiesForClass:objectClass];
+    NSArray *cascadeProperties = [objectClass cascadeProperties];
 
     // For Swift classes we need an instance of the object when parsing properties
     id swiftObjectInstance = isSwiftClass ? [[objectClass alloc] init] : nil;
@@ -155,8 +156,9 @@
         }
 
         if (prop) {
+            prop.cascade = [cascadeProperties containsObject:propertyName];
             [propArray addObject:prop];
-         }
+        }
     }
     free(props);
 

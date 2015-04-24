@@ -43,6 +43,7 @@
 @property (nonatomic, readwrite, assign) RLMPropertyType type;
 @property (nonatomic, readwrite) BOOL indexed;
 @property (nonatomic, copy) NSString *objectClassName;
+@property (nonatomic, readwrite) BOOL cascade;
 
 // private properties
 @property (nonatomic, assign) char objcType;
