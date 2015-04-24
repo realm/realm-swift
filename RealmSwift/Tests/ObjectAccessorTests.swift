@@ -82,6 +82,7 @@ class ObjectAccessorTests: TestCase {
     func testIntSizes() {
         let realm = realmWithTestPath()
 
+        let v8  = Int8(1)  << 6
         let v16 = Int16(1) << 12
         let v32 = Int32(1) << 30
         // 1 << 40 doesn't auto-promote to Int64 on 32-bit platforms
@@ -89,17 +90,50 @@ class ObjectAccessorTests: TestCase {
         realm.write {
             let obj = SwiftAllIntSizesObject()
 
-            obj.int16 = v16
-            XCTAssertEqual(obj.int16, v16)
-            obj.int32 = v32
-            XCTAssertEqual(obj.int32, v32)
-            obj.int64 = v64
-            XCTAssertEqual(obj.int64, v64)
+            let testObject: Void -> Void = {
+                obj.objectSchema.properties.map { $0.name }.map { obj[$0] = 0 }
+
+                obj["int8"] = Int(v8)
+                XCTAssertEqual(obj["int8"]! as! Int, Int(v8))
+                obj["int16"] = Int(v16)
+                XCTAssertEqual(obj["int16"]! as! Int, Int(v16))
+                obj["int32"] = Int(v32)
+                XCTAssertEqual(obj["int32"]! as! Int, Int(v32))
+                obj["int64"] = NSNumber(longLong: v64)
+                XCTAssertEqual(obj["int64"]! as! NSNumber, NSNumber(longLong: v64))
+
+                obj.objectSchema.properties.map { $0.name }.map { obj[$0] = 0 }
+
+                obj.setValue(Int(v8), forKey: "int8")
+                XCTAssertEqual(obj.valueForKey("int8")! as! Int, Int(v8))
+                obj.setValue(Int(v16), forKey: "int16")
+                XCTAssertEqual(obj.valueForKey("int16")! as! Int, Int(v16))
+                obj.setValue(Int(v32), forKey: "int32")
+                XCTAssertEqual(obj.valueForKey("int32")! as! Int, Int(v32))
+                obj.setValue(NSNumber(longLong: v64), forKey: "int64")
+                XCTAssertEqual(obj.valueForKey("int64")! as! NSNumber, NSNumber(longLong: v64))
+
+                obj.objectSchema.properties.map { $0.name }.map { obj[$0] = 0 }
+
+                obj.int8 = v8
+                XCTAssertEqual(obj.int8, v8)
+                obj.int16 = v16
+                XCTAssertEqual(obj.int16, v16)
+                obj.int32 = v32
+                XCTAssertEqual(obj.int32, v32)
+                obj.int64 = v64
+                XCTAssertEqual(obj.int64, v64)
+            }
+
+            testObject()
 
             realm.add(obj)
+
+            testObject()
         }
 
         let obj = realm.objects(SwiftAllIntSizesObject).first!
+        XCTAssertEqual(obj.int8, v8)
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
         XCTAssertEqual(obj.int64, v64)
