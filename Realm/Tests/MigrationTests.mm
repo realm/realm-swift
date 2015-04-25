@@ -91,7 +91,7 @@
 
 - (void)testSchemaVersion {
     [RLMRealm setDefaultRealmSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
-                                                      __unused NSUInteger oldSchemaVersion) {
+                                                                  __unused NSUInteger oldSchemaVersion) {
     }];
 
     RLMRealm *defaultRealm = [RLMRealm defaultRealm];
@@ -106,7 +106,8 @@
 
     XCTAssertEqual(0U, [RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
     [RLMRealm setDefaultRealmSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
-                                                                  __unused NSUInteger oldSchemaVersion) {
+                                                                  NSUInteger oldSchemaVersion) {
+        XCTAssertEqual(0U, oldSchemaVersion);
     }];
 
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -132,7 +133,8 @@
 
     __block bool migrationComplete = false;
     [RLMRealm setSchemaVersion:2 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(__unused RLMMigration *migration,
-                                                                                        __unused NSUInteger oldSchemaVersion) {
+                                                                                        NSUInteger oldSchemaVersion) {
+        XCTAssertEqual(0U, oldSchemaVersion);
         migrationComplete = true;
     }];
     RLMRealm *anotherRealm = [RLMRealm realmWithPath:RLMTestRealmPath()];
@@ -766,6 +768,15 @@
 
     // implicit migration
     XCTAssertEqualObjects(@"otherString", [StringObject.allObjects.firstObject stringCol]);
+}
+
+- (void)testMigrationBlockNotCalledForIntialRealmCreation {
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+                XCTFail(@"Migration block should not have been called");
+            }];
+    XCTAssertNoThrow([self realmWithTestPath]);
 }
 
 @end

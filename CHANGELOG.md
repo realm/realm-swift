@@ -1,6 +1,10 @@
 x.xx.x Release notes (yyyy-MM-dd)
 =============================================================
 
+### API breaking changes
+
+* Migration blocks are no longer called when a Realm file is first created.
+
 ### Enhancements
 
 * `Int8` properties defined in Swift are now treated as integers, rather than
@@ -17,6 +21,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 0.91.2 Release notes (2015-04-16)
 =============================================================
 
+* Migration blocks are no longer called when a Realm file is first created.
+
 ### Enhancements
 
 * `RLMCollection` supports collection KVC operations.
@@ -30,11 +36,6 @@ x.xx.x Release notes (yyyy-MM-dd)
 
 * `+[RLMSchema dynamicSchemaForRealm:]` now respects search indexes.
 * `+[RLMProperty isEqualToProperty:]` now checks for equal `indexed` properties.
-* Setting indexed string properties to strings with embedded NUL bytes now
-  throws an exception rather than crashing deep within the core library.
-* Fix incorrect results when querying an indexed property on an RLMArray.
-* Fix corruption of string indexes when an object is deleted when there are
-  duplicate values for the indexed property.
 
 0.91.1 Release notes (2015-03-12)
 =============================================================

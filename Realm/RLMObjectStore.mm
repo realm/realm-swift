@@ -270,9 +270,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
     return changed;
 }
 
-static bool RLMMigrationRequired(RLMRealm *realm, NSUInteger newVersion) {
-    NSUInteger oldVersion = RLMRealmSchemaVersion(realm);
-
+static bool RLMMigrationRequired(RLMRealm *realm, NSUInteger newVersion, NSUInteger oldVersion) {
     // validate versions
     if (oldVersion > newVersion && oldVersion != RLMNotVersioned) {
         NSString *reason = [NSString stringWithFormat:@"Realm at path '%@' has version number %lu which is greater than the current schema version %lu. "
@@ -287,7 +285,7 @@ static bool RLMMigrationRequired(RLMRealm *realm, NSUInteger newVersion) {
 NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
     // if the schema version matches, try to get all the tables without entering
     // a write transaction
-    if (!RLMMigrationRequired(realm, newVersion) && RLMRealmGetTables(realm, targetSchema)) {
+    if (!RLMMigrationRequired(realm, newVersion, RLMRealmSchemaVersion(realm)) && RLMRealmGetTables(realm, targetSchema)) {
         RLMRealmSetSchema(realm, targetSchema, true);
         RLMRealmUpdateIndexes(realm);
         return nil;
@@ -300,7 +298,8 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
     // Recheck the schema version after beginning the write transaction as
     // another process may have done the migration after we opened the read
     // transaction
-    bool migrating = RLMMigrationRequired(realm, newVersion);
+    NSUInteger oldVersion = RLMRealmSchemaVersion(realm);
+    bool migrating = RLMMigrationRequired(realm, newVersion, oldVersion);
 
     @try {
         // create tables
@@ -308,8 +307,9 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
         RLMRealmSetSchema(realm, targetSchema, true);
 
         if (migrating) {
-            // apply migration block if provided
-            if (migrationBlock) {
+            // apply the migration block if provided and there's any old data
+            // to be migrated
+            if (oldVersion != RLMNotVersioned && migrationBlock) {
                 NSError *error = migrationBlock();
                 if (error) {
                     [realm cancelWriteTransaction];
