@@ -45,10 +45,11 @@
                                           view:(realm::LinkViewRef)view
                                          realm:(RLMRealm *)realm
                                            key:(NSString *)key {
-    RLMArrayLinkView *ar = [[RLMArrayLinkView alloc] initWithObjectClassName:objectClassName parentObject:nil key:key];
+    RLMArrayLinkView *ar = [[RLMArrayLinkView alloc] initWithObjectClassName:objectClassName];
     ar->_backingLinkView = view;
     ar->_realm = realm;
     ar->_objectSchema = ar->_realm.schema[objectClassName];
+    ar->_key = key;
     return ar;
 }
 

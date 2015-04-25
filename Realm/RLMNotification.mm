@@ -18,6 +18,8 @@
 
 #import "RLMNotification.hpp"
 
+#import "RLMArray_Private.hpp"
+#import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
@@ -101,9 +103,27 @@ void RLMObservationInfo::recordObserver(realm::Row& objectRow,
         setRow(*objectRow.get_table(), objectRow.get_index());
     }
 
-    // record the observation if the object is standalone
     if (!row) {
+        // record the observation if the object is standalone
         standaloneObservers.push_back({observer, options, context, keyPath});
+
+        // Arrays need a reference to their containing object to avoid having to
+        // go through the awful proxy object from mutableArrayValueForKey.
+        // For persisted objects we do this when the object is added or created
+        // (and have to to support notifications from modifying an object which
+        // was never observed), but for Swift classes (both RealmSwift and
+        // RLMObject) we can't do it then because we don't know what the parent
+        // object is.
+
+        NSUInteger sep = [keyPath rangeOfString:@"."].location;
+        NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
+        RLMProperty *prop = objectSchema[key];
+        if (prop && prop.type == RLMPropertyTypeArray) {
+            id value = valueForKey(key, ^{ return [object valueForKey:key]; });
+            RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmArray] : value;
+            array->_key = key;
+            array->_parentObject = object;
+        }
     }
 }
 
@@ -143,7 +163,7 @@ void RLMObservationInfo::removeObservers() {
     for (auto const& info : standaloneObservers) {
         [object removeObserver:info.observer forKeyPath:info.key context:info.context];
     }
-
+    [cachedObjects removeAllObjects];
 }
 
 void RLMObservationInfo::restoreObservers() {

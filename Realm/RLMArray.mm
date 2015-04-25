@@ -30,7 +30,6 @@
 @implementation RLMArray {
     // array for standalone
     NSMutableArray *_backingArray;
-    __weak RLMObjectBase *_parentObject;
 }
 
 static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, NSIndexSet *is, dispatch_block_t f) {
@@ -56,19 +55,6 @@ static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange
     changeArray(ar, kind, [NSIndexSet indexSetWithIndexesInRange:index], f);
 }
 
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName
-                           parentObject:(id)object
-                                    key:(NSString *)key {
-    self = [super init];
-    if (self) {
-        _objectClassName = objectClassName;
-        _parentObject = object;
-        _key = key;
-    }
-    return self;
-}
-
-// used by legacy models
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {
     self = [super init];
     if (self) {
