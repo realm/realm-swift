@@ -315,9 +315,7 @@ public class ObjectUtil: NSObject {
         // Skip the first property (super):
         // super is an implicit property on Swift objects
         for i in 1..<reflection.count {
-            println(reflection[i])
             let mirror = reflection[i].1
-            println(mirror.valueType)
             if mirror.disposition == .Optional {
                 properties.append(reflection[i].0)
             }
