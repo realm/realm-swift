@@ -251,14 +251,16 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
         }
 
         // update table metadata
-        if (objectSchema.primaryKeyProperty != nil) {
+        NSString *oldPrimary = tableSchema.primaryKeyProperty.name;
+        NSString *newPrimary = objectSchema.primaryKeyProperty.name;
+        if (newPrimary) {
             // if there is a primary key set, check if it is the same as the old key
-            if (tableSchema.primaryKeyProperty == nil || ![tableSchema.primaryKeyProperty isEqual:objectSchema.primaryKeyProperty]) {
-                RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, objectSchema.primaryKeyProperty.name);
+            if (!oldPrimary || ![oldPrimary isEqualToString:newPrimary]) {
+                RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, newPrimary);
                 changed = true;
             }
         }
-        else if (tableSchema.primaryKeyProperty) {
+        else if (oldPrimary) {
             // there is no primary key, so if there was one nil out
             RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, nil);
             changed = true;
