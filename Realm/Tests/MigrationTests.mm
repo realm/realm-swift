@@ -703,46 +703,5 @@
     RLMClearAccessorCache();
 }
 
-- (void)testAddingAndRemovingIndex {
-    RLMSchema *noIndex = [[RLMSchema alloc] init];
-    noIndex.objectSchema = @[[RLMObjectSchema schemaForObjectClass:StringObject.class]];
-
-    RLMSchema *index = [[RLMSchema alloc] init];
-    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
-    [objectSchema.properties[0] setIndexed:YES];
-    index.objectSchema = @[objectSchema];
-
-    auto columnIsIndexed = ^(RLMRealm *realm) {
-        RLMObjectSchema *objectSchema = realm.schema[@"StringObject"];
-        return objectSchema.table->has_search_index([objectSchema.properties[0] column]);
-    };
-
-    // create initial file with no index
-    @autoreleasepool {
-        XCTAssertFalse(columnIsIndexed([self realmWithTestPathAndSchema:noIndex]));
-    }
-
-    // should add index when opening with indexed schema
-    @autoreleasepool {
-        XCTAssertTrue(columnIsIndexed([self realmWithTestPathAndSchema:index]));
-    }
-
-    // should remove index when opening with non-indexed schema
-    @autoreleasepool {
-        XCTAssertFalse(columnIsIndexed([self realmWithTestPathAndSchema:noIndex]));
-    }
-
-    // create initial file with index
-    [self deleteFiles];
-    @autoreleasepool {
-        XCTAssertTrue(columnIsIndexed([self realmWithTestPathAndSchema:index]));
-    }
-
-    // should be able to open readonly with mismatched index schema
-    @autoreleasepool {
-        XCTAssertTrue(columnIsIndexed([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]));
-    }
-}
-
 @end
 

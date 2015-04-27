@@ -103,7 +103,7 @@ static void RLMRealmUpdateIndexes(RLMRealm *realm) {
                     table->add_search_index(prop.column);
                 }
                 else {
-                    table->remove_search_index(prop.column);
+//                    table->remove_search_index(prop.column);
                 }
             }
         }
