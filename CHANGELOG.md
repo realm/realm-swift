@@ -10,6 +10,13 @@ x.xx.x Release notes (yyyy-MM-dd)
 * `Int8` properties defined in Swift are now treated as integers, rather than
   booleans.
 
+0.91.4 Release notes (2015-04-27)
+=============================================================
+
+### Bugfixes
+
+* Temporarily disable removing indexes from existing columns due to bugs.
+
 0.91.3 Release notes (2015-04-17)
 =============================================================
 
