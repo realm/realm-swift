@@ -1,3 +1,17 @@
+0.91.5 Release notes (2015-04-28)
+=============================================================
+
+### Bugfixes
+
+* Fix issues with removing search indexes and re-enable it.
+
+0.91.4 Release notes (2015-04-27)
+=============================================================
+
+### Bugfixes
+
+* Temporarily disable removing indexes from existing columns due to bugs.
+
 0.91.3 Release notes (2015-04-17)
 =============================================================
 
