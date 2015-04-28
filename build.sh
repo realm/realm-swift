@@ -107,11 +107,6 @@ xcrealm() {
     xc "-project $PROJECT $@"
 }
 
-xcrealmswift() {
-    PROJECT=RealmSwift.xcodeproj
-    xc "-project $PROJECT $@"
-}
-
 build_combined() {
     local scheme="$1"
     local config="$2"
@@ -119,7 +114,7 @@ build_combined() {
     local scope_suffix="$4"
 
     # Derive build paths
-    local build_products_path="build/DerivedData/$module_name/Build/Products"
+    local build_products_path="build/DerivedData/Realm/Build/Products"
     local product_name="$module_name.framework"
     local binary_path="$module_name"
     local iphoneos_path="$build_products_path/$config-iphoneos$scope_suffix/$product_name"
@@ -127,12 +122,11 @@ build_combined() {
     local out_path="build/ios$scope_suffix"
 
     # Build for each platform
-    if [[ "$module_name" == "Realm" ]]; then
-      xcrealm "-scheme '$scheme' -configuration $config -sdk iphoneos"
-      xcrealm "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
-    elif [[ "$module_name" == "RealmSwift" ]]; then
-      xcrealmswift "-scheme '$scheme' -configuration $config -sdk iphoneos"
-      xcrealmswift "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
+    xcrealm "-scheme '$scheme' -configuration $config -sdk iphoneos"
+    xcrealm "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
+
+    # Combine .swiftmodule
+    if [ -d $iphoneos_path/Modules/$module_name.swiftmodule ]; then
       # Combine .swiftmodule
       cp $iphoneos_path/Modules/$module_name.swiftmodule/* $iphonesimulator_path/Modules/$module_name.swiftmodule/
     fi
@@ -171,11 +165,11 @@ test_ios_devices() {
         fi
         exit 1
     fi
-    cmd="$1"
+    scheme="$1"
     configuration="$2"
     failed=0
     for device in "${serial_numbers[@]}"; do
-        $cmd "-scheme 'iOS Device Tests' -configuration $configuration -destination 'id=$device' test" || failed=1
+        xcrealm "-scheme '${scheme}' -configuration $configuration -destination 'id=$device' test" || failed=1
     done
     return $failed
 }
@@ -296,8 +290,7 @@ case "$COMMAND" in
         ;;
 
     "ios-swift")
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphoneos"
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
+        build_combined "RealmSwift iOS" "$CONFIGURATION" RealmSwift
         exit 0
         ;;
 
@@ -310,7 +303,7 @@ case "$COMMAND" in
         ;;
 
     "osx-swift")
-        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
+        xcrealm "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
         exit 0
         ;;
 
@@ -350,15 +343,15 @@ case "$COMMAND" in
         ;;
 
     "test-ios-swift")
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xcrealm "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
         ;;
 
     "test-ios-devices")
         failed=0
-        test_ios_devices xcrealm "$CONFIGURATION" || failed=1
-        test_ios_devices xcrealmswift "$CONFIGURATION" || failed=1
+        test_ios_devices 'iOS Device Tests' "$CONFIGURATION" || failed=1
+        test_ios_devices 'RealmSwift iOS Device Tests' "$CONFIGURATION" || failed=1
         exit $failed
         ;;
 
@@ -368,7 +361,7 @@ case "$COMMAND" in
         ;;
 
     "test-osx-swift")
-        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION test"
+        xcrealm "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION test"
         exit 0
         ;;
 
