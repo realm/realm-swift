@@ -210,6 +210,7 @@ static inline RLMObjectBase *RLMGetLink(unretained<RLMObjectBase> obj, NSUIntege
     NSUInteger index = obj->_row.get_link(colIndex);
     return RLMCreateObjectAccessor(obj->_realm, obj->_realm.schema[objectClassName], index);
 }
+
 static inline void RLMSetValue(unretained<RLMObjectBase> obj, NSUInteger colIndex,
                                unretained<RLMObjectBase> val, RLMCreationOptions options=0) {
     RLMVerifyInWriteTransaction(obj);
@@ -242,6 +243,7 @@ static inline RLMArray *RLMGetArray(unretained<RLMObjectBase> obj, NSUInteger co
                                                                 realm:obj->_realm];
     return ar;
 }
+
 static inline void RLMSetValue(unretained<RLMObjectBase> obj, NSUInteger colIndex,
                                unretained<id><NSFastEnumeration> val,
                                RLMCreationOptions options=0) {

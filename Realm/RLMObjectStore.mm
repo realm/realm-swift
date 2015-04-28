@@ -465,7 +465,6 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
     RLMInitializeSwiftListAccessor(object);
 }
 
-
 RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options) {
     if (options & RLMCreationOptionsUpdateOrCreate && RLMIsObjectSubclass([value class])) {
         RLMObjectBase *obj = value;
@@ -485,7 +484,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 
     // validate values, create row, and populate
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
-        array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema);
+        array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema, realm);
 
         // get or create our accessor
         bool created;
@@ -510,7 +509,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
 
         // assume dictionary or object with kvc properties
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema, !created);
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema, !created, realm);
 
         // populate
         for (RLMProperty *prop in objectSchema.properties) {
