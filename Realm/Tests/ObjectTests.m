@@ -930,6 +930,19 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm commitWriteTransaction];
 }
 
+- (void)testCreateInRealmWithCircularObject
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    CircleObject *object = [[CircleObject alloc] init];
+    object.data = @"data";
+    object.next = [[CircleObject alloc] initWithValue:@[@"other data", object]];
+
+    [realm beginWriteTransaction];
+    [CircleObject createInRealm:realm withValue:object];
+    [realm commitWriteTransaction];
+}
+
 - (void)testObjectDescription
 {
     RLMRealm *realm = [RLMRealm defaultRealm];

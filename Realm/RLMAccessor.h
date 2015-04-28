@@ -38,6 +38,7 @@ id RLMDynamicGet(RLMObjectBase *obj, NSString *propName);
 
 // by property/column
 void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOptions options);
+void _RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOptions options, NSMapTable *mapping);
 
 //
 // Class modification
