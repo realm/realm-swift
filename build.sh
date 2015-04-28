@@ -109,9 +109,9 @@ xcrealm() {
 
 build_combined() {
     local scheme="$1"
-    local config="$2"
-    local module_name="$3"
-    local scope_suffix="$4"
+    local module_name="$2"
+    local scope_suffix="$3"
+    local config="$CONFIGURATION"
 
     # Derive build paths
     local build_products_path="build/DerivedData/Realm/Build/Products"
@@ -134,7 +134,7 @@ build_combined() {
     # Retrieve build products
     clean_retrieve $iphoneos_path $out_path $product_name
 
-    # Combine ar archives
+    # Combine archives
     xcrun lipo -create "$iphonesimulator_path/$binary_path" "$iphoneos_path/$binary_path" -output "$out_path/$product_name/$module_name"
 }
 
@@ -273,7 +273,7 @@ case "$COMMAND" in
         ;;
 
     "ios-static")
-        build_combined iOS "$CONFIGURATION" Realm
+        build_combined iOS Realm
         exit 0
         ;;
 
@@ -285,12 +285,12 @@ case "$COMMAND" in
         ;;
 
     "ios-dynamic")
-        build_combined "iOS Dynamic" "$CONFIGURATION" Realm "-dynamic"
+        build_combined "iOS Dynamic" Realm "-dynamic"
         exit 0
         ;;
 
     "ios-swift")
-        build_combined "RealmSwift iOS" "$CONFIGURATION" RealmSwift
+        build_combined "RealmSwift iOS" RealmSwift
         exit 0
         ;;
 
