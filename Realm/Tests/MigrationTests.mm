@@ -751,7 +751,7 @@
     // initialize realm
     @autoreleasepool {
         [[RLMRealm defaultRealm] transactionWithBlock:^{
-            [StringObject createInDefaultRealmWithObject:@[@"string"]];
+            [StringObject createInDefaultRealmWithValue:@[@"string"]];
         }];
     }
 

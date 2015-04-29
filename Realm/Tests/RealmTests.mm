@@ -704,13 +704,13 @@ extern "C" {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    PrimaryStringObject *obj = [[PrimaryStringObject alloc] initWithObject:@[@"string1", @1]];
+    PrimaryStringObject *obj = [[PrimaryStringObject alloc] initWithValue:@[@"string1", @1]];
     [realm addObject:obj];
 
-    PrimaryStringObject *obj2 = [[PrimaryStringObject alloc] initWithObject:@[@"string2", @2]];
+    PrimaryStringObject *obj2 = [[PrimaryStringObject alloc] initWithValue:@[@"string2", @2]];
     [realm addObject:obj2];
 
-    PrimaryStringObject *obj3 = [[PrimaryStringObject alloc] initWithObject:@[@"string3", @3]];
+    PrimaryStringObject *obj3 = [[PrimaryStringObject alloc] initWithValue:@[@"string3", @3]];
     [realm addObject:obj3];
 
     RLMResults *objects = [PrimaryStringObject allObjects];
@@ -720,8 +720,8 @@ extern "C" {
     XCTAssertEqual([(PrimaryStringObject *)objects[2] intCol], 3, @"Value should be 3");
 
     // upsert with array of 2 objects. One is to update the existing value, another is added
-    NSArray *array = @[[[PrimaryStringObject alloc] initWithObject:@[@"string2", @4]],
-                       [[PrimaryStringObject alloc] initWithObject:@[@"string4", @5]]];
+    NSArray *array = @[[[PrimaryStringObject alloc] initWithValue:@[@"string2", @4]],
+                       [[PrimaryStringObject alloc] initWithValue:@[@"string4", @5]]];
     [realm addOrUpdateObjectsFromArray:array];
     XCTAssertEqual([objects count], 4U, @"Should have 4 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
@@ -1209,8 +1209,8 @@ extern "C" {
 {
     RLMRealm *realm = self.realmWithTestPath;
     [realm transactionWithBlock:^{
-        [StringObject createInRealm:realm withObject:@[@"A"]];
-        [StringObject createInRealm:realm withObject:@[@"A"]];
+        [StringObject createInRealm:realm withValue:@[@"A"]];
+        [StringObject createInRealm:realm withValue:@[@"A"]];
     }];
     auto fileSize = ^(NSString *path) {
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
