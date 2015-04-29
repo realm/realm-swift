@@ -498,7 +498,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         objectBlueprint[primaryKey.name] = uniqueValue;
     }
     
-    return [realm createObject:schema.className withObject:objectBlueprint];
+    return [realm createObject:schema.className withValue:objectBlueprint];
 }
 
 + (id)uniqueValueForProperty:(RLMProperty *)primaryKey className:(NSString *)className inRealm:(RLMRealm *)realm
