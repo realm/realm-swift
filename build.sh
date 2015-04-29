@@ -102,11 +102,6 @@ xc() {
     fi
 }
 
-xcrealm() {
-    PROJECT=Realm.xcodeproj
-    xc "-project $PROJECT $@"
-}
-
 build_combined() {
     local scheme="$1"
     local module_name="$2"
@@ -122,13 +117,12 @@ build_combined() {
     local out_path="build/ios$scope_suffix"
 
     # Build for each platform
-    xcrealm "-scheme '$scheme' -configuration $config -sdk iphoneos"
-    xcrealm "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
+    xc "-scheme '$scheme' -configuration $config -sdk iphoneos"
+    xc "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
 
     # Combine .swiftmodule
-    if [ -d $iphoneos_path/Modules/$module_name.swiftmodule ]; then
-      # Combine .swiftmodule
-      cp $iphoneos_path/Modules/$module_name.swiftmodule/* $iphonesimulator_path/Modules/$module_name.swiftmodule/
+    if [ -d $iphonesimulator_path/Modules/$module_name.swiftmodule ]; then
+      cp $iphonesimulator_path/Modules/$module_name.swiftmodule/* $iphoneos_path/Modules/$module_name.swiftmodule/
     fi
 
     # Retrieve build products
@@ -169,7 +163,7 @@ test_ios_devices() {
     configuration="$2"
     failed=0
     for device in "${serial_numbers[@]}"; do
-        xcrealm "-scheme '${scheme}' -configuration $configuration -destination 'id=$device' test" || failed=1
+        xc "-scheme '${scheme}' -configuration $configuration -destination 'id=$device' test" || failed=1
     done
     return $failed
 }
@@ -279,7 +273,7 @@ case "$COMMAND" in
 
     "pre-ios-swift")
         if ! [ -d "build/ios-dynamic" ]; then
-            sh build.sh ios-dynamic
+            sh build.sh ios-dynamic "LD_DYLIB_INSTALL_NAME='@rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm'"
         fi
         exit 0
         ;;
@@ -295,7 +289,7 @@ case "$COMMAND" in
         ;;
 
     "osx")
-        xcrealm "-scheme OSX -configuration $CONFIGURATION"
+        xc "-scheme OSX -configuration $CONFIGURATION"
         rm -rf build/osx
         mkdir build/osx
         cp -R build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework build/osx
@@ -303,7 +297,7 @@ case "$COMMAND" in
         ;;
 
     "osx-swift")
-        xcrealm "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
+        xc "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
         exit 0
         ;;
 
@@ -331,20 +325,20 @@ case "$COMMAND" in
         ;;
 
     "test-ios-static")
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xc "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xc "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
         ;;
 
     "test-ios-dynamic")
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xc "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xc "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
         ;;
 
     "test-ios-swift")
-        xcrealm "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealm "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xc "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xc "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
         ;;
 
@@ -356,12 +350,12 @@ case "$COMMAND" in
         ;;
 
     "test-osx")
-        xcrealm "-scheme OSX -configuration $CONFIGURATION test GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
+        xc "-scheme OSX -configuration $CONFIGURATION test GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
         exit 0
         ;;
 
     "test-osx-swift")
-        xcrealm "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION test"
+        xc "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION test"
         exit 0
         ;;
 
