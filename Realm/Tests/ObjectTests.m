@@ -205,7 +205,11 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 @end
 
-@interface PrimaryCompanyObject : CompanyObject
+RLM_ARRAY_TYPE(PrimaryEmployeeObject);
+
+@interface PrimaryCompanyObject : RLMObject
+@property NSString *name;
+@property RLMArray<PrimaryEmployeeObject> *employees;
 @property PrimaryEmployeeObject *intern;
 @end
 
@@ -898,12 +902,12 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    PrimaryEmployeeObject *eo = [PrimaryEmployeeObject createInRealm:realm withObject:@[@"Samuel", @19, @NO]];
-    PrimaryCompanyObject *co = [PrimaryCompanyObject createInRealm:realm withObject:@[@"Realm", @[eo], eo]];
+    PrimaryEmployeeObject *eo = [PrimaryEmployeeObject createInRealm:realm withValue:@[@"Samuel", @19, @NO]];
+    PrimaryCompanyObject *co = [PrimaryCompanyObject createInRealm:realm withValue:@[@"Realm", @[eo], eo]];
     [realm commitWriteTransaction];
 
     [realm beginWriteTransaction];
-    [PrimaryCompanyObject createOrUpdateInRealm:realm withObject:@{
+    [PrimaryCompanyObject createOrUpdateInRealm:realm withValue:@{
                                                                    @"name" : @"Realm",
                                                                    @"intern" : @{@"name":@"Samuel", @"hired":@YES},
                                                                    }];
@@ -914,6 +918,20 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertEqualObjects(@"Samuel", eo.name);
     XCTAssertEqual(YES, eo.hired);
     XCTAssertEqual(19, eo.age);
+
+    [realm beginWriteTransaction];
+    [PrimaryCompanyObject createOrUpdateInRealm:realm withValue:@{
+                                                                   @"name" : @"Realm",
+                                                                   @"employees": @[@{@"name":@"Samuel", @"hired":@NO}],
+                                                                   @"intern" : @{@"name":@"Samuel", @"age":@20},
+                                                                   }];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, co.employees.count);
+    XCTAssertEqual(1U, [PrimaryEmployeeObject allObjectsInRealm:realm].count);
+    XCTAssertEqualObjects(@"Samuel", eo.name);
+    XCTAssertEqual(NO, eo.hired);
+    XCTAssertEqual(20, eo.age);
 }
 
 - (void)testCreateInRealmCopiesFromOtherRealm {
