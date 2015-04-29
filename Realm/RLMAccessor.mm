@@ -182,17 +182,17 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 static inline size_t RLMAddLinkedObject(RLMObjectBase *link,
                                         __unsafe_unretained RLMRealm *const realm,
                                         RLMCreationOptions options,
-                                        __unsafe_unretained NSMapTable *mapping=nil) {
+                                        __unsafe_unretained NSMapTable *valueToAccessorMapping=nil) {
     if (link.isInvalidated) {
         @throw RLMException(@"Adding a deleted or invalidated object to a Realm is not permitted");
     }
     else if (link->_realm != realm) {
         // only try to update if link object has primary key
         if ((options & RLMCreationOptionsUpdateOrCreate) && link->_objectSchema.primaryKeyProperty) {
-            link = _RLMCreateObjectInRealmWithValue(realm, link->_objectSchema.className, link, RLMCreationOptionsUpdateOrCreate | RLMCreationOptionsAllowCopy, mapping);
+            link = _RLMCreateObjectInRealmWithValue(realm, link->_objectSchema.className, link, RLMCreationOptionsUpdateOrCreate | RLMCreationOptionsAllowCopy, valueToAccessorMapping);
         }
         else if (options & RLMCreationOptionsAllowCopy) {
-            link = _RLMCreateObjectInRealmWithValue(realm, link->_objectSchema.className, link, RLMCreationOptionsAllowCopy, mapping);
+            link = _RLMCreateObjectInRealmWithValue(realm, link->_objectSchema.className, link, RLMCreationOptionsAllowCopy, valueToAccessorMapping);
         }
         else {
             RLMAddObjectToRealm(link, realm, options);
@@ -212,7 +212,7 @@ static inline RLMObjectBase *RLMGetLink(__unsafe_unretained RLMObjectBase *const
     return RLMCreateObjectAccessor(obj->_realm, obj->_realm.schema[objectClassName], index);
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
-                               __unsafe_unretained RLMObjectBase *const val, RLMCreationOptions options=0, __unsafe_unretained NSMapTable *mapping=nil) {
+                               __unsafe_unretained RLMObjectBase *const val, RLMCreationOptions options=0, __unsafe_unretained NSMapTable *valueToAccessorMapping=nil) {
     RLMVerifyInWriteTransaction(obj);
 
     if (!val || (id)val == NSNull.null) {
@@ -229,7 +229,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
             @throw RLMException(reason);
         }
 
-        obj->_row.set_link(colIndex, RLMAddLinkedObject(val, obj->_realm, options, mapping));
+        obj->_row.set_link(colIndex, RLMAddLinkedObject(val, obj->_realm, options, valueToAccessorMapping));
     }
 }
 
@@ -245,7 +245,7 @@ static inline RLMArray *RLMGetArray(__unsafe_unretained RLMObjectBase *const obj
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
                                __unsafe_unretained id<NSFastEnumeration> val,
-                               RLMCreationOptions options=0, __unsafe_unretained NSMapTable *mapping=nil) {
+                               RLMCreationOptions options=0, __unsafe_unretained NSMapTable *valueToAccessorMapping=nil) {
     RLMVerifyInWriteTransaction(obj);
 
     realm::LinkViewRef linkView = obj->_row.get_linklist(colIndex);
@@ -254,7 +254,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
     linkView->clear();
     if ((id)val != NSNull.null) {
         for (RLMObjectBase *link in val) {
-            linkView->add(RLMAddLinkedObject(link, obj->_realm, options, mapping));
+            linkView->add(RLMAddLinkedObject(link, obj->_realm, options, valueToAccessorMapping));
         }
     }
 }
@@ -652,7 +652,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
 }
 
 void _RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const prop,
-                   __unsafe_unretained id val, RLMCreationOptions options, __unsafe_unretained NSMapTable *mapping) {
+                   __unsafe_unretained id val, RLMCreationOptions options, __unsafe_unretained NSMapTable *valueToAccessorMapping) {
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
         case RLMAccessorCodeByte:
@@ -691,10 +691,10 @@ void _RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unret
             RLMSetValue(obj, col, (NSData *)val);
             break;
         case RLMAccessorCodeLink:
-            RLMSetValue(obj, col, (RLMObjectBase *)val, options, mapping);
+            RLMSetValue(obj, col, (RLMObjectBase *)val, options, valueToAccessorMapping);
             break;
         case RLMAccessorCodeArray:
-            RLMSetValue(obj, col, (RLMArray *)val, options, mapping);
+            RLMSetValue(obj, col, (RLMArray *)val, options, valueToAccessorMapping);
             break;
         case RLMAccessorCodeAny:
             RLMSetValue(obj, col, val);

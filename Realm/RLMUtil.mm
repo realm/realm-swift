@@ -163,29 +163,29 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
     @throw RLMException(@"Invalid RLMPropertyType specified");
 }
 
-static inline id RLMValidatedRealmObject(id obj, RLMSchema *schema, RLMObjectSchema *objectSchema, RLMRealm *realm, NSMapTable *mapping) {
+static inline id RLMValidatedRealmObject(id obj, RLMSchema *schema, RLMObjectSchema *objectSchema, RLMRealm *realm, NSMapTable *valueToAccessorMapping) {
     if (realm) {
-        return _RLMCreateObjectInRealmWithValue(realm, objectSchema.className, obj, RLMCreationOptionsAllowCopy | RLMCreationOptionsUpdateOrCreate, mapping);
+        return _RLMCreateObjectInRealmWithValue(realm, objectSchema.className, obj, RLMCreationOptionsAllowCopy | RLMCreationOptionsUpdateOrCreate, valueToAccessorMapping);
     }
     else {
         return [[objectSchema.objectClass alloc] initWithValue:obj schema:schema];
     }
 }
 
-id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema, RLMRealm *realm, NSMapTable *mapping) {
+id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema, RLMRealm *realm, NSMapTable *valueToAccessorMapping) {
     if (!RLMIsObjectValidForProperty(obj, prop)) {
         // check for object or array literals
         if (prop.type == RLMPropertyTypeObject) {
             // for object create and try to initialize with obj
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
-            return RLMValidatedRealmObject(obj, schema, objSchema, realm, mapping);
+            return RLMValidatedRealmObject(obj, schema, objSchema, realm, valueToAccessorMapping);
         }
         else if (prop.type == RLMPropertyTypeArray && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
             // for arrays, create objects for each literal object and return new array
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
             RLMArray *objects = [[RLMArray alloc] initWithObjectClassName: objSchema.className standalone:YES];
             for (id el in obj) {
-                [objects addObject:RLMValidatedRealmObject(el, schema, objSchema, realm, mapping)];
+                [objects addObject:RLMValidatedRealmObject(el, schema, objSchema, realm, valueToAccessorMapping)];
             }
             return objects;
         }
@@ -218,7 +218,7 @@ NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
     return defaults;
 }
 
-NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing, RLMRealm *realm, NSMapTable *mapping) {
+NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing, RLMRealm *realm, NSMapTable *valueToAccessorMapping) {
     NSArray *properties = objectSchema.properties;
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     NSDictionary *defaultValues = nil;
@@ -238,13 +238,13 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *o
             if (!obj) {
                 obj = NSNull.null;
             }
-            outDict[prop.name] = RLMValidatedObjectForProperty(obj, prop, schema, realm, mapping);
+            outDict[prop.name] = RLMValidatedObjectForProperty(obj, prop, schema, realm, valueToAccessorMapping);
         }
     }
     return outDict;
 }
 
-NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema, RLMRealm *realm, NSMapTable *mapping) {
+NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema, RLMRealm *realm, NSMapTable *valueToAccessorMapping) {
     NSArray *props = objectSchema.properties;
     if (array.count != props.count) {
         @throw RLMException(@"Invalid array input. Number of array elements does not match number of properties.");
@@ -253,7 +253,7 @@ NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objec
     // validate all values
     NSMutableArray *outArray = [NSMutableArray arrayWithCapacity:props.count];
     for (NSUInteger i = 0; i < array.count; i++) {
-        [outArray addObject:RLMValidatedObjectForProperty(array[i], props[i], schema, realm, mapping)];
+        [outArray addObject:RLMValidatedObjectForProperty(array[i], props[i], schema, realm, valueToAccessorMapping)];
     }
     return outArray;
 };

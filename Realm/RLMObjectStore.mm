@@ -469,7 +469,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     return _RLMCreateObjectInRealmWithValue(realm, className, value, options, [NSMapTable strongToStrongObjectsMapTable]);
 }
 
-RLMObjectBase *_RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options, NSMapTable *mapping) {
+RLMObjectBase *_RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options, NSMapTable *valueToAccessorMapping) {
     if (options & RLMCreationOptionsUpdateOrCreate && RLMIsObjectSubclass([value class])) {
         RLMObjectBase *obj = value;
         if ([obj->_objectSchema.className isEqualToString:className] && obj->_realm == realm) {
@@ -485,15 +485,15 @@ RLMObjectBase *_RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *class
     RLMSchema *schema = realm.schema;
     RLMObjectSchema *objectSchema = schema[className];
     RLMObjectBase *object;
-    if ((object = [mapping objectForKey:value])) {
+    if ((object = [valueToAccessorMapping objectForKey:value])) {
         return object;
     }
     object = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-    [mapping setObject:object forKey:value];
+    [valueToAccessorMapping setObject:object forKey:value];
 
     // validate values, create row, and populate
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
-        array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema, realm, mapping);
+        array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema, realm, valueToAccessorMapping);
 
         // get or create our accessor
         bool created;
@@ -507,7 +507,7 @@ RLMObjectBase *_RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *class
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
                 _RLMDynamicSet(object, prop, array[i],
-                              options | RLMCreationOptionsUpdateOrCreate | (prop.isPrimary ? RLMCreationOptionsEnforceUnique : 0), mapping);
+                              options | RLMCreationOptionsUpdateOrCreate | (prop.isPrimary ? RLMCreationOptionsEnforceUnique : 0), valueToAccessorMapping);
             }
         }
     }
@@ -526,7 +526,7 @@ RLMObjectBase *_RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *class
             id propValue = dict[prop.name];
             if (propValue && (created || !prop.isPrimary)) {
                 _RLMDynamicSet(object, prop, propValue,
-                              options | RLMCreationOptionsUpdateOrCreate | (prop.isPrimary ? RLMCreationOptionsEnforceUnique : 0), mapping);
+                              options | RLMCreationOptionsUpdateOrCreate | (prop.isPrimary ? RLMCreationOptionsEnforceUnique : 0), valueToAccessorMapping);
             }
         }
     }
