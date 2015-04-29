@@ -58,11 +58,15 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     return self;
 }
 
-- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
+- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema valueToAccessorMapping:(NSMapTable *)valueToAccessorMapping {
+    if (id existing = [valueToAccessorMapping objectForKey:value]) {
+        return existing;
+    }
     self = [self init];
+    [valueToAccessorMapping setObject:self forKey:value];
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // validate and populate
-        array = RLMValidatedArrayForObjectSchema(array, _objectSchema, schema);
+        array = RLMValidatedArrayForObjectSchema(array, _objectSchema, schema, nil, valueToAccessorMapping);
         NSArray *properties = _objectSchema.properties;
         for (NSUInteger i = 0; i < array.count; i++) {
             [self setValue:array[i] forKeyPath:[properties[i] name]];
@@ -70,7 +74,7 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     }
     else {
         // assume our object is an NSDictionary or a an object with kvc properties
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, schema);
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, schema, false, nil, valueToAccessorMapping);
         for (NSString *name in dict) {
             id val = dict[name];
             // strip out NSNull before passing values to standalone setters

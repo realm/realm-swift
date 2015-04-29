@@ -261,7 +261,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(stringObjects.count, 1)
         let persistedObject = object.object!
 
-        XCTAssertEqual(persistedObject.intCol, 12)
+        XCTAssertEqual(persistedObject.intCol, 11)
         XCTAssertNil(standalone.realm) // the standalone object should be copied, rather than added, to the realm
         XCTAssertEqual(object.object!, persistedObject)
         XCTAssertEqual(object.objects.first!, persistedObject)

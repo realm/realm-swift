@@ -1002,6 +1002,19 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [realm commitWriteTransaction];
 }
 
+- (void)testInitCircularObject
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    NSMutableDictionary *value = [NSMutableDictionary dictionaryWithObject:@"data" forKey:@"data"];
+    value[@"next"] = @{@"data": @"other data", @"next": value};
+
+    [realm beginWriteTransaction];
+    CircleObject *standalone = [[CircleObject alloc] initWithValue:value];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(standalone.next.next, standalone);
+}
+
 - (void)testObjectDescription
 {
     RLMRealm *realm = [RLMRealm defaultRealm];

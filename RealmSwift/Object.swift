@@ -76,7 +76,7 @@ public class Object: RLMObjectBase, Equatable, Printable {
                     thrown if any required properties are not present and no default is set.
     */
     public init(value: AnyObject) {
-        super.init(value: value, schema: RLMSchema.sharedSchema())
+        super.init(value: value, schema: RLMSchema.sharedSchema(), valueToAccessorMapping: NSMapTable.strongToStrongObjectsMapTable())
     }
 
 
@@ -160,8 +160,8 @@ public class Object: RLMObjectBase, Equatable, Printable {
     WARNING: This is an internal initializer not intended for public use.
     :nodoc:
     */
-    public override init(value: AnyObject, schema: RLMSchema) {
-        super.init(value: value, schema: schema)
+    public override init(value: AnyObject, schema: RLMSchema, valueToAccessorMapping: NSMapTable?) {
+        super.init(value: value, schema: schema, valueToAccessorMapping: valueToAccessorMapping)
     }
 
     /**

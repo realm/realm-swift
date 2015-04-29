@@ -168,7 +168,7 @@ static inline id RLMValidatedRealmObject(id obj, RLMSchema *schema, RLMObjectSch
         return _RLMCreateObjectInRealmWithValue(realm, objectSchema.className, obj, RLMCreationOptionsAllowCopy | RLMCreationOptionsUpdateOrCreate, valueToAccessorMapping);
     }
     else {
-        return [[objectSchema.objectClass alloc] initWithValue:obj schema:schema];
+        return [[objectSchema.objectClass alloc] initWithValue:obj schema:schema valueToAccessorMapping:valueToAccessorMapping];
     }
 }
 
