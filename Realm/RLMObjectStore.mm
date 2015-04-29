@@ -659,8 +659,8 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         NSArray *props = objectSchema.properties;
         for (NSUInteger i = 0; i < array.count; i++) {
             RLMProperty *prop = props[i];
-            // skip primary key when updating since it doesn't change
             id propValue = RLMNSNullToNil(array[i]);
+            // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
                 id val = array[i];
                 RLMValidateValueForProperty(val, prop, schema, false, false);
