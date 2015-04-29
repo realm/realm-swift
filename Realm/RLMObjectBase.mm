@@ -87,12 +87,8 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
             @throw RLMException(@"Invalid array input. Number of array elements does not match number of properties.");
         }
         for (NSUInteger i = 0; i < array.count; i++) {
-            id propertyValue = array[i];
-            // strip out NSNull before passing values to standalone setters
-            if (propertyValue == NSNull.null) {
-                propertyValue = nil;
-            }
-            [self setValue:RLMValidatedObjectForProperty(array[i], properties[i], schema) forKeyPath:[properties[i] name]];
+            id propertyValue = RLMValidatedObjectForProperty(array[i], properties[i], schema);
+            [self setValue:RLMNSNullToNil(propertyValue) forKeyPath:[properties[i] name]];
         }
     }
     else {
@@ -109,7 +105,8 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
                 obj = defaultValues[prop.name];
             }
 
-            [self setValue:RLMValidatedObjectForProperty(obj, prop, schema) forKeyPath:prop.name];
+            obj = RLMValidatedObjectForProperty(obj, prop, schema);
+            [self setValue:RLMNSNullToNil(obj) forKeyPath:prop.name];
         }
     }
 

@@ -69,6 +69,14 @@ static inline T *RLMDynamicCast(__unsafe_unretained id obj) {
     return nil;
 }
 
+template<typename T>
+static inline T *RLMNSNullToNil(T *obj) {
+    if (obj == NSNull.null) {
+        return nil;
+    }
+    return obj;
+}
+
 // Translate an rlmtype to a string representation
 static inline NSString *RLMTypeToString(RLMPropertyType type) {
     switch (type) {
