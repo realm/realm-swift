@@ -163,7 +163,7 @@ test_ios_devices() {
     configuration="$2"
     failed=0
     for device in "${serial_numbers[@]}"; do
-        xc "-scheme '${scheme}' -configuration $configuration -destination 'id=$device' test" || failed=1
+        xc "-scheme '$scheme' -configuration $configuration -destination 'id=$device' test" || failed=1
     done
     return $failed
 }
