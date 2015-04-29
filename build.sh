@@ -272,6 +272,10 @@ case "$COMMAND" in
         ;;
 
     "pre-ios-swift")
+        # FIXME: Deleting the built products directory is a temporary workaround
+        #        to an auto-linking issue: Xcode will attempt to link the static
+        #        Realm.framework if it is built, rather than the dynamic framework.
+        rm -rf build/DerivedData/Realm/Build/Products "$BUILT_PRODUCTS_DIR"
         if ! [ -d "build/ios-dynamic" ]; then
             sh build.sh ios-dynamic "LD_DYLIB_INSTALL_NAME='@rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm'"
         fi
