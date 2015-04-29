@@ -422,10 +422,7 @@ static inline NSUInteger RLMCreateOrGetRowForObject(__unsafe_unretained RLMObjec
     RLMProperty *primaryProperty = schema.primaryKeyProperty;
     if (createOrUpdate && primaryProperty) {
         // get primary value
-        id primaryValue = primaryValueGetter(primaryProperty);
-        if (primaryValue == NSNull.null) {
-            primaryValue = nil;
-        }
+        id primaryValue = RLMNSNullToNil(primaryValueGetter(primaryProperty));
         
         // search for existing object based on primary key type
         if (primaryProperty.type == RLMPropertyTypeString) {
@@ -663,10 +660,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         for (NSUInteger i = 0; i < array.count; i++) {
             RLMProperty *prop = props[i];
             // skip primary key when updating since it doesn't change
-            id propValue = array[i];
-            if (propValue == NSNull.null) {
-                propValue = nil;
-            }
+            id propValue = RLMNSNullToNil(array[i]);
             if (created || !prop.isPrimary) {
                 id val = array[i];
                 RLMValidateValueForProperty(val, prop, schema, false, false);
@@ -780,9 +774,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
         return nil;
     }
 
-    if (key == NSNull.null) {
-        key = nil;
-    }
+    key = RLMNSNullToNil(key);
 
     size_t row = realm::not_found;
     if (primaryProperty.type == RLMPropertyTypeString) {
