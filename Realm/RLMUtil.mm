@@ -163,23 +163,13 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
     @throw RLMException(@"Invalid RLMPropertyType specified");
 }
 
-id RLMValidatedRealmObject(id obj, RLMSchema *schema, RLMObjectSchema *objectSchema, RLMRealm *realm, NSMapTable *mapping);
-id RLMValidatedRealmObject(id obj, RLMSchema *schema, RLMObjectSchema *objectSchema, RLMRealm *realm, NSMapTable *mapping) {
-    if (realm && objectSchema.primaryKeyProperty) {
-        id pk;
-        if (auto array = RLMDynamicCast<NSArray>(obj)) {
-            pk = array[objectSchema.primaryKeyProperty.column];
-        }
-        else {
-            pk = [obj valueForKey:objectSchema.primaryKeyProperty.name];
-        }
-        if (pk) {
-            if (RLMGetObject(realm, objectSchema.className, pk)) {
-                return _RLMCreateObjectInRealmWithValue(realm, objectSchema.className, obj, RLMCreationOptionsAllowCopy | RLMCreationOptionsUpdateOrCreate, mapping);
-            }
-        }
+static inline id RLMValidatedRealmObject(id obj, RLMSchema *schema, RLMObjectSchema *objectSchema, RLMRealm *realm, NSMapTable *mapping) {
+    if (realm) {
+        return _RLMCreateObjectInRealmWithValue(realm, objectSchema.className, obj, RLMCreationOptionsAllowCopy | RLMCreationOptionsUpdateOrCreate, mapping);
     }
-    return [[objectSchema.objectClass alloc] initWithValue:obj schema:schema];
+    else {
+        return [[objectSchema.objectClass alloc] initWithValue:obj schema:schema];
+    }
 }
 
 id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema, RLMRealm *realm, NSMapTable *mapping) {
