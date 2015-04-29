@@ -493,7 +493,7 @@ RLMObjectBase *_RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *class
 
     // validate values, create row, and populate
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
-        array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema, realm);
+        array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema, realm, mapping);
 
         // get or create our accessor
         bool created;
