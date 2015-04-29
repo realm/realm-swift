@@ -196,6 +196,25 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @implementation DataObject
 @end
 
+@interface PrimaryEmployeeObject : EmployeeObject
+@end
+
+@implementation PrimaryEmployeeObject
++ (NSString *)primaryKey {
+    return @"name";
+}
+@end
+
+@interface PrimaryCompanyObject : CompanyObject
+@property PrimaryEmployeeObject *intern;
+@end
+
+@implementation PrimaryCompanyObject
++ (NSString *)primaryKey {
+    return @"name";
+}
+@end
+
 #pragma mark - Tests
 
 @interface ObjectTests : RLMTestCase
@@ -873,6 +892,28 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertEqual(1U, DogObject.allObjects.count);
 
     [realm commitWriteTransaction];
+}
+
+- (void)testCreateInRealmReusesExistingNestedObjectsByPrimaryKey {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    PrimaryEmployeeObject *eo = [PrimaryEmployeeObject createInRealm:realm withObject:@[@"Samuel", @19, @NO]];
+    PrimaryCompanyObject *co = [PrimaryCompanyObject createInRealm:realm withObject:@[@"Realm", @[eo], eo]];
+    [realm commitWriteTransaction];
+
+    [realm beginWriteTransaction];
+    [PrimaryCompanyObject createOrUpdateInRealm:realm withObject:@{
+                                                                   @"name" : @"Realm",
+                                                                   @"intern" : @{@"name":@"Samuel", @"hired":@YES},
+                                                                   }];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, co.employees.count);
+    XCTAssertEqual(1U, [PrimaryEmployeeObject allObjectsInRealm:realm].count);
+    XCTAssertEqualObjects(@"Samuel", eo.name);
+    XCTAssertEqual(YES, eo.hired);
+    XCTAssertEqual(19, eo.age);
 }
 
 - (void)testCreateInRealmCopiesFromOtherRealm {
