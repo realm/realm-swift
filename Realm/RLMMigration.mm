@@ -151,8 +151,8 @@
     }
 }
 
--(RLMObject *)createObject:(NSString *)className withValue:(id)object {
-    return [_realm createObject:className withValue:object];
+-(RLMObject *)createObject:(NSString *)className withValue:(id)value {
+    return [_realm createObject:className withValue:value];
 }
 
 - (RLMObject *)createObject:(NSString *)className withObject:(id)object {

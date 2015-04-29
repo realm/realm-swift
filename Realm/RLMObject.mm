@@ -39,16 +39,16 @@
     return [super init];
 }
 
-- (instancetype)initWithValue:(id)object {
-    return [super initWithValue:object schema:RLMSchema.sharedSchema];
+- (instancetype)initWithValue:(id)value {
+    return [super initWithValue:value schema:RLMSchema.sharedSchema];
 }
 
 - (instancetype)initWithObject:(id)object {
     return [self initWithValue:object];
 }
 
-+ (instancetype)createInDefaultRealmWithValue:(id)object {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMCreationOptionsAllowCopy);
++ (instancetype)createInDefaultRealmWithValue:(id)value {
+    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], value, RLMCreationOptionsAllowCopy);
 }
 
 + (instancetype)createInDefaultRealmWithObject:(id)object {
@@ -63,8 +63,8 @@
     return [self createInRealm:realm withValue:object];
 }
 
-+ (instancetype)createOrUpdateInDefaultRealmWithValue:(id)object {
-    return [self createOrUpdateInRealm:[RLMRealm defaultRealm] withValue:object];
++ (instancetype)createOrUpdateInDefaultRealmWithValue:(id)value {
+    return [self createOrUpdateInRealm:[RLMRealm defaultRealm] withValue:value];
 }
 
 + (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object {
