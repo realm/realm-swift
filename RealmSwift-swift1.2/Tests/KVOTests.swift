@@ -157,6 +157,16 @@ class KVOTests: TestCase {
         observeListChange(obj, "arrayCol", .Removal, NSIndexSet(index: 0)) {
             obj.arrayCol.removeAll()
         }
+
+        observeChange(obj, "invalidated", false, true) {
+            self.realm.delete(obj)
+        }
+
+        let obj2 = KVOObject()
+        realm.add(obj2)
+        observeChange(obj2, "arrayCol.invalidated", false, true) {
+            self.realm.delete(obj2)
+        }
     }
 
     func testAllPropertyTypesMultipleAccessors() {
@@ -186,6 +196,17 @@ class KVOTests: TestCase {
         observeListChange(obs, "arrayCol", .Removal, NSIndexSet(index: 0)) {
             obj.arrayCol.removeAll()
         }
+
+        observeChange(obs, "invalidated", false, true) {
+            self.realm.delete(obj)
+        }
+
+        let obj2 = KVOObject()
+        realm.add(obj2)
+        let obs2 = realm.objectForPrimaryKey(KVOObject.self, key: obj2.pk)!
+        observeChange(obs2, "arrayCol.invalidated", false, true) {
+            self.realm.delete(obj2)
+        }
     }
 
     func testAddToRealmAfterAddingObservers() {
@@ -199,6 +220,24 @@ class KVOTests: TestCase {
         observeChange(obj, "ignored", 0, 15) {
             self.realm.add(obj)
             obj.ignored = 15
+        }
+
+        obj = KVOObject()
+        observeChange(obj, "invalidated", false, true) {
+            self.realm.add(obj)
+            self.realm.delete(obj)
+        }
+
+        obj = KVOObject()
+        observeChange(obj, "arrayCol.invalidated", false, true) {
+            self.realm.add(obj)
+            self.realm.delete(obj)
+        }
+
+        obj = KVOObject()
+        observeListChange(obj, "arrayCol", .Insertion, NSIndexSet(index: 0)) {
+            self.realm.add(obj)
+            obj.arrayCol.append(obj)
         }
     }
 }
