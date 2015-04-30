@@ -23,6 +23,7 @@
 
 @property CGFloat x;
 @property CGFloat y;
+@property NSString *pathID;
 
 @end
 

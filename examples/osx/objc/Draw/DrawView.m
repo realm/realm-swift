@@ -57,9 +57,9 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
     NSBezierPath *path = [NSBezierPath bezierPath];
     path.lineWidth = 4.0f;
     CGPoint point = theEvent.locationInWindow;
-    NSArray *pointArray = @[@(point.x), @(self.frame.size.height - point.y)];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID, @[pointArray]]];
+        [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID]];
+        [DrawPoint createInDefaultRealmWithObject:@[@(point.x), @(self.frame.size.height - point.y), self.pathID]];
     }];
 }
 
@@ -115,10 +115,8 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
 
 - (void)addPoint:(CGPoint)point
 {
-    NSArray *pointArray = @[@(point.x), @(self.frame.size.height - point.y)];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
-        [currentPath.points addObject:[[DrawPoint alloc] initWithObject:pointArray]];
+        [DrawPoint createInDefaultRealmWithObject:@[@(point.x), @(self.frame.size.height - point.y), self.pathID]];
     }];
 }
 
