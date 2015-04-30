@@ -21,6 +21,7 @@
 
 #import <realm/link_view.hpp>
 #import <realm/group.hpp>
+#import <realm/replication.hpp>
 #import <pthread.h>
 
 namespace realm {
@@ -29,6 +30,8 @@ namespace realm {
 
 @interface RLMRealm ()
 @property (nonatomic, readonly, getter=getOrCreateGroup) realm::Group *group;
+@property (nonatomic, readonly) realm::SharedGroup *sharedGroup;
+@property (nonatomic, readonly) realm::Replication *transactLogRegistry;
 - (void)handleExternalCommit;
 @end
 

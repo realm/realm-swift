@@ -34,7 +34,13 @@
 
 + (void)resetRealmState;
 
-- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory dynamic:(BOOL)dynamic error:(NSError **)error;
+- (instancetype)initWithPath:(NSString *)path
+                         key:(NSData *)key
+                    readOnly:(BOOL)readonly
+                    inMemory:(BOOL)inMemory
+                     dynamic:(BOOL)dynamic
+                       error:(NSError **)error
+               serverBaseURL:(NSURL *)serverBaseURL;
 
 + (instancetype)realmWithPath:(NSString *)path
                           key:(NSData *)key

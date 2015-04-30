@@ -55,8 +55,10 @@
         // create rw realm to migrate with current on disk table
         _realm = realm;
 
+        // FIXME: Passing nil for serverBaseURL may not always be the right thing to do.
+
         // create read only realm used during migration with current on disk schema
-        _oldRealm = [[RLMMigrationRealm alloc] initWithPath:realm.path key:key readOnly:NO inMemory:NO dynamic:YES error:error];
+        _oldRealm = [[RLMMigrationRealm alloc] initWithPath:realm.path key:key readOnly:NO inMemory:NO dynamic:YES error:error serverBaseURL:nil];
         if (_oldRealm) {
             RLMRealmSetSchema(_oldRealm, [RLMSchema dynamicSchemaFromRealm:_oldRealm], true);
         }
