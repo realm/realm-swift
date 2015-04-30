@@ -1198,8 +1198,8 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
                 // inconsistent with the accessed Realm file. This exception
                 // probably has to be transmuted to an NSError.
                 bool server_synchronization_mode = bool(serverBaseURL);
-                _replication.reset(realm::makeWriteLogCollector(path.UTF8String, server_synchronization_mode,
-                                                                static_cast<const char *>(key.bytes)).get());
+                _replication = realm::makeWriteLogCollector(path.UTF8String, server_synchronization_mode,
+                                                            static_cast<const char *>(key.bytes));
                 SharedGroup::DurabilityLevel durability = inMemory ? SharedGroup::durability_MemOnly :
                                                                      SharedGroup::durability_Full;
                 _sharedGroup = make_unique<SharedGroup>(*_replication, durability,
