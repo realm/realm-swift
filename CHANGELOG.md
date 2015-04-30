@@ -4,6 +4,16 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### API breaking changes
 
 * Migration blocks are no longer called when a Realm file is first created.
+* The following APIs have been deprecated in favor of newer method names:
+
+| Deprecated API | New API |
+| ------- | ------- |
+| `-[RLMMigration createObject:withObject:]` | `-[RLMMigration createObject:withValue:]` |
+| `-[RLMObject initWithObject:]` | `-[RLMObject initWithValue:]` |
+| `+[RLMObject createInDefaultRealmWithObject:]` | `+[RLMObject createInDefaultRealmWithValue:]` |
+| `+[RLMObject createInRealm:withObject:]` | `+[RLMObject createInRealm:withValue:]` |
+| `+[RLMObject createOrUpdateInDefaultRealmWithObject:]` | `+[RLMObject createOrUpdateInDefaultRealmWithValue:]` |
+| `+[RLMObject createOrUpdateInRealm:withObject:]` | `+[RLMObject createOrUpdateInRealm:withValue:]` |
 
 ### Enhancements
 
