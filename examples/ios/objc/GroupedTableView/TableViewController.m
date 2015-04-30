@@ -138,7 +138,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
         [realm beginWriteTransaction];
         for (NSInteger index = 0; index < 5; index++) {
             // Add row via dictionary. Order is ignored.
-            [DemoObject createInRealm:realm withObject:@{@"title": [self randomTitle],
+            [DemoObject createInRealm:realm withValue:@{@"title": [self randomTitle],
                                                          @"date": [NSDate date],
                                                          @"sectionTitle": [self randomSectionTitle]}];
         }
@@ -149,7 +149,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 - (void)add
 {
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        [DemoObject createInDefaultRealmWithObject:@[[self randomTitle], [NSDate date], [self randomSectionTitle]]];
+        [DemoObject createInDefaultRealmWithValue:@[[self randomTitle], [NSDate date], [self randomSectionTitle]]];
     }];
 }
 

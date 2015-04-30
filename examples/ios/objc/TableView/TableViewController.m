@@ -119,7 +119,7 @@ static NSString * const kTableName = @"table";
         [realm beginWriteTransaction];
         for (NSInteger index = 0; index < 5; index++) {
             // Add row via dictionary. Order is ignored.
-            [DemoObject createInRealm:realm withObject:@{@"title": [self randomString],
+            [DemoObject createInRealm:realm withValue:@{@"title": [self randomString],
                                                          @"date": [self randomDate]}];
         }
         [realm commitWriteTransaction];
@@ -130,7 +130,7 @@ static NSString * const kTableName = @"table";
 {
     RLMRealm *realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
-    [DemoObject createInRealm:realm withObject:@[[self randomString], [self randomDate]]];
+    [DemoObject createInRealm:realm withValue:@[[self randomString], [self randomDate]]];
     [realm commitWriteTransaction];
 }
 

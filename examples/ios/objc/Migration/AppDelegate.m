@@ -61,7 +61,7 @@
             [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
                 // give JP a dog
                 if ([newObject[@"fullName"] isEqualToString:@"JP McDonald"]) {
-                    Pet *jpsDog = [[Pet alloc] initWithObject:@[@"Jimbo", @(AnimalTypeDog)]];
+                    Pet *jpsDog = [[Pet alloc] initWithValue:@[@"Jimbo", @(AnimalTypeDog)]];
                     [newObject[@"pets"] addObject:jpsDog];
                 }
             }];

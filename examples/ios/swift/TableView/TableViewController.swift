@@ -98,7 +98,7 @@ class TableViewController: UITableViewController {
             realm.beginWriteTransaction()
             for index in 0..<5 {
                 // Add row via dictionary. Order is ignored.
-                DemoObject.createInRealm(realm, withObject: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
+                DemoObject.createInRealm(realm, withValue: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
             }
             realm.commitWriteTransaction()
         }
@@ -107,7 +107,7 @@ class TableViewController: UITableViewController {
     func add() {
         let realm = RLMRealm.defaultRealm()
         realm.beginWriteTransaction()
-        DemoObject.createInRealm(realm, withObject: [TableViewController.randomString(), TableViewController.randomDate()])
+        DemoObject.createInRealm(realm, withValue: [TableViewController.randomString(), TableViewController.randomDate()])
         realm.commitWriteTransaction()
     }
 
