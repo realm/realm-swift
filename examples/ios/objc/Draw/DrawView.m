@@ -52,18 +52,16 @@
     UIBezierPath *path = [UIBezierPath bezierPath];
     path.lineWidth = 4.0f;
     CGPoint point = [[touches anyObject] locationInView:self];
-    NSArray *pointArray = @[@(point.x), @(point.y)];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID, @[pointArray]]];
+        [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID]];
+        [DrawPoint createInDefaultRealmWithObject:@[@(point.x), @(point.y), self.pathID]];
     }];
 }
 
 - (void)addPoint:(CGPoint)point
 {
-    NSArray *pointArray = @[@(point.x), @(point.y)];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
-        [currentPath.points addObject:[[DrawPoint alloc] initWithObject:pointArray]];
+        [DrawPoint createInDefaultRealmWithObject:@[@(point.x), @(point.y), self.pathID]];
     }];
 }
 

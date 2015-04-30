@@ -24,7 +24,6 @@
 
 @property NSString *pathID;
 @property NSString *drawerID;
-@property RLMArray<DrawPoint> *points;
 @property (readonly) UIBezierPath *path;
 
 @end
