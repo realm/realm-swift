@@ -21,8 +21,8 @@
 
 @interface DrawPoint : RLMObject
 
-@property CGFloat x;
-@property CGFloat y;
+@property double x;
+@property double y;
 @property NSString *pathID;
 
 @end
