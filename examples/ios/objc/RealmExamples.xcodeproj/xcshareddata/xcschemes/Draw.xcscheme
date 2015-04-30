@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E87985A61A1450E800FB1EBF"
+               BlueprintIdentifier = "E80ABD6E1AF2A9DA00A37843"
                BuildableName = "Draw.app"
                BlueprintName = "Draw"
                ReferencedContainer = "container:RealmExamples.xcodeproj">
@@ -32,7 +32,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E87985A61A1450E800FB1EBF"
+            BlueprintIdentifier = "E80ABD6E1AF2A9DA00A37843"
             BuildableName = "Draw.app"
             BlueprintName = "Draw"
             ReferencedContainer = "container:RealmExamples.xcodeproj">
@@ -48,10 +48,11 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E87985A61A1450E800FB1EBF"
+            BlueprintIdentifier = "E80ABD6E1AF2A9DA00A37843"
             BuildableName = "Draw.app"
             BlueprintName = "Draw"
             ReferencedContainer = "container:RealmExamples.xcodeproj">
@@ -66,10 +67,11 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E87985A61A1450E800FB1EBF"
+            BlueprintIdentifier = "E80ABD6E1AF2A9DA00A37843"
             BuildableName = "Draw.app"
             BlueprintName = "Draw"
             ReferencedContainer = "container:RealmExamples.xcodeproj">

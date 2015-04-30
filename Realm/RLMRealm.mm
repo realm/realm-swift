@@ -358,7 +358,7 @@ atomic<bool> s_syncLogEverything(false);
                               serverPath:(NSString *)serverPath {
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
     msg.body = [serverPath dataUsingEncoding:NSUTF8StringEncoding];
-    msg.head = [NSString stringWithFormat:@"ident %@ %lu\n", sessionIdent, msg.body.length];
+    msg.head = [NSString stringWithFormat:@"ident %@ %lu\n", sessionIdent, (unsigned long)msg.body.length];
     [self enqueueOutputMessage:msg];
     NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: Get unique client identifier for "
           "remote file '%@'", _ident, sessionIdent, serverPath);
@@ -376,7 +376,7 @@ atomic<bool> s_syncLogEverything(false);
     msg.body = [serverPath dataUsingEncoding:NSUTF8StringEncoding];
     msg.head = [NSString stringWithFormat:@"bind %@ %llu %llu %llu %lu\n", sessionIdent,
                          ulonglong(fileIdent), ulonglong(serverVersion), ulonglong(clientVersion),
-                         msg.body.length];
+                         (unsigned long)msg.body.length];
     [self enqueueOutputMessage:msg];
     NSLog(@"RealmSync: Connection[%lu]: Sessions[%@]: Sending: Bind local file '%@' "
           "with identifier %llu to remote file '%@' continuing synchronization from "
@@ -659,7 +659,7 @@ atomic<bool> s_syncLogEverything(false);
         NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: Changeset %llu -> %llu "
               "of size %lu with origin timestamp %llu and origin client file identifier %llu "
               "(last integrated client version is %llu)", _ident, sessionIdent,
-              ulonglong(serverVersion-1), ulonglong(serverVersion), _messageBodyBuffer.length,
+              ulonglong(serverVersion-1), ulonglong(serverVersion), (unsigned long)_messageBodyBuffer.length,
               ulonglong(originTimestamp), ulonglong(originFileIdent), ulonglong(clientVersion));
     }
 
@@ -729,11 +729,11 @@ atomic<bool> s_syncLogEverything(false);
 
         bool serverSynchronizationMode = true;
         SharedGroup::DurabilityLevel durability = SharedGroup::durability_Full;
-        _history.reset(makeWriteLogCollector(clientPath.UTF8String,
-                                             serverSynchronizationMode).get());
+        _history = realm::makeWriteLogCollector(clientPath.UTF8String,
+                                                serverSynchronizationMode);
         _sharedGroup = make_unique<SharedGroup>(*_history, durability);
-        _backgroundHistory.reset(makeWriteLogCollector(clientPath.UTF8String,
-                                                       serverSynchronizationMode).get());
+        _backgroundHistory = realm::makeWriteLogCollector(clientPath.UTF8String,
+                                                          serverSynchronizationMode);
         _backgroundSharedGroup =
             make_unique<SharedGroup>(*_backgroundHistory, durability);
 
@@ -857,12 +857,12 @@ atomic<bool> s_syncLogEverything(false);
                               length:historyEntry.log_data.size()]; // Full copy
     msg.head = [NSString stringWithFormat:@"changeset %@ %llu %llu %llu %lu\n", _sessionIdent,
                          ulonglong(uploadVersion), ulonglong(serverVersion),
-                         ulonglong(historyEntry.timestamp), msg.body.length];
+                         ulonglong(historyEntry.timestamp), (unsigned long)msg.body.length];
     if (s_syncLogEverything) {
         NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: Changeset %llu -> %llu "
               "of size %lu with timestamp %llu (last integrated server version is %llu)",
               _connection.ident, _sessionIdent, ulonglong(uploadVersion-1),
-              ulonglong(uploadVersion), msg.body.length, ulonglong(historyEntry.timestamp),
+              ulonglong(uploadVersion), (unsigned long)msg.body.length, ulonglong(historyEntry.timestamp),
               serverVersion);
     }
     __weak RLMSyncSession *weakSelf = self;
