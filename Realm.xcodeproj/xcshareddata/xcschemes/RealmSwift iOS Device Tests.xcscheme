@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E887075C1AEF0F070085A45E"
-               BuildableName = "RealmSwift iOS Tests copy.xctest"
+               BuildableName = "RealmSwift iOS Tests.xctest"
                BlueprintName = "RealmSwift iOS Device Tests"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
@@ -47,7 +47,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E887075C1AEF0F070085A45E"
-               BuildableName = "RealmSwift iOS Tests copy.xctest"
+               BuildableName = "RealmSwift iOS Tests.xctest"
                BlueprintName = "RealmSwift iOS Device Tests"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>

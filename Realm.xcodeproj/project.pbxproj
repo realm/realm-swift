@@ -661,7 +661,7 @@
 		E876B72E1AEF65DF00C7252E /* strip-frameworks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = "strip-frameworks.sh"; path = "scripts/strip-frameworks.sh"; sourceTree = SOURCE_ROOT; };
 		E8839B2C19E31FD90047B1A8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Realm/Tests/TestHost/Info.plist; sourceTree = SOURCE_ROOT; };
 		E8839B2D19E31FD90047B1A8 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Realm/Tests/TestHost/main.m; sourceTree = SOURCE_ROOT; };
-		E88707781AEF0F070085A45E /* RealmSwift iOS Tests copy.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RealmSwift iOS Tests copy.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E88707781AEF0F070085A45E /* RealmSwift iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RealmSwift iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E88C36FF19745E5500C9963D /* RLMSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RLMSupport.swift; sourceTree = "<group>"; };
 		E8917597197A1B350068ACC6 /* UnicodeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnicodeTests.m; sourceTree = "<group>"; };
 		E891759A197A1B600068ACC6 /* SwiftUnicodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUnicodeTests.swift; sourceTree = "<group>"; };
@@ -972,7 +972,7 @@
 				E8D5CBE51AE9CA08000E93BF /* RealmSwift.framework */,
 				E8D5CBEF1AE9CA08000E93BF /* RealmSwift iOS Tests.xctest */,
 				E829925B1AEEEF0800CAC9C3 /* RealmSwift TestHost.app */,
-				E88707781AEF0F070085A45E /* RealmSwift iOS Tests copy.xctest */,
+				E88707781AEF0F070085A45E /* RealmSwift iOS Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1347,7 +1347,7 @@
 			);
 			name = "RealmSwift iOS Device Tests";
 			productName = "RealmSwift iOSTests";
-			productReference = E88707781AEF0F070085A45E /* RealmSwift iOS Tests copy.xctest */;
+			productReference = E88707781AEF0F070085A45E /* RealmSwift iOS Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		E8D5CB891AE9C690000E93BF /* RealmSwift OSX */ = {
@@ -2510,7 +2510,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_LDFLAGS = "$(inherited)";
-				PRODUCT_NAME = "RealmSwift iOS Tests copy";
+				PRODUCT_NAME = "RealmSwift iOS Tests";
 				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RealmSwift TestHost.app/RealmSwift TestHost";
@@ -2541,7 +2541,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_LDFLAGS = "$(inherited)";
-				PRODUCT_NAME = "RealmSwift iOS Tests copy";
+				PRODUCT_NAME = "RealmSwift iOS Tests";
 				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RealmSwift TestHost.app/RealmSwift TestHost";
 				VALIDATE_PRODUCT = YES;
