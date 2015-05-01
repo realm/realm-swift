@@ -86,6 +86,9 @@ xcode() {
 }
 
 xc() {
+    if [ "$ACTION" == "clean" ]; then
+        exit 0
+    fi
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcode "$@"
     elif [[ "$XCMODE" == "xcpretty" ]]; then
@@ -99,45 +102,33 @@ xc() {
     fi
 }
 
-xcrealm() {
-    PROJECT=Realm.xcodeproj
-    xc "-project $PROJECT $@"
-}
-
-xcrealmswift() {
-    PROJECT=RealmSwift.xcodeproj
-    xc "-project $PROJECT $@"
-}
-
 build_combined() {
     local scheme="$1"
-    local config="$2"
-    local module_name="$3"
-    local scope_suffix="$4"
+    local module_name="$2"
+    local scope_suffix="$3"
+    local config="$CONFIGURATION"
 
     # Derive build paths
-    local build_products_path="build/DerivedData/$module_name/Build/Products"
+    local build_products_path="build/DerivedData/Realm/Build/Products"
     local product_name="$module_name.framework"
     local binary_path="$module_name"
     local iphoneos_path="$build_products_path/$config-iphoneos$scope_suffix/$product_name"
     local iphonesimulator_path="$build_products_path/$config-iphonesimulator$scope_suffix/$product_name"
-    local out_path="build/ios"
+    local out_path="build/ios$scope_suffix"
 
     # Build for each platform
-    if [[ "$module_name" == "Realm" ]]; then
-      xcrealm "-scheme '$scheme' -configuration $config -sdk iphoneos"
-      xcrealm "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
-    elif [[ "$module_name" == "RealmSwift" ]]; then
-      xcrealmswift "-scheme '$scheme' -configuration $config -sdk iphoneos"
-      xcrealmswift "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
-      # Combine .swiftmodule
-      cp $iphoneos_path/Modules/$module_name.swiftmodule/* $iphonesimulator_path/Modules/$module_name.swiftmodule/
+    xc "-scheme '$scheme' -configuration $config -sdk iphoneos"
+    xc "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
+
+    # Combine .swiftmodule
+    if [ -d $iphonesimulator_path/Modules/$module_name.swiftmodule ]; then
+      cp $iphonesimulator_path/Modules/$module_name.swiftmodule/* $iphoneos_path/Modules/$module_name.swiftmodule/
     fi
 
     # Retrieve build products
     clean_retrieve $iphoneos_path $out_path $product_name
 
-    # Combine ar archives
+    # Combine archives
     xcrun lipo -create "$iphonesimulator_path/$binary_path" "$iphoneos_path/$binary_path" -output "$out_path/$product_name/$module_name"
 }
 
@@ -168,11 +159,11 @@ test_ios_devices() {
         fi
         exit 1
     fi
-    cmd="$1"
+    scheme="$1"
     configuration="$2"
     failed=0
     for device in "${serial_numbers[@]}"; do
-        $cmd "-scheme 'iOS Device Tests' -configuration $configuration -destination 'id=$device' test" || failed=1
+        xc "-scheme '$scheme' -configuration $configuration -destination 'id=$device' test" || failed=1
     done
     return $failed
 }
@@ -276,23 +267,34 @@ case "$COMMAND" in
         ;;
 
     "ios-static")
-        build_combined iOS "$CONFIGURATION" Realm
+        build_combined iOS Realm
         exit 0
         ;;
 
     "ios-dynamic")
-        build_combined "iOS Dynamic" "$CONFIGURATION" Realm "-dynamic"
+        build_combined "iOS Dynamic" Realm "-dynamic"
+        exit 0
+        ;;
+
+    "pre-ios-swift")
+        # FIXME: Deleting the built products directory is a temporary workaround
+        #        to an auto-linking issue: Xcode will attempt to link the static
+        #        Realm.framework if it is built, rather than the dynamic framework.
+        : ${BUILT_PRODUCTS_DIR:="build/DerivedData/Realm/Build/Products"}
+        rm -rf "$BUILT_PRODUCTS_DIR"/Realm.framework
+        if ! [ -d "build/ios-dynamic" ]; then
+            sh build.sh ios-dynamic "LD_DYLIB_INSTALL_NAME='@rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm'"
+        fi
         exit 0
         ;;
 
     "ios-swift")
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphoneos"
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
+        build_combined "RealmSwift iOS" RealmSwift
         exit 0
         ;;
 
     "osx")
-        xcrealm "-scheme OSX -configuration $CONFIGURATION"
+        xc "-scheme OSX -configuration $CONFIGURATION"
         rm -rf build/osx
         mkdir build/osx
         cp -R build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework build/osx
@@ -300,7 +302,10 @@ case "$COMMAND" in
         ;;
 
     "osx-swift")
-        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
+        xc "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
+        rm -rf build/osx
+        mkdir build/osx
+        cp -R build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework build/osx
         exit 0
         ;;
 
@@ -328,37 +333,41 @@ case "$COMMAND" in
         ;;
 
     "test-ios-static")
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xc "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xc "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
         ;;
 
     "test-ios-dynamic")
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xc "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xc "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
         ;;
 
     "test-ios-swift")
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xc "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xc "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
         ;;
 
     "test-ios-devices")
         failed=0
-        test_ios_devices xcrealm "$CONFIGURATION" || failed=1
-        test_ios_devices xcrealmswift "$CONFIGURATION" || failed=1
+        test_ios_devices 'iOS Device Tests' "$CONFIGURATION" || failed=1
+        # FIXME: Deleting the built products directory is a temporary workaround
+        #        to an auto-linking issue: Xcode will attempt to link the static
+        #        Realm.framework if it is built, rather than the dynamic framework.
+        rm -rf build/{Release,Debug}-iphone{os,simulator}/Realm.framework
+        test_ios_devices 'RealmSwift iOS Device Tests' "$CONFIGURATION" || failed=1
         exit $failed
         ;;
 
     "test-osx")
-        xcrealm "-scheme OSX -configuration $CONFIGURATION test GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
+        xc "-scheme OSX -configuration $CONFIGURATION test GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
         exit 0
         ;;
 
     "test-osx-swift")
-        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION test"
+        xc "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION test"
         exit 0
         ;;
 

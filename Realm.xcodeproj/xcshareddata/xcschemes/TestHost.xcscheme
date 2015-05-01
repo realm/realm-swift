@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0610"
+   LastUpgradeVersion = "0630"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,24 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "023B19A71A4234380067FB81"
-               BuildableName = "RealmSwift.framework"
-               BlueprintName = "RealmSwift iOS"
-               ReferencedContainer = "container:RealmSwift.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02B822551A532100007F28A5"
-               BuildableName = "RealmSwift iOS Tests.xctest"
-               BlueprintName = "RealmSwift iOS Tests"
-               ReferencedContainer = "container:RealmSwift.xcodeproj">
+               BlueprintIdentifier = "3F1A5E711992EB7400F45F4C"
+               BuildableName = "TestHost.app"
+               BlueprintName = "TestHost"
+               ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -42,24 +28,14 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02B822551A532100007F28A5"
-               BuildableName = "RealmSwift iOS Tests.xctest"
-               BlueprintName = "RealmSwift iOS Tests"
-               ReferencedContainer = "container:RealmSwift.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "023B19A71A4234380067FB81"
-            BuildableName = "RealmSwift.framework"
-            BlueprintName = "RealmSwift iOS"
-            ReferencedContainer = "container:RealmSwift.xcodeproj">
+            BlueprintIdentifier = "3F1A5E711992EB7400F45F4C"
+            BuildableName = "TestHost.app"
+            BlueprintName = "TestHost"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -72,15 +48,16 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "023B19A71A4234380067FB81"
-            BuildableName = "RealmSwift.framework"
-            BlueprintName = "RealmSwift iOS"
-            ReferencedContainer = "container:RealmSwift.xcodeproj">
+            BlueprintIdentifier = "3F1A5E711992EB7400F45F4C"
+            BuildableName = "TestHost.app"
+            BlueprintName = "TestHost"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -90,15 +67,16 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "023B19A71A4234380067FB81"
-            BuildableName = "RealmSwift.framework"
-            BlueprintName = "RealmSwift iOS"
-            ReferencedContainer = "container:RealmSwift.xcodeproj">
+            BlueprintIdentifier = "3F1A5E711992EB7400F45F4C"
+            BuildableName = "TestHost.app"
+            BlueprintName = "TestHost"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
