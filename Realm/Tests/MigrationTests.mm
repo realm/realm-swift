@@ -876,7 +876,7 @@
     @autoreleasepool {
         RLMRealm *realm = [self realmWithTestPathAndSchema:nonnull];
         [realm transactionWithBlock:^{
-            [MigrationTwoStringObject createInRealm:realm withObject:@[@"string", @"string2"]];
+            [MigrationTwoStringObject createInRealm:realm withValue:@[@"string", @"string2"]];
         }];
     }
 
