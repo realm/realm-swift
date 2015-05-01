@@ -40,7 +40,7 @@
 }
 
 - (instancetype)initWithValue:(id)value {
-    return [super initWithValue:value schema:RLMSchema.sharedSchema];
+    return [super initWithValue:value schema:RLMSchema.sharedSchema valueToAccessorMapping:RLMAccessorCreationMapTable()];
 }
 
 - (instancetype)initWithObject:(id)object {
