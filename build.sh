@@ -353,6 +353,10 @@ case "$COMMAND" in
     "test-ios-devices")
         failed=0
         test_ios_devices 'iOS Device Tests' "$CONFIGURATION" || failed=1
+        # FIXME: Deleting the built products directory is a temporary workaround
+        #        to an auto-linking issue: Xcode will attempt to link the static
+        #        Realm.framework if it is built, rather than the dynamic framework.
+        rm -rf build/{Release,Debug}-iphone{os,simulator}/Realm.framework
         test_ios_devices 'RealmSwift iOS Device Tests' "$CONFIGURATION" || failed=1
         exit $failed
         ;;

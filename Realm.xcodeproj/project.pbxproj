@@ -441,13 +441,6 @@
 			remoteGlobalIDString = E8D89B971955FC6D00CF2B9A;
 			remoteInfo = OSX;
 		};
-		E887077A1AEF0F2D0085A45E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E82992511AEEEF0800CAC9C3;
-			remoteInfo = "RealmSwift TestHost";
-		};
 		E88AAAF0195603B700AA2020 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -1343,7 +1336,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E887077B1AEF0F2D0085A45E /* PBXTargetDependency */,
 			);
 			name = "RealmSwift iOS Device Tests";
 			productName = "RealmSwift iOSTests";
@@ -2085,11 +2077,6 @@
 			target = E8D89B971955FC6D00CF2B9A /* OSX */;
 			targetProxy = E87022EC1AEF13EA00C7B2C6 /* PBXContainerItemProxy */;
 		};
-		E887077B1AEF0F2D0085A45E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E82992511AEEEF0800CAC9C3 /* RealmSwift TestHost */;
-			targetProxy = E887077A1AEF0F2D0085A45E /* PBXContainerItemProxy */;
-		};
 		E88AAAF1195603B700AA2020 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E8D89B971955FC6D00CF2B9A /* OSX */;
@@ -2497,8 +2484,8 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
 					"$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Frameworks",
+					"$(inherited)",
 				);
 				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -2528,8 +2515,8 @@
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
 					"$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Frameworks",
+					"$(inherited)",
 				);
 				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
