@@ -53,6 +53,13 @@
     return ar;
 }
 
+void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NSString *keyPath, RLMArray *array, id observed) {
+    if (!info && [keyPath isEqualToString:@"invalidated"] && array.class == [RLMArrayLinkView class]) {
+        RLMArrayLinkView *lv = static_cast<RLMArrayLinkView *>(array);
+        info = std::make_unique<RLMObservationInfo>(lv->_objectSchema, lv->_backingLinkView->get_origin_row_index(), observed);
+    }
+}
+
 //
 // validation helpers
 //
@@ -413,9 +420,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
          forKeyPath:(NSString *)keyPath
             options:(NSKeyValueObservingOptions)options
             context:(void *)context {
-    if (!_observationInfo && [keyPath isEqualToString:@"invalidated"]) {
-        _observationInfo = std::make_unique<RLMObservationInfo>(_objectSchema, _backingLinkView->get_origin_row_index(), self);
-    }
+    RLMEnsureArrayObservationInfo(_observationInfo, keyPath, self, self);
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 

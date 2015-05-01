@@ -17,13 +17,17 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMListBase.h"
-#import <Realm/RLMArray.h>
+
+#import "RLMArray_Private.hpp"
+#import "RLMNotification.hpp"
 
 @interface RLMArray (KVO)
 - (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes;
 @end
 
-@implementation RLMListBase
+@implementation RLMListBase {
+    std::unique_ptr<RLMObservationInfo> _observationInfo;
+}
 
 - (instancetype)initWithArray:(RLMArray *)array {
     self = [super init];
@@ -33,12 +37,24 @@
     return self;
 }
 
+- (id)valueForKey:(NSString *)key {
+    return [__rlmArray valueForKey:key];
+}
+
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])buffer count:(NSUInteger)len {
     return [__rlmArray countByEnumeratingWithState:state objects:buffer count:len];
 }
 
 - (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
     return [__rlmArray objectsAtIndexes:indexes];
+}
+
+- (void)addObserver:(id)observer
+         forKeyPath:(NSString *)keyPath
+            options:(NSKeyValueObservingOptions)options
+            context:(void *)context {
+    RLMEnsureArrayObservationInfo(_observationInfo, keyPath, __rlmArray, self);
+    [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
 @end

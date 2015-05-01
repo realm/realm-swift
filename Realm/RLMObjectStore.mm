@@ -328,12 +328,12 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     // set to proper accessor class
     object_setClass(object, schema.accessorClass);
 
+    RLMInitializeSwiftListAccessor(object);
+
     // re-add the observers
     if (object->_observationInfo) {
         object->_observationInfo->restoreObservers();
     }
-
-    RLMInitializeSwiftListAccessor(object);
 }
 
 static void RLMValidateValueForProperty(__unsafe_unretained id const obj,
