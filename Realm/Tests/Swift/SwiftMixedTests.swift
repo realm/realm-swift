@@ -27,13 +27,13 @@ class SwiftMixedTests: SwiftTestCase {
 
         // FIXME: add object with subtable
         realm.beginWriteTransaction()
-        MixedObject.createInRealm(realm, withObject: [true, "Jens", 50])
+        MixedObject.createInRealm(realm, withValue: [true, "Jens", 50])
         // FIXME: Adding this object makes the test fail
-        // MixedObject.createInRealm(realm, withObject: [true, 10, 52] as NSArray)
-        MixedObject.createInRealm(realm, withObject: [true, 3.1 as Float, 53] as NSArray)
-        MixedObject.createInRealm(realm, withObject: [true, 3.1 as Double, 54] as NSArray)
-        MixedObject.createInRealm(realm, withObject: [true, NSDate(), 55] as NSArray)
-        MixedObject.createInRealm(realm, withObject: [true, data!, 50] as NSArray)
+        // MixedObject.createInRealm(realm, withValue: [true, 10, 52] as NSArray)
+        MixedObject.createInRealm(realm, withValue: [true, 3.1 as Float, 53] as NSArray)
+        MixedObject.createInRealm(realm, withValue: [true, 3.1 as Double, 54] as NSArray)
+        MixedObject.createInRealm(realm, withValue: [true, NSDate(), 55] as NSArray)
+        MixedObject.createInRealm(realm, withValue: [true, data!, 50] as NSArray)
         realm.commitWriteTransaction()
 
         let objects = MixedObject.allObjectsInRealm(realm)

@@ -62,7 +62,7 @@ class SwiftLinkTests: SwiftTestCase {
         XCTAssertEqual(SwiftDogObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 dog")
 
         realm.beginWriteTransaction()
-        let fiel = SwiftOwnerObject.createInRealm(realm, withObject: ["Fiel", NSNull()])
+        let fiel = SwiftOwnerObject.createInRealm(realm, withValue: ["Fiel", NSNull()])
         fiel.dog = owner.dog
         realm.commitWriteTransaction()
 
@@ -157,7 +157,7 @@ class SwiftLinkTests: SwiftTestCase {
         XCTAssertEqual(DogObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 dog")
 
         realm.beginWriteTransaction()
-        let fiel = OwnerObject.createInRealm(realm, withObject: ["Fiel", NSNull()])
+        let fiel = OwnerObject.createInRealm(realm, withValue: ["Fiel", NSNull()])
         fiel.dog = owner.dog
         realm.commitWriteTransaction()
 

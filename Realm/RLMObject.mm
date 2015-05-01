@@ -39,23 +39,39 @@
     return [super init];
 }
 
+- (instancetype)initWithValue:(id)value {
+    return [super initWithValue:value schema:RLMSchema.sharedSchema];
+}
+
 - (instancetype)initWithObject:(id)object {
-    return [super initWithObject:object schema:RLMSchema.sharedSchema];
+    return [self initWithValue:object];
+}
+
++ (instancetype)createInDefaultRealmWithValue:(id)value {
+    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], value, RLMCreationOptionsAllowCopy);
 }
 
 + (instancetype)createInDefaultRealmWithObject:(id)object {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMCreationOptionsAllowCopy);
+    return [self createInDefaultRealmWithValue:object];
 }
 
-+ (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)value {
++ (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMCreationOptionsAllowCopy);
 }
 
-+ (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object {
-    return [self createOrUpdateInRealm:[RLMRealm defaultRealm] withObject:object];
++ (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object {
+    return [self createInRealm:realm withValue:object];
 }
 
-+ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)value {
++ (instancetype)createOrUpdateInDefaultRealmWithValue:(id)value {
+    return [self createOrUpdateInRealm:[RLMRealm defaultRealm] withValue:value];
+}
+
++ (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object {
+    return [self createOrUpdateInDefaultRealmWithValue:object];
+}
+
++ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value {
     // verify primary key
     RLMObjectSchema *schema = [self sharedSchema];
     if (!schema.primaryKeyProperty) {
@@ -63,6 +79,10 @@
         @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
     }
     return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMCreationOptionsUpdateOrCreate | RLMCreationOptionsAllowCopy);
+}
+
++ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object {
+    return [self createOrUpdateInRealm:realm withValue:object];
 }
 
 - (id)objectForKeyedSubscript:(NSString *)key {

@@ -181,7 +181,7 @@ public final class Migration {
     :returns: The created object.
     */
     public func create(className: String, value: AnyObject = [:]) -> MigrationObject {
-        return unsafeBitCast(rlmMigration.createObject(className, withObject: value), MigrationObject.self)
+        return unsafeBitCast(rlmMigration.createObject(className, withValue: value), MigrationObject.self)
     }
 
     /**

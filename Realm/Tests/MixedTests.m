@@ -32,12 +32,12 @@
 
     // FIXME: add object with subtable
     [realm beginWriteTransaction];
-    [MixedObject createInRealm:realm withObject:@[@YES, @"Jens", @50]];
-    [MixedObject createInRealm:realm withObject:@[@YES, @10, @52]];
-    [MixedObject createInRealm:realm withObject:@[@YES, @3.1f, @53]];
-    [MixedObject createInRealm:realm withObject:@[@YES, @3.1, @54]];
-    [MixedObject createInRealm:realm withObject:@[@YES, [NSDate date], @55]];
-    [MixedObject createInRealm:realm withObject:@[@YES, [NSData dataWithBytes:(void *)data length:strlen(data)], @56]];
+    [MixedObject createInRealm:realm withValue:@[@YES, @"Jens", @50]];
+    [MixedObject createInRealm:realm withValue:@[@YES, @10, @52]];
+    [MixedObject createInRealm:realm withValue:@[@YES, @3.1f, @53]];
+    [MixedObject createInRealm:realm withValue:@[@YES, @3.1, @54]];
+    [MixedObject createInRealm:realm withValue:@[@YES, [NSDate date], @55]];
+    [MixedObject createInRealm:realm withValue:@[@YES, [NSData dataWithBytes:(void *)data length:strlen(data)], @56]];
     [realm commitWriteTransaction];
 
     RLMResults *objects = [MixedObject allObjectsInRealm:realm];
@@ -64,8 +64,8 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    XCTAssertThrows(([MixedObject createInRealm:realm withObject:@[@YES, @[@1, @2], @7]]), @"Mixed cannot be an NSArray");
-    XCTAssertThrows(([MixedObject createInRealm:realm withObject:@[@YES, @{@"key": @7}, @11]]), @"Mixed cannot be an NSDictionary");
+    XCTAssertThrows(([MixedObject createInRealm:realm withValue:@[@YES, @[@1, @2], @7]]), @"Mixed cannot be an NSArray");
+    XCTAssertThrows(([MixedObject createInRealm:realm withValue:@[@YES, @{@"key": @7}, @11]]), @"Mixed cannot be an NSDictionary");
 
     XCTAssertEqual([MixedObject allObjects].count, (NSUInteger)0, @"0 rows expected");
     [realm commitWriteTransaction];

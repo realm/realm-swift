@@ -4,6 +4,16 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### API breaking changes
 
 * Migration blocks are no longer called when a Realm file is first created.
+* The following APIs have been deprecated in favor of newer method names:
+
+| Deprecated API                                         | New API                                               |
+|:-------------------------------------------------------|:------------------------------------------------------|
+| `-[RLMMigration createObject:withObject:]`             | `-[RLMMigration createObject:withValue:]`             |
+| `-[RLMObject initWithObject:]`                         | `-[RLMObject initWithValue:]`                         |
+| `+[RLMObject createInDefaultRealmWithObject:]`         | `+[RLMObject createInDefaultRealmWithValue:]`         |
+| `+[RLMObject createInRealm:withObject:]`               | `+[RLMObject createInRealm:withValue:]`               |
+| `+[RLMObject createOrUpdateInDefaultRealmWithObject:]` | `+[RLMObject createOrUpdateInDefaultRealmWithValue:]` |
+| `+[RLMObject createOrUpdateInRealm:withObject:]`       | `+[RLMObject createOrUpdateInRealm:withValue:]`       |
 
 ### Enhancements
 
@@ -72,8 +82,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 
 * `attributesForProperty:` has been removed from `RLMObject`. You now specify indexed
   properties by implementing the `indexedProperties` method.
-* An exception will be thrown when calling `setEncryptionKey:forRealmsAtPath:`, 
-  `setSchemaVersion:forRealmAtPath:withMigrationBlock:`, and `migrateRealmAtPath:` 
+* An exception will be thrown when calling `setEncryptionKey:forRealmsAtPath:`,
+  `setSchemaVersion:forRealmAtPath:withMigrationBlock:`, and `migrateRealmAtPath:`
   when a Realm at the given path is already open.
 * Object and array properties of type `RLMObject` will no longer be allowed.
 
@@ -164,8 +174,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Rename `-[RLMRealm encryptedRealmWithPath:key:readOnly:error:]` to
   `-[RLMRealm realmWithPath:encryptionKey:readOnly:error:]`.
 * `-[RLMRealm setSchemaVersion:withMigrationBlock]` is no longer global and must be called
-  for each individual Realm path used. You can now call `-[RLMRealm setDefaultRealmSchemaVersion:withMigrationBlock]` 
-  for the default Realm and `-[RLMRealm setSchemaVersion:forRealmAtPath:withMigrationBlock:]` for all others; 
+  for each individual Realm path used. You can now call `-[RLMRealm setDefaultRealmSchemaVersion:withMigrationBlock]`
+  for the default Realm and `-[RLMRealm setSchemaVersion:forRealmAtPath:withMigrationBlock:]` for all others;
 
 ### Enhancements
 
@@ -409,7 +419,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Support subclassing RLMObject models. Although you can now persist subclasses,
-  polymorphic behavior is not supported (i.e. setting a property to an 
+  polymorphic behavior is not supported (i.e. setting a property to an
   instance of its subclass).
 * Add support for sorting RLMArray properties.
 * Speed up inserting objects with `addObject:` by ~20%.
@@ -475,7 +485,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Realm change notifications when beginning a write transaction are now sent
   after updating rather than before, to match refresh.
 * `-isEqual:` now uses the default `NSObject` implementation unless a primary key
-  is specified for an RLMObject. When a primary key is specified, `-isEqual:` calls 
+  is specified for an RLMObject. When a primary key is specified, `-isEqual:` calls
   `-isEqualToObject:` and a corresponding implementation for `-hash` is also implemented.
 
 0.84.0 Release notes (2014-08-28)
@@ -531,7 +541,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Add support for querying for nil object properties.
-* Improve error message when specifying invalid literals when creating or 
+* Improve error message when specifying invalid literals when creating or
   initializing RLMObjects.
 * Throw an exception when an RLMObject is used from the incorrect thread rather
   than crashing in confusing ways.
@@ -567,12 +577,12 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Fixed rapid growth of the realm file size.
-* Fixed a bug which could cause a crash during RLMArray destruction after a query. 
+* Fixed a bug which could cause a crash during RLMArray destruction after a query.
 * Fixed bug related to querying on float properties: `floatProperty = 1.7` now works.
 * Fixed potential bug related to the handling of array properties (RLMArray).
 * Fixed bug where array properties accessed the wrong property.
 * Fixed bug that prevented objects with custom getters to be added to a Realm.
-* Fixed a bug where initializing a standalone object with an array literal would 
+* Fixed a bug where initializing a standalone object with an array literal would
   trigger an exception.
 * Clarified exception messages when using unsupported NSPredicate operators.
 * Clarified exception messages when using unsupported property types on RLMObject subclasses.
@@ -714,7 +724,7 @@ The Objective-C API has been updated and your code will break!
 0.10.0 Release notes (2014-04-23)
 =============================================================
 
-TightDB is now Realm! The Objective-C API has been updated 
+TightDB is now Realm! The Objective-C API has been updated
 and your code will break!
 
 ### API breaking changes
@@ -752,7 +762,7 @@ and your code will break!
 * `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
 * Return `NSNotFound` instead of -1 when appropriate.
 * Renamed `castClass` to `castToTytpedTableClass` on `TDBTable`.
-* `removeAllRows`, `removeRowAtIndex`, `removeLastRow`, `addRow` and `insertRow` methods 
+* `removeAllRows`, `removeRowAtIndex`, `removeLastRow`, `addRow` and `insertRow` methods
   on table now return void instead of BOOL.
 
 ### Enhancements
@@ -768,7 +778,7 @@ and your code will break!
 * Column names in Typed Tables can begin with non-capital letters too. The generated `addX`
   selector can look odd. For example, a table with one column with name `age`,
   appending a new row will look like `[table addage:7]`.
-* Mixed typed values are better validated when rows are added, inserted, 
+* Mixed typed values are better validated when rows are added, inserted,
   or modified as object literals.
 * `addRow`, `insertRow`, and row updates can be done using objects
    derived from `NSObject`.
@@ -784,7 +794,7 @@ and your code will break!
 =============================================================
 
 The Objective-C API has been updated and your code will break!
-Of notable changes a fast interface has been added. 
+Of notable changes a fast interface has been added.
 This interface includes specific methods to get and set values into Tightdb.
 To use these methods import `<Tightdb/TightdbFast.h>`.
 
@@ -913,4 +923,3 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * None.
-

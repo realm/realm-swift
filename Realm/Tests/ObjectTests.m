@@ -217,10 +217,10 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm addObject:soInit];
     
     // Create object while adding to realm using NSArray
-    EmployeeObject *soUsingArray = [EmployeeObject createInRealm:realm withObject:@[@"John", @40, @NO]];
+    EmployeeObject *soUsingArray = [EmployeeObject createInRealm:realm withValue:@[@"John", @40, @NO]];
     
     // Create object while adding to realm using NSDictionary
-    EmployeeObject *soUsingDictionary = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Susi", @"age": @25, @"hired": @YES}];
+    EmployeeObject *soUsingDictionary = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Susi", @"age": @25, @"hired": @YES}];
     
     [realm commitWriteTransaction];
     
@@ -239,7 +239,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
 -(void)testObjectInitWithObjectTypeArray
 {
-    EmployeeObject *obj1 = [[EmployeeObject alloc] initWithObject:@[@"Peter", @30, @YES]];
+    EmployeeObject *obj1 = [[EmployeeObject alloc] initWithValue:@[@"Peter", @30, @YES]];
     
     XCTAssertEqualObjects(obj1.name, @"Peter", @"Names should be equal");
     XCTAssertEqual(obj1.age, 30, @"Age should be equal");
@@ -258,14 +258,14 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertEqual(fromRealm.age, 30, @"Age should be equal");
     XCTAssertEqual(fromRealm.hired, YES, @"Hired should be equal");
     
-    XCTAssertThrows(([[EmployeeObject alloc] initWithObject:@[@"Peter", @30]]), @"To few arguments");
-    XCTAssertThrows(([[EmployeeObject alloc] initWithObject:@[@YES, @"Peter", @30]]), @"Wrong arguments");
-    XCTAssertThrows(([[EmployeeObject alloc] initWithObject:@[]]), @"empty arguments");
+    XCTAssertThrows(([[EmployeeObject alloc] initWithValue:@[@"Peter", @30]]), @"To few arguments");
+    XCTAssertThrows(([[EmployeeObject alloc] initWithValue:@[@YES, @"Peter", @30]]), @"Wrong arguments");
+    XCTAssertThrows(([[EmployeeObject alloc] initWithValue:@[]]), @"empty arguments");
 }
 
 -(void)testObjectInitWithObjectTypeDictionary
 {
-    EmployeeObject *obj1 = [[EmployeeObject alloc] initWithObject:@{@"name": @"Susi", @"age": @25, @"hired": @YES}];
+    EmployeeObject *obj1 = [[EmployeeObject alloc] initWithValue:@{@"name": @"Susi", @"age": @25, @"hired": @YES}];
     
     XCTAssertEqualObjects(obj1.name, @"Susi", @"Names should be equal");
     XCTAssertEqual(obj1.age, 25, @"Age should be equal");
@@ -284,79 +284,79 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertEqual(fromRealm.age, 25, @"Age should be equal");
     XCTAssertEqual(fromRealm.hired, YES, @"Hired should be equal");
     
-    XCTAssertThrows([[EmployeeObject alloc] initWithObject:@{}], @"Initialization with missing values should throw");
-    XCTAssertNoThrow([[DefaultObject alloc] initWithObject:@{@"intCol": @1}],
+    XCTAssertThrows([[EmployeeObject alloc] initWithValue:@{}], @"Initialization with missing values should throw");
+    XCTAssertNoThrow([[DefaultObject alloc] initWithValue:@{@"intCol": @1}],
                      "Overriding some default values at initialization should not throw");
 }
 
 -(void)testObjectInitWithObjectTypeObject
 {
-    DogExtraObject *dogExt = [[DogExtraObject alloc] initWithObject:@[@"Fido", @12, @"Poodle"]];
+    DogExtraObject *dogExt = [[DogExtraObject alloc] initWithValue:@[@"Fido", @12, @"Poodle"]];
 
     // initialize second object with first object
-    DogObject *dog = [[DogObject alloc] initWithObject:dogExt];
+    DogObject *dog = [[DogObject alloc] initWithValue:dogExt];
     XCTAssertEqualObjects(dog.dogName, @"Fido", @"Names should be equal");
     XCTAssertEqual(dog.age, 12, @"Age should be equal");
 
     // missing properties should throw
-    XCTAssertThrows([[DogExtraObject alloc] initWithObject:dog], @"Initialization with missing values should throw");
+    XCTAssertThrows([[DogExtraObject alloc] initWithValue:dog], @"Initialization with missing values should throw");
 
     // nested objects should work
-    XCTAssertNoThrow([[OwnerObject alloc] initWithObject:(@[@"Alex", dogExt])], @"Should not throw");
+    XCTAssertNoThrow([[OwnerObject alloc] initWithValue:(@[@"Alex", dogExt])], @"Should not throw");
 }
 
 -(void)testObjectInitWithObjectLiterals {
     NSArray *array = @[@"company", @[@[@"Alex", @29, @YES]]];
-    CompanyObject *company = [[CompanyObject alloc] initWithObject:array];
+    CompanyObject *company = [[CompanyObject alloc] initWithValue:array];
     XCTAssertEqualObjects(company.name, array[0], @"Company name should be set");
     XCTAssertEqualObjects([company.employees[0] name], array[1][0][0], @"First employee should be Alex");
 
     NSDictionary *dict = @{@"name": @"dictionaryCompany", @"employees": @[@{@"name": @"Bjarne", @"age": @32, @"hired": @NO}]};
-    CompanyObject *dictCompany = [[CompanyObject alloc] initWithObject:dict];
+    CompanyObject *dictCompany = [[CompanyObject alloc] initWithValue:dict];
     XCTAssertEqualObjects(dictCompany.name, dict[@"name"], @"Company name should be set");
     XCTAssertEqualObjects([dictCompany.employees[0] name], dict[@"employees"][0][@"name"], @"First employee should be Bjarne");
 
     NSArray *invalidArray = @[@"company", @[@[@"Alex", @29, @2]]];
-    XCTAssertThrows([[CompanyObject alloc] initWithObject:invalidArray], @"Invalid sub-literal should throw");
+    XCTAssertThrows([[CompanyObject alloc] initWithValue:invalidArray], @"Invalid sub-literal should throw");
     NSDictionary *invalidDict= @{@"employees": @[@[@"Alex", @29, @2]]};
-    XCTAssertThrows([[CompanyObject alloc] initWithObject:invalidDict], @"Dictionary missing properties should throw");
+    XCTAssertThrows([[CompanyObject alloc] initWithValue:invalidDict], @"Dictionary missing properties should throw");
 
-    OwnerObject *owner = [[OwnerObject alloc] initWithObject:@[@"Brian", @{@"dogName": @"Brido", @"age": @0}]];
+    OwnerObject *owner = [[OwnerObject alloc] initWithValue:@[@"Brian", @{@"dogName": @"Brido", @"age": @0}]];
     XCTAssertEqualObjects(owner.dog.dogName, @"Brido");
 
-    OwnerObject *ownerArrayDog = [[OwnerObject alloc] initWithObject:@[@"JP", @[@"PJ", @0]]];
+    OwnerObject *ownerArrayDog = [[OwnerObject alloc] initWithValue:@[@"JP", @[@"PJ", @0]]];
     XCTAssertEqualObjects(ownerArrayDog.dog.dogName, @"PJ");
 }
 
 - (void)testInitFromDictionaryMissingPropertyKey {
     CompanyObject *co = nil;
-    XCTAssertThrows([[CompanyObject alloc] initWithObject:@{}]);
-    XCTAssertNoThrow(co = [[CompanyObject alloc] initWithObject:@{@"name": @"a"}]);
+    XCTAssertThrows([[CompanyObject alloc] initWithValue:@{}]);
+    XCTAssertNoThrow(co = [[CompanyObject alloc] initWithValue:@{@"name": @"a"}]);
     XCTAssertEqualObjects(co.name, @"a");
     XCTAssertEqual(co.employees.count, 0U);
 
     OwnerObject *oo = nil;
-    XCTAssertNoThrow(oo = [[OwnerObject alloc] initWithObject:@{@"name": @"a"}]);
+    XCTAssertNoThrow(oo = [[OwnerObject alloc] initWithValue:@{@"name": @"a"}]);
     XCTAssertEqualObjects(oo.name, @"a");
     XCTAssertNil(oo.dog);
 }
 
 - (void)testInitFromDictionaryPropertyKey {
     CompanyObject *co = nil;
-    XCTAssertNoThrow((co = [[CompanyObject alloc] initWithObject:@{@"name": @"a", @"employees": NSNull.null}]));
+    XCTAssertNoThrow((co = [[CompanyObject alloc] initWithValue:@{@"name": @"a", @"employees": NSNull.null}]));
     XCTAssertEqualObjects(co.name, @"a");
     XCTAssertEqual(co.employees.count, 0U);
 
     OwnerObject *oo = nil;
-    XCTAssertNoThrow((oo = [[OwnerObject alloc] initWithObject:@{@"name": @"a", @"employees": NSNull.null}]));
+    XCTAssertNoThrow((oo = [[OwnerObject alloc] initWithValue:@{@"name": @"a", @"employees": NSNull.null}]));
     XCTAssertEqualObjects(oo.name, @"a");
     XCTAssertNil(oo.dog);
 }
 
 -(void)testObjectInitWithObjectTypeOther
 {
-    XCTAssertThrows([[EmployeeObject alloc] initWithObject:@"StringObject"], @"Not an array or dictionary");
-    XCTAssertThrows([[EmployeeObject alloc] initWithObject:nil], @"Not an array or dictionary");
+    XCTAssertThrows([[EmployeeObject alloc] initWithValue:@"StringObject"], @"Not an array or dictionary");
+    XCTAssertThrows([[EmployeeObject alloc] initWithValue:nil], @"Not an array or dictionary");
 }
 
 
@@ -365,8 +365,8 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    IntObject *obj0 = [IntObject createInRealm:realm withObject:@[@10]];
-    IntObject *obj1 = [IntObject createInRealm:realm withObject:@[@20]];
+    IntObject *obj0 = [IntObject createInRealm:realm withValue:@[@10]];
+    IntObject *obj1 = [IntObject createInRealm:realm withValue:@[@20]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(obj0.intCol, 10,  @"integer should be 10");
@@ -382,7 +382,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 - (void)testKeyedSubscripting
 {
     // standalone
-    EmployeeObject *objs = [[EmployeeObject alloc] initWithObject:@{@"name" : @"Test0", @"age" : @23, @"hired": @NO}];
+    EmployeeObject *objs = [[EmployeeObject alloc] initWithValue:@{@"name" : @"Test0", @"age" : @23, @"hired": @NO}];
     XCTAssertEqualObjects(objs[@"name"], @"Test0",  @"Name should be Test0");
     XCTAssertEqualObjects(objs[@"age"], @23,  @"age should be 23");
     XCTAssertEqualObjects(objs[@"hired"], @NO,  @"hired should be NO");
@@ -391,8 +391,8 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    EmployeeObject *obj0 = [EmployeeObject createInRealm:realm withObject:@{@"name" : @"Test1", @"age" : @24, @"hired": @NO}];
-    EmployeeObject *obj1 = [EmployeeObject createInRealm:realm withObject:@{@"name" : @"Test2", @"age" : @25, @"hired": @YES}];
+    EmployeeObject *obj0 = [EmployeeObject createInRealm:realm withValue:@{@"name" : @"Test1", @"age" : @24, @"hired": @NO}];
+    EmployeeObject *obj1 = [EmployeeObject createInRealm:realm withValue:@{@"name" : @"Test2", @"age" : @25, @"hired": @YES}];
     [realm commitWriteTransaction];
     
     XCTAssertEqualObjects(obj0[@"name"], @"Test1",  @"Name should be Test1");
@@ -433,7 +433,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     
     [realm addObject:c];
 
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @506, @7.7f, @8.8, @"banach", bin2,
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @506, @7.7f, @8.8, @"banach", bin2,
                                                      timeNow, @YES, @(-20), @2, NSNull.null]];
     [realm commitWriteTransaction];
     
@@ -481,8 +481,8 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    [StringObject createInDefaultRealmWithObject:@[@"string"]];
-    StringSubclassObject *obj = [StringSubclassObject createInDefaultRealmWithObject:@[@"string", @"string2"]];
+    [StringObject createInDefaultRealmWithValue:@[@"string"]];
+    StringSubclassObject *obj = [StringSubclassObject createInDefaultRealmWithValue:@[@"string", @"string2"]];
 
     // ensure property ordering
     XCTAssertEqualObjects([obj.objectSchema.properties[0] name], @"stringCol");
@@ -497,7 +497,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     // ensure exceptions on when using polymorphism
     [realm beginWriteTransaction];
-    StringLinkObject *linkObject = [StringLinkObject createInDefaultRealmWithObject:@[NSNull.null, @[]]];
+    StringLinkObject *linkObject = [StringLinkObject createInDefaultRealmWithValue:@[NSNull.null, @[]]];
     XCTAssertThrows(linkObject.stringObjectCol = obj);
     XCTAssertThrows([linkObject.stringObjectArrayCol addObject:obj]);
     [realm commitWriteTransaction];
@@ -613,7 +613,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     for (NSString *key in keys) {
         NSMutableDictionary *dict = [inputValues mutableCopy];
         [dict removeObjectForKey:key];
-        [DefaultObject createInRealm:realm withObject:dict];
+        [DefaultObject createInRealm:realm withValue:dict];
     }
 
     [realm commitWriteTransaction];
@@ -648,7 +648,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
         RLMProperty *prop = realm.schema[@"DefaultObject"][key];
         if (prop.type == RLMPropertyTypeArray || prop.type == RLMPropertyTypeObject) {
             [realm beginWriteTransaction];
-            [DefaultObject createInRealm:realm withObject:dict];
+            [DefaultObject createInRealm:realm withValue:dict];
             [realm commitWriteTransaction];
 
             DefaultObject *object = DefaultObject.allObjects.lastObject;
@@ -664,7 +664,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
         }
         else {
             [realm beginWriteTransaction];
-            XCTAssertThrows([DefaultObject createInRealm:realm withObject:dict]);
+            XCTAssertThrows([DefaultObject createInRealm:realm withValue:dict]);
             [realm commitWriteTransaction];
         }
     }
@@ -741,7 +741,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm beginWriteTransaction];
     
     // Test NSDictonary
-    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withObject:dictValidAllTypes]), @"Creating object with valid value types should not throw exception");
+    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withValue:dictValidAllTypes]), @"Creating object with valid value types should not throw exception");
     
     for (NSString *keyToInvalidate in dictValidAllTypes.allKeys) {
         NSMutableDictionary *invalidInput = [dictValidAllTypes mutableCopy];
@@ -754,7 +754,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
         
         // Ignoring test for mixedCol since only NSObjects can go in NSDictionary
         if (![keyToInvalidate isEqualToString:@"mixedCol"]) {
-            XCTAssertThrows(([AllTypesObject createInRealm:realm withObject:invalidInput]), @"Creating object with invalid value types should throw exception");
+            XCTAssertThrows(([AllTypesObject createInRealm:realm withValue:invalidInput]), @"Creating object with invalid value types should throw exception");
         }
     }
     
@@ -768,7 +768,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     
     // add test/link object to realm
     [realm beginWriteTransaction];
-    StringObject *to = [StringObject createInRealm:realm withObject:@[@"c"]];
+    StringObject *to = [StringObject createInRealm:realm withValue:@[@"c"]];
     [realm commitWriteTransaction];
     
     const char bin[4] = { 0, 1, 2, 3 };
@@ -779,7 +779,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm beginWriteTransaction];
     
     // Test NSArray
-    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withObject:arrayValidAllTypes]), @"Creating object with valid value types should not throw exception");
+    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withValue:arrayValidAllTypes]), @"Creating object with valid value types should not throw exception");
     
     const NSInteger stringColIndex = 4;
     const NSInteger mixedColIndex = 9;
@@ -795,7 +795,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
         
         // Ignoring test for mixedCol since only NSObjects can go in NSArray
         if (i != mixedColIndex) {
-            XCTAssertThrows(([AllTypesObject createInRealm:realm withObject:invalidInput]), @"Creating object with invalid value types should throw exception");
+            XCTAssertThrows(([AllTypesObject createInRealm:realm withValue:invalidInput]), @"Creating object with invalid value types should throw exception");
         }
     }
     
@@ -809,13 +809,13 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm beginWriteTransaction];
 
     NSArray *array = @[@"company", @[@[@"Alex", @29, @YES]]];
-    [CompanyObject createInDefaultRealmWithObject:array];
+    [CompanyObject createInDefaultRealmWithValue:array];
 
     NSDictionary *dict = @{@"name": @"dictionaryCompany", @"employees": @[@{@"name": @"Bjarne", @"age": @32, @"hired": @NO}]};
-    [CompanyObject createInDefaultRealmWithObject:dict];
+    [CompanyObject createInDefaultRealmWithValue:dict];
 
     NSArray *invalidArray = @[@"company", @[@[@"Alex", @29, @2]]];
-    XCTAssertThrows([CompanyObject createInDefaultRealmWithObject:invalidArray], @"Invalid sub-literal should throw");
+    XCTAssertThrows([CompanyObject createInDefaultRealmWithValue:invalidArray], @"Invalid sub-literal should throw");
 
     [realm commitWriteTransaction];
 
@@ -831,8 +831,8 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     // create with object literals
     [realm beginWriteTransaction];
 
-    [OwnerObject createInDefaultRealmWithObject:@[@"Brian", @{@"dogName": @"Brido", @"age": @0}]];
-    [OwnerObject createInDefaultRealmWithObject:@[@"JP", @[@"PJ", @0]]];
+    [OwnerObject createInDefaultRealmWithValue:@[@"Brian", @{@"dogName": @"Brido", @"age": @0}]];
+    [OwnerObject createInDefaultRealmWithValue:@[@"JP", @[@"PJ", @0]]];
 
     [realm commitWriteTransaction];
 
@@ -843,18 +843,18 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     // verify with kvc objects
     // create DogExtraObject
-    DogExtraObject *dogExt = [[DogExtraObject alloc] initWithObject:@[@"Fido", @12, @"Poodle"]];
+    DogExtraObject *dogExt = [[DogExtraObject alloc] initWithValue:@[@"Fido", @12, @"Poodle"]];
 
     [realm beginWriteTransaction];
 
     // create second object with DogExtraObject object
-    DogObject *dog = [DogObject createInDefaultRealmWithObject:dogExt];
+    DogObject *dog = [DogObject createInDefaultRealmWithValue:dogExt];
 
     // missing properties
-    XCTAssertThrows([DogExtraObject createInDefaultRealmWithObject:dog], @"Initialization with missing values should throw");
+    XCTAssertThrows([DogExtraObject createInDefaultRealmWithValue:dog], @"Initialization with missing values should throw");
 
     // nested objects should work
-    XCTAssertNoThrow([OwnerObject createInDefaultRealmWithObject:(@[@"Alex", dogExt])], @"Should not throw");
+    XCTAssertNoThrow([OwnerObject createInDefaultRealmWithValue:(@[@"Alex", dogExt])], @"Should not throw");
 
     [realm commitWriteTransaction];
 }
@@ -863,12 +863,12 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    DogObject *dog = [DogObject createInDefaultRealmWithObject:@[@"Fido", @5]];
-    OwnerObject *owner = [OwnerObject createInDefaultRealmWithObject:@[@"name", dog]];
+    DogObject *dog = [DogObject createInDefaultRealmWithValue:@[@"Fido", @5]];
+    OwnerObject *owner = [OwnerObject createInDefaultRealmWithValue:@[@"name", dog]];
     XCTAssertTrue([owner.dog isEqualToObject:dog]);
     XCTAssertEqual(1U, DogObject.allObjects.count);
 
-    DogArrayObject *dogArray = [DogArrayObject createInDefaultRealmWithObject:@[@[dog]]];
+    DogArrayObject *dogArray = [DogArrayObject createInDefaultRealmWithValue:@[@[dog]]];
     XCTAssertTrue([dogArray.dogs[0] isEqualToObject:dog]);
     XCTAssertEqual(1U, DogObject.allObjects.count);
 
@@ -881,13 +881,13 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm1 beginWriteTransaction];
     [realm2 beginWriteTransaction];
 
-    DogObject *dog = [DogObject createInDefaultRealmWithObject:@[@"Fido", @5]];
-    OwnerObject *owner = [OwnerObject createInRealm:realm2 withObject:@[@"name", dog]];
+    DogObject *dog = [DogObject createInDefaultRealmWithValue:@[@"Fido", @5]];
+    OwnerObject *owner = [OwnerObject createInRealm:realm2 withValue:@[@"name", dog]];
     XCTAssertFalse([owner.dog isEqualToObject:dog]);
     XCTAssertEqual(1U, DogObject.allObjects.count);
     XCTAssertEqual(1U, [DogObject allObjectsInRealm:realm2].count);
 
-    DogArrayObject *dogArray = [DogArrayObject createInRealm:realm2 withObject:@[@[dog]]];
+    DogArrayObject *dogArray = [DogArrayObject createInRealm:realm2 withValue:@[@[dog]]];
     XCTAssertFalse([dogArray.dogs[0] isEqualToObject:dog]);
     XCTAssertEqual(1U, DogObject.allObjects.count);
     XCTAssertEqual(2U, [DogObject allObjectsInRealm:realm2].count);
@@ -899,17 +899,17 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 - (void)testCreateInRealmWithOtherObjects {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    StringObjectNoThrow *object = [StringObjectNoThrow createInDefaultRealmWithObject:@[@"string"]];
+    StringObjectNoThrow *object = [StringObjectNoThrow createInDefaultRealmWithValue:@[@"string"]];
 
     // create subclass with instance of base class with/without default objects
-    XCTAssertThrows([StringSubclassObject createInDefaultRealmWithObject:object]);
-    XCTAssertNoThrow([StringSubclassObjectWithDefaults createInDefaultRealmWithObject:object]);
+    XCTAssertThrows([StringSubclassObject createInDefaultRealmWithValue:object]);
+    XCTAssertNoThrow([StringSubclassObjectWithDefaults createInDefaultRealmWithValue:object]);
 
     // create using non-realm object with custom getter
     StringSubclassDataObject *obj = [StringSubclassDataObject new];
     obj.stringCol = @"a";
     obj.stringCol2 = @"b";
-    [StringSubclassObjectWithDefaults createInDefaultRealmWithObject:obj];
+    [StringSubclassObjectWithDefaults createInDefaultRealmWithValue:obj];
 
     XCTAssertEqual(2U, StringSubclassObjectWithDefaults.allObjects.count);
     [realm commitWriteTransaction];
@@ -922,10 +922,10 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm beginWriteTransaction];
     
     // This exception only gets thrown when there is no default vaule and it is for an NSObject property
-    XCTAssertThrows(([EmployeeObject createInRealm:realm withObject:@{@"age" : @27, @"hired" : @YES}]), @"Missing values in NSDictionary should throw default value exception");
+    XCTAssertThrows(([EmployeeObject createInRealm:realm withValue:@{@"age" : @27, @"hired" : @YES}]), @"Missing values in NSDictionary should throw default value exception");
     
     // This exception gets thrown when count of array does not match with object schema
-    XCTAssertThrows(([EmployeeObject createInRealm:realm withObject:@[@27, @YES]]), @"Missing values in NSDictionary should throw default value exception");
+    XCTAssertThrows(([EmployeeObject createInRealm:realm withValue:@[@27, @YES]]), @"Missing values in NSDictionary should throw default value exception");
     
     [realm commitWriteTransaction];
 }
@@ -980,7 +980,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     [realm beginWriteTransaction];
     char longData[200];
-    [DataObject createInRealm:realm withObject:@[[NSData dataWithBytes:&longData length:200], [NSData dataWithBytes:&longData length:2]]];
+    [DataObject createInRealm:realm withValue:@[[NSData dataWithBytes:&longData length:200], [NSData dataWithBytes:&longData length:2]]];
     [realm commitWriteTransaction];
 
     DataObject *obj = [DataObject allObjectsInRealm:realm].firstObject;
@@ -993,7 +993,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    EmployeeObject *obj = [EmployeeObject createInRealm:realm withObject:@[@"Peter", @30, @YES]];
+    EmployeeObject *obj = [EmployeeObject createInRealm:realm withValue:@[@"Peter", @30, @YES]];
     [realm deleteObject:obj];
     [realm commitWriteTransaction];
 
@@ -1088,13 +1088,13 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 
 - (void)testIsDeleted {
-    StringObject *obj1 = [[StringObject alloc] initWithObject:@[@"a"]];
+    StringObject *obj1 = [[StringObject alloc] initWithValue:@[@"a"]];
     XCTAssertEqual(obj1.invalidated, NO);
 
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
     [realm addObject:obj1];
-    StringObject *obj2 = [StringObject createInRealm:realm withObject:@[@"b"]];
+    StringObject *obj2 = [StringObject createInRealm:realm withValue:@[@"b"]];
 
     XCTAssertEqual([obj1 isInvalidated], NO);
     XCTAssertEqual(obj2.invalidated, NO);
@@ -1114,7 +1114,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertThrows([realm addObject:obj1], @"Adding deleted object should throw");
 
     NSArray *propObject = @[@"", @[obj2], @[]];
-    XCTAssertThrows([ArrayPropertyObject createInRealm:realm withObject:propObject], @"Adding deleted object as a link should throw");
+    XCTAssertThrows([ArrayPropertyObject createInRealm:realm withValue:propObject], @"Adding deleted object as a link should throw");
 
     [realm commitWriteTransaction];
 
@@ -1125,19 +1125,19 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 - (void)testPrimaryKey {
     [[RLMRealm defaultRealm] beginWriteTransaction];
 
-    [PrimaryStringObject createInDefaultRealmWithObject:(@[@"string", @1])];
-    PrimaryStringObject *obj = [PrimaryStringObject createInDefaultRealmWithObject:(@[@"string2", @1])];
-    XCTAssertThrows([PrimaryStringObject createInDefaultRealmWithObject:(@[@"string", @1])], @"Duplicate primary key should throw");
+    [PrimaryStringObject createInDefaultRealmWithValue:(@[@"string", @1])];
+    PrimaryStringObject *obj = [PrimaryStringObject createInDefaultRealmWithValue:(@[@"string2", @1])];
+    XCTAssertThrows([PrimaryStringObject createInDefaultRealmWithValue:(@[@"string", @1])], @"Duplicate primary key should throw");
     XCTAssertThrows(obj.stringCol = @"string2", @"Setting primary key should throw");
 
-    [PrimaryIntObject createInDefaultRealmWithObject:(@[@1])];
-    PrimaryIntObject *obj1 = [PrimaryIntObject createInDefaultRealmWithObject:(@{@"intCol": @2})];
-    XCTAssertThrows([PrimaryIntObject createInDefaultRealmWithObject:(@[@1])], @"Duplicate primary key should throw");
+    [PrimaryIntObject createInDefaultRealmWithValue:(@[@1])];
+    PrimaryIntObject *obj1 = [PrimaryIntObject createInDefaultRealmWithValue:(@{@"intCol": @2})];
+    XCTAssertThrows([PrimaryIntObject createInDefaultRealmWithValue:(@[@1])], @"Duplicate primary key should throw");
     XCTAssertThrows(obj1.intCol = 2, @"Setting primary key should throw");
 
-    [PrimaryInt64Object createInDefaultRealmWithObject:(@[@(1LL << 40)])];
-    PrimaryInt64Object *obj2 = [PrimaryInt64Object createInDefaultRealmWithObject:(@[@(1LL << 41)])];
-    XCTAssertThrows([PrimaryInt64Object createInDefaultRealmWithObject:(@[@(1LL << 40)])], @"Duplicate primary key should throw");
+    [PrimaryInt64Object createInDefaultRealmWithValue:(@[@(1LL << 40)])];
+    PrimaryInt64Object *obj2 = [PrimaryInt64Object createInDefaultRealmWithValue:(@[@(1LL << 41)])];
+    XCTAssertThrows([PrimaryInt64Object createInDefaultRealmWithValue:(@[@(1LL << 40)])], @"Duplicate primary key should throw");
     XCTAssertThrows(obj2.int64Col = 1LL << 41, @"Setting primary key should throw");
 
     [[RLMRealm defaultRealm] commitWriteTransaction];
@@ -1147,22 +1147,22 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    [PrimaryStringObject createOrUpdateInDefaultRealmWithObject:@[@"string", @1]];
+    [PrimaryStringObject createOrUpdateInDefaultRealmWithValue:@[@"string", @1]];
     RLMResults *objects = [PrimaryStringObject allObjects];
     XCTAssertEqual([objects count], 1U, @"Should have 1 object");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
 
-    [PrimaryStringObject createOrUpdateInRealm:realm withObject:@{@"stringCol": @"string2", @"intCol": @2}];
+    [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"stringCol": @"string2", @"intCol": @2}];
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
 
     // upsert with new secondary property
-    [PrimaryStringObject createOrUpdateInDefaultRealmWithObject:@[@"string", @3]];
+    [PrimaryStringObject createOrUpdateInDefaultRealmWithValue:@[@"string", @3]];
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 3, @"Value should be 3");
 
     // upsert on non-primary key object should throw
-    XCTAssertThrows([StringObject createOrUpdateInDefaultRealmWithObject:@[@"string"]]);
-    XCTAssertThrows([StringObject createOrUpdateInRealm:realm withObject:@[@"string"]]);
+    XCTAssertThrows([StringObject createOrUpdateInDefaultRealmWithValue:@[@"string"]]);
+    XCTAssertThrows([StringObject createOrUpdateInRealm:realm withValue:@[@"string"]]);
 
     [realm commitWriteTransaction];
 }
@@ -1171,13 +1171,13 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    [PrimaryNestedObject createOrUpdateInDefaultRealmWithObject:@[@0, @[@"string", @1], @[@[@"string", @1]], @[@"string"], @[@[@1]], @""]];
+    [PrimaryNestedObject createOrUpdateInDefaultRealmWithValue:@[@0, @[@"string", @1], @[@[@"string", @1]], @[@"string"], @[@[@1]], @""]];
     XCTAssertEqual([[PrimaryNestedObject allObjects] count], 1U, @"Should have 1 object");
     XCTAssertEqual([[PrimaryStringObject allObjects] count], 1U, @"Should have 1 object");
     XCTAssertEqual([[PrimaryIntObject allObjects] count], 1U, @"Should have 1 object");
 
     // update parent and nested object
-    [PrimaryNestedObject createOrUpdateInDefaultRealmWithObject:@{@"primaryCol": @0,
+    [PrimaryNestedObject createOrUpdateInDefaultRealmWithValue:@{@"primaryCol": @0,
                                                                   @"primaryStringObject": @[@"string", @2],
                                                                   @"primaryStringObjectWrapper": @[@[@"string", @2]],
                                                                   @"stringObject": @[@"string2"]}];
@@ -1189,7 +1189,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertEqual([[StringObject allObjects] count], 2U, @"Should have 2 objects");
 
     // test partial update nulling out object/array properties
-    [PrimaryNestedObject createOrUpdateInDefaultRealmWithObject:@{@"primaryCol": @0,
+    [PrimaryNestedObject createOrUpdateInDefaultRealmWithValue:@{@"primaryCol": @0,
                                                                   @"stringCol": @"updated",
                                                                   @"stringObject": NSNull.null,
                                                                   @"primaryIntArray": NSNull.null}];
@@ -1200,14 +1200,14 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertNil(obj.stringObject, @"stringObject should be nil");
 
     // inserting new object should update nested
-    obj = [PrimaryNestedObject createOrUpdateInDefaultRealmWithObject:@[@1, @[@"string", @3], @[@[@"string", @3]], @[@"string"], @[], @""]];
+    obj = [PrimaryNestedObject createOrUpdateInDefaultRealmWithValue:@[@1, @[@"string", @3], @[@[@"string", @3]], @[@"string"], @[], @""]];
     XCTAssertEqual([[PrimaryNestedObject allObjects] count], 2U, @"Should have 2 objects");
     XCTAssertEqual([[PrimaryStringObject allObjects] count], 1U, @"Should have 1 object");
     XCTAssertEqual([(PrimaryStringObject *)[[PrimaryStringObject allObjects] lastObject] intCol], 3, @"intCol should be 3");
 
     // test addOrUpdateObject
-    obj.primaryStringObject = [PrimaryStringObject createInDefaultRealmWithObject:@[@"string2", @1]];
-    PrimaryNestedObject *obj1 = [[PrimaryNestedObject alloc] initWithObject:@[@1, @[@"string2", @4], @[@[@"string2", @4]], @[@"string"], @[@[@1], @[@2]], @""]];
+    obj.primaryStringObject = [PrimaryStringObject createInDefaultRealmWithValue:@[@"string2", @1]];
+    PrimaryNestedObject *obj1 = [[PrimaryNestedObject alloc] initWithValue:@[@1, @[@"string2", @4], @[@[@"string2", @4]], @[@"string"], @[@[@1], @[@2]], @""]];
     [realm addOrUpdateObject:obj1];
     XCTAssertEqual([[PrimaryNestedObject allObjects] count], 2U, @"Should have 2 objects");
     XCTAssertEqual([[PrimaryStringObject allObjects] count], 2U, @"Should have 2 objects");
@@ -1215,7 +1215,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertEqual([(PrimaryStringObject *)[[PrimaryStringObject allObjects] lastObject] intCol], 4, @"intCol should be 4");
 
     // creating new object with same primary key should throw
-    XCTAssertThrows([PrimaryStringObject createInDefaultRealmWithObject:(@[@"string", @1])]);
+    XCTAssertThrows([PrimaryStringObject createInDefaultRealmWithValue:(@[@"string", @1])]);
 
     [realm commitWriteTransaction];
 }
@@ -1225,8 +1225,8 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [[RLMRealm defaultRealm] beginWriteTransaction];
 
     // set object with primary and non primary keys as they both override isEqual and hash
-    PrimaryStringObject *obj = [PrimaryStringObject createInDefaultRealmWithObject:(@[@"string2", @1])];
-    StringObject *strObj = [StringObject createInDefaultRealmWithObject:@[@"string"]];
+    PrimaryStringObject *obj = [PrimaryStringObject createInDefaultRealmWithValue:(@[@"string2", @1])];
+    StringObject *strObj = [StringObject createInDefaultRealmWithValue:@[@"string"]];
     NSMutableSet *dict = [NSMutableSet set];
     [dict addObject:obj];
     [dict addObject:strObj];
@@ -1244,8 +1244,8 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
 - (void)testObjectWithKey {
     [RLMRealm.defaultRealm beginWriteTransaction];
-    PrimaryStringObject *strObj = [PrimaryStringObject createInDefaultRealmWithObject:@[@"key", @0]];
-    PrimaryIntObject *intObj = [PrimaryIntObject createInDefaultRealmWithObject:@[@0]];
+    PrimaryStringObject *strObj = [PrimaryStringObject createInDefaultRealmWithValue:@[@"key", @0]];
+    PrimaryIntObject *intObj = [PrimaryIntObject createInDefaultRealmWithValue:@[@0]];
     [RLMRealm.defaultRealm commitWriteTransaction];
 
     // no PK
@@ -1266,7 +1266,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 
 - (void)testBacklinks {
-    StringObject *obj = [[StringObject alloc] initWithObject:@[@"string"]];
+    StringObject *obj = [[StringObject alloc] initWithValue:@[@"string"]];
 
     // calling on standalone should throw
     XCTAssertThrows([obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"]);
@@ -1282,7 +1282,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertEqual(0U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
 
     [realm transactionWithBlock:^{
-        StringLinkObject *lObj = [StringLinkObject createInDefaultRealmWithObject:@[obj, @[]]];
+        StringLinkObject *lObj = [StringLinkObject createInDefaultRealmWithValue:@[obj, @[]]];
         XCTAssertEqual(1U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
 
         lObj.stringObjectCol = nil;
