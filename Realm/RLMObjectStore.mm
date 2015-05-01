@@ -466,7 +466,7 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
 }
 
 RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options) {
-    return _RLMCreateObjectInRealmWithValue(realm, className, value, options, [NSMapTable strongToStrongObjectsMapTable]);
+    return _RLMCreateObjectInRealmWithValue(realm, className, value, options, RLMAccessorCreationMapTable());
 }
 
 RLMObjectBase *_RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options, NSMapTable *valueToAccessorMapping) {

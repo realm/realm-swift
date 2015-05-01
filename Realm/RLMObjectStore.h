@@ -86,6 +86,10 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
 // get an object with the given primary key
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key);
 
+static inline NSMapTable *RLMAccessorCreationMapTable() {
+    return [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPointerPersonality | NSPointerFunctionsOpaqueMemory valueOptions:NSPointerFunctionsObjectPointerPersonality | NSPointerFunctionsOpaqueMemory];
+}
+
 // create object from array or dictionary
 RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options);
 

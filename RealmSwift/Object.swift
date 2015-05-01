@@ -76,7 +76,7 @@ public class Object: RLMObjectBase, Equatable, Printable {
                     thrown if any required properties are not present and no default is set.
     */
     public init(value: AnyObject) {
-        super.init(value: value, schema: RLMSchema.sharedSchema(), valueToAccessorMapping: NSMapTable.strongToStrongObjectsMapTable())
+        super.init(value: value, schema: RLMSchema.sharedSchema(), valueToAccessorMapping: RLMAccessorCreationMapTable())
     }
 
 
