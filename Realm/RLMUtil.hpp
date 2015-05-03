@@ -27,6 +27,22 @@
 @class RLMRealm;
 @class RLMSchema;
 
+// Helper structs for unretained<> to make unretained<id> work
+template<typename T>
+struct RLMUnretainedPtr {
+    using type = __unsafe_unretained T *const;
+};
+
+template<>
+struct RLMUnretainedPtr<id> {
+    using type = __unsafe_unretained id const;
+};
+
+// type alias for const unretained pointers
+// only needs to be used in function/method definitions, not declarations
+template<typename T>
+using unretained = typename RLMUnretainedPtr<T>::type;
+
 NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
 NSException *RLMException(std::exception const& exception);
 
