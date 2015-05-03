@@ -111,9 +111,9 @@ xcrealmswift() {
 
 build_combined() {
     local scheme="$1"
-    local config="$2"
-    local module_name="$3"
-    local scope_suffix="$4"
+    local module_name="$2"
+    local scope_suffix="$3"
+    local config="$CONFIGURATION"
 
     # Derive build paths
     local build_products_path="build/DerivedData/$module_name/Build/Products"
@@ -121,17 +121,16 @@ build_combined() {
     local binary_path="$module_name"
     local iphoneos_path="$build_products_path/$config-iphoneos$scope_suffix/$product_name"
     local iphonesimulator_path="$build_products_path/$config-iphonesimulator$scope_suffix/$product_name"
-    local out_path="build/ios"
+    local out_path="build/ios$scope_suffix"
 
     # Build for each platform
-    if [[ "$module_name" == "Realm" ]]; then
-      xcrealm "-scheme '$scheme' -configuration $config -sdk iphoneos"
-      xcrealm "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
-    elif [[ "$module_name" == "RealmSwift" ]]; then
-      xcrealmswift "-scheme '$scheme' -configuration $config -sdk iphoneos"
-      xcrealmswift "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
-      # Combine .swiftmodule
-      cp $iphoneos_path/Modules/$module_name.swiftmodule/* $iphonesimulator_path/Modules/$module_name.swiftmodule/
+    cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]')
+    $cmd "-scheme '$scheme' -configuration $config -sdk iphoneos"
+    $cmd "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
+
+    # Combine .swiftmodule
+    if [ -d $iphonesimulator_path/Modules/$module_name.swiftmodule ]; then
+      cp $iphonesimulator_path/Modules/$module_name.swiftmodule/* $iphoneos_path/Modules/$module_name.swiftmodule/
     fi
 
     # Retrieve build products
@@ -276,18 +275,17 @@ case "$COMMAND" in
         ;;
 
     "ios-static")
-        build_combined iOS "$CONFIGURATION" Realm
+        build_combined iOS Realm
         exit 0
         ;;
 
     "ios-dynamic")
-        build_combined "iOS Dynamic" "$CONFIGURATION" Realm "-dynamic"
+        build_combined "iOS Dynamic" Realm "-dynamic" "LD_DYLIB_INSTALL_NAME='@rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm'"
         exit 0
         ;;
 
     "ios-swift")
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphoneos"
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
+        build_combined "RealmSwift iOS" RealmSwift
         exit 0
         ;;
 
@@ -301,6 +299,9 @@ case "$COMMAND" in
 
     "osx-swift")
         xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
+        rm -rf build/osx
+        mkdir build/osx
+        cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework build/osx
         exit 0
         ;;
 
