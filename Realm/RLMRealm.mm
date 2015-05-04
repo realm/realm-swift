@@ -1044,80 +1044,14 @@ atomic<bool> s_syncLogEverything(false);
     size_t size = data.length;
     BinaryData changeset(data2, size);
     ostream *applyLog = 0;
-    BOOL conflict;
-//    try {
-    REALM_ASSERT(baseVersion >= 1);
     Replication &history = *_backgroundHistory;
+    Replication::CommitLogEntry entry;
+    entry.peer_id = originFileIdent;
+    entry.peer_version = serverVersion;
+    entry.timestamp = originTimestamp;
+    entry.log_data = changeset;
     newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion,
-                                                 changeset, originTimestamp, originFileIdent,
-                                                 serverVersion, applyLog);
-    conflict = (newVersion == 0);
-//    }
-//    catch (Replication::BadTransactLog&) {
-//        NSString *message = [NSString stringWithFormat:@"Application of server changeset "
-//                                      "%llu -> %llu failed", ulonglong(serverVersion-1),
-//                                      ulonglong(serverVersion)];
-//        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
-//    }
-
-    if (!conflict) {
-        if (s_syncLogEverything) {
-            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Server changeset (%llu -> %llu) "
-                  "integrated (producing client version %llu)", _connection.ident, _sessionIdent,
-                  ulonglong(serverVersion-1), ulonglong(serverVersion), ulonglong(newVersion));
-        }
-        [[[RLMRealm realmWithPath:_clientPath] notifier] notifyOtherRealms];
-        return;
-    }
-
-/*
-    // If the last changeset is local, or if the history is empty,
-    // require that the last integragted client version of the
-    // incoming changeset is the current client version, i.e., the
-    // client version produced by the last changeset in the local
-    // history.
-    BOOL lastChangesetIsFromServer = NO;
-    if (current_server_version > first_server_version) {
-        Replication::CommitLogEntry lastHistoryEntry;
-        _backgroundHistory->get_commit_entries(baseVersion, baseVersion+1, &firstHistoryEntry);
-        lastChangesetIsFromServer = (lastHistoryEntry.peer_id != 0);
-    }
-*/
-
-    // WARNING: Strictly speaking, the following is not the correct resolution
-    // of the conflict between two identical initial changesets, but it is done
-    // as a temporary workaround to allow the current version of this binding to
-    // carry out an initial schema creating transaction without getting into an
-    // immediate unrecoverable conflict. It does not work in general as even the
-    // initial changeset is allowed to contain elements that are additive rather
-    // than idempotent.
-    bool conflictOnFirstChangeset = baseVersion == 1;
-    if (conflictOnFirstChangeset) {
-        Replication::CommitLogEntry firstHistoryEntry;
-        _backgroundHistory->get_commit_entries(baseVersion, baseVersion+1, &firstHistoryEntry);
-        BOOL isForeign = (firstHistoryEntry.peer_id != 0);
-        BOOL identicalSchemaCreatingTransactions = !isForeign &&
-            firstHistoryEntry.log_data == changeset;
-        if (identicalSchemaCreatingTransactions) {
-            BinaryData emptyChangeset;
-            Replication &history = *_backgroundHistory;
-            newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, 0,
-                                                         emptyChangeset, originTimestamp,
-                                                         originFileIdent, serverVersion,
-                                                         applyLog);
-            REALM_ASSERT(newVersion != 0);
-            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Conflict on identical initial "
-                  "schema-creating transactions resolved (impropperly) (producing client "
-                  "version %llu)", _connection.ident, _sessionIdent, ulonglong(newVersion));
-            return;
-        }
-    }
-
-    NSString *message =
-        [NSString stringWithFormat:@"RealmSync: Connection[%lu]: Session[%@]: Conflict between "
-                  "client version %llu and server version %llu", _connection.ident, _sessionIdent,
-                  ulonglong(baseVersion+1), ulonglong(serverVersion)];
-    @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+                                                 entry, applyLog);
 }
 
 
