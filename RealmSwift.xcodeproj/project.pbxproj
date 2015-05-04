@@ -114,6 +114,7 @@
 		C0FE465C1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
 		C0FE465D1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
 		C0FE465E1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
+		E8DF38121AF7187700BC914F /* strip-frameworks.sh in Copy Strip Frameworks Script */ = {isa = PBXBuildFile; fileRef = E8DF380F1AF7185B00BC914F /* strip-frameworks.sh */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -187,6 +188,17 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8DF38111AF7186A00BC914F /* Copy Strip Frameworks Script */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				E8DF38121AF7187700BC914F /* strip-frameworks.sh in Copy Strip Frameworks Script */,
+			);
+			name = "Copy Strip Frameworks Script";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -231,6 +243,7 @@
 		E81A1FC21955FE0100FDED82 /* RealmTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RealmTests-Info.plist"; sourceTree = "<group>"; };
 		E8839B2C19E31FD90047B1A8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Realm/Tests/TestHost/Info.plist; sourceTree = SOURCE_ROOT; };
 		E8839B2D19E31FD90047B1A8 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Realm/Tests/TestHost/main.m; sourceTree = SOURCE_ROOT; };
+		E8DF380F1AF7185B00BC914F /* strip-frameworks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = "strip-frameworks.sh"; path = "scripts/strip-frameworks.sh"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -338,6 +351,7 @@
 		E8D89B9B1955FC6D00CF2B9A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				E8DF380F1AF7185B00BC914F /* strip-frameworks.sh */,
 				023B19F71A423BD20067FB81 /* libc++.dylib */,
 			);
 			name = "Supporting Files";
@@ -427,6 +441,7 @@
 				023B19A31A4234380067FB81 /* Sources */,
 				023B19A41A4234380067FB81 /* Frameworks */,
 				29E3C6C31A718C5A00B62C1D /* Embed Dynamic/Realm.framework */,
+				E8DF38111AF7186A00BC914F /* Copy Strip Frameworks Script */,
 			);
 			buildRules = (
 			);
