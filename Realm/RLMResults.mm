@@ -87,7 +87,7 @@
 //
 // validation helper
 //
-static inline void RLMResultsValidateAttached(__unsafe_unretained RLMResults *const ar) {
+static inline void RLMResultsValidateAttached(unretained<RLMResults> ar) {
     if (ar->_viewCreated) {
         // verify view is attached and up to date
         if (!ar->_backingView.is_attached()) {
@@ -105,12 +105,12 @@ static inline void RLMResultsValidateAttached(__unsafe_unretained RLMResults *co
     }
     // otherwise we're backed by a table and don't need to update anything
 }
-static inline void RLMResultsValidate(__unsafe_unretained RLMResults *const ar) {
+static inline void RLMResultsValidate(unretained<RLMResults> ar) {
     RLMResultsValidateAttached(ar);
     RLMCheckThread(ar->_realm);
 }
 
-static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMResults *const ar) {
+static inline void RLMResultsValidateInWriteTransaction(unretained<RLMResults> ar) {
     // first verify attached
     RLMResultsValidate(ar);
 

@@ -84,8 +84,8 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     return self;
 }
 
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
-                       schema:(__unsafe_unretained RLMObjectSchema *const)schema {
+- (instancetype)initWithRealm:(unretained<RLMRealm>)realm
+                       schema:(unretained<RLMObjectSchema>)schema {
     self = [super init];
     if (self) {
         _realm = realm;
