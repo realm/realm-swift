@@ -166,6 +166,11 @@
 
 /**
  Indicates if this Realm is currently in a write transaction.
+
+ @warning Wrapping mutating operations in a write transaction if this property returns `NO`
+          may cause a large number of write transactions to be created, which could negatively
+          impact Realm's performance. Always prefer performing multiple mutations in a single
+          transaction when possible.
  */
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 
