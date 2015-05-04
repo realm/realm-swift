@@ -52,7 +52,7 @@ examples.each do |example|
   filepath = File.join(example, "project.pbxproj")
   contents = File.read(filepath)
   File.open(filepath, "w") do |file|
-    file.puts contents.gsub("/build/ios/swift", "/ios/swift")
+    file.puts contents.gsub("/build/ios/swift", "/ios")
                       .gsub("/build/ios", "/ios/static")
                       .gsub("Realm/Swift", "Swift")
                       .gsub("/build/osx", "/osx")

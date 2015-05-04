@@ -546,16 +546,6 @@ case "$COMMAND" in
         mv realm-browser.zip ${WORKSPACE}
         ;;
 
-    "package-docs")
-        cd tightdb_objc
-        sh build.sh docs
-        cd docs/output/*
-        tar --exclude='realm-docset.tgz' \
-            --exclude='realm.xar' \
-            -cvzf \
-            realm-docs.tgz *
-        ;;
-
     "package-examples")
         cd tightdb_objc
         ./scripts/package_examples.rb
@@ -563,14 +553,23 @@ case "$COMMAND" in
         ;;
 
     "package-test-examples")
-        VERSION=$(file realm-cocoa-*.zip | grep -o '\d*\.\d*\.\d*')
-        unzip realm-cocoa-*.zip
+        VERSION=$(file realm-objc-*.zip | grep -o '\d*\.\d*\.\d*')
+        unzip realm-objc-${VERSION}.zip
 
-        cp $0 realm-cocoa-${VERSION}
-        cd realm-cocoa-${VERSION}
-        sh build.sh examples
+        cp $0 realm-objc-${VERSION}
+        cd realm-objc-${VERSION}
+        sh build.sh examples-ios
+        sh build.sh examples-osx
         cd ..
-        rm -rf realm-cocoa-${VERSION}
+        rm -rf realm-objc-${VERSION}
+
+        unzip realm-swift-${VERSION}.zip
+
+        cp $0 realm-swift-${VERSION}
+        cd realm-swift-${VERSION}
+        sh build.sh examples-ios-swift
+        cd ..
+        rm -rf realm-swift-${VERSION}
         ;;
 
     "package-ios-static")
@@ -615,76 +614,88 @@ case "$COMMAND" in
         ;;
 
     "package-release")
-        TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package.XXXX)
+        LANG="$2"
+        TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
 
         cd tightdb_objc
         VERSION=$(sh build.sh get-version)
         cd ..
 
-        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/osx/swift
-        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/ios/static
-        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/ios/dynamic
-        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/ios/swift
-        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/browser
-        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/Swift
+        FOLDER=${TEMPDIR}/realm-${LANG}-${VERSION}
+
+        mkdir -p ${FOLDER}/osx ${FOLDER}/ios ${FOLDER}/browser
+
+        if [[ "${LANG}" == "objc" ]]; then
+            mkdir -p ${FOLDER}/ios/static
+            mkdir -p ${FOLDER}/ios/dynamic
+            mkdir -p ${FOLDER}/Swift
+
+            (
+                cd ${FOLDER}/osx
+                unzip ${WORKSPACE}/realm-framework-osx.zip
+            )
+
+            (
+                cd ${FOLDER}/ios/static
+                unzip ${WORKSPACE}/realm-framework-ios.zip
+            )
+
+            (
+                cd ${FOLDER}/ios/dynamic
+                unzip ${WORKSPACE}/realm-dynamic-framework-ios.zip
+            )
+        else
+            (
+                cd ${FOLDER}/osx
+                unzip ${WORKSPACE}/realm-swift-framework-osx.zip
+            )
+
+            (
+                cd ${FOLDER}/ios
+                unzip ${WORKSPACE}/realm-swift-framework-ios.zip
+            )
+        fi
 
         (
-            cd ${TEMPDIR}/realm-cocoa-${VERSION}/osx
-            unzip ${WORKSPACE}/realm-framework-osx.zip
-        )
-
-        (
-            cd ${TEMPDIR}/realm-cocoa-${VERSION}/ios/static
-            unzip ${WORKSPACE}/realm-framework-ios.zip
-        )
-
-        (
-            cd ${TEMPDIR}/realm-cocoa-${VERSION}/ios/dynamic
-            unzip ${WORKSPACE}/realm-dynamic-framework-ios.zip
-        )
-
-        (
-            cd ${TEMPDIR}/realm-cocoa-${VERSION}/osx/swift
-            unzip ${WORKSPACE}/realm-swift-framework-osx.zip
-        )
-
-        (
-            cd ${TEMPDIR}/realm-cocoa-${VERSION}/ios/swift
-            unzip ${WORKSPACE}/realm-swift-framework-ios.zip
-        )
-
-        (
-            cd ${TEMPDIR}/realm-cocoa-${VERSION}/browser
+            cd ${FOLDER}/browser
             unzip ${WORKSPACE}/realm-browser.zip
         )
 
         (
             cd ${WORKSPACE}/tightdb_objc
-            cp -R plugin ${TEMPDIR}/realm-cocoa-${VERSION}
-            cp LICENSE ${TEMPDIR}/realm-cocoa-${VERSION}/LICENSE.txt
-            cp Realm/Swift/RLMSupport.swift ${TEMPDIR}/realm-cocoa-${VERSION}/Swift/
+            cp -R plugin ${FOLDER}
+            cp LICENSE ${FOLDER}/LICENSE.txt
+            if [[ "${LANG}" == "objc" ]]; then
+                cp Realm/Swift/RLMSupport.swift ${FOLDER}/Swift/
+            fi
         )
 
         (
-            cd ${TEMPDIR}/realm-cocoa-${VERSION}
+            cd ${FOLDER}
             unzip ${WORKSPACE}/realm-examples.zip
+            cd examples
+            if [[ "${LANG}" == "objc" ]]; then
+                rm -rf ios/swift
+            else
+                rm -rf ios/objc ios/rubymotion osx
+            fi
         )
 
-        cat > ${TEMPDIR}/realm-cocoa-${VERSION}/docs.webloc <<EOF
+        cat > ${FOLDER}/docs.webloc <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>URL</key>
-    <string>http://realm.io/docs/ios/latest</string>
+    <string>https://realm.io/docs/${LANG}/${VERSION}</string>
 </dict>
 </plist>
 EOF
 
         (
           cd ${TEMPDIR}
-          zip --symlinks -r realm-cocoa-${VERSION}.zip realm-cocoa-${VERSION}
-          mv realm-cocoa-${VERSION}.zip ${WORKSPACE}
+          zip --symlinks -r realm-${LANG}-${VERSION}.zip realm-${LANG}-${VERSION}
+          mv realm-${LANG}-${VERSION}.zip ${WORKSPACE}
         )
         ;;
 
@@ -717,10 +728,6 @@ EOF
         sh tightdb_objc/build.sh package-osx
         cp tightdb_objc/build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip .
 
-        echo 'Packaging docs'
-        sh tightdb_objc/build.sh package-docs
-        cp tightdb_objc/docs/output/*/realm-docs.tgz .
-
         echo 'Packaging examples'
         (
             cd tightdb_objc/examples
@@ -740,8 +747,9 @@ EOF
         sh tightdb_objc/build.sh package-osx-swift
         cp tightdb_objc/build/osx/realm-swift-framework-osx.zip .
 
-        echo 'Building final release package'
-        sh tightdb_objc/build.sh package-release
+        echo 'Building final release packages'
+        sh tightdb_objc/build.sh package-release objc
+        sh tightdb_objc/build.sh package-release swift
 
         echo 'Testing packaged examples'
         sh tightdb_objc/build.sh package-test-examples
