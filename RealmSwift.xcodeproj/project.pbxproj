@@ -114,6 +114,7 @@
 		C0FE465C1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
 		C0FE465D1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
 		C0FE465E1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
+		E8DF38121AF7187700BC914F /* strip-frameworks.sh in Copy Strip Frameworks Script */ = {isa = PBXBuildFile; fileRef = E8DF380F1AF7185B00BC914F /* strip-frameworks.sh */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -187,6 +188,17 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8DF38111AF7186A00BC914F /* Copy Strip Frameworks Script */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				E8DF38121AF7187700BC914F /* strip-frameworks.sh in Copy Strip Frameworks Script */,
+			);
+			name = "Copy Strip Frameworks Script";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -231,6 +243,7 @@
 		E81A1FC21955FE0100FDED82 /* RealmTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RealmTests-Info.plist"; sourceTree = "<group>"; };
 		E8839B2C19E31FD90047B1A8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Realm/Tests/TestHost/Info.plist; sourceTree = SOURCE_ROOT; };
 		E8839B2D19E31FD90047B1A8 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Realm/Tests/TestHost/main.m; sourceTree = SOURCE_ROOT; };
+		E8DF380F1AF7185B00BC914F /* strip-frameworks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = "strip-frameworks.sh"; path = "scripts/strip-frameworks.sh"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -338,6 +351,7 @@
 		E8D89B9B1955FC6D00CF2B9A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				E8DF380F1AF7185B00BC914F /* strip-frameworks.sh */,
 				023B19F71A423BD20067FB81 /* libc++.dylib */,
 			);
 			name = "Supporting Files";
@@ -383,23 +397,6 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		0201B2761A54C68C004CFB6F /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		023B19A51A4234380067FB81 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
 		0201B2661A54C68C004CFB6F /* RealmSwift OSX */ = {
 			isa = PBXNativeTarget;
@@ -407,7 +404,6 @@
 			buildPhases = (
 				0201B2691A54C68C004CFB6F /* Sources */,
 				0201B2731A54C68C004CFB6F /* Frameworks */,
-				0201B2761A54C68C004CFB6F /* Headers */,
 				29A03F0F1A7C499C00C0D92E /* Embed Dynamic/Realm.framework */,
 			);
 			buildRules = (
@@ -444,8 +440,8 @@
 			buildPhases = (
 				023B19A31A4234380067FB81 /* Sources */,
 				023B19A41A4234380067FB81 /* Frameworks */,
-				023B19A51A4234380067FB81 /* Headers */,
 				29E3C6C31A718C5A00B62C1D /* Embed Dynamic/Realm.framework */,
+				E8DF38111AF7186A00BC914F /* Copy Strip Frameworks Script */,
 			);
 			buildRules = (
 			);
@@ -583,7 +579,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ ! -d \"../ios/dynamic\" && ! -d \"../build/ios/Realm.framework\" ]]; then\n  CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\nfi\n";
+			shellScript = "if [[ ! -d \"build/ios-dynamic/Realm.framework\" ]]; then\n  CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\nfi\n";
 		};
 		295C17A41A7C55DA000E5F54 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -605,7 +601,6 @@
 			);
 			inputPaths = (
 				"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)/Realm.framework",
-				../osx/Realm.framework,
 			);
 			name = "Embed Dynamic/Realm.framework";
 			outputPaths = (
@@ -613,7 +608,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ ! -d \"../osx\" ]]; then\n  DYNAMIC_FRAMEWORK=\"${SCRIPT_INPUT_FILE_0}\"\nelse\n  DYNAMIC_FRAMEWORK=\"${SCRIPT_INPUT_FILE_1}\"\nfi\n\nrm -rf \"${SCRIPT_OUTPUT_FILE_0}\"\nmkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${DYNAMIC_FRAMEWORK}\" \"${SCRIPT_OUTPUT_FILE_0}/\"\n\ninstall_name_tool -id @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${SCRIPT_OUTPUT_FILE_0}/Realm.framework/Realm\"\ninstall_name_tool -change @rpath/Realm.framework/Versions/A/Realm @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"";
+			shellScript = "DYNAMIC_FRAMEWORK=\"${SCRIPT_INPUT_FILE_0}\"\n\nrm -rf \"${SCRIPT_OUTPUT_FILE_0}\"\nmkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${DYNAMIC_FRAMEWORK}\" \"${SCRIPT_OUTPUT_FILE_0}/\"\n\ninstall_name_tool -id @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${SCRIPT_OUTPUT_FILE_0}/Realm.framework/Realm\"\ninstall_name_tool -change @rpath/Realm.framework/Versions/A/Realm @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"";
 		};
 		29E3C6C31A718C5A00B62C1D /* Embed Dynamic/Realm.framework */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -621,15 +616,14 @@
 			files = (
 			);
 			inputPaths = (
-				build/ios/Realm.framework,
-				../ios/dynamic/Realm.framework,
+				"build/ios-dynamic/Realm.framework",
 			);
 			name = "Embed Dynamic/Realm.framework";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ ! -d \"../ios/dynamic\" ]]; then\n  DYNAMIC_FRAMEWORK=\"${SCRIPT_INPUT_FILE_0}\"\nelse\n  DYNAMIC_FRAMEWORK=\"${SCRIPT_INPUT_FILE_1}\"\nfi\nFRAMEWORKS_PATH=\"${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\nrm -rf \"$FRAMEWORKS_PATH\"\nmkdir -p \"$FRAMEWORKS_PATH\"\ncp -R \"${DYNAMIC_FRAMEWORK}\" \"${FRAMEWORKS_PATH}/\"\n\ninstall_name_tool -id @rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm \"${FRAMEWORKS_PATH}/Realm.framework/Realm\"\ninstall_name_tool -change @rpath/Realm.framework/Realm @rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"\n\n\"${FRAMEWORKS_PATH}/Realm.framework/Resources/strip-frameworks.sh\"";
+			shellScript = "DYNAMIC_FRAMEWORK=\"${SCRIPT_INPUT_FILE_0}\"\nFRAMEWORKS_PATH=\"${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\nrm -rf \"$FRAMEWORKS_PATH\"\nmkdir -p \"$FRAMEWORKS_PATH\"\ncp -R \"${DYNAMIC_FRAMEWORK}\" \"${FRAMEWORKS_PATH}/\"\n\ninstall_name_tool -id @rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm \"${FRAMEWORKS_PATH}/Realm.framework/Realm\"\ninstall_name_tool -change @rpath/Realm.framework/Realm @rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -794,13 +788,8 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = (
-					"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)",
-					../osx,
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-				);
+				FRAMEWORK_SEARCH_PATHS = "build/DerivedData/Realm/Build/Products/$(CONFIGURATION)";
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -824,13 +813,8 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = (
-					"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)",
-					../osx,
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-				);
+				FRAMEWORK_SEARCH_PATHS = "build/DerivedData/Realm/Build/Products/$(CONFIGURATION)";
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -850,9 +834,7 @@
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Versions/A/Frameworks";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					core/include,
@@ -879,9 +861,7 @@
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Versions/A/Frameworks";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					core/include,
@@ -912,13 +892,8 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = (
-					build/ios,
-					../ios/dynamic,
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-				);
+				FRAMEWORK_SEARCH_PATHS = "build/ios-dynamic";
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -942,13 +917,8 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = (
-					build/ios,
-					../ios/dynamic,
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-				);
+				FRAMEWORK_SEARCH_PATHS = "build/ios-dynamic";
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -986,9 +956,7 @@
 					"$(inherited)",
 					"$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Frameworks",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					core/include,
@@ -1019,9 +987,7 @@
 					"$(inherited)",
 					"$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Frameworks",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					core/include,

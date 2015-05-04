@@ -381,7 +381,7 @@
 		E81C393F1AE5CE7B00F03B56 /* Copy Strip Frameworks Script */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = Resources;
+			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
 				E81C39401AE5CE8900F03B56 /* strip-frameworks.sh in Copy Strip Frameworks Script */,
