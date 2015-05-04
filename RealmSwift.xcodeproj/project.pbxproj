@@ -383,23 +383,6 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		0201B2761A54C68C004CFB6F /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		023B19A51A4234380067FB81 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
 		0201B2661A54C68C004CFB6F /* RealmSwift OSX */ = {
 			isa = PBXNativeTarget;
@@ -407,7 +390,6 @@
 			buildPhases = (
 				0201B2691A54C68C004CFB6F /* Sources */,
 				0201B2731A54C68C004CFB6F /* Frameworks */,
-				0201B2761A54C68C004CFB6F /* Headers */,
 				29A03F0F1A7C499C00C0D92E /* Embed Dynamic/Realm.framework */,
 			);
 			buildRules = (
@@ -444,7 +426,6 @@
 			buildPhases = (
 				023B19A31A4234380067FB81 /* Sources */,
 				023B19A41A4234380067FB81 /* Frameworks */,
-				023B19A51A4234380067FB81 /* Headers */,
 				29E3C6C31A718C5A00B62C1D /* Embed Dynamic/Realm.framework */,
 			);
 			buildRules = (
