@@ -752,6 +752,7 @@
     @autoreleasepool {
         [[RLMRealm defaultRealm] transactionWithBlock:^{
             [StringObject createInDefaultRealmWithValue:@[@"string"]];
+            [ArrayPropertyObject createInDefaultRealmWithValue:@[@"array", @[@[@"string"]], @[@[@1]]]];
         }];
     }
 
@@ -763,6 +764,13 @@
                                 XCTAssertEqualObjects([oldObject valueForKey:@"realm"], oldObject.realm);
                                 XCTAssertThrows([oldObject valueForKey:@"noSuchKey"]);
                                 XCTAssertThrows([newObject setValue:@1 forKey:@"noSuchKey"]);
+                            }];
+
+                            [migration enumerateObjects:ArrayPropertyObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+                                XCTAssertEqual(RLMDynamicObject.class, newObject.class);
+                                XCTAssertEqual(RLMDynamicObject.class, oldObject.class);
+                                XCTAssertEqual(RLMDynamicObject.class, [[oldObject[@"array"] firstObject] class]);
+                                XCTAssertEqual(RLMDynamicObject.class, [[newObject[@"array"] firstObject] class]);
                             }];
                         }];
 

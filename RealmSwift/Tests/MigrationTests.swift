@@ -171,6 +171,23 @@ class MigrationTests: TestCase {
                 XCTAssertEqual(count, 1)
             })
         }
+
+        autoreleasepool {
+            Realm().write {
+                Realm().create(SwiftArrayPropertyObject.self, value: ["string", [["array"]], [[2]]])
+            }
+        }
+
+        autoreleasepool {
+            self.migrateAndTestRealm(Realm.defaultPath, schemaVersion: 3, block: { migration, oldSchemaVersion in
+                migration.enumerate("SwiftArrayPropertyObject") { oldObject, newObject in
+                    XCTAssertTrue(oldObject! as AnyObject is MigrationObject)
+                    XCTAssertTrue(newObject! as AnyObject is MigrationObject)
+                    XCTAssertTrue(oldObject!["array"]! is List<MigrationObject>)
+                    XCTAssertTrue(oldObject!["array"]! is List<MigrationObject>)
+                }
+            })
+        }
     }
 
     func testCreate() {
