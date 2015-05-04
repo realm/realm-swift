@@ -254,14 +254,14 @@ class ObjectCreationTests: TestCase {
     func testUpdateWithNestedObjects() {
         let standalone = SwiftPrimaryStringObject(value: ["primary", 11])
         Realm().beginWrite()
-        let object = Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["otherPrimary", standalone, [["primary", 12]]], update: true)
+        let object = Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["otherPrimary", ["primary", 12], [["primary", 12]]], update: true)
         Realm().commitWrite()
 
         let stringObjects = Realm().objects(SwiftPrimaryStringObject)
         XCTAssertEqual(stringObjects.count, 1)
         let persistedObject = object.object!
 
-        XCTAssertEqual(persistedObject.intCol, 11)
+        XCTAssertEqual(persistedObject.intCol, 12)
         XCTAssertNil(standalone.realm) // the standalone object should be copied, rather than added, to the realm
         XCTAssertEqual(object.object!, persistedObject)
         XCTAssertEqual(object.objects.first!, persistedObject)
