@@ -174,6 +174,10 @@ class RealmTests: TestCase {
             realm.cancelWrite()
             XCTAssertFalse(realm.inWriteTransaction)
         }
+
+        realm.beginWrite()
+        realm.invalidate()
+        XCTAssertFalse(realm.inWriteTransaction)
     }
 
     func testAddSingleObject() {

@@ -346,6 +346,23 @@ extern "C" {
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
+- (void)testInWriteTransaction {
+    RLMRealm *realm = [self realmWithTestPath];
+    XCTAssertFalse(realm.inWriteTransaction);
+    [realm beginWriteTransaction];
+    XCTAssertTrue(realm.inWriteTransaction);
+    [realm cancelWriteTransaction];
+    [realm transactionWithBlock:^{
+        XCTAssertTrue(realm.inWriteTransaction);
+        [realm cancelWriteTransaction];
+        XCTAssertFalse(realm.inWriteTransaction);
+    }];
+
+    [realm beginWriteTransaction];
+    [realm invalidate];
+    XCTAssertFalse(realm.inWriteTransaction);
+}
+
 - (void)testAutorefreshAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
 
