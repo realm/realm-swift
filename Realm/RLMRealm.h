@@ -164,6 +164,11 @@
  */
 @property (nonatomic, readonly) RLMSchema *schema;
 
+/**
+ Indicates if this Realm is currently in a write transaction.
+ */
+@property (nonatomic, readonly) BOOL inWriteTransaction;
+
 /**---------------------------------------------------------------------------------------
  *  @name Default Realm Path
  * ---------------------------------------------------------------------------------------

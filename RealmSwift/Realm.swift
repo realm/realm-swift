@@ -208,6 +208,11 @@ public final class Realm {
         rlmRealm.cancelWriteTransaction()
     }
 
+    /// Indicates if this Realm is currently in a write transaction.
+    public var inWriteTransaction: Bool {
+        return rlmRealm.inWriteTransaction
+    }
+
     // MARK: Adding and Creating objects
 
     /**
