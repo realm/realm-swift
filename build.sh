@@ -120,7 +120,7 @@ build_combined() {
     local out_path="build/ios$scope_suffix"
 
     # Build for each platform
-    cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]')
+    cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]') # lowercase the module name to generate command (xcrealm or xcrealmswift)
     $cmd "-scheme '$scheme' -configuration $config -sdk iphoneos"
     $cmd "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
 
