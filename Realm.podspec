@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.version                 = `sh build.sh get-version`
   s.summary                 = 'Realm is a modern data framework & database for iOS & OS X.'
   s.description             = <<-DESC
-                              The Realm database, for Objective-C.
+                              The Realm database, for Objective-C. (If you want to use Realm from Swift, see the “RealmSwift” pod.)
 
                               Realm is a mobile database: a replacement for Core Data & SQLite. You can use it on iOS & OS X. Realm is not an ORM on top SQLite: instead it uses its own persistence engine, built for simplicity (& speed). Learn more and get help at https://realm.io
                               DESC

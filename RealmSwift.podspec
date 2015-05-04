@@ -3,14 +3,9 @@ Pod::Spec.new do |s|
   s.version                 = `sh build.sh get-version`
   s.summary                 = 'Realm is a modern data framework & database for iOS & OSX.'
   s.description             = <<-DESC
-                              Realm is a modern data framework & database for iOS & OSX. You can use it purely in memory — or persist to disk with extraordinary performance.
+                              The Realm database, for Swift. (If you want to use Realm from Objective-C, see the “Realm” pod.)
 
-                              Realm’s data structures look like NSObjects and NSArrays, but provide additional features such as: querying, relationships & graphs, thread safety, and more.
-
-                              Realm is not built on SQLite. Instead, a custom C++ core is used to provide memory-efficient access to your data by using Realm objects, which usually consume less RAM than native objects. The core also provides an optional persistence layer that can automatically save and retrieve your objects from disk.
-
-                              Realm offers extraordinary performance compared to SQLite and other persistence solutions. It has been in development since 2011 and powers an app with over 1 million
-                              daily active users at a major mobile game company.
+                              Realm is a mobile database: a replacement for Core Data & SQLite. You can use it on iOS & OS X. Realm is not an ORM on top SQLite: instead it uses its own persistence engine, built for simplicity (& speed). Learn more and get help at https://realm.io
                               DESC
   s.homepage                = "http://realm.io"
   s.source                  = { :git => 'https://github.com/Realm/realm-cocoa.git', :tag => "v#{s.version}" }
