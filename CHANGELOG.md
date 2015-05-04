@@ -16,6 +16,7 @@ x.x.x Release notes (yyyy-MM-dd)
   REALM_DISABLE_ENCRYPTION=YES in your application's environment variables to
   have requests to open an encrypted Realm treated as a request for an
   unencrypted Realm.
+* Linked objects are properly updated in `createOrUpdateInRealm:withValue:`.
 
 0.92.1 Release notes (2015-05-06)
 =============================================================
