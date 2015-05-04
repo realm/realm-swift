@@ -40,7 +40,7 @@ end
 
 examples = [
   "examples/ios/objc/RealmExamples.xcodeproj",
-  "examples/ios/swift-next/RealmExamples.xcodeproj",
+  "examples/ios/swift/RealmExamples.xcodeproj",
   "examples/osx/objc/RealmExamples.xcodeproj"
 ]
 
