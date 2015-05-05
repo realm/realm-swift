@@ -1064,7 +1064,7 @@ atomic<bool> s_syncLogEverything(false);
     // immediate unrecoverable conflict. It does not work in general as even the
     // initial changeset is allowed to contain elements that are additive rather
     // than idempotent.
-    BOOL schemaCreatingTransaction = baseVersion == 1;
+    BOOL schemaCreatingTransaction = serverVersion == 2;
     if (schemaCreatingTransaction) {
         Replication::CommitLogEntry firstHistoryEntry;
         _backgroundHistory->get_commit_entries(baseVersion, baseVersion+1, &firstHistoryEntry);
@@ -1078,26 +1078,25 @@ atomic<bool> s_syncLogEverything(false);
             emptyEntry.peer_id = originFileIdent;
             emptyEntry.peer_version = serverVersion;
             emptyEntry.log_data = emptyChangeset;
-            newVersion = _backgroundHistory->apply_foreign_changeset(*_backgroundSharedGroup, 0, emptyEntry, applyLog);
-            REALM_ASSERT_3(newVersion, !=, 0);
+            newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion, emptyEntry, applyLog);
             NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Identical initial schema-creating transaction resolved "
                    "(producing client version %llu)", _connection.ident, _sessionIdent, ulonglong(newVersion));
+            return;
         }
         else {
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Schema-creating transactions were not identical." userInfo:nil];
         }
     }
-    else {
-        newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion,
+    
+    newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion,
                                                  entry, applyLog);
-        REALM_ASSERT_3(newVersion, !=, 0);
-        if (s_syncLogEverything) {
-            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Server changeset (%llu -> %llu) "
-                  "integrated (producing client version %llu)", _connection.ident, _sessionIdent,
-                  ulonglong(serverVersion-1), ulonglong(serverVersion), ulonglong(newVersion));
-        }
-        [[[RLMRealm realmWithPath:_clientPath] notifier] notifyOtherRealms];
+    REALM_ASSERT_3(newVersion, !=, 0);
+    if (s_syncLogEverything) {
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Server changeset (%llu -> %llu) "
+              "integrated (producing client version %llu)", _connection.ident, _sessionIdent,
+              ulonglong(serverVersion-1), ulonglong(serverVersion), ulonglong(newVersion));
     }
+    [[[RLMRealm realmWithPath:_clientPath] notifier] notifyOtherRealms];
 }
 
 
