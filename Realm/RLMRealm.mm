@@ -735,8 +735,6 @@ atomic<bool> s_syncLogEverything(false);
         _sharedGroup = make_unique<SharedGroup>(*_history, durability);
         _backgroundHistory = realm::makeWriteLogCollector(clientPath.UTF8String,
                                                           serverSynchronizationMode);
-        uint64_t peer_id = self.fileIdent; // FIXME: Set peer ID when it is actually assigned. Should not be an init-time argument.
-        _backgroundHistory->set_sync(realm::make_sync_demo(peer_id, *_backgroundHistory));
         _backgroundSharedGroup =
             make_unique<SharedGroup>(*_backgroundHistory, durability);
 
@@ -888,6 +886,7 @@ atomic<bool> s_syncLogEverything(false);
 
 - (void)handleIdentMessageWithFileIdent:(uint_fast64_t)fileIdent {
     _history->set_client_file_ident(fileIdent); // Save in persistent storage
+    _backgroundHistory->set_sync(realm::make_sync_demo(fileIdent, *_backgroundHistory));
     _fileIdent = fileIdent;
     if (_connection.isOpen)
         [self connectionIsOpen];
