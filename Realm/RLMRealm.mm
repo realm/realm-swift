@@ -811,6 +811,11 @@ atomic<bool> s_syncLogEverything(false);
                                            serverPath:_serverPath];
         return;
     }
+    
+    // FIXME: Is it okay to access _backgroundHistory here?
+    auto sync = realm::make_sync_demo(*_backgroundHistory);
+    sync->set_peer_id(_fileIdent);
+    _backgroundHistory->set_sync(std::move(sync));
 
     _latestVersionUploaded = _syncProgressClientVersion;
     if (_latestVersionUploaded > _latestVersionAvailable) // Transiently possible (FIXME: Or is it?)
@@ -886,7 +891,6 @@ atomic<bool> s_syncLogEverything(false);
 
 - (void)handleIdentMessageWithFileIdent:(uint_fast64_t)fileIdent {
     _history->set_client_file_ident(fileIdent); // Save in persistent storage
-    _backgroundHistory->set_sync(realm::make_sync_demo(fileIdent, *_backgroundHistory));
     _fileIdent = fileIdent;
     if (_connection.isOpen)
         [self connectionIsOpen];
