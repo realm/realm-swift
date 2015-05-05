@@ -1646,4 +1646,38 @@
     XCTAssertEqualObjects(@"Joe", [[querySort lastObject] name]);
 }
 
+- (void)testConstantPredicates
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [PersonObject createInRealm:realm withValue:@[@"Fiel", @27]];
+    [PersonObject createInRealm:realm withValue:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withValue:@[@"Ari", @33]];
+    [realm commitWriteTransaction];
+
+    RLMResults *all = [PersonObject objectsWithPredicate:[NSPredicate predicateWithValue:YES]];
+    XCTAssertEqual(all.count, 3U, @"Expecting 3 results");
+
+    RLMResults *none = [PersonObject objectsWithPredicate:[NSPredicate predicateWithValue:NO]];
+    XCTAssertEqual(none.count, 0U, @"Expecting 0 results");
+}
+
+- (void)testEmptyCompoundPredicates
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [PersonObject createInRealm:realm withValue:@[@"Fiel", @27]];
+    [PersonObject createInRealm:realm withValue:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withValue:@[@"Ari", @33]];
+    [realm commitWriteTransaction];
+
+    RLMResults *all = [PersonObject objectsWithPredicate:[NSCompoundPredicate andPredicateWithSubpredicates:@[]]];
+    XCTAssertEqual(all.count, 3U, @"Expecting 3 results");
+
+    RLMResults *none = [PersonObject objectsWithPredicate:[NSCompoundPredicate orPredicateWithSubpredicates:@[]]];
+    XCTAssertEqual(none.count, 0U, @"Expecting 0 results");
+}
+
 @end

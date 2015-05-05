@@ -69,6 +69,27 @@ NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName) 
 }
 
 namespace {
+
+// FIXME: TrueExpression and FalseExpression should be supported by core in some way
+
+struct TrueExpression : realm::Expression {
+    size_t find_first(size_t start, size_t end) const override
+    {
+        if (start != end)
+            return start;
+
+        return realm::not_found;
+    }
+    void set_table() override {}
+    const Table* get_table() override { return nullptr; }
+};
+
+struct FalseExpression : realm::Expression {
+    size_t find_first(size_t, size_t) const override { return realm::not_found; }
+    void set_table() override {}
+    const Table* get_table() override { return nullptr; }
+};
+
 // add a clause for numeric constraints based on operator type
 template <typename T>
 void add_numeric_constraint_to_query(realm::Query& query,
@@ -284,12 +305,6 @@ void process_or_group(Query &query, id array, Func&& func) {
         // Queries can't be empty, so if there's zero things in the OR group
         // validation will fail. Work around this by adding an expression which
         // will never find any rows in a table.
-        // FIXME: this should be supported by core in some way
-        struct FalseExpression : realm::Expression {
-            size_t find_first(size_t, size_t) const override { return realm::not_found; }
-            void set_table() override {}
-            const Table* get_table() override { return nullptr; }
-        };
         query.expression(new FalseExpression);
     }
 
@@ -547,12 +562,17 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
 
         switch ([comp compoundPredicateType]) {
             case NSAndPredicateType:
-                // Add all of the subpredicates.
-                query.group();
-                for (NSPredicate *subp in comp.subpredicates) {
-                    update_query_with_predicate(subp, schema, objectSchema, query);
+                if (comp.subpredicates.count) {
+                    // Add all of the subpredicates.
+                    query.group();
+                    for (NSPredicate *subp in comp.subpredicates) {
+                        update_query_with_predicate(subp, schema, objectSchema, query);
+                    }
+                    query.end_group();
+                } else {
+                    // NSCompoundPredicate's documentation states that an AND predicate with no subpredicates evaluates to TRUE.
+                    query.expression(new TrueExpression);
                 }
-                query.end_group();
                 break;
 
             case NSOrPredicateType: {
@@ -622,10 +642,15 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                                          @"Predicate expressions must compare a keypath and another keypath or a constant value");
         }
     }
+    else if ([predicate isEqual:[NSPredicate predicateWithValue:YES]]) {
+        query.expression(new TrueExpression);
+    } else if ([predicate isEqual:[NSPredicate predicateWithValue:NO]]) {
+        query.expression(new FalseExpression);
+    }
     else {
         // invalid predicate type
         @throw RLMPredicateException(@"Invalid predicate",
-                                     @"Only support compound and comparison predicates");
+                                     @"Only support compound, comparison and constant predicates");
     }
 }
 
