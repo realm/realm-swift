@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* `-[RLMRealm inWriteTransaction]` is now public.
+
+### Bugfixes
+
+* None.
+
 0.92.0 Release notes (2015-05-05)
 =============================================================
 
