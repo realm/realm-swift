@@ -795,10 +795,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (NSUInteger)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)outError {
-    key = validatedKey(key) ?: keyForPath(realmPath);
     RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(realmPath);
     if (!realm) {
         NSError *error;
+        key = validatedKey(key) ?: keyForPath(realmPath);
         realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:YES inMemory:NO dynamic:YES error:&error];
         if (error) {
             RLMSetErrorOrThrow(error, outError);
@@ -807,6 +807,39 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 
     return RLMRealmSchemaVersion(realm);
+}
+
++ (BOOL)migrationRequiredAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)outError {
+    RLMRealm *realm = RLMGetAnyCachedRealmForPath(realmPath);
+    if (realm) {
+        // we've already successfully opened a realm, so a migration isn't necessary.
+        return NO;
+    } else if (![[NSFileManager defaultManager] fileExistsAtPath:realmPath]) {
+        // paths with no realm files never require a migration.
+        return NO;
+    } else {
+        NSError *error;
+        key = validatedKey(key) ?: keyForPath(realmPath);
+        realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:YES inMemory:NO dynamic:YES error:&error];
+        if (error) {
+            RLMSetErrorOrThrow(error, outError);
+            // the realm could not be created, which means it cannot be migrated.
+            return NO;
+        }
+    }
+    for (RLMObjectSchema *objectSchema in [[RLMSchema sharedSchema] objectSchema]) {
+        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
+        if (tableSchema == nil) {
+            // creating missing tables doesn't require a migration.
+            continue;
+        }
+        NSString *errorMessage = RLMVerifyAndAlignColumns(tableSchema, objectSchema, true);
+        if (errorMessage != nil) {
+            return YES;
+        }
+    }
+
+    return NO;
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath {

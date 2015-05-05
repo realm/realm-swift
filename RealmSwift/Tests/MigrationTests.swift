@@ -22,7 +22,7 @@ import Realm
 import Realm.Private
 import Foundation
 
-private func realmWithCustomSchema(path: String, schema :RLMSchema) -> RLMRealm {
+private func realmWithCustomSchema(path: String, schema: RLMSchema) -> RLMRealm {
     return RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: true, schema: schema, error: nil)!
 }
 
@@ -39,7 +39,7 @@ private func realmWithSingleClassProperties(path: String, className: String, pro
 
 class MigrationTests: TestCase {
 
-    // MARK Utility methods
+    // MARK: Utility methods
 
     // create realm at path and test version is 0
     private func createAndTestRealmAtPath(realmPath: String) {
@@ -51,7 +51,9 @@ class MigrationTests: TestCase {
     }
 
     // migrate realm at path and ensure migration
-    private func migrateAndTestRealm(realmPath: String, shouldRun: Bool = true, schemaVersion: UInt = 1, autoMigration: Bool = false, block: MigrationBlock? = nil) {
+    private func migrateAndTestRealm(realmPath: String, isNecessary: Bool = false, shouldRun: Bool = true, schemaVersion: UInt = 1, autoMigration: Bool = false, block: MigrationBlock? = nil) {
+        var error: NSError? = nil
+        XCTAssertEqual(migrationRequiredAtPath(realmPath, error: &error), isNecessary)
         var didRun = false
         setSchemaVersion(schemaVersion, realmPath, { migration, oldSchemaVersion in
             if let block = block {
@@ -69,9 +71,22 @@ class MigrationTests: TestCase {
         }
 
         XCTAssertEqual(didRun, shouldRun)
+        XCTAssertFalse(migrationRequiredAtPath(realmPath))
     }
 
-    // MARK Test cases
+    // MARK: Test cases
+
+    func testMigrationRequired() {
+        autoreleasepool {
+            _ = Realm()
+        }
+        XCTAssertFalse(migrationRequiredAtPath(Realm.defaultPath), "should return false immediately after creating a realm.")
+        autoreleasepool {
+            let prop = RLMProperty(name: "stringCol", type: .Int, objectClassName: nil, indexed: false)
+            realmWithSingleClassProperties(self.testRealmPath(), "SwiftStringObject", [prop])
+        }
+        XCTAssert(migrationRequiredAtPath(testRealmPath()), "should return true immediately after creating a realm with a custom schema.")
+    }
 
     func testSetDefaultRealmSchemaVersion() {
         createAndTestRealmAtPath(Realm.defaultPath)
@@ -117,13 +132,12 @@ class MigrationTests: TestCase {
     }
 
     func testMigrationProperties() {
-        let prop = RLMProperty(name: "stringCol", type: RLMPropertyType.Int, objectClassName: nil, indexed: false)
-        autoreleasepool { () -> () in
+        autoreleasepool {
+            let prop = RLMProperty(name: "stringCol", type: .Int, objectClassName: nil, indexed: false)
             realmWithSingleClassProperties(Realm.defaultPath, "SwiftStringObject", [prop])
-            return
         }
 
-        migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
+        migrateAndTestRealm(Realm.defaultPath, isNecessary: true, block: { migration, oldSchemaVersion in
             XCTAssertEqual(migration.oldSchema.objectSchema.count, 1)
             XCTAssertGreaterThan(migration.newSchema.objectSchema.count, 1)
             XCTAssertEqual(migration.oldSchema.objectSchema[0].properties.count, 1)
@@ -330,4 +344,3 @@ class MigrationTests: TestCase {
         XCTAssertEqual(Realm().objects(SwiftBoolObject).count, 4)
     }
 }
-

@@ -89,6 +89,27 @@
     return realm;
 }
 
+- (void)testMigrationRequiredAtPath {
+    NSError *error;
+    XCTAssertFalse([RLMRealm migrationRequiredAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:&error],
+                   @"should return NO if there is no realm file at the given path");
+    XCTAssertNil(error, @"error should be nil after checking if a migration is required while there is no realm file at the given path");
+
+    @autoreleasepool {
+        [RLMRealm defaultRealm];
+    }
+    XCTAssertFalse([RLMRealm migrationRequiredAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil],
+                   @"should return NO immediately after creating a realm at the specified path.");
+
+    [RLMRealm setDefaultRealmSchemaVersion:1 withMigrationBlock:nil];
+    XCTAssertFalse([RLMRealm migrationRequiredAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil],
+                   @"should return NO immediately after changing the schema version for a realm at the specified path.");
+
+    [RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath];
+    XCTAssertFalse([RLMRealm migrationRequiredAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil],
+                   @"should return NO immediately after migrating a realm at the specified path.");
+}
+
 - (void)testSchemaVersion {
     [RLMRealm setDefaultRealmSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
                                                                   __unused NSUInteger oldSchemaVersion) {
@@ -160,7 +181,8 @@
     @autoreleasepool {
         // open realm with new schema before migration to test migration is necessary
         objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
-        XCTAssertThrows([self realmWithTestPath], @"Migration should be required");
+        XCTAssertTrue([RLMRealm migrationRequiredAtPath:RLMTestRealmPath() encryptionKey:nil error:nil],
+                      @"Migration should be required");
     }
 
     // apply migration
@@ -176,7 +198,11 @@
             XCTAssertNoThrow(newObject[@"stringCol"] = stringObj, @"Should be able to set stringCol");
         }];
     }];
+    XCTAssertTrue([RLMRealm migrationRequiredAtPath:RLMTestRealmPath() encryptionKey:nil error:nil],
+                  @"Migration should be required after setting schema version but before performing the migration");
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    XCTAssertFalse([RLMRealm migrationRequiredAtPath:RLMTestRealmPath() encryptionKey:nil error:nil],
+                  @"Migration should not be required after performing a migration");
 
     // verify migration
     @autoreleasepool {

@@ -24,6 +24,11 @@ extern "C" {
 
 @class RLMRealm, RLMSchema, RLMObjectSchema, RLMObjectBase, RLMResults;
 
+// compares tableSchema to objectSchema.
+// aligns columns on the objectSchema if alignColumns is true.
+// returns an error message if the comparison failed (i.e. a migration is required), or nil otherwise.
+NSString *RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema, bool alignColumns);
+
 //
 // Table modifications
 //

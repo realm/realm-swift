@@ -482,9 +482,8 @@ public final class Realm {
 
     :param: path          Path to save the Realm to.
     :param: encryptionKey Optional 64-byte encryption key to encrypt the new file with.
+    
     :returns:             If an error occurs, returns an `NSError` object, otherwise `nil`.
-
-    :returns: Whether the realm was copied successfully.
     */
     public func writeCopyToPath(path: String, encryptionKey: NSData? = nil) -> NSError? {
         var error: NSError?
@@ -512,7 +511,7 @@ public final class Realm {
 
     :param: encryptionKey 64-byte encryption key to use, or `nil` to unset.
     :param: path          Realm path to set the encryption key for.
-    +*/
+    */
     public class func setEncryptionKey(encryptionKey: NSData?, forPath: String = Realm.defaultPath) {
         RLMRealm.setEncryptionKey(encryptionKey, forRealmsAtPath: forPath)
     }
