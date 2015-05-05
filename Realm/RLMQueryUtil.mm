@@ -562,12 +562,17 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
 
         switch ([comp compoundPredicateType]) {
             case NSAndPredicateType:
-                // Add all of the subpredicates.
-                query.group();
-                for (NSPredicate *subp in comp.subpredicates) {
-                    update_query_with_predicate(subp, schema, objectSchema, query);
+                if (comp.subpredicates.count) {
+                    // Add all of the subpredicates.
+                    query.group();
+                    for (NSPredicate *subp in comp.subpredicates) {
+                        update_query_with_predicate(subp, schema, objectSchema, query);
+                    }
+                    query.end_group();
+                } else {
+                    // NSCompoundPredicate's documentation states that an AND predicate with no subpredicates evaluates to TRUE.
+                    query.expression(new TrueExpression);
                 }
-                query.end_group();
                 break;
 
             case NSOrPredicateType: {
