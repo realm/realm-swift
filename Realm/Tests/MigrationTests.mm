@@ -145,22 +145,34 @@
 }
 
 - (void)testRemovingSubclass {
-    RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"DeletedClass" objectClass:RLMObject.class properties:@[]];
-    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    @autoreleasepool {
+        RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"DeletedClass" objectClass:RLMObject.class properties:@[]];
+        RLMRealm *realm = [self realmWithSingleObject:objectSchema];
 
-    [realm transactionWithBlock:^{
-        [realm createObject:@"DeletedClass" withValue:@[]];
-    }];
+        [realm transactionWithBlock:^{
+            [realm createObject:@"DeletedClass" withValue:@[]];
+        }];
+    }
 
-    // apply migration
-    [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(__unused RLMMigration *migration, NSUInteger oldSchemaVersion) {
-        XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
-    }];
-    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    @autoreleasepool {
+        // apply migration
+        [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+            XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
 
-    // verify migration
-    realm = [self realmWithTestPath];
-    XCTAssertFalse(realm.group->has_table(RLMStringDataWithNSString(RLMTableNameForClass(@"DeletedClass"))), @"The deleted class should not have a table.");
+            XCTAssertTrue([migration deleteTableForClassName:@"DeletedClass"]);
+            XCTAssertFalse([migration deleteTableForClassName:@"NoSuchClass"]);
+
+            XCTAssertThrows([migration deleteTableForClassName:nil]);
+            XCTAssertThrows([migration deleteTableForClassName:StringObject.className]);
+        }];
+        [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    }
+
+    @autoreleasepool {
+        // verify migration
+        RLMRealm *realm = [self realmWithTestPath];
+        XCTAssertFalse(realm.group->has_table(RLMStringDataWithNSString(RLMTableNameForClass(@"DeletedClass"))), @"The deleted class should not have a table.");
+    }
 
     [RLMRealm setSchemaVersion:0 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
