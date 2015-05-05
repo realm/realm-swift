@@ -898,6 +898,53 @@ atomic<bool> s_syncLogEverything(false);
                                 originTimestamp:(uint_fast64_t)originTimestamp
                                 originFileIdent:(uint_fast64_t)originFileIdent
                                            data:(NSData *)data {
+    // We cannot save the synchronization progress marker (`serverVersion`,
+    // `clientVersion`) to persistent storage until the changeset is actually
+    // integrated locally, but that means it will be delayed by two context
+    // switches, i.e., first by a switch to the background thread, and then by a
+    // switch back to the main thread, and in each of these switches there is a
+    // risk of termination of the flow of this information due to a severed weak
+    // reference, which presumably would be due to the termination of the
+    // synchronization session, but not necessarily in connection with the
+    // termination of the application.
+    //
+    // Additionally, we want to be able to make a proper monotony check on
+    // `serverVersion` and `clientVersion` before having the background thread
+    // attempting to apply the changeset, and to do that, we must both check and
+    // update `_syncProgressServerVersion` and `_syncProgressClientVersion`
+    // right here in the main thread.
+    //
+    // Note: The server version must increase, since it is the number of a new
+    // server version. The client version, however, can only be increased by an
+    // 'accept' message, so it must remain unchanged here.
+    bool good_versions = serverVersion > _syncProgressServerVersion &&
+        clientVersion == _syncProgressClientVersion;
+    if (!good_versions) {
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: ERROR: Bad server or client version "
+              "in 'changeset' message", _connection.ident, _sessionIdent);
+        [_connection close];
+        return;
+
+    }
+    _syncProgressServerVersion = serverVersion;
+    _syncProgressClientVersion = clientVersion;
+
+    // Skip changesets that were already integrated during an earlier session,
+    // but still attempt to save a new synchronization progress marker to
+    // persistent storage.
+    if (clientVersion <= _serverVersionThreshold) {
+        if (s_syncLogEverything) {
+            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Ignoring previously integrated "
+                  "changeset", _connection.ident, _sessionIdent);
+        }
+        [self addBackgroundTaskWithServerVersion:serverVersion
+                                   clientVersion:clientVersion
+                                 originTimestamp:0
+                                 originFileIdent:0
+                                            data:nil];
+        return;
+    }
+
     // FIXME: Consider whether we should attempt to apply small changsesets
     // immediately on the main thread (right here) if auto-refresh is enabled,
     // `_backgroundOperationQueue` is empty, and a try-lock on the
