@@ -1005,8 +1005,48 @@ atomic<bool> s_syncLogEverything(false);
     entry.peer_version = serverVersion;
     entry.timestamp = originTimestamp;
     entry.log_data = changeset;
-    newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion,
+
+    // WARNING: Strictly speaking, the following is not the correct resolution
+    // of the conflict between two identical initial changesets, but it is done
+    // as a temporary workaround to allow the current version of this binding to
+    // carry out an initial schema creating transaction without getting into an
+    // immediate unrecoverable conflict. It does not work in general as even the
+    // initial changeset is allowed to contain elements that are additive rather
+    // than idempotent.
+    BOOL schemaCreatingTransaction = baseVersion == 1;
+    if (schemaCreatingTransaction) {
+        Replication::CommitLogEntry firstHistoryEntry;
+        _backgroundHistory->get_commit_entries(baseVersion, baseVersion+1, &firstHistoryEntry);
+        BOOL isForeign = (firstHistoryEntry.peer_id != 0);
+        BOOL identicalSchemaCreatingTransactions = !isForeign &&
+            firstHistoryEntry.log_data == changeset;
+        if (identicalSchemaCreatingTransactions) {
+            BinaryData emptyChangeset;
+            Replication::CommitLogEntry emptyEntry;
+            emptyEntry.timestamp = originTimestamp;
+            emptyEntry.peer_id = originFileIdent;
+            emptyEntry.peer_version = serverVersion;
+            emptyEntry.log_data = emptyChangeset;
+            newVersion = _backgroundHistory->apply_foreign_changeset(*_backgroundSharedGroup, 0, emptyEntry, applyLog);
+            REALM_ASSERT_3(newVersion, !=, 0);
+            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Identical initial schema-creating transaction resolved "
+                   "(producing client version %llu)", _connection.ident, _sessionIdent, ulonglong(newVersion));
+        }
+        else {
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Schema-creating transactions were not identical." userInfo:nil];
+        }
+    }
+    else {
+        newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion,
                                                  entry, applyLog);
+        REALM_ASSERT_3(newVersion, !=, 0);
+        if (s_syncLogEverything) {
+            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Server changeset (%llu -> %llu) "
+                  "integrated (producing client version %llu)", _connection.ident, _sessionIdent,
+                  ulonglong(serverVersion-1), ulonglong(serverVersion), ulonglong(newVersion));
+        }
+        [[[RLMRealm realmWithPath:_clientPath] notifier] notifyOtherRealms];
+    }
 }
 
 
@@ -1563,17 +1603,17 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 /**
  Replaces all string columns in this Realm with a string enumeration column and compacts the
  database file.
- 
+
  Cannot be called from a write transaction.
 
  Compaction will not occur if other `RLMRealm` instances exist.
- 
+
  While compaction is in progress, attempts by other threads or processes to open the database will
  wait.
- 
+
  Be warned that resource requirements for compaction is proportional to the amount of live data in
  the database.
- 
+
  Compaction works by writing the database contents to a temporary database file and then replacing
  the database with the temporary one. The name of the temporary file is formed by appending
  `.tmp_compaction_space` to the name of the database.
