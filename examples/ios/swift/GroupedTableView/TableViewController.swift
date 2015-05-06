@@ -86,9 +86,9 @@ class TableViewController: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! Cell
 
-        let object = objectForIndexPath(indexPath)!
-        cell.textLabel?.text = object.title
-        cell.detailTextLabel?.text = object.date.description
+        let object = objectForIndexPath(indexPath)
+        cell.textLabel?.text = object?.title
+        cell.detailTextLabel?.text = object?.date.description
 
         return cell
     }
