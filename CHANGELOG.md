@@ -11,7 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Force code re-signing after stripping architectures in `strip-frameworks.sh`.
 
 0.92.0 Release notes (2015-05-05)
 =============================================================

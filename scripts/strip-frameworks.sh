@@ -20,12 +20,22 @@
 
 # This script strips all non-valid architectures from dynamic libraries in
 # the application's `Frameworks` directory.
-# 
+#
 # The following environment variables are required:
-# 
+#
 # BUILT_PRODUCTS_DIR
 # FRAMEWORKS_FOLDER_PATH
 # VALID_ARCHS
+# EXPANDED_CODE_SIGN_IDENTITY
+
+
+# Signs a framework with the provided identity
+code_sign() {
+  # Use the current code_sign_identitiy
+  echo "Code Signing $1 with Identity ${EXPANDED_CODE_SIGN_IDENTITY_NAME}"
+  echo "/usr/bin/codesign --force --sign ${EXPANDED_CODE_SIGN_IDENTITY} --preserve-metadata=identifier,entitlements $1"
+  /usr/bin/codesign --force --sign ${EXPANDED_CODE_SIGN_IDENTITY} --preserve-metadata=identifier,entitlements "$1"
+}
 
 echo "Stripping frameworks"
 cd "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}"
@@ -47,5 +57,8 @@ for file in $(find . -type f -perm +111); do
   done
   if [[ "$stripped" != "" ]]; then
     echo "Stripped $file of architectures:$stripped"
+    if [ "${CODE_SIGNING_REQUIRED}" == "YES" ]; then
+      code_sign "${file}"
+    fi
   fi
 done
