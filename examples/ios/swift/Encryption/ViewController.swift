@@ -90,10 +90,7 @@ class ViewController: UIViewController {
     func getKey() -> NSData {
         // Identifier for our keychain entry - should be unique for your application
         let keychainIdentifier = "io.Realm.EncryptionExampleKey"
-        let optionalKeychainIdentifierData = keychainIdentifier.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)
-
-        assert(optionalKeychainIdentifierData != nil)
-        let keychainIdentifierData = optionalKeychainIdentifierData!
+        let keychainIdentifierData = keychainIdentifier.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
 
         // First check in the keychain for an existing key
         var query: [NSString: AnyObject] = [

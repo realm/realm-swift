@@ -78,10 +78,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 migration.enumerate(Person.className()) { oldObject, newObject in
                     if oldSchemaVersion < 1 {
                         // combine name fields into a single field
-                        let firstName = oldObject?["firstName"] as? String
-                        assert(firstName != nil)
-                        let lastName = oldObject?["lastName"] as? String
-                        assert(lastName != nil)
+                        let firstName = oldObject!["firstName"] as! String
+                        let lastName = oldObject!["lastName"] as! String
                         newObject?["fullName"] = "\(firstName) \(lastName)"
                     }
                 }
