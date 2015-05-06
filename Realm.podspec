@@ -1,6 +1,5 @@
 Pod::Spec.new do |s|
   s.name                    = 'Realm'
-  s.module_map              = 'Realm/module.modulemap'
   s.version                 = `sh build.sh get-version`
   s.summary                 = 'Realm is a modern data framework & database for iOS & OS X.'
   s.description             = <<-DESC
@@ -32,6 +31,7 @@ Pod::Spec.new do |s|
                               'include/Realm/RLMSchema.h',
                               'include/Realm/Realm.h'
 
+  s.module_map              = 'Realm/module.modulemap'
   s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"'"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
   s.source_files            = 'Realm/*.{m,mm}'
