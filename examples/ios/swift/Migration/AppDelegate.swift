@@ -21,7 +21,7 @@ import RealmSwift
 
 // Old data models
 /* V0
-class Person: RLMObject {
+class Person: Object {
     dynamic var firstName = ""
     dynamic var lastName = ""
     dynamic var age = 0
@@ -29,7 +29,7 @@ class Person: RLMObject {
 */
 
 /* V1
-class Person: RLMObject {
+class Person: Object {
     dynamic var fullName = ""        // combine firstName and lastName into single field
     dynamic var age = 0
 }
