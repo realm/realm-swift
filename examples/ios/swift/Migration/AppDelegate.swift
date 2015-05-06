@@ -47,6 +47,10 @@ class Person: Object {
     let pets = List<Pet>() // Add pets field
 }
 
+func bundlePath(path: String) -> String? {
+    return NSBundle.mainBundle().resourcePath?.stringByAppendingPathComponent(path)
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -61,9 +65,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let defaultPath = Realm.defaultPath
         let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
 
-        let v0Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v0.realm")
-        NSFileManager.defaultManager().removeItemAtPath(defaultPath, error: nil)
-        NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath, error: nil)
+        let v0Path = bundlePath("default-v0.realm")
+        if let v0Path = v0Path {
+            NSFileManager.defaultManager().removeItemAtPath(defaultPath, error: nil)
+            NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath, error: nil)
+        }
 
         // define a migration block
         // you can define this inline, but we will reuse this to migrate realm files from multiple versions
@@ -73,19 +79,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 migration.enumerate(Person.className()) { oldObject, newObject in
                     if oldSchemaVersion < 1 {
                         // combine name fields into a single field
-                        let firstName = oldObject!["firstName"] as! String
-                        let lastName = oldObject!["lastName"] as! String
-                        newObject!["fullName"] = "\(firstName) \(lastName)"
+                        let firstName = oldObject?["firstName"] as? String
+                        assert(firstName != nil)
+                        let lastName = oldObject?["lastName"] as? String
+                        assert(lastName != nil)
+                        newObject?["fullName"] = "\(firstName) \(lastName)"
                     }
                 }
             }
             if oldSchemaVersion < 2 {
                 migration.enumerate(Person.className()) { oldObject, newObject in
                     // give JP a dog
-                    if newObject!["fullName"] as! String == "JP McDonald" {
+                    if newObject?["fullName"] as? String == "JP McDonald" {
                         let jpsDog = migration.create(Pet.className(), value: ["Jimbo", "dog"])
-                        let dogs = newObject!["pets"] as! List<MigrationObject>
-                        dogs.append(jpsDog)
+                        let dogs = newObject?["pets"] as? List<MigrationObject>
+                        dogs?.append(jpsDog)
                     }
                 }
             }
@@ -101,26 +109,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //
         // Migrate a realms at a custom paths
         //
-        let v1Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v1.realm")
-        let v2Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v2.realm")
-        let realmv1Path = defaultParentPath.stringByAppendingPathComponent("default-v1.realm")
-        let realmv2Path = defaultParentPath.stringByAppendingPathComponent("default-v2.realm")
-        setSchemaVersion(3, realmv1Path, migrationBlock)
-        setSchemaVersion(3, realmv2Path, migrationBlock)
+        let v1Path = bundlePath("default-v1.realm")
+        let v2Path = bundlePath("default-v2.realm")
+        if let v1Path = v1Path, v2Path = v2Path {
+            let realmv1Path = defaultParentPath.stringByAppendingPathComponent("default-v1.realm")
+            let realmv2Path = defaultParentPath.stringByAppendingPathComponent("default-v2.realm")
+            setSchemaVersion(3, realmv1Path, migrationBlock)
+            setSchemaVersion(3, realmv2Path, migrationBlock)
 
-        NSFileManager.defaultManager().removeItemAtPath(realmv1Path, error: nil)
-        NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path, error: nil)
-        NSFileManager.defaultManager().removeItemAtPath(realmv2Path, error: nil)
-        NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path, error: nil)
+            NSFileManager.defaultManager().removeItemAtPath(realmv1Path, error: nil)
+            NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path, error: nil)
+            NSFileManager.defaultManager().removeItemAtPath(realmv2Path, error: nil)
+            NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path, error: nil)
 
-        // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
-        migrateRealm(realmv1Path)
+            // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
+            migrateRealm(realmv1Path)
 
-        // print out all migrated objects in the migrated realms
-        let realmv1 = Realm(path: realmv1Path)
-        println("Migrated objects in the Realm migrated from v1: \(realmv1.objects(Person))")
-        let realmv2 = Realm(path: realmv2Path)
-        println("Migrated objects in the Realm migrated from v2: \(realmv2.objects(Person))")
+            // print out all migrated objects in the migrated realms
+            let realmv1 = Realm(path: realmv1Path)
+            println("Migrated objects in the Realm migrated from v1: \(realmv1.objects(Person))")
+            let realmv2 = Realm(path: realmv2Path)
+            println("Migrated objects in the Realm migrated from v2: \(realmv2.objects(Person))")
+        }
 
         return true
     }
