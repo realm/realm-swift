@@ -813,7 +813,7 @@ atomic<bool> s_syncLogEverything(false);
     }
     
     // FIXME: Is it okay to access _backgroundHistory here?
-    auto sync = realm::make_sync_demo(*_backgroundHistory);
+    auto sync = realm::make_sync_demo(false, *_backgroundHistory);
     sync->set_peer_id(_fileIdent);
     _backgroundHistory->set_sync(std::move(sync));
 
@@ -1056,47 +1056,30 @@ atomic<bool> s_syncLogEverything(false);
     entry.peer_version = serverVersion;
     entry.timestamp = originTimestamp;
     entry.log_data = changeset;
-
-    // WARNING: Strictly speaking, the following is not the correct resolution
-    // of the conflict between two identical initial changesets, but it is done
-    // as a temporary workaround to allow the current version of this binding to
-    // carry out an initial schema creating transaction without getting into an
-    // immediate unrecoverable conflict. It does not work in general as even the
-    // initial changeset is allowed to contain elements that are additive rather
-    // than idempotent.
-    BOOL schemaCreatingTransaction = serverVersion == 2;
-    if (schemaCreatingTransaction) {
-        Replication::CommitLogEntry firstHistoryEntry;
-        _backgroundHistory->get_commit_entries(baseVersion, baseVersion+1, &firstHistoryEntry);
-        BOOL isForeign = (firstHistoryEntry.peer_id != 0);
-        BOOL identicalSchemaCreatingTransactions = !isForeign &&
-            firstHistoryEntry.log_data == changeset;
-        if (identicalSchemaCreatingTransactions) {
-            BinaryData emptyChangeset;
-            Replication::CommitLogEntry emptyEntry;
-            emptyEntry.timestamp = originTimestamp;
-            emptyEntry.peer_id = originFileIdent;
-            emptyEntry.peer_version = serverVersion;
-            emptyEntry.log_data = emptyChangeset;
-            newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion, emptyEntry, applyLog);
-            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Identical initial schema-creating transaction resolved "
-                   "(producing client version %llu)", _connection.ident, _sessionIdent, ulonglong(newVersion));
-            return;
-        }
-        else {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Schema-creating transactions were not identical." userInfo:nil];
-        }
+    
+    try {
+        newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion, entry, applyLog);
+    }
+    catch (const _impl::TransactLogParser::BadTransactLog&) {
+        throw;
     }
     
-    newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion,
-                                                 entry, applyLog);
-    REALM_ASSERT_3(newVersion, !=, 0);
-    if (s_syncLogEverything) {
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Server changeset (%llu -> %llu) "
-              "integrated (producing client version %llu)", _connection.ident, _sessionIdent,
-              ulonglong(serverVersion-1), ulonglong(serverVersion), ulonglong(newVersion));
-    }
     [[[RLMRealm realmWithPath:_clientPath] notifier] notifyOtherRealms];
+    
+    if (newVersion == 0) {
+        // Identical schema-creating transaction detected and handled.
+        newVersion = 2;
+        
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Identical initial schema-creating transaction resolved "
+              "(producing client version %llu)", _connection.ident, _sessionIdent, ulonglong(newVersion));
+    }
+    else {
+        if (s_syncLogEverything) {
+            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Server changeset (%llu -> %llu) "
+                  "integrated (producing client version %llu)", _connection.ident, _sessionIdent,
+                  ulonglong(serverVersion-1), ulonglong(serverVersion), ulonglong(newVersion));
+        }
+    }
 }
 
 
