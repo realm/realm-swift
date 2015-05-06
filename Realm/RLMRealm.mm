@@ -1056,20 +1056,23 @@ atomic<bool> s_syncLogEverything(false);
     entry.peer_version = serverVersion;
     entry.timestamp = originTimestamp;
     entry.log_data = changeset;
-    
+
     try {
         newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion, entry, applyLog);
     }
     catch (const _impl::TransactLogParser::BadTransactLog&) {
-        throw;
+        NSString *message = [NSString stringWithFormat:@"Application of server changeset "
+                                      "%llu -> %llu failed", ulonglong(serverVersion-1),
+                                      ulonglong(serverVersion)];
+        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
     }
-    
+
     [[[RLMRealm realmWithPath:_clientPath] notifier] notifyOtherRealms];
-    
+
     if (newVersion == 0) {
         // Identical schema-creating transaction detected and handled.
         newVersion = 2;
-        
+
         NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Identical initial schema-creating transaction resolved "
               "(producing client version %llu)", _connection.ident, _sessionIdent, ulonglong(newVersion));
     }
