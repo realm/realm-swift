@@ -21,6 +21,7 @@
 #import "RLMObjectSchema_Private.h"
 #import "RLMRealm_Private.h"
 #import "RLMSchema_Private.h"
+#import "RLMUtil.hpp"
 
 @interface EncryptionTests : RLMTestCase
 @end
@@ -32,6 +33,21 @@
                      encryptionKey:key
                           readOnly:NO
                              error:nil];
+}
+
++ (XCTestSuite *)defaultTestSuite
+{
+    if (RLMIsDebuggerAttached()) {
+        XCTestSuite *suite = [XCTestSuite testSuiteWithName:self.className];
+        [suite addTest:[EncryptionTests testCaseWithSelector:@selector(encryptionTestsAreSkippedWhileDebuggerIsAttached)]];
+        return suite;
+    }
+
+    return [super defaultTestSuite];
+}
+
+- (void)encryptionTestsAreSkippedWhileDebuggerIsAttached
+{
 }
 
 #pragma mark - Key validation

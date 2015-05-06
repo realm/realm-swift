@@ -29,9 +29,6 @@
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
-#include <sys/sysctl.h>
-#include <sys/types.h>
-
 #include <realm/commit_log.hpp>
 #include <realm/version.hpp>
 
@@ -88,28 +85,9 @@ static void clearKeyCache() {
     }
 }
 
-static bool isDebuggerAttached()
-{
-    int name[] = {
-        CTL_KERN,
-        KERN_PROC,
-        KERN_PROC_PID,
-        getpid()
-    };
-
-    struct kinfo_proc info;
-    size_t info_size = sizeof(info);
-    if (sysctl(name, sizeof(name)/sizeof(name[0]), &info, &info_size, NULL, 0) == -1) {
-        NSLog(@"sysctl() failed: %s", strerror(errno));
-        return false;
-    }
-
-    return (info.kp_proc.p_flag & P_TRACED) != 0;
-}
-
 static void validateNotInDebugger()
 {
-    if (isDebuggerAttached()) {
+    if (RLMIsDebuggerAttached()) {
         @throw RLMException(@"Cannot open an encrypted Realm with a debugger attached to the process");
     }
 }
