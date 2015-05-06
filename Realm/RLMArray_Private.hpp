@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray_Private.h"
-#import "RLMResults.h"
+#import <Realm/RLMResults.h>
 
 #import <memory>
 
