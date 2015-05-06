@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.92.1 Release notes (2015-05-06)
 =============================================================
 
 ### API breaking changes
@@ -8,6 +8,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * `-[RLMRealm inWriteTransaction]` is now public.
+* Realm Swift is now available on CoocaPods.
 
 ### Bugfixes
 
