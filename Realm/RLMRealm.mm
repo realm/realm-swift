@@ -61,8 +61,19 @@ using namespace realm::util;
 //
 // Global encryption key cache and validation
 //
+
+static bool shouldForciblyDisableEncryption()
+{
+    static bool disableEncryption = getenv("REALM_DISABLE_ENCRYPTION");
+    return disableEncryption;
+}
+
 static NSMutableDictionary *s_keysPerPath = [NSMutableDictionary new];
 static NSData *keyForPath(NSString *path) {
+    if (shouldForciblyDisableEncryption()) {
+        return nil;
+    }
+
     @synchronized (s_keysPerPath) {
         return s_keysPerPath[path];
     }
@@ -93,6 +104,10 @@ static void validateNotInDebugger()
 }
 
 static NSData *validatedKey(NSData *key) {
+    if (shouldForciblyDisableEncryption()) {
+        return nil;
+    }
+
     if (key && key.length != 64) {
         @throw RLMException(@"Encryption key must be exactly 64 bytes long");
     }
@@ -175,7 +190,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
         NSError *error = nil;
         try {
             // NOTE: we do these checks here as is this is the first time encryption keys are used
-            if (validatedKey(key)) {
+            if ((key = validatedKey(key))) {
                 validateNotInDebugger();
             }
 
@@ -850,11 +865,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (BOOL)writeCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
-    if (validatedKey(key)) {
+    key = validatedKey(key) ?: keyForPath(path);
+    if (key) {
         validateNotInDebugger();
     }
-
-    key = validatedKey(key) ?: keyForPath(path);
 
     try {
         self.group->write(path.UTF8String, static_cast<const char *>(key.bytes));

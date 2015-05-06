@@ -102,7 +102,9 @@
  Encrypted Realms currently cannot be opened while lldb is attached to the
  process since lldb often hangs in this situation. See issue #1625 for
  further discussion. Attempting to open an encrypted Realm with lldb attached
- will result in an EXC_BAD_ACCESS.
+ will result in an EXC_BAD_ACCESS. Running your application with
+ REALM_DISABLE_ENCRYPTION=YES set in your environment will result in Realm
+ treating requests to open an encrypted Realm as requesting an unencrypted Realm.
 
  @param path        Path to the file you want the data saved in.
  @param key         64-byte key to use to encrypt the data.
