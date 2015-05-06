@@ -65,8 +65,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let defaultPath = Realm.defaultPath
         let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
 
-        let v0Path = bundlePath("default-v0.realm")
-        if let v0Path = v0Path {
+        if let v0Path = bundlePath("default-v0.realm") {
             NSFileManager.defaultManager().removeItemAtPath(defaultPath, error: nil)
             NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath, error: nil)
         }
@@ -109,9 +108,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //
         // Migrate a realms at a custom paths
         //
-        let v1Path = bundlePath("default-v1.realm")
-        let v2Path = bundlePath("default-v2.realm")
-        if let v1Path = v1Path, v2Path = v2Path {
+        if let v1Path = bundlePath("default-v1.realm"), v2Path = bundlePath("default-v2.realm") {
             let realmv1Path = defaultParentPath.stringByAppendingPathComponent("default-v1.realm")
             let realmv2Path = defaultParentPath.stringByAppendingPathComponent("default-v2.realm")
             setSchemaVersion(3, realmv1Path, migrationBlock)
