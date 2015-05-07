@@ -195,6 +195,17 @@ public final class Migration {
         RLMDeleteObjectFromRealm(object, RLMObjectBaseRealm(object))
     }
 
+    /**
+    Deletes the data for the class with the given name.
+
+    :param:   name The name of the Object class to delete.
+
+    :returns: whether data was deleted.
+    */
+    public func deleteData(objectClassName: String) -> Bool {
+        return rlmMigration.deleteDataForClassName(objectClassName)
+    }
+
     private init(_ rlmMigration: RLMMigration) {
         self.rlmMigration = rlmMigration
     }

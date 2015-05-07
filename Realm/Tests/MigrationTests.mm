@@ -175,9 +175,6 @@
         XCTAssertFalse(realm.group->has_table(RLMStringDataWithNSString(RLMTableNameForClass(@"DeletedClass"))), @"The deleted class should not have a table.");
         XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
     }
-
-    [RLMRealm setSchemaVersion:0 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
 - (void)testAddingPropertyAtEnd {
