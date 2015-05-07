@@ -88,13 +88,13 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
 - (void)deleteObject:(RLMObject *)object;
 
 /**
- Deletes the table for the class with the given name. Throws if that class still is in the schema.
+ Deletes the data for the class with the given name.
  
  @param   name The name of the RLMObject class to delete.
  
- @return whether the table existed and was deleted.
+ @return whether data was deleted.
  */
-- (BOOL)deleteTableForClassName:(NSString *)name;
+- (BOOL)deleteDataForClassName:(NSString *)name;
 
 @end
 

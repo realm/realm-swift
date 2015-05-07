@@ -74,8 +74,8 @@
 
 - (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {
     // modify object schema to use RLMObject class (or else bad accessors will get created)
-    objectSchema.objectClass = RLMObject.class;
-    objectSchema.accessorClass = RLMObject.class;
+    objectSchema.objectClass = RLMDynamicObject.class;
+    objectSchema.accessorClass = RLMDynamicObject.class;
 
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
@@ -159,11 +159,12 @@
         [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
             XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
 
-            XCTAssertTrue([migration deleteTableForClassName:@"DeletedClass"]);
-            XCTAssertFalse([migration deleteTableForClassName:@"NoSuchClass"]);
+            XCTAssertTrue([migration deleteDataForClassName:@"DeletedClass"]);
+            XCTAssertFalse([migration deleteDataForClassName:@"NoSuchClass"]);
+            XCTAssertFalse([migration deleteDataForClassName:nil]);
 
-            XCTAssertThrows([migration deleteTableForClassName:nil]);
-            XCTAssertThrows([migration deleteTableForClassName:StringObject.className]);
+            [migration createObject:StringObject.className withValue:@[@"migration"]];
+            XCTAssertTrue([migration deleteDataForClassName:StringObject.className]);
         }];
         [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
     }
@@ -172,6 +173,7 @@
         // verify migration
         RLMRealm *realm = [self realmWithTestPath];
         XCTAssertFalse(realm.group->has_table(RLMStringDataWithNSString(RLMTableNameForClass(@"DeletedClass"))), @"The deleted class should not have a table.");
+        XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
     }
 
     [RLMRealm setSchemaVersion:0 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];

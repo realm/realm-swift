@@ -163,20 +163,27 @@
     [_realm deleteObject:object];
 }
 
-- (BOOL)deleteTableForClassName:(NSString *)name {
+- (BOOL)deleteDataForClassName:(NSString *)name {
     if (!name) {
-        @throw RLMException(@"Must provide a class name.");
-    }
-
-    if ([_realm.schema schemaForClassName:name]) {
-        @throw RLMException([NSString stringWithFormat:@"Cannot delete table for class name '%@', since it is in use.", name]);
+        return false;
     }
 
     size_t table = _realm.group->find_table(RLMStringDataWithNSString(RLMTableNameForClass(name)));
     if (table == realm::not_found) {
         return false;
     }
-    _realm.group->remove_table(table);
+
+    if ([_realm.schema schemaForClassName:name]) {
+        _realm.group->get_table(table)->clear();
+    }
+    else {
+        _realm.group->remove_table(table);
+
+        if (RLMRealmPrimaryKeyForObjectClass(_realm, name)) {
+            RLMRealmSetPrimaryKeyForObjectClass(_realm, name, nil);
+        }
+    }
+
     return true;
 }
 
