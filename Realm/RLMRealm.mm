@@ -1058,7 +1058,7 @@ atomic<bool> s_syncLogEverything(false);
     entry.log_data = changeset;
 
     try {
-        newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion, entry, applyLog);
+        newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, 0, baseVersion, entry, applyLog);
     }
     catch (const _impl::TransactLogParser::BadTransactLog&) {
         NSString *message = [NSString stringWithFormat:@"Application of server changeset "
