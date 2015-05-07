@@ -64,6 +64,41 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @implementation SchemaTestClassLink
 @end
 
+
+@interface SchemaTestClassWithSingleDuplicatePropertyBase : FakeObject
+@property NSString *string;
+@end
+
+@implementation SchemaTestClassWithSingleDuplicatePropertyBase
+@end
+
+@interface SchemaTestClassWithSingleDuplicateProperty : SchemaTestClassWithSingleDuplicatePropertyBase
+@property NSString *string;
+@end
+
+@implementation SchemaTestClassWithSingleDuplicateProperty
+@dynamic string;
+@end
+
+@interface SchemaTestClassWithMultipleDuplicatePropertiesBase : FakeObject
+@property NSString *string;
+@property int integer;
+@end
+
+@implementation SchemaTestClassWithMultipleDuplicatePropertiesBase
+@end
+
+@interface SchemaTestClassWithMultipleDuplicateProperties : SchemaTestClassWithMultipleDuplicatePropertiesBase
+@property NSString *string;
+@property int integer;
+@end
+
+@implementation SchemaTestClassWithMultipleDuplicateProperties
+@dynamic string;
+@dynamic integer;
+@end
+
+
 @interface SchemaTests : RLMTestCase
 @end
 
@@ -344,6 +379,12 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t}\n"
                                               @"\t}\n"
                                               @"}");
+}
+
+- (void)testClassWithDuplicateProperties
+{
+    XCTAssertThrows([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithSingleDuplicateProperty.class]);
+    XCTAssertThrows([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithMultipleDuplicateProperties.class]);
 }
 
 @end

@@ -150,3 +150,11 @@
     return nil;
 }
 @end
+
+#pragma mark FakeObject
+
+@implementation FakeObject
++ (NSArray *)ignoredProperties { return nil; }
++ (NSArray *)indexedProperties { return nil; }
++ (NSString *)primaryKey { return nil; }
+@end
