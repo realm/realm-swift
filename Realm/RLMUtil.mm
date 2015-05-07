@@ -166,20 +166,29 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
     @throw RLMException(@"Invalid RLMPropertyType specified");
 }
 
-id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
+static inline id RLMValidatedRealmObject(id obj, RLMSchema *schema, RLMObjectSchema *objectSchema, RLMRealm *realm) {
+    if (realm) {
+        return RLMCreateObjectInRealmWithValue(realm, objectSchema.className, obj, RLMCreationOptionsAllowCopy | RLMCreationOptionsUpdateOrCreate);
+    }
+    else {
+        return [[objectSchema.objectClass alloc] initWithValue:obj schema:schema];
+    }
+}
+
+id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema, RLMRealm *realm) {
     if (!RLMIsObjectValidForProperty(obj, prop)) {
         // check for object or array literals
         if (prop.type == RLMPropertyTypeObject) {
             // for object create and try to initialize with obj
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
-            return [[objSchema.objectClass alloc] initWithValue:obj schema:schema];
+            return RLMValidatedRealmObject(obj, schema, objSchema, realm);
         }
         else if (prop.type == RLMPropertyTypeArray && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
             // for arrays, create objects for each literal object and return new array
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
             RLMArray *objects = [[RLMArray alloc] initWithObjectClassName: objSchema.className standalone:YES];
             for (id el in obj) {
-                [objects addObject:[[objSchema.objectClass alloc] initWithValue:el schema:schema]];
+                [objects addObject:RLMValidatedRealmObject(el, schema, objSchema, realm)];
             }
             return objects;
         }
@@ -212,7 +221,7 @@ NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
     return defaults;
 }
 
-NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
+NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing, RLMRealm *realm) {
     NSArray *properties = objectSchema.properties;
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     NSDictionary *defaultValues = nil;
@@ -232,13 +241,13 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *o
             if (!obj) {
                 obj = NSNull.null;
             }
-            outDict[prop.name] = RLMValidatedObjectForProperty(obj, prop, schema);
+            outDict[prop.name] = RLMValidatedObjectForProperty(obj, prop, schema, realm);
         }
     }
     return outDict;
 }
 
-NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema) {
+NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema, RLMRealm *realm) {
     NSArray *props = objectSchema.properties;
     if (array.count != props.count) {
         @throw RLMException(@"Invalid array input. Number of array elements does not match number of properties.");
@@ -247,7 +256,7 @@ NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objec
     // validate all values
     NSMutableArray *outArray = [NSMutableArray arrayWithCapacity:props.count];
     for (NSUInteger i = 0; i < array.count; i++) {
-        [outArray addObject:RLMValidatedObjectForProperty(array[i], props[i], schema)];
+        [outArray addObject:RLMValidatedObjectForProperty(array[i], props[i], schema, realm)];
     }
     return outArray;
 };
