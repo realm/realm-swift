@@ -443,14 +443,14 @@ void update_query_with_value_expression(RLMSchema *schema,
     if (pred.predicateOperatorType == NSInPredicateOperatorType) {
         process_or_group(query, value, [&](id item) {
             id normalized = value_from_constant_expression_or_value(item);
-            validate_property_value(prop, normalized, @"Expected object of type %@ in IN clause for property '%@' on object of type %@, but received: %@", desc, keyPath);
+            validate_property_value(prop, normalized, @"Expected object of type %@ in IN clause for property '%@' on object of type '%@', but received: %@", desc, keyPath);
             add_constraint_to_query(query, prop.type, NSEqualToPredicateOperatorType,
                                     pred.options, indexes, index, normalized);
         });
         return;
     }
 
-    validate_property_value(prop, value, @"Expected object of type %@ for property '%@' on object of type %@, but received: %@", desc, keyPath);
+    validate_property_value(prop, value, @"Expected object of type %@ for property '%@' on object of type '%@', but received: %@", desc, keyPath);
     add_constraint_to_query(query, prop.type, pred.predicateOperatorType,
                             pred.options, indexes, index, value);
 }
