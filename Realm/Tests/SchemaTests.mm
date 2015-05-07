@@ -64,6 +64,27 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @implementation SchemaTestClassLink
 @end
 
+// Inherit from NSObject rather than RLMObject to prevent the duplicate property from causing every
+// test to blow up.
+@interface SchemaTestClassWithDuplicatePropertyBase : NSObject
+@property NSString *string;
+@end
+
+// Implement the portions of RLMObject's interface that +[RLMObjectSchema schemaForObjectClass:] uses.
+@implementation SchemaTestClassWithDuplicatePropertyBase
++ (NSArray *)ignoredProperties { return nil; }
++ (NSArray *)indexedProperties { return nil; }
+@end
+
+@interface SchemaTestClassWithDuplicateProperty : SchemaTestClassWithDuplicatePropertyBase
+@property NSString *string;
+@end
+
+@implementation SchemaTestClassWithDuplicateProperty
+@dynamic string;
+@end
+
+
 @interface SchemaTests : RLMTestCase
 @end
 
@@ -344,6 +365,11 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t}\n"
                                               @"\t}\n"
                                               @"}");
+}
+
+- (void)testClassWithDuplicateProperties
+{
+    XCTAssertThrows([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithDuplicateProperty.class]);
 }
 
 @end
