@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Exceptions raised when incorrect object types are used with predicates now contain more detailed information.
 
 ### Bugfixes
 
