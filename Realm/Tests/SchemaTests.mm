@@ -64,24 +64,38 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @implementation SchemaTestClassLink
 @end
 
-// Inherit from NSObject rather than RLMObject to prevent the duplicate property from causing every
-// test to blow up.
-@interface SchemaTestClassWithDuplicatePropertyBase : NSObject
+
+@interface SchemaTestClassWithSingleDuplicatePropertyBase : FakeObject
 @property NSString *string;
 @end
 
-// Implement the portions of RLMObject's interface that +[RLMObjectSchema schemaForObjectClass:] uses.
-@implementation SchemaTestClassWithDuplicatePropertyBase
-+ (NSArray *)ignoredProperties { return nil; }
-+ (NSArray *)indexedProperties { return nil; }
+@implementation SchemaTestClassWithSingleDuplicatePropertyBase
 @end
 
-@interface SchemaTestClassWithDuplicateProperty : SchemaTestClassWithDuplicatePropertyBase
+@interface SchemaTestClassWithSingleDuplicateProperty : SchemaTestClassWithSingleDuplicatePropertyBase
 @property NSString *string;
 @end
 
-@implementation SchemaTestClassWithDuplicateProperty
+@implementation SchemaTestClassWithSingleDuplicateProperty
 @dynamic string;
+@end
+
+@interface SchemaTestClassWithMultipleDuplicatePropertiesBase : FakeObject
+@property NSString *string;
+@property int integer;
+@end
+
+@implementation SchemaTestClassWithMultipleDuplicatePropertiesBase
+@end
+
+@interface SchemaTestClassWithMultipleDuplicateProperties : SchemaTestClassWithMultipleDuplicatePropertiesBase
+@property NSString *string;
+@property int integer;
+@end
+
+@implementation SchemaTestClassWithMultipleDuplicateProperties
+@dynamic string;
+@dynamic integer;
 @end
 
 
@@ -369,7 +383,8 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 - (void)testClassWithDuplicateProperties
 {
-    XCTAssertThrows([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithDuplicateProperty.class]);
+    XCTAssertThrows([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithSingleDuplicateProperty.class]);
+    XCTAssertThrows([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithMultipleDuplicateProperties.class]);
 }
 
 @end

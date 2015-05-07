@@ -254,4 +254,7 @@ RLM_ARRAY_TYPE(CircleObject);
 @property (readonly) int readOnlyPropertyMadeReadWriteInClassExtension;
 @end
 
+#pragma mark FakeObject
 
+@interface FakeObject : NSObject
+@end
