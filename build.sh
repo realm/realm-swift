@@ -26,6 +26,8 @@ if ! [ -z "${JENKINS_HOME}" ]; then
     CODESIGN_PARAMS="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO"
 fi
 
+export REALM_SKIP_DEBUGGER_CHECKS=YES
+
 usage() {
 cat <<EOF
 Usage: sh $0 command [argument]

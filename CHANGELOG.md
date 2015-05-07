@@ -1,3 +1,22 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Prevent debugging of an application using an encrypted Realm to work around
+  frequent LLDB hangs. Until the underlying issue is addressed you may set
+  REALM_DISABLE_ENCRYPTION=YES in your application's environment variables to
+  have requests to open an encrypted Realm treated as a request for an
+  unencrypted Realm.
+
 0.92.1 Release notes (2015-05-06)
 =============================================================
 

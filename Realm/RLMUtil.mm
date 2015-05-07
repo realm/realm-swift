@@ -26,6 +26,9 @@
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 
+#include <sys/sysctl.h>
+#include <sys/types.h>
+
 #if !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"
 #endif
@@ -328,4 +331,29 @@ static inline BOOL RLMIsSubclass(Class class1, Class class2) {
 
 BOOL RLMIsObjectSubclass(Class klass) {
     return RLMIsSubclass(class_getSuperclass(klass), RLMObjectBase.class);
+}
+
+BOOL RLMIsDebuggerAttached()
+{
+    // NOTE: Debugger checks are a workaround for LLDB hangs when dealing with encrypted realms (issue #1625).
+    // Skipping the checks is necessary for encryption tests to run, but can result in hangs when debugging
+    // other tests.
+    if (getenv("REALM_SKIP_DEBUGGER_CHECKS"))
+        return NO;
+
+    int name[] = {
+        CTL_KERN,
+        KERN_PROC,
+        KERN_PROC_PID,
+        getpid()
+    };
+
+    struct kinfo_proc info;
+    size_t info_size = sizeof(info);
+    if (sysctl(name, sizeof(name)/sizeof(name[0]), &info, &info_size, NULL, 0) == -1) {
+        NSLog(@"sysctl() failed: %s", strerror(errno));
+        return false;
+    }
+
+    return (info.kp_proc.p_flag & P_TRACED) != 0;
 }
