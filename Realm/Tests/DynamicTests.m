@@ -108,7 +108,8 @@
     RLMObject *o1 = results[0], *o2 = results[1];
     XCTAssertEqualObjects(o1[@"intCol"], @1, @"First object should have column value 1");
     XCTAssertEqualObjects(o2[@"stringCol"], @"column2", @"Second object should have string value column2");
-    XCTAssertThrows(o1[@"invalid"], @"Invalid column name should throw");
+    NSException *exception = RLMAssertThrows(o1[@"invalid"], @"Invalid column name should throw");
+    RLMAssertMatches(exception.reason, @"Invalid property name");
 }
 
 - (void)testDynamicTypes {

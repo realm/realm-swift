@@ -437,6 +437,7 @@
 		3F8DCA5719930F550008BD7F /* iOS Device Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Device Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
 		C073E1201AE9B705002C0A30 /* RLMObject_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMObject_Private.hpp; sourceTree = "<group>"; };
+		C0D6E4101AFBFAF7001F3027 /* RLMAssertions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAssertions.h; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1F631955FC9300FDED82 /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccessor.h; sourceTree = "<group>"; };
 		E81A1F641955FC9300FDED82 /* RLMAccessor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAccessor.mm; sourceTree = "<group>"; };
@@ -617,6 +618,7 @@
 				E81A1FC01955FE0100FDED82 /* PropertyTypeTest.mm */,
 				E81A1FC11955FE0100FDED82 /* QueryTests.m */,
 				E81A1FC31955FE0100FDED82 /* RealmTests.mm */,
+				C0D6E4101AFBFAF7001F3027 /* RLMAssertions.h */,
 				027A4D2A1AB1012500AA46F9 /* RLMMultiProcessTestCase.h */,
 				027A4D2B1AB1012500AA46F9 /* RLMMultiProcessTestCase.m */,
 				E8A543AD195C9C9E00990A20 /* RLMPredicateUtil.h */,
