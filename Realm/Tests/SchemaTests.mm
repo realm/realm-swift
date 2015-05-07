@@ -383,8 +383,8 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 - (void)testClassWithDuplicateProperties
 {
-    XCTAssertThrows([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithSingleDuplicateProperty.class]);
-    XCTAssertThrows([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithMultipleDuplicateProperties.class]);
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithSingleDuplicateProperty.class], @"'string' .* multiple times .* 'SchemaTestClassWithSingleDuplicateProperty'");
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithMultipleDuplicateProperties.class], @"'SchemaTestClassWithMultipleDuplicateProperties' .* declared multiple times");
 }
 
 @end
