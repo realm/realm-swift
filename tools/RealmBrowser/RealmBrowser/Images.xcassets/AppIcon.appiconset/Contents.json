@@ -3,61 +3,61 @@
     {
       "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "realm-square-logo-16.png",
+      "filename" : "Realm Browser16w.png",
       "scale" : "1x"
     },
     {
       "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "realm-square-logo-16@2.png",
+      "filename" : "Realm Browser32w-1.png",
       "scale" : "2x"
     },
     {
       "size" : "32x32",
       "idiom" : "mac",
-      "filename" : "realm-square-logo-32.png",
+      "filename" : "Realm Browser32w.png",
       "scale" : "1x"
     },
     {
       "size" : "32x32",
       "idiom" : "mac",
-      "filename" : "realm-square-logo-32@2.png",
+      "filename" : "Realm Browser64w.png",
       "scale" : "2x"
     },
     {
       "size" : "128x128",
       "idiom" : "mac",
-      "filename" : "realm-square-logo-128.png",
+      "filename" : "Realm Browser128w.png",
       "scale" : "1x"
     },
     {
       "size" : "128x128",
       "idiom" : "mac",
-      "filename" : "realm-square-logo-128@2.png",
+      "filename" : "Realm Browser256w-1.png",
       "scale" : "2x"
     },
     {
       "size" : "256x256",
       "idiom" : "mac",
-      "filename" : "realm-square-logo-256.png",
+      "filename" : "Realm Browser256w.png",
       "scale" : "1x"
     },
     {
       "size" : "256x256",
       "idiom" : "mac",
-      "filename" : "realm-square-logo-256@2.png",
+      "filename" : "Realm Browser512w-1.png",
       "scale" : "2x"
     },
     {
       "size" : "512x512",
       "idiom" : "mac",
-      "filename" : "realm-square-logo-512.png",
+      "filename" : "Realm Browser512w.png",
       "scale" : "1x"
     },
     {
       "size" : "512x512",
       "idiom" : "mac",
-      "filename" : "realm-square-logo-512@2.png",
+      "filename" : "Realm Browser.png",
       "scale" : "2x"
     }
   ],
