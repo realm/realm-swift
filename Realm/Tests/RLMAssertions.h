@@ -19,31 +19,31 @@
 #import <XCTest/XCTest.h>
 
 #define RLMAssertThrows(expression, ...) \
-RLMPrimativeAssertThrows(self, expression,  __VA_ARGS__)
+    RLMPrimitiveAssertThrows(self, expression,  __VA_ARGS__)
 
-#define RLMPrimativeAssertThrows(self, expression, format...) \
+#define RLMPrimitiveAssertThrows(self, expression, format...) \
 ({ \
-NSException *__caughtException = nil; \
-@try { \
-(expression); \
-} \
-@catch (id exception) { \
-__caughtException = exception; \
-}\
-if (!__caughtException) { \
-_XCTRegisterFailure(self, _XCTFailureDescription(_XCTAssertion_Throws, 0, @#expression), format); \
-} \
-__caughtException; \
+    NSException *caughtException = nil; \
+    @try { \
+        (expression); \
+    } \
+    @catch (id exception) { \
+        caughtException = exception; \
+    } \
+    if (!caughtException) { \
+        _XCTRegisterFailure(self, _XCTFailureDescription(_XCTAssertion_Throws, 0, @#expression), format); \
+    } \
+    caughtException; \
 })
 
 #define RLMAssertMatches(expression, regex, ...) \
-RLMPrimativeAssertMatches(self, expression, regex,  __VA_ARGS__)
+    RLMPrimitiveAssertMatches(self, expression, regex,  __VA_ARGS__)
 
-#define RLMPrimativeAssertMatches(self, expression, regex, format...) \
+#define RLMPrimitiveAssertMatches(self, expression, regexString, format...) \
 ({ \
-NSString *string = (expression);\
-NSRegularExpression *__regex = [NSRegularExpression regularExpressionWithPattern: regex options: 0 error:nil];\
-if ([__regex numberOfMatchesInString:string options:0 range:NSMakeRange(0, string.length)] == 0) { \
-_XCTRegisterFailure(self, [_XCTFailureDescription(_XCTAssertion_True, 0, @#expression @" (EXPR_STRING) matches " @#regex)stringByReplacingOccurrencesOfString:@"EXPR_STRING" withString:string ?: @"<nil>"], format); \
-} \
+    NSString *string = (expression); \
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: regexString options: 0 error:nil]; \
+    if ([regex numberOfMatchesInString:string options:0 range:NSMakeRange(0, string.length)] == 0) { \
+        _XCTRegisterFailure(self, [_XCTFailureDescription(_XCTAssertion_True, 0, @#expression @" (EXPR_STRING) matches " @#regexString) stringByReplacingOccurrencesOfString:@"EXPR_STRING" withString:string ?: @"<nil>"], format); \
+    } \
 })
