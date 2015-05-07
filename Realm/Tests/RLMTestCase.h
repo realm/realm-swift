@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <XCTest/XCTest.h>
+#import "RLMAssertions.h"
 #import "RLMTestObjects.h"
 
 #ifdef __cplusplus
