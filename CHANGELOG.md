@@ -17,6 +17,7 @@ x.x.x Release notes (yyyy-MM-dd)
   have requests to open an encrypted Realm treated as a request for an
   unencrypted Realm.
 * Linked objects are properly updated in `createOrUpdateInRealm:withValue:`.
+* List properties on Objects are now properly initialized during fast enumeration.
 
 0.92.1 Release notes (2015-05-06)
 =============================================================
