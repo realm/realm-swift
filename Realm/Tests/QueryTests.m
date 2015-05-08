@@ -286,16 +286,16 @@
     [self verifySort:realm column:@"stringCol" ascending:NO expected:@"cc"];
     
     // sort by mixed column
-    XCTAssertThrows([[AllTypesObject allObjects] sortedResultsUsingProperty:@"mixedCol" ascending:YES],
-                    @"Sort on mixed col not supported");
-    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"mixedCol" ascending:NO],
-                    @"Sort on mixed col not supported");
+    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingProperty:@"mixedCol" ascending:YES], @"'mixedCol' .* 'AllTypesObject': sorting is only supported .* type any");
+    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"mixedCol" ascending:NO]);
     
     // sort invalid name
-    XCTAssertThrows([[AllTypesObject allObjects] sortedResultsUsingProperty:@"invalidCol" ascending:YES],
-                    @"Sort on invalid col not supported");
-    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"invalidCol" ascending:NO],
-                    @"Sort on invalid col not supported");
+    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingProperty:@"invalidCol" ascending:YES], @"'invalidCol'.* 'AllTypesObject'.* not found");
+    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"invalidCol" ascending:NO]);
+
+    // sort on key path
+    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingProperty:@"key.path" ascending:YES], @"key paths is not supported");
+    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"key.path" ascending:NO]);
 }
 
 - (void)testSortByMultipleColumns {
