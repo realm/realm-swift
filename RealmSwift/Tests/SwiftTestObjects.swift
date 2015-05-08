@@ -104,7 +104,7 @@ class SwiftEmployeeObject: Object {
 }
 
 class SwiftCompanyObject: Object {
-    let employees = List<SwiftEmployeeObject>()
+    dynamic var employees = List<SwiftEmployeeObject>()
 }
 
 class SwiftArrayPropertyObject: Object {

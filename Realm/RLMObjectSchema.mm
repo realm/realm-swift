@@ -179,6 +179,12 @@
             Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
             id value = object_getIvar(swiftObjectInstance, ivar);
             NSString *className = [value _rlmArray].objectClassName;
+            NSUInteger existing = [propArray indexOfObjectPassingTest:^BOOL(RLMProperty *obj, __unused NSUInteger idx, __unused BOOL *stop) {
+                return [obj.name isEqualToString:propName];
+            }];
+            if (existing != NSNotFound) {
+                [propArray removeObjectAtIndex:existing];
+            }
             [propArray addObject:[[RLMProperty alloc] initSwiftListPropertyWithName:propName
                                                                                ivar:ivar
                                                                     objectClassName:className]];
