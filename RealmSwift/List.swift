@@ -311,7 +311,9 @@ extension List: ExtensibleCollectionType {
     public func generate() -> GeneratorOf<T> {
         let base = NSFastGenerator(_rlmArray)
         return GeneratorOf<T>() {
-            return base.next() as! T?
+            let accessor = base.next() as! T?
+            RLMInitializeSwiftListAccessor(accessor)
+            return accessor
         }
     }
 
