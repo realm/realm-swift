@@ -63,8 +63,8 @@ static void RLMPrecondition(bool condition, NSString *name, NSString *format, ..
 // return the column index for a validated column name
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName) {
     RLMProperty *prop = desc[columnName];
-    RLMPrecondition(prop, @"Invalid column name",
-                    @"Column name %@ not found in table", columnName);
+    RLMPrecondition(prop, @"Invalid property name",
+                    @"Property '%@' not found in object of type '%@'", columnName, desc.className);
     return prop.column;
 }
 
@@ -377,16 +377,16 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
     for (NSString *path in paths) {
         if (prop) {
             RLMPrecondition(prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray,
-                            @"Invalid value", @"column name '%@' is not a link", prevPath);
+                            @"Invalid value", @"Property '%@' is not a link in object of type '%@'", prevPath, desc.className);
             indexes.push_back(prop.column);
             prop = desc[path];
-            RLMPrecondition(prop, @"Invalid column name",
-                            @"Column name %@ not found in table", path);
+            RLMPrecondition(prop, @"Invalid property name",
+                            @"Property '%@' not found in object of type '%@'", path, desc.className);
         }
         else {
             prop = desc[path];
-            RLMPrecondition(prop, @"Invalid column name",
-                            @"Column name %@ not found in table", path);
+            RLMPrecondition(prop, @"Invalid property name",
+                            @"Property '%@' not found in object of type '%@'", path, desc.className);
 
             if (isAny) {
                 RLMPrecondition(prop.type == RLMPropertyTypeArray,

@@ -466,15 +466,14 @@
     NSString *className = PersonObject.className;
 
     // invalid column/property name
-    XCTAssertThrows([realm objects:className where:@"height > 72"], @"invalid column");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"height > 72"], @"'height' not found in .* 'PersonObject'");
 
     // wrong/invalid data types
-    XCTAssertThrows([realm objects:className where:@"age != xyz"], @"invalid type");
-    XCTAssertThrows([realm objects:className where:@"name == 3"], @"invalid type");
-    XCTAssertThrows([realm objects:className where:@"age IN {'xyz'}"], @"invalid type");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age != xyz"], @"'xyz' not found in .* 'PersonObject'");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"name == 3"], @"type string .* property 'name' .* 'PersonObject'.*: 3");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age IN {'xyz'}"], @"type int .* property 'age' .* 'PersonObject'.*: xyz");
     XCTAssertThrows([realm objects:className where:@"name IN {3}"], @"invalid type");
 
-    XCTAssertThrows([realm objects:className where:@"age != xyz"], @"invalid type");
     className = AllTypesObject.className;
 
     XCTAssertThrows([realm objects:className where:@"boolCol == Foo"], @"invalid type");
@@ -490,7 +489,7 @@
     XCTAssertThrows([realm objects:className where:@"3 == 3"], @"comparing 2 constants");
 
     // invalid strings
-    XCTAssertThrows([realm objects:className where:@""], @"empty string");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@""], @"Unable to parse");
     XCTAssertThrows([realm objects:className where:@"age"], @"column name only");
     XCTAssertThrows([realm objects:className where:@"sdlfjasdflj"], @"gibberish");
     XCTAssertThrows([realm objects:className where:@"age * 25"], @"invalid operator");
@@ -499,37 +498,37 @@
     XCTAssertThrows([realm objects:className where:@"()"], @"parens");
 
     // not a link column
-    XCTAssertThrows([realm objects:className where:@"age.age == 25"]);
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age.age == 25"], @"'age' is not a link .* 'PersonObject'");
     XCTAssertThrows([realm objects:className where:@"age.age.age == 25"]);
 
     // abuse of BETWEEN
-    XCTAssertThrows([realm objects:className where:@"age BETWEEN 25"], @"between with a scalar");
-    XCTAssertThrows([realm objects:className where:@"age BETWEEN Foo"], @"between with a string");
-    XCTAssertThrows([realm objects:className where:@"age BETWEEN {age, age}"], @"between with array of keypaths");
-    XCTAssertThrows([realm objects:className where:@"age BETWEEN {age, 0}"], @"between with array of keypaths");
-    XCTAssertThrows([realm objects:className where:@"age BETWEEN {0, age}"], @"between with array of keypaths");
-    XCTAssertThrows([realm objects:className where:@"age BETWEEN {0, {1, 10}}"], @"between with nested arrays");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN 25"], @"type NSArray for BETWEEN");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN Foo"], @"BETWEEN operator must compare a KeyPath with an aggregate");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {age, age}"], @"must be constant values");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {age, 0}"], @"must be constant values");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {0, age}"], @"must be constant values");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {0, {1, 10}}"], @"must be constant values");
 
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1]];
-    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of 1 item");
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"exactly two objects");
 
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1, @2, @3]];
-    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of 3 items");
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"exactly two objects");
 
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@"Foo", @"Bar"]];
-    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of strings");
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type int for BETWEEN");
 
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1.5, @2.5]];
-    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of doubles");
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type int for BETWEEN");
 
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1, @[@2, @3]]];
-    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with nested array");
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type int for BETWEEN");
 
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @{@25 : @35}];
-    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with dictionary");
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type NSArray for BETWEEN");
 
     pred = [NSPredicate predicateWithFormat:@"height BETWEEN %@", @[@25, @35]];
-    XCTAssertThrows([realm objects:className withPredicate:pred], @"invalid property/column");
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"'height' not found .* 'PersonObject'");
 
     // bad type in link IN
     XCTAssertThrows([PersonLinkObject objectsInRealm:realm where:@"person.age IN {'Tim'}"]);
