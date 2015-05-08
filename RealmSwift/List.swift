@@ -309,9 +309,13 @@ extension List: ExtensibleCollectionType {
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the list.
     public func generate() -> GeneratorOf<T> {
-        let base = NSFastGenerator(_rlmArray)
+        var i: UInt = 0
         return GeneratorOf<T>() {
-            return base.next() as! T?
+            if (i >= self._rlmArray.count) {
+                return .None
+            } else {
+                return self._rlmArray[i++] as? T
+            }
         }
     }
 
