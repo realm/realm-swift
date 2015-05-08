@@ -195,6 +195,19 @@ public final class Migration {
         RLMDeleteObjectFromRealm(object, RLMObjectBaseRealm(object))
     }
 
+    /**
+    Deletes the data for the class with the given name.
+    This deletes all objects of the given class, and if the Object subclass no longer exists in your program,
+    cleans up any remaining metadata for the class in the Realm file.
+
+    :param:   name The name of the Object class to delete.
+
+    :returns: whether there was any data to delete.
+    */
+    public func deleteData(objectClassName: String) -> Bool {
+        return rlmMigration.deleteDataForClassName(objectClassName)
+    }
+
     private init(_ rlmMigration: RLMMigration) {
         self.rlmMigration = rlmMigration
     }

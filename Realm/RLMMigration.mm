@@ -163,4 +163,28 @@
     [_realm deleteObject:object];
 }
 
+- (BOOL)deleteDataForClassName:(NSString *)name {
+    if (!name) {
+        return false;
+    }
+
+    size_t table = _realm.group->find_table(RLMStringDataWithNSString(RLMTableNameForClass(name)));
+    if (table == realm::not_found) {
+        return false;
+    }
+
+    if ([_realm.schema schemaForClassName:name]) {
+        _realm.group->get_table(table)->clear();
+    }
+    else {
+        _realm.group->remove_table(table);
+
+        if (RLMRealmPrimaryKeyForObjectClass(_realm, name)) {
+            RLMRealmSetPrimaryKeyForObjectClass(_realm, name, nil);
+        }
+    }
+
+    return true;
+}
+
 @end

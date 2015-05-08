@@ -23,8 +23,9 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
-#import "RLMRealm_Private.h"
+#import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMUtil.hpp"
 #import "RLMObjectStore.h"
 
 #import <realm/table.hpp>
@@ -73,8 +74,8 @@
 
 - (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {
     // modify object schema to use RLMObject class (or else bad accessors will get created)
-    objectSchema.objectClass = RLMObject.class;
-    objectSchema.accessorClass = RLMObject.class;
+    objectSchema.objectClass = RLMDynamicObject.class;
+    objectSchema.accessorClass = RLMDynamicObject.class;
 
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
@@ -141,6 +142,39 @@
 
     XCTAssertEqual(2U, [RLMRealm schemaVersionAtPath:anotherRealm.path encryptionKey:nil error:nil]);
     XCTAssertTrue(migrationComplete);
+}
+
+- (void)testRemovingSubclass {
+    @autoreleasepool {
+        RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"DeletedClass" objectClass:RLMObject.class properties:@[]];
+        RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+
+        [realm transactionWithBlock:^{
+            [realm createObject:@"DeletedClass" withValue:@[]];
+        }];
+    }
+
+    @autoreleasepool {
+        // apply migration
+        [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+            XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
+
+            XCTAssertTrue([migration deleteDataForClassName:@"DeletedClass"]);
+            XCTAssertFalse([migration deleteDataForClassName:@"NoSuchClass"]);
+            XCTAssertFalse([migration deleteDataForClassName:nil]);
+
+            [migration createObject:StringObject.className withValue:@[@"migration"]];
+            XCTAssertTrue([migration deleteDataForClassName:StringObject.className]);
+        }];
+        [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    }
+
+    @autoreleasepool {
+        // verify migration
+        RLMRealm *realm = [self realmWithTestPath];
+        XCTAssertFalse(realm.group->has_table(RLMStringDataWithNSString(RLMTableNameForClass(@"DeletedClass"))), @"The deleted class should not have a table.");
+        XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+    }
 }
 
 - (void)testAddingPropertyAtEnd {

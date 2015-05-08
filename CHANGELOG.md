@@ -8,6 +8,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Exceptions raised when incorrect object types are used with predicates now contain more detailed information.
+* Added `-[RLMMigration deleteDataForClassName:]` and `Migration.deleteData(_:)` 
+  to enable cleaning up after removing object subclasses
 
 ### Bugfixes
 

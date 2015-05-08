@@ -267,8 +267,6 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
         }
     }
 
-    // FIXME - remove deleted tables
-
     return changed;
 }
 

@@ -87,6 +87,17 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
  */
 - (void)deleteObject:(RLMObject *)object;
 
+/**
+ Deletes the data for the class with the given name.
+ This deletes all objects of the given class, and if the RLMObject subclass no longer exists in your program,
+ cleans up any remaining metadata for the class in the Realm file.
+ 
+ @param  name The name of the RLMObject class to delete.
+ 
+ @return whether there was any data to delete.
+ */
+- (BOOL)deleteDataForClassName:(NSString *)name;
+
 @end
 
 
