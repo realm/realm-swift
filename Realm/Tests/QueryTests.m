@@ -286,13 +286,11 @@
     [self verifySort:realm column:@"stringCol" ascending:NO expected:@"cc"];
     
     // sort by mixed column
-    XCTAssertThrows([[AllTypesObject allObjects] sortedResultsUsingProperty:@"mixedCol" ascending:YES],
-                    @"Sort on mixed col not supported");
-    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"mixedCol" ascending:NO],
-                    @"Sort on mixed col not supported");
+    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingProperty:@"mixedCol" ascending:YES], @"'mixedCol' .* 'AllTypesObject': sorting is only supported .* type any");
+    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"mixedCol" ascending:NO]);
     
     // sort invalid name
-    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingProperty:@"invalidCol" ascending:YES], @"'invalidCol' not found .* 'AllTypesObject'");
+    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingProperty:@"invalidCol" ascending:YES], @"'invalidCol'.* 'AllTypesObject'.* not found");
     XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"invalidCol" ascending:NO]);
 
     // sort on key path

@@ -656,9 +656,9 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
 
 RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *propName) {
     // validate
-    RLMPrecondition(![propName containsString:@"."], @"Invalid sort property", @"Sorting on key paths is not supported.");
+    RLMPrecondition(![propName containsString:@"."], @"Invalid sort property", @"Cannot sort on '%@': sorting on key paths is not supported.", propName);
     RLMProperty *prop = schema[propName];
-    RLMPrecondition(prop, @"Invalid sort property", @"Property named '%@' not found on object of type '%@'.", propName, schema.className);
+    RLMPrecondition(prop, @"Invalid sort property", @"Cannot sort on property '%@' on object of type '%@': property not found.", propName, schema.className);
 
     switch (prop.type) {
         case RLMPropertyTypeBool:
@@ -671,7 +671,7 @@ RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *prop
 
         default:
             @throw RLMPredicateException(@"Invalid sort property type",
-                                         @"Sorting is only supported on Bool, Date, Double, Float, Integer, and String properties.");
+                                         @"Cannot sort on property '%@' on object of type '%@': sorting is only supported on bool, date, double, float, integer, and string properties, but property is of type %@.", propName, schema.className, RLMTypeToString(prop.type));
     }
     return prop;
 }
