@@ -268,7 +268,9 @@ extension Results: CollectionType {
     public func generate() -> GeneratorOf<T> {
         let base = NSFastGenerator(rlmResults)
         return GeneratorOf<T>() {
-            return base.next() as! T?
+            let accessor = base.next() as! T?
+            RLMInitializeSwiftListAccessor(accessor)
+            return accessor
         }
     }
 
