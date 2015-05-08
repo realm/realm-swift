@@ -292,10 +292,8 @@
                     @"Sort on mixed col not supported");
     
     // sort invalid name
-    XCTAssertThrows([[AllTypesObject allObjects] sortedResultsUsingProperty:@"invalidCol" ascending:YES],
-                    @"Sort on invalid col not supported");
-    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"invalidCol" ascending:NO],
-                    @"Sort on invalid col not supported");
+    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingProperty:@"invalidCol" ascending:YES], @"'invalidCol' not found .* 'AllTypesObject'");
+    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"invalidCol" ascending:NO]);
 }
 
 - (void)testSortByMultipleColumns {

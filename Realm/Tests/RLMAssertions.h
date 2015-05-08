@@ -47,3 +47,9 @@
         _XCTRegisterFailure(self, [_XCTFailureDescription(_XCTAssertion_True, 0, @#expression @" (EXPR_STRING) matches " @#regexString) stringByReplacingOccurrencesOfString:@"EXPR_STRING" withString:string ?: @"<nil>"], format); \
     } \
 })
+
+#define RLMAssertThrowsWithReasonMatching(expression, regex, ...) \
+({ \
+    NSException *exception = RLMAssertThrows(expression, __VA_ARGS__); \
+    RLMAssertMatches(exception.reason, regex, __VA_ARGS__); \
+})

@@ -650,14 +650,14 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
     else {
         // invalid predicate type
         @throw RLMPredicateException(@"Invalid predicate",
-                                     @"Only support compound, comparison and constant predicates");
+                                     @"Only support compound, comparison, and constant predicates");
     }
 }
 
 RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *propName) {
     // validate
     RLMProperty *prop = schema[propName];
-    RLMPrecondition(prop, @"Invalid sort column", @"Column named '%@' not found.", prop);
+    RLMPrecondition(prop, @"Invalid sort property", @"Property named '%@' not found on object of type '%@'.", propName, schema.className);
 
     switch (prop.type) {
         case RLMPropertyTypeBool:
@@ -669,8 +669,8 @@ RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *prop
             break;
 
         default:
-            @throw RLMPredicateException(@"Invalid sort column type",
-                                         @"Sorting is only supported on Bool, Date, Double, Float, Integer and String columns.");
+            @throw RLMPredicateException(@"Invalid sort property type",
+                                         @"Sorting is only supported on Bool, Date, Double, Float, Integer, and String properties.");
     }
     return prop;
 }
