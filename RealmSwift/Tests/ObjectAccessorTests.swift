@@ -165,4 +165,40 @@ class ObjectAccessorTests: TestCase {
 
         XCTAssertEqual(objects[0].longCol, updatedLongNumber, "After update: 2 ^ 33 expected")
     }
+
+    func testRelation() {
+        let realm = realmWithTestPath()
+
+        let object1 = SwiftObject()
+        let object2 = SwiftObject()
+
+        let trueObject = SwiftBoolObject()
+        trueObject.boolCol = true
+
+        let falseObject = SwiftBoolObject()
+        falseObject.boolCol = false
+
+        object1.arrayCol.append(trueObject)
+        object1.arrayCol.append(falseObject)
+
+        object2.arrayCol.append(trueObject)
+        object2.arrayCol.append(falseObject)
+
+        realm.write {
+            realm.add(object1)
+            realm.add(object2)
+        }
+
+        let objects = realm.objects(SwiftObject)
+
+        let firstObject = objects.first
+        XCTAssertEqual(2, firstObject!.arrayCol.count)
+
+        let lastObject = objects.last
+        XCTAssertEqual(2, lastObject!.arrayCol.count)
+
+        for obj in objects {
+            XCTAssertEqual(2, obj.arrayCol.count)
+        }
+    }
 }
