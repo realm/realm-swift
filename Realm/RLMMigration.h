@@ -89,7 +89,8 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
 
 /**
  Deletes the data for the class with the given name.
- This is used to clean up as removing RLMObject subclasses.
+ This deletes all objects of the given class, and if the RLMObject subclass no longer exists in your program,
+ cleans up any remaining metadata for the class in the Realm file.
  
  @param  name The name of the RLMObject class to delete.
  
