@@ -266,9 +266,13 @@ extension Results: CollectionType {
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
     public func generate() -> GeneratorOf<T> {
-        let base = NSFastGenerator(rlmResults)
+        var i: UInt = 0
         return GeneratorOf<T>() {
-            return base.next() as! T?
+            if (i >= self.rlmResults.count) {
+                return .None
+            } else {
+                return self.rlmResults[i++] as? T
+            }
         }
     }
 
