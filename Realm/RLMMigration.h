@@ -89,10 +89,11 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
 
 /**
  Deletes the data for the class with the given name.
+ This is used to clean up as removing RLMObject subclasses.
  
- @param   name The name of the RLMObject class to delete.
+ @param  name The name of the RLMObject class to delete.
  
- @return whether data was deleted.
+ @return whether there was any data to delete.
  */
 - (BOOL)deleteDataForClassName:(NSString *)name;
 

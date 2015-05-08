@@ -197,10 +197,11 @@ public final class Migration {
 
     /**
     Deletes the data for the class with the given name.
+    This is used to clean up as removing Object subclasses.
 
     :param:   name The name of the Object class to delete.
 
-    :returns: whether data was deleted.
+    :returns: whether there was any data to delete.
     */
     public func deleteData(objectClassName: String) -> Bool {
         return rlmMigration.deleteDataForClassName(objectClassName)
