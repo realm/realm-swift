@@ -91,6 +91,13 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(arrayCol!.type, PropertyType.Array)
         XCTAssertFalse(arrayCol!.indexed)
         XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
+
+        let dynamicArrayCol = SwiftCompanyObject().objectSchema["employees"]
+        XCTAssertNotNil(dynamicArrayCol)
+        XCTAssertEqual(dynamicArrayCol!.name, "employees")
+        XCTAssertEqual(dynamicArrayCol!.type, PropertyType.Array)
+        XCTAssertFalse(dynamicArrayCol!.indexed)
+        XCTAssertEqual(dynamicArrayCol!.objectClassName!, "SwiftEmployeeObject")
     }
 
     func testInvalidObjects() {
