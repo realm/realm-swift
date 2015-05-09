@@ -39,7 +39,7 @@ mv ${SRCROOT}/docs/html ${SRCROOT}/docs/output/${realm_version}
 
 ${jazzy} \
   --author Realm \
-  --author_url "http://realm.io" \
+  --author_url "https://realm.io" \
   --clean \
   --github_url https://github.com/realm/realm-cocoa \
   --github-file-prefix https://github.com/realm/realm-cocoa/tree/v${realm_version} \
