@@ -39,12 +39,12 @@ mv ${SRCROOT}/docs/html ${SRCROOT}/docs/output/${realm_version}
 
 ${jazzy} \
   --author Realm \
-  --author_url "http://realm.io" \
+  --author_url "https://realm.io" \
   --clean \
   --github_url https://github.com/realm/realm-cocoa \
   --github-file-prefix https://github.com/realm/realm-cocoa/tree/v${realm_version} \
   --module RealmSwift \
   --module-version ${realm_version} \
   --output "${SRCROOT}/docs/swift_output" \
-  --root-url http://realm.io/docs/swift/api/ \
+  --root-url https://realm.io/docs/swift/${realm_version}/api/ \
   --xcodebuild-arguments "-project,${SRCROOT}/RealmSwift.xcodeproj,-dry-run" \
