@@ -330,7 +330,7 @@ case "$COMMAND" in
 
     "test-ios-static")
         xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S,OS=7.1' test"
         exit 0
         ;;
 
