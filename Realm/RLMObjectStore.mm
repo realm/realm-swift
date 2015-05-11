@@ -348,7 +348,7 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
 void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
     // switch List<> properties to linkviews from standalone arrays
     static Class s_swiftObjectClass = NSClassFromString(@"RealmSwift.Object");
-    if (![object isKindOfClass:s_swiftObjectClass]) {
+    if (!object || !object->_row || ![object isKindOfClass:s_swiftObjectClass]) {
         return;
     }
 
