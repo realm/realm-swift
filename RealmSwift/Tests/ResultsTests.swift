@@ -264,6 +264,13 @@ class ResultsTests: TestCase {
 
         XCTAssertEqual(str, "12")
     }
+
+    func testArrayAggregateWithSwiftObjectDoesntThrow() {
+        let results = getAggregateableResults()
+
+        // Should not throw a type error.
+        results.filter("ANY stringListCol == %@", SwiftStringObject())
+    }
 }
 
 class ResultsFromTableTests: ResultsTests {

@@ -14,6 +14,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Swift: Enumerating through a standalone `List` whose objects themselves
   have list properties won't crash.
+* Swift: Using a subclass of `RealmSwift.Object` in an aggregate operator of a predicate
+  no longer throws a spurious type error.
 
 0.92.2 Release notes (2015-05-08)
 =============================================================
