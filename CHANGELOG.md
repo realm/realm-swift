@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Using a Swift subclass of Realm.Object in an aggregate operator of a predicate
+  no longer throws a spurious type error.
+
 0.92.2 Release notes (2015-05-08)
 =============================================================
 
