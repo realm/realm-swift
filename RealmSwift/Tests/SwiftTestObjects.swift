@@ -113,6 +113,10 @@ class SwiftArrayPropertyObject: Object {
     let intArray = List<SwiftIntObject>()
 }
 
+class SwiftListOfSwiftObject: Object {
+    let array = List<SwiftObject>()
+}
+
 class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
     let boolArray = List<SwiftBoolObject>()
 }

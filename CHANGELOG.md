@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Swift: Enumerating through a standalone `List` whose objects themselves
+  have list properties won't crash.
+
 0.92.2 Release notes (2015-05-08)
 =============================================================
 
