@@ -254,10 +254,10 @@ public final class Results<T: Object>: Printable {
 
     :param: property The name of a property conforming to `AddableType` to calculate average on.
 
-    :returns: The average of the given property over all objects in the Results.
+    :returns: The average of the given property over all objects in the Results, or `nil` if the Results is empty.
     */
-    public func average<U: AddableType>(property: String) -> U {
-        return rlmResults.averageOfProperty(property) as AnyObject as! U
+    public func average<U: AddableType>(property: String) -> U? {
+        return rlmResults.averageOfProperty(property) as! U?
     }
 }
 
