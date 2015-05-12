@@ -33,7 +33,7 @@ namespace realm {
 @end
 
 // throw an exception if the realm is being used from the wrong thread
-static inline void RLMCheckThread(unretained<RLMRealm> realm) {
+static inline void RLMCheckThread(__unsafe_unretained RLMRealm *const realm) {
     if (realm->_threadID != pthread_mach_thread_np(pthread_self())) {
         @throw RLMException(@"Realm accessed from incorrect thread");
     }
