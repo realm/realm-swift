@@ -75,6 +75,15 @@ class ListTests: TestCase {
         XCTAssertFalse(array.description.isEmpty)
     }
 
+    func testInvalidated() {
+        XCTAssertFalse(array.invalidated)
+
+        if let realm = arrayObject.realm {
+            realm.delete(arrayObject)
+            XCTAssertTrue(array.invalidated)
+        }
+    }
+
     func testCount() {
         XCTAssertEqual(Int(0), array.count)
 

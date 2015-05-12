@@ -8,7 +8,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Swift: Added `List.invalidated`, which returns if the given `List` is no longer
+  safe to be accessed, and is analogous to `-[RLMArray isInvalidated]`.
 
 ### Bugfixes
 

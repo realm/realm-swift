@@ -62,6 +62,9 @@ public final class List<T: Object>: ListBase {
         return Realm(_rlmArray.realm)
     }
 
+    /// Indicates if the list can no longer be accessed.
+    public var invalidated: Bool { return _rlmArray.invalidated }
+
     // MARK: Initializers
 
     /// Creates a `List` that holds objects of type `T`.
