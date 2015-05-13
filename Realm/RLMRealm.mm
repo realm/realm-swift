@@ -324,7 +324,7 @@ atomic<bool> s_syncLogEverything(false);
 }
 
 
-- (void)close {
+- (void)closeAndTryToReconnectLater {
     if (!_isOpen)
         return;
 
@@ -341,10 +341,12 @@ atomic<bool> s_syncLogEverything(false);
 
     _isOpen = NO;
 
-    NSLog(@"RealmSync: Connection[%lu]: Closed", _ident);
+    NSTimeInterval reconnectDelay = 5;
 
-    // FIXME: Retry opening the connection after a delay, maybe with a
-    // progressively growing delay.
+    NSLog(@"RealmSync: Connection[%lu]: Closed (will try to reconnect in %g seconds)",
+          _ident, (double)reconnectDelay);
+
+    [self performSelector:@selector(open) withObject:nil afterDelay:reconnectDelay];
 }
 
 
@@ -362,7 +364,7 @@ atomic<bool> s_syncLogEverything(false);
     msg.head = [NSString stringWithFormat:@"ident %@ %lu\n", sessionIdent, (unsigned long)msg.body.length];
     [self enqueueOutputMessage:msg];
     NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: Get unique client identifier for "
-          "remote file '%@'", _ident, sessionIdent, serverPath);
+          "remote Realm '%@'", _ident, sessionIdent, serverPath);
 }
 
 
@@ -379,8 +381,8 @@ atomic<bool> s_syncLogEverything(false);
                          ulonglong(fileIdent), ulonglong(serverVersion), ulonglong(clientVersion),
                          (unsigned long)msg.body.length];
     [self enqueueOutputMessage:msg];
-    NSLog(@"RealmSync: Connection[%lu]: Sessions[%@]: Sending: Bind local file '%@' "
-          "with identifier %llu to remote file '%@' continuing synchronization from "
+    NSLog(@"RealmSync: Connection[%lu]: Sessions[%@]: Sending: Bind local Realm '%@' "
+          "with identifier %llu to remote Realm '%@' continuing synchronization from "
           "server version %llu, whose last integrated client version is %llu", _ident,
           sessionIdent, clientPath, ulonglong(fileIdent), serverPath, ulonglong(serverVersion),
           ulonglong(clientVersion));
@@ -444,8 +446,7 @@ atomic<bool> s_syncLogEverything(false);
             if (n < 0) {
                 NSLog(@"RealmSync: Connection[%lu]: Error reading from socket: %@",
                       _ident, _inputStream.streamError);
-                // FIXME: Report the error, close the connection, and try to
-                // reconnect later
+                [self closeAndTryToReconnectLater];
                 return;
             }
             if (n == 0)
@@ -466,8 +467,7 @@ atomic<bool> s_syncLogEverything(false);
                     _headBufferCurr = copy(inputBegin, i, _headBufferCurr);
                     if (_headBufferCurr == headBufferEnd) {
                         NSLog(@"RealmSync: Connection[%lu]: Message head too big", _ident);
-                        // FIXME: Report the error, close the connection, and
-                        // try to reconnect later
+                        [self closeAndTryToReconnectLater];
                         return;
                     }
                     inputBegin = i;
@@ -503,8 +503,7 @@ atomic<bool> s_syncLogEverything(false);
                         if (!good) {
                             NSLog(@"RealmSync: Connection[%lu]: Bad 'changeset' message "
                                   "from server", _ident);
-                            // FIXME: Report the error, close the connection,
-                            // and try to reconnect later
+                            [self closeAndTryToReconnectLater];
                             return;
                         }
                         _messageBodySize = changesetSize;
@@ -530,8 +529,7 @@ atomic<bool> s_syncLogEverything(false);
                         if (!good) {
                             NSLog(@"RealmSync: Connection[%lu]: Bad 'accept' message "
                                   "from server", _ident);
-                            // FIXME: Report the error, close the connection,
-                            // and try to reconnect later
+                            [self closeAndTryToReconnectLater];
                             return;
                         }
                         NSNumber *sessionIdent2 = [NSNumber numberWithUnsignedInteger:sessionIdent];
@@ -549,8 +547,7 @@ atomic<bool> s_syncLogEverything(false);
                         if (!good) {
                             NSLog(@"RealmSync: Connection[%lu]: Bad 'ident' message "
                                   "from server", _ident);
-                            // FIXME: Report the error, close the connection,
-                            // and try to reconnect later
+                            [self closeAndTryToReconnectLater];
                             return;
                         }
                         NSNumber *sessionIdent2 = [NSNumber numberWithUnsignedInteger:sessionIdent];
@@ -558,8 +555,7 @@ atomic<bool> s_syncLogEverything(false);
                     }
                     else {
                         NSLog(@"RealmSync: Connection[%lu]: Bad message from server", _ident);
-                        // FIXME: Report the error, close the connection, and
-                        // try to reconnect later
+                        [self closeAndTryToReconnectLater];
                         return;
                     }
                 }
@@ -602,8 +598,7 @@ atomic<bool> s_syncLogEverything(false);
             if (n < 0) {
                 NSLog(@"RealmSync: Connection[%lu]: Error writing to socket: %@",
                       _ident, _outputStream.streamError);
-                // FIXME: Report the error, close the connection, and try to
-                // reconnect later
+                [self closeAndTryToReconnectLater];
                 return;
             }
             _currentOutputBegin += n;
@@ -621,15 +616,14 @@ atomic<bool> s_syncLogEverything(false);
                 return;
           end_of_input:
             NSLog(@"RealmSync: Connection[%lu]: Server closed connection", _ident);
-            // FIXME: Report the error, and try to reconnect later
+            [self closeAndTryToReconnectLater];
             return;
         }
         case NSStreamEventErrorOccurred: {
             if (stream != _inputStream && stream != _outputStream)
                 return;
-            NSLog(@"RealmSync: Connection[%lu]: Socket error: %@",
-                  _ident, _outputStream.streamError);
-            // FIXME: Report the error, close the connection, and try to reconnect later
+            NSLog(@"RealmSync: Connection[%lu]: Socket error: %@", _ident, stream.streamError);
+            [self closeAndTryToReconnectLater];
             return;
         }
     }
@@ -639,7 +633,7 @@ atomic<bool> s_syncLogEverything(false);
 - (void)handleIdentMessageWithSessionIdent:(NSNumber *)sessionIdent
                                  fileIdent:(uint_fast64_t)fileIdent {
     typedef unsigned long long ulonglong;
-    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: Identify client file by %llu",
+    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: Identify client Realm by %llu",
           _ident, sessionIdent, ulonglong(fileIdent));
 
     RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
@@ -658,7 +652,7 @@ atomic<bool> s_syncLogEverything(false);
     if (s_syncLogEverything) {
         typedef unsigned long long ulonglong;
         NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: Changeset %llu -> %llu "
-              "of size %lu with origin timestamp %llu and origin client file identifier %llu "
+              "of size %lu with origin timestamp %llu and origin client Realm identifier %llu "
               "(last integrated client version is %llu)", _ident, sessionIdent,
               ulonglong(serverVersion-1), ulonglong(serverVersion), (unsigned long)_messageBodyBuffer.length,
               ulonglong(originTimestamp), ulonglong(originFileIdent), ulonglong(clientVersion));
@@ -705,6 +699,7 @@ atomic<bool> s_syncLogEverything(false);
 
     unique_ptr<SharedGroup> _backgroundSharedGroup; // For background thread
     unique_ptr<Replication> _backgroundHistory;     // For background thread
+    realm::SyncBase        *_backgroundTransformer; // For background thread
 
     Replication::version_type _latestVersionAvailable;
     Replication::version_type _latestVersionUploaded;
@@ -737,6 +732,10 @@ atomic<bool> s_syncLogEverything(false);
                                                           serverSynchronizationMode);
         _backgroundSharedGroup =
             make_unique<SharedGroup>(*_backgroundHistory, durability);
+        std::unique_ptr<realm::SyncBase> backgroundTransformer =
+            realm::make_sync_demo(false, *_backgroundHistory);
+        _backgroundTransformer = backgroundTransformer.get();
+        _backgroundHistory->set_sync(std::move(backgroundTransformer));
 
         _uploadInProgress = NO;
 
@@ -811,11 +810,6 @@ atomic<bool> s_syncLogEverything(false);
                                            serverPath:_serverPath];
         return;
     }
-    
-    // FIXME: Is it okay to access _backgroundHistory here?
-    auto sync = realm::make_sync_demo(false, *_backgroundHistory);
-    sync->set_peer_id(_fileIdent);
-    _backgroundHistory->set_sync(std::move(sync));
 
     _latestVersionUploaded = _syncProgressClientVersion;
     if (_latestVersionUploaded > _latestVersionAvailable) // Transiently possible (FIXME: Or is it?)
@@ -891,6 +885,7 @@ atomic<bool> s_syncLogEverything(false);
 
 - (void)handleIdentMessageWithFileIdent:(uint_fast64_t)fileIdent {
     _history->set_client_file_ident(fileIdent); // Save in persistent storage
+    _backgroundTransformer->set_peer_id(fileIdent); // FIXME: Describe what (if anything) prevents a race condition here, as a naive analysis would suggest that the background thread could be accessing _backgroundHistory concurrently. It would be tempting to conclude that a race is not possible, because the background thread must not attempt to transform anything before the file identifier is known. Note that it cannot be assumed the there will be no spurious 'ident' messages received.
     _fileIdent = fileIdent;
     if (_connection.isOpen)
         [self connectionIsOpen];
@@ -926,7 +921,7 @@ atomic<bool> s_syncLogEverything(false);
     if (!good_versions) {
         NSLog(@"RealmSync: Connection[%lu]: Session[%@]: ERROR: Bad server or client version "
               "in 'changeset' message", _connection.ident, _sessionIdent);
-        [_connection close];
+        [_connection closeAndTryToReconnectLater];
         return;
 
     }
@@ -983,7 +978,7 @@ atomic<bool> s_syncLogEverything(false);
     if (!good_versions) {
         NSLog(@"RealmSync: Connection[%lu]: Session[%@]: ERROR: Bad server or client version "
               "in 'accept' message", _connection.ident, _sessionIdent);
-        [_connection close];
+        [_connection closeAndTryToReconnectLater];
         return;
 
     }
