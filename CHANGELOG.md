@@ -3,7 +3,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* `Results.average(_:)` now returns an optional, which is `nil` if and only if the results
+* Swift: `Results.average(_:)` now returns an optional, which is `nil` if and only if the results
   set is empty.
 
 ### Enhancements
