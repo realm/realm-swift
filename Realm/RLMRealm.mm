@@ -752,6 +752,8 @@ atomic<bool> s_syncLogEverything(false);
     uint_fast64_t fileIdent;
     _history->get_sync_info(fileIdent, _syncProgressServerVersion, _syncProgressClientVersion);
     _fileIdent = fileIdent;
+    if (fileIdent != 0)
+        _backgroundTransformer->set_peer_id(fileIdent);
 
     REALM_ASSERT(_syncProgressClientVersion >= 1);
 
