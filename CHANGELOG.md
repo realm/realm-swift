@@ -10,6 +10,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Swift: Added `List.invalidated`, which returns if the given `List` is no longer
   safe to be accessed, and is analogous to `-[RLMArray isInvalidated]`.
+* Assertion messages are automatically logged to Crashlytics if it's loaded
+  into the current process to make it easier to diagnose crashes.
 
 ### Bugfixes
 
@@ -17,6 +19,11 @@ x.x.x Release notes (yyyy-MM-dd)
   have list properties won't crash.
 * Swift: Using a subclass of `RealmSwift.Object` in an aggregate operator of a predicate
   no longer throws a spurious type error.
+* Fix incorrect results for when using OR in a query on a `RLMArray`/`List<>`.
+* Fix incorrect values from `[RLMResults count]`/`Results.count` when using
+  `!=` on an int property with no other query conditions.
+* Lower the maximum doubling threshold for Realm file sizes from 128MB to 16MB
+  to reduce the amount of wasted space.
 
 0.92.2 Release notes (2015-05-08)
 =============================================================
