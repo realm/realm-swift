@@ -1,0 +1,448 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E81D29431B015EFF009EDD76 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E81D29421B015EFF009EDD76 /* AppDelegate.m */; };
+		E81D29451B015EFF009EDD76 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E81D29441B015EFF009EDD76 /* main.m */; };
+		E81D29481B015EFF009EDD76 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E81D29471B015EFF009EDD76 /* ViewController.m */; };
+		E81D294A1B015EFF009EDD76 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E81D29491B015EFF009EDD76 /* Images.xcassets */; };
+		E81D294D1B015EFF009EDD76 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E81D294B1B015EFF009EDD76 /* Main.storyboard */; };
+		E81D29591B015EFF009EDD76 /* CarthageExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81D29581B015EFF009EDD76 /* CarthageExampleTests.m */; };
+		E887530C1B01605F00DD2234 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E887530B1B01605F00DD2234 /* Realm.framework */; };
+		E887530D1B01605F00DD2234 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E887530B1B01605F00DD2234 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E81D29531B015EFF009EDD76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E81D29341B015EFE009EDD76 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E81D293B1B015EFE009EDD76;
+			remoteInfo = CarthageExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E887530E1B01605F00DD2234 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E887530D1B01605F00DD2234 /* Realm.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		E81D293C1B015EFE009EDD76 /* CarthageExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarthageExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E81D29401B015EFF009EDD76 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E81D29411B015EFF009EDD76 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		E81D29421B015EFF009EDD76 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		E81D29441B015EFF009EDD76 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		E81D29461B015EFF009EDD76 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		E81D29471B015EFF009EDD76 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		E81D29491B015EFF009EDD76 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		E81D294C1B015EFF009EDD76 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		E81D29521B015EFF009EDD76 /* CarthageExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CarthageExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E81D29571B015EFF009EDD76 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E81D29581B015EFF009EDD76 /* CarthageExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CarthageExampleTests.m; sourceTree = "<group>"; };
+		E887530B1B01605F00DD2234 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/Mac/Realm.framework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E81D29391B015EFE009EDD76 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E887530C1B01605F00DD2234 /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E81D294F1B015EFF009EDD76 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E81D29331B015EFE009EDD76 = {
+			isa = PBXGroup;
+			children = (
+				E887530B1B01605F00DD2234 /* Realm.framework */,
+				E81D293E1B015EFE009EDD76 /* CarthageExample */,
+				E81D29551B015EFF009EDD76 /* CarthageExampleTests */,
+				E81D293D1B015EFE009EDD76 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E81D293D1B015EFE009EDD76 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E81D293C1B015EFE009EDD76 /* CarthageExample.app */,
+				E81D29521B015EFF009EDD76 /* CarthageExampleTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E81D293E1B015EFE009EDD76 /* CarthageExample */ = {
+			isa = PBXGroup;
+			children = (
+				E81D29411B015EFF009EDD76 /* AppDelegate.h */,
+				E81D29421B015EFF009EDD76 /* AppDelegate.m */,
+				E81D29461B015EFF009EDD76 /* ViewController.h */,
+				E81D29471B015EFF009EDD76 /* ViewController.m */,
+				E81D29491B015EFF009EDD76 /* Images.xcassets */,
+				E81D294B1B015EFF009EDD76 /* Main.storyboard */,
+				E81D293F1B015EFE009EDD76 /* Supporting Files */,
+			);
+			path = CarthageExample;
+			sourceTree = "<group>";
+		};
+		E81D293F1B015EFE009EDD76 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E81D29401B015EFF009EDD76 /* Info.plist */,
+				E81D29441B015EFF009EDD76 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E81D29551B015EFF009EDD76 /* CarthageExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				E81D29581B015EFF009EDD76 /* CarthageExampleTests.m */,
+				E81D29561B015EFF009EDD76 /* Supporting Files */,
+			);
+			path = CarthageExampleTests;
+			sourceTree = "<group>";
+		};
+		E81D29561B015EFF009EDD76 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E81D29571B015EFF009EDD76 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E81D293B1B015EFE009EDD76 /* CarthageExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E81D295C1B015EFF009EDD76 /* Build configuration list for PBXNativeTarget "CarthageExample" */;
+			buildPhases = (
+				E81D29381B015EFE009EDD76 /* Sources */,
+				E81D29391B015EFE009EDD76 /* Frameworks */,
+				E81D293A1B015EFE009EDD76 /* Resources */,
+				E887530E1B01605F00DD2234 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CarthageExample;
+			productName = CarthageExample;
+			productReference = E81D293C1B015EFE009EDD76 /* CarthageExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E81D29511B015EFF009EDD76 /* CarthageExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E81D295F1B015EFF009EDD76 /* Build configuration list for PBXNativeTarget "CarthageExampleTests" */;
+			buildPhases = (
+				E81D294E1B015EFF009EDD76 /* Sources */,
+				E81D294F1B015EFF009EDD76 /* Frameworks */,
+				E81D29501B015EFF009EDD76 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E81D29541B015EFF009EDD76 /* PBXTargetDependency */,
+			);
+			name = CarthageExampleTests;
+			productName = CarthageExampleTests;
+			productReference = E81D29521B015EFF009EDD76 /* CarthageExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E81D29341B015EFE009EDD76 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0630;
+				ORGANIZATIONNAME = Realm;
+				TargetAttributes = {
+					E81D293B1B015EFE009EDD76 = {
+						CreatedOnToolsVersion = 6.3.1;
+					};
+					E81D29511B015EFF009EDD76 = {
+						CreatedOnToolsVersion = 6.3.1;
+						TestTargetID = E81D293B1B015EFE009EDD76;
+					};
+				};
+			};
+			buildConfigurationList = E81D29371B015EFE009EDD76 /* Build configuration list for PBXProject "CarthageExample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E81D29331B015EFE009EDD76;
+			productRefGroup = E81D293D1B015EFE009EDD76 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E81D293B1B015EFE009EDD76 /* CarthageExample */,
+				E81D29511B015EFF009EDD76 /* CarthageExampleTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E81D293A1B015EFE009EDD76 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E81D294A1B015EFF009EDD76 /* Images.xcassets in Resources */,
+				E81D294D1B015EFF009EDD76 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E81D29501B015EFF009EDD76 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E81D29381B015EFE009EDD76 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E81D29481B015EFF009EDD76 /* ViewController.m in Sources */,
+				E81D29451B015EFF009EDD76 /* main.m in Sources */,
+				E81D29431B015EFF009EDD76 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E81D294E1B015EFF009EDD76 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E81D29591B015EFF009EDD76 /* CarthageExampleTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E81D29541B015EFF009EDD76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E81D293B1B015EFE009EDD76 /* CarthageExample */;
+			targetProxy = E81D29531B015EFF009EDD76 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		E81D294B1B015EFF009EDD76 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E81D294C1B015EFF009EDD76 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		E81D295A1B015EFF009EDD76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/Mac";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		E81D295B1B015EFF009EDD76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/Mac";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		E81D295D1B015EFF009EDD76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = CarthageExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E81D295E1B015EFF009EDD76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = CarthageExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		E81D29601B015EFF009EDD76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = CarthageExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CarthageExample.app/Contents/MacOS/CarthageExample";
+			};
+			name = Debug;
+		};
+		E81D29611B015EFF009EDD76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = CarthageExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CarthageExample.app/Contents/MacOS/CarthageExample";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E81D29371B015EFE009EDD76 /* Build configuration list for PBXProject "CarthageExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E81D295A1B015EFF009EDD76 /* Debug */,
+				E81D295B1B015EFF009EDD76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E81D295C1B015EFF009EDD76 /* Build configuration list for PBXNativeTarget "CarthageExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E81D295D1B015EFF009EDD76 /* Debug */,
+				E81D295E1B015EFF009EDD76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E81D295F1B015EFF009EDD76 /* Build configuration list for PBXNativeTarget "CarthageExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E81D29601B015EFF009EDD76 /* Debug */,
+				E81D29611B015EFF009EDD76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E81D29341B015EFE009EDD76 /* Project object */;
+}
