@@ -553,7 +553,7 @@ case "$COMMAND" in
     "package-examples")
         cd tightdb_objc
         ./scripts/package_examples.rb
-        zip --symlinks -r realm-examples.zip examples
+        zip --symlinks -r realm-examples.zip examples -x "examples/installation/*"
         ;;
 
     "package-test-examples")
