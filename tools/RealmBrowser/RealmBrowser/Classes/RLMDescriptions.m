@@ -56,7 +56,7 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
     if (self) {
         dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateStyle = NSDateFormatterMediumStyle;
-        dateFormatter.timeStyle = NSDateFormatterShortStyle;
+        dateFormatter.timeStyle = NSDateFormatterMediumStyle;
         
         numberFormatter = [[NSNumberFormatter alloc] init];
         numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;

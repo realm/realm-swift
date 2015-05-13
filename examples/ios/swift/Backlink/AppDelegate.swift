@@ -25,7 +25,7 @@ class Dog: RLMObject {
     var owners: [Person] {
         // Realm doesn't persist this property because it only has a getter defined
         // Define "owners" as the inverse relationship to Person.dogs
-        return linkingObjectsOfClass("Person", forProperty: "dogs") as [Person]
+        return linkingObjectsOfClass(Person.className(), forProperty: "dogs") as! [Person]
     }
 }
 
@@ -39,11 +39,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: NSDictionary?) -> Bool {
-
-        self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
-        self.window!.rootViewController = UIViewController()
-        self.window!.makeKeyAndVisible()
+    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+        window = UIWindow(frame: UIScreen.mainScreen().bounds)
+        window?.rootViewController = UIViewController()
+        window?.makeKeyAndVisible()
 
         NSFileManager.defaultManager().removeItemAtPath(RLMRealm.defaultRealmPath(), error: nil)
 
@@ -56,7 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Log all dogs and their owners using the "owners" inverse relationship
         let allDogs = Dog.allObjects()
         for dog in allDogs {
-            let dog = dog as Dog
+            let dog = dog as! Dog
             let ownerNames = dog.owners.map { $0.name }
             println("\(dog.name) has \(ownerNames.count) owners (\(ownerNames))")
         }

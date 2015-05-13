@@ -17,9 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMObjectStore.hpp"
 
 @class RLMObjectSchema, RLMProperty, RLMObjectBase;
+
+typedef NSUInteger RLMCreationOptions;
 
 //
 // Accessors Class Creation/Caching

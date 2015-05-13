@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMModelExporter.h"
-#import <Realm/Realm.h>
+@import Realm;
 
 NSString * const kLanguageJava = @"Java";
 NSString * const kLanguageObjC = @"Objective-C";
@@ -77,6 +77,7 @@ NSString * const kLanguageObjC = @"Objective-C";
         
         if (!success) {
             NSLog(@"Error writing file at %@\n%@", url, [error localizedFailureReason]);
+            [[NSApplication sharedApplication] presentError:error];
         }
     }
 }

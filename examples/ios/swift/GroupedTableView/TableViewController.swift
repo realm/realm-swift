@@ -48,7 +48,7 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set realm notification block
-        notificationToken = RLMRealm.defaultRealm().addNotificationBlock { note, realm in
+        notificationToken = RLMRealm.defaultRealm().addNotificationBlock { [unowned self] note, realm in
             self.tableView.reloadData()
         }
         for section in sectionTitles {
@@ -84,7 +84,7 @@ class TableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as Cell
+        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! Cell
 
         let object = objectForIndexPath(indexPath)!
         cell.textLabel?.text = object.title

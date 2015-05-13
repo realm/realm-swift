@@ -16,8 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include <stdio.h>
-#import <Foundation/Foundation.h>
+#import <Realm/RLMConstants.h>
 
 NSString * const RLMRealmRefreshRequiredNotification = @"RLMRealmRefreshRequiredNotification";
 NSString * const RLMRealmDidChangeNotification = @"RLMRealmDidChangeNotification";
+
+NSString * const RLMErrorDomain = @"io.realm";
+
+NSString * const RLMExceptionName = @"RLMException";
+
+NSString * const RLMRealmVersionKey = @"RLMRealmVersion";
+
+NSString * const RLMRealmCoreVersionKey = @"RLMRealmCoreVersion";

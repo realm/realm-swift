@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
 #import "RLMTableCellView.h"
 
 @interface RLMBoolTableCellView : RLMTableCellView

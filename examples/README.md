@@ -10,22 +10,22 @@ The following examples are located in the `ios/objc/RealmExamples.xcodeproj` pro
 
 Chat app to demonstrate how to use a synced realm. To run, follow these steps:
 
-* checkout tightdb's [sync-demo branch](https://github.com/tightdb/tightdb/tree/sync-demo)
-* Build tightdb by running `sh build.sh config && sh build.sh build && sh build.sh build-iphone`
-* Move tightdb's `iphone-lib` folder to the root of this repo and rename it to `core`
-* Start the realm server by running `python realm_server.py`
-* Edit `examples/ios/objc/Chat/AppDelegate.m` to use the IP address or hostname of the computer running the realm server
+* Checkout realm-core’s [sync-demo-2 branch](https://github.com/tightdb/tightdb/tree/sync-demo-2)
+* Build realm-core by running `sh build.sh config && sh build.sh build-cocoa`
+* Copy the `core` directory from your realm-cocoa to your realm-cocoa-private directory
+* In realm-core start the realm server by running `./src/realm/realm-server-noinst <HOSTNAME>`
+* Edit `examples/ios/objc/Chat/AppDelegate.m` to use the hostname of the computer running the realm server
 * Run the "Chat" scheme
 
 ### Draw
 
 Drawing app to demonstrate how to use a synced realm. To run, follow these steps:
 
-* Checkout tightdb's [sync-demo-2 branch](https://github.com/tightdb/tightdb/tree/sync-demo-2)
-* Build tightdb by running `sh build.sh config && sh build.sh build-cocoa`
+* Checkout realm-core’s [sync-demo-2 branch](https://github.com/tightdb/tightdb/tree/sync-demo-2)
+* Build realm-core by running `sh build.sh config && sh build.sh build-cocoa`
 * Copy the `core` directory from your realm-cocoa to your realm-cocoa-private directory
-* In realm-core start the realm server by running `./src/tightdb/tightdb-server-noinst <HOSTNAME>`
-* Edit `examples/ios/objc/Draw/AppDelegate.m` and `examples/osx/objc/Draw/AppDelegate.m` to use the IP address or hostname of the computer running the realm server
+* In realm-core start the realm server by running `./src/realm/realm-server-noinst <HOSTNAME>`
+* Edit `examples/ios/objc/Draw/AppDelegate.m` and `examples/osx/objc/Draw/AppDelegate.m` to use the hostname of the computer running the realm server
 * Run the "Draw" scheme in both examples projects
 
 ### Simple
@@ -96,7 +96,7 @@ This simple app demonstrates how to define models with inverse relationships usi
 
 ***RubyMotion support is experimental. We make no claims towards stability and/or performance when using Realm in RubyMotion.***
 
-In the `ios/rubymotion` directory, you will find a Simple example demonstrating how to use Realm in a [RubyMotion](http://www.rubymotion.com) iOS app. Make sure to have run `sh build.sh ios` from the root of this repo before building and running this example. You can build and run this example by running `rake` from the `rubymotion/Simple` directory.
+In the `ios/rubymotion` directory, you will find a Simple example demonstrating how to use Realm in a [RubyMotion](http://www.rubymotion.com) iOS app. Make sure to have run `sh build.sh ios-static` from the root of this repo before building and running this example. You can build and run this example by running `rake` from the `rubymotion/Simple` directory.
 
 To use Realm in your own RubyMotion iOS or OSX app, you must define your models in Objective-C and place them in the `models/` directory. Then in your `Rakefile`, define the following `vendor_project`s:
 

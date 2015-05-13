@@ -111,52 +111,52 @@ class SwiftArrayTests: SwiftTestCase {
 
         // MIN ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int min
-        var min = noArray.minOfProperty("intCol") as NSNumber
+        var min = noArray.minOfProperty("intCol") as! NSNumber
         XCTAssertEqual(min.intValue, Int32(1), "Minimum should be 1")
-        min = yesArray.minOfProperty("intCol") as NSNumber
+        min = yesArray.minOfProperty("intCol") as! NSNumber
         XCTAssertEqual(min.intValue, Int32(0), "Minimum should be 0")
 
         // Test float min
-        min = noArray.minOfProperty("floatCol") as NSNumber
+        min = noArray.minOfProperty("floatCol") as! NSNumber
         XCTAssertEqualWithAccuracy(min.floatValue, Float(0), 0.1, "Minimum should be 0.0f")
-        min = yesArray.minOfProperty("floatCol") as NSNumber
+        min = yesArray.minOfProperty("floatCol") as! NSNumber
         XCTAssertEqualWithAccuracy(min.floatValue, Float(1.2), 0.1, "Minimum should be 1.2f")
 
         // Test double min
-        min = noArray.minOfProperty("doubleCol") as NSNumber
+        min = noArray.minOfProperty("doubleCol") as! NSNumber
         XCTAssertEqualWithAccuracy(min.doubleValue, Double(2.5), 0.1, "Minimum should be 1.5")
-        min = yesArray.minOfProperty("doubleCol") as NSNumber
+        min = yesArray.minOfProperty("doubleCol") as! NSNumber
         XCTAssertEqualWithAccuracy(min.doubleValue, Double(0), 0.1, "Minimum should be 0.0")
 
         // Test date min
-        var dateMinOutput = noArray.minOfProperty("dateCol") as NSDate
+        var dateMinOutput = noArray.minOfProperty("dateCol") as! NSDate
         XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, "Minimum should be dateMaxInput")
-        dateMinOutput = yesArray.minOfProperty("dateCol") as NSDate
+        dateMinOutput = yesArray.minOfProperty("dateCol") as! NSDate
         XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, "Minimum should be dateMinInput")
 
         // MAX ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int max
-        var max = noArray.maxOfProperty("intCol") as NSNumber
+        var max = noArray.maxOfProperty("intCol") as! NSNumber
         XCTAssertEqual(max.integerValue, 1, "Maximum should be 8")
-        max = yesArray.maxOfProperty("intCol") as NSNumber
+        max = yesArray.maxOfProperty("intCol") as! NSNumber
         XCTAssertEqual(max.integerValue, 0, "Maximum should be 10")
 
         // Test float max
-        max = noArray.maxOfProperty("floatCol") as NSNumber
+        max = noArray.maxOfProperty("floatCol") as! NSNumber
         XCTAssertEqualWithAccuracy(max.floatValue, Float(0), 0.1, "Maximum should be 0.0f")
-        max = yesArray.maxOfProperty("floatCol") as NSNumber
+        max = yesArray.maxOfProperty("floatCol") as! NSNumber
         XCTAssertEqualWithAccuracy(max.floatValue, Float(1.2), 0.1, "Maximum should be 1.2f")
 
         // Test double max
-        max = noArray.maxOfProperty("doubleCol") as NSNumber
+        max = noArray.maxOfProperty("doubleCol") as! NSNumber
         XCTAssertEqualWithAccuracy(max.doubleValue, Double(2.5), 0.1, "Maximum should be 3.5")
-        max = yesArray.maxOfProperty("doubleCol") as NSNumber
+        max = yesArray.maxOfProperty("doubleCol") as! NSNumber
         XCTAssertEqualWithAccuracy(max.doubleValue, Double(0), 0.1, "Maximum should be 0.0")
 
         // Test date max
-        var dateMaxOutput = noArray.maxOfProperty("dateCol") as NSDate
+        var dateMaxOutput = noArray.maxOfProperty("dateCol") as! NSDate
         XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, "Maximum should be dateMaxInput")
-        dateMaxOutput = yesArray.maxOfProperty("dateCol") as NSDate
+        dateMaxOutput = yesArray.maxOfProperty("dateCol") as! NSDate
         XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, "Maximum should be dateMinInput")
     }
 
@@ -225,13 +225,13 @@ class SwiftArrayTests: SwiftTestCase {
 
         XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
 
-        var test = peopleInCompany[0] as SwiftEmployeeObject
+        var test = peopleInCompany[0] as! SwiftEmployeeObject
         XCTAssertEqual(test.age, po1.age, "Should be equal")
         XCTAssertEqual(test.name, po1.name, "Should be equal")
         XCTAssertEqual(test.hired, po1.hired, "Should be equal")
         // XCTAssertEqual(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
-        test = peopleInCompany[1] as SwiftEmployeeObject
+        test = peopleInCompany[1] as! SwiftEmployeeObject
         XCTAssertEqual(test.age, po3.age, "Should be equal")
         XCTAssertEqual(test.name, po3.name, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
@@ -338,52 +338,52 @@ class SwiftArrayTests: SwiftTestCase {
 
         // MIN ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int min
-        var min = noArray.minOfProperty("intCol") as NSNumber
+        var min = noArray.minOfProperty("intCol") as! NSNumber
         XCTAssertEqual(min.intValue, Int32(1), "Minimum should be 1")
-        min = yesArray.minOfProperty("intCol") as NSNumber
+        min = yesArray.minOfProperty("intCol") as! NSNumber
         XCTAssertEqual(min.intValue, Int32(0), "Minimum should be 0")
 
         // Test float min
-        min = noArray.minOfProperty("floatCol") as NSNumber
+        min = noArray.minOfProperty("floatCol") as! NSNumber
         XCTAssertEqualWithAccuracy(min.floatValue, Float(0), 0.1, "Minimum should be 0.0f")
-        min = yesArray.minOfProperty("floatCol") as NSNumber
+        min = yesArray.minOfProperty("floatCol") as! NSNumber
         XCTAssertEqualWithAccuracy(min.floatValue, Float(1.2), 0.1, "Minimum should be 1.2f")
 
         // Test double min
-        min = noArray.minOfProperty("doubleCol") as NSNumber
+        min = noArray.minOfProperty("doubleCol") as! NSNumber
         XCTAssertEqualWithAccuracy(min.doubleValue, Double(2.5), 0.1, "Minimum should be 1.5")
-        min = yesArray.minOfProperty("doubleCol") as NSNumber
+        min = yesArray.minOfProperty("doubleCol") as! NSNumber
         XCTAssertEqualWithAccuracy(min.doubleValue, Double(0), 0.1, "Minimum should be 0.0")
 
         // Test date min
-        var dateMinOutput = noArray.minOfProperty("dateCol") as NSDate
+        var dateMinOutput = noArray.minOfProperty("dateCol") as! NSDate
         XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, "Minimum should be dateMaxInput")
-        dateMinOutput = yesArray.minOfProperty("dateCol") as NSDate
+        dateMinOutput = yesArray.minOfProperty("dateCol") as! NSDate
         XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, "Minimum should be dateMinInput")
 
         // MAX ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int max
-        var max = noArray.maxOfProperty("intCol") as NSNumber
+        var max = noArray.maxOfProperty("intCol") as! NSNumber
         XCTAssertEqual(max.integerValue, 1, "Maximum should be 8")
-        max = yesArray.maxOfProperty("intCol") as NSNumber
+        max = yesArray.maxOfProperty("intCol") as! NSNumber
         XCTAssertEqual(max.integerValue, 0, "Maximum should be 10")
 
         // Test float max
-        max = noArray.maxOfProperty("floatCol") as NSNumber
+        max = noArray.maxOfProperty("floatCol") as! NSNumber
         XCTAssertEqualWithAccuracy(max.floatValue, Float(0), 0.1, "Maximum should be 0.0f")
-        max = yesArray.maxOfProperty("floatCol") as NSNumber
+        max = yesArray.maxOfProperty("floatCol") as! NSNumber
         XCTAssertEqualWithAccuracy(max.floatValue, Float(1.2), 0.1, "Maximum should be 1.2f")
 
         // Test double max
-        max = noArray.maxOfProperty("doubleCol") as NSNumber
+        max = noArray.maxOfProperty("doubleCol") as! NSNumber
         XCTAssertEqualWithAccuracy(max.doubleValue, Double(2.5), 0.1, "Maximum should be 3.5")
-        max = yesArray.maxOfProperty("doubleCol") as NSNumber
+        max = yesArray.maxOfProperty("doubleCol") as! NSNumber
         XCTAssertEqualWithAccuracy(max.doubleValue, Double(0), 0.1, "Maximum should be 0.0")
 
         // Test date max
-        var dateMaxOutput = noArray.maxOfProperty("dateCol") as NSDate
+        var dateMaxOutput = noArray.maxOfProperty("dateCol") as! NSDate
         XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, "Maximum should be dateMaxInput")
-        dateMaxOutput = yesArray.maxOfProperty("dateCol") as NSDate
+        dateMaxOutput = yesArray.maxOfProperty("dateCol") as! NSDate
         XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, "Maximum should be dateMinInput")
     }
 
@@ -446,13 +446,13 @@ class SwiftArrayTests: SwiftTestCase {
 
         XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
 
-        var test = peopleInCompany[0] as EmployeeObject
+        var test = peopleInCompany[0] as! EmployeeObject
         XCTAssertEqual(test.age, po1.age, "Should be equal")
         XCTAssertEqual(test.name!, po1.name!, "Should be equal")
         XCTAssertEqual(test.hired, po1.hired, "Should be equal")
         // XCTAssertEqual(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
-        test = peopleInCompany[1] as EmployeeObject
+        test = peopleInCompany[1] as! EmployeeObject
         XCTAssertEqual(test.age, po3.age, "Should be equal")
         XCTAssertEqual(test.name!, po3.name!, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
@@ -506,7 +506,7 @@ class SwiftArrayTests: SwiftTestCase {
         let sortedByAge = EmployeeObject.allObjectsInRealm(realm).sortedResultsUsingProperty("age", ascending: true)
         let sortedByName = sortedByAge.sortedResultsUsingProperty("name", ascending: false)
 
-        XCTAssertEqual(Int32(20), (sortedByAge[0] as EmployeeObject).age)
-        XCTAssertEqual(Int32(40), (sortedByName[0] as EmployeeObject).age)
+        XCTAssertEqual(Int32(20), (sortedByAge[0] as! EmployeeObject).age)
+        XCTAssertEqual(Int32(40), (sortedByName[0] as! EmployeeObject).age)
     }
 }

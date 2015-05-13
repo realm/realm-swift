@@ -1,13 +1,176 @@
-x.x.x Release notes (yyyy-MM-dd)
+x.xx.x Release notes (yyyy-MM-dd)
 =============================================================
 
 ### API breaking changes
 
-* None.
+* Migration blocks are no longer called when a Realm file is first created.
 
 ### Enhancements
 
-* Add ``-[RLMRealm writeEncryptedCopyToPath:key:error:]``.
+* `Int8` properties defined in Swift are now treated as integers, rather than
+  booleans.
+
+0.91.5 Release notes (2015-04-28)
+=============================================================
+
+### Bugfixes
+
+* Fix issues with removing search indexes and re-enable it.
+
+0.91.4 Release notes (2015-04-27)
+=============================================================
+
+### Bugfixes
+
+* Temporarily disable removing indexes from existing columns due to bugs.
+
+0.91.3 Release notes (2015-04-17)
+=============================================================
+
+### Bugfixes
+
+* Fix `Extra argument 'objectClassName' in call` errors when building via
+  CocoaPods.
+
+0.91.2 Release notes (2015-04-16)
+=============================================================
+
+* Migration blocks are no longer called when a Realm file is first created.
+
+### Enhancements
+
+* `RLMCollection` supports collection KVC operations.
+* Sorting `RLMResults` is 2-5x faster (typically closer to 2x).
+* Refreshing `RLMRealm` after a write transaction which inserts or modifies
+  strings or `NSData` is committed on another thread is significantly faster.
+* Indexes are now added and removed from existing properties when a Realm file
+  is opened, rather than only when properties are first added.
+
+### Bugfixes
+
+* `+[RLMSchema dynamicSchemaForRealm:]` now respects search indexes.
+* `+[RLMProperty isEqualToProperty:]` now checks for equal `indexed` properties.
+
+0.91.1 Release notes (2015-03-12)
+=============================================================
+
+### Enhancements
+
+* The browser will automatically refresh when the Realm has been modified
+  from another process.
+* Allow using Realm in an embedded framework by setting
+  `APPLICATION_EXTENSION_API_ONLY` to YES.
+
+### Bugfixes
+
+* Fix a crash in CFRunLoopSourceInvalidate.
+
+0.91.0 Release notes (2015-03-10)
+=============================================================
+
+### API breaking changes
+
+* `attributesForProperty:` has been removed from `RLMObject`. You now specify indexed
+  properties by implementing the `indexedProperties` method.
+* An exception will be thrown when calling `setEncryptionKey:forRealmsAtPath:`, 
+  `setSchemaVersion:forRealmAtPath:withMigrationBlock:`, and `migrateRealmAtPath:` 
+  when a Realm at the given path is already open.
+* Object and array properties of type `RLMObject` will no longer be allowed.
+
+### Enhancements
+
+* Add support for sharing Realm files between processes.
+* The browser will no longer show objects that have no persisted properties.
+* `RLMSchema`, `RLMObjectSchema`, and `RLMProperty` now have more useful descriptions.
+* Opening an encrypted Realm while a debugger is attached to the process no
+  longer throws an exception.
+* `RLMArray` now exposes an `isInvalidated` property to indicate if it can no
+  longer be accessed.
+
+### Bugfixes
+
+* An exception will now be thrown when calling `-beginWriteTransaction` from within a notification
+  triggered by calling `-beginWriteTransaction` elsewhere.
+* When calling `delete:` we now verify that the object being deleted is persisted in the target Realm.
+* Fix crash when calling `createOrUpdate:inRealm` with nested linked objects.
+* Use the key from `+[RLMRealm setEncryptionKey:forRealmsAtPath:]` in
+  `-writeCopyToPath:error:` and `+migrateRealmAtPath:`.
+* Comparing an RLMObject to a non-RLMObject using `-[RLMObject isEqual:]` or
+  `-isEqualToObject:` now returns NO instead of crashing.
+* Improved error message when an `RLMObject` subclass is defined nested within
+  another Swift declaration.
+* Fix crash when the process is terminated by the OS on iOS while encrypted realms are open.
+* Fix crash after large commits to encrypted realms.
+
+0.90.6 Release notes (2015-02-20)
+=============================================================
+
+### Enhancements
+
+* Improve compatiblity of encrypted Realms with third-party crash reporters.
+
+### Bugfixes
+
+* Fix incorrect results when using aggregate functions on sorted RLMResults.
+* Fix data corruption when using writeCopyToPath:encryptionKey:.
+* Maybe fix some assertion failures.
+
+0.90.5 Release notes (2015-02-04)
+=============================================================
+
+### Bugfixes
+
+* Fix for crashes when encryption is enabled on 64-bit iOS devices.
+
+0.90.4 Release notes (2015-01-29)
+=============================================================
+
+### Bugfixes
+
+* Fix bug that resulted in columns being dropped and recreated during migrations.
+
+0.90.3 Release notes (2015-01-27)
+=============================================================
+
+### Enhancements
+
+* Calling `createInDefaultRealmWithObject:`, `createInRealm:withObject:`,
+  `createOrUpdateInDefaultRealmWithObject:` or `createOrUpdateInRealm:withObject:`
+  is a no-op if the argument is an RLMObject of the same type as the receiver
+  and is already backed by the target realm.
+
+### Bugfixes
+
+* Fix incorrect column type assertions when the first Realm file opened is a
+  read-only file that is missing tables.
+* Throw an exception when adding an invalidated or deleted object as a link.
+* Throw an exception when calling `createOrUpdateInRealm:withObject:` when the
+  receiver has no primary key defined.
+
+0.90.1 Release notes (2015-01-22)
+=============================================================
+
+### Bugfixes
+
+* Fix for RLMObject being treated as a model object class and showing up in the browser.
+* Fix compilation from the podspec.
+* Fix for crash when calling `objectsWhere:` with grouping in the query on `allObjects`.
+
+0.90.0 Release notes (2015-01-21)
+=============================================================
+
+### API breaking changes
+
+* Rename `-[RLMRealm encryptedRealmWithPath:key:readOnly:error:]` to
+  `-[RLMRealm realmWithPath:encryptionKey:readOnly:error:]`.
+* `-[RLMRealm setSchemaVersion:withMigrationBlock]` is no longer global and must be called
+  for each individual Realm path used. You can now call `-[RLMRealm setDefaultRealmSchemaVersion:withMigrationBlock]` 
+  for the default Realm and `-[RLMRealm setSchemaVersion:forRealmAtPath:withMigrationBlock:]` for all others; 
+
+### Enhancements
+
+* Add `-[RLMRealm writeCopyToPath:encryptionKey:error:]`.
+* Add support for comparing string columns to other string columns in queries.
 
 ### Bugfixes
 
@@ -15,6 +178,18 @@ x.x.x Release notes (yyyy-MM-dd)
 * Throw an exception if the number of items in a RLMResults or RLMArray changes
   while it's being fast-enumerated.
 * Also encrypt the temporary files used when encryption is enabled for a Realm.
+* Fixed crash in JSONImport example on OS X with non-en_US locale.
+* Fixed infinite loop when opening a Realm file in the Browser at the same time
+  as it is open in a 32-bit simulator.
+* Fixed a crash when adding primary keys to older realm files with no primary
+  keys on any objects.
+* Fixed a crash when removing a primary key in a migration.
+* Fixed a crash when multiple write transactions with no changes followed by a
+  write transaction with changes were committed without the main thread
+  RLMRealm getting a chance to refresh.
+* Fixed incomplete results when querying for non-null relationships.
+* Improve the error message when a Realm file is opened in multiple processes
+  at once.
 
 0.89.2 Release notes (2015-01-02)
 =============================================================

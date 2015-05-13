@@ -16,14 +16,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-extern "C" {
 #import "RLMTestCase.h"
-#import "RLMSchema_Private.h"
-}
+
 #import "RLMMigration.h"
+#import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.h"
+#import "RLMSchema_Private.h"
+#import "RLMObjectStore.h"
+
+#import <realm/table.hpp>
 
 @interface MigrationObject : RLMObject
 @property int intCol;
@@ -53,6 +57,15 @@ extern "C" {
 }
 @end
 
+@interface ThreeFieldMigrationObject : RLMObject
+@property int col1;
+@property int col2;
+@property int col3;
+@end
+
+@implementation ThreeFieldMigrationObject
+@end
+
 @interface MigrationTests : RLMTestCase
 @end
 
@@ -65,42 +78,100 @@ extern "C" {
 
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
-    return [self realmWithTestPathAndSchema:schema];
+    RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
+
+    // Set the initial version to 0 since we're pretending this was created with
+    // a shared schema
+    [realm beginWriteTransaction];
+    RLMRealmSetSchemaVersion(realm, 0);
+    [realm commitWriteTransaction];
+
+    return realm;
 }
 
 - (void)testSchemaVersion {
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
-                                                      __unused NSUInteger oldSchemaVersion) {
+    [RLMRealm setDefaultRealmSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
+                                                                  __unused NSUInteger oldSchemaVersion) {
     }];
 
     RLMRealm *defaultRealm = [RLMRealm defaultRealm];
     XCTAssertEqual(1U, RLMRealmSchemaVersion(defaultRealm));
 }
 
-- (void)testAddingProperty {
+- (void)testGetSchemaVersion {
+    XCTAssertThrows([RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
+    @autoreleasepool {
+        [RLMRealm defaultRealm];
+    }
+
+    XCTAssertEqual(0U, [RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
+    [RLMRealm setDefaultRealmSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
+                                                                  NSUInteger oldSchemaVersion) {
+        XCTAssertEqual(0U, oldSchemaVersion);
+    }];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
+    realm = nil;
+}
+
+- (void)testPerRealmMigration {
+    @autoreleasepool {
+        [RLMRealm defaultRealm];
+    }
+
+    XCTAssertEqual(0U, [RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
+    [RLMRealm setDefaultRealmSchemaVersion:1 withMigrationBlock:nil];
+
+    @autoreleasepool {
+        RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+        RLMRealm *anotherRealm = [RLMRealm realmWithPath:RLMTestRealmPath()];
+
+        XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:defaultRealm.path encryptionKey:nil error:nil]);
+        XCTAssertEqual(0U, [RLMRealm schemaVersionAtPath:anotherRealm.path encryptionKey:nil error:nil]);
+    }
+
+    __block bool migrationComplete = false;
+    [RLMRealm setSchemaVersion:2 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(__unused RLMMigration *migration,
+                                                                                        NSUInteger oldSchemaVersion) {
+        XCTAssertEqual(0U, oldSchemaVersion);
+        migrationComplete = true;
+    }];
+    RLMRealm *anotherRealm = [RLMRealm realmWithPath:RLMTestRealmPath()];
+
+    XCTAssertEqual(2U, [RLMRealm schemaVersionAtPath:anotherRealm.path encryptionKey:nil error:nil]);
+    XCTAssertTrue(migrationComplete);
+}
+
+- (void)testAddingPropertyAtEnd {
     // create schema to migrate from with single string column
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
     objectSchema.properties = @[objectSchema.properties[0]];
 
-    // create realm with old schema and populate
-    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
-    [realm beginWriteTransaction];
-    [realm createObject:MigrationObject.className withObject:@[@1]];
-    [realm createObject:MigrationObject.className withObject:@[@2]];
-    [realm commitWriteTransaction];
+    @autoreleasepool {
+        // create realm with old schema and populate
+        RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+        [realm beginWriteTransaction];
+        [realm createObject:MigrationObject.className withObject:@[@1]];
+        [realm createObject:MigrationObject.className withObject:@[@2]];
+        [realm commitWriteTransaction];
+    }
 
-    // open realm with new schema before migration to test migration is necessary
-    objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
-    XCTAssertThrows([self realmWithTestPath], @"Migration should be required");
-    
+    @autoreleasepool {
+        // open realm with new schema before migration to test migration is necessary
+        objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
+        XCTAssertThrows([self realmWithTestPath], @"Migration should be required");
+    }
+
     // apply migration
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
         [migration enumerateObjects:MigrationObject.className
                               block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertThrows(oldObject[@"stringCol"], @"stringCol should not exist on old object");
             NSNumber *intObj;
             XCTAssertNoThrow(intObj = oldObject[@"intCol"], @"Should be able to access intCol on oldObject");
+            XCTAssertEqualObjects(newObject[@"intCol"], oldObject[@"intCol"]);
             NSString *stringObj = [NSString stringWithFormat:@"%@", intObj];
             XCTAssertNoThrow(newObject[@"stringCol"] = stringObj, @"Should be able to set stringCol");
         }];
@@ -108,20 +179,50 @@ extern "C" {
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 
     // verify migration
-    realm = [self realmWithTestPath];
-    MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
-    XCTAssertEqual(mig1.intCol, 2, @"Int column should have value 2");
-    XCTAssertEqualObjects(mig1.stringCol, @"2", @"String column should be populated");
+    @autoreleasepool {
+        RLMRealm *realm = [self realmWithTestPath];
+        MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
+        XCTAssertEqual(mig1.intCol, 2, @"Int column should have value 2");
+        XCTAssertEqualObjects(mig1.stringCol, @"2", @"String column should be populated");
+    }
 
-    [RLMRealm setSchemaVersion:0 withMigrationBlock:nil];
+    [RLMRealm setSchemaVersion:0 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
+- (void)testAddingPropertyAtBeginningPreservesData {
+    // create schema to migrate from with the second and third columns from the final data
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:ThreeFieldMigrationObject.class];
+    objectSchema.properties = @[objectSchema.properties[1], objectSchema.properties[2]];
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    [realm createObject:ThreeFieldMigrationObject.className withObject:@[@1, @2]];
+    [realm commitWriteTransaction];
+
+    [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(RLMMigration *migration, NSUInteger) {
+        [migration enumerateObjects:ThreeFieldMigrationObject.className
+                              block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertThrows(oldObject[@"col1"]);
+            XCTAssertEqualObjects(oldObject[@"col2"], newObject[@"col2"]);
+            XCTAssertEqualObjects(oldObject[@"col3"], newObject[@"col3"]);
+        }];
+    }];
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+
+    // verify migration
+    realm = [self realmWithTestPath];
+    ThreeFieldMigrationObject *mig = [ThreeFieldMigrationObject allObjectsInRealm:realm][0];
+    XCTAssertEqual(0, mig.col1);
+    XCTAssertEqual(1, mig.col2);
+    XCTAssertEqual(2, mig.col3);
+}
 
 - (void)testRemoveProperty {
     // create schema to migrate from with single string column
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
-    RLMProperty *thirdProperty = [[RLMProperty alloc] initWithName:@"deletedCol" type:RLMPropertyTypeBool objectClassName:nil attributes:(RLMPropertyAttributes)0];
+    RLMProperty *thirdProperty = [[RLMProperty alloc] initWithName:@"deletedCol" type:RLMPropertyTypeBool objectClassName:nil indexed:NO];
     thirdProperty.column = 2;
     objectSchema.properties = [objectSchema.properties arrayByAddingObject:thirdProperty];
 
@@ -133,12 +234,15 @@ extern "C" {
     [realm commitWriteTransaction];
 
     // apply migration
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
         [migration enumerateObjects:MigrationObject.className
                                        block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertNoThrow(oldObject[@"deletedCol"], @"Deleted column should be accessible on old object.");
             XCTAssertThrows(newObject[@"deletedCol"], @"Deleted column should not be accessible on new object.");
+
+            XCTAssertEqualObjects(newObject[@"intCol"], oldObject[@"intCol"]);
+            XCTAssertEqualObjects(newObject[@"stringCol"], oldObject[@"stringCol"]);
         }];
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
@@ -152,7 +256,7 @@ extern "C" {
 - (void)testRemoveAndAddProperty {
     // create schema to migrate from with single string column
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
-    RLMProperty *oldInt = [[RLMProperty alloc] initWithName:@"oldIntCol" type:RLMPropertyTypeInt objectClassName:nil attributes:(RLMPropertyAttributes)0];
+    RLMProperty *oldInt = [[RLMProperty alloc] initWithName:@"oldIntCol" type:RLMPropertyTypeInt objectClassName:nil indexed:NO];
     objectSchema.properties = @[oldInt, objectSchema.properties[1]];
 
     // create realm with old schema and populate
@@ -173,7 +277,7 @@ extern "C" {
     };
 
     // apply migration
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
         [migration enumerateObjects:MigrationObject.className block:migrateObjectBlock];
     }];
@@ -202,10 +306,11 @@ extern "C" {
     [realm commitWriteTransaction];
 
     // apply migration
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
         [migration enumerateObjects:MigrationObject.className
                                        block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(newObject[@"intCol"], oldObject[@"intCol"]);
             NSNumber *intObj = oldObject[@"stringCol"];
             XCTAssert([intObj isKindOfClass:NSNumber.class], @"Old stringCol should be int");
             newObject[@"stringCol"] = intObj.stringValue;
@@ -233,17 +338,49 @@ extern "C" {
     [realm commitWriteTransaction];
 
     // apply migration
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()],
                     @"Migration should throw due to duplicate primary keys)");
 
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
         __block int objectID = 0;
         [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
             newObject[@"intCol"] = @(objectID++);
         }];
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+}
+
+- (void)testRemovePrimaryKeyMigration {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@2]];
+    [realm commitWriteTransaction];
+
+    objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+    objectSchema.primaryKeyProperty.isPrimary = NO;
+    objectSchema.primaryKeyProperty = nil;
+
+    // needs a no-op migration
+    XCTAssertThrows([self realmWithSingleObject:objectSchema]);
+
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+        [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"intCol"], newObject[@"intCol"]);
+        }];
+    }];
+
+    XCTAssertNoThrow([self realmWithSingleObject:objectSchema]);
 }
 
 - (void)testStringPrimaryKeyMigration {
@@ -260,7 +397,9 @@ extern "C" {
     [realm commitWriteTransaction];
 
     // apply migration
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
         [migration enumerateObjects:@"MigrationStringPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
             newObject[@"stringCol"] = [[NSUUID UUID] UUIDString];
         }];
@@ -273,7 +412,7 @@ extern "C" {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationStringPrimaryKeyObject.class];
 
     // create without search index
-    objectSchema.primaryKeyProperty.attributes = 0;
+    objectSchema.primaryKeyProperty.indexed = NO;
 
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
@@ -283,13 +422,49 @@ extern "C" {
     [realm commitWriteTransaction];
 
     // apply migration
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
         [migration enumerateObjects:@"MigrationStringPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
             newObject[@"stringCol"] = [[NSUUID UUID] UUIDString];
         }];
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 }
+
+#if 0 // FIXME: re-enable when int indexing is enabled
+- (void)testIntPrimaryKeyNoIndexMigration {
+    // make string an int
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+
+    // create without search index
+    objectSchema.primaryKeyProperty.indexed = NO;
+
+    // create realm with old schema and populate
+    @autoreleasepool {
+        RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+        [realm beginWriteTransaction];
+        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@2]];
+        [realm commitWriteTransaction];
+
+        XCTAssertFalse(realm.schema[MigrationPrimaryKeyObject.className].table->has_search_index(0));
+    }
+
+    // apply migration
+    [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) { }];
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+
+    // check that column is now indexed
+    RLMRealm *realm = [self realmWithTestPath];
+    XCTAssertTrue(realm.schema[MigrationPrimaryKeyObject.className].table->has_search_index(0));
+
+    // verify that old data still exists
+    RLMResults *objects = [MigrationPrimaryKeyObject allObjectsInRealm:realm];
+    XCTAssertEqual(1, [objects[0] intCol]);
+    XCTAssertEqual(2, [objects[1] intCol]);
+}
+#endif
 
 - (void)testDuplicatePrimaryKeyMigration {
     // make string an int
@@ -305,11 +480,15 @@ extern "C" {
     [realm commitWriteTransaction];
 
     // apply bad migration
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should throw due to duplicate primary keys)");
 
     // apply good migration
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
         NSMutableSet *seen = [NSMutableSet set];
         __block bool duplicateDeleted = false;
         [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
@@ -345,7 +524,9 @@ extern "C" {
     }
 
     // fail to apply migration
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should throw due to duplicate primary keys)");
 
     // should still be able to open with pre-migration schema
@@ -358,7 +539,8 @@ extern "C" {
         [RLMRealm defaultRealm];
     }
 
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+    [RLMRealm setDefaultRealmSchemaVersion:1
+                        withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
         [migration createObject:StringObject.className withObject:@[@"string"]];
     }];
 
@@ -369,7 +551,9 @@ extern "C" {
 - (void)testVersionNumberCanStaySameWithNoSchemaChanges {
     @autoreleasepool { [self realmWithTestPathAndSchema:[RLMSchema sharedSchema]]; }
 
-    [RLMRealm setSchemaVersion:0 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
+    [RLMRealm setSchemaVersion:0
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertNoThrow([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
@@ -389,15 +573,19 @@ extern "C" {
     }
 
     __block bool migrationApplied = false;
-    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
-        [migration enumerateObjects:MigrationObject.className block:^(RLMObject *, RLMObject *newObject) {
-            newObject[@"stringCol"] = @"";
-        }];
-        migrationApplied = true;
-    }];
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+                [migration enumerateObjects:MigrationObject.className block:^(RLMObject *, RLMObject *newObject) {
+                    newObject[@"stringCol"] = @"";
+                }];
+                migrationApplied = true;
+            }];
 
     // migration should be applied when opening realm
-    [RLMRealm realmWithPath:RLMTestRealmPath()];
+    @autoreleasepool {
+        [RLMRealm realmWithPath:RLMTestRealmPath()];
+    }
     XCTAssertEqual(true, migrationApplied);
 
     // applying migration at same version is no-op
@@ -406,7 +594,9 @@ extern "C" {
     XCTAssertEqual(false, migrationApplied);
 
     // test version cant go down
-    [RLMRealm setSchemaVersion:0 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
+    [RLMRealm setSchemaVersion:0
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
@@ -445,6 +635,7 @@ extern "C" {
 
     // accessors should work
     CircleObject *obj = [[CircleObject allObjectsInRealm:realm] firstObject];
+    XCTAssertEqualObjects(@"data", obj.data);
     [realm beginWriteTransaction];
     XCTAssertNoThrow(obj.data = @"new data");
     XCTAssertNoThrow(obj.next = obj);
@@ -472,6 +663,120 @@ extern "C" {
     RLMRealm *defaultRealm = RLMRealm.defaultRealm;
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
     XCTAssertEqual(defaultRealm, RLMRealm.defaultRealm);
+}
+
+- (void)testAccessorCreationForReadOnlyRealms {
+    RLMClearAccessorCache();
+
+    // Create a realm file with only a single table
+    @autoreleasepool {
+        RLMRealm *realm = [self realmWithSingleObject:[RLMObjectSchema schemaForObjectClass:IntObject.class]];
+        [realm beginWriteTransaction];
+        [realm createObject:IntObject.className withObject:@[@1]];
+        [realm commitWriteTransaction];
+    }
+
+    Class intObjectAccessorClass;
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+
+        intObjectAccessorClass = realm.schema[IntObject.className].accessorClass;
+
+        // StringObject table doesn't exist, so it should not have an accessor
+        // class despite being in the object schema
+        RLMObjectSchema *missingTableSchema = realm.schema[StringObject.className];
+        XCTAssertNotNil(missingTableSchema);
+        XCTAssertEqual(missingTableSchema.accessorClass, RLMDynamicObject.class);
+    }
+
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+
+        // read-write realm should have a different IntObject accessor class due
+        // to that we check for RLMSchema compatibility and not for each RLMObjectSchema
+        XCTAssertNotEqual(intObjectAccessorClass, realm.schema[IntObject.className].accessorClass);
+
+        // StringObject should now have an accessor class
+        RLMObjectSchema *missingTableSchema = realm.schema[StringObject.className];
+        XCTAssertNotNil(missingTableSchema);
+        XCTAssertNotNil(missingTableSchema.accessorClass);
+        XCTAssertNotEqual(missingTableSchema.accessorClass, RLMObject.class);
+    }
+
+    RLMClearAccessorCache();
+}
+
+- (void)testAddingAndRemovingIndex {
+    RLMSchema *noIndex = [[RLMSchema alloc] init];
+    noIndex.objectSchema = @[[RLMObjectSchema schemaForObjectClass:StringObject.class]];
+
+    RLMSchema *index = [[RLMSchema alloc] init];
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+    [objectSchema.properties[0] setIndexed:YES];
+    index.objectSchema = @[objectSchema];
+
+    auto columnIsIndexed = ^(RLMRealm *realm) {
+        RLMObjectSchema *objectSchema = realm.schema[@"StringObject"];
+        return objectSchema.table->has_search_index([objectSchema.properties[0] column]);
+    };
+
+    // create initial file with no index
+    @autoreleasepool {
+        XCTAssertFalse(columnIsIndexed([self realmWithTestPathAndSchema:noIndex]));
+    }
+
+    // should add index when opening with indexed schema
+    @autoreleasepool {
+        XCTAssertTrue(columnIsIndexed([self realmWithTestPathAndSchema:index]));
+    }
+
+    // should remove index when opening with non-indexed schema
+    @autoreleasepool {
+        XCTAssertFalse(columnIsIndexed([self realmWithTestPathAndSchema:noIndex]));
+    }
+
+    // create initial file with index
+    [self deleteFiles];
+    @autoreleasepool {
+        XCTAssertTrue(columnIsIndexed([self realmWithTestPathAndSchema:index]));
+    }
+
+    // should be able to open readonly with mismatched index schema
+    @autoreleasepool {
+        XCTAssertTrue(columnIsIndexed([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]));
+    }
+}
+
+- (void)testEnumeratedObjectsDuringMigration {
+    // initialize realm
+    @autoreleasepool {
+        [[RLMRealm defaultRealm] transactionWithBlock:^{
+            [StringObject createInDefaultRealmWithObject:@[@"string"]];
+        }];
+    }
+
+    [RLMRealm setDefaultRealmSchemaVersion:1
+                        withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+                            [migration enumerateObjects:StringObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+                                XCTAssertEqualObjects([oldObject valueForKey:@"stringCol"], oldObject[@"stringCol"]);
+                                [newObject setValue:@"otherString" forKey:@"stringCol"];
+                                XCTAssertEqualObjects([oldObject valueForKey:@"realm"], oldObject.realm);
+                                XCTAssertThrows([oldObject valueForKey:@"noSuchKey"]);
+                                XCTAssertThrows([newObject setValue:@1 forKey:@"noSuchKey"]);
+                            }];
+                        }];
+
+    // implicit migration
+    XCTAssertEqualObjects(@"otherString", [StringObject.allObjects.firstObject stringCol]);
+}
+
+- (void)testMigrationBlockNotCalledForIntialRealmCreation {
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+                XCTFail(@"Migration block should not have been called");
+            }];
+    XCTAssertNoThrow([self realmWithTestPath]);
 }
 
 @end

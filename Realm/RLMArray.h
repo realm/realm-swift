@@ -56,6 +56,11 @@
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
+/**
+ Indicates if an array can no longer be accessed.
+ */
+@property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
+
 #pragma mark -
 
 /**---------------------------------------------------------------------------------------
@@ -295,8 +300,7 @@
 
 @end
 
-
-@interface RLMArray (Private)
+@interface RLMArray (Swift)
+// for use only in Swift class definitions
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 @end
-

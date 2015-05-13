@@ -19,10 +19,14 @@
 #import "RLMArray_Private.hpp"
 
 #import "RLMObject.h"
+#import "RLMObject_Private.h"
+#import "RLMObjectStore.h"
 #import "RLMObjectSchema.h"
-#import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMSwiftSupport.h"
+#import "RLMUtil.hpp"
+
+#import <realm/link_view.hpp>
 
 @implementation RLMArray {
     // array for standalone
@@ -96,14 +100,12 @@
 
 
 //
-// Stanalone RLMArray implementation
+// Standalone RLMArray implementation
 //
 
 static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
-    if (![array->_objectClassName isEqualToString:object.objectSchema.className]) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object type does not match RLMArray"
-                                     userInfo:nil];
+    if (!object || ![array->_objectClassName isEqualToString:object->_objectSchema.className]) {
+        @throw RLMException(@"Object type does not match RLMArray");
     }
 }
 
@@ -113,6 +115,10 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSUInteger)count {
     return _backingArray.count;
+}
+
+- (BOOL)isInvalidated {
+    return NO;
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
@@ -137,7 +143,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     RLMValidateMatchingObjectType(self, object);
     NSUInteger index = 0;
     for (RLMObject *cmp in _backingArray) {
-        if ([object isEqualToObject:cmp]) {
+        if (RLMObjectBaseAreEqual(object, cmp)) {
             return index;
         }
         index++;
@@ -147,7 +153,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (void)deleteObjectsFromRealm {
     for (RLMObject *obj in _backingArray) {
-        RLMDeleteObjectFromRealm(obj);
+        RLMDeleteObjectFromRealm(obj, _realm);
     }
 }
 
@@ -163,6 +169,14 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
+- (id)valueForKey:(NSString *)key {
+    return [_backingArray valueForKey:key];
+}
+
+- (void)setValue:(id)value forKey:(NSString *)key {
+    [_backingArray setValue:value forKey:key];
+}
+
 //
 // Methods unsupported on standalone RLMArray instances
 //
@@ -172,8 +186,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate
 {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called on RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+    @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
 }
 
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
@@ -183,8 +196,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties
 {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called on RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+    @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
 }
 
 #pragma GCC diagnostic pop
@@ -215,7 +227,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSString *)description
 {
-    return [self descriptionWithMaxDepth:5];
+    return [self descriptionWithMaxDepth:RLMDescriptionMaxDepth];
 }
 
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
@@ -224,7 +236,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     }
 
     const NSUInteger maxObjects = 100;
-    NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <0x%lx> (\n", (long)self];
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <%p> (\n", self];
     unsigned long index = 0, skipped = 0;
     for (id obj in self) {
         NSString *sub;

@@ -31,13 +31,13 @@
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
-                  attributes:(RLMPropertyAttributes)attributes {
+                  indexed:(BOOL)indexed {
     self = [super init];
     if (self) {
         _name = name;
         _type = type;
         _objectClassName = objectClassName;
-        _attributes = attributes;
+        _indexed = indexed;
         [self setObjcCodeFromType];
         [self updateAccessors];
     }
@@ -136,21 +136,15 @@
                                                           encoding:NSUTF8StringEncoding];
 
                 Class cls = [RLMSchema classForString:_objectClassName];
-                if (!RLMIsSubclass(cls, RLMObjectBase.class)) {
-                    @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/cocoa/#to-many for more information.", self.objectClassName]
-                                                 userInfo:nil];
+                if (!RLMIsObjectSubclass(cls)) {
+                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/cocoa/#to-many for more information.", self.objectClassName]);
                 }
             }
             else if (strcmp(code, "@\"NSNumber\"") == 0) {
-                @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:[NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types. See http://realm.io/docs/cocoa/api/Constants/RLMPropertyType.html for all supported types."]
-                                             userInfo:nil];
+                @throw RLMException([NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types. See http://realm.io/docs/cocoa/api/Constants/RLMPropertyType.html for all supported types."]);
             }
             else if (strcmp(code, "@\"RLMArray\"") == 0) {
-                @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>"
-                                             userInfo:nil];
+                @throw RLMException(@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>");
             }
             else {
                 // for objects strip the quotes and @
@@ -158,10 +152,8 @@
 
                 // verify type
                 Class cls = [RLMSchema classForString:className];
-                if (!RLMIsSubclass(cls, RLMObjectBase.class)) {
-                    @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/api/Classes/RLMObject.html for more information.", className]
-                                                 userInfo:nil];
+                if (!RLMIsObjectSubclass(cls)) {
+                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/api/Classes/RLMObject.html for more information.", className]);
                 }
 
                 _type = RLMPropertyTypeObject;
@@ -209,7 +201,7 @@
 }
 
 - (instancetype)initSwiftPropertyWithName:(NSString *)name
-                               attributes:(RLMPropertyAttributes)attributes
+                                  indexed:(BOOL)indexed
                                  property:(objc_property_t)property
                                  instance:(RLMObject *)obj {
     self = [super init];
@@ -218,7 +210,7 @@
     }
 
     _name = name;
-    _attributes = attributes;
+    _indexed = indexed;
 
     if ([self parseObjcProperty:property]) {
         return nil;
@@ -232,7 +224,7 @@
     if (![self setTypeFromRawType]) {
         NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                             "Add to ignoredPropertyNames: method to ignore.", self.name];
-        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+        @throw RLMException(reason);
     }
 
     // convert type for any swift property types (which are parsed as Any)
@@ -240,6 +232,9 @@
         if ([[obj valueForKey:_name] isKindOfClass:[NSString class]]) {
             _type = RLMPropertyTypeString;
         }
+    }
+    if (_objcType == 'c') {
+        _type = RLMPropertyTypeInt;
     }
 
     // update getter/setter names
@@ -249,7 +244,7 @@
 }
 
 - (instancetype)initWithName:(NSString *)name
-                  attributes:(RLMPropertyAttributes)attributes
+                     indexed:(BOOL)indexed
                     property:(objc_property_t)property
 {
     self = [super init];
@@ -258,7 +253,7 @@
     }
 
     _name = name;
-    _attributes = attributes;
+    _indexed = indexed;
 
     if ([self parseObjcProperty:property]) {
         return nil;
@@ -267,7 +262,7 @@
     if (![self setTypeFromRawType]) {
         NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", self.name];
-        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+        @throw RLMException(reason);
     }
 
     // update getter/setter names
@@ -301,7 +296,7 @@
     prop->_type = _type;
     prop->_objcType = _objcType;
     prop->_objectClassName = _objectClassName;
-    prop->_attributes = _attributes;
+    prop->_indexed = _indexed;
     prop->_getterName = _getterName;
     prop->_setterName = _setterName;
     prop->_getterSel = _getterSel;
@@ -312,17 +307,16 @@
     return prop;
 }
 
-
--(BOOL)isEqualToProperty:(RLMProperty *)prop {
-    return [_name isEqualToString:prop.name] && _type == prop.type && prop.isPrimary == _isPrimary &&
-           (_objectClassName == nil || [_objectClassName isEqualToString:prop.objectClassName]);
+- (BOOL)isEqualToProperty:(RLMProperty *)property {
+    return _type == property->_type
+        && _indexed == property->_indexed
+        && _isPrimary == property->_isPrimary
+        && [_name isEqualToString:property->_name]
+        && (_objectClassName == property->_objectClassName  || [_objectClassName isEqualToString:property->_objectClassName]);
 }
 
-- (BOOL)isEqual:(id)object {
-    if (![object isKindOfClass:RLMProperty.class]) {
-        return NO;
-    }
-    return [self isEqualToProperty:object];
+- (NSString *)description {
+    return [NSString stringWithFormat:@"%@ {\n\ttype = %@;\n\tobjectClassName = %@;\n\tindexed = %@;\n\tisPrimary = %@;\n}", self.name, RLMTypeToString(self.type), self.objectClassName, self.indexed ? @"YES" : @"NO", self.isPrimary ? @"YES" : @"NO"];
 }
 
 @end

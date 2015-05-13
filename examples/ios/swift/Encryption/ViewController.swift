@@ -45,8 +45,8 @@ class ViewController: UIViewController {
         // Use an autorelease pool to close the Realm at the end of the block, so
         // that we can try to reopen it with different keys
         autoreleasepool {
-            let realm = RLMRealm.encryptedRealmWithPath(RLMRealm.defaultRealmPath(),
-                key: self.getKey(), readOnly: false, error: nil)
+            let realm = RLMRealm(path: RLMRealm.defaultRealmPath(),
+                encryptionKey: self.getKey(), readOnly: false, error: nil)
 
             // Add an object
             realm.transactionWithBlock {
@@ -59,8 +59,8 @@ class ViewController: UIViewController {
         // Opening with wrong key fails since it decrypts to the wrong thing
         autoreleasepool {
             var error: NSError? = nil
-            RLMRealm.encryptedRealmWithPath(RLMRealm.defaultRealmPath(),
-                key: "1234567890123456789012345678901234567890123456789012345678901234".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false),
+            RLMRealm(path: RLMRealm.defaultRealmPath(),
+                encryptionKey: "1234567890123456789012345678901234567890123456789012345678901234".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false),
                 readOnly: false, error: &error)
             self.log("Open with wrong key: \(error)")
         }
@@ -74,10 +74,10 @@ class ViewController: UIViewController {
 
         // Reopening with the correct key works and can read the data
         autoreleasepool {
-            let realm = RLMRealm.encryptedRealmWithPath(RLMRealm.defaultRealmPath(),
-                key: self.getKey(), readOnly: false, error: nil)
+            let realm = RLMRealm(path: RLMRealm.defaultRealmPath(),
+                encryptionKey: self.getKey(), readOnly: false, error: nil)
 
-            self.log("Saved object: \((EncryptionObject.allObjectsInRealm(realm).firstObject()! as EncryptionObject).stringProp)")
+            self.log("Saved object: \((EncryptionObject.allObjectsInRealm(realm).firstObject() as! EncryptionObject).stringProp)")
         }
     }
 
@@ -98,10 +98,12 @@ class ViewController: UIViewController {
             kSecReturnData: true
         ]
 
-        var dataTypeRef: Unmanaged<AnyObject>?
-        var status = SecItemCopyMatching(query, &dataTypeRef)
+        // To avoid Swift optimization bug, should use withUnsafeMutablePointer() function to retrieve the keychain item
+        // See also: http://stackoverflow.com/questions/24145838/querying-ios-keychain-using-swift/27721328#27721328
+        var dataTypeRef: AnyObject?
+        var status = withUnsafeMutablePointer(&dataTypeRef) { SecItemCopyMatching(query, UnsafeMutablePointer($0)) }
         if status == errSecSuccess {
-            return dataTypeRef?.takeUnretainedValue() as NSData
+            return dataTypeRef as! NSData
         }
 
         // No pre-existing key from this application, so generate a new one

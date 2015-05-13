@@ -52,10 +52,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func application(application: UIApplication!, didFinishLaunchingWithOptions launchOptions: NSDictionary!) -> Bool {
-        self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
-        self.window!.rootViewController = UIViewController()
-        self.window!.makeKeyAndVisible()
+    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+        window = UIWindow(frame: UIScreen.mainScreen().bounds)
+        window?.rootViewController = UIViewController()
+        window?.makeKeyAndVisible()
 
         // copy over old data files for migration
         let defaultPath = RLMRealm.defaultRealmPath()
@@ -73,8 +73,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 migration.enumerateObjects(Person.className()) { oldObject, newObject in
                     if oldSchemaVersion < 1 {
                         // combine name fields into a single field
-                        let firstName = oldObject["firstName"] as String
-                        let lastName = oldObject["lastName"] as String
+                        let firstName = oldObject["firstName"] as! String
+                        let lastName = oldObject["lastName"] as! String
                         newObject["fullName"] = "\(firstName) \(lastName)"
                     }
                 }
@@ -82,7 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if oldSchemaVersion < 2 {
                 migration.enumerateObjects(Person.className()) { oldObject, newObject in
                     // give JP a dog
-                    if newObject["fullName"] as String == "JP McDonald" {
+                    if newObject["fullName"] as! String == "JP McDonald" {
                         let jpsDog = Pet(object: ["Jimbo", "dog"])
                         newObject["pets"].addObject(jpsDog)
                     }
@@ -90,7 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             println("Migration complete.")
         }
-        RLMRealm.setSchemaVersion(3, withMigrationBlock: migrationBlock)
+        RLMRealm.setDefaultRealmSchemaVersion(3, withMigrationBlock: migrationBlock)
 
         // print out all migrated objects in the default realm
         // migration is performed implicitly on Realm access
@@ -108,6 +108,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path, error: nil)
         NSFileManager.defaultManager().removeItemAtPath(realmv2Path, error: nil)
         NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path, error: nil)
+
+        // set the schema version and migration blocks for our custom path realms
+        RLMRealm.setSchemaVersion(3, forRealmAtPath: realmv1Path, withMigrationBlock: migrationBlock)
+        RLMRealm.setSchemaVersion(3, forRealmAtPath: realmv2Path, withMigrationBlock: migrationBlock)
 
         // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
         RLMRealm.migrateRealmAtPath(realmv1Path)

@@ -16,55 +16,28 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-extern "C" {
-#import "RLMRealm_Dynamic.h"
-#import "RLMSchema_Private.h"
-#import "RLMAccessor.h"
+#import "RLMRealm_Private.h"
+#import "RLMUtil.hpp"
+
+#import <realm/link_view.hpp>
+#import <realm/group.hpp>
+#import <realm/replication.hpp>
+#import <pthread.h>
+
+namespace realm {
+    class Group;
 }
 
-#import <tightdb/link_view.hpp>
-#import <tightdb/group.hpp>
-
-// RLMRealm private members
-@interface RLMRealm () {
-    @public
-    // expose ivar to to avoid objc messages in accessors
-    BOOL _inWriteTransaction;
-    mach_port_t _threadID;
-}
-@property (nonatomic, readonly) BOOL inWriteTransaction;
-@property (nonatomic, readonly) BOOL dynamic;
-@property (nonatomic, readonly, getter=getOrCreateGroup) tightdb::Group *group;
-@property (nonatomic, readwrite) RLMSchema *schema;
-
-- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error serverBaseURL:(NSURL *)serverBaseURL;
-
-+ (void)notifyRealmsAtPath:(NSString *)path exceptRealm:(RLMRealm *)exceptRealm;
-
-- (tightdb::SharedGroup *)sharedGroup;
-- (tightdb::Replication *)transactLogRegistry;
-
+@interface RLMRealm ()
+@property (nonatomic, readonly, getter=getOrCreateGroup) realm::Group *group;
+@property (nonatomic, readonly) realm::SharedGroup *sharedGroup;
+@property (nonatomic, readonly) realm::Replication *transactLogRegistry;
+- (void)handleExternalCommit;
 @end
 
 // throw an exception if the realm is being used from the wrong thread
-inline void RLMCheckThread(__unsafe_unretained RLMRealm *realm) {
+static inline void RLMCheckThread(__unsafe_unretained RLMRealm *const realm) {
     if (realm->_threadID != pthread_mach_thread_np(pthread_self())) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Realm accessed from incorrect thread"
-                                     userInfo:nil];
+        @throw RLMException(@"Realm accessed from incorrect thread");
     }
 }
-
-// get the table used to store object of objectClass
-static inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
-                                                       NSString *className,
-                                                       bool &created) {
-    NSString *tableName = RLMTableNameForClass(className);
-    return realm.group->get_or_add_table(tableName.UTF8String, &created);
-}
-static inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
-                                                       NSString *className) {
-    NSString *tableName = RLMTableNameForClass(className);
-    return realm.group->get_table(tableName.UTF8String);
-}
-

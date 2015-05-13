@@ -16,15 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm_Private.hpp"
-#import "RLMObject.h"
-#import "RLMObjectSchema.h"
-#import <tightdb/row.hpp>
+#import <Realm/RLMObject.h>
 
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
   @public
-    tightdb::Row _row;
     RLMRealm *_realm;
     // objectSchema is a cached pointer to an object stored in the RLMSchema
     // owned by _realm, so it's guaranteed to stay alive as long as this object
@@ -32,17 +28,54 @@
     __unsafe_unretained RLMObjectSchema *_objectSchema;
 }
 
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *)realm
-                       schema:(__unsafe_unretained RLMObjectSchema *)schema
-                defaultValues:(BOOL)useDefaults;
-- (instancetype)initWithObject:(id)object schema:(RLMSchema *)schema;
+// standalone initializer
+- (instancetype)initWithObject:(id)value schema:(RLMSchema *)schema;
 
-// namespace properties to prevent collision with user properties
-@property (nonatomic, readwrite) RLMRealm *realm;
-@property (nonatomic, readwrite) RLMObjectSchema *objectSchema;
+// live accessor initializer
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
+                       schema:(__unsafe_unretained RLMObjectSchema *const)schema;
 
 // shared schema for this class
 + (RLMObjectSchema *)sharedSchema;
+
+@end
+
+@interface RLMDynamicObject : RLMObject
+
+@end
+
+//
+// Getters and setters for RLMObjectBase ivars for realm and objectSchema
+//
+FOUNDATION_EXTERN void RLMObjectBaseSetRealm(RLMObjectBase *object, RLMRealm *realm);
+FOUNDATION_EXTERN RLMRealm *RLMObjectBaseRealm(RLMObjectBase *object);
+FOUNDATION_EXTERN void RLMObjectBaseSetObjectSchema(RLMObjectBase *object, RLMObjectSchema *objectSchema);
+FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *object);
+
+// Get linking objects for an RLMObjectBase
+FOUNDATION_EXTERN NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property);
+
+// Dynamic access to RLMObjectBase properties
+FOUNDATION_EXTERN id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key);
+FOUNDATION_EXTERN void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *object, NSString *key, id obj);
+
+// Compare two RLObjectBases
+FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2);
+
+// Get ObjectUil class for objc or swift
+FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
+
+FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
+
+@class RLMProperty, RLMArray;
+@interface RLMObjectUtil : NSObject
+
++ (NSString *)primaryKeyForClass:(Class)cls;
++ (NSArray *)ignoredPropertiesForClass:(Class)cls;
++ (NSArray *)indexedPropertiesForClass:(Class)cls;
+
++ (NSArray *)getGenericListPropertyNames:(id)obj;
++ (void)initializeListProperty:(RLMObjectBase *)object property:(RLMProperty *)property array:(RLMArray *)array;
 
 @end
 

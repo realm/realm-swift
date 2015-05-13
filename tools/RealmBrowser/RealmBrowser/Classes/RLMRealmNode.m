@@ -18,11 +18,11 @@
 
 #import "RLMRealmNode.h"
 
-#import <Realm/Realm.h>
+@import Realm;
+@import Realm.Private;
 
 #import "RLMSidebarTableCellView.h"
 #import "NSColor+ByteSizeFactory.h"
-#import "Realm_Private.h"
 
 @implementation RLMRealmNode
 
@@ -43,22 +43,27 @@
 
 - (BOOL)connect:(NSError **)error
 {
+    NSError *localError;
     _realm = [RLMRealm realmWithPath:_url
                                  key:nil
                             readOnly:NO
                             inMemory:NO
                              dynamic:YES
                               schema:nil
-                               error:error];
-    
-    if (*error != nil) {
-        NSLog(@"Realm was opened with error: %@", *error);
+                               error:&localError];
+
+    if (localError) {
+        NSLog(@"Realm was opened with error: %@", localError);
     }
     else {
         _topLevelClasses = [self constructTopLevelClasses];    
     }
+
+    if (error) {
+        *error = localError;
+    }
     
-    return error != nil;
+    return !localError;
 }
 
 
@@ -118,10 +123,11 @@
     NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:classCount];
     
     for (NSUInteger index = 0; index < classCount; index++) {
-        RLMObjectSchema *objectSchema = allObjectSchemas[index];        
-        RLMClassNode *tableNode = [[RLMClassNode alloc] initWithSchema:objectSchema inRealm:_realm];
-        
-        [result addObject:tableNode];
+        RLMObjectSchema *objectSchema = allObjectSchemas[index];
+        if (objectSchema.properties.count > 0) {
+            RLMClassNode *tableNode = [[RLMClassNode alloc] initWithSchema:objectSchema inRealm:_realm];
+            [result addObject:tableNode];
+        }
     }
     
     return result;

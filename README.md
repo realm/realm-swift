@@ -1,8 +1,7 @@
-![Realm](logo.png)
+![Realm](https://github.com/realm/realm-cocoa/raw/master/logo.png)
 
 Realm is a mobile database that runs directly inside phones, tablets or wearables.
 This repository holds the source code for the iOS & OSX versions of Realm, for both Swift & Objective-C.
-
 
 ## Features
 
@@ -11,19 +10,26 @@ This repository holds the source code for the iOS & OSX versions of Realm, for b
 * **Modern:** Realm supports relationships, generics, vectorization and even Swift.
 * **Fast:** Realm is faster than even raw SQLite on common operations, while maintaining an extremely rich feature set.
 
-## Setting up Realm in your app
+## Getting Started
 
-Please see the [detailed instructions in our docs](http://realm.io/docs/cocoa/#installation) to install Realm in your Xcode project.
-
-Once your app is set up with Realm, our [documentation](#documentation) will guide you to unleash its full potential.
+Please see the [detailed instructions in our docs](http://realm.io/docs/cocoa/#installation) to add Realm to your Xcode project.
 
 ## Documentation
 
-Documentation for Realm can be found at [realm.io/docs/cocoa](http://realm.io/docs/cocoa). The API reference is located at [realm.io/docs/cocoa/api](http://realm.io/docs/cocoa/api).
+Documentation for Realm can be found at [realm.io/docs/cocoa](http://realm.io/docs/cocoa).  
+The API reference is located at [realm.io/docs/cocoa/api](http://realm.io/docs/cocoa/api).
+
+## Getting Help
+
+- **Need help with your code?**: Look for previous questions on the  [#realm tag](https://stackoverflow.com/questions/tagged/realm?sort=newest) — or [ask a new question](http://stackoverflow.com/questions/ask?tags=realm). We activtely monitor & answer questions on SO!
+- **Have a bug to report?** [Open an issue](https://github.com/realm/realm-cocoa/issues/new). If possible, include the version of Realm, a full log, the Realm file, and a project that shows the issue.
+- **Have a feature request?** [Open an issue](https://github.com/realm/realm-cocoa/issues/new). Tell us what the feature should do, and why you want the feature.
+- **Want to ask in-depth questions?** [Join our online office hours](https://attendee.gotowebinar.com/rt/1182038037080364033). We host these once a month, and you can join via chat, audio call, or video call.
+- Sign up for our [**Community Newsletter**](http://eepurl.com/VEKCn) to get regular tips, learn about other use-cases and get alerted of blogposts and tutorials about Realm.
 
 ## Building Realm
 
-In case you don't want to use the precompiled version, you can build Realm yourself.
+In case you don't want to use the precompiled version, you can build Realm yourself from source.
 
 Prerequisites:
 

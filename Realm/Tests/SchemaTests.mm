@@ -19,11 +19,15 @@
 #import <XCTest/XCTest.h>
 
 #import "RLMTestCase.h"
+
+#import "RLMAccessor.h"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMProperty_Private.h"
+#import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
-#import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 
+#import <algorithm>
 #import <objc/runtime.h>
 
 @interface SchemaTestClassBase : RLMObject
@@ -64,6 +68,13 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @end
 
 @implementation SchemaTests
+
+- (void)testNoSchemaForUnpersistedObjectClasses {
+    RLMSchema *schema = [RLMSchema sharedSchema];
+    XCTAssertNil([schema schemaForClassName:@"RLMObject"]);
+    XCTAssertNil([schema schemaForClassName:@"RLMObjectBase"]);
+    XCTAssertNil([schema schemaForClassName:@"RLMDynamicObject"]);
+}
 
 - (void)testInheritanceInitialization
 {
@@ -142,7 +153,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         }
 
         // Test creating objects of each class
-        [self.class deleteFiles];
+        [self deleteFiles];
         RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
         [realm beginWriteTransaction];
         [realm createObject:@"SchemaTestClassBase" withObject:@{@"baseCol": @[@0]}];
@@ -229,6 +240,110 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     
     // Test 7: Test querying object schemas using subscription for unexpected types
     XCTAssertThrows(schema[unexpectedType], @"Expecting asking schema for type %@ in realm using subscription to throw", unexpectedType);
+
+    // Test 8: RLMObject should not appear in the shared object schema
+    XCTAssertThrows(RLMSchema.sharedSchema[@"RLMObject"]);
+}
+
+- (void)testDescription {
+    NSArray *expectedTypes = @[@"AllTypesObject",
+                               @"StringObject",
+                               @"IntObject"];
+
+    NSMutableArray *objectSchema = [NSMutableArray array];
+    for (NSString *className in expectedTypes) {
+        [objectSchema addObject:[RLMObjectSchema schemaForObjectClass:NSClassFromString(className)]];
+    }
+
+    RLMSchema *schema = [[RLMSchema alloc] init];
+    schema.objectSchema = objectSchema;
+
+    XCTAssertEqualObjects(schema.description, @"Schema {\n"
+                                              @"\tAllTypesObject {\n"
+                                              @"\t\tboolCol {\n"
+                                              @"\t\t\ttype = bool;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tintCol {\n"
+                                              @"\t\t\ttype = int;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tfloatCol {\n"
+                                              @"\t\t\ttype = float;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tdoubleCol {\n"
+                                              @"\t\t\ttype = double;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tstringCol {\n"
+                                              @"\t\t\ttype = string;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tbinaryCol {\n"
+                                              @"\t\t\ttype = data;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tdateCol {\n"
+                                              @"\t\t\ttype = date;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tcBoolCol {\n"
+                                              @"\t\t\ttype = bool;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tlongCol {\n"
+                                              @"\t\t\ttype = int;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tmixedCol {\n"
+                                              @"\t\t\ttype = any;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tobjectCol {\n"
+                                              @"\t\t\ttype = object;\n"
+                                              @"\t\t\tobjectClassName = StringObject;\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t}\n"
+                                              @"\tStringObject {\n"
+                                              @"\t\tstringCol {\n"
+                                              @"\t\t\ttype = string;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t}\n"
+                                              @"\tIntObject {\n"
+                                              @"\t\tintCol {\n"
+                                              @"\t\t\ttype = int;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t}\n"
+                                              @"}");
 }
 
 @end

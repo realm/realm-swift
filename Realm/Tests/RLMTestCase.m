@@ -31,78 +31,90 @@
 
 NSString *RLMRealmPathForFile(NSString *fileName) {
 #if TARGET_OS_IPHONE
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    return [documentsDirectory stringByAppendingPathComponent:fileName];
-#else
-    return fileName;
-#endif
-}
-
-NSString *RLMDefaultRealmPath() {
-#if TARGET_OS_IPHONE
     NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
 #else
     NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
     path = [path stringByAppendingPathComponent:[[[NSBundle mainBundle] executablePath] lastPathComponent]];
 #endif
-    return [path stringByAppendingPathComponent:@"default.realm"];
+    return [path stringByAppendingPathComponent:fileName];
+}
+
+NSString *RLMDefaultRealmPath() {
+    return RLMRealmPathForFile(@"default.realm");
 }
 
 NSString *RLMTestRealmPath() {
     return RLMRealmPathForFile(@"test.realm");
 }
 
-static NSString *RLMLockPath(NSString *path) {
-    return [path stringByAppendingString:@".lock"];
+static void deleteOrThrow(NSString *path) {
+    NSError *error;
+    if (![[NSFileManager defaultManager] removeItemAtPath:path error:&error]) {
+        if (error.code != NSFileNoSuchFileError) {
+            @throw [NSException exceptionWithName:@"RLMTestException"
+                                           reason:[@"Unable to delete realm: " stringByAppendingString:error.description]
+                                         userInfo:nil];
+        }
+    }
 }
 
 static void RLMDeleteRealmFilesAtPath(NSString *path) {
-    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete realm" userInfo:nil];
-    }
-    
-    [[NSFileManager defaultManager] removeItemAtPath:RLMLockPath(path) error:nil];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:RLMLockPath(path)]) {
-        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete realm" userInfo:nil];
-    }
+    deleteOrThrow(path);
+    deleteOrThrow([path stringByAppendingString:@".lock"]);
+    deleteOrThrow([path stringByAppendingString:@".note"]);
 }
 
+NSData *RLMGenerateKey() {
+    uint8_t buffer[64];
+    SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
+    return [[NSData alloc] initWithBytes:buffer length:sizeof(buffer)];
+}
+
+static BOOL encryptTests() {
+    static BOOL encryptAll = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if (getenv("REALM_ENCRYPT_ALL")) {
+            encryptAll = YES;
+        }
+    });
+    return encryptAll;
+}
 
 @implementation RLMTestCase
 
-+ (void)setUp
-{
-    [super setUp];
-    
-    // Delete Realm files
-    RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
-    RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
+- (void)setUp {
+    @autoreleasepool {
+        [super setUp];
+        [self deleteFiles];
+
+        if (encryptTests()) {
+            [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
+            [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMTestRealmPath()];
+        }
+    }
 }
 
-+ (void)tearDown
-{
-    [super tearDown];
-    [self deleteFiles];
+- (void)tearDown {
+    @autoreleasepool {
+        [super tearDown];
+        [self deleteFiles];
+    }
 }
 
-+ (void)deleteFiles {
+- (void)deleteFiles {
     // Clear cache
     [RLMRealm resetRealmState];
-    
+
     // Delete Realm files
     RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
     RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
 }
 
-- (void)invokeTest
-{
-    [RLMTestCase setUp];
+- (void)invokeTest {
     @autoreleasepool {
         [super invokeTest];
     }
-    [RLMTestCase tearDown];
 }
 
 - (RLMRealm *)realmWithTestPath
@@ -112,6 +124,26 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema {
     return [RLMRealm realmWithPath:RLMTestRealmPath() key:nil readOnly:NO inMemory:NO dynamic:YES schema:schema error:nil];
+}
+
+- (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block {
+    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
+        XCTAssertNotNil(realm, @"Realm should not be nil");
+        if (note == expectedNote) {
+            [notificationFired fulfill];
+        }
+    }];
+
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, block);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // wait for queue to finish
+    dispatch_sync(queue, ^{});
+
+    [realm removeNotification:token];
 }
 
 @end

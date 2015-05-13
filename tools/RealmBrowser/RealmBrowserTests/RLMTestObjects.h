@@ -16,9 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/Realm.h>
+@import Realm;
 
 @interface RealmObject1 : RLMObject
 @property NSInteger intProp;
+@property NSString *stringProp;
+@end
+
+@interface RealmObjectWithoutStoredProperties : RLMObject
 @property NSString *stringProp;
 @end

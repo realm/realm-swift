@@ -18,6 +18,7 @@
 
 import XCTest
 import Realm
+import Realm.Private
 
 func testRealmPath() -> String {
     return realmPathForFile("test.realm")
@@ -30,7 +31,7 @@ func defaultRealmPath() -> String {
 func realmPathForFile(fileName: String) -> String {
     #if os(iOS)
         let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
-        return (paths[0] as String) + "/" + fileName
+        return (paths[0] as! String) + "/" + fileName
     #else
         return fileName
     #endif

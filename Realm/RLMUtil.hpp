@@ -16,16 +16,23 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMConstants.h"
-#import "RLMSchema.h"
+#import <Realm/RLMConstants.h>
 #import <objc/runtime.h>
 
-#import <tightdb/table.hpp>
-#import <tightdb/row.hpp>
-#import <tightdb/string_data.hpp>
-#import <tightdb/util/safe_int_ops.hpp>
+#import <realm/binary_data.hpp>
+#import <realm/string_data.hpp>
 
+@class RLMObjectSchema;
 @class RLMProperty;
+@class RLMRealm;
+@class RLMSchema;
+
+NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
+NSException *RLMException(std::exception const& exception);
+
+NSError *RLMMakeError(RLMError code, std::exception const& exception);
+
+void RLMSetErrorOrThrow(NSError *error, NSError **outError);
 
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
@@ -49,8 +56,12 @@ NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema);
 // returns dictionary with default values and allocates child objects when applicable
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing = false);
 
+NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t index));
+
+void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t index));
+
 // C version of isKindOfClass
-static inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
+static inline BOOL RLMIsKindOfClass(Class class1, Class class2) {
     while (class1) {
         if (class1 == class2) return YES;
         class1 = class_getSuperclass(class1);
@@ -58,11 +69,8 @@ static inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
     return NO;
 }
 
-// Determines if class1 descends from class2
-static inline BOOL RLMIsSubclass(Class class1, Class class2) {
-    class1 = class_getSuperclass(class1);
-    return RLMIsKindOfclass(class1, class2);
-}
+// Returns whether the class is an indirect descendant of RLMObjectBase
+BOOL RLMIsObjectSubclass(Class klass);
 
 template<typename T>
 static inline T *RLMDynamicCast(__unsafe_unretained id obj) {
@@ -100,7 +108,7 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 }
 
 // String conversion utilities
-static inline NSString * RLMStringDataToNSString(tightdb::StringData stringData) {
+static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
     static_assert(sizeof(NSUInteger) >= sizeof(size_t),
                   "Need runtime overflow check for size_t to NSUInteger conversion");
     return [[NSString alloc] initWithBytes:stringData.data()
@@ -108,14 +116,14 @@ static inline NSString * RLMStringDataToNSString(tightdb::StringData stringData)
                                   encoding:NSUTF8StringEncoding];
 }
 
-static inline tightdb::StringData RLMStringDataWithNSString(NSString *string) {
+static inline realm::StringData RLMStringDataWithNSString(NSString *string) {
     static_assert(sizeof(size_t) >= sizeof(NSUInteger),
                   "Need runtime overflow check for NSUInteger to size_t conversion");
-    return tightdb::StringData(string.UTF8String,
+    return realm::StringData(string.UTF8String,
                                [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 }
 
 // Binary convertion utilities
-static inline tightdb::BinaryData RLMBinaryDataForNSData(NSData *data) {
-    return tightdb::BinaryData(static_cast<const char *>(data.bytes), data.length);
+static inline realm::BinaryData RLMBinaryDataForNSData(NSData *data) {
+    return realm::BinaryData(static_cast<const char *>(data.bytes), data.length);
 }

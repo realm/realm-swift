@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class RLMArray;
+
 @interface RLMSwiftSupport : NSObject
 
 + (BOOL)isSwiftClassName:(NSString *)className;

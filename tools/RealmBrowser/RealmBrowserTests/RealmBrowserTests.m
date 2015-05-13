@@ -16,11 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <XCTest/XCTest.h>
-#import <Realm/Realm.h>
-#import "Realm_Private.h"
+@import XCTest;
+@import Realm;
+@import Realm.Private;
 #import "RLMTestDataGenerator.h"
 #import "RLMTestObjects.h"
+#import "RLMRealmNode.h"
 
 @interface RealmBrowserTests : XCTestCase
 
@@ -32,8 +33,10 @@
 {
     NSString *fileName = [NSString stringWithFormat:@"%@.realm", [[NSUUID UUID] UUIDString]];
     NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
-    BOOL success = [RLMTestDataGenerator createRealmAtUrl:fileURL withClassesNamed:@[[RealmObject1 className]] objectCount:10];
-    XCTAssertEqual(YES, success);
+    @autoreleasepool {
+        BOOL success = [RLMTestDataGenerator createRealmAtUrl:fileURL withClassesNamed:@[[RealmObject1 className]] objectCount:10];
+        XCTAssertEqual(YES, success);
+    }
     NSError *error = nil;
     RLMRealm *realm = [RLMRealm realmWithPath:fileURL.path
                                           key:nil
@@ -45,6 +48,23 @@
     XCTAssertNil(error);
     XCTAssertNotNil(realm);
     XCTAssertEqual(10, [[realm allObjects:[RealmObject1 className]] count]);
+}
+
+- (void)testDoesNotShowObjectsWithNoPersistedProperties {
+    NSString *fileName = [NSString stringWithFormat:@"%@.realm", [[NSUUID UUID] UUIDString]];
+    NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
+    @autoreleasepool {
+        BOOL success = [RLMTestDataGenerator createRealmAtUrl:fileURL withClassesNamed:@[[RealmObjectWithoutStoredProperties className]] objectCount:10];
+        XCTAssertTrue(success);
+    }
+    NSError *error = nil;
+    RLMRealmNode *realmNode = [[RLMRealmNode alloc] initWithName:@"name" url:fileURL.path];
+    XCTAssertTrue([realmNode connect:&error]);
+    XCTAssertNil(error);
+    XCTAssertNotNil(realmNode.topLevelClasses);
+    for (RLMClassNode *node in realmNode.topLevelClasses) {
+        XCTAssertNotEqualObjects(@"RealmObjectWithoutStoredProperties", node.name);
+    }
 }
 
 @end

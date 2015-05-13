@@ -1,1 +1,0 @@
-do shell script "sh install_templates.sh" with administrator privileges

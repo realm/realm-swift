@@ -21,10 +21,13 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Dynamic.h"
 
-#import <libkern/OSAtomic.h>
+extern "C" {
+#import "RLMSchema_Private.h"
+}
 
 @interface RLMRealm ()
 + (BOOL)isCoreDebug;
+- (BOOL)compact;
 @end
 
 @interface RLMObjectSchema (Private)
@@ -46,9 +49,9 @@
 
 - (void)testCoreDebug {
 #if DEBUG
-    XCTAssertTrue([RLMRealm isCoreDebug], @"Debug version of Realm should use libtightdb{-ios}-dbg");
+    XCTAssertTrue([RLMRealm isCoreDebug], @"Debug version of Realm should use librealm{-ios}-dbg");
 #else
-    XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use libtightdb{-ios}");
+    XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use librealm{-ios}");
 #endif
 }
 
@@ -86,22 +89,22 @@
     [StringObject createInRealm:realm withObject:@[@"a"]];
     [StringObject createInRealm:realm withObject:@[@"b"]];
     [StringObject createInRealm:realm withObject:@[@"c"]];
-    XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
+    XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, 3U, @"Expecting 3 objects");
     [realm commitWriteTransaction];
 
     // test again after write transaction
     RLMResults *objects = [StringObject allObjectsInRealm:realm];
-    XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
+    XCTAssertEqual(objects.count, 3U, @"Expecting 3 objects");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
 
     [realm beginWriteTransaction];
     [realm deleteObject:objects[2]];
     [realm deleteObject:objects[0]];
-    XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, 1U, @"Expecting 1 object");
     [realm commitWriteTransaction];
 
     objects = [StringObject allObjectsInRealm:realm];
-    XCTAssertEqual(objects.count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual(objects.count, 1U, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
@@ -138,13 +141,15 @@
 
     // delete objects
     RLMResults *objects = [StringObject allObjectsInRealm:realm];
-    XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
+    XCTAssertEqual(objects.count, 3U, @"Expecting 3 objects");
     [realm beginWriteTransaction];
+    [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol != 'a'"]];
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U, @"Expecting 0 objects");
     [realm deleteObjects:objects];
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)0, @"Expecting 0 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 0U, @"Expecting 0 objects");
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)0, @"Expecting 0 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 0U, @"Expecting 0 objects");
     XCTAssertThrows(strObj.stringCol, @"Object should be invalidated");
 
     // add objects to linkView
@@ -153,22 +158,22 @@
     [StringObject createInRealm:realm withObject:@[@"d"]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)4, @"Expecting 4 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 4U, @"Expecting 4 objects");
 
     // remove from linkView
     [realm beginWriteTransaction];
     [realm deleteObjects:obj.array];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)1, @"Expecting 1 object");
-    XCTAssertEqual(obj.array.count, (NSUInteger)0, @"Expecting 0 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U, @"Expecting 1 object");
+    XCTAssertEqual(obj.array.count, 0U, @"Expecting 0 objects");
 
     // remove NSArray
     NSArray *arrayOfLastObject = @[[[StringObject allObjectsInRealm:realm] lastObject]];
     [realm beginWriteTransaction];
     [realm deleteObjects:arrayOfLastObject];
     [realm commitWriteTransaction];
-    XCTAssertEqual(objects.count, (NSUInteger)0, @"Expecting 0 objects");
+    XCTAssertEqual(objects.count, 0U, @"Expecting 0 objects");
 
     // add objects to linkView
     [realm beginWriteTransaction];
@@ -177,11 +182,11 @@
     [realm commitWriteTransaction];
 
     // remove objects from realm
-    XCTAssertEqual(obj.array.count, (NSUInteger)2, @"Expecting 2 objects");
+    XCTAssertEqual(obj.array.count, 2U, @"Expecting 2 objects");
     [realm beginWriteTransaction];
     [realm deleteObjects:[StringObject allObjectsInRealm:realm]];
     [realm commitWriteTransaction];
-    XCTAssertEqual(obj.array.count, (NSUInteger)0, @"Expecting 0 objects");
+    XCTAssertEqual(obj.array.count, 0U, @"Expecting 0 objects");
 }
 
 - (void)testAddPersistedObjectToOtherRealm {
@@ -337,28 +342,8 @@
         [StringObject createInRealm:realm withObject:@[@"b"]];
     }];
     RLMResults *objects = [StringObject allObjectsInRealm:realm];
-    XCTAssertEqual(objects.count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual(objects.count, 1U, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
-}
-
-- (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block {
-    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
-        XCTAssertNotNil(realm, @"Realm should not be nil");
-        if (note == expectedNote) {
-            [notificationFired fulfill];
-        }
-    }];
-
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, block);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // wait for queue to finish
-    dispatch_sync(queue, ^{});
-
-    [realm removeNotification:token];
 }
 
 - (void)testAutorefreshAfterBackgroundUpdate {
@@ -417,7 +402,7 @@
         // notify main thread that we're ready for it to commit
         [bgReady fulfill];
 
-        // run for two seconds or until we recieve notification
+        // run for two seconds or until we receive notification
         NSDate *end = [NSDate dateWithTimeIntervalSinceNow:5.0];
         while (!fulfilled) {
             [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:end];
@@ -478,6 +463,40 @@
     XCTAssertTrue(notificationFired);
 }
 
+- (void)testBeginWriteTransactionsRefreshesRealm {
+    // auto refresh on by default
+    RLMRealm *realm = [self realmWithTestPath];
+
+    // Set up notification which will be triggered when calling beginWriteTransaction
+    __block bool notificationFired = false;
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
+        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+        XCTAssertThrows([realm beginWriteTransaction], @"We should already be in a write transaction");
+        notificationFired = true;
+    }];
+
+    // dispatch to background syncronously
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withObject:@[@"string"]];
+        [realm commitWriteTransaction];
+    });
+    dispatch_sync(queue, ^{});
+
+    // notification shouldnt have fired
+    XCTAssertFalse(notificationFired);
+
+    [realm beginWriteTransaction];
+
+    // notification should have fired
+    XCTAssertTrue(notificationFired);
+
+    [realm cancelWriteTransaction];
+    [realm removeNotification:token];
+}
+
 - (void)testInMemoryRealm
 {
     RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
@@ -522,15 +541,13 @@
     RLMRealm *realm = RLMRealm.defaultRealm;
 
     // Using dispatch_async to ensure it actually lands on another thread
-    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
-    OSSpinLockLock(&spinlock);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{
         XCTAssertThrows([realm beginWriteTransaction]);
         XCTAssertThrows([IntObject allObjectsInRealm:realm]);
         XCTAssertThrows([IntObject objectsInRealm:realm where:@"intCol = 0"]);
-        OSSpinLockUnlock(&spinlock);
     });
-    OSSpinLockLock(&spinlock);
+    dispatch_sync(queue, ^{});
 }
 
 - (void)testReadOnlyFile
@@ -594,6 +611,7 @@
 
         [realm beginWriteTransaction];
         [realm createObject:StringObject.className withObject:@[@"a"]];
+        RLMRealmSetSchemaVersion(realm, 0);
         [realm commitWriteTransaction];
     }
 
@@ -602,7 +620,16 @@
 
     // verify that reading a missing table gives an empty array rather than
     // crashing
-    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+    RLMResults *results = [IntObject allObjectsInRealm:realm];
+    XCTAssertEqual(0U, results.count);
+    XCTAssertEqual(results, [results objectsWhere:@"intCol = 5"]);
+    XCTAssertEqual(results, [results sortedResultsUsingProperty:@"intCol" ascending:YES]);
+    XCTAssertThrows([results objectAtIndex:0]);
+    XCTAssertEqual(NSNotFound, [results indexOfObject:nil]);
+    XCTAssertNoThrow([realm deleteObjects:results]);
+    for (__unused id obj in results) {
+        XCTFail(@"Got an item in empty results");
+    }
 }
 
 - (void)testReadOnlyRealmWithMissingColumns
@@ -641,8 +668,8 @@
     // Confirm that objects were added to the correct realms
     RLMResults *defaultObjects = [StringObject allObjectsInRealm:defaultRealm];
     RLMResults *testObjects = [StringObject allObjectsInRealm:testRealm];
-    XCTAssertEqual(defaultObjects.count, (NSUInteger)1, @"Expecting 1 object");
-    XCTAssertEqual(testObjects.count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual(defaultObjects.count, 1U, @"Expecting 1 object");
+    XCTAssertEqual(testObjects.count, 1U, @"Expecting 1 object");
     XCTAssertEqualObjects([defaultObjects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
     XCTAssertEqualObjects([testObjects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
@@ -671,6 +698,92 @@
     XCTAssertThrows([realm addOrUpdateObject:[[StringObject alloc] initWithObject:@[@"string"]]]);
 
     [realm commitWriteTransaction];
+}
+
+- (void)testAddOrUpdateObjectsFromArray {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    PrimaryStringObject *obj = [[PrimaryStringObject alloc] initWithObject:@[@"string1", @1]];
+    [realm addObject:obj];
+
+    PrimaryStringObject *obj2 = [[PrimaryStringObject alloc] initWithObject:@[@"string2", @2]];
+    [realm addObject:obj2];
+
+    PrimaryStringObject *obj3 = [[PrimaryStringObject alloc] initWithObject:@[@"string3", @3]];
+    [realm addObject:obj3];
+
+    RLMResults *objects = [PrimaryStringObject allObjects];
+    XCTAssertEqual([objects count], 3U, @"Should have 3 object");
+    XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
+    XCTAssertEqual([(PrimaryStringObject *)objects[1] intCol], 2, @"Value should be 2");
+    XCTAssertEqual([(PrimaryStringObject *)objects[2] intCol], 3, @"Value should be 3");
+
+    // upsert with array of 2 objects. One is to update the existing value, another is added
+    NSArray *array = @[[[PrimaryStringObject alloc] initWithObject:@[@"string2", @4]],
+                       [[PrimaryStringObject alloc] initWithObject:@[@"string4", @5]]];
+    [realm addOrUpdateObjectsFromArray:array];
+    XCTAssertEqual([objects count], 4U, @"Should have 4 objects");
+    XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
+    XCTAssertEqual([(PrimaryStringObject *)objects[1] intCol], 4, @"Value should be 4");
+    XCTAssertEqual([(PrimaryStringObject *)objects[2] intCol], 3, @"Value should be 3");
+    XCTAssertEqual([(PrimaryStringObject *)objects[3] intCol], 5, @"Value should be 5");
+
+    [realm commitWriteTransaction];
+}
+
+- (void)testDelete {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    OwnerObject *obj = [OwnerObject createInDefaultRealmWithObject:@[@"deeter", @[@"barney", @2]]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, OwnerObject.allObjects.count);
+    XCTAssertEqual(NO, obj.invalidated);
+
+    XCTAssertThrows([realm deleteObject:obj]);
+
+    RLMRealm *testRealm = [self realmWithTestPath];
+    [testRealm transactionWithBlock:^{
+        XCTAssertThrows([testRealm deleteObject:[[OwnerObject alloc] init]]);
+        [realm transactionWithBlock:^{
+            XCTAssertThrows([testRealm deleteObject:obj]);
+        }];
+    }];
+
+    [realm transactionWithBlock:^{
+        [realm deleteObject:obj];
+        XCTAssertEqual(YES, obj.invalidated);
+    }];
+
+    XCTAssertEqual(0U, OwnerObject.allObjects.count);
+}
+
+- (void)testDeleteObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    CompanyObject *obj = [CompanyObject createInDefaultRealmWithObject:@[@"deeter", @[@[@"barney", @2, @YES]]]];
+    NSArray *objects = @[obj];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, CompanyObject.allObjects.count);
+
+    XCTAssertThrows([realm deleteObjects:objects]);
+    XCTAssertThrows([realm deleteObjects:[CompanyObject allObjectsInRealm:realm]]);
+    XCTAssertThrows([realm deleteObjects:obj.employees]);
+
+    RLMRealm *testRealm = [self realmWithTestPath];
+    [testRealm transactionWithBlock:^{
+        [realm transactionWithBlock:^{
+            XCTAssertThrows([testRealm deleteObjects:objects]);
+            XCTAssertThrows([testRealm deleteObjects:[CompanyObject allObjectsInRealm:realm]]);
+            XCTAssertThrows([testRealm deleteObjects:obj.employees]);
+        }];
+    }];
+
+    XCTAssertEqual(1U, CompanyObject.allObjects.count);
 }
 
 - (void)testDeleteAllObjects {
@@ -863,6 +976,7 @@
     dog.age = 10;
     XCTAssertNoThrow([realm addObjects:@[dog]], @"should allow RLMObject in array");
     XCTAssertEqual(1U, [[DogObject allObjectsInRealm:realm] count]);
+    [realm cancelWriteTransaction];
 }
 
 - (void)testWriteCopyOfRealm
@@ -1019,20 +1133,98 @@
     XCTAssertEqual(2U, [IntObject allObjects].count);
 }
 
-- (void)testBadEncryptionKeys
+- (void)testInvalidLockFile
 {
-    XCTAssertThrows([RLMRealm encryptedRealmWithPath:RLMRealm.defaultRealmPath key:nil readOnly:NO error:nil]);
-    XCTAssertThrows([RLMRealm encryptedRealmWithPath:RLMRealm.defaultRealmPath key:[NSData data] readOnly:NO error:nil]);
-    XCTAssertThrows([RLMRealm migrateEncryptedRealmAtPath:RLMRealm.defaultRealmPath key:nil]);
-    XCTAssertThrows([RLMRealm migrateEncryptedRealmAtPath:RLMRealm.defaultRealmPath key:[NSData data]]);
-    XCTAssertThrows([RLMRealm setEncryptionKey:[NSData data] forRealmsAtPath:RLMRealm.defaultRealmPath]);
+    // Create the realm file and lock file
+    @autoreleasepool { [RLMRealm defaultRealm]; }
+
+    int fd = open([RLMRealm.defaultRealmPath stringByAppendingString:@".lock"].UTF8String, O_RDWR);
+    XCTAssertNotEqual(-1, fd);
+
+    // Change the value of the mutex size field in the shared info header
+    uint8_t value = 255;
+    pwrite(fd, &value, 1, 1);
+
+    // Ensure that SharedGroup can't get an exclusive lock on the lock file so
+    // that it can't just recreate it
+    int ret = flock(fd, LOCK_SH);
+    XCTAssertEqual(0, ret);
+
+    NSError *error;
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMRealm.defaultRealmPath readOnly:NO error:&error];
+    XCTAssertNil(realm);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(RLMErrorIncompatibleLockFile, error.code);
+
+    flock(fd, LOCK_UN);
+    close(fd);
 }
 
-- (void)testValidEncryptionKeys
-{
-    XCTAssertNoThrow([RLMRealm setEncryptionKey:[[NSMutableData alloc] initWithLength:64]
-                                forRealmsAtPath:RLMRealm.defaultRealmPath]);
-    XCTAssertNoThrow([RLMRealm setEncryptionKey:nil forRealmsAtPath:RLMRealm.defaultRealmPath]);
+- (void)testCannotSetSchemaVersionWhenRealmIsOpen {
+    RLMRealm *realm = [self realmWithTestPath];
+    NSString *path = realm.path;
 
+    XCTAssertThrows([RLMRealm setSchemaVersion:1 forRealmAtPath:path withMigrationBlock:nil]);
 }
+
+- (void)testCannotMigrateRealmWhenRealmIsOpen {
+    RLMRealm *realm = [self realmWithTestPath];
+    NSString *path = realm.path;
+
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:path]);
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:path encryptionKey:[[NSMutableData alloc] initWithLength:64]]);
+}
+
+- (void)testCannotSetEncryptionKeyWhenRealmIsOpen {
+    RLMRealm *realm = [self realmWithTestPath];
+    NSString *path = realm.path;
+
+    XCTAssertThrows([RLMRealm setEncryptionKey:nil forRealmsAtPath:path]);
+    XCTAssertThrows([RLMRealm setEncryptionKey:[[NSMutableData alloc] initWithLength:64] forRealmsAtPath:path]);
+}
+
+- (void)testNotificationPipeBufferOverfull {
+    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+    // pipes have a 8 KB buffer on OS X, so verify we don't block after 8192 commits
+    for (int i = 0; i < 9000; ++i) {
+        [realm transactionWithBlock:^{}];
+    }
+}
+
+- (void)testHoldRealmAfterSourceThreadIsDestroyed {
+    __block RLMRealm *realm;
+
+    // Using an NSThread to ensure the thread (and thus runloop) is actually destroyed
+    NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(runBlock:) object:^{
+        realm = [RLMRealm defaultRealm];
+    }];
+    [thread start];
+    while (!thread.isFinished)
+        usleep(100);
+
+    [realm path]; // ensure ARC releases the object after the thread has finished
+}
+
+- (void)testCompact
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm transactionWithBlock:^{
+        [StringObject createInRealm:realm withObject:@[@"A"]];
+        [StringObject createInRealm:realm withObject:@[@"A"]];
+    }];
+    auto fileSize = ^(NSString *path) {
+        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+        return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
+    };
+    unsigned long long fileSizeBefore = fileSize(realm.path);
+    XCTAssertTrue([realm compact]);
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 2U);
+    unsigned long long fileSizeAfter = fileSize(realm.path);
+    XCTAssertGreaterThan(fileSizeBefore, fileSizeAfter);
+}
+
+- (void)runBlock:(void (^)())block {
+    block();
+}
+
 @end

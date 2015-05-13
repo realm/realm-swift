@@ -18,7 +18,6 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
-#import <Realm/RLMObject.h>
 
 /**
  This class models properties persisted to Realm in an RLMObjectSchema.
@@ -43,11 +42,11 @@
 @property (nonatomic, readonly) RLMPropertyType type;
 
 /**
- Property attributes.
+ Indicates if this property is indexed.
  
- @see RLMPropertyAttributes
+ @see RLMObject
  */
-@property (nonatomic, readonly) RLMPropertyAttributes attributes;
+@property (nonatomic, readonly) BOOL indexed;
 
 /**
  Object class name - specify object types for RLMObject and RLMArray properties.
@@ -55,8 +54,8 @@
 @property (nonatomic, readonly, copy) NSString *objectClassName;
 
 /**
- Returns YES if property objects are equal
+ Returns YES if property objects are equal.
  */
-- (BOOL)isEqualToProperty:(RLMProperty *)prop;
+- (BOOL)isEqualToProperty:(RLMProperty *)property;
 
 @end

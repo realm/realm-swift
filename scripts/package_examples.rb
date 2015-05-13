@@ -17,7 +17,7 @@ def remove_target(project_path, target_name)
 
   project.save
 
-  FileUtils.rm(project_path + "/xcshareddata/xcschemes/" + target_name + ".xcscheme")
+  FileUtils.rm("#{project_path}/xcshareddata/xcschemes/#{target_name}.xcscheme", :force => true)
 end
 
 def remove_all_dependencies(project_path)
@@ -36,7 +36,7 @@ end
 # Script
 ##########################
 
-# Remove Realm target and dependency from both objc projects
+# Remove Realm target and dependency from all objc projects
 
 objc_examples = [
   "examples/ios/objc/RealmExamples.xcodeproj",
@@ -53,7 +53,21 @@ objc_examples.each do |example|
   File.open(filepath, "w") do |file|
     file.puts contents.gsub("/build/ios", "/ios")
                       .gsub("Realm/Swift", "Swift")
-                      .gsub("build/DerivedData/Realm/Build/Products/Release", "osx")
+                      .gsub("/build/osx", "/osx")
+  end
+end
+
+# Update location of RealmSwift.xcodeproj for all swift projects
+
+swift_examples = [
+  "examples/ios/swift-next/RealmExamples.xcodeproj"
+]
+
+swift_examples.each do |example|
+  filepath = File.join(example, "project.pbxproj")
+  contents = File.read(filepath)
+  File.open(filepath, "w") do |file|
+    file.puts contents.gsub("../../../RealmSwift.xcodeproj", "../../../swift/RealmSwift.xcodeproj")
   end
 end
 

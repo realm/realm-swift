@@ -21,26 +21,38 @@ Pod::Spec.new do |s|
   s.documentation_url       = "http://realm.io/docs/cocoa/#{s.version}"
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
-  s.compiler_flags          = "-DTIGHTDB_HAVE_CONFIG -DREALM_SWIFT=0 -DREALM_VERSION='@\"#{s.version}\"'"
+  public_header_files = 'include/Realm/RLMArray.h',
+                        'include/Realm/RLMCollection.h',
+                        'include/Realm/RLMConstants.h',
+                        'include/Realm/RLMListBase.h',
+                        'include/Realm/RLMMigration.h',
+                        'include/Realm/RLMObject.h',
+                        'include/Realm/RLMObjectBase.h',
+                        'include/Realm/RLMObjectSchema.h',
+                        'include/Realm/RLMPlatform.h',
+                        'include/Realm/RLMProperty.h',
+                        'include/Realm/RLMRealm.h',
+                        'include/Realm/RLMResults.h',
+                        'include/Realm/RLMSchema.h',
+                        'include/Realm/Realm.h'
+
+  s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"'"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
-  s.private_header_files    = 'include-ios/**/*.hpp', 'include-osx/**/*.hpp', '**/*_Private.h'
-  s.source_files            = 'Realm/*.{m,mm}', 'core/**/*.{h,hpp}'
+  s.public_header_files     = public_header_files
+  s.source_files            = 'Realm/*.{h,m,mm,hpp}', 'include/**/*.hpp'
+  s.header_mappings_dir     = 'include'
   s.xcconfig                = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)' }
   s.preserve_paths          = %w(build.sh)
 
-  s.ios.deployment_target   = '6.0'
-  s.ios.vendored_library    = 'core/libtightdb-ios.a'
-  s.ios.header_mappings_dir = 'include-ios'
-  s.ios.source_files        = 'include-ios/**/*.hpp'
+  s.ios.deployment_target   = '7.0'
+  s.ios.vendored_library    = 'core/librealm-ios.a'
 
-  s.osx.deployment_target   = '10.8'
-  s.osx.vendored_library    = 'core/libtightdb.a'
-  s.osx.header_mappings_dir = 'include-osx'
-  s.osx.source_files        = 'include-osx/**/*.hpp'
+  s.osx.deployment_target   = '10.9'
+  s.osx.vendored_library    = 'core/librealm.a'
 
   s.subspec 'Headers' do |s|
-    s.ios.source_files        = 'include-ios/**/*.h'
-    s.osx.source_files        = 'include-osx/**/*.h'
+    s.source_files          = 'include/**/*.h'
+    s.public_header_files   = public_header_files
   end
 end

@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestDataGenerator.h"
-#import <Realm/Realm.h>
+@import Realm;
 
 const NSUInteger kMaxItemsInTestArray = 12;
 
@@ -38,6 +38,7 @@ const NSUInteger kMaxItemsInTestArray = 12;
     RLMRealm *realm = [RLMRealm realmWithPath:url.path readOnly:NO error:&error];
     
     if (error) {
+        [[NSApplication sharedApplication] presentError:error];
         return NO;
     }
     

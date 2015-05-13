@@ -24,6 +24,12 @@
 #import "RLMRealmOutlineNode.h"
 #import "RLMRealmBrowserWindowController.h"
 
+@interface RLMDocument ()
+
+@property (nonatomic) RLMNotificationToken *changeNotificationToken;
+
+@end
+
 @implementation RLMDocument
 
 - (instancetype)initWithContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
@@ -55,12 +61,21 @@
             if ([realmNode connect:&error]) {
                 ws.presentedRealm  = realmNode;
 
+                ws.changeNotificationToken = [realmNode.realm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+                    for (RLMRealmBrowserWindowController *windowController in ws.windowControllers) {
+                        [windowController reloadAfterEdit];
+                    }
+                }];
+
                 NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
                 [documentController noteNewRecentDocumentURL:absoluteURL];
             
                 for (RLMRealmBrowserWindowController *windowController in ws.windowControllers) {
                     [windowController realmDidLoad];
                 }
+            }
+            else if (error) {
+                [[NSApplication sharedApplication] presentError:error];
             }
         });
     }

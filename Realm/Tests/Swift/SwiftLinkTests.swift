@@ -39,10 +39,10 @@ class SwiftLinkTests: SwiftTestCase {
         let dogs = SwiftDogObject.allObjectsInRealm(realm)
         XCTAssertEqual(owners.count, UInt(1), "Expecting 1 owner")
         XCTAssertEqual(dogs.count, UInt(1), "Expecting 1 dog")
-        XCTAssertEqual((owners[0] as SwiftOwnerObject).name, "Tim", "Tim is named Tim")
-        XCTAssertEqual((dogs[0] as SwiftDogObject).dogName, "Harvie", "Harvie is named Harvie")
+        XCTAssertEqual((owners[0] as! SwiftOwnerObject).name, "Tim", "Tim is named Tim")
+        XCTAssertEqual((dogs[0] as! SwiftDogObject).dogName, "Harvie", "Harvie is named Harvie")
 
-        let tim = owners[0] as SwiftOwnerObject
+        let tim = owners[0] as! SwiftOwnerObject
         XCTAssertEqual(tim.dog.dogName, "Harvie", "Tim's dog should be Harvie")
     }
 
@@ -134,10 +134,10 @@ class SwiftLinkTests: SwiftTestCase {
         let dogs = DogObject.allObjectsInRealm(realm)
         XCTAssertEqual(owners.count, UInt(1), "Expecting 1 owner")
         XCTAssertEqual(dogs.count, UInt(1), "Expecting 1 dog")
-        XCTAssertEqual((owners[0] as OwnerObject).name!, "Tim", "Tim is named Tim")
-        XCTAssertEqual((dogs[0] as DogObject).dogName!, "Harvie", "Harvie is named Harvie")
+        XCTAssertEqual((owners[0] as! OwnerObject).name!, "Tim", "Tim is named Tim")
+        XCTAssertEqual((dogs[0] as! DogObject).dogName!, "Harvie", "Harvie is named Harvie")
 
-        let tim = owners[0] as OwnerObject
+        let tim = owners[0] as! OwnerObject
         XCTAssertEqual(tim.dog.dogName!, "Harvie", "Tim's dog should be Harvie")
     }
 

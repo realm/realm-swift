@@ -18,23 +18,55 @@
 
 #import "RLMTestCase.h"
 
-@interface IndexedStringObject : RLMObject
-@property NSString *stringCol;
-@end
-
-@implementation IndexedStringObject
-+ (RLMPropertyAttributes)attributesForProperty:(__unused NSString *)propertyName
-{
-    return RLMPropertyAttributeIndexed;
-}
-@end
-
 #if !DEBUG
 
 @interface PerformanceTests : RLMTestCase
 @end
 
+static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
+
 @implementation PerformanceTests
+
++ (void)setUp {
+    [super setUp];
+
+    s_smallRealm = [self createStringObjects:1];
+    s_mediumRealm = [self createStringObjects:5];
+    s_largeRealm = [self createStringObjects:50];
+}
+
++ (void)tearDown {
+    s_smallRealm = s_mediumRealm = s_largeRealm = nil;
+    [super tearDown];
+}
+
+- (void)measureBlock:(void (^)(void))block {
+    [super measureBlock:^{
+        @autoreleasepool {
+            block();
+        }
+    }];
+}
+
+- (void)measureMetrics:(NSArray *)metrics automaticallyStartMeasuring:(BOOL)automaticallyStartMeasuring forBlock:(void (^)(void))block {
+    [super measureMetrics:metrics automaticallyStartMeasuring:automaticallyStartMeasuring forBlock:^{
+        @autoreleasepool {
+            block();
+        }
+    }];
+}
+
++ (RLMRealm *)createStringObjects:(int)factor {
+    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@(factor).stringValue];
+    [realm beginWriteTransaction];
+    for (int i = 0; i < 1000 * factor; ++i) {
+        [StringObject createInRealm:realm withObject:@[@"a"]];
+        [StringObject createInRealm:realm withObject:@[@"b"]];
+    }
+    [realm commitWriteTransaction];
+
+    return realm;
+}
 
 - (void)testInsertMultiple {
     [self measureBlock:^{
@@ -53,7 +85,7 @@
 - (void)testInsertSingleLiteral {
     [self measureBlock:^{
         RLMRealm *realm = self.realmWithTestPath;
-        for (int i = 0; i < 500; ++i) {
+        for (int i = 0; i < 50; ++i) {
             [realm beginWriteTransaction];
             [StringObject createInRealm:realm withObject:@[@"a"]];
             [realm commitWriteTransaction];
@@ -74,20 +106,15 @@
     }];
 }
 
-- (RLMRealm *)createStringObjects:(int)factor {
-    RLMRealm *realm = self.realmWithTestPath;
-    [realm beginWriteTransaction];
-    for (int i = 0; i < 1000 * factor; ++i) {
-        [StringObject createInRealm:realm withObject:@[@"a"]];
-        [StringObject createInRealm:realm withObject:@[@"b"]];
-    }
-    [realm commitWriteTransaction];
-
-    return realm;
+- (RLMRealm *)getStringObjects:(int)factor {
+    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@(factor).stringValue];
+    [NSFileManager.defaultManager removeItemAtPath:RLMTestRealmPath() error:nil];
+    [realm writeCopyToPath:RLMTestRealmPath() error:nil];
+    return [self realmWithTestPath];
 }
 
 - (void)testCountWhereQuery {
-    RLMRealm *realm = [self createStringObjects:50];
+    RLMRealm *realm = [self getStringObjects:50];
     [self measureBlock:^{
         RLMResults *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
         [array count];
@@ -95,7 +122,7 @@
 }
 
 - (void)testCountWhereTableView {
-    RLMRealm *realm = [self createStringObjects:50];
+    RLMRealm *realm = [self getStringObjects:50];
     [self measureBlock:^{
         RLMResults *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
         [array firstObject]; // Force materialization of backing table view
@@ -104,7 +131,7 @@
 }
 
 - (void)testEnumerateAndAccessQuery {
-    RLMRealm *realm = [self createStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [self measureBlock:^{
         for (StringObject *so in [StringObject objectsInRealm:realm where:@"stringCol = 'a'"]) {
@@ -114,7 +141,7 @@
 }
 
 - (void)testEnumerateAndAccessAll {
-    RLMRealm *realm = [self createStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [self measureBlock:^{
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
@@ -124,7 +151,7 @@
 }
 
 - (void)testEnumerateAndAccessAllSlow {
-    RLMRealm *realm = [self createStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [self measureBlock:^{
         RLMResults *all = [StringObject allObjectsInRealm:realm];
@@ -136,7 +163,7 @@
 }
 
 - (void)testEnumerateAndAccessArrayProperty {
-    RLMRealm *realm = [self createStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [realm beginWriteTransaction];
     ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm
@@ -151,7 +178,7 @@
 }
 
 - (void)testEnumerateAndAccessArrayPropertySlow {
-    RLMRealm *realm = [self createStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [realm beginWriteTransaction];
     ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm
@@ -166,12 +193,24 @@
     }];
 }
 
-- (void)testEnumerateAndMutate {
-    RLMRealm *realm = [self createStringObjects:1];
+- (void)testEnumerateAndMutateAll {
+    RLMRealm *realm = [self getStringObjects:5];
 
     [self measureBlock:^{
         [realm beginWriteTransaction];
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+            so.stringCol = @"c";
+        }
+        [realm commitWriteTransaction];
+    }];
+}
+
+- (void)testEnumerateAndMutateQuery {
+    RLMRealm *realm = [self getStringObjects:1];
+
+    [self measureBlock:^{
+        [realm beginWriteTransaction];
+        for (StringObject *so in [StringObject objectsInRealm:realm where:@"stringCol != 'b'"]) {
             so.stringCol = @"c";
         }
         [realm commitWriteTransaction];
@@ -189,15 +228,9 @@
     }];
 }
 
-- (void)testQueryDeletion {
-    RLMRealm *realm = self.realmWithTestPath;
-
+- (void)testDeleteAll {
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        [realm beginWriteTransaction];
-        for (int i = 0; i < 5000; ++i) {
-            [StringObject createInRealm:realm withObject:@[@"a"]];
-        }
-        [realm commitWriteTransaction];
+        RLMRealm *realm = [self getStringObjects:5];
 
         [self startMeasuring];
         [realm beginWriteTransaction];
@@ -207,17 +240,23 @@
     }];
 }
 
-- (void)testManualDeletion {
-    RLMRealm *realm = self.realmWithTestPath;
-
+- (void)testQueryDeletion {
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        [realm beginWriteTransaction];
-        for (int i = 0; i < 5000; ++i) {
-            [StringObject createInRealm:realm withObject:@[@"a"]];
-        }
-        [realm commitWriteTransaction];
+        RLMRealm *realm = [self getStringObjects:5];
 
-        NSMutableArray *objects = [NSMutableArray arrayWithCapacity:5000];
+        [self startMeasuring];
+        [realm beginWriteTransaction];
+        [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol = 'a' OR stringCol = 'b'"]];
+        [realm commitWriteTransaction];
+        [self stopMeasuring];
+    }];
+}
+
+- (void)testManualDeletion {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:5];
+
+        NSMutableArray *objects = [NSMutableArray arrayWithCapacity:10000];
         for (StringObject *obj in [StringObject allObjectsInRealm:realm]) {
             [objects addObject:obj];
         }
@@ -290,20 +329,161 @@
     }];
 }
 
-- (void)testRealmCreation {
-    [self realmWithTestPath]; // ensure a cached realm for the path
-
+- (void)testRealmCreationCached {
+    __block RLMRealm *realm;
     dispatch_queue_t queue = dispatch_queue_create("test queue", 0);
+    dispatch_async(queue, ^{
+        realm = [self realmWithTestPath]; // ensure a cached realm for the path
+    });
+    dispatch_sync(queue, ^{});
+
     [self measureBlock:^{
         for (int i = 0; i < 250; ++i) {
-            dispatch_async(queue, ^{
-                @autoreleasepool {
-                    [self realmWithTestPath];
-                }
-            });
+            @autoreleasepool {
+                [self realmWithTestPath];
+            }
+        }
+    }];
+    [realm path];
+}
+
+- (void)testRealmCreationUncached {
+    [self measureBlock:^{
+        for (int i = 0; i < 50; ++i) {
+            @autoreleasepool {
+                [self realmWithTestPath];
+            }
+        }
+    }];
+}
+
+- (void)testCommitWriteTransaction {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+        [realm beginWriteTransaction];
+        IntObject *obj = [IntObject createInRealm:realm withObject:@[@0]];
+        [realm commitWriteTransaction];
+
+        [self startMeasuring];
+        while (obj.intCol < 100) {
+            [realm transactionWithBlock:^{
+                obj.intCol++;
+            }];
+        }
+        [self stopMeasuring];
+    }];
+}
+
+- (void)testCommitWriteTransactionWithLocalNotification {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+        [realm beginWriteTransaction];
+        IntObject *obj = [IntObject createInRealm:realm withObject:@[@0]];
+        [realm commitWriteTransaction];
+
+        RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) { }];
+        [self startMeasuring];
+        while (obj.intCol < 100) {
+            [realm transactionWithBlock:^{
+                obj.intCol++;
+            }];
+        }
+        [self stopMeasuring];
+        [realm removeNotification:token];
+    }];
+}
+
+- (void)testCommitWriteTransactionWithCrossThreadNotification {
+    const int stopValue = 100;
+
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+        [realm beginWriteTransaction];
+        IntObject *obj = [IntObject createInRealm:realm withObject:@[@0]];
+        [realm commitWriteTransaction];
+
+        dispatch_queue_t queue = dispatch_queue_create("background", 0);
+        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+        dispatch_async(queue, ^{
+            RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+            IntObject *obj = [[IntObject allObjectsInRealm:realm] firstObject];
+            __block bool stop = false;
+            RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
+                stop = obj.intCol == stopValue;
+            }];
+
+            dispatch_semaphore_signal(sema);
+            while (!stop) {
+                [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+            }
+
+            [realm removeNotification:token];
+        });
+
+        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+        [self startMeasuring];
+        while (obj.intCol < stopValue) {
+            [realm transactionWithBlock:^{
+                obj.intCol++;
+            }];
         }
 
         dispatch_sync(queue, ^{});
+        [self stopMeasuring];
+    }];
+}
+
+- (void)testCrossThreadSyncLatency {
+    const int stopValue = 100;
+
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+        [realm beginWriteTransaction];
+        IntObject *obj = [IntObject createInRealm:realm withObject:@[@0]];
+        [realm commitWriteTransaction];
+
+        dispatch_queue_t queue = dispatch_queue_create("background", 0);
+        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+        dispatch_async(queue, ^{
+            RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+            IntObject *obj = [[IntObject allObjectsInRealm:realm] firstObject];
+            RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
+                if (obj.intCol % 2 == 0 && obj.intCol < stopValue) {
+                    [realm transactionWithBlock:^{
+                        obj.intCol++;
+                    }];
+                }
+            }];
+
+            dispatch_semaphore_signal(sema);
+            while (obj.intCol < stopValue) {
+                [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+            }
+
+            [realm removeNotification:token];
+        });
+
+        RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
+            if (obj.intCol % 2 == 1 && obj.intCol < stopValue) {
+                [realm transactionWithBlock:^{
+                    obj.intCol++;
+                }];
+            }
+        }];
+
+        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+        [self startMeasuring];
+        [realm transactionWithBlock:^{
+            obj.intCol++;
+        }];
+        while (obj.intCol < stopValue) {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+        }
+
+        dispatch_sync(queue, ^{});
+        [self stopMeasuring];
+
+        [realm removeNotification:token];
     }];
 }
 

@@ -30,6 +30,10 @@ class SwiftIntObject: RLMObject {
     dynamic var intCol = 0
 }
 
+class SwiftLongObject: RLMObject {
+    dynamic var longCol: Int64 = 0
+}
+
 class SwiftObject: RLMObject {
     dynamic var boolCol = false
     dynamic var intCol = 123
@@ -73,6 +77,7 @@ class SwiftAggregateObject: RLMObject {
 }
 
 class SwiftAllIntSizesObject: RLMObject {
+    dynamic var int8  : Int8  = 0
     dynamic var int16 : Int16 = 0
     dynamic var int32 : Int32 = 0
     dynamic var int64 : Int64 = 0

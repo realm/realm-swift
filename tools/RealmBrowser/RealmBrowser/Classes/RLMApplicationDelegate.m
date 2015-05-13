@@ -16,11 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+@import Realm;
+
 #import "RLMApplicationDelegate.h"
-
-#import <Realm/Realm.h>
 #import "RLMTestDataGenerator.h"
-
 #import "TestClasses.h"
 
 const NSUInteger kTopTipDelay = 250;

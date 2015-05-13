@@ -16,7 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSchema.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
+#import <Realm/RLMSchema.h>
+
+@class RLMRealm;
 
 //
 // Realm table namespace costants/methods
@@ -28,19 +34,19 @@
 //            of the typename (the rest of the name after class)
 //  metadata - table used for realm metadata storage
 extern NSString * const c_objectTableNamePrefix;
-extern const char *c_metadataTableName;
-extern const char *c_versionColumnName;
+extern const char * const c_metadataTableName;
+extern const char * const c_primaryKeyTableName;
+extern const char * const c_versionColumnName;
 extern const size_t c_versionColumnIndex;
-extern const NSUInteger RLMNotVersioned;
 
-inline NSString *RLMClassForTableName(NSString *tableName) {
+static inline NSString *RLMClassForTableName(NSString *tableName) {
     if ([tableName hasPrefix:c_objectTableNamePrefix]) {
         return [tableName substringFromIndex:6];
     }
     return nil;
 }
 
-inline NSString *RLMTableNameForClass(NSString *className) {
+static inline NSString *RLMTableNameForClass(NSString *className) {
     return [c_objectTableNamePrefix stringByAppendingString:className];
 }
 
@@ -49,9 +55,14 @@ inline NSString *RLMTableNameForClass(NSString *className) {
 // Realm schema metadata
 //
 
+
+// check if the realm already has all metadata tbales
+bool RLMRealmHasMetadataTables(RLMRealm *realm);
+
 // create any metadata tables that don't already exist
 // must be in write transaction to set
-void RLMRealmCreateMetadataTables(RLMRealm *realm);
+// returns true if it actually did anything
+bool RLMRealmCreateMetadataTables(RLMRealm *realm);
 
 NSUInteger RLMRealmSchemaVersion(RLMRealm *realm);
 
@@ -82,4 +93,11 @@ void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass,
 // class for string
 + (Class)classForString:(NSString *)className;
 
+// shallow copy for reusing schema properties accross the same Realm on multiple threads
+- (instancetype)shallowCopy;
+
 @end
+
+#ifdef __cplusplus
+}
+#endif

@@ -71,13 +71,9 @@
 @end
 
 @implementation IndexedObject
-+ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName
++ (NSArray *)indexedProperties
 {
-    RLMPropertyAttributes superAttributes = [super attributesForProperty:propertyName];
-    if ([propertyName isEqualToString:@"name"]) {
-        superAttributes |= RLMPropertyAttributeIndexed;
-    }
-    return superAttributes;
+    return @[@"name"];
 }
 @end
 
@@ -198,12 +194,6 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @end
 
 @implementation DataObject
-@end
-
-#pragma mark - Private
-
-@interface RLMRealm ()
-@property (nonatomic) RLMSchema *schema;
 @end
 
 #pragma mark - Tests
@@ -428,13 +418,13 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     AllTypesObject *c = [[AllTypesObject alloc] init];
     
-    c.BoolCol   = NO;
-    c.IntCol  = 54;
-    c.FloatCol = 0.7f;
-    c.DoubleCol = 0.8;
-    c.StringCol = @"foo";
-    c.BinaryCol = bin1;
-    c.DateCol = timeZero;
+    c.boolCol   = NO;
+    c.intCol  = 54;
+    c.floatCol = 0.7f;
+    c.doubleCol = 0.8;
+    c.stringCol = @"foo";
+    c.binaryCol = bin1;
+    c.dateCol = timeZero;
     c.cBoolCol = false;
     c.longCol = 99;
     c.mixedCol = @"string";
@@ -473,6 +463,15 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     XCTAssertTrue([row1.mixedCol isEqual:@"string"],    @"row1.mixedCol");
     XCTAssertEqualObjects(row2.mixedCol, @2,            @"row2.mixedCol");
+
+    [realm transactionWithBlock:^{
+        row1.boolCol = NO;
+        row1.cBoolCol = false;
+        row1.boolCol = (BOOL)6;
+        row1.cBoolCol = (BOOL)6;
+    }];
+    XCTAssertEqual(row1.boolCol, true);
+    XCTAssertEqual(row1.cBoolCol, true);
 }
 
 - (void)testObjectSubclass {
@@ -507,7 +506,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 - (void)testDataSizeLimits {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    // Allocation must be < 16 MB, with an 8-byte header and the allcation size
+    // Allocation must be < 16 MB, with an 8-byte header and the allocation size
     // 8-byte aligned
     static const int maxSize = 0xFFFFFF - 15;
 
@@ -529,6 +528,34 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     // A blob over 16 MB should throw (and not crash)
     [realm beginWriteTransaction];
     XCTAssertThrows(obj.data1 = [NSData dataWithBytesNoCopy:malloc(maxSize + 1) length:maxSize + 1 freeWhenDone:YES]);
+    [realm commitWriteTransaction];
+}
+
+- (void)testStringSizeLimits {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    // Allocation must be < 16 MB, with an 8-byte header, trailing NUL,  and the
+    // allocation size 8-byte aligned
+    static const int maxSize = 0xFFFFFF - 16;
+
+    void *buffer = calloc(maxSize, 1);
+    strcpy((char *)buffer + maxSize - sizeof("hello") - 1, "hello");
+    NSString *str = [[NSString alloc] initWithBytesNoCopy:buffer length:maxSize encoding:NSUTF8StringEncoding freeWhenDone:YES];
+    StringObject *obj = [[StringObject alloc] init];
+    obj.stringCol = str;
+
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects(str, obj.stringCol);
+
+    // A blob over 16 MB should throw (and not crash)
+    [realm beginWriteTransaction];
+    XCTAssertThrows(obj.stringCol = [[NSString alloc] initWithBytesNoCopy:calloc(maxSize + 1, 1)
+                                                                   length:maxSize + 1
+                                                                 encoding:NSUTF8StringEncoding
+                                                             freeWhenDone:YES]);
     [realm commitWriteTransaction];
 }
 
@@ -948,6 +975,19 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertNoThrow(obj.description);
 }
 
+- (void)testDataObjectDescription {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    char longData[200];
+    [DataObject createInRealm:realm withObject:@[[NSData dataWithBytes:&longData length:200], [NSData dataWithBytes:&longData length:2]]];
+    [realm commitWriteTransaction];
+
+    DataObject *obj = [DataObject allObjectsInRealm:realm].firstObject;
+    XCTAssertTrue([obj.description rangeOfString:@"200 total bytes"].location != NSNotFound);
+    XCTAssertTrue([obj.description rangeOfString:@"2 total bytes"].location != NSNotFound);
+}
+
 - (void)testDeletedObjectDescription
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -965,10 +1005,10 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 - (void)testIndex
 {
     RLMProperty *nameProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"name"];
-    XCTAssertTrue(nameProperty.attributes & RLMPropertyAttributeIndexed, @"indexed property should have an index");
+    XCTAssertTrue(nameProperty.indexed, @"indexed property should have an index");
     
     RLMProperty *ageProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"age"];
-    XCTAssertFalse(ageProperty.attributes & RLMPropertyAttributeIndexed, @"non-indexed property shouldn't have an index");
+    XCTAssertFalse(ageProperty.indexed, @"non-indexed property shouldn't have an index");
 }
 
 - (void)testRetainedRealmObjectUnknownKey
@@ -1001,6 +1041,8 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     RLMRealm *realm = [RLMRealm defaultRealm];
     RLMRealm *otherRealm = [self realmWithTestPath];
 
+    XCTAssertFalse([obj isEqual:[NSObject new]], @"Comparing an RLMObject to a non-RLMObject should be false.");
+    XCTAssertFalse([obj isEqualToObject:(RLMObject *)[NSObject new]], @"Comparing an RLMObject to a non-RLMObject should be false.");
     XCTAssertTrue([obj isEqual:obj], @"Same instance.");
     XCTAssertTrue([obj isEqualToObject:obj], @"Same instance.");
     XCTAssertFalse([obj isEqualToObject:otherObj], @"Comparison outside of realm.");
@@ -1033,24 +1075,16 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     // Standalone can be accessed from other threads
     // Using dispatch_async to ensure it actually lands on another thread
-    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
-    OSSpinLockLock(&spinlock);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        XCTAssertNoThrow(obj.intCol = 5);
-        OSSpinLockUnlock(&spinlock);
-    });
-    OSSpinLockLock(&spinlock);
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{ XCTAssertNoThrow(obj.intCol = 5); });
+    dispatch_sync(queue, ^{});
 
     [RLMRealm.defaultRealm beginWriteTransaction];
     [RLMRealm.defaultRealm addObject:obj];
     [RLMRealm.defaultRealm commitWriteTransaction];
 
-    XCTAssertNoThrow(obj.intCol);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        XCTAssertThrows(obj.intCol);
-        OSSpinLockUnlock(&spinlock);
-    });
-    OSSpinLockLock(&spinlock);
+    dispatch_async(queue, ^{ XCTAssertThrows(obj.intCol); });
+    dispatch_sync(queue, ^{});
 }
 
 - (void)testIsDeleted {
@@ -1069,14 +1103,19 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     // delete
     [realm beginWriteTransaction];
+    // Delete directly
     [realm deleteObject:obj1];
-    [realm deleteObject:obj2];
+    // Delete as result of query since then obj2's realm could point to a different instance
+    [realm deleteObject:[[StringObject allObjectsInRealm:realm] firstObject]];
 
     XCTAssertEqual(obj1.invalidated, YES);
     XCTAssertEqual(obj2.invalidated, YES);
 
     XCTAssertThrows([realm addObject:obj1], @"Adding deleted object should throw");
-    
+
+    NSArray *propObject = @[@"", @[obj2], @[]];
+    XCTAssertThrows([ArrayPropertyObject createInRealm:realm withObject:propObject], @"Adding deleted object as a link should throw");
+
     [realm commitWriteTransaction];
 
     XCTAssertEqual(obj1.invalidated, YES);
@@ -1121,8 +1160,9 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 3, @"Value should be 3");
 
-    // upsert on non-primary key object shoudld throw
+    // upsert on non-primary key object should throw
     XCTAssertThrows([StringObject createOrUpdateInDefaultRealmWithObject:@[@"string"]]);
+    XCTAssertThrows([StringObject createOrUpdateInRealm:realm withObject:@[@"string"]]);
 
     [realm commitWriteTransaction];
 }
