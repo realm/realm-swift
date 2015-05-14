@@ -278,14 +278,16 @@ case "$COMMAND" in
         ;;
 
     "ios-dynamic")
-        build_combined "iOS Dynamic" Realm "-dynamic" "LD_DYLIB_INSTALL_NAME='@rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm'"
+        build_combined "iOS Dynamic" Realm "-dynamic"
         exit 0
         ;;
 
     "ios-swift")
+        sh build.sh ios-dynamic
         build_combined "RealmSwift iOS" RealmSwift
         mkdir build/ios/swift
         cp -R build/ios/RealmSwift.framework build/ios/swift
+        cp -R build/ios-dynamic/Realm.framework build/ios/swift
         exit 0
         ;;
 
@@ -606,7 +608,7 @@ case "$COMMAND" in
         sh build.sh ios-swift
 
         cd build/ios/swift
-        zip --symlinks -r realm-swift-framework-ios.zip RealmSwift.framework
+        zip --symlinks -r realm-swift-framework-ios.zip RealmSwift.framework Realm.framework
         ;;
 
     "package-osx-swift")
