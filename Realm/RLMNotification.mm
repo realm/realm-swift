@@ -240,16 +240,13 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
     struct change {
         RLMObservationInfo *info;
         __unsafe_unretained NSString *property;
-    };
-    std::vector<change> changes;
-    struct arrayChange {
-        RLMObservationInfo *info;
-        __unsafe_unretained NSString *property;
         NSMutableIndexSet *indexes;
     };
-    std::vector<arrayChange> arrayChanges;
 
+    std::vector<change> changes;
+    std::vector<RLMObservationInfo *> invalidated;
     std::vector<std::vector<RLMObservationInfo *> *> observers;
+
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         if (objectSchema->_observedObjects.empty()) {
             continue;
@@ -281,16 +278,16 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
                 }
 
                 auto linkview = observer->getRow().get_linklist(prop.column);
-                arrayChange *c = nullptr;
-                for (auto& ac : arrayChanges) {
+                change *c = nullptr;
+                for (auto& ac : changes) {
                     if (ac.info == observer && ac.property == name) {
                         c = &ac;
                         break;
                     }
                 }
                 if (!c) {
-                    arrayChanges.push_back({observer, name, [NSMutableIndexSet new]});
-                    c = &arrayChanges.back();
+                    changes.push_back({observer, name, [NSMutableIndexSet new]});
+                    c = &changes.back();
                 }
 
                 size_t start = 0, index;
@@ -301,7 +298,6 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
             }
         }
 
-        NSString *invalidated = @"invalidated";
         for (auto const& row : cs.rows) {
             if (row.table_ndx >= observers.size() || !observers[row.table_ndx]) {
                 continue;
@@ -309,32 +305,28 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
 
             for (auto observer : *observers[row.table_ndx]) {
                 if (observer->isForRow(row.row_ndx)) {
-                    changes.push_back({observer, invalidated});
+                    invalidated.push_back(observer);
                     break;
                 }
             }
         }
 
         for (auto const& change : changes) {
-            change.info->willChange(change.property);
-        }
-        for (auto const& change : arrayChanges) {
             change.info->willChange(change.property, NSKeyValueChangeRemoval, change.indexes);
         }
-        for (auto const& change : changes) {
-            if (change.property == invalidated) {
-                change.info->setReturnNil(true);
-            }
+        for (auto info : invalidated) {
+            info->willChange(@"invalidated");
+            info->setReturnNil(true);
         }
     });
 
     block();
 
     for (auto const& change : changes) {
-        change.info->didChange(change.property);
-    }
-    for (auto const& change : arrayChanges) {
         change.info->didChange(change.property, NSKeyValueChangeRemoval, change.indexes);
+    }
+    for (auto info : invalidated) {
+        info->didChange(@"invalidated");
     }
 
     realm.group->set_cascade_notification_handler(nullptr);
