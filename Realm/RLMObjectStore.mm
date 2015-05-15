@@ -237,7 +237,7 @@ static bool RLMPropertyCanBeMigrated(RLMProperty *oldProperty, RLMProperty *newP
 }
 
 
-static void RLMMigratePropertyToProperty(RLMProperty *oldProperty, RLMProperty *newProperty, Table *table) {
+static void RLMCopyPropertyToProperty(RLMProperty *oldProperty, RLMProperty *newProperty, Table *table) {
     size_t oldColumn = oldProperty.column;
     size_t newColumn = newProperty.column;
     if (oldProperty.type == newProperty.type && newProperty.type == RLMPropertyTypeString) {
@@ -247,7 +247,7 @@ static void RLMMigratePropertyToProperty(RLMProperty *oldProperty, RLMProperty *
         }
     }
     else {
-        @throw RLMException([NSString stringWithFormat:@"Unable to automatically migrate a property of type '%@' to type '%@'", RLMTypeToString(oldProperty.type), RLMTypeToString(newProperty.type)]);
+        @throw RLMException([NSString stringWithFormat:@"Unable to automatically copy a property of type '%@' to type '%@'", RLMTypeToString(oldProperty.type), RLMTypeToString(newProperty.type)]);
     }
 }
 
@@ -283,7 +283,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
             if (RLMPropertyHasChanged(prop, tableProp)) {
                 RLMCreateColumn(realm, *objectSchema.table, prop);
                 if (RLMPropertyCanBeMigrated(tableProp, prop)) {
-                    RLMMigratePropertyToProperty(tableProp, prop, objectSchema.table);
+                    RLMCopyPropertyToProperty(tableProp, prop, objectSchema.table);
                 }
                 changed = true;
             }
