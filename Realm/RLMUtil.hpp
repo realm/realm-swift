@@ -115,6 +115,9 @@ static inline realm::StringData RLMStringDataWithNSString(__unsafe_unretained NS
 static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSData *const data) {
     return realm::BinaryData(static_cast<const char *>(data.bytes), data.length);
 }
+static inline NSData *RLMBinaryDataToNSData(realm::BinaryData data) {
+    return [[NSData alloc] initWithBytes:data.data() length:data.size()];
+}
 
 static inline NSUInteger RLMConvertNotFound(size_t index) {
     return index == realm::not_found ? NSNotFound : index;
