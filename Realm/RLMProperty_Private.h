@@ -22,6 +22,8 @@
 
 @class RLMObjectBase;
 
+FOUNDATION_EXTERN BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType);
+
 // private property interface
 @interface RLMProperty ()
 

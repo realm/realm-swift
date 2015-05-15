@@ -24,6 +24,17 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
+    switch (propertyType) {
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeString:
+            return YES;
+        default:
+            return NO;
+    }
+}
+
 @implementation RLMProperty {
     NSString *_objcRawType;
 }
