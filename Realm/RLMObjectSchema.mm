@@ -134,7 +134,7 @@
 
     for (RLMProperty *prop in schema.properties) {
         RLMPropertyType type = prop.type;
-        if (prop.optional && type != RLMPropertyTypeObject && type != RLMPropertyTypeArray && type != RLMPropertyTypeString) {
+        if (prop.optional && !RLMPropertyTypeIsNullable(type)) {
             @throw RLMException([NSString stringWithFormat:@"Only 'string', 'array', and 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)]);
         }
     }
