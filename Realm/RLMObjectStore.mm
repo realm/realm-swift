@@ -345,18 +345,22 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     RLMCheckThread(realm);
 }
 
-void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
-    // switch List<> properties to linkviews from standalone arrays
-    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwift.Object");
-    if (!object || !object->_row || ![object isKindOfClass:s_swiftObjectClass]) {
+void RLMInitializeSwiftListAccessor(__unsafe_unretained RLMObjectBase *const object) {
+    if (!object || !object->_row || !object->_objectSchema.isSwiftClass) {
         return;
+    }
+
+    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwift.Object");
+    if (![object isKindOfClass:s_swiftObjectClass]) {
+        return; // Is a Swift class using the obj-c API
     }
 
     for (RLMProperty *prop in object->_objectSchema.properties) {
         if (prop.type == RLMPropertyTypeArray) {
-            [RLMObjectUtilClass(YES) initializeListProperty:object property:prop array:[RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
-                                                                                                                             view:object->_row.get_linklist(prop.column)
-                                                                                                                            realm:object->_realm]];
+            RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
+                                                                    view:object->_row.get_linklist(prop.column)
+                                                                   realm:object->_realm];
+            [RLMObjectUtilClass(YES) initializeListProperty:object property:prop array:array];
         }
     }
 }
