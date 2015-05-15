@@ -32,8 +32,6 @@
 
 #import <objc/message.h>
 
-extern "C" {
-
 static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema) {
     NSMutableArray *properties = [NSMutableArray arrayWithCapacity:objectSchema.properties.count];
     NSMutableArray *exceptionMessages = [NSMutableArray array];
@@ -365,8 +363,6 @@ void RLMInitializeSwiftListAccessor(__unsafe_unretained RLMObjectBase *const obj
     }
 }
 
-} // extern "C" {
-
 template<typename F>
 static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F primaryValueGetter, RLMCreationOptions options, bool &created) {
     // try to get existing row if updating
@@ -396,8 +392,6 @@ static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F p
     // get accessor
     return rowIndex;
 }
-
-extern "C" {
 
 void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOptions options) {
     RLMVerifyInWriteTransaction(realm);
@@ -628,5 +622,3 @@ RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm
     RLMInitializeSwiftListAccessor(accessor);
     return accessor;
 }
-
-} // extern "C" {
