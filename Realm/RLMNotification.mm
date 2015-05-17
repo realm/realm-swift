@@ -332,53 +332,58 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
     realm.group->set_cascade_notification_handler(nullptr);
 }
 
-struct ObserverState {
-    size_t table;
-    size_t row;
-    size_t column;
-    NSString *key;
-    RLMObservationInfo *info;
-
-    bool changed = false;
-    bool multipleLinkviewChanges = false;
-    NSKeyValueChange linkviewChangeKind = NSKeyValueChangeSetting;
-    NSMutableIndexSet *linkviewChangeIndexes;
-};
-
+namespace {
 class TransactLogHandler {
-    size_t current_table = 0;
-    ObserverState *active_linklist = nullptr;
+    struct ObserverState {
+        size_t table;
+        size_t row;
+        RLMObservationInfo *info;
+
+        struct change {
+            bool changed = false;
+            bool multipleLinkviewChanges = false;
+            NSKeyValueChange linkviewChangeKind = NSKeyValueChangeSetting;
+            NSMutableIndexSet *linkviewChangeIndexes = nil;
+        };
+        std::vector<change> changes;
+
+        change& getChange(size_t i) {
+            if (changes.size() <= i) {
+                changes.resize(std::max(changes.size() * 2, i + 1));
+            }
+            return changes[i];
+        }
+
+        template<typename Func>
+        void forEach(Func&& f) const {
+            if (row == realm::npos) {
+                return;
+            }
+            for (size_t i = 0; i < changes.size(); ++i) {
+                auto const& change = changes[i];
+                if (change.changed) {
+                    f(i, change);
+                }
+            }
+        }
+    };
+
+    size_t currentTable = 0;
+    size_t currentCol = 0;
+    ObserverState *activeObserver = nullptr;
+    ObserverState::change *activeLinkList = nullptr;
     std::vector<ObserverState> observers;
 
     void findObservers(NSArray *schema) {
-        // all this should maybe be precomputed or cached or something
         for (RLMObjectSchema *objectSchema in schema) {
             for (auto info : objectSchema->_observedObjects) {
                 auto const& row = info->getRow();
                 if (!row.is_attached()) // FIXME: should maybe try to remove from array on invalidate
                     continue;
                 info->setReturnNil(false);
-                for (size_t i = 0; i < objectSchema.properties.count; ++i) {
-                    observers.push_back({
-                        row.get_table()->get_index_in_group(),
-                        row.get_index(),
-                        i,
-                        [objectSchema.properties[i] name],
-                        info});
-                }
-            }
-        }
-
-        for (RLMObjectSchema *objectSchema in schema) {
-            for (auto info : objectSchema->_observedObjects) {
-                auto const& row = info->getRow();
-                if (!row.is_attached()) // FIXME: should maybe try to remove from array on invalidate
-                    continue;
                 observers.push_back({
                     row.get_table()->get_index_in_group(),
                     row.get_index(),
-                    realm::npos,
-                    @"invalidated",
                     info});
             }
         }
@@ -386,14 +391,27 @@ class TransactLogHandler {
 
     void notifyObservers() {
         for (auto const& o : observers) {
-            if (o.row == realm::not_found) {
-                if (o.column == realm::npos) { // i.e. invalidated
-                    o.info->didChange(o.key);
-                }
-            }
-            else if (o.changed)
-                o.info->didChange(o.key, o.linkviewChangeKind, o.linkviewChangeIndexes);
+            o.forEach([&](size_t i, auto const& change) {
+                o.info->didChange([o.info->getObjectSchema().properties[i] name],
+                                  change.linkviewChangeKind,
+                                  change.linkviewChangeIndexes);
+            });
         }
+        for (auto const& o : observers) {
+            if (o.row == realm::not_found) {
+                o.info->didChange(@"invalidated");
+            }
+        }
+    }
+
+    bool markDirty(size_t row_ndx, size_t col_ndx) {
+        for (auto& o : observers) {
+            if (o.table == currentTable && o.row == row_ndx) {
+                o.getChange(col_ndx).changed = true;
+                return true;
+            }
+        }
+        return true;
     }
 
 public:
@@ -412,13 +430,16 @@ public:
     void parse_complete() {
         for (auto const& o : observers) {
             if (o.row == realm::not_found) {
-                if (o.column == realm::npos) { // i.e. invalidated
-                    o.info->willChange(o.key);
-                    o.info->setReturnNil(true);
-                }
+                o.info->willChange(@"invalidated");
+                o.info->setReturnNil(true);
+                continue;
             }
-            else if (o.changed)
-                o.info->willChange(o.key, o.linkviewChangeKind, o.linkviewChangeIndexes);
+
+            o.forEach([&](size_t i, auto const& change) {
+                o.info->willChange([o.info->getObjectSchema().properties[i] name],
+                                   change.linkviewChangeKind,
+                                   change.linkviewChangeIndexes);
+            });
         }
     }
 
@@ -439,7 +460,7 @@ public:
     bool set_link_type(size_t, LinkType) { return false; }
 
     bool select_table(size_t group_level_ndx, int, const size_t*) noexcept {
-        current_table = group_level_ndx;
+        currentTable = group_level_ndx;
         return true;
     }
 
@@ -450,10 +471,9 @@ public:
 
     bool erase_rows(size_t row_ndx, size_t, size_t last_row_ndx, bool unordered) noexcept {
         for (auto& o : observers) {
-            if (o.table == current_table) {
+            if (o.table == currentTable) {
                 if (o.row == row_ndx) {
                     o.row = realm::npos;
-                    o.changed = false;
                 }
                 else if (unordered && o.row == last_row_ndx) {
                     o.row = row_ndx;
@@ -468,19 +488,21 @@ public:
 
     bool clear_table() noexcept {
         for (auto& o : observers) {
-            if (o.table == current_table) {
+            if (o.table == currentTable) {
                 o.row = realm::npos;
-                o.changed = false;
+                o.changes.clear();
             }
         }
         return true;
     }
 
     bool select_link_list(size_t col, size_t row) {
-        active_linklist = nullptr;
+        activeLinkList = nullptr;
         for (auto& o : observers) {
-            if (o.table == current_table && o.row == row && o.column == col) {
-                active_linklist = &o;
+            if (o.table == currentTable && o.row == row) {
+                currentCol = col;
+                activeObserver = &o;
+                activeLinkList = &o.getChange(col);
                 break;
             }
         }
@@ -488,7 +510,7 @@ public:
     }
 
     void append_link_list_change(NSKeyValueChange kind, NSUInteger index) {
-        if (ObserverState *o = active_linklist) {
+        if (ObserverState::change *o = activeLinkList) {
             if (o->multipleLinkviewChanges)
                 return;
             if (!o->linkviewChangeIndexes) {
@@ -538,11 +560,11 @@ public:
     }
 
     bool link_list_clear() {
-        if (ObserverState *o = active_linklist) {
+        if (ObserverState::change *o = activeLinkList) {
             if (o->multipleLinkviewChanges)
                 return true;
 
-            auto range = NSMakeRange(0, o->info->getRow().get_linklist(o->column)->size());
+            auto range = NSMakeRange(0, activeObserver->info->getRow().get_linklist(currentCol)->size());
             if (!o->linkviewChangeIndexes) {
                 o->linkviewChangeIndexes = [NSMutableIndexSet indexSetWithIndexesInRange:range];
                 o->linkviewChangeKind = NSKeyValueChangeRemoval;
@@ -565,18 +587,18 @@ public:
     bool link_list_move(size_t, size_t) { return true; }
 
     // Things that just mark the field as modified
-    bool set_int(size_t col, size_t row, int_fast64_t) { return mark_dirty(row, col); }
-    bool set_bool(size_t col, size_t row, bool) { return mark_dirty(row, col); }
-    bool set_float(size_t col, size_t row, float) { return mark_dirty(row, col); }
-    bool set_double(size_t col, size_t row, double) { return mark_dirty(row, col); }
-    bool set_string(size_t col, size_t row, StringData) { return mark_dirty(row, col); }
-    bool set_binary(size_t col, size_t row, BinaryData) { return mark_dirty(row, col); }
-    bool set_date_time(size_t col, size_t row, DateTime) { return mark_dirty(row, col); }
-    bool set_table(size_t col, size_t row) { return mark_dirty(row, col); }
-    bool set_mixed(size_t col, size_t row, const Mixed&) { return mark_dirty(row, col); }
-    bool set_link(size_t col, size_t row, size_t) { return mark_dirty(row, col); }
-    bool set_null(size_t col, size_t row) { return mark_dirty(row, col); }
-    bool nullify_link(size_t col, size_t row) { return mark_dirty(row, col); }
+    bool set_int(size_t col, size_t row, int_fast64_t) { return markDirty(row, col); }
+    bool set_bool(size_t col, size_t row, bool) { return markDirty(row, col); }
+    bool set_float(size_t col, size_t row, float) { return markDirty(row, col); }
+    bool set_double(size_t col, size_t row, double) { return markDirty(row, col); }
+    bool set_string(size_t col, size_t row, StringData) { return markDirty(row, col); }
+    bool set_binary(size_t col, size_t row, BinaryData) { return markDirty(row, col); }
+    bool set_date_time(size_t col, size_t row, DateTime) { return markDirty(row, col); }
+    bool set_table(size_t col, size_t row) { return markDirty(row, col); }
+    bool set_mixed(size_t col, size_t row, const Mixed&) { return markDirty(row, col); }
+    bool set_link(size_t col, size_t row, size_t) { return markDirty(row, col); }
+    bool set_null(size_t col, size_t row) { return markDirty(row, col); }
+    bool nullify_link(size_t col, size_t row) { return markDirty(row, col); }
 
     // Things we don't need to do anything for
     bool optimize_table() { return false; }
@@ -596,17 +618,8 @@ public:
     bool insert_mixed(size_t, size_t, size_t, const Mixed&) { return false; }
     bool insert_link(size_t, size_t, size_t, size_t) { return false; }
     bool insert_link_list(size_t, size_t, size_t) { return false; }
-
-private:
-    bool mark_dirty(size_t row_ndx, size_t col_ndx) {
-        for (auto& o : observers) {
-            if (o.table == current_table && o.row == row_ndx && o.column == col_ndx) {
-                o.changed = true;
-            }
-        }
-        return true;
-    }
 };
+}
 
 void RLMAdvanceRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema) {
     TransactLogHandler(schema.objectSchema, [&](auto&&... args) {
