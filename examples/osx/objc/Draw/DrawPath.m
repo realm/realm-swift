@@ -27,7 +27,7 @@
     NSBezierPath *path = [NSBezierPath bezierPath];
     path.lineWidth = 4.0f;
     NSUInteger index = 0;
-    RLMResults *points = [DrawPoint objectsWhere:@"pathID = %@",self.pathID];
+    RLMResults *points = [DrawPoint objectsInRealm:self.realm where:@"pathID == %@", self.pathID];
     for (DrawPoint *point in points) {
         CGPoint cgPoint = CGPointMake(point.x, point.y);
         if (index == 0) {

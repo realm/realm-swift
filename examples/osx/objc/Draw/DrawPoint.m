@@ -20,9 +20,4 @@
 
 @implementation DrawPoint
 
-+ (NSString *)primaryKey
-{
-    return @"pointID";
-}
-
 @end

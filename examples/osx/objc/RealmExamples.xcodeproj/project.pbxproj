@@ -29,6 +29,8 @@
 		027838FE1A7AE8CC00553A86 /* DrawPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838FA1A7AE8CC00553A86 /* DrawPoint.m */; };
 		027838FF1A7AE8CC00553A86 /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838FC1A7AE8CC00553A86 /* DrawView.m */; };
 		027839061A7C48D500553A86 /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E85A517019BA76B7006C63CB /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		22CFE2811B0A330200D5EC93 /* SwatchColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE27E1B0A330200D5EC93 /* SwatchColor.m */; };
+		22CFE2821B0A330200D5EC93 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2801B0A330200D5EC93 /* SwatchesView.m */; };
 		E823C33D19BA4A5F00D2FF5F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F1E82019BA4A3800FAD64E /* Foundation.framework */; };
 		E823C34D19BA4A7600D2FF5F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E823C34919BA4A7600D2FF5F /* main.m */; };
 		E823C34E19BA4A7600D2FF5F /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = E823C34B19BA4A7600D2FF5F /* Person.m */; };
@@ -93,6 +95,10 @@
 		027838FA1A7AE8CC00553A86 /* DrawPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawPoint.m; sourceTree = "<group>"; };
 		027838FB1A7AE8CC00553A86 /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
 		027838FC1A7AE8CC00553A86 /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
+		22CFE27D1B0A330200D5EC93 /* SwatchColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchColor.h; sourceTree = "<group>"; };
+		22CFE27E1B0A330200D5EC93 /* SwatchColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchColor.m; sourceTree = "<group>"; };
+		22CFE27F1B0A330200D5EC93 /* SwatchesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchesView.h; sourceTree = "<group>"; };
+		22CFE2801B0A330200D5EC93 /* SwatchesView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchesView.m; sourceTree = "<group>"; };
 		E823C33C19BA4A5F00D2FF5F /* JSONImport */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = JSONImport; sourceTree = BUILT_PRODUCTS_DIR; };
 		E823C34919BA4A7600D2FF5F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E823C34A19BA4A7600D2FF5F /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
@@ -135,6 +141,10 @@
 				027838FA1A7AE8CC00553A86 /* DrawPoint.m */,
 				027838FB1A7AE8CC00553A86 /* DrawView.h */,
 				027838FC1A7AE8CC00553A86 /* DrawView.m */,
+				22CFE27D1B0A330200D5EC93 /* SwatchColor.h */,
+				22CFE27E1B0A330200D5EC93 /* SwatchColor.m */,
+				22CFE27F1B0A330200D5EC93 /* SwatchesView.h */,
+				22CFE2801B0A330200D5EC93 /* SwatchesView.m */,
 				027838E01A7AE77A00553A86 /* Images.xcassets */,
 				027838E21A7AE77A00553A86 /* MainMenu.xib */,
 				027838D91A7AE77A00553A86 /* Supporting Files */,
@@ -290,7 +300,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"osx/Realm.framework\" ]]; then\n    sh build.sh osx\nfi\n";
+			shellScript = "cd ../../../\nif [[ ! -d \"build/osx/Realm.framework\" ]]; then\n    sh build.sh osx\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -299,7 +309,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22CFE2821B0A330200D5EC93 /* SwatchesView.m in Sources */,
 				027838DF1A7AE77A00553A86 /* main.m in Sources */,
+				22CFE2811B0A330200D5EC93 /* SwatchColor.m in Sources */,
 				027838FD1A7AE8CC00553A86 /* DrawPath.m in Sources */,
 				027838FE1A7AE8CC00553A86 /* DrawPoint.m in Sources */,
 				027838DD1A7AE77A00553A86 /* AppDelegate.m in Sources */,

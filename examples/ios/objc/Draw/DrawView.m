@@ -18,6 +18,8 @@
 
 #import "DrawView.h"
 #import "DrawPath.h"
+#import "SwatchesView.h"
+#import "SwatchColor.h"
 #import <Realm/Realm.h>
 
 @interface DrawView ()
@@ -26,6 +28,8 @@
 @property RLMResults *paths;
 @property RLMNotificationToken *notificationToken;
 @property NSString *vendorID;
+@property SwatchesView *swatchesView;
+@property SwatchColor *currentColor;
 
 @end
 
@@ -42,8 +46,26 @@
         }];
         self.vendorID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         self.paths = [DrawPath allObjects];
+        self.swatchesView = [[SwatchesView alloc] initWithFrame:CGRectZero];
+        [self addSubview:self.swatchesView];
+        
+        __block typeof(self) blockSelf = self;
+        self.swatchesView.swatchColorChangedHandler = ^{
+            blockSelf.currentColor = blockSelf.swatchesView.selectedColor;
+        };
     }
     return self;
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    
+    CGRect frame = self.swatchesView.frame;
+    frame.size.width = CGRectGetWidth(self.frame);
+    frame.origin.y = CGRectGetHeight(self.frame) - CGRectGetHeight(frame);
+    self.swatchesView.frame = frame;
+    [self.swatchesView setNeedsLayout];
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -53,7 +75,8 @@
     path.lineWidth = 4.0f;
     CGPoint point = [[touches anyObject] locationInView:self];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID]];
+        NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
+        [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID, colorName]];
         [DrawPoint createInDefaultRealmWithObject:@[[[NSUUID UUID] UUIDString], self.pathID, @(point.x), @(point.y)]];
     }];
 }
@@ -86,11 +109,8 @@
 - (void)drawRect:(CGRect)rect
 {
     for (DrawPath *path in self.paths) {
-        if ([path.drawerID isEqualToString:self.vendorID]) {
-            [[UIColor redColor] setStroke];
-        } else {
-            [[UIColor blueColor] setStroke];
-        }
+        SwatchColor *swatchColor = [SwatchColor swatchColorForName:path.color];
+        [swatchColor.color setStroke];
         [path.path stroke];
     }
 }
