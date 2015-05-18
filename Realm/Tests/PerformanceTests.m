@@ -69,8 +69,9 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testInsertMultiple {
-    [self measureBlock:^{
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = self.realmWithTestPath;
+        [self startMeasuring];
         [realm beginWriteTransaction];
         for (int i = 0; i < 5000; ++i) {
             StringObject *obj = [[StringObject alloc] init];
@@ -78,6 +79,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
             [realm addObject:obj];
         }
         [realm commitWriteTransaction];
+        [self stopMeasuring];
         [self tearDown];
     }];
 }

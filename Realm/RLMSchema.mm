@@ -56,7 +56,7 @@ static NSMutableDictionary *s_localNameToClass;
     return _objectSchemaByName[className];
 }
 
-- (RLMObjectSchema *)objectForKeyedSubscript:(id <NSCopying>)className {
+- (RLMObjectSchema *)objectForKeyedSubscript:(__unsafe_unretained id<NSCopying> const)className {
     RLMObjectSchema *schema = _objectSchemaByName[className];
     if (!schema) {
         NSString *message = [NSString stringWithFormat:@"Object type '%@' not persisted in Realm", className];

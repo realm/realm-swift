@@ -35,7 +35,7 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
 // standalone init
 - (instancetype)init {
     if (RLMSchema.sharedSchema) {
-        RLMObjectSchema *objectSchema = [self.class sharedSchema];
+        __unsafe_unretained RLMObjectSchema *objectSchema = [self.class sharedSchema];
         self = [self initWithRealm:nil schema:objectSchema];
 
         // set default values

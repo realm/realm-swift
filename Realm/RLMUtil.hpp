@@ -118,7 +118,7 @@ static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
                                   encoding:NSUTF8StringEncoding];
 }
 
-static inline realm::StringData RLMStringDataWithNSString(NSString *string) {
+static inline realm::StringData RLMStringDataWithNSString(__unsafe_unretained NSString *string) {
     static_assert(sizeof(size_t) >= sizeof(NSUInteger),
                   "Need runtime overflow check for NSUInteger to size_t conversion");
     return realm::StringData(string.UTF8String,
@@ -126,6 +126,6 @@ static inline realm::StringData RLMStringDataWithNSString(NSString *string) {
 }
 
 // Binary convertion utilities
-static inline realm::BinaryData RLMBinaryDataForNSData(NSData *data) {
+static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSData *data) {
     return realm::BinaryData(static_cast<const char *>(data.bytes), data.length);
 }
