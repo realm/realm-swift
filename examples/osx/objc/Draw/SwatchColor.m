@@ -69,6 +69,9 @@
     else if ([name isEqualToString:@"Yellow"]) {
         return [SwatchColor yellowSwatchColor];
     }
+    else if ([name isEqualToString:@"Realm"]) {
+        return [SwatchColor realmSwatchColor];
+    }
     
     return nil;
 }
@@ -84,7 +87,8 @@
              [SwatchColor lightBlueSwatchColor],
              [SwatchColor brownSwatchColor],
              [SwatchColor orangeSwatchColor],
-             [SwatchColor yellowSwatchColor]];
+             [SwatchColor yellowSwatchColor],
+             [SwatchColor realmSwatchColor]];
 }
 
 + (instancetype)blackSwatchColor
@@ -135,6 +139,11 @@
 + (instancetype)yellowSwatchColor
 {
     return [[SwatchColor alloc] initWithName:@"Yellow" color:[NSColor yellowColor]];
+}
+
++ (instancetype)realmSwatchColor
+{
+    return [[SwatchColor alloc] initWithName:@"Realm" color:[NSColor colorWithRed:230/255.0f green:102.0f/255.0f blue:102.0f/255.0f alpha:1.0f]];
 }
 
 @end

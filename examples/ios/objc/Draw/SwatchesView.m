@@ -17,8 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 #import "SwatchesView.h"
 
-static CGFloat kSwatchButtonHeight = 107.0f;
-static CGFloat kSwatchButtonWidth = 37.0f;
+static CGFloat kSwatchButtonHeightPhone = 85.0f;
+static CGFloat kSwatchButtonWidthPhone = 30.0f;
+
+static CGFloat kSwatchButtonHeightPad= 166.0f;
+static CGFloat kSwatchButtonWidthPad = 57.0f;
 
 static CGFloat kSwatchPencilPadding = 1.0f;
 
@@ -29,6 +32,7 @@ static CGFloat kSwatchPencilPadding = 1.0f;
 
 - (void)setupButtons;
 - (void)buttonTapped:(id)sender;
++ (CGSize)sizeForDevice;
 
 @end
 
@@ -36,7 +40,7 @@ static CGFloat kSwatchPencilPadding = 1.0f;
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
-    frame.size.height = kSwatchButtonHeight;
+    frame.size.height = [SwatchesView sizeForDevice].height;
     if (self = [super initWithFrame:frame]) {
         [self setupButtons];
     }
@@ -60,7 +64,6 @@ static CGFloat kSwatchPencilPadding = 1.0f;
         button.contentMode = UIViewContentModeScaleAspectFit;
         [button setImage:pencilImage forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-        button.frame = (CGRect){CGPointZero, {kSwatchButtonWidth, kSwatchButtonHeight}};
         [self addSubview:button];
         
         [buttons addObject:button];
@@ -71,15 +74,17 @@ static CGFloat kSwatchPencilPadding = 1.0f;
 
 - (void)layoutSubviews
 {
-    CGFloat width = (self.colors.count * kSwatchButtonWidth) + ((self.colors.count-1) * kSwatchPencilPadding);
+    CGFloat deviceWidth = [SwatchesView sizeForDevice].width;
+    CGFloat width = (self.colors.count * deviceWidth) + ((self.colors.count-1) * kSwatchPencilPadding);
     CGFloat x = (CGRectGetWidth(self.frame) - width) * 0.5f;
     
     for (UIButton *button in self.colorButtons) {
         CGRect frame = button.frame;
         frame.origin.x = x;
+        frame.size = [SwatchesView sizeForDevice];
         button.frame = frame;
         
-        x += kSwatchButtonWidth + kSwatchPencilPadding;
+        x += deviceWidth + kSwatchPencilPadding;
     }
 }
 
@@ -103,6 +108,15 @@ static CGFloat kSwatchPencilPadding = 1.0f;
     
     if (self.swatchColorChangedHandler)
         self.swatchColorChangedHandler();
+}
+
++ (CGSize)sizeForDevice
+{
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        return (CGSize){kSwatchButtonWidthPad, kSwatchButtonHeightPad};
+    }
+    
+    return (CGSize){kSwatchButtonWidthPhone, kSwatchButtonHeightPhone};
 }
 
 @end

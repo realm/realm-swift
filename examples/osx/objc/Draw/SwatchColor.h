@@ -38,5 +38,6 @@
 + (instancetype)brownSwatchColor;
 + (instancetype)orangeSwatchColor;
 + (instancetype)yellowSwatchColor;
++ (instancetype)realmSwatchColor;
 
 @end
