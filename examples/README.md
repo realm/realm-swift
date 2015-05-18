@@ -10,8 +10,8 @@ The following examples are located in the `ios/objc/RealmExamples.xcodeproj` pro
 
 Chat app to demonstrate how to use a synced realm. To run, follow these steps:
 
-* Checkout realm-core’s [sync-demo-2 branch](https://github.com/tightdb/tightdb/tree/sync-demo-2)
-* Build realm-core by running `sh build.sh config && sh build.sh build-cocoa`
+* Checkout realm-core’s [sync-demo-3 branch](https://github.com/tightdb/tightdb/tree/sync-demo-3)
+* Build realm-core by running `sh build.sh build && sh build.sh build-cocoa`
 * Copy the `core` directory from your realm-cocoa to your realm-cocoa-private directory
 * In realm-core start the realm server by running `./src/realm/realm-server-noinst <HOSTNAME>`
 * Edit `examples/ios/objc/Chat/AppDelegate.m` to use the hostname of the computer running the realm server
@@ -21,8 +21,8 @@ Chat app to demonstrate how to use a synced realm. To run, follow these steps:
 
 Drawing app to demonstrate how to use a synced realm. To run, follow these steps:
 
-* Checkout realm-core’s [sync-demo-2 branch](https://github.com/tightdb/tightdb/tree/sync-demo-2)
-* Build realm-core by running `sh build.sh config && sh build.sh build-cocoa`
+* Checkout realm-core’s [sync-demo-3 branch](https://github.com/tightdb/tightdb/tree/sync-demo-3)
+* Build realm-core by running `sh build.sh build && sh build.sh build-cocoa`
 * Copy the `core` directory from your realm-cocoa to your realm-cocoa-private directory
 * In realm-core start the realm server by running `./src/realm/realm-server-noinst <HOSTNAME>`
 * Edit `examples/ios/objc/Draw/AppDelegate.m` and `examples/osx/objc/Draw/AppDelegate.m` to use the hostname of the computer running the realm server
