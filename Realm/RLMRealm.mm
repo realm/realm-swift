@@ -166,6 +166,8 @@ atomic<bool> s_syncLogEverything(false);
 @property (readonly, nonatomic) NSString *clientPath;
 @property (readonly, nonatomic) NSString *serverPath;
 - (void)connectionIsOpen;
+- (void)connectionIsOpenAndSessionHasFileIdent;
+- (void)connectionIsClosed;
 - (void)handleIdentMessageWithFileIdent:(uint_fast64_t)fileIdent;
 - (void)handleChangesetMessageWithServerVersion:(Replication::version_type)serverVersion
                                   clientVersion:(Replication::version_type)clientVersion
@@ -340,6 +342,11 @@ atomic<bool> s_syncLogEverything(false);
     _outputCompletionHandler = nil;
 
     _isOpen = NO;
+
+    for (NSNumber *sessionIdent in _sessions) {
+        RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
+        [session connectionIsClosed];
+    }
 
     NSTimeInterval reconnectDelay = 5;
 
@@ -737,8 +744,6 @@ atomic<bool> s_syncLogEverything(false);
         _backgroundTransformer = backgroundTransformer.get();
         _backgroundHistory->set_sync(std::move(backgroundTransformer));
 
-        _uploadInProgress = NO;
-
         _backgroundOperationQueue = [[NSOperationQueue alloc] init];
         _backgroundOperationQueue.name = @"io.realm.sync";
         _backgroundOperationQueue.maxConcurrentOperationCount = 1;
@@ -807,12 +812,17 @@ atomic<bool> s_syncLogEverything(false);
 
 
 - (void)connectionIsOpen {
-    if (_fileIdent == 0) {
+    if (_fileIdent != 0) {
+        [self connectionIsOpenAndSessionHasFileIdent];
+    }
+    else {
         [_connection sendIdentMessageWithSessionIdent:_sessionIdent
                                            serverPath:_serverPath];
-        return;
     }
+}
 
+
+- (void)connectionIsOpenAndSessionHasFileIdent {
     _latestVersionUploaded = _syncProgressClientVersion;
     if (_latestVersionUploaded > _latestVersionAvailable) // Transiently possible (FIXME: Or is it?)
         _latestVersionUploaded = _latestVersionAvailable;
@@ -823,6 +833,11 @@ atomic<bool> s_syncLogEverything(false);
                                       serverPath:_serverPath
                                       clientPath:_clientPath];
     [self resumeUpload];
+}
+
+
+- (void)connectionIsClosed {
+    _uploadInProgress = NO;
 }
 
 
@@ -890,7 +905,7 @@ atomic<bool> s_syncLogEverything(false);
     _backgroundTransformer->set_peer_id(fileIdent); // FIXME: Describe what (if anything) prevents a race condition here, as a naive analysis would suggest that the background thread could be accessing _backgroundHistory concurrently. It would be tempting to conclude that a race is not possible, because the background thread must not attempt to transform anything before the file identifier is known. Note that it cannot be assumed the there will be no spurious 'ident' messages received.
     _fileIdent = fileIdent;
     if (_connection.isOpen)
-        [self connectionIsOpen];
+        [self connectionIsOpenAndSessionHasFileIdent];
 }
 
 
