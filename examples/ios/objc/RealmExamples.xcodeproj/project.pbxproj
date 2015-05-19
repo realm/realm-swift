@@ -26,6 +26,8 @@
 		0295B90119D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90219D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90319D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		22CFE2871B0A393B00D5EC93 /* SwatchColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2841B0A393B00D5EC93 /* SwatchColor.m */; };
+		22CFE2881B0A393B00D5EC93 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2861B0A393B00D5EC93 /* SwatchesView.m */; };
 		3FC898FD1A140F550067CBEC /* LabelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FC1A140F550067CBEC /* LabelViewController.m */; };
 		C06134DF1A718BB800D22D12 /* TodayExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C0DC42061A7079D00067156A /* TodayExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C06134E41A71AA4E00D22D12 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
@@ -238,6 +240,10 @@
 
 /* Begin PBXFileReference section */
 		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/ios/Realm.framework; sourceTree = "<group>"; };
+		22CFE2831B0A393B00D5EC93 /* SwatchColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchColor.h; sourceTree = "<group>"; };
+		22CFE2841B0A393B00D5EC93 /* SwatchColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchColor.m; sourceTree = "<group>"; };
+		22CFE2851B0A393B00D5EC93 /* SwatchesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchesView.h; sourceTree = "<group>"; };
+		22CFE2861B0A393B00D5EC93 /* SwatchesView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchesView.m; sourceTree = "<group>"; };
 		3FC898FB1A140F550067CBEC /* LabelViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelViewController.h; sourceTree = "<group>"; };
 		3FC898FC1A140F550067CBEC /* LabelViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LabelViewController.m; sourceTree = "<group>"; };
 		C0658DB41A76CBD8002F7A84 /* extension WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "extension WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -549,6 +555,10 @@
 				E80ABD851AF2AA3F00A37843 /* DrawPoint.m */,
 				E80ABD861AF2AA3F00A37843 /* DrawView.h */,
 				E80ABD871AF2AA3F00A37843 /* DrawView.m */,
+				22CFE2831B0A393B00D5EC93 /* SwatchColor.h */,
+				22CFE2841B0A393B00D5EC93 /* SwatchColor.m */,
+				22CFE2851B0A393B00D5EC93 /* SwatchesView.h */,
+				22CFE2861B0A393B00D5EC93 /* SwatchesView.m */,
 				E80ABD881AF2AA3F00A37843 /* Images.xcassets */,
 				E80ABD891AF2AA3F00A37843 /* Info.plist */,
 				E80ABD8A1AF2AA3F00A37843 /* main.m */,
@@ -1107,7 +1117,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22CFE2881B0A393B00D5EC93 /* SwatchesView.m in Sources */,
 				E80ABD8C1AF2AA3F00A37843 /* DrawPath.m in Sources */,
+				22CFE2871B0A393B00D5EC93 /* SwatchColor.m in Sources */,
 				E80ABD8E1AF2AA3F00A37843 /* DrawView.m in Sources */,
 				E80ABD8B1AF2AA3F00A37843 /* AppDelegate.m in Sources */,
 				E80ABD8F1AF2AA3F00A37843 /* main.m in Sources */,

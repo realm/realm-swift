@@ -19,6 +19,8 @@
 #import "DrawView.h"
 #import "DrawPath.h"
 #import <Realm/Realm.h>
+#import "SwatchColor.h"
+#import "SwatchesView.h"
 
 NSString * const host = @"Alexanders-MacBook-Pro.local";
 
@@ -28,6 +30,8 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
 @property RLMResults *paths;
 @property RLMNotificationToken *notificationToken;
 @property NSString *vendorID;
+@property SwatchesView *swatchesView;
+@property SwatchColor *currentColor;
 
 @end
 
@@ -42,14 +46,36 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
         [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
         [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
                            serverBaseURL:[NSString stringWithFormat:@"realm://%@/draw", host]];
+        [RLMRealm setServerSyncLogLevel:1]; // `level >= 2` means "everything"
 
         self.notificationToken = [[RLMRealm defaultRealm] addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
             self.paths = [DrawPath allObjects];
             [self setNeedsDisplay:YES];
         }];
         self.paths = [DrawPath allObjects];
+        
+        self.swatchesView = [[SwatchesView alloc] initWithFrame:CGRectZero];
+        [self addSubview:self.swatchesView];
+        
+        __block typeof(self) blockSelf = self;
+        self.swatchesView.swatchColorChangedHandler = ^{
+            blockSelf.currentColor = blockSelf.swatchesView.selectedColor;
+        };
+        
+        [self resizeSubviewsWithOldSize:self.frame.size];
     }
     return self;
+}
+
+- (void)resizeSubviewsWithOldSize:(NSSize)oldSize
+{
+    [super resizeSubviewsWithOldSize:oldSize];
+    
+    CGRect frame = self.swatchesView.frame;
+    frame.size.width = CGRectGetWidth(self.frame);
+    frame.origin.y = CGRectGetHeight(self.frame) - CGRectGetHeight(frame);
+    self.swatchesView.frame = frame;
+    [self.swatchesView setNeedsLayout:YES];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent {
@@ -58,13 +84,23 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
     path.lineWidth = 4.0f;
     CGPoint point = theEvent.locationInWindow;
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID]];
-        [DrawPoint createInDefaultRealmWithObject:@[@(point.x), @(self.frame.size.height - point.y), self.pathID]];
+        NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
+        [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID, colorName]];
+        [DrawPoint createInDefaultRealmWithObject:@[[NSUUID UUID].UUIDString, self.pathID, @(point.x), @(self.frame.size.height - point.y)]];
     }];
 }
 
 -(void)mouseDragged:(NSEvent *)theEvent {
     [self addPoint:theEvent.locationInWindow];
+}
+
+- (void)mouseUp:(NSEvent *)theEvent {
+    [self addPoint:theEvent.locationInWindow];
+
+    [[RLMRealm defaultRealm] transactionWithBlock:^{
+        DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
+        currentPath.drawerID = @""; // mark this path as ended
+    }];
 }
 
 /*
@@ -116,7 +152,7 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
 - (void)addPoint:(CGPoint)point
 {
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        [DrawPoint createInDefaultRealmWithObject:@[@(point.x), @(self.frame.size.height - point.y), self.pathID]];
+        [DrawPoint createInDefaultRealmWithObject:@[[NSUUID UUID].UUIDString, self.pathID, @(point.x), @(self.frame.size.height - point.y)]];
     }];
 }
 
@@ -127,11 +163,8 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
     NSRectFill(rect);
 
     for (DrawPath *path in self.paths) {
-        if ([path.drawerID isEqualToString:self.vendorID]) {
-            [[NSColor redColor] setStroke];
-        } else {
-            [[NSColor blueColor] setStroke];
-        }
+        SwatchColor *swatchColor = [SwatchColor swatchColorForName:path.color];
+        [swatchColor.color setStroke];
         [path.path stroke];
     }
 

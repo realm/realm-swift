@@ -597,6 +597,27 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 */
 + (void)setServerSyncLogLevel:(int)level;
 
+#pragma mark - Sync demo
+
+/**
+ Enable server synchronozation for the Realm at the specified
+ path. Must be called prior to requesting any accessor object
+ (RLMRealm) for that Realm.
+
+ @param serverBaseURL E.g. realm://realm.foo.com:7800/my_realm, where
+ `my_realm` is the name of the Realm at \a path as known to the
+ server.
+*/
++ (void)enableServerSyncOnPath:(NSString *)path serverBaseURL:(NSString *)serverBaseURL;
+
+/**
+ Set the log level for the synchronization network protocol. A value
+ less than, or equal to 1 is understood as "normal level", and a value
+ greater than, or equal to 2 means "log everything". The log level may
+ be changed at any time, and by any thread.
+*/
++ (void)setServerSyncLogLevel:(int)level;
+
 #pragma mark -
 
 //---------------------------------------------------------------------------------------

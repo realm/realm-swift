@@ -24,6 +24,7 @@
 
 @property NSString *pathID;
 @property NSString *drawerID;
+@property NSString *color;
 @property (readonly) NSBezierPath *path;
 
 @end
