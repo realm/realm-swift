@@ -25,11 +25,15 @@
 @interface DrawView ()
 
 @property NSString *pathID;
+@property NSMutableSet *drawnPathIDs;
 @property RLMResults *paths;
 @property RLMNotificationToken *notificationToken;
 @property NSString *vendorID;
 @property SwatchesView *swatchesView;
 @property SwatchColor *currentColor;
+@property CGContextRef onscreenContext;
+@property CGLayerRef offscreenLayer;
+@property CGContextRef offscreenContext;
 
 @end
 
@@ -39,7 +43,6 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor whiteColor];
         self.notificationToken = [[RLMRealm defaultRealm] addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
             self.paths = [DrawPath allObjects];
             [self setNeedsDisplay];
@@ -53,6 +56,7 @@
         self.swatchesView.swatchColorChangedHandler = ^{
             blockSelf.currentColor = blockSelf.swatchesView.selectedColor;
         };
+        self.drawnPathIDs = [[NSMutableSet alloc] init];
     }
     return self;
 }
@@ -97,6 +101,10 @@
 {
     CGPoint point = [[touches anyObject] locationInView:self];
     [self addPoint:point];
+    [[RLMRealm defaultRealm] transactionWithBlock:^{
+        DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
+        currentPath.drawerID = @""; // mark this path as ended
+    }];
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
@@ -104,13 +112,58 @@
     [self touchesEnded:touches withEvent:event];
 }
 
+- (void)drawPath:(DrawPath*)path withContext:(CGContextRef)context
+{
+    SwatchColor *swatchColor = [SwatchColor swatchColorForName:path.color];
+    CGContextSetStrokeColorWithColor(context, [swatchColor.color CGColor]);
+    CGContextSetLineWidth(context, path.path.lineWidth);
+    CGContextAddPath(context, [path.path CGPath]);
+    CGContextStrokePath(context);
+}
+
 - (void)drawRect:(CGRect)rect
 {
-    for (DrawPath *path in self.paths) {
-        SwatchColor *swatchColor = [SwatchColor swatchColorForName:path.color];
-        [swatchColor.color setStroke];
-        [path.path stroke];
+    // create offscreen context just once (must be done here)
+    if (self.offscreenContext == nil) {
+        self.onscreenContext = UIGraphicsGetCurrentContext();
+
+        float contentScaleFactor = [self contentScaleFactor];
+        CGSize size = CGSizeMake(self.bounds.size.width * contentScaleFactor, self.bounds.size.height * contentScaleFactor);
+
+        self.offscreenLayer = CGLayerCreateWithContext(self.onscreenContext, size, NULL);
+        self.offscreenContext = CGLayerGetContext(self.offscreenLayer);
+        CGContextScaleCTM(self.offscreenContext, contentScaleFactor, contentScaleFactor);
+
+        CGContextSetFillColorWithColor(self.offscreenContext, [[UIColor whiteColor] CGColor]);
+        CGContextFillRect(self.offscreenContext, self.bounds);
     }
+
+    // draw new "inactive" paths to the offscreen image
+    NSMutableArray* activePaths = [[NSMutableArray alloc] init];
+
+    for (DrawPath *path in self.paths) {
+        BOOL pathAlreadyDrawn = [self.drawnPathIDs containsObject:path.pathID];
+        if (pathAlreadyDrawn) {
+            continue;
+        }
+        BOOL pathEnded = [path.drawerID isEqualToString:@""];
+        if (pathEnded) {
+            [self drawPath:path withContext:self.offscreenContext];
+            [self.drawnPathIDs addObject:path.pathID];
+        } else {
+            [activePaths addObject:path];
+        }
+    }
+
+    // copy offscreen image to screen
+    CGContextDrawLayerInRect(self.onscreenContext, self.bounds, self.offscreenLayer);
+
+    // lastly draw the currently active paths
+    for (DrawPath *path in activePaths) {
+        [self drawPath:path withContext:self.onscreenContext];
+    }
+    NSLog(@"Inactive paths: %lu", (unsigned long)self.drawnPathIDs.count);
+    NSLog(@"Active paths: %lu", (unsigned long)activePaths.count);
 }
 
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
