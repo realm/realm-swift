@@ -166,20 +166,6 @@
     NSLog(@"Active paths: %lu", (unsigned long)activePaths.count);
 }
 
-- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
-{
-    if ( event.subtype == UIEventSubtypeMotionShake )
-    {
-        RLMRealm *realm = [RLMRealm defaultRealm];
-        [realm transactionWithBlock:^{
-            [realm deleteAllObjects];
-        }];
-    }
-
-    if ( [super respondsToSelector:@selector(motionEnded:withEvent:)] )
-        [super motionEnded:motion withEvent:event];
-}
-
 - (BOOL)canBecomeFirstResponder
 {
     return YES;
