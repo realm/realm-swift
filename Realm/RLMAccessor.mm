@@ -69,26 +69,26 @@ static FunctionType RLMGetImpForSelector(Class cls, SEL selector) {
     return reinterpret_cast<FunctionType>(method_getImplementation(class_getInstanceMethod(cls, selector)));
 }
 
+namespace {
 // Helper for calling superclass methods outside the context of a method
-template<typename T>
 class RLMSuperImpl {
 public:
     RLMSuperImpl() { }
 
     RLMSuperImpl(__unsafe_unretained RLMProperty *const prop, Class superClass)
     : getterSel(prop.getterSel)
-    , getter(RLMGetImpForSelector<T (*)(id, SEL)>(superClass, getterSel))
+    , getter(RLMGetImpForSelector<id (*)(id, SEL)>(superClass, getterSel))
     , setterSel(prop.setterSel)
-    , setter(RLMGetImpForSelector<void (*)(id, SEL, T)>(superClass, setterSel))
+    , setter(RLMGetImpForSelector<void (*)(id, SEL, id)>(superClass, setterSel))
     {
     }
 
 
-    T get(__unsafe_unretained id const obj) const {
-        return getter ? getter(obj, getterSel) : T{};
+    id get(__unsafe_unretained id const obj) const {
+        return getter ? getter(obj, getterSel) : nil;
     }
 
-    void set(__unsafe_unretained id const obj, const T value) const {
+    void set(__unsafe_unretained id const obj, __unsafe_unretained id const value) const {
         if (setter) {
             setter(obj, setterSel, value);
         }
@@ -96,10 +96,11 @@ public:
 
 private:
     SEL getterSel;
-    T (*getter)(id, SEL) = nullptr;
+    id (*getter)(id, SEL) = nullptr;
     SEL setterSel;
-    void (*setter)(id, SEL, T) = nullptr;
+    void (*setter)(id, SEL, id) = nullptr;
 };
+}
 
 // long getter/setter
 static inline long long RLMGetLong(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex) {
@@ -254,7 +255,7 @@ static inline RLMObjectBase *RLMGetLinkedObjectForValue(__unsafe_unretained RLMR
 static inline RLMObjectBase *RLMGetLink(__unsafe_unretained RLMObjectBase *const obj,
                                         NSUInteger colIndex,
                                         __unsafe_unretained NSString *const objectClassName,
-                                        RLMSuperImpl<id> const& super) {
+                                        RLMSuperImpl const& super) {
     Row const& row = obj->_row;
     __unsafe_unretained RLMObjectBase *value = super.get(obj);
     if (row.is_null_link(colIndex)) {
@@ -276,7 +277,7 @@ static inline RLMObjectBase *RLMGetLink(__unsafe_unretained RLMObjectBase *const
 
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
                                __unsafe_unretained RLMObjectBase *const val,
-                               RLMSuperImpl<id> const& super) {
+                               RLMSuperImpl const& super) {
     RLMVerifyInWriteTransaction(obj);
 
     if (!val) {
@@ -303,7 +304,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 static inline RLMArray *RLMGetArray(__unsafe_unretained RLMObjectBase *const obj,
                                     NSUInteger colIndex,
                                     __unsafe_unretained NSString *const objectClassName,
-                                    RLMSuperImpl<id> const& super) {
+                                    RLMSuperImpl const& super) {
     RLMVerifyAttached(obj);
 
     if (RLMArray *value = super.get(obj)) {
@@ -457,7 +458,7 @@ static IMP RLMAccessorGetter(RLMProperty *prop, RLMAccessorCode accessorCode, Cl
             });
         case RLMAccessorCodeLink: {
             NSString *objectClassName = prop.objectClassName;
-            RLMSuperImpl<id> super(prop, superClass);
+            RLMSuperImpl super(prop, superClass);
 
             return imp_implementationWithBlock(^id(__unsafe_unretained RLMObjectBase *const obj) {
                 return RLMGetLink(obj, colIndex, objectClassName, super);
@@ -465,7 +466,7 @@ static IMP RLMAccessorGetter(RLMProperty *prop, RLMAccessorCode accessorCode, Cl
         }
         case RLMAccessorCodeArray: {
             NSString *objectClassName = prop.objectClassName;
-            RLMSuperImpl<id> super(prop, superClass);
+            RLMSuperImpl super(prop, superClass);
 
             return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
                 return RLMGetArray(obj, colIndex, objectClassName, super);
@@ -494,7 +495,7 @@ static IMP RLMMakeSetter(RLMProperty *prop) {
 template<typename T>
 static IMP RLMMakeSetter(RLMProperty *prop, Class parentClass) {
     NSUInteger colIndex = prop.column;
-    RLMSuperImpl<id> super(prop, parentClass);
+    RLMSuperImpl super(prop, parentClass);
     return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj, T val) {
         RLMSetValue(obj, colIndex, val, super);
     });
@@ -525,7 +526,7 @@ static IMP RLMAccessorStandaloneGetter(RLMProperty *prop, RLMAccessorCode access
     // only override getters for RLMArray properties
     if (accessorCode == RLMAccessorCodeArray) {
         NSString *objectClassName = prop.objectClassName;
-        RLMSuperImpl<id> super(prop, superClass);
+        RLMSuperImpl super(prop, superClass);
 
         return imp_implementationWithBlock(^(RLMObjectBase *obj) {
             id val = super.get(obj);
@@ -542,7 +543,7 @@ static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, RLMAccessorCode access
     // only override getters for RLMArray properties
     if (accessorCode == RLMAccessorCodeArray) {
         NSString *objectClassName = prop.objectClassName;
-        RLMSuperImpl<id> super(prop, superClass);
+        RLMSuperImpl super(prop, superClass);
 
         return imp_implementationWithBlock(^(RLMObjectBase *obj, id<NSFastEnumeration> ar) {
             // make copy when setting (as is the case for all other variants)
