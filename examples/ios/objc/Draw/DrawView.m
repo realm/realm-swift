@@ -71,8 +71,6 @@
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     self.pathID = [[NSUUID UUID] UUIDString];
-    UIBezierPath *path = [UIBezierPath bezierPath];
-    path.lineWidth = 4.0f;
     CGPoint point = [[touches anyObject] locationInView:self];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
         NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
