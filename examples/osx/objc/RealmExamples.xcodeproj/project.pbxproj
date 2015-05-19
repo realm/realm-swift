@@ -23,12 +23,12 @@
 /* Begin PBXBuildFile section */
 		027838DD1A7AE77A00553A86 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838DC1A7AE77A00553A86 /* AppDelegate.m */; };
 		027838DF1A7AE77A00553A86 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838DE1A7AE77A00553A86 /* main.m */; };
-		027838E11A7AE77A00553A86 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 027838E01A7AE77A00553A86 /* Images.xcassets */; };
 		027838E41A7AE77A00553A86 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 027838E21A7AE77A00553A86 /* MainMenu.xib */; };
 		027838FD1A7AE8CC00553A86 /* DrawPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838F81A7AE8CC00553A86 /* DrawPath.m */; };
 		027838FE1A7AE8CC00553A86 /* DrawPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838FA1A7AE8CC00553A86 /* DrawPoint.m */; };
 		027838FF1A7AE8CC00553A86 /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838FC1A7AE8CC00553A86 /* DrawView.m */; };
 		027839061A7C48D500553A86 /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E85A517019BA76B7006C63CB /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		22B62CCA1B0B3A4C005B1167 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 027838E01A7AE77A00553A86 /* Images.xcassets */; };
 		22CFE2811B0A330200D5EC93 /* SwatchColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE27E1B0A330200D5EC93 /* SwatchColor.m */; };
 		22CFE2821B0A330200D5EC93 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2801B0A330200D5EC93 /* SwatchesView.m */; };
 		E823C33D19BA4A5F00D2FF5F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F1E82019BA4A3800FAD64E /* Foundation.framework */; };
@@ -280,8 +280,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				027838E11A7AE77A00553A86 /* Images.xcassets in Resources */,
 				027838E41A7AE77A00553A86 /* MainMenu.xib in Resources */,
+				22B62CCA1B0B3A4C005B1167 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
