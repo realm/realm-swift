@@ -39,7 +39,7 @@ const size_t c_primaryKeyObjectClassColumnIndex =  0;
 const char * const c_primaryKeyPropertyNameColumnName = "pk_property";
 const size_t c_primaryKeyPropertyNameColumnIndex =  1;
 
-const NSUInteger RLMNotVersioned = (NSUInteger)-1;
+const NSInteger RLMNotVersioned = -1;
 
 
 // RLMSchema private properties
@@ -183,6 +183,14 @@ NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
 void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
     realm::TableRef table = realm.group->get_or_add_table(c_metadataTableName);
     table->set_int(c_versionColumnIndex, 0, version);
+}
+
+bool RLMIsNotVersioned(NSUInteger version) {
+    // Previously, RLMNotVersioned was an NSUInteger, which differs in size on different platforms. This caused schema-creating transactions
+    // to differ in value between different architectures, causing conflicts in sync. However, since the bit pattern is actually persisted,
+    // we need to check the 32-bit pattern here as well to avoid breaking backwards compatibility.
+    static const NSUInteger notVersioned32bit = 0x00000000ffffffff;
+    return version == NSUInteger(RLMNotVersioned) || version == notVersioned32bit;
 }
 
 NSString *RLMRealmPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass) {

@@ -274,7 +274,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
 
 static bool RLMMigrationRequired(RLMRealm *realm, NSUInteger newVersion, NSUInteger oldVersion) {
     // validate versions
-    if (oldVersion > newVersion && oldVersion != RLMNotVersioned) {
+    if (oldVersion > newVersion && !RLMIsNotVersioned(oldVersion)) {
         NSString *reason = [NSString stringWithFormat:@"Realm at path '%@' has version number %lu which is greater than the current schema version %lu. "
                                                       @"You must call setSchemaVersion: or setDefaultRealmSchemaVersion: before accessing an upgraded Realm.",
                             realm.path, (unsigned long)oldVersion, (unsigned long)newVersion];
@@ -311,7 +311,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
         if (migrating) {
             // apply the migration block if provided and there's any old data
             // to be migrated
-            if (oldVersion != RLMNotVersioned && migrationBlock) {
+            if (!RLMIsNotVersioned(oldVersion) && migrationBlock) {
                 NSError *error = migrationBlock();
                 if (error) {
                     [realm cancelWriteTransaction];
