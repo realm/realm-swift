@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 #import "SwatchesView.h"
 
-static CGFloat kSwatchButtonHeight = 165.0f;
-static CGFloat kSwatchButtonWidth = 56.0f;
+static CGFloat kSwatchButtonHeight = 110.0f;
+static CGFloat kSwatchButtonWidth = 38.0f;
 
 static CGFloat kSwatchPencilPadding = 1.0f;
 
