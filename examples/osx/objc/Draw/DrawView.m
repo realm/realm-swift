@@ -86,7 +86,7 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
     [[RLMRealm defaultRealm] transactionWithBlock:^{
         NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
         [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID, colorName]];
-        [DrawPoint createInDefaultRealmWithObject:@[self.pathID, @(point.x), @(self.frame.size.height - point.y)]];
+        [DrawPoint createInDefaultRealmWithObject:@[[NSUUID UUID].UUIDString, self.pathID, @(point.x), @(self.frame.size.height - point.y)]];
     }];
 }
 
@@ -143,7 +143,7 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
 - (void)addPoint:(CGPoint)point
 {
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        [DrawPoint createInDefaultRealmWithObject:@[self.pathID, @(point.x), @(self.frame.size.height - point.y)]];
+        [DrawPoint createInDefaultRealmWithObject:@[[NSUUID UUID].UUIDString, self.pathID, @(point.x), @(self.frame.size.height - point.y)]];
     }];
 }
 

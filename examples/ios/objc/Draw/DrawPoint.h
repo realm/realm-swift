@@ -23,8 +23,8 @@
 
 @property NSString *pointID;
 @property NSString *pathID;
-@property CGFloat x;
-@property CGFloat y;
+@property double x;
+@property double y;
 
 @end
 
