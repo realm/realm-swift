@@ -546,12 +546,15 @@ static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, RLMAccessorCode access
         RLMSuperImpl super(prop, superClass);
 
         return imp_implementationWithBlock(^(RLMObjectBase *obj, id<NSFastEnumeration> ar) {
-            // make copy when setting (as is the case for all other variants)
-            RLMArray *standaloneAr = [[RLMArray alloc] initWithObjectClassName:objectClassName standalone:YES];
-            if ((id)ar != NSNull.null) {
-                [standaloneAr addObjects:ar];
+            if (ar == nil || ar == (id)NSNull.null) {
+                super.set(obj, nil);
             }
-            super.set(obj, standaloneAr);
+            else {
+                // make copy when setting (as is the case for all other variants)
+                RLMArray *standaloneAr = [[RLMArray alloc] initWithObjectClassName:objectClassName standalone:YES];
+                [standaloneAr addObjects:ar];
+                super.set(obj, standaloneAr);
+            }
         });
     }
     return nil;
