@@ -94,6 +94,15 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
     [self addPoint:theEvent.locationInWindow];
 }
 
+- (void)mouseUp:(NSEvent *)theEvent {
+    [self addPoint:theEvent.locationInWindow];
+
+    [[RLMRealm defaultRealm] transactionWithBlock:^{
+        DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
+        currentPath.drawerID = @""; // mark this path as ended
+    }];
+}
+
 /*
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
