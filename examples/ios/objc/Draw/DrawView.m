@@ -162,8 +162,6 @@
     for (DrawPath *path in activePaths) {
         [self drawPath:path withContext:self.onscreenContext];
     }
-    NSLog(@"Inactive paths: %lu", (unsigned long)self.drawnPathIDs.count);
-    NSLog(@"Active paths: %lu", (unsigned long)activePaths.count);
 }
 
 - (BOOL)canBecomeFirstResponder
