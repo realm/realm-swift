@@ -300,13 +300,22 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 }
 
 // array getter/setter
-static inline RLMArray *RLMGetArray(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, __unsafe_unretained NSString *const objectClassName) {
+static inline RLMArray *RLMGetArray(__unsafe_unretained RLMObjectBase *const obj,
+                                    NSUInteger colIndex,
+                                    __unsafe_unretained NSString *const objectClassName,
+                                    RLMSuperImpl<id> const& super) {
     RLMVerifyAttached(obj);
 
+    if (RLMArray *value = super.get(obj)) {
+        return value;
+    }
+
     realm::LinkViewRef linkView = obj->_row.get_linklist(colIndex);
-    return [RLMArrayLinkView arrayWithObjectClassName:objectClassName
-                                                 view:linkView
-                                                realm:obj->_realm];
+    RLMArray *ar = [RLMArrayLinkView arrayWithObjectClassName:objectClassName
+                                                         view:linkView
+                                                        realm:obj->_realm];
+    super.set(obj, ar);
+    return ar;
 }
 
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
@@ -456,8 +465,10 @@ static IMP RLMAccessorGetter(RLMProperty *prop, RLMAccessorCode accessorCode, Cl
         }
         case RLMAccessorCodeArray: {
             NSString *objectClassName = prop.objectClassName;
+            RLMSuperImpl<id> super(prop, superClass);
+
             return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
-                return RLMGetArray(obj, colIndex, objectClassName);
+                return RLMGetArray(obj, colIndex, objectClassName, super);
             });
         }
         case RLMAccessorCodeAny:
@@ -798,7 +809,7 @@ id RLMDynamicGet(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained NSS
         case RLMAccessorCodeDate:     return RLMGetDate(obj, col);
         case RLMAccessorCodeData:     return RLMGetData(obj, col);
         case RLMAccessorCodeLink:     return RLMGetLink(obj, col, prop.objectClassName, {});
-        case RLMAccessorCodeArray:    return RLMGetArray(obj, col, prop.objectClassName);
+        case RLMAccessorCodeArray:    return RLMGetArray(obj, col, prop.objectClassName, {});
         case RLMAccessorCodeAny:      return RLMGetAnyProperty(obj, col);
     }
 }
