@@ -142,12 +142,12 @@
     NSMutableArray* activePaths = [[NSMutableArray alloc] init];
 
     for (DrawPath *path in self.paths) {
-        BOOL pathAlreadyDrawn = [self.drawnPathIDs containsObject:path.pathID];
-        if (pathAlreadyDrawn) {
-            continue;
-        }
         BOOL pathEnded = [path.drawerID isEqualToString:@""];
         if (pathEnded) {
+            BOOL pathAlreadyDrawn = [self.drawnPathIDs containsObject:path.pathID];
+            if (pathAlreadyDrawn) {
+                continue;
+            }
             [self drawPath:path withContext:self.offscreenContext];
             [self.drawnPathIDs addObject:path.pathID];
         } else {
