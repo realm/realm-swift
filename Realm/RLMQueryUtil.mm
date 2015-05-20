@@ -411,11 +411,11 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
     return prop;
 }
 
-void validate_property_value(__unsafe_unretained RLMProperty *prop,
-                             __unsafe_unretained id value,
-                             __unsafe_unretained NSString *err,
-                             __unsafe_unretained RLMObjectSchema *objectSchema,
-                             __unsafe_unretained NSString *keyPath) {
+void validate_property_value(__unsafe_unretained RLMProperty *const prop,
+                             __unsafe_unretained id const value,
+                             __unsafe_unretained NSString *const err,
+                             __unsafe_unretained RLMObjectSchema *const objectSchema,
+                             __unsafe_unretained NSString *const keyPath) {
     if (prop.type == RLMPropertyTypeArray) {
         RLMPrecondition([RLMObjectBaseObjectSchema(RLMDynamicCast<RLMObjectBase>(value)).className isEqualToString:prop.objectClassName],
                         @"Invalid value", err, prop.objectClassName, keyPath, objectSchema.className, value);

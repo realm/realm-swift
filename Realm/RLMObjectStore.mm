@@ -422,7 +422,9 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
 
     // get or create row
     bool created;
-    auto primaryGetter = [=](__unsafe_unretained RLMProperty *p) { return [object valueForKey:p.getterName]; };
+    auto primaryGetter = [=](__unsafe_unretained RLMProperty *const p) {
+        return [object valueForKey:p.getterName];
+    };
     object->_row = (*schema.table)[RLMCreateOrGetRowForObject(schema, primaryGetter, options, created)];
 
     // populate all properties
