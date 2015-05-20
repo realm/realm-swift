@@ -826,4 +826,10 @@
     XCTAssertEqual(RLMNotVersioned, std::numeric_limits<uint64_t>::max());
 }
 
+- (void)testSetSchemaVersionValidatesVersion
+{
+    RLMAssertThrowsWithReasonMatching([RLMRealm setSchemaVersion:RLMNotVersioned forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil], @"Cannot set schema version");
+    [RLMRealm setSchemaVersion:RLMNotVersioned - 1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
+}
+
 @end

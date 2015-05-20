@@ -803,6 +803,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         @throw RLMException(@"Cannot set schema version for Realms that are already open.");
     }
 
+    if (version == RLMNotVersioned) {
+        @throw RLMException(@"Cannot set schema version to RLMNotVersioned.");
+    }
+
     @synchronized(s_migrationBlocks) {
         if (block) {
             s_migrationBlocks[realmPath] = block;
