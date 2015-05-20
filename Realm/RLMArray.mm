@@ -83,7 +83,8 @@
     }
 }
 
-- (void)removeAllObjects {
+- (void)removeAllObjects
+{
     [_backingArray removeAllObjects];
 }
 
