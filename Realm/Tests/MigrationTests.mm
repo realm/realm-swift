@@ -821,5 +821,9 @@
     XCTAssertNoThrow([self realmWithTestPath]);
 }
 
-@end
+- (void)testRLMNotVersionedHasCorrectValue
+{
+    XCTAssertEqual(RLMNotVersioned, std::numeric_limits<uint64_t>::max());
+}
 
+@end

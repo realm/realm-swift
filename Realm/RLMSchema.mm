@@ -39,8 +39,7 @@ const size_t c_primaryKeyObjectClassColumnIndex =  0;
 const char * const c_primaryKeyPropertyNameColumnName = "pk_property";
 const size_t c_primaryKeyPropertyNameColumnIndex =  1;
 
-const NSUInteger RLMNotVersioned = (NSUInteger)-1;
-
+const uint64_t RLMNotVersioned = std::numeric_limits<uint64_t>::max();
 
 // RLMSchema private properties
 @interface RLMSchema ()
