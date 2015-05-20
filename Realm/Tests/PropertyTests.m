@@ -50,7 +50,7 @@
                                              @"floatCol":  [[RLMProperty alloc] initWithName:@"floatCol"  type:RLMPropertyTypeFloat  objectClassName:nil             indexed:NO optional:NO],
                                              @"doubleCol": [[RLMProperty alloc] initWithName:@"doubleCol" type:RLMPropertyTypeDouble objectClassName:nil             indexed:NO optional:NO],
                                              @"stringCol": [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil             indexed:NO optional:YES],
-                                             @"binaryCol": [[RLMProperty alloc] initWithName:@"binaryCol" type:RLMPropertyTypeData   objectClassName:nil             indexed:NO optional:NO],
+                                             @"binaryCol": [[RLMProperty alloc] initWithName:@"binaryCol" type:RLMPropertyTypeData   objectClassName:nil             indexed:NO optional:YES],
                                              @"dateCol":   [[RLMProperty alloc] initWithName:@"dateCol"   type:RLMPropertyTypeDate   objectClassName:nil             indexed:NO optional:NO],
                                              @"cBoolCol":  [[RLMProperty alloc] initWithName:@"cBoolCol"  type:RLMPropertyTypeBool   objectClassName:nil             indexed:NO optional:NO],
                                              @"longCol":   [[RLMProperty alloc] initWithName:@"longCol"   type:RLMPropertyTypeInt    objectClassName:nil             indexed:NO optional:NO],

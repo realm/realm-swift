@@ -148,7 +148,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 static inline NSData *RLMGetData(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex) {
     RLMVerifyAttached(obj);
     realm::BinaryData data = obj->_row.get_binary(colIndex);
-    return [NSData dataWithBytes:data.data() length:data.size()];
+    return RLMBinaryDataToNSData(data);
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, __unsafe_unretained NSData *const data) {
     RLMVerifyInWriteTransaction(obj);
@@ -272,8 +272,7 @@ static inline id RLMGetAnyProperty(__unsafe_unretained RLMObjectBase *const obj,
             return [NSDate dateWithTimeIntervalSince1970:mixed.get_datetime().get_datetime()];
         case RLMPropertyTypeData: {
             realm::BinaryData bd = mixed.get_binary();
-            NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
-            return d;
+            return RLMBinaryDataToNSData(bd);
         }
         case RLMPropertyTypeArray:
             @throw [NSException exceptionWithName:@"RLMNotImplementedException"

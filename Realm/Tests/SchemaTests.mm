@@ -352,7 +352,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              @"\t\t\toptional = NO;\n"
+                                              @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t\tdateCol {\n"
                                               @"\t\t\ttype = date;\n"
