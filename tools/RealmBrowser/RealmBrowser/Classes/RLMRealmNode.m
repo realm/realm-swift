@@ -117,19 +117,19 @@
 - (NSArray *)constructTopLevelClasses
 {
     RLMSchema *realmSchema = _realm.schema;
-    NSArray *allObjectSchemas = realmSchema.objectSchema;
+    NSArray *objectSchemas = realmSchema.objectSchema;
+
+    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:objectSchemas.count];
     
-    NSUInteger classCount = allObjectSchemas.count;
-    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:classCount];
-    
-    for (NSUInteger index = 0; index < classCount; index++) {
-        RLMObjectSchema *objectSchema = allObjectSchemas[index];
+    for (RLMObjectSchema *objectSchema in objectSchemas) {
         if (objectSchema.properties.count > 0) {
             RLMClassNode *tableNode = [[RLMClassNode alloc] initWithSchema:objectSchema inRealm:_realm];
             [result addObject:tableNode];
         }
     }
-    
+
+    [result sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]]];
+
     return result;
 }
 
