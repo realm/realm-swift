@@ -61,10 +61,6 @@ using namespace realm::util;
 }
 @end
 
-using namespace std;
-using namespace realm;
-using namespace realm::util;
-
 //
 // Global encryption key cache and validation
 //
@@ -169,7 +165,7 @@ atomic<bool> s_syncLogEverything(false);
 - (void)connectionIsOpen;
 - (void)connectionIsOpenAndSessionHasFileIdent;
 - (void)connectionIsClosed;
-- (void)handleIdentMessageWithServerFileIdent:(uint_fast64_t)serverFileIdent
+- (void)handleAllocMessageWithServerFileIdent:(uint_fast64_t)serverFileIdent
                               clientFileIdent:(uint_fast64_t)clientFileIdent;
 - (void)handleChangesetMessageWithServerVersion:(Replication::version_type)serverVersion
                                   clientVersion:(Replication::version_type)clientVersion
@@ -258,7 +254,7 @@ atomic<bool> s_syncLogEverything(false);
         _inputBufferSize = 1024;
         _inputBuffer = make_unique<char[]>(_inputBufferSize);
 
-        _headBufferSize = 192;
+        _headBufferSize = 256;
         _headBuffer = make_unique<char[]>(_headBufferSize);
 
         _currentOutputChunk = nil;
@@ -321,6 +317,8 @@ atomic<bool> s_syncLogEverything(false);
 
     _isOpen = YES;
 
+    [self sendIdentMessage];
+
     for (NSNumber *sessionIdent in _sessions) {
         RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
         [session connectionIsOpen];
@@ -353,7 +351,7 @@ atomic<bool> s_syncLogEverything(false);
     NSTimeInterval reconnectDelay = 5;
 
     NSLog(@"RealmSync: Connection[%lu]: Closed (will try to reconnect in %g seconds)",
-          _ident, (double)reconnectDelay);
+          _ident, double(reconnectDelay));
 
     [self performSelector:@selector(open) withObject:nil afterDelay:reconnectDelay];
 }
@@ -366,11 +364,37 @@ atomic<bool> s_syncLogEverything(false);
 }
 
 
-- (void)sendIdentMessageWithSessionIdent:(NSNumber *)sessionIdent
+- (void)sendIdentMessage {
+    // FIXME: These need to be set correctly (tentative:
+    // `applicationIdent` is a unique application identifier registered with
+    // Realm and `userIdent` could for example be the concattenation of a user
+    // name and a password).
+    NSData *applicationIdent = [@"dummy_app"  dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *userIdent        = [@"dummy_user" dataUsingEncoding:NSUTF8StringEncoding];
+
+    NSMutableData *body = [applicationIdent mutableCopy];
+    [body appendData:userIdent];
+
+    uint_fast64_t protocolVersion = 1;
+    size_t applicationIdentSize = size_t(applicationIdent.length);
+    size_t userIdentSize        = size_t(userIdent.length);
+    typedef unsigned long      ulong;
+    typedef unsigned long long ulonglong;
+    RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
+    msg.body = body;
+    msg.head = [NSString stringWithFormat:@"ident %llu %lu %lu\n", ulonglong(protocolVersion),
+                         ulong(applicationIdentSize), ulong(userIdentSize)];
+    [self enqueueOutputMessage:msg];
+    NSLog(@"RealmSync: Connection[%lu]: Sending: Application and user identities", _ident);
+}
+
+
+- (void)sendAllocMessageWithSessionIdent:(NSNumber *)sessionIdent
                               serverPath:(NSString *)serverPath {
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
+    typedef unsigned long ulong;
     msg.body = [serverPath dataUsingEncoding:NSUTF8StringEncoding];
-    msg.head = [NSString stringWithFormat:@"ident %@ %lu\n", sessionIdent, (unsigned long)msg.body.length];
+    msg.head = [NSString stringWithFormat:@"alloc %@ %lu\n", sessionIdent, ulong(msg.body.length)];
     [self enqueueOutputMessage:msg];
     NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: Allocate unique identifier pair for "
           "remote Realm '%@'", _ident, sessionIdent, serverPath);
@@ -384,13 +408,14 @@ atomic<bool> s_syncLogEverything(false);
                           clientVersion:(Replication::version_type)clientVersion
                              serverPath:(NSString *)serverPath
                              clientPath:(NSString *)clientPath {
+    typedef unsigned long      ulong;
     typedef unsigned long long ulonglong;
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
     msg.body = [serverPath dataUsingEncoding:NSUTF8StringEncoding];
     msg.head = [NSString stringWithFormat:@"bind %@ %llu %llu %llu %llu %lu\n", sessionIdent,
                          ulonglong(serverFileIdent), ulonglong(clientFileIdent),
                          ulonglong(serverVersion), ulonglong(clientVersion),
-                         (unsigned long)msg.body.length];
+                         ulong(msg.body.length)];
     [self enqueueOutputMessage:msg];
     NSLog(@"RealmSync: Connection[%lu]: Sessions[%@]: Sending: Bind local Realm '%@' (%llu) "
           "to remote Realm '%@' (%llu) continuing synchronization from server version %llu, "
@@ -548,8 +573,8 @@ atomic<bool> s_syncLogEverything(false);
                                                     serverVersion:serverVersion
                                                     clientVersion:clientVersion];
                     }
-                    else if (message_type == "ident") {
-                        // New unique client file identifier from server.
+                    else if (message_type == "alloc") {
+                        // New unique file identifier pair from server.
                         unsigned sessionIdent = 0;
                         uint_fast64_t serverFileIdent = 0, clientFileIdent = 0;
                         char sp1, sp2, sp3;
@@ -558,13 +583,13 @@ atomic<bool> s_syncLogEverything(false);
                         bool good = parser && parser.eof() && sp1 == ' ' && sp2 == ' ' &&
                             sp3 == ' ';
                         if (!good) {
-                            NSLog(@"RealmSync: Connection[%lu]: Bad 'ident' message "
+                            NSLog(@"RealmSync: Connection[%lu]: Bad 'alloc' message "
                                   "from server", _ident);
                             [self closeAndTryToReconnectLater];
                             return;
                         }
                         NSNumber *sessionIdent2 = [NSNumber numberWithUnsignedInteger:sessionIdent];
-                        [self handleIdentMessageWithSessionIdent:sessionIdent2
+                        [self handleAllocMessageWithSessionIdent:sessionIdent2
                                                  serverFileIdent:serverFileIdent
                                                  clientFileIdent:clientFileIdent];
                     }
@@ -645,7 +670,7 @@ atomic<bool> s_syncLogEverything(false);
 }
 
 
-- (void)handleIdentMessageWithSessionIdent:(NSNumber *)sessionIdent
+- (void)handleAllocMessageWithSessionIdent:(NSNumber *)sessionIdent
                            serverFileIdent:(uint_fast64_t)serverFileIdent
                            clientFileIdent:(uint_fast64_t)clientFileIdent {
     typedef unsigned long long ulonglong;
@@ -657,7 +682,7 @@ atomic<bool> s_syncLogEverything(false);
     if (!session)
         return; // This session no longer exists
 
-    [session handleIdentMessageWithServerFileIdent:serverFileIdent
+    [session handleAllocMessageWithServerFileIdent:serverFileIdent
                                    clientFileIdent:clientFileIdent];
 }
 
@@ -830,7 +855,7 @@ atomic<bool> s_syncLogEverything(false);
         [self connectionIsOpenAndSessionHasFileIdent];
     }
     else {
-        [_connection sendIdentMessageWithSessionIdent:_sessionIdent
+        [_connection sendAllocMessageWithSessionIdent:_sessionIdent
                                            serverPath:_serverPath];
     }
 }
@@ -915,11 +940,11 @@ atomic<bool> s_syncLogEverything(false);
 }
 
 
-- (void)handleIdentMessageWithServerFileIdent:(uint_fast64_t)serverFileIdent
+- (void)handleAllocMessageWithServerFileIdent:(uint_fast64_t)serverFileIdent
                               clientFileIdent:(uint_fast64_t)clientFileIdent {
     _history->set_client_file_ident(clientFileIdent); // Save in persistent storage
     // FIXME: Must save server file identifier in persistent storage
-    _backgroundTransformer->set_peer_id(clientFileIdent); // FIXME: Describe what (if anything) prevents a race condition here, as a naive analysis would suggest that the background thread could be accessing _backgroundHistory concurrently. It would be tempting to conclude that a race is not possible, because the background thread must not attempt to transform anything before the file identifier is known. Note that it cannot be assumed the there will be no spurious 'ident' messages received.
+    _backgroundTransformer->set_peer_id(clientFileIdent); // FIXME: Describe what (if anything) prevents a race condition here, as a naive analysis would suggest that the background thread could be accessing _backgroundHistory concurrently. It would be tempting to conclude that a race is not possible, because the background thread must not attempt to transform anything before the file identifier is known. Note that it cannot be assumed the there will be no spurious 'alloc' messages received.
     _serverFileIdent = serverFileIdent;
     _clientFileIdent = clientFileIdent;
     if (_connection.isOpen)
