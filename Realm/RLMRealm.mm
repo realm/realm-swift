@@ -162,13 +162,15 @@ atomic<bool> s_syncLogEverything(false);
 @interface RLMSyncSession : NSObject
 @property (readonly, nonatomic) RLMServerConnection *connection;
 @property (readonly, nonatomic) NSNumber *sessionIdent;
-@property (nonatomic) uint_fast64_t fileIdent;
-@property (readonly, nonatomic) NSString *clientPath;
+@property (nonatomic) uint_fast64_t serverFileIdent;
+@property (nonatomic) uint_fast64_t clientFileIdent;
 @property (readonly, nonatomic) NSString *serverPath;
+@property (readonly, nonatomic) NSString *clientPath;
 - (void)connectionIsOpen;
 - (void)connectionIsOpenAndSessionHasFileIdent;
 - (void)connectionIsClosed;
-- (void)handleIdentMessageWithFileIdent:(uint_fast64_t)fileIdent;
+- (void)handleIdentMessageWithServerFileIdent:(uint_fast64_t)serverFileIdent
+                              clientFileIdent:(uint_fast64_t)clientFileIdent;
 - (void)handleChangesetMessageWithServerVersion:(Replication::version_type)serverVersion
                                   clientVersion:(Replication::version_type)clientVersion
                                 originTimestamp:(uint_fast64_t)originTimestamp
@@ -370,13 +372,14 @@ atomic<bool> s_syncLogEverything(false);
     msg.body = [serverPath dataUsingEncoding:NSUTF8StringEncoding];
     msg.head = [NSString stringWithFormat:@"ident %@ %lu\n", sessionIdent, (unsigned long)msg.body.length];
     [self enqueueOutputMessage:msg];
-    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: Get unique client identifier for "
+    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: Allocate unique identifier pair for "
           "remote Realm '%@'", _ident, sessionIdent, serverPath);
 }
 
 
 - (void)sendBindMessageWithSessionIdent:(NSNumber *)sessionIdent
-                              fileIdent:(uint_fast64_t)fileIdent
+                              serverFileIdent:(uint_fast64_t)serverFileIdent
+                              clientFileIdent:(uint_fast64_t)clientFileIdent
                           serverVersion:(Replication::version_type)serverVersion
                           clientVersion:(Replication::version_type)clientVersion
                              serverPath:(NSString *)serverPath
@@ -384,15 +387,16 @@ atomic<bool> s_syncLogEverything(false);
     typedef unsigned long long ulonglong;
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
     msg.body = [serverPath dataUsingEncoding:NSUTF8StringEncoding];
-    msg.head = [NSString stringWithFormat:@"bind %@ %llu %llu %llu %lu\n", sessionIdent,
-                         ulonglong(fileIdent), ulonglong(serverVersion), ulonglong(clientVersion),
+    msg.head = [NSString stringWithFormat:@"bind %@ %llu %llu %llu %llu %lu\n", sessionIdent,
+                         ulonglong(serverFileIdent), ulonglong(clientFileIdent),
+                         ulonglong(serverVersion), ulonglong(clientVersion),
                          (unsigned long)msg.body.length];
     [self enqueueOutputMessage:msg];
-    NSLog(@"RealmSync: Connection[%lu]: Sessions[%@]: Sending: Bind local Realm '%@' "
-          "with identifier %llu to remote Realm '%@' continuing synchronization from "
-          "server version %llu, whose last integrated client version is %llu", _ident,
-          sessionIdent, clientPath, ulonglong(fileIdent), serverPath, ulonglong(serverVersion),
-          ulonglong(clientVersion));
+    NSLog(@"RealmSync: Connection[%lu]: Sessions[%@]: Sending: Bind local Realm '%@' (%llu) "
+          "to remote Realm '%@' (%llu) continuing synchronization from server version %llu, "
+          "whose last integrated client version is %llu", _ident, sessionIdent, clientPath,
+          ulonglong(clientFileIdent), serverPath, ulonglong(serverFileIdent),
+          ulonglong(serverVersion), ulonglong(clientVersion));
 }
 
 
@@ -547,10 +551,12 @@ atomic<bool> s_syncLogEverything(false);
                     else if (message_type == "ident") {
                         // New unique client file identifier from server.
                         unsigned sessionIdent = 0;
-                        uint_fast64_t fileIdent = 0;
-                        char sp1, sp2;
-                        parser >> sp1 >> sessionIdent >> sp2 >> fileIdent;
-                        bool good = parser && parser.eof() && sp1 == ' ' && sp2 == ' ';
+                        uint_fast64_t serverFileIdent = 0, clientFileIdent = 0;
+                        char sp1, sp2, sp3;
+                        parser >> sp1 >> sessionIdent >> sp2 >> serverFileIdent >> sp3 >>
+                            clientFileIdent;
+                        bool good = parser && parser.eof() && sp1 == ' ' && sp2 == ' ' &&
+                            sp3 == ' ';
                         if (!good) {
                             NSLog(@"RealmSync: Connection[%lu]: Bad 'ident' message "
                                   "from server", _ident);
@@ -558,7 +564,9 @@ atomic<bool> s_syncLogEverything(false);
                             return;
                         }
                         NSNumber *sessionIdent2 = [NSNumber numberWithUnsignedInteger:sessionIdent];
-                        [self handleIdentMessageWithSessionIdent:sessionIdent2 fileIdent:fileIdent];
+                        [self handleIdentMessageWithSessionIdent:sessionIdent2
+                                                 serverFileIdent:serverFileIdent
+                                                 clientFileIdent:clientFileIdent];
                     }
                     else {
                         NSLog(@"RealmSync: Connection[%lu]: Bad message from server", _ident);
@@ -638,16 +646,19 @@ atomic<bool> s_syncLogEverything(false);
 
 
 - (void)handleIdentMessageWithSessionIdent:(NSNumber *)sessionIdent
-                                 fileIdent:(uint_fast64_t)fileIdent {
+                           serverFileIdent:(uint_fast64_t)serverFileIdent
+                           clientFileIdent:(uint_fast64_t)clientFileIdent {
     typedef unsigned long long ulonglong;
-    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: Identify client Realm by %llu",
-          _ident, sessionIdent, ulonglong(fileIdent));
+    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: New unique Realm identifier pair "
+          "is (%llu, %llu)", _ident, sessionIdent, ulonglong(serverFileIdent),
+          ulonglong(clientFileIdent));
 
     RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
     if (!session)
         return; // This session no longer exists
 
-    [session handleIdentMessageWithFileIdent:fileIdent];
+    [session handleIdentMessageWithServerFileIdent:serverFileIdent
+                                   clientFileIdent:clientFileIdent];
 }
 
 
@@ -720,14 +731,15 @@ atomic<bool> s_syncLogEverything(false);
 
 
 - (instancetype)initWithConnection:(RLMServerConnection *)connection
-                        clientPath:(NSString *)clientPath
-                        serverPath:(NSString *)serverPath {
+                        serverPath:(NSString *)serverPath
+                        clientPath:(NSString *)clientPath {
     self = [super init];
     if (self) {
         _connection = connection;
-        _fileIdent = 0; // Zero means unassigned
-        _clientPath = clientPath;
+        _serverFileIdent = 0; // Assigned when `_clientFileIdent` is assigned
+        _clientFileIdent = 0; // Zero means unassigned
         _serverPath = serverPath;
+        _clientPath = clientPath;
         _sessionIdent = [NSNumber numberWithUnsignedInteger:[connection newSessionIdent]];
 
         bool serverSynchronizationMode = true;
@@ -754,11 +766,13 @@ atomic<bool> s_syncLogEverything(false);
 
 - (void)mainThreadInit {
     // Called by main thread
-    uint_fast64_t fileIdent;
-    _history->get_sync_info(fileIdent, _syncProgressServerVersion, _syncProgressClientVersion);
-    _fileIdent = fileIdent;
-    if (fileIdent != 0)
-        _backgroundTransformer->set_peer_id(fileIdent);
+    uint_fast64_t clientFileIdent;
+    // FIXME: Must also fetch server file identifier from persistent storage
+    _history->get_sync_info(clientFileIdent, _syncProgressServerVersion,
+                            _syncProgressClientVersion);
+    _clientFileIdent = clientFileIdent;
+    if (clientFileIdent != 0)
+        _backgroundTransformer->set_peer_id(clientFileIdent);
 
     REALM_ASSERT(_syncProgressClientVersion >= 1);
 
@@ -806,13 +820,13 @@ atomic<bool> s_syncLogEverything(false);
 
 - (void)refreshLatestVersionAvailable {
     _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
-    if (_connection.isOpen && _fileIdent != 0)
+    if (_connection.isOpen && _clientFileIdent != 0)
         [self resumeUpload];
 }
 
 
 - (void)connectionIsOpen {
-    if (_fileIdent != 0) {
+    if (_clientFileIdent != 0) {
         [self connectionIsOpenAndSessionHasFileIdent];
     }
     else {
@@ -827,7 +841,8 @@ atomic<bool> s_syncLogEverything(false);
     if (_latestVersionUploaded > _latestVersionAvailable) // Transiently possible (FIXME: Or is it?)
         _latestVersionUploaded = _latestVersionAvailable;
     [_connection sendBindMessageWithSessionIdent:_sessionIdent
-                                       fileIdent:_fileIdent
+                                       serverFileIdent:_serverFileIdent
+                                       clientFileIdent:_clientFileIdent
                                    serverVersion:_syncProgressServerVersion
                                    clientVersion:_syncProgressClientVersion
                                       serverPath:_serverPath
@@ -842,7 +857,7 @@ atomic<bool> s_syncLogEverything(false);
 
 
 - (void)resumeUpload {
-    REALM_ASSERT(_connection.isOpen && _fileIdent != 0);
+    REALM_ASSERT(_connection.isOpen && _clientFileIdent != 0);
     if (_uploadInProgress)
         return;
     _uploadInProgress = YES;
@@ -900,10 +915,13 @@ atomic<bool> s_syncLogEverything(false);
 }
 
 
-- (void)handleIdentMessageWithFileIdent:(uint_fast64_t)fileIdent {
-    _history->set_client_file_ident(fileIdent); // Save in persistent storage
-    _backgroundTransformer->set_peer_id(fileIdent); // FIXME: Describe what (if anything) prevents a race condition here, as a naive analysis would suggest that the background thread could be accessing _backgroundHistory concurrently. It would be tempting to conclude that a race is not possible, because the background thread must not attempt to transform anything before the file identifier is known. Note that it cannot be assumed the there will be no spurious 'ident' messages received.
-    _fileIdent = fileIdent;
+- (void)handleIdentMessageWithServerFileIdent:(uint_fast64_t)serverFileIdent
+                              clientFileIdent:(uint_fast64_t)clientFileIdent {
+    _history->set_client_file_ident(clientFileIdent); // Save in persistent storage
+    // FIXME: Must save server file identifier in persistent storage
+    _backgroundTransformer->set_peer_id(clientFileIdent); // FIXME: Describe what (if anything) prevents a race condition here, as a naive analysis would suggest that the background thread could be accessing _backgroundHistory concurrently. It would be tempting to conclude that a race is not possible, because the background thread must not attempt to transform anything before the file identifier is known. Note that it cannot be assumed the there will be no spurious 'ident' messages received.
+    _serverFileIdent = serverFileIdent;
+    _clientFileIdent = clientFileIdent;
     if (_connection.isOpen)
         [self connectionIsOpenAndSessionHasFileIdent];
 }
@@ -1005,11 +1023,11 @@ atomic<bool> s_syncLogEverything(false);
     // The order in which updated synchronization progress markers are saved to
     // persistent storage must be the same order in with the are received from
     // the server either via a 'changeset' message or an 'accept' message.
-        [self addBackgroundTaskWithServerVersion:serverVersion
-                                   clientVersion:clientVersion
-                                 originTimestamp:0
-                                 originFileIdent:0
-                                            data:nil];
+    [self addBackgroundTaskWithServerVersion:serverVersion
+                               clientVersion:clientVersion
+                             originTimestamp:0
+                             originFileIdent:0
+                                        data:nil];
 }
 
 
@@ -1423,8 +1441,8 @@ static id RLMAutorelease(id value) {
                             [s_serverConnections setObject:conn forKey:hostKey];
                         }
                         session = [[RLMSyncSession alloc] initWithConnection:conn
-                                                                  clientPath:realm.path
-                                                                  serverPath:serverBaseURL.path];
+                                                                  serverPath:serverBaseURL.path
+                                                                  clientPath:realm.path];
                         [s_syncSessions setObject:session forKey:realm.path];
                         NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
                         __weak RLMSyncSession *weakSession = session;
