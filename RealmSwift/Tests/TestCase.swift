@@ -53,6 +53,10 @@ class TestCase: RLMAutoreleasePoolTestCase {
         RLMAssertThrows(self, { _ = block() } as dispatch_block_t, message, fileName, lineNumber);
     }
 
+    func assertNil<T>(@autoclosure block: () -> T?, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
+        XCTAssert(block() == nil, message ?? "", file: fileName, line: lineNumber);
+    }
+
     private func realmFilePrefix() -> String {
         let remove = NSCharacterSet(charactersInString: "-[]")
         return self.name.stringByTrimmingCharactersInSet(remove)

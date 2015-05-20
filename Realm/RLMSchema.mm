@@ -163,15 +163,15 @@ static NSMutableDictionary *s_localNameToClass;
     return schema;
 }
 
-NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
+uint64_t RLMRealmSchemaVersion(RLMRealm *realm) {
     realm::TableRef table = realm.group->get_table(c_metadataTableName);
     if (!table || table->get_column_count() == 0) {
         return RLMNotVersioned;
     }
-    return NSUInteger(table->get_int(c_versionColumnIndex, 0));
+    return table->get_int(c_versionColumnIndex, 0);
 }
 
-void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
+void RLMRealmSetSchemaVersion(RLMRealm *realm, uint64_t version) {
     realm::TableRef table = realm.group->get_or_add_table(c_metadataTableName);
     table->set_int(c_versionColumnIndex, 0, version);
 }

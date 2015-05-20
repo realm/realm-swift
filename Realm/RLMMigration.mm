@@ -140,7 +140,7 @@
         }
 
         // apply block and set new schema version
-        NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);
+        uint64_t oldVersion = RLMRealmSchemaVersion(_realm);
         block(self, oldVersion);
 
         // verify uniqueness for any new unique columns before committing

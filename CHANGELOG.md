@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-mm-DD)
+=============================================================
+
+### API breaking changes
+
+* Schema versions are now represented as uint64_t (Objective-C) and UInt64 (Swift) so that they have
+  the same representation on all architectures.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
 0.92.3 Release notes (2015-05-13)
 =============================================================
 

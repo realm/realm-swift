@@ -64,10 +64,10 @@ bool RLMRealmHasMetadataTables(RLMRealm *realm);
 // returns true if it actually did anything
 bool RLMRealmCreateMetadataTables(RLMRealm *realm);
 
-NSUInteger RLMRealmSchemaVersion(RLMRealm *realm);
+uint64_t RLMRealmSchemaVersion(RLMRealm *realm);
 
 // must be in write transaction to set
-void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version);
+void RLMRealmSetSchemaVersion(RLMRealm *realm, uint64_t version);
 
 // get primary key property name for object class
 NSString *RLMRealmPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass);

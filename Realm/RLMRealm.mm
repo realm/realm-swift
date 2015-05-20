@@ -794,11 +794,11 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return RLMGetObjects(self, objectClassName, predicate);
 }
 
-+ (void)setDefaultRealmSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block {
++ (void)setDefaultRealmSchemaVersion:(uint64_t)version withMigrationBlock:(RLMMigrationBlock)block {
     [RLMRealm setSchemaVersion:version forRealmAtPath:[RLMRealm defaultRealmPath] withMigrationBlock:block];
 }
 
-+ (void)setSchemaVersion:(NSUInteger)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block {
++ (void)setSchemaVersion:(uint64_t)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block {
     if (RLMGetAnyCachedRealmForPath(realmPath)) {
         @throw RLMException(@"Cannot set schema version for Realms that are already open.");
     }
@@ -814,11 +814,11 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
-+ (NSUInteger)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error {
++ (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error {
     return [RLMRealm schemaVersionAtPath:realmPath encryptionKey:nil error:error];
 }
 
-+ (NSUInteger)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)outError {
++ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)outError {
     key = validatedKey(key) ?: keyForPath(realmPath);
     RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(realmPath);
     if (!realm) {
