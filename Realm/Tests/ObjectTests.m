@@ -218,41 +218,42 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 }
 @end
 
-@interface DataObjectNoThrow : DataObject
+@interface DateObjectNoThrow : DateObject
+@property NSDate *date2;
 @end
 
-@implementation DataObjectNoThrow
+@implementation DateObjectNoThrow
 - (id)valueForUndefinedKey:(__unused NSString *)key {
     return nil;
 }
 @end
 
-@interface DataSubclassObject : DataObjectNoThrow
-@property NSData *data3;
+@interface DateSubclassObject : DateObjectNoThrow
+@property NSDate *date3;
 @end
 
-@implementation DataSubclassObject
+@implementation DateSubclassObject
 @end
 
-@interface DataDefaultsObject : DataObjectNoThrow
-@property NSData *data3;
+@interface DateDefaultsObject : DateObjectNoThrow
+@property NSDate *date3;
 @end
 
-@implementation DataDefaultsObject
+@implementation DateDefaultsObject
 + (NSDictionary *)defaultPropertyValues {
     return @{
-             @"data3": [NSData data],
+             @"date3": [NSDate date],
              };
 }
 @end
 
-@interface SubclassDataObject : NSObject
-@property NSData *data1;
-@property (getter=customGetter) NSData *data2;
-@property (setter=customSetter:) NSData *data3;
+@interface SubclassDateObject : NSObject
+@property NSDate *dateCol;
+@property (getter=customGetter) NSDate *date2;
+@property (setter=customSetter:) NSDate *date3;
 @end
 
-@implementation SubclassDataObject
+@implementation SubclassDateObject
 @end
 
 #pragma mark - Tests
@@ -1078,20 +1079,20 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 - (void)testCreateInRealmWithOtherObjects {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    DataObjectNoThrow *object = [DataObjectNoThrow createInDefaultRealmWithValue:@[NSData.data, NSData.data]];
+    DateObjectNoThrow *object = [DateObjectNoThrow createInDefaultRealmWithValue:@[NSDate.date, NSDate.date]];
 
     // create subclass with instance of base class with/without default objects
-    XCTAssertThrows([DataSubclassObject createInDefaultRealmWithValue:object]);
-    XCTAssertNoThrow([DataDefaultsObject createInDefaultRealmWithValue:object]);
+    XCTAssertThrows([DateSubclassObject createInDefaultRealmWithValue:object]);
+    XCTAssertNoThrow([DateObjectNoThrow createInDefaultRealmWithValue:object]);
 
     // create using non-realm object with custom getter
-    SubclassDataObject *obj = [SubclassDataObject new];
-    obj.data1 = [@"a" dataUsingEncoding:NSUTF8StringEncoding];
-    obj.data2 = [@"b" dataUsingEncoding:NSUTF8StringEncoding];
-    obj.data3 = [@"c" dataUsingEncoding:NSUTF8StringEncoding];
-    [DataDefaultsObject createInDefaultRealmWithValue:obj];
+    SubclassDateObject *obj = [SubclassDateObject new];
+    obj.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:1000];
+    obj.date2 = [NSDate dateWithTimeIntervalSinceReferenceDate:2000];
+    obj.date3 = [NSDate dateWithTimeIntervalSinceReferenceDate:3000];
+    [DateDefaultsObject createInDefaultRealmWithValue:obj];
 
-    XCTAssertEqual(2U, DataDefaultsObject.allObjects.count);
+    XCTAssertEqual(2U, DateObjectNoThrow.allObjects.count);
     [realm commitWriteTransaction];
 }
 

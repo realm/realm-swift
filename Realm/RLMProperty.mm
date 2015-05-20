@@ -29,6 +29,7 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
         case RLMPropertyTypeArray:
         case RLMPropertyTypeObject:
         case RLMPropertyTypeString:
+        case RLMPropertyTypeData:
             return YES;
         default:
             return NO;
@@ -141,6 +142,7 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
             }
             else if (strcmp(code, "@\"NSData\"") == 0) {
                 _type = RLMPropertyTypeData;
+                _optional = YES;
             }
             else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
                 // get object class from type string - @"RLMArray<objectClassName>"
