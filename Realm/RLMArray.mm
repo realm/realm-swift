@@ -175,7 +175,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     [_backingArray setValue:value forKey:key];
 }
 
-- (NSUInteger)indexOfObjectWithPredicate:(__unused NSPredicate *)predicate {
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
     return [_backingArray indexOfObjectPassingTest:^BOOL(id obj, NSUInteger, BOOL *) {
         return [predicate evaluateWithObject:obj];
     }];
