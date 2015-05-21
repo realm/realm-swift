@@ -193,19 +193,20 @@ static inline RLMObjectBase *RLMAddLinkedObjectOrLiteral(__unsafe_unretained RLM
         @throw RLMException(@"Adding a deleted or invalidated object to a Realm is not permitted");
     }
 
-    if (!link->_realm && (creationOptions & RLMCreationOptionsPromoteStandalone)) {
-        // standalone
-        RLMAddObjectToRealm(link, realm, creationOptions & RLMCreationOptionsCreateOrUpdate);
+    if (link->_realm == realm) {
         return link;
     }
-    if (link->_realm != realm) {
-        // copy from another realm or un-promoted standalone
-        return RLMCreateObjectInRealmWithValue(realm, className, link, creationOptions & RLMCreationOptionsCreateOrUpdate);
+
+    if (creationOptions & RLMCreationOptionsPromoteStandalone) {
+        if (!link->_realm) {
+            RLMAddObjectToRealm(link, realm, creationOptions & RLMCreationOptionsCreateOrUpdate);
+            return link;
+        }
+        @throw RLMException(@"Can not add objects from a differnt Realm");
     }
-    else {
-        // already persisted in this realm
-        return link;
-    }
+
+    // copy from another realm or copy from standalone
+    return RLMCreateObjectInRealmWithValue(realm, className, link, creationOptions & RLMCreationOptionsCreateOrUpdate);
 }
 
 // link getter/setter
