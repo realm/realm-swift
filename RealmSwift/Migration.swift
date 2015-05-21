@@ -220,7 +220,10 @@ private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrat
     return { migration, oldVersion in
         // set all accessor classes to MigrationObject
         for objectSchema in migration.oldSchema.objectSchema {
-            (objectSchema as! RLMObjectSchema).accessorClass = MigrationObject.self
+            if let objectSchema = objectSchema as? RLMObjectSchema {
+                objectSchema.accessorClass = MigrationObject.self
+                objectSchema.isSwiftClass = true // not set automatically for schemas from the Realm file
+            }
         }
         for objectSchema in migration.newSchema.objectSchema {
             (objectSchema as! RLMObjectSchema).accessorClass = MigrationObject.self
