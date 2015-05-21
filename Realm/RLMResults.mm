@@ -72,12 +72,12 @@
 
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<realm::Query>)query
-                                      view:(realm::TableView)view
+                                      view:(realm::TableView &&)view
                                      realm:(RLMRealm *)realm {
     RLMResults *ar = [[RLMResults alloc] initPrivate];
     ar->_objectClassName = objectClassName;
     ar->_viewCreated = YES;
-    ar->_backingView = move(view);
+    ar->_backingView = std::move(view);
     ar->_backingQuery = move(query);
     ar->_realm = realm;
     ar->_objectSchema = realm.schema[objectClassName];

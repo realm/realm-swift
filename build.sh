@@ -14,7 +14,7 @@ set -o pipefail
 set -e
 
 # You can override the version of the core library
-: ${REALM_CORE_VERSION:=0.89.3} # set to "current" to always use the current build
+: ${REALM_CORE_VERSION:=0.89.4} # set to "current" to always use the current build
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool

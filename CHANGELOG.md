@@ -8,6 +8,9 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Swift: Made `Object.init()` a required initializer.
+* `RLMObject`, `RLMResults`, `Object` and `Results` can now be safely
+  deallocated (but still not used) from any thread.
+* Improved performance of most simple queries.
 
 ### Bugfixes
 
