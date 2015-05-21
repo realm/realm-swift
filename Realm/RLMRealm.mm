@@ -711,7 +711,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)addObject:(__unsafe_unretained RLMObject *const)object {
-    RLMAddObjectToRealm(object, self, RLMCreationOptionsNone);
+    RLMAddObjectToRealm(object, self, false);
 }
 
 - (void)addObjects:(id<NSFastEnumeration>)array {
@@ -731,7 +731,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         @throw RLMException(reason);
     }
 
-    RLMAddObjectToRealm(object, self, RLMCreationOptionsUpdateOrCreate);
+    RLMAddObjectToRealm(object, self, true);
 }
 
 - (void)addOrUpdateObjectsFromArray:(id)array {
@@ -865,7 +865,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (RLMObject *)createObject:(NSString *)className withValue:(id)value {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, value, RLMCreationOptionsNone);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, value, false);
 }
 
 - (BOOL)writeCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {

@@ -181,21 +181,17 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 
 static inline size_t RLMAddLinkedObject(RLMObjectBase *link,
                                         __unsafe_unretained RLMRealm *const realm,
-                                        RLMCreationOptions options) {
+                                        bool createOrUpdate) {
     if (link.isInvalidated) {
         @throw RLMException(@"Adding a deleted or invalidated object to a Realm is not permitted");
     }
+    else if (!link->_realm) {
+        // standalone
+        RLMAddObjectToRealm(link, realm, createOrUpdate);
+    }
     else if (link->_realm != realm) {
-        // only try to update if link object has primary key
-        if ((options & RLMCreationOptionsUpdateOrCreate) && link->_objectSchema.primaryKeyProperty) {
-            link = RLMCreateObjectInRealmWithValue(realm, link->_objectSchema.className, link, RLMCreationOptionsUpdateOrCreate | RLMCreationOptionsAllowCopy);
-        }
-        else if (options & RLMCreationOptionsAllowCopy) {
-            link = RLMCreateObjectInRealmWithValue(realm, link->_objectSchema.className, link, RLMCreationOptionsAllowCopy);
-        }
-        else {
-            RLMAddObjectToRealm(link, realm, options);
-        }
+        // copy from another realm
+        link = RLMCreateObjectInRealmWithValue(realm, link->_objectSchema.className, link, createOrUpdate);
     }
     return link->_row.get_index();
 }
@@ -212,7 +208,7 @@ static inline RLMObjectBase *RLMGetLink(__unsafe_unretained RLMObjectBase *const
 }
 
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
-                               __unsafe_unretained RLMObjectBase *const val, RLMCreationOptions options=0) {
+                               __unsafe_unretained RLMObjectBase *const val, bool createOrUpdate = false) {
     RLMVerifyInWriteTransaction(obj);
 
     if (!val || (id)val == NSNull.null) {
@@ -229,7 +225,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
             @throw RLMException(reason);
         }
 
-        obj->_row.set_link(colIndex, RLMAddLinkedObject(val, obj->_realm, options));
+        obj->_row.set_link(colIndex, RLMAddLinkedObject(val, obj->_realm, createOrUpdate));
     }
 }
 
@@ -246,7 +242,7 @@ static inline RLMArray *RLMGetArray(__unsafe_unretained RLMObjectBase *const obj
 
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
                                __unsafe_unretained id<NSFastEnumeration> const val,
-                               RLMCreationOptions options=0) {
+                               bool createOrUpdate = false) {
     RLMVerifyInWriteTransaction(obj);
 
     realm::LinkViewRef linkView = obj->_row.get_linklist(colIndex);
@@ -255,7 +251,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
     linkView->clear();
     if ((id)val != NSNull.null) {
         for (RLMObjectBase *link in val) {
-            linkView->add(RLMAddLinkedObject(link, obj->_realm, options));
+            linkView->add(RLMAddLinkedObject(link, obj->_realm, createOrUpdate));
         }
     }
 }
@@ -631,7 +627,7 @@ Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchem
                                   RLMAccessorStandaloneGetter, RLMAccessorStandaloneSetter);
 }
 
-void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
+void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val, bool createOrUpdate) {
     RLMObjectSchema *schema = obj->_objectSchema;
     RLMProperty *prop = schema[propName];
     if (!prop) {
@@ -644,12 +640,11 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
                             @{@"Property name:" : propName ?: @"nil",
                               @"Value": val ? [val description] : @"nil"});
     }
-    RLMDynamicSet(obj, prop, val, prop.isPrimary ? RLMCreationOptionsEnforceUnique : 0);
+    RLMDynamicSet(obj, prop, val, createOrUpdate);
 }
 
-void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj,
-                   __unsafe_unretained RLMProperty *const prop,
-                   __unsafe_unretained id val, RLMCreationOptions options) {
+void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const prop,
+                   __unsafe_unretained id val, bool createOrUpdate) {
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
         case RLMAccessorCodeByte:
@@ -657,7 +652,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj,
         case RLMAccessorCodeInt:
         case RLMAccessorCodeLong:
         case RLMAccessorCodeLongLong:
-            if (options & RLMCreationOptionsEnforceUnique) {
+            if (prop.isPrimary) {
                 RLMSetValueUnique(obj, col, prop.name, [val longLongValue]);
             }
             else {
@@ -674,7 +669,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj,
             RLMSetValue(obj, col, [val boolValue]);
             break;
         case RLMAccessorCodeString:
-            if (options & RLMCreationOptionsEnforceUnique) {
+            if (prop.isPrimary) {
                 RLMSetValueUnique(obj, col, prop.name, (NSString *)val);
             }
             else {
@@ -688,10 +683,10 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj,
             RLMSetValue(obj, col, (NSData *)val);
             break;
         case RLMAccessorCodeLink:
-            RLMSetValue(obj, col, (RLMObjectBase *)val, options);
+            RLMSetValue(obj, col, (RLMObjectBase *)val, createOrUpdate);
             break;
         case RLMAccessorCodeArray:
-            RLMSetValue(obj, col, (RLMArray *)val, options);
+            RLMSetValue(obj, col, (RLMArray *)val, createOrUpdate);
             break;
         case RLMAccessorCodeAny:
             RLMSetValue(obj, col, val);

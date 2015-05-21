@@ -266,7 +266,7 @@ void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *object, NSString *ke
     }
 
     if (object->_realm) {
-        RLMDynamicValidatedSet(object, key, obj);
+        RLMDynamicValidatedSet(object, key, obj, false);
     }
     else {
         [object setValue:obj forKey:key];

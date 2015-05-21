@@ -49,30 +49,13 @@ void RLMRealmCreateAccessors(RLMSchema *schema);
 // Clear the cache of created accessor classes
 void RLMClearAccessorCache();
 
-//
-// Options for object creation
-//
-typedef NS_OPTIONS(NSUInteger, RLMCreationOptions) {
-    // Normal object creation
-    RLMCreationOptionsNone = 0,
-    // Verify that no existing row has the same value for this property
-    RLMCreationOptionsEnforceUnique = 1 << 0,
-    // If the property is a link or array property, upsert the linked objects
-    // if they have a primary key, and insert them otherwise.
-    RLMCreationOptionsUpdateOrCreate = 1 << 1,
-    // If a link or array property links to an object persisted in a different
-    // realm from the object, copy it into the object's realm rather than throwing
-    // an error
-    RLMCreationOptionsAllowCopy = 1 << 2,
-};
-
 
 //
 // Adding, Removing, Getting Objects
 //
 
 // add an object to the given realm
-void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOptions options);
+void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, bool createOrUpdate);
 
 // delete an object from its realm
 void RLMDeleteObjectFromRealm(RLMObjectBase *object, RLMRealm *realm);
@@ -87,7 +70,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) NS_RETURNS_RETAINED;
 
 // create object from array or dictionary
-RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options) NS_RETURNS_RETAINED;
+RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, bool createOrUpdate) NS_RETURNS_RETAINED;
 
 //
 // Accessor Creation

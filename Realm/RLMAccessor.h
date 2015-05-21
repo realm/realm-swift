@@ -20,8 +20,6 @@
 
 @class RLMObjectSchema, RLMProperty, RLMObjectBase;
 
-typedef NSUInteger RLMCreationOptions;
-
 //
 // Accessors Class Creation/Caching
 //
@@ -33,11 +31,11 @@ Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchem
 //
 // Dynamic getters/setters
 //
-void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val);
+void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val, bool createOrUpdate);
 id RLMDynamicGet(RLMObjectBase *obj, NSString *propName);
 
 // by property/column
-void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOptions options);
+void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, bool createOrUpdate);
 
 //
 // Class modification
