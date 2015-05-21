@@ -236,7 +236,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
                                 valSchema.className, [objSchema.properties[colIndex] objectClassName]];
             @throw RLMException(reason);
         }
-        RLMObjectBase *link = RLMAddLinkedObjectOrLiteral(obj->_realm, valSchema.className, val, RLMCreationOptionsNone);
+        RLMObjectBase *link = RLMAddLinkedObjectOrLiteral(obj->_realm, valSchema.className, val, RLMCreationOptionsPromoteStandalone);
         obj->_row.set_link(colIndex, link->_row.get_index());
     }
 }
@@ -261,7 +261,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
     // FIXME: make sure delete rules don't purge objects
     linkView->clear();
     for (RLMObjectBase *link in array) {
-        RLMObjectBase * addedLink = RLMAddLinkedObjectOrLiteral(obj->_realm, link->_objectSchema.className, link, RLMCreationOptionsNone);
+        RLMObjectBase * addedLink = RLMAddLinkedObjectOrLiteral(obj->_realm, link->_objectSchema.className, link, RLMCreationOptionsPromoteStandalone);
         linkView->add(addedLink->_row.get_index());
     }
 }
@@ -650,7 +650,7 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
                             @{@"Property name:" : propName ?: @"nil",
                               @"Value": val ? [val description] : @"nil"});
     }
-    RLMDynamicSet(obj, prop, val, RLMCreationOptionsNone);
+    RLMDynamicSet(obj, prop, val, RLMCreationOptionsPromoteStandalone);
 }
 
 void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const prop,
