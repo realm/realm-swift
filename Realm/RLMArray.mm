@@ -83,10 +83,9 @@
     }
 }
 
-- (void)removeAllObjects {
-    while (self.count) {
-        [self removeLastObject];
-    }
+- (void)removeAllObjects
+{
+    [_backingArray removeAllObjects];
 }
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index {
