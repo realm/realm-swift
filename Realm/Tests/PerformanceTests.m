@@ -118,17 +118,21 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testCountWhereQuery {
     RLMRealm *realm = [self getStringObjects:50];
     [self measureBlock:^{
-        RLMResults *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
-        [array count];
+        for (int i = 0; i < 50; ++i) {
+            RLMResults *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
+            [array count];
+        }
     }];
 }
 
 - (void)testCountWhereTableView {
     RLMRealm *realm = [self getStringObjects:50];
     [self measureBlock:^{
-        RLMResults *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
-        [array firstObject]; // Force materialization of backing table view
-        [array count];
+        for (int i = 0; i < 10; ++i) {
+            RLMResults *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
+            [array firstObject]; // Force materialization of backing table view
+            [array count];
+        }
     }];
 }
 
@@ -224,7 +228,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and longCol != 7 and stringCol IN {'a', 'b', 'c'}"];
 
     [self measureBlock:^{
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 500; ++i) {
             [AllTypesObject objectsInRealm:realm withPredicate:predicate];
         }
     }];
@@ -232,7 +236,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
 - (void)testDeleteAll {
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        RLMRealm *realm = [self getStringObjects:5];
+        RLMRealm *realm = [self getStringObjects:50];
 
         [self startMeasuring];
         [realm beginWriteTransaction];
@@ -304,8 +308,8 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testLargeINQuery {
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
-    NSMutableArray *ids = [NSMutableArray arrayWithCapacity:1000];
-    for (int i = 0; i < 2000; ++i) {
+    NSMutableArray *ids = [NSMutableArray arrayWithCapacity:3000];
+    for (int i = 0; i < 3000; ++i) {
         [IntObject createInRealm:realm withValue:@[@(i)]];
         if (i % 2) {
             [ids addObject:@(i)];
@@ -321,7 +325,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testSortingAllObjects {
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
-    for (int i = 0; i < 2000; ++i) {
+    for (int i = 0; i < 3000; ++i) {
         [IntObject createInRealm:realm withValue:@[@(arc4random())]];
     }
     [realm commitWriteTransaction];
@@ -385,7 +389,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
         RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) { }];
         [self startMeasuring];
-        while (obj.intCol < 100) {
+        while (obj.intCol < 500) {
             [realm transactionWithBlock:^{
                 obj.intCol++;
             }];
@@ -396,7 +400,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testCommitWriteTransactionWithCrossThreadNotification {
-    const int stopValue = 100;
+    const int stopValue = 500;
 
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
@@ -436,7 +440,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testCrossThreadSyncLatency {
-    const int stopValue = 100;
+    const int stopValue = 500;
 
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
