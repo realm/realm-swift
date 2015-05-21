@@ -186,7 +186,7 @@
 }
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
-    RLMDynamicValidatedSet(self, key, value, false);
+    RLMDynamicValidatedSet(self, key, value);
 }
 
 @end

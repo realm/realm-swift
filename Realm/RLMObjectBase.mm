@@ -23,6 +23,7 @@
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMArray_Private.hpp"
 
 #import "RLMObjectStore.h"
 #import "RLMSwiftSupport.h"
@@ -57,6 +58,73 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
 
     return self;
 }
+
+static inline id RLMValidatedRealmObject(id obj, RLMSchema *schema, RLMObjectSchema *objectSchema) {
+    return [[objectSchema.objectClass alloc] initWithValue:obj schema:schema];
+}
+
+static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
+    if (!RLMIsObjectValidForProperty(obj, prop)) {
+        // check for object or array literals
+        if (prop.type == RLMPropertyTypeObject) {
+            // for object create and try to initialize with obj
+            RLMObjectSchema *objSchema = schema[prop.objectClassName];
+            return RLMValidatedRealmObject(obj, schema, objSchema);
+        }
+        else if (prop.type == RLMPropertyTypeArray && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
+            // for arrays, create objects for each literal object and return new array
+            RLMObjectSchema *objSchema = schema[prop.objectClassName];
+            RLMArray *objects = [[RLMArray alloc] initWithObjectClassName: objSchema.className standalone:YES];
+            for (id el in obj) {
+                [objects addObject:RLMValidatedRealmObject(el, schema, objSchema)];
+            }
+            return objects;
+        }
+
+        // if not a literal throw
+        NSString *message = [NSString stringWithFormat:@"Invalid value '%@' for property '%@'", obj ?: @"nil", prop.name];
+        @throw RLMException(message);
+    }
+    return obj;
+}
+
+static NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema) {
+    NSArray *properties = objectSchema.properties;
+    NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
+    NSDictionary *defaultValues = nil;
+    for (RLMProperty *prop in properties) {
+        id obj = [value valueForKey:prop.name];
+
+        // get default for nil object
+        if (!obj) {
+            if (!defaultValues) {
+                defaultValues = RLMDefaultValuesForObjectSchema(objectSchema);
+            }
+            obj = defaultValues[prop.name];
+        }
+
+        // validate if object is not nil, or for nil if we don't allow missing values
+        if (!obj) {
+            obj = NSNull.null;
+        }
+        outDict[prop.name] = RLMValidatedObjectForProperty(obj, prop, schema);
+    }
+    return outDict;
+}
+
+static NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema) {
+    NSArray *props = objectSchema.properties;
+    if (array.count != props.count) {
+        @throw RLMException(@"Invalid array input. Number of array elements does not match number of properties.");
+    }
+
+    // validate all values
+    NSMutableArray *outArray = [NSMutableArray arrayWithCapacity:props.count];
+    for (NSUInteger i = 0; i < array.count; i++) {
+        [outArray addObject:RLMValidatedObjectForProperty(array[i], props[i], schema)];
+    }
+    return outArray;
+};
 
 - (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
     self = [self init];
@@ -266,7 +334,7 @@ void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *object, NSString *ke
     }
 
     if (object->_realm) {
-        RLMDynamicValidatedSet(object, key, obj, false);
+        RLMDynamicValidatedSet(object, key, obj);
     }
     else {
         [object setValue:obj forKey:key];

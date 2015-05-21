@@ -31,11 +31,11 @@ Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchem
 //
 // Dynamic getters/setters
 //
-void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val, bool createOrUpdate);
+void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val);
 id RLMDynamicGet(RLMObjectBase *obj, NSString *propName);
 
 // by property/column
-void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, bool createOrUpdate);
+void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, bool createOrUpdate, bool promoteStandalone);
 
 //
 // Class modification

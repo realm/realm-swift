@@ -72,6 +72,9 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) NS_RETURNS_R
 // create object from array or dictionary
 RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, bool createOrUpdate) NS_RETURNS_RETAINED;
 
+// validate and object literal
+void RLMValidateObjectLiteral(id obj, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing);
+
 //
 // Accessor Creation
 //

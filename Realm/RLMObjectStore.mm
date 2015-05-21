@@ -455,7 +455,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         // set in table with out validation
         // skip primary key when updating since it doesn't change
         if (created || !prop.isPrimary) {
-            RLMDynamicSet(object, prop, value, createOrUpdate);
+            RLMDynamicSet(object, prop, value, createOrUpdate, true);
         }
 
         // set the ivars for object and array properties to nil as otherwise the
@@ -476,6 +476,85 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     RLMInitializeSwiftListAccessor(object);
 }
 
+static void RLMValidateObjectOrLiteral(id obj, NSString *className, RLMSchema *schema, bool allowMissing) {
+    if (obj != nil && obj != NSNull.null) {
+        if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(obj)) {
+            RLMObjectSchema *objectSchema = objBase->_objectSchema;
+            if (![className isEqualToString:objectSchema.className]) {
+                // if not the right object class treat as literal
+                RLMValidateObjectLiteral(objBase, schema[className], schema, allowMissing);
+            }
+            if (objBase.isInvalidated) {
+                @throw RLMException(@"Adding a deleted or invalidated object to a Realm is not permitted");
+            }
+        }
+        else {
+            RLMValidateObjectLiteral(obj, schema[className], schema, allowMissing);
+        }
+    }
+}
+
+static void RLMValidateObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema, bool allowMissing) {
+    switch (prop.type) {
+        case RLMPropertyTypeString:
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeDate:
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeAny:
+            if (!RLMIsObjectValidForProperty(obj, prop)) {
+                @throw RLMException(@"Invalid property",
+                                    @{@"Property name:" : prop.name ?: @"nil",
+                                      @"Value": obj ? [obj description] : @"nil"});
+            }
+            break;
+        case RLMPropertyTypeObject:
+            RLMValidateObjectOrLiteral(obj, prop.objectClassName, schema, allowMissing);
+            break;
+        case RLMPropertyTypeArray: {
+            if (obj != nil && obj != NSNull.null) {
+                id<NSFastEnumeration> array = obj;
+                for (id el in array) {
+                    RLMValidateObjectOrLiteral(el, prop.objectClassName, schema, allowMissing);
+                }
+            }
+            break;
+        }
+    }
+}
+
+void RLMValidateObjectLiteral(id literal, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
+    NSArray *props = objectSchema.properties;
+    if (NSArray *array = RLMDynamicCast<NSArray>(literal)) {
+        if (array.count != props.count) {
+            @throw RLMException(@"Invalid array input. Number of array elements does not match number of properties.");
+        }
+        for (NSUInteger i = 0; i < array.count; i++) {
+            RLMProperty *prop = props[i];
+            RLMValidateObjectForProperty(array[i], prop, schema, allowMissing);
+        }
+    }
+    else {
+        NSDictionary *defaults;
+        for (RLMProperty *prop in props) {
+            id obj = [literal valueForKey:prop.name];
+
+            // get default for nil object
+            if (!obj) {
+                if (!defaults) {
+                    defaults = RLMDefaultValuesForObjectSchema(objectSchema);
+                }
+                obj = defaults[prop.name];
+            }
+            if (obj || !allowMissing) {
+                RLMValidateObjectForProperty(obj, prop, schema, allowMissing);
+            }
+        }
+    }
+}
+
 RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, bool createOrUpdate = false) {
     if (createOrUpdate && RLMIsObjectSubclass([value class])) {
         RLMObjectBase *obj = value;
@@ -493,10 +572,11 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     RLMObjectSchema *objectSchema = schema[className];
     RLMObjectBase *object = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
 
-    // validate values, create row, and populate
-    if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
-        array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema, realm);
+    // validate value
+    RLMValidateObjectLiteral(value, objectSchema, schema, createOrUpdate);
 
+    // create row, and populate
+    if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // get or create our accessor
         bool created;
         auto primaryGetter = [=](RLMProperty *p) { return array[p.column]; };
@@ -508,7 +588,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
             RLMProperty *prop = props[i];
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, prop, array[i], createOrUpdate);
+                RLMDynamicSet(object, prop, array[i], createOrUpdate, false);
             }
         }
     }
@@ -518,15 +598,20 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         auto primaryGetter = [=](RLMProperty *p) { return [value valueForKey:p.name]; };
         object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, createOrUpdate, created)];
 
-        // assume dictionary or object with kvc properties
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema, !created, realm);
-
         // populate
+        NSDictionary *defaultValues = nil;
         for (RLMProperty *prop in objectSchema.properties) {
+            id propValue = [value valueForKey:prop.name];
+            if (!propValue && created) {
+                if (!defaultValues) {
+                    defaultValues = RLMDefaultValuesForObjectSchema(objectSchema);
+                }
+                propValue = defaultValues[prop.name];
+            }
+
             // skip missing properties and primary key when updating since it doesn't change
-            id propValue = dict[prop.name];
             if (propValue && (created || !prop.isPrimary)) {
-                RLMDynamicSet(object, prop, propValue, createOrUpdate);
+                RLMDynamicSet(object, prop, propValue, createOrUpdate, false);
             }
         }
     }
