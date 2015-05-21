@@ -1240,6 +1240,22 @@ extern "C" {
     XCTAssertGreaterThan(fileSizeBefore, fileSizeAfter);
 }
 
+- (void)testCanCreate100RealmsWithoutBreakingGCD
+{
+    NSMutableArray *realms = [NSMutableArray array];
+    for (int i = 0; i < 100; ++i) {
+        NSString *realmFileName = [NSString stringWithFormat:@"test.%d.realm", i];
+        RLMRealm *realm = [RLMRealm realmWithPath:RLMRealmPathForFile(realmFileName)];
+        [realms addObject:realm];
+    }
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Block dispatched to concurrent queue should be executed"];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [expectation fulfill];
+    });
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+}
+
 - (void)runBlock:(void (^)())block {
     block();
 }
