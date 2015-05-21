@@ -499,7 +499,7 @@ static void RLMValidateObjectOrLiteral(id obj, NSString *className, RLMSchema *s
     }
 }
 
-static void RLMValidateObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema, bool allowMissing) {
+static void RLMValidateObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema, bool recurse, bool allowMissing) {
     switch (prop.type) {
         case RLMPropertyTypeString:
         case RLMPropertyTypeBool:
@@ -516,13 +516,17 @@ static void RLMValidateObjectForProperty(id obj, RLMProperty *prop, RLMSchema *s
             }
             break;
         case RLMPropertyTypeObject:
-            RLMValidateObjectOrLiteral(obj, prop.objectClassName, schema, allowMissing);
+            if (recurse) {
+                RLMValidateObjectOrLiteral(obj, prop.objectClassName, schema, allowMissing);
+            }
             break;
         case RLMPropertyTypeArray: {
-            if (obj != nil && obj != NSNull.null) {
-                id<NSFastEnumeration> array = obj;
-                for (id el in array) {
-                    RLMValidateObjectOrLiteral(el, prop.objectClassName, schema, allowMissing);
+            if (recurse) {
+                if (obj != nil && obj != NSNull.null) {
+                    id<NSFastEnumeration> array = obj;
+                    for (id el in array) {
+                        RLMValidateObjectOrLiteral(el, prop.objectClassName, schema, allowMissing);
+                    }
                 }
             }
             break;
@@ -538,7 +542,7 @@ void RLMValidateObjectLiteral(id literal, RLMObjectSchema *objectSchema, RLMSche
         }
         for (NSUInteger i = 0; i < array.count; i++) {
             RLMProperty *prop = props[i];
-            RLMValidateObjectForProperty(array[i], prop, schema, allowMissing);
+            RLMValidateObjectForProperty(array[i], prop, schema, true, allowMissing);
         }
     }
     else {
@@ -553,8 +557,8 @@ void RLMValidateObjectLiteral(id literal, RLMObjectSchema *objectSchema, RLMSche
                 }
                 obj = defaults[prop.name];
             }
-            if (obj || !allowMissing) {
-                RLMValidateObjectForProperty(obj, prop, schema, allowMissing);
+            if (obj || prop.isPrimary || !allowMissing) {
+                RLMValidateObjectForProperty(obj, prop, schema, true, allowMissing);
             }
         }
     }
@@ -578,7 +582,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     RLMObjectBase *object = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
 
     // validate value
-    RLMValidateObjectLiteral(value, objectSchema, schema, createOrUpdate);
+    //RLMValidateObjectLiteral(value, objectSchema, schema, createOrUpdate);
 
     RLMCreationOptions creationOptions = createOrUpdate ? RLMCreationOptionsCreateOrUpdate : RLMCreationOptionsNone;
 
@@ -595,7 +599,9 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
             RLMProperty *prop = props[i];
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, prop, array[i], creationOptions);
+                id val = array[i];
+                RLMValidateObjectForProperty(val, prop, schema, false, false);
+                RLMDynamicSet(object, prop, val, creationOptions);
             }
         }
     }
@@ -614,11 +620,22 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
                     defaultValues = RLMDefaultValuesForObjectSchema(objectSchema);
                 }
                 propValue = defaultValues[prop.name];
+                if (!propValue && (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray)) {
+                    propValue = NSNull.null;
+                }
             }
 
-            // skip missing properties and primary key when updating since it doesn't change
-            if (propValue && (created || !prop.isPrimary)) {
-                RLMDynamicSet(object, prop, propValue, creationOptions);
+            if (propValue) {
+                if (created || !prop.isPrimary) {
+                    // skip missing properties and primary key when updating since it doesn't change
+                    RLMValidateObjectForProperty(propValue, prop, schema, false, false);
+                    RLMDynamicSet(object, prop, propValue, creationOptions);
+                }
+            }
+            else if (created) {
+                @throw RLMException(@"Invalid property",
+                                    @{@"Property name:" : prop.name ?: @"nil",
+                                      @"Value": propValue ? [propValue description] : @"nil"});
             }
         }
     }
