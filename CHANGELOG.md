@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* The interprocess notification mechanism no longer uses dispatch worker threads, preventing it from
+  starving other GCD clients of the opportunity to execute blocks when dozens of Realms are open at once.
+
 0.92.3 Release notes (2015-05-13)
 =============================================================
 
