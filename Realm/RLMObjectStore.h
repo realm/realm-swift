@@ -51,6 +51,21 @@ void RLMClearAccessorCache();
 
 
 //
+// Options for object creation
+//
+typedef NS_OPTIONS(NSUInteger, RLMCreationOptions) {
+    // Normal object creation
+    RLMCreationOptionsNone = 0,
+    // If the property is a link or array property, upsert the linked objects
+    // if they have a primary key, and insert them otherwise.
+    RLMCreationOptionsCreateOrUpdate = 1 << 0,
+    // Allow standalone objects to be promoted to persisted objects
+    // if false objects are treated as literals and copied during object creation
+    RLMCreationOptionsPromoteStandalone = 1 << 1,
+};
+
+
+//
 // Adding, Removing, Getting Objects
 //
 

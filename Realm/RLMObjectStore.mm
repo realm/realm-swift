@@ -435,6 +435,11 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     auto primaryGetter = [=](RLMProperty *p) { return [object valueForKey:p.getterName]; };
     object->_row = (*schema.table)[RLMCreateOrGetRowForObject(schema, primaryGetter, createOrUpdate, created)];
 
+    RLMCreationOptions creationOptions = RLMCreationOptionsPromoteStandalone;
+    if (createOrUpdate) {
+        creationOptions |= RLMCreationOptionsCreateOrUpdate;
+    }
+
     // populate all properties
     for (RLMProperty *prop in schema.properties) {
         // get object from ivar using key value coding
@@ -455,7 +460,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         // set in table with out validation
         // skip primary key when updating since it doesn't change
         if (created || !prop.isPrimary) {
-            RLMDynamicSet(object, prop, value, createOrUpdate, true);
+            RLMDynamicSet(object, prop, value, creationOptions);
         }
 
         // set the ivars for object and array properties to nil as otherwise the
@@ -575,6 +580,8 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     // validate value
     RLMValidateObjectLiteral(value, objectSchema, schema, createOrUpdate);
 
+    RLMCreationOptions creationOptions = createOrUpdate ? RLMCreationOptionsCreateOrUpdate : RLMCreationOptionsNone;
+
     // create row, and populate
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // get or create our accessor
@@ -588,7 +595,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
             RLMProperty *prop = props[i];
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, prop, array[i], createOrUpdate, false);
+                RLMDynamicSet(object, prop, array[i], creationOptions);
             }
         }
     }
@@ -611,7 +618,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 
             // skip missing properties and primary key when updating since it doesn't change
             if (propValue && (created || !prop.isPrimary)) {
-                RLMDynamicSet(object, prop, propValue, createOrUpdate, false);
+                RLMDynamicSet(object, prop, propValue, creationOptions);
             }
         }
     }
