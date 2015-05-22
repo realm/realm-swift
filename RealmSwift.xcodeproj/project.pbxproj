@@ -231,6 +231,8 @@
 		5DE0B6CB1B0FECF4007831D9 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		5DE0B6CC1B0FEDE0007831D9 /* RealmSwift iOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "RealmSwift iOS.xcconfig"; sourceTree = "<group>"; };
 		5DE0B6CD1B0FEFDA007831D9 /* RealmSwift OSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "RealmSwift OSX.xcconfig"; sourceTree = "<group>"; };
+		5DE0B6CE1B0FF1F7007831D9 /* iOS Tests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "iOS Tests.xcconfig"; sourceTree = "<group>"; };
+		5DE0B6CF1B0FF326007831D9 /* OSX Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "OSX Tests.xcconfig"; sourceTree = "<group>"; };
 		C0027B061AAF6FBC00F013A2 /* SchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SchemaTests.swift; path = RealmSwift/Tests/SchemaTests.swift; sourceTree = SOURCE_ROOT; };
 		C0027B0A1AAF736700F013A2 /* ObjectSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ObjectSchemaTests.swift; path = RealmSwift/Tests/ObjectSchemaTests.swift; sourceTree = SOURCE_ROOT; };
 		C0240C2A1A84090000858BFA /* RealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RealmTests.swift; path = RealmSwift/Tests/RealmTests.swift; sourceTree = SOURCE_ROOT; };
@@ -414,8 +416,10 @@
 		5DE0B6C81B0FE812007831D9 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
+				5DE0B6CF1B0FF326007831D9 /* OSX Tests.xcconfig */,
 				5DE0B6C91B0FE835007831D9 /* Base.xcconfig */,
 				5DE0B6CA1B0FECF4007831D9 /* Debug.xcconfig */,
+				5DE0B6CE1B0FF1F7007831D9 /* iOS Tests.xcconfig */,
 				5DE0B6CC1B0FEDE0007831D9 /* RealmSwift iOS.xcconfig */,
 				5DE0B6CD1B0FEFDA007831D9 /* RealmSwift OSX.xcconfig */,
 				5DE0B6CB1B0FECF4007831D9 /* Release.xcconfig */,
@@ -787,62 +791,15 @@
 		};
 		0201B2901A54C697004CFB6F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5DE0B6CF1B0FF326007831D9 /* OSX Tests.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
-				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"build/osx",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					core/include,
-				);
-				INFOPLIST_FILE = "RealmSwift/Tests/RealmSwiftTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/../Frameworks";
-				METAL_ENABLE_DEBUG_INFO = YES;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Realm,
-				);
-				PRODUCT_NAME = "RealmSwift OSX Tests";
-				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		0201B2911A54C697004CFB6F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5DE0B6CF1B0FF326007831D9 /* OSX Tests.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
-				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"build/osx",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					core/include,
-				);
-				INFOPLIST_FILE = "RealmSwift/Tests/RealmSwiftTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/../Frameworks";
-				METAL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Realm,
-				);
-				PRODUCT_NAME = "RealmSwift OSX Tests";
-				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -876,62 +833,15 @@
 		};
 		02B822801A532100007F28A5 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5DE0B6CE1B0FF1F7007831D9 /* iOS Tests.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"build/ios-dynamic",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					core/include,
-				);
-				INFOPLIST_FILE = "RealmSwift/Tests/RealmSwiftTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				METAL_ENABLE_DEBUG_INFO = YES;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-framework",
-					XCTest,
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		02B822811A532100007F28A5 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5DE0B6CE1B0FF1F7007831D9 /* iOS Tests.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"build/ios-dynamic",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					core/include,
-				);
-				INFOPLIST_FILE = "RealmSwift/Tests/RealmSwiftTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				METAL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-framework",
-					XCTest,
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
