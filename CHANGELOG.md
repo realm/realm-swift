@@ -1,3 +1,24 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Swift: Made `Object.init()` a required initializer.
+* `RLMObject`, `RLMResults`, `Object` and `Results` can now be safely
+  deallocated (but still not used) from any thread.
+* Improve performance of `-[RLMArray indexOfObjectWhere:]` and `-[RLMArray
+  indexOfObjectWithPredicate:]`, and implement them for standalone RLMArrays.
+* Improved performance of most simple queries.
+
+### Bugfixes
+
+* The interprocess notification mechanism no longer uses dispatch worker threads, preventing it from
+  starving other GCD clients of the opportunity to execute blocks when dozens of Realms are open at once.
+
 0.92.3 Release notes (2015-05-13)
 =============================================================
 

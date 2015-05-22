@@ -83,10 +83,9 @@
     }
 }
 
-- (void)removeAllObjects {
-    while (self.count) {
-        [self removeLastObject];
-    }
+- (void)removeAllObjects
+{
+    [_backingArray removeAllObjects];
 }
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index {
@@ -176,6 +175,12 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     [_backingArray setValue:value forKey:key];
 }
 
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
+    return [_backingArray indexOfObjectPassingTest:^BOOL(id obj, NSUInteger, BOOL *) {
+        return [predicate evaluateWithObject:obj];
+    }];
+}
+
 //
 // Methods unsupported on standalone RLMArray instances
 //
@@ -211,15 +216,6 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 {
     return [self indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:predicateFormat
                                                                    arguments:args]];
-}
-
-- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate
-{
-    RLMResults *objects = [self objectsWithPredicate:predicate];
-    if ([objects count] == 0) {
-        return NSNotFound;
-    }
-    return [self indexOfObject:[objects firstObject]];
 }
 
 #pragma mark - Superclass Overrides

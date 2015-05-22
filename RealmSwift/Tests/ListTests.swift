@@ -462,19 +462,6 @@ class ListStandaloneTests: ListTests {
         assertThrows(self.array.filter(pred1))
         assertThrows(self.array.filter(pred2))
     }
-
-    override func testIndexOfFormat() {
-        assertThrows(self.array.indexOf("stringCol = %@", "1"))
-        assertThrows(self.array.indexOf("noSuchCol = %@", "1"))
-    }
-
-    override func testIndexOfPredicate() {
-        let pred1 = NSPredicate(format: "stringCol = '1'")
-        let pred2 = NSPredicate(format: "noSuchCol = '2'")
-
-        assertThrows(self.array.indexOf(pred1))
-        assertThrows(self.array.indexOf(pred2))
-    }
 }
 
 class ListNewlyAddedTests: ListTests {

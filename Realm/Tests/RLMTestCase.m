@@ -58,12 +58,6 @@ static void deleteOrThrow(NSString *path) {
     }
 }
 
-static void RLMDeleteRealmFilesAtPath(NSString *path) {
-    deleteOrThrow(path);
-    deleteOrThrow([path stringByAppendingString:@".lock"]);
-    deleteOrThrow([path stringByAppendingString:@".note"]);
-}
-
 NSData *RLMGenerateKey() {
     uint8_t buffer[64];
     SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
@@ -107,8 +101,15 @@ static BOOL encryptTests() {
     [RLMRealm resetRealmState];
 
     // Delete Realm files
-    RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
-    RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
+    [self deleteRealmFileAtPath:RLMDefaultRealmPath()];
+    [self deleteRealmFileAtPath:RLMTestRealmPath()];
+}
+
+- (void)deleteRealmFileAtPath:(NSString *)path
+{
+    deleteOrThrow(path);
+    deleteOrThrow([path stringByAppendingString:@".lock"]);
+    deleteOrThrow([path stringByAppendingString:@".note"]);
 }
 
 - (void)invokeTest {

@@ -45,6 +45,15 @@ extern "C" {
 
 @implementation RealmTests
 
+- (void)deleteFiles
+{
+    [super deleteFiles];
+
+    for (NSString *realmPath in self.pathsFor100Realms) {
+        [self deleteRealmFileAtPath:realmPath];
+    }
+}
+
 #pragma mark - Tests
 
 - (void)testCoreDebug {
@@ -1238,6 +1247,30 @@ extern "C" {
     XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 2U);
     unsigned long long fileSizeAfter = fileSize(realm.path);
     XCTAssertGreaterThan(fileSizeBefore, fileSizeAfter);
+}
+
+- (NSArray *)pathsFor100Realms
+{
+    NSMutableArray *paths = [NSMutableArray array];
+    for (int i = 0; i < 100; ++i) {
+        NSString *realmFileName = [NSString stringWithFormat:@"test.%d.realm", i];
+        [paths addObject:RLMRealmPathForFile(realmFileName)];
+    }
+    return paths;
+}
+
+- (void)testCanCreate100RealmsWithoutBreakingGCD
+{
+    NSMutableArray *realms = [NSMutableArray array];
+    for (NSString *realmPath in self.pathsFor100Realms) {
+        [realms addObject:[RLMRealm realmWithPath:realmPath]];
+    }
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Block dispatched to concurrent queue should be executed"];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [expectation fulfill];
+    });
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 - (void)runBlock:(void (^)())block {

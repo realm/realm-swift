@@ -209,14 +209,14 @@ public:
         _shutdownReadFd = pipeFd[0];
         _shutdownWriteFd = pipeFd[1];
 
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self listen];
-        });
+        [NSThread detachNewThreadSelector:@selector(listen) toTarget:self withObject:nil];
     }
     return self;
 }
 
 - (void)listen {
+    [NSThread currentThread].name = @"RLMRealm notification listener";
+
     // Create the runloop source
     CFRunLoopSourceContext ctx{};
     ctx.info = (__bridge void *)self;
