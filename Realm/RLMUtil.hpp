@@ -19,6 +19,7 @@
 #import <Realm/RLMConstants.h>
 #import <objc/runtime.h>
 
+#import <realm/array.hpp>
 #import <realm/binary_data.hpp>
 #import <realm/string_data.hpp>
 
@@ -128,4 +129,8 @@ static inline realm::StringData RLMStringDataWithNSString(NSString *string) {
 // Binary convertion utilities
 static inline realm::BinaryData RLMBinaryDataForNSData(NSData *data) {
     return realm::BinaryData(static_cast<const char *>(data.bytes), data.length);
+}
+
+static inline NSUInteger RLMConvertNotFound(size_t index) {
+    return index == realm::not_found ? NSNotFound : index;
 }
