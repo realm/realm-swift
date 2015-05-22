@@ -60,7 +60,7 @@ typedef NS_OPTIONS(NSUInteger, RLMCreationOptions) {
     // if they have a primary key, and insert them otherwise.
     RLMCreationOptionsCreateOrUpdate = 1 << 0,
     // Allow standalone objects to be promoted to persisted objects
-    // if false objects are treated as literals and copied during object creation
+    // if false objects are copied during object creation
     RLMCreationOptionsPromoteStandalone = 1 << 1,
 };
 
@@ -87,8 +87,10 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) NS_RETURNS_R
 // create object from array or dictionary
 RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, bool createOrUpdate) NS_RETURNS_RETAINED;
 
-// validate and object literal
-void RLMValidateObjectLiteral(id obj, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing);
+// validate and object value for a given property
+// accepts and array of property values, a dictionary of properties, or a kvc object conforming to objectSchema
+void RLMValidateValueForProperty(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing);
+
 
 //
 // Accessor Creation

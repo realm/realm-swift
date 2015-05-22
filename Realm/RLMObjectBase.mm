@@ -65,14 +65,14 @@ static inline id RLMValidatedRealmObject(id obj, RLMSchema *schema, RLMObjectSch
 
 static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
     if (!RLMIsObjectValidForProperty(obj, prop)) {
-        // check for object or array literals
+        // check for object or array of properties
         if (prop.type == RLMPropertyTypeObject) {
             // for object create and try to initialize with obj
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
             return RLMValidatedRealmObject(obj, schema, objSchema);
         }
         else if (prop.type == RLMPropertyTypeArray && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
-            // for arrays, create objects for each literal object and return new array
+            // for arrays, create objects for each element and return new array
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
             RLMArray *objects = [[RLMArray alloc] initWithObjectClassName: objSchema.className standalone:YES];
             for (id el in obj) {
@@ -81,7 +81,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
             return objects;
         }
 
-        // if not a literal throw
+        // if not convertible to prop throw
         NSString *message = [NSString stringWithFormat:@"Invalid value '%@' for property '%@'", obj ?: @"nil", prop.name];
         @throw RLMException(message);
     }
