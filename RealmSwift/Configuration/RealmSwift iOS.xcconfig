@@ -1,0 +1,12 @@
+SUPPORTED_PLATFORMS = iphonesimulator iphoneos;
+APPLICATION_EXTENSION_API_ONLY = YES;
+SKIP_INSTALL = YES;
+
+DYLIB_COMPATIBILITY_VERSION = 1;
+DYLIB_CURRENT_VERSION = 1;
+DYLIB_INSTALL_NAME_BASE = @rpath;
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
+DEFINES_MODULE = YES;
+INFOPLIST_FILE = RealmSwift/RealmSwift-Info.plist;
+PRODUCT_NAME = RealmSwift;
+FRAMEWORK_SEARCH_PATHS = build/ios-dynamic;
