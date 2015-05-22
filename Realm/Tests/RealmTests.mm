@@ -45,6 +45,15 @@ extern "C" {
 
 @implementation RealmTests
 
+- (void)deleteFiles
+{
+    [super deleteFiles];
+
+    for (NSString *realmPath in self.pathsFor100Realms) {
+        [self deleteRealmFileAtPath:realmPath];
+    }
+}
+
 #pragma mark - Tests
 
 - (void)testCoreDebug {
@@ -1240,13 +1249,21 @@ extern "C" {
     XCTAssertGreaterThan(fileSizeBefore, fileSizeAfter);
 }
 
+- (NSArray *)pathsFor100Realms
+{
+    NSMutableArray *paths = [NSMutableArray array];
+    for (int i = 0; i < 100; ++i) {
+        NSString *realmFileName = [NSString stringWithFormat:@"test.%d.realm", i];
+        [paths addObject:RLMRealmPathForFile(realmFileName)];
+    }
+    return paths;
+}
+
 - (void)testCanCreate100RealmsWithoutBreakingGCD
 {
     NSMutableArray *realms = [NSMutableArray array];
-    for (int i = 0; i < 100; ++i) {
-        NSString *realmFileName = [NSString stringWithFormat:@"test.%d.realm", i];
-        RLMRealm *realm = [RLMRealm realmWithPath:RLMRealmPathForFile(realmFileName)];
-        [realms addObject:realm];
+    for (NSString *realmPath in self.pathsFor100Realms) {
+        [realms addObject:[RLMRealm realmWithPath:realmPath]];
     }
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"Block dispatched to concurrent queue should be executed"];
