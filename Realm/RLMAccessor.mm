@@ -180,8 +180,8 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 }
 
 static inline RLMObjectBase *RLMGetLinkedObjectForValue(__unsafe_unretained RLMRealm *const realm,
-                                                        NSString *className,
-                                                        id value,
+                                                        __unsafe_unretained NSString *const className,
+                                                        __unsafe_unretained id const value,
                                                         RLMCreationOptions creationOptions) {
     RLMObjectBase *link = RLMDynamicCast<RLMObjectBase>(value);
     if (!link || ![link->_objectSchema.className isEqualToString:className]) {
