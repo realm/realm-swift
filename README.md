@@ -48,7 +48,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more details!
 
 ## License
 
-Realm Cocoa is published under the Apache 2.0 license.  
+Realm Objective-C & Realm Swift are published under the Apache 2.0 license.  
 The underlying core is available under the [Realm Core Binary License](https://github.com/realm/realm-cocoa/blob/master/LICENSE#L210-L243) while we [work to open-source it under the Apache 2.0 license](http://realm.io/docs/cocoa/#faq).
 
 ## Feedback
