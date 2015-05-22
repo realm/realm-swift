@@ -1410,7 +1410,7 @@ static id RLMAutorelease(id value) {
         // create tables, set schema, and create accessors when needed
         if (readonly || (dynamic && !customSchema)) {
             // for readonly realms and dynamic realms without a custom schema just set the schema
-            if (RLMIsNotVersioned(RLMRealmSchemaVersion(realm))) {
+            if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
                 RLMSetErrorOrThrow([NSError errorWithDomain:RLMErrorDomain code:RLMErrorFail userInfo:@{NSLocalizedDescriptionKey:@"Cannot open an uninitialized realm in read-only mode"}], outError);
                 return nil;
             }

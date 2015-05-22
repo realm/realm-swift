@@ -65,5 +65,3 @@
 - (BOOL)isEqualToSchema:(RLMSchema *)schema;
 
 @end
-
-bool RLMIsNotVersioned(NSUInteger version);
