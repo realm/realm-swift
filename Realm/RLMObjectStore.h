@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-@class RLMRealm, RLMSchema, RLMObjectSchema, RLMObjectBase, RLMResults;
+@class RLMRealm, RLMSchema, RLMObjectSchema, RLMObjectBase, RLMResults, RLMProperty;
 
 //
 // Table modifications
@@ -87,9 +87,12 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) NS_RETURNS_R
 // create object from array or dictionary
 RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, bool createOrUpdate) NS_RETURNS_RETAINED;
 
-// validate and object value for a given property
+// validate an object value for a given object schema
 // accepts and array of property values, a dictionary of properties, or a kvc object conforming to objectSchema
-void RLMValidateValueForProperty(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing);
+void RLMValidateValueForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool validateNested, bool allowMissing);
+
+// validate an object value for a given property
+void RLMValidateValueForProperty(id value, RLMProperty *prop, RLMSchema *schema, bool validateNested, bool allowMissing);
 
 
 //
