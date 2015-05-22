@@ -56,14 +56,14 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
-        let array = SwiftArrayPropertyObject.createInRealm(realm, withObject: ["arrayObject", [], []]);
+        let array = SwiftArrayPropertyObject.createInRealm(realm, withValue: ["arrayObject", [], []]);
         XCTAssertNotNil(array.array, "Should be able to get an empty array")
         XCTAssertEqual(array.array.count, UInt(0), "Should start with no array elements")
 
         let obj = SwiftStringObject()
         obj.stringCol = "a"
         array.array.addObject(obj)
-        array.array.addObject(SwiftStringObject.createInRealm(realm, withObject: ["b"]))
+        array.array.addObject(SwiftStringObject.createInRealm(realm, withValue: ["b"]))
         array.array.addObject(obj)
         realm.commitWriteTransaction()
 
@@ -80,7 +80,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
     func testModifyDetatchedArray() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        let arObj = SwiftArrayPropertyObject.createInRealm(realm, withObject: ["arrayObject", [], []])
+        let arObj = SwiftArrayPropertyObject.createInRealm(realm, withValue: ["arrayObject", [], []])
         XCTAssertNotNil(arObj.array, "Should be able to get an empty array")
         XCTAssertEqual(arObj.array.count, UInt(0), "Should start with no array elements")
 
@@ -88,7 +88,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         obj.stringCol = "a"
         let array = arObj.array
         array.addObject(obj)
-        array.addObject(SwiftStringObject.createInRealm(realm, withObject: ["b"]))
+        array.addObject(SwiftStringObject.createInRealm(realm, withValue: ["b"]))
         realm.commitWriteTransaction()
 
         XCTAssertEqual(array.count, UInt(2), "Should have two elements in array")
@@ -101,8 +101,8 @@ class SwiftArrayPropertyTests: SwiftTestCase {
 
         realm.beginWriteTransaction()
 
-        let obj = SwiftArrayPropertyObject.createInRealm(realm, withObject: ["arrayObject", [], []])
-        let child1 = SwiftStringObject.createInRealm(realm, withObject: ["a"])
+        let obj = SwiftArrayPropertyObject.createInRealm(realm, withValue: ["arrayObject", [], []])
+        let child1 = SwiftStringObject.createInRealm(realm, withValue: ["a"])
         let child2 = SwiftStringObject()
         child2.stringCol = "b"
         obj.array.addObjects([child2, child1])
@@ -167,14 +167,14 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
-        let array = ArrayPropertyObject.createInRealm(realm, withObject: ["arrayObject", [], []]);
+        let array = ArrayPropertyObject.createInRealm(realm, withValue: ["arrayObject", [], []]);
         XCTAssertNotNil(array.array, "Should be able to get an empty array")
         XCTAssertEqual(array.array.count, UInt(0), "Should start with no array elements")
 
         let obj = StringObject()
         obj.stringCol = "a"
         array.array.addObject(obj)
-        array.array.addObject(StringObject.createInRealm(realm, withObject: ["b"]))
+        array.array.addObject(StringObject.createInRealm(realm, withValue: ["b"]))
         array.array.addObject(obj)
         realm.commitWriteTransaction()
 
@@ -193,7 +193,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
     func testModifyDetatchedArray_objc() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        let arObj = ArrayPropertyObject.createInRealm(realm, withObject: ["arrayObject", [], []])
+        let arObj = ArrayPropertyObject.createInRealm(realm, withValue: ["arrayObject", [], []])
         XCTAssertNotNil(arObj.array, "Should be able to get an empty array")
         XCTAssertEqual(arObj.array.count, UInt(0), "Should start with no array elements")
 
@@ -201,7 +201,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         obj.stringCol = "a"
         let array = arObj.array
         array.addObject(obj)
-        array.addObject(StringObject.createInRealm(realm, withObject: ["b"]))
+        array.addObject(StringObject.createInRealm(realm, withValue: ["b"]))
         realm.commitWriteTransaction()
 
         XCTAssertEqual(array.count, UInt(2), "Should have two elements in array")
@@ -214,8 +214,8 @@ class SwiftArrayPropertyTests: SwiftTestCase {
 
         realm.beginWriteTransaction()
 
-        let obj = ArrayPropertyObject.createInRealm(realm, withObject: ["arrayObject", [], []])
-        let child1 = StringObject.createInRealm(realm, withObject: ["a"])
+        let obj = ArrayPropertyObject.createInRealm(realm, withValue: ["arrayObject", [], []])
+        let child1 = StringObject.createInRealm(realm, withValue: ["a"])
         let child2 = StringObject()
         child2.stringCol = "b"
         obj.array.addObjects([child2, child1])

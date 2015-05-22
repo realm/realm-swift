@@ -27,7 +27,7 @@
 {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
-    StringObject *obj = [StringObject createInRealm:realm withObject:@[@"a"]];
+    StringObject *obj = [StringObject createInRealm:realm withValue:@[@"a"]];
     [realm commitWriteTransaction];
     
     XCTAssertThrows([obj setStringCol:@"throw"], @"Setter should throw when called outside of transaction.");
@@ -39,10 +39,10 @@
     
     // Insert an object
     [realm beginWriteTransaction];
-    StringObject *obj = [StringObject createInRealm:realm withObject:@[@"a"]];
+    StringObject *obj = [StringObject createInRealm:realm withValue:@[@"a"]];
     [realm commitWriteTransaction];
     
-    XCTAssertThrows([StringObject createInRealm:realm withObject:@[@"a"]], @"Outside write transaction");
+    XCTAssertThrows([StringObject createInRealm:realm withValue:@[@"a"]], @"Outside write transaction");
     XCTAssertThrows([realm commitWriteTransaction], @"No write transaction to close");
     
     [realm beginWriteTransaction];

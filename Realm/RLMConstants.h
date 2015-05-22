@@ -111,7 +111,7 @@ typedef NS_ENUM(NSInteger, RLMError) {
     RLMErrorIncompatibleLockFile  = 8,
 };
 
-// Schema version used for unitialized Realms
+// Schema version used for uninitialized Realms
 extern const NSUInteger RLMNotVersioned;
 
 extern NSString * const RLMErrorDomain;

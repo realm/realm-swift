@@ -33,7 +33,7 @@
     else {
         RLMRealm *realm = [RLMRealm defaultRealm];
         [realm beginWriteTransaction];
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
     }
 }
@@ -42,7 +42,7 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     if (self.isParent) {
         [realm beginWriteTransaction];
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
 
         RLMRunChildAndWait();
@@ -62,7 +62,7 @@
     }
     else {
         [realm beginWriteTransaction];
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
     }
 }
@@ -80,7 +80,7 @@
     }
     else {
         [realm beginWriteTransaction];
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
     }
 }
@@ -102,7 +102,7 @@
     }
     else {
         [realm beginWriteTransaction];
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
     }
 }
@@ -119,7 +119,7 @@
     }
     else {
         [realm beginWriteTransaction];
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
     }
 }
@@ -153,7 +153,7 @@
     }
     else {
         [realm beginWriteTransaction];
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
     }
 }
@@ -165,7 +165,7 @@
     [realm beginWriteTransaction];
     IntObject *obj = [IntObject allObjectsInRealm:realm].firstObject;
     if (!obj) {
-        obj = [IntObject createInRealm:realm withObject:@[@0]];
+        obj = [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
     }
     else {
@@ -207,7 +207,7 @@
 
     if (self.isParent) {
         [realm beginWriteTransaction];
-        IntObject *obj = [IntObject createInDefaultRealmWithObject:@[@(-workers)]];
+        IntObject *obj = [IntObject createInDefaultRealmWithValue:@[@(-workers)]];
         [realm commitWriteTransaction];
 
         dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_CONCURRENT);
@@ -262,8 +262,8 @@
         ++obj.intCol;
 
         // Do some stuff
-        [DoubleObject createInDefaultRealmWithObject:@[@(obj.intCol)]];
-        [DoubleObject createInDefaultRealmWithObject:@[@(obj.intCol)]];
+        [DoubleObject createInDefaultRealmWithValue:@[@(obj.intCol)]];
+        [DoubleObject createInDefaultRealmWithValue:@[@(obj.intCol)]];
         RLMResults *min = [DoubleObject objectsWhere:@"doubleCol = %@", [DoubleObject.allObjects minOfProperty:@"doubleCol"]];
         [realm deleteObject:min.firstObject];
         [realm commitWriteTransaction];
@@ -280,7 +280,7 @@
         [self runChildAndWait];
         RLMRealm *realm = RLMRealm.defaultRealm;
         [realm beginWriteTransaction];
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
         XCTAssertEqual(1U, [IntObject allObjects].count);
     }

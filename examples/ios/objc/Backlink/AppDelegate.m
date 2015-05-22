@@ -55,8 +55,8 @@ RLM_ARRAY_TYPE(Dog)
 
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
-        [Person createInRealm:realm withObject:@[@"John", @[@[@"Fido", @1]]]];
-        [Person createInRealm:realm withObject:@[@"Mary", @[@[@"Rex", @2]]]];
+        [Person createInRealm:realm withValue:@[@"John", @[@[@"Fido", @1]]]];
+        [Person createInRealm:realm withValue:@[@"Mary", @[@[@"Rex", @2]]]];
     }];
 
     // Log all dogs and their owners using the "owners" inverse relationship

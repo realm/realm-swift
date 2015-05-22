@@ -69,14 +69,16 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
  Create an RLMObject of type `className` in the Realm being migrated.
 
  @param className   The name of the RLMObject class to create.
- @param object      The value used to populate the created object. This can be any key/value coding compliant
+ @param value       The value used to populate the created object. This can be any key/value coding compliant
                     object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                     an NSArray with one object for each persisted property. An exception will be
                     thrown if any required properties are not present and no default is set.
 
                     When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
  */
--(RLMObject *)createObject:(NSString *)className withObject:(id)object;
+-(RLMObject *)createObject:(NSString *)className withValue:(id)value;
+
+-(RLMObject *)createObject:(NSString *)className withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createObject:withValue:");
 
 /**
  Delete an object from a Realm during a migration. This can be called within `enumerateObjects:block:`.
@@ -84,6 +86,17 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
  @param object  Object to be deleted from the Realm being migrated.
  */
 - (void)deleteObject:(RLMObject *)object;
+
+/**
+ Deletes the data for the class with the given name.
+ This deletes all objects of the given class, and if the RLMObject subclass no longer exists in your program,
+ cleans up any remaining metadata for the class in the Realm file.
+ 
+ @param  name The name of the RLMObject class to delete.
+ 
+ @return whether there was any data to delete.
+ */
+- (BOOL)deleteDataForClassName:(NSString *)name;
 
 @end
 

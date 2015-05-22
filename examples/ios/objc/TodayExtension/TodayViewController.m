@@ -38,7 +38,7 @@
     self.tick = [Tick allObjects].firstObject;
     if (!self.tick) {
         [[RLMRealm defaultRealm] transactionWithBlock:^{
-            self.tick = [Tick createInDefaultRealmWithObject:@[@"", @0]];
+            self.tick = [Tick createInDefaultRealmWithValue:@[@"", @0]];
         }];
     }
     self.notificationToken = [self.tick.realm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {

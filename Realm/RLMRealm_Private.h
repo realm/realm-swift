@@ -27,7 +27,7 @@
     BOOL _inWriteTransaction;
     mach_port_t _threadID;
 }
-@property (nonatomic, readonly) BOOL inWriteTransaction;
+
 @property (nonatomic, readonly) BOOL dynamic;
 @property (nonatomic, readwrite) RLMSchema *schema;
 @property (nonatomic, strong) RLMNotifier *notifier;

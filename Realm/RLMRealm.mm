@@ -31,8 +31,6 @@
 
 #include <atomic>
 #include <sstream>
-#include <sys/sysctl.h>
-#include <sys/types.h>
 
 #include <realm/util/memory_stream.hpp>
 #include <realm/commit_log.hpp>
@@ -64,8 +62,19 @@ using namespace realm::util;
 //
 // Global encryption key cache and validation
 //
+
+static bool shouldForciblyDisableEncryption()
+{
+    static bool disableEncryption = getenv("REALM_DISABLE_ENCRYPTION");
+    return disableEncryption;
+}
+
 static NSMutableDictionary *s_keysPerPath = [NSMutableDictionary new];
 static NSData *keyForPath(NSString *path) {
+    if (shouldForciblyDisableEncryption()) {
+        return nil;
+    }
+
     @synchronized (s_keysPerPath) {
         return s_keysPerPath[path];
     }
@@ -88,7 +97,18 @@ static void clearKeyCache() {
     }
 }
 
+static void validateNotInDebugger()
+{
+    if (RLMIsDebuggerAttached()) {
+        @throw RLMException(@"Cannot open an encrypted Realm with a debugger attached to the process");
+    }
+}
+
 static NSData *validatedKey(NSData *key) {
+    if (shouldForciblyDisableEncryption()) {
+        return nil;
+    }
+
     if (key && key.length != 64) {
         @throw RLMException(@"Encryption key must be exactly 64 bytes long");
     }
@@ -1208,6 +1228,11 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 
         NSError *error = nil;
         try {
+            // NOTE: we do these checks here as is this is the first time encryption keys are used
+            if ((key = validatedKey(key))) {
+                validateNotInDebugger();
+            }
+
             if (readonly) {
                 _readGroup = make_unique<Group>(path.UTF8String, static_cast<const char *>(key.bytes));
                 _group = _readGroup.get();
@@ -1392,7 +1417,7 @@ static id RLMAutorelease(id value) {
         return RLMAutorelease(realm);
     }
 
-    key = validatedKey(key) ?: keyForPath(path);
+    key = key ?: keyForPath(path);
 
     NSURL *serverBaseURL;
     @synchronized (s_serverBaseURLS) {
@@ -1925,7 +1950,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         @throw RLMException(@"Encryption key must not be nil");
     }
 
-    return [self migrateRealmAtPath:realmPath key:key];
+    return [self migrateRealmAtPath:realmPath key:validatedKey(key)];
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
@@ -1943,8 +1968,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), [RLMSchema.sharedSchema copy], [realm migrationBlock:key]);
 }
 
-- (RLMObject *)createObject:(NSString *)className withObject:(id)object {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, object, RLMCreationOptionsNone);
+- (RLMObject *)createObject:(NSString *)className withValue:(id)value {
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, value, RLMCreationOptionsNone);
 }
 
 + (void)enableServerSyncOnPath:(NSString *)path serverBaseURL:(NSString *)serverBaseURL {
@@ -1967,6 +1992,9 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (BOOL)writeCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
     key = validatedKey(key) ?: keyForPath(path);
+    if (key) {
+        validateNotInDebugger();
+    }
 
     try {
         self.group->write(path.UTF8String, static_cast<const char *>(key.bytes));

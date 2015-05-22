@@ -267,8 +267,6 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
         }
     }
 
-    // FIXME - remove deleted tables
-
     return changed;
 }
 
@@ -350,7 +348,7 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
 void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
     // switch List<> properties to linkviews from standalone arrays
     static Class s_swiftObjectClass = NSClassFromString(@"RealmSwift.Object");
-    if (![object isKindOfClass:s_swiftObjectClass]) {
+    if (!object || !object->_row || ![object isKindOfClass:s_swiftObjectClass]) {
         return;
     }
 
@@ -465,7 +463,6 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
     RLMInitializeSwiftListAccessor(object);
 }
 
-
 RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options) {
     if (options & RLMCreationOptionsUpdateOrCreate && RLMIsObjectSubclass([value class])) {
         RLMObjectBase *obj = value;
@@ -485,7 +482,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 
     // validate values, create row, and populate
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
-        array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema);
+        array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema, realm);
 
         // get or create our accessor
         bool created;
@@ -510,7 +507,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
 
         // assume dictionary or object with kvc properties
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema, !created);
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema, !created, realm);
 
         // populate
         for (RLMProperty *prop in objectSchema.properties) {

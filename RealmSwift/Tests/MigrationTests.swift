@@ -37,6 +37,10 @@ private func realmWithSingleClassProperties(path: String, className: String, pro
     return realmWithSingleClass(path, objectSchema)
 }
 
+private func dynamicRealm(path: String) -> RLMRealm {
+    return RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: true, schema: nil, error: nil)
+}
+
 class MigrationTests: TestCase {
 
     // MARK Utility methods
@@ -171,6 +175,23 @@ class MigrationTests: TestCase {
                 XCTAssertEqual(count, 1)
             })
         }
+
+        autoreleasepool {
+            Realm().write {
+                Realm().create(SwiftArrayPropertyObject.self, value: ["string", [["array"]], [[2]]])
+            }
+        }
+
+        autoreleasepool {
+            self.migrateAndTestRealm(Realm.defaultPath, schemaVersion: 3, block: { migration, oldSchemaVersion in
+                migration.enumerate("SwiftArrayPropertyObject") { oldObject, newObject in
+                    XCTAssertTrue(oldObject! as AnyObject is MigrationObject)
+                    XCTAssertTrue(newObject! as AnyObject is MigrationObject)
+                    XCTAssertTrue(oldObject!["array"]! is List<MigrationObject>)
+                    XCTAssertTrue(oldObject!["array"]! is List<MigrationObject>)
+                }
+            })
+        }
     }
 
     func testCreate() {
@@ -213,6 +234,34 @@ class MigrationTests: TestCase {
         })
 
         XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
+    }
+
+    func testDeleteData() {
+        autoreleasepool {
+            let realm = realmWithSingleClassProperties(testRealmPath(), "DeletedClass", [])
+            realm.transactionWithBlock {
+                realm.createObject("DeletedClass", withValue: [])
+            }
+        }
+
+        autoreleasepool {
+            setSchemaVersion(1, testRealmPath()) { migration, oldSchemaVersion in
+                XCTAssertEqual(oldSchemaVersion, 0, "Initial schema version should be 0");
+
+                XCTAssertTrue(migration.deleteData("DeletedClass"));
+                XCTAssertFalse(migration.deleteData("NoSuchClass"));
+
+                migration.create(SwiftStringObject.className(), value: ["migration"])
+                XCTAssertTrue(migration.deleteData(SwiftStringObject.className()));
+            }
+            migrateRealm(testRealmPath())
+        }
+
+        autoreleasepool {
+            let realm = dynamicRealm(testRealmPath())
+            XCTAssertNil(realm.schema.schemaForClassName("DeletedClass"))
+            XCTAssertEqual(0, realm.allObjects("SwiftStringObject").count)
+        }
     }
 
     // test getting/setting all property types

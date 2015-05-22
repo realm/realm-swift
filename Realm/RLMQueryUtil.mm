@@ -63,12 +63,33 @@ static void RLMPrecondition(bool condition, NSString *name, NSString *format, ..
 // return the column index for a validated column name
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName) {
     RLMProperty *prop = desc[columnName];
-    RLMPrecondition(prop, @"Invalid column name",
-                    @"Column name %@ not found in table", columnName);
+    RLMPrecondition(prop, @"Invalid property name",
+                    @"Property '%@' not found in object of type '%@'", columnName, desc.className);
     return prop.column;
 }
 
 namespace {
+
+// FIXME: TrueExpression and FalseExpression should be supported by core in some way
+
+struct TrueExpression : realm::Expression {
+    size_t find_first(size_t start, size_t end) const override
+    {
+        if (start != end)
+            return start;
+
+        return realm::not_found;
+    }
+    void set_table() override {}
+    const Table* get_table() override { return nullptr; }
+};
+
+struct FalseExpression : realm::Expression {
+    size_t find_first(size_t, size_t) const override { return realm::not_found; }
+    void set_table() override {}
+    const Table* get_table() override { return nullptr; }
+};
+
 // add a clause for numeric constraints based on operator type
 template <typename T>
 void add_numeric_constraint_to_query(realm::Query& query,
@@ -284,12 +305,6 @@ void process_or_group(Query &query, id array, Func&& func) {
         // Queries can't be empty, so if there's zero things in the OR group
         // validation will fail. Work around this by adding an expression which
         // will never find any rows in a table.
-        // FIXME: this should be supported by core in some way
-        struct FalseExpression : realm::Expression {
-            size_t find_first(size_t, size_t) const override { return realm::not_found; }
-            void set_table() override {}
-            const Table* get_table() override { return nullptr; }
-        };
         query.expression(new FalseExpression);
     }
 
@@ -362,16 +377,16 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
     for (NSString *path in paths) {
         if (prop) {
             RLMPrecondition(prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray,
-                            @"Invalid value", @"column name '%@' is not a link", prevPath);
+                            @"Invalid value", @"Property '%@' is not a link in object of type '%@'", prevPath, desc.className);
             indexes.push_back(prop.column);
             prop = desc[path];
-            RLMPrecondition(prop, @"Invalid column name",
-                            @"Column name %@ not found in table", path);
+            RLMPrecondition(prop, @"Invalid property name",
+                            @"Property '%@' not found in object of type '%@'", path, desc.className);
         }
         else {
             prop = desc[path];
-            RLMPrecondition(prop, @"Invalid column name",
-                            @"Column name %@ not found in table", path);
+            RLMPrecondition(prop, @"Invalid property name",
+                            @"Property '%@' not found in object of type '%@'", path, desc.className);
 
             if (isAny) {
                 RLMPrecondition(prop.type == RLMPropertyTypeArray,
@@ -394,14 +409,14 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
     return prop;
 }
 
-void validate_property_value(RLMProperty *prop, id value, NSString *err) {
+void validate_property_value(RLMProperty *prop, id value, NSString *err, RLMObjectSchema *objectSchema, NSString *keyPath) {
     if (prop.type == RLMPropertyTypeArray) {
-        RLMPrecondition([RLMDynamicCast<RLMObject>(value).objectSchema.className isEqualToString:prop.objectClassName],
-                        @"Invalid value", err, prop.objectClassName);
+        RLMPrecondition([RLMObjectBaseObjectSchema(RLMDynamicCast<RLMObjectBase>(value)).className isEqualToString:prop.objectClassName],
+                        @"Invalid value", err, prop.objectClassName, keyPath, objectSchema.className, value);
     }
     else {
         RLMPrecondition(RLMIsObjectValidForProperty(value, prop),
-                        @"Invalid value", err, RLMTypeToString(prop.type));
+                        @"Invalid value", err, RLMTypeToString(prop.type), keyPath, objectSchema.className, value);
     }
 }
 
@@ -428,14 +443,14 @@ void update_query_with_value_expression(RLMSchema *schema,
     if (pred.predicateOperatorType == NSInPredicateOperatorType) {
         process_or_group(query, value, [&](id item) {
             id normalized = value_from_constant_expression_or_value(item);
-            validate_property_value(prop, normalized, @"Object in IN clause must be of type %@");
+            validate_property_value(prop, normalized, @"Expected object of type %@ in IN clause for property '%@' on object of type '%@', but received: %@", desc, keyPath);
             add_constraint_to_query(query, prop.type, NSEqualToPredicateOperatorType,
                                     pred.options, indexes, index, normalized);
         });
         return;
     }
 
-    validate_property_value(prop, value, @"object must be of type %@");
+    validate_property_value(prop, value, @"Expected object of type %@ for property '%@' on object of type '%@', but received: %@", desc, keyPath);
     add_constraint_to_query(query, prop.type, pred.predicateOperatorType,
                             pred.options, indexes, index, value);
 }
@@ -547,12 +562,17 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
 
         switch ([comp compoundPredicateType]) {
             case NSAndPredicateType:
-                // Add all of the subpredicates.
-                query.group();
-                for (NSPredicate *subp in comp.subpredicates) {
-                    update_query_with_predicate(subp, schema, objectSchema, query);
+                if (comp.subpredicates.count) {
+                    // Add all of the subpredicates.
+                    query.group();
+                    for (NSPredicate *subp in comp.subpredicates) {
+                        update_query_with_predicate(subp, schema, objectSchema, query);
+                    }
+                    query.end_group();
+                } else {
+                    // NSCompoundPredicate's documentation states that an AND predicate with no subpredicates evaluates to TRUE.
+                    query.expression(new TrueExpression);
                 }
-                query.end_group();
                 break;
 
             case NSOrPredicateType: {
@@ -622,17 +642,23 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                                          @"Predicate expressions must compare a keypath and another keypath or a constant value");
         }
     }
+    else if ([predicate isEqual:[NSPredicate predicateWithValue:YES]]) {
+        query.expression(new TrueExpression);
+    } else if ([predicate isEqual:[NSPredicate predicateWithValue:NO]]) {
+        query.expression(new FalseExpression);
+    }
     else {
         // invalid predicate type
         @throw RLMPredicateException(@"Invalid predicate",
-                                     @"Only support compound and comparison predicates");
+                                     @"Only support compound, comparison, and constant predicates");
     }
 }
 
 RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *propName) {
     // validate
+    RLMPrecondition([propName rangeOfString:@"."].location == NSNotFound, @"Invalid sort property", @"Cannot sort on '%@': sorting on key paths is not supported.", propName);
     RLMProperty *prop = schema[propName];
-    RLMPrecondition(prop, @"Invalid sort column", @"Column named '%@' not found.", prop);
+    RLMPrecondition(prop, @"Invalid sort property", @"Cannot sort on property '%@' on object of type '%@': property not found.", propName, schema.className);
 
     switch (prop.type) {
         case RLMPropertyTypeBool:
@@ -644,8 +670,8 @@ RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *prop
             break;
 
         default:
-            @throw RLMPredicateException(@"Invalid sort column type",
-                                         @"Sorting is only supported on Bool, Date, Double, Float, Integer and String columns.");
+            @throw RLMPredicateException(@"Invalid sort property type",
+                                         @"Cannot sort on property '%@' on object of type '%@': sorting is only supported on bool, date, double, float, integer, and string properties, but property is of type %@.", propName, schema.className, RLMTypeToString(prop.type));
     }
     return prop;
 }

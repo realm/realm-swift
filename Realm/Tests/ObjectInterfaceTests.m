@@ -44,7 +44,7 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    CustomAccessorsObject *ca = [CustomAccessorsObject createInRealm:realm withObject:@[@"name", @2]];
+    CustomAccessorsObject *ca = [CustomAccessorsObject createInRealm:realm withValue:@[@"name", @2]];
     XCTAssertEqualObjects([ca getThatName], @"name", @"name property should be name.");
     
     [ca setTheInt:99];
@@ -77,7 +77,7 @@
     CustomAccessorsObject *caStandalone = [[CustomAccessorsObject alloc] init];
     caStandalone.name = @"name";
     caStandalone.age = 99;
-    [CustomAccessorsObject createInRealm:realm withObject:caStandalone];
+    [CustomAccessorsObject createInRealm:realm withValue:caStandalone];
     [realm commitWriteTransaction];
 
     CustomAccessorsObject *objectFromRealm = [CustomAccessorsObject allObjects][0];
@@ -89,8 +89,8 @@
 {
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
-    PrimaryKeyWithLinkObject *object = [PrimaryKeyWithLinkObject createInRealm:realm withObject:@[@"", @[@""]]];
-    PrimaryKeyWithLinkObject *returnedObject = [PrimaryKeyWithLinkObject createOrUpdateInRealm:realm withObject:object];
+    PrimaryKeyWithLinkObject *object = [PrimaryKeyWithLinkObject createInRealm:realm withValue:@[@"", @[@""]]];
+    PrimaryKeyWithLinkObject *returnedObject = [PrimaryKeyWithLinkObject createOrUpdateInRealm:realm withValue:object];
     XCTAssertEqual(object, returnedObject);
     [realm commitWriteTransaction];
 }

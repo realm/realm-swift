@@ -1,14 +1,111 @@
-x.xx.x Release notes (yyyy-MM-dd)
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* The interprocess notification mechanism no longer uses dispatch worker threads, preventing it from
+  starving other GCD clients of the opportunity to execute blocks when dozens of Realms are open at once.
+
+0.92.3 Release notes (2015-05-13)
+=============================================================
+
+### API breaking changes
+
+* Swift: `Results.average(_:)` now returns an optional, which is `nil` if and only if the results
+  set is empty.
+
+### Enhancements
+
+* Swift: Added `List.invalidated`, which returns if the given `List` is no longer
+  safe to be accessed, and is analogous to `-[RLMArray isInvalidated]`.
+* Assertion messages are automatically logged to Crashlytics if it's loaded
+  into the current process to make it easier to diagnose crashes.
+
+### Bugfixes
+
+* Swift: Enumerating through a standalone `List` whose objects themselves
+  have list properties won't crash.
+* Swift: Using a subclass of `RealmSwift.Object` in an aggregate operator of a predicate
+  no longer throws a spurious type error.
+* Fix incorrect results for when using OR in a query on a `RLMArray`/`List<>`.
+* Fix incorrect values from `[RLMResults count]`/`Results.count` when using
+  `!=` on an int property with no other query conditions.
+* Lower the maximum doubling threshold for Realm file sizes from 128MB to 16MB
+  to reduce the amount of wasted space.
+
+0.92.2 Release notes (2015-05-08)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Exceptions raised when incorrect object types are used with predicates now contain more detailed information.
+* Added `-[RLMMigration deleteDataForClassName:]` and `Migration.deleteData(_:)` 
+  to enable cleaning up after removing object subclasses
+
+### Bugfixes
+
+* Prevent debugging of an application using an encrypted Realm to work around
+  frequent LLDB hangs. Until the underlying issue is addressed you may set
+  REALM_DISABLE_ENCRYPTION=YES in your application's environment variables to
+  have requests to open an encrypted Realm treated as a request for an
+  unencrypted Realm.
+* Linked objects are properly updated in `createOrUpdateInRealm:withValue:`.
+* List properties on Objects are now properly initialized during fast enumeration.
+
+0.92.1 Release notes (2015-05-06)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* `-[RLMRealm inWriteTransaction]` is now public.
+* Realm Swift is now available on CoocaPods.
+
+### Bugfixes
+
+* Force code re-signing after stripping architectures in `strip-frameworks.sh`.
+
+0.92.0 Release notes (2015-05-05)
 =============================================================
 
 ### API breaking changes
 
 * Migration blocks are no longer called when a Realm file is first created.
+* The following APIs have been deprecated in favor of newer method names:
+
+| Deprecated API                                         | New API                                               |
+|:-------------------------------------------------------|:------------------------------------------------------|
+| `-[RLMMigration createObject:withObject:]`             | `-[RLMMigration createObject:withValue:]`             |
+| `-[RLMObject initWithObject:]`                         | `-[RLMObject initWithValue:]`                         |
+| `+[RLMObject createInDefaultRealmWithObject:]`         | `+[RLMObject createInDefaultRealmWithValue:]`         |
+| `+[RLMObject createInRealm:withObject:]`               | `+[RLMObject createInRealm:withValue:]`               |
+| `+[RLMObject createOrUpdateInDefaultRealmWithObject:]` | `+[RLMObject createOrUpdateInDefaultRealmWithValue:]` |
+| `+[RLMObject createOrUpdateInRealm:withObject:]`       | `+[RLMObject createOrUpdateInRealm:withValue:]`       |
 
 ### Enhancements
 
 * `Int8` properties defined in Swift are now treated as integers, rather than
   booleans.
+* NSPredicates created using `+predicateWithValue:` are now supported.
+
+### Bugfixes
+
+* Compound AND predicates with no subpredicates now correctly match all objects.
 
 0.91.5 Release notes (2015-04-28)
 =============================================================
@@ -72,8 +169,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 
 * `attributesForProperty:` has been removed from `RLMObject`. You now specify indexed
   properties by implementing the `indexedProperties` method.
-* An exception will be thrown when calling `setEncryptionKey:forRealmsAtPath:`, 
-  `setSchemaVersion:forRealmAtPath:withMigrationBlock:`, and `migrateRealmAtPath:` 
+* An exception will be thrown when calling `setEncryptionKey:forRealmsAtPath:`,
+  `setSchemaVersion:forRealmAtPath:withMigrationBlock:`, and `migrateRealmAtPath:`
   when a Realm at the given path is already open.
 * Object and array properties of type `RLMObject` will no longer be allowed.
 
@@ -164,8 +261,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Rename `-[RLMRealm encryptedRealmWithPath:key:readOnly:error:]` to
   `-[RLMRealm realmWithPath:encryptionKey:readOnly:error:]`.
 * `-[RLMRealm setSchemaVersion:withMigrationBlock]` is no longer global and must be called
-  for each individual Realm path used. You can now call `-[RLMRealm setDefaultRealmSchemaVersion:withMigrationBlock]` 
-  for the default Realm and `-[RLMRealm setSchemaVersion:forRealmAtPath:withMigrationBlock:]` for all others; 
+  for each individual Realm path used. You can now call `-[RLMRealm setDefaultRealmSchemaVersion:withMigrationBlock]`
+  for the default Realm and `-[RLMRealm setSchemaVersion:forRealmAtPath:withMigrationBlock:]` for all others;
 
 ### Enhancements
 
@@ -409,7 +506,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Support subclassing RLMObject models. Although you can now persist subclasses,
-  polymorphic behavior is not supported (i.e. setting a property to an 
+  polymorphic behavior is not supported (i.e. setting a property to an
   instance of its subclass).
 * Add support for sorting RLMArray properties.
 * Speed up inserting objects with `addObject:` by ~20%.
@@ -475,7 +572,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Realm change notifications when beginning a write transaction are now sent
   after updating rather than before, to match refresh.
 * `-isEqual:` now uses the default `NSObject` implementation unless a primary key
-  is specified for an RLMObject. When a primary key is specified, `-isEqual:` calls 
+  is specified for an RLMObject. When a primary key is specified, `-isEqual:` calls
   `-isEqualToObject:` and a corresponding implementation for `-hash` is also implemented.
 
 0.84.0 Release notes (2014-08-28)
@@ -531,7 +628,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Add support for querying for nil object properties.
-* Improve error message when specifying invalid literals when creating or 
+* Improve error message when specifying invalid literals when creating or
   initializing RLMObjects.
 * Throw an exception when an RLMObject is used from the incorrect thread rather
   than crashing in confusing ways.
@@ -567,12 +664,12 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Fixed rapid growth of the realm file size.
-* Fixed a bug which could cause a crash during RLMArray destruction after a query. 
+* Fixed a bug which could cause a crash during RLMArray destruction after a query.
 * Fixed bug related to querying on float properties: `floatProperty = 1.7` now works.
 * Fixed potential bug related to the handling of array properties (RLMArray).
 * Fixed bug where array properties accessed the wrong property.
 * Fixed bug that prevented objects with custom getters to be added to a Realm.
-* Fixed a bug where initializing a standalone object with an array literal would 
+* Fixed a bug where initializing a standalone object with an array literal would
   trigger an exception.
 * Clarified exception messages when using unsupported NSPredicate operators.
 * Clarified exception messages when using unsupported property types on RLMObject subclasses.
@@ -714,7 +811,7 @@ The Objective-C API has been updated and your code will break!
 0.10.0 Release notes (2014-04-23)
 =============================================================
 
-TightDB is now Realm! The Objective-C API has been updated 
+TightDB is now Realm! The Objective-C API has been updated
 and your code will break!
 
 ### API breaking changes
@@ -752,7 +849,7 @@ and your code will break!
 * `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
 * Return `NSNotFound` instead of -1 when appropriate.
 * Renamed `castClass` to `castToTytpedTableClass` on `TDBTable`.
-* `removeAllRows`, `removeRowAtIndex`, `removeLastRow`, `addRow` and `insertRow` methods 
+* `removeAllRows`, `removeRowAtIndex`, `removeLastRow`, `addRow` and `insertRow` methods
   on table now return void instead of BOOL.
 
 ### Enhancements
@@ -768,7 +865,7 @@ and your code will break!
 * Column names in Typed Tables can begin with non-capital letters too. The generated `addX`
   selector can look odd. For example, a table with one column with name `age`,
   appending a new row will look like `[table addage:7]`.
-* Mixed typed values are better validated when rows are added, inserted, 
+* Mixed typed values are better validated when rows are added, inserted,
   or modified as object literals.
 * `addRow`, `insertRow`, and row updates can be done using objects
    derived from `NSObject`.
@@ -784,7 +881,7 @@ and your code will break!
 =============================================================
 
 The Objective-C API has been updated and your code will break!
-Of notable changes a fast interface has been added. 
+Of notable changes a fast interface has been added.
 This interface includes specific methods to get and set values into Tightdb.
 To use these methods import `<Tightdb/TightdbFast.h>`.
 
@@ -913,4 +1010,3 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * None.
-

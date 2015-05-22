@@ -99,7 +99,18 @@
     schema.properties = props;
 
     // verify that we didn't add any properties twice due to inheritance
-    assert(props.count == [NSSet setWithArray:[props valueForKey:@"name"]].count);
+    if (props.count != [NSSet setWithArray:[props valueForKey:@"name"]].count) {
+        NSCountedSet *countedPropertyNames = [NSCountedSet setWithArray:[props valueForKey:@"name"]];
+        NSSet *duplicatePropertyNames = [countedPropertyNames filteredSetUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id object, NSDictionary *) {
+            return [countedPropertyNames countForObject:object] > 1;
+        }]];
+
+        if (duplicatePropertyNames.count == 1) {
+            @throw RLMException([NSString stringWithFormat:@"Property '%@' is declared multiple times in the class hierarchy of '%@'", duplicatePropertyNames.allObjects.firstObject, className]);
+        } else {
+            @throw RLMException([NSString stringWithFormat:@"Object '%@' has properties that are declared multiple times in its class hierarchy: '%@'", className, [duplicatePropertyNames.allObjects componentsJoinedByString:@"', '"]]);
+        }
+    }
 
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
@@ -168,6 +179,12 @@
             Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
             id value = object_getIvar(swiftObjectInstance, ivar);
             NSString *className = [value _rlmArray].objectClassName;
+            NSUInteger existing = [propArray indexOfObjectPassingTest:^BOOL(RLMProperty *obj, __unused NSUInteger idx, __unused BOOL *stop) {
+                return [obj.name isEqualToString:propName];
+            }];
+            if (existing != NSNotFound) {
+                [propArray removeObjectAtIndex:existing];
+            }
             [propArray addObject:[[RLMProperty alloc] initSwiftListPropertyWithName:propName
                                                                                ivar:ivar
                                                                     objectClassName:className]];

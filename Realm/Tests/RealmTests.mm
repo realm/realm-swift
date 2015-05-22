@@ -86,9 +86,9 @@ extern "C" {
 - (void)testRealmAddAndRemoveObjects {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
-    [StringObject createInRealm:realm withObject:@[@"a"]];
-    [StringObject createInRealm:realm withObject:@[@"b"]];
-    [StringObject createInRealm:realm withObject:@[@"c"]];
+    [StringObject createInRealm:realm withValue:@[@"a"]];
+    [StringObject createInRealm:realm withValue:@[@"b"]];
+    [StringObject createInRealm:realm withValue:@[@"c"]];
     XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, 3U, @"Expecting 3 objects");
     [realm commitWriteTransaction];
 
@@ -110,11 +110,11 @@ extern "C" {
 
 - (void)testRemoveNonpersistedObject {
     RLMRealm *realm = [self realmWithTestPath];
-    StringObject *obj = [[StringObject alloc] initWithObject:@[@"a"]];
+    StringObject *obj = [[StringObject alloc] initWithValue:@[@"a"]];
 
     [realm beginWriteTransaction];
     XCTAssertThrows([realm deleteObject:obj]);
-    obj = [StringObject createInRealm:realm withObject:@[@"b"]];
+    obj = [StringObject createInRealm:realm withValue:@[@"b"]];
     [realm commitWriteTransaction];
 
     [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
@@ -134,9 +134,9 @@ extern "C" {
 - (void)testRealmBatchRemoveObjects {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
-    StringObject *strObj = [StringObject createInRealm:realm withObject:@[@"a"]];
-    [StringObject createInRealm:realm withObject:@[@"b"]];
-    [StringObject createInRealm:realm withObject:@[@"c"]];
+    StringObject *strObj = [StringObject createInRealm:realm withValue:@[@"a"]];
+    [StringObject createInRealm:realm withValue:@[@"b"]];
+    [StringObject createInRealm:realm withValue:@[@"c"]];
     [realm commitWriteTransaction];
 
     // delete objects
@@ -154,8 +154,8 @@ extern "C" {
 
     // add objects to linkView
     [realm beginWriteTransaction];
-    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withObject:@[@"name", @[@[@"a"], @[@"b"], @[@"c"]], @[]]];
-    [StringObject createInRealm:realm withObject:@[@"d"]];
+    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[@[@"a"], @[@"b"], @[@"c"]], @[]]];
+    [StringObject createInRealm:realm withValue:@[@"d"]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 4U, @"Expecting 4 objects");
@@ -177,8 +177,8 @@ extern "C" {
 
     // add objects to linkView
     [realm beginWriteTransaction];
-    [obj.array addObject:[StringObject createInRealm:realm withObject:@[@"a"]]];
-    [obj.array addObject:[[StringObject alloc] initWithObject:@[@"b"]]];
+    [obj.array addObject:[StringObject createInRealm:realm withValue:@[@"a"]]];
+    [obj.array addObject:[[StringObject alloc] initWithValue:@[@"b"]]];
     [realm commitWriteTransaction];
 
     // remove objects from realm
@@ -242,7 +242,7 @@ extern "C" {
     XCTAssertEqualObjects(so.stringCol, @"value");
 
     [realm2 beginWriteTransaction];
-    StringObject *so2 = [StringObject createInRealm:realm2 withObject:so];
+    StringObject *so2 = [StringObject createInRealm:realm2 withValue:so];
     [realm2 commitWriteTransaction];
 
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm1].count);
@@ -271,7 +271,7 @@ extern "C" {
     XCTAssertEqual(1U, [CompanyObject allObjectsInRealm:realm1].count);
 
     [realm2 beginWriteTransaction];
-    CompanyObject *co2 = [CompanyObject createInRealm:realm2 withObject:co];
+    CompanyObject *co2 = [CompanyObject createInRealm:realm2 withValue:co];
     [realm2 commitWriteTransaction];
 
     XCTAssertEqual(1U, [EmployeeObject allObjectsInRealm:realm1].count);
@@ -300,7 +300,7 @@ extern "C" {
     XCTAssertEqual(2U, [CircleObject allObjectsInRealm:realm1].count);
 
     [realm2 beginWriteTransaction];
-    CircleObject *c2 = [CircleObject createInRealm:realm2 withObject:c];
+    CircleObject *c2 = [CircleObject createInRealm:realm2 withValue:c];
     [realm2 commitWriteTransaction];
 
     XCTAssertEqualObjects(c2.data, @"1");
@@ -322,7 +322,7 @@ extern "C" {
     [realm1 commitWriteTransaction];
 
     [realm2 beginWriteTransaction];
-    CircleObject *c2 = [CircleObject createInRealm:realm2 withObject:@[@"3", @[@"2", c]]];
+    CircleObject *c2 = [CircleObject createInRealm:realm2 withValue:@[@"3", @[@"2", c]]];
     [realm2 commitWriteTransaction];
 
     XCTAssertEqual(1U, [CircleObject allObjectsInRealm:realm1].count);
@@ -339,11 +339,28 @@ extern "C" {
 - (void)testRealmTransactionBlock {
     RLMRealm *realm = [self realmWithTestPath];
     [realm transactionWithBlock:^{
-        [StringObject createInRealm:realm withObject:@[@"b"]];
+        [StringObject createInRealm:realm withValue:@[@"b"]];
     }];
     RLMResults *objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, 1U, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
+}
+
+- (void)testInWriteTransaction {
+    RLMRealm *realm = [self realmWithTestPath];
+    XCTAssertFalse(realm.inWriteTransaction);
+    [realm beginWriteTransaction];
+    XCTAssertTrue(realm.inWriteTransaction);
+    [realm cancelWriteTransaction];
+    [realm transactionWithBlock:^{
+        XCTAssertTrue(realm.inWriteTransaction);
+        [realm cancelWriteTransaction];
+        XCTAssertFalse(realm.inWriteTransaction);
+    }];
+
+    [realm beginWriteTransaction];
+    [realm invalidate];
+    XCTAssertFalse(realm.inWriteTransaction);
 }
 
 - (void)testAutorefreshAfterBackgroundUpdate {
@@ -354,7 +371,7 @@ extern "C" {
     [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withObject:@[@"string"]];
+        [StringObject createInRealm:realm withValue:@[@"string"]];
         [realm commitWriteTransaction];
     }];
 
@@ -370,7 +387,7 @@ extern "C" {
     [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withObject:@[@"string"]];
+        [StringObject createInRealm:realm withValue:@[@"string"]];
         [realm commitWriteTransaction];
 
         XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
@@ -418,7 +435,7 @@ extern "C" {
     bgDone = [self expectationWithDescription:@"background queue done"];;
 
     [realm beginWriteTransaction];
-    [StringObject createInRealm:realm withObject:@[@"string"]];
+    [StringObject createInRealm:realm withValue:@[@"string"]];
     [realm commitWriteTransaction];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -438,7 +455,7 @@ extern "C" {
     [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withObject:@[@"string"]];
+        [StringObject createInRealm:realm withValue:@[@"string"]];
         [realm commitWriteTransaction];
 
         XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
@@ -480,7 +497,7 @@ extern "C" {
     dispatch_async(queue, ^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withObject:@[@"string"]];
+        [StringObject createInRealm:realm withValue:@[@"string"]];
         [realm commitWriteTransaction];
     });
     dispatch_sync(queue, ^{});
@@ -504,9 +521,9 @@ extern "C" {
     [self waitForNotification:RLMRealmDidChangeNotification realm:inMemoryRealm block:^{
         RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
         [inMemoryRealm beginWriteTransaction];
-        [StringObject createInRealm:inMemoryRealm withObject:@[@"a"]];
-        [StringObject createInRealm:inMemoryRealm withObject:@[@"b"]];
-        [StringObject createInRealm:inMemoryRealm withObject:@[@"c"]];
+        [StringObject createInRealm:inMemoryRealm withValue:@[@"a"]];
+        [StringObject createInRealm:inMemoryRealm withValue:@[@"b"]];
+        [StringObject createInRealm:inMemoryRealm withValue:@[@"c"]];
         XCTAssertEqual(3U, [StringObject allObjectsInRealm:inMemoryRealm].count);
         [inMemoryRealm commitWriteTransaction];
     }];
@@ -555,7 +572,7 @@ extern "C" {
     @autoreleasepool {
         RLMRealm *realm = self.realmWithTestPath;
         [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withObject:@[@"a"]];
+        [StringObject createInRealm:realm withValue:@[@"a"]];
         [realm commitWriteTransaction];
     }
 
@@ -610,7 +627,7 @@ extern "C" {
         RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
 
         [realm beginWriteTransaction];
-        [realm createObject:StringObject.className withObject:@[@"a"]];
+        [realm createObject:StringObject.className withValue:@[@"a"]];
         RLMRealmSetSchemaVersion(realm, 0);
         [realm commitWriteTransaction];
     }
@@ -645,7 +662,7 @@ extern "C" {
         RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
 
         [realm beginWriteTransaction];
-        [realm createObject:StringObject.className withObject:@[]];
+        [realm createObject:StringObject.className withValue:@[]];
         [realm commitWriteTransaction];
     }
 
@@ -660,8 +677,8 @@ extern "C" {
     RLMRealm *testRealm = self.realmWithTestPath;
     [defaultRealm beginWriteTransaction];
     [testRealm beginWriteTransaction];
-    [StringObject createInRealm:defaultRealm withObject:@[@"a"]];
-    [StringObject createInRealm:testRealm withObject:@[@"b"]];
+    [StringObject createInRealm:defaultRealm withValue:@[@"a"]];
+    [StringObject createInRealm:testRealm withValue:@[@"b"]];
     [testRealm commitWriteTransaction];
     [defaultRealm commitWriteTransaction];
 
@@ -678,24 +695,24 @@ extern "C" {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    PrimaryStringObject *obj = [[PrimaryStringObject alloc] initWithObject:@[@"string", @1]];
+    PrimaryStringObject *obj = [[PrimaryStringObject alloc] initWithValue:@[@"string", @1]];
     [realm addOrUpdateObject:obj];
     RLMResults *objects = [PrimaryStringObject allObjects];
     XCTAssertEqual([objects count], 1U, @"Should have 1 object");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
 
-    PrimaryStringObject *obj2 = [[PrimaryStringObject alloc] initWithObject:@[@"string2", @2]];
+    PrimaryStringObject *obj2 = [[PrimaryStringObject alloc] initWithValue:@[@"string2", @2]];
     [realm addOrUpdateObject:obj2];
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
 
     // upsert with new secondary property
-    PrimaryStringObject *obj3 = [[PrimaryStringObject alloc] initWithObject:@[@"string", @3]];
+    PrimaryStringObject *obj3 = [[PrimaryStringObject alloc] initWithValue:@[@"string", @3]];
     [realm addOrUpdateObject:obj3];
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 3, @"Value should be 3");
 
     // upsert on non-primary key object should throw
-    XCTAssertThrows([realm addOrUpdateObject:[[StringObject alloc] initWithObject:@[@"string"]]]);
+    XCTAssertThrows([realm addOrUpdateObject:[[StringObject alloc] initWithValue:@[@"string"]]]);
 
     [realm commitWriteTransaction];
 }
@@ -704,13 +721,13 @@ extern "C" {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    PrimaryStringObject *obj = [[PrimaryStringObject alloc] initWithObject:@[@"string1", @1]];
+    PrimaryStringObject *obj = [[PrimaryStringObject alloc] initWithValue:@[@"string1", @1]];
     [realm addObject:obj];
 
-    PrimaryStringObject *obj2 = [[PrimaryStringObject alloc] initWithObject:@[@"string2", @2]];
+    PrimaryStringObject *obj2 = [[PrimaryStringObject alloc] initWithValue:@[@"string2", @2]];
     [realm addObject:obj2];
 
-    PrimaryStringObject *obj3 = [[PrimaryStringObject alloc] initWithObject:@[@"string3", @3]];
+    PrimaryStringObject *obj3 = [[PrimaryStringObject alloc] initWithValue:@[@"string3", @3]];
     [realm addObject:obj3];
 
     RLMResults *objects = [PrimaryStringObject allObjects];
@@ -720,8 +737,8 @@ extern "C" {
     XCTAssertEqual([(PrimaryStringObject *)objects[2] intCol], 3, @"Value should be 3");
 
     // upsert with array of 2 objects. One is to update the existing value, another is added
-    NSArray *array = @[[[PrimaryStringObject alloc] initWithObject:@[@"string2", @4]],
-                       [[PrimaryStringObject alloc] initWithObject:@[@"string4", @5]]];
+    NSArray *array = @[[[PrimaryStringObject alloc] initWithValue:@[@"string2", @4]],
+                       [[PrimaryStringObject alloc] initWithValue:@[@"string4", @5]]];
     [realm addOrUpdateObjectsFromArray:array];
     XCTAssertEqual([objects count], 4U, @"Should have 4 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
@@ -736,7 +753,7 @@ extern "C" {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    OwnerObject *obj = [OwnerObject createInDefaultRealmWithObject:@[@"deeter", @[@"barney", @2]]];
+    OwnerObject *obj = [OwnerObject createInDefaultRealmWithValue:@[@"deeter", @[@"barney", @2]]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(1U, OwnerObject.allObjects.count);
@@ -764,7 +781,7 @@ extern "C" {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    CompanyObject *obj = [CompanyObject createInDefaultRealmWithObject:@[@"deeter", @[@[@"barney", @2, @YES]]]];
+    CompanyObject *obj = [CompanyObject createInDefaultRealmWithValue:@[@"deeter", @[@[@"barney", @2, @YES]]]];
     NSArray *objects = @[obj];
     [realm commitWriteTransaction];
 
@@ -790,7 +807,7 @@ extern "C" {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    OwnerObject *obj = [OwnerObject createInDefaultRealmWithObject:@[@"deeter", @[@"barney", @2]]];
+    OwnerObject *obj = [OwnerObject createInDefaultRealmWithValue:@[@"deeter", @[@"barney", @2]]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(1U, OwnerObject.allObjects.count);
@@ -813,7 +830,7 @@ extern "C" {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    IntObject *createdObject = [IntObject createInRealm:realm withObject:@[@0]];
+    IntObject *createdObject = [IntObject createInRealm:realm withValue:@[@0]];
     [realm cancelWriteTransaction];
 
     XCTAssertTrue(createdObject.isInvalidated);
@@ -825,7 +842,7 @@ extern "C" {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    IntObject *objectToDelete = [IntObject createInRealm:realm withObject:@[@0]];
+    IntObject *objectToDelete = [IntObject createInRealm:realm withValue:@[@0]];
     [realm commitWriteTransaction];
 
     [realm beginWriteTransaction];
@@ -841,7 +858,7 @@ extern "C" {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    IntObject *objectToModify = [IntObject createInRealm:realm withObject:@[@0]];
+    IntObject *objectToModify = [IntObject createInRealm:realm withValue:@[@0]];
     [realm commitWriteTransaction];
 
     [realm beginWriteTransaction];
@@ -856,8 +873,8 @@ extern "C" {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    CircleObject *obj1 = [CircleObject createInRealm:realm withObject:@[@"1", NSNull.null]];
-    CircleObject *obj2 = [CircleObject createInRealm:realm withObject:@[@"2", NSNull.null]];
+    CircleObject *obj1 = [CircleObject createInRealm:realm withValue:@[@"1", NSNull.null]];
+    CircleObject *obj2 = [CircleObject createInRealm:realm withValue:@[@"2", NSNull.null]];
     [realm commitWriteTransaction];
 
     // Link to existing persisted
@@ -890,7 +907,7 @@ extern "C" {
 
     // Modify link
     [realm beginWriteTransaction];
-    CircleObject *obj4 = [CircleObject createInRealm:realm withObject:@[@"4", NSNull.null]];
+    CircleObject *obj4 = [CircleObject createInRealm:realm withValue:@[@"4", NSNull.null]];
     [realm commitWriteTransaction];
 
     [realm beginWriteTransaction];
@@ -905,9 +922,9 @@ extern "C" {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    IntObject *obj1 = [IntObject createInRealm:realm withObject:@[@0]];
-    IntObject *obj2 = [IntObject createInRealm:realm withObject:@[@1]];
-    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withObject:@[@"", @[], @[obj1]]];
+    IntObject *obj1 = [IntObject createInRealm:realm withValue:@[@0]];
+    IntObject *obj2 = [IntObject createInRealm:realm withValue:@[@1]];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[obj1]]];
     [realm commitWriteTransaction];
 
     // Add existing persisted
@@ -945,7 +962,7 @@ extern "C" {
 {
     RLMRealm *realm = [self realmWithTestPath];
     [realm transactionWithBlock:^{
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
         [realm cancelWriteTransaction];
     }];
 
@@ -957,7 +974,7 @@ extern "C" {
     @autoreleasepool {
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
     }
 
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:[self realmWithTestPath]].count);
@@ -983,7 +1000,7 @@ extern "C" {
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
     }];
 
     NSError *writeError;
@@ -997,7 +1014,7 @@ extern "C" {
 {
     RLMRealm *realm = [self realmWithTestPath];
     [realm transactionWithBlock:^{
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
     }];
 
     NSError *writeError;
@@ -1009,7 +1026,7 @@ extern "C" {
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
-        [IntObject createInRealm:realm withObject:@[@0]];
+        [IntObject createInRealm:realm withValue:@[@0]];
 
         NSError *writeError;
         XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
@@ -1023,7 +1040,7 @@ extern "C" {
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
-        [IntObject createInRealm:realm withObject:@[@1]];
+        [IntObject createInRealm:realm withValue:@[@1]];
     }];
 
     [realm invalidate];
@@ -1036,7 +1053,7 @@ extern "C" {
     RLMRealm *realm = [RLMRealm defaultRealm];
     __block IntObject *obj;
     [realm transactionWithBlock:^{
-        obj = [IntObject createInRealm:realm withObject:@[@0]];
+        obj = [IntObject createInRealm:realm withValue:@[@0]];
     }];
 
     [realm invalidate];
@@ -1048,7 +1065,7 @@ extern "C" {
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
-        [IntObject createInRealm:realm withObject:@[@1]];
+        [IntObject createInRealm:realm withValue:@[@1]];
     }];
 
     RLMResults *results = [IntObject objectsInRealm:realm where:@"intCol = 1"];
@@ -1064,7 +1081,7 @@ extern "C" {
     RLMRealm *realm = [RLMRealm defaultRealm];
     __block ArrayPropertyObject *arrayObject;
     [realm transactionWithBlock:^{
-        arrayObject = [ArrayPropertyObject createInRealm:realm withObject:@[@"", @[], @[@[@1]]]];
+        arrayObject = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[@[@1]]]];
     }];
 
     RLMArray *array = arrayObject.intArray;
@@ -1095,7 +1112,7 @@ extern "C" {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     @autoreleasepool {
-        [IntObject createInRealm:realm withObject:@[@1]];
+        [IntObject createInRealm:realm withValue:@[@1]];
     }
     [realm invalidate];
 
@@ -1110,7 +1127,7 @@ extern "C" {
 
     dispatch_group_async(group, queue, ^{
         [RLMRealm.defaultRealm transactionWithBlock:^{
-            [IntObject createInDefaultRealmWithObject:@[@1]];
+            [IntObject createInDefaultRealmWithValue:@[@1]];
         }];
     });
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
@@ -1119,7 +1136,7 @@ extern "C" {
 
     dispatch_group_async(group, queue, ^{
         [RLMRealm.defaultRealm transactionWithBlock:^{
-            [IntObject createInDefaultRealmWithObject:@[@1]];
+            [IntObject createInDefaultRealmWithValue:@[@1]];
         }];
     });
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
@@ -1209,8 +1226,8 @@ extern "C" {
 {
     RLMRealm *realm = self.realmWithTestPath;
     [realm transactionWithBlock:^{
-        [StringObject createInRealm:realm withObject:@[@"A"]];
-        [StringObject createInRealm:realm withObject:@[@"A"]];
+        [StringObject createInRealm:realm withValue:@[@"A"]];
+        [StringObject createInRealm:realm withValue:@[@"A"]];
     }];
     auto fileSize = ^(NSString *path) {
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
@@ -1221,6 +1238,22 @@ extern "C" {
     XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 2U);
     unsigned long long fileSizeAfter = fileSize(realm.path);
     XCTAssertGreaterThan(fileSizeBefore, fileSizeAfter);
+}
+
+- (void)testCanCreate100RealmsWithoutBreakingGCD
+{
+    NSMutableArray *realms = [NSMutableArray array];
+    for (int i = 0; i < 100; ++i) {
+        NSString *realmFileName = [NSString stringWithFormat:@"test.%d.realm", i];
+        RLMRealm *realm = [RLMRealm realmWithPath:RLMRealmPathForFile(realmFileName)];
+        [realms addObject:realm];
+    }
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Block dispatched to concurrent queue should be executed"];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [expectation fulfill];
+    });
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 - (void)runBlock:(void (^)())block {

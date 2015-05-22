@@ -249,11 +249,11 @@ class ResultsTests: TestCase {
 
     func testAverage() {
         let results = getAggregateableResults()
-        XCTAssertEqual(Int(2), results.average("intCol") as Int)
-        XCTAssertEqualWithAccuracy(Float(1.8333), results.average("floatCol") as Float, 0.001)
-        XCTAssertEqualWithAccuracy(Double(1.85), results.average("doubleCol") as Double, 0.001)
+        XCTAssertEqual(Int(2), results.average("intCol") as Int!)
+        XCTAssertEqualWithAccuracy(Float(1.8333), results.average("floatCol") as Float!, 0.001)
+        XCTAssertEqualWithAccuracy(Double(1.85), results.average("doubleCol") as Double!, 0.001)
 
-        assertThrows(results.average("noSuchCol") as Float)
+        assertThrows(results.average("noSuchCol")! as Float)
     }
 
     func testFastEnumeration() {
@@ -263,6 +263,13 @@ class ResultsTests: TestCase {
         }
 
         XCTAssertEqual(str, "12")
+    }
+
+    func testArrayAggregateWithSwiftObjectDoesntThrow() {
+        let results = getAggregateableResults()
+
+        // Should not throw a type error.
+        results.filter("ANY stringListCol == %@", SwiftStringObject())
     }
 }
 

@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+import Foundation
 import Realm
 import Realm.Private
 
@@ -60,6 +61,9 @@ public final class List<T: Object>: ListBase {
         }
         return Realm(_rlmArray.realm)
     }
+
+    /// Indicates if the list can no longer be accessed.
+    public var invalidated: Bool { return _rlmArray.invalidated }
 
     // MARK: Initializers
 
@@ -310,7 +314,9 @@ extension List: ExtensibleCollectionType {
     public func generate() -> GeneratorOf<T> {
         let base = NSFastGenerator(_rlmArray)
         return GeneratorOf<T>() {
-            return base.next() as! T?
+            let accessor = base.next() as! T?
+            RLMInitializeSwiftListAccessor(accessor)
+            return accessor
         }
     }
 

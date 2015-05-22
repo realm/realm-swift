@@ -17,21 +17,22 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import UIKit
-import Realm
+import RealmSwift
 
-class Dog: RLMObject {
+
+class Dog: Object {
     dynamic var name = ""
     dynamic var age = 0
     var owners: [Person] {
         // Realm doesn't persist this property because it only has a getter defined
         // Define "owners" as the inverse relationship to Person.dogs
-        return linkingObjectsOfClass(Person.className(), forProperty: "dogs") as! [Person]
+        return linkingObjects(Person.self, forProperty: "dogs")
     }
 }
 
-class Person: RLMObject {
+class Person: Object {
     dynamic var name = ""
-    dynamic var dogs = RLMArray(objectClassName: Dog.className())
+    let dogs = List<Dog>()
 }
 
 @UIApplicationMain
@@ -44,18 +45,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
 
-        NSFileManager.defaultManager().removeItemAtPath(RLMRealm.defaultRealmPath(), error: nil)
+        NSFileManager.defaultManager().removeItemAtPath(Realm.defaultPath, error: nil)
 
-        let realm = RLMRealm.defaultRealm()
-        realm.transactionWithBlock {
-            Person.createInRealm(realm, withObject: ["John", [["Fido", 1]]])
-            Person.createInRealm(realm, withObject: ["Mary", [["Rex", 2]]])
+        let realm = Realm()
+        realm.write {
+            realm.create(Person.self, value: ["John", [["Fido", 1]]])
+            realm.create(Person.self, value: ["Mary", [["Rex", 2]]])
         }
 
         // Log all dogs and their owners using the "owners" inverse relationship
-        let allDogs = Dog.allObjects()
+        let allDogs = realm.objects(Dog)
         for dog in allDogs {
-            let dog = dog as! Dog
             let ownerNames = dog.owners.map { $0.name }
             println("\(dog.name) has \(ownerNames.count) owners (\(ownerNames))")
         }

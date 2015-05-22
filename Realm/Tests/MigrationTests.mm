@@ -23,8 +23,9 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
-#import "RLMRealm_Private.h"
+#import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMUtil.hpp"
 #import "RLMObjectStore.h"
 
 #import <realm/table.hpp>
@@ -73,8 +74,8 @@
 
 - (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {
     // modify object schema to use RLMObject class (or else bad accessors will get created)
-    objectSchema.objectClass = RLMObject.class;
-    objectSchema.accessorClass = RLMObject.class;
+    objectSchema.objectClass = RLMDynamicObject.class;
+    objectSchema.accessorClass = RLMDynamicObject.class;
 
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
@@ -143,6 +144,39 @@
     XCTAssertTrue(migrationComplete);
 }
 
+- (void)testRemovingSubclass {
+    @autoreleasepool {
+        RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"DeletedClass" objectClass:RLMObject.class properties:@[]];
+        RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+
+        [realm transactionWithBlock:^{
+            [realm createObject:@"DeletedClass" withValue:@[]];
+        }];
+    }
+
+    @autoreleasepool {
+        // apply migration
+        [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+            XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
+
+            XCTAssertTrue([migration deleteDataForClassName:@"DeletedClass"]);
+            XCTAssertFalse([migration deleteDataForClassName:@"NoSuchClass"]);
+            XCTAssertFalse([migration deleteDataForClassName:nil]);
+
+            [migration createObject:StringObject.className withValue:@[@"migration"]];
+            XCTAssertTrue([migration deleteDataForClassName:StringObject.className]);
+        }];
+        [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    }
+
+    @autoreleasepool {
+        // verify migration
+        RLMRealm *realm = [self realmWithTestPath];
+        XCTAssertFalse(realm.group->has_table(RLMStringDataWithNSString(RLMTableNameForClass(@"DeletedClass"))), @"The deleted class should not have a table.");
+        XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+    }
+}
+
 - (void)testAddingPropertyAtEnd {
     // create schema to migrate from with single string column
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
@@ -152,8 +186,8 @@
         // create realm with old schema and populate
         RLMRealm *realm = [self realmWithSingleObject:objectSchema];
         [realm beginWriteTransaction];
-        [realm createObject:MigrationObject.className withObject:@[@1]];
-        [realm createObject:MigrationObject.className withObject:@[@2]];
+        [realm createObject:MigrationObject.className withValue:@[@1]];
+        [realm createObject:MigrationObject.className withValue:@[@2]];
         [realm commitWriteTransaction];
     }
 
@@ -198,7 +232,7 @@
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    [realm createObject:ThreeFieldMigrationObject.className withObject:@[@1, @2]];
+    [realm createObject:ThreeFieldMigrationObject.className withValue:@[@1, @2]];
     [realm commitWriteTransaction];
 
     [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(RLMMigration *migration, NSUInteger) {
@@ -229,8 +263,8 @@
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    [realm createObject:MigrationObject.className withObject:@[@1, @"1", @YES]];
-    [realm createObject:MigrationObject.className withObject:@[@2, @"2", @NO]];
+    [realm createObject:MigrationObject.className withValue:@[@1, @"1", @YES]];
+    [realm createObject:MigrationObject.className withValue:@[@2, @"2", @NO]];
     [realm commitWriteTransaction];
 
     // apply migration
@@ -262,8 +296,8 @@
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    [realm createObject:MigrationObject.className withObject:@[@1, @"1"]];
-    [realm createObject:MigrationObject.className withObject:@[@1, @"2"]];
+    [realm createObject:MigrationObject.className withValue:@[@1, @"1"]];
+    [realm createObject:MigrationObject.className withValue:@[@1, @"2"]];
     [realm commitWriteTransaction];
 
     // object migration object
@@ -301,8 +335,8 @@
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    [realm createObject:MigrationObject.className withObject:@[@1, @1]];
-    [realm createObject:MigrationObject.className withObject:@[@2, @2]];
+    [realm createObject:MigrationObject.className withValue:@[@1, @1]];
+    [realm createObject:MigrationObject.className withValue:@[@2, @2]];
     [realm commitWriteTransaction];
 
     // apply migration
@@ -333,8 +367,8 @@
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
-    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+    [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
+    [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
     [realm commitWriteTransaction];
 
     // apply migration
@@ -361,8 +395,8 @@
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
-    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@2]];
+    [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
+    [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@2]];
     [realm commitWriteTransaction];
 
     objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
@@ -392,8 +426,8 @@
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    [realm createObject:MigrationStringPrimaryKeyObject.className withObject:@[@"1"]];
-    [realm createObject:MigrationStringPrimaryKeyObject.className withObject:@[@"2"]];
+    [realm createObject:MigrationStringPrimaryKeyObject.className withValue:@[@"1"]];
+    [realm createObject:MigrationStringPrimaryKeyObject.className withValue:@[@"2"]];
     [realm commitWriteTransaction];
 
     // apply migration
@@ -417,8 +451,8 @@
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    [realm createObject:MigrationStringPrimaryKeyObject.className withObject:@[@"1"]];
-    [realm createObject:MigrationStringPrimaryKeyObject.className withObject:@[@"2"]];
+    [realm createObject:MigrationStringPrimaryKeyObject.className withValue:@[@"1"]];
+    [realm createObject:MigrationStringPrimaryKeyObject.className withValue:@[@"2"]];
     [realm commitWriteTransaction];
 
     // apply migration
@@ -444,8 +478,8 @@
     @autoreleasepool {
         RLMRealm *realm = [self realmWithSingleObject:objectSchema];
         [realm beginWriteTransaction];
-        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
-        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@2]];
+        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
+        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@2]];
         [realm commitWriteTransaction];
 
         XCTAssertFalse(realm.schema[MigrationPrimaryKeyObject.className].table->has_search_index(0));
@@ -475,8 +509,8 @@
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
-    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+    [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
+    [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
     [realm commitWriteTransaction];
 
     // apply bad migration
@@ -518,8 +552,8 @@
     @autoreleasepool {
         RLMRealm *realm = [self realmWithSingleObject:objectSchema];
         [realm beginWriteTransaction];
-        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
-        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
+        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
         [realm commitWriteTransaction];
     }
 
@@ -541,7 +575,7 @@
 
     [RLMRealm setDefaultRealmSchemaVersion:1
                         withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
-        [migration createObject:StringObject.className withObject:@[@"string"]];
+        [migration createObject:StringObject.className withValue:@[@"string"]];
     }];
 
     // implicit migration
@@ -568,7 +602,7 @@
         // create realm with old schema and populate
         RLMRealm *realm = [self realmWithSingleObject:objectSchema];
         [realm beginWriteTransaction];
-        [realm createObject:MigrationObject.className withObject:@[@1, @1]];
+        [realm createObject:MigrationObject.className withValue:@[@1, @1]];
         [realm commitWriteTransaction];
     }
 
@@ -605,7 +639,7 @@
         // create realm with old schema and populate
         RLMRealm *realm = [self realmWithSingleObject:[RLMObjectSchema schemaForObjectClass:MigrationObject.class]];
         [realm beginWriteTransaction];
-        [realm createObject:MigrationObject.className withObject:@[@1, @"1"]];
+        [realm createObject:MigrationObject.className withValue:@[@1, @"1"]];
         [realm commitWriteTransaction];
     }
     XCTAssertNoThrow([RLMRealm realmWithPath:RLMTestRealmPath()]);
@@ -615,7 +649,7 @@
     @autoreleasepool {
         // create object in default realm
         [[RLMRealm defaultRealm] transactionWithBlock:^{
-            [CircleObject createInDefaultRealmWithObject:@[@"data", NSNull.null]];
+            [CircleObject createInDefaultRealmWithValue:@[@"data", NSNull.null]];
         }];
 
         // create realm with the properties reversed
@@ -625,7 +659,7 @@
 
         RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
         [realm beginWriteTransaction];
-        [realm createObject:CircleObject.className withObject:@[NSNull.null, @"data"]];
+        [realm createObject:CircleObject.className withValue:@[NSNull.null, @"data"]];
         [realm commitWriteTransaction];
     }
 
@@ -672,7 +706,7 @@
     @autoreleasepool {
         RLMRealm *realm = [self realmWithSingleObject:[RLMObjectSchema schemaForObjectClass:IntObject.class]];
         [realm beginWriteTransaction];
-        [realm createObject:IntObject.className withObject:@[@1]];
+        [realm createObject:IntObject.className withValue:@[@1]];
         [realm commitWriteTransaction];
     }
 
@@ -751,7 +785,8 @@
     // initialize realm
     @autoreleasepool {
         [[RLMRealm defaultRealm] transactionWithBlock:^{
-            [StringObject createInDefaultRealmWithObject:@[@"string"]];
+            [StringObject createInDefaultRealmWithValue:@[@"string"]];
+            [ArrayPropertyObject createInDefaultRealmWithValue:@[@"array", @[@[@"string"]], @[@[@1]]]];
         }];
     }
 
@@ -763,6 +798,13 @@
                                 XCTAssertEqualObjects([oldObject valueForKey:@"realm"], oldObject.realm);
                                 XCTAssertThrows([oldObject valueForKey:@"noSuchKey"]);
                                 XCTAssertThrows([newObject setValue:@1 forKey:@"noSuchKey"]);
+                            }];
+
+                            [migration enumerateObjects:ArrayPropertyObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+                                XCTAssertEqual(RLMDynamicObject.class, newObject.class);
+                                XCTAssertEqual(RLMDynamicObject.class, oldObject.class);
+                                XCTAssertEqual(RLMDynamicObject.class, [[oldObject[@"array"] firstObject] class]);
+                                XCTAssertEqual(RLMDynamicObject.class, [[newObject[@"array"] firstObject] class]);
                             }];
                         }];
 

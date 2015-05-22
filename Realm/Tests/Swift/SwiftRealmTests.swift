@@ -44,9 +44,9 @@ class SwiftRealmTests: SwiftTestCase {
     func testRealmAddAndRemoveObjects() {
         var realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        SwiftStringObject.createInRealm(realm, withObject: ["a"])
-        SwiftStringObject.createInRealm(realm, withObject: ["b"])
-        SwiftStringObject.createInRealm(realm, withObject: ["c"])
+        SwiftStringObject.createInRealm(realm, withValue: ["a"])
+        SwiftStringObject.createInRealm(realm, withValue: ["b"])
+        SwiftStringObject.createInRealm(realm, withValue: ["c"])
         XCTAssertEqual(SwiftStringObject.allObjectsInRealm(realm).count, UInt(3), "Expecting 3 objects")
         realm.commitWriteTransaction()
 
@@ -79,7 +79,7 @@ class SwiftRealmTests: SwiftTestCase {
         dispatch_async(dispatch_queue_create("background", nil)) {
             let realm = self.realmWithTestPath()
             realm.beginWriteTransaction()
-            SwiftStringObject.createInRealm(realm, withObject: ["string"])
+            SwiftStringObject.createInRealm(realm, withValue: ["string"])
             realm.commitWriteTransaction()
         }
         waitForExpectationsWithTimeout(2.0, handler: nil)
@@ -155,7 +155,7 @@ class SwiftRealmTests: SwiftTestCase {
 
         dispatch_async(dispatch_queue_create("background", nil)) {
             let realm = self.realmWithTestPath()
-            let obj = SwiftStringObject(object: ["string"])
+            let obj = SwiftStringObject(value: ["string"])
             realm.beginWriteTransaction()
             realm.addObject(obj)
             realm.commitWriteTransaction()
@@ -179,9 +179,9 @@ class SwiftRealmTests: SwiftTestCase {
     func testRealmAddAndRemoveObjects_objc() {
         var realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        StringObject.createInRealm(realm, withObject: ["a"])
-        StringObject.createInRealm(realm, withObject: ["b"])
-        StringObject.createInRealm(realm, withObject: ["c"])
+        StringObject.createInRealm(realm, withValue: ["a"])
+        StringObject.createInRealm(realm, withValue: ["b"])
+        StringObject.createInRealm(realm, withValue: ["c"])
         XCTAssertEqual(StringObject.allObjectsInRealm(realm).count, UInt(3), "Expecting 3 objects")
         realm.commitWriteTransaction()
 
@@ -216,7 +216,7 @@ class SwiftRealmTests: SwiftTestCase {
         dispatch_async(dispatch_queue_create("background", nil)) {
             let realm = self.realmWithTestPath()
             realm.beginWriteTransaction()
-            StringObject.createInRealm(realm, withObject: ["string"])
+            StringObject.createInRealm(realm, withValue: ["string"])
             realm.commitWriteTransaction()
         }
         waitForExpectationsWithTimeout(2.0, handler: nil)
@@ -240,7 +240,7 @@ class SwiftRealmTests: SwiftTestCase {
 
         dispatch_async(dispatch_queue_create("background", nil)) {
             let realm = self.realmWithTestPath()
-            let obj = StringObject(object: ["string"])
+            let obj = StringObject(value: ["string"])
             realm.transactionWithBlock() {
                 realm.addObject(obj)
             }

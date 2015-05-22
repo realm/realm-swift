@@ -44,7 +44,7 @@
     // Add objects
     [realm beginWriteTransaction];
     for (NSArray *rowArray in rowsArray) {
-        [EmployeeObject createInRealm:realm withObject:rowArray];
+        [EmployeeObject createInRealm:realm withValue:rowArray];
     }
     [realm commitWriteTransaction];
 

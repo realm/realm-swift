@@ -29,6 +29,10 @@ class ListTests: TestCase {
         fatalError("abstract")
     }
 
+    func createArrayWithLinks() ->  SwiftListOfSwiftObject {
+        fatalError("abstract")
+    }
+
     override func setUp() {
         super.setUp()
 
@@ -69,6 +73,15 @@ class ListTests: TestCase {
 
     func testDescription() {
         XCTAssertFalse(array.description.isEmpty)
+    }
+
+    func testInvalidated() {
+        XCTAssertFalse(array.invalidated)
+
+        if let realm = arrayObject.realm {
+            realm.delete(arrayObject)
+            XCTAssertTrue(array.invalidated)
+        }
     }
 
     func testCount() {
@@ -392,11 +405,35 @@ class ListTests: TestCase {
             XCTAssertTrue(count(obj.description) > 0, "Object should have description")
         }
     }
+
+    func testEnumeratingListWithListProperties() {
+        let arrayObject = createArrayWithLinks()
+
+        arrayObject.realm?.beginWrite()
+        for _ in 0..<10 {
+            arrayObject.array.append(SwiftObject())
+        }
+        arrayObject.realm?.commitWrite()
+
+        XCTAssertEqual(10, arrayObject.array.count)
+
+        for object in arrayObject.array {
+            XCTAssertEqual(123, object.intCol)
+            XCTAssertEqual(false, object.objectCol.boolCol)
+            XCTAssertEqual(0, object.arrayCol.count)
+        }
+    }
 }
 
 class ListStandaloneTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let array = SwiftArrayPropertyObject()
+        XCTAssertNil(array.realm)
+        return array
+    }
+
+    override func createArrayWithLinks() -> SwiftListOfSwiftObject {
+        let array = SwiftListOfSwiftObject()
         XCTAssertNil(array.realm)
         return array
     }
@@ -450,6 +487,15 @@ class ListNewlyAddedTests: ListTests {
         XCTAssertNotNil(array.realm)
         return array
     }
+
+    override func createArrayWithLinks() -> SwiftListOfSwiftObject {
+        let array = SwiftListOfSwiftObject()
+        let realm = Realm()
+        realm.write { realm.add(array) }
+
+        XCTAssertNotNil(array.realm)
+        return array
+    }
 }
 
 class ListNewlyCreatedTests: ListTests {
@@ -457,6 +503,16 @@ class ListNewlyCreatedTests: ListTests {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
         let array = realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
+        realm.commitWrite()
+
+        XCTAssertNotNil(array.realm)
+        return array
+    }
+
+    override func createArrayWithLinks() -> SwiftListOfSwiftObject {
+        let realm = Realm()
+        realm.beginWrite()
+        let array = realm.create(SwiftListOfSwiftObject)
         realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
@@ -471,6 +527,17 @@ class ListRetrievedTests: ListTests {
         realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
         realm.commitWrite()
         let array = realm.objects(SwiftArrayPropertyObject).first!
+
+        XCTAssertNotNil(array.realm)
+        return array
+    }
+
+    override func createArrayWithLinks() -> SwiftListOfSwiftObject {
+        let realm = Realm()
+        realm.beginWrite()
+        realm.create(SwiftListOfSwiftObject)
+        realm.commitWrite()
+        let array = realm.objects(SwiftListOfSwiftObject).first!
 
         XCTAssertNotNil(array.realm)
         return array
