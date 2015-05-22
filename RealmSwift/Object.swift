@@ -63,7 +63,7 @@ public class Object: RLMObjectBase, Equatable, Printable {
 
     :see: Realm().add(_:)
     */
-    public override init() {
+    public required override init() {
         super.init()
     }
 

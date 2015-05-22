@@ -116,6 +116,15 @@ class ObjectCreationTests: TestCase {
         verifySwiftObjectWithDictionaryLiteral(objectWithKVCObject, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
     }
 
+    func testGenericInit() {
+        func createObject<T: Object>() -> T {
+            return T()
+        }
+        let obj1: SwiftBoolObject = createObject()
+        let obj2 = SwiftBoolObject()
+        XCTAssertEqual(obj1.boolCol, obj2.boolCol, "object created via generic initializer should equal object created by calling initializer directly")
+    }
+
     // MARK: Creation tests
 
     func testCreateWithDefaults() {

@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Swift: Made `Object.init()` a required initializer.
 
 ### Bugfixes
 
