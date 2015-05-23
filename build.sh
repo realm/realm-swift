@@ -166,10 +166,11 @@ test_ios_devices() {
         exit 1
     fi
     cmd="$1"
-    configuration="$2"
+    scheme="$2"
+    configuration="$3"
     failed=0
     for device in "${serial_numbers[@]}"; do
-        $cmd "-scheme 'iOS Device Tests' -configuration $configuration -destination 'id=$device' test" || failed=1
+        $cmd "-scheme '$2' -configuration $configuration -destination 'id=$device' test" || failed=1
     done
     return $failed
 }
@@ -347,8 +348,8 @@ case "$COMMAND" in
 
     "test-ios-devices")
         failed=0
-        test_ios_devices xcrealm "$CONFIGURATION" || failed=1
-        test_ios_devices xcrealmswift "$CONFIGURATION" || failed=1
+        test_ios_devices xcrealm "iOS Device Tests" "$CONFIGURATION" || failed=1
+        test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION" || failed=1
         exit $failed
         ;;
 

@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-#if !DEBUG
+#if !DEBUG && os(iOS)
 
 private func createStringObjects(factor: Int) -> Realm {
     let realm = Realm(inMemoryIdentifier: factor.description)
@@ -36,7 +36,16 @@ private var smallRealm: Realm!
 private var mediumRealm: Realm!
 private var largeRealm: Realm!
 
+private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
+
 class SwiftPerformanceTests: TestCase {
+    override class func defaultTestSuite() -> XCTestSuite? {
+        if (isRunningOnDevice) {
+            return super.defaultTestSuite()
+        }
+        return nil
+    }
+
     override class func setUp() {
         super.setUp()
         autoreleasepool {
