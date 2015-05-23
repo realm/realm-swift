@@ -1,7 +1,0 @@
-SKIP_INSTALL = YES;
-FRAMEWORK_SEARCH_PATHS = $(inherited) build/osx;
-INFOPLIST_FILE = RealmSwift/Tests/RealmSwiftTests-Info.plist;
-LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks;
-PRODUCT_NAME = $(TARGET_NAME);
-SWIFT_OBJC_BRIDGING_HEADER = RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h
-SWIFT_OPTIMIZATION_LEVEL = -Onone;

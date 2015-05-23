@@ -29,3 +29,6 @@ MACOSX_DEPLOYMENT_TARGET = 10.9;
 IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 CODE_SIGN_IDENTITY[sdk=iphone*] = iPhone Developer;
 TARGETED_DEVICE_FAMILY = 1,2;
+
+REALM_FRAMEWORK_PATH[sdk=iphone*] = build/ios-dynamic;
+REALM_FRAMEWORK_PATH[sdk=macosx*] = build/osx;
