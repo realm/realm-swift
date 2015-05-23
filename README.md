@@ -6,18 +6,25 @@ This repository holds the source code for the iOS & OSX versions of Realm, for b
 ## Features
 
 * **Mobile-first:** Realm is the first database built from the ground up to run directly inside phones, tablets and wearables.
-* **Simple:** Data is directly [exposed as objects](http://realm.io/docs/cocoa/#models) and [queryable by code](http://realm.io/docs/cocoa/#queries), removing the need for ORM's riddled with performance & maintenance issues. Plus, we've worked hard to [keep our API down to just 4 common classes](http://realm.io/docs/cocoa/api/) (Object, Array, Results and Realms) and 1 utility class (Migrations): most of our users pick it up intuitively, getting simple apps up & running in minutes.
+* **Simple:** Data is directly [exposed as objects](http://realm.io/docs/objc/latest/#models) and [queryable by code](http://realm.io/docs/objc/latest/#queries), removing the need for ORM's riddled with performance & maintenance issues. Plus, we've worked hard to [keep our API down to just 4 common classes](http://realm.io/docs/objc/latest/api/) (Object, Array, Results and Realms) and 1 utility class (Migrations): most of our users pick it up intuitively, getting simple apps up & running in minutes.
 * **Modern:** Realm supports relationships, generics, vectorization and even Swift.
 * **Fast:** Realm is faster than even raw SQLite on common operations, while maintaining an extremely rich feature set.
 
 ## Getting Started
 
-Please see the [detailed instructions in our docs](http://realm.io/docs/cocoa/#installation) to add Realm to your Xcode project.
+Please see the detailed instructions in our docs to add [Realm Objective-C](http://realm.io/docs/objc/#installation) _or_ [Realm Swift](http://realm.io/docs/swift/#installation) to your Xcode project.
 
 ## Documentation
 
-Documentation for Realm can be found at [realm.io/docs/cocoa](http://realm.io/docs/cocoa).  
-The API reference is located at [realm.io/docs/cocoa/api](http://realm.io/docs/cocoa/api).
+### Realm Objective-C
+
+The documentation can be found at [realm.io/docs/objc/latest](http://realm.io/docs/objc/latest).  
+The API reference is located at [realm.io/docs/objc/latest/api](http://realm.io/docs/objc/latest/api).
+
+### Realm Swift
+
+The documentation can be found at [realm.io/docs/swift/latest](http://realm.io/docs/swift/latest).  
+The API reference is located at [realm.io/docs/swift/latest/api](http://realm.io/docs/swift/latest/api).
 
 ## Getting Help
 
@@ -49,7 +56,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more details!
 ## License
 
 Realm Objective-C & Realm Swift are published under the Apache 2.0 license.  
-The underlying core is available under the [Realm Core Binary License](https://github.com/realm/realm-cocoa/blob/master/LICENSE#L210-L243) while we [work to open-source it under the Apache 2.0 license](http://realm.io/docs/cocoa/#faq).
+The underlying core is available under the [Realm Core Binary License](https://github.com/realm/realm-cocoa/blob/master/LICENSE#L210-L243) while we [work to open-source it under the Apache 2.0 license](http://realm.io/docs/objc/latest/#faq).
 
 ## Feedback
 
