@@ -316,7 +316,7 @@ void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
                              NSComparisonPredicateOptions predicateOptions,
                              std::vector<NSUInteger> linkColumns, NSUInteger idx, id value)
 {
-    realm::Table *(^table)() = ^{
+    auto table = [&] {
         realm::TableRef& tbl = query.get_table();
         for (NSUInteger col : linkColumns) {
             tbl->link(col); // mutates m_link_chain on table
@@ -370,11 +370,12 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
                                         NSString *keyPath, std::vector<NSUInteger> &indexes, bool isAny)
 {
     RLMProperty *prop = nil;
-    NSArray *paths = [keyPath componentsSeparatedByString:@"."];
-    indexes.reserve(paths.count - 1);
 
     NSString *prevPath = nil;
-    for (NSString *path in paths) {
+    NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
+    do {
+        end = [keyPath rangeOfString:@"." options:0 range:{start, length - start}].location;
+        NSString *path = [keyPath substringWithRange:{start, end == NSNotFound ? length - start : end - start}];
         if (prop) {
             RLMPrecondition(prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray,
                             @"Invalid value", @"Property '%@' is not a link in object of type '%@'", prevPath, desc.className);
@@ -404,12 +405,17 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
             desc = schema[prop.objectClassName];
         }
         prevPath = path;
-    }
+        start = end + 1;
+    } while (end != NSNotFound);
 
     return prop;
 }
 
-void validate_property_value(RLMProperty *prop, id value, NSString *err, RLMObjectSchema *objectSchema, NSString *keyPath) {
+void validate_property_value(__unsafe_unretained RLMProperty *const prop,
+                             __unsafe_unretained id const value,
+                             __unsafe_unretained NSString *const err,
+                             __unsafe_unretained RLMObjectSchema *const objectSchema,
+                             __unsafe_unretained NSString *const keyPath) {
     if (prop.type == RLMPropertyTypeArray) {
         RLMPrecondition([RLMObjectBaseObjectSchema(RLMDynamicCast<RLMObjectBase>(value)).className isEqualToString:prop.objectClassName],
                         @"Invalid value", err, prop.objectClassName, keyPath, objectSchema.className, value);
@@ -554,7 +560,7 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query,
 }
 
 void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
-                                 RLMObjectSchema *objectSchema, realm::Query & query)
+                                 RLMObjectSchema *objectSchema, realm::Query &query)
 {
     // Compound predicates.
     if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
@@ -577,7 +583,7 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
 
             case NSOrPredicateType: {
                 // Add all of the subpredicates with ors inbetween.
-                process_or_group(query, comp.subpredicates, [&](NSPredicate *subp) {
+                process_or_group(query, comp.subpredicates, [&](__unsafe_unretained NSPredicate *const subp) {
                     update_query_with_predicate(subp, schema, objectSchema, query);
                 });
                 break;

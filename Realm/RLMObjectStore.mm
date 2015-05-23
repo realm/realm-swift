@@ -32,8 +32,6 @@
 
 #import <objc/message.h>
 
-extern "C" {
-
 static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema) {
     NSMutableArray *properties = [NSMutableArray arrayWithCapacity:objectSchema.properties.count];
     NSMutableArray *exceptionMessages = [NSMutableArray array];
@@ -337,7 +335,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
     return nil;
 }
 
-static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
+static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {
     // if realm is not writable throw
     if (!realm.inWriteTransaction) {
         @throw RLMException(@"Can only add, remove, or create objects in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
@@ -345,26 +343,31 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     RLMCheckThread(realm);
 }
 
-void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
-    // switch List<> properties to linkviews from standalone arrays
-    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwift.Object");
-    if (!object || !object->_row || ![object isKindOfClass:s_swiftObjectClass]) {
+void RLMInitializeSwiftListAccessor(__unsafe_unretained RLMObjectBase *const object) {
+    if (!object || !object->_row || !object->_objectSchema.isSwiftClass) {
         return;
+    }
+
+    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwift.Object");
+    if (![object isKindOfClass:s_swiftObjectClass]) {
+        return; // Is a Swift class using the obj-c API
     }
 
     for (RLMProperty *prop in object->_objectSchema.properties) {
         if (prop.type == RLMPropertyTypeArray) {
-            [RLMObjectUtilClass(YES) initializeListProperty:object property:prop array:[RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
-                                                                                                                             view:object->_row.get_linklist(prop.column)
-                                                                                                                            realm:object->_realm]];
+            RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
+                                                                    view:object->_row.get_linklist(prop.column)
+                                                                   realm:object->_realm];
+            [RLMObjectUtilClass(YES) initializeListProperty:object property:prop array:array];
         }
     }
 }
 
-} // extern "C" {
-
 template<typename F>
-static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F primaryValueGetter, RLMCreationOptions options, bool &created) {
+static inline NSUInteger RLMCreateOrGetRowForObject(__unsafe_unretained RLMObjectSchema *const schema,
+                                                    F&& primaryValueGetter,
+                                                    RLMCreationOptions options,
+                                                    bool &created) {
     // try to get existing row if updating
     size_t rowIndex = realm::not_found;
     realm::Table &table = *schema.table;
@@ -393,9 +396,9 @@ static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F p
     return rowIndex;
 }
 
-extern "C" {
-
-void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOptions options) {
+void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
+                         __unsafe_unretained RLMRealm *const realm,
+                         RLMCreationOptions options) {
     RLMVerifyInWriteTransaction(realm);
 
     // verify that object is standalone
@@ -419,7 +422,9 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
 
     // get or create row
     bool created;
-    auto primaryGetter = [=](RLMProperty *p) { return [object valueForKey:p.getterName]; };
+    auto primaryGetter = [=](__unsafe_unretained RLMProperty *const p) {
+        return [object valueForKey:p.getterName];
+    };
     object->_row = (*schema.table)[RLMCreateOrGetRowForObject(schema, primaryGetter, options, created)];
 
     // populate all properties
@@ -524,7 +529,8 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     return object;
 }
 
-void RLMDeleteObjectFromRealm(RLMObjectBase *object, RLMRealm *realm) {
+void RLMDeleteObjectFromRealm(__unsafe_unretained RLMObjectBase *const object,
+                              __unsafe_unretained RLMRealm *const realm) {
     if (realm != object->_realm) {
         @throw RLMException(@"Can only delete an object from the Realm it belongs to.");
     }
@@ -624,5 +630,3 @@ RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm
     RLMInitializeSwiftListAccessor(accessor);
     return accessor;
 }
-
-} // extern "C" {

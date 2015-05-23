@@ -710,7 +710,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
-- (void)addObject:(RLMObject *)object {
+- (void)addObject:(__unsafe_unretained RLMObject *const)object {
     RLMAddObjectToRealm(object, self, RLMCreationOptionsNone);
 }
 

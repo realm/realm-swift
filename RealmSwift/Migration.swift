@@ -220,10 +220,18 @@ private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrat
     return { migration, oldVersion in
         // set all accessor classes to MigrationObject
         for objectSchema in migration.oldSchema.objectSchema {
-            (objectSchema as! RLMObjectSchema).accessorClass = MigrationObject.self
+            if let objectSchema = objectSchema as? RLMObjectSchema {
+                objectSchema.accessorClass = MigrationObject.self
+                // isSwiftClass is always `false` for object schema generated
+                // from the table, but we need to pretend it's from a swift class
+                // (even if it isn't) for the accessors to be initialized correctly.
+                objectSchema.isSwiftClass = true
+            }
         }
         for objectSchema in migration.newSchema.objectSchema {
-            (objectSchema as! RLMObjectSchema).accessorClass = MigrationObject.self
+            if let objectSchema = objectSchema as? RLMObjectSchema {
+                objectSchema.accessorClass = MigrationObject.self
+            }
         }
 
         // run migration

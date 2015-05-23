@@ -81,13 +81,13 @@ void RLMDeleteObjectFromRealm(RLMObjectBase *object, RLMRealm *realm);
 void RLMDeleteAllObjectsFromRealm(RLMRealm *realm);
 
 // get objects of a given class
-RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate);
+RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) NS_RETURNS_RETAINED;
 
 // get an object with the given primary key
-id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key);
+id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) NS_RETURNS_RETAINED;
 
 // create object from array or dictionary
-RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options);
+RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options) NS_RETURNS_RETAINED;
 
 //
 // Accessor Creation
@@ -96,8 +96,9 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 // Create accessors
 RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm,
                                        RLMObjectSchema *objectSchema,
-                                       NSUInteger index);
+                                       NSUInteger index) NS_RETURNS_RETAINED;
 
+// switch List<> properties from being backed by standalone RLMArrays to RLMArrayLinkView
 void RLMInitializeSwiftListAccessor(RLMObjectBase *object);
 
 #ifdef __cplusplus
