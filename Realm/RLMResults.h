@@ -97,6 +97,13 @@
  *  ---------------------------------------------------------------------------------------
  */
 /**
+ Returns a Boolean value that indicates whether a given object is present in this RLMResults.
+
+ @param object  An object (of the same type as returned from the objectClassName selector).
+ */
+- (BOOL)containsObject:(RLMObject *)object;
+
+/**
  Gets the index of an object.
 
  Returns NSNotFound if the object is not found in this RLMResults.

@@ -229,6 +229,11 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return nil;
 }
 
+- (BOOL)containsObject:(RLMObject *)object
+{
+    return [self indexOfObject:object] != NSNotFound;
+}
+
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     // check attached for table and object
     RLMResultsValidate(self);

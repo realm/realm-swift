@@ -326,6 +326,34 @@
     XCTAssertTrue([description rangeOfString:@"912 objects skipped"].location != NSNotFound);
 }
 
+- (void)testContainsObject
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    StringObject *so = [StringObject createInRealm:realm withValue:@[@""]];
+    StringObject *deletedObject = [StringObject createInRealm:realm withValue:@[@""]];
+    [realm deleteObject:deletedObject];
+    [realm commitWriteTransaction];
+
+    RLMResults *results = [EmployeeObject objectsWhere:@"hired = YES"];
+    XCTAssertTrue([results containsObject:po1]);
+    XCTAssertFalse([results containsObject:po2]);
+    XCTAssertTrue([results containsObject:po3]);
+    XCTAssertThrows([results containsObject:so]);
+    XCTAssertThrows([results containsObject:deletedObject]);
+
+    results = [EmployeeObject allObjects];
+    XCTAssertTrue([results containsObject:po1]);
+    XCTAssertTrue([results containsObject:po2]);
+    XCTAssertTrue([results containsObject:po3]);
+    XCTAssertThrows([results containsObject:so]);
+    XCTAssertThrows([results containsObject:deletedObject]);
+}
+
 - (void)testIndexOfObject
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
