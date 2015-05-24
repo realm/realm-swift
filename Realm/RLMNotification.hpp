@@ -28,16 +28,6 @@ namespace realm {
     class SharedGroup;
 }
 
-// A copy of all of the parameters used when adding an observer to an object,
-// used for unregistering and reregistering observers when adding a standalone
-// object to a Realm.
-struct RLMRecordedObservation {
-    __unsafe_unretained id observer;
-    NSKeyValueObservingOptions options;
-    void *context;
-    NSString *key;
-};
-
 class RLMObservationInfo {
 public:
     RLMObservationInfo(id object);
@@ -90,17 +80,10 @@ public:
     }
 
     void recordObserver(realm::Row& row, RLMObjectSchema *objectSchema,
-                        id observer, NSString *keyPath,
-                        NSKeyValueObservingOptions options, void *context);
-    void removeObserver(id observer, NSString *keyPath);
-    void removeObserver(id observer, NSString *keyPath, void *context);
+                        NSString *keyPath);
+    void removeObserver();
+    bool hasObservers() const { return observerCount > 0; }
 
-
-    // remove all recorded observers from the object
-    // used when adding standalone objects to a realm
-    void removeObservers();
-    // re-add the observers removed with removeObservers
-    void restoreObservers();
 
     id valueForKey(NSString *key, id (^value)());
 
@@ -117,8 +100,7 @@ private:
 
     // valueForKey: hack
     bool returnNil = false;
-    // Recorded observers for a standalone RLMObject; unused for persisted objects
-    std::vector<RLMRecordedObservation> standaloneObservers;
+    size_t observerCount = 0;
 
     // objects returned from valueForKey() to keep them alive in case observers
     // are added and so that they can still be accessed after row is detached
@@ -140,6 +122,8 @@ public:
     void *kvoInfo = nullptr;
 };
 
+RLMObservationInfo *RLMGetObservationInfo(std::unique_ptr<RLMObservationInfo> const& info, size_t row, RLMObjectSchema *objectSchema);
+
 // Call the appropriate SharedGroup member function, with change notifications
 void RLMAdvanceRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
 void RLMRollbackAndContinueAsRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
@@ -147,5 +131,3 @@ void RLMPromoteToWrite(realm::SharedGroup &sg, realm::History &history, RLMSchem
 
 // invoke the block, sending notifications for cascading deletes/link nullifications
 void RLMTrackDeletions(RLMRealm *realm, dispatch_block_t block);
-
-RLMObservationInfo *RLMGetObservationInfo(std::unique_ptr<RLMObservationInfo> const& info, size_t row, RLMObjectSchema *objectSchema);

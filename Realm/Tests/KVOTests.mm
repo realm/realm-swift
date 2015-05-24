@@ -710,120 +710,16 @@ public:
 }
 
 - (void)testAddToRealmAfterAddingObservers {
-    KVOObject *obj = [self createObject];
-    KVORecorder r1(self, obj, @"int32Col");
-    KVORecorder r2(self, obj, @"ignored");
-
     RLMRealm *realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
-    [realm addObject:obj];
-    obj.int32Col = 10;
-    obj.ignored = 15;
-    AssertChanged(r1, @2, @10);
-    AssertChanged(r2, @0, @15);
-    [realm commitWriteTransaction];
-}
 
-- (void)testInitialIsNotRetriggeredOnAdd {
     KVOObject *obj = [self createObject];
-    KVORecorder r1(self, obj, @"int32Col", NSKeyValueObservingOptionInitial);
-    KVORecorder r2(self, obj, @"ignored", NSKeyValueObservingOptionInitial);
-
-    r1.pop_front();
-    r2.pop_front();
-
-    RLMRealm *realm = RLMRealm.defaultRealm;
-    [realm beginWriteTransaction];
-    [realm addObject:obj];
-    [realm commitWriteTransaction];
-
-    XCTAssertTrue(r1.empty());
-    XCTAssertTrue(r2.empty());
-}
-
-- (void)testAddToRealmWithLinkedStandaloneObjects {
     {
-        KVOLinkObject2 *obj = [self createLinkObject];
-        KVORecorder r(self, obj.obj, @"obj.boolCol");
-
-        RLMRealm *realm = RLMRealm.defaultRealm;
-        [realm beginWriteTransaction];
-        [realm addObject:obj.obj];
-        obj.obj.obj.boolCol = YES;
-        AssertChanged(r, @NO, @YES);
-        [realm cancelWriteTransaction];
+        KVORecorder r(self, obj, @"int32Col");
+        XCTAssertThrows([realm addObject:obj]);
     }
-    @autoreleasepool {
-        KVOLinkObject2 *obj = [self createLinkObject];
-        KVORecorder r(self, obj.obj, @"obj.boolCol");
-
-        RLMRealm *realm = RLMRealm.defaultRealm;
-        [realm beginWriteTransaction];
-        [realm addObject:obj.obj];
-        obj.obj.obj.boolCol = YES;
-        AssertChanged(r, @NO, @YES);
-        [realm cancelWriteTransaction];
-        AssertChanged(r, @YES, NSNull.null);
-    }
-
-    __weak id objleak;
-    @autoreleasepool {
-        KVOLinkObject2 *obj = [self createLinkObject];
-        objleak = obj;
-        KVORecorder r(self, obj, @"obj.obj.boolCol");
-
-        RLMRealm *realm = RLMRealm.defaultRealm;
-        [realm beginWriteTransaction];
-        [realm addObject:obj];
-        obj.obj.obj.boolCol = YES;
-        AssertChanged(r, @NO, @YES);
-        [realm cancelWriteTransaction];
-        AssertChanged(r, @YES, NSNull.null);
-    }
-    @autoreleasepool {
-        XCTAssertNil(objleak);
-    }
-
-#if 0 // re-adding observing in middle doesn't seem to work
-    {
-        KVOLinkObject2 *obj = [self createLinkObject];
-        KVORecorder r(self, obj, @"obj.obj.boolCol");
-
-        RLMRealm *realm = RLMRealm.defaultRealm;
-        [realm beginWriteTransaction];
-        [realm addObject:obj.obj];
-        obj.obj.obj.boolCol = YES;
-        AssertChanged(r, @NO, @YES);
-        [realm cancelWriteTransaction];
-        AssertChanged(r, @YES, NSNull.null);
-    }
-
-    {
-        KVOLinkObject2 *obj = [self createLinkObject];
-        KVORecorder r(self, obj, @"obj.obj.boolCol");
-
-        RLMRealm *realm = RLMRealm.defaultRealm;
-        [realm beginWriteTransaction];
-        [realm addObject:obj.obj.obj];
-        obj.obj.obj.boolCol = YES;
-        AssertChanged(r, @NO, @YES);
-        [realm cancelWriteTransaction];
-        AssertChanged(r, @YES, NSNull.null);
-    }
-
-    {
-        KVOLinkObject2 *obj = [self createLinkObject];
-        KVORecorder r(self, obj.obj, @"obj.boolCol");
-
-        RLMRealm *realm = RLMRealm.defaultRealm;
-        [realm beginWriteTransaction];
-        [realm addObject:obj];
-        obj.obj.obj.boolCol = YES;
-        AssertChanged(r, @NO, @YES);
-        [realm cancelWriteTransaction];
-        AssertChanged(r, @YES, NSNull.null);
-    }
-#endif
+    XCTAssertNoThrow([realm addObject:obj]);
+    [realm cancelWriteTransaction];
 }
 
 @end

@@ -237,24 +237,14 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     if (!_observationInfo) {
         _observationInfo = std::make_unique<RLMObservationInfo>(self);
     }
-    _observationInfo->recordObserver(_row, _objectSchema, observer, keyPath, options, context);
+    _observationInfo->recordObserver(_row, _objectSchema, keyPath);
 
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
 - (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath {
     [super removeObserver:observer forKeyPath:keyPath];
-    _observationInfo->removeObserver(observer, keyPath);
-}
-
-- (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath context:(void *)context {
-    bool skipUnregistering = true;
-    if (_observationInfo) {
-        std::swap(_observationInfo->skipUnregisteringObservers, skipUnregistering);
-    }
-    [super removeObserver:observer forKeyPath:keyPath context:context];
-    _observationInfo->skipUnregisteringObservers = skipUnregistering;
-    _observationInfo->removeObserver(observer, keyPath, context);
+    _observationInfo->removeObserver();
 }
 
 - (void *)observationInfo {

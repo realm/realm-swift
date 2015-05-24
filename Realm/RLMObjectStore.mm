@@ -267,6 +267,9 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         // for differing realms users must explicitly create the object in the second realm
         @throw RLMException(@"Object is already persisted in a Realm");
     }
+    if (object->_observationInfo && object->_observationInfo->hasObservers()) {
+        @throw RLMException(@"Cannot add an object with observers to a Realm");
+    }
 
     // set the realm and schema
     NSString *objectClassName = object->_objectSchema.className;
@@ -282,12 +285,6 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     RLMCreationOptions creationOptions = RLMCreationOptionsPromoteStandalone;
     if (createOrUpdate) {
         creationOptions |= RLMCreationOptionsCreateOrUpdate;
-    }
-
-    // unregister all observers of the standalone object
-    // has to be done before any linked standalone objects are added
-    if (object->_observationInfo) {
-        object->_observationInfo->removeObservers();
     }
 
     // populate all properties
@@ -329,11 +326,6 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     object_setClass(object, schema.accessorClass);
 
     RLMInitializeSwiftListAccessor(object);
-
-    // re-add the observers
-    if (object->_observationInfo) {
-        object->_observationInfo->restoreObservers();
-    }
 }
 
 static void RLMValidateValueForProperty(__unsafe_unretained id const obj,

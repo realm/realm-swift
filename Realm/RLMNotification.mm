@@ -92,10 +92,9 @@ void RLMObservationInfo::setRow(realm::Table &table, size_t newRow) {
 
 void RLMObservationInfo::recordObserver(realm::Row& objectRow,
                                         __unsafe_unretained RLMObjectSchema *const objectSchema,
-                                        __unsafe_unretained id const observer,
-                                        __unsafe_unretained NSString *const keyPath,
-                                        NSKeyValueObservingOptions options,
-                                        void *context) {
+                                        __unsafe_unretained NSString *const keyPath) {
+    ++observerCount;
+
     // add ourselves to the list of observed objects if this is the first time
     // an observer is being added to a persisted object
     if (objectRow && !row) {
@@ -104,9 +103,6 @@ void RLMObservationInfo::recordObserver(realm::Row& objectRow,
     }
 
     if (!row) {
-        // record the observation if the object is standalone
-        standaloneObservers.push_back({observer, options, context, keyPath});
-
         // Arrays need a reference to their containing object to avoid having to
         // go through the awful proxy object from mutableArrayValueForKey.
         // For persisted objects we do this when the object is added or created
@@ -137,43 +133,8 @@ static void erase_first(Container&& c, Pred&& p) {
     }
 }
 
-void RLMObservationInfo::removeObserver(__unsafe_unretained id const observer,
-                                        __unsafe_unretained NSString *const keyPath) {
-    if (!skipUnregisteringObservers) {
-        erase_first(standaloneObservers, [&](auto const& info) {
-            return info.observer == observer && [info.key isEqualToString:keyPath];
-        });
-    }
-}
-
-void RLMObservationInfo::removeObserver(__unsafe_unretained id const observer,
-                                        __unsafe_unretained NSString *const keyPath,
-                                        void *context) {
-    if (!skipUnregisteringObservers) {
-        erase_first(standaloneObservers, [&](auto const& info) {
-            return info.observer == observer
-                && info.context == context
-                && [info.key isEqualToString:keyPath];
-        });
-    }
-}
-
-void RLMObservationInfo::removeObservers() {
-   skipUnregisteringObservers  = true;
-    for (auto const& info : standaloneObservers) {
-        [object removeObserver:info.observer forKeyPath:info.key context:info.context];
-    }
-    [cachedObjects removeAllObjects];
-}
-
-void RLMObservationInfo::restoreObservers() {
-    for (auto const& info : standaloneObservers) {
-        [object addObserver:info.observer
-                 forKeyPath:info.key
-                    options:info.options & ~NSKeyValueObservingOptionInitial
-                    context:info.context];
-    }
-    standaloneObservers.clear();
+void RLMObservationInfo::removeObserver() {
+    --observerCount;
 }
 
 id RLMObservationInfo::valueForKey(NSString *key, id (^getValue)()) {
