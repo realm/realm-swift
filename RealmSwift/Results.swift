@@ -291,6 +291,6 @@ extension Results: CVarArgType {
     /// Transform `self` into a series of machine words that can be
     /// appropriately interpreted by C varargs
     public func encode() -> [Word] {
-        return (map(self, { $0 }) as NSArray).encode()
+        return rlmResults.encode()
     }
 }
