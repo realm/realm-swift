@@ -29,7 +29,7 @@ class ListTests: TestCase {
         fatalError("abstract")
     }
 
-    func createArrayWithLinks() ->  SwiftListOfSwiftObject {
+    func createArrayWithLinks() -> SwiftListOfSwiftObject {
         fatalError("abstract")
     }
 
@@ -43,7 +43,7 @@ class ListTests: TestCase {
         arrayObject = createArray()
         array = arrayObject.array
 
-        let realm = self.realmWithTestPath()
+        let realm = realmWithTestPath()
         realm.write {
             realm.add(self.str1)
             realm.add(self.str2)
@@ -65,7 +65,7 @@ class ListTests: TestCase {
 
     override class func defaultTestSuite() -> XCTestSuite! {
         // Don't run tests for the base class
-        if self.isEqual(ListTests) {
+        if isEqual(ListTests) {
             return nil
         }
         return super.defaultTestSuite()
@@ -200,6 +200,32 @@ class ListTests: TestCase {
         array.append(str2)
         XCTAssertEqual(Int(1), array.filter("stringCol = '1'").count)
         XCTAssertEqual(Int(1), array.filter("stringCol = '2'").count)
+    }
+
+    func testFilterList() {
+        let innerArray = createArrayWithLinks()
+
+        if let realm = innerArray.realm {
+            realm.beginWrite()
+            innerArray.array.append(SwiftObject())
+            let outerArray = SwiftDoubleListOfSwiftObject()
+            realm.add(outerArray)
+            outerArray.array.append(innerArray)
+            realm.commitWrite()
+            XCTAssertEqual(Int(1), outerArray.array.filter("ANY array IN %@", innerArray.array).count)
+        }
+    }
+
+    func testFilterResults() {
+        let arrayObject = createArrayWithLinks()
+
+        if let realm = arrayObject.realm {
+            realm.beginWrite()
+            arrayObject.array.append(SwiftObject())
+            let subArray = arrayObject.array
+            realm.commitWrite()
+            XCTAssertEqual(Int(1), realm.objects(SwiftListOfSwiftObject).filter("ANY array IN %@", subArray).count)
+        }
     }
 
     func testFilterPredicate() {
@@ -468,7 +494,7 @@ class ListNewlyAddedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let array = SwiftArrayPropertyObject()
         array.name = "name"
-        let realm = self.realmWithTestPath()
+        let realm = realmWithTestPath()
         realm.write { realm.add(array) }
 
         XCTAssertNotNil(array.realm)
@@ -487,7 +513,7 @@ class ListNewlyAddedTests: ListTests {
 
 class ListNewlyCreatedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
-        let realm = self.realmWithTestPath()
+        let realm = realmWithTestPath()
         realm.beginWrite()
         let array = realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
         realm.commitWrite()
@@ -509,7 +535,7 @@ class ListNewlyCreatedTests: ListTests {
 
 class ListRetrievedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
-        let realm = self.realmWithTestPath()
+        let realm = realmWithTestPath()
         realm.beginWrite()
         realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
         realm.commitWrite()

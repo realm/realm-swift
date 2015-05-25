@@ -1,3 +1,20 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Swift: `Results` now conforms to `CVarArgType` so it can
+  now be passed as an argument to `Results.filter(_:...)`
+  and `List.filter(_:...)`.
+
+### Bugfixes
+
+* None.
+
 0.92.4 Release notes (2015-05-22)
 =============================================================
 

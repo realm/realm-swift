@@ -179,6 +179,25 @@ class ResultsTests: TestCase {
         XCTAssertEqual(Int(0), results.filter("stringCol = %@", "3").count)
     }
 
+    func testFilterList() {
+        let outerArray = SwiftDoubleListOfSwiftObject()
+        let realm = realmWithTestPath()
+        let innerArray = SwiftListOfSwiftObject()
+        innerArray.array.append(SwiftObject())
+        outerArray.array.append(innerArray)
+        realm.add(outerArray)
+        XCTAssertEqual(Int(1), outerArray.array.filter("ANY array IN %@", realm.objects(SwiftObject)).count)
+    }
+
+    func testFilterResults() {
+        let array = SwiftListOfSwiftObject()
+        let realm = realmWithTestPath()
+        array.array.append(SwiftObject())
+        realm.add(array)
+        XCTAssertEqual(Int(1),
+            realm.objects(SwiftListOfSwiftObject).filter("ANY array IN %@", realm.objects(SwiftObject)).count)
+    }
+
     func testFilterPredicate() {
         let pred1 = NSPredicate(format: "stringCol = '1'")
         let pred2 = NSPredicate(format: "stringCol = '2'")
