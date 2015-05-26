@@ -28,7 +28,7 @@ Migration block used to migrate a Realm.
                          existing objects which require migration.
 :param: oldSchemaVersion The schema version of the `Realm` being migrated.
 */
-public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt) -> Void
+public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt64) -> Void
 
 /// Object class used during migrations
 public typealias MigrationObject = DynamicObject
@@ -68,7 +68,7 @@ block automatically as needed.
 :param: version The current schema version.
 :param: block   The block which migrates the Realm to the current version.
 */
-public func setDefaultRealmSchemaVersion(schemaVersion: UInt, migrationBlock: MigrationBlock) {
+public func setDefaultRealmSchemaVersion(schemaVersion: UInt64, migrationBlock: MigrationBlock) {
     RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: accessorMigrationBlock(migrationBlock))
 }
 
@@ -91,7 +91,7 @@ block automatically as needed.
 :param: realmPath The path of the Realms to migrate.
 :param: block     The block which migrates the Realm to the current version.
 */
-public func setSchemaVersion(schemaVersion: UInt, realmPath: String, migrationBlock: MigrationBlock) {
+public func setSchemaVersion(schemaVersion: UInt64, realmPath: String, migrationBlock: MigrationBlock) {
     RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: realmPath, withMigrationBlock: accessorMigrationBlock(migrationBlock))
 }
 
@@ -104,7 +104,7 @@ Get the schema version for a Realm at a given path.
                       possible errors, omit the argument, or pass in `nil`.
 :returns: The version of the Realm at `realmPath` or `nil` if the version cannot be read.
 */
-public func schemaVersionAtPath(realmPath: String, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) -> UInt? {
+public func schemaVersionAtPath(realmPath: String, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) -> UInt64? {
     let version = RLMRealm.schemaVersionAtPath(realmPath, encryptionKey: encryptionKey, error: error)
     if version == RLMNotVersioned {
         return nil

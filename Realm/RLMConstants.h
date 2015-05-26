@@ -112,7 +112,7 @@ typedef NS_ENUM(NSInteger, RLMError) {
 };
 
 // Schema version used for uninitialized Realms
-extern const NSUInteger RLMNotVersioned;
+extern const uint64_t RLMNotVersioned;
 
 extern NSString * const RLMErrorDomain;
 

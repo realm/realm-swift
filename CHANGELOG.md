@@ -3,7 +3,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* Schema versions are now represented as `uint64_t` (Objective-C) and `UInt64` (Swift) so that they have
+  the same representation on all architectures.
 
 ### Enhancements
 
