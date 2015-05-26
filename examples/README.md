@@ -92,3 +92,10 @@ In the `osx/objc/RealmExamples.xcodeproj` project, you will find the following e
 This is a small OS X command-line program which demonstrates how to import data from JSON into a Realm.
 
 Open the project in Xcode, and press "Run" to build and run the program. It will write output to the console.
+
+## Installation Examples
+
+The `installation/` directory contains example Xcode projects demonstrating how
+to install Realm Objective-C and Realm Swift from all available methods defined
+in <https://realm.io/docs/objc/latest/#installation> and
+<https://realm.io/docs/swift/latest/#installation>.
