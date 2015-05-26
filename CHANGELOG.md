@@ -10,6 +10,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Swift: `Results` now conforms to `CVarArgType` so it can
   now be passed as an argument to `Results.filter(_:...)`
   and `List.filter(_:...)`.
+* Swift: Made `SortDescriptor` conform to the `Equatable` and
+  `StringLiteralConvertible` protocols.
 
 ### Bugfixes
 

@@ -70,3 +70,51 @@ extension SortDescriptor: Printable {
         return "SortDescriptor (property: \(property), direction: \(direction))"
     }
 }
+
+// MARK: Equatable
+
+extension SortDescriptor: Equatable {}
+
+/// Returns whether the two sort descriptors are equal.
+public func ==(lhs: SortDescriptor, rhs: SortDescriptor) -> Bool {
+    return lhs.property == rhs.property &&
+        lhs.ascending == lhs.ascending
+}
+
+// MARK: StringLiteralConvertible
+
+extension SortDescriptor: StringLiteralConvertible {
+
+    /// `StringLiteralType`. Required for `StringLiteralConvertible` conformance.
+    public typealias UnicodeScalarLiteralType = StringLiteralType
+
+    /// `StringLiteralType`. Required for `StringLiteralConvertible` conformance.
+    public typealias ExtendedGraphemeClusterLiteralType = StringLiteralType
+
+    /**
+    Creates a `SortDescriptor` from a `UnicodeScalarLiteralType`.
+
+    :param: unicodeScalarLiteral Property name literal.
+    */
+    public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
+        self.init(property: value)
+    }
+
+    /**
+    Creates a `SortDescriptor` from an `ExtendedGraphemeClusterLiteralType`.
+
+    :param: extendedGraphemeClusterLiteral Property name literal.
+    */
+    public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
+        self.init(property: value)
+    }
+
+    /**
+    Creates a `SortDescriptor` from a `StringLiteralType`.
+
+    :param: stringLiteral Property name literal.
+    */
+    public init(stringLiteral value: StringLiteralType) {
+        self.init(property: value)
+    }
+}
