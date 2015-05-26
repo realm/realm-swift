@@ -15,7 +15,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Swift: `RealmSwift.framework` no longer embeds `Realm.framework`,
+  which now allows apps using it to pass iTunes Connect validation.
 
 0.92.4 Release notes (2015-05-22)
 =============================================================
