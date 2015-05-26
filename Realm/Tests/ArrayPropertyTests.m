@@ -21,6 +21,13 @@
 @implementation DogArrayObject
 @end
 
+RLM_ARRAY_TYPE(PrimaryStringObject)
+@interface ArrayOfPrimaryStringObject : RLMObject
+@property RLMArray<PrimaryStringObject> *array;
+@end
+@implementation ArrayOfPrimaryStringObject
+@end
+
 @interface ArrayPropertyTests : RLMTestCase
 @end
 
@@ -53,6 +60,22 @@
     for (RLMObject *obj in array.array) {
         XCTAssertTrue(obj.description.length, @"Object should have description");
     }
+}
+
+- (void)testAddObjectPrimaryKey
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    PrimaryStringObject *primaryString = [PrimaryStringObject createInRealm:realm withValue:@[@"a", @0]];
+    ArrayOfPrimaryStringObject *array = [ArrayOfPrimaryStringObject createInRealm:realm withValue:@[@[]]];
+    [array.array addObject:primaryString];
+    XCTAssertEqual([array.array count], 1U);
+    PrimaryStringObject *modifiedPrimaryString = [[PrimaryStringObject alloc] initWithValue:primaryString];
+    [array.array removeAllObjects];
+    XCTAssertEqual([array.array count], 0U);
+    [array.array addObject:modifiedPrimaryString];
+    XCTAssertEqual([array.array count], 1U);
+    [realm commitWriteTransaction];
 }
 
 -(void)testModifyDetatchedArray {

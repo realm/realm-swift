@@ -142,7 +142,11 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
     RLMValidateObjectClass(object, self.objectClassName);
 
     if (object->_realm != self.realm) {
-        [self.realm addObject:object];
+        if (object.objectSchema.primaryKeyProperty != nil) {
+            [self.realm addOrUpdateObject:object];
+        } else {
+            [self.realm addObject:object];
+        }
     }
     _backingLinkView->add(object->_row.get_index());
 }
