@@ -12,6 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
   and `List.filter(_:...)`.
 * Swift: Made `SortDescriptor` conform to the `Equatable` and
   `StringLiteralConvertible` protocols.
+* Int primary keys are once again automatically indexed.
 
 ### Bugfixes
 
