@@ -404,7 +404,6 @@
 			buildPhases = (
 				0201B2691A54C68C004CFB6F /* Sources */,
 				0201B2731A54C68C004CFB6F /* Frameworks */,
-				29A03F0F1A7C499C00C0D92E /* Embed Dynamic/Realm.framework */,
 			);
 			buildRules = (
 			);
@@ -592,22 +591,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [[ ! -d \"../osx\" && ! -d \"../build/osx/Realm.framework\" ]]; then\n  CONFIGURATION=$CONFIGURATION sh build.sh osx\nfi\n";
-		};
-		29A03F0F1A7C499C00C0D92E /* Embed Dynamic/Realm.framework */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)/Realm.framework",
-			);
-			name = "Embed Dynamic/Realm.framework";
-			outputPaths = (
-				"$(CONFIGURATION_BUILD_DIR)/$(FRAMEWORKS_FOLDER_PATH)",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "DYNAMIC_FRAMEWORK=\"${SCRIPT_INPUT_FILE_0}\"\n\nrm -rf \"${SCRIPT_OUTPUT_FILE_0}\"\nmkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${DYNAMIC_FRAMEWORK}\" \"${SCRIPT_OUTPUT_FILE_0}/\"\n\ninstall_name_tool -id @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${SCRIPT_OUTPUT_FILE_0}/Realm.framework/Realm\"\ninstall_name_tool -change @rpath/Realm.framework/Versions/A/Realm @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 

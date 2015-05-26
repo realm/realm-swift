@@ -300,9 +300,8 @@ case "$COMMAND" in
         ;;
 
     "osx-swift")
+        sh build.sh osx
         xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
-        rm -rf build/osx
-        mkdir build/osx
         cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework build/osx
         exit 0
         ;;
@@ -616,7 +615,7 @@ case "$COMMAND" in
         sh build.sh osx-swift
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip RealmSwift.framework
+        zip --symlinks -r realm-swift-framework-osx.zip RealmSwift.framework Realm.framework
         ;;
 
     "package-release")
