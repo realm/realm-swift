@@ -283,7 +283,6 @@ case "$COMMAND" in
         ;;
 
     "ios-swift")
-        sh build.sh ios-dynamic
         build_combined "RealmSwift iOS" RealmSwift
         mkdir build/ios/swift
         cp -R build/ios/RealmSwift.framework build/ios/swift
