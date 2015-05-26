@@ -148,6 +148,7 @@
 				E8E060B81AFAB5EB00484DEE /* Frameworks */,
 				E8E060B91AFAB5EB00484DEE /* Resources */,
 				E8AD59E81AFAB62100E79784 /* Embed Frameworks */,
+				C07E5D8A1B150F4900ED625C /* Strip Framework Architectures */,
 			);
 			buildRules = (
 			);
@@ -232,6 +233,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C07E5D8A1B150F4900ED625C /* Strip Framework Architectures */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Strip Framework Architectures";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E8E060B71AFAB5EB00484DEE /* Sources */ = {
