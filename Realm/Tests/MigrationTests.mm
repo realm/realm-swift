@@ -499,12 +499,12 @@
 }
 
 - (void)testDuplicatePrimaryKeyMigration {
-    // make string an int
+    // make the pk non-primary so that we can add duplicate values
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
     objectSchema.primaryKeyProperty.isPrimary = NO;
     objectSchema.primaryKeyProperty = nil;
 
-    // create realm with old schema and populate
+    // populate with values that will be invalid when the property is made primary
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
     [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
@@ -517,7 +517,7 @@
             withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should throw due to duplicate primary keys)");
 
-    // apply good migration
+    // apply good migration that deletes duplicates
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMTestRealmPath()
             withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
