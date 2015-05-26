@@ -299,7 +299,6 @@ case "$COMMAND" in
         ;;
 
     "osx-swift")
-        sh build.sh osx
         xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
         cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework build/osx
         exit 0
