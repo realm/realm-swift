@@ -139,9 +139,9 @@ build_combined() {
 }
 
 clean_retrieve() {
-  mkdir -p $2
-  rm -rf $2/$3
-  cp -R $1 $2
+  mkdir -p "$2"
+  rm -rf "$2/$3"
+  cp -R "$1" "$2"
 }
 
 ######################################
