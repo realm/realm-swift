@@ -14,8 +14,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Swift: Made `SortDescriptor` conform to the `Equatable` and
   `StringLiteralConvertible` protocols.
 * Int primary keys are once again automatically indexed.
-* Improve error reporting when indexing is request for a property that can't be
-  indexed.
+* Improve error reporting when attempting to mark a property of a type that
+  cannot be indexed as indexed.
 
 ### Bugfixes
 
