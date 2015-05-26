@@ -374,7 +374,7 @@ static id RLMAutorelease(id value) {
     }
 
     key = key ?: keyForPath(path);
-    realm = [[RLMRealm alloc] initWithPath:path key:key readOnly:readonly inMemory:inMemory dynamic:dynamic error:outError];
+    realm = [[self alloc] initWithPath:path key:key readOnly:readonly inMemory:inMemory dynamic:dynamic error:outError];
     if (outError && *outError) {
         return nil;
     }
@@ -823,7 +823,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(realmPath);
     if (!realm) {
         NSError *error;
-        realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:YES inMemory:NO dynamic:YES error:&error];
+        realm = [[self alloc] initWithPath:realmPath key:key readOnly:YES inMemory:NO dynamic:YES error:&error];
         if (error) {
             RLMSetErrorOrThrow(error, outError);
             return RLMNotVersioned;
@@ -853,7 +853,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     key = validatedKey(key) ?: keyForPath(realmPath);
 
     NSError *error;
-    RLMRealm *realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES error:&error];
+    RLMRealm *realm = [[self alloc] initWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES error:&error];
     if (error)
         return error;
 
