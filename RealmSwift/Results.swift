@@ -284,3 +284,13 @@ extension Results: CollectionType {
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
     public var endIndex: Int { return count }
 }
+
+// MARK: Variadic Arguments Support
+
+extension Results: CVarArgType {
+    /// Transform `self` into a series of machine words that can be
+    /// appropriately interpreted by C varargs
+    public func encode() -> [Word] {
+        return rlmResults.encode()
+    }
+}
