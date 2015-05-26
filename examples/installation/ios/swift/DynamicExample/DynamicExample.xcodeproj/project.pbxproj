@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C07E5D871B15083F00ED625C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D861B15083F00ED625C /* Realm.framework */; };
+		C07E5D891B15084800ED625C /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D861B15083F00ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E8AD59E61AFAB62100E79784 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AD59E51AFAB62100E79784 /* RealmSwift.framework */; };
 		E8AD59E71AFAB62100E79784 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E8AD59E51AFAB62100E79784 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E8E060C11AFAB5EB00484DEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E060C01AFAB5EB00484DEE /* AppDelegate.swift */; };
@@ -34,6 +36,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C07E5D891B15084800ED625C /* Realm.framework in Embed Frameworks */,
 				E8AD59E71AFAB62100E79784 /* RealmSwift.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -42,6 +45,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C07E5D861B15083F00ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../realm-swift-latest/ios/Realm.framework"; sourceTree = "<group>"; };
 		E8AD59E51AFAB62100E79784 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../../../realm-swift-latest/ios/RealmSwift.framework"; sourceTree = "<group>"; };
 		E8E060BB1AFAB5EB00484DEE /* DynamicExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DynamicExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8E060BF1AFAB5EB00484DEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -60,6 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C07E5D871B15083F00ED625C /* Realm.framework in Frameworks */,
 				E8AD59E61AFAB62100E79784 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -77,6 +82,7 @@
 		E8E060B21AFAB5EB00484DEE = {
 			isa = PBXGroup;
 			children = (
+				C07E5D861B15083F00ED625C /* Realm.framework */,
 				E8AD59E51AFAB62100E79784 /* RealmSwift.framework */,
 				E8E060BD1AFAB5EB00484DEE /* DynamicExample */,
 				E8E060D31AFAB5EB00484DEE /* DynamicExampleTests */,
@@ -142,6 +148,7 @@
 				E8E060B81AFAB5EB00484DEE /* Frameworks */,
 				E8E060B91AFAB5EB00484DEE /* Resources */,
 				E8AD59E81AFAB62100E79784 /* Embed Frameworks */,
+				C07E5D8A1B150F4900ED625C /* Strip Framework Architectures */,
 			);
 			buildRules = (
 			);
@@ -227,6 +234,24 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		C07E5D8A1B150F4900ED625C /* Strip Framework Architectures */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Strip Framework Architectures";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		E8E060B71AFAB5EB00484DEE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -296,10 +321,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"../../../realm-swift-latest/ios",
-					"../../../realm-swift-latest/ios/RealmSwift.framework/Frameworks",
-				);
+				FRAMEWORK_SEARCH_PATHS = "../../../realm-swift-latest/ios";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -345,10 +367,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"../../../realm-swift-latest/ios",
-					"../../../realm-swift-latest/ios/RealmSwift.framework/Frameworks",
-				);
+				FRAMEWORK_SEARCH_PATHS = "../../../realm-swift-latest/ios";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;

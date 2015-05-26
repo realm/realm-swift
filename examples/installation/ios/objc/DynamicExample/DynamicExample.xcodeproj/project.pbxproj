@@ -149,6 +149,7 @@
 				E8561ABA1AFB1518006E087E /* Frameworks */,
 				E8561ABB1AFB1518006E087E /* Resources */,
 				E8561AE91AFB1534006E087E /* Embed Frameworks */,
+				C07E5D8B1B15100E00ED625C /* Strip Framework Architectures */,
 			);
 			buildRules = (
 			);
@@ -233,6 +234,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C07E5D8B1B15100E00ED625C /* Strip Framework Architectures */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Strip Framework Architectures";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E8561AB91AFB1518006E087E /* Sources */ = {
@@ -440,6 +459,7 @@
 				E8561AE21AFB1518006E087E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E8561AE31AFB1518006E087E /* Build configuration list for PBXNativeTarget "DynamicExampleTests" */ = {
 			isa = XCConfigurationList;
@@ -448,6 +468,7 @@
 				E8561AE51AFB1518006E087E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

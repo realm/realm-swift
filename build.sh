@@ -139,9 +139,9 @@ build_combined() {
 }
 
 clean_retrieve() {
-  mkdir -p $2
-  rm -rf $2/$3
-  cp -R $1 $2
+  mkdir -p "$2"
+  rm -rf "$2/$3"
+  cp -R "$1" "$2"
 }
 
 ######################################
@@ -278,7 +278,7 @@ case "$COMMAND" in
         ;;
 
     "ios-dynamic")
-        build_combined "iOS Dynamic" Realm "-dynamic" "LD_DYLIB_INSTALL_NAME='@rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm'"
+        build_combined "iOS Dynamic" Realm "-dynamic"
         exit 0
         ;;
 
@@ -286,6 +286,7 @@ case "$COMMAND" in
         build_combined "RealmSwift iOS" RealmSwift
         mkdir build/ios/swift
         cp -R build/ios/RealmSwift.framework build/ios/swift
+        cp -R build/ios-dynamic/Realm.framework build/ios/swift
         exit 0
         ;;
 
@@ -299,8 +300,6 @@ case "$COMMAND" in
 
     "osx-swift")
         xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
-        rm -rf build/osx
-        mkdir build/osx
         cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework build/osx
         exit 0
         ;;
@@ -606,7 +605,7 @@ case "$COMMAND" in
         sh build.sh ios-swift
 
         cd build/ios/swift
-        zip --symlinks -r realm-swift-framework-ios.zip RealmSwift.framework
+        zip --symlinks -r realm-swift-framework-ios.zip RealmSwift.framework Realm.framework
         ;;
 
     "package-osx-swift")
@@ -614,7 +613,7 @@ case "$COMMAND" in
         sh build.sh osx-swift
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip RealmSwift.framework
+        zip --symlinks -r realm-swift-framework-osx.zip RealmSwift.framework Realm.framework
         ;;
 
     "package-release")
