@@ -1,3 +1,20 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* `-[RLMArray addObject:]`, `-[RLMArray addObjects:]`, `List.append(_:)` and
+  `List.extend(_:)` now supports passing in unpersisted objects with primary
+  key values already contained in the target Realm.
+
+### Bugfixes
+
+* None.
+
 0.92.4 Release notes (2015-05-22)
 =============================================================
 
