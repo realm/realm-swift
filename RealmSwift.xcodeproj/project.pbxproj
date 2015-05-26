@@ -119,7 +119,6 @@
 		C0FE465C1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
 		C0FE465D1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
 		C0FE465E1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
-		E8DF38121AF7187700BC914F /* strip-frameworks.sh in Copy Strip Frameworks Script */ = {isa = PBXBuildFile; fileRef = E8DF380F1AF7185B00BC914F /* strip-frameworks.sh */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -194,17 +193,6 @@
 				29FA58751A79B6C000A222E5 /* RealmSwift.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E8DF38111AF7186A00BC914F /* Copy Strip Frameworks Script */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 7;
-			files = (
-				E8DF38121AF7187700BC914F /* strip-frameworks.sh in Copy Strip Frameworks Script */,
-			);
-			name = "Copy Strip Frameworks Script";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -461,7 +449,6 @@
 			buildPhases = (
 				023B19A31A4234380067FB81 /* Sources */,
 				023B19A41A4234380067FB81 /* Frameworks */,
-				E8DF38111AF7186A00BC914F /* Copy Strip Frameworks Script */,
 			);
 			buildRules = (
 			);
