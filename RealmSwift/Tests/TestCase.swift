@@ -50,11 +50,11 @@ class TestCase: RLMAutoreleasePoolTestCase {
 
     func assertThrows<T>(@autoclosure(escaping) block: () -> T, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
         exceptionThrown = true
-        RLMAssertThrows(self, { _ = block() } as dispatch_block_t, message, fileName, lineNumber);
+        RLMAssertThrows(self, { _ = block() } as dispatch_block_t, message, fileName, lineNumber)
     }
 
     func assertNil<T>(@autoclosure block: () -> T?, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
-        XCTAssert(block() == nil, message ?? "", file: fileName, line: lineNumber);
+        XCTAssert(block() == nil, message ?? "", file: fileName, line: lineNumber)
     }
 
     private func realmFilePrefix() -> String {
