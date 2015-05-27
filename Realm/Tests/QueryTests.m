@@ -923,19 +923,7 @@
                                             expectedReason:(NSString *)expectedReason
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    @try {
-        RLMResults *queryResult = [realm objects:className where:predicate];
-        NSUInteger actualCount = queryResult.count;
-#pragma unused(actualCount)
-
-        XCTFail(@"Predicate: %@ - exception expected.", predicate);
-    }
-    @catch (NSException *exception) {
-        if (![expectedReason isEqualToString:exception.reason]) {
-            XCTFail(@"Exception reason: expected \"%@\" received @\"%@\"", expectedReason, exception.reason);
-        }
-        realm = nil;
-    }
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:predicate], expectedReason);
 }
 
 
@@ -1677,6 +1665,57 @@
 
     RLMResults *none = [PersonObject objectsWithPredicate:[NSCompoundPredicate orPredicateWithSubpredicates:@[]]];
     XCTAssertEqual(none.count, 0U, @"Expecting 0 results");
+}
+
+- (void)testComparisonsWithKeyPathOnRHS
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+
+    [QueryObject createInRealm:realm withValue:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"a", @"a"]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"a", @"A"]];
+    [QueryObject createInRealm:realm withValue:@[@NO,  @NO,  @2, @2, @1.0f,  @3.55f, @99.9, @6.66, @"a", @"ab"]];
+    [QueryObject createInRealm:realm withValue:@[@NO,  @YES, @3, @6, @4.21f, @1.0f,  @1.0,  @7.77, @"a", @"AB"]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @YES, @4, @5, @23.0f, @23.0f, @7.4,  @8.88, @"a", @"b"]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @NO,  @15, @8, @1.0f,  @66.0f, @1.01, @9.99, @"a", @"ba"]];
+    [QueryObject createInRealm:realm withValue:@[@NO,  @YES, @15, @15, @1.0f,  @66.0f, @1.01, @9.99, @"a", @"BA"]];
+
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(4U, [QueryObject objectsWhere:@"TRUE == bool1"].count);
+    XCTAssertEqual(3U, [QueryObject objectsWhere:@"TRUE != bool2"].count);
+
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"1 == int1"].count);
+    XCTAssertEqual(5U, [QueryObject objectsWhere:@"2 != int2"].count);
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"2 > int1"].count);
+    XCTAssertEqual(4U, [QueryObject objectsWhere:@"2 < int1"].count);
+    XCTAssertEqual(3U, [QueryObject objectsWhere:@"2 >= int1"].count);
+    XCTAssertEqual(5U, [QueryObject objectsWhere:@"2 <= int1"].count);
+
+    XCTAssertEqual(3U, [QueryObject objectsWhere:@"1.0 == float1"].count);
+    XCTAssertEqual(6U, [QueryObject objectsWhere:@"1.0 != float2"].count);
+    XCTAssertEqual(1U, [QueryObject objectsWhere:@"1.0 > float1"].count);
+    XCTAssertEqual(6U, [QueryObject objectsWhere:@"1.0 < float2"].count);
+    XCTAssertEqual(4U, [QueryObject objectsWhere:@"1.0 >= float1"].count);
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"1.0 <= float2"].count);
+
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"1.0 == double1"].count);
+    XCTAssertEqual(5U, [QueryObject objectsWhere:@"1.0 != double1"].count);
+    XCTAssertEqual(1U, [QueryObject objectsWhere:@"5.0 > double2"].count);
+    XCTAssertEqual(6U, [QueryObject objectsWhere:@"5.0 < double2"].count);
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"5.55 >= double2"].count);
+    XCTAssertEqual(6U, [QueryObject objectsWhere:@"5.55 <= double2"].count);
+
+    XCTAssertEqual(1U, [QueryObject objectsWhere:@"'a' == string2"].count);
+    XCTAssertEqual(6U, [QueryObject objectsWhere:@"'a' != string2"].count);
+
+    RLMAssertThrowsWithReasonMatching([QueryObject objectsWhere:@"'Realm' CONTAINS string1"].count,
+                                      @"Operator type 99 is not supported .* right side");
+    RLMAssertThrowsWithReasonMatching([QueryObject objectsWhere:@"'Amazon' BEGINSWITH string2"].count,
+                                      @"Operator type 8 is not supported .* right side");
+    RLMAssertThrowsWithReasonMatching([QueryObject objectsWhere:@"'Tuba' ENDSWITH string1"].count,
+                                      @"Operator type 9 is not supported .* right side");
 }
 
 @end
