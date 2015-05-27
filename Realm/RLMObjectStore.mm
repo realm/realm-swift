@@ -408,7 +408,7 @@ static inline NSUInteger RLMCreateOrGetRowForObject(__unsafe_unretained RLMObjec
 
 void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
                          __unsafe_unretained RLMRealm *const realm, 
-						 bool createOrUpdate) {
+                         bool createOrUpdate) {
     RLMVerifyInWriteTransaction(realm);
 
     // verify that object is standalone
@@ -481,7 +481,23 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     RLMInitializeSwiftListAccessor(object);
 }
 
-static void RLMValidateNestedObject(id obj, NSString *className, RLMSchema *schema, bool validateNested, bool allowMissing) {
+static void RLMValidateValueForProperty(__unsafe_unretained id const obj,
+                                        __unsafe_unretained RLMProperty *const prop,
+                                        __unsafe_unretained RLMSchema *const schema,
+                                        bool validateNested,
+                                        bool allowMissing);
+
+static void RLMValidateValueForObjectSchema(__unsafe_unretained id const value,
+                                            __unsafe_unretained RLMObjectSchema *const objectSchema,
+                                            __unsafe_unretained RLMSchema *const schema,
+                                            bool validateNested,
+                                            bool allowMissing);
+
+static void RLMValidateNestedObject(__unsafe_unretained id const obj,
+                                    __unsafe_unretained NSString *const className,
+                                    __unsafe_unretained RLMSchema *const schema,
+                                    bool validateNested,
+                                    bool allowMissing) {
     if (obj != nil && obj != NSNull.null) {
         if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(obj)) {
             RLMObjectSchema *objectSchema = objBase->_objectSchema;
@@ -499,7 +515,11 @@ static void RLMValidateNestedObject(id obj, NSString *className, RLMSchema *sche
     }
 }
 
-void RLMValidateValueForProperty(id obj, RLMProperty *prop, RLMSchema *schema, bool validateNested, bool allowMissing) {
+static void RLMValidateValueForProperty(__unsafe_unretained id const obj,
+                                        __unsafe_unretained RLMProperty *const prop,
+                                        __unsafe_unretained RLMSchema *const schema,
+                                        bool validateNested,
+                                        bool allowMissing) {
     switch (prop.type) {
         case RLMPropertyTypeString:
         case RLMPropertyTypeBool:
@@ -537,7 +557,11 @@ void RLMValidateValueForProperty(id obj, RLMProperty *prop, RLMSchema *schema, b
     }
 }
 
-void RLMValidateValueForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool validateNested, bool allowMissing) {
+static void RLMValidateValueForObjectSchema(__unsafe_unretained id const value,
+                                            __unsafe_unretained RLMObjectSchema *const objectSchema,
+                                            __unsafe_unretained RLMSchema *const schema,
+                                            bool validateNested,
+                                            bool allowMissing) {
     NSArray *props = objectSchema.properties;
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         if (array.count != props.count) {
