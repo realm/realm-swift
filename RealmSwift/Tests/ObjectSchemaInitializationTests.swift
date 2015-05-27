@@ -145,7 +145,7 @@ class ObjectSchemaInitializationTests: TestCase {
     }
 
     func testNonNullableOptionalPropertiesAreCoerced() {
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonNullableOptionalProperties.self), "Should throw when marking non-String properties as optional")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonNullableOptionalProperties.self), "Should throw when marking non-String and non-Data properties as optional")
     }
 }
 
@@ -204,7 +204,6 @@ class SwiftObjectWithUnindexibleProperties : SwiftFakeObject {
 }
 
 class SwiftObjectWithNonNullableOptionalProperties: SwiftFakeObject {
-    dynamic var optBinaryCol: NSData?
     dynamic var optDateCol: NSDate?
 }
 
