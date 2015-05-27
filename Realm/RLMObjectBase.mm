@@ -60,27 +60,28 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
 }
 
 static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
-    if (!RLMIsObjectValidForProperty(obj, prop)) {
-        // check for object or array of properties
-        if (prop.type == RLMPropertyTypeObject) {
-            // for object create and try to initialize with obj
-            RLMObjectSchema *objSchema = schema[prop.objectClassName];
-            return [[objSchema.objectClass alloc] initWithValue:obj schema:schema];
-        }
-        else if (prop.type == RLMPropertyTypeArray && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
-            // for arrays, create objects for each element and return new array
-            RLMObjectSchema *objSchema = schema[prop.objectClassName];
-            RLMArray *objects = [[RLMArray alloc] initWithObjectClassName: objSchema.className standalone:YES];
-            for (id el in obj) {
-                [objects addObject:[[objSchema.objectClass alloc] initWithValue:el schema:schema]];
-            }
-            return objects;
-        }
-
-        // if not convertible to prop throw
-        @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' for property '%@'", obj, prop.name]);
+    if (RLMIsObjectValidForProperty(obj, prop)) {
+        return obj;
     }
-    return obj;
+
+    // check for object or array of properties
+    if (prop.type == RLMPropertyTypeObject) {
+        // for object create and try to initialize with obj
+        RLMObjectSchema *objSchema = schema[prop.objectClassName];
+        return [[objSchema.objectClass alloc] initWithValue:obj schema:schema];
+    }
+    else if (prop.type == RLMPropertyTypeArray && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
+        // for arrays, create objects for each element and return new array
+        RLMObjectSchema *objSchema = schema[prop.objectClassName];
+        RLMArray *objects = [[RLMArray alloc] initWithObjectClassName: objSchema.className standalone:YES];
+        for (id el in obj) {
+            [objects addObject:[[objSchema.objectClass alloc] initWithValue:el schema:schema]];
+        }
+        return objects;
+    }
+
+    // if not convertible to prop throw
+    @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' for property '%@'", obj, prop.name]);
 }
 
 - (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
@@ -95,7 +96,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
         }
     }
     else {
-        // assume our object is an NSDictionary or a an object with kvc properties
+        // assume our object is an NSDictionary or an object with kvc properties
         NSDictionary *defaultValues = nil;
         for (RLMProperty *prop in properties) {
             id obj = [value valueForKey:prop.name];

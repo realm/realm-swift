@@ -614,7 +614,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // get or create our accessor
         bool created;
-        auto primaryGetter = [=](RLMProperty *p) { return array[p.column]; };
+        auto primaryGetter = [=](__unsafe_unretained RLMProperty *const p) { return array[p.column]; };
         object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, createOrUpdate, created)];
 
         // populate
