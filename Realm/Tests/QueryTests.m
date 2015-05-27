@@ -1711,11 +1711,11 @@
     XCTAssertEqual(6U, [QueryObject objectsWhere:@"'a' != string2"].count);
 
     RLMAssertThrowsWithReasonMatching([QueryObject objectsWhere:@"'Realm' CONTAINS string1"].count,
-                                      @"Operator type 99 is not supported .* right side");
+                                      @"Operator 'CONTAINS' is not supported .* right side");
     RLMAssertThrowsWithReasonMatching([QueryObject objectsWhere:@"'Amazon' BEGINSWITH string2"].count,
-                                      @"Operator type 8 is not supported .* right side");
+                                      @"Operator 'BEGINSWITH' is not supported .* right side");
     RLMAssertThrowsWithReasonMatching([QueryObject objectsWhere:@"'Tuba' ENDSWITH string1"].count,
-                                      @"Operator type 9 is not supported .* right side");
+                                      @"Operator 'ENDSWITH' is not supported .* right side");
 }
 
 @end

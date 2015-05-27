@@ -90,6 +90,42 @@ struct FalseExpression : realm::Expression {
     const Table* get_table() override { return nullptr; }
 };
 
+NSString *operatorName(NSPredicateOperatorType operatorType)
+{
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            return @"<";
+        case NSLessThanOrEqualToPredicateOperatorType:
+            return @"<=";
+        case NSGreaterThanPredicateOperatorType:
+            return @">";
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            return @">=";
+        case NSEqualToPredicateOperatorType:
+            return @"==";
+        case NSNotEqualToPredicateOperatorType:
+            return @"!=";
+        case NSMatchesPredicateOperatorType:
+            return @"MATCHES";
+        case NSLikePredicateOperatorType:
+            return @"LIKE";
+        case NSBeginsWithPredicateOperatorType:
+            return @"BEGINSWITH";
+        case NSEndsWithPredicateOperatorType:
+            return @"ENDSWITH";
+        case NSInPredicateOperatorType:
+            return @"IN";
+        case NSContainsPredicateOperatorType:
+            return @"CONTAINS";
+        case NSBetweenPredicateOperatorType:
+            return @"BETWEENS";
+        case NSCustomSelectorPredicateOperatorType:
+            return @"custom selector";
+    }
+
+    return [NSString stringWithFormat:@"unknown operator %lu", (unsigned long)operatorType];
+}
+
 // add a clause for numeric constraints based on operator type
 template <typename A, typename B>
 void add_numeric_constraint_to_query(realm::Query& query,
@@ -119,7 +155,7 @@ void add_numeric_constraint_to_query(realm::Query& query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                         @"Operator type %lu not supported for type %@", (unsigned long)operatorType, RLMTypeToString(datatype));
+                                         @"Operator '%@' not supported for type %@", operatorName(operatorType), RLMTypeToString(datatype));
     }
 }
 
@@ -134,7 +170,7 @@ void add_bool_constraint_to_query(realm::Query &query, NSPredicateOperatorType o
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                         @"Operator type %lu not supported for bool type", (unsigned long)operatorType);
+                                         @"Operator '%@' not supported for bool type", operatorName(operatorType));
     }
 }
 
@@ -167,7 +203,7 @@ void add_string_constraint_to_query(realm::Query &query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                         @"Operator type %lu not supported for string type", (unsigned long)operatorType);
+                                         @"Operator '%@' not supported for string type", operatorName(operatorType));
     }
 }
 
@@ -183,8 +219,8 @@ void add_string_constraint_to_query(realm::Query& query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                         @"Operator type %lu is not supported for string type with key path on right side of operator",
-                                         (unsigned long)operatorType);
+                                         @"Operator '%@' is not supported for string type with key path on right side of operator",
+                                         operatorName(operatorType));
     }
 }
 
@@ -275,7 +311,7 @@ void add_binary_constraint_to_query(realm::Query & query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                         @"Operator type %lu not supported for binary type", (unsigned long)operatorType);
+                                         @"Operator '%@' not supported for binary type", operatorName(operatorType));
     }
 }
 
@@ -287,8 +323,8 @@ void add_binary_constraint_to_query(realm::Query& query, NSPredicateOperatorType
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                         @"Operator type %lu is not supported binary type with key path on right side of operator",
-                                         (unsigned long)operatorType);
+                                         @"Operator '%@' is not supported for binary type with key path on right side of operator",
+                                         operatorName(operatorType));
     }
 }
 
@@ -644,7 +680,7 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query,
                     break;
                 default:
                     @throw RLMPredicateException(@"Invalid operator type",
-                                                 @"Operator type %lu not supported for string type", (unsigned long)type);
+                                                 @"Operator '%@' not supported for string type", operatorName(type));
             }
             break;
         }
