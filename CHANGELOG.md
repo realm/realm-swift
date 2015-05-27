@@ -1,3 +1,21 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+?? summary
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Objects are no longer copied into standalone objects during object creation. This fixes an issue where
+  nested objects with a primary key are sometimes duplicated rather than updated.
+
 0.93.0 Release notes (2015-05-27)
 =============================================================
 
