@@ -66,7 +66,7 @@ class SwiftOptionalObject: Object {
 //    dynamic var optFloatCol: Float?
 //    dynamic var optDoubleCol: Double?
     dynamic var optStringCol: NSString?
-//    dynamic var optBinaryCol: NSData?
+    dynamic var optBinaryCol: NSData?
 //    dynamic var optDateCol: NSDate?
     dynamic var optObjectCol: SwiftBoolObject?
 //    let arrayCol = List<SwiftBoolObject>()
