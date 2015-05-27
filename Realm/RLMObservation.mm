@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMNotification.hpp"
+#import "RLMObservation.hpp"
 
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"

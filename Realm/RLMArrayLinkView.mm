@@ -18,7 +18,7 @@
 
 #import "RLMArray_Private.hpp"
 
-#import "RLMNotification.hpp"
+#import "RLMObservation.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"

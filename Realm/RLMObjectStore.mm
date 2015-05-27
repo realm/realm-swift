@@ -21,7 +21,7 @@
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"
-#import "RLMNotification.hpp"
+#import "RLMObservation.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"

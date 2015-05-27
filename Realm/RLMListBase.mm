@@ -19,7 +19,7 @@
 #import "RLMListBase.h"
 
 #import "RLMArray_Private.hpp"
-#import "RLMNotification.hpp"
+#import "RLMObservation.hpp"
 
 @interface RLMArray (KVO)
 - (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes;
