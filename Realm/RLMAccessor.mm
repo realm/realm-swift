@@ -202,7 +202,7 @@ static inline RLMObjectBase *RLMGetLinkedObjectForValue(__unsafe_unretained RLMR
             RLMAddObjectToRealm(link, realm, creationOptions & RLMCreationOptionsCreateOrUpdate);
             return link;
         }
-        @throw RLMException(@"Can not add objects from a differnt Realm");
+        @throw RLMException(@"Can not add objects from a different Realm");
     }
 
     // copy from another realm or copy from standalone

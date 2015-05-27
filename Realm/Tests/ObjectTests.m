@@ -205,11 +205,11 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 @end
 
-@interface EmployeeWrapper : RLMObject
+@interface LinkToPrimaryEmployeeObject : RLMObject
 @property PrimaryEmployeeObject *wrapped;
 @end
 
-@implementation EmployeeWrapper
+@implementation LinkToPrimaryEmployeeObject
 @end
 
 RLM_ARRAY_TYPE(PrimaryEmployeeObject);
@@ -218,7 +218,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 @property NSString *name;
 @property RLMArray<PrimaryEmployeeObject> *employees;
 @property PrimaryEmployeeObject *intern;
-@property EmployeeWrapper *wrappedIntern;
+@property LinkToPrimaryEmployeeObject *wrappedIntern;
 @end
 
 @implementation PrimaryCompanyObject
