@@ -23,6 +23,7 @@
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMArray_Private.hpp"
 
 #import "RLMObjectStore.h"
 #import "RLMSwiftSupport.h"
@@ -58,26 +59,57 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     return self;
 }
 
+static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
+    if (RLMIsObjectValidForProperty(obj, prop)) {
+        return obj;
+    }
+
+    // check for object or array of properties
+    if (prop.type == RLMPropertyTypeObject) {
+        // for object create and try to initialize with obj
+        RLMObjectSchema *objSchema = schema[prop.objectClassName];
+        return [[objSchema.objectClass alloc] initWithValue:obj schema:schema];
+    }
+    else if (prop.type == RLMPropertyTypeArray && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
+        // for arrays, create objects for each element and return new array
+        RLMObjectSchema *objSchema = schema[prop.objectClassName];
+        RLMArray *objects = [[RLMArray alloc] initWithObjectClassName: objSchema.className standalone:YES];
+        for (id el in obj) {
+            [objects addObject:[[objSchema.objectClass alloc] initWithValue:el schema:schema]];
+        }
+        return objects;
+    }
+
+    // if not convertible to prop throw
+    @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' for property '%@'", obj, prop.name]);
+}
+
 - (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
     self = [self init];
+    NSArray *properties = _objectSchema.properties;
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
-        // validate and populate
-        array = RLMValidatedArrayForObjectSchema(array, _objectSchema, schema);
-        NSArray *properties = _objectSchema.properties;
+        if (array.count != properties.count) {
+            @throw RLMException(@"Invalid array input. Number of array elements does not match number of properties.");
+        }
         for (NSUInteger i = 0; i < array.count; i++) {
-            [self setValue:array[i] forKeyPath:[properties[i] name]];
+            [self setValue:RLMValidatedObjectForProperty(array[i], properties[i], schema) forKeyPath:[properties[i] name]];
         }
     }
     else {
-        // assume our object is an NSDictionary or a an object with kvc properties
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, schema);
-        for (NSString *name in dict) {
-            id val = dict[name];
-            // strip out NSNull before passing values to standalone setters
-            if (val == NSNull.null) {
-                val = nil;
+        // assume our object is an NSDictionary or an object with kvc properties
+        NSDictionary *defaultValues = nil;
+        for (RLMProperty *prop in properties) {
+            id obj = [value valueForKey:prop.name];
+
+            // get default for nil object
+            if (!obj) {
+                if (!defaultValues) {
+                    defaultValues = RLMDefaultValuesForObjectSchema(_objectSchema);
+                }
+                obj = defaultValues[prop.name];
             }
-            [self setValue:val forKeyPath:name];
+
+            [self setValue:RLMValidatedObjectForProperty(obj, prop, schema) forKeyPath:prop.name];
         }
     }
 
