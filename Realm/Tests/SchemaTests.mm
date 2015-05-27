@@ -99,6 +99,15 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @end
 
 
+@interface InvalidPrimaryKeyType : FakeObject
+@property double primaryKey;
+@end
+@implementation InvalidPrimaryKeyType
++ (NSString *)primaryKey {
+    return @"primaryKey";
+}
+@end
+
 @interface SchemaTests : RLMTestCase
 @end
 
@@ -385,6 +394,10 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 {
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithSingleDuplicateProperty.class], @"'string' .* multiple times .* 'SchemaTestClassWithSingleDuplicateProperty'");
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithMultipleDuplicateProperties.class], @"'SchemaTestClassWithMultipleDuplicateProperties' .* declared multiple times");
+}
+
+- (void)testClassWithInvalidPrimaryKey {
+    XCTAssertThrows([RLMObjectSchema schemaForObjectClass:InvalidPrimaryKeyType.class]);
 }
 
 @end

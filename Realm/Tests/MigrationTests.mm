@@ -466,7 +466,6 @@
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 }
 
-#if 0 // FIXME: re-enable when int indexing is enabled
 - (void)testIntPrimaryKeyNoIndexMigration {
     // make string an int
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
@@ -498,15 +497,14 @@
     XCTAssertEqual(1, [objects[0] intCol]);
     XCTAssertEqual(2, [objects[1] intCol]);
 }
-#endif
 
 - (void)testDuplicatePrimaryKeyMigration {
-    // make string an int
+    // make the pk non-primary so that we can add duplicate values
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
     objectSchema.primaryKeyProperty.isPrimary = NO;
     objectSchema.primaryKeyProperty = nil;
 
-    // create realm with old schema and populate
+    // populate with values that will be invalid when the property is made primary
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
     [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
@@ -519,7 +517,7 @@
             withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {}];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should throw due to duplicate primary keys)");
 
-    // apply good migration
+    // apply good migration that deletes duplicates
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMTestRealmPath()
             withMigrationBlock:^(RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
