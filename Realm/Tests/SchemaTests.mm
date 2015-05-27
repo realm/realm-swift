@@ -64,7 +64,6 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @implementation SchemaTestClassLink
 @end
 
-
 @interface SchemaTestClassWithSingleDuplicatePropertyBase : FakeObject
 @property NSString *string;
 @end
@@ -96,6 +95,15 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @implementation SchemaTestClassWithMultipleDuplicateProperties
 @dynamic string;
 @dynamic integer;
+@end
+
+@interface UnindexableProperty : FakeObject
+@property double unindexable;
+@end
+@implementation UnindexableProperty
++ (NSArray *)indexedProperties {
+    return @[@"unindexable"];
+}
 @end
 
 
@@ -398,6 +406,14 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 - (void)testClassWithInvalidPrimaryKey {
     XCTAssertThrows([RLMObjectSchema schemaForObjectClass:InvalidPrimaryKeyType.class]);
+}
+
+- (void)testClassWithUnindexableProperty {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:UnindexableProperty.class];
+    RLMSchema *schema = [[RLMSchema alloc] init];
+    schema.objectSchema = @[objectSchema];
+    RLMAssertThrowsWithReasonMatching([self realmWithTestPathAndSchema:schema],
+                                      @".*UnindexableProperty\\.unindexable.*double.*");
 }
 
 @end

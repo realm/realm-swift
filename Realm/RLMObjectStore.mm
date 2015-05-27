@@ -92,17 +92,30 @@ static void RLMRealmUpdateIndexes(RLMRealm *realm) {
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         realm::Table *table = objectSchema.table;
         for (RLMProperty *prop in objectSchema.properties) {
-            if (prop.indexed != table->has_search_index(prop.column)) {
-                if (!realm.inWriteTransaction) {
-                    [realm beginWriteTransaction];
-                    commitWriteTransaction = true;
-                }
-                if (prop.indexed) {
+            if (prop.indexed == table->has_search_index(prop.column)) {
+                continue;
+            }
+
+            if (!realm.inWriteTransaction) {
+                [realm beginWriteTransaction];
+                commitWriteTransaction = true;
+            }
+            if (prop.indexed) {
+                try {
                     table->add_search_index(prop.column);
                 }
-                else {
-                    table->remove_search_index(prop.column);
+                catch (realm::LogicError const&) {
+                    if (commitWriteTransaction) {
+                        [realm cancelWriteTransaction];
+                    }
+
+                    NSString *err = [NSString stringWithFormat:@"Cannot index property '%@.%@': indexing properties of type '%@' is currently not supported",
+                                     objectSchema.className, prop.name, RLMTypeToString(prop.type)];
+                    @throw RLMException(err);
                 }
+            }
+            else {
+                table->remove_search_index(prop.column);
             }
         }
     }
