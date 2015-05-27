@@ -69,7 +69,6 @@ swift_examples.each do |example|
   contents = File.read(filepath)
   File.open(filepath, "w") do |file|
     file.puts contents.gsub("/build/ios/swift", "/ios")
-                      .gsub("/build/ios-dynamic", "/ios")
   end
 end
 
