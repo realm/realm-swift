@@ -379,61 +379,81 @@ void process_or_group(Query &query, id array, Func&& func) {
     query.end_group();
 }
 
-template <typename T, typename TableGetter,
-    typename std::enable_if_t<!std::is_same<T, realm::DateTime>::value>* = nullptr>
-realm::Columns<T> valueOfTypeForQuery(TableGetter&& table, NSUInteger idx)
-{
-    return table()->template column<T>(idx);
-}
+template <typename RequestedType, typename TableGetter>
+struct ColumnOfTypeHelper {
+    static realm::Columns<RequestedType> convert(TableGetter&& table, NSUInteger idx)
+    {
+        return table()->template column<RequestedType>(idx);
+    }
+};
 
-template <typename T, typename TableGetter,
-    typename std::enable_if_t<std::is_same<T, realm::DateTime>::value>* = nullptr>
-realm::Columns<Int> valueOfTypeForQuery(TableGetter&& table, NSUInteger idx)
-{
-    return table()->template column<Int>(idx);
-}
+template <typename TableGetter>
+struct ColumnOfTypeHelper<realm::DateTime, TableGetter> {
+    static realm::Columns<Int> convert(TableGetter&& table, NSUInteger idx)
+    {
+        return table()->template column<Int>(idx);
+    }
+};
 
+template <typename RequestedType, typename TableGetter>
+struct ValueOfTypeHelper;
 
-template <typename T, typename TableGetter,
-    typename std::enable_if_t<std::is_same<T, bool>::value>* = nullptr>
-bool valueOfTypeForQuery(TableGetter&&, NSNumber *value)
-{
-    return value.boolValue;
-}
+template <typename TableGetter>
+struct ValueOfTypeHelper<realm::DateTime, TableGetter> {
+    static Int convert(TableGetter&&, id value)
+    {
+        return [value timeIntervalSince1970];
+    }
+};
 
-template <typename T, typename TableGetter,
-    typename std::enable_if_t<std::is_same<T, realm::DateTime>::value>* = nullptr>
-Int valueOfTypeForQuery(TableGetter&&, NSDate *value)
-{
-    return value.timeIntervalSince1970;
-}
+template <typename TableGetter>
+struct ValueOfTypeHelper<bool, TableGetter> {
+    static bool convert(TableGetter&&, id value)
+    {
+        return [value boolValue];
+    }
+};
 
-template <typename T, typename TableGetter,
-    typename std::enable_if_t<std::is_same<T, Double>::value>* = nullptr>
-Double valueOfTypeForQuery(TableGetter&&, NSNumber *value)
-{
-    return value.doubleValue;
-}
+template <typename TableGetter>
+struct ValueOfTypeHelper<Double, TableGetter> {
+    static Double convert(TableGetter&&, id value)
+    {
+        return [value doubleValue];
+    }
+};
 
-template <typename T, typename TableGetter,
-    typename std::enable_if_t<std::is_same<T, Float>::value>* = nullptr>
-Float valueOfTypeForQuery(TableGetter&&, NSNumber *value)
-{
-    return value.floatValue;
-}
+template <typename TableGetter>
+struct ValueOfTypeHelper<Float, TableGetter> {
+    static Float convert(TableGetter&&, id value)
+    {
+        return [value floatValue];
+    }
+};
 
-template <typename T, typename TableGetter,
-    typename std::enable_if_t<std::is_same<T, Int>::value>* = nullptr>
-Int valueOfTypeForQuery(TableGetter&&, NSNumber *value)
-{
-    return value.longLongValue;
-}
+template <typename TableGetter>
+struct ValueOfTypeHelper<Int, TableGetter> {
+    static Int convert(TableGetter&&, id value)
+    {
+        return [value longLongValue];
+    }
+};
 
-template <typename T, typename TableGetter,
-    typename std::enable_if_t<std::is_same<T, String>::value>* = nullptr>
-NSString *valueOfTypeForQuery(TableGetter&&, id value)
+template <typename TableGetter>
+struct ValueOfTypeHelper<String, TableGetter> {
+    static id convert(TableGetter&&, id value)
+    {
+        return value;
+    }
+};
+
+template <typename RequestedType, typename Value, typename TableGetter>
+auto value_of_type_for_query(TableGetter&& tables, Value&& value)
 {
-    return value;
+    const bool isColumnIndex = std::is_same<NSUInteger, typename std::remove_reference<Value>::type>::value;
+    using helper = std::conditional_t<isColumnIndex,
+                                     ColumnOfTypeHelper<RequestedType, TableGetter>,
+                                     ValueOfTypeHelper<RequestedType, TableGetter>>;
+    return helper::convert(std::forward<TableGetter>(tables), std::forward<Value>(value));
 }
 
 template <typename... T>
@@ -454,22 +474,22 @@ void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
 
     switch (type) {
         case type_Bool:
-            add_bool_constraint_to_query(query, operatorType, valueOfTypeForQuery<bool>(table, values)...);
+            add_bool_constraint_to_query(query, operatorType, value_of_type_for_query<bool>(table, values)...);
             break;
         case type_DateTime:
-            add_numeric_constraint_to_query(query, type, operatorType, valueOfTypeForQuery<realm::DateTime>(table, values)...);
+            add_numeric_constraint_to_query(query, type, operatorType, value_of_type_for_query<realm::DateTime>(table, values)...);
             break;
         case type_Double:
-            add_numeric_constraint_to_query(query, type, operatorType, valueOfTypeForQuery<Double>(table, values)...);
+            add_numeric_constraint_to_query(query, type, operatorType, value_of_type_for_query<Double>(table, values)...);
             break;
         case type_Float:
-            add_numeric_constraint_to_query(query, type, operatorType, valueOfTypeForQuery<Float>(table, values)...);
+            add_numeric_constraint_to_query(query, type, operatorType, value_of_type_for_query<Float>(table, values)...);
             break;
         case type_Int:
-            add_numeric_constraint_to_query(query, type, operatorType, valueOfTypeForQuery<Int>(table, values)...);
+            add_numeric_constraint_to_query(query, type, operatorType, value_of_type_for_query<Int>(table, values)...);
             break;
         case type_String:
-            add_string_constraint_to_query(query, operatorType, predicateOptions, valueOfTypeForQuery<String>(table, values)...);
+            add_string_constraint_to_query(query, operatorType, predicateOptions, value_of_type_for_query<String>(table, values)...);
             break;
         case type_Binary:
             if (linkColumns.empty()) {
