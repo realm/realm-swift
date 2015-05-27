@@ -36,26 +36,40 @@ end
 # Script
 ##########################
 
-# Remove Realm & RealmSwift target and dependencies from all example projects
+# Remove Realm target and dependencies from all example objc projects
 
-examples = [
+objc_examples = [
   "examples/ios/objc/RealmExamples.xcodeproj",
-  "examples/ios/swift/RealmExamples.xcodeproj",
   "examples/osx/objc/RealmExamples.xcodeproj"
 ]
 
-examples.each do |example|
+objc_examples.each do |example|
   remove_all_dependencies(example)
   remove_target(example, "Realm")
+
+  filepath = File.join(example, "project.pbxproj")
+  contents = File.read(filepath)
+  File.open(filepath, "w") do |file|
+    file.puts contents.gsub("/build/ios", "/ios/static")
+                      .gsub("/build/osx", "/osx")
+  end
+end
+
+# Remove RealmSwift target and dependencies from all example swift projects
+
+swift_examples = [
+  "examples/ios/swift/RealmExamples.xcodeproj"
+]
+
+swift_examples.each do |example|
+  remove_all_dependencies(example)
   remove_target(example, "RealmSwift")
 
   filepath = File.join(example, "project.pbxproj")
   contents = File.read(filepath)
   File.open(filepath, "w") do |file|
     file.puts contents.gsub("/build/ios/swift", "/ios")
-                      .gsub("/build/ios", "/ios/static")
-                      .gsub("Realm/Swift", "Swift")
-                      .gsub("/build/osx", "/osx")
+                      .gsub("/build/ios-dynamic", "/ios")
   end
 end
 
