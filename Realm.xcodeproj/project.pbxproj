@@ -88,6 +88,7 @@
 		02AFB46A1A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02B709551B17D3E4000541CD /* object_store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02B709531B17D3E4000541CD /* object_store.cpp */; };
 		02B709561B17D3E4000541CD /* object_store.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02B709541B17D3E4000541CD /* object_store.hpp */; };
+		02B767C11B17E28700697258 /* object_store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02B709531B17D3E4000541CD /* object_store.cpp */; };
 		02B8EF5919E601D80045A93D /* RLMResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5819E601D80045A93D /* RLMResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02B8EF5A19E601D80045A93D /* RLMResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5819E601D80045A93D /* RLMResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02B8EF5C19E7048D0045A93D /* RLMCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5B19E7048D0045A93D /* RLMCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1246,6 +1247,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02B767C11B17E28700697258 /* object_store.cpp in Sources */,
 				027A4D281AB100E000AA46F9 /* RLMRealmUtil.mm in Sources */,
 				29E3C7081A71C1C700B62C1D /* RLMAccessor.mm in Sources */,
 				29E3C7091A71C1C700B62C1D /* RLMArray.mm in Sources */,
