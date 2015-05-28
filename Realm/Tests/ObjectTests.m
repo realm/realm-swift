@@ -694,6 +694,26 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertEqualObjects(so[@"stringCol"], @"b");
 }
 
+- (void)testSettingNonOptionalPropertiesToNil {
+    RequiredPropertiesObject *ro = [[RequiredPropertiesObject alloc] init];
+
+    ro.stringCol = nil;
+    ro.binaryCol = nil;
+
+    XCTAssertNil(ro.stringCol);
+    XCTAssertNil(ro.binaryCol);
+
+    ro.stringCol = @"a";
+    ro.binaryCol = [@"a" dataUsingEncoding:NSUTF8StringEncoding];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:ro];
+    RLMAssertThrowsWithReasonMatching(ro.stringCol = nil, @"null into non-nullable column");
+    RLMAssertThrowsWithReasonMatching(ro.binaryCol = nil, @"null into non-nullable column");
+    [realm cancelWriteTransaction];
+}
+
 
 #pragma mark - Default Property Values
 
