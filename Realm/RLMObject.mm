@@ -173,6 +173,10 @@
     return nil;
 }
 
++ (NSArray *)requiredProperties {
+    return nil;
+}
+
 @end
 
 @implementation RLMDynamicObject
