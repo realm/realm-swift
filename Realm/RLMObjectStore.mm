@@ -30,6 +30,7 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+#import "object_store.hpp"
 #import <objc/message.h>
 
 static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema) {
@@ -194,7 +195,7 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
 
 // try to set table references on targetSchema and return true if all tables exist
 static bool RLMRealmGetTables(RLMRealm *realm, RLMSchema *targetSchema) {
-    if (!RLMRealmHasMetadataTables(realm)) {
+    if (!realm::ObjectStore::has_metadata_tables(realm.group)) {
         return false;
     }
 
@@ -222,7 +223,7 @@ static bool RLMPropertyHasChanged(RLMProperty *p1, RLMProperty *p2) {
 // NOTE: must be called from within write transaction
 static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting) {
     // create metadata tables if neded
-    bool changed = RLMRealmCreateMetadataTables(realm);
+    bool changed = realm::ObjectStore::create_metadata_tables(realm.group);
 
     // first pass to create missing tables
     NSMutableArray *objectSchemaToUpdate = [NSMutableArray array];
@@ -267,13 +268,13 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
         if (newPrimary) {
             // if there is a primary key set, check if it is the same as the old key
             if (!oldPrimary || ![oldPrimary isEqualToString:newPrimary]) {
-                RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, newPrimary);
+                realm::ObjectStore::set_primary_key_for_object(realm.group, objectSchema.className.UTF8String, newPrimary.UTF8String);
                 changed = true;
             }
         }
         else if (oldPrimary) {
             // there is no primary key, so if there was one nil out
-            RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, nil);
+            realm::ObjectStore::set_primary_key_for_object(realm.group, objectSchema.className.UTF8String, "");
             changed = true;
         }
     }
@@ -283,7 +284,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
 
 static bool RLMMigrationRequired(RLMRealm *realm, uint64_t newVersion, uint64_t oldVersion) {
     // validate versions
-    if (oldVersion > newVersion && oldVersion != RLMNotVersioned) {
+    if (oldVersion > newVersion && oldVersion != realm::ObjectStore::NotVersioned) {
         NSString *reason = [NSString stringWithFormat:@"Realm at path '%@' has version number %lu which is greater than the current schema version %lu. "
                                                       @"You must call setSchemaVersion: or setDefaultRealmSchemaVersion: before accessing an upgraded Realm.",
                             realm.path, (unsigned long)oldVersion, (unsigned long)newVersion];
@@ -296,7 +297,7 @@ static bool RLMMigrationRequired(RLMRealm *realm, uint64_t newVersion, uint64_t 
 NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
     // if the schema version matches, try to get all the tables without entering
     // a write transaction
-    if (!RLMMigrationRequired(realm, newVersion, RLMRealmSchemaVersion(realm)) && RLMRealmGetTables(realm, targetSchema)) {
+    if (!RLMMigrationRequired(realm, newVersion, realm::ObjectStore::get_schema_version(realm.group)) && RLMRealmGetTables(realm, targetSchema)) {
         RLMRealmSetSchema(realm, targetSchema, true);
         RLMRealmUpdateIndexes(realm);
         return nil;
@@ -309,7 +310,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
     // Recheck the schema version after beginning the write transaction as
     // another process may have done the migration after we opened the read
     // transaction
-    uint64_t oldVersion = RLMRealmSchemaVersion(realm);
+    uint64_t oldVersion = realm::ObjectStore::get_schema_version(realm.group);
     bool migrating = RLMMigrationRequired(realm, newVersion, oldVersion);
 
     @try {
@@ -320,7 +321,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
         if (migrating) {
             // apply the migration block if provided and there's any old data
             // to be migrated
-            if (oldVersion != RLMNotVersioned && migrationBlock) {
+            if (oldVersion != realm::ObjectStore::NotVersioned && migrationBlock) {
                 NSError *error = migrationBlock();
                 if (error) {
                     [realm cancelWriteTransaction];
@@ -328,7 +329,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
                 }
             }
 
-            RLMRealmSetSchemaVersion(realm, newVersion);
+            realm::ObjectStore::set_schema_version(realm.group, newVersion);
             RLMRealmUpdateIndexes(realm);
             changed = true;
         }

@@ -50,33 +50,6 @@ static inline NSString *RLMTableNameForClass(NSString *className) {
     return [c_objectTableNamePrefix stringByAppendingString:className];
 }
 
-
-//
-// Realm schema metadata
-//
-
-
-// check if the realm already has all metadata tbales
-bool RLMRealmHasMetadataTables(RLMRealm *realm);
-
-// create any metadata tables that don't already exist
-// must be in write transaction to set
-// returns true if it actually did anything
-bool RLMRealmCreateMetadataTables(RLMRealm *realm);
-
-uint64_t RLMRealmSchemaVersion(RLMRealm *realm);
-
-// must be in write transaction to set
-void RLMRealmSetSchemaVersion(RLMRealm *realm, uint64_t version);
-
-// get primary key property name for object class
-NSString *RLMRealmPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass);
-
-// sets primary key property for object class
-// must be in write transaction to set
-void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass, NSString *primaryKey);
-
-
 //
 // RLMSchema private interface
 //

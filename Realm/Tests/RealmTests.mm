@@ -20,6 +20,9 @@
 
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.hpp"
+
+#import "object_store.hpp"
 
 extern "C" {
 #import "RLMSchema_Private.h"
@@ -637,7 +640,7 @@ extern "C" {
 
         [realm beginWriteTransaction];
         [realm createObject:StringObject.className withValue:@[@"a"]];
-        RLMRealmSetSchemaVersion(realm, 0);
+        realm::ObjectStore::set_schema_version(realm.group, 0);
         [realm commitWriteTransaction];
     }
 

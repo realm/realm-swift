@@ -29,15 +29,6 @@
 #import <realm/group.hpp>
 
 NSString * const c_objectTableNamePrefix = @"class_";
-const char * const c_metadataTableName = "metadata";
-const char * const c_versionColumnName = "version";
-const size_t c_versionColumnIndex = 0;
-
-const char * const c_primaryKeyTableName = "pk";
-const char * const c_primaryKeyObjectClassColumnName = "pk_table";
-const size_t c_primaryKeyObjectClassColumnIndex =  0;
-const char * const c_primaryKeyPropertyNameColumnName = "pk_property";
-const size_t c_primaryKeyPropertyNameColumnIndex =  1;
 
 const uint64_t RLMNotVersioned = std::numeric_limits<uint64_t>::max();
 
@@ -161,77 +152,6 @@ static NSMutableDictionary *s_localNameToClass;
     schema.objectSchema = schemaArray;
     return schema;
 }
-
-uint64_t RLMRealmSchemaVersion(RLMRealm *realm) {
-    realm::TableRef table = realm.group->get_table(c_metadataTableName);
-    if (!table || table->get_column_count() == 0) {
-        return RLMNotVersioned;
-    }
-    return table->get_int(c_versionColumnIndex, 0);
-}
-
-void RLMRealmSetSchemaVersion(RLMRealm *realm, uint64_t version) {
-    realm::TableRef table = realm.group->get_or_add_table(c_metadataTableName);
-    table->set_int(c_versionColumnIndex, 0, version);
-}
-
-NSString *RLMRealmPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass) {
-    realm::TableRef table = realm.group->get_table(c_primaryKeyTableName);
-    if (!table) {
-        return nil;
-    }
-    size_t row = table->find_first_string(c_primaryKeyObjectClassColumnIndex, RLMStringDataWithNSString(objectClass));
-    if (row == realm::not_found) {
-        return nil;
-    }
-    return RLMStringDataToNSString(table->get_string(c_primaryKeyPropertyNameColumnIndex, row));
-}
-
-bool RLMRealmHasMetadataTables(RLMRealm *realm) {
-    return realm.group->get_table(c_primaryKeyTableName) && realm.group->get_table(c_metadataTableName);
-}
-
-bool RLMRealmCreateMetadataTables(RLMRealm *realm) {
-    bool changed = false;
-    realm::TableRef table = realm.group->get_or_add_table(c_primaryKeyTableName);
-    if (table->get_column_count() == 0) {
-        table->add_column(realm::type_String, c_primaryKeyObjectClassColumnName);
-        table->add_column(realm::type_String, c_primaryKeyPropertyNameColumnName);
-        changed = true;
-    }
-
-    table = realm.group->get_or_add_table(c_metadataTableName);
-    if (table->get_column_count() == 0) {
-        table->add_column(realm::type_Int, c_versionColumnName);
-
-        // set initial version
-        table->add_empty_row();
-        table->set_int(c_versionColumnIndex, 0, RLMNotVersioned);
-        changed = true;
-    }
-
-    return changed;
-}
-
-void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass, NSString *primaryKey) {
-    realm::TableRef table = realm.group->get_table(c_primaryKeyTableName);
-
-    // get row or create if new object and populate
-    size_t row = table->find_first_string(c_primaryKeyObjectClassColumnIndex, RLMStringDataWithNSString(objectClass));
-    if (row == realm::not_found && primaryKey != nil) {
-        row = table->add_empty_row();
-        table->set_string(c_primaryKeyObjectClassColumnIndex, row, RLMStringDataWithNSString(objectClass));
-    }
-
-    // set if changing, or remove if setting to nil
-    if (primaryKey == nil && row != realm::not_found) {
-        table->remove(row);
-    }
-    else {
-        table->set_string(c_primaryKeyPropertyNameColumnIndex, row, RLMStringDataWithNSString(primaryKey));
-    }
-}
-
 
 + (Class)classForString:(NSString *)className {
     if (Class cls = s_localNameToClass[className]) {

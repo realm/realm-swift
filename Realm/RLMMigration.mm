@@ -28,6 +28,8 @@
 #import "RLMResults_Private.h"
 #import "RLMSchema_Private.h"
 
+#import "object_store.hpp"
+
 #import <realm/link_view.hpp>
 #import <realm/table_view.hpp>
 
@@ -129,7 +131,7 @@
         }
 
         // apply block and set new schema version
-        uint64_t oldVersion = RLMRealmSchemaVersion(_realm);
+        uint64_t oldVersion = realm::ObjectStore::get_schema_version(_realm.group);
         block(self, oldVersion);
 
         // verify uniqueness for any new unique columns before committing
@@ -168,8 +170,9 @@
     else {
         _realm.group->remove_table(table);
 
-        if (RLMRealmPrimaryKeyForObjectClass(_realm, name)) {
-            RLMRealmSetPrimaryKeyForObjectClass(_realm, name, nil);
+        std::string primaryKey = realm::ObjectStore::get_primary_key_for_object(_realm.group, name.UTF8String);
+        if (primaryKey.length()) {
+            realm::ObjectStore::set_primary_key_for_object(_realm.group, name.UTF8String, "");
         }
     }
 

@@ -29,6 +29,7 @@
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
+#include "object_store.hpp"
 #include <realm/commit_log.hpp>
 #include <realm/version.hpp>
 
@@ -385,7 +386,7 @@ static id RLMAutorelease(id value) {
         // create tables, set schema, and create accessors when needed
         if (readonly || (dynamic && !customSchema)) {
             // for readonly realms and dynamic realms without a custom schema just set the schema
-            if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
+            if (realm::ObjectStore::get_schema_version(realm.group) == realm::ObjectStore::NotVersioned) {
                 RLMSetErrorOrThrow([NSError errorWithDomain:RLMErrorDomain code:RLMErrorFail userInfo:@{NSLocalizedDescriptionKey:@"Cannot open an uninitialized realm in read-only mode"}], outError);
                 return nil;
             }
@@ -803,7 +804,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         @throw RLMException(@"Cannot set schema version for Realms that are already open.");
     }
 
-    if (version == RLMNotVersioned) {
+    if (version == realm::ObjectStore::NotVersioned) {
         @throw RLMException(@"Cannot set schema version to RLMNotVersioned.");
     }
 
@@ -830,11 +831,11 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:YES inMemory:NO dynamic:YES error:&error];
         if (error) {
             RLMSetErrorOrThrow(error, outError);
-            return RLMNotVersioned;
+            return realm::ObjectStore::NotVersioned;
         }
     }
 
-    return RLMRealmSchemaVersion(realm);
+    return realm::ObjectStore::get_schema_version(realm.group);
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath {

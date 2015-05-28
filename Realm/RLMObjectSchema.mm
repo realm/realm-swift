@@ -28,6 +28,7 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+#import "object_store.hpp"
 #import <realm/group.hpp>
 
 // private properties
@@ -226,11 +227,12 @@
     schema.className = className;
 
     // get primary key from realm metadata
-    NSString *primaryKey = RLMRealmPrimaryKeyForObjectClass(realm, className);
-    if (primaryKey) {
-        schema.primaryKeyProperty = schema[primaryKey];
+    std::string primaryKey = realm::ObjectStore::get_primary_key_for_object(realm.group, className.UTF8String);
+    if (primaryKey.length()) {
+        NSString *primaryKeyString = [NSString stringWithUTF8String:primaryKey.c_str()];
+        schema.primaryKeyProperty = schema[primaryKeyString];
         if (!schema.primaryKeyProperty) {
-            NSString *reason = [NSString stringWithFormat:@"No property matching primary key '%@'", primaryKey];
+            NSString *reason = [NSString stringWithFormat:@"No property matching primary key '%@'", primaryKeyString];
             @throw RLMException(reason);
         }
     }
