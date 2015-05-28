@@ -348,7 +348,7 @@ void add_link_constraint_to_query(realm::Query & query,
 
 void add_link_constraint_to_query(realm::Query& query, NSPredicateOperatorType operatorType, RLMObject *obj, NSUInteger column) {
     // Link constraints only support the equal-to and not-equal-to operators. The order of operands
-    // is not important for those comaprisons so we can delegate to the other implementation.
+    // is not important for those comparisons so we can delegate to the other implementation.
     add_link_constraint_to_query(query, operatorType, column, obj);
 }
 
