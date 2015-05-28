@@ -29,6 +29,11 @@
 + (void)resetRealmState;
 @end
 
+__attribute((constructor))
+static void initializeSharedSchema() {
+    [RLMSchema class];
+}
+
 NSString *RLMRealmPathForFile(NSString *fileName) {
 #if TARGET_OS_IPHONE
     NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];

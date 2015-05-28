@@ -21,6 +21,11 @@
 #import <Realm/Realm.h>
 #import <Realm/RLMRealmUtil.h>
 
+__attribute((constructor))
+static void initializeSharedSchema() {
+    [RLMSchema class];
+}
+
 void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     BOOL didThrow = NO;
     @try {
