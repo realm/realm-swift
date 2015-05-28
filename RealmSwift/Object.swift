@@ -323,4 +323,8 @@ public class ObjectUtil: NSObject {
 
         return properties
     }
+
+    @objc private class func requiredPropertiesForClass(_: AnyClass) -> NSArray? {
+        return nil
+    }
 }

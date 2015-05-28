@@ -250,6 +250,14 @@
  */
 + (NSArray *)ignoredProperties;
 
+/**
+ Implement to return an array of property names that should be required. These properties will not allow storing
+ `nil`.
+ 
+ @return    NSArray of property names that are required.
+ */
++ (NSArray *)requiredProperties;
+
 
 /**---------------------------------------------------------------------------------------
  *  @name Getting & Querying Objects from the Default Realm

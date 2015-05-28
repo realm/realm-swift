@@ -93,6 +93,11 @@ RLM_ARRAY_TYPE(IntObject)
 @property IndexedStringObject *objectCol;
 @end
 
+@interface RequiredPropertiesObject : RLMObject
+@property NSString *stringCol;
+@property NSData *binaryCol;
+@end
+
 #pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject

@@ -357,4 +357,8 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     return nil;
 }
 
++ (NSArray *)requiredPropertiesForClass:(Class)cls {
+    return [cls requiredProperties];
+}
+
 @end

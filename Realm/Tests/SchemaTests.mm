@@ -429,4 +429,10 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                       @".*Can't index property.*double.*");
 }
 
++ (void)testClassWithRequiredNullableProperties {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:RequiredPropertiesObject.class];
+    XCTAssertFalse([objectSchema[@"stringCol"] optional]);
+    XCTAssertFalse([objectSchema[@"binaryCol"] optional]);
+}
+
 @end

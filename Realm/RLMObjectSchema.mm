@@ -206,6 +206,12 @@
                                 property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeArray; // remove if/when core supports required link columns
         }
     }
+    if (NSArray *requiredProperties = [objectUtil requiredPropertiesForClass:objectClass]) {
+        for (RLMProperty *property in propArray) {
+            bool optional = ![requiredProperties containsObject:property.name];
+            property.optional &= optional;
+        }
+    }
 
     return propArray;
 }
