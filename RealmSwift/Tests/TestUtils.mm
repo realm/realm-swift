@@ -21,6 +21,11 @@
 #import <Realm/Realm.h>
 #import <Realm/RLMRealmUtil.h>
 
+__attribute((constructor))
+static void initializeSharedSchema() {
+    [RLMSchema class];
+}
+
 @implementation RLMAutoreleasePoolTestCase
 - (void)invokeTest {
     @autoreleasepool {
