@@ -498,7 +498,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         // set in table with out validation
         // skip primary key when updating since it doesn't change
         if (created || !prop.isPrimary) {
-            RLMDynamicSet(object, prop, value, creationOptions);
+            RLMDynamicSet(object, prop, RLMNSNullToNil(value), creationOptions);
         }
 
         // set the ivars for object and array properties to nil as otherwise the
@@ -659,12 +659,11 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         NSArray *props = objectSchema.properties;
         for (NSUInteger i = 0; i < array.count; i++) {
             RLMProperty *prop = props[i];
-            id propValue = RLMNSNullToNil(array[i]);
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
                 id val = array[i];
                 RLMValidateValueForProperty(val, prop, schema, false, false);
-                RLMDynamicSet(object, prop, val, creationOptions);
+                RLMDynamicSet(object, prop, RLMNSNullToNil(val), creationOptions);
             }
         }
     }
@@ -692,7 +691,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
                 if (created || !prop.isPrimary) {
                     // skip missing properties and primary key when updating since it doesn't change
                     RLMValidateValueForProperty(propValue, prop, schema, false, false);
-                    RLMDynamicSet(object, prop, propValue, creationOptions);
+                    RLMDynamicSet(object, prop, RLMNSNullToNil(propValue), creationOptions);
                 }
             }
             else if (created && !prop.optional) {
