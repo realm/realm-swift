@@ -135,7 +135,11 @@
     for (RLMProperty *prop in schema.properties) {
         RLMPropertyType type = prop.type;
         if (prop.optional && !RLMPropertyTypeIsNullable(type)) {
-            @throw RLMException([NSString stringWithFormat:@"Only 'string', 'array', and 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)]);
+            NSString *error = [NSString stringWithFormat:@"Only 'string', 'array', and 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)];
+            if (prop.type == RLMPropertyTypeAny && isSwift) {
+                error = [error stringByAppendingString:@"\nIf this is a 'String?' property, it must be declared as 'NSString?' instead."];
+            }
+            @throw RLMException(error);
         }
     }
 
