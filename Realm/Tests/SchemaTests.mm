@@ -116,6 +116,15 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 }
 @end
 
+@interface RequiredLinkProperty : FakeObject
+@property BoolObject *object;
+@end
+@implementation RequiredLinkProperty
++ (NSArray *)requiredProperties {
+    return @[@"object"];
+}
+@end
+
 @interface SchemaTests : RLMTestCase
 @end
 
@@ -429,10 +438,14 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                       @".*Can't index property.*double.*");
 }
 
-+ (void)testClassWithRequiredNullableProperties {
+- (void)testClassWithRequiredNullableProperties {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:RequiredPropertiesObject.class];
     XCTAssertFalse([objectSchema[@"stringCol"] optional]);
     XCTAssertFalse([objectSchema[@"binaryCol"] optional]);
+}
+
+- (void)testClassWithRequiredLinkProperty {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:RequiredLinkProperty.class], @"cannot be made required.*'object'");
 }
 
 @end

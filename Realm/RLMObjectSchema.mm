@@ -208,8 +208,13 @@
     }
     if (NSArray *requiredProperties = [objectUtil requiredPropertiesForClass:objectClass]) {
         for (RLMProperty *property in propArray) {
-            bool optional = ![requiredProperties containsObject:property.name];
-            property.optional &= optional;
+            bool required = [requiredProperties containsObject:property.name];
+            if (required && (property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeArray)) {
+                NSString *error = [NSString stringWithFormat:@"Object and Array property types cannot be made required, " \
+                                                              "but '+[%@ requiredProperties]' included '%@'", objectClass, property.name];
+                @throw RLMException(error);
+            }
+            property.optional &= !required;
         }
     }
 
