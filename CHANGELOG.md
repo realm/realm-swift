@@ -15,6 +15,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Objects are no longer copied into standalone objects during object creation. This fixes an issue where
   nested objects with a primary key are sometimes duplicated rather than updated.
+* Comparison predicates with a constant on the left of the operator and key path on the right now give
+  correct results. An exception is now thrown for predicates that do not yet support this ordering.
 
 0.93.0 Release notes (2015-05-27)
 =============================================================
