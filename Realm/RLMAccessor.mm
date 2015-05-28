@@ -633,7 +633,7 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
                             @{@"Property name:" : propName ?: @"nil",
                               @"Value": val ? [val description] : @"nil"});
     }
-    RLMDynamicSet(obj, prop, val, RLMCreationOptionsPromoteStandalone);
+    RLMDynamicSet(obj, prop, RLMNSNullToNil(val), RLMCreationOptionsPromoteStandalone);
 }
 
 void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const prop,
