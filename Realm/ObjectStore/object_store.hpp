@@ -16,8 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef __Realm__object_store__
-#define __Realm__object_store__
+#ifndef __realm__object_store__
+#define __realm__object_store__
 
 #include <realm/group.hpp>
 
@@ -42,13 +42,13 @@ namespace realm {
         static void set_schema_version(realm::Group *group, uint64_t version);
 
         // get primary key property name for object type
-        static std::string get_primary_key_for_object(realm::Group *group, std::string object_type);
+        static StringData get_primary_key_for_object(realm::Group *group, StringData object_type);
         
         // sets primary key property for object type
         // must be in write transaction to set
-        static void set_primary_key_for_object(realm::Group *group, std::string object_type, std::string primary_key);
+        static void set_primary_key_for_object(realm::Group *group, StringData object_type, StringData primary_key);
     };
 }
 
-#endif /* defined(__Realm__object_store__) */
+#endif /* defined(__realm__object_store__) */
 

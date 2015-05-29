@@ -71,7 +71,7 @@ void ObjectStore::set_schema_version(realm::Group *group, uint64_t version) {
     table->set_int(c_versionColumnIndex, 0, version);
 }
 
-std::string ObjectStore::get_primary_key_for_object(realm::Group *group, std::string object_type) {
+StringData ObjectStore::get_primary_key_for_object(realm::Group *group, StringData object_type) {
     realm::TableRef table = group->get_table(c_primaryKeyTableName);
     if (!table) {
         return "";
@@ -83,18 +83,18 @@ std::string ObjectStore::get_primary_key_for_object(realm::Group *group, std::st
     return table->get_string(c_primaryKeyPropertyNameColumnIndex, row);
 }
 
-void ObjectStore::set_primary_key_for_object(realm::Group *group, std::string object_type, std::string primary_key) {
+void ObjectStore::set_primary_key_for_object(realm::Group *group, StringData object_type, StringData primary_key) {
     realm::TableRef table = group->get_table(c_primaryKeyTableName);
 
     // get row or create if new object and populate
     size_t row = table->find_first_string(c_primaryKeyObjectClassColumnIndex, object_type);
-    if (row == realm::not_found && primary_key.length()) {
+    if (row == realm::not_found && primary_key.size()) {
         row = table->add_empty_row();
         table->set_string(c_primaryKeyObjectClassColumnIndex, row, object_type);
     }
 
     // set if changing, or remove if setting to nil
-    if (primary_key.length() == 0 && row != realm::not_found) {
+    if (primary_key.size() == 0 && row != realm::not_found) {
         table->remove(row);
     }
     else {
