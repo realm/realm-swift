@@ -188,7 +188,7 @@
 /**
  Returns the location of the default Realm as a string.
 
- `~/Application Support/{bundle ID}/default.realm` on OS X.
+ `~/Library/Application Support/{bundle ID}/default.realm` on OS X.
 
  `default.realm` in your application's documents directory on iOS.
 

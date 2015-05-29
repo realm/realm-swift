@@ -58,7 +58,7 @@ public final class Realm {
     /**
     The location of the default Realm as a string. Can be overridden.
 
-    `~/Application Support/{bundle ID}/default.realm` on OS X.
+    `~/Library/Application Support/{bundle ID}/default.realm` on OS X.
 
     `default.realm` in your application's documents directory on iOS.
 
