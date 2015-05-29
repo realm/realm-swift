@@ -131,7 +131,8 @@ static inline NSData *RLMBinaryDataToNSData(realm::BinaryData binaryData) {
 }
 
 static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSData *const data) {
-    return realm::BinaryData(static_cast<const char *>(data.bytes), data.length);
+    auto bytes = static_cast<const char *>(data.bytes) ?: static_cast<char *>((__bridge void *)data);
+    return realm::BinaryData(bytes, data.length);
 }
 
 static inline NSUInteger RLMConvertNotFound(size_t index) {
