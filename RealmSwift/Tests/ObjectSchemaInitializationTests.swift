@@ -98,7 +98,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(arrayCol!.name, "arrayCol")
         XCTAssertEqual(arrayCol!.type, PropertyType.Array)
         XCTAssertFalse(arrayCol!.indexed)
-        XCTAssertTrue(arrayCol!.optional)
+        XCTAssertFalse(arrayCol!.optional)
         XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
 
         let dynamicArrayCol = SwiftCompanyObject().objectSchema["employees"]
@@ -106,6 +106,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(dynamicArrayCol!.name, "employees")
         XCTAssertEqual(dynamicArrayCol!.type, PropertyType.Array)
         XCTAssertFalse(dynamicArrayCol!.indexed)
+        XCTAssertFalse(arrayCol!.optional)
         XCTAssertEqual(dynamicArrayCol!.objectClassName!, "SwiftEmployeeObject")
     }
 
