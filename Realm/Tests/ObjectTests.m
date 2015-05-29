@@ -692,6 +692,62 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertEqualObjects(so.stringCol, @"b");
     XCTAssertEqualObjects([so valueForKey:@"stringCol"], @"b");
     XCTAssertEqualObjects(so[@"stringCol"], @"b");
+
+    [realm transactionWithBlock:^{
+        so.stringCol = @"";
+    }];
+    XCTAssertEqualObjects(so.stringCol, @"");
+    XCTAssertEqualObjects([so valueForKey:@"stringCol"], @"");
+    XCTAssertEqualObjects(so[@"stringCol"], @"");
+}
+
+- (void)testOptionalBinaryProperties {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    BinaryObject *bo = [[BinaryObject alloc] init];
+
+    XCTAssertNil(bo.binaryCol);
+    XCTAssertNil([bo valueForKey:@"binaryCol"]);
+    XCTAssertNil(bo[@"binaryCol"]);
+
+    NSData *aData = [@"a" dataUsingEncoding:NSUTF8StringEncoding];
+    bo.binaryCol = aData;
+    XCTAssertEqualObjects(bo.binaryCol, aData);
+    XCTAssertEqualObjects([bo valueForKey:@"binaryCol"], aData);
+    XCTAssertEqualObjects(bo[@"binaryCol"], aData);
+
+    [bo setValue:nil forKey:@"binaryCol"];
+    XCTAssertNil(bo.binaryCol);
+    XCTAssertNil([bo valueForKey:@"binaryCol"]);
+    XCTAssertNil(bo[@"binaryCol"]);
+
+    [realm transactionWithBlock:^{
+        [realm addObject:bo];
+        XCTAssertNil(bo.binaryCol);
+        XCTAssertNil([bo valueForKey:@"binaryCol"]);
+        XCTAssertNil(bo[@"binaryCol"]);
+    }];
+
+    bo = [BinaryObject allObjectsInRealm:realm].firstObject;
+
+    XCTAssertNil(bo.binaryCol);
+    XCTAssertNil([bo valueForKey:@"binaryCol"]);
+    XCTAssertNil(bo[@"binaryCol"]);
+
+    NSData *bData = [@"b" dataUsingEncoding:NSUTF8StringEncoding];
+    [realm transactionWithBlock:^{
+        bo.binaryCol = bData;
+    }];
+    XCTAssertEqualObjects(bo.binaryCol, bData);
+    XCTAssertEqualObjects([bo valueForKey:@"binaryCol"], bData);
+    XCTAssertEqualObjects(bo[@"binaryCol"], bData);
+
+    NSData *emptyData = [NSData data];
+    [realm transactionWithBlock:^{
+        bo.binaryCol = emptyData;
+    }];
+    XCTAssertEqualObjects(bo.binaryCol, emptyData);
+    XCTAssertEqualObjects([bo valueForKey:@"binaryCol"], emptyData);
+    XCTAssertEqualObjects(bo[@"binaryCol"], emptyData);
 }
 
 - (void)testSettingNonOptionalPropertiesToNil {
