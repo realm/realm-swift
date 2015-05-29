@@ -166,10 +166,11 @@ test_ios_devices() {
         exit 1
     fi
     cmd="$1"
-    configuration="$2"
+    scheme="$2"
+    configuration="$3"
     failed=0
     for device in "${serial_numbers[@]}"; do
-        $cmd "-scheme 'iOS Device Tests' -configuration $configuration -destination 'id=$device' test" || failed=1
+        $cmd "-scheme '$2' -configuration $configuration -destination 'id=$device' test" || failed=1
     done
     return $failed
 }
@@ -283,7 +284,7 @@ case "$COMMAND" in
         ;;
 
     "ios-swift")
-        build_combined "RealmSwift iOS" RealmSwift
+        build_combined RealmSwift RealmSwift
         mkdir build/ios/swift
         cp -R build/ios/RealmSwift.framework build/ios/swift
         cp -R build/ios-dynamic/Realm.framework build/ios/swift
@@ -299,7 +300,7 @@ case "$COMMAND" in
         ;;
 
     "osx-swift")
-        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
+        xcrealmswift "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
         cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework build/osx
         exit 0
         ;;
@@ -340,15 +341,15 @@ case "$COMMAND" in
         ;;
 
     "test-ios-swift")
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
         ;;
 
     "test-ios-devices")
         failed=0
-        test_ios_devices xcrealm "$CONFIGURATION" || failed=1
-        test_ios_devices xcrealmswift "$CONFIGURATION" || failed=1
+        test_ios_devices xcrealm "iOS Device Tests" "$CONFIGURATION" || failed=1
+        test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION" || failed=1
         exit $failed
         ;;
 
@@ -358,7 +359,7 @@ case "$COMMAND" in
         ;;
 
     "test-osx-swift")
-        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION test"
+        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION test"
         exit 0
         ;;
 
