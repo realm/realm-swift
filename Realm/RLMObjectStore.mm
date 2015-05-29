@@ -144,9 +144,9 @@ static void RLMCreateColumn(RLMRealm *realm, realm::Table &table, RLMProperty *p
             prop.column = table.add_column_link(realm::DataType(prop.type), prop.name.UTF8String, *linkTable);
             break;
         }
-        default: {
+        default:
             prop.column = table.add_column(realm::DataType(prop.type), prop.name.UTF8String, prop.optional);
-        }
+            break;
     }
 }
 
