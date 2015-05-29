@@ -822,13 +822,13 @@
 
 - (void)testRLMNotVersionedHasCorrectValue
 {
-    XCTAssertEqual(realm::ObjectStore::NotVersioned, std::numeric_limits<uint64_t>::max());
+    XCTAssertEqual(RLMNotVersioned, std::numeric_limits<uint64_t>::max());
 }
 
 - (void)testSetSchemaVersionValidatesVersion
 {
-    RLMAssertThrowsWithReasonMatching([RLMRealm setSchemaVersion:realm::ObjectStore::NotVersioned forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil], @"Cannot set schema version");
-    [RLMRealm setSchemaVersion:realm::ObjectStore::NotVersioned - 1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
+    RLMAssertThrowsWithReasonMatching([RLMRealm setSchemaVersion:RLMNotVersioned forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil], @"Cannot set schema version");
+    [RLMRealm setSchemaVersion:RLMNotVersioned - 1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
 }
 
 @end

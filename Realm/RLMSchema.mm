@@ -25,12 +25,13 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+#import "object_store.hpp"
 #import <objc/runtime.h>
 #import <realm/group.hpp>
 
 NSString * const c_objectTableNamePrefix = @"class_";
 
-const uint64_t RLMNotVersioned = std::numeric_limits<uint64_t>::max();
+const uint64_t RLMNotVersioned = realm::ObjectStore::NotVersioned;
 
 // RLMSchema private properties
 @interface RLMSchema ()

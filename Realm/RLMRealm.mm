@@ -831,7 +831,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:YES inMemory:NO dynamic:YES error:&error];
         if (error) {
             RLMSetErrorOrThrow(error, outError);
-            return realm::ObjectStore::NotVersioned;
+            return RLMNotVersioned;
         }
     }
 
