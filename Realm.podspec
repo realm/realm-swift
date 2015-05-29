@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
                               'include/Realm/Realm.h'
 
   s.module_map              = 'Realm/module.modulemap'
-  s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"'"
+  s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
   s.source_files            = 'Realm/*.{m,mm}', 'Realm/ObjectStore/*.cpp'
   s.header_mappings_dir     = 'include'
