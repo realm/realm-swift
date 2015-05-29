@@ -135,7 +135,7 @@
     for (RLMProperty *prop in schema.properties) {
         RLMPropertyType type = prop.type;
         if (prop.optional && !RLMPropertyTypeIsNullable(type)) {
-            NSString *error = [NSString stringWithFormat:@"Only 'string', 'array', and 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)];
+            NSString *error = [NSString stringWithFormat:@"Only 'string', 'binary', and 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)];
             if (prop.type == RLMPropertyTypeAny && isSwift) {
                 error = [error stringByAppendingString:@"\nIf this is a 'String?' property, it must be declared as 'NSString?' instead."];
             }
@@ -203,14 +203,14 @@
     if (NSArray *optionalProperties = [objectUtil getOptionalPropertyNames:swiftObjectInstance]) {
         for (RLMProperty *property in propArray) {
             property.optional = [optionalProperties containsObject:property.name] ||
-                                property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeArray; // remove if/when core supports required link columns
+                                property.type == RLMPropertyTypeObject; // remove if/when core supports required link columns
         }
     }
     if (NSArray *requiredProperties = [objectUtil requiredPropertiesForClass:objectClass]) {
         for (RLMProperty *property in propArray) {
             bool required = [requiredProperties containsObject:property.name];
-            if (required && (property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeArray)) {
-                NSString *error = [NSString stringWithFormat:@"Object and Array property types cannot be made required, " \
+            if (required && property.type == RLMPropertyTypeObject) {
+                NSString *error = [NSString stringWithFormat:@"Object properties cannot be made required, " \
                                                               "but '+[%@ requiredProperties]' included '%@'", objectClass, property.name];
                 @throw RLMException(error);
             }

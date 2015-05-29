@@ -26,7 +26,6 @@
 
 BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
     switch (propertyType) {
-        case RLMPropertyTypeArray:
         case RLMPropertyTypeObject:
         case RLMPropertyTypeString:
         case RLMPropertyTypeData:
@@ -147,7 +146,6 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
             else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
                 // get object class from type string - @"RLMArray<objectClassName>"
                 _type = RLMPropertyTypeArray;
-                _optional = true;
                 _objectClassName = [[NSString alloc] initWithBytes:code + arrayPrefixLen
                                                             length:strlen(code + arrayPrefixLen) - 2 // drop trailing >"
                                                           encoding:NSUTF8StringEncoding];
