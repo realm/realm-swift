@@ -138,7 +138,10 @@ void RLMObservationInfo::removeObserver() {
 }
 
 id RLMObservationInfo::valueForKey(NSString *key, id (^getValue)()) {
-    if (returnNil && ![key isEqualToString:@"invalidated"]) {
+    if (invalidated) {
+        if ([key isEqualToString:@"invalidated"]) {
+            return @YES;
+        }
         return cachedObjects[key];
     }
 
@@ -277,7 +280,7 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
         }
         for (auto info : invalidated) {
             info->willChange(@"invalidated");
-            info->setReturnNil(true);
+            info->prepareForInvalidation();
         }
     });
 
@@ -342,7 +345,6 @@ class TransactLogHandler {
                 auto const& row = info->getRow();
                 if (!row.is_attached()) // FIXME: should maybe try to remove from array on invalidate
                     continue;
-                info->setReturnNil(false);
                 observers.push_back({
                     row.get_table()->get_index_in_group(),
                     row.get_index(),
@@ -410,7 +412,7 @@ public:
 
         for (auto info : invalidated) {
             info->willChange(@"invalidated");
-            info->setReturnNil(true);
+            info->prepareForInvalidation();
         }
     }
 

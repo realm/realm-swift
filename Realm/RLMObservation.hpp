@@ -68,10 +68,10 @@ public:
         }
     }
 
-    void setReturnNil(bool value) {
+    void prepareForInvalidation() {
         REALM_ASSERT(objectSchema);
         for (auto info = this; info; info = info->next)
-            info->returnNil = value;
+            info->invalidated = true;
     }
 
     void setRow(size_t newRow);
@@ -99,7 +99,7 @@ private:
     __unsafe_unretained id object;
 
     // valueForKey: hack
-    bool returnNil = false;
+    bool invalidated = false;
     size_t observerCount = 0;
 
     // objects returned from valueForKey() to keep them alive in case observers
