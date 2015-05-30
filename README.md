@@ -12,7 +12,7 @@ This repository holds the source code for the iOS & OSX versions of Realm, for b
 
 ## Getting Started
 
-Please see the detailed instructions in our docs to add [Realm Objective-C](https://realm.io/docs/objc/#installation) _or_ [Realm Swift](https://realm.io/docs/swift/#installation) to your Xcode project.
+Please see the detailed instructions in our docs to add [Realm Objective-C](https://realm.io/docs/objc/latest/#installation) _or_ [Realm Swift](https://realm.io/docs/swift/latest/#installation) to your Xcode project.
 
 ## Documentation
 
