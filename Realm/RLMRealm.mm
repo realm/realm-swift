@@ -294,6 +294,17 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     return [path stringByAppendingPathComponent:fileName];
 }
 
++ (NSString *)writeableTemporaryPathForFile:(NSString*)fileName
+{
+    NSString *path = NSTemporaryDirectory();
+    [[NSFileManager defaultManager] createDirectoryAtPath:path
+                              withIntermediateDirectories:YES
+                                               attributes:nil
+                                                    error:nil];
+    fileName = [NSString stringWithFormat:@"%d-%@", NSProcessInfo.processInfo.processIdentifier, fileName];
+    return [path stringByAppendingPathComponent:fileName];
+}
+
 + (instancetype)defaultRealm
 {
     return [RLMRealm realmWithPath:[RLMRealm defaultRealmPath] readOnly:NO error:nil];
@@ -312,7 +323,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 + (instancetype)inMemoryRealmWithIdentifier:(NSString *)identifier {
-    return [self realmWithPath:[RLMRealm writeablePathForFile:identifier] key:nil
+    return [self realmWithPath:[RLMRealm writeableTemporaryPathForFile:identifier] key:nil
                       readOnly:NO inMemory:YES dynamic:NO schema:nil error:nil];
 }
 
