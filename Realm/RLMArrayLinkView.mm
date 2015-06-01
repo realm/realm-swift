@@ -54,7 +54,7 @@
 }
 
 void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NSString *keyPath, RLMArray *array, id observed) {
-    if (!info && [keyPath isEqualToString:@"invalidated"] && array.class == [RLMArrayLinkView class]) {
+    if (!info && [keyPath isEqualToString:RLMInvalidatedKey] && array.class == [RLMArrayLinkView class]) {
         RLMArrayLinkView *lv = static_cast<RLMArrayLinkView *>(array);
         info = std::make_unique<RLMObservationInfo>(lv->_objectSchema, lv->_backingLinkView->get_origin_row_index(), observed);
     }
@@ -353,7 +353,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 
 - (id)valueForKey:(NSString *)key {
     // FIXME: change to "@invalidated"?
-    if ([key isEqualToString:@"invalidated"]) {
+    if ([key isEqualToString:RLMInvalidatedKey]) {
         return @(!_backingLinkView->is_attached());
     }
 

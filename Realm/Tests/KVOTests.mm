@@ -759,7 +759,7 @@ public:
 - (void)testDeleteObservedObject {
     KVOObject *obj = [self createObject];
     KVORecorder r1(self, obj, @"boolCol");
-    KVORecorder r2(self, obj, @"invalidated");
+    KVORecorder r2(self, obj, RLMInvalidatedKey);
     [self.realm deleteObject:obj];
     AssertChanged(r2, @NO, @YES);
     // should not crash
@@ -776,7 +776,7 @@ public:
     KVOObject *obj = [self createObject];
     KVORecorder r1(self, obj, @"arrayCol");
     KVORecorder r2(self, obj, @"arrayCol.invalidated");
-    KVORecorder r3(self, obj.arrayCol, @"invalidated");
+    KVORecorder r3(self, obj.arrayCol, RLMInvalidatedKey);
     [self.realm deleteObject:obj];
     AssertChanged(r2, @NO, @YES);
     AssertChanged(r3, @NO, @YES);
@@ -785,7 +785,7 @@ public:
 - (void)testDeleteAllObjects {
     KVOObject *obj = [self createObject];
     KVORecorder r1(self, obj, @"boolCol");
-    KVORecorder r2(self, obj, @"invalidated");
+    KVORecorder r2(self, obj, RLMInvalidatedKey);
     [self.realm deleteAllObjects];
     AssertChanged(r2, @NO, @YES);
     // should not crash
@@ -794,7 +794,7 @@ public:
 - (void)testClearTable {
     KVOObject *obj = [self createObject];
     KVORecorder r1(self, obj, @"boolCol");
-    KVORecorder r2(self, obj, @"invalidated");
+    KVORecorder r2(self, obj, RLMInvalidatedKey);
     [self.realm deleteObjects:[KVOObject allObjectsInRealm:self.realm]];
     AssertChanged(r2, @NO, @YES);
     // should not crash
@@ -803,7 +803,7 @@ public:
 - (void)testClearQuery {
     KVOObject *obj = [self createObject];
     KVORecorder r1(self, obj, @"boolCol");
-    KVORecorder r2(self, obj, @"invalidated");
+    KVORecorder r2(self, obj, RLMInvalidatedKey);
     [self.realm deleteObjects:[KVOObject objectsInRealm:self.realm where:@"TRUEPREDICATE"]];
     AssertChanged(r2, @NO, @YES);
     // should not crash
@@ -931,7 +931,7 @@ public:
 // conceptually similar and don't make sense in the multiple realm instances case
 - (void)testCancelWriteTransactionWhileObservingNewObject {
     KVOObject *obj = [self createObject];
-    KVORecorder r(self, obj, @"invalidated");
+    KVORecorder r(self, obj, RLMInvalidatedKey);
     KVORecorder r2(self, obj, @"boolCol");
     [self.realm cancelWriteTransaction];
     AssertChanged(r, @NO, @YES);
@@ -989,7 +989,7 @@ public:
 - (void)testCancelWriteTransactionWhileObservingNewObjectLinkingToNewObject {
     KVOObject *obj = [self createObject];
     obj.objectCol = [self createObject];
-    KVORecorder r(self, obj, @"invalidated");
+    KVORecorder r(self, obj, RLMInvalidatedKey);
     KVORecorder r2(self, obj, @"objectCol");
     KVORecorder r3(self, obj, @"objectCol.boolCol");
     [self.realm cancelWriteTransaction];
