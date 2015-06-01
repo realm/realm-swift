@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'pathname'
+require 'tmpdir'
 
 require 'octokit'
 
@@ -14,7 +15,17 @@ OBJC_ZIP = BUILD + "realm-objc-#{VERSION}.zip"
 SWIFT_ZIP = BUILD + "realm-swift-#{VERSION}.zip"
 CARTHAGE_ZIP = BUILD + 'Carthage.framework.zip'
 
-FileUtils.cp SWIFT_ZIP, CARTHAGE_ZIP
+puts 'Creating Carthage release zip'
+Dir.mktmpdir do |tmp|
+  Dir.chdir(tmp) do
+    FileUtils.mkdir_p %w(Carthage/Build/Mac Carthage/Build/iOS)
+    system('unzip', SWIFT_ZIP.to_path, :out=>"/dev/null")
+    FileUtils.rm_f CARTHAGE_ZIP
+    FileUtils.mv(%W(realm-swift-#{VERSION}/ios/Realm.framework realm-swift-#{VERSION}/ios/RealmSwift.framework), 'Carthage/Build/iOS')
+    FileUtils.mv(%W(realm-swift-#{VERSION}/osx/Realm.framework realm-swift-#{VERSION}/osx/RealmSwift.framework), 'Carthage/Build/Mac')
+    system('zip', '--symlinks', '-r', CARTHAGE_ZIP.to_path, 'Carthage', :out=>"/dev/null")
+  end
+end
 
 REPOSITORY = 'realm/realm-cocoa'
 
@@ -44,6 +55,6 @@ release_url = response[:url]
 
 uploads = [OBJC_ZIP, SWIFT_ZIP, CARTHAGE_ZIP]
 uploads.each do |upload|
-  puts "Uploading #{upload.basename} to Github"
+  puts "Uploading #{upload.basename} to GitHub"
   github.upload_asset(release_url, upload.to_path)
 end
