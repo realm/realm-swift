@@ -760,6 +760,14 @@ EOF
 
         ;;
 
+    "github-release")
+        if [ -z "${GITHUB_ACCESS_TOKEN}" ]; then
+            echo 'GITHUB_ACCESS_TOKEN must be set to create GitHub releases'
+            exit 1
+        fi
+        ./scripts/github_release.rb "${WORKSPACE}"
+        ;;
+
     *)
         echo "Unknown command '$COMMAND'"
         usage
