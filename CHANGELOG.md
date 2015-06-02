@@ -1029,24 +1029,3 @@ The Objective-C API has been updated and your code will break!
 ### Bugfixes
 
 * None.
-
-
-
-*Template follows:*
-
-x.x.x Release notes (yyyy-MM-dd)
-=============================================================
-
-?? summary
-
-### API breaking changes
-
-* None.
-
-### Enhancements
-
-* None.
-
-### Bugfixes
-
-* None.
