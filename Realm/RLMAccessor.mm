@@ -256,6 +256,7 @@ static inline RLMObjectBase *RLMGetLink(__unsafe_unretained RLMObjectBase *const
                                         NSUInteger colIndex,
                                         __unsafe_unretained NSString *const objectClassName,
                                         RLMSuperImpl const& super) {
+    RLMVerifyAttached(obj);
     Row const& row = obj->_row;
     __unsafe_unretained RLMObjectBase *value = super.get(obj);
     if (row.is_null_link(colIndex)) {
@@ -265,12 +266,13 @@ static inline RLMObjectBase *RLMGetLink(__unsafe_unretained RLMObjectBase *const
         return nil;
     }
 
-    if (value && row.get_index() == value->_row.get_index()) {
+    size_t dstRow = row.get_link(colIndex);
+    if (value && value->_row.get_index() == dstRow) {
         return value;
     }
 
     __unsafe_unretained RLMRealm *realm = obj->_realm;
-    id newValue = RLMCreateObjectAccessor(realm, realm.schema[objectClassName], row.get_link(colIndex));
+    id newValue = RLMCreateObjectAccessor(realm, realm.schema[objectClassName], dstRow);
     super.set(obj, newValue);
     return newValue;
 }
