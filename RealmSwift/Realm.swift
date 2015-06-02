@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
-import Realm.Private
+/// import Realm
+/// import Realm.Private
 
 /**
 A Realm instance (also referred to as "a realm") represents a Realm

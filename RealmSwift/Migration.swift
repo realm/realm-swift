@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
-import Realm.Private
+/// import Realm
+/// import Realm.Private
 
 /**
 Migration block used to migrate a Realm.

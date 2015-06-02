@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+/// import Realm
 
 /**
 This class represents properties persisted to Realm in an ObjectSchema.
