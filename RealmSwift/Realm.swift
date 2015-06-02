@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
-import Realm.Private
+/// import Realm
+/// import Realm.Private
 
 /**
 A Realm instance (also referred to as "a realm") represents a Realm
@@ -549,7 +549,7 @@ public func ==(lhs: Realm, rhs: Realm) -> Bool {
 // MARK: Notifications
 
 /// A notification due to changes to a realm.
-public enum Notification: String {
+public enum RLMNotification: String {
     /**
     Posted when the data in a realm has changed.
 
@@ -573,7 +573,7 @@ public enum Notification: String {
 }
 
 /// Closure to run when the data in a Realm was modified.
-public typealias NotificationBlock = (notification: Notification, realm: Realm) -> Void
+public typealias NotificationBlock = (notification: RLMNotification, realm: Realm) -> Void
 
 internal func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
     return { rlmNotification, rlmRealm in

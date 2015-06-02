@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
-import Realm.Private
+/// import Realm
+/// import Realm.Private
 
 /**
 In Realm you define your model classes by subclassing `Object` and adding properties to be persisted.

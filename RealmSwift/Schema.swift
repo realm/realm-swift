@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+/// import Realm
 
 /**
 This class represents the collection of model object schemas persisted to Realm.
