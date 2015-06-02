@@ -10,7 +10,7 @@ BUILD_SH = Pathname(__FILE__).+('../../build.sh').expand_path
 VERSION = `sh '#{BUILD_SH}' get-version`.strip
 RELEASE = "v#{VERSION}"
 
-BUILD = ARGV[0] ? Pathname(ARGV[0]).expand_path : BUILD_SH.parent + 'build'
+BUILD = BUILD_SH.parent + 'build'
 OBJC_ZIP = BUILD + "realm-objc-#{VERSION}.zip"
 SWIFT_ZIP = BUILD + "realm-swift-#{VERSION}.zip"
 CARTHAGE_ZIP = BUILD + 'Carthage.framework.zip'
