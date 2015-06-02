@@ -42,48 +42,20 @@ public:
         return objectSchema;
     }
 
-    void willChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const {
-        if (indexes) {
-            forEach([=](__unsafe_unretained auto o) {
-                [o willChange:kind valuesAtIndexes:indexes forKey:key];
-            });
-        }
-        else {
-            forEach([=](__unsafe_unretained auto o) {
-                [o willChangeValueForKey:key];
-            });
-        }
-    }
+    // Send willChange/didChange notifications to all observers for this object/row
+    // Sends the array versions if indexes is non-nil, normal versions otherwise
+    void willChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
+    void didChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
 
-    void didChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const {
-        if (indexes) {
-            forEach([=](__unsafe_unretained auto o) {
-                [o didChange:kind valuesAtIndexes:indexes forKey:key];
-            });
-        }
-        else {
-            forEach([=](__unsafe_unretained auto o) {
-                [o didChangeValueForKey:key];
-            });
-        }
-    }
+    void prepareForInvalidation();
 
-    void prepareForInvalidation() {
-        REALM_ASSERT(objectSchema);
-        for (auto info = this; info; info = info->next)
-            info->invalidated = true;
-    }
-
-    void setRow(size_t newRow);
     bool isForRow(size_t ndx) const {
         return row && row.get_index() == ndx;
     }
 
-    void recordObserver(realm::Row& row, RLMObjectSchema *objectSchema,
-                        NSString *keyPath);
+    void recordObserver(realm::Row& row, RLMObjectSchema *objectSchema, NSString *keyPath);
     void removeObserver();
     bool hasObservers() const { return observerCount > 0; }
-
 
     id valueForKey(NSString *key, id (^value)());
 

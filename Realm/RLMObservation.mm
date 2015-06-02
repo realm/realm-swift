@@ -72,6 +72,38 @@ RLMObservationInfo::~RLMObservationInfo() {
 #endif
 }
 
+void RLMObservationInfo::willChange(NSString *key, NSKeyValueChange kind, NSIndexSet *indexes) const {
+    if (indexes) {
+        forEach([=](__unsafe_unretained auto o) {
+            [o willChange:kind valuesAtIndexes:indexes forKey:key];
+        });
+    }
+    else {
+        forEach([=](__unsafe_unretained auto o) {
+            [o willChangeValueForKey:key];
+        });
+    }
+}
+
+void RLMObservationInfo::didChange(NSString *key, NSKeyValueChange kind, NSIndexSet *indexes) const {
+    if (indexes) {
+        forEach([=](__unsafe_unretained auto o) {
+            [o didChange:kind valuesAtIndexes:indexes forKey:key];
+        });
+    }
+    else {
+        forEach([=](__unsafe_unretained auto o) {
+            [o didChangeValueForKey:key];
+        });
+    }
+}
+
+void RLMObservationInfo::prepareForInvalidation() {
+    REALM_ASSERT(objectSchema);
+    for (auto info = this; info; info = info->next)
+        info->invalidated = true;
+}
+
 void RLMObservationInfo::setRow(realm::Table &table, size_t newRow) {
     REALM_ASSERT(!row);
     REALM_ASSERT(objectSchema);
