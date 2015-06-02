@@ -78,6 +78,10 @@ static inline T *RLMNSNullToNil(T *obj) {
     return obj;
 }
 
+static inline bool RLMIsNilOrNull(__unsafe_unretained id obj) {
+    return !obj || obj == NSNull.null;
+}
+
 // Translate an rlmtype to a string representation
 static inline NSString *RLMTypeToString(RLMPropertyType type) {
     switch (type) {
