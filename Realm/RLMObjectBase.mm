@@ -54,7 +54,24 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     return self;
 }
 
-static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
+static id RLMValidatedObjectForStandaloneProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
+    if (!RLMIsNilOrNull(obj)) {
+        if (prop.type == RLMPropertyTypeObject) {
+            // for object create and try to initialize with obj
+            RLMObjectSchema *objSchema = schema[prop.objectClassName];
+            return [[objSchema.objectClass alloc] initWithValue:obj schema:schema];
+        }
+        else if (prop.type == RLMPropertyTypeArray && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
+            // for arrays, create objects for each element and return new array
+            RLMObjectSchema *objSchema = schema[prop.objectClassName];
+            RLMArray *objects = [[RLMArray alloc] initWithObjectClassName: objSchema.className standalone:YES];
+            for (id el in obj) {
+                [objects addObject:[[objSchema.objectClass alloc] initWithValue:el schema:schema]];
+            }
+            return objects;
+        }
+    }
+
     if (RLMIsObjectValidForProperty(obj, prop)) {
         return obj;
     }
@@ -87,7 +104,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
             @throw RLMException(@"Invalid array input. Number of array elements does not match number of properties.");
         }
         for (NSUInteger i = 0; i < array.count; i++) {
-            id propertyValue = RLMValidatedObjectForProperty(array[i], properties[i], schema);
+            id propertyValue = RLMValidatedObjectForStandaloneProperty(array[i], properties[i], schema);
             [self setValue:RLMNSNullToNil(propertyValue) forKeyPath:[properties[i] name]];
         }
     }
@@ -105,7 +122,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
                 obj = defaultValues[prop.name];
             }
 
-            obj = RLMValidatedObjectForProperty(obj, prop, schema);
+            obj = RLMValidatedObjectForStandaloneProperty(obj, prop, schema);
             [self setValue:RLMNSNullToNil(obj) forKeyPath:prop.name];
         }
     }
