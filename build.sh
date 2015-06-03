@@ -354,7 +354,11 @@ case "$COMMAND" in
         ;;
 
     "test-osx")
-        xcrealm "-scheme OSX -configuration $CONFIGURATION test GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
+        COVERAGE_PARAMS=""
+        if [[ "$CONFIGURATION" == "Debug" ]]; then
+            COVERAGE_PARAMS="GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
+        fi
+        xcrealm "-scheme OSX -configuration $CONFIGURATION test $COVERAGE_PARAMS"
         exit 0
         ;;
 
