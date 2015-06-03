@@ -341,10 +341,6 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 
 @implementation RLMObjectUtil
 
-+ (NSString *)primaryKeyForClass:(Class)cls {
-    return [cls primaryKey];
-}
-
 + (NSArray *)ignoredPropertiesForClass:(Class)cls {
     return [cls ignoredProperties];
 }

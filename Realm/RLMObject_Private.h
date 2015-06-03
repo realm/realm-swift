@@ -70,7 +70,6 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 @class RLMProperty, RLMArray;
 @interface RLMObjectUtil : NSObject
 
-+ (NSString *)primaryKeyForClass:(Class)cls;
 + (NSArray *)ignoredPropertiesForClass:(Class)cls;
 + (NSArray *)indexedPropertiesForClass:(Class)cls;
 

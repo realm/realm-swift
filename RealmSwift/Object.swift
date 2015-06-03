@@ -270,18 +270,13 @@ public final class DynamicObject : Object {
 /// :nodoc:
 /// Internal class. Do not use directly.
 public class ObjectUtil: NSObject {
-    @objc private class func primaryKeyForClass(type: AnyClass) -> NSString? {
-        if let type = type as? Object.Type {
-            return type.primaryKey()
-        }
-        return nil
-    }
     @objc private class func ignoredPropertiesForClass(type: AnyClass) -> NSArray? {
         if let type = type as? Object.Type {
             return type.ignoredProperties() as NSArray?
         }
         return nil
     }
+
     @objc private class func indexedPropertiesForClass(type: AnyClass) -> NSArray? {
         if let type = type as? Object.Type {
             return type.indexedProperties() as NSArray?
