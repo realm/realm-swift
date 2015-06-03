@@ -72,10 +72,6 @@ public final class List<T: Object>: ListBase {
         super.init(array: RLMArray(objectClassName: T.className()))
     }
 
-    internal init(_ rlmArray: RLMArray) {
-        super.init(array: rlmArray)
-    }
-
     // MARK: Index Retrieval
 
     /**
