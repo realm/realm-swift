@@ -1,3 +1,20 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fixed an issue where the packaged OS X Realm.framework was built with
+  `GCC_GENERATE_TEST_COVERAGE_FILES` and `GCC_INSTRUMENT_PROGRAM_FLOW_ARCS`
+  enabled.
+
 0.93.1 Release notes (2015-05-29)
 =============================================================
 
