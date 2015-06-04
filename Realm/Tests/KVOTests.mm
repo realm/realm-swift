@@ -1034,7 +1034,6 @@ public:
         KVORecorder r(self, obj, @"arrayCol");
         [self.realm cancelWriteTransaction];
         [self.realm beginWriteTransaction];
-        // FIXME: needs more data in transaction log for `clear()`
         AssertIndexChange(NSKeyValueChangeInsertion, ([NSIndexSet indexSetWithIndexesInRange:{0, 2}]));
     }
     {

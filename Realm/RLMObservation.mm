@@ -365,8 +365,6 @@ class TransactLogHandler {
     std::vector<ObserverState> observers;
     std::vector<RLMObservationInfo *> invalidated;
 
-    size_t currentCol = 0;
-    ObserverState *activeObserver = nullptr;
     ObserverState::change *activeLinkList = nullptr;
 
     // Find all observed objects in the given object schema and build up the
@@ -510,8 +508,6 @@ public:
         activeLinkList = nullptr;
         for (auto& o : observers) {
             if (o.table == currentTable && o.row == row) {
-                currentCol = col;
-                activeObserver = &o;
                 activeLinkList = &o.getChange(col);
                 break;
             }
@@ -570,13 +566,13 @@ public:
         return true;
     }
 
-    bool link_list_clear() {
+    bool link_list_clear(std::vector<std::size_t> const& values) {
         ObserverState::change *o = activeLinkList;
         if (!o || o->multipleLinkviewChanges) {
             return true;
         }
 
-        NSRange range{0, activeObserver->info->getRow().get_linklist(currentCol)->size()};
+        NSRange range{0, values.size()};
         if (!o->linkviewChangeIndexes) {
             o->linkviewChangeIndexes = [NSMutableIndexSet indexSetWithIndexesInRange:range];
             o->linkviewChangeKind = NSKeyValueChangeRemoval;
