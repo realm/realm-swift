@@ -169,7 +169,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
 
         ObjectStore::Schema schema;
         for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
-            schema.push_back(ObjectSchemaRef(new ObjectSchema(objectSchema.objectStoreCopy)));
+            schema.push_back(objectSchema.objectStoreCopy);
         }
 
         bool changed = ObjectStore::update_realm_with_schema(realm.group, newVersion, schema, [=]() {

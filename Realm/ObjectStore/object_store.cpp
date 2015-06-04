@@ -180,19 +180,19 @@ static inline bool property_has_changed(Property &p1, Property &p2) {
 // set references to tables on targetSchema and create/update any missing or out-of-date tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
-bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema target_schema, bool update_existing) {
+bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target_schema, bool update_existing) {
     bool changed = false;
 
     // first pass to create missing tables
     vector<ObjectSchema *> to_update;
     for (size_t i = 0; i < target_schema.size(); i++) {
-        ObjectSchema *object_schema = target_schema[i].get();
+        ObjectSchema &object_schema = target_schema[i];
         bool created = false;
-        ObjectStore::table_for_object_type_create_if_needed(group, object_schema->name, created);
+        ObjectStore::table_for_object_type_create_if_needed(group, object_schema.name, created);
 
         // we will modify tables for any new objectSchema (table was created) or for all if update_existing is true
         if (update_existing || created) {
-            to_update.push_back(object_schema);
+            to_update.push_back(&object_schema);
             changed = true;
         }
     }
@@ -267,7 +267,7 @@ bool ObjectStore::is_migration_required(realm::Group *group, uint64_t new_versio
 
 bool ObjectStore::update_realm_with_schema(realm::Group *group,
                                            uint64_t version,
-                                           Schema schema,
+                                           Schema &schema,
                                            MigrationFunction migration) {
     // Recheck the schema version after beginning the write transaction as
     // another process may have done the migration after we opened the read
@@ -277,14 +277,14 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
     // create tables
     bool changed = create_metadata_tables(group) | create_tables(group, schema, migrating);
     for (size_t i = 0; i < schema.size(); i++) {
-        ObjectSchema *target_schema = schema[i].get();
-        TableRef table = table_for_object_type(group, target_schema->name);
+        ObjectSchema &target_schema = schema[i];
+        TableRef table = table_for_object_type(group, target_schema.name);
 
         // read-only realms may be missing tables entirely
         if (table) {
-            auto errors = validate_schema_and_update_column_mapping(group, *target_schema);
+            auto errors = validate_schema_and_update_column_mapping(group, target_schema);
             if (errors.size()) {
-                throw ObjectStoreValidationException(errors, target_schema->name);
+                throw ObjectStoreValidationException(errors, target_schema.name);
             }
         }
     }
@@ -308,7 +308,7 @@ ObjectStore::Schema ObjectStore::schema_from_group(Group *group) {
     for (unsigned long i = 0; i < group->size(); i++) {
         string object_type = object_type_for_table_name(group->get_table_name(i));
         if (object_type.length()) {
-            schema.push_back(ObjectSchemaRef(new ObjectSchema(group, object_type)));
+            schema.push_back(ObjectSchema(group, object_type));
         }
     }
     return schema;

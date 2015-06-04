@@ -44,10 +44,10 @@ namespace realm {
         // optionally runs migration function/lambda if schema is out of date
         // NOTE: must be performed within a write transaction
         typedef std::function<void()> MigrationFunction;
-        typedef std::vector<ObjectSchemaRef> Schema;
+        typedef std::vector<ObjectSchema> Schema;
         static bool update_realm_with_schema(Group *group,
                                              uint64_t version,
-                                             Schema schema,
+                                             Schema &schema,
                                              MigrationFunction migration);
 
         // get a table for an object type
@@ -70,7 +70,7 @@ namespace realm {
 
         // set references to tables on targetSchema and create/update any missing or out-of-date tables
         // if update existing is true, updates existing tables, otherwise validates existing tables
-        static bool create_tables(realm::Group *group, ObjectStore::Schema target_schema, bool update_existing);
+        static bool create_tables(realm::Group *group, ObjectStore::Schema &target_schema, bool update_existing);
 
         // get primary key property name for object type
         static StringData get_primary_key_for_object(Group *group, StringData object_type);

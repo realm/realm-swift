@@ -138,7 +138,7 @@ static NSMutableDictionary *s_localNameToClass;
     // cache descriptors for all subclasses of RLMObject
     NSMutableArray *schemaArray = [NSMutableArray arrayWithCapacity:objectStoreSchema.size()];
     for (unsigned long i = 0; i < objectStoreSchema.size(); i++) {
-        [schemaArray addObject:[RLMObjectSchema objectSchemaForObjectStoreSchema:*objectStoreSchema[i]]];
+        [schemaArray addObject:[RLMObjectSchema objectSchemaForObjectStoreSchema:objectStoreSchema[i]]];
     }
     
     // set class array and mapping

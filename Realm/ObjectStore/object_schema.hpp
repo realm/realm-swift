@@ -42,8 +42,6 @@ namespace realm {
             return property_for_name(primary_key);
         }
     };
-
-    typedef std::shared_ptr<ObjectSchema> ObjectSchemaRef;
 }
 
 #endif /* defined(__realm__object_schema__) */

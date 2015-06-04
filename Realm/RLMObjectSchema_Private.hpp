@@ -37,6 +37,6 @@ namespace realm {
 - (realm::ObjectSchema)objectStoreCopy;
 
 // initialize with realm::ObjectSchema
-+ (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema)objectSchema;
++ (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema &)objectSchema;
 
 @end
