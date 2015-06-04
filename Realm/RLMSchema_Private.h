@@ -25,32 +25,6 @@ extern "C" {
 @class RLMRealm;
 
 //
-// Realm table namespace costants/methods
-//
-
-// NOTE: the object store uses a custom table namespace for storing data.
-// There current names used are:
-//  class_* - any table name beginning with class is used to store objects
-//            of the typename (the rest of the name after class)
-//  metadata - table used for realm metadata storage
-extern NSString * const c_objectTableNamePrefix;
-extern const char * const c_metadataTableName;
-extern const char * const c_primaryKeyTableName;
-extern const char * const c_versionColumnName;
-extern const size_t c_versionColumnIndex;
-
-static inline NSString *RLMClassForTableName(NSString *tableName) {
-    if ([tableName hasPrefix:c_objectTableNamePrefix]) {
-        return [tableName substringFromIndex:6];
-    }
-    return nil;
-}
-
-static inline NSString *RLMTableNameForClass(NSString *className) {
-    return [c_objectTableNamePrefix stringByAppendingString:className];
-}
-
-//
 // RLMSchema private interface
 //
 @class RLMRealm;

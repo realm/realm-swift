@@ -159,16 +159,16 @@
         return false;
     }
 
-    size_t table = _realm.group->find_table(RLMStringDataWithNSString(RLMTableNameForClass(name)));
-    if (table == realm::not_found) {
+    TableRef table = ObjectStore::table_for_object_type(_realm.group, name.UTF8String);
+    if (!table) {
         return false;
     }
 
     if ([_realm.schema schemaForClassName:name]) {
-        _realm.group->get_table(table)->clear();
+        table->clear();
     }
     else {
-        _realm.group->remove_table(table);
+        _realm.group->remove_table(table->get_index_in_group());
     }
 
     return true;

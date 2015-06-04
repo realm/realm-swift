@@ -53,6 +53,9 @@ namespace realm {
         // get a table for an object type
         static realm::TableRef table_for_object_type(Group *group, StringData object_type);
 
+        // get existing Schema from a group
+        static Schema schema_from_group(Group *group);
+
     private:
         // set a new schema version
         static void set_schema_version(Group *group, uint64_t version);

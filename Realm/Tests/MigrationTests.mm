@@ -167,7 +167,7 @@
     @autoreleasepool {
         // verify migration
         RLMRealm *realm = [self realmWithTestPath];
-        XCTAssertFalse(realm.group->has_table(RLMStringDataWithNSString(RLMTableNameForClass(@"DeletedClass"))), @"The deleted class should not have a table.");
+        XCTAssertFalse(ObjectStore::table_for_object_type(realm.group, "DeletedClass"), @"The deleted class should not have a table.");
         XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
     }
 }

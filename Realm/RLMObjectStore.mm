@@ -139,8 +139,7 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
 // try to set table references on targetSchema and return true if all tables exist
 static bool RLMRealmHasAllTables(RLMRealm *realm, RLMSchema *targetSchema) {
     for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
-        NSString *tableName = RLMTableNameForClass(objectSchema.className);
-        TableRef table = realm.group->get_table(tableName.UTF8String);
+        TableRef table = ObjectStore::table_for_object_type(realm.group, objectSchema.className.UTF8String);
         if (!table) {
             return false;
         }
@@ -192,10 +191,8 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
             [realm cancelWriteTransaction];
         }
     } catch (ObjectStoreException e) {
-        [realm cancelWriteTransaction];
         @throw RLMException(e);
     } catch (ObjectStoreValidationException e) {
-        [realm cancelWriteTransaction];
         @throw RLMException(e);
     }
     } @catch(NSException *e) {

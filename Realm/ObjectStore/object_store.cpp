@@ -303,3 +303,13 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
     return true;
 }
 
+ObjectStore::Schema ObjectStore::schema_from_group(Group *group) {
+    ObjectStore::Schema schema;
+    for (unsigned long i = 0; i < group->size(); i++) {
+        string object_type = object_type_for_table_name(group->get_table_name(i));
+        if (object_type.length()) {
+            schema.push_back(ObjectSchemaRef(new ObjectSchema(group, object_type)));
+        }
+    }
+    return schema;
+}

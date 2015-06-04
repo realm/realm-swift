@@ -29,8 +29,6 @@
 #import <objc/runtime.h>
 #import <realm/group.hpp>
 
-NSString * const c_objectTableNamePrefix = @"class_";
-
 const uint64_t RLMNotVersioned = realm::ObjectStore::NotVersioned;
 
 // RLMSchema private properties
@@ -135,22 +133,16 @@ static NSMutableDictionary *s_localNameToClass;
 // schema based on tables in a realm
 + (instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm {
     // generate object schema and class mapping for all tables in the realm
-    unsigned long numTables = realm.group->size();
-    NSMutableArray *schemaArray = [NSMutableArray arrayWithCapacity:numTables];
-    
+    ObjectStore::Schema objectStoreSchema = ObjectStore::schema_from_group(realm.group);
+
     // cache descriptors for all subclasses of RLMObject
-    RLMSchema *schema = [[RLMSchema alloc] init];
-    for (unsigned long i = 0; i < numTables; i++) {
-        NSString *className = RLMClassForTableName(@(realm.group->get_table_name(i).data()));
-        if (className) {
-            realm::ObjectSchema objectSchema(realm.group, className.UTF8String);
-            RLMObjectSchema *object = [RLMObjectSchema objectSchemaForObjectStoreSchema:objectSchema];
-            object.table = realm.group->get_table(i).get();
-            [schemaArray addObject:object];
-        }
+    NSMutableArray *schemaArray = [NSMutableArray arrayWithCapacity:objectStoreSchema.size()];
+    for (unsigned long i = 0; i < objectStoreSchema.size(); i++) {
+        [schemaArray addObject:[RLMObjectSchema objectSchemaForObjectStoreSchema:*objectStoreSchema[i]]];
     }
     
     // set class array and mapping
+    RLMSchema *schema = [RLMSchema new];
     schema.objectSchema = schemaArray;
     return schema;
 }
