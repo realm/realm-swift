@@ -32,6 +32,7 @@ namespace realm {
         static uint64_t get_schema_version(Group *group);
 
         // set a new schema version
+        // FIXME - should be private (set through update_realm_with_schema)
         static void set_schema_version(Group *group, uint64_t version);
 
         // checks if a migration is required for a given schema version
