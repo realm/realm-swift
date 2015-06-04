@@ -322,8 +322,6 @@
     realm = [self realmWithTestPath];
     MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertThrows(mig1[@"oldIntCol"], @"Deleted column should no longer be accessible.");
-    XCTAssertEqual(0U, [mig1.objectSchema.properties[0] column]);
-    XCTAssertEqual(1U, [mig1.objectSchema.properties[1] column]);
 }
 
 - (void)testChangePropertyType {

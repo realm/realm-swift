@@ -196,7 +196,7 @@
 // generate a schema from a table - specify the custom class name for the dynamic
 // class and the name to be used in the schema - used for migrations and dynamic interface
 +(instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm {
-    realm::TableRef table = RLMTableForObjectClass(realm, className);
+    realm::TableRef table = ObjectStore::table_for_object_type(realm.group, className.UTF8String);
     if (!table) {
         return nil;
     }
@@ -309,7 +309,7 @@
 
 - (realm::Table *)table {
     if (!_table) {
-        _table = RLMTableForObjectClass(_realm, _className);
+        _table = ObjectStore::table_for_object_type(_realm.group, _className.UTF8String);
     }
     return _table.get();
 }
@@ -318,17 +318,22 @@
     _table.reset(table);
 }
 
+- (realm::ObjectSchema)objectStoreCopy {
+    ObjectSchema objectSchema;
+    objectSchema.name = _className.UTF8String;
+    objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.name.UTF8String : "";
+    for (RLMProperty *prop in _properties) {
+        Property p;
+        p.name = prop.name.UTF8String;
+        p.type = (PropertyType)prop.type;
+        p.object_type = prop.objectClassName ? prop.objectClassName.UTF8String : "";
+        p.is_indexed = prop.indexed;
+        p.is_primary = (prop == _primaryKeyProperty);
+        objectSchema.properties.push_back(p);
+    }
+    return objectSchema;
+}
+
 @end
 
-realm::TableRef RLMTableForObjectClass(RLMRealm *realm,
-                                         NSString *className,
-                                         bool &created) {
-    NSString *tableName = RLMTableNameForClass(className);
-    return realm.group->get_or_add_table(tableName.UTF8String, &created);
-}
 
-realm::TableRef RLMTableForObjectClass(RLMRealm *realm,
-                                         NSString *className) {
-    NSString *tableName = RLMTableNameForClass(className);
-    return realm.group->get_table(tableName.UTF8String);
-}

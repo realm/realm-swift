@@ -226,6 +226,7 @@ void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMOb
     }
 }
 
+
 NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
     NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:userInfo];
     [info addEntriesFromDictionary:@{
@@ -234,6 +235,27 @@ NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
                                      }];
 
     return [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:info];
+}
+
+NSException *RLMException(realm::ObjectStoreException & exception) {
+    switch (exception.kind()) {
+        case ObjectStoreException::RealmVersionGreaterThanSchemaVersion:
+            return RLMException(@"Schema version less than last set version in Realm");
+            break;
+        default:
+            break;
+    }
+}
+
+NSException *RLMException(realm::ObjectStoreValidationException & e) {
+    NSMutableString *errorMessage = [NSMutableString stringWithFormat:
+                                     @"Migration is required for object type '%s' due to the following errors:",
+                                     e.object_type().c_str()];
+    for (size_t i = 0; i < e.validation_errors().size(); i++) {
+        [errorMessage appendString:@"\n- "];
+        [errorMessage appendString:@(e.validation_errors()[i].c_str())];
+    }
+    return RLMException(errorMessage);
 }
 
 NSException *RLMException(std::exception const& exception) {

@@ -16,24 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectSchema_Private.h"
-#import "object_schema.hpp"
+#include "property.hpp"
 
-namespace realm {
-    class Table;
-    template<typename T> class BasicTableRef;
-    typedef BasicTableRef<Table> TableRef;
-}
-
-// RLMObjectSchema private
-@interface RLMObjectSchema ()
-
-@property (nonatomic) realm::Table *table;
-
-// shallow copy reusing properties and property map
-- (instancetype)shallowCopy;
-
-// create realm::ObjectSchema copy
-- (realm::ObjectSchema)objectStoreCopy;
-
-@end
+using namespace realm;
