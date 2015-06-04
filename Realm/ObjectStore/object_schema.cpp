@@ -35,7 +35,7 @@ ObjectSchema::ObjectSchema(realm::Group *group, std::string name) : name(name) {
         if (property.type == PropertyTypeObject || property.type == PropertyTypeArray) {
             // set link type for objects and arrays
             realm::TableRef linkTable = table->get_link_target(col);
-            property.object_type = ObjectStore::class_for_table_name(linkTable->get_name().data());
+            property.object_type = ObjectStore::object_type_for_table_name(linkTable->get_name().data());
         }
         else {
             property.object_type = "";
@@ -72,7 +72,7 @@ std::vector<ObjectSchema> ObjectSchema::object_schema_from_group(realm::Group *g
     vector<ObjectSchema> object_schema;
 
     for (unsigned long i = 0; i < numTables; i++) {
-        std::string name = ObjectStore::class_for_table_name(group->get_table_name(i).data());
+        std::string name = ObjectStore::object_type_for_table_name(group->get_table_name(i).data());
         if (name.length()) {
             object_schema.push_back(ObjectSchema(group, name));
         }

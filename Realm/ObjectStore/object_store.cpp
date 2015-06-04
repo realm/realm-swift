@@ -105,26 +105,26 @@ void ObjectStore::set_primary_key_for_object(realm::Group *group, StringData obj
     }
 }
 
-string ObjectStore::class_for_table_name(string table_name) {
+string ObjectStore::object_type_for_table_name(string table_name) {
     if (table_name.compare(0, 6, c_object_table_name_prefix) == 0) {
         return table_name.substr(6, table_name.length()-6);
     }
     return string();
 }
 
-string ObjectStore::table_name_for_class(string class_name) {
-    return c_object_table_name_prefix + class_name;
+string ObjectStore::table_name_for_object_type(string object_type) {
+    return c_object_table_name_prefix + object_type;
 }
 
 realm::TableRef ObjectStore::table_for_object_type(realm::Group *group, StringData object_type) {
-    return group->get_table(table_name_for_class(object_type));
+    return group->get_table(table_name_for_object_type(object_type));
 }
 
 realm::TableRef ObjectStore::table_for_object_type_create_if_needed(realm::Group *group, StringData object_type, bool &created) {
-    return group->get_or_add_table(table_name_for_class(object_type), &created);
+    return group->get_or_add_table(table_name_for_object_type(object_type), &created);
 }
 
-std::vector<std::string> ObjectStore::validate_and_update_column_mapping(realm::Group *group, ObjectSchema &target_schema) {
+std::vector<std::string> ObjectStore::validate_schema_and_update_column_mapping(realm::Group *group, ObjectSchema &target_schema) {
     vector<string> validation_errors;
     ObjectSchema table_schema(group, target_schema.name);
 
@@ -180,9 +180,8 @@ static inline bool property_has_changed(Property &p1, Property &p2) {
 // set references to tables on targetSchema and create/update any missing or out-of-date tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
-static inline bool create_tables(realm::Group *group, ObjectStore::Schema target_schema, bool update_existing) {
-    // create metadata tables if neded
-    bool changed = realm::ObjectStore::create_metadata_tables(group);
+bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema target_schema, bool update_existing) {
+    bool changed = false;
 
     // first pass to create missing tables
     vector<ObjectSchema *> to_update;
@@ -276,14 +275,14 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
     bool migrating = is_migration_required(group, version);
 
     // create tables
-    bool changed = create_tables(group, schema, migrating);
+    bool changed = create_metadata_tables(group) | create_tables(group, schema, migrating);
     for (size_t i = 0; i < schema.size(); i++) {
         ObjectSchema *target_schema = schema[i].get();
         TableRef table = table_for_object_type(group, target_schema->name);
 
         // read-only realms may be missing tables entirely
         if (table) {
-            auto errors = validate_and_update_column_mapping(group, *target_schema);
+            auto errors = validate_schema_and_update_column_mapping(group, *target_schema);
             if (errors.size()) {
                 throw ObjectStoreValidationException(errors, target_schema->name);
             }

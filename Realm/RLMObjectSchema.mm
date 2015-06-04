@@ -192,59 +192,6 @@
     return propArray;
 }
 
-
-// generate a schema from a table - specify the custom class name for the dynamic
-// class and the name to be used in the schema - used for migrations and dynamic interface
-+(instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm {
-    realm::TableRef table = ObjectStore::table_for_object_type(realm.group, className.UTF8String);
-    if (!table) {
-        return nil;
-    }
-
-    // create array of RLMProperties
-    size_t count = table->get_column_count();
-    NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
-    for (size_t col = 0; col < count; col++) {
-        // create new property
-        NSString *name = RLMStringDataToNSString(table->get_column_name(col).data());
-        RLMProperty *prop = [[RLMProperty alloc] initWithName:name
-                                                         type:RLMPropertyType(table->get_column_type(col))
-                                              objectClassName:nil
-                                                      indexed:table->has_search_index(col)];
-        prop.column = col;
-        if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
-            // set link type for objects and arrays
-            realm::TableRef linkTable = table->get_link_target(col);
-            prop.objectClassName = RLMClassForTableName(@(linkTable->get_name().data()));
-        }
-
-        [propArray addObject:prop];
-    }
-
-    // create schema object and set properties
-    RLMObjectSchema *schema = [RLMObjectSchema new];
-    schema.properties = propArray;
-    schema.className = className;
-
-    // get primary key from realm metadata
-    std::string primaryKey = realm::ObjectStore::get_primary_key_for_object(realm.group, className.UTF8String);
-    if (primaryKey.length()) {
-        NSString *primaryKeyString = [NSString stringWithUTF8String:primaryKey.c_str()];
-        schema.primaryKeyProperty = schema[primaryKeyString];
-        if (!schema.primaryKeyProperty) {
-            NSString *reason = [NSString stringWithFormat:@"No property matching primary key '%@'", primaryKeyString];
-            @throw RLMException(reason);
-        }
-    }
-
-    // for dynamic schema use vanilla RLMDynamicObject accessor classes
-    schema.objectClass = RLMObject.class;
-    schema.accessorClass = RLMDynamicObject.class;
-    schema.standaloneClass = RLMObject.class;
-
-    return schema;
-}
-
 - (id)copyWithZone:(NSZone *)zone {
     RLMObjectSchema *schema = [[RLMObjectSchema allocWithZone:zone] init];
     schema->_objectClass = _objectClass;
@@ -333,6 +280,42 @@
     }
     return objectSchema;
 }
+
++ (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema)objectSchema {
+    RLMObjectSchema *schema = [RLMObjectSchema new];
+    schema.className = @(objectSchema.name.c_str());
+
+    // create array of RLMProperties
+    NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:objectSchema.properties.size()];
+    for (size_t col = 0; col < objectSchema.properties.size(); col++) {
+        Property &prop = objectSchema.properties[col];
+        RLMProperty *property = [[RLMProperty alloc] initWithName:@(prop.name.c_str())
+                                                             type:(RLMPropertyType)prop.type
+                                                  objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
+                                                          indexed:prop.is_indexed];
+        property.isPrimary = (prop.name == objectSchema.primary_key);
+        [propArray addObject:property];
+    }
+    schema.properties = propArray;
+
+    // get primary key from realm metadata
+    if (objectSchema.primary_key.length()) {
+        NSString *primaryKeyString = [NSString stringWithUTF8String:objectSchema.primary_key.c_str()];
+        schema.primaryKeyProperty = schema[primaryKeyString];
+        if (!schema.primaryKeyProperty) {
+            NSString *reason = [NSString stringWithFormat:@"No property matching primary key '%@'", primaryKeyString];
+            @throw RLMException(reason);
+        }
+    }
+
+    // for dynamic schema use vanilla RLMDynamicObject accessor classes
+    schema.objectClass = RLMObject.class;
+    schema.accessorClass = RLMDynamicObject.class;
+    schema.standaloneClass = RLMObject.class;
+    
+    return schema;
+}
+
 
 @end
 

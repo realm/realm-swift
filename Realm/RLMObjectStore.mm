@@ -118,7 +118,7 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
         // read-only realms may be missing tables entirely
         if (objectSchema.table) {
             ObjectSchema schema = objectSchema.objectStoreCopy;
-            auto errors = ObjectStore::validate_and_update_column_mapping(realm.group, schema);
+            auto errors = ObjectStore::validate_schema_and_update_column_mapping(realm.group, schema);
             if (verify && errors.size()) {
                 @throw RLMException(ObjectStoreValidationException(errors, schema.name));
             }
@@ -138,10 +138,6 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
 
 // try to set table references on targetSchema and return true if all tables exist
 static bool RLMRealmHasAllTables(RLMRealm *realm, RLMSchema *targetSchema) {
-    if (!ObjectStore::has_metadata_tables(realm.group)) {
-        return false;
-    }
-
     for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
         NSString *tableName = RLMTableNameForClass(objectSchema.className);
         TableRef table = realm.group->get_table(tableName.UTF8String);

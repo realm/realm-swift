@@ -143,7 +143,8 @@ static NSMutableDictionary *s_localNameToClass;
     for (unsigned long i = 0; i < numTables; i++) {
         NSString *className = RLMClassForTableName(@(realm.group->get_table_name(i).data()));
         if (className) {
-            RLMObjectSchema *object = [RLMObjectSchema schemaFromTableForClassName:className realm:realm];
+            realm::ObjectSchema objectSchema(realm.group, className.UTF8String);
+            RLMObjectSchema *object = [RLMObjectSchema objectSchemaForObjectStoreSchema:objectSchema];
             object.table = realm.group->get_table(i).get();
             [schemaArray addObject:object];
         }

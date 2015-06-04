@@ -169,11 +169,6 @@
     }
     else {
         _realm.group->remove_table(table);
-
-        std::string primaryKey = realm::ObjectStore::get_primary_key_for_object(_realm.group, name.UTF8String);
-        if (primaryKey.length()) {
-            realm::ObjectStore::set_primary_key_for_object(_realm.group, name.UTF8String, "");
-        }
     }
 
     return true;

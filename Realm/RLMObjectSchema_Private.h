@@ -39,7 +39,4 @@
 // returns a cached or new schema for a given object class
 +(instancetype)schemaForObjectClass:(Class)objectClass;
 
-// generate a schema from a table
-+(instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm;
-
 @end

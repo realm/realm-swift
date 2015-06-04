@@ -28,38 +28,18 @@ namespace realm {
         // Schema version used for uninitialized Realms
         static const uint64_t NotVersioned;
 
-        // check if the realm already has all metadata tables
-        static bool has_metadata_tables(Group *group);
-
-        // create any metadata tables that don't already exist
-        // must be in write transaction to set
-        // returns true if it actually did anything
-        static bool create_metadata_tables(Group *group);
-
         // get the last set schema version
         static uint64_t get_schema_version(Group *group);
 
         // set a new schema version
         static void set_schema_version(Group *group, uint64_t version);
 
-        // get primary key property name for object type
-        static StringData get_primary_key_for_object(Group *group, StringData object_type);
-        
-        // sets primary key property for object type
-        // must be in write transaction to set
-        static void set_primary_key_for_object(Group *group, StringData object_type, StringData primary_key);
+        // checks if a migration is required for a given schema version
+        static bool is_migration_required(realm::Group *group, uint64_t new_version);
 
         // verify a target schema against its table, setting the table_column property on each schema object
         // returns array of validation errors
-        static std::vector<std::string> validate_and_update_column_mapping(Group *group, ObjectSchema &target_schema);
-
-        // get the table used to store object of objectClass
-        static std::string table_name_for_class(std::string class_name);
-        static std::string class_for_table_name(std::string table_name);
-        static realm::TableRef table_for_object_type(Group *group, StringData object_type);
-        static realm::TableRef table_for_object_type_create_if_needed(Group *group, StringData object_type, bool &created);
-
-        static bool is_migration_required(realm::Group *group, uint64_t new_version);
+        static std::vector<std::string> validate_schema_and_update_column_mapping(Group *group, ObjectSchema &target_schema);
 
         // updates a Realm to a given target schema/version creating tables as necessary
         // returns if any changes were made
@@ -72,6 +52,35 @@ namespace realm {
                                              uint64_t version,
                                              Schema schema,
                                              MigrationFunction migration);
+
+        // get a table for an object type
+        static realm::TableRef table_for_object_type(Group *group, StringData object_type);
+
+    private:
+        // check if the realm already has all metadata tables
+        static bool has_metadata_tables(Group *group);
+
+        // create any metadata tables that don't already exist
+        // must be in write transaction to set
+        // returns true if it actually did anything
+        static bool create_metadata_tables(Group *group);
+
+        // set references to tables on targetSchema and create/update any missing or out-of-date tables
+        // if update existing is true, updates existing tables, otherwise validates existing tables
+        static bool create_tables(realm::Group *group, ObjectStore::Schema target_schema, bool update_existing);
+
+        // get primary key property name for object type
+        static StringData get_primary_key_for_object(Group *group, StringData object_type);
+
+        // sets primary key property for object type
+        // must be in write transaction to set
+        static void set_primary_key_for_object(Group *group, StringData object_type, StringData primary_key);
+
+        static realm::TableRef table_for_object_type_create_if_needed(Group *group, StringData object_type, bool &created);
+        static std::string table_name_for_object_type(std::string class_name);
+        static std::string object_type_for_table_name(std::string table_name);
+
+        friend ObjectSchema;
     };
 
     class ObjectStoreException : public std::exception {
