@@ -640,7 +640,6 @@ extern "C" {
 
         [realm beginWriteTransaction];
         [realm createObject:StringObject.className withValue:@[@"a"]];
-        realm::ObjectStore::set_schema_version(realm.group, 0);
         [realm commitWriteTransaction];
     }
 

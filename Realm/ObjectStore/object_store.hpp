@@ -31,10 +31,6 @@ namespace realm {
         // get the last set schema version
         static uint64_t get_schema_version(Group *group);
 
-        // set a new schema version
-        // FIXME - should be private (set through update_realm_with_schema)
-        static void set_schema_version(Group *group, uint64_t version);
-
         // checks if a migration is required for a given schema version
         static bool is_migration_required(realm::Group *group, uint64_t new_version);
 
@@ -58,6 +54,9 @@ namespace realm {
         static realm::TableRef table_for_object_type(Group *group, StringData object_type);
 
     private:
+        // set a new schema version
+        static void set_schema_version(Group *group, uint64_t version);
+
         // check if the realm already has all metadata tables
         static bool has_metadata_tables(Group *group);
 

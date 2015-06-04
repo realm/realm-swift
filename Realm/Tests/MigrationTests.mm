@@ -81,13 +81,7 @@
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
     RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
-
-    // Set the initial version to 0 since we're pretending this was created with
-    // a shared schema
-    [realm beginWriteTransaction];
-    realm::ObjectStore::set_schema_version(realm.group, 0);
-    [realm commitWriteTransaction];
-
+    
     return realm;
 }
 
