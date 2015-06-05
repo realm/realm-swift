@@ -98,7 +98,6 @@ static NSMutableDictionary *s_localNameToClass;
         NSString *className = NSStringFromClass(cls);
         if ([RLMSwiftSupport isSwiftClassName:className]) {
             className = [RLMSwiftSupport demangleClassName:className];
-            s_localNameToClass[className] = cls;
         }
         // NSStringFromClass demangles the names for top-level Swift classes
         // but not for nested classes. _T indicates it's a Swift symbol, t
@@ -107,9 +106,12 @@ static NSMutableDictionary *s_localNameToClass;
             NSString *message = [NSString stringWithFormat:@"RLMObject subclasses cannot be nested within other declarations. Please move %@ to global scope.", className];
             @throw RLMException(message);
         }
-        else {
-            s_localNameToClass[className] = cls;
+
+        if (s_localNameToClass[className]) {
+            NSString *message = [NSString stringWithFormat:@"RLMObject subclasses with the same name cannot be included twice in the same target. Please make sure '%@' is only linked once to your current target.", className];
+            @throw RLMException(message);
         }
+        s_localNameToClass[className] = cls;
 
         // override classname for all valid classes
         RLMReplaceClassNameMethod(cls, className);
