@@ -63,18 +63,3 @@ Property *ObjectSchema::property_for_name(std::string name) {
     }
     return nullptr;
 }
-
-std::vector<ObjectSchema> ObjectSchema::object_schema_from_group(realm::Group *group) {
-    // generate object schema and class mapping for all tables in the realm
-    unsigned long numTables = group->size();
-    vector<ObjectSchema> object_schema;
-
-    for (unsigned long i = 0; i < numTables; i++) {
-        std::string name = ObjectStore::object_type_for_table_name(group->get_table_name(i).data());
-        if (name.length()) {
-            object_schema.push_back(ObjectSchema(group, name));
-        }
-    }
-
-    return object_schema;
-}

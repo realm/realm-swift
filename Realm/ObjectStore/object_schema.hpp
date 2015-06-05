@@ -31,8 +31,6 @@ namespace realm {
         ObjectSchema() {}
         ObjectSchema(Group *group, std::string name);
 
-        static std::vector<ObjectSchema> object_schema_from_group(Group *group);
-
         std::string name;
         std::vector<Property> properties;
         std::string primary_key;
