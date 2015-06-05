@@ -36,6 +36,7 @@ NSException *RLMException(realm::ObjectStoreException & exception);
 NSException *RLMException(realm::ObjectStoreValidationException & exception);
 
 NSError *RLMMakeError(RLMError code, std::exception const& exception);
+NSError *RLMMakeError(NSException *exception);
 
 void RLMSetErrorOrThrow(NSError *error, NSError **outError);
 

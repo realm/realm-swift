@@ -404,10 +404,11 @@ static id RLMAutorelease(id value) {
             else {
                 // if we are the first realm at this path, set/align schema or perform migration if needed
                 RLMSchema *targetSchema = customSchema ?: RLMSchema.sharedSchema;
-                NSError *error = RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path),
-                                                               [targetSchema copy], [realm migrationBlock:key]);
-                if (error) {
-                    RLMSetErrorOrThrow(error, outError);
+                @try {
+                    RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path), [targetSchema copy], [realm migrationBlock:key]);
+                }
+                @catch (NSException *exception) {
+                    RLMSetErrorOrThrow(RLMMakeError(exception), outError);
                     return nil;
                 }
 
@@ -862,7 +863,12 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     if (error)
         return error;
 
-    return RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), [RLMSchema.sharedSchema copy], [realm migrationBlock:key]);
+    @try {
+        RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), [RLMSchema.sharedSchema copy], [realm migrationBlock:key]);
+    } @catch (NSException *ex) {
+        return RLMMakeError(ex);
+    }
+    return nil;
 }
 
 - (RLMObject *)createObject:(NSString *)className withValue:(id)value {

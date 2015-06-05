@@ -57,7 +57,7 @@ namespace realm {
         static Schema schema_from_group(Group *group);
 
         // check if indexes are up to date - if false you need to call update_realm_with_schema
-        static bool are_indexes_up_to_date(Group *group, Schema &schema);
+        static bool indexes_are_up_to_date(Group *group, Schema &schema);
 
     private:
         // set a new schema version

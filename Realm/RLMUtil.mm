@@ -275,6 +275,12 @@ NSError *RLMMakeError(RLMError code, std::exception const& exception) {
                                       @"Error Code": @(code)}];
 }
 
+NSError *RLMMakeError(NSException *exception) {
+    return [NSError errorWithDomain:RLMErrorDomain
+                               code:0
+                           userInfo:@{NSLocalizedDescriptionKey: exception.reason}];
+}
+
 void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
     if (outError) {
         *outError = error;

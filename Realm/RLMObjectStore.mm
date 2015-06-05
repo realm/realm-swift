@@ -115,23 +115,22 @@ static bool RLMRealmHasAllTables(RLMRealm *realm, RLMSchema *targetSchema) {
     return true;
 }
 
-NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
+void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
     ObjectStore::Schema schema;
     for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
         schema.push_back(objectSchema.objectStoreCopy);
     }
 
     try {
-        if (!ObjectStore::is_migration_required(realm.group, newVersion) && ObjectStore::are_indexes_up_to_date(realm.group, schema) && RLMRealmHasAllTables(realm, targetSchema)) {
+        if (RLMRealmHasAllTables(realm, targetSchema) && !ObjectStore::is_migration_required(realm.group, newVersion) && ObjectStore::indexes_are_up_to_date(realm.group, schema)) {
             RLMRealmSetSchema(realm, targetSchema, true);
-            return nil;
+            return;
         }
     }
     catch (ObjectStoreException e) {
         @throw RLMException(e);
     }
 
-    @try {
     try {
         // either a migration is needed or there's missing tables, so we do need a
         // write transaction
@@ -142,6 +141,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
             if (migrationBlock) {
                 NSError *error = migrationBlock();
                 if (error) {
+                    [realm cancelWriteTransaction];
                     @throw RLMException(error.description);
                 }
             }
@@ -155,15 +155,12 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
             [realm cancelWriteTransaction];
         }
     } catch (ObjectStoreException e) {
+        [realm cancelWriteTransaction];
         @throw RLMException(e);
     } catch (ObjectStoreValidationException e) {
+        [realm cancelWriteTransaction];
         @throw RLMException(e);
     }
-    } @catch(NSException *e) {
-        [realm cancelWriteTransaction];
-        @throw e;
-    }
-    return nil;
 }
 
 static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {

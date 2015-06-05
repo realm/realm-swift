@@ -318,8 +318,8 @@ ObjectStore::Schema ObjectStore::schema_from_group(Group *group) {
     return schema;
 }
 
-bool ObjectStore::are_indexes_up_to_date(Group *group, Schema &schema) {
-    for (auto& object_schema:schema) {
+bool ObjectStore::indexes_are_up_to_date(Group *group, Schema &schema) {
+    for (auto &object_schema:schema) {
         TableRef table = table_for_object_type(group, object_schema.name);
         if (!table) {
             continue;
