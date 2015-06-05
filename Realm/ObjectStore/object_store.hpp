@@ -35,8 +35,12 @@ namespace realm {
         static bool is_migration_required(realm::Group *group, uint64_t new_version);
 
         // verify a target schema against its table, setting the table_column property on each schema object
+        // updates the column mapping on the target_schema
         // returns array of validation errors
-        static std::vector<std::string> validate_schema_and_update_column_mapping(Group *group, ObjectSchema &target_schema);
+        static std::vector<std::string> validate_schema(Group *group, ObjectSchema &target_schema);
+
+        // updates the target_column member for all properties based on the column indexes in the passed in group
+        static void update_column_mapping(Group *group, ObjectSchema &target_schema);
 
         // updates a Realm to a given target schema/version creating tables and updating indexes as necessary
         // returns if any changes were made
@@ -45,10 +49,7 @@ namespace realm {
         // NOTE: must be performed within a write transaction
         typedef std::function<void()> MigrationFunction;
         typedef std::vector<ObjectSchema> Schema;
-        static bool update_realm_with_schema(Group *group,
-                                             uint64_t version,
-                                             Schema &schema,
-                                             MigrationFunction migration);
+        static bool update_realm_with_schema(Group *group, uint64_t version, Schema &schema, MigrationFunction migration);
 
         // get a table for an object type
         static realm::TableRef table_for_object_type(Group *group, StringData object_type);

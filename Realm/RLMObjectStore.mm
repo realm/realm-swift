@@ -70,25 +70,6 @@ void RLMClearAccessorCache() {
     [s_accessorSchema removeAllObjects];
 }
 
-static void RLMUpdatePropertyColumns(Group *group, RLMObjectSchema *rlmObjectSchema, ObjectSchema &objectSchema, bool verify) {
-    auto errors = ObjectStore::validate_schema_and_update_column_mapping(group, objectSchema);
-    if (verify && errors.size()) {
-        @throw RLMException(ObjectStoreValidationException(errors, objectSchema.name));
-    }
-
-    // update column mapping
-    for (size_t i = 0; i < objectSchema.properties.size(); i++) {
-        ((RLMProperty *)rlmObjectSchema.properties[i]).column = objectSchema.properties[i].table_column;
-    }
-
-    // re-order properties
-    rlmObjectSchema.properties = [rlmObjectSchema.properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
-        if (p1.column < p2.column) return NSOrderedAscending;
-        if (p1.column > p2.column) return NSOrderedDescending;
-        return NSOrderedSame;
-    }];
-}
-
 void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     realm.schema = targetSchema;
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
@@ -97,7 +78,27 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
         // read-only realms may be missing tables entirely
         if (objectSchema.table) {
             ObjectSchema schema = objectSchema.objectStoreCopy;
-            RLMUpdatePropertyColumns(realm.group, objectSchema, schema, verify);
+            if (verify) {
+                auto errors = ObjectStore::validate_schema(realm.group, schema);
+                if (errors.size()) {
+                    @throw RLMException(ObjectStoreValidationException(errors, schema.name));
+                }
+            }
+            else {
+                ObjectStore::update_column_mapping(realm.group, schema);
+            }
+
+            // copy updated column mapping
+            for (size_t i = 0; i < schema.properties.size(); i++) {
+                ((RLMProperty *)objectSchema.properties[i]).column = schema.properties[i].table_column;
+            }
+
+            // re-order properties
+            objectSchema.properties = [objectSchema.properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
+                if (p1.column < p2.column) return NSOrderedAscending;
+                if (p1.column > p2.column) return NSOrderedDescending;
+                return NSOrderedSame;
+            }];
         }
     }
 }

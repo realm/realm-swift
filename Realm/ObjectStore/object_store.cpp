@@ -20,6 +20,7 @@
 
 #include <realm/link_view.hpp>
 #include <realm/table_view.hpp>
+#include <realm/util/assert.hpp>
 
 using namespace realm;
 using namespace std;
@@ -127,7 +128,7 @@ realm::TableRef ObjectStore::table_for_object_type_create_if_needed(realm::Group
     return group->get_or_add_table(table_name_for_object_type(object_type), &created);
 }
 
-std::vector<std::string> ObjectStore::validate_schema_and_update_column_mapping(realm::Group *group, ObjectSchema &target_schema) {
+std::vector<std::string> ObjectStore::validate_schema(realm::Group *group, ObjectSchema &target_schema) {
     vector<string> validation_errors;
     ObjectSchema table_schema(group, target_schema.name);
 
@@ -174,6 +175,16 @@ std::vector<std::string> ObjectStore::validate_schema_and_update_column_mapping(
     }
 
     return validation_errors;
+}
+
+void ObjectStore::update_column_mapping(Group *group, ObjectSchema &target_schema) {
+    ObjectSchema table_schema(group, target_schema.name);
+    for (auto& target_prop:target_schema.properties) {
+        auto table_prop = table_schema.property_for_name(target_prop.name);
+        REALM_ASSERT_DEBUG(table_prop);
+
+        target_prop.table_column = table_prop->table_column;
+    }
 }
 
 static inline bool property_has_changed(Property &p1, Property &p2) {
@@ -283,7 +294,7 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
 
         // read-only realms may be missing tables entirely
         if (table) {
-            auto errors = validate_schema_and_update_column_mapping(group, target_schema);
+            auto errors = validate_schema(group, target_schema);
             if (errors.size()) {
                 throw ObjectStoreValidationException(errors, target_schema.name);
             }
@@ -324,8 +335,8 @@ bool ObjectStore::indexes_are_up_to_date(Group *group, Schema &schema) {
         if (!table) {
             continue;
         }
-        
-        validate_schema_and_update_column_mapping(group, object_schema); // FIXME we just need the column mapping
+
+        update_column_mapping(group, object_schema);
         for (auto& property:object_schema.properties) {
             if (property.requires_index() != table->has_search_index(property.table_column)) {
                 return false;
