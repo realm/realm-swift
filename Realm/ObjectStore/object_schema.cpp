@@ -46,7 +46,7 @@ ObjectSchema::ObjectSchema(realm::Group *group, std::string name) : name(name) {
     primary_key = realm::ObjectStore::get_primary_key_for_object(group, name);
     if (primary_key.length()) {
         auto primary_key_iter = primary_key_property();
-        if (primary_key_iter == properties.end()) {
+        if (!primary_key_iter) {
             std::vector<std::string> errors;
             errors.push_back("No property matching primary key '" + primary_key + "'");
             throw ObjectStoreValidationException(errors, name);
@@ -55,15 +55,13 @@ ObjectSchema::ObjectSchema(realm::Group *group, std::string name) : name(name) {
     }
 }
 
-std::vector<Property>::iterator ObjectSchema::property_for_name(std::string name) {
-    auto iter = properties.begin();
-    while (iter < properties.end()) {
-        if (iter->name == name) {
-            return iter;
+Property *ObjectSchema::property_for_name(std::string name) {
+    for (auto& prop:properties) {
+        if (prop.name == name) {
+            return &prop;
         }
-        iter++;
     }
-    return iter;
+    return nullptr;
 }
 
 std::vector<ObjectSchema> ObjectSchema::object_schema_from_group(realm::Group *group) {

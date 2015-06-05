@@ -82,7 +82,7 @@ namespace realm {
         // must be in write transaction to set
         static void set_primary_key_for_object(Group *group, StringData object_type, StringData primary_key);
 
-        static realm::TableRef table_for_object_type_create_if_needed(Group *group, StringData object_type, bool &created);
+        static TableRef table_for_object_type_create_if_needed(Group *group, StringData object_type, bool &created);
         static std::string table_name_for_object_type(std::string class_name);
         static std::string object_type_for_table_name(std::string table_name);
 
@@ -103,9 +103,10 @@ namespace realm {
             RealmPropertyTypeNotIndexable,          // object_type, property_name, property_type
             RealmDuplicatePrimaryKeyValue,          // object_type, property_name
         };
-
         typedef std::map<std::string, std::string> Dict;
+        
         ObjectStoreException(Kind kind, Dict dict = Dict()) : m_kind(kind), m_dict(dict) {}
+
         ObjectStoreException::Kind kind() { return m_kind; }
         ObjectStoreException::Dict &dict() { return m_dict; }
 

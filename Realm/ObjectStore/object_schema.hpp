@@ -37,8 +37,8 @@ namespace realm {
         std::vector<Property> properties;
         std::string primary_key;
 
-        std::vector<Property>::iterator property_for_name(std::string name);
-        std::vector<Property>::iterator primary_key_property() {
+        Property *property_for_name(std::string name);
+        Property *primary_key_property() {
             return property_for_name(primary_key);
         }
     };

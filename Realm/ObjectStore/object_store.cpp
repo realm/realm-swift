@@ -132,44 +132,44 @@ std::vector<std::string> ObjectStore::validate_schema_and_update_column_mapping(
     ObjectSchema table_schema(group, target_schema.name);
 
     // check to see if properties are the same
-    for (auto current_prop = table_schema.properties.begin(); current_prop != table_schema.properties.end(); current_prop++) {
-        auto target_prop = target_schema.property_for_name(current_prop->name);
+    for (auto& current_prop:table_schema.properties) {
+        auto target_prop = target_schema.property_for_name(current_prop.name);
 
-        if (target_prop == target_schema.properties.end()) {
-            validation_errors.push_back("Property '" + current_prop->name + "' is missing from latest object model.");
+        if (!target_prop) {
+            validation_errors.push_back("Property '" + current_prop.name + "' is missing from latest object model.");
             continue;
         }
 
-        if (current_prop->type != target_prop->type) {
+        if (current_prop.type != target_prop->type) {
             validation_errors.push_back("Property types for '" + target_prop->name + "' property do not match. " +
-                                        "Old type '" + string_for_property_type(current_prop->type) +
+                                        "Old type '" + string_for_property_type(current_prop.type) +
                                         "', new type '" + string_for_property_type(target_prop->type) + "'");
             continue;
         }
-        if (current_prop->type == PropertyTypeObject || target_prop->type == PropertyTypeArray) {
-            if (current_prop->object_type != target_prop->object_type) {
-                validation_errors.push_back("Target object type for property '" + current_prop->name + "' does not match. " +
-                                            "Old type '" + current_prop->object_type +
+        if (current_prop.type == PropertyTypeObject || target_prop->type == PropertyTypeArray) {
+            if (current_prop.object_type != target_prop->object_type) {
+                validation_errors.push_back("Target object type for property '" + current_prop.name + "' does not match. " +
+                                            "Old type '" + current_prop.object_type +
                                             "', new type '" + target_prop->object_type + "'.");
             }
         }
-        if (current_prop->is_primary != target_prop->is_primary) {
-            if (current_prop->is_primary) {
-                validation_errors.push_back("Property '" + current_prop->name + "' is no longer a primary key.");
+        if (current_prop.is_primary != target_prop->is_primary) {
+            if (current_prop.is_primary) {
+                validation_errors.push_back("Property '" + current_prop.name + "' is no longer a primary key.");
             }
             else {
-                validation_errors.push_back("Property '" + current_prop->name + "' has been made a primary key.");
+                validation_errors.push_back("Property '" + current_prop.name + "' has been made a primary key.");
             }
         }
 
         // create new property with aligned column
-        target_prop->table_column = current_prop->table_column;
+        target_prop->table_column = current_prop.table_column;
     }
 
     // check for new missing properties
-    for (auto target_iter = target_schema.properties.begin(); target_iter != target_schema.properties.end(); target_iter++) {
-        if (table_schema.property_for_name(target_iter->name) == table_schema.properties.end()) {
-            validation_errors.push_back("Property '" + target_iter->name + "' has been added to latest object model.");
+    for (auto& target_prop:target_schema.properties) {
+        if (!table_schema.property_for_name(target_prop.name)) {
+            validation_errors.push_back("Property '" + target_prop.name + "' has been added to latest object model.");
         }
     }
 
@@ -188,8 +188,7 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
 
     // first pass to create missing tables
     vector<ObjectSchema *> to_update;
-    for (size_t i = 0; i < target_schema.size(); i++) {
-        ObjectSchema &object_schema = target_schema[i];
+    for (auto& object_schema:target_schema) {
         bool created = false;
         ObjectStore::table_for_object_type_create_if_needed(group, object_schema.name, created);
 
@@ -201,29 +200,28 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
     }
 
     // second pass adds/removes columns for out of date tables
-    for (size_t i = 0; i < to_update.size(); i++) {
-        ObjectSchema *target_schema = to_update[i];
+    for (auto target_schema:to_update) {
         TableRef table = ObjectStore::table_for_object_type(group, target_schema->name);
 
         ObjectSchema current_schema(group, target_schema->name);
         vector<Property> &target_props = target_schema->properties;
 
         // add missing columns
-        for (auto target_prop = target_props.begin(); target_prop < target_props.end(); target_prop++) {
-            auto current_prop = current_schema.property_for_name(target_prop->name);
+        for (auto target_prop:target_props) {
+            auto current_prop = current_schema.property_for_name(target_prop.name);
 
             // add any new properties (new name or different type)
-            if (current_prop == current_schema.properties.end() || property_has_changed(*current_prop, *target_prop)) {
-                switch (target_prop->type) {
+            if (!current_prop || property_has_changed(*current_prop, target_prop)) {
+                switch (target_prop.type) {
                         // for objects and arrays, we have to specify target table
                     case PropertyTypeObject:
                     case PropertyTypeArray: {
-                        realm::TableRef link_table = ObjectStore::table_for_object_type(group, target_prop->object_type);
-                        target_prop->table_column = table->add_column_link(realm::DataType(target_prop->type), target_prop->name, *link_table);
+                        realm::TableRef link_table = ObjectStore::table_for_object_type(group, target_prop.object_type);
+                        target_prop.table_column = table->add_column_link(realm::DataType(target_prop.type), target_prop.name, *link_table);
                         break;
                     }
                     default:
-                        target_prop->table_column = table->add_column(realm::DataType(target_prop->type), target_prop->name);
+                        target_prop.table_column = table->add_column(realm::DataType(target_prop.type), target_prop.name);
                         break;
                 }
                 changed = true;
@@ -231,12 +229,13 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
         }
 
         // remove extra columns
-        vector<Property> reverse_props = current_schema.properties;
-        std::sort(reverse_props.begin(), reverse_props.end(), [](Property &i, Property &j){ return (j.table_column < i.table_column); });
-        for (auto iter = reverse_props.begin(); iter != reverse_props.end(); iter++) {
-            auto target_prop_iter = target_schema->property_for_name(iter->name);
-            if (target_prop_iter == target_props.end() || property_has_changed(*iter, *target_prop_iter)) {
-                table->remove_column(iter->table_column);
+        sort(begin(current_schema.properties), end(current_schema.properties), [](Property &i, Property &j) {
+            return (j.table_column < i.table_column);
+        });
+        for (auto& current_prop:current_schema.properties) {
+            auto target_prop_iter = target_schema->property_for_name(current_prop.name);
+            if (!target_prop_iter || property_has_changed(current_prop, *target_prop_iter)) {
+                table->remove_column(current_prop.table_column);
                 changed = true;
             }
         }
@@ -279,8 +278,7 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
 
     // create tables
     bool changed = create_metadata_tables(group) | create_tables(group, schema, migrating);
-    for (size_t i = 0; i < schema.size(); i++) {
-        ObjectSchema &target_schema = schema[i];
+    for (auto& target_schema:schema) {
         TableRef table = table_for_object_type(group, target_schema.name);
 
         // read-only realms may be missing tables entirely
@@ -311,7 +309,7 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
 
 ObjectStore::Schema ObjectStore::schema_from_group(Group *group) {
     ObjectStore::Schema schema;
-    for (unsigned long i = 0; i < group->size(); i++) {
+    for (size_t i = 0; i < group->size(); i++) {
         string object_type = object_type_for_table_name(group->get_table_name(i));
         if (object_type.length()) {
             schema.push_back(ObjectSchema(group, object_type));
@@ -321,14 +319,14 @@ ObjectStore::Schema ObjectStore::schema_from_group(Group *group) {
 }
 
 bool ObjectStore::are_indexes_up_to_date(Group *group, Schema &schema) {
-    for (auto &object_schema:schema) {
+    for (auto& object_schema:schema) {
         TableRef table = table_for_object_type(group, object_schema.name);
         if (!table) {
             continue;
         }
         
         validate_schema_and_update_column_mapping(group, object_schema); // FIXME we just need the column mapping
-        for (auto &property:object_schema.properties) {
+        for (auto& property:object_schema.properties) {
             if (property.requires_index() != table->has_search_index(property.table_column)) {
                 return false;
             }
@@ -339,13 +337,13 @@ bool ObjectStore::are_indexes_up_to_date(Group *group, Schema &schema) {
 
 bool ObjectStore::update_indexes(Group *group, Schema &schema) {
     bool changed = false;
-    for (auto &object_schema:schema) {
+    for (auto& object_schema:schema) {
         TableRef table = table_for_object_type(group, object_schema.name);
         if (!table) {
             continue;
         }
 
-        for (auto &property:object_schema.properties) {
+        for (auto& property:object_schema.properties) {
             if (property.requires_index() == table->has_search_index(property.table_column)) {
                 continue;
             }
@@ -356,8 +354,11 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
                     table->add_search_index(property.table_column);
                 }
                 catch (realm::LogicError const&) {
-                    throw ObjectStoreException(ObjectStoreException::RealmPropertyTypeNotIndexable,
-                                               {{"object_type", object_schema.name}, {"property_name", property.name}, {"property_type", string_for_property_type(property.type)}});
+                    throw ObjectStoreException(ObjectStoreException::RealmPropertyTypeNotIndexable, {
+                        {"object_type", object_schema.name},
+                        {"property_name", property.name},
+                        {"property_type", string_for_property_type(property.type)}
+                    });
                 }
             }
             else {
@@ -369,9 +370,9 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
 }
 
 void ObjectStore::validate_primary_column_uniqueness(Group *group, Schema &schema) {
-    for (auto &object_schema:schema) {
+    for (auto& object_schema:schema) {
         auto primary_prop = object_schema.primary_key_property();
-        if (primary_prop == object_schema.properties.end()) {
+        if (!primary_prop) {
             continue;
         }
 
