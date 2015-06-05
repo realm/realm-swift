@@ -216,7 +216,7 @@
     }
 
     [RLMRealm setSchemaVersion:0 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
+    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
 - (void)testAddingPropertyAtBeginningPreservesData {
@@ -368,8 +368,8 @@
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMTestRealmPath()
             withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {}];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()],
-                    @"Migration should throw due to duplicate primary keys)");
+    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMTestRealmPath()],
+                    @"Migration should return error due to duplicate primary keys)");
 
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMTestRealmPath()
@@ -506,7 +506,7 @@
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMTestRealmPath()
             withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {}];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should throw due to duplicate primary keys)");
+    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should return error due to duplicate primary keys)");
 
     // apply good migration that deletes duplicates
     [RLMRealm setSchemaVersion:1
@@ -550,7 +550,7 @@
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMTestRealmPath()
             withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {}];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should throw due to duplicate primary keys)");
+    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should return error due to duplicate primary keys)");
 
     // should still be able to open with pre-migration schema
     XCTAssertNoThrow([self realmWithSingleObject:objectSchema]);
@@ -620,7 +620,7 @@
     [RLMRealm setSchemaVersion:0
                 forRealmAtPath:RLMTestRealmPath()
             withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {}];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
+    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
 - (void)testVersionNumberCanStaySameWhenAddingObjectSchema {
