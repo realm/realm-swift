@@ -77,7 +77,6 @@
 		027A4D2D1AB1012500AA46F9 /* RLMMultiProcessTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 027A4D2B1AB1012500AA46F9 /* RLMMultiProcessTestCase.m */; };
 		028481CB19CCFC9C0097A416 /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */; };
 		028481EF19CD032C0097A416 /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */; };
-		029E9A821B17DF6A008B7A93 /* object_store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02B709531B17D3E4000541CD /* object_store.cpp */; };
 		02AFB4631A80343600E11938 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4611A80343600E11938 /* PropertyTests.m */; };
 		02AFB4641A80343600E11938 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4611A80343600E11938 /* PropertyTests.m */; };
 		02AFB4651A80343600E11938 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4611A80343600E11938 /* PropertyTests.m */; };
@@ -88,7 +87,6 @@
 		02AFB46A1A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02B709551B17D3E4000541CD /* object_store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02B709531B17D3E4000541CD /* object_store.cpp */; };
 		02B709561B17D3E4000541CD /* object_store.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02B709541B17D3E4000541CD /* object_store.hpp */; };
-		02B767C11B17E28700697258 /* object_store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02B709531B17D3E4000541CD /* object_store.cpp */; };
 		02B8EF5919E601D80045A93D /* RLMResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5819E601D80045A93D /* RLMResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02B8EF5A19E601D80045A93D /* RLMResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5819E601D80045A93D /* RLMResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02B8EF5C19E7048D0045A93D /* RLMCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5B19E7048D0045A93D /* RLMCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -99,7 +97,6 @@
 		02D9AFC01B22488800A1BD87 /* object_schema.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFB81B22488800A1BD87 /* object_schema.hpp */; };
 		02D9AFC11B22488800A1BD87 /* object_schema.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFB81B22488800A1BD87 /* object_schema.hpp */; };
 		02D9AFC21B22488800A1BD87 /* object_schema.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFB81B22488800A1BD87 /* object_schema.hpp */; };
-		02D9AFC31B22488800A1BD87 /* object_store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02D9AFB91B22488800A1BD87 /* object_store.cpp */; };
 		02D9AFC41B22488800A1BD87 /* object_store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02D9AFB91B22488800A1BD87 /* object_store.cpp */; };
 		02D9AFC51B22488800A1BD87 /* object_store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02D9AFB91B22488800A1BD87 /* object_store.cpp */; };
 		02D9AFC61B22488800A1BD87 /* object_store.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFBA1B22488800A1BD87 /* object_store.hpp */; };
@@ -1294,7 +1291,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				02B767C11B17E28700697258 /* object_store.cpp in Sources */,
 				027A4D281AB100E000AA46F9 /* RLMRealmUtil.mm in Sources */,
 				29E3C7081A71C1C700B62C1D /* RLMAccessor.mm in Sources */,
 				29E3C7091A71C1C700B62C1D /* RLMArray.mm in Sources */,
@@ -1361,7 +1357,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				029E9A821B17DF6A008B7A93 /* object_store.cpp in Sources */,
 				027A4D271AB100E000AA46F9 /* RLMRealmUtil.mm in Sources */,
 				E856D1F31956154C00FB2FCF /* RLMAccessor.mm in Sources */,
 				E856D1F61956154C00FB2FCF /* RLMArray.mm in Sources */,
@@ -1450,7 +1445,6 @@
 				023B195C1A3BA90D0067FB81 /* RLMListBase.m in Sources */,
 				02B709551B17D3E4000541CD /* object_store.cpp in Sources */,
 				3F452EC619C2279800AFC154 /* RLMSwiftSupport.m in Sources */,
-				02D9AFC31B22488800A1BD87 /* object_store.cpp in Sources */,
 				3F20DA2419BE1EA6007DE308 /* RLMUpdateChecker.mm in Sources */,
 				02D9AFBD1B22488800A1BD87 /* object_schema.cpp in Sources */,
 				E81A1FB11955FC9300FDED82 /* RLMUtil.mm in Sources */,
