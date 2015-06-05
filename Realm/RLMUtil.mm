@@ -242,6 +242,10 @@ NSException *RLMException(realm::ObjectStoreException & exception) {
         case ObjectStoreException::RealmVersionGreaterThanSchemaVersion:
             return RLMException(@"Schema version less than last set version in Realm");
             break;
+        case ObjectStoreException::RealmPropertyTypeNotIndexable:
+            return RLMException([NSString stringWithFormat:@"Cannot index property '%s.%s': indexing properties of type '%s' is currently not supported",
+                                 exception.dict()["object_type"].c_str(), exception.dict()["property_name"].c_str(), exception.dict()["property_type"].c_str()]);
+                                break;
         default:
             break;
     }

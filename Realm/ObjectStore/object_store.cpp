@@ -289,6 +289,8 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
         }
     }
 
+    changed = changed | update_indexes(group, schema);
+
     if (!migrating) {
         return changed;
     }
@@ -313,3 +315,52 @@ ObjectStore::Schema ObjectStore::schema_from_group(Group *group) {
     }
     return schema;
 }
+
+bool ObjectStore::are_indexes_up_to_date(Group *group, Schema &schema) {
+    for (auto &object_schema:schema) {
+        TableRef table = table_for_object_type(group, object_schema.name);
+        if (!table) {
+            continue;
+        }
+        
+        validate_schema_and_update_column_mapping(group, object_schema); // FIXME we just need the column mapping
+        for (auto &property:object_schema.properties) {
+            if (property.is_indexed != table->has_search_index(property.table_column)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool ObjectStore::update_indexes(Group *group, Schema &schema) {
+    bool changed = false;
+    for (auto &object_schema:schema) {
+        TableRef table = table_for_object_type(group, object_schema.name);
+        if (!table) {
+            continue;
+        }
+
+        for (auto &property:object_schema.properties) {
+            if (property.is_indexed == table->has_search_index(property.table_column)) {
+                continue;
+            }
+
+            changed = true;
+            if (property.is_indexed) {
+                try {
+                    table->add_search_index(property.table_column);
+                }
+                catch (realm::LogicError const&) {
+                    throw ObjectStoreException(ObjectStoreException::RealmPropertyTypeNotIndexable,
+                                               {{"object_type", object_schema.name}, {"property_name", property.name}, {"property_type", string_for_property_type(property.type)}});
+                }
+            }
+            else {
+                table->remove_search_index(property.table_column);
+            }
+        }
+    }
+    return changed;
+}
+

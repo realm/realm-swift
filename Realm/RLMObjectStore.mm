@@ -33,45 +33,6 @@
 #import "object_store.hpp"
 #import <objc/message.h>
 
-// ensure all search indexes for all tables are up-to-date
-// does not need to be called from a write transaction
-static void RLMRealmUpdateIndexes(RLMRealm *realm) {
-    bool commitWriteTransaction = false;
-    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-        realm::Table *table = objectSchema.table;
-        for (RLMProperty *prop in objectSchema.properties) {
-            if (prop.indexed == table->has_search_index(prop.column)) {
-                continue;
-            }
-
-            if (!realm.inWriteTransaction) {
-                [realm beginWriteTransaction];
-                commitWriteTransaction = true;
-            }
-            if (prop.indexed) {
-                try {
-                    table->add_search_index(prop.column);
-                }
-                catch (realm::LogicError const&) {
-                    if (commitWriteTransaction) {
-                        [realm cancelWriteTransaction];
-                    }
-
-                    NSString *err = [NSString stringWithFormat:@"Cannot index property '%@.%@': indexing properties of type '%@' is currently not supported",
-                                     objectSchema.className, prop.name, RLMTypeToString(prop.type)];
-                    @throw RLMException(err);
-                }
-            }
-            else {
-                table->remove_search_index(prop.column);
-            }
-        }
-    }
-
-    if (commitWriteTransaction) {
-        [realm commitWriteTransaction];
-    }
-}
 
 // Schema used to created generated accessors
 static NSMutableArray * const s_accessorSchema = [NSMutableArray new];
@@ -109,30 +70,35 @@ void RLMClearAccessorCache() {
     [s_accessorSchema removeAllObjects];
 }
 
+static void RLMUpdatePropertyColumns(Group *group, RLMObjectSchema *rlmObjectSchema, ObjectSchema &objectSchema, bool verify) {
+    auto errors = ObjectStore::validate_schema_and_update_column_mapping(group, objectSchema);
+    if (verify && errors.size()) {
+        @throw RLMException(ObjectStoreValidationException(errors, objectSchema.name));
+    }
+
+    // update column mapping
+    for (size_t i = 0; i < objectSchema.properties.size(); i++) {
+        ((RLMProperty *)rlmObjectSchema.properties[i]).column = objectSchema.properties[i].table_column;
+    }
+
+    // re-order properties
+    rlmObjectSchema.properties = [rlmObjectSchema.properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
+        if (p1.column < p2.column) return NSOrderedAscending;
+        if (p1.column > p2.column) return NSOrderedDescending;
+        return NSOrderedSame;
+    }];
+}
+
 void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     realm.schema = targetSchema;
-
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         objectSchema.realm = realm;
 
         // read-only realms may be missing tables entirely
         if (objectSchema.table) {
             ObjectSchema schema = objectSchema.objectStoreCopy;
-            auto errors = ObjectStore::validate_schema_and_update_column_mapping(realm.group, schema);
-            if (verify && errors.size()) {
-                @throw RLMException(ObjectStoreValidationException(errors, schema.name));
-            }
-
-            // update column mapping
-            for (size_t i = 0; i < schema.properties.size(); i++) {
-                ((RLMProperty *)objectSchema.properties[i]).column = schema.properties[i].table_column;
-            }
+            RLMUpdatePropertyColumns(realm.group, objectSchema, schema, verify);
         }
-        objectSchema.properties = [objectSchema.properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
-            if (p1.column < p2.column) return NSOrderedAscending;
-            if (p1.column > p2.column) return NSOrderedDescending;
-            return NSOrderedSame;
-        }];
     }
 }
 
@@ -150,10 +116,14 @@ static bool RLMRealmHasAllTables(RLMRealm *realm, RLMSchema *targetSchema) {
 }
 
 NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
+    ObjectStore::Schema schema;
+    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
+        schema.push_back(objectSchema.objectStoreCopy);
+    }
+
     try {
-        if (!ObjectStore::is_migration_required(realm.group, newVersion) && RLMRealmHasAllTables(realm, targetSchema)) {
+        if (!ObjectStore::is_migration_required(realm.group, newVersion) && ObjectStore::are_indexes_up_to_date(realm.group, schema) && RLMRealmHasAllTables(realm, targetSchema)) {
             RLMRealmSetSchema(realm, targetSchema, true);
-            RLMRealmUpdateIndexes(realm);
             return nil;
         }
     }
@@ -167,13 +137,8 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
         // write transaction
         [realm beginWriteTransaction];
 
-        ObjectStore::Schema schema;
-        for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
-            schema.push_back(objectSchema.objectStoreCopy);
-        }
-
         bool changed = ObjectStore::update_realm_with_schema(realm.group, newVersion, schema, [=]() {
-            RLMRealmSetSchema(realm, targetSchema, true);
+            RLMRealmSetSchema(realm, targetSchema, false);
             if (migrationBlock) {
                 NSError *error = migrationBlock();
                 if (error) {
@@ -182,7 +147,6 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
             }
         });
         RLMRealmSetSchema(realm, targetSchema, false);
-        RLMRealmUpdateIndexes(realm);
 
         if (changed) {
             [realm commitWriteTransaction];

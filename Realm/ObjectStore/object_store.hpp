@@ -38,7 +38,7 @@ namespace realm {
         // returns array of validation errors
         static std::vector<std::string> validate_schema_and_update_column_mapping(Group *group, ObjectSchema &target_schema);
 
-        // updates a Realm to a given target schema/version creating tables as necessary
+        // updates a Realm to a given target schema/version creating tables and updating indexes as necessary
         // returns if any changes were made
         // passed in schema ar updated with the correct column mapping
         // optionally runs migration function/lambda if schema is out of date
@@ -55,6 +55,9 @@ namespace realm {
 
         // get existing Schema from a group
         static Schema schema_from_group(Group *group);
+
+        // check if indexes are up to date - if false you need to call update_realm_with_schema
+        static bool are_indexes_up_to_date(Group *group, Schema &schema);
 
     private:
         // set a new schema version
@@ -83,6 +86,9 @@ namespace realm {
         static std::string table_name_for_object_type(std::string class_name);
         static std::string object_type_for_table_name(std::string table_name);
 
+        // returns if any indexes were changed
+        static bool update_indexes(Group *group, Schema &schema);
+
         friend ObjectSchema;
     };
 
@@ -91,12 +97,17 @@ namespace realm {
         enum Kind {
             // thrown when calling update_realm_to_schema and the realm version is greater than the given version
             RealmVersionGreaterThanSchemaVersion,
+            RealmPropertyTypeNotIndexable,          // object_type, property_name, property_type
         };
-        ObjectStoreException(Kind kind) : m_kind(kind) {}
+
+        typedef std::map<std::string, std::string> Dict;
+        ObjectStoreException(Kind kind, Dict dict = Dict()) : m_kind(kind), m_dict(dict) {}
         ObjectStoreException::Kind kind() { return m_kind; }
+        ObjectStoreException::Dict &dict() { return m_dict; }
 
     private:
         Kind m_kind;
+        Dict m_dict;
     };
 
     class ObjectStoreValidationException : public std::exception {
