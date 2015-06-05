@@ -18,6 +18,9 @@
 
 #include "object_store.hpp"
 
+#include <realm/link_view.hpp>
+#include <realm/table_view.hpp>
+
 using namespace realm;
 using namespace std;
 
@@ -289,17 +292,18 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
         }
     }
 
-    changed = changed | update_indexes(group, schema);
+    changed = update_indexes(group, schema) | changed;
 
     if (!migrating) {
         return changed;
     }
 
     // apply the migration block if provided and there's any old data
-    // to be migrated
     if (get_schema_version(group) != realm::ObjectStore::NotVersioned) {
         migration();
     }
+
+    validate_primary_column_uniqueness(group, schema);
 
     set_schema_version(group, version);
     return true;
@@ -325,7 +329,7 @@ bool ObjectStore::are_indexes_up_to_date(Group *group, Schema &schema) {
         
         validate_schema_and_update_column_mapping(group, object_schema); // FIXME we just need the column mapping
         for (auto &property:object_schema.properties) {
-            if (property.is_indexed != table->has_search_index(property.table_column)) {
+            if (property.requires_index() != table->has_search_index(property.table_column)) {
                 return false;
             }
         }
@@ -342,12 +346,12 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
         }
 
         for (auto &property:object_schema.properties) {
-            if (property.is_indexed == table->has_search_index(property.table_column)) {
+            if (property.requires_index() == table->has_search_index(property.table_column)) {
                 continue;
             }
 
             changed = true;
-            if (property.is_indexed) {
+            if (property.requires_index()) {
                 try {
                     table->add_search_index(property.table_column);
                 }
@@ -364,3 +368,16 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
     return changed;
 }
 
+void ObjectStore::validate_primary_column_uniqueness(Group *group, Schema &schema) {
+    for (auto &object_schema:schema) {
+        auto primary_prop = object_schema.primary_key_property();
+        if (primary_prop == object_schema.properties.end()) {
+            continue;
+        }
+
+        realm::TableRef table = table_for_object_type(group, object_schema.name);
+        if (table->get_distinct_view(primary_prop->table_column).size() != table->size()) {
+            throw ObjectStoreException(ObjectStoreException::RealmDuplicatePrimaryKeyValue, {{"object_type", object_schema.name}, {"property_name", primary_prop->name}});
+        }
+    }
+}

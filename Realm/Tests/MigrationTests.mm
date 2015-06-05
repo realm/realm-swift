@@ -473,8 +473,6 @@
         [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
         [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@2]];
         [realm commitWriteTransaction];
-
-        XCTAssertFalse(realm.schema[MigrationPrimaryKeyObject.className].table->has_search_index(0));
     }
 
     // apply migration

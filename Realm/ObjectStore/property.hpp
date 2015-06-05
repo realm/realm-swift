@@ -54,6 +54,7 @@ namespace realm {
         bool is_indexed;
 
         size_t table_column;
+        bool requires_index() { return is_primary | is_indexed; }
     };
 
     static inline const char *string_for_property_type(PropertyType type) {

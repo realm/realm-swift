@@ -246,6 +246,8 @@ NSException *RLMException(realm::ObjectStoreException & exception) {
             return RLMException([NSString stringWithFormat:@"Cannot index property '%s.%s': indexing properties of type '%s' is currently not supported",
                                  exception.dict()["object_type"].c_str(), exception.dict()["property_name"].c_str(), exception.dict()["property_type"].c_str()]);
                                 break;
+        case ObjectStoreException::RealmDuplicatePrimaryKeyValue:
+            return RLMException([NSString stringWithFormat:@"Primary key property '%s' has duplicate values after migration.", exception.dict()["property_name"].c_str()]);
         default:
             break;
     }

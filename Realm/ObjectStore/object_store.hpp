@@ -89,6 +89,9 @@ namespace realm {
         // returns if any indexes were changed
         static bool update_indexes(Group *group, Schema &schema);
 
+        // validates that all primary key properties have unique values
+        static void validate_primary_column_uniqueness(Group *group, Schema &schema);
+
         friend ObjectSchema;
     };
 
@@ -98,6 +101,7 @@ namespace realm {
             // thrown when calling update_realm_to_schema and the realm version is greater than the given version
             RealmVersionGreaterThanSchemaVersion,
             RealmPropertyTypeNotIndexable,          // object_type, property_name, property_type
+            RealmDuplicatePrimaryKeyValue,          // object_type, property_name
         };
 
         typedef std::map<std::string, std::string> Dict;

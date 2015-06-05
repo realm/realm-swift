@@ -30,9 +30,6 @@
 
 #import "object_store.hpp"
 
-#import <realm/link_view.hpp>
-#import <realm/table_view.hpp>
-
 // The source realm for a migration has to use a SharedGroup to be able to share
 // the file with the destination realm, but we don't want to let the user call
 // beginWriteTransaction on it as that would make no sense.
@@ -99,27 +96,6 @@
     }
 }
 
-- (void)verifyPrimaryKeyUniqueness {
-    for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
-        // if we have a new primary key not equal to our old one, verify uniqueness
-        RLMProperty *primaryProperty = objectSchema.primaryKeyProperty;
-        RLMProperty *oldPrimaryProperty = [[_oldRealm.schema schemaForClassName:objectSchema.className] primaryKeyProperty];
-        if (!primaryProperty || primaryProperty == oldPrimaryProperty) {
-            continue;
-        }
-
-        realm::Table *table = objectSchema.table;
-        NSUInteger count = table->size();
-        if (!table->has_search_index(primaryProperty.column)) {
-            table->add_search_index(primaryProperty.column);
-        }
-        if (table->get_distinct_view(primaryProperty.column).size() != count) {
-            NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
-            @throw RLMException(reason);
-        }
-    }
-}
-
 - (void)execute:(RLMMigrationBlock)block {
     @autoreleasepool {
         // copy old schema and reset after migration
@@ -133,9 +109,6 @@
         // apply block and set new schema version
         uint64_t oldVersion = realm::ObjectStore::get_schema_version(_realm.group);
         block(self, oldVersion);
-
-        // verify uniqueness for any new unique columns before committing
-        [self verifyPrimaryKeyUniqueness];
 
         // reset schema to saved schema since it has been altered
         RLMRealmSetSchema(_realm, savedSchema, true);
