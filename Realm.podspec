@@ -36,8 +36,7 @@ Pod::Spec.new do |s|
   s.prepare_command         = 'sh build.sh cocoapods-setup'
   s.source_files            = 'Realm/*.{m,mm}'
   s.header_mappings_dir     = 'include'
-  s.xcconfig                = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
-                                'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)' }
+  s.xcconfig                = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'c++14' }
   s.preserve_paths          = %w(build.sh)
 
   s.ios.deployment_target   = '7.0'
