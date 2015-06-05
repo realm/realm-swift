@@ -109,14 +109,14 @@ void ObjectStore::set_primary_key_for_object(realm::Group *group, StringData obj
     }
 }
 
-string ObjectStore::object_type_for_table_name(string table_name) {
+string ObjectStore::object_type_for_table_name(const string &table_name) {
     if (table_name.compare(0, 6, c_object_table_name_prefix) == 0) {
         return table_name.substr(6, table_name.length()-6);
     }
     return string();
 }
 
-string ObjectStore::table_name_for_object_type(string object_type) {
+string ObjectStore::table_name_for_object_type(const string &object_type) {
     return c_object_table_name_prefix + object_type;
 }
 
@@ -124,7 +124,7 @@ realm::TableRef ObjectStore::table_for_object_type(realm::Group *group, StringDa
     return group->get_table(table_name_for_object_type(object_type));
 }
 
-realm::TableRef ObjectStore::table_for_object_type_create_if_needed(realm::Group *group, StringData object_type, bool &created) {
+realm::TableRef ObjectStore::table_for_object_type_create_if_needed(realm::Group *group, const StringData &object_type, bool &created) {
     return group->get_or_add_table(table_name_for_object_type(object_type), &created);
 }
 

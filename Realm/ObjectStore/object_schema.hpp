@@ -29,13 +29,13 @@ namespace realm {
     class ObjectSchema {
     public:
         ObjectSchema() {}
-        ObjectSchema(Group *group, std::string name);
+        ObjectSchema(Group *group, const std::string &name);
 
         std::string name;
         std::vector<Property> properties;
         std::string primary_key;
 
-        Property *property_for_name(std::string name);
+        Property *property_for_name(const std::string &name);
         Property *primary_key_property() {
             return property_for_name(primary_key);
         }

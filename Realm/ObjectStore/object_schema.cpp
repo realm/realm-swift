@@ -22,7 +22,7 @@
 using namespace realm;
 using namespace std;
 
-ObjectSchema::ObjectSchema(realm::Group *group, std::string name) : name(name) {
+ObjectSchema::ObjectSchema(realm::Group *group, const std::string &name) : name(name) {
     TableRef table = ObjectStore::table_for_object_type(group, name);
     size_t count = table->get_column_count();
     for (size_t col = 0; col < count; col++) {
@@ -55,7 +55,7 @@ ObjectSchema::ObjectSchema(realm::Group *group, std::string name) : name(name) {
     }
 }
 
-Property *ObjectSchema::property_for_name(std::string name) {
+Property *ObjectSchema::property_for_name(const std::string &name) {
     for (auto& prop:properties) {
         if (prop.name == name) {
             return &prop;
