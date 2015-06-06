@@ -24,12 +24,16 @@
 
 #include "property.hpp"
 #include <realm/group.hpp>
+#include <realm/table.hpp>
 
 namespace realm {
     class ObjectSchema {
     public:
         ObjectSchema() {}
-        ObjectSchema(Group *group, const std::string &name);
+
+        // create object schema from existing table
+        // if no table is provided it is looked up in the group
+        ObjectSchema(Group *group, const std::string &name, Table *table = nullptr);
 
         std::string name;
         std::vector<Property> properties;

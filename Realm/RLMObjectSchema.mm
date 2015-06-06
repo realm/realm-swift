@@ -297,7 +297,7 @@
         [propArray addObject:property];
     }
     schema.properties = propArray;
-
+    
     // get primary key from realm metadata
     if (objectSchema.primary_key.length()) {
         NSString *primaryKeyString = [NSString stringWithUTF8String:objectSchema.primary_key.c_str()];

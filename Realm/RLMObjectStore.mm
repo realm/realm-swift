@@ -70,16 +70,30 @@ void RLMClearAccessorCache() {
     [s_accessorSchema removeAllObjects];
 }
 
-void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
+static void RLMCopyColumnMapping(RLMObjectSchema *targetSchema, const ObjectSchema &tableSchema) {
+    // copy updated column mapping
+    for (size_t i = 0; i < tableSchema.properties.size(); i++) {
+        ((RLMProperty *)targetSchema.properties[i]).column = tableSchema.properties[i].table_column;
+    }
+
+    // re-order properties
+    targetSchema.properties = [targetSchema.properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
+        if (p1.column < p2.column) return NSOrderedAscending;
+        if (p1.column > p2.column) return NSOrderedDescending;
+        return NSOrderedSame;
+    }];
+}
+
+void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndAlignColumns) {
     realm.schema = targetSchema;
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         objectSchema.realm = realm;
 
         // read-only realms may be missing tables entirely
-        if (objectSchema.table) {
+        if (verifyAndAlignColumns && objectSchema.table) {
             ObjectSchema schema = objectSchema.objectStoreCopy;
-            if (verify) {
-                auto errors = ObjectStore::validate_schema(realm.group, schema);
+            if (verifyAndAlignColumns) {
+                auto errors = ObjectStore::validate_schema(realm.group, schema, objectSchema.table);
                 if (errors.size()) {
                     @throw RLMException(ObjectStoreValidationException(errors, schema.name));
                 }
@@ -87,19 +101,17 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
             else {
                 ObjectStore::update_column_mapping(realm.group, schema);
             }
-
-            // copy updated column mapping
-            for (size_t i = 0; i < schema.properties.size(); i++) {
-                ((RLMProperty *)objectSchema.properties[i]).column = schema.properties[i].table_column;
-            }
-
-            // re-order properties
-            objectSchema.properties = [objectSchema.properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
-                if (p1.column < p2.column) return NSOrderedAscending;
-                if (p1.column > p2.column) return NSOrderedDescending;
-                return NSOrderedSame;
-            }];
+            RLMCopyColumnMapping(objectSchema, schema);
         }
+    }
+}
+
+static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema, ObjectStore::Schema &alignedSchema) {
+    realm.schema = targetSchema;
+    for (ObjectSchema &aligned:alignedSchema) {
+        RLMObjectSchema *objectSchema = targetSchema[@(aligned.name.c_str())];
+        objectSchema.realm = realm;
+        RLMCopyColumnMapping(objectSchema, aligned);
     }
 }
 
@@ -137,8 +149,8 @@ void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSc
         // write transaction
         [realm beginWriteTransaction];
 
-        bool changed = ObjectStore::update_realm_with_schema(realm.group, newVersion, schema, [=]() {
-            RLMRealmSetSchema(realm, targetSchema, false);
+        bool changed = ObjectStore::update_realm_with_schema(realm.group, newVersion, schema, [=](__unused Group *group, ObjectStore::Schema &schema) {
+            RLMRealmSetSchemaAndAlign(realm, targetSchema, schema);
             if (migrationBlock) {
                 NSError *error = migrationBlock();
                 if (error) {
@@ -147,7 +159,7 @@ void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSc
                 }
             }
         });
-        RLMRealmSetSchema(realm, targetSchema, false);
+        RLMRealmSetSchemaAndAlign(realm, targetSchema, schema);
 
         if (changed) {
             [realm commitWriteTransaction];

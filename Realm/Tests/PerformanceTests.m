@@ -18,8 +18,6 @@
 
 #import "RLMTestCase.h"
 
-#if !DEBUG
-
 @interface PerformanceTests : RLMTestCase
 @end
 
@@ -495,4 +493,3 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
 @end
 
-#endif

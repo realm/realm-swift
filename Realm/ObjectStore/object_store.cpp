@@ -128,9 +128,9 @@ realm::TableRef ObjectStore::table_for_object_type_create_if_needed(realm::Group
     return group->get_or_add_table(table_name_for_object_type(object_type), &created);
 }
 
-std::vector<std::string> ObjectStore::validate_schema(realm::Group *group, ObjectSchema &target_schema) {
+std::vector<std::string> ObjectStore::validate_schema(realm::Group *group, ObjectSchema &target_schema, Table *cached_table) {
     vector<string> validation_errors;
-    ObjectSchema table_schema(group, target_schema.name);
+    ObjectSchema table_schema(group, target_schema.name, cached_table);
 
     // check to see if properties are the same
     for (auto& current_prop:table_schema.properties) {
@@ -211,11 +211,10 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
     }
 
     // second pass adds/removes columns for out of date tables
-    for (auto target_schema:to_update) {
-        TableRef table = ObjectStore::table_for_object_type(group, target_schema->name);
-
-        ObjectSchema current_schema(group, target_schema->name);
-        vector<Property> &target_props = target_schema->properties;
+    for (auto target_object_schema:to_update) {
+        TableRef table = table_for_object_type(group, target_object_schema->name);
+        ObjectSchema current_schema(group, target_object_schema->name, table.get());
+        vector<Property> &target_props = target_object_schema->properties;
 
         // add missing columns
         for (auto target_prop:target_props) {
@@ -244,7 +243,7 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
             return (j.table_column < i.table_column);
         });
         for (auto& current_prop:current_schema.properties) {
-            auto target_prop_iter = target_schema->property_for_name(current_prop.name);
+            auto target_prop_iter = target_object_schema->property_for_name(current_prop.name);
             if (!target_prop_iter || property_has_changed(current_prop, *target_prop_iter)) {
                 table->remove_column(current_prop.table_column);
                 changed = true;
@@ -252,16 +251,16 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
         }
 
         // update table metadata
-        if (target_schema->primary_key.length()) {
+        if (target_object_schema->primary_key.length()) {
             // if there is a primary key set, check if it is the same as the old key
-            if (!current_schema.primary_key.length() || current_schema.primary_key != target_schema->primary_key) {
-                realm::ObjectStore::set_primary_key_for_object(group, target_schema->name, target_schema->primary_key);
+            if (!current_schema.primary_key.length() || current_schema.primary_key != target_object_schema->primary_key) {
+                realm::ObjectStore::set_primary_key_for_object(group, target_object_schema->name, target_object_schema->primary_key);
                 changed = true;
             }
         }
         else if (current_schema.primary_key.length()) {
             // there is no primary key, so if there was one nil out
-            realm::ObjectStore::set_primary_key_for_object(group, target_schema->name, "");
+            realm::ObjectStore::set_primary_key_for_object(group, target_object_schema->name, "");
             changed = true;
         }
     }
@@ -288,13 +287,14 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
     bool migrating = is_migration_required(group, version);
 
     // create tables
-    bool changed = create_metadata_tables(group) | create_tables(group, schema, migrating);
-    for (auto& target_schema:schema) {
-        TableRef table = table_for_object_type(group, target_schema.name);
+    bool changed = create_metadata_tables(group);
+    changed = create_tables(group, schema, migrating) | changed;
 
+    for (auto& target_schema:schema) {
         // read-only realms may be missing tables entirely
+        TableRef table = table_for_object_type(group, target_schema.name);
         if (table) {
-            auto errors = validate_schema(group, target_schema);
+            auto errors = validate_schema(group, target_schema, table.get());
             if (errors.size()) {
                 throw ObjectStoreValidationException(errors, target_schema.name);
             }
@@ -309,7 +309,7 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
 
     // apply the migration block if provided and there's any old data
     if (get_schema_version(group) != realm::ObjectStore::NotVersioned) {
-        migration();
+        migration(group, schema);
     }
 
     validate_primary_column_uniqueness(group, schema);
@@ -387,7 +387,7 @@ void ObjectStore::validate_primary_column_uniqueness(Group *group, Schema &schem
             continue;
         }
 
-        realm::TableRef table = table_for_object_type(group, object_schema.name);
+        TableRef table = table_for_object_type(group, object_schema.name);
         if (table->get_distinct_view(primary_prop->table_column).size() != table->size()) {
             throw ObjectStoreException(ObjectStoreException::RealmDuplicatePrimaryKeyValue, {{"object_type", object_schema.name}, {"property_name", primary_prop->name}});
         }

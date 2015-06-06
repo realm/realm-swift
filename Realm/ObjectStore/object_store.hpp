@@ -36,8 +36,9 @@ namespace realm {
 
         // verify a target schema against its table, setting the table_column property on each schema object
         // updates the column mapping on the target_schema
+        // if no table is provided it is fetched from the group
         // returns array of validation errors
-        static std::vector<std::string> validate_schema(Group *group, ObjectSchema &target_schema);
+        static std::vector<std::string> validate_schema(Group *group, ObjectSchema &target_schema, Table *cached_table = nullptr);
 
         // updates the target_column member for all properties based on the column indexes in the passed in group
         static void update_column_mapping(Group *group, ObjectSchema &target_schema);
@@ -47,8 +48,8 @@ namespace realm {
         // passed in schema ar updated with the correct column mapping
         // optionally runs migration function/lambda if schema is out of date
         // NOTE: must be performed within a write transaction
-        typedef std::function<void()> MigrationFunction;
         typedef std::vector<ObjectSchema> Schema;
+        typedef std::function<void(Group *, Schema &)> MigrationFunction;
         static bool update_realm_with_schema(Group *group, uint64_t version, Schema &schema, MigrationFunction migration);
 
         // get a table for an object type

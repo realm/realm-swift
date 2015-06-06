@@ -22,8 +22,13 @@
 using namespace realm;
 using namespace std;
 
-ObjectSchema::ObjectSchema(realm::Group *group, const std::string &name) : name(name) {
-    TableRef table = ObjectStore::table_for_object_type(group, name);
+ObjectSchema::ObjectSchema(Group *group, const std::string &name, Table *table) : name(name) {
+    TableRef tableRef;
+    if (!table) {
+        tableRef = ObjectStore::table_for_object_type(group, name);
+        table = tableRef.get();
+    }
+
     size_t count = table->get_column_count();
     for (size_t col = 0; col < count; col++) {
         Property property;
@@ -63,3 +68,4 @@ Property *ObjectSchema::property_for_name(const std::string &name) {
     }
     return nullptr;
 }
+
