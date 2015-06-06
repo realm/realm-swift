@@ -1180,6 +1180,13 @@ public:
         [obj.arrayCol removeObjectAtIndex:3];
         AssertIndexChange(NSKeyValueChangeRemoval, ([NSIndexSet indexSetWithIndexesInRange:{3, 2}]));
     }
+
+    {
+        KVORecorder r(self, obj, @"arrayCol");
+        [obj.arrayCol removeObjectAtIndex:0];
+        [obj.arrayCol removeAllObjects];
+        AssertIndexChange(NSKeyValueChangeRemoval, ([NSIndexSet indexSetWithIndexesInRange:{0, 3}]));
+    }
 }
 @end
 
