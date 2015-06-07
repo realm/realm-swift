@@ -574,18 +574,20 @@ public:
 
         NSRange range{0, values.size()};
         if (!o->linkviewChangeIndexes) {
-            o->linkviewChangeIndexes = [NSMutableIndexSet indexSetWithIndexesInRange:range];
-            o->linkviewChangeKind = NSKeyValueChangeRemoval;
+            o->linkviewChangeIndexes = [NSMutableIndexSet indexSet];
         }
         else if (o->linkviewChangeKind == NSKeyValueChangeRemoval) {
             range.length += [o->linkviewChangeIndexes count];
-            [o->linkviewChangeIndexes addIndexesInRange:range];
         }
-        // FIXME: clear after insert doesn't need to set multiple
-        else {
-            o->multipleLinkviewChanges = false;
-            o->linkviewChangeIndexes = nil;
+        else if (o->linkviewChangeKind == NSKeyValueChangeInsertion) {
+            range.length -= [o->linkviewChangeIndexes count];
+            [o->linkviewChangeIndexes removeAllIndexes];
         }
+        else { // Replacement
+            [o->linkviewChangeIndexes removeAllIndexes];
+        }
+        o->linkviewChangeKind = NSKeyValueChangeRemoval;
+        [o->linkviewChangeIndexes addIndexesInRange:range];
         o->changed = true;
         return true;
     }

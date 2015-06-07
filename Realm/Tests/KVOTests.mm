@@ -1187,6 +1187,22 @@ public:
         [obj.arrayCol removeAllObjects];
         AssertIndexChange(NSKeyValueChangeRemoval, ([NSIndexSet indexSetWithIndexesInRange:{0, 3}]));
     }
+
+    [obj.arrayCol addObject:obj];
+    {
+        KVORecorder r(self, obj, @"arrayCol");
+        [obj.arrayCol addObject:obj];
+        [obj.arrayCol removeAllObjects];
+        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:0]);
+    }
+
+    [obj.arrayCol addObject:obj];
+    {
+        KVORecorder r(self, obj, @"arrayCol");
+        obj.arrayCol[0] = obj;
+        [obj.arrayCol removeAllObjects];
+        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:0]);
+    }
 }
 @end
 
