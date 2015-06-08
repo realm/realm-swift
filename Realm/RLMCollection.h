@@ -22,6 +22,15 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @class RLMRealm, RLMResults, RLMObject;
 
+#if __has_extension(objc_generics)
+#define RLM_GENERIC_COLLECTION <RLMObjectType>
+#define RLMObjectArgument RLMObjectType
+#else
+#define RLM_GENERIC_COLLECTION
+typedef id RLMObjectType;
+typedef RLMObject * RLMObjectArgument;
+#endif
+
 @protocol RLMCollection <NSFastEnumeration>
 
 @required
