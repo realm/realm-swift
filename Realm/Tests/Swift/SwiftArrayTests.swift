@@ -89,25 +89,25 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertEqual(yesArray.sumOfProperty("intCol").integerValue, 0, "Sum should be 0")
 
         // Test float sum
-        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("floatCol").floatValue, Float(0), 0.1, "Sum should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("floatCol").floatValue, Float(7.2), 0.1, "Sum should be 7.2")
+        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("floatCol").floatValue, Float(0), accuracy: 0.1, "Sum should be 0.0")
+        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("floatCol").floatValue, Float(7.2), accuracy: 0.1, "Sum should be 7.2")
 
         // Test double sum
-        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("doubleCol").doubleValue, Double(10), 0.1, "Sum should be 10.0")
-        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("doubleCol").doubleValue, Double(0), 0.1, "Sum should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("doubleCol").doubleValue, Double(10), accuracy: 0.1, "Sum should be 10.0")
+        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("doubleCol").doubleValue, Double(0), accuracy: 0.1, "Sum should be 0.0")
 
         // Average ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol")!.doubleValue, Double(1), 0.1, "Average should be 1.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol")!.doubleValue, Double(0), 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol").doubleValue, Double(1), accuracy: 0.1, "Average should be 1.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // Test float average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol")!.doubleValue, Double(0), 0.1, "Average should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol")!.doubleValue, Double(1.2), 0.1, "Average should be 1.2")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol").doubleValue, Double(1.2), accuracy: 0.1, "Average should be 1.2")
 
         // Test double average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol")!.doubleValue, Double(2.5), 0.1, "Average should be 2.5")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol")!.doubleValue, Double(0), 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol").doubleValue, Double(2.5), accuracy: 0.1, "Average should be 2.5")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // MIN ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int min
@@ -118,21 +118,21 @@ class SwiftArrayTests: SwiftTestCase {
 
         // Test float min
         min = noArray.minOfProperty("floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.floatValue, Float(0), 0.1, "Minimum should be 0.0f")
+        XCTAssertEqualWithAccuracy(min.floatValue, Float(0), accuracy: 0.1, "Minimum should be 0.0f")
         min = yesArray.minOfProperty("floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.floatValue, Float(1.2), 0.1, "Minimum should be 1.2f")
+        XCTAssertEqualWithAccuracy(min.floatValue, Float(1.2), accuracy: 0.1, "Minimum should be 1.2f")
 
         // Test double min
         min = noArray.minOfProperty("doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.doubleValue, Double(2.5), 0.1, "Minimum should be 1.5")
+        XCTAssertEqualWithAccuracy(min.doubleValue, Double(2.5), accuracy: 0.1, "Minimum should be 1.5")
         min = yesArray.minOfProperty("doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.doubleValue, Double(0), 0.1, "Minimum should be 0.0")
+        XCTAssertEqualWithAccuracy(min.doubleValue, Double(0), accuracy: 0.1, "Minimum should be 0.0")
 
         // Test date min
         var dateMinOutput = noArray.minOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, "Minimum should be dateMaxInput")
+        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, accuracy: 1, "Minimum should be dateMaxInput")
         dateMinOutput = yesArray.minOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, "Minimum should be dateMinInput")
+        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, accuracy: 1, "Minimum should be dateMinInput")
 
         // MAX ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int max
@@ -143,21 +143,21 @@ class SwiftArrayTests: SwiftTestCase {
 
         // Test float max
         max = noArray.maxOfProperty("floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.floatValue, Float(0), 0.1, "Maximum should be 0.0f")
+        XCTAssertEqualWithAccuracy(max.floatValue, Float(0), accuracy: 0.1, "Maximum should be 0.0f")
         max = yesArray.maxOfProperty("floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.floatValue, Float(1.2), 0.1, "Maximum should be 1.2f")
+        XCTAssertEqualWithAccuracy(max.floatValue, Float(1.2), accuracy: 0.1, "Maximum should be 1.2f")
 
         // Test double max
         max = noArray.maxOfProperty("doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.doubleValue, Double(2.5), 0.1, "Maximum should be 3.5")
+        XCTAssertEqualWithAccuracy(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 3.5")
         max = yesArray.maxOfProperty("doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.doubleValue, Double(0), 0.1, "Maximum should be 0.0")
+        XCTAssertEqualWithAccuracy(max.doubleValue, Double(0), accuracy: 0.1, "Maximum should be 0.0")
 
         // Test date max
         var dateMaxOutput = noArray.maxOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, "Maximum should be dateMaxInput")
+        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, accuracy: 1, "Maximum should be dateMaxInput")
         dateMaxOutput = yesArray.maxOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, "Maximum should be dateMinInput")
+        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, accuracy: 1, "Maximum should be dateMinInput")
     }
 
     func testArrayDescription() {
@@ -316,25 +316,25 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertEqual(yesArray.sumOfProperty("intCol").integerValue, 0, "Sum should be 0")
 
         // Test float sum
-        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("floatCol").floatValue, Float(0), 0.1, "Sum should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("floatCol").floatValue, Float(7.2), 0.1, "Sum should be 7.2")
+        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("floatCol").floatValue, Float(0), accuracy: 0.1, "Sum should be 0.0")
+        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("floatCol").floatValue, Float(7.2), accuracy: 0.1, "Sum should be 7.2")
 
         // Test double sum
-        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("doubleCol").doubleValue, Double(10), 0.1, "Sum should be 10.0")
-        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("doubleCol").doubleValue, Double(0), 0.1, "Sum should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("doubleCol").doubleValue, Double(10), accuracy: 0.1, "Sum should be 10.0")
+        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("doubleCol").doubleValue, Double(0), accuracy: 0.1, "Sum should be 0.0")
 
         // Average ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol")!.doubleValue, Double(1), 0.1, "Average should be 1.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol")!.doubleValue, Double(0), 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol").doubleValue, Double(1), accuracy: 0.1, "Average should be 1.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // Test float average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol")!.doubleValue, Double(0), 0.1, "Average should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol")!.doubleValue, Double(1.2), 0.1, "Average should be 1.2")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol").doubleValue, Double(1.2), accuracy: 0.1, "Average should be 1.2")
 
         // Test double average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol")!.doubleValue, Double(2.5), 0.1, "Average should be 2.5")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol")!.doubleValue, Double(0), 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol").doubleValue, Double(2.5), accuracy: 0.1, "Average should be 2.5")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // MIN ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int min
@@ -345,21 +345,21 @@ class SwiftArrayTests: SwiftTestCase {
 
         // Test float min
         min = noArray.minOfProperty("floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.floatValue, Float(0), 0.1, "Minimum should be 0.0f")
+        XCTAssertEqualWithAccuracy(min.floatValue, Float(0), accuracy: 0.1, "Minimum should be 0.0f")
         min = yesArray.minOfProperty("floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.floatValue, Float(1.2), 0.1, "Minimum should be 1.2f")
+        XCTAssertEqualWithAccuracy(min.floatValue, Float(1.2), accuracy: 0.1, "Minimum should be 1.2f")
 
         // Test double min
         min = noArray.minOfProperty("doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.doubleValue, Double(2.5), 0.1, "Minimum should be 1.5")
+        XCTAssertEqualWithAccuracy(min.doubleValue, Double(2.5), accuracy: 0.1, "Minimum should be 1.5")
         min = yesArray.minOfProperty("doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.doubleValue, Double(0), 0.1, "Minimum should be 0.0")
+        XCTAssertEqualWithAccuracy(min.doubleValue, Double(0), accuracy: 0.1, "Minimum should be 0.0")
 
         // Test date min
         var dateMinOutput = noArray.minOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, "Minimum should be dateMaxInput")
+        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, accuracy: 1, "Minimum should be dateMaxInput")
         dateMinOutput = yesArray.minOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, "Minimum should be dateMinInput")
+        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, accuracy: 1, "Minimum should be dateMinInput")
 
         // MAX ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int max
@@ -370,21 +370,21 @@ class SwiftArrayTests: SwiftTestCase {
 
         // Test float max
         max = noArray.maxOfProperty("floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.floatValue, Float(0), 0.1, "Maximum should be 0.0f")
+        XCTAssertEqualWithAccuracy(max.floatValue, Float(0), accuracy: 0.1, "Maximum should be 0.0f")
         max = yesArray.maxOfProperty("floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.floatValue, Float(1.2), 0.1, "Maximum should be 1.2f")
+        XCTAssertEqualWithAccuracy(max.floatValue, Float(1.2), accuracy: 0.1, "Maximum should be 1.2f")
 
         // Test double max
         max = noArray.maxOfProperty("doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.doubleValue, Double(2.5), 0.1, "Maximum should be 3.5")
+        XCTAssertEqualWithAccuracy(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 3.5")
         max = yesArray.maxOfProperty("doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.doubleValue, Double(0), 0.1, "Maximum should be 0.0")
+        XCTAssertEqualWithAccuracy(max.doubleValue, Double(0), accuracy: 0.1, "Maximum should be 0.0")
 
         // Test date max
         var dateMaxOutput = noArray.maxOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, "Maximum should be dateMaxInput")
+        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, accuracy: 1, "Maximum should be dateMaxInput")
         dateMaxOutput = yesArray.maxOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, "Maximum should be dateMinInput")
+        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, accuracy: 1, "Maximum should be dateMinInput")
     }
 
     func testArrayDescription_objc() {
