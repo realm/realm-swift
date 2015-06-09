@@ -222,16 +222,18 @@ public class Object: RLMObjectBase {
         }
         return nil
     }
+
+    // MARK: Equatable
+
+    /// Returns whether both objects are equal.
+    /// Objects are considered equal when they are both from the same Realm
+    /// and point to the same underlying object in the database.
+    public override func isEqual(object: AnyObject?) -> Bool {
+        return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase);
+    }
 }
 
-// MARK: Equatable
 
-/// Returns whether both objects are equal.
-/// Objects are considered equal when they are both from the same Realm
-/// and point to the same underlying object in the database.
-public func == <T: Object>(lhs: T, rhs: T) -> Bool {
-    return RLMObjectBaseAreEqual(lhs, rhs)
-}
 
 /// Object interface which allows untyped getters and setters for Objects.
 public final class DynamicObject : Object {

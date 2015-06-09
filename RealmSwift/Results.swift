@@ -131,8 +131,8 @@ public final class Results<T: Object>: ResultsBase {
 
     :returns: The index of the given object, or `nil` if no objects match.
     */
-    public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
-        return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
+    public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
+        return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
     // MARK: Object Retrieval
@@ -191,8 +191,8 @@ public final class Results<T: Object>: ResultsBase {
 
     :returns: Results containing objects that match the given predicate.
     */
-    public func filter(predicateFormat: String, _ args: CVarArgType...) -> Results<T> {
-        return Results<T>(rlmResults.objectsWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
+    public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T> {
+        return Results<T>(rlmResults.objectsWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
     /**
