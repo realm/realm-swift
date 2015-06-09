@@ -441,7 +441,7 @@ class ObjectCreationTests: TestCase {
         Realm().commitWrite()
         switch type {
             case .Bool:     return ["invalid", 2 as Int, 1.1 as Float, 11.1 as Double]
-            case .Int:      return ["invalid", true, false, 1.1 as Float, 11.1 as Double]
+            case .Int:      return ["invalid", 1.1 as Float, 11.1 as Double]
             case .Float:    return ["invalid", true, false]
             case .Double:   return ["invalid", true, false]
             case .String:   return [0x197A71D, true, false]
