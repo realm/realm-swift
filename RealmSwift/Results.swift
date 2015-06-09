@@ -83,6 +83,12 @@ public final class Results<T: Object>: ResultsBase {
     /// Returns the Realm these results are associated with.
     public var realm: Realm { return Realm(rlmResults.realm) }
 
+    /// Returns a human-readable description of the objects contained in these results.
+    public var description: String {
+        let type = "Results<\(T.className())>"
+        return gsub("RLMResults <0x[a-z0-9]+>", template: type, string: rlmResults.description) ?? type
+    }
+
     /// Returns the number of objects in these results.
     public var count: Int { return Int(rlmResults.count) }
 
@@ -220,7 +226,7 @@ public final class Results<T: Object>: ResultsBase {
     :returns: `Results` with elements sorted by the given sort descriptors.
     */
     public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T> {
-        return Results<T>(rlmResults.sortedResultsUsingDescriptors(map(sortDescriptors) { $0.rlmSortDescriptorValue }))
+        return Results<T>(rlmResults.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Aggregate Operations
@@ -278,17 +284,28 @@ public final class Results<T: Object>: ResultsBase {
     }
 }
 
+public class RLMGenerator<T: Object>: AnyGenerator<T> {
+    private let generatorBase: NSFastGenerator
+
+    init(collection: RLMCollection) {
+        generatorBase = NSFastGenerator(collection)
+    }
+
+    public override func next() -> T? {
+        let accessor = generatorBase.next() as! T?
+        if let accessor = accessor {
+            RLMInitializeSwiftListAccessor(accessor)
+        }
+        return accessor
+    }
+}
+
 extension Results: CollectionType {
     // MARK: Sequence Support
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
-    public func generate() -> GeneratorOf<T> {
-        let base = NSFastGenerator(rlmResults)
-        return GeneratorOf<T>() {
-            let accessor = base.next() as! T?
-            RLMInitializeSwiftListAccessor(accessor)
-            return accessor
-        }
+    public func generate() -> RLMGenerator<T> {
+        return RLMGenerator(collection: rlmResults)
     }
 
     // MARK: Collection Support
@@ -301,3 +318,13 @@ extension Results: CollectionType {
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
     public var endIndex: Int { return count }
 }
+
+// MARK: Variadic Arguments Support
+
+//extension Results: CVarArgType {
+//    /// Transform `self` into a series of machine words that can be
+//    /// appropriately interpreted by C varargs
+//    public func encode() -> [Word] {
+//        return rlmResults.encode()
+//    }
+//}

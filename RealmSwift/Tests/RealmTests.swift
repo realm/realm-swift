@@ -98,13 +98,13 @@ class RealmTests: TestCase {
 
     func testInitInMemory() {
         autoreleasepool {
-            var realm = Realm(inMemoryIdentifier: "identifier")
+            let realm = Realm(inMemoryIdentifier: "identifier")
             realm.write {
                 realm.create(SwiftIntObject.self, value: [1])
                 return
             }
         }
-        var realm = Realm(inMemoryIdentifier: "identifier")
+        let realm = Realm(inMemoryIdentifier: "identifier")
         XCTAssertEqual(realm.objects(SwiftIntObject).count, 0)
 
         realm.write {
@@ -115,7 +115,7 @@ class RealmTests: TestCase {
             XCTAssertEqual(realm.objects(SwiftIntObject).count, 2)
         }
 
-        var realm2 = Realm(inMemoryIdentifier: "identifier2")
+        let realm2 = Realm(inMemoryIdentifier: "identifier2")
         XCTAssertEqual(realm2.objects(SwiftIntObject).count, 0)
     }
 
@@ -359,7 +359,7 @@ class RealmTests: TestCase {
     func testAddNotificationBlock() {
         let realm = Realm()
         var notificationCalled = false
-        let token = realm.addNotificationBlock { (notification, realm) -> Void in
+        _ = realm.addNotificationBlock { _, realm in
             XCTAssertEqual(realm.path, Realm.defaultPath)
             notificationCalled = true
         }
@@ -471,7 +471,7 @@ class RealmTests: TestCase {
             let copy = Realm(path: path)
             XCTAssertEqual(1, copy.objects(SwiftObject).count)
         }
-        NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
+        try! NSFileManager.defaultManager().removeItemAtPath(path)
     }
 
     func testSetEncryptionKey() {
