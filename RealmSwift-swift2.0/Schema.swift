@@ -27,7 +27,7 @@ introspecting the database's schema.
 
 Schemas map to collections of tables in the core database.
 */
-public final class Schema: Printable {
+public final class Schema: CustomStringConvertible {
 
     // MARK: Properties
 

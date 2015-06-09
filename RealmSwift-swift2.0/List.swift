@@ -22,7 +22,7 @@ import Realm.Private
 
 /// :nodoc:
 /// Internal class. Do not use directly.
-public class ListBase: RLMListBase, Printable {
+public class ListBase: RLMListBase {
     // Printable requires a description property defined in Swift (and not obj-c),
     // and it has to be defined as @objc override, which can't be done in a
     // generic class.
@@ -33,7 +33,7 @@ public class ListBase: RLMListBase, Printable {
 
     @objc private func descriptionWithMaxDepth(depth: UInt) -> String {
         let type = "List<\(_rlmArray.objectClassName)>"
-        return gsub("RLMArray <0x[a-z0-9]+>", type, _rlmArray.descriptionWithMaxDepth(depth)) ?? type
+        return gsub("RLMArray <0x[a-z0-9]+>", template: type, string: _rlmArray.descriptionWithMaxDepth(depth)) ?? type
     }
 
     /// Returns the number of objects in this list.
@@ -211,7 +211,7 @@ public final class List<T: Object>: ListBase {
     :returns: `Results` with elements sorted by the given sort descriptors.
     */
     public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T> {
-        return Results<T>(_rlmArray.sortedResultsUsingDescriptors(map(sortDescriptors) { $0.rlmSortDescriptorValue }))
+        return Results<T>(_rlmArray.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Mutation
@@ -236,7 +236,7 @@ public final class List<T: Object>: ListBase {
     :param: objects A sequence of objects.
     */
     public func extend<S: SequenceType where S.Generator.Element == T>(objects: S) {
-        for obj in SequenceOf<T>(objects) {
+        for obj in objects {
             _rlmArray.addObject(unsafeBitCast(obj, RLMObject.self))
         }
     }
@@ -308,13 +308,8 @@ extension List: ExtensibleCollectionType {
     // MARK: Sequence Support
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the list.
-    public func generate() -> GeneratorOf<T> {
-        let base = NSFastGenerator(_rlmArray)
-        return GeneratorOf<T>() {
-            let accessor = base.next() as! T?
-            RLMInitializeSwiftListAccessor(accessor)
-            return accessor
-        }
+    public func generate() -> RLMGenerator<T> {
+        return RLMGenerator(collection: _rlmArray)
     }
 
     // MARK: ExtensibleCollection Support

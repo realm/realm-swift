@@ -61,9 +61,9 @@ public struct SortDescriptor {
     }
 }
 
-// MARK: Printable
+// MARK: CustomStringConvertible
 
-extension SortDescriptor: Printable {
+extension SortDescriptor: CustomStringConvertible {
     /// Returns a human-readable description of the sort descriptor.
     public var description: String {
         let direction = ascending ? "ascending" : "descending"

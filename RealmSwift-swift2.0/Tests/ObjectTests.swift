@@ -230,7 +230,7 @@ class ObjectTests: TestCase {
         }
         autoreleasepool {
             var enumerated = false
-            setSchemaVersion(1, self.testRealmPath()) { migration, _ in
+            setSchemaVersion(1, realmPath: self.testRealmPath()) { migration, _ in
                 migration.enumerate(SwiftObject.className()) { oldObject, newObject in
                     if let newObject = newObject {
                         block(newObject, migration)
