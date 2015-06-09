@@ -37,8 +37,6 @@ public class RLMGenerator: GeneratorType {
         self.collection = collection
     }
 
-    typealias Element = RLMObject
-
     public func next() -> RLMObject? {
         if i >= collection.count {
             return .None
