@@ -53,7 +53,7 @@ the `objects(_:)` instance method on `Realm`.
 
 See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
 */
-public class Object: RLMObjectBase, Equatable, Printable {
+public class Object: RLMObjectBase {
 
     // MARK: Initializers
 

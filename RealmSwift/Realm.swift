@@ -82,7 +82,7 @@ public final class Realm {
     :param: path Path to the realm file.
     */
     public convenience init(path: String = Realm.defaultPath) {
-        self.init(RLMRealm(path: path, readOnly: false, error: nil)!)
+        try! self.init(RLMRealm(path: path, readOnly: false))
     }
     
     /**
@@ -106,10 +106,10 @@ public final class Realm {
                             possible errors, omit the argument, or pass in `nil`.
     */
     public convenience init?(path: String, readOnly: Bool, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, key: encryptionKey, readOnly: readOnly, inMemory: false, dynamic: false, schema: nil, error: error) as RLMRealm? {
+        do {
+            let rlmRealm = try RLMRealm(path: path, key: encryptionKey, readOnly: readOnly, inMemory: false, dynamic: false, schema: nil)
             self.init(rlmRealm)
-        } else {
-            self.init(RLMRealm())
+        } catch {
             return nil
         }
     }
@@ -499,11 +499,19 @@ public final class Realm {
     :returns: Whether the realm was copied successfully.
     */
     public func writeCopyToPath(path: String, encryptionKey: NSData? = nil) -> NSError? {
-        var error: NSError?
+        let error: NSError? = nil
         if let encryptionKey = encryptionKey {
-            rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: &error)
+            do {
+                try rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey)
+            } catch {
+                // FIXME: Catch
+            }
         } else {
-            rlmRealm.writeCopyToPath(path, error: &error)
+            do {
+                try rlmRealm.writeCopyToPath(path)
+            } catch {
+                // FIXME: Catch
+            }
         }
         return error
     }
