@@ -75,6 +75,7 @@
     NSString *testName = [NSString stringWithFormat:@"%@/%@", self.className, self.testName];
     NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];
     env[@"RLMProcessIsChild"] = @"true";
+    [env removeObjectForKey:@"XCTestConfigurationFilePath"];
 
     // Don't inherit the config file in the subprocess, as multiple XCTest
     // processes talking to a single Xcode instance doesn't work at all
