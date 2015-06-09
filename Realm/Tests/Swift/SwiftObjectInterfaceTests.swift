@@ -122,7 +122,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         realm.beginWriteTransaction()
         SwiftStringObject.createInDefaultRealmWithValue(["string"])
 
-        let obj = SwiftStringObjectSubclass.createInDefaultRealmWithValue(["string", "string2"])
+        SwiftStringObjectSubclass.createInDefaultRealmWithValue(["string", "string2"])
         realm.commitWriteTransaction()
 
         // ensure creation in proper table
@@ -131,8 +131,8 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
 
         realm.transactionWithBlock { () -> Void in
             // create self referencing subclass
-            var sub = SwiftSelfRefrencingSubclass.createInDefaultRealmWithValue(["string", []])
-            var sub2 = SwiftSelfRefrencingSubclass()
+            let sub = SwiftSelfRefrencingSubclass.createInDefaultRealmWithValue(["string", []])
+            let sub2 = SwiftSelfRefrencingSubclass()
             sub.objects.addObject(sub2)
         }
     }
