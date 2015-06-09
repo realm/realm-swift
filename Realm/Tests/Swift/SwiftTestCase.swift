@@ -44,29 +44,27 @@ func realmLockPath(path: String) -> String {
 func deleteRealmFilesAtPath(path: String) {
     let fileManager = NSFileManager.defaultManager()
     if fileManager.fileExistsAtPath(path) {
-        let succeeded = NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
-        assert(succeeded, "Unable to delete realm")
+        try! NSFileManager.defaultManager().removeItemAtPath(path)
     }
 
     let lockPath = realmLockPath(path)
     if fileManager.fileExistsAtPath(lockPath) {
-        let succeeded = NSFileManager.defaultManager().removeItemAtPath(lockPath, error: nil)
-        assert(succeeded, "Unable to delete realm")
+        try! NSFileManager.defaultManager().removeItemAtPath(lockPath)
     }
 }
 
 func realmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
-    return RLMRealm(path: testRealmPath(), key: nil, readOnly: false, inMemory: false, dynamic: false, schema: schema, error: nil)
+    return try! RLMRealm(path: testRealmPath(), key: nil, readOnly: false, inMemory: false, dynamic: false, schema: schema)
 }
 
 func dynamicRealmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
-    return RLMRealm(path: testRealmPath(), key: nil, readOnly: false, inMemory: false, dynamic: true, schema: schema, error: nil)
+    return try! RLMRealm(path: testRealmPath(), key: nil, readOnly: false, inMemory: false, dynamic: true, schema: schema)
 }
 
 class SwiftTestCase: XCTestCase {
 
     func realmWithTestPath() -> RLMRealm {
-        return RLMRealm(path: testRealmPath(), readOnly: false, error: nil)!
+        return try! RLMRealm(path: testRealmPath(), readOnly: false)
     }
 
     override func setUp() {
