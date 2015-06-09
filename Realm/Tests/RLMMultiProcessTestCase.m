@@ -58,10 +58,8 @@
 
 - (void)setUp {
     self.isParent = !getenv("RLMProcessIsChild");
-
-    NSProcessInfo *info = NSProcessInfo.processInfo;
-    self.xctestPath = info.arguments[0];
-    self.testsPath = [info.arguments lastObject];
+    self.xctestPath = NSProcessInfo.processInfo.arguments[0];
+    self.testsPath = [NSBundle bundleForClass:[self class]].bundlePath;
 
     [super setUp];
 }
@@ -77,6 +75,10 @@
     NSString *testName = [NSString stringWithFormat:@"%@/%@", self.className, self.testName];
     NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];
     env[@"RLMProcessIsChild"] = @"true";
+
+    // Don't inherit the config file in the subprocess, as multiple XCTest
+    // processes talking to a single Xcode instance doesn't work at all
+    [env removeObjectForKey:@"XCTestConfigurationFilePath"];
 
     NSTask *task = [[NSTask alloc] init];
     task.launchPath = self.xctestPath;
