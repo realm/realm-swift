@@ -293,7 +293,7 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
 bool ObjectStore::is_migration_required(realm::Group *group, uint64_t new_version) {
     uint64_t old_version = get_schema_version(group);
     if (old_version > new_version && old_version != NotVersioned) {
-        throw ObjectStoreException(ObjectStoreException::RealmVersionGreaterThanSchemaVersion);
+        throw ObjectStoreException(ObjectStoreException::Kind::RealmVersionGreaterThanSchemaVersion);
     }
     return old_version != new_version;
 }
@@ -387,7 +387,7 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
                     table->add_search_index(property.table_column);
                 }
                 catch (realm::LogicError const&) {
-                    throw ObjectStoreException(ObjectStoreException::RealmPropertyTypeNotIndexable, {
+                    throw ObjectStoreException(ObjectStoreException::Kind::RealmPropertyTypeNotIndexable, {
                         {"object_type", object_schema.name},
                         {"property_name", property.name},
                         {"property_type", string_for_property_type(property.type)}
@@ -411,7 +411,8 @@ void ObjectStore::validate_primary_column_uniqueness(Group *group, Schema &schem
 
         TableRef table = table_for_object_type(group, object_schema.name);
         if (table->get_distinct_view(primary_prop->table_column).size() != table->size()) {
-            throw ObjectStoreException(ObjectStoreException::RealmDuplicatePrimaryKeyValue, {{"object_type", object_schema.name}, {"property_name", primary_prop->name}});
+            throw ObjectStoreException(ObjectStoreException::Kind::RealmDuplicatePrimaryKeyValue,
+                                       {{"object_type", object_schema.name}, {"property_name", primary_prop->name}});
         }
     }
 }

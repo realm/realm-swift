@@ -37,6 +37,12 @@
 		023B19621A3BA90E0067FB81 /* RLMObjectBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 023B19581A3BA90D0067FB81 /* RLMObjectBase.mm */; };
 		023B19631A3BA90E0067FB81 /* RLMObjectBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 023B19581A3BA90D0067FB81 /* RLMObjectBase.mm */; };
 		023B2B2A1B28E5A40021E54D /* object_store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02D9AFB91B22488800A1BD87 /* object_store.cpp */; };
+		023B2B2D1B28F0CF0021E54D /* object_store_exceptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 023B2B2B1B28F0CF0021E54D /* object_store_exceptions.cpp */; };
+		023B2B2E1B28F0CF0021E54D /* object_store_exceptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 023B2B2B1B28F0CF0021E54D /* object_store_exceptions.cpp */; };
+		023B2B2F1B28F0CF0021E54D /* object_store_exceptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 023B2B2B1B28F0CF0021E54D /* object_store_exceptions.cpp */; };
+		023B2B301B28F0CF0021E54D /* object_store_exceptions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 023B2B2C1B28F0CF0021E54D /* object_store_exceptions.hpp */; };
+		023B2B311B28F0CF0021E54D /* object_store_exceptions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 023B2B2C1B28F0CF0021E54D /* object_store_exceptions.hpp */; };
+		023B2B321B28F0CF0021E54D /* object_store_exceptions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 023B2B2C1B28F0CF0021E54D /* object_store_exceptions.hpp */; };
 		024E6094198B2D51002FA042 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 024E6093198B2D51002FA042 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		024E6097198B2D59002FA042 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 024E6096198B2D59002FA042 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		026B0F0A1A780680005E26C8 /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
@@ -422,6 +428,8 @@
 		023B19571A3BA90D0067FB81 /* RLMObjectBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectBase.h; sourceTree = "<group>"; };
 		023B19581A3BA90D0067FB81 /* RLMObjectBase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObjectBase.mm; sourceTree = "<group>"; };
 		023B19F71A423BD20067FB81 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		023B2B2B1B28F0CF0021E54D /* object_store_exceptions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = object_store_exceptions.cpp; path = ObjectStore/object_store_exceptions.cpp; sourceTree = "<group>"; };
+		023B2B2C1B28F0CF0021E54D /* object_store_exceptions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = object_store_exceptions.hpp; path = ObjectStore/object_store_exceptions.hpp; sourceTree = "<group>"; };
 		024E6093198B2D51002FA042 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
 		024E6096198B2D59002FA042 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
 		026B0F2C1A780680005E26C8 /* iOS Dynamic Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Dynamic Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -596,6 +604,8 @@
 				02D9AFB91B22488800A1BD87 /* object_store.cpp */,
 				02D9AFBA1B22488800A1BD87 /* object_store.hpp */,
 				02D9AFBC1B22488800A1BD87 /* property.hpp */,
+				023B2B2B1B28F0CF0021E54D /* object_store_exceptions.cpp */,
+				023B2B2C1B28F0CF0021E54D /* object_store_exceptions.hpp */,
 			);
 			name = ObjectStore;
 			sourceTree = "<group>";
@@ -808,6 +818,7 @@
 				29E3C71D1A71C1C700B62C1D /* RLMArray.h in Headers */,
 				29E3C71F1A71C1C700B62C1D /* RLMCollection.h in Headers */,
 				29E3C7201A71C1C700B62C1D /* RLMConstants.h in Headers */,
+				023B2B321B28F0CF0021E54D /* object_store_exceptions.hpp in Headers */,
 				29E3C7211A71C1C700B62C1D /* RLMObjectBase.h in Headers */,
 				29E3C7221A71C1C700B62C1D /* RLMMigration.h in Headers */,
 				29E3C7241A71C1C700B62C1D /* RLMObject.h in Headers */,
@@ -849,6 +860,7 @@
 				E856D1F51956154C00FB2FCF /* RLMArray.h in Headers */,
 				02B8EF5D19E7048D0045A93D /* RLMCollection.h in Headers */,
 				E856D1FA1956154C00FB2FCF /* RLMConstants.h in Headers */,
+				023B2B311B28F0CF0021E54D /* object_store_exceptions.hpp in Headers */,
 				0207AB82195DF9FB007EFB12 /* RLMMigration.h in Headers */,
 				E856D1FD1956154C00FB2FCF /* RLMObject.h in Headers */,
 				023B19601A3BA90E0067FB81 /* RLMObjectBase.h in Headers */,
@@ -890,6 +902,7 @@
 				E81A1F891955FC9300FDED82 /* RLMArray.h in Headers */,
 				02B8EF5C19E7048D0045A93D /* RLMCollection.h in Headers */,
 				E81A1F921955FC9300FDED82 /* RLMConstants.h in Headers */,
+				023B2B301B28F0CF0021E54D /* object_store_exceptions.hpp in Headers */,
 				0207AB81195DF9FB007EFB12 /* RLMMigration.h in Headers */,
 				E81A1F961955FC9300FDED82 /* RLMObject.h in Headers */,
 				023B195F1A3BA90E0067FB81 /* RLMObjectBase.h in Headers */,
@@ -1289,6 +1302,7 @@
 				29E3C70D1A71C1C700B62C1D /* RLMObject.mm in Sources */,
 				29E3C70E1A71C1C700B62C1D /* RLMObjectSchema.mm in Sources */,
 				29E3C70F1A71C1C700B62C1D /* RLMObjectStore.mm in Sources */,
+				023B2B2F1B28F0CF0021E54D /* object_store_exceptions.cpp in Sources */,
 				29E3C7101A71C1C700B62C1D /* RLMProperty.mm in Sources */,
 				29E3C7111A71C1C700B62C1D /* RLMQueryUtil.mm in Sources */,
 				29E3C7121A71C1C700B62C1D /* RLMRealm.mm in Sources */,
@@ -1354,6 +1368,7 @@
 				0207AB84195DF9FB007EFB12 /* RLMMigration.mm in Sources */,
 				E856D1FE1956154C00FB2FCF /* RLMObject.mm in Sources */,
 				023B19631A3BA90E0067FB81 /* RLMObjectBase.mm in Sources */,
+				023B2B2E1B28F0CF0021E54D /* object_store_exceptions.cpp in Sources */,
 				E856D2011956154C00FB2FCF /* RLMObjectSchema.mm in Sources */,
 				E856D2031956154C00FB2FCF /* RLMObjectStore.mm in Sources */,
 				E856D2061956154C00FB2FCF /* RLMProperty.mm in Sources */,
@@ -1422,6 +1437,7 @@
 				E81A1F971955FC9300FDED82 /* RLMObject.mm in Sources */,
 				023B19621A3BA90E0067FB81 /* RLMObjectBase.mm in Sources */,
 				E81A1F9B1955FC9300FDED82 /* RLMObjectSchema.mm in Sources */,
+				023B2B2D1B28F0CF0021E54D /* object_store_exceptions.cpp in Sources */,
 				E81A1F9E1955FC9300FDED82 /* RLMObjectStore.mm in Sources */,
 				E81A1FA21955FC9300FDED82 /* RLMProperty.mm in Sources */,
 				E81A1FA51955FC9300FDED82 /* RLMQueryUtil.mm in Sources */,

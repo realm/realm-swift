@@ -23,8 +23,6 @@
 #import <realm/binary_data.hpp>
 #import <realm/string_data.hpp>
 
-#import "object_store.hpp"
-
 @class RLMObjectSchema;
 @class RLMProperty;
 @class RLMRealm;
@@ -32,8 +30,6 @@
 
 NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
 NSException *RLMException(std::exception const& exception);
-NSException *RLMException(realm::ObjectStoreException const& exception);
-NSException *RLMException(realm::ObjectStoreValidationException const& exception);
 
 NSError *RLMMakeError(RLMError code, std::exception const& exception);
 NSError *RLMMakeError(NSException *exception);

@@ -24,6 +24,7 @@
 #include <functional>
 
 #include "object_schema.hpp"
+#include "object_store_exceptions.hpp"
 
 namespace realm {
     class Group;
@@ -104,38 +105,6 @@ namespace realm {
         static void validate_primary_column_uniqueness(Group *group, Schema &schema);
 
         friend ObjectSchema;
-    };
-
-    class ObjectStoreException : public std::exception {
-    public:
-        enum Kind {
-            // thrown when calling update_realm_to_schema and the realm version is greater than the given version
-            RealmVersionGreaterThanSchemaVersion,
-            RealmPropertyTypeNotIndexable,          // object_type, property_name, property_type
-            RealmDuplicatePrimaryKeyValue,          // object_type, property_name
-        };
-        typedef std::map<std::string, std::string> Dict;
-
-        ObjectStoreException(Kind kind, Dict dict = Dict()) : m_kind(kind), m_dict(dict) {}
-
-        ObjectStoreException::Kind kind() const { return m_kind; }
-        const ObjectStoreException::Dict &dict() const { return m_dict; }
-
-    private:
-        Kind m_kind;
-        Dict m_dict;
-    };
-
-    class ObjectStoreValidationException : public std::exception {
-    public:
-        ObjectStoreValidationException(std::vector<std::string> validation_errors, std::string object_type) :
-            m_validation_errors(validation_errors), m_object_type(object_type) {}
-        const std::vector<std::string> &validation_errors() const { return m_validation_errors; }
-        std::string object_type() const { return m_object_type; }
-
-    private:
-        std::vector<std::string> m_validation_errors;
-        std::string m_object_type;
     };
 }
 

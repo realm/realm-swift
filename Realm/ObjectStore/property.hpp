@@ -16,8 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef __realm__property__
-#define __realm__property__
+#ifndef REALM_PROPERTY_HPP
+#define REALM_PROPERTY_HPP
 
 #include <string>
 
@@ -83,4 +83,4 @@ namespace realm {
     }
 }
 
-#endif /* defined__realm__property__ */
+#endif /* REALM_PROPERTY_HPP */
