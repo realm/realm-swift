@@ -81,16 +81,17 @@ public final class Realm {
 
     :param: path Path to the realm file.
     */
-    public convenience init(path: String = Realm.defaultPath) {
-        try! self.init(RLMRealm(path: path, readOnly: false))
+    public convenience init(path: String = Realm.defaultPath) throws {
+        let rlmRealm = try RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: false, schema: nil)
+        self.init(rlmRealm)
     }
     
     /**
     Obtains a `Realm` instance with persistence to a specific file path with
     options.
 
-    Like `init(path:)`, but with the ability to open read-only realms and get
-    errors as an `NSError` inout parameter rather than exceptions.
+    Like `init(path:)`, but with the ability to open read-only realms and
+    encrypted realms.
 
     :warning: Read-only Realms do not support changes made to the file while the
               `Realm` exists. This means that you cannot open a Realm as both read-only
@@ -101,20 +102,10 @@ public final class Realm {
     :param: path            Path to the file you want the data saved in.
     :param: readOnly        Bool indicating if this Realm is read-only (must use for read-only files).
     :param: encryptionKey   64-byte key to use to encrypt the data.
-    :param: error           If an error occurs, upon return contains an `NSError` object
-                            that describes the problem. If you are not interested in
-                            possible errors, omit the argument, or pass in `nil`.
     */
-    public convenience init?(path: String, readOnly: Bool, encryptionKey: NSData? = nil, error outErr: NSErrorPointer = nil) {
-        do {
-            let rlmRealm = try RLMRealm(path: path, key: encryptionKey, readOnly: readOnly, inMemory: false, dynamic: false, schema: nil)
-            self.init(rlmRealm)
-        } catch let error as NSError {
-            if outErr != nil {
-                outErr.memory = error
-            }
-            return nil
-        }
+    public convenience init(path: String, readOnly: Bool, encryptionKey: NSData? = nil) throws {
+        let rlmRealm = try RLMRealm(path: path, key: encryptionKey, readOnly: readOnly, inMemory: false, dynamic: false, schema: nil)
+        self.init(rlmRealm)
     }
 
     /**

@@ -26,7 +26,7 @@ class TestCase: XCTestCase {
     var exceptionThrown = false
 
     func realmWithTestPath() -> Realm {
-        return Realm(path: testRealmPath())
+        return try! Realm(path: testRealmPath())
     }
 
     override func invokeTest() {
