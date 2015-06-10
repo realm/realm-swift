@@ -362,6 +362,10 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     return nil;
 }
 
++ (BOOL)isPropertyBool:(__unused NSString *)name instance:(__unused id)instance {
+    return YES;
+}
+
 + (void)initializeListProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property array:(__unused RLMArray *)array {
 }
 
