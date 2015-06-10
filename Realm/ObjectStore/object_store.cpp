@@ -24,6 +24,8 @@
 #include <realm/table_view.hpp>
 #include <realm/util/assert.hpp>
 
+#include <set>
+
 using namespace realm;
 using namespace std;
 
@@ -103,8 +105,10 @@ void ObjectStore::set_primary_key_for_object(realm::Group *group, StringData obj
     }
 
     // set if changing, or remove if setting to nil
-    if (primary_key.size() == 0 && row != realm::not_found) {
-        table->remove(row);
+    if (primary_key.size() == 0) {
+        if (row != realm::not_found) {
+            table->remove(row);
+        }
     }
     else {
         table->set_string(c_primaryKeyPropertyNameColumnIndex, row, primary_key);
@@ -201,6 +205,7 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
 
     // first pass to create missing tables
     vector<ObjectSchema *> to_update;
+    set<string> target_type_names;
     for (auto& object_schema : target_schema) {
         bool created = false;
         ObjectStore::table_for_object_type_create_if_needed(group, object_schema.name, created);
@@ -210,16 +215,19 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
             to_update.push_back(&object_schema);
             changed = true;
         }
+
+        // keep track of names to figure out what tables need deletion
+        target_type_names.insert(object_schema.name);
     }
 
     // second pass adds/removes columns for out of date tables
-    for (auto target_object_schema : to_update) {
+    for (auto& target_object_schema : to_update) {
         TableRef table = table_for_object_type(group, target_object_schema->name);
         ObjectSchema current_schema(group, target_object_schema->name, table.get());
         vector<Property> &target_props = target_object_schema->properties;
 
         // add missing columns
-        for (auto target_prop : target_props) {
+        for (auto& target_prop : target_props) {
             auto current_prop = current_schema.property_for_name(target_prop.name);
 
             // add any new properties (new name or different type)
@@ -264,6 +272,18 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
             // there is no primary key, so if there was one nil out
             set_primary_key_for_object(group, target_object_schema->name, "");
             changed = true;
+        }
+    }
+
+    // remove primary key entries for deleted types
+    // FIXME - delete actual tables once we have proper testing
+    ObjectStore::Schema schema;
+    for (int i = (int)group->size() - 1; i >= 0 ; i--) {
+        string object_type = object_type_for_table_name(group->get_table_name(i));
+        if (object_type.length()) {
+            if (target_type_names.find(object_type) == target_type_names.end()) {
+                set_primary_key_for_object(group, object_type, "");
+            }
         }
     }
 
