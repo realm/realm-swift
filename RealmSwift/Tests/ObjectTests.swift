@@ -30,7 +30,7 @@ class ObjectTests: TestCase {
         let standalone = SwiftStringObject()
         XCTAssertNil(standalone.realm)
 
-        let realm = Realm()
+        let realm = try! Realm()
         var persisted: SwiftStringObject!
         realm.write {
             persisted = realm.create(SwiftStringObject.self, value: [:])
@@ -42,7 +42,7 @@ class ObjectTests: TestCase {
 
         dispatchSyncNewThread {
             autoreleasepool {
-                XCTAssertNotEqual(Realm(), persisted.realm!)
+                XCTAssertNotEqual(try! Realm(), persisted.realm!)
             }
         }
     }
@@ -60,7 +60,7 @@ class ObjectTests: TestCase {
         let object = SwiftObject()
         XCTAssertFalse(object.invalidated)
 
-        let realm = Realm()
+        let realm = try! Realm()
         realm.write {
             realm.add(object)
             XCTAssertFalse(object.invalidated)
@@ -103,7 +103,7 @@ class ObjectTests: TestCase {
     }
 
     func testLinkingObjects() {
-        let realm = Realm()
+        let realm = try! Realm()
         let object = SwiftEmployeeObject()
         assertThrows(object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees"))
         realm.write {
@@ -132,8 +132,8 @@ class ObjectTests: TestCase {
         }
 
         test(SwiftObject())
-        Realm().write {
-            let persistedObject = Realm().create(SwiftObject.self, value: [:])
+        try! Realm().write {
+            let persistedObject = try! Realm().create(SwiftObject.self, value: [:])
             test(persistedObject)
         }
     }
@@ -258,8 +258,8 @@ class ObjectTests: TestCase {
         }
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
-        Realm().write {
-            let persistedObject = Realm().create(SwiftObject.self, value: [:])
+        try! Realm().write {
+            let persistedObject = try! Realm().create(SwiftObject.self, value: [:])
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
     }
@@ -279,8 +279,8 @@ class ObjectTests: TestCase {
         }
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
-        Realm().write {
-            let persistedObject = Realm().create(SwiftObject.self, value: [:])
+        try! Realm().write {
+            let persistedObject = try! Realm().create(SwiftObject.self, value: [:])
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
     }

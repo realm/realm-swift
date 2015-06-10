@@ -73,10 +73,10 @@ class ObjectAccessorTests: TestCase {
 
     func testPersistedAccessors() {
         let object = SwiftObject()
-        Realm().beginWrite()
-        Realm().create(SwiftObject)
+        try! Realm().beginWrite()
+        try! Realm().create(SwiftObject)
         setAndTestAllProperties(object)
-        Realm().commitWrite()
+        try! Realm().commitWrite()
     }
 
     func testIntSizes() {
