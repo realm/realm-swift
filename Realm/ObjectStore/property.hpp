@@ -45,7 +45,7 @@ namespace realm {
         PropertyTypeArray  = 13,
     };
 
-    class Property {
+    struct Property {
     public:
         std::string name;
         PropertyType type;
@@ -54,7 +54,7 @@ namespace realm {
         bool is_indexed;
 
         size_t table_column;
-        bool requires_index() { return is_primary | is_indexed; }
+        bool requires_index() { return is_primary || is_indexed; }
     };
 
     static inline const char *string_for_property_type(PropertyType type) {

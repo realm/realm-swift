@@ -19,6 +19,9 @@
 #include "object_schema.hpp"
 #include "object_store.hpp"
 
+#include <realm/group.hpp>
+#include <realm/table.hpp>
+
 using namespace realm;
 using namespace std;
 
@@ -30,6 +33,7 @@ ObjectSchema::ObjectSchema(Group *group, const std::string &name, Table *table) 
     }
 
     size_t count = table->get_column_count();
+    properties.reserve(count);
     for (size_t col = 0; col < count; col++) {
         Property property;
         property.name = table->get_column_name(col).data();
@@ -42,21 +46,16 @@ ObjectSchema::ObjectSchema(Group *group, const std::string &name, Table *table) 
             realm::TableRef linkTable = table->get_link_target(col);
             property.object_type = ObjectStore::object_type_for_table_name(linkTable->get_name().data());
         }
-        else {
-            property.object_type = "";
-        }
-        properties.push_back(property);
+        properties.push_back(move(property));
     }
 
     primary_key = realm::ObjectStore::get_primary_key_for_object(group, name);
     if (primary_key.length()) {
-        auto primary_key_iter = primary_key_property();
-        if (!primary_key_iter) {
-            std::vector<std::string> errors;
-            errors.push_back("No property matching primary key '" + primary_key + "'");
-            throw ObjectStoreValidationException(errors, name);
+        auto primary_key_prop = primary_key_property();
+        if (!primary_key_prop) {
+            throw ObjectStoreValidationException({"No property matching primary key '" + primary_key + "'"}, name);
         }
-        primary_key_iter->is_primary = true;
+        primary_key_prop->is_primary = true;
     }
 }
 

@@ -102,9 +102,6 @@
 		02D9AFC61B22488800A1BD87 /* object_store.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFBA1B22488800A1BD87 /* object_store.hpp */; };
 		02D9AFC71B22488800A1BD87 /* object_store.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFBA1B22488800A1BD87 /* object_store.hpp */; };
 		02D9AFC81B22488800A1BD87 /* object_store.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFBA1B22488800A1BD87 /* object_store.hpp */; };
-		02D9AFC91B22488800A1BD87 /* property.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02D9AFBB1B22488800A1BD87 /* property.cpp */; };
-		02D9AFCA1B22488800A1BD87 /* property.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02D9AFBB1B22488800A1BD87 /* property.cpp */; };
-		02D9AFCB1B22488800A1BD87 /* property.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02D9AFBB1B22488800A1BD87 /* property.cpp */; };
 		02D9AFCC1B22488800A1BD87 /* property.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFBC1B22488800A1BD87 /* property.hpp */; };
 		02D9AFCD1B22488800A1BD87 /* property.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFBC1B22488800A1BD87 /* property.hpp */; };
 		02D9AFCE1B22488800A1BD87 /* property.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFBC1B22488800A1BD87 /* property.hpp */; };
@@ -444,7 +441,6 @@
 		02D9AFB81B22488800A1BD87 /* object_schema.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = object_schema.hpp; path = ObjectStore/object_schema.hpp; sourceTree = "<group>"; };
 		02D9AFB91B22488800A1BD87 /* object_store.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = object_store.cpp; path = ObjectStore/object_store.cpp; sourceTree = "<group>"; };
 		02D9AFBA1B22488800A1BD87 /* object_store.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = object_store.hpp; path = ObjectStore/object_store.hpp; sourceTree = "<group>"; };
-		02D9AFBB1B22488800A1BD87 /* property.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = property.cpp; path = ObjectStore/property.cpp; sourceTree = "<group>"; };
 		02D9AFBC1B22488800A1BD87 /* property.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = property.hpp; path = ObjectStore/property.hpp; sourceTree = "<group>"; };
 		02E334C21A5F3C45009F8810 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		02E334C41A5F4923009F8810 /* RLMRealm_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMRealm_Private.hpp; sourceTree = "<group>"; };
@@ -602,7 +598,6 @@
 				02D9AFB81B22488800A1BD87 /* object_schema.hpp */,
 				02D9AFB91B22488800A1BD87 /* object_store.cpp */,
 				02D9AFBA1B22488800A1BD87 /* object_store.hpp */,
-				02D9AFBB1B22488800A1BD87 /* property.cpp */,
 				02D9AFBC1B22488800A1BD87 /* property.hpp */,
 			);
 			name = ObjectStore;
@@ -1302,7 +1297,6 @@
 				29E3C70F1A71C1C700B62C1D /* RLMObjectStore.mm in Sources */,
 				29E3C7101A71C1C700B62C1D /* RLMProperty.mm in Sources */,
 				29E3C7111A71C1C700B62C1D /* RLMQueryUtil.mm in Sources */,
-				02D9AFCB1B22488800A1BD87 /* property.cpp in Sources */,
 				29E3C7121A71C1C700B62C1D /* RLMRealm.mm in Sources */,
 				29E3C7131A71C1C700B62C1D /* RLMResults.mm in Sources */,
 				29E3C7141A71C1C700B62C1D /* RLMSchema.mm in Sources */,
@@ -1368,7 +1362,6 @@
 				023B19631A3BA90E0067FB81 /* RLMObjectBase.mm in Sources */,
 				E856D2011956154C00FB2FCF /* RLMObjectSchema.mm in Sources */,
 				E856D2031956154C00FB2FCF /* RLMObjectStore.mm in Sources */,
-				02D9AFCA1B22488800A1BD87 /* property.cpp in Sources */,
 				E856D2061956154C00FB2FCF /* RLMProperty.mm in Sources */,
 				E856D2081956154C00FB2FCF /* RLMQueryUtil.mm in Sources */,
 				E856D20B1956154C00FB2FCF /* RLMRealm.mm in Sources */,
@@ -1438,7 +1431,6 @@
 				E81A1F9E1955FC9300FDED82 /* RLMObjectStore.mm in Sources */,
 				E81A1FA21955FC9300FDED82 /* RLMProperty.mm in Sources */,
 				E81A1FA51955FC9300FDED82 /* RLMQueryUtil.mm in Sources */,
-				02D9AFC91B22488800A1BD87 /* property.cpp in Sources */,
 				E81A1FA91955FC9300FDED82 /* RLMRealm.mm in Sources */,
 				E81A1F901955FC9300FDED82 /* RLMResults.mm in Sources */,
 				E81A1FAD1955FC9300FDED82 /* RLMSchema.mm in Sources */,

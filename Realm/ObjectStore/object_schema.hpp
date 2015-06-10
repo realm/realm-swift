@@ -16,17 +16,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef __realm__object_schema__
-#define __realm__object_schema__
+#ifndef REALM_OBJECT_SCHEMA_HPP
+#define REALM_OBJECT_SCHEMA_HPP
 
 #include <string>
 #include <vector>
 
 #include "property.hpp"
-#include <realm/group.hpp>
-#include <realm/table.hpp>
 
 namespace realm {
+    class Group;
+    class Table;
+
     class ObjectSchema {
     public:
         ObjectSchema() {}
@@ -46,4 +47,4 @@ namespace realm {
     };
 }
 
-#endif /* defined(__realm__object_schema__) */
+#endif /* defined(REALM_OBJECT_SCHEMA_HPP) */

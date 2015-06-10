@@ -16,13 +16,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef __realm__object_store__
-#define __realm__object_store__
+#ifndef REALM_OBJECT_STORE_HPP
+#define REALM_OBJECT_STORE_HPP
 
-#include <realm/group.hpp>
+#include <map>
+#include <vector>
+#include <functional>
+
 #include "object_schema.hpp"
 
 namespace realm {
+    class Group;
+    class StringData;
+    class Table;
+    template<typename T> class BasicTableRef;
+    typedef BasicTableRef<Table> TableRef;
+
     class ObjectStore {
     public:
         // Schema version used for uninitialized Realms
@@ -106,11 +115,11 @@ namespace realm {
             RealmDuplicatePrimaryKeyValue,          // object_type, property_name
         };
         typedef std::map<std::string, std::string> Dict;
-        
+
         ObjectStoreException(Kind kind, Dict dict = Dict()) : m_kind(kind), m_dict(dict) {}
 
         ObjectStoreException::Kind kind() { return m_kind; }
-        ObjectStoreException::Dict &dict() { return m_dict; }
+        const ObjectStoreException::Dict &dict() { return m_dict; }
 
     private:
         Kind m_kind;
@@ -130,5 +139,5 @@ namespace realm {
     };
 }
 
-#endif /* defined(__realm__object_store__) */
+#endif /* defined(REALM_OBJECT_STORE_HPP) */
 
