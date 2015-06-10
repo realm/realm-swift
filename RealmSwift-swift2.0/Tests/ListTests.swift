@@ -504,7 +504,7 @@ class ListNewlyAddedTests: ListTests {
 
     override func createArrayWithLinks() -> SwiftListOfSwiftObject {
         let array = SwiftListOfSwiftObject()
-        let realm = Realm()
+        let realm = try! Realm()
         realm.write { realm.add(array) }
 
         XCTAssertNotNil(array.realm)
@@ -524,7 +524,7 @@ class ListNewlyCreatedTests: ListTests {
     }
 
     override func createArrayWithLinks() -> SwiftListOfSwiftObject {
-        let realm = Realm()
+        let realm = try! Realm()
         realm.beginWrite()
         let array = realm.create(SwiftListOfSwiftObject)
         realm.commitWrite()
@@ -547,7 +547,7 @@ class ListRetrievedTests: ListTests {
     }
 
     override func createArrayWithLinks() -> SwiftListOfSwiftObject {
-        let realm = Realm()
+        let realm = try! Realm()
         realm.beginWrite()
         realm.create(SwiftListOfSwiftObject)
         realm.commitWrite()
