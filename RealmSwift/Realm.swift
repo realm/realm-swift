@@ -105,11 +105,14 @@ public final class Realm {
                             that describes the problem. If you are not interested in
                             possible errors, omit the argument, or pass in `nil`.
     */
-    public convenience init?(path: String, readOnly: Bool, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) {
+    public convenience init?(path: String, readOnly: Bool, encryptionKey: NSData? = nil, error outErr: NSErrorPointer = nil) {
         do {
             let rlmRealm = try RLMRealm(path: path, key: encryptionKey, readOnly: readOnly, inMemory: false, dynamic: false, schema: nil)
             self.init(rlmRealm)
-        } catch {
+        } catch let error as NSError {
+            if outErr != nil {
+                outErr.memory = error
+            }
             return nil
         }
     }
