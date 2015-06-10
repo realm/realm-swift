@@ -359,13 +359,14 @@ class RealmTests: TestCase {
     func testAddNotificationBlock() {
         let realm = Realm()
         var notificationCalled = false
-        _ = realm.addNotificationBlock { _, realm in
+        let token = realm.addNotificationBlock { _, realm in
             XCTAssertEqual(realm.path, Realm.defaultPath)
             notificationCalled = true
         }
         XCTAssertFalse(notificationCalled)
         realm.write {}
         XCTAssertTrue(notificationCalled)
+        realm.removeNotification(token)
     }
 
     func testRemoveNotification() {
