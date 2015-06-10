@@ -62,7 +62,7 @@ class SwiftPerformanceTests: TestCase {
         super.tearDown()
     }
 
-    override func measureBlock(block: (() -> Void)!) {
+    override func measureBlock(block: (() -> Void)) {
         super.measureBlock {
             autoreleasepool {
                 block()
@@ -70,7 +70,7 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
-    override func measureMetrics(metrics: [AnyObject]!, automaticallyStartMeasuring: Bool, forBlock block: (() -> Void)!) {
+    override func measureMetrics(metrics: [String], automaticallyStartMeasuring: Bool, forBlock block: () -> Void) {
         super.measureMetrics(metrics, automaticallyStartMeasuring: automaticallyStartMeasuring) {
             autoreleasepool {
                 block()
@@ -85,7 +85,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     private func copyRealmToTestPath(realm: Realm) -> Realm {
-        NSFileManager.defaultManager().removeItemAtPath(testRealmPath(), error: nil)
+        try! NSFileManager.defaultManager().removeItemAtPath(testRealmPath())
         realm.writeCopyToPath(testRealmPath())
         return realmWithTestPath()
     }
@@ -186,7 +186,7 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessArrayProperty() {
         let realm = copyRealmToTestPath(mediumRealm)
         realm.beginWrite()
-        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", map(realm.objects(SwiftStringObject)) { $0 }, []])
+        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
         realm.commitWrite()
 
         measureBlock {
@@ -199,7 +199,7 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessArrayPropertySlow() {
         let realm = copyRealmToTestPath(mediumRealm)
         realm.beginWrite()
-        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", map(realm.objects(SwiftStringObject)) { $0 }, []])
+        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
         realm.commitWrite()
 
         measureBlock {
@@ -268,7 +268,7 @@ class SwiftPerformanceTests: TestCase {
     func testManualDeletion() {
         inMeasureBlock {
             let realm = self.copyRealmToTestPath(mediumRealm)
-            let objects = map(realm.objects(SwiftStringObject)) { $0 }
+            let objects = realm.objects(SwiftStringObject).map { $0 }
             self.startMeasuring()
             realm.write {
                 realm.delete(objects)
@@ -411,7 +411,7 @@ class SwiftPerformanceTests: TestCase {
                 }
                 dispatch_semaphore_signal(semaphore)
                 while !stop {
-                    NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as! NSDate)
+                    NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
                 }
                 realm.removeNotification(token)
             }
@@ -446,7 +446,7 @@ class SwiftPerformanceTests: TestCase {
                 }
                 dispatch_semaphore_signal(semaphore)
                 while object.intCol < stopValue {
-                    NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as! NSDate)
+                    NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
                 }
                 realm.removeNotification(token)
             }
@@ -461,7 +461,7 @@ class SwiftPerformanceTests: TestCase {
             self.startMeasuring()
             realm.write { _ = object.intCol++ }
             while object.intCol < stopValue {
-                NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as! NSDate)
+                NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
             }
             dispatch_sync(queue) {}
             self.stopMeasuring()
