@@ -14,6 +14,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fixed an issue where the packaged OS X Realm.framework was built with
   `GCC_GENERATE_TEST_COVERAGE_FILES` and `GCC_INSTRUMENT_PROGRAM_FLOW_ARCS`
   enabled.
+* Fix a memory leak when constructing standalone Swift objects with NSDate
+  properties.
 
 0.93.1 Release notes (2015-05-29)
 =============================================================

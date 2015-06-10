@@ -35,25 +35,20 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
 
 // standalone init
 - (instancetype)init {
-    if (RLMSchema.sharedSchema) {
-        __unsafe_unretained RLMObjectSchema *const objectSchema = [self.class sharedSchema];
-        self = [self initWithRealm:nil schema:objectSchema];
+    self = [super init];
+    if (self && RLMSchema.sharedSchema) {
+        _objectSchema = [self.class sharedSchema];
 
         // set default values
-        if (!objectSchema.isSwiftClass) {
-            NSDictionary *dict = RLMDefaultValuesForObjectSchema(objectSchema);
+        if (!_objectSchema.isSwiftClass) {
+            NSDictionary *dict = RLMDefaultValuesForObjectSchema(_objectSchema);
             for (NSString *key in dict) {
                 [self setValue:dict[key] forKey:key];
             }
         }
 
         // set standalone accessor class
-        object_setClass(self, objectSchema.standaloneClass);
-    }
-    else {
-        // if schema not initialized
-        // this is only used for introspection
-        self = [super init];
+        object_setClass(self, _objectSchema.standaloneClass);
     }
 
     return self;
