@@ -21,6 +21,7 @@
 #import "RLMArray.h"
 #import "RLMObject.h"
 #import "RLMSchema_Private.h"
+#import "RLMObject_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
@@ -256,7 +257,8 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
         }
     }
     if (_objcType == 'c') {
-        _type = RLMPropertyTypeInt;
+        static Class objectUtil = RLMObjectUtilClass(YES);
+        _type = [objectUtil isPropertyBool:name instance:obj] ? RLMPropertyTypeBool : RLMPropertyTypeInt;
     }
 
     // update getter/setter names
