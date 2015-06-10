@@ -413,7 +413,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
     RLMAssertThrowsWithReasonMatching([self realmWithTestPathAndSchema:schema],
-                                      @".*UnindexableProperty\\.unindexable.*double.*");
+                                      @".*Can't index property.*double.*");
 }
 
 @end

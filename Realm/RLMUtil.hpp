@@ -32,8 +32,8 @@
 
 NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
 NSException *RLMException(std::exception const& exception);
-NSException *RLMException(realm::ObjectStoreException & exception);
-NSException *RLMException(realm::ObjectStoreValidationException & exception);
+NSException *RLMException(realm::ObjectStoreException const& exception);
+NSException *RLMException(realm::ObjectStoreValidationException const& exception);
 
 NSError *RLMMakeError(RLMError code, std::exception const& exception);
 NSError *RLMMakeError(NSException *exception);

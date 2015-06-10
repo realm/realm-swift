@@ -276,7 +276,7 @@
         p.object_type = prop.objectClassName ? prop.objectClassName.UTF8String : "";
         p.is_indexed = prop.indexed;
         p.is_primary = (prop == _primaryKeyProperty);
-        objectSchema.properties.push_back(p);
+        objectSchema.properties.push_back(std::move(p));
     }
     return objectSchema;
 }
@@ -287,8 +287,7 @@
 
     // create array of RLMProperties
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:objectSchema.properties.size()];
-    for (size_t col = 0; col < objectSchema.properties.size(); col++) {
-        Property &prop = objectSchema.properties[col];
+    for (Property &prop : objectSchema.properties) {
         RLMProperty *property = [[RLMProperty alloc] initWithName:@(prop.name.c_str())
                                                              type:(RLMPropertyType)prop.type
                                                   objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil

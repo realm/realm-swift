@@ -237,14 +237,14 @@ NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
     return [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:info];
 }
 
-NSException *RLMException(realm::ObjectStoreException & exception) {
+NSException *RLMException(realm::ObjectStoreException const& exception) {
     const ObjectStoreException::Dict &dict = exception.dict();
     switch (exception.kind()) {
         case ObjectStoreException::RealmVersionGreaterThanSchemaVersion:
             return RLMException(@"Schema version less than last set version in Realm");
             break;
         case ObjectStoreException::RealmPropertyTypeNotIndexable:
-            return RLMException([NSString stringWithFormat:@"Cannot index property '%s.%s': indexing properties of type '%s' is currently not supported", dict.at("object_type").c_str(), dict.at("property_name").c_str(), dict.at("property_type").c_str()]);
+            return RLMException([NSString stringWithFormat:@"Can't index property '%s.%s': indexing properties of type '%s' is currently not supported", dict.at("object_type").c_str(), dict.at("property_name").c_str(), dict.at("property_type").c_str()]);
             break;
         case ObjectStoreException::RealmDuplicatePrimaryKeyValue:
             return RLMException([NSString stringWithFormat:@"Primary key property '%s' has duplicate values after migration.", dict.at("property_name").c_str()]);
@@ -253,7 +253,7 @@ NSException *RLMException(realm::ObjectStoreException & exception) {
     }
 }
 
-NSException *RLMException(realm::ObjectStoreValidationException & e) {
+NSException *RLMException(realm::ObjectStoreValidationException const& e) {
     NSMutableString *errorMessage = [NSMutableString stringWithFormat:
                                      @"Migration is required for object type '%s' due to the following errors:",
                                      e.object_type().c_str()];

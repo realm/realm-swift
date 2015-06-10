@@ -140,7 +140,7 @@ void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSc
             return;
         }
     }
-    catch (ObjectStoreException e) {
+    catch (ObjectStoreException & e) {
         @throw RLMException(e);
     }
 
@@ -167,10 +167,10 @@ void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSc
         else {
             [realm cancelWriteTransaction];
         }
-    } catch (ObjectStoreException e) {
+    } catch (ObjectStoreException & e) {
         [realm cancelWriteTransaction];
         @throw RLMException(e);
-    } catch (ObjectStoreValidationException e) {
+    } catch (ObjectStoreValidationException & e) {
         [realm cancelWriteTransaction];
         @throw RLMException(e);
     }

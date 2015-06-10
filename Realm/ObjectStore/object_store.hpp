@@ -118,8 +118,8 @@ namespace realm {
 
         ObjectStoreException(Kind kind, Dict dict = Dict()) : m_kind(kind), m_dict(dict) {}
 
-        ObjectStoreException::Kind kind() { return m_kind; }
-        const ObjectStoreException::Dict &dict() { return m_dict; }
+        ObjectStoreException::Kind kind() const { return m_kind; }
+        const ObjectStoreException::Dict &dict() const { return m_dict; }
 
     private:
         Kind m_kind;
@@ -130,8 +130,8 @@ namespace realm {
     public:
         ObjectStoreValidationException(std::vector<std::string> validation_errors, std::string object_type) :
             m_validation_errors(validation_errors), m_object_type(object_type) {}
-        std::vector<std::string> validation_errors() { return m_validation_errors; }
-        std::string object_type() { return m_object_type; }
+        const std::vector<std::string> &validation_errors() const { return m_validation_errors; }
+        std::string object_type() const { return m_object_type; }
 
     private:
         std::vector<std::string> m_validation_errors;
