@@ -198,7 +198,7 @@ test_ios_devices() {
     configuration="$3"
     failed=0
     for device in "${serial_numbers[@]}"; do
-        $cmd "-scheme '$2' -configuration $configuration -destination 'id=$device' test" || failed=1
+        $cmd "-scheme '$2' -configuration $configuration -sdk iphoneos -destination 'id=$device' test TEST_HOST='\$(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestHost'" || failed=1
     done
     return $failed
 }

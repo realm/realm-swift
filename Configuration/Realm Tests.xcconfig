@@ -14,5 +14,3 @@ REALM_EXCLUDED_SOURCE_FILES[sdk=macosx*] = build/ios-dynamic/* Realm/ios/* Realm
 ALWAYS_SEARCH_USER_PATHS = NO;
 
 EXCLUDED_SOURCE_FILE_NAMES = $(inherited) $(REALM_EXCLUDED_SOURCE_FILES);
-
-TEST_HOST[sdk=iphoneos*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost;
