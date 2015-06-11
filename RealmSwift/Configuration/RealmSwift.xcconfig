@@ -9,5 +9,6 @@ LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/
 DEFINES_MODULE = YES;
 INFOPLIST_FILE = RealmSwift/RealmSwift-Info.plist;
 PRODUCT_NAME = RealmSwift;
+PRODUCT_BUNDLE_IDENTIFIER = io.realm.RealmSwit;
 
 FRAMEWORK_SEARCH_PATHS = $(REALM_FRAMEWORK_PATH);
