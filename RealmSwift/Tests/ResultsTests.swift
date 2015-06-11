@@ -186,7 +186,7 @@ class ResultsTests: TestCase {
         innerArray.array.append(SwiftObject())
         outerArray.array.append(innerArray)
         realm.add(outerArray)
-        // FIXME: XCTAssertEqual(Int(1), outerArray.array.filter("ANY array IN %@", realm.objects(SwiftObject)).count)
+        XCTAssertEqual(Int(1), outerArray.array.filter("ANY array IN %@", realm.objects(SwiftObject)).count)
     }
 
     func testFilterResults() {
@@ -194,9 +194,8 @@ class ResultsTests: TestCase {
         let realm = realmWithTestPath()
         array.array.append(SwiftObject())
         realm.add(array)
-        // FIXME: Make Results conform to CVarArgType
-//        XCTAssertEqual(Int(1),
-//            realm.objects(SwiftListOfSwiftObject).filter("ANY array IN %@", realm.objects(SwiftObject)).count)
+        XCTAssertEqual(Int(1),
+            realm.objects(SwiftListOfSwiftObject).filter("ANY array IN %@", realm.objects(SwiftObject)).count)
     }
 
     func testFilterPredicate() {
@@ -286,10 +285,10 @@ class ResultsTests: TestCase {
     }
 
     func testArrayAggregateWithSwiftObjectDoesntThrow() {
-        _ = getAggregateableResults()
+        let results = getAggregateableResults()
 
         // Should not throw a type error.
-        // FIXME: results.filter("ANY stringListCol == %@", SwiftStringObject())
+        results.filter("ANY stringListCol == %@", SwiftStringObject())
     }
 }
 
