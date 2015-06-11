@@ -36,7 +36,8 @@ class Cell: UITableViewCell {
 
 class TableViewController: UITableViewController {
 
-    var array = Realm().objects(DemoObject).sorted("date")
+    let realm = try! Realm()
+    let array = try! Realm().objects(DemoObject).sorted("date")
     var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
@@ -45,7 +46,7 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set realm notification block
-        notificationToken = Realm().addNotificationBlock { [unowned self] note, realm in
+        notificationToken = realm.addNotificationBlock { [unowned self] note, realm in
             self.tableView.reloadData()
         }
 
@@ -80,7 +81,6 @@ class TableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let realm = Realm()
             realm.beginWrite()
             realm.delete(array[indexPath.row])
             realm.commitWrite()
@@ -94,9 +94,9 @@ class TableViewController: UITableViewController {
         // Import many items in a background thread
         dispatch_async(queue) {
             // Get new realm and table since we are in a new thread
-            let realm = Realm()
+            let realm = try! Realm()
             realm.beginWrite()
-            for index in 0..<5 {
+            for _ in 0..<5 {
                 // Add row via dictionary. Order is ignored.
                 realm.create(DemoObject.self, value: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
             }
@@ -105,7 +105,6 @@ class TableViewController: UITableViewController {
     }
 
     func add() {
-        let realm = Realm()
         realm.beginWrite()
         realm.create(DemoObject.self, value: [TableViewController.randomString(), TableViewController.randomDate()])
         realm.commitWrite()
