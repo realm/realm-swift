@@ -45,9 +45,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
 
-        NSFileManager.defaultManager().removeItemAtPath(Realm.defaultPath, error: nil)
+        try! NSFileManager.defaultManager().removeItemAtPath(Realm.defaultPath)
 
-        let realm = Realm()
+        let realm = try! Realm()
         realm.write {
             realm.create(Person.self, value: ["John", [["Fido", 1]]])
             realm.create(Person.self, value: ["Mary", [["Rex", 2]]])
@@ -57,7 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let allDogs = realm.objects(Dog)
         for dog in allDogs {
             let ownerNames = dog.owners.map { $0.name }
-            println("\(dog.name) has \(ownerNames.count) owners (\(ownerNames))")
+            print("\(dog.name) has \(ownerNames.count) owners (\(ownerNames))")
         }
         return true
     }
