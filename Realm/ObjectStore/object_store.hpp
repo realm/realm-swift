@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,14 +41,14 @@ namespace realm {
         // get the last set schema version
         static uint64_t get_schema_version(Group *group);
 
-        // checks if a migration is required for a given schema version
-        static bool is_migration_required(realm::Group *group, uint64_t new_version);
+        // checks if the schema in the group is at the given version
+        static bool is_schema_at_version(realm::Group *group, uint64_t version);
 
         // verify a target schema against its table, setting the table_column property on each schema object
         // updates the column mapping on the target_schema
         // if no table is provided it is fetched from the group
         // returns array of validation errors
-        static std::vector<std::string> validate_schema(Group *group, ObjectSchema &target_schema, Table *cached_table = nullptr);
+        static std::vector<std::string> validate_schema(Group *group, ObjectSchema &target_schema);
 
         // updates the target_column member for all properties based on the column indexes in the passed in group
         static void update_column_mapping(Group *group, ObjectSchema &target_schema);

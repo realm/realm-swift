@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,12 +25,9 @@
 using namespace realm;
 using namespace std;
 
-ObjectSchema::ObjectSchema(Group *group, const std::string &name, Table *table) : name(name) {
-    TableRef tableRef;
-    if (!table) {
-        tableRef = ObjectStore::table_for_object_type(group, name);
-        table = tableRef.get();
-    }
+ObjectSchema::ObjectSchema(Group *group, const std::string &name) : name(name) {
+    TableRef tableRef = ObjectStore::table_for_object_type(group, name);
+    Table *table = tableRef.get();
 
     size_t count = table->get_column_count();
     properties.reserve(count);

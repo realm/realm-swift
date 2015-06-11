@@ -93,7 +93,7 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndA
         if (verifyAndAlignColumns && objectSchema.table) {
             ObjectSchema schema = objectSchema.objectStoreCopy;
             if (verifyAndAlignColumns) {
-                auto errors = ObjectStore::validate_schema(realm.group, schema, objectSchema.table);
+                auto errors = ObjectStore::validate_schema(realm.group, schema);
                 if (errors.size()) {
                     @throw RLMException(ObjectStoreValidationException(errors, schema.name));
                 }
@@ -135,7 +135,7 @@ void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSc
     }
 
     try {
-        if (RLMRealmHasAllTables(realm, targetSchema) && !ObjectStore::is_migration_required(realm.group, newVersion) && ObjectStore::indexes_are_up_to_date(realm.group, schema)) {
+        if (RLMRealmHasAllTables(realm, targetSchema) && !ObjectStore::is_schema_at_version(realm.group, newVersion) && ObjectStore::indexes_are_up_to_date(realm.group, schema)) {
             RLMRealmSetSchema(realm, targetSchema, true);
             return;
         }

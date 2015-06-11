@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace realm {
     public:
         enum class Kind {
             // thrown when calling update_realm_to_schema and the realm version is greater than the given version
-            RealmVersionGreaterThanSchemaVersion,
+            RealmVersionGreaterThanSchemaVersion,   // old_version, new_version
             RealmPropertyTypeNotIndexable,          // object_type, property_name, property_type
             RealmDuplicatePrimaryKeyValue,          // object_type, property_name
         };

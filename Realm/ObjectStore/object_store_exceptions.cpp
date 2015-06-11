@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ using namespace std;
 ObjectStoreException::ObjectStoreException(Kind kind, Dict dict) : m_kind(kind), m_dict(dict) {
     switch (m_kind) {
         case Kind::RealmVersionGreaterThanSchemaVersion:
-            m_what = "Schema version less than last set version in Realm";
+            m_what = "Provided schema version " + m_dict.at("old_version") + " is less than last set version " + m_dict.at("new_version") + ".";
             break;
         case Kind::RealmPropertyTypeNotIndexable:
             m_what = "Can't index property '" + m_dict.at("object_type") + "." + m_dict.at("property_name") + "': " +

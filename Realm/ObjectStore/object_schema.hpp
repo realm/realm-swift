@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 
 namespace realm {
     class Group;
-    class Table;
 
     class ObjectSchema {
     public:
@@ -34,7 +33,7 @@ namespace realm {
 
         // create object schema from existing table
         // if no table is provided it is looked up in the group
-        ObjectSchema(Group *group, const std::string &name, Table *table = nullptr);
+        ObjectSchema(Group *group, const std::string &name);
 
         std::string name;
         std::vector<Property> properties;

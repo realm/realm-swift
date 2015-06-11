@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <realm/util/assert.hpp>
 
 #include <set>
+#include <string.h>
 
 using namespace realm;
 using namespace std;
@@ -39,74 +40,77 @@ const size_t c_primaryKeyObjectClassColumnIndex =  0;
 const char * const c_primaryKeyPropertyNameColumnName = "pk_property";
 const size_t c_primaryKeyPropertyNameColumnIndex =  1;
 
-const string c_object_table_name_prefix = "class_";
+const size_t c_zeroRowIndex = 0;
+
+const string c_object_table_prefix = "class_";
+const size_t c_object_table_prefix_length = c_object_table_prefix.length();
 
 const uint64_t ObjectStore::NotVersioned = numeric_limits<uint64_t>::max();
 
-bool ObjectStore::has_metadata_tables(realm::Group *group) {
+bool ObjectStore::has_metadata_tables(Group *group) {
     return group->get_table(c_primaryKeyTableName) && group->get_table(c_metadataTableName);
 }
 
-bool ObjectStore::create_metadata_tables(realm::Group *group) {
+bool ObjectStore::create_metadata_tables(Group *group) {
     bool changed = false;
-    realm::TableRef table = group->get_or_add_table(c_primaryKeyTableName);
+    TableRef table = group->get_or_add_table(c_primaryKeyTableName);
     if (table->get_column_count() == 0) {
-        table->add_column(realm::type_String, c_primaryKeyObjectClassColumnName);
-        table->add_column(realm::type_String, c_primaryKeyPropertyNameColumnName);
+        table->add_column(type_String, c_primaryKeyObjectClassColumnName);
+        table->add_column(type_String, c_primaryKeyPropertyNameColumnName);
         changed = true;
     }
 
     table = group->get_or_add_table(c_metadataTableName);
     if (table->get_column_count() == 0) {
-        table->add_column(realm::type_Int, c_versionColumnName);
+        table->add_column(type_Int, c_versionColumnName);
 
         // set initial version
         table->add_empty_row();
-        table->set_int(c_versionColumnIndex, 0, realm::ObjectStore::NotVersioned);
+        table->set_int(c_versionColumnIndex, c_zeroRowIndex, ObjectStore::NotVersioned);
         changed = true;
     }
 
     return changed;
 }
 
-uint64_t ObjectStore::get_schema_version(realm::Group *group) {
-    realm::TableRef table = group->get_table(c_metadataTableName);
+uint64_t ObjectStore::get_schema_version(Group *group) {
+    TableRef table = group->get_table(c_metadataTableName);
     if (!table || table->get_column_count() == 0) {
-        return realm::ObjectStore::NotVersioned;
+        return ObjectStore::NotVersioned;
     }
-    return table->get_int(c_versionColumnIndex, 0);
+    return table->get_int(c_versionColumnIndex, c_zeroRowIndex);
 }
 
-void ObjectStore::set_schema_version(realm::Group *group, uint64_t version) {
-    realm::TableRef table = group->get_or_add_table(c_metadataTableName);
-    table->set_int(c_versionColumnIndex, 0, version);
+void ObjectStore::set_schema_version(Group *group, uint64_t version) {
+    TableRef table = group->get_or_add_table(c_metadataTableName);
+    table->set_int(c_versionColumnIndex, c_zeroRowIndex, version);
 }
 
-StringData ObjectStore::get_primary_key_for_object(realm::Group *group, StringData object_type) {
-    realm::TableRef table = group->get_table(c_primaryKeyTableName);
+StringData ObjectStore::get_primary_key_for_object(Group *group, StringData object_type) {
+    TableRef table = group->get_table(c_primaryKeyTableName);
     if (!table) {
         return "";
     }
     size_t row = table->find_first_string(c_primaryKeyObjectClassColumnIndex, object_type);
-    if (row == realm::not_found) {
+    if (row == not_found) {
         return "";
     }
     return table->get_string(c_primaryKeyPropertyNameColumnIndex, row);
 }
 
-void ObjectStore::set_primary_key_for_object(realm::Group *group, StringData object_type, StringData primary_key) {
-    realm::TableRef table = group->get_table(c_primaryKeyTableName);
+void ObjectStore::set_primary_key_for_object(Group *group, StringData object_type, StringData primary_key) {
+    TableRef table = group->get_table(c_primaryKeyTableName);
 
     // get row or create if new object and populate
     size_t row = table->find_first_string(c_primaryKeyObjectClassColumnIndex, object_type);
-    if (row == realm::not_found && primary_key.size()) {
+    if (row == not_found && primary_key.size()) {
         row = table->add_empty_row();
         table->set_string(c_primaryKeyObjectClassColumnIndex, row, object_type);
     }
 
     // set if changing, or remove if setting to nil
     if (primary_key.size() == 0) {
-        if (row != realm::not_found) {
+        if (row != not_found) {
             table->remove(row);
         }
     }
@@ -116,27 +120,27 @@ void ObjectStore::set_primary_key_for_object(realm::Group *group, StringData obj
 }
 
 string ObjectStore::object_type_for_table_name(const string &table_name) {
-    if (table_name.size() >= 6 && table_name.compare(0, 6, c_object_table_name_prefix) == 0) {
-        return table_name.substr(6, table_name.length()-6);
+    if (table_name.size() >= c_object_table_prefix_length && table_name.compare(0, c_object_table_prefix_length, c_object_table_prefix) == 0) {
+        return table_name.substr(c_object_table_prefix_length, table_name.length() - c_object_table_prefix_length);
     }
     return string();
 }
 
 string ObjectStore::table_name_for_object_type(const string &object_type) {
-    return c_object_table_name_prefix + object_type;
+    return c_object_table_prefix + object_type;
 }
 
-realm::TableRef ObjectStore::table_for_object_type(realm::Group *group, StringData object_type) {
+TableRef ObjectStore::table_for_object_type(Group *group, StringData object_type) {
     return group->get_table(table_name_for_object_type(object_type));
 }
 
-realm::TableRef ObjectStore::table_for_object_type_create_if_needed(realm::Group *group, const StringData &object_type, bool &created) {
+TableRef ObjectStore::table_for_object_type_create_if_needed(Group *group, const StringData &object_type, bool &created) {
     return group->get_or_add_table(table_name_for_object_type(object_type), &created);
 }
 
-std::vector<std::string> ObjectStore::validate_schema(realm::Group *group, ObjectSchema &target_schema, Table *cached_table) {
+std::vector<std::string> ObjectStore::validate_schema(Group *group, ObjectSchema &target_schema) {
     vector<string> validation_errors;
-    ObjectSchema table_schema(group, target_schema.name, cached_table);
+    ObjectSchema table_schema(group, target_schema.name);
 
     // check to see if properties are the same
     for (auto& current_prop : table_schema.properties) {
@@ -200,7 +204,7 @@ static inline bool property_has_changed(Property &p1, Property &p2) {
 // set references to tables on targetSchema and create/update any missing or out-of-date tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
-bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target_schema, bool update_existing) {
+bool ObjectStore::create_tables(Group *group, ObjectStore::Schema &target_schema, bool update_existing) {
     bool changed = false;
 
     // first pass to create missing tables
@@ -223,7 +227,7 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
     // second pass adds/removes columns for out of date tables
     for (auto& target_object_schema : to_update) {
         TableRef table = table_for_object_type(group, target_object_schema->name);
-        ObjectSchema current_schema(group, target_object_schema->name, table.get());
+        ObjectSchema current_schema(group, target_object_schema->name);
         vector<Property> &target_props = target_object_schema->properties;
 
         // add missing columns
@@ -236,12 +240,12 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
                         // for objects and arrays, we have to specify target table
                     case PropertyTypeObject:
                     case PropertyTypeArray: {
-                        realm::TableRef link_table = ObjectStore::table_for_object_type(group, target_prop.object_type);
-                        target_prop.table_column = table->add_column_link(realm::DataType(target_prop.type), target_prop.name, *link_table);
+                        TableRef link_table = ObjectStore::table_for_object_type(group, target_prop.object_type);
+                        target_prop.table_column = table->add_column_link(DataType(target_prop.type), target_prop.name, *link_table);
                         break;
                     }
                     default:
-                        target_prop.table_column = table->add_column(realm::DataType(target_prop.type), target_prop.name);
+                        target_prop.table_column = table->add_column(DataType(target_prop.type), target_prop.name);
                         break;
                 }
                 changed = true;
@@ -290,23 +294,24 @@ bool ObjectStore::create_tables(realm::Group *group, ObjectStore::Schema &target
     return changed;
 }
 
-bool ObjectStore::is_migration_required(realm::Group *group, uint64_t new_version) {
+bool ObjectStore::is_schema_at_version(Group *group, uint64_t version) {
     uint64_t old_version = get_schema_version(group);
-    if (old_version > new_version && old_version != NotVersioned) {
-        throw ObjectStoreException(ObjectStoreException::Kind::RealmVersionGreaterThanSchemaVersion);
+    if (old_version > version && old_version != NotVersioned) {
+        throw ObjectStoreException(ObjectStoreException::Kind::RealmVersionGreaterThanSchemaVersion,
+                                   {{"old_version", to_string(old_version)}, {"new_version", to_string(version)}});
     }
-    return old_version != new_version;
+    return old_version != version;
 }
 
 
-bool ObjectStore::update_realm_with_schema(realm::Group *group,
+bool ObjectStore::update_realm_with_schema(Group *group,
                                            uint64_t version,
                                            Schema &schema,
                                            MigrationFunction migration) {
     // Recheck the schema version after beginning the write transaction as
     // another process may have done the migration after we opened the read
     // transaction
-    bool migrating = is_migration_required(group, version);
+    bool migrating = is_schema_at_version(group, version);
 
     // create tables
     bool changed = create_metadata_tables(group);
@@ -316,7 +321,7 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
         // read-only realms may be missing tables entirely
         TableRef table = table_for_object_type(group, target_schema.name);
         if (table) {
-            auto errors = validate_schema(group, target_schema, table.get());
+            auto errors = validate_schema(group, target_schema);
             if (errors.size()) {
                 throw ObjectStoreValidationException(errors, target_schema.name);
             }
@@ -330,7 +335,7 @@ bool ObjectStore::update_realm_with_schema(realm::Group *group,
     }
 
     // apply the migration block if provided and there's any old data
-    if (get_schema_version(group) != realm::ObjectStore::NotVersioned) {
+    if (get_schema_version(group) != ObjectStore::NotVersioned) {
         migration(group, schema);
     }
 
@@ -386,7 +391,7 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
                 try {
                     table->add_search_index(property.table_column);
                 }
-                catch (realm::LogicError const&) {
+                catch (LogicError const&) {
                     throw ObjectStoreException(ObjectStoreException::Kind::RealmPropertyTypeNotIndexable, {
                         {"object_type", object_schema.name},
                         {"property_name", property.name},
