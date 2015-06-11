@@ -66,8 +66,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
 
         if let v0Path = bundlePath("default-v0.realm") {
-            NSFileManager.defaultManager().removeItemAtPath(defaultPath, error: nil)
-            NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath, error: nil)
+            try! NSFileManager.defaultManager().removeItemAtPath(defaultPath)
+            try! NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath)
         }
 
         // define a migration block
@@ -94,14 +94,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
                 }
             }
-            println("Migration complete.")
+            print("Migration complete.")
         }
 
-        setDefaultRealmSchemaVersion(3, migrationBlock)
+        setDefaultRealmSchemaVersion(3, migrationBlock: migrationBlock)
 
         // print out all migrated objects in the default realm
         // migration is performed implicitly on Realm access
-        println("Migrated objects in the default Realm: \(Realm().objects(Person))")
+        print("Migrated objects in the default Realm: \(try! Realm().objects(Person))")
 
         //
         // Migrate a realms at a custom paths
@@ -109,22 +109,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let v1Path = bundlePath("default-v1.realm"), v2Path = bundlePath("default-v2.realm") {
             let realmv1Path = defaultParentPath.stringByAppendingPathComponent("default-v1.realm")
             let realmv2Path = defaultParentPath.stringByAppendingPathComponent("default-v2.realm")
-            setSchemaVersion(3, realmv1Path, migrationBlock)
-            setSchemaVersion(3, realmv2Path, migrationBlock)
+            setSchemaVersion(3, realmPath: realmv1Path, migrationBlock: migrationBlock)
+            setSchemaVersion(3, realmPath: realmv2Path, migrationBlock: migrationBlock)
 
-            NSFileManager.defaultManager().removeItemAtPath(realmv1Path, error: nil)
-            NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path, error: nil)
-            NSFileManager.defaultManager().removeItemAtPath(realmv2Path, error: nil)
-            NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path, error: nil)
+            try! NSFileManager.defaultManager().removeItemAtPath(realmv1Path)
+            try! NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path)
+            try! NSFileManager.defaultManager().removeItemAtPath(realmv2Path)
+            try! NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path)
 
             // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
             migrateRealm(realmv1Path)
 
             // print out all migrated objects in the migrated realms
-            let realmv1 = Realm(path: realmv1Path)
-            println("Migrated objects in the Realm migrated from v1: \(realmv1.objects(Person))")
-            let realmv2 = Realm(path: realmv2Path)
-            println("Migrated objects in the Realm migrated from v2: \(realmv2.objects(Person))")
+            let realmv1 = try! Realm(path: realmv1Path)
+            print("Migrated objects in the Realm migrated from v1: \(realmv1.objects(Person))")
+            let realmv2 = try! Realm(path: realmv2Path)
+            print("Migrated objects in the Realm migrated from v2: \(realmv2.objects(Person))")
         }
 
         return true

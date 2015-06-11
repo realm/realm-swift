@@ -41,44 +41,40 @@ class ViewController: UIViewController {
         // Use an autorelease pool to close the Realm at the end of the block, so
         // that we can try to reopen it with different keys
         autoreleasepool {
-            if let realm = Realm(path: Realm.defaultPath, readOnly: false,
-                encryptionKey: getKey(), error: nil) {
+            let realm = try! Realm(path: Realm.defaultPath, readOnly: false, encryptionKey: getKey())
 
-                // Add an object
-                realm.write {
-                    let obj = EncryptionObject()
-                    obj.stringProp = "abcd"
-                    realm.add(obj)
-                }
+            // Add an object
+            realm.write {
+                let obj = EncryptionObject()
+                obj.stringProp = "abcd"
+                realm.add(obj)
             }
         }
 
         // Opening with wrong key fails since it decrypts to the wrong thing
         autoreleasepool {
-            var error: NSError? = nil
-            Realm(path: Realm.defaultPath, readOnly: false,
-                encryptionKey: "1234567890123456789012345678901234567890123456789012345678901234".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false),
-                error: &error)
-            log("Open with wrong key: \(error)")
+            do {
+                try Realm(path: Realm.defaultPath, readOnly: false,
+                    encryptionKey: "1234567890123456789012345678901234567890123456789012345678901234".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false))
+            } catch {
+                log("Open with wrong key: \(error)")
+            }
         }
 
         // Opening wihout supplying a key at all fails
         autoreleasepool {
-            var error: NSError? = nil
-            Realm(path: Realm.defaultPath, readOnly: false, error: &error)
-            log("Open with no key: \(error)")
+            do {
+                try Realm(path: Realm.defaultPath, readOnly: false)
+            } catch {
+                log("Open with no key: \(error)")
+            }
         }
 
         // Reopening with the correct key works and can read the data
         autoreleasepool {
-            var error: NSError? = nil
-            if let realm = Realm(path: Realm.defaultPath,
-                readOnly: false,
-                encryptionKey: getKey(),
-                error: &error) {
-                if let stringProp = realm.objects(EncryptionObject).first?.stringProp {
-                    log("Saved object: \(stringProp)")
-                }
+            let realm = try! Realm(path: Realm.defaultPath, readOnly: false, encryptionKey: getKey())
+            if let stringProp = realm.objects(EncryptionObject).first?.stringProp {
+                log("Saved object: \(stringProp)")
             }
         }
     }
@@ -111,6 +107,7 @@ class ViewController: UIViewController {
         // No pre-existing key from this application, so generate a new one
         let keyData = NSMutableData(length: 64)!
         let result = SecRandomCopyBytes(kSecRandomDefault, 64, UnsafeMutablePointer<UInt8>(keyData.mutableBytes))
+        assert(result == 0, "Failed to get random bytes")
 
         // Store the key in the keychain
         query = [
