@@ -468,7 +468,11 @@ class RealmTests: TestCase {
             realm.add(SwiftObject())
         }
         let path = Realm.defaultPath.stringByDeletingLastPathComponent.stringByAppendingPathComponent("copy.realm")
-        XCTAssertNil(realm.writeCopyToPath(path))
+        do {
+            try realm.writeCopyToPath(path)
+        } catch {
+            XCTFail("writeCopyToPath failed")
+        }
         autoreleasepool {
             let copy = try! Realm(path: path)
             XCTAssertEqual(1, copy.objects(SwiftObject).count)
