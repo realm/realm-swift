@@ -16,6 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
   enabled.
 * Fix a memory leak when constructing standalone Swift objects with NSDate
   properties.
+* Throw an exception rather than asserting when an invalidated object is added
+  to an RLMArray.
 
 0.93.1 Release notes (2015-05-29)
 =============================================================
