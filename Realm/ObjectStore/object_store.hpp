@@ -71,6 +71,9 @@ namespace realm {
         // check if indexes are up to date - if false you need to call update_realm_with_schema
         static bool indexes_are_up_to_date(Group *group, Schema &schema);
 
+        // deletes the table for the given type
+        static void delete_data_for_object(Group *group, const StringData &object_type);
+
     private:
         // set a new schema version
         static void set_schema_version(Group *group, uint64_t version);
@@ -84,7 +87,7 @@ namespace realm {
         static bool create_metadata_tables(Group *group);
 
         // set references to tables on targetSchema and create/update any missing or out-of-date tables
-        // if update existing is true, updates existing tables, otherwise validates existing tables
+        // if update existing is true, updates existing tables, otherwise only adds and initializes new tables
         static bool create_tables(realm::Group *group, ObjectStore::Schema &target_schema, bool update_existing);
 
         // get primary key property name for object type

@@ -141,7 +141,7 @@
         table->clear();
     }
     else {
-        _realm.group->remove_table(table->get_index_in_group());
+        realm::ObjectStore::delete_data_for_object(_realm.group, name.UTF8String);
     }
 
     return true;

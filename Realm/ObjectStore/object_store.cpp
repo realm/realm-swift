@@ -24,7 +24,6 @@
 #include <realm/table_view.hpp>
 #include <realm/util/assert.hpp>
 
-#include <set>
 #include <string.h>
 
 using namespace realm;
@@ -209,7 +208,6 @@ bool ObjectStore::create_tables(Group *group, ObjectStore::Schema &target_schema
 
     // first pass to create missing tables
     vector<ObjectSchema *> to_update;
-    set<string> target_type_names;
     for (auto& object_schema : target_schema) {
         bool created = false;
         ObjectStore::table_for_object_type_create_if_needed(group, object_schema.name, created);
@@ -219,9 +217,6 @@ bool ObjectStore::create_tables(Group *group, ObjectStore::Schema &target_schema
             to_update.push_back(&object_schema);
             changed = true;
         }
-
-        // keep track of names to figure out what tables need deletion
-        target_type_names.insert(object_schema.name);
     }
 
     // second pass adds/removes columns for out of date tables
@@ -278,19 +273,6 @@ bool ObjectStore::create_tables(Group *group, ObjectStore::Schema &target_schema
             changed = true;
         }
     }
-
-    // remove primary key entries for deleted types
-    // FIXME - delete actual tables once we have proper testing
-    ObjectStore::Schema schema;
-    for (int i = (int)group->size() - 1; i >= 0 ; i--) {
-        string object_type = object_type_for_table_name(group->get_table_name(i));
-        if (object_type.length()) {
-            if (target_type_names.find(object_type) == target_type_names.end()) {
-                set_primary_key_for_object(group, object_type, "");
-            }
-        }
-    }
-
     return changed;
 }
 
@@ -421,3 +403,12 @@ void ObjectStore::validate_primary_column_uniqueness(Group *group, Schema &schem
         }
     }
 }
+
+void ObjectStore::delete_data_for_object(Group *group, const StringData &object_type) {
+    TableRef table = table_for_object_type(group, object_type);
+    if (table) {
+        group->remove_table(table->get_index_in_group());
+        set_primary_key_for_object(group, object_type, "");
+    }
+}
+
