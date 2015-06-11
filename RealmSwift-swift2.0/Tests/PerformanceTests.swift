@@ -86,7 +86,7 @@ class SwiftPerformanceTests: TestCase {
 
     private func copyRealmToTestPath(realm: Realm) -> Realm {
         try! NSFileManager.defaultManager().removeItemAtPath(testRealmPath())
-        realm.writeCopyToPath(testRealmPath())
+        try! realm.writeCopyToPath(testRealmPath())
         return realmWithTestPath()
     }
 
