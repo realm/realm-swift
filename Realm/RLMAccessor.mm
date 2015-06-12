@@ -46,24 +46,6 @@ typedef NS_ENUM(char, RLMAccessorCode) {
     RLMAccessorCodeAny,
 };
 
-// verify attached
-static inline void RLMVerifyAttached(__unsafe_unretained RLMObjectBase *const obj) {
-    if (!obj->_row.is_attached()) {
-        @throw RLMException(@"Object has been deleted or invalidated.");
-    }
-    RLMCheckThread(obj->_realm);
-}
-
-// verify writable
-static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMObjectBase *const obj) {
-    // first verify is attached
-    RLMVerifyAttached(obj);
-
-    if (!obj->_realm->_inWriteTransaction) {
-        @throw RLMException(@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
-    }
-}
-
 // long getter/setter
 static inline long long RLMGetLong(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex) {
     RLMVerifyAttached(obj);

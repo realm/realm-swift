@@ -18,6 +18,8 @@
 
 #import "RLMObject_Private.h"
 
+#import "RLMRealm_Private.hpp"
+
 #import <realm/link_view.hpp> // required by row.hpp
 #import <realm/row.hpp>
 
@@ -30,3 +32,22 @@
 + (BOOL)shouldPersistToRealm;
 
 @end
+
+// throw an exception if the object is invalidated or on the wrong thread
+static inline void RLMVerifyAttached(__unsafe_unretained RLMObjectBase *const obj) {
+    if (!obj->_row.is_attached()) {
+        @throw RLMException(@"Object has been deleted or invalidated.");
+    }
+    RLMCheckThread(obj->_realm);
+}
+
+// throw an exception if the object can't be modified for any reason
+static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMObjectBase *const obj) {
+    // first verify is attached
+    RLMVerifyAttached(obj);
+
+    if (!obj->_realm->_inWriteTransaction) {
+        @throw RLMException(@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
+    }
+}
+

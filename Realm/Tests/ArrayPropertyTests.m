@@ -144,6 +144,21 @@
     XCTAssertEqualObjects([children[0] stringCol], @"b", @"Only child should be 'b'");
 }
 
+- (void)testAddInvalidated {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    CompanyObject *company = [CompanyObject createInDefaultRealmWithValue:@[@"company", @[]]];
+
+    EmployeeObject *person = [[EmployeeObject alloc] init];
+    person.name = @"Mary";
+    [realm addObject:person];
+    [realm deleteObjects:[EmployeeObject allObjects]];
+
+    XCTAssertThrowsSpecificNamed([company.employees addObject:person], NSException, @"RLMException");
+    XCTAssertThrowsSpecificNamed([company.employees insertObject:person atIndex:0], NSException, @"RLMException");
+}
+
 -(void)testStandalone {
     RLMRealm *realm = [self realmWithTestPath];
 

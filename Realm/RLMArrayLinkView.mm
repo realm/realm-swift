@@ -137,27 +137,33 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
     return RLMCreateObjectAccessor(_realm, _objectSchema, _backingLinkView->get(index).get_index());
 }
 
-- (void)addObject:(RLMObject *)object {
-    RLMLinkViewArrayValidateInWriteTransaction(self);
-    RLMValidateObjectClass(object, self.objectClassName);
+static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger index) {
+    RLMLinkViewArrayValidateInWriteTransaction(ar);
+    RLMValidateObjectClass(object, ar.objectClassName);
 
-    if (object->_realm != self.realm) {
-        [self.realm addObject:object];
+    if (index == NSUIntegerMax) {
+        index = ar->_backingLinkView->size();
     }
-    _backingLinkView->add(object->_row.get_index());
+    else if (index > ar->_backingLinkView->size()) {
+        @throw RLMException(@"Trying to insert object at invalid index");
+    }
+
+    if (object->_realm != ar.realm) {
+        [ar.realm addObject:object];
+    }
+    else if (object->_realm) {
+        RLMVerifyAttached(object);
+    }
+
+    ar->_backingLinkView->insert(index, object->_row.get_index());
+}
+
+- (void)addObject:(RLMObject *)object {
+    RLMInsertObject(self, object, NSUIntegerMax);
 }
 
 - (void)insertObject:(RLMObject *)object atIndex:(NSUInteger)index {
-    RLMLinkViewArrayValidateInWriteTransaction(self);
-    RLMValidateObjectClass(object, self.objectClassName);
-
-    if (index > _backingLinkView->size()) {
-        @throw RLMException(@"Trying to insert object at invalid index");
-    }
-    if (object->_realm != self.realm) {
-        [self.realm addObject:object];
-    }
-    _backingLinkView->insert(index, object->_row.get_index());
+    RLMInsertObject(self, object, index);
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
