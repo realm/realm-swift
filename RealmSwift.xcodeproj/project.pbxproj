@@ -372,6 +372,9 @@
 					026B0EFB1A780414005E26C8 = {
 						CreatedOnToolsVersion = 6.1;
 					};
+					02B822551A532100007F28A5 = {
+						TestTargetID = C0E04FAA1AB2366200DCC8C0;
+					};
 					C0E04FAA1AB2366200DCC8C0 = {
 						CreatedOnToolsVersion = 6.2;
 					};
@@ -544,6 +547,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DA0C4D21B16973B0077F097 /* Tests.xcconfig */;
 			buildSettings = {
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestHost";
 			};
 			name = Debug;
 		};
@@ -551,6 +555,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DA0C4D21B16973B0077F097 /* Tests.xcconfig */;
 			buildSettings = {
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestHost";
 			};
 			name = Release;
 		};
