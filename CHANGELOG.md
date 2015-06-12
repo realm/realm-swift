@@ -1,13 +1,5 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.93.2 Release notes (2015-06-12)
 =============================================================
-
-### API breaking changes
-
-* None.
-
-### Enhancements
-
-* None.
 
 ### Bugfixes
 
