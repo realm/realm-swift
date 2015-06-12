@@ -50,3 +50,4 @@ static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMObjectBase
         @throw RLMException(@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
 }
+
