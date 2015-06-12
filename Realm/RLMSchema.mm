@@ -82,8 +82,9 @@ static NSMutableDictionary *s_localNameToClass;
     NSMutableArray *schemaArray = [NSMutableArray array];
     RLMSchema *schema = [[RLMSchema alloc] init];
 
-    unsigned int numClasses;
-    Class *classes = objc_copyClassList(&numClasses);
+    unsigned int numClasses = objc_getClassList(nullptr, 0);
+    Class *classes = static_cast<Class*>(malloc(sizeof(Class) * numClasses));
+    numClasses = objc_getClassList(classes, numClasses);
 
     // first create class to name mapping so we can do array validation
     // when creating object schema
