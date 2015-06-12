@@ -18,6 +18,9 @@ x.x.x Release notes (yyyy-MM-dd)
   properties.
 * Throw an exception rather than asserting when an invalidated object is added
   to an RLMArray.
+* Fix a case where data loss would occur if a device was hard-powered-off
+  shortly after a write transaction was committed which had to expand the Realm
+  file.
 
 0.93.1 Release notes (2015-05-29)
 =============================================================
