@@ -1103,7 +1103,18 @@ public:
     }
 }
 
-// linkview and table selection ordering
+- (void)testInvalidateRealm {
+    KVOObject *obj = [self createObject];
+    [self.realm commitWriteTransaction];
+
+    KVORecorder r1(self, obj, RLMInvalidatedKey);
+    KVORecorder r2(self, obj, @"arrayCol.invalidated");
+    [self.realm invalidate];
+    [self.realm beginWriteTransaction];
+
+    AssertChanged(r1, @NO, @YES);
+    AssertChanged(r2, @NO, @YES);
+}
 @end
 
 // Observing an object from a different RLMRealm instance backed by the same
