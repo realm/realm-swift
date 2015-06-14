@@ -733,7 +733,7 @@ public:
 @implementation KVOPersistedObjectTests
 - (void)setUp {
     [super setUp];
-    _realm = RLMRealm.defaultRealm;
+    _realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
     [_realm beginWriteTransaction];
 }
 
@@ -745,7 +745,7 @@ public:
 
 - (id)createObject {
     static std::atomic<int> pk{0};
-    return [KVOObject createInDefaultRealmWithValue:@[@(++pk),
+    return [KVOObject createInRealm:_realm withValue:@[@(++pk),
                                                        @NO, @1, @2, @3, @0, @0, @NO, @"",
                                                        NSData.data, [NSDate dateWithTimeIntervalSinceReferenceDate:0],
                                                        NSNull.null, NSNull.null]];
@@ -753,7 +753,7 @@ public:
 
 - (id)createLinkObject {
     static std::atomic<int> pk{0};
-    return [KVOLinkObject2 createInDefaultRealmWithValue:@[@(++pk), @[@(++pk), [self createObject], @[]], @[]]];
+    return [KVOLinkObject2 createInRealm:_realm withValue:@[@(++pk), @[@(++pk), [self createObject], @[]], @[]]];
 }
 
 - (void)testDeleteObservedObject {
@@ -1130,7 +1130,7 @@ public:
     // same thread
     self.secondaryRealm = [[RLMRealm alloc] initWithPath:self.realm.path
                                                      key:nil readOnly:NO
-                                                inMemory:NO dynamic:NO error:nil];
+                                                inMemory:YES dynamic:NO error:nil];
     RLMRealmSetSchema(self.secondaryRealm, [self.realm.schema shallowCopy], false);
 }
 
