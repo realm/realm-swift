@@ -1185,7 +1185,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     // Used for read-write realms
     NSHashTable *_notificationHandlers;
 
-    std::unique_ptr<Replication> _replication;
+    std::unique_ptr<ClientHistory> _history;
     std::unique_ptr<SharedGroup> _sharedGroup;
 
     // Used for read-only realms
@@ -1243,11 +1243,17 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
                 // inconsistent with the accessed Realm file. This exception
                 // probably has to be transmuted to an NSError.
                 bool server_synchronization_mode = bool(serverBaseURL);
-                _replication = realm::makeWriteLogCollector(path.UTF8String, server_synchronization_mode,
-                                                            static_cast<const char *>(key.bytes));
+                if (server_synchronization_mode) {
+                    _history = realm::make_client_sync_history(path.UTF8String,
+                                                               static_cast<const char *>(key.bytes)); // Throws
+                }
+                else {
+                    _history = realm::make_client_history(path.UTF8String,
+                                                          static_cast<const char *>(key.bytes)); // Throws
+                }
                 SharedGroup::DurabilityLevel durability = inMemory ? SharedGroup::durability_MemOnly :
                                                                      SharedGroup::durability_Full;
-                _sharedGroup = make_unique<SharedGroup>(*_replication, durability,
+                _sharedGroup = make_unique<SharedGroup>(*_history, durability,
                                                         static_cast<const char *>(key.bytes));
             }
         }
@@ -1619,7 +1625,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             // begin the read transaction if needed
             [self getOrCreateGroup];
 
-            LangBindHelper::promote_to_write(*_sharedGroup);
+            LangBindHelper::promote_to_write(*_sharedGroup, *_history);
 
             // update state and make all objects in this realm writable
             _inWriteTransaction = YES;
@@ -1684,7 +1690,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
     if (self.inWriteTransaction) {
         try {
-            LangBindHelper::rollback_and_continue_as_read(*_sharedGroup);
+            LangBindHelper::rollback_and_continue_as_read(*_sharedGroup, *_history);
             _inWriteTransaction = NO;
         }
         catch (std::exception& ex) {
@@ -1775,7 +1781,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         if (_sharedGroup->has_changed()) { // Throws
             if (_autorefresh) {
                 if (_group) {
-                    LangBindHelper::advance_read(*_sharedGroup);
+                    LangBindHelper::advance_read(*_sharedGroup, *_history);
                 }
                 [self sendNotifications:RLMRealmDidChangeNotification];
             }
@@ -1802,7 +1808,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         // advance transaction if database has changed
         if (_sharedGroup->has_changed()) { // Throws
             if (_group) {
-                LangBindHelper::advance_read(*_sharedGroup);
+                LangBindHelper::advance_read(*_sharedGroup, *_history);
             }
             else {
                 // Create the read transaction
