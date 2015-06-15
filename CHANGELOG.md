@@ -1,3 +1,18 @@
+x.xx.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Reduce the amount of memory used by RLMRealm notification listener threads.
+
+### Bugfixes
+
+* None.
+
 0.93.2 Release notes (2015-06-12)
 =============================================================
 

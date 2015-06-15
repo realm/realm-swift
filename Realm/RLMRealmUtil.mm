@@ -209,13 +209,16 @@ public:
         _shutdownReadFd = pipeFd[0];
         _shutdownWriteFd = pipeFd[1];
 
-        [NSThread detachNewThreadSelector:@selector(listen) toTarget:self withObject:nil];
+        NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(listen) object:nil];
+        // Use the minimum allowed stack size, as we need very little in our listener
+        thread.stackSize = 16 * 1024;
+        thread.name = @"RLMRealm notification listener";
+        [thread start];
     }
     return self;
 }
 
 - (void)listen {
-    [NSThread currentThread].name = @"RLMRealm notification listener";
 
     // Create the runloop source
     CFRunLoopSourceContext ctx{};
