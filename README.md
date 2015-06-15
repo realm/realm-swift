@@ -49,6 +49,35 @@ Run `sh build.sh help` to see all the actions you can perform (build ios/osx, ge
 
 Executing the examples under the `examples/` folder, requires that you have built the `Realm.framework`.
 
+
+## Branches
+
+Here is an overview of long-running branches, we use in development, which you can use when you want to use Apple's
+latest beta tool releases.
+
+_:warning: Feedback is very welcome for non-released version, but please aware that we can't provide support in the same
+extent as we do for the official released version._
+
+| Branch      | Xcode Version | Swift Version | Associated PR for reference
+| ------------|---------------|---------------|-
+| `master`    | 6.3.2         | Swift 1.2 (swiftlang-602.0.53.1 clang-602.0.53) | -
+| `swift-2.0` | 7.0.0-beta1   | Swift 2.0 (swiftlang-700.0.38.1 clang-700.0.53) | #2069
+
+If you want to use non-released version of Realm e.g. from the `swift-2.0` branch,
+you can still use your preferred dependency manager. We don't provide prebuilt binaries.
+
+### CocoaPods
+
+```ruby
+pod 'RealmSwift', :git => 'https://github.com/realm/realm-cocoa.git', :branch => 'swift-2.0'
+```
+
+### Carthage
+
+```Cartfile
+github "realm/realm-cocoa" "swift-2.0"
+```
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for more details!
