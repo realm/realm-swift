@@ -205,12 +205,20 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 @end
 
+@interface LinkToPrimaryEmployeeObject : RLMObject
+@property PrimaryEmployeeObject *wrapped;
+@end
+
+@implementation LinkToPrimaryEmployeeObject
+@end
+
 RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
 @interface PrimaryCompanyObject : RLMObject
 @property NSString *name;
 @property RLMArray<PrimaryEmployeeObject> *employees;
 @property PrimaryEmployeeObject *intern;
+@property LinkToPrimaryEmployeeObject *wrappedIntern;
 @end
 
 @implementation PrimaryCompanyObject
@@ -903,7 +911,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
     [realm beginWriteTransaction];
     PrimaryEmployeeObject *eo = [PrimaryEmployeeObject createInRealm:realm withValue:@[@"Samuel", @19, @NO]];
-    PrimaryCompanyObject *co = [PrimaryCompanyObject createInRealm:realm withValue:@[@"Realm", @[eo], eo]];
+    PrimaryCompanyObject *co = [PrimaryCompanyObject createInRealm:realm withValue:@[@"Realm", @[eo], eo, @[eo]]];
     [realm commitWriteTransaction];
 
     [realm beginWriteTransaction];
@@ -932,6 +940,12 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertEqualObjects(@"Samuel", eo.name);
     XCTAssertEqual(NO, eo.hired);
     XCTAssertEqual(20, eo.age);
+
+    [realm beginWriteTransaction];
+    [PrimaryCompanyObject createOrUpdateInRealm:realm withValue:@{@"name" : @"Realm",
+                                                                  @"wrappedIntern" : @[eo]}];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(1U, [[PrimaryEmployeeObject allObjectsInRealm:realm] count]);
 }
 
 - (void)testCreateInRealmCopiesFromOtherRealm {

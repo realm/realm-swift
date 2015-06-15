@@ -144,6 +144,21 @@
     XCTAssertEqualObjects([children[0] stringCol], @"b", @"Only child should be 'b'");
 }
 
+- (void)testAddInvalidated {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    CompanyObject *company = [CompanyObject createInDefaultRealmWithValue:@[@"company", @[]]];
+
+    EmployeeObject *person = [[EmployeeObject alloc] init];
+    person.name = @"Mary";
+    [realm addObject:person];
+    [realm deleteObjects:[EmployeeObject allObjects]];
+
+    XCTAssertThrowsSpecificNamed([company.employees addObject:person], NSException, @"RLMException");
+    XCTAssertThrowsSpecificNamed([company.employees insertObject:person atIndex:0], NSException, @"RLMException");
+}
+
 -(void)testStandalone {
     RLMRealm *realm = [self realmWithTestPath];
 
@@ -198,9 +213,10 @@
     XCTAssertThrows(([intArray.intArray objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on standalone RLMArray");
     XCTAssertThrows([intArray.intArray sortedResultsUsingProperty:@"intCol" ascending:YES], @"Should throw on standalone RLMArray");
 
-    XCTAssertThrows([intArray.intArray indexOfObjectWhere:@"intCol == 1"], @"Not yet implemented");
-    XCTAssertThrows(([intArray.intArray indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Not yet implemented");
+    XCTAssertEqual(0U, [intArray.intArray indexOfObjectWhere:@"intCol == 1"]);
+    XCTAssertEqual(0U, ([intArray.intArray indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]));
 
+    XCTAssertEqual([intArray.intArray indexOfObject:intObj], 0U, @"Should be first element");
     XCTAssertEqual([intArray.intArray indexOfObject:intObj], 0U, @"Should be first element");
 
     // test standalone with literals
@@ -347,6 +363,35 @@
 
     // invalid object
     XCTAssertThrows([company.employees indexOfObject:company]);
+}
+
+- (void)testIndexOfObjectWhere
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+
+    // create company
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+    [company.employees addObjects:@[po3, po1]];
+
+    // test standalone
+    XCTAssertEqual(0U, [company.employees indexOfObjectWhere:@"name = 'Jill'"]);
+    XCTAssertEqual(1U, [company.employees indexOfObjectWhere:@"name = 'Joe'"]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObjectWhere:@"name = 'John'"]);
+
+    // add to realm
+    [realm addObject:company];
+    [realm commitWriteTransaction];
+
+    // test LinkView RLMArray
+    XCTAssertEqual(0U, [company.employees indexOfObjectWhere:@"name = 'Jill'"]);
+    XCTAssertEqual(1U, [company.employees indexOfObjectWhere:@"name = 'Joe'"]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObjectWhere:@"name = 'John'"]);
 }
 
 - (void)testFastEnumeration

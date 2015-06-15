@@ -1,0 +1,9 @@
+SUPPORTED_PLATFORMS = iphonesimulator iphoneos;
+
+OTHER_LDFLAGS[sdk=iphone*] = -framework UIKit;
+COPY_PHASE_STRIP = NO;
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks;
+INFOPLIST_FILE = Realm/Tests/TestHost/Info.plist;
+PRODUCT_NAME = $(TARGET_NAME);
+CLANG_MODULES_AUTOLINK = NO;
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;

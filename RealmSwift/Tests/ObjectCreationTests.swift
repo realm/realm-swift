@@ -116,6 +116,15 @@ class ObjectCreationTests: TestCase {
         verifySwiftObjectWithDictionaryLiteral(objectWithKVCObject, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
     }
 
+    func testGenericInit() {
+        func createObject<T: Object>() -> T {
+            return T()
+        }
+        let obj1: SwiftBoolObject = createObject()
+        let obj2 = SwiftBoolObject()
+        XCTAssertEqual(obj1.boolCol, obj2.boolCol, "object created via generic initializer should equal object created by calling initializer directly")
+    }
+
     // MARK: Creation tests
 
     func testCreateWithDefaults() {
@@ -237,18 +246,24 @@ class ObjectCreationTests: TestCase {
     }
 
     func testCreateWithNestedObjects() {
-        let standalone = SwiftPrimaryStringObject(value: ["primary", 11])
+        let standalone = SwiftPrimaryStringObject(value: ["p0", 11])
+
         Realm().beginWrite()
-        let objectWithNestedObjects = Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["primary", ["primary", 11], [standalone]])
+        let objectWithNestedObjects = Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p1", ["p1", 11], [standalone]])
         Realm().commitWrite()
 
         let stringObjects = Realm().objects(SwiftPrimaryStringObject)
-        XCTAssertEqual(stringObjects.count, 1)
+        XCTAssertEqual(stringObjects.count, 2)
         let persistedObject = stringObjects.first!
 
         XCTAssertNotEqual(standalone, persistedObject) // standalone object should be copied into the realm, not added directly
         XCTAssertEqual(objectWithNestedObjects.object!, persistedObject)
-        XCTAssertEqual(objectWithNestedObjects.objects.first!, persistedObject)
+        XCTAssertEqual(objectWithNestedObjects.objects.first!, stringObjects.last!)
+
+        let standalone1 = SwiftPrimaryStringObject(value: ["p3", 11])
+        Realm().beginWrite()
+        assertThrows(Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p3", ["p3", 11], [standalone1]]), "Should throw with duplicate primary key")
+        Realm().commitWrite()
     }
 
     func testUpdateWithNestedObjects() {

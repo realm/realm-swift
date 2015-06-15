@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-#if !DEBUG
+#if !DEBUG && os(iOS)
 
 private func createStringObjects(factor: Int) -> Realm {
     let realm = Realm(inMemoryIdentifier: factor.description)
@@ -36,7 +36,16 @@ private var smallRealm: Realm!
 private var mediumRealm: Realm!
 private var largeRealm: Realm!
 
+private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
+
 class SwiftPerformanceTests: TestCase {
+    override class func defaultTestSuite() -> XCTestSuite? {
+        if (isRunningOnDevice) {
+            return super.defaultTestSuite()
+        }
+        return nil
+    }
+
     override class func setUp() {
         super.setUp()
         autoreleasepool {
@@ -128,17 +137,21 @@ class SwiftPerformanceTests: TestCase {
     func testCountWhereQuery() {
         let realm = copyRealmToTestPath(largeRealm)
         measureBlock {
-            let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
-            _ = results.count
+            for i in 0..<50 {
+                let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
+                _ = results.count
+            }
         }
     }
 
     func testCountWhereTableView() {
-        let realm = copyRealmToTestPath(largeRealm)
+        let realm = copyRealmToTestPath(mediumRealm)
         measureBlock {
-            let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
-            _ = results.first
-            _ = results.count
+            for i in 0..<50 {
+                let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
+                _ = results.first
+                _ = results.count
+            }
         }
     }
 
@@ -224,7 +237,7 @@ class SwiftPerformanceTests: TestCase {
         let predicate = NSPredicate(format: "boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and doubleCol != 7.0 and stringCol IN {'a', 'b', 'c'}")
 
         measureBlock {
-            for _ in 0..<100 {
+            for _ in 0..<500 {
                 _ = realm.objects(SwiftObject).filter(predicate)
             }
         }
@@ -232,7 +245,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testDeleteAll() {
         inMeasureBlock {
-            let realm = self.copyRealmToTestPath(mediumRealm)
+            let realm = self.copyRealmToTestPath(largeRealm)
             self.startMeasuring()
             realm.write {
                 realm.delete(realm.objects(SwiftStringObject))
@@ -296,7 +309,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = realmWithTestPath()
         realm.beginWrite()
         var ids = [Int]()
-        for i in 0..<2000 {
+        for i in 0..<3000 {
             realm.create(SwiftIntObject.self, value: [i])
             if i % 2 != 0 {
                 ids.append(i)
@@ -311,7 +324,7 @@ class SwiftPerformanceTests: TestCase {
     func testSortingAllObjects() {
         let realm = realmWithTestPath()
         realm.write {
-            for _ in 0..<2000 {
+            for _ in 0..<3000 {
                 let randomNumber = Int(arc4random_uniform(UInt32(INT_MAX)))
                 realm.create(SwiftIntObject.self, value: [randomNumber])
             }

@@ -14,7 +14,7 @@ set -o pipefail
 set -e
 
 # You can override the version of the core library
-: ${REALM_CORE_VERSION:=0.89.3} # set to "current" to always use the current build
+: ${REALM_CORE_VERSION:=0.89.6} # set to "current" to always use the current build
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
@@ -139,9 +139,9 @@ build_combined() {
 }
 
 clean_retrieve() {
-  mkdir -p $2
-  rm -rf $2/$3
-  cp -R $1 $2
+  mkdir -p "$2"
+  rm -rf "$2/$3"
+  cp -R "$1" "$2"
 }
 
 ######################################
@@ -166,10 +166,11 @@ test_ios_devices() {
         exit 1
     fi
     cmd="$1"
-    configuration="$2"
+    scheme="$2"
+    configuration="$3"
     failed=0
     for device in "${serial_numbers[@]}"; do
-        $cmd "-scheme 'iOS Device Tests' -configuration $configuration -destination 'id=$device' test" || failed=1
+        $cmd "-scheme '$2' -configuration $configuration -destination 'id=$device' test" || failed=1
     done
     return $failed
 }
@@ -279,14 +280,15 @@ case "$COMMAND" in
         ;;
 
     "ios-dynamic")
-        build_combined "iOS Dynamic" Realm "-dynamic" "LD_DYLIB_INSTALL_NAME='@rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm'"
+        build_combined "iOS Dynamic" Realm "-dynamic"
         exit 0
         ;;
 
     "ios-swift")
-        build_combined "RealmSwift iOS" RealmSwift
+        build_combined RealmSwift RealmSwift
         mkdir build/ios/swift
         cp -R build/ios/RealmSwift.framework build/ios/swift
+        cp -R build/ios-dynamic/Realm.framework build/ios/swift
         exit 0
         ;;
 
@@ -299,9 +301,7 @@ case "$COMMAND" in
         ;;
 
     "osx-swift")
-        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION build"
-        rm -rf build/osx
-        mkdir build/osx
+        xcrealmswift "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
         cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework build/osx
         exit 0
         ;;
@@ -342,25 +342,29 @@ case "$COMMAND" in
         ;;
 
     "test-ios-swift")
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
         ;;
 
     "test-ios-devices")
         failed=0
-        test_ios_devices xcrealm "$CONFIGURATION" || failed=1
-        test_ios_devices xcrealmswift "$CONFIGURATION" || failed=1
+        test_ios_devices xcrealm "iOS Device Tests" "$CONFIGURATION" || failed=1
+        test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION" || failed=1
         exit $failed
         ;;
 
     "test-osx")
-        xcrealm "-scheme OSX -configuration $CONFIGURATION test GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
+        COVERAGE_PARAMS=""
+        if [[ "$CONFIGURATION" == "Debug" ]]; then
+            COVERAGE_PARAMS="GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
+        fi
+        xcrealm "-scheme OSX -configuration $CONFIGURATION test $COVERAGE_PARAMS"
         exit 0
         ;;
 
     "test-osx-swift")
-        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION test"
+        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION test"
         exit 0
         ;;
 
@@ -554,7 +558,7 @@ case "$COMMAND" in
     "package-examples")
         cd tightdb_objc
         ./scripts/package_examples.rb
-        zip --symlinks -r realm-examples.zip examples
+        zip --symlinks -r realm-examples.zip examples -x "examples/installation/*"
         ;;
 
     "package-test-examples")
@@ -607,7 +611,7 @@ case "$COMMAND" in
         sh build.sh ios-swift
 
         cd build/ios/swift
-        zip --symlinks -r realm-swift-framework-ios.zip RealmSwift.framework
+        zip --symlinks -r realm-swift-framework-ios.zip RealmSwift.framework Realm.framework
         ;;
 
     "package-osx-swift")
@@ -615,7 +619,7 @@ case "$COMMAND" in
         sh build.sh osx-swift
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip RealmSwift.framework
+        zip --symlinks -r realm-swift-framework-osx.zip RealmSwift.framework Realm.framework
         ;;
 
     "package-release")
@@ -759,6 +763,37 @@ EOF
         echo 'Testing packaged examples'
         sh tightdb_objc/build.sh package-test-examples
 
+        ;;
+
+    "github-release")
+        if [ -z "${GITHUB_ACCESS_TOKEN}" ]; then
+            echo 'GITHUB_ACCESS_TOKEN must be set to create GitHub releases'
+            exit 1
+        fi
+        ./scripts/github_release.rb
+        ;;
+
+    "add-empty-changelog")
+        empty_section=$(cat <<EOS
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+EOS)
+        changelog=$(cat CHANGELOG.md)
+        echo "$empty_section" > CHANGELOG.md
+        echo >> CHANGELOG.md
+        echo "$changelog" >> CHANGELOG.md
         ;;
 
     *)

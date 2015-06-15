@@ -48,7 +48,7 @@
     // define a migration block
     // you can define this inline, but we will reuse this to migrate realm files from multiple versions
     // to the most current version of our data model
-    RLMMigrationBlock migrationBlock = ^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    RLMMigrationBlock migrationBlock = ^(RLMMigration *migration, uint64_t oldSchemaVersion) {
         if (oldSchemaVersion < 1) {
             [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
                 if (oldSchemaVersion < 1) {

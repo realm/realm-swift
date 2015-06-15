@@ -1,4 +1,55 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.93.2 Release notes (2015-06-12)
+=============================================================
+
+### Bugfixes
+
+* Fixed an issue where the packaged OS X Realm.framework was built with
+  `GCC_GENERATE_TEST_COVERAGE_FILES` and `GCC_INSTRUMENT_PROGRAM_FLOW_ARCS`
+  enabled.
+* Fix a memory leak when constructing standalone Swift objects with NSDate
+  properties.
+* Throw an exception rather than asserting when an invalidated object is added
+  to an RLMArray.
+* Fix a case where data loss would occur if a device was hard-powered-off
+  shortly after a write transaction was committed which had to expand the Realm
+  file.
+
+0.93.1 Release notes (2015-05-29)
+=============================================================
+
+### Bugfixes
+
+* Objects are no longer copied into standalone objects during object creation. This fixes an issue where
+  nested objects with a primary key are sometimes duplicated rather than updated.
+* Comparison predicates with a constant on the left of the operator and key path on the right now give
+  correct results. An exception is now thrown for predicates that do not yet support this ordering.
+* Fix some crashes in `index_string.cpp` with int primary keys or indexed int properties.
+
+0.93.0 Release notes (2015-05-27)
+=============================================================
+
+### API breaking changes
+
+* Schema versions are now represented as `uint64_t` (Objective-C) and `UInt64` (Swift) so that they have
+  the same representation on all architectures.
+
+### Enhancements
+
+* Swift: `Results` now conforms to `CVarArgType` so it can
+  now be passed as an argument to `Results.filter(_:...)`
+  and `List.filter(_:...)`.
+* Swift: Made `SortDescriptor` conform to the `Equatable` and
+  `StringLiteralConvertible` protocols.
+* Int primary keys are once again automatically indexed.
+* Improve error reporting when attempting to mark a property of a type that
+  cannot be indexed as indexed.
+
+### Bugfixes
+
+* Swift: `RealmSwift.framework` no longer embeds `Realm.framework`,
+  which now allows apps using it to pass iTunes Connect validation.
+
+0.92.4 Release notes (2015-05-22)
 =============================================================
 
 ### API breaking changes
@@ -7,7 +58,12 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Swift: Made `Object.init()` a required initializer.
+* `RLMObject`, `RLMResults`, `Object` and `Results` can now be safely
+  deallocated (but still not used) from any thread.
+* Improve performance of `-[RLMArray indexOfObjectWhere:]` and `-[RLMArray
+  indexOfObjectWithPredicate:]`, and implement them for standalone RLMArrays.
+* Improved performance of most simple queries.
 
 ### Bugfixes
 
@@ -985,27 +1041,6 @@ The Objective-C API has been updated and your code will break!
 * Adding appendRow to TightdbTable.
 * Adding object subscripting.
 * Adding method removeColumn on table.
-
-### Bugfixes
-
-* None.
-
-
-
-*Template follows:*
-
-x.x.x Release notes (yyyy-MM-dd)
-=============================================================
-
-?? summary
-
-### API breaking changes
-
-* None.
-
-### Enhancements
-
-* None.
 
 ### Bugfixes
 

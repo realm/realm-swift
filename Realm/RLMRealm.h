@@ -188,7 +188,7 @@
 /**
  Returns the location of the default Realm as a string.
 
- `~/Application Support/{bundle ID}/default.realm` on OS X.
+ `~/Library/Application Support/{bundle ID}/default.realm` on OS X.
 
  `default.realm` in your application's documents directory on iOS.
 
@@ -495,7 +495,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @return    Schema version number for the `RLMRealm` after completing the
             migration. Must be greater than `oldSchemaVersion`.
  */
-typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
+typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVersion);
 
 /**
  Specify a schema version and an associated migration block which is applied when
@@ -527,7 +527,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 
  @see               RLMMigration
  */
-+ (void)setDefaultRealmSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block;
++ (void)setDefaultRealmSchemaVersion:(uint64_t)version withMigrationBlock:(RLMMigrationBlock)block;
 
 /**
  Specify a schema version and an associated migration block which is applied when
@@ -540,7 +540,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 
  @see               RLMMigration
  */
-+ (void)setSchemaVersion:(NSUInteger)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block;
++ (void)setSchemaVersion:(uint64_t)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block;
 
 /**
  Get the schema version for a Realm at a given path.
@@ -552,7 +552,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 
  @return            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
  */
-+ (NSUInteger)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error;
++ (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error;
 
 /**
  Get the schema version for an encrypted Realm at a given path.
@@ -565,7 +565,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 
  @return            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
  */
-+ (NSUInteger)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)error;
++ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)error;
 
 /**
  Performs the registered migration block on a Realm at the given path.

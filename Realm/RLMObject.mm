@@ -48,7 +48,7 @@
 }
 
 + (instancetype)createInDefaultRealmWithValue:(id)value {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], value, RLMCreationOptionsAllowCopy);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], value, false);
 }
 
 + (instancetype)createInDefaultRealmWithObject:(id)object {
@@ -56,7 +56,7 @@
 }
 
 + (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMCreationOptionsAllowCopy);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, false);
 }
 
 + (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object {
@@ -78,7 +78,7 @@
         NSString *reason = [NSString stringWithFormat:@"'%@' does not have a primary key and can not be updated", schema.className];
         @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
     }
-    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMCreationOptionsUpdateOrCreate | RLMCreationOptionsAllowCopy);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, true);
 }
 
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object {

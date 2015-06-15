@@ -51,11 +51,11 @@ class MigrationTests: TestCase {
             Realm(path: realmPath)
             return
         }
-        XCTAssertEqual(UInt(0), schemaVersionAtPath(realmPath)!, "Initial version should be 0")
+        XCTAssertEqual(UInt64(0), schemaVersionAtPath(realmPath)!, "Initial version should be 0")
     }
 
     // migrate realm at path and ensure migration
-    private func migrateAndTestRealm(realmPath: String, shouldRun: Bool = true, schemaVersion: UInt = 1, autoMigration: Bool = false, block: MigrationBlock? = nil) {
+    private func migrateAndTestRealm(realmPath: String, shouldRun: Bool = true, schemaVersion: UInt64 = 1, autoMigration: Bool = false, block: MigrationBlock? = nil) {
         var didRun = false
         setSchemaVersion(schemaVersion, realmPath, { migration, oldSchemaVersion in
             if let block = block {
@@ -87,23 +87,23 @@ class MigrationTests: TestCase {
         migrateRealm(Realm.defaultPath, encryptionKey: nil)
 
         XCTAssertEqual(didRun, true)
-        XCTAssertEqual(UInt(1), schemaVersionAtPath(Realm.defaultPath)!)
+        XCTAssertEqual(UInt64(1), schemaVersionAtPath(Realm.defaultPath)!)
     }
 
     func testSetSchemaVersion() {
         createAndTestRealmAtPath(testRealmPath())
         migrateAndTestRealm(testRealmPath())
 
-        XCTAssertEqual(UInt(1), schemaVersionAtPath(testRealmPath())!)
+        XCTAssertEqual(UInt64(1), schemaVersionAtPath(testRealmPath())!)
     }
 
     func testSchemaVersionAtPath() {
         var error : NSError? = nil
-        XCTAssertNil(schemaVersionAtPath(Realm.defaultPath, error: &error), "Version should be nil before Realm creation")
+        assertNil(schemaVersionAtPath(Realm.defaultPath, error: &error), "Version should be nil before Realm creation")
         XCTAssertNotNil(error, "Error should be set")
 
         Realm()
-        XCTAssertEqual(UInt(0), schemaVersionAtPath(Realm.defaultPath)!, "Initial version should be 0")
+        XCTAssertEqual(UInt64(0), schemaVersionAtPath(Realm.defaultPath)!, "Initial version should be 0")
         assertThrows(schemaVersionAtPath("/dev/null"))
     }
 

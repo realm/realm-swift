@@ -114,6 +114,10 @@ class SwiftArrayPropertyObject: Object {
     let intArray = List<SwiftIntObject>()
 }
 
+class SwiftDoubleListOfSwiftObject: Object {
+    let array = List<SwiftListOfSwiftObject>()
+}
+
 class SwiftListOfSwiftObject: Object {
     let array = List<SwiftObject>()
 }

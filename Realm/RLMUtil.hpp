@@ -19,6 +19,7 @@
 #import <Realm/RLMConstants.h>
 #import <objc/runtime.h>
 
+#import <realm/array.hpp>
 #import <realm/binary_data.hpp>
 #import <realm/string_data.hpp>
 
@@ -37,24 +38,9 @@ void RLMSetErrorOrThrow(NSError *error, NSError **outError);
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 
-// returns a validated object for an input object
-// creates new objects for child objects and array literals as necessary
-// throws if passed in literals are not compatible with prop
-id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema, RLMRealm *realm);
-
-// throws if the values in array are not valid for the given schema
-// returns array with allocated child objects
-NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema, RLMRealm *realm = nil);
-
 // gets default values for the given schema (+defaultPropertyValues)
 // merges with native property defaults if Swift class
 NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema);
-
-// throws if the values in dict or properties in a kvc object are not valid for the given schema
-// inserts default values for missing properties when allowMissing is false
-// throws for missing properties when allowMissing is false
-// returns dictionary with default values and allocates child objects when applicable
-NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing = false, RLMRealm *realm = nil);
 
 NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t index));
 
@@ -118,7 +104,7 @@ static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
                                   encoding:NSUTF8StringEncoding];
 }
 
-static inline realm::StringData RLMStringDataWithNSString(NSString *string) {
+static inline realm::StringData RLMStringDataWithNSString(__unsafe_unretained NSString *const string) {
     static_assert(sizeof(size_t) >= sizeof(NSUInteger),
                   "Need runtime overflow check for NSUInteger to size_t conversion");
     return realm::StringData(string.UTF8String,
@@ -126,6 +112,10 @@ static inline realm::StringData RLMStringDataWithNSString(NSString *string) {
 }
 
 // Binary convertion utilities
-static inline realm::BinaryData RLMBinaryDataForNSData(NSData *data) {
+static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSData *const data) {
     return realm::BinaryData(static_cast<const char *>(data.bytes), data.length);
+}
+
+static inline NSUInteger RLMConvertNotFound(size_t index) {
+    return index == realm::not_found ? NSNotFound : index;
 }

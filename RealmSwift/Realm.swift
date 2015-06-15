@@ -58,7 +58,7 @@ public final class Realm {
     /**
     The location of the default Realm as a string. Can be overridden.
 
-    `~/Application Support/{bundle ID}/default.realm` on OS X.
+    `~/Library/Application Support/{bundle ID}/default.realm` on OS X.
 
     `default.realm` in your application's documents directory on iOS.
 
@@ -246,7 +246,7 @@ public final class Realm {
         if update && object.objectSchema.primaryKeyProperty == nil {
             throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
         }
-        RLMAddObjectToRealm(object, rlmRealm, update ? .UpdateOrCreate : .allZeros)
+        RLMAddObjectToRealm(object, rlmRealm, update)
     }
 
     /**
@@ -289,8 +289,7 @@ public final class Realm {
         if update && schema[T.className()]?.primaryKeyProperty == nil {
           throwRealmException("'\(T.className())' does not have a primary key and can not be updated")
         }
-        let creationOptions: RLMCreationOptions = (update ? .UpdateOrCreate : .allZeros) | .AllowCopy
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, creationOptions), T.self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, update), T.self)
     }
 
     // MARK: Deleting objects

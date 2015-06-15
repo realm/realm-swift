@@ -236,7 +236,7 @@
 
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMDefaultRealmPath()
-            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
                 *migrationRun = YES;
             }];
 }
