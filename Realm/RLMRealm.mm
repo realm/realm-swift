@@ -201,7 +201,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
             }
             else {
                 _history = realm::make_client_history(path.UTF8String,
-                                                            static_cast<const char *>(key.bytes));
+                                                      static_cast<const char *>(key.bytes));
                 SharedGroup::DurabilityLevel durability = inMemory ? SharedGroup::durability_MemOnly :
                                                                      SharedGroup::durability_Full;
                 _sharedGroup = make_unique<SharedGroup>(*_history, durability,
