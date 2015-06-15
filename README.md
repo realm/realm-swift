@@ -81,6 +81,10 @@ pod 'RealmSwift', :git => 'https://github.com/realm/realm-cocoa.git', :branch =>
 github "realm/realm-cocoa" "swift-2.0"
 ```
 
+_**Attention**: RealmSwift via Carthage relies on prebuilt binaries currently as [Carthage doesn't offer yet any
+possibility to specify the desired scheme to build](https://github.com/carthage/Carthage/issues/395).  
+This doesn't effect the availability of the regularly released RealmSwift via Carthage._
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for more details!
