@@ -69,6 +69,9 @@ you can still use your preferred dependency manager. We don't provide prebuilt b
 ### CocoaPods
 
 ```ruby
+# Attention: Realm's custom branch must be also specified explicitly
+# in your Podfile even if you want to use only RealmSwift directly.
+pod 'Realm',      :git => 'https://github.com/realm/realm-cocoa.git', :branch => 'swift-2.0'
 pod 'RealmSwift', :git => 'https://github.com/realm/realm-cocoa.git', :branch => 'swift-2.0'
 ```
 
