@@ -211,6 +211,7 @@ public:
 
         NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(listen) object:nil];
         // Use the minimum allowed stack size, as we need very little in our listener
+        // https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/Multithreading/CreatingThreads/CreatingThreads.html#//apple_ref/doc/uid/10000057i-CH15-SW7
         thread.stackSize = 16 * 1024;
         thread.name = @"RLMRealm notification listener";
         [thread start];
