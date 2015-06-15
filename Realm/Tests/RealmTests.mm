@@ -20,9 +20,6 @@
 
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Dynamic.h"
-#import "RLMRealm_Private.hpp"
-
-#import "object_store.hpp"
 
 extern "C" {
 #import "RLMSchema_Private.h"
