@@ -246,6 +246,16 @@
 					<string>Local Baseline</string>
 				</dict>
 			</dict>
+			<key>testStandaloneObjectInitialization</key>
+			<dict>
+				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
+				<dict>
+					<key>baselineAverage</key>
+					<real>0.56</real>
+					<key>baselineIntegrationDisplayName</key>
+					<string>Local Baseline</string>
+				</dict>
+			</dict>
 			<key>testUnIndexedStringLookup</key>
 			<dict>
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
