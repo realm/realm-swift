@@ -28,6 +28,7 @@
 #import "RLMUtil.hpp"
 #import "RLMObjectStore.h"
 
+#import "object_store.hpp"
 #import <realm/table.hpp>
 
 @interface MigrationObject : RLMObject
@@ -80,13 +81,7 @@
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
     RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
-
-    // Set the initial version to 0 since we're pretending this was created with
-    // a shared schema
-    [realm beginWriteTransaction];
-    RLMRealmSetSchemaVersion(realm, 0);
-    [realm commitWriteTransaction];
-
+    
     return realm;
 }
 
@@ -96,7 +91,7 @@
     }];
 
     RLMRealm *defaultRealm = [RLMRealm defaultRealm];
-    XCTAssertEqual(1U, RLMRealmSchemaVersion(defaultRealm));
+    XCTAssertEqual(1U, realm::ObjectStore::get_schema_version(defaultRealm.group));
 }
 
 - (void)testGetSchemaVersion {
@@ -172,7 +167,7 @@
     @autoreleasepool {
         // verify migration
         RLMRealm *realm = [self realmWithTestPath];
-        XCTAssertFalse(realm.group->has_table(RLMStringDataWithNSString(RLMTableNameForClass(@"DeletedClass"))), @"The deleted class should not have a table.");
+        XCTAssertFalse(ObjectStore::table_for_object_type(realm.group, "DeletedClass"), @"The deleted class should not have a table.");
         XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
     }
 }
@@ -221,7 +216,7 @@
     }
 
     [RLMRealm setSchemaVersion:0 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
+    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
 - (void)testAddingPropertyAtBeginningPreservesData {
@@ -321,8 +316,6 @@
     realm = [self realmWithTestPath];
     MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertThrows(mig1[@"oldIntCol"], @"Deleted column should no longer be accessible.");
-    XCTAssertEqual(0U, [mig1.objectSchema.properties[0] column]);
-    XCTAssertEqual(1U, [mig1.objectSchema.properties[1] column]);
 }
 
 - (void)testChangePropertyType {
@@ -375,8 +368,8 @@
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMTestRealmPath()
             withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {}];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()],
-                    @"Migration should throw due to duplicate primary keys)");
+    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMTestRealmPath()],
+                    @"Migration should return error due to duplicate primary keys)");
 
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMTestRealmPath()
@@ -480,8 +473,6 @@
         [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
         [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@2]];
         [realm commitWriteTransaction];
-
-        XCTAssertFalse(realm.schema[MigrationPrimaryKeyObject.className].table->has_search_index(0));
     }
 
     // apply migration
@@ -515,7 +506,7 @@
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMTestRealmPath()
             withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {}];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should throw due to duplicate primary keys)");
+    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should return error due to duplicate primary keys)");
 
     // apply good migration that deletes duplicates
     [RLMRealm setSchemaVersion:1
@@ -559,7 +550,7 @@
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMTestRealmPath()
             withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {}];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should throw due to duplicate primary keys)");
+    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should return error due to duplicate primary keys)");
 
     // should still be able to open with pre-migration schema
     XCTAssertNoThrow([self realmWithSingleObject:objectSchema]);
@@ -629,7 +620,7 @@
     [RLMRealm setSchemaVersion:0
                 forRealmAtPath:RLMTestRealmPath()
             withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {}];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
+    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
 - (void)testVersionNumberCanStaySameWhenAddingObjectSchema {

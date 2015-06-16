@@ -540,6 +540,7 @@ case "$COMMAND" in
         cp -R core/include include
         mkdir -p include/Realm
         cp Realm/*.{h,hpp} include/Realm
+        cp Realm/ObjectStore/*.hpp include/Realm
         touch include/Realm/RLMPlatform.h
         ;;
 

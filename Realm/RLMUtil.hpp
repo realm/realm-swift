@@ -32,6 +32,7 @@ NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
 NSException *RLMException(std::exception const& exception);
 
 NSError *RLMMakeError(RLMError code, std::exception const& exception);
+NSError *RLMMakeError(NSException *exception);
 
 void RLMSetErrorOrThrow(NSError *error, NSError **outError);
 

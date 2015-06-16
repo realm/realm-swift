@@ -226,6 +226,7 @@ void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMOb
     }
 }
 
+
 NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
     NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:userInfo];
     [info addEntriesFromDictionary:@{
@@ -245,6 +246,12 @@ NSError *RLMMakeError(RLMError code, std::exception const& exception) {
                                code:code
                            userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
                                       @"Error Code": @(code)}];
+}
+
+NSError *RLMMakeError(NSException *exception) {
+    return [NSError errorWithDomain:RLMErrorDomain
+                               code:0
+                           userInfo:@{NSLocalizedDescriptionKey: exception.reason}];
 }
 
 void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
