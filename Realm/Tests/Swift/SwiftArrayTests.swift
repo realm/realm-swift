@@ -165,7 +165,7 @@ class SwiftArrayTests: SwiftTestCase {
 
         realm.beginWriteTransaction()
 
-        for i in 0..<1012 {
+        for _ in 0..<1012 {
             let person = SwiftEmployeeObject()
             person.name = "Mary"
             person.age = 24
@@ -392,7 +392,7 @@ class SwiftArrayTests: SwiftTestCase {
 
         realm.beginWriteTransaction()
 
-        for i in 0..<1012 {
+        for _ in 0..<1012 {
             let person = EmployeeObject()
             person.name = "Mary"
             person.age = 24
@@ -427,7 +427,7 @@ class SwiftArrayTests: SwiftTestCase {
         realm.beginWriteTransaction()
 
         let po1 = makeEmployee(realm, 40, "Joe", true)
-        let po2 = makeEmployee(realm, 30, "John", false)
+        _ = makeEmployee(realm, 30, "John", false)
         let po3 = makeEmployee(realm, 25, "Jill", true)
 
         let company = CompanyObject()

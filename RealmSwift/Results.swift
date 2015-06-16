@@ -42,6 +42,31 @@ extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension Int: AddableType {}
 
+/// :nodoc:
+/// Internal class. Do not use directly.
+public class ResultsBase: NSObject, NSFastEnumeration {
+    internal let rlmResults: RLMResults
+
+    /// Returns a human-readable description of the objects contained in these results.
+    public override var description: String {
+        let type = "Results<\(rlmResults.objectClassName)>"
+        return gsub("RLMResults <0x[a-z0-9]+>", type, rlmResults.description) ?? type
+    }
+
+    // MARK: Initializers
+
+    internal init(_ rlmResults: RLMResults) {
+        self.rlmResults = rlmResults
+    }
+
+    // MARK: Fast Enumeration
+
+    public func countByEnumeratingWithState(state: UnsafeMutablePointer<NSFastEnumerationState>, objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>, count len: Int) -> Int {
+        let enumeration: NSFastEnumeration = rlmResults // FIXME: no idea why this is needed, but doesn't compile otherwise
+        return enumeration.countByEnumeratingWithState(state, objects: buffer, count: len)
+    }
+}
+
 /**
 `Results` is an auto-updating container type in Realm returned from object
 queries.
@@ -51,28 +76,20 @@ filter query results.
 
 Results cannot be created directly.
 */
-public final class Results<T: Object>: Printable {
+public final class Results<T: Object>: ResultsBase {
 
     // MARK: Properties
 
-    internal let rlmResults: RLMResults
-
     /// Returns the Realm these results are associated with.
     public var realm: Realm { return Realm(rlmResults.realm) }
-
-    /// Returns a human-readable description of the objects contained in these results.
-    public var description: String {
-        let type = "Results<\(T.className())>"
-        return gsub("RLMResults <0x[a-z0-9]+>", type, rlmResults.description) ?? type
-    }
 
     /// Returns the number of objects in these results.
     public var count: Int { return Int(rlmResults.count) }
 
     // MARK: Initializers
 
-    internal init(_ rlmResults: RLMResults) {
-        self.rlmResults = rlmResults
+    internal override init(_ rlmResults: RLMResults) {
+        super.init(rlmResults)
     }
 
     // MARK: Index Retrieval
@@ -143,7 +160,7 @@ public final class Results<T: Object>: Printable {
 
     :returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
     */
-    public func valueForKey(key: String) -> AnyObject? {
+    public override func valueForKey(key: String) -> AnyObject? {
         return rlmResults.valueForKey(key)
     }
 
@@ -155,7 +172,7 @@ public final class Results<T: Object>: Printable {
     :param: value The object value.
     :param: key   The name of the property.
     */
-    public func setValue(value: AnyObject?, forKey key: String) {
+    public override func setValue(value: AnyObject?, forKey key: String) {
         return rlmResults.setValue(value, forKey: key)
     }
 
@@ -283,14 +300,4 @@ extension Results: CollectionType {
     /// The collection's "past the end" position.
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
     public var endIndex: Int { return count }
-}
-
-// MARK: Variadic Arguments Support
-
-extension Results: CVarArgType {
-    /// Transform `self` into a series of machine words that can be
-    /// appropriately interpreted by C varargs
-    public func encode() -> [Word] {
-        return rlmResults.encode()
-    }
 }

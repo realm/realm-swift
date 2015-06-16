@@ -92,9 +92,9 @@ class SwiftLinkTests: SwiftTestCase {
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
 
         // refresh owner and check
-        let owner2 = SwiftOwnerObject.allObjectsInRealm(realm).firstObject
-        XCTAssertNotNil(owner, "Should have 1 owner")
-        XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
+        let owner2 = SwiftOwnerObject.allObjectsInRealm(realm).firstObject() as! SwiftOwnerObject
+        XCTAssertNotNil(owner2, "Should have 1 owner")
+        XCTAssertNil(owner2.dog, "Dog should be nullified when deleted")
         XCTAssertEqual(SwiftDogObject.allObjectsInRealm(realm).count, UInt(0), "Expecting 0 dogs")
     }
 
@@ -187,9 +187,9 @@ class SwiftLinkTests: SwiftTestCase {
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
 
         // refresh owner and check
-        let owner2 = OwnerObject.allObjectsInRealm(realm).firstObject
-        XCTAssertNotNil(owner, "Should have 1 owner")
-        XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
+        let owner2 = OwnerObject.allObjectsInRealm(realm).firstObject() as! OwnerObject
+        XCTAssertNotNil(owner2, "Should have 1 owner")
+        XCTAssertNil(owner2.dog, "Dog should be nullified when deleted")
         XCTAssertEqual(DogObject.allObjectsInRealm(realm).count, UInt(0), "Expecting 0 dogs")
     }
 

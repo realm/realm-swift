@@ -48,7 +48,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         let arrayObjects = SwiftArrayPropertyObject.allObjectsInRealm(realm)
 
         XCTAssertEqual(arrayObjects.count, UInt(1), "There should be a single SwiftStringObject in the realm")
-        var cmp = (arrayObjects.firstObject() as! SwiftArrayPropertyObject).array.firstObject() as! SwiftStringObject
+        let cmp = (arrayObjects.firstObject() as! SwiftArrayPropertyObject).array.firstObject() as! SwiftStringObject
         XCTAssertTrue(string.isEqualToObject(cmp), "First array object should be the string object we added")
     }
 
@@ -159,7 +159,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         let arrayObjects = ArrayPropertyObject.allObjectsInRealm(realm)
 
         XCTAssertEqual(arrayObjects.count, UInt(1), "There should be a single StringObject in the realm")
-        var cmp = (arrayObjects.firstObject() as! ArrayPropertyObject).array.firstObject() as! StringObject
+        let cmp = (arrayObjects.firstObject() as! ArrayPropertyObject).array.firstObject() as! StringObject
         XCTAssertTrue(string.isEqualToObject(cmp), "First array object should be the string object we added")
     }
 

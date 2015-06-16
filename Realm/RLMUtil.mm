@@ -36,7 +36,9 @@
 static inline bool nsnumber_is_like_integer(__unsafe_unretained NSNumber *const obj)
 {
     char data_type = [obj objCType][0];
-    return data_type == *@encode(short) ||
+    return data_type == *@encode(bool) ||
+           data_type == *@encode(char) ||
+           data_type == *@encode(short) ||
            data_type == *@encode(int) ||
            data_type == *@encode(long) ||
            data_type == *@encode(long long) ||

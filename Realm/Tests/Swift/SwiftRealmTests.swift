@@ -24,7 +24,7 @@ class SwiftRealmTests: SwiftTestCase {
     // No models
 
     func testRealmExists() {
-        var realm = realmWithTestPath()
+        let realm = realmWithTestPath()
         XCTAssertNotNil(realm, "realm should not be nil");
         XCTAssertTrue((realm as AnyObject) is RLMRealm, "realm should be of class RLMRealm")
     }
@@ -34,7 +34,7 @@ class SwiftRealmTests: SwiftTestCase {
     }
 
     func testEmptyWriteTransaction() {
-        var realm = realmWithTestPath()
+        let realm = realmWithTestPath()
         realm.beginWriteTransaction()
         realm.commitWriteTransaction()
     }
@@ -42,7 +42,7 @@ class SwiftRealmTests: SwiftTestCase {
     // Swift models
 
     func testRealmAddAndRemoveObjects() {
-        var realm = realmWithTestPath()
+        let realm = realmWithTestPath()
         realm.beginWriteTransaction()
         SwiftStringObject.createInRealm(realm, withValue: ["a"])
         SwiftStringObject.createInRealm(realm, withValue: ["b"])
@@ -177,7 +177,7 @@ class SwiftRealmTests: SwiftTestCase {
     // Objective-C models
 
     func testRealmAddAndRemoveObjects_objc() {
-        var realm = realmWithTestPath()
+        let realm = realmWithTestPath()
         realm.beginWriteTransaction()
         StringObject.createInRealm(realm, withValue: ["a"])
         StringObject.createInRealm(realm, withValue: ["b"])
