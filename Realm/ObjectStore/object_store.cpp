@@ -201,11 +201,14 @@ std::vector<ObjectStoreException> ObjectStore::validate_schema(Group *group, Obj
 
     // check for change to primary key
     if (table_schema.primary_key != target_schema.primary_key) {
-        exceptions.emplace_back(ObjectStoreException(ObjectStoreException::Kind::ObjectSchemaMismatchedPrimaryKey, {
-            {ObjectStoreException::InfoKey::ObjectType, target_schema.name},
-            {ObjectStoreException::InfoKey::PrimaryKey, target_schema.primary_key},
-            {ObjectStoreException::InfoKey::OldPrimaryKey, table_schema.primary_key},
-        }));
+        if (table_schema.primary_key.length()) {
+            exceptions.emplace_back(ObjectStoreException(ObjectStoreException::Kind::ObjectSchemaChangedPrimaryKey,
+                                                         table_schema.name, table_schema.primary_key));
+        }
+        else {
+            exceptions.emplace_back(ObjectStoreException(ObjectStoreException::Kind::ObjectSchemaNewPrimaryKey,
+                                                         target_schema.name, target_schema.primary_key));
+        }
     }
 
     // check for new missing properties
@@ -346,9 +349,7 @@ bool ObjectStore::create_tables(Group *group, ObjectStore::Schema &target_schema
 bool ObjectStore::is_schema_at_version(Group *group, uint64_t version) {
     uint64_t old_version = get_schema_version(group);
     if (old_version > version && old_version != NotVersioned) {
-        throw ObjectStoreException(ObjectStoreException::Kind::RealmVersionGreaterThanSchemaVersion, {
-            {ObjectStoreException::InfoKey::OldVersion, to_string(old_version)},
-            {ObjectStoreException::InfoKey::NewVersion, to_string(version)}});
+        throw ObjectStoreException(old_version, version);
     }
     return old_version != version;
 }
