@@ -55,7 +55,10 @@ ObjectSchema::ObjectSchema(Group *group, const std::string &name) : name(name) {
     if (primary_key.length()) {
         auto primary_key_prop = primary_key_property();
         if (!primary_key_prop) {
-            throw ObjectStoreValidationException({"No property matching primary key '" + primary_key + "'"}, name);
+            throw ObjectStoreException(ObjectStoreException::Kind::ObjectSchemaMismatchedPrimaryKey, {
+                {ObjectStoreException::InfoKey::ObjectType, name},
+                {ObjectStoreException::InfoKey::PrimaryKey, ""},
+                {ObjectStoreException::InfoKey::OldPrimaryKey, primary_key}});
         }
         primary_key_prop->is_primary = true;
     }
