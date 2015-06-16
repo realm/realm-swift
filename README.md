@@ -52,10 +52,9 @@ Executing the examples under the `examples/` folder, requires that you have buil
 
 ## Branches
 
-Here is an overview of long-running branches, we use in development, which you can use when you want to use Apple's
-latest beta tool releases.
+Here is an overview of some long-running branches we're currently using in development, which you may wish to use.
 
-_:warning: Feedback is very welcome for non-released version, but please aware that we can't provide support in the same
+_:warning: Feedback is very welcome for unreleased version, but please aware that we can't provide support to the same
 extent as we do for the official released version._
 
 | Branch      | Xcode Version | Swift Version | Associated PR for reference
@@ -70,7 +69,7 @@ you can still use your preferred dependency manager. We don't provide prebuilt b
 
 ```ruby
 # Attention: Realm's custom branch must be also specified explicitly
-# in your Podfile even if you want to use only RealmSwift directly.
+# in your Podfile even if you want to use only Realm Swift directly.
 pod 'Realm',      :git => 'https://github.com/realm/realm-cocoa.git', :branch => 'swift-2.0'
 pod 'RealmSwift', :git => 'https://github.com/realm/realm-cocoa.git', :branch => 'swift-2.0'
 ```
@@ -81,9 +80,9 @@ pod 'RealmSwift', :git => 'https://github.com/realm/realm-cocoa.git', :branch =>
 github "realm/realm-cocoa" "swift-2.0"
 ```
 
-_**Attention**: RealmSwift via Carthage relies on prebuilt binaries currently as [Carthage doesn't offer yet any
+_**Attention**: Realm Swift via Carthage relies on prebuilt binaries currently as [Carthage doesn't offer yet any
 possibility to specify the desired scheme to build](https://github.com/carthage/Carthage/issues/395).  
-This doesn't effect the availability of the regularly released RealmSwift via Carthage._
+This doesn't affect the availability of the regularly released Realm Swift via Carthage._
 
 ## Contributing
 
