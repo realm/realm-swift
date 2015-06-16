@@ -44,6 +44,7 @@ command:
   test:                 tests all iOS and OS X frameworks
   test-all:             tests all iOS and OS X frameworks in both Debug and Release configurations
   test-ios-static:      tests static iOS framework on 32-bit and 64-bit simulators
+  test-ios7-static:     tests static iOS framework on 32-bit and 64-bit iOS 7 simulators
   test-ios-dynamic:     tests dynamic iOS framework on 32-bit and 64-bit simulators
   test-ios-swift:       tests RealmSwift iOS framework on 32-bit and 64-bit simulators
   test-ios-devices:     tests dynamic and Swift iOS frameworks on all attached iOS devices
@@ -312,6 +313,7 @@ case "$COMMAND" in
         set +e # Run both sets of tests even if the first fails
         failed=0
         sh build.sh test-ios-static || failed=1
+        sh build.sh test-ios7-static || failed=1
         sh build.sh test-ios-dynamic || failed=1
         sh build.sh test-ios-swift || failed=1
         sh build.sh test-ios-devices || failed=1
@@ -331,6 +333,12 @@ case "$COMMAND" in
     "test-ios-static")
         xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        exit 0
+        ;;
+
+    "test-ios7-static")
+        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' test"
+        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S,OS=7.1' test"
         exit 0
         ;;
 
@@ -404,6 +412,7 @@ case "$COMMAND" in
 
     "verify-ios-static")
         sh build.sh test-ios-static
+        sh build.sh test-ios7-static
         sh build.sh examples-ios
         ;;
 
@@ -583,6 +592,7 @@ case "$COMMAND" in
     "package-ios-static")
         cd tightdb_objc
         sh build.sh test-ios-static
+        sh build.sh test-ios7-static
         sh build.sh ios-static
 
         cd build/ios
