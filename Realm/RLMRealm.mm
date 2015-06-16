@@ -36,6 +36,7 @@
 #include <realm/commit_log.hpp>
 #include <realm/version.hpp>
 #include <realm/sync.hpp>
+#include <realm/lang_bind_helper.hpp>
 
 using namespace std;
 using namespace realm;
@@ -741,8 +742,8 @@ atomic<bool> s_syncLogEverything(false);
                               clientVersion:(Replication::version_type)clientVersion {
     if (s_syncLogEverything) {
         typedef unsigned long long ulonglong;
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: Accept changeset %llu -> %llu "
-              " (producing server version %llu)", _ident, sessionIdent,
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: Accept changeset %llu -> %llu, "
+              "producing server version %llu", _ident, sessionIdent,
               ulonglong(clientVersion-1), ulonglong(clientVersion), ulonglong(serverVersion));
     }
 
@@ -757,12 +758,12 @@ atomic<bool> s_syncLogEverything(false);
 
 
 @implementation RLMSyncSession {
-    unique_ptr<SharedGroup> _sharedGroup;
-    unique_ptr<Replication> _history;
+    unique_ptr<SharedGroup>   _sharedGroup;
+    unique_ptr<ClientHistory> _history;
 
-    unique_ptr<SharedGroup> _backgroundSharedGroup; // For background thread
-    unique_ptr<Replication> _backgroundHistory;     // For background thread
-    realm::SyncBase        *_backgroundTransformer; // For background thread
+    unique_ptr<SharedGroup>   _backgroundSharedGroup; // For background thread
+    unique_ptr<ClientHistory> _backgroundHistory;     // For background thread
+    unique_ptr<Transformer>   _backgroundTransformer; // For background thread
 
     Replication::version_type _latestVersionAvailable;
     Replication::version_type _latestVersionUploaded;
@@ -787,20 +788,12 @@ atomic<bool> s_syncLogEverything(false);
         _clientPath = clientPath;
         _sessionIdent = [NSNumber numberWithUnsignedInteger:[connection newSessionIdent]];
 
-        bool serverSynchronizationMode = true;
         SharedGroup::DurabilityLevel durability = SharedGroup::durability_Full;
-        _history = realm::makeWriteLogCollector(clientPath.UTF8String,
-                                                serverSynchronizationMode);
+        _history = realm::make_client_sync_history(clientPath.UTF8String);
         _sharedGroup = make_unique<SharedGroup>(*_history, durability);
-        _backgroundHistory = realm::makeWriteLogCollector(clientPath.UTF8String,
-                                                          serverSynchronizationMode);
-        _backgroundSharedGroup =
-            make_unique<SharedGroup>(*_backgroundHistory, durability);
-        std::unique_ptr<realm::SyncBase> backgroundTransformer =
-            realm::make_sync_demo(false, *_backgroundHistory);
-        _backgroundTransformer = backgroundTransformer.get();
-        _backgroundHistory->set_sync(std::move(backgroundTransformer));
-
+        _backgroundHistory = realm::make_client_sync_history(clientPath.UTF8String);
+        _backgroundSharedGroup = make_unique<SharedGroup>(*_backgroundHistory, durability);
+        _backgroundTransformer = realm::make_sync_demo(false, *_backgroundHistory);
         _backgroundOperationQueue = [[NSOperationQueue alloc] init];
         _backgroundOperationQueue.name = @"io.realm.sync";
         _backgroundOperationQueue.maxConcurrentOperationCount = 1;
@@ -811,42 +804,44 @@ atomic<bool> s_syncLogEverything(false);
 
 - (void)mainThreadInit {
     // Called by main thread
-    uint_fast64_t clientFileIdent;
-    // FIXME: Must also fetch server file identifier from persistent storage
-    _history->get_sync_info(clientFileIdent, _syncProgressServerVersion,
-                            _syncProgressClientVersion);
-    _clientFileIdent = clientFileIdent;
-    if (clientFileIdent != 0)
-        _backgroundTransformer->set_peer_id(clientFileIdent);
+    uint_fast64_t serverFileIdent, clientFileIdent;
+    if (_history->get_file_ident_pair(serverFileIdent, clientFileIdent)) {
+        _serverFileIdent = serverFileIdent;
+        _clientFileIdent = clientFileIdent;
+        _backgroundTransformer->set_local_client_file_ident(clientFileIdent);
+    }
 
-    REALM_ASSERT(_syncProgressClientVersion >= 1);
+    _history->get_sync_progress(_syncProgressServerVersion, _syncProgressClientVersion);
 
     _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
     REALM_ASSERT(_latestVersionAvailable >= 1);
+    REALM_ASSERT(_latestVersionAvailable >= _syncProgressClientVersion);
 
     // Due to the nature of the protocol, it is possible that the server sends a
-    // changeset that was already integrated locally. To be able to detect this
-    // situation, we need to know the latest server version that is already
-    // integrated, so that we can skip those changesets. We have
-    // `_syncProgressServerVersionSince`, but it is not guaranteed to be
-    // completely up to date with what is actually in the history. For that
-    // reason, we have to manually search a portion of the history.
+    // changeset that was previously sent, and already integrated locally. To be
+    // able to detect this situation, we need to know the latest server version
+    // that is already integrated, so that we can skip those changesets. We have
+    // `_syncProgressServerVersion`, but it is not guaranteed to be completely
+    // up to date with what is actually in the history. For that reason, we have
+    // to manually search a portion of the history.
     //
     // FIXME: Consider whether this can be done in the same way, and at the same
     // time as latest_local_time_seen and latest_remote_time_seen are managed
     // inside the CommitLogs class.
     _serverVersionThreshold = _syncProgressServerVersion;
     {
-        Replication::CommitLogEntry historyEntry;
-        Replication::version_type version = _latestVersionAvailable;
+        HistoryEntry historyEntry;
+        History::version_type version = _latestVersionAvailable;
+        if (version == 1)
+            version = 0;
         while (version > _syncProgressClientVersion) {
-            _history->get_commit_entries(version-1, version, &historyEntry);
-            BOOL isForeign = historyEntry.peer_id != 0;
+            History::version_type prevVersion = _history->get_history_entry(version, historyEntry);
+            BOOL isForeign = historyEntry.origin_client_file_ident != 0;
             if (isForeign) {
                 _serverVersionThreshold = version;
                 break;
             }
-            --version;
+            version = prevVersion;
         }
     }
 
@@ -882,7 +877,7 @@ atomic<bool> s_syncLogEverything(false);
 
 
 - (void)connectionIsOpenAndSessionHasFileIdent {
-    _latestVersionUploaded = _syncProgressClientVersion;
+    _latestVersionUploaded = std::max<History::version_type>(1, _syncProgressClientVersion);
     if (_latestVersionUploaded > _latestVersionAvailable) // Transiently possible (FIXME: Or is it?)
         _latestVersionUploaded = _latestVersionAvailable;
     [_connection sendBindMessageWithSessionIdent:_sessionIdent
@@ -909,8 +904,8 @@ atomic<bool> s_syncLogEverything(false);
 
     // Fetch and copy the next changeset, and produce an output message from it.
     // Set the completionHandler to a block that calls resumeUpload.
-    Replication::version_type uploadVersion;
-    Replication::CommitLogEntry historyEntry;
+    HistoryEntry::version_type uploadVersion;
+    HistoryEntry historyEntry;
     for (;;) {
         REALM_ASSERT(_latestVersionUploaded <= _latestVersionAvailable);
         if (_latestVersionUploaded == _latestVersionAvailable) {
@@ -918,28 +913,28 @@ atomic<bool> s_syncLogEverything(false);
             return;
         }
         uploadVersion = _latestVersionUploaded + 1;
-        _history->get_commit_entries(uploadVersion-1, uploadVersion, &historyEntry);
+        _history->get_history_entry(uploadVersion, historyEntry);
         // Skip changesets that were downloaded from the server
-        BOOL isForeign = historyEntry.peer_id != 0;
+        BOOL isForeign = historyEntry.origin_client_file_ident != 0;
         if (!isForeign)
             break;
         _latestVersionUploaded = uploadVersion;
     }
-    typedef unsigned long long ulonglong;
+    using ulonglong = unsigned long long;
     // `serverVersion` is the last server version that has been integrated into
     // `uploadVersion`.
-    ulonglong serverVersion = historyEntry.peer_version;
+    ulonglong serverVersion = historyEntry.remote_version;
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
-    msg.body = [NSData dataWithBytes:historyEntry.log_data.data()
-                              length:historyEntry.log_data.size()]; // Full copy
+    msg.body = [NSData dataWithBytes:historyEntry.changeset.data()
+                              length:historyEntry.changeset.size()]; // Full copy
     msg.head = [NSString stringWithFormat:@"changeset %@ %llu %llu %llu %lu\n", _sessionIdent,
                          ulonglong(uploadVersion), ulonglong(serverVersion),
-                         ulonglong(historyEntry.timestamp), (unsigned long)msg.body.length];
+                         ulonglong(historyEntry.origin_timestamp), (unsigned long)msg.body.length];
     if (s_syncLogEverything) {
         NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: Changeset %llu -> %llu "
               "of size %lu with timestamp %llu (last integrated server version is %llu)",
               _connection.ident, _sessionIdent, ulonglong(uploadVersion-1),
-              ulonglong(uploadVersion), (unsigned long)msg.body.length, ulonglong(historyEntry.timestamp),
+              ulonglong(uploadVersion), (unsigned long)msg.body.length, ulonglong(historyEntry.origin_timestamp),
               serverVersion);
     }
     __weak RLMSyncSession *weakSelf = self;
@@ -962,9 +957,15 @@ atomic<bool> s_syncLogEverything(false);
 
 - (void)handleAllocMessageWithServerFileIdent:(uint_fast64_t)serverFileIdent
                               clientFileIdent:(uint_fast64_t)clientFileIdent {
-    _history->set_client_file_ident(clientFileIdent); // Save in persistent storage
-    // FIXME: Must save server file identifier in persistent storage
-    _backgroundTransformer->set_peer_id(clientFileIdent); // FIXME: Describe what (if anything) prevents a race condition here, as a naive analysis would suggest that the background thread could be accessing _backgroundHistory concurrently. It would be tempting to conclude that a race is not possible, because the background thread must not attempt to transform anything before the file identifier is known. Note that it cannot be assumed the there will be no spurious 'alloc' messages received.
+    _history->set_file_ident_pair(serverFileIdent, clientFileIdent); // Save in persistent storage
+    // FIXME: Describe what (if anything) prevents a race condition here, as a
+    // naive analysis would suggest that the background thread could be
+    // accessing _backgroundHistory concurrently. It would be tempting to
+    // conclude that a race is not possible, because the background thread must
+    // not attempt to transform anything before the file identifier is
+    // known. Note that it cannot be assumed the there will be no spurious
+    // 'alloc' messages received.
+    _backgroundTransformer->set_local_client_file_ident(clientFileIdent);
     _serverFileIdent = serverFileIdent;
     _clientFileIdent = clientFileIdent;
     if (_connection.isOpen)
@@ -1006,15 +1007,16 @@ atomic<bool> s_syncLogEverything(false);
 
     }
     _syncProgressServerVersion = serverVersion;
-    _syncProgressClientVersion = clientVersion;
 
     // Skip changesets that were already integrated during an earlier session,
     // but still attempt to save a new synchronization progress marker to
     // persistent storage.
-    if (clientVersion <= _serverVersionThreshold) {
+    if (serverVersion <= _serverVersionThreshold) {
         if (s_syncLogEverything) {
+            using ulonglong = unsigned long long;
             NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Ignoring previously integrated "
-                  "changeset", _connection.ident, _sessionIdent);
+                  "changeset (threshold is %llu)", _connection.ident, _sessionIdent,
+                  ulonglong(_serverVersionThreshold));
         }
         [self addBackgroundTaskWithServerVersion:serverVersion
                                    clientVersion:clientVersion
@@ -1118,43 +1120,44 @@ atomic<bool> s_syncLogEverything(false);
                                   originTimestamp:(uint_fast64_t)originTimestamp
                                   originFileIdent:(uint_fast64_t)originFileIdent
                                              data:(NSData *)data {
-    typedef unsigned long long ulonglong;
-    Replication::version_type baseVersion = clientVersion;
-    Replication::version_type newVersion;
+    using ulonglong = unsigned long long;
     const char *data2 = static_cast<const char *>(data.bytes);
     size_t size = data.length;
     BinaryData changeset(data2, size);
-    ostream *applyLog = 0;
-    Replication &history = *_backgroundHistory;
-    Replication::CommitLogEntry entry;
-    entry.peer_id = originFileIdent;
-    entry.peer_version = serverVersion;
-    entry.timestamp = originTimestamp;
-    entry.log_data = changeset;
-
+    bool schemaCreationsMerged = false;
+    HistoryEntry::version_type newVersion;
     try {
-        newVersion = history.apply_foreign_changeset(*_backgroundSharedGroup, 0, baseVersion, entry, applyLog);
+        Transformer &transformer = *_backgroundTransformer;
+        HistoryEntry::version_type lastIntegratedLocalVersion = clientVersion;
+        BinaryData remoteChangeset = changeset;
+        std::ostream *applyLog = 0;
+        newVersion =
+            transformer.integrate_remote_changeset(*_backgroundSharedGroup, originTimestamp,
+                                                   originFileIdent, lastIntegratedLocalVersion,
+                                                   serverVersion, remoteChangeset, applyLog,
+                                                   &schemaCreationsMerged); // Throws
     }
-    catch (const _impl::TransactLogParser::BadTransactLog&) {
-        NSString *message = [NSString stringWithFormat:@"Application of server changeset "
-                                      "%llu -> %llu failed", ulonglong(serverVersion-1),
-                                      ulonglong(serverVersion)];
+    catch (BadInitialSchemaCreation& e) {
+        NSString *message = [NSString stringWithFormat:@"Unresolvable conflict between initial "
+                                      "schema-creating changesets: %s", e.what()];
+        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+    }
+    catch (TransformError& e) {
+        NSString *message = [NSString stringWithFormat:@"Bad changeset received: %s", e.what()];
         @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
     }
 
     [[[RLMRealm realmWithPath:_clientPath] notifier] notifyOtherRealms];
 
-    if (newVersion == 0) {
-        // Identical schema-creating transaction detected and handled.
-        newVersion = 2;
-
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Identical initial schema-creating transaction resolved "
-              "(producing client version %llu)", _connection.ident, _sessionIdent, ulonglong(newVersion));
+    if (schemaCreationsMerged) {
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Conflict between initial schema-creating "
+              "changesets resolved (temporary hack), producing client version %llu",
+              _connection.ident, _sessionIdent, ulonglong(newVersion));
     }
     else {
         if (s_syncLogEverything) {
             NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Server changeset (%llu -> %llu) "
-                  "integrated (producing client version %llu)", _connection.ident, _sessionIdent,
+                  "integrated, producing client version %llu", _connection.ident, _sessionIdent,
                   ulonglong(serverVersion-1), ulonglong(serverVersion), ulonglong(newVersion));
         }
     }
@@ -2048,10 +2051,6 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (realm::SharedGroup *)sharedGroup {
     return _sharedGroup.get();
-}
-
-- (realm::Replication *)transactLogRegistry {
-    return _replication.get();
 }
 
 @end
