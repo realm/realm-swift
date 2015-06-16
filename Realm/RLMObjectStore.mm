@@ -95,7 +95,7 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndA
             if (verifyAndAlignColumns) {
                 auto errors = ObjectStore::validate_schema(realm.group, schema);
                 if (errors.size()) {
-                    @throw RLMException(ObjectStoreValidationException(errors, schema.name));
+                    @throw RLMException(ObjectStoreException(errors, schema.name));
                 }
             }
             else {
@@ -168,9 +168,6 @@ void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSc
             [realm cancelWriteTransaction];
         }
     } catch (ObjectStoreException & e) {
-        [realm cancelWriteTransaction];
-        @throw RLMException(e);
-    } catch (ObjectStoreValidationException & e) {
         [realm cancelWriteTransaction];
         @throw RLMException(e);
     }
