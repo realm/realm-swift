@@ -485,7 +485,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
                     RLMDynamicSet(object, prop, RLMNSNullToNil(propValue), creationOptions);
                 }
             }
-            else if (created) {
+            else if (created &&!prop.optional) {
                 @throw RLMException(@"Missing property value",
                                     @{@"Property name:" : prop.name ?: @"nil",
                                       @"Value": propValue ? [propValue description] : @"nil"});
