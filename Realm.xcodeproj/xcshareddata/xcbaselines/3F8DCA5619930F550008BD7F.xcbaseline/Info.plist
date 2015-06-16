@@ -16,18 +16,6 @@
 				<string>com.apple.platform.iphoneos</string>
 			</dict>
 		</dict>
-		<key>E15E6DC2-362A-47E4-8E27-83A9497D3A20</key>
-		<dict>
-			<key>targetArchitecture</key>
-			<string>arm64</string>
-			<key>targetDevice</key>
-			<dict>
-				<key>modelCode</key>
-				<string>iPhone7,2</string>
-				<key>platformIdentifier</key>
-				<string>com.apple.platform.iphoneos</string>
-			</dict>
-		</dict>
 	</dict>
 </dict>
 </plist>
