@@ -25,6 +25,8 @@ using namespace realm;
 using namespace std;
 
 ObjectStoreException::CustomWhat ObjectStoreException::s_custom_what = nullptr;
+string ObjectStoreException::s_property_string = "property";
+string ObjectStoreException::s_property_string_upper = "Property";
 
 ObjectStoreException::ObjectStoreException(Kind kind, Info info) : m_kind(kind), m_info(info) {
     set_what();
@@ -64,32 +66,32 @@ void ObjectStoreException::set_what() {
                         " is less than last set version " + m_info[InfoKey::OldVersion] + ".";
             break;
         case Kind::RealmPropertyTypeNotIndexable:
-            m_what = "Can't index property '" + m_info[InfoKey::ObjectType] + "." + m_info[InfoKey::PropertyName] + "': " +
-                        "indexing properties of type '" + m_info[InfoKey::PropertyType] + "' is currently not supported";
+            m_what = "Can't index " + s_property_string + " '" + m_info[InfoKey::ObjectType] + "." + m_info[InfoKey::PropertyName] + "': " +
+                        "indexing a " + s_property_string + " of type '" + m_info[InfoKey::PropertyType] + "' is currently not supported";
             break;
         case Kind::RealmDuplicatePrimaryKeyValue:
-            m_what = "Primary key property '" + m_info[InfoKey::PropertyType] + "' has duplicate values after migration.";
+            m_what = "Primary key " + s_property_string + " '" + m_info[InfoKey::PropertyType] + "' has duplicate values after migration.";
             break;
         case Kind::ObjectSchemaMissingProperty:
-            m_what = "Property '" + m_info[InfoKey::PropertyName] + "' is missing from latest object model.";
+            m_what = s_property_string_upper + " '" + m_info[InfoKey::PropertyName] + "' is missing from latest object model.";
             break;
         case Kind::ObjectSchemaNewProperty:
-            m_what = "Property '" + m_info[InfoKey::PropertyName] + "' has been added to latest object model.";
+            m_what = s_property_string_upper + " '" + m_info[InfoKey::PropertyName] + "' has been added to latest object model.";
             break;
         case Kind::ObjectSchemaMismatchedTypes:
-            m_what = "Property types for '" + m_info[InfoKey::PropertyName] + "' property do not match. " +
+            m_what = s_property_string_upper + " types for '" + m_info[InfoKey::PropertyName] + "' " + s_property_string + " do not match. " +
                         "Old type '" + m_info[InfoKey::OldPropertyType] + "', new type '" + m_info[InfoKey::PropertyType] + "'";
             break;
         case Kind::ObjectSchemaMismatchedObjectTypes:
-            m_what = "Target object type for property '" + m_info[InfoKey::PropertyName] + "' does not match. " +
+            m_what = "Target object type for " + s_property_string + " '" + m_info[InfoKey::PropertyName] + "' does not match. " +
                         "Old type '" + m_info[InfoKey::OldPropertyObjectType] + "', new type '" + m_info[InfoKey::PropertyObjectType] + "'.";
             break;
         case Kind::ObjectSchemaMismatchedPrimaryKey:
             if (!m_info[InfoKey::PrimaryKey].length()) {
-                m_what = "Property '" +  m_info[InfoKey::OldPrimaryKey] + "' is no longer a primary key.";
+                m_what = s_property_string_upper + " '" +  m_info[InfoKey::OldPrimaryKey] + "' is no longer a primary key.";
             }
             else {
-                m_what = "Property '" + m_info[InfoKey::PrimaryKey] + "' has been made a primary key.";
+                m_what = s_property_string_upper + " '" + m_info[InfoKey::PrimaryKey] + "' has been made a primary key.";
             }
             break;
         case Kind::ObjectStoreValidationFailure:
@@ -105,4 +107,12 @@ ObjectStoreException::ObjectStoreException(vector<ObjectStoreException> validati
     m_validation_errors(validation_errors), m_kind(Kind::ObjectStoreValidationFailure), m_info({{InfoKey::ObjectType, object_type}}) {
     set_what();
 }
+
+void ObjectStoreException::set_property_string(std::string property_string) {
+    s_property_string = s_property_string_upper = property_string;
+    s_property_string[0] = tolower(s_property_string[0]);
+    s_property_string_upper[0] = toupper(s_property_string_upper[0]);
+
+}
+
 

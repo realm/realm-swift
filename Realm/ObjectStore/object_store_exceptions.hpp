@@ -74,6 +74,9 @@ namespace realm {
         typedef std::string (*CustomWhat)(ObjectStoreException &);
         static void set_custom_what(CustomWhat message_generator) { s_custom_what = message_generator; }
 
+        // set the string used in defualt messages to represent the property object - defaults to 'property'
+        static void set_property_string(std::string property_string);
+
     private:
         Kind m_kind;
         Info m_info;
@@ -83,6 +86,8 @@ namespace realm {
         void set_what();
 
         static CustomWhat s_custom_what;
+        static std::string s_property_string;
+        static std::string s_property_string_upper;
     };
 }
 
