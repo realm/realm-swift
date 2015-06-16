@@ -23,13 +23,14 @@
 #include <map>
 #include <string>
 
+#define INFO_KEY(key) InfoKey InfoKey##key = "InfoKey" #key;
+
 namespace realm {
     class Property;
 
     class ObjectStoreException : public std::exception {
     public:
         enum class Kind {
-            // thrown when calling update_realm_to_schema and the realm version is greater than the given version
             RealmVersionGreaterThanSchemaVersion,   // OldVersion, NewVersion
             RealmPropertyTypeNotIndexable,          // ObjectType, PropertyName, PropertyType
             RealmDuplicatePrimaryKeyValue,          // ObjectType, PropertyName, PropertyType
@@ -37,57 +38,64 @@ namespace realm {
             ObjectSchemaNewProperty,                // ObjectType, PropertyName, PropertyType
             ObjectSchemaMismatchedTypes,            // ObjectType, PropertyName, PropertyType, OldPropertyType
             ObjectSchemaMismatchedObjectTypes,      // ObjectType, PropertyName, PropertyType, ObjectType, OldObjectType
-            ObjectSchemaMismatchedPrimaryKey,       // ObjectType, PrimaryKey, OldPrimaryKey
+            ObjectSchemaChangedPrimaryKey,          // ObjectType, PrimaryKey
+            ObjectSchemaNewPrimaryKey,              // ObjectType, PrimaryKey
             ObjectSchemaChangedOptionalProperty,
             ObjectSchemaNewOptionalProperty,
             ObjectStoreValidationFailure,           // ObjectType, vector<ObjectStoreException>
         };
 
-        enum class InfoKey {
-            OldVersion,
-            NewVersion,
-            ObjectType,
-            PropertyName,
-            PropertyType,
-            OldPropertyType,
-            PropertyObjectType,
-            OldPropertyObjectType,
-            PrimaryKey,
-            OldPrimaryKey,
-        };
-        typedef std::map<InfoKey, std::string> Info;
+        typedef const std::string InfoKey;
+        typedef std::map<std::string, std::string> Info;
 
-        ObjectStoreException(Kind kind, Info info = Info());
         ObjectStoreException(Kind kind, const std::string &object_type, const Property &prop);
+
+        // ObjectSchemaMismatchedTypes, ObjectSchemaMismatchedObjectTypes
         ObjectStoreException(Kind kind, const std::string &object_type, const Property &prop, const Property &oldProp);
+
+        // ObjectSchemaChangedPrimaryKey, ObjectSchemaNewPrimaryKey
+        ObjectStoreException(Kind kind, const std::string &object_type, const std::string primary_key);
+
+        // RealmVersionGreaterThanSchemaVersion
+        ObjectStoreException(uint64_t old_version, uint64_t new_version);
 
         // ObjectStoreValidationFailure
         ObjectStoreException(std::vector<ObjectStoreException> validation_errors, const std::string &object_type);
 
         ObjectStoreException::Kind kind() const { return m_kind; }
         const ObjectStoreException::Info &info() const { return m_info; }
-        const std::vector<ObjectStoreException> &validation_errors() { return m_validation_errors; }
 
         const char *what() const noexcept override  { return m_what.c_str(); }
 
         // implement CustomWhat to customize exception messages per platform/language
-        typedef std::string (*CustomWhat)(ObjectStoreException &);
-        static void set_custom_what(CustomWhat message_generator) { s_custom_what = message_generator; }
-
-        // set the string used in defualt messages to represent the property object - defaults to 'property'
-        static void set_property_string(std::string property_string);
+        typedef std::map<Kind, std::string> FormatStrings;
+        static void set_custom_format_strings(FormatStrings custom_format_strings) { s_custom_format_strings = custom_format_strings; }
 
     private:
+        ObjectStoreException(Kind kind, Info info = Info());
+
         Kind m_kind;
         Info m_info;
         std::vector<ObjectStoreException> m_validation_errors;
 
         std::string m_what;
-        void set_what();
+        std::string generate_what() const;
+        std::string validation_errors_string() const;
+        std::string populate_format_string(const std::string &format_string) const;
 
-        static CustomWhat s_custom_what;
-        static std::string s_property_string;
-        static std::string s_property_string_upper;
+        static const FormatStrings s_default_format_strings;
+        static FormatStrings s_custom_format_strings;
+
+    public:
+        INFO_KEY(OldVersion);
+        INFO_KEY(NewVersion);
+        INFO_KEY(ObjectType);
+        INFO_KEY(PropertyName);
+        INFO_KEY(PropertyType);
+        INFO_KEY(OldPropertyType);
+        INFO_KEY(PropertyObjectType);
+        INFO_KEY(OldPropertyObjectType);
+        INFO_KEY(PrimaryKey);
     };
 }
 

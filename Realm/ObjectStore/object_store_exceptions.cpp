@@ -20,99 +20,113 @@
 #include "property.hpp"
 
 #include <realm/util/assert.hpp>
+#include <regex>
 
 using namespace realm;
 using namespace std;
 
-ObjectStoreException::CustomWhat ObjectStoreException::s_custom_what = nullptr;
-string ObjectStoreException::s_property_string = "property";
-string ObjectStoreException::s_property_string_upper = "Property";
-
-ObjectStoreException::ObjectStoreException(Kind kind, Info info) : m_kind(kind), m_info(info) {
-    set_what();
-}
+ObjectStoreException::ObjectStoreException(Kind kind, Info info) : m_kind(kind), m_info(info), m_what(generate_what()) {}
 
 ObjectStoreException::ObjectStoreException(Kind kind, const std::string &object_type, const Property &prop) : m_kind(kind) {
-    m_info[InfoKey::ObjectType] = object_type;
-    m_info[InfoKey::PropertyName] = prop.name;
-    m_info[InfoKey::PropertyType] = string_for_property_type(prop.type);
-    m_info[InfoKey::PropertyObjectType] = prop.object_type;
-    set_what();
+    m_info[InfoKeyObjectType] = object_type;
+    m_info[InfoKeyPropertyName] = prop.name;
+    m_info[InfoKeyPropertyType] = string_for_property_type(prop.type);
+    m_info[InfoKeyPropertyObjectType] = prop.object_type;
+    m_what = generate_what();
 }
 
 ObjectStoreException::ObjectStoreException(Kind kind, const std::string &object_type, const Property &prop, const Property &oldProp) :
     m_kind(kind) {
-    m_info[InfoKey::ObjectType] = object_type;
-    m_info[InfoKey::PropertyName] = prop.name;
-    m_info[InfoKey::PropertyType] = string_for_property_type(prop.type);
-    m_info[InfoKey::OldPropertyType] = string_for_property_type(oldProp.type);
-    m_info[InfoKey::PropertyObjectType] = prop.object_type;
-    m_info[InfoKey::OldPropertyObjectType] = oldProp.object_type;
-    set_what();
+    m_info[InfoKeyObjectType] = object_type;
+    m_info[InfoKeyPropertyName] = prop.name;
+    m_info[InfoKeyPropertyType] = string_for_property_type(prop.type);
+    m_info[InfoKeyOldPropertyType] = string_for_property_type(oldProp.type);
+    m_info[InfoKeyPropertyObjectType] = prop.object_type;
+    m_info[InfoKeyOldPropertyObjectType] = oldProp.object_type;
+    m_what = generate_what();
 }
 
-void ObjectStoreException::set_what() {
-    if (s_custom_what) {
-        string custom = s_custom_what(*this);
-        if (custom.length()) {
-            m_what = custom;
-            return;
-        }
-    }
+ObjectStoreException::ObjectStoreException(Kind kind, const std::string &object_type, const std::string primary_key) : m_kind(kind) {
+    m_info[InfoKeyObjectType] = object_type;
+    m_info[InfoKeyPrimaryKey] = primary_key;
+    m_what = generate_what();
+}
 
-    switch (m_kind) {
-        case Kind::RealmVersionGreaterThanSchemaVersion:
-            m_what = "Provided schema version " + m_info[InfoKey::NewVersion] +
-                        " is less than last set version " + m_info[InfoKey::OldVersion] + ".";
-            break;
-        case Kind::RealmPropertyTypeNotIndexable:
-            m_what = "Can't index " + s_property_string + " '" + m_info[InfoKey::ObjectType] + "." + m_info[InfoKey::PropertyName] + "': " +
-                        "indexing a " + s_property_string + " of type '" + m_info[InfoKey::PropertyType] + "' is currently not supported";
-            break;
-        case Kind::RealmDuplicatePrimaryKeyValue:
-            m_what = "Primary key " + s_property_string + " '" + m_info[InfoKey::PropertyType] + "' has duplicate values after migration.";
-            break;
-        case Kind::ObjectSchemaMissingProperty:
-            m_what = s_property_string_upper + " '" + m_info[InfoKey::PropertyName] + "' is missing from latest object model.";
-            break;
-        case Kind::ObjectSchemaNewProperty:
-            m_what = s_property_string_upper + " '" + m_info[InfoKey::PropertyName] + "' has been added to latest object model.";
-            break;
-        case Kind::ObjectSchemaMismatchedTypes:
-            m_what = s_property_string_upper + " types for '" + m_info[InfoKey::PropertyName] + "' " + s_property_string + " do not match. " +
-                        "Old type '" + m_info[InfoKey::OldPropertyType] + "', new type '" + m_info[InfoKey::PropertyType] + "'";
-            break;
-        case Kind::ObjectSchemaMismatchedObjectTypes:
-            m_what = "Target object type for " + s_property_string + " '" + m_info[InfoKey::PropertyName] + "' does not match. " +
-                        "Old type '" + m_info[InfoKey::OldPropertyObjectType] + "', new type '" + m_info[InfoKey::PropertyObjectType] + "'.";
-            break;
-        case Kind::ObjectSchemaMismatchedPrimaryKey:
-            if (!m_info[InfoKey::PrimaryKey].length()) {
-                m_what = s_property_string_upper + " '" +  m_info[InfoKey::OldPrimaryKey] + "' is no longer a primary key.";
-            }
-            else {
-                m_what = s_property_string_upper + " '" + m_info[InfoKey::PrimaryKey] + "' has been made a primary key.";
-            }
-            break;
-        case Kind::ObjectStoreValidationFailure:
-            m_what = "Migration is required for object type '" + info().at(InfoKey::ObjectType) + "' due to the following errors:";
-            for (auto error : m_validation_errors) {
-                m_what += string("\n- ") + error.what();
-            }
-            break;
-    }
+ObjectStoreException::ObjectStoreException(uint64_t old_version, uint64_t new_version) : m_kind(Kind::RealmVersionGreaterThanSchemaVersion) {
+    m_info[InfoKeyOldVersion] = to_string(old_version);
+    m_info[InfoKeyNewVersion] = to_string(new_version);
+    m_what = generate_what();
 }
 
 ObjectStoreException::ObjectStoreException(vector<ObjectStoreException> validation_errors, const string &object_type) :
-    m_validation_errors(validation_errors), m_kind(Kind::ObjectStoreValidationFailure), m_info({{InfoKey::ObjectType, object_type}}) {
-    set_what();
+    m_validation_errors(validation_errors),
+    m_kind(Kind::ObjectStoreValidationFailure)
+{
+    m_info[InfoKeyObjectType] = object_type;
+    m_what = generate_what();
 }
 
-void ObjectStoreException::set_property_string(std::string property_string) {
-    s_property_string = s_property_string_upper = property_string;
-    s_property_string[0] = tolower(s_property_string[0]);
-    s_property_string_upper[0] = toupper(s_property_string_upper[0]);
-
+string ObjectStoreException::generate_what() const {
+    auto format_string = s_custom_format_strings.find(m_kind);
+    if (format_string != s_custom_format_strings.end()) {
+        return populate_format_string(format_string->second);
+    }
+    return populate_format_string(s_default_format_strings.at(m_kind));
 }
+
+string ObjectStoreException::validation_errors_string() const {
+    string errors_string;
+    for (auto error : m_validation_errors) {
+        errors_string += string("\n- ") + error.what();
+    }
+    return errors_string;
+}
+
+std::string ObjectStoreException::populate_format_string(const std::string & format_string) const {
+    string out_string, current(format_string);
+    smatch sm;
+    regex re("\\{(\\w+)\\}");
+    while(regex_search(current, sm, re)) {
+        out_string += sm.prefix();
+        const string &key = sm[1];
+        if (key == "ValidationString") {
+            out_string += validation_errors_string();
+        }
+        else {
+            out_string += m_info.at(key);
+        }
+        current = sm.suffix();
+    }
+    out_string += current;
+    return out_string;
+}
+
+ObjectStoreException::FormatStrings ObjectStoreException::s_custom_format_strings;
+const ObjectStoreException::FormatStrings ObjectStoreException::s_default_format_strings = {
+    {Kind::RealmVersionGreaterThanSchemaVersion,
+        "Provided schema version {InfoKeyNewVersion} is less than last set version {InfoKeyOldVersion}."},
+    {Kind::RealmPropertyTypeNotIndexable,
+        "Can't index property {InfoKeyObjectType}.{InfoKeyPropertyName}: indexing a property of type '{InfoKeyPropertyType}' is currently not supported"},
+    {Kind::RealmDuplicatePrimaryKeyValue,
+        "Primary key property '{InfoKeyPropertyType}' has duplicate values after migration."},
+    {Kind::ObjectSchemaMissingProperty,
+        "Property '{InfoKeyPropertyName}' is missing from latest object model."},
+    {Kind::ObjectSchemaNewProperty,
+        "Property '{InfoKeyPropertyName}' has been added to latest object model."},
+    {Kind::ObjectSchemaMismatchedTypes,
+        "Property types for '{InfoKeyPropertyName}' property do not match. Old type '{InfoKeyOldPropertyType}', new type '{InfoKeyPropertyType}'"},
+    {Kind::ObjectSchemaMismatchedObjectTypes,
+        "Target object type for property '{InfoKeyPropertyName}' does not match. Old type '{InfoKeyOldPropertyObjectType}', new type '{InfoKeyPropertyObjectType}'."},
+    {Kind::ObjectSchemaChangedPrimaryKey,
+        "Property '{InfoKeyPrimaryKey}' is no longer a primary key."},
+    {Kind::ObjectSchemaNewPrimaryKey,
+        "Property '{InfoKeyPrimaryKey}' has been made a primary key."},
+    {Kind::ObjectSchemaChangedOptionalProperty,
+        "Property '{InfoKeyPrimaryKey}' is no longer optional."},
+    {Kind::ObjectSchemaNewOptionalProperty,
+        "Property '{InfoKeyPrimaryKey}' has been made optional."},
+    {Kind::ObjectStoreValidationFailure,
+        "Migration is required for object type '{InfoKeyObjectType}' due to the following errors: {ValidationErrors}"}
+};
 
 
