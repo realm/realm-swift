@@ -23,8 +23,6 @@
 #include <map>
 #include <string>
 
-#define INFO_KEY(key) InfoKey InfoKey##key = "InfoKey" #key;
-
 namespace realm {
     class Property;
 
@@ -87,6 +85,7 @@ namespace realm {
         static FormatStrings s_custom_format_strings;
 
     public:
+        #define INFO_KEY(key) InfoKey InfoKey##key = "InfoKey" #key;
         INFO_KEY(OldVersion);
         INFO_KEY(NewVersion);
         INFO_KEY(ObjectType);
@@ -96,6 +95,7 @@ namespace realm {
         INFO_KEY(PropertyObjectType);
         INFO_KEY(OldPropertyObjectType);
         INFO_KEY(PrimaryKey);
+        #undef INFO_KEY
     };
 }
 
