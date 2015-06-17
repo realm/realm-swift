@@ -100,6 +100,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Added anonymous analytics on simulator/debugger runs.
 * Add `-[RLMArray moveObjectAtIndex:toIndex:]` and `List.move(from:to:)` to
   allow moving objects in the given `RLMArray` / `List`.
+* Entire standalone object graph copies can now be made with
+  `-[RLMObject initWithValue:]` and `Object(value:)` when the value is of the
+  same object type.
 
 ### Bugfixes
 
