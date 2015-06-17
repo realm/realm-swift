@@ -27,10 +27,12 @@ int main(int argc, char *argv[]) {
 
 #else
 
-#import <sys/cdefs.h>
+#import <Cocoa/Cocoa.h>
 
-int main(__unused int argc, __unused char *argv[]) {
-    return 1;
+int main(int argc, const char *argv[]) {
+    @autoreleasepool {
+        return NSApplicationMain(argc, argv);
+    }
 }
 
 #endif

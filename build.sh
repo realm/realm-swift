@@ -348,6 +348,7 @@ case "$COMMAND" in
 
     "test-ios-devices")
         failed=0
+        XCMODE=xcodebuild # override XCMODE because xcpretty causes problems with device tests
         test_ios_devices xcrealm "iOS Device Tests" "$CONFIGURATION" || failed=1
         # test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION" || failed=1 # FIXME: Re-enable once fixed
         exit $failed
