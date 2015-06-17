@@ -358,9 +358,7 @@ static void RLMValidateValueForProperty(__unsafe_unretained id const obj,
         case RLMPropertyTypeData:
         case RLMPropertyTypeAny:
             if (!RLMIsObjectValidForProperty(obj, prop)) {
-                @throw RLMException(@"Invalid property",
-                                    @{@"Property name:" : prop.name ?: @"nil",
-                                      @"Value": obj ? [obj description] : @"nil"});
+                @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' for property '%@'", obj, prop.name]);
             }
             break;
         case RLMPropertyTypeObject:
@@ -372,7 +370,7 @@ static void RLMValidateValueForProperty(__unsafe_unretained id const obj,
             if (validateNested) {
                 if (obj != nil && obj != NSNull.null) {
                     if (![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
-                        @throw  RLMException(@"Array property value is not enumerable.");
+                        @throw  RLMException([NSString stringWithFormat:@"Array property value (%@) is not enumerable.", obj]);
                     }
                     id<NSFastEnumeration> array = obj;
                     for (id el in array) {
