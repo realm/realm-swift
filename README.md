@@ -57,11 +57,11 @@ Here is an overview of some long-running branches we're currently using in devel
 _:warning: Feedback is very welcome for unreleased version, but please aware that we can't provide support to the same
 extent as we do for the official released version._
 
- Branch | Xcode Version | Swift Version | Associated PR for reference
---------|---------------|---------------|-
- [`master`](/realm/realm-cocoa/tree/master)  | 6.3.2 | Swift 1.2 (swiftlang-602.0.53.1 clang-602.0.53) | -
- [`swift-2.0`](/realm/realm-cocoa/tree/swift-2.0) | 7.0.0-beta1 | Swift 2.0 (swiftlang-700.0.38.1 clang-700.0.53) | [#2069](/realm/realm-cocoa/pull/2069)
- [`null-string-beta-2`](/realm/realm-cocoa/tree/null-string-beta-2) | same as `master` | same as `master` | [#628](/realm/realm-cocoa/issues/628)
+| Branch                                                             | Xcode Version    | Swift Version                                   | Associated PR for reference           |
+|:-------------------------------------------------------------------|:-----------------|:------------------------------------------------|:--------------------------------------|
+| [`master`](/realm/realm-cocoa/tree/master)                         | 6.3.2            | Swift 1.2 (swiftlang-602.0.53.1 clang-602.0.53) | -                                     |
+| [`swift-2.0`](/realm/realm-cocoa/tree/swift-2.0)                   | 7.0.0-beta1      | Swift 2.0 (swiftlang-700.0.38.1 clang-700.0.53) | [#2069](/realm/realm-cocoa/pull/2069) |
+| [`null-string-beta-2`](/realm/realm-cocoa/tree/null-string-beta-2) | same as `master` | same as `master`                                | [#628](/realm/realm-cocoa/issues/628) |
 
 If you want to use non-released version of Realm e.g. from the `swift-2.0` branch,
 you can still use your preferred dependency manager. We don't provide prebuilt binaries.
