@@ -47,6 +47,8 @@ namespace realm {
 
     struct Property {
     public:
+        Property() : object_type(""), is_primary(false), is_indexed(false), is_nullable(false) {}
+
         std::string name;
         PropertyType type;
         std::string object_type;

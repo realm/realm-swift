@@ -26,20 +26,13 @@ FOUNDATION_EXTERN void RLMDisableSyncToDisk();
 FOUNDATION_EXTERN NSData *RLMRealmValidatedEncryptionKey(NSData *key);
 
 // RLMRealm private members
-@interface RLMRealm () {
-    @public
-    // expose ivar to to avoid objc messages in accessors
-    BOOL _inWriteTransaction;
-    mach_port_t _threadID;
-}
+@interface RLMRealm ()
 
 @property (nonatomic, readonly) BOOL dynamic;
 @property (nonatomic, readwrite) RLMSchema *schema;
 @property (nonatomic, strong) RLMNotifier *notifier;
 
 + (void)resetRealmState;
-
-- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory dynamic:(BOOL)dynamic error:(NSError **)error;
 
 /**
  This method is useful only in specialized circumstances, for example, when opening Realm files

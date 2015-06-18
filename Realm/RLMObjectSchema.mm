@@ -28,9 +28,6 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#import "object_store.hpp"
-#import <realm/group.hpp>
-
 using namespace realm;
 
 // private properties
@@ -49,6 +46,8 @@ using namespace realm;
     self.className = objectClassName;
     self.properties = properties;
     self.objectClass = objectClass;
+    self.accessorClass = objectClass;
+    self.standaloneClass = objectClass;
     return self;
 }
 
@@ -309,7 +308,7 @@ using namespace realm;
 
 - (realm::Table *)table {
     if (!_table) {
-        _table = ObjectStore::table_for_object_type(_realm.group, _className.UTF8String);
+        [_realm cacheTableAccessors];
     }
     return _table.get();
 }

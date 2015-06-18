@@ -19,11 +19,10 @@
 #include "object_schema.hpp"
 #include "object_store.hpp"
 
-#include <realm/group.hpp>
-#include <realm/table.hpp>
+#include <realm/group_shared.hpp>
+#include <realm/link_view.hpp>
 
 using namespace realm;
-using namespace std;
 
 ObjectSchema::ObjectSchema(Group *group, const std::string &name) : name(name) {
     TableRef tableRef = ObjectStore::table_for_object_type(group, name);
@@ -44,14 +43,14 @@ ObjectSchema::ObjectSchema(Group *group, const std::string &name) : name(name) {
             realm::TableRef linkTable = table->get_link_target(col);
             property.object_type = ObjectStore::object_type_for_table_name(linkTable->get_name().data());
         }
-        properties.push_back(move(property));
+        properties.push_back(std::move(property));
     }
 
     primary_key = realm::ObjectStore::get_primary_key_for_object(group, name);
     if (primary_key.length()) {
         auto primary_key_prop = primary_key_property();
         if (!primary_key_prop) {
-            throw ObjectStoreException(ObjectStoreException::Kind::ObjectSchemaChangedPrimaryKey, name, primary_key);
+            throw InvalidPrimaryKeyException(name, primary_key);
         }
         primary_key_prop->is_primary = true;
     }

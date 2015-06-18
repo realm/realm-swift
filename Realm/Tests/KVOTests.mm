@@ -1470,10 +1470,7 @@ public:
     [super setUp];
     // use private constructor to bypass cache and get a second instance on the
     // same thread
-    self.secondaryRealm = [[RLMRealm alloc] initWithPath:self.realm.path
-                                                     key:nil readOnly:NO
-                                                inMemory:YES dynamic:NO error:nil];
-    RLMRealmSetSchema(self.secondaryRealm, [self.realm.schema shallowCopy], false);
+    self.secondaryRealm = [RLMRealm realmWithPath:self.realm.path key:nil readOnly:NO inMemory:YES dynamic:NO schema:[self.realm.schema shallowCopy] error:nil];
 }
 
 - (void)tearDown {

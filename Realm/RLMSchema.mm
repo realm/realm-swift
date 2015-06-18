@@ -197,12 +197,17 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
 // schema based on tables in a realm
 + (instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm {
     // generate object schema and class mapping for all tables in the realm
-    ObjectStore::Schema objectStoreSchema = ObjectStore::schema_from_group(realm.group);
+    Schema objectStoreSchema = ObjectStore::schema_from_group(realm.group);
+    return [self dynamicSchemaFromObjectStoreSchema:objectStoreSchema];
+}
 
+// schema based on tables in a realm
++ (instancetype)dynamicSchemaFromObjectStoreSchema:(Schema &)objectStoreSchema {
     // cache descriptors for all subclasses of RLMObject
     NSMutableArray *schemaArray = [NSMutableArray arrayWithCapacity:objectStoreSchema.size()];
-    for (unsigned long i = 0; i < objectStoreSchema.size(); i++) {
-        [schemaArray addObject:[RLMObjectSchema objectSchemaForObjectStoreSchema:objectStoreSchema[i]]];
+    for (auto &objectSchema : objectStoreSchema) {
+        RLMObjectSchema *schema = [RLMObjectSchema objectSchemaForObjectStoreSchema:objectSchema.second];
+        [schemaArray addObject:schema];
     }
 
     // set class array and mapping

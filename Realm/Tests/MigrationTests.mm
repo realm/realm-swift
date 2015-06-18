@@ -30,7 +30,7 @@
 #import "RLMUtil.hpp"
 
 #import "object_store.hpp"
-#import <realm/table.hpp>
+#import "shared_realm.hpp"
 
 using namespace realm;
 

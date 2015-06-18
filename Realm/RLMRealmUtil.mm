@@ -34,7 +34,7 @@ void RLMCacheRealm(RLMRealm *realm) {
             s_realmsPerPath[realm.path] = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality
                                                                 valueOptions:NSPointerFunctionsWeakMemory];
         }
-        [s_realmsPerPath[realm.path] setObject:realm forKey:@(realm->_threadID)];
+        [s_realmsPerPath[realm.path] setObject:realm forKey:@(pthread_mach_thread_np(pthread_self()))];
     }
 }
 
@@ -53,6 +53,9 @@ RLMRealm *RLMGetThreadLocalCachedRealmForPath(NSString *path) {
 
 void RLMClearRealmCache() {
     @synchronized(s_realmsPerPath) {
+        /*for (NSMapTable *table in s_realmsPerPath.allValues) {
+            assert(table.objectEnumerator.allObjects.count == 0);
+        }*/
         [s_realmsPerPath removeAllObjects];
     }
 }
@@ -65,7 +68,7 @@ void RLMInstallUncaughtExceptionHandler() {
         @synchronized(s_realmsPerPath) {
             for (NSMapTable *realmsPerThread in s_realmsPerPath.allValues) {
                 if (RLMRealm *realm = [realmsPerThread objectForKey:threadID]) {
-                    if (realm->_inWriteTransaction) {
+                    if (realm.inWriteTransaction) {
                         [realm cancelWriteTransaction];
                     }
                 }
@@ -246,7 +249,7 @@ public:
     ctx.info = (__bridge void *)self;
     ctx.perform = [](void *info) {
         RLMNotifier *notifier = (__bridge RLMNotifier *)info;
-        [notifier->_realm handleExternalCommit];
+        [notifier->_realm notify];
     };
 
     CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
