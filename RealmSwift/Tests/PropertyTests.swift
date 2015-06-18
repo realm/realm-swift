@@ -32,7 +32,7 @@ class PropertyTests: TestCase {
             self.primitiveProperty = schema["SwiftObject"]!["intCol"]!
             self.linkProperty = schema["SwiftOptionalObject"]!["optObjectCol"]!
             self.primaryProperty = schema["SwiftPrimaryStringObject"]!["stringCol"]!
-            self.optionalProperty = schema["SwiftOptionalObject"]!["optStringCol"]!
+            self.optionalProperty = schema["SwiftOptionalObject"]!["optObjectCol"]!
         }
     }
 

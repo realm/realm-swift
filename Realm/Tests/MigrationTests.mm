@@ -831,6 +831,7 @@
     [RLMRealm setSchemaVersion:RLMNotVersioned - 1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
 }
 
+#ifdef REALM_ENABLE_NULL
 - (void)testChangingColumnNullability {
     RLMSchema *nullable = [[RLMSchema alloc] init];
     nullable.objectSchema = @[[RLMObjectSchema schemaForObjectClass:StringObject.class]];
@@ -887,5 +888,6 @@
         XCTAssertTrue(realm.schema[@"MigrationTwoStringObject"][@"col1"].optional);
     }
 }
+#endif
 
 @end

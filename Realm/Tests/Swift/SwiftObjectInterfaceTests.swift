@@ -137,6 +137,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         }
     }
 
+#if REALM_ENABLE_NULL
     func testOptionalSwiftProperties() {
         let realm = realmWithTestPath()
         realm.transactionWithBlock { realm.addObject(SwiftOptionalObject()) }
@@ -166,6 +167,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         XCTAssertNil(firstObj.optStringCol)
         XCTAssertNil(firstObj.optBinaryCol)
     }
+#endif
 
     func testSwiftClassNameIsDemangled() {
         XCTAssertEqual(SwiftObject.className()!, "SwiftObject", "Calling className() on Swift class should return demangled name")

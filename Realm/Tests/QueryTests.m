@@ -1718,6 +1718,7 @@
                                       @"Operator 'ENDSWITH' is not supported .* right side");
 }
 
+#ifdef REALM_ENABLE_NULL
 - (void)testQueryOnNullableStringColumn {
     void (^testWithStringClass)(Class) = ^(Class stringObjectClass) {
         RLMRealm *realm = [RLMRealm defaultRealm];
@@ -1808,5 +1809,6 @@
     testWithStringClass([LinkStringObject class], [StringObject class]);
     testWithStringClass([LinkIndexedStringObject class], [IndexedStringObject class]);
 }
+#endif
 
 @end

@@ -27,8 +27,10 @@
 BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
     switch (propertyType) {
         case RLMPropertyTypeObject:
+#ifdef REALM_ENABLE_NULL
         case RLMPropertyTypeString:
         case RLMPropertyTypeData:
+#endif
             return YES;
         default:
             return NO;
@@ -134,14 +136,18 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
             }
             else if (strcmp(code, "@\"NSString\"") == 0) {
                 _type = RLMPropertyTypeString;
+#if REALM_ENABLE_NULL
                 _optional = YES;
+#endif
             }
             else if (strcmp(code, "@\"NSDate\"") == 0) {
                 _type = RLMPropertyTypeDate;
             }
             else if (strcmp(code, "@\"NSData\"") == 0) {
                 _type = RLMPropertyTypeData;
+#if REALM_ENABLE_NULL
                 _optional = YES;
+#endif
             }
             else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
                 // get object class from type string - @"RLMArray<objectClassName>"

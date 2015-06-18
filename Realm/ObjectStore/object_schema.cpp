@@ -37,7 +37,11 @@ ObjectSchema::ObjectSchema(Group *group, const std::string &name) : name(name) {
         property.type = (PropertyType)table->get_column_type(col);
         property.is_indexed = table->has_search_index(col);
         property.is_primary = false;
+#ifdef REALM_ENABLE_NULL
         property.is_nullable = table->is_nullable(col) || property.type == PropertyTypeObject;
+#else
+        property.is_nullable = property.type == PropertyTypeObject;
+#endif
         property.table_column = col;
         if (property.type == PropertyTypeObject || property.type == PropertyTypeArray) {
             // set link type for objects and arrays

@@ -292,7 +292,11 @@ bool ObjectStore::create_tables(Group *group, ObjectStore::Schema &target_schema
                         break;
                     }
                     default:
+#ifdef REALM_ENABLE_NULL
                         target_prop.table_column = table->add_column(DataType(target_prop.type), target_prop.name, target_prop.is_nullable);
+#else
+                        target_prop.table_column = table->add_column(DataType(target_prop.type), target_prop.name);
+#endif
                         break;
                 }
 
