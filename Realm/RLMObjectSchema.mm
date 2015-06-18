@@ -292,7 +292,7 @@ using namespace realm;
 
 - (realm::Table *)table {
     if (!_table) {
-        _table = ObjectStore::table_for_object_type(_realm.group, _className.UTF8String);
+        [_realm cacheTableAccessors];
     }
     return _table.get();
 }

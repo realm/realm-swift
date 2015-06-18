@@ -151,7 +151,7 @@ static BOOL encryptTests() {
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
-        if (note == expectedNote) {
+        if ([note isEqualToString:expectedNote]) {
             [notificationFired fulfill];
         }
     }];

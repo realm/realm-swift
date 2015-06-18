@@ -30,6 +30,7 @@
 #import "RLMUtil.hpp"
 
 #include "object_store.hpp"
+#include "shared_realm.hpp"
 #include <realm/commit_log.hpp>
 #include <realm/disable_sync_to_disk.hpp>
 #include <realm/version.hpp>
@@ -44,9 +45,13 @@ void RLMDisableSyncToDisk() {
 
 // Notification Token
 
-@interface RLMNotificationToken ()
+@interface RLMNotificationToken () {
+@public
+    Realm::NotificationFunction _notification;
+}
 @property (nonatomic, strong) RLMRealm *realm;
 @property (nonatomic, copy) RLMNotificationBlock block;
+
 @end
 
 @implementation RLMNotificationToken
@@ -153,20 +158,14 @@ static NSString *s_defaultRealmPath = nil;
 static NSString * const c_defaultRealmFileName = @"default.realm";
 
 @implementation RLMRealm {
-    // Used for read-write realms
-    NSHashTable *_notificationHandlers;
-
-    std::unique_ptr<ClientHistory> _history;
-    std::unique_ptr<SharedGroup> _sharedGroup;
-
-    // Used for read-only realms
-    std::unique_ptr<Group> _readGroup;
-
-    // Used for both
-    Group *_group;
-    BOOL _readOnly;
-    BOOL _inMemory;
+    SharedRealm _realm;
 }
+
+@dynamic path;
+@dynamic readOnly;
+@dynamic inWriteTransaction;
+@dynamic group;
+@dynamic autorefresh;
 
 + (BOOL)isCoreDebug {
     return realm::Version::has_feature(realm::feature_Debug);
@@ -183,16 +182,37 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     RLMInstallUncaughtExceptionHandler();
 }
 
+- (void)verifyThread {
+    _realm->verify_thread();
+}
+
+- (BOOL)inWriteTransaction {
+    return _realm->is_in_transaction();
+}
+
+- (NSString *)path {
+    return @(_realm->config().path.c_str());
+}
+
+- (realm::Group *)group {
+    return _realm->read_group();
+}
+
+- (BOOL)isReadOnly {
+    return _realm->config().read_only;
+}
+
+-(BOOL)autorefresh {
+    return _realm->auto_refresh();
+}
+
+- (void)setAutorefresh:(BOOL)autorefresh {
+    _realm->set_auto_refresh(autorefresh);
+}
+
 - (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory dynamic:(BOOL)dynamic error:(NSError **)outError {
-    self = [super init];
-    if (self) {
-        _path = path;
-        _threadID = pthread_mach_thread_np(pthread_self());
-        _notificationHandlers = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
-        _readOnly = readonly;
-        _inMemory = inMemory;
+    if (self = [super init]) {
         _dynamic = dynamic;
-        _autorefresh = YES;
 
         NSError *error = nil;
         try {
@@ -200,44 +220,12 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
             if ((key = validatedKey(key))) {
                 validateNotInDebugger();
             }
-
-            if (readonly) {
-                _readGroup = make_unique<Group>(path.UTF8String, static_cast<const char *>(key.bytes));
-                _group = _readGroup.get();
-            }
-            else {
-                _history = realm::make_client_history(path.UTF8String,
-                                                      static_cast<const char *>(key.bytes));
-                SharedGroup::DurabilityLevel durability = inMemory ? SharedGroup::durability_MemOnly :
-                                                                     SharedGroup::durability_Full;
-                _sharedGroup = make_unique<SharedGroup>(*_history, durability,
-                                                        static_cast<const char *>(key.bytes));
-            }
-        }
-        catch (File::PermissionDenied const& ex) {
-            NSString *mode = readonly ? @"read" : @"read-write";
-            NSString *additionalMessage = [NSString stringWithFormat:@"Unable to open a realm at path '%@'. Please use a path where your app has %@ permissions.", path, mode];
-            NSString *newMessage = [NSString stringWithFormat:@"%s\n%@", ex.what(), additionalMessage];
-            error = RLMMakeError(RLMErrorFilePermissionDenied,
-                                     File::PermissionDenied(newMessage.UTF8String));
-        }
-        catch (File::Exists const& ex) {
-            error = RLMMakeError(RLMErrorFileExists, ex);
-        }
-        catch (File::AccessError const& ex) {
-            error = RLMMakeError(RLMErrorFileAccessError, ex);
-        }
-        catch (IncompatibleLockFile const&) {
-            NSString *err = @"Realm file is currently open in another process "
-                             "which cannot share access with this process. All "
-                             "processes sharing a single file must be the same "
-                             "architecture. For sharing files between the Realm "
-                             "Browser and an iOS simulator, this means that you "
-                             "must use a 64-bit simulator.";
-            error = [NSError errorWithDomain:RLMErrorDomain
-                                        code:RLMErrorIncompatibleLockFile
-                                    userInfo:@{NSLocalizedDescriptionKey: err,
-                                               @"Error Code": @(RLMErrorIncompatibleLockFile)}];
+            realm::Realm::Config config;
+            config.path = path.UTF8String;
+            config.read_only = readonly;
+            config.in_memory = inMemory;
+            config.encryption_key = key ? static_cast<const char *>(key.bytes) : StringData();
+            _realm = std::make_shared<realm::Realm>(config);
         }
         catch (exception const& ex) {
             error = RLMMakeError(RLMErrorFail, ex);
@@ -250,13 +238,6 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 
     }
     return self;
-}
-
-- (realm::Group *)getOrCreateGroup {
-    if (!_group) {
-        _group = &const_cast<Group&>(_sharedGroup->begin_read());
-    }
-    return _group;
 }
 
 + (NSString *)defaultRealmPath
@@ -368,10 +349,10 @@ static id RLMAutorelease(id value) {
     // try to reuse existing realm first
     RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(path);
     if (realm) {
-        if (realm->_readOnly != readonly) {
+        if (realm.isReadOnly != readonly) {
             @throw RLMException(@"Realm at path already opened with different read permissions", @{@"path":realm.path});
         }
-        if (realm->_inMemory != inMemory) {
+        if (realm->_realm->config().in_memory != inMemory) {
             @throw RLMException(@"Realm at path already opened with different inMemory settings", @{@"path":realm.path});
         }
         if (realm->_dynamic != dynamic) {
@@ -435,13 +416,17 @@ static id RLMAutorelease(id value) {
         if (!realm.notifier) {
             return nil;
         }
+        __weak RLMNotifier *weakNotifier = realm.notifier;
+        realm->_realm->m_external_notifier = make_unique<function<void()>>([=]() {
+            [weakNotifier notifyOtherRealms];
+        });
     }
 
     return RLMAutorelease(realm);
 }
 
 - (NSError *(^)())migrationBlock:(NSData *)encryptionKey {
-    RLMMigrationBlock userBlock = migrationBlockForPath(_path);
+    RLMMigrationBlock userBlock = migrationBlockForPath(self.path);
     if (userBlock) {
         return ^{
             NSError *error;
@@ -478,13 +463,13 @@ static id RLMAutorelease(id value) {
 }
 
 static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a read-only Realm") {
-    if (realm->_readOnly) {
+    if (realm.readOnly) {
         @throw RLMException(msg);
     }
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
-    RLMCheckThread(self);
+    [self verifyThread];
     CheckReadWrite(self, @"Read-only Realms do not change and do not have change notifications");
     if (!block) {
         @throw RLMException(@"The notification block should not be nil");
@@ -493,129 +478,47 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
     token.realm = self;
     token.block = block;
-    [_notificationHandlers addObject:token];
+    token->_notification = token->_notification.make_shared([=](const std::string notification) {
+        token.block([NSString stringWithUTF8String:notification.c_str()], token.realm);
+    });
+    _realm->add_notification(token->_notification);
     return token;
 }
 
 - (void)removeNotification:(RLMNotificationToken *)token {
-    RLMCheckThread(self);
+    [self verifyThread];
     if (token) {
-        [_notificationHandlers removeObject:token];
+        _realm->remove_notification(token->_notification);
         token.realm = nil;
-        token.block = nil;
-    }
-}
-
-- (void)sendNotifications:(NSString *)notification {
-    NSAssert(!_readOnly, @"Read-only realms do not have notifications");
-
-    // call this realms notification blocks
-    for (RLMNotificationToken *token in [_notificationHandlers allObjects]) {
-        if (token.block) {
-            token.block(notification, self);
-        }
     }
 }
 
 - (void)beginWriteTransaction {
-    CheckReadWrite(self);
-    RLMCheckThread(self);
-
-    if (!self.inWriteTransaction) {
-        try {
-            // if the upgrade to write will move the transaction forward,
-            // announce the change after promoting
-            bool announce = _sharedGroup->has_changed();
-
-            // begin the read transaction if needed
-            [self getOrCreateGroup];
-
-            LangBindHelper::promote_to_write(*_sharedGroup, *_history);
-
-            // update state and make all objects in this realm writable
-            _inWriteTransaction = YES;
-
-            if (announce) {
-                [self sendNotifications:RLMRealmDidChangeNotification];
-            }
-        }
-        catch (std::exception& ex) {
-            // File access errors are treated as exceptions here since they should not occur after the shared
-            // group has already been successfully opened on the file and memory mapped. The shared group constructor handles
-            // the excepted error related to file access.
-            @throw RLMException(ex);
-        }
-    } else {
-        @throw RLMException(@"The Realm is already in a write transaction");
-    }
+    _realm->begin_transaction();
 }
 
 - (void)commitWriteTransaction {
-    CheckReadWrite(self);
-    RLMCheckThread(self);
-
-    if (self.inWriteTransaction) {
-        try {
-            LangBindHelper::commit_and_continue_as_read(*_sharedGroup);
-
-            // update state and make all objects in this realm read-only
-            _inWriteTransaction = NO;
-
-            // notify other realm instances of changes
-            [self.notifier notifyOtherRealms];
-
-            // send local notification
-            [self sendNotifications:RLMRealmDidChangeNotification];
-        }
-        catch (std::exception& ex) {
-            @throw RLMException(ex);
-        }
-    } else {
-       @throw RLMException(@"Can't commit a non-existing write transaction");
-    }
+    _realm->commit_transaction();
 }
 
 - (void)transactionWithBlock:(void(^)(void))block {
-    [self beginWriteTransaction];
+    _realm->begin_transaction();
     block();
-    if (_inWriteTransaction) {
-        [self commitWriteTransaction];
+    if (_realm->is_in_transaction()) {
+        _realm->commit_transaction();
     }
 }
 
 - (void)cancelWriteTransaction {
-    CheckReadWrite(self);
-    RLMCheckThread(self);
-
-    if (self.inWriteTransaction) {
-        try {
-            LangBindHelper::rollback_and_continue_as_read(*_sharedGroup, *_history);
-            _inWriteTransaction = NO;
-        }
-        catch (std::exception& ex) {
-            @throw RLMException(ex);
-        }
-    } else {
-        @throw RLMException(@"Can't cancel a non-existing write transaction");
-    }
+    _realm->cancel_transaction();
 }
 
 - (void)invalidate {
-    RLMCheckThread(self);
-    CheckReadWrite(self, @"Cannot invalidate a read-only realm");
-
-    if (_inWriteTransaction) {
+    if (_realm->is_in_transaction()) {
         NSLog(@"WARNING: An RLMRealm instance was invalidated during a write "
               "transaction and all pending changes have been rolled back.");
-        [self cancelWriteTransaction];
     }
-    if (!_group) {
-        // Nothing to do if the read transaction hasn't been begun
-        return;
-    }
-
-    _sharedGroup->end_read();
-    _group = nullptr;
+    _realm->invalidate();
     for (RLMObjectSchema *objectSchema in _schema.objectSchema) {
         objectSchema.table = nullptr;
     }
@@ -643,28 +546,11 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
  */
 - (BOOL)compact
 {
-    RLMCheckThread(self);
-    BOOL compactSucceeded = NO;
-    if (!_inWriteTransaction) {
-        try {
-            for (RLMObjectSchema *objectSchema in _schema.objectSchema) {
-                objectSchema.table->optimize();
-            }
-            _sharedGroup->end_read();
-            compactSucceeded = _sharedGroup->compact();
-            _sharedGroup->begin_read();
-        }
-        catch (std::exception& ex) {
-            @throw RLMException(ex);
-        }
-    } else {
-        @throw RLMException(@"Can't compact a Realm within a write transaction");
-    }
-    return compactSucceeded;
+    return _realm->compact();
 }
 
 - (void)dealloc {
-    if (_inWriteTransaction) {
+    if (_realm && _realm->is_in_transaction()) {
         [self cancelWriteTransaction];
         NSLog(@"WARNING: An RLMRealm instance was deallocated during a write transaction and all "
               "pending changes have been rolled back. Make sure to retain a reference to the "
@@ -673,53 +559,17 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     [_notifier stop];
 }
 
-- (void)handleExternalCommit {
-    RLMCheckThread(self);
-    NSAssert(!_readOnly, @"Read-only realms do not have notifications");
-    try {
-        if (_sharedGroup->has_changed()) { // Throws
-            if (_autorefresh) {
-                if (_group) {
-                    LangBindHelper::advance_read(*_sharedGroup, *_history);
-                }
-                [self sendNotifications:RLMRealmDidChangeNotification];
-            }
-            else {
-                [self sendNotifications:RLMRealmRefreshRequiredNotification];
-            }
-        }
-    }
-    catch (exception &ex) {
-        @throw RLMException(ex);
-    }
+- (void)notify {
+    _realm->notify();
 }
 
 - (BOOL)refresh {
-    RLMCheckThread(self);
-    CheckReadWrite(self, @"Cannot refresh a read-only realm (external modifications to read only realms are not supported)");
+    return _realm->refresh();
+}
 
-    // can't be any new changes if we're in a write transaction
-    if (self.inWriteTransaction) {
-        return NO;
-    }
-
-    try {
-        // advance transaction if database has changed
-        if (_sharedGroup->has_changed()) { // Throws
-            if (_group) {
-                LangBindHelper::advance_read(*_sharedGroup, *_history);
-            }
-            else {
-                // Create the read transaction
-                [self getOrCreateGroup];
-            }
-            [self sendNotifications:RLMRealmDidChangeNotification];
-            return YES;
-        }
-        return NO;
-    }
-    catch (exception &ex) {
-        @throw RLMException(ex);
+- (void)cacheTableAccessors {
+    for (RLMObjectSchema *objectSchema in _schema.objectSchema) {
+        objectSchema.table = ObjectStore::table_for_object_type(_realm->read_group(), objectSchema.className.UTF8String).get();
     }
 }
 

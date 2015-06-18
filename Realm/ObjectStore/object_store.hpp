@@ -48,7 +48,7 @@ namespace realm {
         // updates the column mapping on the target_schema
         // if no table is provided it is fetched from the group
         // returns array of validation errors
-        static std::vector<ObjectStoreException> validate_schema(Group *group, ObjectSchema &target_schema);
+        static std::vector<ObjectStoreException> validate_object_schema(Group *group, ObjectSchema &target_schema);
 
         // updates the target_column member for all properties based on the column indexes in the passed in group
         static void update_column_mapping(Group *group, ObjectSchema &target_schema);

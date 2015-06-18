@@ -420,7 +420,7 @@ extern "C" {
         __block bool fulfilled = false;
         RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
             XCTAssertNotNil(realm, @"Realm should not be nil");
-            XCTAssertEqual(note, RLMRealmDidChangeNotification);
+            XCTAssertEqualObjects(note, RLMRealmDidChangeNotification);
             XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
             fulfilled = true;
         }];

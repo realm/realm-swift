@@ -99,7 +99,7 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndA
         if (verifyAndAlignColumns && objectSchema.table) {
             ObjectSchema schema = objectSchema.objectStoreCopy;
             if (verifyAndAlignColumns) {
-                auto errors = ObjectStore::validate_schema(realm.group, schema);
+                auto errors = ObjectStore::validate_object_schema(realm.group, schema);
                 if (errors.size()) {
                     @throw RLMException(ObjectStoreException(errors, schema.name));
                 }
@@ -189,7 +189,7 @@ static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *con
     if (!realm.inWriteTransaction) {
         @throw RLMException(@"Can only add, remove, or create objects in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
-    RLMCheckThread(realm);
+    [realm verifyThread];
 }
 
 void RLMInitializeSwiftListAccessor(__unsafe_unretained RLMObjectBase *const object) {
@@ -533,7 +533,7 @@ void RLMDeleteAllObjectsFromRealm(RLMRealm *realm) {
 }
 
 RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) {
-    RLMCheckThread(realm);
+    [realm verifyThread];
 
     // create view from table and predicate
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
@@ -557,7 +557,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
 }
 
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
-    RLMCheckThread(realm);
+    [realm verifyThread];
 
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
 

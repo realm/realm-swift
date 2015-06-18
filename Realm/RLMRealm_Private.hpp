@@ -28,13 +28,9 @@ namespace realm {
 }
 
 @interface RLMRealm ()
-@property (nonatomic, readonly, getter=getOrCreateGroup) realm::Group *group;
-- (void)handleExternalCommit;
+// FIXME - group should not be exposed
+@property (nonatomic, readonly) realm::Group *group;
+- (void)verifyThread;
+- (void)notify;
+- (void)cacheTableAccessors;
 @end
-
-// throw an exception if the realm is being used from the wrong thread
-static inline void RLMCheckThread(__unsafe_unretained RLMRealm *const realm) {
-    if (realm->_threadID != pthread_mach_thread_np(pthread_self())) {
-        @throw RLMException(@"Realm accessed from incorrect thread");
-    }
-}

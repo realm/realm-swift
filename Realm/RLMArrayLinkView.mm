@@ -53,13 +53,13 @@ static inline void RLMLinkViewArrayValidateAttached(__unsafe_unretained RLMArray
     if (!ar->_backingLinkView->is_attached()) {
         @throw RLMException(@"RLMArray is no longer valid");
     }
-    RLMCheckThread(ar->_realm);
+    [ar->_realm verifyThread];
 }
 static inline void RLMLinkViewArrayValidateInWriteTransaction(__unsafe_unretained RLMArrayLinkView *const ar) {
     // first verify attached
     RLMLinkViewArrayValidateAttached(ar);
 
-    if (!ar->_realm->_inWriteTransaction) {
+    if (!ar->_realm.inWriteTransaction) {
         @throw RLMException(@"Can't mutate a persisted array outside of a write transaction.");
     }
 }

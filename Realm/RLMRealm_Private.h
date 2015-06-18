@@ -24,12 +24,7 @@
 FOUNDATION_EXTERN void RLMDisableSyncToDisk();
 
 // RLMRealm private members
-@interface RLMRealm () {
-    @public
-    // expose ivar to to avoid objc messages in accessors
-    BOOL _inWriteTransaction;
-    mach_port_t _threadID;
-}
+@interface RLMRealm ()
 
 @property (nonatomic, readonly) BOOL dynamic;
 @property (nonatomic, readwrite) RLMSchema *schema;

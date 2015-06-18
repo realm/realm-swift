@@ -110,14 +110,14 @@ static inline void RLMResultsValidateAttached(__unsafe_unretained RLMResults *co
 }
 static inline void RLMResultsValidate(__unsafe_unretained RLMResults *const ar) {
     RLMResultsValidateAttached(ar);
-    RLMCheckThread(ar->_realm);
+    [ar->_realm verifyThread];
 }
 
 static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMResults *const ar) {
     // first verify attached
     RLMResultsValidate(ar);
 
-    if (!ar->_realm->_inWriteTransaction) {
+    if (!ar->_realm.inWriteTransaction) {
         @throw RLMException(@"Can't mutate a persisted array outside of a write transaction.");
     }
 }
@@ -139,7 +139,7 @@ static RowIndexes::Sorter RLMSorterFromDescriptors(RLMObjectSchema *schema, NSAr
         return _backingView.size();
     }
     else {
-        RLMCheckThread(_realm);
+        [_realm verifyThread];
         return _backingQuery->count();
     }
 }
@@ -498,7 +498,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (NSUInteger)count {
-    RLMCheckThread(_realm);
+    [_realm verifyThread];
     return _table->size();
 }
 
@@ -519,7 +519,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
-    RLMCheckThread(_realm);
+    [_realm verifyThread];
     if (object.invalidated) {
         @throw RLMException(@"RLMObject is no longer valid");
     }
@@ -541,22 +541,22 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (id)minOfProperty:(NSString *)property {
-    RLMCheckThread(_realm);
+    [_realm verifyThread];
     return minOfProperty(*_table, _realm, _objectClassName, property);
 }
 
 - (id)maxOfProperty:(NSString *)property {
-    RLMCheckThread(_realm);
+    [_realm verifyThread];
     return maxOfProperty(*_table, _realm, _objectClassName, property);
 }
 
 - (NSNumber *)sumOfProperty:(NSString *)property {
-    RLMCheckThread(_realm);
+    [_realm verifyThread];
     return sumOfProperty(*_table, _realm, _objectClassName, property);
 }
 
 - (NSNumber *)averageOfProperty:(NSString *)property {
-    RLMCheckThread(_realm);
+    [_realm verifyThread];
     return averageOfProperty(*_table, _realm, _objectClassName, property);
 }
 

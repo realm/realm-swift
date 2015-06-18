@@ -161,7 +161,7 @@ TableRef ObjectStore::table_for_object_type_create_if_needed(Group *group, const
     return group->get_or_add_table(table_name_for_object_type(object_type), &created);
 }
 
-std::vector<ObjectStoreException> ObjectStore::validate_schema(Group *group, ObjectSchema &target_schema) {
+std::vector<ObjectStoreException> ObjectStore::validate_object_schema(Group *group, ObjectSchema &target_schema) {
     vector<ObjectStoreException> exceptions;
     ObjectSchema table_schema(group, target_schema.name);
 
@@ -372,7 +372,7 @@ bool ObjectStore::update_realm_with_schema(Group *group,
         // read-only realms may be missing tables entirely
         TableRef table = table_for_object_type(group, target_schema.name);
         if (table) {
-            auto errors = validate_schema(group, target_schema);
+            auto errors = validate_object_schema(group, target_schema);
             if (errors.size()) {
                 throw ObjectStoreException(errors, target_schema.name);
             }
