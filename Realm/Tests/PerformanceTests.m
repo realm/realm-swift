@@ -439,60 +439,6 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
-- (void)testCrossThreadSyncLatency {
-    const int stopValue = 500;
-
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
-        [realm beginWriteTransaction];
-        IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
-        [realm commitWriteTransaction];
-
-        dispatch_queue_t queue = dispatch_queue_create("background", 0);
-        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-        dispatch_async(queue, ^{
-            RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
-            IntObject *obj = [[IntObject allObjectsInRealm:realm] firstObject];
-            RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
-                if (obj.intCol % 2 == 0 && obj.intCol < stopValue) {
-                    [realm transactionWithBlock:^{
-                        obj.intCol++;
-                    }];
-                }
-            }];
-
-            dispatch_semaphore_signal(sema);
-            while (obj.intCol < stopValue) {
-                [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-            }
-
-            [realm removeNotification:token];
-        });
-
-        RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
-            if (obj.intCol % 2 == 1 && obj.intCol < stopValue) {
-                [realm transactionWithBlock:^{
-                    obj.intCol++;
-                }];
-            }
-        }];
-
-        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-        [self startMeasuring];
-        [realm transactionWithBlock:^{
-            obj.intCol++;
-        }];
-        while (obj.intCol < stopValue) {
-            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-        }
-
-        dispatch_sync(queue, ^{});
-        [self stopMeasuring];
-
-        [realm removeNotification:token];
-    }];
-}
-
 @end
 
 #endif
