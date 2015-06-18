@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMRealm;
+@class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMRealm, RLMProperty;
 
 typedef NSUInteger RLMCreationOptions;
 
@@ -35,6 +35,7 @@ Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchem
 //
 void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val);
 id RLMDynamicGet(RLMObjectBase *obj, NSString *propName);
+id RLMDynamicGet(RLMObjectBase *obj, RLMProperty *prop);
 
 // by property/column
 void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOptions options);

@@ -18,6 +18,7 @@
 
 #import "RLMObservation.hpp"
 
+#import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
@@ -147,7 +148,7 @@ void RLMObservationInfo::recordObserver(realm::Row& objectRow,
         NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
         RLMProperty *prop = objectSchema[key];
         if (prop && prop.type == RLMPropertyTypeArray) {
-            id value = valueForKey(key, ^{ return [object valueForKey:key]; });
+            id value = valueForKey(key);
             RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmArray] : value;
             array->_key = key;
             array->_parentObject = object;
@@ -169,7 +170,7 @@ void RLMObservationInfo::removeObserver() {
     --observerCount;
 }
 
-id RLMObservationInfo::valueForKey(NSString *key, id (^getValue)()) {
+id RLMObservationInfo::valueForKey(NSString *key) {
     if (invalidated) {
         if ([key isEqualToString:RLMInvalidatedKey]) {
             return @YES;
@@ -177,16 +178,25 @@ id RLMObservationInfo::valueForKey(NSString *key, id (^getValue)()) {
         return cachedObjects[key];
     }
 
-    RLMProperty *prop = objectSchema[key];
-    if (!prop) {
-        return getValue();
+    if (key != lastKey) {
+        lastKey = key;
+        lastProp = objectSchema[key];
     }
 
+    static auto superValueForKey = reinterpret_cast<id(*)(id, SEL, NSString *)>([NSObject methodForSelector:@selector(valueForKey:)]);
+    if (!lastProp) {
+        return superValueForKey(object, @selector(valueForKey:), key);
+    }
+
+    auto getSuper = [&] {
+        return row ? RLMDynamicGet(object, lastProp) : superValueForKey(object, @selector(valueForKey:), key);
+    };
+
     // We need to return the same object each time for observing over keypaths to work
-    if (prop.type == RLMPropertyTypeArray) {
+    if (lastProp.type == RLMPropertyTypeArray) {
         RLMArray *value = cachedObjects[key];
         if (!value) {
-            value = getValue();
+            value = getSuper();
             if (!cachedObjects) {
                 cachedObjects = [NSMutableDictionary new];
             }
@@ -195,17 +205,17 @@ id RLMObservationInfo::valueForKey(NSString *key, id (^getValue)()) {
         return value;
     }
 
-    if (prop.type == RLMPropertyTypeObject) {
-        if (row.is_null_link(prop.column)) {
+    if (lastProp.type == RLMPropertyTypeObject) {
+        if (row.is_null_link(lastProp.column)) {
             [cachedObjects removeObjectForKey:key];
             return nil;
         }
 
         RLMObjectBase *value = cachedObjects[key];
-        if (value && value->_row.get_index() == row.get_link(prop.column)) {
+        if (value && value->_row.get_index() == row.get_link(lastProp.column)) {
             return value;
         }
-        value = getValue();
+        value = getSuper();
         if (!cachedObjects) {
             cachedObjects = [NSMutableDictionary new];
         }
@@ -213,7 +223,7 @@ id RLMObservationInfo::valueForKey(NSString *key, id (^getValue)()) {
         return value;
     }
 
-    return getValue();
+    return getSuper();
 }
 
 RLMObservationInfo *RLMGetObservationInfo(std::unique_ptr<RLMObservationInfo> const& info,

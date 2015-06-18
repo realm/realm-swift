@@ -21,7 +21,7 @@
 #import <realm/link_view.hpp> // required by row.hpp
 #import <realm/row.hpp>
 
-@class RLMObjectSchema, RLMObjectBase, RLMRealm, RLMSchema;
+@class RLMObjectSchema, RLMObjectBase, RLMRealm, RLMSchema, RLMProperty;
 
 namespace realm {
     class History;
@@ -57,7 +57,7 @@ public:
     void removeObserver();
     bool hasObservers() const { return observerCount > 0; }
 
-    id valueForKey(NSString *key, id (^value)());
+    id valueForKey(NSString *key);
 
 private:
     RLMObservationInfo *next = nullptr;
@@ -73,6 +73,8 @@ private:
     // valueForKey: hack
     bool invalidated = false;
     size_t observerCount = 0;
+    NSString *lastKey = nil;
+    __unsafe_unretained RLMProperty *lastProp = nil;
 
     // objects returned from valueForKey() to keep them alive in case observers
     // are added and so that they can still be accessed after row is detached

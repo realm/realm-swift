@@ -126,7 +126,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 
 - (id)valueForKey:(NSString *)key {
     if (_observationInfo) {
-        return _observationInfo->valueForKey(key, ^{ return [super valueForKey:key]; });
+        return _observationInfo->valueForKey(key);
     }
     return [super valueForKey:key];
 }
