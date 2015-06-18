@@ -445,6 +445,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
         [realm beginWriteTransaction];
+        [realm deleteAllObjects];
         IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
 
