@@ -53,6 +53,9 @@ RLMRealm *RLMGetThreadLocalCachedRealmForPath(NSString *path) {
 
 void RLMClearRealmCache() {
     @synchronized(s_realmsPerPath) {
+        /*for (NSMapTable *table in s_realmsPerPath.allValues) {
+            assert(table.objectEnumerator.allObjects.count == 0);
+        }*/
         [s_realmsPerPath removeAllObjects];
     }
 }
