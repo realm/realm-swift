@@ -56,7 +56,12 @@ class TestCase: XCTestCase {
 
     func assertThrows<T>(@autoclosure(escaping) block: () -> T, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
         exceptionThrown = true
-        RLMAssertThrows(self, { _ = block() } as dispatch_block_t, message, fileName, lineNumber)
+        RLMAssertThrows(self, { _ = block() } as dispatch_block_t, "RLMException", message, fileName, lineNumber)
+    }
+
+    func assertThrows<T>(@autoclosure(escaping) block: () -> T, named: String?, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
+        exceptionThrown = true
+        RLMAssertThrows(self, { _ = block() } as dispatch_block_t, named, message, fileName, lineNumber)
     }
 
     func assertNil<T>(@autoclosure block: () -> T?, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {

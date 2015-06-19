@@ -217,7 +217,7 @@ class ResultsTests: TestCase {
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
 
-        assertThrows(self.results.sorted("noSuchCol"))
+        assertThrows(self.results.sorted("noSuchCol"), named: "Invalid sort property")
     }
 
     func testSortWithDescriptor() {
@@ -234,7 +234,7 @@ class ResultsTests: TestCase {
         XCTAssertEqual(2, sorted[1].intCol)
         XCTAssertEqual(1.11, sorted[2].doubleCol)
 
-        assertThrows(results.sorted([SortDescriptor(property: "noSuchCol")]))
+        assertThrows(results.sorted([SortDescriptor(property: "noSuchCol")]), named: "Invalid sort property")
     }
 
     func testMin() {
@@ -244,7 +244,7 @@ class ResultsTests: TestCase {
         XCTAssertEqual(Double(1.11), results.min("doubleCol") as Double!)
         XCTAssertEqual(NSDate(timeIntervalSince1970: 1), results.min("dateCol") as NSDate!)
 
-        assertThrows(results.min("noSuchCol") as Float!)
+        assertThrows(results.min("noSuchCol") as Float!, named: "Invalid property name")
     }
 
     func testMax() {
@@ -254,7 +254,7 @@ class ResultsTests: TestCase {
         XCTAssertEqual(Double(2.22), results.max("doubleCol") as Double!)
         XCTAssertEqual(NSDate(timeIntervalSince1970: 2), results.max("dateCol") as NSDate!)
 
-        assertThrows(results.max("noSuchCol") as Float!)
+        assertThrows(results.max("noSuchCol") as Float!, named: "Invalid property name")
     }
 
     func testSum() {
@@ -263,7 +263,7 @@ class ResultsTests: TestCase {
         XCTAssertEqualWithAccuracy(Float(5.5), results.sum("floatCol") as Float, 0.001)
         XCTAssertEqualWithAccuracy(Double(5.55), results.sum("doubleCol") as Double, 0.001)
 
-        assertThrows(results.sum("noSuchCol") as Float)
+        assertThrows(results.sum("noSuchCol") as Float, named: "Invalid property name")
     }
 
     func testAverage() {
@@ -272,7 +272,7 @@ class ResultsTests: TestCase {
         XCTAssertEqualWithAccuracy(Float(1.8333), results.average("floatCol") as Float!, 0.001)
         XCTAssertEqualWithAccuracy(Double(1.85), results.average("doubleCol") as Double!, 0.001)
 
-        assertThrows(results.average("noSuchCol")! as Float)
+        assertThrows(results.average("noSuchCol")! as Float, named: "Invalid property name")
     }
 
     func testFastEnumeration() {
