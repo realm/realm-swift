@@ -263,6 +263,26 @@ RLMObservationInfo *RLMGetObservationInfo(std::unique_ptr<RLMObservationInfo> co
     return nullptr;
 }
 
+void RLMClearTable(RLMObjectSchema *objectSchema) {
+    for (auto info : objectSchema->_observedObjects) {
+        info->willChange(RLMInvalidatedKey);
+    }
+
+    RLMTrackDeletions(objectSchema.realm, ^{
+        objectSchema.table->clear();
+
+        for (auto info : objectSchema->_observedObjects) {
+            info->prepareForInvalidation();
+        }
+    });
+
+    for (auto info : reverse(objectSchema->_observedObjects)) {
+        info->didChange(RLMInvalidatedKey);
+    }
+
+    objectSchema->_observedObjects.clear();
+}
+
 void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block_t block) {
     struct change {
         RLMObservationInfo *info;

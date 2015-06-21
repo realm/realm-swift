@@ -103,5 +103,8 @@ void RLMAdvanceRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *
 void RLMRollbackAndContinueAsRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
 void RLMPromoteToWrite(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
 
+// delete all objects from a single table with optimized change notifications
+void RLMClearTable(RLMObjectSchema *realm);
+
 // invoke the block, sending notifications for cascading deletes/link nullifications
 void RLMTrackDeletions(RLMRealm *realm, dispatch_block_t block);

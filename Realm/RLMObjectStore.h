@@ -75,9 +75,6 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, bool createOrUp
 // delete an object from its realm
 void RLMDeleteObjectFromRealm(RLMObjectBase *object, RLMRealm *realm);
 
-// delete all objects from a single table
-void RLMClearTable(RLMObjectSchema *realm);
-
 // deletes all objects from a realm
 void RLMDeleteAllObjectsFromRealm(RLMRealm *realm);
 

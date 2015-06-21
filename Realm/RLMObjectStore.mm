@@ -533,22 +533,6 @@ void RLMDeleteObjectFromRealm(__unsafe_unretained RLMObjectBase *const object,
     object->_realm = nil;
 }
 
-void RLMClearTable(RLMObjectSchema *objectSchema) {
-    for (auto info : objectSchema->_observedObjects) {
-        info->willChange(RLMInvalidatedKey);
-    }
-
-    RLMTrackDeletions(objectSchema.realm, ^{
-        objectSchema.table->clear();
-    });
-
-    for (auto info : objectSchema->_observedObjects) {
-        info->didChange(RLMInvalidatedKey);
-    }
-
-    objectSchema->_observedObjects.clear();
-}
-
 void RLMDeleteAllObjectsFromRealm(RLMRealm *realm) {
     RLMVerifyInWriteTransaction(realm);
 
