@@ -99,9 +99,6 @@ using namespace realm;
 
 - (void)execute:(RLMMigrationBlock)block {
     @autoreleasepool {
-        // copy old schema and reset after migration
-        RLMSchema *savedSchema = [_realm.schema copy];
-
         // disable all primary keys for migration
         for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
             objectSchema.primaryKeyProperty.isPrimary = NO;
@@ -110,9 +107,6 @@ using namespace realm;
         // apply block and set new schema version
         uint64_t oldVersion = _realm->_realm->config().schema_version;
         block(self, oldVersion);
-
-        // reset schema to saved schema since it has been altered
-        RLMRealmSetSchema(_realm, savedSchema, true);
     }
 }
 
