@@ -95,7 +95,17 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
         // assume our object is an NSDictionary or an object with kvc properties
         NSDictionary *defaultValues = nil;
         for (RLMProperty *prop in properties) {
-            id obj = [value valueForKey:prop.name];
+            id obj;
+            @try {
+                obj = [value valueForKey:prop.name];
+            }
+            @catch (NSException *e) {
+                if ([e.name isEqualToString:NSUndefinedKeyException]) {
+                    @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' to initialize object of type '%@': missing key '%@'",
+                                         value, _objectSchema.className, prop.name]);
+                }
+                @throw;
+            }
 
             // get default for nil object
             if (!obj) {

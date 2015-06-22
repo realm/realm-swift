@@ -467,7 +467,18 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         // populate
         NSDictionary *defaultValues = nil;
         for (RLMProperty *prop in objectSchema.properties) {
-            id propValue = [value valueForKey:prop.name];
+            id propValue;
+            @try {
+                propValue = [value valueForKey:prop.name];
+            }
+            @catch (NSException *e) {
+                if ([e.name isEqualToString:NSUndefinedKeyException]) {
+                    @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' to initialize object of type '%@': missing key '%@'",
+                                         value, objectSchema.className, prop.name]);
+                }
+                @throw;
+            }
+
             if (!propValue && created) {
                 if (!defaultValues) {
                     defaultValues = RLMDefaultValuesForObjectSchema(objectSchema);
