@@ -84,13 +84,14 @@ SharedRealm Realm::get_shared_realm(Config &config)
         return realm;
     }
 
-    realm = make_shared<Realm>(config);
+    realm = SharedRealm(new Realm(config));
 
     // we want to ensure we are only initializing a single realm at a time
     lock_guard<mutex> lock(s_init_mutex);
 
     if (!config.schema) {
         // get schema from group and skip validation
+        realm->m_config.schema_version = ObjectStore::get_schema_version(realm->read_group());
         realm->m_config.schema = make_unique<ObjectStore::Schema>(ObjectStore::schema_from_group(realm->read_group()));
     }
     else if (config.read_only) {
@@ -107,21 +108,45 @@ SharedRealm Realm::get_shared_realm(Config &config)
         realm->m_config.schema = make_unique<ObjectStore::Schema>(*existing->m_config.schema);
     }
     else {
-        // its a new realm so update/migrate if needed
-        ObjectStore::update_realm_with_schema(realm->read_group(), config.schema_version, *realm->m_config.schema, realm->m_config.migration_function);
+        // its a non-cached realm so update/migrate if needed
+        realm->update_schema(*realm->m_config.schema, config.schema_version);
     }
 
     s_global_cache.cache_realm(realm, realm->m_thread_id);
     return realm;
 }
 
-static void check_read_write(Realm *realm) {
+bool Realm::update_schema(ObjectStore::Schema &schema, uint64_t version)
+{
+    bool changed = false;
+    try {
+        begin_transaction();
+        changed = ObjectStore::update_realm_with_schema(read_group(), version, schema, m_config.migration_function);
+        commit_transaction();
+        m_config.schema_version = version;
+        if (m_config.schema.get() != &schema) {
+            m_config.schema = make_unique<ObjectStore::Schema>(schema);
+        }
+    }
+    catch (...) {
+        if (is_in_transaction()) {
+            cancel_transaction();
+        }
+        throw;
+    }
+
+    return changed;
+}
+
+static void check_read_write(Realm *realm)
+{
     if (realm->config().read_only) {
         throw RealmException(RealmException::Kind::InvalidTransaction, "Can't perform transactions on read-only Realms.");
     }
 }
 
-void Realm::verify_thread() {
+void Realm::verify_thread()
+{
     if (m_thread_id != this_thread::get_id()) {
         throw RealmException(RealmException::Kind::IncorrectThread, "Realm accessed from incorrect thread.");
     }

@@ -59,10 +59,9 @@ ObjectStoreException::ObjectStoreException(uint64_t old_version, uint64_t new_ve
 }
 
 ObjectStoreException::ObjectStoreException(vector<ObjectStoreException> validation_errors, const string &object_type) :
-    m_validation_errors(validation_errors),
-    m_kind(Kind::ObjectStoreValidationFailure),
-    m_info({{InfoKeyObjectType, object_type}}),
-    m_what(generate_what()) {
+    m_validation_errors(validation_errors), m_kind(Kind::ObjectStoreValidationFailure) {
+    m_info[InfoKeyObjectType] = object_type;
+    m_what = generate_what();
 }
 
 string ObjectStoreException::generate_what() const {
@@ -88,7 +87,7 @@ std::string ObjectStoreException::populate_format_string(const std::string & for
     while(regex_search(current, sm, re)) {
         out_string += sm.prefix();
         const string &key = sm[1];
-        if (key == "ValidationString") {
+        if (key == "ValidationErrors") {
             out_string += validation_errors_string();
         }
         else {

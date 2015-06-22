@@ -52,10 +52,19 @@ namespace realm {
             Config(const Config& c);
         };
 
-        Realm(Config &config);
-        Realm(const Realm& r) = delete;
-
+        // Get a cached Realm or create a new one if no cached copies exists
+        // Caching is done by path - mismatches for inMemory and readOnly Config properties
+        // will raise an exception
+        // If schema/schema_version is specified, update_schema is called automatically on the realm
+        // and a migration is performed. If not specified, the schema version and schema are dynamically
+        // read from the the existing Realm.
         static SharedRealm get_shared_realm(Config &config);
+
+        // Updates a Realm to a given target schema/version creating tables and updating indexes as necessary
+        // Uses the existing migration function on the Config, and the resulting Schema and version with updated
+        // column mappings are set on the realms config upon success.
+        // returns if any changes were made
+        bool update_schema(ObjectStore::Schema &schema, uint64_t version);
 
         const Config &config() const { return m_config; }
 
@@ -83,6 +92,9 @@ namespace realm {
         const std::string DidChangeNotification = "DidChangeNotification";
 
       private:
+        Realm(Config &config);
+        //Realm(const Realm& r) = delete;
+
         Config m_config;
         std::thread::id m_thread_id;
         bool m_in_transaction;
@@ -131,6 +143,9 @@ namespace realm {
             IncompatibleLockFile,
             InvalidTransaction,
             IncorrectThread,
+            /** Thrown when trying to open an unitialized Realm without a target schema or with a mismatching
+             schema version **/
+            InvalidSchemaVersion
         };
         RealmException(Kind kind, std::string message) : m_kind(kind), m_what(message) {}
 

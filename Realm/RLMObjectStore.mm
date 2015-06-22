@@ -31,6 +31,7 @@
 #import "RLMUtil.hpp"
 
 #import "object_store.hpp"
+#import "shared_realm.hpp"
 #import <objc/message.h>
 
 using namespace realm;
@@ -112,7 +113,7 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndA
     }
 }
 
-static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema, ObjectStore::Schema &alignedSchema) {
+void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema, ObjectStore::Schema &alignedSchema) {
     realm.schema = targetSchema;
     for (ObjectSchema &aligned:alignedSchema) {
         RLMObjectSchema *objectSchema = targetSchema[@(aligned.name.c_str())];
@@ -134,52 +135,20 @@ static bool RLMRealmHasAllTables(RLMRealm *realm, RLMSchema *targetSchema) {
     return true;
 }
 
-void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
+void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema) {
     ObjectStore::Schema schema;
     for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
         schema.push_back(objectSchema.objectStoreCopy);
     }
 
     try {
-        if (RLMRealmHasAllTables(realm, targetSchema) && !ObjectStore::is_schema_at_version(realm.group, newVersion) && ObjectStore::indexes_are_up_to_date(realm.group, schema)) {
+        if (RLMRealmHasAllTables(realm, targetSchema) && ObjectStore::is_schema_at_version(realm.group, newVersion) && ObjectStore::indexes_are_up_to_date(realm.group, schema)) {
             RLMRealmSetSchema(realm, targetSchema, true);
             return;
         }
-    }
-    catch (ObjectStoreException & e) {
-        @throw RLMException(e);
-    }
-
-    try {
-        // either a migration is needed or there's missing tables, so we do need a
-        // write transaction
-        [realm beginWriteTransaction];
-
-        bool migrationCalled = false;
-        bool changed = ObjectStore::update_realm_with_schema(realm.group, newVersion, schema, [&](__unused Group *group, ObjectStore::Schema &schema) {
-            RLMRealmSetSchemaAndAlign(realm, targetSchema, schema);
-            if (migrationBlock) {
-                NSError *error = migrationBlock();
-                if (error) {
-                    [realm cancelWriteTransaction];
-                    @throw RLMException(error.description);
-                }
-            }
-            migrationCalled = true;
-        });
-
-        if (!migrationCalled) {
-            RLMRealmSetSchemaAndAlign(realm, targetSchema, schema);
-        }
-
-        if (changed) {
-            [realm commitWriteTransaction];
-        }
-        else {
-            [realm cancelWriteTransaction];
-        }
-    } catch (ObjectStoreException & e) {
-        [realm cancelWriteTransaction];
+        realm->_realm->update_schema(schema, newVersion);
+        RLMRealmSetSchemaAndAlign(realm, targetSchema, schema);
+    } catch (const std::exception & e) {
         @throw RLMException(e);
     }
 }

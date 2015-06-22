@@ -29,7 +29,7 @@
 #import "RLMObjectStore.h"
 
 #import "object_store.hpp"
-#import <realm/table.hpp>
+#import "shared_realm.hpp"
 
 using namespace realm;
 
@@ -111,7 +111,7 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
     }];
 
     RLMRealm *defaultRealm = [RLMRealm defaultRealm];
-    XCTAssertEqual(1U, realm::ObjectStore::get_schema_version(defaultRealm.group));
+    XCTAssertEqual(1U, defaultRealm->_realm->config().schema_version);
 }
 
 - (void)testGetSchemaVersion {

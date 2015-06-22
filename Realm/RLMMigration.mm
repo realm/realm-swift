@@ -28,7 +28,7 @@
 #import "RLMResults_Private.h"
 #import "RLMSchema_Private.h"
 
-#import "object_store.hpp"
+#import "shared_realm.hpp"
 
 using namespace realm;
 
@@ -57,10 +57,9 @@ using namespace realm;
         _realm = realm;
 
         // create read only realm used during migration with current on disk schema
-        _oldRealm = [[RLMMigrationRealm alloc] initWithPath:realm.path key:key readOnly:NO inMemory:NO dynamic:YES error:error];
-        if (_oldRealm) {
-            RLMRealmSetSchema(_oldRealm, [RLMSchema dynamicSchemaFromRealm:_oldRealm], true);
-        }
+        _oldRealm = [RLMRealm realmWithPath:realm.path key:key readOnly:NO inMemory:NO dynamic:YES schema:nil error:error];
+        object_setClass(_oldRealm, RLMMigrationRealm.class);
+
         if (error && *error) {
             return nil;
         }
@@ -109,7 +108,7 @@ using namespace realm;
         }
 
         // apply block and set new schema version
-        uint64_t oldVersion = realm::ObjectStore::get_schema_version(_realm.group);
+        uint64_t oldVersion = _realm->_realm->config().schema_version;
         block(self, oldVersion);
 
         // reset schema to saved schema since it has been altered

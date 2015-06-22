@@ -25,9 +25,14 @@
 
 namespace realm {
     class Group;
+    class Realm;
 }
 
-@interface RLMRealm ()
+@interface RLMRealm () {
+    @public
+    std::shared_ptr<Realm> _realm;
+}
+
 // FIXME - group should not be exposed
 @property (nonatomic, readonly) realm::Group *group;
 - (void)verifyThread;

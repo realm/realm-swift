@@ -351,7 +351,7 @@ bool ObjectStore::is_schema_at_version(Group *group, uint64_t version) {
     if (old_version > version && old_version != NotVersioned) {
         throw ObjectStoreException(old_version, version);
     }
-    return old_version != version;
+    return old_version == version;
 }
 
 
@@ -362,7 +362,7 @@ bool ObjectStore::update_realm_with_schema(Group *group,
     // Recheck the schema version after beginning the write transaction as
     // another process may have done the migration after we opened the read
     // transaction
-    bool migrating = is_schema_at_version(group, version);
+    bool migrating = !is_schema_at_version(group, version);
 
     // create tables
     bool changed = create_metadata_tables(group);
