@@ -149,12 +149,6 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     return NSNotFound;
 }
 
-- (void)deleteObjectsFromRealm {
-    for (RLMObject *obj in _backingArray) {
-        RLMDeleteObjectFromRealm(obj, _realm);
-    }
-}
-
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...
 {
     va_list args;
