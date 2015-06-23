@@ -86,7 +86,7 @@ class RealmTests: TestCase {
             contents:"a".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false),
             attributes: nil)
         do {
-            try Realm(path: Realm.defaultPath, readOnly: false)
+            _ = try Realm(path: Realm.defaultPath, readOnly: false)
             XCTFail("Realm creation should have failed")
         } catch {
         }

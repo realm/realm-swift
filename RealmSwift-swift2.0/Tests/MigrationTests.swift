@@ -48,7 +48,7 @@ class MigrationTests: TestCase {
     // create realm at path and test version is 0
     private func createAndTestRealmAtPath(realmPath: String) {
         autoreleasepool {
-            try! Realm(path: realmPath)
+            _ = try! Realm(path: realmPath)
             return
         }
         XCTAssertEqual(UInt64(0), schemaVersionAtPath(realmPath)!, "Initial version should be 0")
@@ -66,7 +66,7 @@ class MigrationTests: TestCase {
         })
 
         if autoMigration {
-            try! Realm(path: realmPath)
+            _ = try! Realm(path: realmPath)
         }
         else {
             migrateRealm(realmPath, encryptionKey: nil)
@@ -102,7 +102,7 @@ class MigrationTests: TestCase {
         assertNil(schemaVersionAtPath(Realm.defaultPath, error: &error), "Version should be nil before Realm creation")
         XCTAssertNotNil(error, "Error should be set")
 
-        try! Realm()
+        _ = try! Realm()
         XCTAssertEqual(UInt64(0), schemaVersionAtPath(Realm.defaultPath)!, "Initial version should be 0")
         assertThrows(schemaVersionAtPath("/dev/null"))
     }
