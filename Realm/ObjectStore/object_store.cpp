@@ -33,16 +33,12 @@ template <typename T>
 static inline
 T get_value(TableRef table, size_t row, size_t column);
 
-template <typename T>
-static inline
-void set_value(TableRef table, size_t row, size_t column, T value);
-
 template <>
 StringData get_value(TableRef table, size_t row, size_t column) {
     return table->get_string(column, row);
 }
 
-template <>
+static inline
 void set_value(TableRef table, size_t row, size_t column, StringData value) {
     table->set_string(column, row, value);
 }
@@ -52,7 +48,7 @@ BinaryData get_value(TableRef table, size_t row, size_t column) {
     return table->get_binary(column, row);
 }
 
-template <>
+static inline
 void set_value(TableRef table, size_t row, size_t column, BinaryData value) {
     table->set_binary(column, row, value);
 }
