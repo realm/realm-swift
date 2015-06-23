@@ -747,19 +747,18 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)deleteObjects:(id)array {
-    if (NSArray *nsArray = RLMDynamicCast<NSArray>(array)) {
-        // for arrays and standalone delete each individually
-        for (id obj in nsArray) {
-            if ([obj isKindOfClass:RLMObjectBase.class]) {
-                RLMDeleteObjectFromRealm(obj, self);
-            }
-        }
-    }
-    else if ([array respondsToSelector:@selector(realm)] && [array respondsToSelector:@selector(deleteObjectsFromRealm)]) {
+    if ([array respondsToSelector:@selector(realm)] && [array respondsToSelector:@selector(deleteObjectsFromRealm)]) {
         if (self != (RLMRealm *)[array realm]) {
             @throw RLMException(@"Can only delete objects from the Realm they belong to.");
         }
         [array deleteObjectsFromRealm];
+    }
+    else if ([array conformsToProtocol:@protocol(NSFastEnumeration)]) {
+        for (id obj in array) {
+            if ([obj isKindOfClass:RLMObjectBase.class]) {
+                RLMDeleteObjectFromRealm(obj, self);
+            }
+        }
     }
     else {
         @throw RLMException(@"Invalid array type - container must be an RLMArray, RLMArray, or NSArray of RLMObjects");
