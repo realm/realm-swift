@@ -222,6 +222,10 @@
 		3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FE79FF819BA6A5900780C9A /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
 		3FE79FF919BA6A5900780C9A /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
+		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
+		C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
+		C0CDC0841B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
+		C0CDC0851B38DABC00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		E81A1F851955FC9300FDED82 /* RLMAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F631955FC9300FDED82 /* RLMAccessor.h */; };
 		E81A1F861955FC9300FDED82 /* RLMAccessor.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1F641955FC9300FDED82 /* RLMAccessor.mm */; };
 		E81A1F891955FC9300FDED82 /* RLMArray.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F661955FC9300FDED82 /* RLMArray.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -942,6 +946,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 026B0F291A780680005E26C8 /* Build configuration list for PBXNativeTarget "iOS Dynamic Tests" */;
 			buildPhases = (
+				293F98F01A76E05700C0199D /* Get Version Number */,
 				026B0F091A780680005E26C8 /* Sources */,
 				026B0F271A780680005E26C8 /* Frameworks */,
 				02F346351A843F31007F6D74 /* CopyFiles */,
@@ -997,6 +1002,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3F8DCA5D19930F550008BD7F /* Build configuration list for PBXNativeTarget "iOS Device Tests" */;
 			buildPhases = (
+				293F98F01A76E05700C0199D /* Get Version Number */,
 				3F8DCA5319930F550008BD7F /* Sources */,
 				3F8DCA5419930F550008BD7F /* Frameworks */,
 			);
@@ -1033,6 +1039,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E856D1EB195614A400FB2FCF /* Build configuration list for PBXNativeTarget "iOS Tests" */;
 			buildPhases = (
+				293F98F01A76E05700C0199D /* Get Version Number */,
 				E856D1DB195614A400FB2FCF /* Sources */,
 				E856D1DC195614A400FB2FCF /* Frameworks */,
 			);
@@ -1069,6 +1076,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E8D89BB11955FC6D00CF2B9A /* Build configuration list for PBXNativeTarget "OSX Tests" */;
 			buildPhases = (
+				293F98F01A76E05700C0199D /* Get Version Number */,
 				E8D89B9F1955FC6D00CF2B9A /* Sources */,
 				E8D89BA01955FC6D00CF2B9A /* Frameworks */,
 			);
@@ -1273,6 +1281,7 @@
 				026B0F171A780680005E26C8 /* RLMTestCase.m in Sources */,
 				026B0F181A780680005E26C8 /* RLMTestObjects.m in Sources */,
 				026B0F191A780680005E26C8 /* SchemaTests.mm in Sources */,
+				C0CDC0841B38DABB00C5716D /* UtilTests.mm in Sources */,
 				026B0F1A1A780680005E26C8 /* SwiftArrayPropertyTests.swift in Sources */,
 				026B0F1B1A780680005E26C8 /* SwiftArrayTests.swift in Sources */,
 				026B0F1C1A780680005E26C8 /* SwiftDynamicTests.swift in Sources */,
@@ -1339,6 +1348,7 @@
 				3F8DCA6B19930F960008BD7F /* LinkTests.m in Sources */,
 				3F8DCA6C19930F960008BD7F /* MigrationTests.mm in Sources */,
 				3F8DCA6D19930F960008BD7F /* MixedTests.m in Sources */,
+				C0CDC0851B38DABC00C5716D /* UtilTests.mm in Sources */,
 				3F8DCA6E19930F960008BD7F /* ObjectInterfaceTests.m in Sources */,
 				3F8DCA6F19930F960008BD7F /* ObjectTests.m in Sources */,
 				3F8DCA7019930F960008BD7F /* PerformanceTests.m in Sources */,
@@ -1408,6 +1418,7 @@
 				E856D21F195615B100FB2FCF /* RLMTestCase.m in Sources */,
 				028481CB19CCFC9C0097A416 /* RLMTestObjects.m in Sources */,
 				0207AB8A195DFA15007EFB12 /* SchemaTests.mm in Sources */,
+				C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */,
 				3F8DCA7619930FCB0008BD7F /* SwiftArrayPropertyTests.swift in Sources */,
 				3F8DCA7719930FCB0008BD7F /* SwiftArrayTests.swift in Sources */,
 				3F8DCA7819930FCB0008BD7F /* SwiftDynamicTests.swift in Sources */,
@@ -1475,6 +1486,7 @@
 				E81A1FEB1955FE0100FDED82 /* RealmTests.mm in Sources */,
 				E8A5DEED1968E520006A50F6 /* RLMPredicateUtil.m in Sources */,
 				3FDCFEB619F6A8D3005E414A /* RLMSupport.swift in Sources */,
+				C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */,
 				E81A1FEE1955FE0100FDED82 /* RLMTestCase.m in Sources */,
 				028481EF19CD032C0097A416 /* RLMTestObjects.m in Sources */,
 				0207AB89195DFA15007EFB12 /* SchemaTests.mm in Sources */,
