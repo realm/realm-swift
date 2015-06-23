@@ -115,10 +115,10 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(schema.properties.count, 1)
 
         // FIXME - disable any and make sure this fails
-        RLMObjectSchema(forObjectClass: SwiftObjectWithAnyObject.self)  // Should throw when not ignoring a property of a type we can't persist
+        _ = RLMObjectSchema(forObjectClass: SwiftObjectWithAnyObject.self)  // Should throw when not ignoring a property of a type we can't persist
 
-        RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)       // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
-        RLMObjectSchema(forObjectClass: SwiftObjectWithStruct.self)     // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
+        _ = RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)       // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
+        _ = RLMObjectSchema(forObjectClass: SwiftObjectWithStruct.self)     // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
 
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDatePrimaryKey.self), "Should throw when setting a non int/string primary key")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSURL.self), "Should throw when not ignoring a property of a type we can't persist")
