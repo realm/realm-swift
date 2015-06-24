@@ -54,7 +54,7 @@ class ViewController: UIViewController {
         // Opening with wrong key fails since it decrypts to the wrong thing
         autoreleasepool {
             do {
-                try Realm(path: Realm.defaultPath, readOnly: false,
+                _ = try Realm(path: Realm.defaultPath, readOnly: false,
                     encryptionKey: "1234567890123456789012345678901234567890123456789012345678901234".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false))
             } catch {
                 log("Open with wrong key: \(error)")
@@ -64,7 +64,7 @@ class ViewController: UIViewController {
         // Opening wihout supplying a key at all fails
         autoreleasepool {
             do {
-                try Realm(path: Realm.defaultPath, readOnly: false)
+                _ = try Realm(path: Realm.defaultPath, readOnly: false)
             } catch {
                 log("Open with no key: \(error)")
             }
