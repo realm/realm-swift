@@ -31,6 +31,16 @@
 #import "object_store.hpp"
 #import <realm/table.hpp>
 
+static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        Table *table = objectSchema.table;
+        for (RLMProperty *property in objectSchema.properties) {
+            XCTAssertEqual(property.column, table->get_column_index(RLMStringDataWithNSString(property.name)));
+            XCTAssertEqual(property.indexed, table->has_search_index(property.column));
+        }
+    }
+}
+
 @interface MigrationObject : RLMObject
 @property int intCol;
 @property NSString *stringCol;
@@ -143,6 +153,9 @@
     }];
     RLMRealm *anotherRealm = [RLMRealm realmWithPath:RLMTestRealmPath()];
 
+    RLMAssertRealmSchemaMatchesTable(self, [RLMRealm defaultRealm]);
+    RLMAssertRealmSchemaMatchesTable(self, anotherRealm);
+
     XCTAssertEqual(2U, [RLMRealm schemaVersionAtPath:anotherRealm.path encryptionKey:nil error:nil]);
     XCTAssertTrue(migrationComplete);
 }
@@ -175,6 +188,7 @@
     @autoreleasepool {
         // verify migration
         RLMRealm *realm = [self realmWithTestPath];
+        RLMAssertRealmSchemaMatchesTable(self, realm);
         XCTAssertFalse(ObjectStore::table_for_object_type(realm.group, "DeletedClass"), @"The deleted class should not have a table.");
         XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
     }
@@ -218,6 +232,7 @@
     // verify migration
     @autoreleasepool {
         RLMRealm *realm = [self realmWithTestPath];
+        RLMAssertRealmSchemaMatchesTable(self, realm);
         MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
         XCTAssertEqual(mig1.intCol, 2, @"Int column should have value 2");
         XCTAssertEqualObjects(mig1.stringCol, @"2", @"String column should be populated");
@@ -250,6 +265,7 @@
 
     // verify migration
     realm = [self realmWithTestPath];
+    RLMAssertRealmSchemaMatchesTable(self, realm);
     ThreeFieldMigrationObject *mig = [ThreeFieldMigrationObject allObjectsInRealm:realm][0];
     XCTAssertEqual(0, mig.col1);
     XCTAssertEqual(1, mig.col2);
@@ -286,6 +302,7 @@
 
     // verify migration
     realm = [self realmWithTestPath];
+    RLMAssertRealmSchemaMatchesTable(self, realm);
     MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertThrows(mig1[@"deletedCol"], @"Deleted column should no longer be accessible.");
 }
@@ -322,8 +339,37 @@
 
     // verify migration
     realm = [self realmWithTestPath];
+    RLMAssertRealmSchemaMatchesTable(self, realm);
     MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertThrows(mig1[@"oldIntCol"], @"Deleted column should no longer be accessible.");
+}
+
+- (void)testMigrationProperlySetsPropertyColumns {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
+    objectSchema.properties = @[
+                                [[RLMProperty alloc] initWithName:@"firstName" type:RLMPropertyTypeString objectClassName:nil indexed:false optional:NO],
+                                [[RLMProperty alloc] initWithName:@"lastName" type:RLMPropertyTypeString objectClassName:nil indexed:false optional:NO],
+                                [[RLMProperty alloc] initWithName:@"age" type:RLMPropertyTypeInt objectClassName:nil indexed:false optional:NO],
+                                ];
+
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    [realm createObject:MigrationObject.className withValue:@[@"a", @"b", @1]];
+    [realm createObject:MigrationObject.className withValue:@[@"c", @"d", @2]];
+    [realm commitWriteTransaction];
+
+    [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(__unused RLMMigration *migration, uint64_t oldSchemaVersion) {
+        XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
+    }];
+
+    // verify migration
+    objectSchema.properties = @[
+                                [[RLMProperty alloc] initWithName:@"fullName" type:RLMPropertyTypeString objectClassName:nil indexed:false optional:NO],
+                                [[RLMProperty alloc] initWithName:@"age" type:RLMPropertyTypeInt objectClassName:nil indexed:false optional:NO],
+                                [[RLMProperty alloc] initWithName:@"pets" type:RLMPropertyTypeArray objectClassName:MigrationObject.className indexed:false optional:NO],
+                                ];
+    realm = [self realmWithSingleObject:objectSchema];
+    RLMAssertRealmSchemaMatchesTable(self, realm);
 }
 
 - (void)testChangePropertyType {
@@ -356,6 +402,7 @@
 
     // verify migration
     realm = [self realmWithTestPath];
+    RLMAssertRealmSchemaMatchesTable(self, realm);
     MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertEqualObjects(mig1[@"stringCol"], @"2", @"stringCol should be string after migration.");
 }
@@ -389,6 +436,7 @@
         }];
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    RLMAssertRealmSchemaMatchesTable(self, [self realmWithTestPath]);
 }
 
 - (void)testRemovePrimaryKeyMigration {
@@ -417,6 +465,7 @@
     }];
 
     XCTAssertNoThrow([self realmWithSingleObject:objectSchema]);
+    RLMAssertRealmSchemaMatchesTable(self, [self realmWithSingleObject:objectSchema]);
 }
 
 - (void)testStringPrimaryKeyMigration {
@@ -441,6 +490,7 @@
         }];
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    RLMAssertRealmSchemaMatchesTable(self, [self realmWithTestPath]);
 }
 
 - (void)testStringPrimaryKeyNoIndexMigration {
@@ -466,6 +516,7 @@
         }];
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    RLMAssertRealmSchemaMatchesTable(self, [self realmWithTestPath]);
 }
 
 - (void)testIntPrimaryKeyNoIndexMigration {
@@ -490,6 +541,7 @@
 
     // check that column is now indexed
     RLMRealm *realm = [self realmWithTestPath];
+    RLMAssertRealmSchemaMatchesTable(self, realm);
     XCTAssertTrue(realm.schema[MigrationPrimaryKeyObject.className].table->has_search_index(0));
 
     // verify that old data still exists
@@ -535,6 +587,7 @@
         XCTAssertEqual(true, duplicateDeleted);
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    RLMAssertRealmSchemaMatchesTable(self, [self realmWithTestPath]);
 
     // make sure deletion occurred
     XCTAssertEqual(1U, [[MigrationPrimaryKeyObject allObjectsInRealm:[RLMRealm realmWithPath:RLMTestRealmPath()]] count]);
@@ -680,6 +733,8 @@
 
     // test object from other realm still works
     XCTAssertEqualObjects(obj.data, @"new data");
+
+    RLMAssertRealmSchemaMatchesTable(self, realm);
 
     // verify schema for both objects
     NSArray *properties = defaultObj.objectSchema.properties;
