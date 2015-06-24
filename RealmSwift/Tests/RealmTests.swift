@@ -395,13 +395,15 @@ class RealmTests: TestCase {
             notificationFired.fulfill()
         }
 
-        dispatch_async(dispatch_queue_create("background", nil)) {
+        let queue = dispatch_queue_create("background", nil)
+        dispatch_async(queue) {
             Realm().write {
                 Realm().create(SwiftStringObject.self, value: ["string"])
                 return
             }
         }
         waitForExpectationsWithTimeout(2, handler: nil)
+        dispatch_sync(queue) {}
         Realm().removeNotification(token)
 
         // get object
@@ -425,13 +427,15 @@ class RealmTests: TestCase {
         let results = realm.objects(SwiftStringObject)
         XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
 
-        dispatch_async(dispatch_queue_create("background", nil)) {
+        let queue = dispatch_queue_create("background", nil)
+        dispatch_async(queue) {
             Realm().write {
                 Realm().create(SwiftStringObject.self, value: ["string"])
                 return
             }
         }
         waitForExpectationsWithTimeout(2, handler: nil)
+        dispatch_sync(queue) {}
         realm.removeNotification(token)
 
         XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
@@ -489,11 +493,13 @@ class RealmTests: TestCase {
         XCTAssertFalse(realm == testRealm)
 
         let fired = expectationWithDescription("fired")
-        dispatch_async(dispatch_queue_create("background", nil)) {
+        let queue = dispatch_queue_create("background", nil)
+        dispatch_async(queue) {
             let otherThreadRealm = Realm()
             XCTAssertFalse(realm == otherThreadRealm)
             fired.fulfill()
         }
         waitForExpectationsWithTimeout(2, handler: nil)
+        dispatch_sync(queue) {}
     }
 }
