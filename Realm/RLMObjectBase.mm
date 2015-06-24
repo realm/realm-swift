@@ -87,7 +87,8 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
             @throw RLMException(@"Invalid array input. Number of array elements does not match number of properties.");
         }
         for (NSUInteger i = 0; i < array.count; i++) {
-            [self setValue:RLMValidatedObjectForProperty(array[i], properties[i], schema) forKeyPath:[properties[i] name]];
+            id propertyValue = RLMValidatedObjectForProperty(array[i], properties[i], schema);
+            [self setValue:RLMNSNullToNil(propertyValue) forKeyPath:[properties[i] name]];
         }
     }
     else {
@@ -104,7 +105,8 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
                 obj = defaultValues[prop.name];
             }
 
-            [self setValue:RLMValidatedObjectForProperty(obj, prop, schema) forKeyPath:prop.name];
+            obj = RLMValidatedObjectForProperty(obj, prop, schema);
+            [self setValue:RLMNSNullToNil(obj) forKeyPath:prop.name];
         }
     }
 
@@ -349,6 +351,14 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 }
 
 + (void)initializeListProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property array:(__unused RLMArray *)array {
+}
+
++ (NSArray *)getOptionalPropertyNames:(__unused id)obj {
+    return nil;
+}
+
++ (NSArray *)requiredPropertiesForClass:(Class)cls {
+    return [cls requiredProperties];
 }
 
 @end

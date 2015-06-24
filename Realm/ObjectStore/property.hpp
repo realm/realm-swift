@@ -52,6 +52,7 @@ namespace realm {
         std::string object_type;
         bool is_primary;
         bool is_indexed;
+        bool is_nullable;
 
         size_t table_column;
         bool requires_index() { return is_primary || is_indexed; }

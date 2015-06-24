@@ -52,8 +52,8 @@ class SwiftOptionalObject: RLMObject {
 //    dynamic var optIntCol: Int?
 //    dynamic var optFloatCol: Float?
 //    dynamic var optDoubleCol: Double?
-//    dynamic var optStringCol: String?
-//    dynamic var optBinaryCol: NSData?
+    dynamic var optStringCol: NSString?
+    dynamic var optBinaryCol: NSData?
 //    dynamic var optDateCol: NSDate?
     dynamic var optObjectCol: SwiftBoolObject?
 //    dynamic var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())

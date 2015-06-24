@@ -118,5 +118,6 @@
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
-                     indexed:(BOOL)indexed;
+                     indexed:(BOOL)indexed
+                    optional:(BOOL)optional;
 @end

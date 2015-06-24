@@ -57,6 +57,18 @@
 }
 @end
 
+@implementation LinkStringObject
+@end
+
+@implementation LinkIndexedStringObject
+@end
+
+@implementation RequiredPropertiesObject
++ (NSArray *)requiredProperties {
+    return @[@"stringCol", @"binaryCol"];
+}
+@end
+
 #pragma mark AllTypesObject
 
 @implementation AllTypesObject
@@ -157,4 +169,5 @@
 + (NSArray *)ignoredProperties { return nil; }
 + (NSArray *)indexedProperties { return nil; }
 + (NSString *)primaryKey { return nil; }
++ (NSArray *)requiredProperties { return nil; }
 @end

@@ -306,4 +306,25 @@ public class ObjectUtil: NSObject {
         let list = (object as! Object)[property!.name]! as! RLMListBase
         list._rlmArray = array
     }
+
+    @objc private class func getOptionalPropertyNames(object: AnyObject) -> NSArray {
+        let reflection = reflect(object)
+
+        var properties = [String]()
+
+        // Skip the first property (super):
+        // super is an implicit property on Swift objects
+        for i in 1..<reflection.count {
+            let mirror = reflection[i].1
+            if mirror.disposition == .Optional {
+                properties.append(reflection[i].0)
+            }
+        }
+
+        return properties
+    }
+
+    @objc private class func requiredPropertiesForClass(_: AnyClass) -> NSArray? {
+        return nil
+    }
 }

@@ -105,6 +105,10 @@ static inline bool object_has_valid_type(__unsafe_unretained id const obj)
 
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
                                  __unsafe_unretained RLMProperty *const property) {
+    if (property.optional && (!obj || obj == [NSNull null])) {
+        return YES;
+    }
+
     switch (property.type) {
         case RLMPropertyTypeString:
             return [obj isKindOfClass:[NSString class]];
@@ -137,9 +141,6 @@ BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
         case RLMPropertyTypeObject: {
             // only NSNull, nil, or objects which derive from RLMObject and match the given
             // object class are valid
-            if (obj == nil || obj == NSNull.null) {
-                return YES;
-            }
             RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(obj);
             return objBase && [objBase->_objectSchema.className isEqualToString:property.objectClassName];
         }

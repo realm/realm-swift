@@ -29,6 +29,14 @@
 + (void)resetRealmState;
 @end
 
+// This ensures the shared schema is initialized outside of of a test case,
+// so if an exception is thrown, it will kill the test process rather than
+// allowing hundreds of test cases to fail in strange ways
+__attribute((constructor))
+static void initializeSharedSchema() {
+    [RLMSchema class];
+}
+
 NSString *RLMRealmPathForFile(NSString *fileName) {
 #if TARGET_OS_IPHONE
     NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
