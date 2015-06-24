@@ -336,11 +336,9 @@ class SwiftPerformanceTests: TestCase {
 
     func testRealmCreationCached() {
         var realm: Realm!
-        let queue = dispatch_queue_create("test queue", nil)
-        dispatch_async(queue) {
+        dispatchSyncNewThread {
             realm = self.realmWithTestPath()
         }
-        dispatch_sync(queue) {}
 
         measureBlock {
             for _ in 0..<250 {
