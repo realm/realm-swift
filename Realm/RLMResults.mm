@@ -287,7 +287,7 @@ static std::unique_ptr<RowIndexes::Sorter> RLMSorterFromDescriptors(RLMObjectSch
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
-    RLMResultsValidate(self);
+    RLMCheckThread(_realm);
 
     // copy array and apply new predicate creating a new query and view
     auto query = [self cloneQuery];
@@ -303,7 +303,7 @@ static std::unique_ptr<RowIndexes::Sorter> RLMSorterFromDescriptors(RLMObjectSch
 }
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties {
-    RLMResultsValidate(self);
+    RLMCheckThread(_realm);
 
     auto query = [self cloneQuery];
     auto sorter = RLMSorterFromDescriptors(_objectSchema, properties);
