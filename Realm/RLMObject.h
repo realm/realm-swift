@@ -396,7 +396,7 @@
  
      RLM_ARRAY_TYPE(ObjectType)
      ...
-     @property RLMArray<ObjectType> *arrayOfObjectTypes;
+     @property RLM_GENERIC_ARRAY(ObjectType) *arrayOfObjectTypes;
   */
 #define RLM_ARRAY_TYPE(RLM_OBJECT_SUBCLASS)\
 @protocol RLM_OBJECT_SUBCLASS <NSObject>   \
