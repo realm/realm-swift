@@ -5,20 +5,21 @@ cat <<EOF
 Usage: sh $0 command [argument]
 
 command:
-  bootstrap:                downloads product dependencies and runs 'pod install'/'carthage bootstrap' where appropriate
+  bootstrap:                       downloads product dependencies and runs 'pod install'/'carthage bootstrap' where appropriate
 
-  test-all:                 tests all projects in this repo.
+  test-all:                        tests all projects in this repo.
 
-  test-ios-objc-static:     tests iOS Objective-C static example.
-  test-ios-objc-dynamic:    tests iOS Objective-C dynamic example.
-  test-ios-objc-cocoapods:  tests iOS Objective-C CocoaPods example.
-  test-ios-objc-carthage:   tests iOS Objective-C Carthage example.
-  test-ios-swift-dynamic:   tests iOS Swift dynamic example.
-  test-ios-swift-cocoapods: tests iOS Swift CocoaPods example.
+  test-ios-objc-static:            tests iOS Objective-C static example.
+  test-ios-objc-dynamic:           tests iOS Objective-C dynamic example.
+  test-ios-objc-cocoapods:         tests iOS Objective-C CocoaPods example.
+  test-ios-objc-cocoapods-dynamic: tests iOS Objective-C CocoaPods Dynamic example.
+  test-ios-objc-carthage:          tests iOS Objective-C Carthage example.
+  test-ios-swift-dynamic:          tests iOS Swift dynamic example.
+  test-ios-swift-cocoapods:        tests iOS Swift CocoaPods example.
 
-  test-osx-objc-dynamic:    tests OS X Objective-C dynamic example.
-  test-osx-objc-cocoapods:  tests OS X Objective-C CocoaPods example.
-  test-osx-objc-carthage:   tests OS X Objective-C Carthage example.
+  test-osx-objc-dynamic:           tests OS X Objective-C dynamic example.
+  test-osx-objc-cocoapods:         tests OS X Objective-C CocoaPods example.
+  test-osx-objc-carthage:          tests OS X Objective-C Carthage example.
 EOF
 }
 
@@ -57,6 +58,7 @@ case "$COMMAND" in
         ################
 
         pod install --project-directory=ios/objc/CocoaPodsExample
+        pod install --project-directory=ios/objc/CocoaPodsDynamicExample
         pod install --project-directory=ios/swift/CocoaPodsExample
         pod install --project-directory=osx/objc/CocoaPodsExample
 
@@ -64,14 +66,14 @@ case "$COMMAND" in
         # Carthage
         ################
 
-        # (
-        #     cd ios/objc/CarthageExample
-        #     carthage bootstrap
-        # )
-        # (
-        #     cd osx/objc/CarthageExample
-        #     carthage bootstrap
-        # )
+        (
+            cd ios/objc/CarthageExample
+            carthage bootstrap
+        )
+        (
+            cd osx/objc/CarthageExample
+            carthage bootstrap
+        )
         exit 0
         ;;
 
@@ -83,13 +85,14 @@ case "$COMMAND" in
         ./build.sh test-ios-objc-static || exit 1
         ./build.sh test-ios-objc-dynamic || exit 1
         ./build.sh test-ios-objc-cocoapods || exit 1
-        # ./build.sh test-ios-objc-carthage || exit 1
+        ./build.sh test-ios-objc-cocoapods-dynamic || exit 1
+        ./build.sh test-ios-objc-carthage || exit 1
         ./build.sh test-ios-swift-dynamic || exit 1
         ./build.sh test-ios-swift-cocoapods || exit 1
 
         ./build.sh test-osx-objc-dynamic || exit 1
         ./build.sh test-osx-objc-cocoapods || exit 1
-        # ./build.sh test-osx-objc-carthage || exit 1
+        ./build.sh test-osx-objc-carthage || exit 1
         exit 0
         ;;
 
@@ -105,6 +108,11 @@ case "$COMMAND" in
 
     "test-ios-objc-cocoapods")
         xctest "-workspace" "ios/objc/CocoaPodsExample/CocoaPodsExample.xcworkspace" "-scheme" "CocoaPodsExample"
+        exit 0
+        ;;
+
+    "test-ios-objc-cocoapods-dynamic")
+        xctest "-workspace" "ios/objc/CocoaPodsDynamicExample/CocoaPodsDynamicExample.xcworkspace" "-scheme" "CocoaPodsDynamicExample"
         exit 0
         ;;
 
