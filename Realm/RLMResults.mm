@@ -65,7 +65,7 @@
     ar->_objectClassName = objectClassName;
     ar->_viewCreated = NO;
     ar->_backingQuery = move(query);
-    ar->_sortOrder = std::move(sorter);
+    ar->_sortOrder = sorter;
     ar->_realm = realm;
     ar->_objectSchema = realm.schema[objectClassName];
     return ar;
@@ -120,12 +120,12 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     }
 }
 
-static std::unique_ptr<RowIndexes::Sorter> RLMSorterFromDescriptors(RLMObjectSchema *schema, NSArray *descriptors)
+static RowIndexes::Sorter RLMSorterFromDescriptors(RLMObjectSchema *schema, NSArray *descriptors)
 {
     std::vector<size_t> columns;
     std::vector<bool> order;
     RLMGetColumnIndices(schema, descriptors, columns, order);
-    return std::make_unique<RowIndexes::Sorter>(columns, order);
+    return RowIndexes::Sorter(columns, order);
 }
 
 //
@@ -294,7 +294,7 @@ static std::unique_ptr<RowIndexes::Sorter> RLMSorterFromDescriptors(RLMObjectSch
     RLMUpdateQueryWithPredicate(query.get(), predicate, _realm.schema, _realm.schema[self.objectClassName]);
     return [RLMResults resultsWithObjectClassName:self.objectClassName
                                             query:move(query)
-                                             sort:std::move(_sortOrder)
+                                             sort:_sortOrder
                                             realm:_realm];
 }
 
@@ -307,7 +307,7 @@ static std::unique_ptr<RowIndexes::Sorter> RLMSorterFromDescriptors(RLMObjectSch
 
     auto query = [self cloneQuery];
     auto sorter = RLMSorterFromDescriptors(_objectSchema, properties);
-    return [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) sort:*sorter realm:_realm];
+    return [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) sort:sorter realm:_realm];
 }
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index {
