@@ -29,6 +29,8 @@
 #import <objc/runtime.h>
 #import <realm/group.hpp>
 
+using namespace realm;
+
 const uint64_t RLMNotVersioned = realm::ObjectStore::NotVersioned;
 
 // RLMSchema private properties
