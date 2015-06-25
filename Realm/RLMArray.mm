@@ -107,7 +107,17 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     }
 }
 
+static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
+                                   NSUInteger index, bool allowOnePastEnd=false) {
+    NSUInteger max = ar->_backingArray.count + allowOnePastEnd;
+    if (index >= max) {
+        @throw RLMException([NSString stringWithFormat:@"Index %llu is out of bounds (must be less than %llu).",
+                             (unsigned long long)index, (unsigned long long)max]);
+    }
+}
+
 - (id)objectAtIndex:(NSUInteger)index {
+    RLMValidateArrayBounds(self, index);
     return [_backingArray objectAtIndex:index];
 }
 
@@ -125,15 +135,18 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
     RLMValidateMatchingObjectType(self, anObject);
+    RLMValidateArrayBounds(self, index, true);
     [_backingArray insertObject:anObject atIndex:index];
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
+    RLMValidateArrayBounds(self, index);
     [_backingArray removeObjectAtIndex:index];
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
     RLMValidateMatchingObjectType(self, anObject);
+    RLMValidateArrayBounds(self, index);
     [_backingArray replaceObjectAtIndex:index withObject:anObject];
 }
 

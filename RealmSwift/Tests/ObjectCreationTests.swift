@@ -227,7 +227,8 @@ class ObjectCreationTests: TestCase {
                 values[propNum] = invalidValue
 
                 Realm().beginWrite()
-                assertThrows(Realm().create(SwiftObject.self, value: values), "Invalid property value '\(invalidValue)' for property number \(propNum)")
+                assertThrows(Realm().create(SwiftObject.self, value: values),
+                    "Invalid property value '\(invalidValue)' for property number \(propNum)")
                 Realm().cancelWrite()
             }
         }

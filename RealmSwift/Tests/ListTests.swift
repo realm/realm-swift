@@ -255,7 +255,7 @@ class ListTests: TestCase {
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
 
-        assertThrows(self.array.sorted("noSuchCol"))
+        assertThrows(self.array.sorted("noSuchCol"), named: "Invalid sort property")
     }
 
     func testSortWithDescriptors() {
@@ -297,7 +297,8 @@ class ListTests: TestCase {
         XCTAssertEqual(2, sorted[1].intCol)
         XCTAssertEqual(1.11, sorted[2].doubleCol)
 
-        assertThrows(array.sorted([SortDescriptor(property: "noSuchCol", ascending: true)]))
+        assertThrows(array.sorted([SortDescriptor(property: "noSuchCol", ascending: true)]),
+            named: "Invalid sort property")
     }
 
     func testFastEnumeration() {

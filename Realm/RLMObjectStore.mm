@@ -370,11 +370,11 @@ static void RLMValidateValueForProperty(__unsafe_unretained id const obj,
             }
             break;
         case RLMPropertyTypeArray: {
-            if (validateNested) {
-                if (obj != nil && obj != NSNull.null) {
-                    if (![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
-                        @throw  RLMException([NSString stringWithFormat:@"Array property value (%@) is not enumerable.", obj]);
-                    }
+            if (obj != nil && obj != NSNull.null) {
+                if (![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
+                    @throw  RLMException([NSString stringWithFormat:@"Array property value (%@) is not enumerable.", obj]);
+                }
+                if (validateNested) {
                     id<NSFastEnumeration> array = obj;
                     for (id el in array) {
                         RLMValidateNestedObject(el, prop.objectClassName, schema, validateNested, allowMissing);
@@ -467,7 +467,8 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         // populate
         NSDictionary *defaultValues = nil;
         for (RLMProperty *prop in objectSchema.properties) {
-            id propValue = [value valueForKey:prop.name];
+            id propValue = RLMValidatedValueForProperty(value, prop.name, objectSchema.className);
+
             if (!propValue && created) {
                 if (!defaultValues) {
                     defaultValues = RLMDefaultValuesForObjectSchema(objectSchema);

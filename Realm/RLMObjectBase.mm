@@ -95,7 +95,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
         // assume our object is an NSDictionary or an object with kvc properties
         NSDictionary *defaultValues = nil;
         for (RLMProperty *prop in properties) {
-            id obj = [value valueForKey:prop.name];
+            id obj = RLMValidatedValueForProperty(value, prop.name, _objectSchema.className);
 
             // get default for nil object
             if (!obj) {
@@ -329,6 +329,18 @@ BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2) {
     o1->_row.get_index() == o2->_row.get_index();
 }
 
+id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
+    @try {
+        return [object valueForKey:key];
+    }
+    @catch (NSException *e) {
+        if ([e.name isEqualToString:NSUndefinedKeyException]) {
+            @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' to initialize object of type '%@': missing key '%@'",
+                                 object, className, key]);
+        }
+        @throw;
+    }
+}
 
 Class RLMObjectUtilClass(BOOL isSwift) {
     static Class objectUtilObjc = [RLMObjectUtil class];
