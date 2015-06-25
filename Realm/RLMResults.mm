@@ -30,6 +30,7 @@
 
 #import <objc/runtime.h>
 #import <realm/table_view.hpp>
+#import <realm/views.hpp>
 
 //
 // RLMResults implementation
@@ -64,7 +65,7 @@
     ar->_objectClassName = objectClassName;
     ar->_viewCreated = NO;
     ar->_backingQuery = move(query);
-    ar->_sortOrder = sorter;
+    ar->_sortOrder = std::move(sorter);
     ar->_realm = realm;
     ar->_objectSchema = realm.schema[objectClassName];
     return ar;
@@ -99,7 +100,7 @@ static inline void RLMResultsValidateAttached(__unsafe_unretained RLMResults *co
         // create backing view if needed
         ar->_backingView = ar->_backingQuery->find_all();
         ar->_viewCreated = YES;
-        if (!ar->_sortOrder.m_columns.empty()) {
+        if (!ar->_sortOrder.m_column_indexes.empty()) {
             ar->_backingView.sort(ar->_sortOrder.m_column_indexes, ar->_sortOrder.m_ascending);
         }
     }
@@ -117,6 +118,14 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (!ar->_realm->_inWriteTransaction) {
         @throw RLMException(@"Can't mutate a persisted array outside of a write transaction.");
     }
+}
+
+static std::unique_ptr<RowIndexes::Sorter> RLMSorterFromDescriptors(RLMObjectSchema *schema, NSArray *descriptors)
+{
+    std::vector<size_t> columns;
+    std::vector<bool> order;
+    RLMGetColumnIndices(schema, descriptors, columns, order);
+    return std::make_unique<RowIndexes::Sorter>(columns, order);
 }
 
 //
@@ -285,7 +294,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMUpdateQueryWithPredicate(query.get(), predicate, _realm.schema, _realm.schema[self.objectClassName]);
     return [RLMResults resultsWithObjectClassName:self.objectClassName
                                             query:move(query)
-                                             sort:_backingView.m_sorting_predicate
+                                             sort:std::move(_sortOrder)
                                             realm:_realm];
 }
 
@@ -297,12 +306,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMResultsValidate(self);
 
     auto query = [self cloneQuery];
-    RLMResults *r = [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) realm:_realm];
-
-    // attach new table view
-    RLMResultsValidateAttached(r);
-    RLMUpdateViewWithOrder(r->_backingView, _realm.schema[self.objectClassName], properties);
-    return r;
+    auto sorter = RLMSorterFromDescriptors(_objectSchema, properties);
+    return [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) sort:*sorter realm:_realm];
 }
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index {

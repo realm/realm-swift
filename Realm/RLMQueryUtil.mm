@@ -868,11 +868,3 @@ void RLMGetColumnIndices(RLMObjectSchema *schema, NSArray *properties,
         order.push_back(descriptor.ascending);
     }
 }
-
-void RLMUpdateViewWithOrder(realm::TableView &view, RLMObjectSchema *schema, NSArray *properties)
-{
-    std::vector<size_t> columns;
-    std::vector<bool> order;
-    RLMGetColumnIndices(schema, properties, columns, order);
-    view.sort(move(columns), move(order));
-}
