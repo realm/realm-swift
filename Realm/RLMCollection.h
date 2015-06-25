@@ -18,6 +18,17 @@
 
 @class RLMRealm, RLMResults, RLMObject;
 
+#if __has_extension(objc_generics)
+#define RLM_GENERIC_COLLECTION <RLMObjectType>
+#define RLMObjectArgument RLMObjectType
+#define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS *><CLASS>
+#else
+#define RLM_GENERIC_COLLECTION
+typedef id RLMObjectType;
+typedef RLMObject * RLMObjectArgument;
+#define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
+#endif
+
 @protocol RLMCollection <NSFastEnumeration>
 
 @required

@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMCollection.h>
 
-@class RLMObject, RLMRealm, RLMResults;
+@class RLMObject, RLMRealm, RLMResults RLM_GENERIC_COLLECTION;
 
 /**
  
@@ -34,7 +34,7 @@
  lazily created when accessed, or can be obtained by querying a Realm.
  */
 
-@interface RLMArray : NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMArray RLM_GENERIC_COLLECTION : NSObject<RLMCollection, NSFastEnumeration>
 
 /**---------------------------------------------------------------------------------------
  *  @name RLMArray Properties
@@ -75,7 +75,7 @@
  
  @return An RLMObject of the class contained by this RLMArray.
  */
-- (id)objectAtIndex:(NSUInteger)index;
+- (RLMObjectType)objectAtIndex:(NSUInteger)index;
 
 /**
  Returns the first object in the array.
@@ -84,7 +84,7 @@
  
  @return An RLMObject of the class contained by this RLMArray.
  */
-- (id)firstObject;
+- (RLMObjectType)firstObject;
 
 /**
  Returns the last object in the array.
@@ -93,7 +93,7 @@
 
  @return An RLMObject of the class contained by this RLMArray.
  */
-- (id)lastObject;
+- (RLMObjectType)lastObject;
 
 
 #pragma mark -
@@ -111,7 +111,7 @@
  
  @param object  An RLMObject of the class contained by this RLMArray.
  */
-- (void)addObject:(RLMObject *)object;
+- (void)addObject:(RLMObjectArgument)object;
 
 /**
  Adds an array of objects at the end of the array.
@@ -133,7 +133,7 @@
  @param anObject  An object (of the same type as returned from the objectClassName selector).
  @param index   The array index at which the object is inserted.
  */
-- (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index;
+- (void)insertObject:(RLMObjectArgument)anObject atIndex:(NSUInteger)index;
 
 /**
  Removes an object at a given index.
@@ -170,7 +170,7 @@
  @param index       The array index of the object to be replaced.
  @param anObject    An object (of the same type as returned from the objectClassName selector).
  */
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)anObject;
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObjectArgument)anObject;
 
 
 #pragma mark -
@@ -187,7 +187,7 @@
  
  @param object  An object (of the same type as returned from the objectClassName selector).
  */
-- (NSUInteger)indexOfObject:(RLMObject *)object;
+- (NSUInteger)indexOfObject:(RLMObjectArgument)object;
 
 /**
  Gets the index of the first object matching the predicate.
@@ -214,7 +214,7 @@
  
  @return                An RLMResults of objects that match the given predicate
  */
-- (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
+- (RLMResults RLM_GENERIC_COLLECTION*)objectsWhere:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate in the RLMArray.
@@ -223,7 +223,7 @@
  
  @return            An RLMResults of objects that match the given predicate
  */
-- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
+- (RLMResults RLM_GENERIC_COLLECTION*)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get a sorted RLMResults from an RLMArray
@@ -233,7 +233,7 @@
  
  @return    An RLMResults sorted by the specified property.
  */
-- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults RLM_GENERIC_COLLECTION*)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
 /**
  Get a sorted RLMResults from an RLMArray
@@ -242,12 +242,12 @@
 
  @return    An RLMResults sorted by the specified properties.
  */
-- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
+- (RLMResults RLM_GENERIC_COLLECTION*)sortedResultsUsingDescriptors:(NSArray *)properties;
 
 #pragma mark -
 
-- (id)objectAtIndexedSubscript:(NSUInteger)index;
-- (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index;
+- (RLMObjectType)objectAtIndexedSubscript:(NSUInteger)index;
+- (void)setObject:(RLMObjectType)newValue atIndexedSubscript:(NSUInteger)index;
 
 #pragma mark -
 
