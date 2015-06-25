@@ -8,6 +8,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Reduce the amount of memory used by RLMRealm notification listener threads.
+* Add nullability annotations to the Objective-C API to provide enhanced compiler
+  warnings and bridging to Swift.
 
 ### Bugfixes
 
