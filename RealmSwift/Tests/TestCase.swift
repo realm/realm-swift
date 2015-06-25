@@ -48,6 +48,12 @@ class TestCase: XCTestCase {
         RLMRealm.resetRealmState()
     }
 
+    func dispatchSyncNewThread(block: dispatch_block_t) {
+        let queue = dispatch_queue_create("background", nil)
+        dispatch_async(queue, block)
+        dispatch_sync(queue) {}
+    }
+
     func assertThrows<T>(@autoclosure(escaping) block: () -> T, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
         exceptionThrown = true
         RLMAssertThrows(self, { _ = block() } as dispatch_block_t, message, fileName, lineNumber)
