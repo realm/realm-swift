@@ -32,6 +32,8 @@
 #import <realm/table_view.hpp>
 #import <realm/views.hpp>
 
+using namespace realm;
+
 //
 // RLMResults implementation
 //

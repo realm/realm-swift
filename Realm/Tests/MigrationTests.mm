@@ -31,6 +31,8 @@
 #import "object_store.hpp"
 #import <realm/table.hpp>
 
+using namespace realm;
+
 static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         Table *table = objectSchema.table;

@@ -262,7 +262,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     auto query = std::make_unique<realm::Query>(_backingLinkView->get_target_table().where(_backingLinkView));
     return [RLMResults resultsWithObjectClassName:self.objectClassName
                                             query:move(query)
-                                             sort:RowIndexes::Sorter(columns, order)
+                                             sort:realm::RowIndexes::Sorter(columns, order)
                                             realm:_realm];
 
 }
