@@ -5,9 +5,9 @@ cat <<EOF
 Usage: sh $0 command [argument]
 
 command:
-  bootstrap:                downloads product dependencies and runs 'pod install'/'carthage bootstrap' where appropriate
+  bootstrap:                       downloads product dependencies and runs 'pod install'/'carthage bootstrap' where appropriate
 
-  test-all:                 tests all projects in this repo.
+  test-all:                        tests all projects in this repo.
 
   test-ios-objc-static:            tests iOS Objective-C static example.
   test-ios-objc-dynamic:           tests iOS Objective-C dynamic example.
@@ -66,14 +66,14 @@ case "$COMMAND" in
         # Carthage
         ################
 
-        # (
-        #     cd ios/objc/CarthageExample
-        #     carthage bootstrap
-        # )
-        # (
-        #     cd osx/objc/CarthageExample
-        #     carthage bootstrap
-        # )
+        (
+            cd ios/objc/CarthageExample
+            carthage bootstrap
+        )
+        (
+            cd osx/objc/CarthageExample
+            carthage bootstrap
+        )
         exit 0
         ;;
 
@@ -86,13 +86,13 @@ case "$COMMAND" in
         ./build.sh test-ios-objc-dynamic || exit 1
         ./build.sh test-ios-objc-cocoapods || exit 1
         ./build.sh test-ios-objc-cocoapods-dynamic || exit 1
-        # ./build.sh test-ios-objc-carthage || exit 1
+        ./build.sh test-ios-objc-carthage || exit 1
         ./build.sh test-ios-swift-dynamic || exit 1
         ./build.sh test-ios-swift-cocoapods || exit 1
 
         ./build.sh test-osx-objc-dynamic || exit 1
         ./build.sh test-osx-objc-cocoapods || exit 1
-        # ./build.sh test-osx-objc-carthage || exit 1
+        ./build.sh test-osx-objc-carthage || exit 1
         exit 0
         ;;
 
