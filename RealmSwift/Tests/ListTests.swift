@@ -148,7 +148,7 @@ class ListTests: TestCase {
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
 
-        assertThrows(self.array[200], named: nil)
+        assertThrows(self.array[200])
         assertThrows(self.array[-200])
     }
 
@@ -348,7 +348,7 @@ class ListTests: TestCase {
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
 
-        assertThrows(self.array.insert(self.str2, atIndex: 200), named: nil)
+        assertThrows(self.array.insert(self.str2, atIndex: 200))
         assertThrows(self.array.insert(self.str2, atIndex: -200))
     }
 
@@ -359,7 +359,7 @@ class ListTests: TestCase {
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str1, array[1])
 
-        assertThrows(self.array.removeAtIndex(200), named: nil)
+        assertThrows(self.array.removeAtIndex(200))
         assertThrows(self.array.removeAtIndex(-200))
     }
 
@@ -400,7 +400,7 @@ class ListTests: TestCase {
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str2, array[1])
 
-        assertThrows(self.array.replace(200, object: self.str2), named: nil)
+        assertThrows(self.array.replace(200, object: self.str2))
         assertThrows(self.array.replace(-200, object: self.str2))
     }
 

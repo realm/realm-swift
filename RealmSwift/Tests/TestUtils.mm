@@ -36,7 +36,7 @@ void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *name, N
     }
     @catch (NSException *e) {
         didThrow = YES;
-        if (name && ![name isEqualToString:e.name]) {
+        if (![name isEqualToString:e.name]) {
             NSString *msg = [NSString stringWithFormat:@"The given expression threw an exception named '%@', but expected '%@'",
                              e.name, name];
             [self recordFailureWithDescription:msg inFile:fileName atLine:lineNumber expected:NO];
