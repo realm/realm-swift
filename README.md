@@ -54,8 +54,8 @@ Executing the examples under the `examples/` folder, requires that you have buil
 
 Here is an overview of some long-running branches we're currently using in development, which you may wish to use.
 
-_:warning: Feedback is very welcome for unreleased version, but please aware that we can't provide support to the same
-extent as we do for the official released version._
+_**Warning**: we welcome feedback on these branches — please comment on their PRs whenever possible.
+We strongly recommend against using those branches to ship production applications._
 
 | Branch                                                             | Xcode Version    | Swift Version                                   | Associated PR for reference           |
 |:-------------------------------------------------------------------|:-----------------|:------------------------------------------------|:--------------------------------------|
