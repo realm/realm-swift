@@ -8,6 +8,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Reduce the amount of memory used by RLMRealm notification listener threads.
+* Avoid evaluating results eagerly when filtering and sorting.
 
 ### Bugfixes
 
