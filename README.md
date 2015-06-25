@@ -50,12 +50,9 @@ Run `sh build.sh help` to see all the actions you can perform (build ios/osx, ge
 Executing the examples under the `examples/` folder, requires that you have built the `Realm.framework`.
 
 
-## Branches
+## Long-running Branches
 
-Here is an overview of some long-running branches we're currently using in development, which you may wish to use.
-
-_**Warning**: we welcome feedback on these branches — please comment on their PRs whenever possible.
-We strongly recommend against using those branches to ship production applications._
+Realm maintains long-running branches for specific purposes, some of which you may wish to use. We usually do not provide binaries for long-running branches. **We strongly recommend against using them to ship production applications.** Please do send us your feedback on these branches, ideally via a comment on their associated PR.
 
 | Branch                                                             | Xcode Version    | Swift Version                                   | Associated PR for reference           |
 |:-------------------------------------------------------------------|:-----------------|:------------------------------------------------|:--------------------------------------|
@@ -63,27 +60,21 @@ We strongly recommend against using those branches to ship production applicatio
 | [`swift-2.0`](/realm/realm-cocoa/tree/swift-2.0)                   | 7.0.0-beta1      | Swift 2.0 (swiftlang-700.0.38.1 clang-700.0.53) | [#2069](/realm/realm-cocoa/pull/2069) |
 | [`null-string-beta-2`](/realm/realm-cocoa/tree/null-string-beta-2) | same as `master` | same as `master`                                | [#628](/realm/realm-cocoa/issues/628) |
 
-If you want to use non-released version of Realm e.g. from the `swift-2.0` branch,
-you can still use your preferred dependency manager. We don't provide prebuilt binaries.
-
-### CocoaPods
+### Using Long-running Branches in CocoaPods
 
 ```ruby
-# Attention: Realm's custom branch must be also specified explicitly
-# in your Podfile even if you want to use only Realm Swift directly.
+# You need to add both “Realm” & “RealmSwift”
 pod 'Realm',      :git => 'https://github.com/realm/realm-cocoa.git', :branch => 'swift-2.0'
 pod 'RealmSwift', :git => 'https://github.com/realm/realm-cocoa.git', :branch => 'swift-2.0'
 ```
 
-### Carthage
+### Using Long-running Branches in Carthage
 
 ```Cartfile
 github "realm/realm-cocoa" "null-string-beta-2"
 ```
-
-_**Attention**: Realm Swift via Carthage relies on prebuilt binaries currently as [Carthage doesn't offer yet any
-possibility to specify the desired scheme to build](https://github.com/carthage/Carthage/issues/395).  
-This doesn't affect the availability of the regularly released Realm Swift via Carthage._
+Using Realm Swift via Carthage relies on prebuilt binaries currently as [Carthage doesn't offer a
+way to specify the desired scheme to build at the moment](https://github.com/carthage/Carthage/issues/395). This doesn't affect the availability of the regular releases released Realm Swift via Carthage._
 
 ## Contributing
 
