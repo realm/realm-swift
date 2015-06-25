@@ -82,7 +82,7 @@ public final class Realm {
     :param: path Path to the realm file.
     */
     public convenience init(path: String = Realm.defaultPath) {
-        self.init(RLMRealm(path: path, readOnly: false, error: nil))
+        self.init(RLMRealm(path: path, readOnly: false, error: nil)!)
     }
     
     /**

@@ -451,7 +451,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 -(void)testObjectInitWithObjectTypeOther
 {
     XCTAssertThrows([[EmployeeObject alloc] initWithValue:@"StringObject"], @"Not an array or dictionary");
-    XCTAssertThrows([[EmployeeObject alloc] initWithValue:nil], @"Not an array or dictionary");
+    XCTAssertThrows([[EmployeeObject alloc] initWithValue:self.nonLiteralNil], @"Not an array or dictionary");
 }
 
 

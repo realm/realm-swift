@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class RLMObjectSchema;
 
 /**
@@ -46,7 +48,7 @@
  
  @see               RLMObjectSchema
  */
-- (RLMObjectSchema *)schemaForClassName:(NSString *)className;
+- (nullable RLMObjectSchema *)schemaForClassName:(NSString *)className;
 
 /**
  Look up an RLMObjectSchema for the given class name in this Realm. Throws if there
@@ -65,3 +67,5 @@
 - (BOOL)isEqualToSchema:(RLMSchema *)schema;
 
 @end
+
+NS_ASSUME_NONNULL_END

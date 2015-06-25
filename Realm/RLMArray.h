@@ -19,6 +19,8 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMCollection.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class RLMObject, RLMRealm, RLMResults;
 
 /**
@@ -54,7 +56,7 @@
 /**
  The Realm in which this array is persisted. Returns nil for standalone arrays.
  */
-@property (nonatomic, readonly) RLMRealm *realm;
+@property (nonatomic, readonly, nullable) RLMRealm *realm;
 
 /**
  Indicates if an array can no longer be accessed.
@@ -84,7 +86,7 @@
  
  @return An RLMObject of the class contained by this RLMArray.
  */
-- (id)firstObject;
+- (nullable id)firstObject;
 
 /**
  Returns the last object in the array.
@@ -93,7 +95,7 @@
 
  @return An RLMObject of the class contained by this RLMArray.
  */
-- (id)lastObject;
+- (nullable id)lastObject;
 
 
 #pragma mark -
@@ -304,3 +306,5 @@
 // for use only in Swift class definitions
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 @end
+
+NS_ASSUME_NONNULL_END

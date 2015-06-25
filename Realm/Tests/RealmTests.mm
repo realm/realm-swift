@@ -549,7 +549,7 @@ extern "C" {
 
 - (void)testRealmFileAccess
 {
-    XCTAssertThrows([RLMRealm realmWithPath:nil], @"nil path");
+    XCTAssertThrows([RLMRealm realmWithPath:self.nonLiteralNil], @"nil path");
     XCTAssertThrows([RLMRealm realmWithPath:@""], @"empty path");
 
     NSString *content = @"Some content";
@@ -650,7 +650,7 @@ extern "C" {
     XCTAssertEqual(results, [results objectsWhere:@"intCol = 5"]);
     XCTAssertEqual(results, [results sortedResultsUsingProperty:@"intCol" ascending:YES]);
     XCTAssertThrows([results objectAtIndex:0]);
-    XCTAssertEqual(NSNotFound, [results indexOfObject:nil]);
+    XCTAssertEqual(NSNotFound, [results indexOfObject:self.nonLiteralNil]);
     XCTAssertNoThrow([realm deleteObjects:results]);
     for (__unused id obj in results) {
         XCTFail(@"Got an item in empty results");

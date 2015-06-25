@@ -83,4 +83,3 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 + (NSArray *)requiredPropertiesForClass:(Class)cls;
 
 @end
-

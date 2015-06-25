@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class RLMRealm;
 @class RLMSchema;
 @class RLMObjectSchema;
@@ -31,3 +33,5 @@
 + (NSString *)className;
 
 @end
+
+NS_ASSUME_NONNULL_END

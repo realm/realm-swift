@@ -155,5 +155,10 @@ static BOOL encryptTests() {
     [realm removeNotification:token];
 }
 
+- (id)nonLiteralNil
+{
+    return nil;
+}
+
 @end
 

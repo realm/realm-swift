@@ -53,12 +53,12 @@
 #pragma mark - Key validation
 
 - (void)testBadEncryptionKeys {
-    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:nil readOnly:NO error:nil]);
+    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:self.nonLiteralNil readOnly:NO error:nil]);
     XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:NSData.data readOnly:NO error:nil]);
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:nil]);
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:self.nonLiteralNil]);
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:NSData.data]);
     XCTAssertThrows([RLMRealm setEncryptionKey:NSData.data forRealmsAtPath:RLMRealm.defaultRealmPath]);
-    XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:nil error:nil]);
+    XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:self.nonLiteralNil error:nil]);
     XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:NSData.data error:nil]);
 }
 

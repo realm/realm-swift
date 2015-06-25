@@ -19,6 +19,8 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMCollection.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class RLMObject, RLMRealm;
 
 /**
@@ -76,7 +78,7 @@
 
  @return An RLMObject of the class contained by this RLMResults.
  */
-- (id)firstObject;
+- (nullable id)firstObject;
 
 /**
  Returns the last object in the results.
@@ -85,7 +87,7 @@
 
  @return An RLMObject of the class contained by this RLMResults.
  */
-- (id)lastObject;
+- (nullable id)lastObject;
 
 
 
@@ -179,7 +181,7 @@
 
  @return The minimum value for the property amongst objects in an RLMResults.
  */
--(id)minOfProperty:(NSString *)property;
+-(nullable id)minOfProperty:(NSString *)property;
 
 /**
  Returns the maximum (highest) value of the given property of objects in an RLMResults
@@ -192,7 +194,7 @@
 
  @return The maximum value for the property amongst objects in an RLMResults
  */
--(id)maxOfProperty:(NSString *)property;
+-(nullable id)maxOfProperty:(NSString *)property;
 
 /**
  Returns the sum of the given property for objects in an RLMResults.
@@ -219,7 +221,7 @@
  @return    The average for the given property amongst objects in an RLMResults. This will be of type double for both
  float and double properties.
  */
--(NSNumber *)averageOfProperty:(NSString *)property;
+-(nullable NSNumber *)averageOfProperty:(NSString *)property;
 
 #pragma mark -
 
@@ -246,3 +248,4 @@
 
 @end
 
+NS_ASSUME_NONNULL_END

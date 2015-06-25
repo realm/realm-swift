@@ -20,6 +20,8 @@
 
 @class RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  An RLMRealm instance (also referred to as "a realm") represents a Realm
  database.
@@ -91,7 +93,7 @@
 
  @return An `RLMRealm` instance.
  */
-+ (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
++ (nullable instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 
 /**
  Obtains an `RLMRealm` instance persisted to an encrypted file.
@@ -115,10 +117,10 @@
 
  @return An encrypted `RLMRealm` instance.
  */
-+ (instancetype)realmWithPath:(NSString *)path
-                encryptionKey:(NSData *)key
-                     readOnly:(BOOL)readonly
-                        error:(NSError **)error;
++ (nullable instancetype)realmWithPath:(NSString *)path
+                         encryptionKey:(NSData *)key
+                              readOnly:(BOOL)readonly
+                                 error:(NSError **)error;
 
 /**
  Set the encryption key to use when opening Realms at a certain path.
@@ -135,7 +137,7 @@
  @param key     64-byte encryption key to use, or `nil` to unset.
  @param path    Realm path to set the encryption key for.
  */
-+ (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path;
++ (void)setEncryptionKey:(nullable NSData *)key forRealmsAtPath:(NSString *)path;
 
 /**
  Obtains an `RLMRealm` instance for an un-persisted in-memory Realm. The identifier
@@ -527,7 +529,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
  @see               RLMMigration
  */
-+ (void)setDefaultRealmSchemaVersion:(uint64_t)version withMigrationBlock:(RLMMigrationBlock)block;
++ (void)setDefaultRealmSchemaVersion:(uint64_t)version withMigrationBlock:(nullable RLMMigrationBlock)block;
 
 /**
  Specify a schema version and an associated migration block which is applied when
@@ -540,7 +542,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
  @see               RLMMigration
  */
-+ (void)setSchemaVersion:(uint64_t)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block;
++ (void)setSchemaVersion:(uint64_t)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(nullable RLMMigrationBlock)block;
 
 /**
  Get the schema version for a Realm at a given path.
@@ -565,7 +567,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
  @return            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
  */
-+ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)error;
++ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
 /**
  Performs the registered migration block on a Realm at the given path.
@@ -629,3 +631,5 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 //
 @interface RLMNotificationToken : NSObject
 @end
+
+NS_ASSUME_NONNULL_END

@@ -164,7 +164,7 @@
 
             XCTAssertTrue([migration deleteDataForClassName:@"DeletedClass"]);
             XCTAssertFalse([migration deleteDataForClassName:@"NoSuchClass"]);
-            XCTAssertFalse([migration deleteDataForClassName:nil]);
+            XCTAssertFalse([migration deleteDataForClassName:self.nonLiteralNil]);
 
             [migration createObject:StringObject.className withValue:@[@"migration"]];
             XCTAssertTrue([migration deleteDataForClassName:StringObject.className]);

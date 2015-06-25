@@ -71,7 +71,7 @@ class SwiftPropertyTypeTest: SwiftTestCase {
             realm.addObject(obj)
         }
 
-        let obj = SwiftAllIntSizesObject.allObjectsInRealm(realm)[0]! as! SwiftAllIntSizesObject
+        let obj = SwiftAllIntSizesObject.allObjectsInRealm(realm)[0] as! SwiftAllIntSizesObject
         XCTAssertEqual(obj.int8, v8)
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
@@ -98,7 +98,7 @@ class SwiftPropertyTypeTest: SwiftTestCase {
             realm.addObject(obj)
         }
 
-        let obj = AllIntSizesObject.allObjectsInRealm(realm)[0]! as! AllIntSizesObject
+        let obj = AllIntSizesObject.allObjectsInRealm(realm)[0] as! AllIntSizesObject
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
         XCTAssertEqual(obj.int64, v64)

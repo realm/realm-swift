@@ -39,7 +39,7 @@ class SwiftDefaultObject: RLMObject {
     dynamic var intCol = 1
     dynamic var boolCol = true
 
-    override class func defaultPropertyValues() -> [NSObject : AnyObject]! {
+    override class func defaultPropertyValues() -> [NSObject : AnyObject]? {
         return ["intCol": 2]
     }
 }
@@ -170,7 +170,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
 #endif
 
     func testSwiftClassNameIsDemangled() {
-        XCTAssertEqual(SwiftObject.className()!, "SwiftObject", "Calling className() on Swift class should return demangled name")
+        XCTAssertEqual(SwiftObject.className(), "SwiftObject", "Calling className() on Swift class should return demangled name")
     }
 
     // Objective-C models
