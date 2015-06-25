@@ -34,7 +34,7 @@ extern "C" {
 //
 // NOTE: the schema passed in will be set on the Realm and may later be mutated. sharing a targetSchema accross
 // even the same Realm with different column orderings will cause issues
-NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger version, RLMSchema *targetSchema, NSError *(^migrationBlock)());
+void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger version, RLMSchema *targetSchema, NSError *(^migrationBlock)());
 
 // sets a realm's schema to a copy of targetSchema
 // caches table accessors on each objectSchema

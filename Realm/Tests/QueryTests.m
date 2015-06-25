@@ -1718,4 +1718,97 @@
                                       @"Operator 'ENDSWITH' is not supported .* right side");
 }
 
+#ifdef REALM_ENABLE_NULL
+- (void)testQueryOnNullableStringColumn {
+    void (^testWithStringClass)(Class) = ^(Class stringObjectClass) {
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [stringObjectClass createInRealm:realm withValue:@[@"a"]];
+            [stringObjectClass createInRealm:realm withValue:@[NSNull.null]];
+            [stringObjectClass createInRealm:realm withValue:@[@"b"]];
+            [stringObjectClass createInRealm:realm withValue:@[NSNull.null]];
+            [stringObjectClass createInRealm:realm withValue:@[@""]];
+        }];
+
+        RLMResults *allObjects = [stringObjectClass allObjectsInRealm:realm];
+        XCTAssertEqual(5U, allObjects.count);
+
+        RLMResults *nilStrings = [stringObjectClass objectsInRealm:realm where:@"stringCol = NULL"];
+        XCTAssertEqual(2U, nilStrings.count);
+        XCTAssertEqualObjects((@[NSNull.null, NSNull.null]), [nilStrings valueForKey:@"stringCol"]);
+
+        RLMResults *nonNilStrings = [stringObjectClass objectsInRealm:realm where:@"stringCol != NULL"];
+        XCTAssertEqual(3U, nonNilStrings.count);
+        XCTAssertEqualObjects((@[@"a", @"b", @""]), [nonNilStrings valueForKey:@"stringCol"]);
+
+        XCTAssertEqual(3U, [stringObjectClass objectsInRealm:realm where:@"stringCol IN {NULL, 'a'}"].count);
+
+        XCTAssertEqual(1U, [stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS 'a'"].count);
+        XCTAssertEqual(1U, [stringObjectClass objectsInRealm:realm where:@"stringCol BEGINSWITH 'a'"].count);
+        XCTAssertEqual(1U, [stringObjectClass objectsInRealm:realm where:@"stringCol ENDSWITH 'a'"].count);
+
+        XCTAssertEqual(0U, [stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS 'z'"].count);
+
+        XCTAssertEqual(1U, [stringObjectClass objectsInRealm:realm where:@"stringCol = ''"].count);
+
+        RLMResults *sorted = [[stringObjectClass allObjectsInRealm:realm] sortedResultsUsingProperty:@"stringCol" ascending:YES];
+        XCTAssertEqualObjects((@[NSNull.null, NSNull.null, @"", @"a", @"b"]), [sorted valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects((@[@"b", @"a", @"", NSNull.null, NSNull.null]), [[sorted sortedResultsUsingProperty:@"stringCol" ascending:NO] valueForKey:@"stringCol"]);
+
+        [realm transactionWithBlock:^{
+            [realm deleteObject:[stringObjectClass allObjectsInRealm:realm].firstObject];
+        }];
+
+        XCTAssertEqual(2U, nilStrings.count);
+        XCTAssertEqual(2U, nonNilStrings.count);
+
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol BEGINSWITH ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol ENDSWITH ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS[c] ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol BEGINSWITH[c] ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol ENDSWITH[c] ''"] valueForKey:@"stringCol"]);
+
+        XCTAssertEqualObjects(@[], ([[stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS %@", @"\0"] valueForKey:@"self"]));
+        XCTAssertEqualObjects([[stringObjectClass allObjectsInRealm:realm] valueForKey:@"stringCol"], ([[StringObject objectsInRealm:realm where:@"stringCol CONTAINS NULL"] valueForKey:@"stringCol"]));
+    };
+    testWithStringClass([StringObject class]);
+    testWithStringClass([IndexedStringObject class]);
+}
+
+- (void)testQueryingOnLinkToNullableStringColumn {
+    void (^testWithStringClass)(Class, Class) = ^(Class stringLinkClass, Class stringObjectClass) {
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [stringLinkClass createInRealm:realm withValue:@[[stringObjectClass createInRealm:realm withValue:@[@"a"]]]];
+            [stringLinkClass createInRealm:realm withValue:@[[stringObjectClass createInRealm:realm withValue:@[NSNull.null]]]];
+            [stringLinkClass createInRealm:realm withValue:@[[stringObjectClass createInRealm:realm withValue:@[@"b"]]]];
+            [stringLinkClass createInRealm:realm withValue:@[[stringObjectClass createInRealm:realm withValue:@[NSNull.null]]]];
+            [stringLinkClass createInRealm:realm withValue:@[[stringObjectClass createInRealm:realm withValue:@[@""]]]];
+        }];
+
+        RLMResults *nilStrings = [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol = NULL"];
+        XCTAssertEqual(2U, nilStrings.count);
+        XCTAssertEqualObjects((@[NSNull.null, NSNull.null]), [nilStrings valueForKeyPath:@"objectCol.stringCol"]);
+
+        RLMResults *nonNilStrings = [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol != NULL"];
+        XCTAssertEqual(3U, nonNilStrings.count);
+        XCTAssertEqualObjects((@[@"a", @"b", @""]), [nonNilStrings valueForKeyPath:@"objectCol.stringCol"]);
+
+        XCTAssertEqual(3U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol IN {NULL, 'a'}"].count);
+
+        XCTAssertEqual(1U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol CONTAINS 'a'"].count);
+        XCTAssertEqual(1U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol BEGINSWITH 'a'"].count);
+        XCTAssertEqual(1U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol ENDSWITH 'a'"].count);
+
+        XCTAssertEqual(0U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol CONTAINS 'z'"].count);
+
+        XCTAssertEqual(1U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol = ''"].count);
+    };
+
+    testWithStringClass([LinkStringObject class], [StringObject class]);
+    testWithStringClass([LinkIndexedStringObject class], [IndexedStringObject class]);
+}
+#endif
+
 @end

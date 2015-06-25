@@ -24,6 +24,19 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
+    switch (propertyType) {
+        case RLMPropertyTypeObject:
+#ifdef REALM_ENABLE_NULL
+        case RLMPropertyTypeString:
+        case RLMPropertyTypeData:
+#endif
+            return YES;
+        default:
+            return NO;
+    }
+}
+
 @implementation RLMProperty {
     NSString *_objcRawType;
 }
@@ -31,13 +44,15 @@
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
-                  indexed:(BOOL)indexed {
+                     indexed:(BOOL)indexed
+                    optional:(BOOL)optional {
     self = [super init];
     if (self) {
         _name = name;
         _type = type;
         _objectClassName = objectClassName;
         _indexed = indexed;
+        _optional = optional;
         [self setObjcCodeFromType];
         [self updateAccessors];
     }
@@ -121,12 +136,18 @@
             }
             else if (strcmp(code, "@\"NSString\"") == 0) {
                 _type = RLMPropertyTypeString;
+#if REALM_ENABLE_NULL
+                _optional = YES;
+#endif
             }
             else if (strcmp(code, "@\"NSDate\"") == 0) {
                 _type = RLMPropertyTypeDate;
             }
             else if (strcmp(code, "@\"NSData\"") == 0) {
                 _type = RLMPropertyTypeData;
+#if REALM_ENABLE_NULL
+                _optional = YES;
+#endif
             }
             else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
                 // get object class from type string - @"RLMArray<objectClassName>"
@@ -157,6 +178,7 @@
                 }
 
                 _type = RLMPropertyTypeObject;
+                _optional = true;
                 _objectClassName = className;
             }
             return YES;
@@ -303,6 +325,7 @@
     prop->_setterSel = _setterSel;
     prop->_isPrimary = _isPrimary;
     prop->_swiftListIvar = _swiftListIvar;
+    prop->_optional = _optional;
     
     return prop;
 }
@@ -311,12 +334,13 @@
     return _type == property->_type
         && _indexed == property->_indexed
         && _isPrimary == property->_isPrimary
+        && _optional == property->_optional
         && [_name isEqualToString:property->_name]
         && (_objectClassName == property->_objectClassName  || [_objectClassName isEqualToString:property->_objectClassName]);
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@ {\n\ttype = %@;\n\tobjectClassName = %@;\n\tindexed = %@;\n\tisPrimary = %@;\n}", self.name, RLMTypeToString(self.type), self.objectClassName, self.indexed ? @"YES" : @"NO", self.isPrimary ? @"YES" : @"NO"];
+    return [NSString stringWithFormat:@"%@ {\n\ttype = %@;\n\tobjectClassName = %@;\n\tindexed = %@;\n\tisPrimary = %@;\n\toptional = %@;\n}", self.name, RLMTypeToString(self.type), self.objectClassName, self.indexed ? @"YES" : @"NO", self.isPrimary ? @"YES" : @"NO", self.optional ? @"YES" : @"NO"];
 }
 
 @end

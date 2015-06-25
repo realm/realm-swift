@@ -28,6 +28,7 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+#import "object_store.hpp"
 #import <realm/group.hpp>
 
 // private properties
@@ -131,6 +132,21 @@
         }
     }
 
+    for (RLMProperty *prop in schema.properties) {
+        RLMPropertyType type = prop.type;
+        if (prop.optional && !RLMPropertyTypeIsNullable(type)) {
+#ifdef REALM_ENABLE_NULL
+            NSString *error = [NSString stringWithFormat:@"Only 'string', 'binary', and 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)];
+#else
+            NSString *error = [NSString stringWithFormat:@"Only 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)];
+#endif
+            if (prop.type == RLMPropertyTypeAny && isSwift) {
+                error = [error stringByAppendingString:@"\nIf this is a 'String?' property, it must be declared as 'NSString?' instead."];
+            }
+            @throw RLMException(error);
+        }
+    }
+
     return schema;
 }
 
@@ -188,59 +204,25 @@
         }
     }
 
+    if (NSArray *optionalProperties = [objectUtil getOptionalPropertyNames:swiftObjectInstance]) {
+        for (RLMProperty *property in propArray) {
+            property.optional = [optionalProperties containsObject:property.name] ||
+                                property.type == RLMPropertyTypeObject; // remove if/when core supports required link columns
+        }
+    }
+    if (NSArray *requiredProperties = [objectUtil requiredPropertiesForClass:objectClass]) {
+        for (RLMProperty *property in propArray) {
+            bool required = [requiredProperties containsObject:property.name];
+            if (required && property.type == RLMPropertyTypeObject) {
+                NSString *error = [NSString stringWithFormat:@"Object properties cannot be made required, " \
+                                                              "but '+[%@ requiredProperties]' included '%@'", objectClass, property.name];
+                @throw RLMException(error);
+            }
+            property.optional &= !required;
+        }
+    }
+
     return propArray;
-}
-
-
-// generate a schema from a table - specify the custom class name for the dynamic
-// class and the name to be used in the schema - used for migrations and dynamic interface
-+(instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm {
-    realm::TableRef table = RLMTableForObjectClass(realm, className);
-    if (!table) {
-        return nil;
-    }
-
-    // create array of RLMProperties
-    size_t count = table->get_column_count();
-    NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
-    for (size_t col = 0; col < count; col++) {
-        // create new property
-        NSString *name = RLMStringDataToNSString(table->get_column_name(col).data());
-        RLMProperty *prop = [[RLMProperty alloc] initWithName:name
-                                                         type:RLMPropertyType(table->get_column_type(col))
-                                              objectClassName:nil
-                                                      indexed:table->has_search_index(col)];
-        prop.column = col;
-        if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
-            // set link type for objects and arrays
-            realm::TableRef linkTable = table->get_link_target(col);
-            prop.objectClassName = RLMClassForTableName(@(linkTable->get_name().data()));
-        }
-
-        [propArray addObject:prop];
-    }
-
-    // create schema object and set properties
-    RLMObjectSchema *schema = [RLMObjectSchema new];
-    schema.properties = propArray;
-    schema.className = className;
-
-    // get primary key from realm metadata
-    NSString *primaryKey = RLMRealmPrimaryKeyForObjectClass(realm, className);
-    if (primaryKey) {
-        schema.primaryKeyProperty = schema[primaryKey];
-        if (!schema.primaryKeyProperty) {
-            NSString *reason = [NSString stringWithFormat:@"No property matching primary key '%@'", primaryKey];
-            @throw RLMException(reason);
-        }
-    }
-
-    // for dynamic schema use vanilla RLMDynamicObject accessor classes
-    schema.objectClass = RLMObject.class;
-    schema.accessorClass = RLMDynamicObject.class;
-    schema.standaloneClass = RLMObject.class;
-
-    return schema;
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -289,6 +271,7 @@
         if (p1.type != p2.type ||
             p1.column != p2.column ||
             p1.isPrimary != p2.isPrimary ||
+            p1.optional != p2.optional ||
             ![p1.name isEqualToString:p2.name] ||
             !(p1.objectClassName == p2.objectClassName || [p1.objectClassName isEqualToString:p2.objectClassName])) {
             return NO;
@@ -307,7 +290,7 @@
 
 - (realm::Table *)table {
     if (!_table) {
-        _table = RLMTableForObjectClass(_realm, _className);
+        _table = ObjectStore::table_for_object_type(_realm.group, _className.UTF8String);
     }
     return _table.get();
 }
@@ -316,17 +299,59 @@
     _table.reset(table);
 }
 
+- (realm::ObjectSchema)objectStoreCopy {
+    ObjectSchema objectSchema;
+    objectSchema.name = _className.UTF8String;
+    objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.name.UTF8String : "";
+    for (RLMProperty *prop in _properties) {
+        Property p;
+        p.name = prop.name.UTF8String;
+        p.type = (PropertyType)prop.type;
+        p.object_type = prop.objectClassName ? prop.objectClassName.UTF8String : "";
+        p.is_indexed = prop.indexed;
+        p.is_primary = (prop == _primaryKeyProperty);
+        p.is_nullable = prop.optional;
+        objectSchema.properties.push_back(std::move(p));
+    }
+    return objectSchema;
+}
+
++ (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema &)objectSchema {
+    RLMObjectSchema *schema = [RLMObjectSchema new];
+    schema.className = @(objectSchema.name.c_str());
+
+    // create array of RLMProperties
+    NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:objectSchema.properties.size()];
+    for (Property &prop : objectSchema.properties) {
+        RLMProperty *property = [[RLMProperty alloc] initWithName:@(prop.name.c_str())
+                                                             type:(RLMPropertyType)prop.type
+                                                  objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
+                                                          indexed:prop.is_indexed
+                                                         optional:prop.is_nullable];
+        property.isPrimary = (prop.name == objectSchema.primary_key);
+        [propArray addObject:property];
+    }
+    schema.properties = propArray;
+    
+    // get primary key from realm metadata
+    if (objectSchema.primary_key.length()) {
+        NSString *primaryKeyString = [NSString stringWithUTF8String:objectSchema.primary_key.c_str()];
+        schema.primaryKeyProperty = schema[primaryKeyString];
+        if (!schema.primaryKeyProperty) {
+            NSString *reason = [NSString stringWithFormat:@"No property matching primary key '%@'", primaryKeyString];
+            @throw RLMException(reason);
+        }
+    }
+
+    // for dynamic schema use vanilla RLMDynamicObject accessor classes
+    schema.objectClass = RLMObject.class;
+    schema.accessorClass = RLMDynamicObject.class;
+    schema.standaloneClass = RLMObject.class;
+    
+    return schema;
+}
+
+
 @end
 
-realm::TableRef RLMTableForObjectClass(RLMRealm *realm,
-                                         NSString *className,
-                                         bool &created) {
-    NSString *tableName = RLMTableNameForClass(className);
-    return realm.group->get_or_add_table(tableName.UTF8String, &created);
-}
 
-realm::TableRef RLMTableForObjectClass(RLMRealm *realm,
-                                         NSString *className) {
-    NSString *tableName = RLMTableNameForClass(className);
-    return realm.group->get_table(tableName.UTF8String);
-}

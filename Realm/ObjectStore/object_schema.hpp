@@ -16,11 +16,34 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import <XCTest/XCTestCase.h>
+#ifndef REALM_OBJECT_SCHEMA_HPP
+#define REALM_OBJECT_SCHEMA_HPP
 
-FOUNDATION_EXTERN void RLMAssertThrows(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block, NSString *message, NSString *fileName, NSUInteger lineNumber);
+#include <string>
+#include <vector>
 
-// Forcibly deallocate the RLMRealm for the given path on the main thread
-// Will cause crashes if it's alive for a reason other than being leaked by RLMAssertThrows
-FOUNDATION_EXTERN void RLMDeallocateRealm(NSString *path);
+#include "property.hpp"
+
+namespace realm {
+    class Group;
+
+    class ObjectSchema {
+    public:
+        ObjectSchema() {}
+
+        // create object schema from existing table
+        // if no table is provided it is looked up in the group
+        ObjectSchema(Group *group, const std::string &name);
+
+        std::string name;
+        std::vector<Property> properties;
+        std::string primary_key;
+
+        Property *property_for_name(const std::string &name);
+        Property *primary_key_property() {
+            return property_for_name(primary_key);
+        }
+    };
+}
+
+#endif /* defined(REALM_OBJECT_SCHEMA_HPP) */

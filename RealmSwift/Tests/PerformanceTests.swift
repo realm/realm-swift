@@ -19,8 +19,6 @@
 import XCTest
 import RealmSwift
 
-#if !DEBUG && os(iOS)
-
 private func createStringObjects(factor: Int) -> Realm {
     let realm = Realm(inMemoryIdentifier: factor.description)
     realm.write {
@@ -39,11 +37,13 @@ private var largeRealm: Realm!
 private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
 
 class SwiftPerformanceTests: TestCase {
-    override class func defaultTestSuite() -> XCTestSuite? {
+    override class func defaultTestSuite() -> XCTestSuite {
+#if !DEBUG && os(iOS)
         if (isRunningOnDevice) {
             return super.defaultTestSuite()
         }
-        return nil
+#endif
+        return XCTestSuite(name: "SwiftPerformanceTests")
     }
 
     override class func setUp() {
@@ -137,7 +137,7 @@ class SwiftPerformanceTests: TestCase {
     func testCountWhereQuery() {
         let realm = copyRealmToTestPath(largeRealm)
         measureBlock {
-            for i in 0..<50 {
+            for _ in 0..<50 {
                 let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
                 _ = results.count
             }
@@ -147,7 +147,7 @@ class SwiftPerformanceTests: TestCase {
     func testCountWhereTableView() {
         let realm = copyRealmToTestPath(mediumRealm)
         measureBlock {
-            for i in 0..<50 {
+            for _ in 0..<50 {
                 let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
                 _ = results.first
                 _ = results.count
@@ -159,7 +159,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(mediumRealm)
         measureBlock {
             for stringObject in realm.objects(SwiftStringObject).filter("stringCol = 'a'") {
-                let string = stringObject.stringCol
+                _ = stringObject.stringCol
             }
         }
     }
@@ -168,7 +168,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(mediumRealm)
         measureBlock {
             for stringObject in realm.objects(SwiftStringObject) {
-                let string = stringObject.stringCol
+                _ = stringObject.stringCol
             }
         }
     }
@@ -178,7 +178,7 @@ class SwiftPerformanceTests: TestCase {
         measureBlock {
             let results = realm.objects(SwiftStringObject)
             for i in 0..<results.count {
-                let string = results[i].stringCol
+                _ = results[i].stringCol
             }
         }
     }
@@ -191,7 +191,7 @@ class SwiftPerformanceTests: TestCase {
 
         measureBlock {
             for stringObject in arrayPropertyObject.array {
-                let string = stringObject.stringCol
+                _ = stringObject.stringCol
             }
         }
     }
@@ -205,7 +205,7 @@ class SwiftPerformanceTests: TestCase {
         measureBlock {
             let list = arrayPropertyObject.array
             for i in 0..<list.count {
-                let string = list[i].stringCol
+                _ = list[i].stringCol
             }
         }
     }
@@ -471,5 +471,3 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 }
-
-#endif

@@ -28,8 +28,7 @@
 #import "RLMResults_Private.h"
 #import "RLMSchema_Private.h"
 
-#import <realm/link_view.hpp>
-#import <realm/table_view.hpp>
+#import "object_store.hpp"
 
 // The source realm for a migration has to use a SharedGroup to be able to share
 // the file with the destination realm, but we don't want to let the user call
@@ -99,27 +98,6 @@
     }
 }
 
-- (void)verifyPrimaryKeyUniqueness {
-    for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
-        // if we have a new primary key not equal to our old one, verify uniqueness
-        RLMProperty *primaryProperty = objectSchema.primaryKeyProperty;
-        RLMProperty *oldPrimaryProperty = [[_oldRealm.schema schemaForClassName:objectSchema.className] primaryKeyProperty];
-        if (!primaryProperty || primaryProperty == oldPrimaryProperty) {
-            continue;
-        }
-
-        realm::Table *table = objectSchema.table;
-        NSUInteger count = table->size();
-        if (!table->has_search_index(primaryProperty.column)) {
-            table->add_search_index(primaryProperty.column);
-        }
-        if (table->get_distinct_view(primaryProperty.column).size() != count) {
-            NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
-            @throw RLMException(reason);
-        }
-    }
-}
-
 - (void)execute:(RLMMigrationBlock)block {
     @autoreleasepool {
         // copy old schema and reset after migration
@@ -131,11 +109,8 @@
         }
 
         // apply block and set new schema version
-        uint64_t oldVersion = RLMRealmSchemaVersion(_realm);
+        uint64_t oldVersion = realm::ObjectStore::get_schema_version(_realm.group);
         block(self, oldVersion);
-
-        // verify uniqueness for any new unique columns before committing
-        [self verifyPrimaryKeyUniqueness];
 
         // reset schema to saved schema since it has been altered
         RLMRealmSetSchema(_realm, savedSchema, true);
@@ -159,20 +134,16 @@
         return false;
     }
 
-    size_t table = _realm.group->find_table(RLMStringDataWithNSString(RLMTableNameForClass(name)));
-    if (table == realm::not_found) {
+    TableRef table = ObjectStore::table_for_object_type(_realm.group, name.UTF8String);
+    if (!table) {
         return false;
     }
 
     if ([_realm.schema schemaForClassName:name]) {
-        _realm.group->get_table(table)->clear();
+        table->clear();
     }
     else {
-        _realm.group->remove_table(table);
-
-        if (RLMRealmPrimaryKeyForObjectClass(_realm, name)) {
-            RLMRealmSetPrimaryKeyForObjectClass(_realm, name, nil);
-        }
+        realm::ObjectStore::delete_data_for_object(_realm.group, name.UTF8String);
     }
 
     return true;

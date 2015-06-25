@@ -44,10 +44,6 @@ namespace realm {
 
 // initializer
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName standalone:(BOOL)standalone;
-
-// deletes all objects in the RLMArray from their containing realms
-- (void)deleteObjectsFromRealm;
-
 @end
 
 
@@ -58,6 +54,9 @@ namespace realm {
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                     view:(realm::LinkViewRef)view
                                    realm:(RLMRealm *)realm;
+
+// deletes all objects in the RLMArray from their containing realms
+- (void)deleteObjectsFromRealm;
 @end
 
 

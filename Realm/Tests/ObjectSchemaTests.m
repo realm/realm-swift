@@ -33,12 +33,18 @@
                                                     @"\t\tobjectClassName = (null);\n"
                                                     @"\t\tindexed = YES;\n"
                                                     @"\t\tisPrimary = YES;\n"
+#ifdef REALM_ENABLE_NULL
+                                                    @"\t\toptional = YES;\n"
+#else
+                                                    @"\t\toptional = NO;\n"
+#endif
                                                     @"\t}\n"
                                                     @"\tintCol {\n"
                                                     @"\t\ttype = int;\n"
                                                     @"\t\tobjectClassName = (null);\n"
                                                     @"\t\tindexed = NO;\n"
                                                     @"\t\tisPrimary = NO;\n"
+                                                    @"\t\toptional = NO;\n"
                                                     @"\t}\n"
                                                     @"}");
 }

@@ -55,8 +55,6 @@ command:
   examples-ios:         builds all static iOS examples
   examples-ios-swift:   builds all Swift iOS examples
   examples-osx:         builds all OS X examples
-  browser:              builds the Realm Browser
-  test-browser:         tests the Realm Browser
   get-version:          get the current version
   set-version version:  set the version
   cocoapods-setup:      download realm-core and create a stub RLMPlatform.h file to enable building via CocoaPods
@@ -335,6 +333,12 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "test-ios7-static")
+        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' test"
+        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S,OS=7.1' test"
+        exit 0
+        ;;
+
     "test-ios-dynamic")
         xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
@@ -350,7 +354,7 @@ case "$COMMAND" in
     "test-ios-devices")
         failed=0
         test_ios_devices xcrealm "iOS Device Tests" "$CONFIGURATION" || failed=1
-        test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION" || failed=1
+        # test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION" || failed=1 # FIXME: Re-enable once fixed
         exit $failed
         ;;
 
@@ -379,6 +383,8 @@ case "$COMMAND" in
         sh build.sh verify-osx-swift-debug
         sh build.sh verify-ios-static
         sh build.sh verify-ios-static-debug
+        sh build.sh verify-ios7-static
+        sh build.sh verify-ios7-static-debug
         sh build.sh verify-ios-dynamic
         sh build.sh verify-ios-dynamic-debug
         sh build.sh verify-ios-swift
@@ -388,7 +394,6 @@ case "$COMMAND" in
 
     "verify-osx")
         sh build.sh test-osx
-        sh build.sh test-browser
         sh build.sh examples-osx
 
         (
@@ -406,6 +411,10 @@ case "$COMMAND" in
     "verify-ios-static")
         sh build.sh test-ios-static
         sh build.sh examples-ios
+        ;;
+
+    "verify-ios7-static")
+        sh build.sh test-ios7-static
         ;;
 
     "verify-ios-dynamic")
@@ -486,19 +495,6 @@ case "$COMMAND" in
         ;;
 
     ######################################
-    # Browser
-    ######################################
-    "browser")
-        xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser -configuration $CONFIGURATION clean build ${CODESIGN_PARAMS}"
-        exit 0
-        ;;
-
-    "test-browser")
-        xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser test ${CODESIGN_PARAMS}"
-        exit 0
-        ;;
-
-    ######################################
     # Versioning
     ######################################
     "get-version")
@@ -509,7 +505,7 @@ case "$COMMAND" in
 
     "set-version")
         realm_version="$2"
-        version_files="Realm/Realm-Info.plist tools/RealmBrowser/RealmBrowser/RealmBrowser-Info.plist"
+        version_files="Realm/Realm-Info.plist"
 
         if [ -z "$realm_version" ]; then
             echo "You must specify a version."
@@ -541,19 +537,13 @@ case "$COMMAND" in
         cp -R core/include include
         mkdir -p include/Realm
         cp Realm/*.{h,hpp} include/Realm
+        cp Realm/ObjectStore/*.hpp include/Realm
         touch include/Realm/RLMPlatform.h
         ;;
 
     ######################################
     # Release packaging
     ######################################
-    "package-browser")
-        cd tightdb_objc
-        sh build.sh browser
-        cd ${WORKSPACE}/tightdb_objc/tools/RealmBrowser/build/DerivedData/RealmBrowser/Build/Products/Release
-        zip -r realm-browser.zip Realm\ Browser.app
-        mv realm-browser.zip ${WORKSPACE}
-        ;;
 
     "package-examples")
         cd tightdb_objc
@@ -632,7 +622,7 @@ case "$COMMAND" in
 
         FOLDER=${TEMPDIR}/realm-${LANG}-${VERSION}
 
-        mkdir -p ${FOLDER}/osx ${FOLDER}/ios ${FOLDER}/browser
+        mkdir -p ${FOLDER}/osx ${FOLDER}/ios
 
         if [[ "${LANG}" == "objc" ]]; then
             mkdir -p ${FOLDER}/ios/static
@@ -664,11 +654,6 @@ case "$COMMAND" in
                 unzip ${WORKSPACE}/realm-swift-framework-ios.zip
             )
         fi
-
-        (
-            cd ${FOLDER}/browser
-            unzip ${WORKSPACE}/realm-browser.zip
-        )
 
         (
             cd ${WORKSPACE}/tightdb_objc
@@ -744,9 +729,6 @@ EOF
         )
         sh tightdb_objc/build.sh package-examples
         cp tightdb_objc/realm-examples.zip .
-
-        echo 'Packaging browser'
-        sh tightdb_objc/build.sh package-browser
 
         echo 'Packaging iOS Swift'
         sh tightdb_objc/build.sh package-ios-swift

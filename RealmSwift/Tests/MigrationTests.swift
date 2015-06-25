@@ -121,7 +121,7 @@ class MigrationTests: TestCase {
     }
 
     func testMigrationProperties() {
-        let prop = RLMProperty(name: "stringCol", type: RLMPropertyType.Int, objectClassName: nil, indexed: false)
+        let prop = RLMProperty(name: "stringCol", type: RLMPropertyType.Int, objectClassName: nil, indexed: false, optional: false)
         autoreleasepool { () -> () in
             realmWithSingleClassProperties(Realm.defaultPath, "SwiftStringObject", [prop])
             return

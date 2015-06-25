@@ -32,6 +32,7 @@
 #include <atomic>
 #include <sstream>
 
+#include "object_store.hpp"
 #include <realm/util/memory_stream.hpp>
 #include <realm/commit_log.hpp>
 #include <realm/version.hpp>
@@ -1444,7 +1445,7 @@ static id RLMAutorelease(id value) {
         // create tables, set schema, and create accessors when needed
         if (readonly || (dynamic && !customSchema)) {
             // for readonly realms and dynamic realms without a custom schema just set the schema
-            if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
+            if (realm::ObjectStore::get_schema_version(realm.group) == realm::ObjectStore::NotVersioned) {
                 RLMSetErrorOrThrow([NSError errorWithDomain:RLMErrorDomain code:RLMErrorFail userInfo:@{NSLocalizedDescriptionKey:@"Cannot open an uninitialized realm in read-only mode"}], outError);
                 return nil;
             }
@@ -1514,10 +1515,11 @@ static id RLMAutorelease(id value) {
 
                 // if we are the first realm at this path, set/align schema or perform migration if needed
                 RLMSchema *targetSchema = customSchema ?: RLMSchema.sharedSchema;
-                NSError *error = RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path),
-                                                               [targetSchema copy], [realm migrationBlock:key]);
-                if (error) {
-                    RLMSetErrorOrThrow(error, outError);
+                @try {
+                    RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path), [targetSchema copy], [realm migrationBlock:key]);
+                }
+                @catch (NSException *exception) {
+                    RLMSetErrorOrThrow(RLMMakeError(exception), outError);
                     return nil;
                 }
 
@@ -1862,27 +1864,18 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)deleteObjects:(id)array {
-    if (NSArray *nsArray = RLMDynamicCast<NSArray>(array)) {
-        // for arrays and standalone delete each individually
-        for (id obj in nsArray) {
+    if ([array respondsToSelector:@selector(realm)] && [array respondsToSelector:@selector(deleteObjectsFromRealm)]) {
+        if (self != (RLMRealm *)[array realm]) {
+            @throw RLMException(@"Can only delete objects from the Realm they belong to.");
+        }
+        [array deleteObjectsFromRealm];
+    }
+    else if ([array conformsToProtocol:@protocol(NSFastEnumeration)]) {
+        for (id obj in array) {
             if ([obj isKindOfClass:RLMObjectBase.class]) {
                 RLMDeleteObjectFromRealm(obj, self);
             }
         }
-    }
-    else if (RLMArray *rlmArray = RLMDynamicCast<RLMArray>(array)) {
-        if (self != rlmArray.realm) {
-            @throw RLMException(@"Can only delete an object from the Realm it belongs to.");
-        }
-        // call deleteObjectsFromRealm for our RLMArray
-        [rlmArray deleteObjectsFromRealm];
-    }
-    else if (RLMResults *rlmResults = RLMDynamicCast<RLMResults>(array)) {
-        if (self != rlmResults.realm) {
-            @throw RLMException(@"Can only delete an object from the Realm it belongs to.");
-        }
-        // call deleteObjectsFromRealm for our RLMResults
-        [rlmResults deleteObjectsFromRealm];
     }
     else {
         @throw RLMException(@"Invalid array type - container must be an RLMArray, RLMArray, or NSArray of RLMObjects");
@@ -1920,7 +1913,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         @throw RLMException(@"Cannot set schema version for Realms that are already open.");
     }
 
-    if (version == RLMNotVersioned) {
+    if (version == realm::ObjectStore::NotVersioned) {
         @throw RLMException(@"Cannot set schema version to RLMNotVersioned.");
     }
 
@@ -1951,7 +1944,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         }
     }
 
-    return RLMRealmSchemaVersion(realm);
+    return realm::ObjectStore::get_schema_version(realm.group);
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath {
@@ -1978,7 +1971,12 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     if (error)
         return error;
 
-    return RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), [RLMSchema.sharedSchema copy], [realm migrationBlock:key]);
+    @try {
+        RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), [RLMSchema.sharedSchema copy], [realm migrationBlock:key]);
+    } @catch (NSException *ex) {
+        return RLMMakeError(ex);
+    }
+    return nil;
 }
 
 - (RLMObject *)createObject:(NSString *)className withValue:(id)value {

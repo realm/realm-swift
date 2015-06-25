@@ -637,7 +637,6 @@ extern "C" {
 
         [realm beginWriteTransaction];
         [realm createObject:StringObject.className withValue:@[@"a"]];
-        RLMRealmSetSchemaVersion(realm, 0);
         [realm commitWriteTransaction];
     }
 

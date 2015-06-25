@@ -36,7 +36,9 @@
 static inline bool nsnumber_is_like_integer(__unsafe_unretained NSNumber *const obj)
 {
     char data_type = [obj objCType][0];
-    return data_type == *@encode(short) ||
+    return data_type == *@encode(bool) ||
+           data_type == *@encode(char) ||
+           data_type == *@encode(short) ||
            data_type == *@encode(int) ||
            data_type == *@encode(long) ||
            data_type == *@encode(long long) ||
@@ -103,6 +105,10 @@ static inline bool object_has_valid_type(__unsafe_unretained id const obj)
 
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
                                  __unsafe_unretained RLMProperty *const property) {
+    if (property.optional && (!obj || obj == [NSNull null])) {
+        return YES;
+    }
+
     switch (property.type) {
         case RLMPropertyTypeString:
             return [obj isKindOfClass:[NSString class]];
@@ -135,9 +141,6 @@ BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
         case RLMPropertyTypeObject: {
             // only NSNull, nil, or objects which derive from RLMObject and match the given
             // object class are valid
-            if (obj == nil || obj == NSNull.null) {
-                return YES;
-            }
             RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(obj);
             return objBase && [objBase->_objectSchema.className isEqualToString:property.objectClassName];
         }
@@ -226,6 +229,7 @@ void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMOb
     }
 }
 
+
 NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
     NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:userInfo];
     [info addEntriesFromDictionary:@{
@@ -245,6 +249,12 @@ NSError *RLMMakeError(RLMError code, std::exception const& exception) {
                                code:code
                            userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
                                       @"Error Code": @(code)}];
+}
+
+NSError *RLMMakeError(NSException *exception) {
+    return [NSError errorWithDomain:RLMErrorDomain
+                               code:0
+                           userInfo:@{NSLocalizedDescriptionKey: exception.reason}];
 }
 
 void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
