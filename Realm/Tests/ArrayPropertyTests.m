@@ -191,7 +191,7 @@
     ArrayPropertyObject *intArray = [[ArrayPropertyObject alloc] init];
     IntObject *intObj = [[IntObject alloc] init];
     intObj.intCol = 1;
-    XCTAssertThrows([intArray.array addObject:intObj], @"Addint to string array should throw");
+    XCTAssertThrows([intArray.array addObject:(StringObject *)intObj], @"Addint to string array should throw");
     [intArray.intArray addObject:intObj];
 
     XCTAssertThrows([intArray.intArray objectsWhere:@"intCol == 1"], @"Should throw on standalone RLMArray");
@@ -256,8 +256,8 @@
     XCTAssertTrue([[array.intArray objectAtIndex:1] isEqualToObject:intObj4], @"Objects should be replaced");
     XCTAssertEqual(array.intArray.count, 3U, @"Should have 3 elements in int array");
 
-    XCTAssertThrows([array.array replaceObjectAtIndex:0 withObject:intObj4], @"Throws exception throws when type mismatched");
-    XCTAssertThrows([array.intArray replaceObjectAtIndex:1 withObject:stringObj4], @"Throws exception when type mismatched");
+    XCTAssertThrows([array.array replaceObjectAtIndex:0 withObject:(StringObject *)intObj4], @"Throws exception throws when type mismatched");
+    XCTAssertThrows([array.intArray replaceObjectAtIndex:1 withObject:(IntObject *)stringObj4], @"Throws exception when type mismatched");
 }
 
 - (void)testDeleteObjectInStandaloneArray {
@@ -347,7 +347,7 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:notInRealm]);
 
     // invalid object
-    XCTAssertThrows([company.employees indexOfObject:company]);
+    XCTAssertThrows([company.employees indexOfObject:(EmployeeObject *)company]);
 }
 
 - (void)testIndexOfObjectWhere
