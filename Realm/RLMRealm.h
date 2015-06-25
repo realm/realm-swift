@@ -171,7 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The RLMSchema used by this RLMRealm.
  */
-@property (nonatomic, readonly) RLMSchema *schema;
+@property (nonatomic, readonly, null_unspecified) RLMSchema *schema;
 
 /**
  Indicates if this Realm is currently in a write transaction.
