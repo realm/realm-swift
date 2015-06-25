@@ -29,6 +29,8 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+using namespace realm;
+
 const NSUInteger RLMDescriptionMaxDepth = 5;
 
 @implementation RLMObjectBase

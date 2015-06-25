@@ -31,6 +31,8 @@
 #import <objc/runtime.h>
 #import <realm/table_view.hpp>
 
+using namespace realm;
+
 //
 // RLMResults implementation
 //

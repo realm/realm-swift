@@ -30,6 +30,8 @@
 
 #import "object_store.hpp"
 
+using namespace realm;
+
 // The source realm for a migration has to use a SharedGroup to be able to share
 // the file with the destination realm, but we don't want to let the user call
 // beginWriteTransaction on it as that would make no sense.
