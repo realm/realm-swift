@@ -20,6 +20,7 @@ command:
   test-osx-objc-dynamic:           tests OS X Objective-C dynamic example.
   test-osx-objc-cocoapods:         tests OS X Objective-C CocoaPods example.
   test-osx-objc-carthage:          tests OS X Objective-C Carthage example.
+  test-osx-swift-dynamic:          tests OS X Swift dynamic example.
 EOF
 }
 
@@ -143,6 +144,11 @@ case "$COMMAND" in
 
     "test-osx-objc-carthage")
         xcodebuild -project osx/objc/CarthageExample/CarthageExample.xcodeproj -scheme CarthageExample clean build test || exit 1
+        exit 0
+        ;;
+
+    "test-osx-swift-dynamic")
+        xcodebuild -project osx/swift/DynamicExample/DynamicExample.xcodeproj -scheme DynamicExample clean build test || exit 1
         exit 0
         ;;
 
