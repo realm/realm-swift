@@ -16,10 +16,13 @@ command:
   test-ios-objc-carthage:          tests iOS Objective-C Carthage example.
   test-ios-swift-dynamic:          tests iOS Swift dynamic example.
   test-ios-swift-cocoapods:        tests iOS Swift CocoaPods example.
+  test-ios-swift-carthage:         tests iOS Objective-C Carthage example.
 
   test-osx-objc-dynamic:           tests OS X Objective-C dynamic example.
   test-osx-objc-cocoapods:         tests OS X Objective-C CocoaPods example.
   test-osx-objc-carthage:          tests OS X Objective-C Carthage example.
+  test-osx-swift-dynamic:          tests OS X Swift dynamic example.
+  test-osx-swift-carthage:         tests OS X Swift Carthage example.
 EOF
 }
 
@@ -57,24 +60,17 @@ case "$COMMAND" in
         # CoocaPods
         ################
 
-        pod install --project-directory=ios/objc/CocoaPodsExample
-        pod install --project-directory=ios/objc/CocoaPodsDynamicExample
-        pod install --project-directory=ios/swift/CocoaPodsExample
-        pod install --project-directory=osx/objc/CocoaPodsExample
+        for path in ios/objc/CocoaPodsExample ios/objc/CocoaPodsDynamicExample ios/swift/CocoaPodsExample osx/objc/CocoaPodsExample; do
+            pod install --project-directory=$path
+        done
 
         ################
         # Carthage
         ################
 
-        (
-            cd ios/objc/CarthageExample
-            carthage bootstrap
-        )
-        (
-            cd osx/objc/CarthageExample
-            carthage bootstrap
-        )
-        exit 0
+        for path in ios/objc/CarthageExample ios/swift/CarthageExample osx/objc/CarthageExample osx/swift/CarthageExample; do
+            (cd $path; carthage bootstrap)
+        done
         ;;
 
     ######################################
@@ -89,61 +85,65 @@ case "$COMMAND" in
         ./build.sh test-ios-objc-carthage || exit 1
         ./build.sh test-ios-swift-dynamic || exit 1
         ./build.sh test-ios-swift-cocoapods || exit 1
+        ./build.sh test-ios-swift-carthage || exit 1
 
         ./build.sh test-osx-objc-dynamic || exit 1
         ./build.sh test-osx-objc-cocoapods || exit 1
         ./build.sh test-osx-objc-carthage || exit 1
-        exit 0
+        ./build.sh test-osx-swift-dynamic || exit 1
+        ./build.sh test-osx-swift-carthage || exit 1
         ;;
 
     "test-ios-objc-static")
         xctest "-project" "ios/objc/StaticExample/StaticExample.xcodeproj" "-scheme" "StaticExample"
-        exit 0
         ;;
 
     "test-ios-objc-dynamic")
         xctest "-project" "ios/objc/DynamicExample/DynamicExample.xcodeproj" "-scheme" "DynamicExample"
-        exit 0
         ;;
 
     "test-ios-objc-cocoapods")
         xctest "-workspace" "ios/objc/CocoaPodsExample/CocoaPodsExample.xcworkspace" "-scheme" "CocoaPodsExample"
-        exit 0
         ;;
 
     "test-ios-objc-cocoapods-dynamic")
         xctest "-workspace" "ios/objc/CocoaPodsDynamicExample/CocoaPodsDynamicExample.xcworkspace" "-scheme" "CocoaPodsDynamicExample"
-        exit 0
         ;;
 
     "test-ios-objc-carthage")
         xctest "-project" "ios/objc/CarthageExample/CarthageExample.xcodeproj" "-scheme" "CarthageExample"
-        exit 0
         ;;
 
     "test-ios-swift-dynamic")
         xctest "-project" "ios/swift/DynamicExample/DynamicExample.xcodeproj" "-scheme" "DynamicExample"
-        exit 0
         ;;
 
     "test-ios-swift-cocoapods")
         xctest "-workspace" "ios/swift/CocoaPodsExample/CocoaPodsExample.xcworkspace" "-scheme" "CocoaPodsExample"
-        exit 0
+        ;;
+
+    "test-ios-swift-carthage")
+        xctest "-project" "ios/swift/CarthageExample/CarthageExample.xcodeproj" "-scheme" "CarthageExample"
         ;;
 
     "test-osx-objc-dynamic")
         xcodebuild -project osx/objc/DynamicExample/DynamicExample.xcodeproj -scheme DynamicExample clean build test || exit 1
-        exit 0
         ;;
 
     "test-osx-objc-cocoapods")
         xcodebuild -workspace osx/objc/CocoaPodsExample/CocoaPodsExample.xcworkspace -scheme CocoaPodsExample clean build test || exit 1
-        exit 0
         ;;
 
     "test-osx-objc-carthage")
         xcodebuild -project osx/objc/CarthageExample/CarthageExample.xcodeproj -scheme CarthageExample clean build test || exit 1
-        exit 0
+        ;;
+
+    "test-osx-swift-dynamic")
+        xcodebuild -project osx/swift/DynamicExample/DynamicExample.xcodeproj -scheme DynamicExample clean build test || exit 1
+        ;;
+
+    "test-osx-swift-carthage")
+        xcodebuild -project osx/swift/CarthageExample/CarthageExample.xcodeproj -scheme CarthageExample clean build test || exit 1
         ;;
 
     *)
