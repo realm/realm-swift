@@ -24,4 +24,7 @@
   @public
     RLMObjectSchema *_objectSchema;
 }
+
+- (void)deliverOnQueue:(dispatch_queue_t)queue queryQueue:(dispatch_queue_t)queryQueue block:(void (^)(RLMResults *))block;
+
 @end

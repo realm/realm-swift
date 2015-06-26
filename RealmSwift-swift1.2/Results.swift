@@ -223,6 +223,22 @@ public final class Results<T: Object>: ResultsBase {
         return Results<T>(rlmResults.sortedResultsUsingDescriptors(map(sortDescriptors) { $0.rlmSortDescriptorValue }))
     }
 
+    // MARK: Delivery
+
+    /**
+    Asynchronously yields a queue-local copy of the results onto the given dispatch queue.
+
+    :warning: This method cannot be called during a write transaction, or when the containing realm is read-only.
+
+    :param: queue The dispatch queue onto which the results should be delivered.
+    :param: block The block to be called on the given `queue` with the queue-local copy of the results.
+    */
+    public func deliver(onQueue queue: dispatch_queue_t = dispatch_get_main_queue(), block: Results<T> -> Void) {
+        rlmResults.deliverOnQueue(queue) {
+            block(Results<T>($0))
+        }
+    }
+
     // MARK: Aggregate Operations
 
     /**

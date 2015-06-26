@@ -18,6 +18,8 @@
 
 #import "RLMTestCase.h"
 
+#import "RLMResults_Private.h"
+
 #import <mach/mach.h>
 #import <objc/runtime.h>
 
@@ -490,6 +492,122 @@
 
     XCTAssertEqual(40, [(EmployeeObject *)filtered[0] age]);
     XCTAssertEqual(30, [(EmployeeObject *)filtered[1] age]);
+}
+
+- (void)testAsyncQuerying {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *sortedName = [sortedAge sortedResultsUsingProperty:@"name" ascending:NO];
+    RLMResults *filtered = [sortedName objectsWhere:@"age > 0"];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"async query"];
+    [filtered deliverOnQueue:dispatch_get_main_queue() block:^(RLMResults *results) {
+        XCTAssertEqual(3U, results.count);
+        XCTAssertEqual(40, [(EmployeeObject *)results[0] age]);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2 handler:nil];
+}
+
+- (void)testAsyncQueryWithCommitAfterExport {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *sortedName = [sortedAge sortedResultsUsingProperty:@"name" ascending:NO];
+    RLMResults *filtered = [sortedName objectsWhere:@"age > 0"];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"async query"];
+
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+
+    dispatch_queue_t resultsQueue = dispatch_queue_create("results", NULL);
+    dispatch_queue_t queryQueue = dispatch_queue_create("query", NULL);
+    dispatch_async(queryQueue, ^{
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    });
+
+    [filtered deliverOnQueue:resultsQueue queryQueue:queryQueue block:^(RLMResults *results) {
+        XCTAssertEqual(3U, results.count);
+        XCTAssertEqual(40, [(EmployeeObject *)results[0] age]);
+        [expectation fulfill];
+    }];
+    [realm transactionWithBlock:^{}];
+    dispatch_semaphore_signal(semaphore);
+
+    [self waitForExpectationsWithTimeout:2 handler:nil];
+}
+
+- (void)testAsyncQueryWithCommitBeforeReExport {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *sortedName = [sortedAge sortedResultsUsingProperty:@"name" ascending:NO];
+    RLMResults *filtered = [sortedName objectsWhere:@"age > 0"];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"async query"];
+
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+
+    dispatch_queue_t resultsQueue = dispatch_queue_create("results", NULL);
+    dispatch_queue_t queryQueue = dispatch_queue_create("query", NULL);
+
+    [filtered deliverOnQueue:resultsQueue queryQueue:queryQueue block:^(RLMResults *results) {
+        XCTAssertEqual(3U, results.count);
+        XCTAssertEqual(40, [(EmployeeObject *)results[0] age]);
+        [expectation fulfill];
+    }];
+
+    dispatch_async(queryQueue, ^{
+        dispatch_semaphore_signal(semaphore);
+    });
+
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    [realm transactionWithBlock:^{}];
+
+    [self waitForExpectationsWithTimeout:2 handler:nil];
+}
+
+- (void)testHandoverOfExistingTableView {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *sortedName = [sortedAge sortedResultsUsingProperty:@"name" ascending:NO];
+    RLMResults *filtered = [sortedName objectsWhere:@"age > 0"];
+
+    [filtered lastObject];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"async query"];
+    [filtered deliverOnQueue:dispatch_queue_create("background", NULL) block:^(RLMResults *results) {
+        XCTAssertEqual(3U, results.count);
+        XCTAssertEqual(40, [(EmployeeObject *)results[0] age]);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2 handler:nil];
 }
 
 static vm_size_t get_resident_size() {

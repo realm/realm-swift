@@ -21,15 +21,15 @@
 
 #import <realm/link_view.hpp>
 #import <realm/group.hpp>
+#import <realm/group_shared.hpp>
 #import <pthread.h>
-
-namespace realm {
-    class Group;
-}
 
 @interface RLMRealm ()
 @property (nonatomic, readonly, getter=getOrCreateGroup) realm::Group *group;
+@property (nonatomic, readonly) realm::SharedGroup *sharedGroup;
+@property (nonatomic, readonly) bool inMemory;
 - (void)handleExternalCommit;
+- (realm::Group *)getOrCreateGroupAtVersion:(realm::SharedGroup::VersionID)version;
 @end
 
 // throw an exception if the realm is being used from the wrong thread
