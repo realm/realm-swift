@@ -69,8 +69,7 @@ case "$COMMAND" in
         ################
 
         for path in ios/objc/CarthageExample ios/swift/CarthageExample osx/objc/CarthageExample osx/swift/CarthageExample; do
-            cd $path
-            carthage bootstrap
+            (cd $path; carthage bootstrap)
         done
         ;;
 
