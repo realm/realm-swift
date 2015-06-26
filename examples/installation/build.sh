@@ -123,7 +123,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios-swift-carthage")
-        xctest "-workspace" "ios/swift/CarthageExample/CarthageExample.xcworkspace" "-scheme" "CarthageExample"
+        xctest "-project" "ios/swift/CarthageExample/CarthageExample.xcodeproj" "-scheme" "CarthageExample"
         ;;
 
     "test-osx-objc-dynamic")
