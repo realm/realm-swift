@@ -55,7 +55,7 @@ RLMObservationInfo::RLMObservationInfo(RLMObjectSchema *objectSchema, std::size_
 : object(object)
 , objectSchema(objectSchema)
 {
-    REALM_ASSERT(objectSchema);
+    REALM_ASSERT_DEBUG(objectSchema);
     setRow(*objectSchema.table, row);
 }
 
@@ -66,10 +66,10 @@ RLMObservationInfo::RLMObservationInfo(id object)
 
 RLMObservationInfo::~RLMObservationInfo() {
     if (prev) {
-        REALM_ASSERT(prev->next == this);
+        REALM_ASSERT_DEBUG(prev->next == this);
         prev->next = next;
         if (next) {
-            REALM_ASSERT(next->prev == this);
+            REALM_ASSERT_DEBUG(next->prev == this);
             next->prev = prev;
         }
     }
@@ -121,14 +121,14 @@ void RLMObservationInfo::didChange(NSString *key, NSKeyValueChange kind, NSIndex
 }
 
 void RLMObservationInfo::prepareForInvalidation() {
-    REALM_ASSERT(objectSchema);
+    REALM_ASSERT_DEBUG(objectSchema);
     for (auto info = this; info; info = info->next)
         info->invalidated = true;
 }
 
 void RLMObservationInfo::setRow(realm::Table &table, size_t newRow) {
-    REALM_ASSERT(!row);
-    REALM_ASSERT(objectSchema);
+    REALM_ASSERT_DEBUG(!row);
+    REALM_ASSERT_DEBUG(objectSchema);
     skipUnregisteringObservers = true;
     row = table[newRow];
     for (auto info : objectSchema->_observedObjects) {
@@ -430,7 +430,7 @@ class TransactLogHandler {
         for (RLMObjectSchema *objectSchema in schema) {
             for (auto info : objectSchema->_observedObjects) {
                 auto const& row = info->getRow();
-                if (!row.is_attached()) // FIXME: should maybe try to remove from array on invalidate
+                if (!row.is_attached())
                     continue;
                 observers.push_back({
                     row.get_table()->get_index_in_group(),
