@@ -305,6 +305,11 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
         observers[ndx] = &objectSchema->_observedObjects;
     }
 
+    if (observers.empty()) {
+        block();
+        return;
+    }
+
     realm.group->set_cascade_notification_handler([&](realm::Group::CascadeNotification const& cs) {
         for (auto const& link : cs.links) {
             size_t table_ndx = link.origin_table->get_index_in_group();
