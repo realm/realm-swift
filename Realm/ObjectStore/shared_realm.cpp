@@ -47,6 +47,8 @@ Realm::Config::Config(const Config& c)
     }
 }
 
+Realm::Config::Config() = default;
+Realm::Config::Config(Config&&) = default;
 Realm::Config::~Config() = default;
 
 Realm::Config& Realm::Config::operator=(realm::Realm::Config const& c)

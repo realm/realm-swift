@@ -56,8 +56,8 @@ namespace realm {
 
             MigrationFunction migration_function;
 
-            Config() = default;
-            Config(Config&&) = default;
+            Config();
+            Config(Config&&);
             Config(const Config& c);
             ~Config();
 
