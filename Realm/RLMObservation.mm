@@ -66,6 +66,7 @@ RLMObservationInfo::RLMObservationInfo(id object)
 
 RLMObservationInfo::~RLMObservationInfo() {
     if (prev) {
+        // Not the head of the linked list, so just detach from the list
         REALM_ASSERT_DEBUG(prev->next == this);
         prev->next = next;
         if (next) {
@@ -74,6 +75,9 @@ RLMObservationInfo::~RLMObservationInfo() {
         }
     }
     else if (objectSchema) {
+        // The head of the list, so remove self from the object schema's array
+        // of observation info, either replacing self with the next info or
+        // removing entirely if there is no next
         auto end = objectSchema->_observedObjects.end();
         auto it = find(objectSchema->_observedObjects.begin(), end, this);
         if (it != end) {
@@ -87,7 +91,10 @@ RLMObservationInfo::~RLMObservationInfo() {
             }
         }
     }
+    // Otherwise the observed object was standalone, so nothing to do
+
 #ifdef DEBUG
+    // ensure that incorrect cleanup fails noisily
     object = (__bridge id)(void *)-1;
     prev = (RLMObservationInfo *)-1;
     next = (RLMObservationInfo *)-1;
@@ -283,6 +290,8 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
     std::vector<RLMObservationInfo *> invalidated;
     std::vector<std::vector<RLMObservationInfo *> *> observers;
 
+    // Build up an array of observation info arrays which is indexed by table
+    // index (the object schemata may be in an entirely different order)
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         if (objectSchema->_observedObjects.empty()) {
             continue;
@@ -294,15 +303,19 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
         observers[ndx] = &objectSchema->_observedObjects;
     }
 
+    // No need for change tracking if no objects are observed
     if (observers.empty()) {
         block();
         return;
     }
 
+    // This callback is called by core with a list of row deletions and
+    // resulting link nullifications immediately before things are deleted and nullified
     realm.group->set_cascade_notification_handler([&](realm::Group::CascadeNotification const& cs) {
         for (auto const& link : cs.links) {
             size_t table_ndx = link.origin_table->get_index_in_group();
             if (table_ndx >= observers.size() || !observers[table_ndx]) {
+                // The modified table has no observers
                 continue;
             }
 
@@ -331,6 +344,9 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
                     c = &changes.back();
                 }
 
+                // We know what row index is being removed from the LinkView,
+                // but what we actually want is the indexes in the LinkView that
+                // are going away
                 size_t start = 0, index;
                 while ((index = linkview->find(link.old_target_row_ndx, start)) != realm::not_found) {
                     [c->indexes addIndex:index];
@@ -341,6 +357,7 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
 
         for (auto const& row : cs.rows) {
             if (row.table_ndx >= observers.size() || !observers[row.table_ndx]) {
+                // The modified table has no observers
                 continue;
             }
 
@@ -352,6 +369,7 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
             }
         }
 
+        // The relative order of these loops is very important
         for (auto info : invalidated) {
             info->willChange(RLMInvalidatedKey);
         }
@@ -377,11 +395,16 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
 
 namespace {
 class TransactLogHandler {
+    // For advance_read() and friends, we need to batch up the change
+    // notifications and send them all at once, since all of the changes are
+    // applied atomically. ObserverState tracks everything needed to send the
+    // notifications for a single observed row.
     struct ObserverState {
         size_t table;
         size_t row;
         RLMObservationInfo *info;
 
+        // Change information for a single property/column
         struct change {
             bool changed = false;
             bool multipleLinkviewChanges = false;
@@ -390,6 +413,7 @@ class TransactLogHandler {
         };
         std::vector<change> changes;
 
+        // Get the change info for the given column, creating it if needed
         change& getChange(size_t i) {
             if (changes.size() <= i) {
                 changes.resize(std::max(changes.size() * 2, i + 1));
@@ -397,6 +421,7 @@ class TransactLogHandler {
             return changes[i];
         }
 
+        // Loop over the columns which were changed
         template<typename Func>
         void forEach(Func&& f) const {
             for (size_t i = 0; i < changes.size(); ++i) {
@@ -407,6 +432,7 @@ class TransactLogHandler {
             }
         }
 
+        // Simple lexographic ordering
         friend bool operator<(ObserverState const& lft, ObserverState const& rgt) {
             return std::tie(lft.table, lft.row) < std::tie(rgt.table, rgt.row);
         }
@@ -479,6 +505,8 @@ public:
         notifyObservers();
     }
 
+    // Called at the end of the transaction log immediately before the version
+    // is advanced
     void parse_complete() {
         for (auto info : invalidated) {
             info->willChange(RLMInvalidatedKey);
@@ -590,6 +618,8 @@ public:
             [o->linkviewChangeIndexes addIndex:index];
         }
         else {
+            // Array KVO can only send a single kind of change at a time, so
+            // if there's multiple just give up and send "Set"
             o->multipleLinkviewChanges = true;
             o->linkviewChangeIndexes = nil;
         }

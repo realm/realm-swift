@@ -28,6 +28,19 @@ namespace realm {
     class SharedGroup;
 }
 
+// RLMObservationInfo stores all of the KVO-related data for RLMObjectBase and
+// RLMArray. There is a one-to-one relationship between observed objects and
+// RLMObservationInfo instances, so it could be folded into RLMObjectBase, and
+// is a separate class mostly to avoid making all accessor objects far larger.
+//
+// RLMObjectSchema stores a vector of pointers to the first observation info
+// created for each row. If there are multiple observation infos for a single
+// row (such as if there are multiple observed objects backed by a single row,
+// or if both an object and an array property of that object are observed),
+// they're stored in an intrusive doubly-linked-list in the `next` and `prev`
+// members. This is done primarily to make it simpler and faster to loop over
+// all of the observed objects for a single row, as that needs to be done for
+// every change.
 class RLMObservationInfo {
 public:
     RLMObservationInfo(id object);
@@ -47,8 +60,6 @@ public:
     void willChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
     void didChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
 
-    void prepareForInvalidation();
-
     bool isForRow(size_t ndx) const {
         return row && row.get_index() == ndx;
     }
@@ -57,9 +68,21 @@ public:
     void removeObserver();
     bool hasObservers() const { return observerCount > 0; }
 
+    // valueForKey: on observed object and array properties needs to return the
+    // same object each time for KVO to work at all. Doing this all the time
+    // requires some odd semantics to avoid reference cycles, so instead we do
+    // it only to the extent specifically required by KVO. In addition, we
+    // need to continue to return the same object even if this row is deleted,
+    // or deleting an object with active observers will explode horribly.
+    // Once prepareForInvalidation() is called, valueForKey() will always return
+    // the cached value for object and array properties without checking the
+    // backing row to verify it's up-to-date.
     id valueForKey(NSString *key);
 
+    void prepareForInvalidation();
+
 private:
+    // Doubly-linked-list of observed objects for the same row as this
     RLMObservationInfo *next = nullptr;
     RLMObservationInfo *prev = nullptr;
 
@@ -90,6 +113,8 @@ private:
             f(info->object);
     }
 
+    // Default move/copy constructors don't work due to the intrusive linked
+    // list and we don't need them
     RLMObservationInfo(RLMObservationInfo const&) = delete;
     RLMObservationInfo(RLMObservationInfo&&) = delete;
     RLMObservationInfo& operator=(RLMObservationInfo const&) = delete;
@@ -100,14 +125,18 @@ public:
     void *kvoInfo = nullptr;
 };
 
-RLMObservationInfo *RLMGetObservationInfo(std::unique_ptr<RLMObservationInfo> const& info, size_t row, RLMObjectSchema *objectSchema);
+// Get the the observation info chain for the given row
+// Will simply return info if it's non-null, and will search ojectSchema's array
+// for a matching one otherwise, and return null if there are none
+RLMObservationInfo *RLMGetObservationInfo(std::unique_ptr<RLMObservationInfo> const& info,
+                                          size_t row, RLMObjectSchema *objectSchema);
 
 // Call the appropriate SharedGroup member function, with change notifications
 void RLMAdvanceRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
 void RLMRollbackAndContinueAsRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
 void RLMPromoteToWrite(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
 
-// delete all objects from a single table with optimized change notifications
+// delete all objects from a single table with change notifications
 void RLMClearTable(RLMObjectSchema *realm);
 
 // invoke the block, sending notifications for cascading deletes/link nullifications
