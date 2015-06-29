@@ -21,8 +21,9 @@ extern "C" {
 #endif
     
 #import <Realm/RLMSchema.h>
+#import <Realm/RLMDefines.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_ASSUME_NONNULL_BEGIN
 
 @class RLMRealm;
 
@@ -47,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_ASSUME_NONNULL_END
 
 #ifdef __cplusplus
 }

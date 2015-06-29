@@ -17,10 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <Realm/RLMDefines.h>
 
 @class RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_ASSUME_NONNULL_BEGIN
 
 /**
  An RLMRealm instance (also referred to as "a realm") represents a Realm
@@ -632,4 +633,4 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 @interface RLMNotificationToken : NSObject
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_ASSUME_NONNULL_END

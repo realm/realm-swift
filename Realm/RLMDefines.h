@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,22 +17,36 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMDefines.h>
 
-RLM_ASSUME_NONNULL_BEGIN
+#ifndef __has_feature
+#define __has_feature(x) 0
+#endif
 
-@class RLMRealm;
-@class RLMSchema;
-@class RLMObjectSchema;
+#if !__has_feature(nullability)
+#ifndef __nullable
+#define __nullable
+#endif
+#ifndef __nonnull
+#define __nonnull
+#endif
+#ifndef __null_unspecified
+#define __null_unspecified
+#endif
+#ifndef nullable
+#define nullable
+#endif
+#ifndef nonnull
+#define nonnull
+#endif
+#ifndef null_unspecified
+#define null_unspecified
+#endif
+#endif
 
-@interface RLMObjectBase : NSObject
-
-@property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
-
-- (instancetype)init;
-
-+ (NSString *)className;
-
-@end
-
-RLM_ASSUME_NONNULL_END
+#if defined(NS_ASSUME_NONNULL_BEGIN) && defined(NS_ASSUME_NONNULL_END)
+#define RLM_ASSUME_NONNULL_BEGIN NS_ASSUME_NONNULL_BEGIN
+#define RLM_ASSUME_NONNULL_END NS_ASSUME_NONNULL_END
+#else
+#define RLM_ASSUME_NONNULL_BEGIN
+#define RLM_ASSUME_NONNULL_END
+#endif

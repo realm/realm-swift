@@ -17,8 +17,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <Realm/RLMDefines.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_ASSUME_NONNULL_BEGIN
 
 @class RLMObjectSchema;
 
@@ -68,4 +69,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_ASSUME_NONNULL_END

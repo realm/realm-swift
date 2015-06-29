@@ -16,7 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-NS_ASSUME_NONNULL_BEGIN
+#import <Realm/RLMDefines.h>
+
+RLM_ASSUME_NONNULL_BEGIN
 
 @class RLMRealm, RLMResults, RLMObject;
 
@@ -61,4 +63,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_ASSUME_NONNULL_END

@@ -18,8 +18,9 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
+#import <Realm/RLMDefines.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_ASSUME_NONNULL_BEGIN
 
 /**
  This class models properties persisted to Realm in an RLMObjectSchema.
@@ -67,4 +68,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_ASSUME_NONNULL_END
