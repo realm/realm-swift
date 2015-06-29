@@ -491,9 +491,6 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
                     existing objects which require migration.
 
  @param oldSchemaVersion    The schema version of the `RLMRealm` being migrated.
-
- @return    Schema version number for the `RLMRealm` after completing the
-            migration. Must be greater than `oldSchemaVersion`.
  */
 typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVersion);
 
@@ -523,7 +520,6 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
  @param version     The current schema version.
  @param block       The block which migrates the Realm to the current version.
- @return            The error that occurred while applying the migration, if any.
 
  @see               RLMMigration
  */
@@ -536,7 +532,6 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
  @param version     The current schema version.
  @param realmPath   The path at which this schema version and migration block is applied.
  @param block       The block which migrates the Realm to the current version.
- @return            The error that occurred while applying the migration, if any.
 
  @see               RLMMigration
  */
