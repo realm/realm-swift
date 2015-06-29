@@ -309,7 +309,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return    An object of the subclass type or nil if an object with the given primary key does not exist.
  @see       -primaryKey
  */
-+ (nullable instancetype)objectForPrimaryKey:(id)primaryKey;
++ (nullable instancetype)objectForPrimaryKey:(nullable id)primaryKey;
 
 
 /**---------------------------------------------------------------------------------------
@@ -358,7 +358,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return    An object of the subclass type or nil if an object with the given primary key does not exist.
  @see       -primaryKey
  */
-+ (nullable instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(id)primaryKey;
++ (nullable instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(nullable id)primaryKey;
 
 /**
  Get an `NSArray` of objects of type `className` which have this object as the given property value. This can
