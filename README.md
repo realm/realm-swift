@@ -73,8 +73,8 @@ pod 'RealmSwift', :git => 'https://github.com/realm/realm-cocoa.git', :branch =>
 ```Cartfile
 github "realm/realm-cocoa" "null-string-beta-2"
 ```
-Using Realm Swift via Carthage relies on prebuilt binaries currently as [Carthage doesn't offer a
-way to specify the desired scheme to build at the moment](https://github.com/carthage/Carthage/issues/395). This doesn't affect the availability of the regular releases released Realm Swift via Carthage._
+Only regular releases of Realm Swift are available via Carthage. Realm Swift relies on prebuilt binaries currently as [Carthage doesn't offer a
+way to specify the desired scheme to build at the moment](https://github.com/carthage/Carthage/issues/395).
 
 ## Contributing
 
