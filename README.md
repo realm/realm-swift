@@ -52,29 +52,13 @@ Executing the examples under the `examples/` folder, requires that you have buil
 
 ## Long-running Branches
 
-Realm maintains long-running branches for specific purposes, some of which you may wish to use. We usually do not provide binaries for long-running branches. **We strongly recommend against using them to ship production applications.** Please do send us your feedback on these branches, ideally via a comment on their associated PR.
+Realm maintains long-running branches for specific purposes, some of which you may wish to use.
 
 | Branch                                                             | Xcode Version    | Swift Version                                   | Associated PR for reference           |
 |:-------------------------------------------------------------------|:-----------------|:------------------------------------------------|:--------------------------------------|
 | [`master`](/realm/realm-cocoa/tree/master)                         | 6.3.2            | Swift 1.2 (swiftlang-602.0.53.1 clang-602.0.53) | -                                     |
 | [`swift-2.0`](/realm/realm-cocoa/tree/swift-2.0)                   | 7.0.0-beta1      | Swift 2.0 (swiftlang-700.0.38.1 clang-700.0.53) | [#2069](/realm/realm-cocoa/pull/2069) |
 | [`null-string-beta-2`](/realm/realm-cocoa/tree/null-string-beta-2) | same as `master` | same as `master`                                | [#628](/realm/realm-cocoa/issues/628) |
-
-### Using Long-running Branches in CocoaPods
-
-```ruby
-# You need to add both “Realm” & “RealmSwift”
-pod 'Realm',      :git => 'https://github.com/realm/realm-cocoa.git', :branch => 'swift-2.0'
-pod 'RealmSwift', :git => 'https://github.com/realm/realm-cocoa.git', :branch => 'swift-2.0'
-```
-
-### Using Long-running Branches in Carthage
-
-```Cartfile
-github "realm/realm-cocoa" "null-string-beta-2"
-```
-Only regular releases of Realm Swift are available via Carthage. Realm Swift relies on prebuilt binaries currently as [Carthage doesn't offer a
-way to specify the desired scheme to build at the moment](https://github.com/carthage/Carthage/issues/395).
 
 ## Contributing
 
