@@ -27,7 +27,7 @@ import Realm
 /**
 An enum of the different property types supported by Realm. Object type.
 
-See [Realm Models](http://realm.io/docs/cocoa/latest/#models).
+See [Realm Models](http://realm.io/docs/swift/latest/#models).
 
 ## Primitive types
 
