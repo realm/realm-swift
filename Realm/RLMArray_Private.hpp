@@ -20,6 +20,7 @@
 #import <Realm/RLMResults.h>
 
 #import <memory>
+#import <realm/views.hpp>
 
 namespace realm {
     class LinkView;
@@ -72,6 +73,12 @@ namespace realm {
                                      query:(std::unique_ptr<realm::Query>)query
                                       view:(realm::TableView &&)view
                                      realm:(RLMRealm *)realm;
+
++ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                     query:(std::unique_ptr<realm::Query>)query
+                                      sort:(RowIndexes::Sorter const&)sorter
+                                     realm:(RLMRealm *)realm;
+
 - (void)deleteObjectsFromRealm;
 @end
 
