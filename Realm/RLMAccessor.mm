@@ -137,13 +137,21 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
 // date getter/setter
 static inline NSDate *RLMGetDate(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex) {
     RLMVerifyAttached(obj);
+    if (obj->_row.is_null(colIndex)) {
+        return nil;
+    }
     realm::DateTime dt = obj->_row.get_datetime(colIndex);
-    return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
+    return RLMDateTimeToNSDate(dt);
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, __unsafe_unretained NSDate *const date) {
     RLMVerifyInWriteTransaction(obj);
-    int64_t time = date.timeIntervalSince1970;
-    obj->_row.set_datetime(colIndex, realm::DateTime(time));
+    if (date) {
+        realm::DateTime dt = RLMDateTimeForNSDate(date);
+        obj->_row.set_datetime(colIndex, dt);
+    }
+    else {
+        obj->_row.set_null(colIndex);
+    }
 }
 
 // data getter/setter
@@ -275,7 +283,7 @@ static inline id RLMGetAnyProperty(__unsafe_unretained RLMObjectBase *const obj,
         case RLMPropertyTypeBool:
             return @(mixed.get_bool());
         case RLMPropertyTypeDate:
-            return [NSDate dateWithTimeIntervalSince1970:mixed.get_datetime().get_datetime()];
+            return RLMDateTimeToNSDate(mixed.get_datetime());
         case RLMPropertyTypeData: {
             realm::BinaryData bd = mixed.get_binary();
             return RLMBinaryDataToNSData(bd);
@@ -304,7 +312,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
         return;
     }
     if (NSDate *date = RLMDynamicCast<NSDate>(val)) {
-        obj->_row.set_mixed(col_ndx, realm::DateTime(int64_t([date timeIntervalSince1970])));
+        obj->_row.set_mixed(col_ndx, RLMDateTimeForNSDate(date));
         return;
     }
     if (NSData *data = RLMDynamicCast<NSData>(val)) {
