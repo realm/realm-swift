@@ -21,6 +21,7 @@
 
 #import <realm/array.hpp>
 #import <realm/binary_data.hpp>
+#import <realm/datetime.hpp>
 #import <realm/string_data.hpp>
 #import <realm/util/file.hpp>
 
@@ -139,6 +140,16 @@ static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSDat
     // the casting bit ensures that we create a data with a non-null pointer
     auto bytes = static_cast<const char *>(data.bytes) ?: static_cast<char *>((__bridge void *)data);
     return realm::BinaryData(bytes, data.length);
+}
+
+// Date convertion utilities
+static inline NSDate *RLMDateTimeToNSDate(realm::DateTime dateTime) {
+    return [NSDate dateWithTimeIntervalSince1970:dateTime.get_datetime()];
+}
+
+static inline realm::DateTime RLMDateTimeForNSDate(__unsafe_unretained NSDate *const date) {
+    std::time_t time = date.timeIntervalSince1970;
+    return realm::DateTime(time);
 }
 
 static inline NSUInteger RLMConvertNotFound(size_t index) {
