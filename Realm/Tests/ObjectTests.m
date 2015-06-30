@@ -265,7 +265,27 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
 @implementation ObjectTests
 
--(void)testObjectInit
+- (void)testNSNumberProperties {
+    NSNumberObject *obj = [NSNumberObject new];
+    obj.intObj = @20;
+    obj.floatObj = @0.7f;
+    obj.doubleObj = @33.3;
+    obj.boolObj = @YES;
+    XCTAssertEqualObjects(@20, obj.intObj);
+    XCTAssertEqualObjects(@0.7f, obj.floatObj);
+    XCTAssertEqualObjects(@33.3, obj.doubleObj);
+    XCTAssertEqualObjects(@YES, obj.boolObj);
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqualObjects(@20, obj.intObj);
+    XCTAssertEqualObjects(@0.7f, obj.floatObj);
+    XCTAssertEqualObjects(@33.3, obj.doubleObj);
+    XCTAssertEqualObjects(@YES, obj.boolObj);
+}
+
+- (void)testObjectInit
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     

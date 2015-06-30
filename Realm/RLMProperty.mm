@@ -32,6 +32,8 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
         case RLMPropertyTypeString:
         case RLMPropertyTypeData:
         case RLMPropertyTypeDate:
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeBool:
 #endif
             return YES;
         default:
@@ -81,6 +83,9 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
 }
 
 -(void)setObjcCodeFromType {
+    if (_optional) {
+        _objcType = '@';
+    }
     switch (_type) {
         case RLMPropertyTypeInt:
             _objcType = 'q';
@@ -132,6 +137,9 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
             static const char arrayPrefix[] = "@\"RLMArray<";
             static const int arrayPrefixLen = sizeof(arrayPrefix) - 1;
 
+            static const char numberPrefix[] = "@\"NSNumber<";
+            static const int numberPrefixLen = sizeof(numberPrefix) - 1;
+
             if (code[1] == '\0') {
                 // string is "@"
                 _type = RLMPropertyTypeAny;
@@ -166,11 +174,42 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
                     @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/cocoa/#to-many for more information.", self.objectClassName]);
                 }
             }
+            else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
+                // get number type from type string - @"NSNumber<objectClassName>"
+                _type = RLMPropertyTypeArray;
+                _objectClassName = [[NSString alloc] initWithBytes:code + numberPrefixLen
+                                                            length:strlen(code + numberPrefixLen) - 2 // drop trailing >"
+                                                          encoding:NSUTF8StringEncoding];
+
+
+                if ([_objectClassName isEqualToString:@"RLMInt"]) {
+                    _type = RLMPropertyTypeInt;
+#if REALM_ENABLE_NULL
+                    _optional = YES;
+#endif
+                }
+                else if ([_objectClassName isEqualToString:@"RLMFloat"]) {
+                    _type = RLMPropertyTypeFloat;
+                }
+                else if ([_objectClassName isEqualToString:@"RLMDouble"]) {
+                    _type = RLMPropertyTypeDouble;
+                }
+                else if ([_objectClassName isEqualToString:@"RLMBool"]) {
+                    _type = RLMPropertyTypeBool;
+#if REALM_ENABLE_NULL
+                    _optional = YES;
+#endif
+                }
+                else {
+                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an NSNumber object type. NSNumbers can only be RLMInt at the moment. See http://realm.io/docs/cocoa/ for more information.", self.objectClassName]);
+                }
+                _objectClassName = nil;
+            }
             else if (strcmp(code, "@\"NSNumber\"") == 0) {
-                @throw RLMException([NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types. See http://realm.io/docs/cocoa/api/Constants/RLMPropertyType.html for all supported types."]);
+                @throw RLMException([NSString stringWithFormat:@"NSNumber properties require a protocol defining the contained type - example: NSNumber<RLMInt>."]);
             }
             else if (strcmp(code, "@\"RLMArray\"") == 0) {
-                @throw RLMException(@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>");
+                @throw RLMException(@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>.");
             }
             else {
                 // for objects strip the quotes and @
