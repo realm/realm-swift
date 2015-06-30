@@ -56,10 +56,11 @@ public final class List<T: Object>: ListBase {
     /// The Realm the objects in this list belong to, or `nil` if the list's owning
     /// object does not belong to a realm (the list is standalone).
     public var realm: Realm? {
-        if _rlmArray.realm == nil {
+        if let rlmRealm = _rlmArray.realm {
+            return Realm(rlmRealm)
+        } else {
             return nil
         }
-        return Realm(_rlmArray.realm)
     }
 
     /// Indicates if the list can no longer be accessed.

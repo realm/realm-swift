@@ -128,10 +128,10 @@ exactly when and how migrations are performed.
           that occured otherwise.
 */
 public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
-    if encryptionKey == nil {
-        return RLMRealm.migrateRealmAtPath(path)
-    } else {
+    if let encryptionKey = encryptionKey {
         return RLMRealm.migrateRealmAtPath(path, encryptionKey: encryptionKey)
+    } else {
+        return RLMRealm.migrateRealmAtPath(path)
     }
 }
 

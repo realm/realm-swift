@@ -17,12 +17,15 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <Realm/RLMDefines.h>
+
+RLM_ASSUME_NONNULL_BEGIN
 
 @class RLMSchema;
 @class RLMArray;
 @class RLMObject;
 
-typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObject);
+typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObject * __nullable newObject);
 
 /**---------------------------------------------------------------------------------------
  *  @name Realm Migrations
@@ -100,4 +103,4 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
 
 @end
 
-
+RLM_ASSUME_NONNULL_END
