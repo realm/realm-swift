@@ -35,7 +35,7 @@ RLM_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readwrite, copy) NSArray *objectSchema;
 
 // schema based on runtime objects
-+ (instancetype)sharedSchema;
++ (nullable instancetype)sharedSchema;
 
 // schema based on tables in a Realm
 + (instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm;
