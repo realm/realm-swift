@@ -24,6 +24,13 @@
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
 #endif
 
+@interface NSNumberObject : RLMObject
+@property NSNumber<RLMInt> *intObj;
+@property NSNumber<RLMFloat> *floatObj;
+@property NSNumber<RLMDouble> *doubleObj;
+@property NSNumber<RLMBool> *boolObj;
+@end
+
 #pragma mark - Abstract Objects
 #pragma mark -
 
