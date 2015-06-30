@@ -25,7 +25,7 @@ RLM_ASSUME_NONNULL_BEGIN
 @class RLMArray;
 @class RLMObject;
 
-typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject,  RLMObject * __nullable newObject);
+typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObject * __nullable newObject);
 
 /**---------------------------------------------------------------------------------------
  *  @name Realm Migrations
