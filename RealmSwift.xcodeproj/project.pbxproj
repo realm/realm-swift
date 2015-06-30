@@ -421,7 +421,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ $PLATFORM_NAME == \"macosx\" ]]; then\n  if [[ ! -d \"build/osx/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh osx\n  fi\nelse\n  if [[ ! -d \"build/ios-dynamic/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\n  fi\nfi\n";
+			shellScript = "if [[ $PLATFORM_NAME == \"macosx\" ]]; then\n  if [[ ! -d \"build/osx/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh osx\n  fi\nelif [[ $PLATFORM_NAME == \"iphoneos\" ]] || [[ $PLATFORM_NAME == \"iphonesimulator\" ]]; then\n  if [[ ! -d \"build/ios-dynamic/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\n  fi\nelse\n  if [[ ! -d \"build/watchos-dynamic/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh watchos-dynamic\n  fi\nfi";
 		};
 		5DA0C4D41B16A0D70077F097 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
