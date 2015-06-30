@@ -31,6 +31,7 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
 #ifdef REALM_ENABLE_NULL
         case RLMPropertyTypeString:
         case RLMPropertyTypeData:
+        case RLMPropertyTypeDate:
 #endif
             return YES;
         default:
@@ -143,6 +144,9 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
             }
             else if (strcmp(code, "@\"NSDate\"") == 0) {
                 _type = RLMPropertyTypeDate;
+#if REALM_ENABLE_NULL
+                _optional = YES;
+#endif
             }
             else if (strcmp(code, "@\"NSData\"") == 0) {
                 _type = RLMPropertyTypeData;

@@ -102,6 +102,7 @@ RLM_ARRAY_TYPE(IntObject)
 @interface RequiredPropertiesObject : RLMObject
 @property NSString *stringCol;
 @property NSData *binaryCol;
+@property NSDate *dateCol;
 @end
 
 #pragma mark AllTypesObject
