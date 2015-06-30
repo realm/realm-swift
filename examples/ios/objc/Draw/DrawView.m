@@ -78,16 +78,17 @@
     CGPoint point = [[touches anyObject] locationInView:self];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
         NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
-        [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID, colorName]];
-        [DrawPoint createInDefaultRealmWithObject:@[[[NSUUID UUID] UUIDString], self.pathID, @(point.x), @(point.y)]];
+        [DrawPath createInDefaultRealmWithValue:@[self.pathID, self.vendorID, colorName, @[]]];
+        [DrawPoint createInDefaultRealmWithValue:@[[NSUUID UUID].UUIDString, @(point.x), @(point.y)]];
     }];
 }
 
 - (void)addPoint:(CGPoint)point
 {
+    DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
-        [DrawPoint createInDefaultRealmWithObject:@[[[NSUUID UUID] UUIDString], currentPath.pathID, @(point.x), @(point.y)]];
+        DrawPoint *newPoint = [DrawPoint createInDefaultRealmWithValue:@[[NSUUID UUID].UUIDString, @(point.x), @(point.y)]];
+        [currentPath.points addObject:newPoint];
     }];
 }
 

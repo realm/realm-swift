@@ -85,8 +85,8 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
     CGPoint point = theEvent.locationInWindow;
     [[RLMRealm defaultRealm] transactionWithBlock:^{
         NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
-        [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID, colorName]];
-        [DrawPoint createInDefaultRealmWithObject:@[[NSUUID UUID].UUIDString, self.pathID, @(point.x), @(self.frame.size.height - point.y)]];
+        [DrawPath createInDefaultRealmWithValue:@[self.pathID, self.vendorID, colorName, @[]]];
+        [DrawPoint createInDefaultRealmWithValue:@[[NSUUID UUID].UUIDString, @(point.x), @(self.frame.size.height - point.y)]];
     }];
 }
 
@@ -151,8 +151,10 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
 
 - (void)addPoint:(CGPoint)point
 {
+    DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        [DrawPoint createInDefaultRealmWithObject:@[[NSUUID UUID].UUIDString, self.pathID, @(point.x), @(self.frame.size.height - point.y)]];
+        DrawPoint *newPoint = [DrawPoint createInDefaultRealmWithValue:@[[NSUUID UUID].UUIDString, @(point.x), @(self.frame.size.height - point.y)]];
+        [currentPath.points addObject:newPoint];
     }];
 }
 

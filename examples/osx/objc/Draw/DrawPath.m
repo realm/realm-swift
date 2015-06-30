@@ -27,8 +27,7 @@
     NSBezierPath *path = [NSBezierPath bezierPath];
     path.lineWidth = 4.0f;
     NSUInteger index = 0;
-    RLMResults *points = [DrawPoint objectsInRealm:self.realm where:@"pathID == %@", self.pathID];
-    for (DrawPoint *point in points) {
+    for (DrawPoint *point in self.points) {
         CGPoint cgPoint = CGPointMake(point.x, point.y);
         if (index == 0) {
             [path moveToPoint:cgPoint];
@@ -43,6 +42,11 @@
 + (NSString *)primaryKey
 {
     return @"pathID";
+}
+
++ (NSArray *)ignoredProperties
+{
+    return @[@"path"];
 }
 
 @end
