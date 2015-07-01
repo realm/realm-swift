@@ -75,7 +75,7 @@ static inline T *RLMDynamicCast(__unsafe_unretained id obj) {
 
 template<typename T>
 static inline T *RLMNSNullToNil(T *obj) {
-    if (obj == NSNull.null) {
+    if (static_cast<id>(obj) == NSNull.null) {
         return nil;
     }
     return obj;

@@ -66,7 +66,8 @@ class SwiftOptionalObject: Object {
 //    dynamic var optFloatCol: Float?
 //    dynamic var optDoubleCol: Double?
 #if REALM_ENABLE_NULL
-    dynamic var optStringCol: NSString?
+    dynamic var optNSStringCol: NSString?
+    dynamic var optStringCol: String?
     dynamic var optBinaryCol: NSData?
     dynamic var optDateCol: NSDate?
 #endif
