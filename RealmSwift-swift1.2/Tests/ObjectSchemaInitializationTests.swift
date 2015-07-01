@@ -147,6 +147,24 @@ class ObjectSchemaInitializationTests: TestCase {
         }
     }
 
+    func testOptionalProperties() {
+        let schema = RLMObjectSchema(forObjectClass: SwiftOptionalObject.self)
+
+        for prop in schema.properties {
+            XCTAssertTrue((prop as! RLMProperty).optional)
+        }
+
+        let types = map(schema.properties) { prop in
+            (prop as! RLMProperty).type
+        }
+
+#if REALM_ENABLE_NULL
+        XCTAssertEqual(types, [.String, .String, .Data, .Date, .Object])
+#else
+        XCTAssertEqual(types, [.Object])
+#endif
+    }
+
     func testImplicitlyUnwrappedOptionalsAreParsedAsOptionals() {
         let schema = SwiftImplicitlyUnwrappedOptionalObject().objectSchema
         XCTAssertTrue(schema["optObjectCol"]!.optional)
