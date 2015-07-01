@@ -285,17 +285,28 @@ public class ObjectUtil: NSObject {
         (object as! Object).listForProperty(property)._rlmArray = array
     }
 
-    @objc private class func getOptionalPropertyNames(object: AnyObject) -> NSArray {
+    @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
         let reflection = reflect(object)
 
-        var properties = [String]()
+        var properties = [String:AnyObject]()
 
         // Skip the first property (super):
         // super is an implicit property on Swift objects
         for i in 1..<reflection.count {
             let mirror = reflection[i].1
             if mirror.disposition == .Optional {
-                properties.append(reflection[i].0)
+                let name = reflection[i].0
+                if mirror.valueType is Optional<String>.Type || mirror.valueType is Optional<NSString>.Type {
+                    properties[name] = Int(PropertyType.String.rawValue)
+                } else if mirror.valueType is Optional<NSDate>.Type {
+                    properties[name] = Int(PropertyType.Date.rawValue)
+                } else if mirror.valueType is Optional<NSData>.Type {
+                    properties[name] = Int(PropertyType.Data.rawValue)
+                } else if mirror.valueType is Optional<Object>.Type {
+                    properties[name] = Int(PropertyType.Object.rawValue)
+                } else {
+                    properties[name] = NSNull()
+                }
             }
         }
 

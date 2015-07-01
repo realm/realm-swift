@@ -79,7 +79,7 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 + (NSArray *)getGenericListPropertyNames:(id)obj;
 + (void)initializeListProperty:(RLMObjectBase *)object property:(RLMProperty *)property array:(RLMArray *)array;
 
-+ (NSArray *)getOptionalPropertyNames:(id)obj;
++ (NSDictionary *)getOptionalProperties:(id)obj;
 + (NSArray *)requiredPropertiesForClass:(Class)cls;
 
 @end
