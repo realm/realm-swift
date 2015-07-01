@@ -31,6 +31,8 @@
 #import "object_store.hpp"
 #import <realm/table.hpp>
 
+using namespace realm;
+
 @interface MigrationObject : RLMObject
 @property int intCol;
 @property NSString *stringCol;

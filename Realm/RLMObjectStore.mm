@@ -33,6 +33,7 @@
 #import "object_store.hpp"
 #import <objc/message.h>
 
+using namespace realm;
 
 // Schema used to created generated accessors
 static NSMutableArray * const s_accessorSchema = [NSMutableArray new];
