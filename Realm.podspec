@@ -19,6 +19,7 @@ Pod::Spec.new do |s|
   public_header_files       = 'include/Realm/RLMArray.h',
                               'include/Realm/RLMCollection.h',
                               'include/Realm/RLMConstants.h',
+                              'include/Realm/RLMDefines.h',
                               'include/Realm/RLMListBase.h',
                               'include/Realm/RLMMigration.h',
                               'include/Realm/RLMObject.h',
