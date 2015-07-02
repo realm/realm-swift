@@ -72,8 +72,8 @@ void RLMClearAccessorCache() {
 
 static void RLMCopyColumnMapping(RLMObjectSchema *targetSchema, const ObjectSchema &tableSchema) {
     // copy updated column mapping
-    for (size_t i = 0; i < tableSchema.properties.size(); i++) {
-        ((RLMProperty *)targetSchema.properties[i]).column = tableSchema.properties[i].table_column;
+    for (auto &prop : tableSchema.properties) {
+        targetSchema[@(prop.name.c_str())].column = prop.table_column;
     }
 
     // re-order properties

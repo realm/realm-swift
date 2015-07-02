@@ -311,6 +311,7 @@
         p.is_indexed = prop.indexed;
         p.is_primary = (prop == _primaryKeyProperty);
         p.is_nullable = prop.optional;
+        p.table_column = prop.column;
         objectSchema.properties.push_back(std::move(p));
     }
     return objectSchema;
@@ -328,6 +329,7 @@
                                                   objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
                                                           indexed:prop.is_indexed
                                                          optional:prop.is_nullable];
+        property.column = prop.table_column;
         property.isPrimary = (prop.name == objectSchema.primary_key);
         [propArray addObject:property];
     }
