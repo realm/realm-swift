@@ -660,6 +660,88 @@ public:
     }
 }
 
+- (void)testAllPropertyTypesDynamic {
+    KVOObject *obj = [self createObject];
+    if (![obj respondsToSelector:@selector(setObject:forKeyedSubscript:)]) {
+        return;
+    }
+
+    {
+        KVORecorder r(self, obj, @"boolCol");
+        obj[@"boolCol"] = @YES;
+        AssertChanged(r, @NO, @YES);
+    }
+
+    {
+        KVORecorder r(self, obj, @"int16Col");
+        obj[@"int16Col"] = @0;
+        AssertChanged(r, @1, @0);
+    }
+
+    {
+        KVORecorder r(self, obj, @"int32Col");
+        obj[@"int32Col"] = @0;
+        AssertChanged(r, @2, @0);
+    }
+
+    {
+        KVORecorder r(self, obj, @"int64Col");
+        obj[@"int64Col"] = @0;
+        AssertChanged(r, @3, @0);
+    }
+
+    {
+        KVORecorder r(self, obj, @"floatCol");
+        obj[@"floatCol"] = @1.0f;
+        AssertChanged(r, @0, @1);
+    }
+
+    {
+        KVORecorder r(self, obj, @"doubleCol");
+        obj[@"doubleCol"] = @1.0;
+        AssertChanged(r, @0, @1);
+    }
+
+    {
+        KVORecorder r(self, obj, @"cBoolCol");
+        obj[@"cBoolCol"] = @YES;
+        AssertChanged(r, @NO, @YES);
+    }
+
+    {
+        KVORecorder r(self, obj, @"stringCol");
+        obj[@"stringCol"] = @"abc";
+        AssertChanged(r, @"", @"abc");
+    }
+
+    {
+        KVORecorder r(self, obj, @"binaryCol");
+        NSData *data = [@"abc" dataUsingEncoding:NSUTF8StringEncoding];
+        obj[@"binaryCol"] = data;
+        AssertChanged(r, NSData.data, data);
+    }
+
+    {
+        KVORecorder r(self, obj, @"dateCol");
+        NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:1];
+        obj[@"dateCol"] = date;
+        AssertChanged(r, [NSDate dateWithTimeIntervalSinceReferenceDate:0], date);
+    }
+
+    {
+        KVORecorder r(self, obj, @"objectCol");
+        obj[@"objectCol"] = obj;
+        AssertChanged(r, NSNull.null, [self observableForObject:obj]);
+    }
+
+    {
+        KVORecorder r(self, obj, @"arrayCol");
+        obj[@"arrayCol"] = obj.arrayCol;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+}
+
 - (void)testArrayDiffs {
     KVOLinkObject2 *obj = [self createLinkObject];
     KVORecorder r(self, obj, @"array");
