@@ -71,9 +71,14 @@ void RLMClearAccessorCache() {
 }
 
 static void RLMCopyColumnMapping(RLMObjectSchema *targetSchema, const ObjectSchema &tableSchema) {
+    REALM_ASSERT_DEBUG(targetSchema.properties.count == tableSchema.properties.size());
+
     // copy updated column mapping
-    for (size_t i = 0; i < tableSchema.properties.size(); i++) {
-        ((RLMProperty *)targetSchema.properties[i]).column = tableSchema.properties[i].table_column;
+    size_t i = 0;
+    for (RLMProperty *targetProp in targetSchema.properties) {
+        REALM_ASSERT_DEBUG(targetProp.name.UTF8String == tableSchema.properties[i].name);
+        targetProp.column = tableSchema.properties[i].table_column;
+        ++i;
     }
 
     // re-order properties
@@ -149,7 +154,8 @@ void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSc
         // write transaction
         [realm beginWriteTransaction];
 
-        bool changed = ObjectStore::update_realm_with_schema(realm.group, newVersion, schema, [=](__unused Group *group, ObjectStore::Schema &schema) {
+        bool migrationCalled = false;
+        bool changed = ObjectStore::update_realm_with_schema(realm.group, newVersion, schema, [&](__unused Group *group, ObjectStore::Schema &schema) {
             RLMRealmSetSchemaAndAlign(realm, targetSchema, schema);
             if (migrationBlock) {
                 NSError *error = migrationBlock();
@@ -158,8 +164,12 @@ void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSc
                     @throw RLMException(error.description);
                 }
             }
+            migrationCalled = true;
         });
-        RLMRealmSetSchemaAndAlign(realm, targetSchema, schema);
+
+        if (!migrationCalled) {
+            RLMRealmSetSchemaAndAlign(realm, targetSchema, schema);
+        }
 
         if (changed) {
             [realm commitWriteTransaction];
