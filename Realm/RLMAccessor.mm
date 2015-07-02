@@ -399,6 +399,19 @@ static IMP RLMAccessorGetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
     }
 }
 
+template<typename Function>
+static void RLMWrapSetter(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained NSString *const name, Function&& f) {
+    RLMObservationInfo *info = RLMGetObservationInfo(obj->_observationInfo, obj->_row.get_index(), obj->_objectSchema);
+    if (info) {
+        info->willChange(name);
+        f();
+        info->didChange(name);
+    }
+    else {
+        f();
+    }
+}
+
 template<typename ArgType, typename StorageType=ArgType>
 static IMP RLMMakeSetter(RLMProperty *prop) {
     NSUInteger colIndex = prop.column;
@@ -409,15 +422,9 @@ static IMP RLMMakeSetter(RLMProperty *prop) {
         });
     }
     return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj, ArgType val) {
-        RLMObservationInfo *info = RLMGetObservationInfo(obj->_observationInfo, obj->_row.get_index(), obj->_objectSchema);
-        if (info) {
-            info->willChange(name);
+        RLMWrapSetter(obj, name, [&] {
             RLMSetValue(obj, colIndex, static_cast<StorageType>(val));
-            info->didChange(name);
-        }
-        else {
-            RLMSetValue(obj, colIndex, static_cast<StorageType>(val));
-        }
+        });
     });
 }
 
@@ -669,7 +676,10 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     if (!RLMIsObjectValidForProperty(val, prop)) {
         @throw RLMException([NSString stringWithFormat:@"Invalid property value `%@` for property `%@` of class `%@`", val, propName, obj->_objectSchema.className]);
     }
-    RLMDynamicSet(obj, prop, RLMNSNullToNil(val), RLMCreationOptionsPromoteStandalone);
+
+    RLMWrapSetter(obj, prop.name, [&] {
+        RLMDynamicSet(obj, prop, RLMNSNullToNil(val), RLMCreationOptionsPromoteStandalone);
+    });
 }
 
 void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const prop,
