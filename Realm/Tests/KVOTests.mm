@@ -573,12 +573,90 @@ public:
         AssertChanged(r, NSNull.null, [self observableForObject:obj]);
     }
 
-    { // should be testing assignment, not mutation
+    {
         KVORecorder r(self, obj, @"arrayCol");
-        id mutator = [obj mutableArrayValueForKey:@"arrayCol"];
-        [mutator addObject:obj];
+        obj.arrayCol = obj.arrayCol;
         r.refresh();
-        r.pop_front();
+        r.pop_front(); // asserts that there's something to pop
+    }
+}
+
+- (void)testAllPropertyTypesKVC {
+    KVOObject *obj = [self createObject];
+
+    {
+        KVORecorder r(self, obj, @"boolCol");
+        [obj setValue:@YES forKey:@"boolCol"];
+        AssertChanged(r, @NO, @YES);
+    }
+
+    {
+        KVORecorder r(self, obj, @"int16Col");
+        [obj setValue:@0 forKey:@"int16Col"];
+        AssertChanged(r, @1, @0);
+    }
+
+    {
+        KVORecorder r(self, obj, @"int32Col");
+        [obj setValue:@0 forKey:@"int32Col"];
+        AssertChanged(r, @2, @0);
+    }
+
+    {
+        KVORecorder r(self, obj, @"int64Col");
+        [obj setValue:@0 forKey:@"int64Col"];
+        AssertChanged(r, @3, @0);
+    }
+
+    {
+        KVORecorder r(self, obj, @"floatCol");
+        [obj setValue:@1.0f forKey:@"floatCol"];
+        AssertChanged(r, @0, @1);
+    }
+
+    {
+        KVORecorder r(self, obj, @"doubleCol");
+        [obj setValue:@1.0 forKey:@"doubleCol"];
+        AssertChanged(r, @0, @1);
+    }
+
+    {
+        KVORecorder r(self, obj, @"cBoolCol");
+        [obj setValue:@YES forKey:@"cBoolCol"];
+        AssertChanged(r, @NO, @YES);
+    }
+
+    {
+        KVORecorder r(self, obj, @"stringCol");
+        [obj setValue:@"abc" forKey:@"stringCol"];
+        AssertChanged(r, @"", @"abc");
+    }
+
+    {
+        KVORecorder r(self, obj, @"binaryCol");
+        NSData *data = [@"abc" dataUsingEncoding:NSUTF8StringEncoding];
+        [obj setValue:data forKey:@"binaryCol"];
+        AssertChanged(r, NSData.data, data);
+    }
+
+    {
+        KVORecorder r(self, obj, @"dateCol");
+        NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:1];
+        [obj setValue:date forKey:@"dateCol"];
+        AssertChanged(r, [NSDate dateWithTimeIntervalSinceReferenceDate:0], date);
+    }
+
+    {
+        KVORecorder r(self, obj, @"objectCol");
+        [obj setValue:obj forKey:@"objectCol"];
+        AssertChanged(r, NSNull.null, [self observableForObject:obj]);
+    }
+
+    {
+        KVORecorder r(self, obj, @"arrayCol");
+        [obj setValue:obj.arrayCol forKey:@"arrayCol"];
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
     }
 }
 
