@@ -606,6 +606,27 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [realm commitWriteTransaction];
 }
 
+- (void)testDatePrecisionPreservation
+{
+    DateObject *dateObject = [[DateObject alloc] initWithValue:@[NSDate.distantFuture]];
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:dateObject];
+    [realm commitWriteTransaction];
+    XCTAssertEqualObjects(NSDate.distantFuture, dateObject.dateCol);
+
+    [realm beginWriteTransaction];
+    NSDate *date = ({
+        NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitMonth|NSCalendarUnitYear|NSCalendarUnitDay fromDate:NSDate.date];
+        components.calendar = [NSCalendar currentCalendar];
+        components.year += 50000;
+        components.date;
+    });
+    dateObject.dateCol = date;
+    [realm commitWriteTransaction];
+    XCTAssertEqualObjects(date, dateObject.dateCol);
+}
+
 - (void)testDataSizeLimits {
     RLMRealm *realm = [RLMRealm defaultRealm];
 

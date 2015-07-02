@@ -140,7 +140,7 @@ static inline NSDate *RLMGetDate(__unsafe_unretained RLMObjectBase *const obj, N
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, __unsafe_unretained NSDate *const date) {
     RLMVerifyInWriteTransaction(obj);
-    std::time_t time = date.timeIntervalSince1970;
+    int64_t time = date.timeIntervalSince1970;
     obj->_row.set_datetime(colIndex, realm::DateTime(time));
 }
 
@@ -298,7 +298,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
         return;
     }
     if (NSDate *date = RLMDynamicCast<NSDate>(val)) {
-        obj->_row.set_mixed(col_ndx, realm::DateTime(time_t([date timeIntervalSince1970])));
+        obj->_row.set_mixed(col_ndx, realm::DateTime(int64_t([date timeIntervalSince1970])));
         return;
     }
     if (NSData *data = RLMDynamicCast<NSData>(val)) {
