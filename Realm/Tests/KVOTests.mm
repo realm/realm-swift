@@ -213,6 +213,16 @@ public:
     } \
 } while (false)
 
+// Validate that `r` has a notification with the given kind and changed indexes,
+// remove it, and verify that there are no more notifications
+#define AssertIndexChange(kind, indexes) do { \
+    if (NSDictionary *note = AssertNotification(r)) { \
+        XCTAssertEqual([note[NSKeyValueChangeKindKey] intValue], kind); \
+        XCTAssertEqualObjects(note[NSKeyValueChangeIndexesKey], indexes); \
+    } \
+    XCTAssertTrue(r.empty()); \
+} while (0)
+
 // Tests for plain Foundation key-value observing to verify that we correctly
 // match the standard semantics. Each of the subclasses of KVOTests runs the
 // same set of tests on RLMObjects in difference scenarios
@@ -577,14 +587,6 @@ public:
     KVORecorder r(self, obj, @"array");
 
     id mutator = [obj mutableArrayValueForKey:@"array"];
-
-#define AssertIndexChange(kind, indexes) do { \
-    if (NSDictionary *note = AssertNotification(r)) { \
-        XCTAssertEqual([note[NSKeyValueChangeKindKey] intValue], kind); \
-        XCTAssertEqualObjects(note[NSKeyValueChangeIndexesKey], indexes); \
-    } \
-    XCTAssertTrue(r.empty()); \
-} while (0)
 
     [mutator addObject:obj.obj];
     AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
