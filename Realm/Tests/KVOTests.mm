@@ -113,6 +113,15 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @implementation PlainLinkObject2
 @end
 
+// Tables with no links (or backlinks) preserve the order of rows on
+// insertion/deletion, while tables with links do not, so we need an object
+// class known to have no links to test the ordered case
+@interface ObjectWithNoLinksToOrFrom : RLMObject
+@property int value;
+@end
+@implementation ObjectWithNoLinksToOrFrom
+@end
+
 @interface KVOTests : RLMTestCase
 // get an object that should be observed for the given object being mutated
 // used by some of the subclasses to observe a different accessor for the same row
@@ -1389,6 +1398,47 @@ public:
         obj.arrayCol[0] = obj;
         [obj.arrayCol removeAllObjects];
         AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:0]);
+    }
+}
+
+- (void)testOrderedErase {
+    NSMutableArray *objects = [NSMutableArray arrayWithCapacity:10];
+    for (int i = 0; i < 10; ++i) @autoreleasepool {
+        [objects addObject:[ObjectWithNoLinksToOrFrom createInRealm:self.realm withValue:@[@(i)]]];
+    }
+
+    // deleteObject: always uses move_last_over(), but TableView::clear() uses
+    // erase() if there's no links
+    auto deleteObject = ^(int value) {
+        [self.realm deleteObjects:[ObjectWithNoLinksToOrFrom objectsInRealm:self.realm where:@"value = %d", value]];
+    };
+
+    { // delete object before observed, then observed
+        KVORecorder r(self, objects[2], @"invalidated");
+        deleteObject(1);
+        deleteObject(2);
+        AssertChanged(r, @NO, @YES);
+    }
+
+    { // delete object after observed, then observed
+        KVORecorder r(self, objects[3], @"invalidated");
+        deleteObject(4);
+        deleteObject(3);
+        AssertChanged(r, @NO, @YES);
+    }
+
+    { // delete observed, then object before observed
+        KVORecorder r(self, objects[6], @"invalidated");
+        deleteObject(6);
+        deleteObject(5);
+        AssertChanged(r, @NO, @YES);
+    }
+
+    { // delete observed, then object after observed
+        KVORecorder r(self, objects[7], @"invalidated");
+        deleteObject(7);
+        deleteObject(8);
+        AssertChanged(r, @NO, @YES);
     }
 }
 @end
