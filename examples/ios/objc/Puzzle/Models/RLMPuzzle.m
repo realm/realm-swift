@@ -16,11 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <UIKit/UIKit.h>
+#import "RLMPuzzle.h"
 
-@interface RLMStartView : UIVisualEffectView
+@implementation RLMPuzzle
 
-@property (nonatomic, copy) void (^startButtonTapped)(void);
-@property (nonatomic, copy) void (^joinButtonTapped)(void);
++ (NSDictionary *)defaultPropertyValues
+{
+    return @{@"uuid":[NSUUID UUID].UUIDString,
+             @"userID":[NSUUID UUID].UUIDString,
+             @"creationTime":[NSDate date]};
+}
 
 @end

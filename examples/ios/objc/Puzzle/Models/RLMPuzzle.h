@@ -16,11 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <UIKit/UIKit.h>
+#import <Realm/Realm.h>
+#import "RLMPuzzlePiece.h"
 
-@interface RLMStartView : UIVisualEffectView
+@interface RLMPuzzle : RLMObject
 
-@property (nonatomic, copy) void (^startButtonTapped)(void);
-@property (nonatomic, copy) void (^joinButtonTapped)(void);
+@property NSString *uuid;
+@property NSString *userID;
+@property NSDate *creationTime;
+@property RLMArray<RLMPuzzlePiece> *pieces;
 
 @end

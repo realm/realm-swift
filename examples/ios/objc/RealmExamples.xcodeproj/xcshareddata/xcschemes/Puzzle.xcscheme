@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2224B1D61B036B060054642E"
+               BlueprintIdentifier = "22C389AA1B44FB030055CE88"
                BuildableName = "Puzzle.app"
                BlueprintName = "Puzzle"
                ReferencedContainer = "container:RealmExamples.xcodeproj">
@@ -56,7 +56,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2224B1D61B036B060054642E"
+            BlueprintIdentifier = "22C389AA1B44FB030055CE88"
             BuildableName = "Puzzle.app"
             BlueprintName = "Puzzle"
             ReferencedContainer = "container:RealmExamples.xcodeproj">
@@ -76,7 +76,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2224B1D61B036B060054642E"
+            BlueprintIdentifier = "22C389AA1B44FB030055CE88"
             BuildableName = "Puzzle.app"
             BlueprintName = "Puzzle"
             ReferencedContainer = "container:RealmExamples.xcodeproj">
@@ -95,7 +95,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2224B1D61B036B060054642E"
+            BlueprintIdentifier = "22C389AA1B44FB030055CE88"
             BuildableName = "Puzzle.app"
             BlueprintName = "Puzzle"
             ReferencedContainer = "container:RealmExamples.xcodeproj">

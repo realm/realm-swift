@@ -22,8 +22,12 @@
 
 @interface RLMPuzzlePiece : RLMObject
 
-@property (nonatomic, assign) NSInteger pieceID;
-@property (nonatomic, assign) CGFloat x;
-@property (nonatomic, assign) CGFloat y;
+@property NSInteger pieceID;
+@property CGFloat x;
+@property CGFloat y;
+@property NSString *userID;
 
 @end
+
+RLM_ARRAY_TYPE(RLMPuzzlePiece)
+

@@ -42,6 +42,7 @@
 		22C389F71B44FDB30055CE88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		22C389F81B44FDC10055CE88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
 		22C389F91B44FE890055CE88 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
+		22C389FC1B451F3C0055CE88 /* RLMPuzzle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389FB1B451F3C0055CE88 /* RLMPuzzle.m */; };
 		22CFE2871B0A393B00D5EC93 /* SwatchColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2841B0A393B00D5EC93 /* SwatchColor.m */; };
 		22CFE2881B0A393B00D5EC93 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2861B0A393B00D5EC93 /* SwatchesView.m */; };
 		3FC898FD1A140F550067CBEC /* LabelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FC1A140F550067CBEC /* LabelViewController.m */; };
@@ -283,6 +284,8 @@
 		22C389E51B44FB6C0055CE88 /* RLMPuzzleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzleView.m; sourceTree = "<group>"; };
 		22C389E61B44FB6C0055CE88 /* RLMStartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMStartView.h; sourceTree = "<group>"; };
 		22C389E71B44FB6C0055CE88 /* RLMStartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMStartView.m; sourceTree = "<group>"; };
+		22C389FA1B451F3C0055CE88 /* RLMPuzzle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzle.h; sourceTree = "<group>"; };
+		22C389FB1B451F3C0055CE88 /* RLMPuzzle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzle.m; sourceTree = "<group>"; };
 		22CFE2831B0A393B00D5EC93 /* SwatchColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchColor.h; sourceTree = "<group>"; };
 		22CFE2841B0A393B00D5EC93 /* SwatchColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchColor.m; sourceTree = "<group>"; };
 		22CFE2851B0A393B00D5EC93 /* SwatchesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchesView.h; sourceTree = "<group>"; };
@@ -563,6 +566,8 @@
 		22C389DC1B44FB6C0055CE88 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				22C389FA1B451F3C0055CE88 /* RLMPuzzle.h */,
+				22C389FB1B451F3C0055CE88 /* RLMPuzzle.m */,
 				22C389DD1B44FB6C0055CE88 /* RLMPuzzlePiece.h */,
 				22C389DE1B44FB6C0055CE88 /* RLMPuzzlePiece.m */,
 			);
@@ -1244,6 +1249,7 @@
 				22C389F21B44FB6C0055CE88 /* RLMStartView.m in Sources */,
 				22C389EE1B44FB6C0055CE88 /* RLMPuzzlePiece.m in Sources */,
 				22C389E81B44FB6C0055CE88 /* AppDelegate.m in Sources */,
+				22C389FC1B451F3C0055CE88 /* RLMPuzzle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

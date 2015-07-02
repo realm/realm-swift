@@ -18,6 +18,7 @@
 
 #import "RLMViewController.h"
 #import <Realm/Realm.h>
+#import "RLMPuzzle.h"
 #import "RLMPuzzlePiece.h"
 #import "RLMPuzzleView.h"
 #import "RLMStartView.h"
@@ -29,11 +30,34 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
 @property (nonatomic, strong) RLMStartView *startView;
 @property (nonatomic, strong) RLMPuzzleView *puzzleView;
 @property (nonatomic, strong) NSMutableArray *puzzlePieces;
-@property (nonatomic, strong) RLMRealm *inMemoryRealm;
+
+@property (nonatomic, strong) RLMNotificationToken *notificationToken;
+
+@property (nonatomic, strong) RLMResults *puzzles;
+@property (nonatomic, strong) NSString *currentPuzzleID;
+
+- (void)setupNotifications;
+- (void)removeNotifications;
+
+- (void)updatePuzzleState;
 
 @end
 
 @implementation RLMViewController
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        [self setupNotifications];
+    }
+    
+    return self;
+}
+
+- (void)dealloc
+{
+    [self removeNotifications];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -69,36 +93,15 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
         }];
     };
     
-    if (self.inMemoryRealm)
-        return;
-    
     self.puzzlePieces = [NSMutableArray array];
 
-    self.inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"io.realm.puzzle"];
-    for (NSInteger i = 0; i < self.puzzleView.numberOfPieces; i++) {
-        RLMPuzzlePiece *piece = [[RLMPuzzlePiece alloc] init];
-        piece.pieceID = i;
 
-        [self.inMemoryRealm transactionWithBlock:^{
-            [self.inMemoryRealm addObject:piece];
-        }];
-        
-        [self.puzzlePieces addObject:piece];
-    }
 }
 
 - (void)puzzleView:(RLMPuzzleView *)puzzleView pieceMoved:(RLMPuzzlePieceName)pieceID toPoint:(CGPoint)point
 {
     RLMPuzzlePiece *piece = self.puzzlePieces[pieceID];
-    [self.inMemoryRealm transactionWithBlock:^{
-        piece.x = point.x;
-        piece.y = point.y;
-    }];
-}
 
-- (UIStatusBarStyle)preferredStatusBarStyle
-{
-    return UIStatusBarStyleLightContent;
 }
 
 - (BOOL)prefersStatusBarHidden
@@ -106,9 +109,21 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
     return YES;
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+#pragma mark - Notifications -
+- (void)setupNotifications
+{
+    __weak typeof(self) weakSelf = self;
+    RLMNotificationBlock block = ^(NSString *notification, RLMRealm *realm) {
+        weakSelf.puzzles = [RLMPuzzle allObjects];
+        [weakSelf updatePuzzleState];
+    };
+    
+    _notificationToken = [[RLMRealm defaultRealm] addNotificationBlock:block];
+}
+
+- (void)removeNotifications
+{
+    [[RLMRealm defaultRealm] removeNotification:self.notificationToken];
 }
 
 @end
