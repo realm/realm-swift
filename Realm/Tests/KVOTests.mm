@@ -842,6 +842,15 @@ public:
     AssertChanged(r, NSNull.null, @YES);
 }
 
+- (void)testArrayKVC {
+    KVOObject *obj = [self createObject];
+    [obj.arrayCol addObject:obj];
+
+    KVORecorder r(self, obj, @"boolCol");
+    [obj.arrayCol setValue:@YES forKey:@"boolCol"];
+    AssertChanged(r, @NO, @YES);
+}
+
 // RLMArray doesn't support @count at all
 //- (void)testObserveArrayCount {
 //    KVOObject *obj = [self createObject];
