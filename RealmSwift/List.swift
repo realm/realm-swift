@@ -70,7 +70,8 @@ public final class List<T: Object>: ListBase {
 
     /// Creates a `List` that holds objects of type `T`.
     public override init() {
-        super.init(array: RLMArray(objectClassName: T.className()))
+        // FIXME: use T.className()
+        super.init(array: RLMArray(objectClassName: (T.self as Object.Type).className()))
     }
 
     // MARK: Index Retrieval
