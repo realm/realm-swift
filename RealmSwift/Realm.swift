@@ -280,10 +280,12 @@ public final class Realm {
     :returns: The created object.
     */
     public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
-        if update && schema[T.className()]?.primaryKeyProperty == nil {
-          throwRealmException("'\(T.className())' does not have a primary key and can not be updated")
+        // FIXME: use T.className()
+        let className = (T.self as Object.Type).className()
+        if update && schema[className]?.primaryKeyProperty == nil {
+          throwRealmException("'\(className)' does not have a primary key and can not be updated")
         }
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, update), T.self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), T.self)
     }
 
     // MARK: Deleting objects
@@ -350,7 +352,8 @@ public final class Realm {
     :returns: All objects of the given type in Realm.
     */
     public func objects<T: Object>(type: T.Type) -> Results<T> {
-        return Results<T>(RLMGetObjects(rlmRealm, T.className(), nil))
+        // FIXME: use T.className()
+        return Results<T>(RLMGetObjects(rlmRealm, (T.self as Object.Type).className(), nil))
     }
 
     /**
@@ -368,7 +371,8 @@ public final class Realm {
     :returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
     public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, type.className(), key), Optional<T>.self)
+        // FIXME: use T.className()
+        return unsafeBitCast(RLMGetObject(rlmRealm, (T.self as Object.Type).className(), key), Optional<T>.self)
     }
 
 
