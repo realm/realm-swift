@@ -28,9 +28,10 @@ RLM_ASSUME_NONNULL_BEGIN
 @interface RLMObjectBase : NSObject
 
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
-@property (nonatomic, readonly) NSString *className;
 
 - (instancetype)init;
+
++ (NSString *)className;
 
 @end
 
