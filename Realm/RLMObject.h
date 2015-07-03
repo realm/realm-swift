@@ -60,8 +60,27 @@ RLM_ASSUME_NONNULL_BEGIN
  ### Relationships
  
  See our [Cocoa guide](http://realm.io/docs/cocoa/latest) for more details.
- */
 
+ ### Key-Value Observing
+
+ All RLMObject properties (including properties you create in subclasses) are
+ Key-Value Observing compliant, except for `realm` and `objectSchema`. There are
+ several Realm-specific things to keep in mind when observing Realm objects:
+
+ 1. Unlike `NSMutableArray` properties, `RLMArray` properties do not require
+    using the proxy object returned from `-mutableArrayValueForKey:`, or defining
+    KVC mutation methods on the containing class. You can simply call methods on
+    the RLMArray directly and the changes will be observed by the containing
+    object.
+ 2. Standalone RLMObjects cannot be added to a Realm while they have any
+    observed properties.
+ 3. Modifying persisted RLMObjects in `-observeValueForKeyPath:ofObject:change:context:`
+    is problematic. Properties may change when the Realm is not in a write
+    transaction (for example, when `-[RLMRealm refresh]` is called after changes
+    are made on a different thread), and notifications sent prior to the change
+    being applied (when `NSKeyValueObservingOptionPrior` is used) may be sent at
+    times when you *cannot* begin a write transaction.
+ */
 
 @interface RLMObject : RLMObjectBase
 
