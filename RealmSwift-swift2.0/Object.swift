@@ -141,7 +141,8 @@ public class Object: RLMObjectBase {
     :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
     */
     public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
-        return RLMObjectBaseLinkingObjectsOfClass(self, T.className(), propertyName) as! [T]
+        // FIXME: use T.className()
+        return RLMObjectBaseLinkingObjectsOfClass(self, (T.self as Object.Type).className(), propertyName) as! [T]
     }
 
 
