@@ -98,16 +98,16 @@ class SwiftArrayTests: SwiftTestCase {
 
         // Average ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol").doubleValue, Double(1), accuracy: 0.1, "Average should be 1.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol")!.doubleValue, Double(1), accuracy: 0.1, "Average should be 1.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // Test float average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol").doubleValue, Double(1.2), accuracy: 0.1, "Average should be 1.2")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol")!.doubleValue, Double(1.2), accuracy: 0.1, "Average should be 1.2")
 
         // Test double average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol").doubleValue, Double(2.5), accuracy: 0.1, "Average should be 2.5")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol")!.doubleValue, Double(2.5), accuracy: 0.1, "Average should be 2.5")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // MIN ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int min
@@ -325,16 +325,16 @@ class SwiftArrayTests: SwiftTestCase {
 
         // Average ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol").doubleValue, Double(1), accuracy: 0.1, "Average should be 1.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol")!.doubleValue, Double(1), accuracy: 0.1, "Average should be 1.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // Test float average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol").doubleValue, Double(1.2), accuracy: 0.1, "Average should be 1.2")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol")!.doubleValue, Double(1.2), accuracy: 0.1, "Average should be 1.2")
 
         // Test double average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol").doubleValue, Double(2.5), accuracy: 0.1, "Average should be 2.5")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol").doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol")!.doubleValue, Double(2.5), accuracy: 0.1, "Average should be 2.5")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // MIN ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int min
