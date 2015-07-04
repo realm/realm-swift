@@ -573,10 +573,10 @@ public:
 }
 
 - (void)testArrayDiffs {
-    KVOObject *obj = [self createObject];
-    KVORecorder r(self, obj, @"arrayCol");
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVORecorder r(self, obj, @"array");
 
-    id mutator = [obj mutableArrayValueForKey:@"arrayCol"];
+    id mutator = [obj mutableArrayValueForKey:@"array"];
 
 #define AssertIndexChange(kind, indexes) do { \
     if (NSDictionary *note = AssertNotification(r)) { \
@@ -586,22 +586,22 @@ public:
     XCTAssertTrue(r.empty()); \
 } while (0)
 
-    [mutator addObject:obj];
+    [mutator addObject:obj.obj];
     AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
 
-    [mutator addObject:obj];
+    [mutator addObject:obj.obj];
     AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:1]);
 
     [mutator removeObjectAtIndex:0];
     AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:0]);
 
-    [mutator replaceObjectAtIndex:0 withObject:obj];
+    [mutator replaceObjectAtIndex:0 withObject:obj.obj];
     AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndex:0]);
 
     NSMutableIndexSet *indexes = [NSMutableIndexSet new];
     [indexes addIndex:0];
     [indexes addIndex:2];
-    [mutator insertObjects:@[obj, obj] atIndexes:indexes];
+    [mutator insertObjects:@[obj.obj, obj.obj] atIndexes:indexes];
     AssertIndexChange(NSKeyValueChangeInsertion, indexes);
 
     [mutator removeObjectsAtIndexes:indexes];
@@ -610,8 +610,8 @@ public:
     // We deliberately diverge from NSMutableArray for `removeAllObjects` and
     // `addObjectsFromArray:`, because generating a separate notification for
     // each object added or removed is needlessly pessimal.
-    if (![obj.arrayCol isKindOfClass:[NSArray class]]) {
-        [mutator addObjectsFromArray:@[obj, obj]];
+    if (![obj.array isKindOfClass:[NSArray class]]) {
+        [mutator addObjectsFromArray:@[obj.obj, obj.obj]];
         AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(1, 2)]);
 
         [mutator removeLastObject];
