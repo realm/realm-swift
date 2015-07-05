@@ -18,6 +18,8 @@
 
 #import "RLMPRealmPlugin.h"
 
+#import "RLMPSimulatorManager.h"
+
 static RLMPRealmPlugin *sharedPlugin;
 
 @interface RLMPRealmPlugin()
@@ -103,6 +105,9 @@ static RLMPRealmPlugin *sharedPlugin;
     NSArray *arguments = @[@"-xcodeProjectPath", workspacePath];
     NSDictionary *configuration = @{NSWorkspaceLaunchConfigurationArguments : arguments};
     
+    // Find Device UUID
+    NSString *bootedSimulatorUUID = [RLMPSimulatorManager bootedSimulatorUUID];
+    
     NSError *error;
     if (![[NSWorkspace sharedWorkspace] launchApplicationAtURL:self.browserUrl options:0 configuration:configuration error:&error]) {
         // This will happen if the Browser was present at Xcode launch and then was deleted
@@ -113,6 +118,7 @@ static RLMPRealmPlugin *sharedPlugin;
                              informativeTextWithFormat:@"Failed to launch the Realm Browser with error message:\n%@.", error];
         [alert runModal];
     }
+    
 }
 
 - (void)dealloc
