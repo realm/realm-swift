@@ -45,29 +45,36 @@ static RLMPRealmPlugin *sharedPlugin;
     if (self = [super init]) {
         // Save reference to plugin's bundle, for resource acccess
         self.bundle = plugin;
-        
-        // Look for the Realm Browser
-        NSString *urlString = [[NSWorkspace sharedWorkspace] fullPathForApplication:@"Realm Browser"];
-        if (urlString) {
-            self.browserUrl = [NSURL fileURLWithPath:urlString];
-            
-            // Create menu item to open Browser under File:
-            NSMenuItem *menuItem = [[NSApp mainMenu] itemWithTitle:@"File"];
-            if (menuItem) {
-                [[menuItem submenu] addItem:[NSMenuItem separatorItem]];
-                NSMenuItem *actionMenuItem = [[NSMenuItem alloc] initWithTitle:@"Open Realm..."
-                                                                        action:@selector(openBrowser)
-                                                                 keyEquivalent:@""];
-                [actionMenuItem setTarget:self];
-                [[menuItem submenu] addItem:actionMenuItem];
-            }
-        }
-        else {
-            NSLog(@"Realm Plugin: Couldn't find Realm Browser. Will not show 'Open Realm...' menu item.");
-        }
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(didApplicationFinishLaunchingNotification:)
+                                                     name:NSApplicationDidFinishLaunchingNotification
+                                                   object:nil];
     }
     
     return self;
+}
+
+- (void)didApplicationFinishLaunchingNotification:(NSNotification *)notification
+{
+    // Look for the Realm Browser
+    NSString *urlString = [[NSWorkspace sharedWorkspace] fullPathForApplication:@"Realm Browser"];
+    if (urlString) {
+        self.browserUrl = [NSURL fileURLWithPath:urlString];
+        
+        // Create menu item to open Browser under File:
+        NSMenuItem *menuItem = [[NSApp mainMenu] itemWithTitle:@"File"];
+        if (menuItem) {
+            [[menuItem submenu] addItem:[NSMenuItem separatorItem]];
+            NSMenuItem *actionMenuItem = [[NSMenuItem alloc] initWithTitle:@"Open Realm..."
+                                                                    action:@selector(openBrowser)
+                                                             keyEquivalent:@""];
+            [actionMenuItem setTarget:self];
+            [[menuItem submenu] addItem:actionMenuItem];
+        }
+    }
+    else {
+        NSLog(@"Realm Plugin: Couldn't find Realm Browser. Will not show 'Open Realm...' menu item.");
+    }
 }
 
 - (void)openBrowser
