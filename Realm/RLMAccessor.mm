@@ -240,7 +240,8 @@ static inline RLMArray *RLMGetArray(__unsafe_unretained RLMObjectBase *const obj
     return [RLMArrayLinkView arrayWithObjectClassName:objectClassName
                                                  view:linkView
                                                 realm:obj->_realm
-                                                  key:propName];
+                                                  key:propName
+                                         parentSchema:obj->_objectSchema];
 }
 
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,

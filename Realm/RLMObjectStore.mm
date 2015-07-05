@@ -211,7 +211,8 @@ void RLMInitializeSwiftListAccessor(__unsafe_unretained RLMObjectBase *const obj
             RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
                                                                     view:object->_row.get_linklist(prop.column)
                                                                    realm:object->_realm
-                                                                     key:prop.name];
+                                                                     key:prop.name
+                                                            parentSchema:object->_objectSchema];
             [RLMObjectUtilClass(YES) initializeListProperty:object property:prop array:array];
         }
     }

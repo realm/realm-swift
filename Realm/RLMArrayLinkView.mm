@@ -38,17 +38,20 @@
     realm::LinkViewRef _backingLinkView;
     RLMRealm *_realm;
     __unsafe_unretained RLMObjectSchema *_objectSchema;
+    __unsafe_unretained RLMObjectSchema *_containingObjectSchema;
     std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
 
 + (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
                                           view:(realm::LinkViewRef)view
                                          realm:(RLMRealm *)realm
-                                           key:(NSString *)key {
+                                           key:(NSString *)key
+                                  parentSchema:(RLMObjectSchema *)parentSchema {
     RLMArrayLinkView *ar = [[RLMArrayLinkView alloc] initWithObjectClassName:objectClassName];
     ar->_backingLinkView = view;
     ar->_realm = realm;
     ar->_objectSchema = ar->_realm.schema[objectClassName];
+    ar->_containingObjectSchema = parentSchema;
     ar->_key = key;
     return ar;
 }
@@ -56,7 +59,9 @@
 void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NSString *keyPath, RLMArray *array, id observed) {
     if (!info && [keyPath isEqualToString:RLMInvalidatedKey] && array.class == [RLMArrayLinkView class]) {
         RLMArrayLinkView *lv = static_cast<RLMArrayLinkView *>(array);
-        info = std::make_unique<RLMObservationInfo>(lv->_objectSchema, lv->_backingLinkView->get_origin_row_index(), observed);
+        info = std::make_unique<RLMObservationInfo>(lv->_containingObjectSchema,
+                                                    lv->_backingLinkView->get_origin_row_index(),
+                                                    observed);
     }
 }
 
@@ -90,7 +95,9 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
 
 template<typename IndexSetMaker>
 static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, dispatch_block_t f, IndexSetMaker&& is) {
-    RLMObservationInfo *info = RLMGetObservationInfo(ar->_observationInfo, ar->_backingLinkView->get_origin_row_index(), ar->_objectSchema);
+    RLMObservationInfo *info = RLMGetObservationInfo(ar->_observationInfo,
+                                                     ar->_backingLinkView->get_origin_row_index(),
+                                                     ar->_containingObjectSchema);
     if (info) {
         NSIndexSet *indexes = is();
         info->willChange(ar->_key, kind, indexes);
