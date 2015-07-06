@@ -29,6 +29,10 @@ FOUNDATION_EXPORT RLMRealm *RLMGetAnyCachedRealmForPath(NSString *path);
 // Clear the weak cache of Realms
 FOUNDATION_EXPORT void RLMClearRealmCache();
 
+// Install an uncaught exception handler that cancels write transactions
+// for all cached realms on the current thread
+FOUNDATION_EXPORT void RLMInstallUncaughtExceptionHandler();
+
 @interface RLMNotifier : NSObject
 // listens to changes to the realm's file and notifies it when they occur
 // does not retain the Realm
