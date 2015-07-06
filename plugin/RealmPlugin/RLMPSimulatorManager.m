@@ -20,7 +20,7 @@
 
 #import "NSTask+LaunchAdditions.h"
 
-NSString *const RLMPBootedSimulatorKey = @"Booted";
+static NSString * const RLMPBootedSimulatorKey = @"Booted";
 
 @interface RLMPSimulatorManager ()
 
@@ -40,6 +40,7 @@ NSString *const RLMPBootedSimulatorKey = @"Booted";
         [deviceStatuses enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *value, BOOL *stop) {
             if ([value isEqualToString:RLMPBootedSimulatorKey]) {
                 bootedDeviceUUID = key;
+                // Stop when we found single booted device
                 *stop = YES;
             }
         }];
@@ -55,7 +56,10 @@ NSString *const RLMPBootedSimulatorKey = @"Booted";
     
     NSString *output;
     
-    [NSTask launchedTaskSynchonouslyWithPath:path arguments:args inCurrentDirectoryPath:nil standardOutput:&output];
+    [NSTask launchedTaskSynchonouslyWithPath:path
+                                   arguments:args
+                      inCurrentDirectoryPath:nil
+                              standardOutput:&output];
     
     return output;
 }

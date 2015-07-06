@@ -19,8 +19,12 @@
 #import "RLMPRealmPlugin.h"
 
 #import "RLMPSimulatorManager.h"
+#import "NSFileManager+GlobAdditions.h"
 
 static RLMPRealmPlugin *sharedPlugin;
+
+static NSString *const RootDeviceSimulatorPath = @"Library/Developer/CoreSimulator/Devices";
+static NSString *const DeviceSimulatorApplicationPath = @"data/Containers/Data/Application";
 
 @interface RLMPRealmPlugin()
 
@@ -93,23 +97,32 @@ static RLMPRealmPlugin *sharedPlugin;
         return;
     }
     
-    NSArray *workspaceWindowControllers = [NSClassFromString(@"IDEWorkspaceWindowController") valueForKey:@"workspaceWindowControllers"];
-    NSWorkspace *workSpace;
-    for (NSWindowController *controller in workspaceWindowControllers) {
-        if ([[controller valueForKey:@"window"] isEqual:[NSApp keyWindow]]) {
-            workSpace = [controller valueForKey:@"_workspace"];
-            break;
-        }
-    }
-    NSString *workspacePath = [[workSpace valueForKey:@"representingFilePath"] valueForKey:@"_pathString"];
-    NSArray *arguments = @[@"-xcodeProjectPath", workspacePath];
-    NSDictionary *configuration = @{NSWorkspaceLaunchConfigurationArguments : arguments};
-    
     // Find Device UUID
     NSString *bootedSimulatorUUID = [RLMPSimulatorManager bootedSimulatorUUID];
     
+    // Find Realm File URL
+    NSArray *realmFileURLs = [self realmFilesURLWithDeviceUUID:bootedSimulatorUUID];
+    
+    if (realmFileURLs.count == 0) {
+        NSAlert *alert = [NSAlert alertWithMessageText:@"Unable to find Realm file"
+                                         defaultButton:nil
+                                       alternateButton:nil
+                                           otherButton:nil
+                             informativeTextWithFormat:@"You need to launch iOS Simulator that has app that use Realm"];
+        [alert runModal];
+        
+        return;
+    }
+    
+    NSMutableArray *arguments = [NSMutableArray array];
+    for (NSURL *realmFileURL in realmFileURLs) {
+        [arguments addObject:realmFileURL.path];
+    }
+    
+    NSDictionary *configuration = @{ NSWorkspaceLaunchConfigurationArguments : arguments };
+    
     NSError *error;
-    if (![[NSWorkspace sharedWorkspace] launchApplicationAtURL:self.browserUrl options:0 configuration:configuration error:&error]) {
+    if (![[NSWorkspace sharedWorkspace] launchApplicationAtURL:self.browserUrl options:NSWorkspaceLaunchNewInstance configuration:configuration error:&error]) {
         // This will happen if the Browser was present at Xcode launch and then was deleted
         NSAlert *alert = [NSAlert alertWithMessageText:@"Could not launch the Realm Browser"
                                          defaultButton:nil
@@ -119,6 +132,27 @@ static RLMPRealmPlugin *sharedPlugin;
         [alert runModal];
     }
     
+}
+
+- (NSArray *)realmFilesURLWithDeviceUUID:(NSString *)deviceUUID
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSURL *homeURL = [NSURL URLWithString:NSHomeDirectory()];
+    
+    NSMutableString *fullPath = [NSMutableString string];
+    [fullPath appendFormat:@"%@/%@/%@", RootDeviceSimulatorPath, deviceUUID, DeviceSimulatorApplicationPath];
+    NSURL *bootedDeviceURL = [homeURL URLByAppendingPathComponent:fullPath];
+    
+    NSArray *fileURLs = [fileManager globFilesAtDirectoryURL:bootedDeviceURL
+                                               fileExtension:@"realm"
+                                                errorHandler:^BOOL(NSURL *URL, NSError *error) {
+                                                    if (error) {
+                                                        NSLog(@"%@", error);
+                                                        return NO;
+                                                    }
+                                                    return YES;
+                                                }];
+    return fileURLs;
 }
 
 - (void)dealloc
