@@ -1190,6 +1190,7 @@ extern "C" {
     NSString *path = realm.path;
 
     XCTAssertThrows([RLMRealm setSchemaVersion:1 forRealmAtPath:path withMigrationBlock:nil]);
+    XCTAssertNoThrow([RLMRealm setSchemaVersion:[RLMRealm schemaVersionAtPath:path error:nil] forRealmAtPath:path withMigrationBlock:nil]);
 }
 
 - (void)testCannotMigrateRealmWhenRealmIsOpen {
@@ -1198,14 +1199,6 @@ extern "C" {
 
     XCTAssertThrows([RLMRealm migrateRealmAtPath:path]);
     XCTAssertThrows([RLMRealm migrateRealmAtPath:path encryptionKey:[[NSMutableData alloc] initWithLength:64]]);
-}
-
-- (void)testCannotSetEncryptionKeyWhenRealmIsOpen {
-    RLMRealm *realm = [self realmWithTestPath];
-    NSString *path = realm.path;
-
-    XCTAssertThrows([RLMRealm setEncryptionKey:nil forRealmsAtPath:path]);
-    XCTAssertThrows([RLMRealm setEncryptionKey:[[NSMutableData alloc] initWithLength:64] forRealmsAtPath:path]);
 }
 
 - (void)testNotificationPipeBufferOverfull {

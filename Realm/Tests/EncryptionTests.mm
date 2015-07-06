@@ -159,6 +159,25 @@
     }
 }
 
+- (void)testCannotSetEncryptionKeyToNilWhenRealmIsOpen {
+    NSData *key = RLMGenerateKey();
+    RLMRealm *realm = [self realmWithTestPath];
+    NSString *path = realm.path;
+
+    XCTAssertNoThrow([RLMRealm setEncryptionKey:nil forRealmsAtPath:path]);
+    XCTAssertThrows([RLMRealm setEncryptionKey:key forRealmsAtPath:path]);
+}
+
+- (void)testCannotSetEncryptionKeyFromNilWhenRealmIsOpen {
+    NSData *key = RLMGenerateKey();
+    NSString *path = RLMTestRealmPath();
+    [RLMRealm setEncryptionKey:key forRealmsAtPath:path];
+    [self realmWithTestPath];
+
+    XCTAssertThrows([RLMRealm setEncryptionKey:nil forRealmsAtPath:path]);
+    XCTAssertNoThrow([RLMRealm setEncryptionKey:key forRealmsAtPath:path]);
+}
+
 #pragma mark - writeCopyToPath:
 
 - (void)testWriteCopyToPathWithNoRegisteredKeyWritesDecrypted {
