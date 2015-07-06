@@ -386,23 +386,3 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 @end
-
-//
-// RLMCArrayHolder implementation
-//
-@implementation RLMCArrayHolder
-- (instancetype)initWithSize:(NSUInteger)arraySize {
-    if ((self = [super init])) {
-        size = arraySize;
-        array = std::make_unique<id[]>(size);
-    }
-    return self;
-}
-
-- (void)resize:(NSUInteger)newSize {
-    if (newSize != size) {
-        size = newSize;
-        array = std::make_unique<id[]>(size);
-    }
-}
-@end

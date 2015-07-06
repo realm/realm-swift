@@ -113,18 +113,14 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NS
 + (RLMResults *)tableResultsWithObjectSchema:(RLMObjectSchema *)objectSchema realm:(RLMRealm *)realm;
 @end
 
-//
-// A simple holder for a C array of ids to enable autoreleasing the array without
-// the runtime overhead of a NSMutableArray
-//
-@interface RLMCArrayHolder : NSObject {
-@public
-    std::unique_ptr<id[]> array;
-    NSUInteger size;
-}
+// An object which encapulates the shared logic for fast-enumerating RLMArray
+// and RLMResults, and has a buffer to store strong references to the current
+// set of enumerated items
+@interface RLMFastEnumerator : NSObject
+- (instancetype)initWithTableView:(realm::TableView)tableView
+                            realm:(RLMRealm *)realm
+                     objectSchema:(RLMObjectSchema *)objectSchema;
 
-- (instancetype)initWithSize:(NSUInteger)size;
-
-// Reallocate the array if it is not already the given size
-- (void)resize:(NSUInteger)size;
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                    count:(NSUInteger)len;
 @end

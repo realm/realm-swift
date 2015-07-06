@@ -33,6 +33,62 @@
 
 using namespace realm;
 
+static const int RLMEnumerationBufferSize = 16;
+
+@implementation RLMFastEnumerator {
+    id _strongBuffer[RLMEnumerationBufferSize];
+    realm::TableView _tableView;
+    RLMRealm *_realm;
+    RLMObjectSchema *_objectSchema;
+
+}
+
+- (instancetype)initWithTableView:(realm::TableView)tableView realm:(RLMRealm *)realm objectSchema:(RLMObjectSchema *)objectSchema {
+    self = [super init];
+    if (self) {
+        _tableView = std::move(tableView);
+        _realm = realm;
+        _objectSchema = objectSchema;
+    }
+    return self;
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                    count:(NSUInteger)len {
+    RLMCheckThread(_realm);
+    if (!_tableView.is_attached()) {
+        @throw RLMException(@"RLMResults is no longer valid");
+    }
+    // The fast enumeration buffer size is currently a hardcoded number in the
+    // compiler so this can't actually happen, but just in case it changes in
+    // the future...
+    if (len > RLMEnumerationBufferSize) {
+        len = RLMEnumerationBufferSize;
+    }
+
+    NSUInteger batchCount = 0, index = state->state, count = state->extra[1];
+
+    Class accessorClass = _objectSchema.accessorClass;
+    while (index < count && batchCount < len) {
+        // get acessor fot the object class
+        RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:_objectSchema];
+        accessor->_row = (*_objectSchema.table)[_tableView.get_source_ndx(index++)];
+        _strongBuffer[batchCount] = accessor;
+        batchCount++;
+    }
+
+    for (NSUInteger i = batchCount; i < len; ++i) {
+        _strongBuffer[i] = nil;
+    }
+
+    state->itemsPtr = (__unsafe_unretained id *)(void *)_strongBuffer;
+    state->state = index;
+    state->mutationsPtr = state->extra+1;
+
+    return batchCount;
+}
+@end
+
 //
 // RLMResults implementation
 //
@@ -136,47 +192,23 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
-                                  objects:(__unsafe_unretained id [])buffer
+                                  objects:(__unused __unsafe_unretained id [])buffer
                                     count:(NSUInteger)len {
-    RLMResultsValidate(self);
-
-    __autoreleasing RLMCArrayHolder *items;
+    __autoreleasing RLMFastEnumerator *enumerator;
     if (state->state == 0) {
-        items = [[RLMCArrayHolder alloc] initWithSize:len];
-        state->extra[0] = (long)items;
+        RLMResultsValidate(self);
+
+        enumerator = [[RLMFastEnumerator alloc] initWithTableView:_viewCreated ? _backingView : self.cloneQuery->find_all()
+                                                            realm:_realm
+                                                     objectSchema:_objectSchema];
+        state->extra[0] = (long)enumerator;
         state->extra[1] = self.count;
     }
     else {
-        // FIXME: mutationsPtr should be pointing to a value updated by core
-        // whenever the results are changed rather than doing this check
-        if (state->extra[1] != self.count) {
-            @throw RLMException(@"Collection was mutated while being enumerated.");
-        }
-        items = (__bridge id)(void *)state->extra[0];
-        [items resize:len];
+        enumerator = (__bridge id)(void *)state->extra[0];
     }
 
-    NSUInteger batchCount = 0, index = state->state, count = state->extra[1];
-
-    Class accessorClass = _objectSchema.accessorClass;
-    while (index < count && batchCount < len) {
-        // get acessor fot the object class
-        RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:_objectSchema];
-        accessor->_row = (*_objectSchema.table)[[self indexInSource:index++]];
-        items->array[batchCount] = accessor;
-        buffer[batchCount] = accessor;
-        batchCount++;
-    }
-
-    for (NSUInteger i = batchCount; i < len; ++i) {
-        items->array[i] = nil;
-    }
-
-    state->itemsPtr = buffer;
-    state->state = index;
-    state->mutationsPtr = state->extra+1;
-
-    return batchCount;
+    return [enumerator countByEnumeratingWithState:state count:len];
 }
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ... {
