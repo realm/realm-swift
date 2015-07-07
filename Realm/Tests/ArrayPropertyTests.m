@@ -527,24 +527,30 @@
         }
     }
     XCTAssertNil(objects[0], @"Object should have been released");
+}
 
-    void (^mutateDuringEnumeration)() = ^{
-        bool first = true;
-        for (__unused EmployeeObject *e in company.employees) {
-            // Only insert the first time so we don't infinite loop if the check
-            // doesn't work
-            if (first) {
-                [realm beginWriteTransaction];
-                EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
-                [company.employees addObject:eo];
-                [realm commitWriteTransaction];
-                first = false;
-            }
-        }
-    };
+- (void)testModifyDuringEnumeration {
+    RLMRealm *realm = self.realmWithTestPath;
 
-    XCTAssertThrows(mutateDuringEnumeration(),
-                    @"Adding an object during fast enumeration did not throw");
+    [realm beginWriteTransaction];
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+    [realm addObject:company];
+
+    const size_t totalCount = 40;
+    for (size_t i = 0; i < totalCount; ++i) {
+        [company.employees addObject:[EmployeeObject createInRealm:realm withValue:@[@"name", @(i), @NO]]];
+    }
+
+    size_t count = 0;
+    for (EmployeeObject *eo in company.employees) {
+        ++count;
+        [company.employees addObject:eo];
+    }
+    XCTAssertEqual(totalCount, count);
+    XCTAssertEqual(totalCount * 2, company.employees.count);
+
+    [realm cancelWriteTransaction];
 }
 
 - (void)testValueForKey {
