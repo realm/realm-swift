@@ -37,7 +37,7 @@
         NSString *isDirectory;
         [fileURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
         
-        //check it is not a directory
+        // Check whether it is a directory or not
         if (![isDirectory boolValue]) {
             [fileURLs addObject:fileURL];
         }

@@ -20,6 +20,15 @@
 
 @interface NSFileManager (GlobAdditions)
 
+/**
+ Glob all files in specified directoryURL with extension as a predicate
+ 
+ @param directoryURL DirectoryURL
+ @param extension    File extension that wants to be matched
+ @param handler      Error handler
+ 
+ @return NSArray of all matched files
+ */
 - (NSArray *)globFilesAtDirectoryURL:(NSURL *)directoryURL fileExtension:(NSString *)extension errorHandler:(BOOL (^)(NSURL *URL, NSError *error))handler;
 
 @end

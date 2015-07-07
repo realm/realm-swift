@@ -20,6 +20,16 @@
 
 @interface NSTask (LaunchAdditions)
 
+/**
+ Create task and launch synchronously with string from standard output
+ 
+ @param path          Path of task to be executed
+ @param args          Arguments to bundle with task command
+ @param directoryPath Current directory path to execute task (optional)
+ @param output        Output as NSString from Standard output pipe
+ 
+ @return Launched Task
+ */
 + (NSTask *)launchedTaskSynchonouslyWithPath:(NSString *)path arguments:(NSArray *)args inCurrentDirectoryPath:(NSString*)directoryPath standardOutput:(NSString* __autoreleasing *)output;
 
 @end
