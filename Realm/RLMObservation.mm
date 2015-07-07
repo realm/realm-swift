@@ -177,16 +177,6 @@ void RLMObservationInfo::recordObserver(realm::Row& objectRow,
     }
 }
 
-template<typename Container, typename Pred>
-static void erase_first(Container&& c, Pred&& p) {
-    auto it = find_if(c.begin(), c.end(), p);
-    assert(it != c.end());
-    if (it != c.end()) {
-        iter_swap(it, prev(c.end()));
-        c.pop_back();
-    }
-}
-
 void RLMObservationInfo::removeObserver() {
     --observerCount;
 }
