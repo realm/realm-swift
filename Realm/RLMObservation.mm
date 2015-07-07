@@ -640,18 +640,24 @@ public:
         return true;
     }
 
-    bool link_list_nullify(size_t index, size_t) {
+    bool link_list_nullify(size_t index) {
         append_link_list_change(NSKeyValueChangeRemoval, index);
         return true;
     }
 
-    bool link_list_clear(std::vector<std::size_t> const& values) {
+    bool link_list_swap(size_t index1, size_t index2) {
+        append_link_list_change(NSKeyValueChangeReplacement, index1);
+        append_link_list_change(NSKeyValueChangeReplacement, index2);
+        return true;
+    }
+
+    bool link_list_clear(size_t old_size) {
         ObserverState::change *o = activeLinkList;
         if (!o || o->multipleLinkviewChanges) {
             return true;
         }
 
-        NSRange range{0, values.size()};
+        NSRange range{0, old_size};
         if (!o->linkviewChangeIndexes) {
             o->linkviewChangeIndexes = [NSMutableIndexSet indexSet];
         }
@@ -686,7 +692,7 @@ public:
     bool set_mixed(size_t col, size_t row, const Mixed&) { return markDirty(row, col); }
     bool set_link(size_t col, size_t row, size_t) { return markDirty(row, col); }
     bool set_null(size_t col, size_t row) { return markDirty(row, col); }
-    bool nullify_link(size_t col, size_t row, size_t) { return markDirty(row, col); }
+    bool nullify_link(size_t col, size_t row) { return markDirty(row, col); }
 
     // Things we don't need to do anything for
     bool optimize_table() { return false; }
