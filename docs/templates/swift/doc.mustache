@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{name}} {{kind}} Reference</title>
+    <link rel="stylesheet" type="text/css" href="{{path_to_root}}css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="{{path_to_root}}css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="{{path_to_root}}js/jquery.min.js" defer></script>
+    <script src="{{path_to_root}}js/jazzy.js" defer></script>
+  </head>
+  <body>
+    {{#dash_type}}
+    <a name="//apple_ref/swift/{{dash_type}}/{{name}}" class="dashAnchor"></a>
+    {{/dash_type}}
+    <a title="{{name}} {{kind}} Reference"></a>
+    {{> header}}
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="{{path_to_root}}index.html">{{module_name}} Reference</a>
+        <img id="carat" src="{{path_to_root}}img/carat.png" />
+        {{name}} {{kind}} Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      {{> nav}}
+      <article class="main-content">
+        <section>
+          <section class="section">
+            {{^hide_name}}<h1>{{name}}</h1>{{/hide_name}}
+            {{{overview}}}
+          </section>
+          {{> tasks}}
+        </section>
+        {{> footer}}
+      </article>
+    </div>
+  </body>
+</div>
+</html>

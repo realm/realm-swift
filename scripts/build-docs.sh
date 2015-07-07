@@ -48,3 +48,4 @@ ${jazzy} \
   --output "${SRCROOT}/docs/swift_output" \
   --root-url https://realm.io/docs/swift/${realm_version}/api/ \
   --xcodebuild-arguments "-project,${SRCROOT}/RealmSwift.xcodeproj,-dry-run" \
+  --template-directory "${SRCROOT}/docs/templates/swift" \
