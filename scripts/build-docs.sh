@@ -29,7 +29,7 @@ appledoc \
     --ignore "Realm/RLMRealm_Dynamic.h" \
     --ignore "Realm/Realm-Bridging-Header.h" \
     --ignore "Realm/Tests" \
-    --template "${SRCROOT}/docs/templates" \
+    --template "${SRCROOT}/docs/templates/objc" \
     --exit-threshold 1 \
     Realm
 
