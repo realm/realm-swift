@@ -26,6 +26,8 @@ static RLMPRealmPlugin *sharedPlugin;
 static NSString *const RootDeviceSimulatorPath = @"Library/Developer/CoreSimulator/Devices";
 static NSString *const DeviceSimulatorApplicationPath = @"data/Containers/Data/Application";
 
+static NSString *const RLMPErrorDomain = @"io.Realm.error";
+
 @interface RLMPRealmPlugin()
 
 @property (nonatomic, strong) NSBundle *bundle;
@@ -87,13 +89,14 @@ static NSString *const DeviceSimulatorApplicationPath = @"data/Containers/Data/A
 {
     // This shouldn't be possible to call without having the Browser installed
     if (!self.browserUrl) {
-        NSAlert *alert = [NSAlert alertWithMessageText:@"Please install the Realm Browser"
-                                         defaultButton:nil
-                                       alternateButton:nil
-                                           otherButton:nil
-                             informativeTextWithFormat:@"You need to install the Realm Browser in order to use it from this plugin. Please visit realm.io for more information."];
-        [alert runModal];
-
+        NSString *title = @"Please install the Realm Browser";
+        NSString *message = @"You need to install the Realm Browser in order to use it from this plugin. Please visit realm.io for more information.";
+        
+        NSError *error = [NSError errorWithDomain:RLMPErrorDomain
+                                             code:-1
+                                         userInfo:@{ NSLocalizedDescriptionKey : title,
+                                                     NSLocalizedRecoverySuggestionErrorKey : message }];
+        [self showError:error];
         return;
     }
     
@@ -104,13 +107,14 @@ static NSString *const DeviceSimulatorApplicationPath = @"data/Containers/Data/A
     NSArray *realmFileURLs = [self realmFilesURLWithDeviceUUID:bootedSimulatorUUID];
     
     if (realmFileURLs.count == 0) {
-        NSAlert *alert = [NSAlert alertWithMessageText:@"Unable to find Realm file"
-                                         defaultButton:nil
-                                       alternateButton:nil
-                                           otherButton:nil
-                             informativeTextWithFormat:@"You need to launch iOS Simulator that has app that use Realm"];
-        [alert runModal];
+        NSString *title = @"Unable to find Realm file";
+        NSString *message = @"Launch iOS Simulator must have app that uses Realm";
         
+        NSError *error = [NSError errorWithDomain:RLMPErrorDomain
+                                             code:-1
+                                         userInfo:@{ NSLocalizedDescriptionKey : title,
+                                                     NSLocalizedRecoverySuggestionErrorKey : message }];
+        [self showError:error];
         return;
     }
     
@@ -124,12 +128,7 @@ static NSString *const DeviceSimulatorApplicationPath = @"data/Containers/Data/A
     NSError *error;
     if (![[NSWorkspace sharedWorkspace] launchApplicationAtURL:self.browserUrl options:NSWorkspaceLaunchNewInstance configuration:configuration error:&error]) {
         // This will happen if the Browser was present at Xcode launch and then was deleted
-        NSAlert *alert = [NSAlert alertWithMessageText:@"Could not launch the Realm Browser"
-                                         defaultButton:nil
-                                       alternateButton:nil
-                                           otherButton:nil
-                             informativeTextWithFormat:@"Failed to launch the Realm Browser with error message:\n%@.", error];
-        [alert runModal];
+        [self showError:error];
     }
     
 }
@@ -153,6 +152,12 @@ static NSString *const DeviceSimulatorApplicationPath = @"data/Containers/Data/A
                                                     return YES;
                                                 }];
     return fileURLs;
+}
+
+- (void)showError:(NSError *)error
+{
+    NSAlert *alert = [NSAlert alertWithError:error];
+    [alert runModal];
 }
 
 - (void)dealloc
