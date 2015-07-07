@@ -204,6 +204,14 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     _backingLinkView->set(index, object->_row.get_index());
 }
 
+- (void)exchangeObjectAtIndex:(NSUInteger)index1 withObjectAtIndex:(NSUInteger)index2 {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+    RLMValidateArrayBounds(self, index1);
+    RLMValidateArrayBounds(self, index2);
+
+    _backingLinkView->swap(index1, index2);
+}
+
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     // check attached for table and object
     RLMLinkViewArrayValidateAttached(self);

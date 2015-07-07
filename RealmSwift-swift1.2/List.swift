@@ -302,6 +302,21 @@ public final class List<T: Object>: ListBase {
         throwForNegativeIndex(index)
         _rlmArray.replaceObjectAtIndex(UInt(index), withObject: unsafeBitCast(object, RLMObject.self))
     }
+
+    /**
+    Exchanges the objects in the lsi at given indexes.
+
+    :warning: Throws an exception when either index is greater than the number of objects in the list.
+    :warning: This method can only be called during a write transaction.
+
+    :param: index1 The index of the object with which to replace the object at index index2.
+    :param: index2 The index of the object with which to replace the object at index index1.
+    */
+    public func swap(index1: Int, _ index2: Int) {
+        throwForNegativeIndex(index1, parameterName: "index1")
+        throwForNegativeIndex(index2, parameterName: "index2")
+        _rlmArray.exchangeObjectAtIndex(UInt(index1), withObjectAtIndex: UInt(index2))
+    }
 }
 
 extension List: ExtensibleCollectionType {
