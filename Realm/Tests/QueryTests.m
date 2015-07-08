@@ -1811,4 +1811,130 @@
 }
 #endif
 
+- (void)testLimitingResults
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [QueryObject createInRealm:realm withValue:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @NO, @5, @6, @99.0f, @2.3f, @9.1, @33.3, @"Hello", @"World"]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"", @""]];
+    [QueryObject createInRealm:realm withValue:@[@NO, @YES, @1, @2, @1.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
+    [realm commitWriteTransaction];
+
+    RLMResults *sortedResults = [[QueryObject objectsWhere:@"bool1 = YES"] sortedResultsUsingProperty:@"float1" ascending:YES];
+
+    RLMResults *limitedResults = [sortedResults limit:2];
+    XCTAssertEqual(limitedResults.count, 2U);
+
+    // Verify that limiting preserved the sort order.
+    XCTAssertEqual([limitedResults[0] float1], -5.3f);
+    XCTAssertEqual([limitedResults[1] float1], 23.f);
+
+    RLMResults *filteredResults = [limitedResults objectsWhere:@"bool2 = YES"];
+    XCTAssertEqual(filteredResults.count, 1U);
+
+    // Verify that sorting operates within the limited result set.
+    RLMResults *sortedLimitedResults = [limitedResults sortedResultsUsingProperty:@"float1" ascending:NO];
+    XCTAssertEqual([sortedLimitedResults[0] float1], 23.f);
+    XCTAssertEqual([sortedLimitedResults[1] float1], -5.3f);
+
+    RLMResults *limitedLimitedResults = [limitedResults limit:1];
+    XCTAssertEqual(limitedLimitedResults.count, 1U);
+
+    // Verify that further limiting preserved the sort order.
+    XCTAssertEqual([limitedLimitedResults[0] float1], -5.3f);
+
+    filteredResults = [limitedLimitedResults objectsWhere:@"bool2 = YES"];
+    XCTAssertEqual(filteredResults.count, 0U);
+}
+
+- (void)testLimitingTableResults
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [QueryObject createInRealm:realm withValue:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
+    [QueryObject createInRealm:realm withValue:@[@NO, @YES, @1, @2, @1.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @NO, @5, @6, @99.0f, @2.3f, @9.1, @33.3, @"Hello", @"World"]];
+    [QueryObject createInRealm:realm withValue:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"", @""]];
+    [realm commitWriteTransaction];
+
+    RLMResults *limitedResults = [[QueryObject allObjects] limit:2];
+    XCTAssertEqual(limitedResults.count, 2U);
+
+    // Verify that limiting preserved table order.
+    XCTAssertEqual([limitedResults[0] float1], 23.f);
+    XCTAssertEqual([limitedResults[1] float1], 1.0f);
+
+    RLMResults *filteredResults = [limitedResults objectsWhere:@"bool2 = YES"];
+    XCTAssertEqual(filteredResults.count, 2U);
+
+    // Verify that sorting operates within the limited result set.
+    RLMResults *sortedLimitedResults = [limitedResults sortedResultsUsingProperty:@"float1" ascending:YES];
+    XCTAssertEqual([sortedLimitedResults[0] float1], 1.f);
+    XCTAssertEqual([sortedLimitedResults[1] float1], 23.f);
+
+    RLMResults *limitedLimitedResults = [limitedResults limit:1];
+    XCTAssertEqual(limitedLimitedResults.count, 1U);
+
+    // Verify that further limiting preserved table order.
+    XCTAssertEqual([limitedLimitedResults[0] float1], 23.f);
+
+    filteredResults = [limitedLimitedResults objectsWhere:@"bool1 = NO"];
+    XCTAssertEqual(filteredResults.count, 0U);
+}
+
+- (void)testLiveQueriesWithLimitedResults
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    {
+        [QueryObject createInRealm:realm withValue:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
+        [QueryObject createInRealm:realm withValue:@[@YES, @NO, @5, @6, @99.0f, @2.3f, @9.1, @33.3, @"Hello", @"World"]];
+
+        RLMResults *resultsQuery = [[QueryObject objectsWhere:@"bool1 = YES"] limit:2];
+        RLMResults *resultsTableView = [[QueryObject objectsWhere:@"bool1 = YES"] limit:2];
+
+        // Force resultsTableView to form the TableView to verify that it syncs
+        // correctly, and don't call anything but count on resultsQuery so that
+        // it always reruns the query count method
+        (void)[resultsTableView firstObject];
+
+        XCTAssertEqual(resultsQuery.count, 2U);
+        XCTAssertEqual(resultsTableView.count, 2U);
+
+        // Delete the first object in result set
+        [realm deleteObject:resultsTableView.firstObject];
+        XCTAssertEqual(resultsQuery.count, 1U);
+        XCTAssertEqual(resultsTableView.count, 1U);
+
+        // Add an object that does not match query
+        QueryObject *q1 = [QueryObject createInRealm:realm withValue:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
+        XCTAssertEqual(resultsQuery.count, 1U);
+        XCTAssertEqual(resultsTableView.count, 1U);
+
+        // Change object to match query
+        q1.bool1 = YES;
+        XCTAssertEqual(resultsQuery.count, 2U);
+        XCTAssertEqual(resultsTableView.count, 2U);
+
+        // Add another object that matches. The limit should present it from being in the result set.
+        [QueryObject createInRealm:realm withValue:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"", @""]];
+        XCTAssertEqual(resultsQuery.count, 2U);
+        XCTAssertEqual(resultsTableView.count, 2U);
+
+        // Ensure that the new object isn't reachable via queries of the result set.
+        RLMResults *derivedResultsQuery = [resultsTableView objectsWhere:@"float1 < 0"];
+        XCTAssertEqual(derivedResultsQuery.count, 0U);
+
+        // Ensure that sorting doesn't cause the new object to become visible in the results.
+        RLMResults *sortedResultsQuery = [resultsTableView sortedResultsUsingProperty:@"float1" ascending:YES];
+        XCTAssertEqual(sortedResultsQuery.count, 2U);
+        XCTAssertEqual([sortedResultsQuery.firstObject float1], 23.0f);
+    }
+    [realm commitWriteTransaction];
+}
+
 @end
