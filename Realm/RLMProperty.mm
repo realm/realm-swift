@@ -180,7 +180,7 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
 
                 _type = RLMPropertyTypeObject;
                 _optional = true;
-                _objectClassName = className;
+                _objectClassName = [cls className] ?: className;
             }
             return YES;
         }
