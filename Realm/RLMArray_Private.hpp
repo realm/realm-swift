@@ -46,6 +46,13 @@ struct RLMSortOrder {
     }
 };
 
+@protocol RLMFastEnumerable
+@property (nonatomic, readonly) RLMRealm *realm;
+
+- (NSUInteger)indexInSource:(NSUInteger)index;
+- (realm::TableView)tableView;
+@end
+
 @interface RLMArray () {
   @protected
     NSString *_objectClassName;
@@ -60,7 +67,7 @@ struct RLMSortOrder {
 //
 // LinkView backed RLMArray subclass
 //
-@interface RLMArrayLinkView : RLMArray
+@interface RLMArrayLinkView : RLMArray <RLMFastEnumerable>
 + (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
                                           view:(realm::LinkViewRef)view
                                          realm:(RLMRealm *)realm
@@ -80,7 +87,7 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NS
 //
 // RLMResults private methods
 //
-@interface RLMResults ()
+@interface RLMResults () <RLMFastEnumerable>
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<realm::Query>)query
                                      realm:(RLMRealm *)realm;
@@ -117,9 +124,11 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NS
 // and RLMResults, and has a buffer to store strong references to the current
 // set of enumerated items
 @interface RLMFastEnumerator : NSObject
-- (instancetype)initWithTableView:(realm::TableView)tableView
-                            realm:(RLMRealm *)realm
-                     objectSchema:(RLMObjectSchema *)objectSchema;
+- (instancetype)initWithCollection:(id<RLMFastEnumerable>)collection objectSchema:(RLMObjectSchema *)objectSchema;
+
+// Detach this enumerator from the source collection. Must be called before the
+// source collection is changed.
+- (void)detach;
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                     count:(NSUInteger)len;

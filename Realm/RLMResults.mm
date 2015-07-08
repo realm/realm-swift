@@ -36,27 +36,55 @@ using namespace realm;
 static const int RLMEnumerationBufferSize = 16;
 
 @implementation RLMFastEnumerator {
+    // The buffer supplied by fast enumeration does not retain the objects given
+    // to it, but because we create objects on-demand and don't want them
+    // autoreleased (a table can have more rows than the device has memory for
+    // accessor objects) we need a thing to retain them.
     id _strongBuffer[RLMEnumerationBufferSize];
-    realm::TableView _tableView;
+
     RLMRealm *_realm;
     RLMObjectSchema *_objectSchema;
 
+    // Collection being enumerated. Only one of these two will be valid: when
+    // possible we enumerate the collection directly, but when in a write
+    // transaction we instead create a frozen TableView and enumerate that
+    // instead so that mutating the collection during enumeration works.
+    id<RLMFastEnumerable> _collection;
+    realm::TableView _tableView;
 }
 
-- (instancetype)initWithTableView:(realm::TableView)tableView realm:(RLMRealm *)realm objectSchema:(RLMObjectSchema *)objectSchema {
+- (instancetype)initWithCollection:(id<RLMFastEnumerable>)collection objectSchema:(RLMObjectSchema *)objectSchema {
     self = [super init];
     if (self) {
-        _tableView = std::move(tableView);
-        _realm = realm;
+        _realm = collection.realm;
         _objectSchema = objectSchema;
+
+        if (_realm.inWriteTransaction) {
+            _tableView = [collection tableView];
+        }
+        else {
+            _collection = collection;
+            [_realm registerEnumerator:self];
+        }
     }
     return self;
+}
+
+- (void)dealloc {
+    if (_collection) {
+        [_realm unregisterEnumerator:self];
+    }
+}
+
+- (void)detach {
+    _tableView = [_collection tableView];
+    _collection = nil;
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                     count:(NSUInteger)len {
     RLMCheckThread(_realm);
-    if (!_tableView.is_attached()) {
+    if (!_tableView.is_attached() && !_collection) {
         @throw RLMException(@"RLMResults is no longer valid");
     }
     // The fast enumeration buffer size is currently a hardcoded number in the
@@ -66,13 +94,14 @@ static const int RLMEnumerationBufferSize = 16;
         len = RLMEnumerationBufferSize;
     }
 
-    NSUInteger batchCount = 0, index = state->state, count = state->extra[1];
+    NSUInteger batchCount = 0, count = state->extra[1];
 
     Class accessorClass = _objectSchema.accessorClass;
-    while (index < count && batchCount < len) {
-        // get acessor fot the object class
+    for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
+        size_t row = _collection ? [_collection indexInSource:index] : _tableView.get_source_ndx(index);
+
         RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:_objectSchema];
-        accessor->_row = (*_objectSchema.table)[_tableView.get_source_ndx(index++)];
+        accessor->_row = (*_objectSchema.table)[row];
         _strongBuffer[batchCount] = accessor;
         batchCount++;
     }
@@ -81,8 +110,20 @@ static const int RLMEnumerationBufferSize = 16;
         _strongBuffer[i] = nil;
     }
 
+    if (batchCount == 0) {
+        // Release our data if we're done, as we're autoreleased and so may
+        // stick around for a while
+        _collection = nil;
+        if (_tableView.is_attached()) {
+            _tableView = TableView();
+        }
+        else {
+            [_realm unregisterEnumerator:self];
+        }
+    }
+
     state->itemsPtr = (__unsafe_unretained id *)(void *)_strongBuffer;
-    state->state = index;
+    state->state += batchCount;
     state->mutationsPtr = state->extra+1;
 
     return batchCount;
@@ -198,9 +239,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (state->state == 0) {
         RLMResultsValidate(self);
 
-        enumerator = [[RLMFastEnumerator alloc] initWithTableView:_viewCreated ? _backingView : self.cloneQuery->find_all()
-                                                            realm:_realm
-                                                     objectSchema:_objectSchema];
+        enumerator = [[RLMFastEnumerator alloc] initWithCollection:self objectSchema:_objectSchema];
         state->extra[0] = (long)enumerator;
         state->extra[1] = self.count;
     }
@@ -509,6 +548,12 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
     return _backingView.get_source_ndx(index);
 }
 
+- (realm::TableView)tableView {
+    RLMResultsValidateAttached(self);
+    // note: deliberately copies it
+    return _backingView;
+}
+
 @end
 
 @implementation RLMTableResults {
@@ -601,6 +646,10 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 
 - (NSUInteger)indexInSource:(NSUInteger)index {
     return index;
+}
+
+- (realm::TableView)tableView {
+    return _table->where().find_all();
 }
 @end
 

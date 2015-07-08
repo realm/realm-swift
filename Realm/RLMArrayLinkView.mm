@@ -171,9 +171,7 @@ static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyVal
     if (state->state == 0) {
         RLMLinkViewArrayValidateAttached(self);
 
-        enumerator = [[RLMFastEnumerator alloc] initWithTableView:_backingLinkView->get_target_table().where(_backingLinkView).find_all()
-                                                            realm:_realm
-                                                     objectSchema:_objectSchema];
+        enumerator = [[RLMFastEnumerator alloc] initWithCollection:self objectSchema:_objectSchema];
         state->extra[0] = (long)enumerator;
         state->extra[1] = self.count;
     }
@@ -426,6 +424,14 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
             context:(void *)context {
     RLMEnsureArrayObservationInfo(_observationInfo, keyPath, self, self);
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
+}
+
+- (size_t)indexInSource:(NSUInteger)index {
+    return _backingLinkView->get(index).get_index();
+}
+
+- (realm::TableView)tableView {
+    return _backingLinkView->get_target_table().where(_backingLinkView).find_all();
 }
 
 @end
