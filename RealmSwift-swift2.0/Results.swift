@@ -285,8 +285,8 @@ public class RLMGenerator<T: Object>: AnyGenerator<T> {
         generatorBase = NSFastGenerator(collection)
     }
 
-    public override func next() -> T? {
-        let accessor = generatorBase.next() as! T?
+    public override func next() -> Element? {
+        let accessor = generatorBase.next() as! Element?
         if let accessor = accessor {
             RLMInitializeSwiftListAccessor(accessor)
         }
