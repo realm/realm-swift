@@ -11,6 +11,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Avoid evaluating results eagerly when filtering and sorting.
 * Add nullability annotations to the Objective-C API to provide enhanced compiler
   warnings and bridging to Swift.
+* Added `RLM_GENERIC_ARRAY(ObjectType)` macro to make `RLMArray`s use
+  Objective-C generics where available.
 
 ### Bugfixes
 
