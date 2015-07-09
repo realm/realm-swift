@@ -18,6 +18,8 @@
 
 #import "RLMTestCase.h"
 
+#import <Realm/RLMRealm_Private.h>
+
 @interface RLMRealm ()
 + (instancetype)realmWithPath:(NSString *)path
                           key:(NSData *)key
@@ -84,6 +86,16 @@ static BOOL encryptTests() {
 }
 
 @implementation RLMTestCase
+
+#if DEBUG
++ (void)setUp {
+    [super setUp];
+    // Disable actually syncing anything to the disk to greatly speed up the
+    // tests, but only in debug mode because it can't be re-enabled and we need
+    // it enabled for performance tests
+    RLMDisableSyncToDisk();
+}
+#endif
 
 - (void)setUp {
     @autoreleasepool {

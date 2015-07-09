@@ -31,11 +31,16 @@
 
 #include "object_store.hpp"
 #include <realm/commit_log.hpp>
+#include <realm/disable_sync_to_disk.hpp>
 #include <realm/version.hpp>
 
 using namespace std;
 using namespace realm;
 using namespace realm::util;
+
+void RLMDisableSyncToDisk() {
+    realm::disable_sync_to_disk();
+}
 
 // Notification Token
 
