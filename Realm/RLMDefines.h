@@ -22,6 +22,21 @@
 #define __has_feature(x) 0
 #endif
 
+#pragma mark - Generics
+
+#if __has_extension(objc_generics)
+#define RLM_GENERIC_COLLECTION <RLMObjectType>
+#define RLMObjectArgument RLMObjectType
+#define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS *><CLASS>
+#else
+#define RLM_GENERIC_COLLECTION
+typedef id RLMObjectType;
+typedef RLMObject * RLMObjectArgument;
+#define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
+#endif
+
+#pragma mark - Nullability
+
 #if !__has_feature(nullability)
 #ifndef __nullable
 #define __nullable
