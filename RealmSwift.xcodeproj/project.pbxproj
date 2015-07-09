@@ -530,6 +530,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DA0C4D11B16973B0077F097 /* RealmSwift.xcconfig */;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_BITCODE = NO;
 			};
 			name = Debug;
 		};
@@ -537,6 +539,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DA0C4D11B16973B0077F097 /* RealmSwift.xcconfig */;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_BITCODE = NO;
 			};
 			name = Release;
 		};
