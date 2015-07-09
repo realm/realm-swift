@@ -18,9 +18,28 @@
 
 #import "RLMPSimulatorManager.h"
 
-#import "NSTask+LaunchAdditions.h"
-
 static NSString * const RLMPBootedSimulatorKey = @"Booted";
+
+static NSTask * RLMPLaunchedTaskSynchonouslyWithProperty(NSString * path, NSArray *arguments, NSString *__autoreleasing* output)
+{
+    // Setup task with given parameters
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = path;
+    task.arguments = arguments;
+    
+    // Setup output Pipe to created Task
+    NSPipe *outputPipe = [NSPipe pipe];
+    task.standardOutput = outputPipe;
+    
+    [task launch];
+    [task waitUntilExit];
+    
+    NSData *outputData = [[outputPipe fileHandleForReading] readDataToEndOfFile];
+    
+    *output = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
+    
+    return task;
+}
 
 @interface RLMPSimulatorManager ()
 
@@ -55,11 +74,7 @@ static NSString * const RLMPBootedSimulatorKey = @"Booted";
     NSArray *args = @[@"simctl", @"list", @"devices"];
     
     NSString *output;
-    
-    [NSTask launchedTaskSynchonouslyWithPath:path
-                                   arguments:args
-                      inCurrentDirectoryPath:nil
-                              standardOutput:&output];
+    RLMPLaunchedTaskSynchonouslyWithProperty(path, args, &output);
     
     return output;
 }

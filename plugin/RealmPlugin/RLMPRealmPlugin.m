@@ -19,7 +19,6 @@
 #import "RLMPRealmPlugin.h"
 
 #import "RLMPSimulatorManager.h"
-#import "NSFileManager+GlobAdditions.h"
 
 static RLMPRealmPlugin *sharedPlugin;
 
@@ -27,6 +26,29 @@ static NSString *const RootDeviceSimulatorPath = @"Library/Developer/CoreSimulat
 static NSString *const DeviceSimulatorApplicationPath = @"data/Containers/Data/Application";
 
 static NSString *const RLMPErrorDomain = @"io.Realm.error";
+
+static NSArray * RLMPGlobFilesAtDirectoryURLWithPredicate(NSFileManager *fileManager, NSURL *directoryURL, NSPredicate *filteredPredicate, BOOL (^handler)(NSURL *URL, NSError *error))
+{
+    NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtURL:directoryURL
+                                            includingPropertiesForKeys:@[NSURLNameKey, NSURLIsDirectoryKey]
+                                                               options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                          errorHandler:handler];
+    NSMutableArray *fileURLs = [NSMutableArray array];
+    for (NSURL *fileURL in directoryEnumerator) {
+        NSString *fileName;
+        [fileURL getResourceValue:&fileName forKey:NSURLNameKey error:nil];
+        
+        NSString *isDirectory;
+        [fileURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+        
+        // Check whether it is a directory or not
+        if (![isDirectory boolValue]) {
+            [fileURLs addObject:fileURL];
+        }
+    }
+    
+    return [fileURLs filteredArrayUsingPredicate:filteredPredicate];
+}
 
 @interface RLMPRealmPlugin()
 
@@ -108,7 +130,7 @@ static NSString *const RLMPErrorDomain = @"io.Realm.error";
     
     if (realmFileURLs.count == 0) {
         NSString *title = @"Unable to find Realm file";
-        NSString *message = @"Launch iOS Simulator must have app that uses Realm";
+        NSString *message = @"You must launch iOS Simulator with app that uses Realm";
         
         NSError *error = [NSError errorWithDomain:RLMPErrorDomain
                                              code:-1
@@ -140,17 +162,16 @@ static NSString *const RLMPErrorDomain = @"io.Realm.error";
     
     NSMutableString *fullPath = [NSMutableString string];
     [fullPath appendFormat:@"%@/%@/%@", RootDeviceSimulatorPath, deviceUUID, DeviceSimulatorApplicationPath];
-    NSURL *bootedDeviceURL = [homeURL URLByAppendingPathComponent:fullPath];
+    NSURL *bootedDeviceDirectoryURL = [homeURL URLByAppendingPathComponent:fullPath];
     
-    NSArray *fileURLs = [fileManager globFilesAtDirectoryURL:bootedDeviceURL
-                                               fileExtension:@"realm"
-                                                errorHandler:^BOOL(NSURL *URL, NSError *error) {
-                                                    if (error) {
-                                                        NSLog(@"%@", error);
-                                                        return NO;
-                                                    }
-                                                    return YES;
-                                                }];
+    NSArray* fileURLs = RLMPGlobFilesAtDirectoryURLWithPredicate(fileManager, bootedDeviceDirectoryURL, [NSPredicate predicateWithFormat:@"pathExtension == 'realm'"], ^BOOL(NSURL *URL, NSError *error) {
+        if (error) {
+            NSLog(@"%@", error);
+            return NO;
+        }
+        return YES;
+    });
+    
     return fileURLs;
 }
 
