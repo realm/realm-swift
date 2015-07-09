@@ -208,36 +208,4 @@ class KVOTests: TestCase {
             self.realm.delete(obj2)
         }
     }
-
-    func testAddToRealmAfterAddingObservers() {
-        var obj = KVOObject()
-        observeChange(obj, "int32Col", 3, 10) {
-            self.realm.add(obj)
-            obj.int32Col = 10
-        }
-
-        obj = KVOObject()
-        observeChange(obj, "ignored", 0, 15) {
-            self.realm.add(obj)
-            obj.ignored = 15
-        }
-
-        obj = KVOObject()
-        observeChange(obj, "invalidated", false, true) {
-            self.realm.add(obj)
-            self.realm.delete(obj)
-        }
-
-        obj = KVOObject()
-        observeChange(obj, "arrayCol.invalidated", false, true) {
-            self.realm.add(obj)
-            self.realm.delete(obj)
-        }
-
-        obj = KVOObject()
-        observeListChange(obj, "arrayCol", .Insertion, NSIndexSet(index: 0)) {
-            self.realm.add(obj)
-            obj.arrayCol.append(obj)
-        }
-    }
 }
