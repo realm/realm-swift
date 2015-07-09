@@ -129,6 +129,7 @@ void RLMObservationInfo::didChange(NSString *key, NSKeyValueChange kind, NSIndex
 
 void RLMObservationInfo::prepareForInvalidation() {
     REALM_ASSERT_DEBUG(objectSchema);
+    REALM_ASSERT_DEBUG(!prev);
     for (auto info = this; info; info = info->next)
         info->invalidated = true;
 }

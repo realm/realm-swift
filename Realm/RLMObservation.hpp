@@ -77,6 +77,9 @@ public:
     // Once prepareForInvalidation() is called, valueForKey() will always return
     // the cached value for object and array properties without checking the
     // backing row to verify it's up-to-date.
+    //
+    // prepareForInvalidation() must be called on the head of the linked list
+    // (i.e. on the object pointed to directly by the object schema)
     id valueForKey(NSString *key);
 
     void prepareForInvalidation();
