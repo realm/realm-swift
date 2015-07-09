@@ -102,10 +102,10 @@ RLM_ASSUME_NONNULL_BEGIN
 + (NSString *)className;
 
 /**
- Create an RLMObject in the default Realm with a given object.
+ Create an RLMObject in the default Realm with a given value.
 
  Creates an instance of this object and adds it to the default Realm populating
- the object with the given object.
+ the object with the given value.
  
  If nested objects are included in the argument, `createInDefaultRealmWithValue:` will be called
  on them.
