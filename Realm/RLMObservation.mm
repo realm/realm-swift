@@ -333,22 +333,18 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
                     continue;
                 }
 
-                auto linkview = observer->getRow().get_linklist(prop.column);
-                change *c = nullptr;
-                for (auto& ac : changes) {
-                    if (ac.info == observer && ac.property == name) {
-                        c = &ac;
-                        break;
-                    }
-                }
-                if (!c) {
+                auto c = find_if(begin(changes), end(changes), [&](auto const& c) {
+                    return c.info == observer && c.property == name;
+                });
+                if (c == end(changes)) {
                     changes.push_back({observer, name, [NSMutableIndexSet new]});
-                    c = &changes.back();
+                    c = prev(end(changes));
                 }
 
                 // We know what row index is being removed from the LinkView,
                 // but what we actually want is the indexes in the LinkView that
                 // are going away
+                auto linkview = observer->getRow().get_linklist(prop.column);
                 size_t start = 0, index;
                 while ((index = linkview->find(link.old_target_row_ndx, start)) != realm::not_found) {
                     [c->indexes addIndex:index];
