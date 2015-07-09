@@ -280,14 +280,6 @@ void RLMClearTable(RLMObjectSchema *objectSchema) {
 }
 
 void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block_t block) {
-    struct change {
-        RLMObservationInfo *info;
-        __unsafe_unretained NSString *property;
-        NSMutableIndexSet *indexes;
-    };
-
-    std::vector<change> changes;
-    std::vector<RLMObservationInfo *> invalidated;
     std::vector<std::vector<RLMObservationInfo *> *> observers;
 
     // Build up an array of observation info arrays which is indexed by table
@@ -308,6 +300,15 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
         block();
         return;
     }
+
+    struct change {
+        RLMObservationInfo *info;
+        __unsafe_unretained NSString *property;
+        NSMutableIndexSet *indexes;
+    };
+
+    std::vector<change> changes;
+    std::vector<RLMObservationInfo *> invalidated;
 
     // This callback is called by core with a list of row deletions and
     // resulting link nullifications immediately before things are deleted and nullified
