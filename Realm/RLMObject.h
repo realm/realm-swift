@@ -28,8 +28,8 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  
- In Realm you define your model classes by subclassing RLMObject and adding properties to be persisted.
- You then instantiate and use your custom subclasses instead of using the RLMObject class directly.
+ In Realm you define your model classes by subclassing `RLMObject` and adding properties to be persisted.
+ You then instantiate and use your custom subclasses instead of using the `RLMObject` class directly.
  
      // Dog.h
      @interface Dog : RLMObject
@@ -48,12 +48,12 @@ RLM_ASSUME_NONNULL_BEGIN
  - `BOOL` or `bool`
  - `NSDate`
  - `NSData`
- - RLMObject subclasses, so you can have many-to-one relationships.
- - `RLMArray<X>`, where X is an RLMObject subclass, so you can have many-to-many relationships.
+ - `RLMObject` subclasses, so you can have many-to-one relationships.
+ - `RLMArray<X>`, where X is an `RLMObject` subclass, so you can have many-to-many relationships.
 
  ### Querying
  
- You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
+ You can query an object directly via the class methods: `allObjects`, `objectsWhere:`, and `objectsWithPredicate:`.
  These methods allow you to easily query a custom subclass for instances of this class in the
  default Realm. To search in a Realm other than the default Realm use the interface on an RLMRealm instance.
  
@@ -63,18 +63,19 @@ RLM_ASSUME_NONNULL_BEGIN
 
  ### Key-Value Observing
 
- All RLMObject properties (including properties you create in subclasses) are
- Key-Value Observing compliant, except for `realm` and `objectSchema`. There are
- several Realm-specific things to keep in mind when observing Realm objects:
+ All `RLMObject` properties (including properties you create in subclasses) are
+ [Key-Value Observing compliant](https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/KeyValueObserving/KeyValueObserving.html),
+ except for `realm` and `objectSchema`. There are several Realm-specific things
+ to keep in mind when observing Realm objects:
 
  1. Unlike `NSMutableArray` properties, `RLMArray` properties do not require
     using the proxy object returned from `-mutableArrayValueForKey:`, or defining
     KVC mutation methods on the containing class. You can simply call methods on
     the RLMArray directly and the changes will be observed by the containing
     object.
- 2. Standalone RLMObjects cannot be added to a Realm while they have any
+ 2. Standalone `RLMObjects` cannot be added to a Realm while they have any
     observed properties.
- 3. Modifying persisted RLMObjects in `-observeValueForKeyPath:ofObject:change:context:`
+ 3. Modifying persisted `RLMObjects` in `-observeValueForKeyPath:ofObject:change:context:`
     is problematic. Properties may change when the Realm is not in a write
     transaction (for example, when `-[RLMRealm refresh]` is called after changes
     are made on a different thread), and notifications sent prior to the change
