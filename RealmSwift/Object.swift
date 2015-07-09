@@ -22,7 +22,7 @@ import Realm.Private
 
 /**
 In Realm you define your model classes by subclassing `Object` and adding properties to be persisted.
-You then instantiate and use your custom subclasses instead of using the RLMObject class directly.
+You then instantiate and use your custom subclasses instead of using the Object class directly.
 
 ```swift
 class Dog: Object {
