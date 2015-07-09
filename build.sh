@@ -375,6 +375,7 @@ case "$COMMAND" in
         sh build.sh ios-static
         sh build.sh ios-dynamic
         sh build.sh ios-swift
+        sh build.sh watchos
         sh build.sh watchos-swift
         sh build.sh osx
         sh build.sh osx-swift
@@ -738,6 +739,22 @@ case "$COMMAND" in
         zip --symlinks -r realm-swift-framework-osx.zip swift-1.2 swift-2.0
         ;;
 
+    "package-watchos")
+        cd tightdb_objc
+        sh build.sh watchos
+
+        cd build/watchos
+        zip --symlinks -r realm-framework-watchos.zip Realm.framework
+        ;;
+
+    "package-watchos-swift")
+        cd tightdb_objc
+        sh build.sh watchos-swift
+
+        cd build/watchos
+        zip --symlinks -r realm-swift-framework-watchos.zip RealmSwift.framework Realm.framework
+        ;;
+
     "package-release")
         LANG="$2"
         TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
@@ -769,6 +786,11 @@ case "$COMMAND" in
                 cd ${FOLDER}/ios/dynamic
                 unzip ${WORKSPACE}/realm-dynamic-framework-ios.zip
             )
+
+            (
+                cd ${FOLDER}/watchos
+                unzip ${WORKSPACE}/realm-framework-watchos.zip
+            )
         else
             (
                 cd ${FOLDER}/osx
@@ -778,6 +800,11 @@ case "$COMMAND" in
             (
                 cd ${FOLDER}/ios
                 unzip ${WORKSPACE}/realm-swift-framework-ios.zip
+            )
+
+            (
+                cd ${FOLDER}/watchos
+                unzip ${WORKSPACE}/realm-swift-framework-watchos.zip
             )
         fi
 
@@ -863,6 +890,12 @@ EOF
         echo 'Packaging OS X Swift'
         sh tightdb_objc/build.sh package-osx-swift
         cp tightdb_objc/build/osx/realm-swift-framework-osx.zip .
+
+        echo 'Packaging watchOS'
+        sh tightdb_objc/build.sh package-watchos
+        sh tightdb_objc/build.sh package-watchos-swift
+        cp tightdb_objc/build/watchos/realm-swift-framework-watchos.zip .
+        cp tightdb_objc/build/watchos/realm-framework-watchos.zip .
 
         echo 'Building final release packages'
         sh tightdb_objc/build.sh package-release objc
