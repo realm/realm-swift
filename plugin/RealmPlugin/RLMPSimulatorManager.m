@@ -18,26 +18,26 @@
 
 #import "RLMPSimulatorManager.h"
 
-static NSString * const RLMPBootedSimulatorKey = @"Booted";
+static NSString *const RLMPBootedSimulatorKey = @"Booted";
 
-static NSTask * RLMPLaunchedTaskSynchonouslyWithProperty(NSString * path, NSArray *arguments, NSString *__autoreleasing* output)
+static NSTask *RLMPLaunchedTaskSynchonouslyWithProperty(NSString *path, NSArray *arguments, NSString *__autoreleasing *output)
 {
     // Setup task with given parameters
     NSTask *task = [[NSTask alloc] init];
     task.launchPath = path;
     task.arguments = arguments;
-    
+
     // Setup output Pipe to created Task
     NSPipe *outputPipe = [NSPipe pipe];
     task.standardOutput = outputPipe;
-    
+
     [task launch];
     [task waitUntilExit];
-    
+
     NSData *outputData = [[outputPipe fileHandleForReading] readDataToEndOfFile];
-    
+
     *output = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
-    
+
     return task;
 }
 
@@ -47,15 +47,15 @@ static NSTask * RLMPLaunchedTaskSynchonouslyWithProperty(NSString * path, NSArra
 
 @implementation RLMPSimulatorManager
 
-+ (NSString *)bootedSimulatorUUID {
-    
++ (NSString *)bootedSimulatorUUID
+{
     NSString *deviceData = [self readDeviceData];
-    
+
     __block NSString *bootedDeviceUUID;
     if (deviceData) {
         // Process output
         NSDictionary *deviceStatuses = [self processDeviceData:deviceData];
-        
+
         [deviceStatuses enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *value, BOOL *stop) {
             if ([value isEqualToString:RLMPBootedSimulatorKey]) {
                 bootedDeviceUUID = key;
@@ -64,26 +64,33 @@ static NSTask * RLMPLaunchedTaskSynchonouslyWithProperty(NSString * path, NSArra
             }
         }];
     }
-    
+
     return bootedDeviceUUID;
 }
 
-+ (NSString *)readDeviceData {
++ (NSString *)readDeviceData
+{
+    // Find out Xcode path from mainBundle
+    NSURL *bundleURL = [[NSBundle mainBundle] infoDictionary][@"CFBundleInfoPlistURL"];
+
+    // Append with xcrun path
+    NSString *pathToXcrun = @"Contents/Developer/usr/bin/xcrun";
+    NSURL *fullURL = [[NSURL alloc] initWithString:pathToXcrun relativeToURL:bundleURL.baseURL];
+
     // Set parameters to get device detail
-    NSString *path = @"/usr/bin/xcrun";
     NSArray *args = @[@"simctl", @"list", @"devices"];
-    
+
     NSString *output;
-    RLMPLaunchedTaskSynchonouslyWithProperty(path, args, &output);
-    
+    RLMPLaunchedTaskSynchonouslyWithProperty(fullURL.path, args, &output);
+
     return output;
 }
 
-+ (NSDictionary *)processDeviceData:(NSString *)data {
-    
++ (NSDictionary *)processDeviceData:(NSString *)data
+{
     NSMutableDictionary *device = [NSMutableDictionary dictionary];
     NSScanner *scanner = [NSScanner scannerWithString:data];
-    
+
     // Skip punctuation ( ) as we only want status inside
     scanner.charactersToBeSkipped = [NSCharacterSet punctuationCharacterSet];
     while (![scanner isAtEnd]) {
@@ -92,18 +99,18 @@ static NSTask * RLMPLaunchedTaskSynchonouslyWithProperty(NSString * path, NSArra
         // Scan up to (
         [scanner scanUpToString:@"(" intoString:nil];
         [scanner scanUpToString:@")" intoString:&deviceKey];
-        
+
         // Scan up to (
         [scanner scanUpToString:@"(" intoString:nil];
         [scanner scanUpToString:@")" intoString:&deviceStatus];
-        
+
         [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:nil];
-        
+
         if (deviceKey && deviceStatus) {
             [device setValue:deviceStatus forKey:deviceKey];
         }
     }
-    
+
     return device;
 }
 
