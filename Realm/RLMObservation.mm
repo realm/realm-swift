@@ -244,11 +244,11 @@ id RLMObservationInfo::valueForKey(NSString *key) {
     return getSuper();
 }
 
-RLMObservationInfo *RLMGetObservationInfo(std::unique_ptr<RLMObservationInfo> const& info,
+RLMObservationInfo *RLMGetObservationInfo(RLMObservationInfo *info,
                                           size_t row,
                                           __unsafe_unretained RLMObjectSchema *objectSchema) {
     if (info) {
-        return info.get();
+        return info;
     }
 
     for (RLMObservationInfo *info : objectSchema->_observedObjects) {

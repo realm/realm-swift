@@ -131,8 +131,7 @@ public:
 // Get the the observation info chain for the given row
 // Will simply return info if it's non-null, and will search ojectSchema's array
 // for a matching one otherwise, and return null if there are none
-RLMObservationInfo *RLMGetObservationInfo(std::unique_ptr<RLMObservationInfo> const& info,
-                                          size_t row, RLMObjectSchema *objectSchema);
+RLMObservationInfo *RLMGetObservationInfo(RLMObservationInfo *info, size_t row, RLMObjectSchema *objectSchema);
 
 // Call the appropriate SharedGroup member function, with change notifications
 void RLMAdvanceRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
