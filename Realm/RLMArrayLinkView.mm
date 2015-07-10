@@ -38,7 +38,6 @@
 @public
     realm::LinkViewRef _backingLinkView;
     RLMRealm *_realm;
-    __unsafe_unretained RLMObjectSchema *_objectSchema;
     __unsafe_unretained RLMObjectSchema *_containingObjectSchema;
     std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
@@ -360,18 +359,12 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     }
 
     RLMLinkViewArrayValidateAttached(self);
-    const size_t size = _backingLinkView->size();
-    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index) {
-        return _backingLinkView->get(index).get_index();
-    });
+    return RLMCollectionValueForKey(self, key);
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
     RLMLinkViewArrayValidateInWriteTransaction(self);
-    const size_t size = _backingLinkView->size();
-    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t(size_t index) {
-        return _backingLinkView->get(index).get_index();
-    });
+    RLMCollectionSetValueForKey(self, key, value);
 }
 
 - (void)deleteObjectsFromRealm {
@@ -426,7 +419,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
-- (size_t)indexInSource:(NSUInteger)index {
+- (NSUInteger)indexInSource:(NSUInteger)index {
     return _backingLinkView->get(index).get_index();
 }
 

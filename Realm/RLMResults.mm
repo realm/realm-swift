@@ -324,18 +324,12 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 - (id)valueForKey:(NSString *)key {
     RLMResultsValidate(self);
-    const size_t size = _backingView.size();
-    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index) {
-        return _backingView.get_source_ndx(index);
-    });
+    return RLMCollectionValueForKey(self, key);
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
     RLMResultsValidateInWriteTransaction(self);
-    const size_t size = _backingView.size();
-    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t(size_t index) {
-        return _backingView.get_source_ndx(index);
-    });
+    RLMCollectionSetValueForKey(self, key, value);
 }
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
@@ -573,22 +567,6 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
     return _table->size();
 }
 
-- (id)valueForKey:(NSString *)key {
-    RLMResultsValidate(self);
-    const size_t size = _table->size();
-    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index) {
-        return index;
-    });
-}
-
-- (void)setValue:(id)value forKey:(NSString *)key {
-    RLMResultsValidateInWriteTransaction(self);
-    const size_t size = _table->size();
-    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t(size_t index) {
-        return index;
-    });
-}
-
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     RLMCheckThread(_realm);
     if (object.invalidated) {
@@ -637,7 +615,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 
 - (void)deleteObjectsFromRealm {
     RLMResultsValidateInWriteTransaction(self);
-    RLMClearTable(_objectSchema);
+    RLMClearTable(self.objectSchema);
 }
 
 - (std::unique_ptr<Query>)cloneQuery {

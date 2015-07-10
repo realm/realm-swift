@@ -48,6 +48,8 @@ struct RLMSortOrder {
 
 @protocol RLMFastEnumerable
 @property (nonatomic, readonly) RLMRealm *realm;
+@property (nonatomic, readonly) RLMObjectSchema *objectSchema;
+@property (nonatomic, readonly) NSUInteger count;
 
 - (NSUInteger)indexInSource:(NSUInteger)index;
 - (realm::TableView)tableView;
@@ -68,6 +70,8 @@ struct RLMSortOrder {
 // LinkView backed RLMArray subclass
 //
 @interface RLMArrayLinkView : RLMArray <RLMFastEnumerable>
+@property (nonatomic, unsafe_unretained) RLMObjectSchema *objectSchema;
+
 + (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
                                           view:(realm::LinkViewRef)view
                                          realm:(RLMRealm *)realm
