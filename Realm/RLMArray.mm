@@ -28,19 +28,22 @@
 #import <realm/link_view.hpp>
 
 @implementation RLMArray {
+@public
     // array for standalone
     NSMutableArray *_backingArray;
 }
 
-static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, NSIndexSet *is, dispatch_block_t f) {
+template<typename IndexSetFactory>
+static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
     if (!ar->_backingArray) {
         ar->_backingArray = [NSMutableArray new];
     }
 
     if (RLMObjectBase *parent = ar->_parentObject) {
-        [parent willChange:kind valuesAtIndexes:is forKey:ar->_key];
+        NSIndexSet *indexes = is();
+        [parent willChange:kind valuesAtIndexes:indexes forKey:ar->_key];
         f();
-        [parent didChange:kind valuesAtIndexes:is forKey:ar->_key];
+        [parent didChange:kind valuesAtIndexes:indexes forKey:ar->_key];
     }
     else {
         f();
@@ -48,11 +51,15 @@ static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange
 }
 
 static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, NSUInteger index, dispatch_block_t f) {
-    changeArray(ar, kind, [NSIndexSet indexSetWithIndex:index], f);
+    changeArray(ar, kind, f, [=] { return [NSIndexSet indexSetWithIndex:index]; });
 }
 
-static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, NSRange index, dispatch_block_t f) {
-    changeArray(ar, kind, [NSIndexSet indexSetWithIndexesInRange:index], f);
+static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, NSRange range, dispatch_block_t f) {
+    changeArray(ar, kind, f, [=] { return [NSIndexSet indexSetWithIndexesInRange:range]; });
+}
+
+static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, NSIndexSet *is, dispatch_block_t f) {
+    changeArray(ar, kind, f, [=] { return is; });
 }
 
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {

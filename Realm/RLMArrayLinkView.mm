@@ -106,8 +106,8 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
     }
 }
 
-template<typename IndexSetMaker>
-static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, dispatch_block_t f, IndexSetMaker&& is) {
+template<typename IndexSetFactory>
+static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
     RLMObservationInfo *info = RLMGetObservationInfo(ar->_observationInfo,
                                                      ar->_backingLinkView->get_origin_row_index(),
                                                      ar->_containingObjectSchema);
