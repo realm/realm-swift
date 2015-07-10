@@ -996,9 +996,16 @@ public:
     // should not crash
 }
 
-
 - (void)testClearLinkView {
-    // TODO
+    KVOObject *obj = [self createObject];
+    KVOObject *obj2 = [self createObject];
+    [obj2.arrayCol addObject:obj];
+
+    KVORecorder r1(self, obj, @"boolCol");
+    KVORecorder r2(self, obj, RLMInvalidatedKey);
+    [self.realm deleteObjects:obj2.arrayCol];
+    AssertChanged(r2, @NO, @YES);
+    // should not crash
 }
 
 - (void)testCreateObserverAfterDealloc {
