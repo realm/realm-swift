@@ -90,6 +90,11 @@ private:
             f(info->object);
     }
 
+    RLMObservationInfo(RLMObservationInfo const&) = delete;
+    RLMObservationInfo(RLMObservationInfo&&) = delete;
+    RLMObservationInfo& operator=(RLMObservationInfo const&) = delete;
+    RLMObservationInfo& operator=(RLMObservationInfo&&) = delete;
+
 public:
     bool skipUnregisteringObservers = false;
     // storage for the observationInfo property on RLMObjectBase
