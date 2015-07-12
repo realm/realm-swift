@@ -25,6 +25,16 @@
 		0295B91719D103BE0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
+		3E0326FA0A3C41F99701C409 /* Pods_ReactKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8808EDBB2A3CE2C767A1F8D9 /* Pods_ReactKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		3F4AC4EE1B41B0C600882CD6 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
+		3F4AC4EF1B41B0C600882CD6 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; };
+		3F4AC4F01B41B0C600882CD6 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
+		3F4AC4F41B41B0C600882CD6 /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3F4AC4F51B41B0C600882CD6 /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3F4AC5121B41B63C00882CD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB631A12A73E00CB2D0B /* AppDelegate.swift */; };
+		3F4AC51A1B41B66900882CD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F4AC5161B41B66400882CD6 /* AppDelegate.swift */; };
+		3F4AC51B1B41B66F00882CD6 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F4AC5171B41B66400882CD6 /* TableViewController.swift */; };
+		3F4AC51C1B41B67200882CD6 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F4AC5141B41B66400882CD6 /* Images.xcassets */; };
 		3FC898FF1A1414110067CBEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FE1A1414110067CBEC /* ViewController.swift */; };
 		C07E5D7A1B15003B00ED625C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
 		C07E5D7B1B15003B00ED625C /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -38,8 +48,8 @@
 		C07E5D831B15005300ED625C /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C07E5D841B15005500ED625C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
 		C07E5D851B15005500ED625C /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CB2647AF7AEB2CB3A3E4BC24 /* Pods_ReactKitTableView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E29F55A41338CDEB11A041E /* Pods_ReactKitTableView.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
-		E886FB671A12A73E00CB2D0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB631A12A73E00CB2D0B /* AppDelegate.swift */; };
 		E886FB681A12A73E00CB2D0B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E886FB641A12A73E00CB2D0B /* Images.xcassets */; };
 		E886FB6A1A12A73E00CB2D0B /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB661A12A73E00CB2D0B /* TableViewController.swift */; };
 		E8CB088219BA6AEE0018434A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CB088019BA6AEE0018434A /* AppDelegate.swift */; };
@@ -68,6 +78,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3F4AC51F1B41B6F100882CD6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E805758D19BA55E600376620 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8D212EC1AF6A96500DAB243;
+			remoteInfo = RealmSwift;
+		};
 		E8D212FD1AF6AAA000DAB243 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E805758D19BA55E600376620 /* Project object */;
@@ -113,6 +130,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		3F4AC4F31B41B0C600882CD6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				3F4AC4F41B41B0C600882CD6 /* Realm.framework in CopyFiles */,
+				3F4AC4F51B41B0C600882CD6 /* RealmSwift.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C01304E31A60A4A000EB3E1E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -184,9 +212,19 @@
 /* Begin PBXFileReference section */
 		0295B91519D103A70036D6C3 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		0A73D4411B1443A700E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
+		288E9D52786A544D78A7C41D /* Pods-ReactKitTableView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactKitTableView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ReactKitTableView/Pods-ReactKitTableView.debug.xcconfig"; sourceTree = "<group>"; };
+		3F4AC4FA1B41B0C600882CD6 /* ReactKitTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReactKitTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F4AC5141B41B66400882CD6 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ReactKit/Images.xcassets; sourceTree = "<group>"; };
+		3F4AC5151B41B66400882CD6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ReactKit/Info.plist; sourceTree = "<group>"; };
+		3F4AC5161B41B66400882CD6 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ReactKit/AppDelegate.swift; sourceTree = "<group>"; };
+		3F4AC5171B41B66400882CD6 /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TableViewController.swift; path = ReactKit/TableViewController.swift; sourceTree = "<group>"; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../build/ios/swift-1.2/Realm.framework"; sourceTree = SOURCE_ROOT; };
 		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../../../build/ios/swift-1.2/RealmSwift.framework"; sourceTree = SOURCE_ROOT; };
+		5FE3B3112484BC71AB66755F /* Pods-ReactKit.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactKit.release.xcconfig"; path = "Pods/Target Support Files/Pods-ReactKit/Pods-ReactKit.release.xcconfig"; sourceTree = "<group>"; };
+		630DCA2003970F467D891300 /* Pods-ReactKitTableView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactKitTableView.release.xcconfig"; path = "Pods/Target Support Files/Pods-ReactKitTableView/Pods-ReactKitTableView.release.xcconfig"; sourceTree = "<group>"; };
+		6E29F55A41338CDEB11A041E /* Pods_ReactKitTableView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ReactKitTableView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8808EDBB2A3CE2C767A1F8D9 /* Pods_ReactKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ReactKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E886FB631A12A73E00CB2D0B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E886FB641A12A73E00CB2D0B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -212,16 +250,29 @@
 		E8D3F2531A11765200620884 /* Backlink.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Backlink.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D3F2761A11766A00620884 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E8D3F2771A11766A00620884 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EA051703157F45C7BD7488FE /* Pods-ReactKit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactKit.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ReactKit/Pods-ReactKit.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3F4AC4ED1B41B0C600882CD6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3F4AC4F01B41B0C600882CD6 /* libc++.dylib in Frameworks */,
+				3E0326FA0A3C41F99701C409 /* Pods_ReactKit.framework in Frameworks */,
+				CB2647AF7AEB2CB3A3E4BC24 /* Pods_ReactKitTableView.framework in Frameworks */,
+				3F4AC4EE1B41B0C600882CD6 /* Realm.framework in Frameworks */,
+				3F4AC4EF1B41B0C600882CD6 /* RealmSwift.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E886FB581A12A6FC00CB2D0B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */,
 				C07E5D7E1B15004C00ED625C /* Realm.framework in Frameworks */,
 				E8D212F51AF6A9FD00DAB243 /* RealmSwift.framework in Frameworks */,
-				E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,9 +280,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0295B91619D103A70036D6C3 /* libc++.dylib in Frameworks */,
 				C07E5D7C1B15004800ED625C /* Realm.framework in Frameworks */,
 				E8D212F31AF6A9EF00DAB243 /* RealmSwift.framework in Frameworks */,
-				0295B91619D103A70036D6C3 /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,9 +290,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0295B91719D103BE0036D6C3 /* libc++.dylib in Frameworks */,
 				C07E5D801B15004F00ED625C /* Realm.framework in Frameworks */,
 				E8D212F71AF6AA0000DAB243 /* RealmSwift.framework in Frameworks */,
-				0295B91719D103BE0036D6C3 /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,9 +300,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */,
 				C07E5D841B15005500ED625C /* Realm.framework in Frameworks */,
 				E8D212FB1AF6AA0600DAB243 /* RealmSwift.framework in Frameworks */,
-				0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,9 +310,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */,
 				C07E5D821B15005300ED625C /* Realm.framework in Frameworks */,
 				E8D212F91AF6AA0300DAB243 /* RealmSwift.framework in Frameworks */,
-				0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,9 +320,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E8D3F27D1A1177D900620884 /* libc++.dylib in Frameworks */,
 				C07E5D7A1B15003B00ED625C /* Realm.framework in Frameworks */,
 				E8D212F11AF6A9E800DAB243 /* RealmSwift.framework in Frameworks */,
-				E8D3F27D1A1177D900620884 /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,25 +332,59 @@
 		0295B90519D103180036D6C3 /* RealmSwift */ = {
 			isa = PBXGroup;
 			children = (
+				0295B91519D103A70036D6C3 /* libc++.dylib */,
 				C07E5D791B15001500ED625C /* Realm.framework */,
 				C09C490F1A605A4800638C9F /* RealmSwift.framework */,
-				0295B91519D103A70036D6C3 /* libc++.dylib */,
 			);
 			name = RealmSwift;
+			sourceTree = "<group>";
+		};
+		1F9FBF428EC797F8A92CD46C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8808EDBB2A3CE2C767A1F8D9 /* Pods_ReactKit.framework */,
+				6E29F55A41338CDEB11A041E /* Pods_ReactKitTableView.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3F4AC5131B41B65600882CD6 /* ReactKit */ = {
+			isa = PBXGroup;
+			children = (
+				3F4AC5161B41B66400882CD6 /* AppDelegate.swift */,
+				3F4AC5141B41B66400882CD6 /* Images.xcassets */,
+				3F4AC5151B41B66400882CD6 /* Info.plist */,
+				3F4AC5171B41B66400882CD6 /* TableViewController.swift */,
+			);
+			name = ReactKit;
+			sourceTree = "<group>";
+		};
+		88654A085378F3BEBB727278 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				EA051703157F45C7BD7488FE /* Pods-ReactKit.debug.xcconfig */,
+				5FE3B3112484BC71AB66755F /* Pods-ReactKit.release.xcconfig */,
+				288E9D52786A544D78A7C41D /* Pods-ReactKitTableView.debug.xcconfig */,
+				630DCA2003970F467D891300 /* Pods-ReactKitTableView.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 		E805758C19BA55E600376620 = {
 			isa = PBXGroup;
 			children = (
-				0A73D4411B1443A700E1E8EE /* README.md */,
 				E8D3F2751A11766A00620884 /* Backlink */,
 				E8CB087F19BA6AEE0018434A /* Encryption */,
+				1F9FBF428EC797F8A92CD46C /* Frameworks */,
 				E886FB621A12A73E00CB2D0B /* GroupedTableView */,
 				E8CB088419BA6AF70018434A /* Migration */,
+				88654A085378F3BEBB727278 /* Pods */,
 				E805759619BA55E600376620 /* Products */,
+				3F4AC5131B41B65600882CD6 /* ReactKit */,
 				0295B90519D103180036D6C3 /* RealmSwift */,
 				E8CB088F19BA6B000018434A /* Simple */,
 				E8CB089419BA6B080018434A /* TableView */,
+				0A73D4411B1443A700E1E8EE /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -310,6 +395,7 @@
 				E8CB07EF19BA6AB60018434A /* Encryption.app */,
 				E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */,
 				E8CB081419BA6ABD0018434A /* Migration.app */,
+				3F4AC4FA1B41B0C600882CD6 /* ReactKitTableView.app */,
 				E8CB085E19BA6ACA0018434A /* Simple.app */,
 				E8CB083919BA6AC60018434A /* TableView.app */,
 			);
@@ -381,6 +467,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3F4AC4E51B41B0C600882CD6 /* ReactKitTableView */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3F4AC4F71B41B0C600882CD6 /* Build configuration list for PBXNativeTarget "ReactKitTableView" */;
+			buildPhases = (
+				1320525912168DCAA61C3177 /* Check Pods Manifest.lock */,
+				3F4AC4EA1B41B0C600882CD6 /* Sources */,
+				3F4AC4ED1B41B0C600882CD6 /* Frameworks */,
+				3F4AC4F11B41B0C600882CD6 /* Resources */,
+				3F4AC4F31B41B0C600882CD6 /* CopyFiles */,
+				3F4AC4F61B41B0C600882CD6 /* Strip Framework Architectures */,
+				019E4B330E30F6E9EA9E10C2 /* Embed Pods Frameworks */,
+				284452BB2B10A9EB479B4F59 /* Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3F4AC5201B41B6F100882CD6 /* PBXTargetDependency */,
+			);
+			name = ReactKitTableView;
+			productName = TableView;
+			productReference = 3F4AC4FA1B41B0C600882CD6 /* ReactKitTableView.app */;
+			productType = "com.apple.product-type.application";
+		};
 		E886FB511A12A6FC00CB2D0B /* GroupedTableView */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E886FB5D1A12A6FC00CB2D0B /* Build configuration list for PBXNativeTarget "GroupedTableView" */;
@@ -548,11 +657,20 @@
 				E8CB085D19BA6ACA0018434A /* Simple */,
 				E8CB083819BA6AC60018434A /* TableView */,
 				E8D212EC1AF6A96500DAB243 /* RealmSwift */,
+				3F4AC4E51B41B0C600882CD6 /* ReactKitTableView */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		3F4AC4F11B41B0C600882CD6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3F4AC51C1B41B67200882CD6 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E886FB5B1A12A6FC00CB2D0B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -582,6 +700,66 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		019E4B330E30F6E9EA9E10C2 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ReactKitTableView/Pods-ReactKitTableView-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		1320525912168DCAA61C3177 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		284452BB2B10A9EB479B4F59 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ReactKitTableView/Pods-ReactKitTableView-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3F4AC4F61B41B0C600882CD6 /* Strip Framework Architectures */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Strip Framework Architectures";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
+			showEnvVarsInLog = 0;
+		};
 		C06D6CCE1B016A590066C324 /* Strip Framework Architectures */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -613,11 +791,20 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3F4AC4EA1B41B0C600882CD6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3F4AC51A1B41B66900882CD6 /* AppDelegate.swift in Sources */,
+				3F4AC51B1B41B66F00882CD6 /* TableViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E886FB541A12A6FC00CB2D0B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E886FB671A12A73E00CB2D0B /* AppDelegate.swift in Sources */,
+				3F4AC5121B41B63C00882CD6 /* AppDelegate.swift in Sources */,
 				E886FB6A1A12A73E00CB2D0B /* TableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -667,6 +854,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		3F4AC5201B41B6F100882CD6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8D212EC1AF6A96500DAB243 /* RealmSwift */;
+			targetProxy = 3F4AC51F1B41B6F100882CD6 /* PBXContainerItemProxy */;
+		};
 		E8D212FE1AF6AAA000DAB243 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E8D212EC1AF6A96500DAB243 /* RealmSwift */;
@@ -700,6 +892,36 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		3F4AC4F81B41B0C600882CD6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 288E9D52786A544D78A7C41D /* Pods-ReactKitTableView.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/ReactKit/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = ReactKitTableView;
+			};
+			name = Debug;
+		};
+		3F4AC4F91B41B0C600882CD6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 630DCA2003970F467D891300 /* Pods-ReactKitTableView.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = "$(SRCROOT)/ReactKit/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = ReactKitTableView;
+			};
+			name = Release;
+		};
 		E80575AF19BA55E700376620 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -966,6 +1188,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3F4AC4F71B41B0C600882CD6 /* Build configuration list for PBXNativeTarget "ReactKitTableView" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3F4AC4F81B41B0C600882CD6 /* Debug */,
+				3F4AC4F91B41B0C600882CD6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E805759019BA55E600376620 /* Build configuration list for PBXProject "RealmExamples" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
