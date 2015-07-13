@@ -48,7 +48,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  ### Key-Value Observing
 
- RLMArray supports array key-value observing on `LMArray properties on RLMObject
+ RLMArray supports array key-value observing on RLMArray properties on RLMObject
  subclasses, and the `invalidated` property on RLMArray instances themselves is
  key-value observing compliant when the RLMArray is attached to a persisted
  RLMObject (RLMArrays on standalone RLMObjects will never become invalidated).
