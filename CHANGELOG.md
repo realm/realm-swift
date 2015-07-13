@@ -14,7 +14,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Processes crashing due to an uncaught exception during a write transaction will
+  no longer cause other processes using the same Realm to hang indefinitely.
 
 0.93.2 Release notes (2015-06-12)
 =============================================================

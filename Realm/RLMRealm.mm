@@ -175,6 +175,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     initialized = true;
 
     RLMCheckForUpdates();
+    RLMInstallUncaughtExceptionHandler();
 }
 
 - (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory dynamic:(BOOL)dynamic error:(NSError **)outError {
