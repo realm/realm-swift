@@ -133,7 +133,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return                An RLMResults of objects that match the given predicate
  */
-- (RLMResults RLM_GENERIC_COLLECTION*)objectsWhere:(NSString *)predicateFormat, ...;
+- (RLMResults RLM_GENERIC_RETURN*)objectsWhere:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate in the RLMResults.
@@ -142,7 +142,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return            An RLMResults of objects that match the given predicate
  */
-- (RLMResults RLM_GENERIC_COLLECTION*)objectsWithPredicate:(NSPredicate *)predicate;
+- (RLMResults RLM_GENERIC_RETURN*)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get a sorted `RLMResults` from an existing `RLMResults` sorted by a property.
@@ -152,7 +152,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return    An RLMResults sorted by the specified property.
  */
-- (RLMResults RLM_GENERIC_COLLECTION*)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
 /**
  Get a sorted `RLMResults` from an existing `RLMResults` sorted by an `NSArray`` of `RLMSortDescriptor`s.
@@ -161,7 +161,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return    An RLMResults sorted by the specified properties.
  */
-- (RLMResults RLM_GENERIC_COLLECTION*)sortedResultsUsingDescriptors:(NSArray *)properties;
+- (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingDescriptors:(NSArray *)properties;
 
 #pragma mark -
 
