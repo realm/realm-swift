@@ -837,6 +837,27 @@ RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *prop
     return prop;
 }
 
+void validate_parameters_for_bounding_box_search(CLLocationCoordinate2D corner1, CLLocationCoordinate2D corner2,
+                                                 NSString *latitudePropertyName, NSString *longitudePropertyName,
+                                                 RLMObjectSchema *objectSchema)
+{
+    RLMPrecondition(latitudePropertyName && longitudePropertyName, @"Invalid argument", @"Latitude and longitude property names must be non-nil");
+
+    RLMProperty *latitudeProperty = objectSchema[latitudePropertyName];
+    RLMProperty *longitudeProperty = objectSchema[longitudePropertyName];
+    RLMPrecondition(latitudeProperty, @"Invalid property name", @"Latitude property name must refer to a property on %@", objectSchema.className);
+    RLMPrecondition(longitudeProperty, @"Invalid property name", @"Longitude property name must refer to a property on %@", objectSchema.className);
+    RLMPrecondition(latitudeProperty.type == RLMPropertyTypeDouble || latitudeProperty.type == RLMPropertyTypeFloat,
+                    @"Invalid property", @"Latitude property must be of floating point type, but was %@", RLMTypeToString(latitudeProperty.type));
+    RLMPrecondition(longitudeProperty.type == RLMPropertyTypeDouble || longitudeProperty.type == RLMPropertyTypeFloat,
+                    @"Invalid property", @"Longitude property must be of floating point type, but was %@", RLMTypeToString(latitudeProperty.type));
+
+    RLMPrecondition(corner1.latitude >= -90 && corner1.latitude <= 90, @"Invalid coordinate", @"Coordinate latitude must be in the range -90..90.");
+    RLMPrecondition(corner2.latitude >= -90 && corner2.latitude <= 90, @"Invalid coordinate", @"Coordinate latitude must be in the range -90..90.");
+    RLMPrecondition(corner1.longitude >= -180 && corner1.longitude <= 180, @"Invalid coordinate", @"Coordinate longitude must be in the range -180..180.");
+    RLMPrecondition(corner2.longitude >= -180 && corner2.longitude <= 180, @"Invalid coordinate", @"Coordinate longitude must be in the range -180..180.");
+}
+
 } // namespace
 
 void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RLMSchema *schema,
@@ -856,6 +877,29 @@ void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RL
     std::string validateMessage = query->validate();
     RLMPrecondition(validateMessage.empty(), @"Invalid query", @"%.*s",
                     (int)validateMessage.size(), validateMessage.c_str());
+}
+
+void RLMUpdateQueryWithBoundingBoxSearch(realm::Query *query, CLLocationCoordinate2D corner1, CLLocationCoordinate2D corner2,
+                                         NSString *latitudePropertyName, NSString *longitudePropertyName,
+                                         RLMSchema *schema, RLMObjectSchema *objectSchema)
+{
+    validate_parameters_for_bounding_box_search(corner1, corner2, latitudePropertyName, longitudePropertyName, objectSchema);
+
+    CLLocationCoordinate2D bottomLeft = { std::min(corner1.latitude, corner2.latitude), std::min(corner1.longitude, corner2.longitude) };
+    CLLocationCoordinate2D topRight = { std::max(corner1.latitude, corner2.latitude), std::max(corner1.longitude, corner2.longitude) };
+
+    NSPredicate *latitudePredicate = [NSPredicate predicateWithFormat:@"%K BETWEEN {%f, %f}", latitudePropertyName, bottomLeft.latitude, topRight.latitude];
+    // The coordinate pair represents two possible boxes due to the discontinuity in longitudes at the 180th meridian.
+    // We always interpret the bounding box as smallest of the two alternatives.
+    NSPredicate *longitudePredicate;
+    if (topRight.longitude - bottomLeft.longitude <= 180) {
+        longitudePredicate = [NSPredicate predicateWithFormat:@"%K BETWEEN {%f, %f}", longitudePropertyName, bottomLeft.longitude, topRight.longitude];
+    } else {
+        longitudePredicate = [NSPredicate predicateWithFormat:@"%K BETWEEN {-180, %f} OR %K BETWEEN {%f, 180}", longitudePropertyName, bottomLeft.longitude, longitudePropertyName, topRight.longitude];
+    }
+
+    NSPredicate *predicate = [[NSCompoundPredicate alloc] initWithType:NSAndPredicateType subpredicates:@[ latitudePredicate, longitudePredicate ]];
+    RLMUpdateQueryWithPredicate(query, predicate, schema, objectSchema);
 }
 
 void RLMGetColumnIndices(RLMObjectSchema *schema, NSArray *properties,

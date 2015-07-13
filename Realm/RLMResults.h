@@ -19,6 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMCollection.h>
 #import <Realm/RLMDefines.h>
+#import <Realm/RLMLocationTypes.h>
 
 RLM_ASSUME_NONNULL_BEGIN
 
@@ -143,6 +144,17 @@ RLM_ASSUME_NONNULL_BEGIN
  @return            An RLMResults of objects that match the given predicate
  */
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
+
+/**
+ Get objects whose location is within the given bounding box.
+
+ @param box                The bounding box to find objects within.
+ @param latitudeProperty   The property of the object to interpret as the latitude.
+ @param longitudeProperty  The property of the object to interpret as the longitude.
+
+ @return                   An RLMResults of objects whose locations are within the bounding box.
+ */
+- (RLMResults *)objectsWithinBoundingBox:(RLMBoundingBox)box latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty;
 
 /**
  Get a sorted `RLMResults` from an existing `RLMResults` sorted by a property.

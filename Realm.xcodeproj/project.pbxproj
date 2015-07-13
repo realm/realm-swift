@@ -222,6 +222,9 @@
 		3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FE79FF819BA6A5900780C9A /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
 		3FE79FF919BA6A5900780C9A /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
+		5D0B26621B54585B00A0DD25 /* RLMLocationTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D0B26611B54585B00A0DD25 /* RLMLocationTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5D0B26631B54585B00A0DD25 /* RLMLocationTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D0B26611B54585B00A0DD25 /* RLMLocationTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5D0B26641B54585B00A0DD25 /* RLMLocationTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D0B26611B54585B00A0DD25 /* RLMLocationTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D30B74B1B42072600D90C5A /* RLMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D30B74A1B42039F00D90C5A /* RLMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D30B74C1B42072700D90C5A /* RLMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D30B74A1B42039F00D90C5A /* RLMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D30B74D1B42072800D90C5A /* RLMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D30B74A1B42039F00D90C5A /* RLMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -471,6 +474,7 @@
 		3F6B89AE19EF40BA004E8EA8 /* librealm-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "librealm-ios.a"; path = "../core/librealm-ios.a"; sourceTree = "<group>"; };
 		3F8DCA5719930F550008BD7F /* iOS Device Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Device Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
+		5D0B26611B54585B00A0DD25 /* RLMLocationTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMLocationTypes.h; sourceTree = "<group>"; };
 		5D30B74A1B42039F00D90C5A /* RLMDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMDefines.h; sourceTree = "<group>"; };
 		C073E1201AE9B705002C0A30 /* RLMObject_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMObject_Private.hpp; sourceTree = "<group>"; };
 		C0D6E4101AFBFAF7001F3027 /* RLMAssertions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAssertions.h; sourceTree = "<group>"; };
@@ -740,6 +744,7 @@
 				5D30B74A1B42039F00D90C5A /* RLMDefines.h */,
 				023B19551A3BA90D0067FB81 /* RLMListBase.h */,
 				023B19561A3BA90D0067FB81 /* RLMListBase.m */,
+				5D0B26611B54585B00A0DD25 /* RLMLocationTypes.h */,
 				0207AB7D195DF9FB007EFB12 /* RLMMigration.h */,
 				0207AB7E195DF9FB007EFB12 /* RLMMigration.mm */,
 				0207AB7C195DF9FB007EFB12 /* RLMMigration_Private.h */,
@@ -829,6 +834,7 @@
 				29E3C7201A71C1C700B62C1D /* RLMConstants.h in Headers */,
 				023B2B321B28F0CF0021E54D /* object_store_exceptions.hpp in Headers */,
 				29E3C7211A71C1C700B62C1D /* RLMObjectBase.h in Headers */,
+				5D0B26641B54585B00A0DD25 /* RLMLocationTypes.h in Headers */,
 				29E3C7221A71C1C700B62C1D /* RLMMigration.h in Headers */,
 				29E3C7241A71C1C700B62C1D /* RLMObject.h in Headers */,
 				29E3C7251A71C1C700B62C1D /* RLMObjectSchema.h in Headers */,
@@ -872,6 +878,7 @@
 				E856D1FA1956154C00FB2FCF /* RLMConstants.h in Headers */,
 				023B2B311B28F0CF0021E54D /* object_store_exceptions.hpp in Headers */,
 				0207AB82195DF9FB007EFB12 /* RLMMigration.h in Headers */,
+				5D0B26631B54585B00A0DD25 /* RLMLocationTypes.h in Headers */,
 				E856D1FD1956154C00FB2FCF /* RLMObject.h in Headers */,
 				023B19601A3BA90E0067FB81 /* RLMObjectBase.h in Headers */,
 				E856D2001956154C00FB2FCF /* RLMObjectSchema.h in Headers */,
@@ -915,6 +922,7 @@
 				E81A1F921955FC9300FDED82 /* RLMConstants.h in Headers */,
 				023B2B301B28F0CF0021E54D /* object_store_exceptions.hpp in Headers */,
 				0207AB81195DF9FB007EFB12 /* RLMMigration.h in Headers */,
+				5D0B26621B54585B00A0DD25 /* RLMLocationTypes.h in Headers */,
 				E81A1F961955FC9300FDED82 /* RLMObject.h in Headers */,
 				023B195F1A3BA90E0067FB81 /* RLMObjectBase.h in Headers */,
 				E81A1F9A1955FC9300FDED82 /* RLMObjectSchema.h in Headers */,

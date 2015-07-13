@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <Realm/RLMLocationTypes.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,6 +81,9 @@ void RLMDeleteAllObjectsFromRealm(RLMRealm *realm);
 
 // get objects of a given class
 RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) NS_RETURNS_RETAINED;
+
+RLMResults *RLMGetObjectsWithinBoundingBox(RLMRealm *realm, NSString *objectClassName, RLMBoundingBox box, NSString *latitudePropertyName, NSString *longitudePropertyName) NS_RETURNS_RETAINED;
+
 
 // get an object with the given primary key
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) NS_RETURNS_RETAINED;

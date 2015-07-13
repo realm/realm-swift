@@ -271,3 +271,11 @@ RLM_ARRAY_TYPE(CircleObject);
 
 @interface FakeObject : NSObject
 @end
+
+#pragma mark LocationObject
+
+@interface LocationObject : RLMObject
+@property NSString *name;
+@property double latitude;
+@property double longitude;
+@end

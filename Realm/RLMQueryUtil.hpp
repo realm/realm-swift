@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import <CoreLocation/CoreLocation.h>
 #import <Foundation/Foundation.h>
 #import <vector>
 
@@ -34,6 +35,9 @@ extern NSString * const RLMUnsupportedTypesFoundInPropertyComparisonException;
 // apply the given predicate to the passed in query, returning the updated query
 void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RLMSchema *schema,
                                  RLMObjectSchema *objectSchema);
+void RLMUpdateQueryWithBoundingBoxSearch(realm::Query *query, CLLocationCoordinate2D corner1, CLLocationCoordinate2D corner2,
+                                         NSString *latitudePropertyName, NSString *longitudePropertyName,
+                                         RLMSchema *schema, RLMObjectSchema *objectSchema);
 
 // return column index - throw for invalid column name
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *schema, NSString *columnName);
