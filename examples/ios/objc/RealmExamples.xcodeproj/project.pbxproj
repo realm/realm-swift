@@ -46,6 +46,7 @@
 		22C389FF1B452FE80055CE88 /* RLMPuzzlesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389FE1B452FE80055CE88 /* RLMPuzzlesTableViewController.m */; };
 		22CFE2871B0A393B00D5EC93 /* SwatchColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2841B0A393B00D5EC93 /* SwatchColor.m */; };
 		22CFE2881B0A393B00D5EC93 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2861B0A393B00D5EC93 /* SwatchesView.m */; };
+		22D55CCA1B54F1FA00F493A6 /* RLMPuzzleListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D55CC91B54F1FA00F493A6 /* RLMPuzzleListViewController.m */; };
 		3FC898FD1A140F550067CBEC /* LabelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FC1A140F550067CBEC /* LabelViewController.m */; };
 		C06134DF1A718BB800D22D12 /* TodayExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C0DC42061A7079D00067156A /* TodayExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C06134E41A71AA4E00D22D12 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
@@ -293,6 +294,8 @@
 		22CFE2841B0A393B00D5EC93 /* SwatchColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchColor.m; sourceTree = "<group>"; };
 		22CFE2851B0A393B00D5EC93 /* SwatchesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchesView.h; sourceTree = "<group>"; };
 		22CFE2861B0A393B00D5EC93 /* SwatchesView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchesView.m; sourceTree = "<group>"; };
+		22D55CC81B54F1FA00F493A6 /* RLMPuzzleListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzleListViewController.h; sourceTree = "<group>"; };
+		22D55CC91B54F1FA00F493A6 /* RLMPuzzleListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzleListViewController.m; sourceTree = "<group>"; };
 		3FC898FB1A140F550067CBEC /* LabelViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelViewController.h; sourceTree = "<group>"; };
 		3FC898FC1A140F550067CBEC /* LabelViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LabelViewController.m; sourceTree = "<group>"; };
 		C0658DB41A76CBD8002F7A84 /* extension WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "extension WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -564,6 +567,8 @@
 				22C389D81B44FB6C0055CE88 /* RLMViewController.m */,
 				22C389FD1B452FE80055CE88 /* RLMPuzzlesTableViewController.h */,
 				22C389FE1B452FE80055CE88 /* RLMPuzzlesTableViewController.m */,
+				22D55CC81B54F1FA00F493A6 /* RLMPuzzleListViewController.h */,
+				22D55CC91B54F1FA00F493A6 /* RLMPuzzleListViewController.m */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -1255,6 +1260,7 @@
 				22C389F21B44FB6C0055CE88 /* RLMStartView.m in Sources */,
 				22C389EE1B44FB6C0055CE88 /* RLMPuzzlePiece.m in Sources */,
 				22C389E81B44FB6C0055CE88 /* AppDelegate.m in Sources */,
+				22D55CCA1B54F1FA00F493A6 /* RLMPuzzleListViewController.m in Sources */,
 				22C389FC1B451F3C0055CE88 /* RLMPuzzle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1467,6 +1473,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1482,7 +1489,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = 2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1493,6 +1500,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1504,7 +1512,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = 2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

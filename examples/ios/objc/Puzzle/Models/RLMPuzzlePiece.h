@@ -22,7 +22,7 @@
 
 @interface RLMPuzzlePiece : RLMObject
 
-@property NSInteger pieceID;
+@property NSInteger identifier;
 @property CGFloat x;
 @property CGFloat y;
 @property NSString *userID;

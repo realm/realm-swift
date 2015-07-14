@@ -27,7 +27,7 @@
 @property (nonatomic, assign) CGPoint gesturePieceOrigin;
 
 - (void)setupPuzzlePieces;
-- (CGPoint)pointForPiece:(RLMPuzzlePieceName)pieceName;
+- (CGPoint)pointForPiece:(RLMPuzzlePieceIdentifier)piece;
 - (void)layoutPiecesInOriginalPlaces;
 - (void)gestureRecognized:(UIPanGestureRecognizer *)gestureRecognizer;
 
@@ -82,29 +82,29 @@
     }
 }
 
-- (CGPoint)pointForPiece:(RLMPuzzlePieceName)pieceName
+- (CGPoint)pointForPiece:(RLMPuzzlePieceIdentifier)piece
 {
-    switch (pieceName) {
-        case RLMPuzzlePieceNameA1: return CGPointMake(-0.5f,0);
-        case RLMPuzzlePieceNameA2: return CGPointMake(143.5,0);
-        case RLMPuzzlePieceNameA3: return CGPointMake(245,-0.5f);
-        case RLMPuzzlePieceNameA4: return CGPointMake(449.5,0);
-        case RLMPuzzlePieceNameA5: return CGPointMake(542.5,-0.5f);
-        case RLMPuzzlePieceNameB1: return CGPointMake(-0.5f,121.5f);
-        case RLMPuzzlePieceNameB2: return CGPointMake(105.5,173.5);
-        case RLMPuzzlePieceNameB3: return CGPointMake(284,130);
-        case RLMPuzzlePieceNameB4: return CGPointMake(400,193);
-        case RLMPuzzlePieceNameB5: return CGPointMake(583,129.5);
-        case RLMPuzzlePieceNameC1: return CGPointMake(-0.5f,370 );
-        case RLMPuzzlePieceNameC2: return CGPointMake(144,309);
-        case RLMPuzzlePieceNameC3: return CGPointMake(245.5,363.5);
-        case RLMPuzzlePieceNameC4: return CGPointMake(439,306.5);
-        case RLMPuzzlePieceNameC5: return CGPointMake(541.5,367.5);
-        case RLMPuzzlePieceNameD1: return CGPointMake(-0.5f,488);
-        case RLMPuzzlePieceNameD2: return CGPointMake(104,542);
-        case RLMPuzzlePieceNameD3: return CGPointMake(290.5,501);
-        case RLMPuzzlePieceNameD4: return CGPointMake(393,557);
-        case RLMPuzzlePieceNameD5: return CGPointMake(590.5,485.5);
+    switch (piece) {
+        case RLMPuzzlePieceIdentifierA1: return CGPointMake(-0.5f,0);
+        case RLMPuzzlePieceIdentifierA2: return CGPointMake(143.5,0);
+        case RLMPuzzlePieceIdentifierA3: return CGPointMake(245,-0.5f);
+        case RLMPuzzlePieceIdentifierA4: return CGPointMake(449.5,0);
+        case RLMPuzzlePieceIdentifierA5: return CGPointMake(542.5,-0.5f);
+        case RLMPuzzlePieceIdentifierB1: return CGPointMake(-0.5f,121.5f);
+        case RLMPuzzlePieceIdentifierB2: return CGPointMake(105.5,173.5);
+        case RLMPuzzlePieceIdentifierB3: return CGPointMake(284,130);
+        case RLMPuzzlePieceIdentifierB4: return CGPointMake(400,193);
+        case RLMPuzzlePieceIdentifierB5: return CGPointMake(583,129.5);
+        case RLMPuzzlePieceIdentifierC1: return CGPointMake(-0.5f,370 );
+        case RLMPuzzlePieceIdentifierC2: return CGPointMake(144,309);
+        case RLMPuzzlePieceIdentifierC3: return CGPointMake(245.5,363.5);
+        case RLMPuzzlePieceIdentifierC4: return CGPointMake(439,306.5);
+        case RLMPuzzlePieceIdentifierC5: return CGPointMake(541.5,367.5);
+        case RLMPuzzlePieceIdentifierD1: return CGPointMake(-0.5f,488);
+        case RLMPuzzlePieceIdentifierD2: return CGPointMake(104,542);
+        case RLMPuzzlePieceIdentifierD3: return CGPointMake(290.5,501);
+        case RLMPuzzlePieceIdentifierD4: return CGPointMake(393,557);
+        case RLMPuzzlePieceIdentifierD5: return CGPointMake(590.5,485.5);
     }
     
     return CGPointZero;
@@ -128,6 +128,19 @@
     frame.size.width -= (75 * 2);
     frame.size.height -= (75 * 2);
     
+    //Work out the random placement before animating so the delegate can be informed at the same time
+    NSMutableArray *points = [NSMutableArray array];
+    for (NSInteger pieceIndex = RLMPuzzlePieceIdentifierA1; pieceIndex < RLMPuzzlePieceIdentifierNum; pieceIndex++) {
+        CGPoint point = CGPointZero;
+        point.x = frame.origin.x + arc4random() % (NSInteger)((frame.origin.x+frame.size.width)-frame.origin.x);
+        point.y = frame.origin.y + arc4random() % (NSInteger)((frame.origin.y+frame.size.height)-frame.origin.y);
+        [points addObject:[NSValue valueWithCGPoint:point]];
+        
+        if ([self.delegate respondsToSelector:@selector(puzzleView:pieceMoved:toPoint:)]) {
+            [self.delegate puzzleView:self pieceMoved:pieceIndex toPoint:point];
+        }
+    }
+    
     [UIView animateWithDuration:1.5f delay:1.5f usingSpringWithDamping:1.0f initialSpringVelocity:0.2f options:0 animations:^{
         for (RLMPuzzlePieceView *piece in self.puzzlePieces) {
             CGPoint point = CGPointZero;
@@ -138,7 +151,7 @@
     } completion:nil];
 }
 
-- (void)movePiece:(RLMPuzzlePieceName)piece toPoint:(CGPoint)point animated:(BOOL)animated
+- (void)movePiece:(RLMPuzzlePieceIdentifier)piece toPoint:(CGPoint)point animated:(BOOL)animated
 {
     RLMPuzzlePieceView *pieceView = self.puzzlePieces[piece];
     
