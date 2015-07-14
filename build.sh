@@ -221,7 +221,6 @@ esac
 export CONFIGURATION
 
 : ${REALM_SWIFT_VERSION:=1.2}
-rm -f RealmSwift && ln -s "RealmSwift-swift$REALM_SWIFT_VERSION" RealmSwift
 case "$REALM_SWIFT_VERSION" in
     "1.2")
         DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer/"
@@ -273,6 +272,19 @@ case "$COMMAND" in
         else
             echo "The core library seems to be up to date."
         fi
+        exit 0
+        ;;
+
+    ######################################
+    # Swift versioning
+    ######################################
+    "set-swift-version")
+        version="$2"
+        if [[ -n "$version" ]]; then
+            version="$(xcrun swift --version | grep -io --color=never -E 'Apple Swift version ([^\b ]*)' | cut -f 4 -d ' ')"
+        fi
+        rm -f RealmSwift && ln -s "RealmSwift-swift$version" RealmSwift && git update-index --assume-unchanged RealmSwift
+        rm -f Realm/Tests/Swift && ln -s "Realm/Tests/Swift$version" Swift && git update-index --assume-unchanged Realm/Tests/Swift
         exit 0
         ;;
 
