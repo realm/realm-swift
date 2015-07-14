@@ -175,3 +175,9 @@ class SwiftIndexedPropertiesObject: Object {
         return ["stringCol"] // Add "intCol" when integer indexing is supported
     }
 }
+
+class SwiftLocationObject: Object {
+    dynamic var name = ""
+    dynamic var latitude = 0 as Double
+    dynamic var longitude = 0 as Double
+}

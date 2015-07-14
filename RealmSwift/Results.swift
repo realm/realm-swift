@@ -19,6 +19,8 @@
 import Foundation
 import Realm
 
+public typealias BoundingBox = RLMBoundingBox
+
 // MARK: MinMaxType
 
 /// Types which can be used for min()/max().
@@ -198,6 +200,19 @@ public final class Results<T: Object>: ResultsBase {
     */
     public func filter(predicate: NSPredicate) -> Results<T> {
         return Results<T>(rlmResults.objectsWithPredicate(predicate))
+    }
+
+    /**
+    Filters the results to the objects whose location is within the given bounding box.
+
+    :param: boundingBox        The bounding box to find objects within.
+    :param: latitudeProperty   The property of the object to interpret as the latitude.
+    :param: longitudeProperty  The property of the object to interpret as the longitude.
+
+    :returns: Results containing objects that are within the given bounding box.
+    */
+    public func filter(withinBoundingBox boundingBox: BoundingBox, latitudeProperty: String, longitudeProperty: String) -> Results<T> {
+        return Results<T>(rlmResults.objectsWithinBoundingBox(boundingBox, latitudeProperty: latitudeProperty, longitudeProperty: longitudeProperty))
     }
 
     // MARK: Sorting
