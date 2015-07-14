@@ -1,4 +1,4 @@
-SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos;
+SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos watchsimulator watchos;
 APPLICATION_EXTENSION_API_ONLY = YES;
 SKIP_INSTALL = YES;
 

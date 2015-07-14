@@ -39,6 +39,8 @@ command:
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
   ios-swift:            builds RealmSwift frameworks for iOS
+  watchos:              builds watchOS framwork
+  watchos-swift:        builds RealmSwift framework for watchOS
   osx:                  builds OS X framework
   osx-swift:            builds RealmSwift framework for OS X
   test:                 tests all iOS and OS X frameworks
@@ -105,7 +107,7 @@ xcrealmswift() {
     xc "-project $PROJECT $@"
 }
 
-build_combined() {
+build_ios_combined() {
     local scheme="$1"
     local module_name="$2"
     local scope_suffix="$3"
@@ -134,6 +136,37 @@ build_combined() {
 
     # Combine ar archives
     xcrun lipo -create "$iphonesimulator_path/$binary_path" "$iphoneos_path/$binary_path" -output "$out_path/$product_name/$module_name"
+}
+
+build_watchos_combined() {
+    local scheme="$1"
+    local module_name="$2"
+    local scope_suffix="$3"
+    local config="$CONFIGURATION"
+
+    # Derive build paths
+    local build_products_path="build/DerivedData/$module_name/Build/Products"
+    local product_name="$module_name.framework"
+    local binary_path="$module_name"
+    local watchos_path="$build_products_path/$config-watchos$scope_suffix/$product_name"
+    local watchsimulator_path="$build_products_path/$config-watchsimulator$scope_suffix/$product_name"
+    local out_path="build/watchos$scope_suffix"
+
+    # Build for each platform
+    cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]') # lowercase the module name to generate command (xcrealm or xcrealmswift)
+    $cmd "-scheme '$scheme' -configuration $config -sdk watchos"
+    $cmd "-scheme '$scheme' -configuration $config -sdk watchsimulator ONLY_ACTIVE_ARCH=NO"
+
+    # Combine .swiftmodule
+    if [ -d $watchsimulator_path/Modules/$module_name.swiftmodule ]; then
+      cp $watchsimulator_path/Modules/$module_name.swiftmodule/* $watchos_path/Modules/$module_name.swiftmodule/
+    fi
+
+    # Retrieve build products
+    clean_retrieve $watchos_path $out_path $product_name
+
+    # Combine ar archives
+    xcrun lipo -create "$watchsimulator_path/$binary_path" "$watchos_path/$binary_path" -output "$out_path/$product_name/$module_name"
 }
 
 clean_retrieve() {
@@ -266,26 +299,38 @@ case "$COMMAND" in
         sh build.sh ios-static
         sh build.sh ios-dynamic
         sh build.sh ios-swift
+        sh build.sh watchos
+        sh build.sh watchos-swift
         sh build.sh osx
         sh build.sh osx-swift
         exit 0
         ;;
 
     "ios-static")
-        build_combined iOS Realm
+        build_ios_combined iOS Realm
         exit 0
         ;;
 
     "ios-dynamic")
-        build_combined "iOS Dynamic" Realm "-dynamic"
+        build_ios_combined "iOS Dynamic" Realm "-dynamic"
         exit 0
         ;;
 
     "ios-swift")
-        build_combined RealmSwift RealmSwift
+        build_ios_combined RealmSwift RealmSwift
         mkdir build/ios/swift
         cp -R build/ios/RealmSwift.framework build/ios/swift
         cp -R build/ios-dynamic/Realm.framework build/ios/swift
+        exit 0
+        ;;
+
+    "watchos")
+        build_watchos_combined "watchOS" Realm
+        exit 0
+        ;;
+
+    "watchos-swift")
+        build_watchos_combined RealmSwift RealmSwift
         exit 0
         ;;
 
@@ -611,6 +656,22 @@ case "$COMMAND" in
         zip --symlinks -r realm-swift-framework-osx.zip RealmSwift.framework Realm.framework
         ;;
 
+    "package-watchos")
+        cd tightdb_objc
+        sh build.sh watchos
+
+        cd build/watchos
+        zip --symlinks -r realm-framework-watchos.zip Realm.framework
+        ;;
+
+    "package-watchos-swift")
+        cd tightdb_objc
+        sh build.sh watchos-swift
+
+        cd build/watchos
+        zip --symlinks -r realm-swift-framework-watchos.zip RealmSwift.framework Realm.framework
+        ;;
+
     "package-release")
         LANG="$2"
         TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
@@ -642,6 +703,11 @@ case "$COMMAND" in
                 cd ${FOLDER}/ios/dynamic
                 unzip ${WORKSPACE}/realm-dynamic-framework-ios.zip
             )
+
+            (
+                cd ${FOLDER}/watchos
+                unzip ${WORKSPACE}/realm-framework-watchos.zip
+            )
         else
             (
                 cd ${FOLDER}/osx
@@ -651,6 +717,11 @@ case "$COMMAND" in
             (
                 cd ${FOLDER}/ios
                 unzip ${WORKSPACE}/realm-swift-framework-ios.zip
+            )
+
+            (
+                cd ${FOLDER}/watchos
+                unzip ${WORKSPACE}/realm-swift-framework-watchos.zip
             )
         fi
 
@@ -736,6 +807,12 @@ EOF
         echo 'Packaging OS X Swift'
         sh tightdb_objc/build.sh package-osx-swift
         cp tightdb_objc/build/osx/realm-swift-framework-osx.zip .
+
+        echo 'Packaging watchOS'
+        sh tightdb_objc/build.sh package-watchos
+        sh tightdb_objc/build.sh package-watchos-swift
+        cp tightdb_objc/build/watchos/realm-swift-framework-watchos.zip .
+        cp tightdb_objc/build/watchos/realm-framework-watchos.zip .
 
         echo 'Building final release packages'
         sh tightdb_objc/build.sh package-release objc
