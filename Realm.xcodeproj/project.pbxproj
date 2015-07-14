@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		C04B4BD71B55C47600FAE58E /* Swift Version */ = {
+		C04B4BD71B55C47600FAE58E /* Change Swift Version */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Swift Version" */;
+			buildConfigurationList = C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Change Swift Version" */;
 			buildPhases = (
-				C04B4BDB1B55C47A00FAE58E /* Swift Swift Version */,
+				C04B4BDB1B55C47A00FAE58E /* Switch Swift Version */,
 			);
 			dependencies = (
 			);
-			name = "Swift Version";
+			name = "Change Swift Version";
 			productName = "Swift Version";
 		};
 /* End PBXAggregateTarget section */
@@ -1197,7 +1197,7 @@
 				026B0F041A780680005E26C8 /* iOS Dynamic Tests */,
 				3F8DCA5619930F550008BD7F /* iOS Device Tests */,
 				3F1A5E711992EB7400F45F4C /* TestHost */,
-				C04B4BD71B55C47600FAE58E /* Swift Version */,
+				C04B4BD71B55C47600FAE58E /* Change Swift Version */,
 			);
 		};
 /* End PBXProject section */
@@ -1277,14 +1277,14 @@
 			shellPath = /bin/sh;
 			shellScript = "echo \"#define REALM_COCOA_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
 		};
-		C04B4BDB1B55C47A00FAE58E /* Swift Swift Version */ = {
+		C04B4BDB1B55C47A00FAE58E /* Switch Swift Version */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Swift Swift Version";
+			name = "Switch Swift Version";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1602,17 +1602,17 @@
 		};
 		C04B4BDD1B55C51500FAE58E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C04B4BD71B55C47600FAE58E /* Swift Version */;
+			target = C04B4BD71B55C47600FAE58E /* Change Swift Version */;
 			targetProxy = C04B4BDC1B55C51500FAE58E /* PBXContainerItemProxy */;
 		};
 		C04B4BDF1B55C51C00FAE58E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C04B4BD71B55C47600FAE58E /* Swift Version */;
+			target = C04B4BD71B55C47600FAE58E /* Change Swift Version */;
 			targetProxy = C04B4BDE1B55C51C00FAE58E /* PBXContainerItemProxy */;
 		};
 		C04B4BE11B55C52100FAE58E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C04B4BD71B55C47600FAE58E /* Swift Version */;
+			target = C04B4BD71B55C47600FAE58E /* Change Swift Version */;
 			targetProxy = C04B4BE01B55C52100FAE58E /* PBXContainerItemProxy */;
 		};
 		E81A20091955FE3B00FDED82 /* PBXTargetDependency */ = {
@@ -1856,6 +1856,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
 			};
 			name = Debug;
 		};
@@ -1863,6 +1865,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
 			};
 			name = Release;
 		};
@@ -2230,13 +2234,14 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Swift Version" */ = {
+		C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Change Swift Version" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C04B4BD81B55C47600FAE58E /* Debug */,
 				C04B4BD91B55C47600FAE58E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E856D1E8195614A400FB2FCF /* Build configuration list for PBXNativeTarget "iOS" */ = {
 			isa = XCConfigurationList;
