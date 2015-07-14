@@ -32,6 +32,8 @@
 #import <realm/table_view.hpp>
 #import <realm/views.hpp>
 
+static const NSUInteger noLimit = NSUIntegerMax;
+
 //
 // RLMResults implementation
 //
@@ -40,6 +42,7 @@
     realm::TableView _backingView;
     BOOL _viewCreated;
     RowIndexes::Sorter _sortOrder;
+    NSUInteger _limit;
 
 @protected
     RLMRealm *_realm;
@@ -59,8 +62,23 @@
 
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<realm::Query>)query
+                                     realm:(RLMRealm *)realm
+                                     limit:(NSUInteger)limit {
+    return [self resultsWithObjectClassName:objectClassName query:move(query) sort:RowIndexes::Sorter{} realm:realm limit:limit];
+}
+
++ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                     query:(std::unique_ptr<realm::Query>)query
                                       sort:(RowIndexes::Sorter const&)sorter
                                      realm:(RLMRealm *)realm {
+    return [self resultsWithObjectClassName:objectClassName query:std::move(query) sort:sorter realm:realm limit:noLimit];
+}
+
++ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                     query:(std::unique_ptr<realm::Query>)query
+                                      sort:(RowIndexes::Sorter const&)sorter
+                                     realm:(RLMRealm *)realm
+                                     limit:(NSUInteger)limit {
     RLMResults *ar = [[self alloc] initPrivate];
     ar->_objectClassName = objectClassName;
     ar->_viewCreated = NO;
@@ -68,20 +86,7 @@
     ar->_sortOrder = sorter;
     ar->_realm = realm;
     ar->_objectSchema = realm.schema[objectClassName];
-    return ar;
-}
-
-+ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
-                                     query:(std::unique_ptr<realm::Query>)query
-                                      view:(realm::TableView &&)view
-                                     realm:(RLMRealm *)realm {
-    RLMResults *ar = [[RLMResults alloc] initPrivate];
-    ar->_objectClassName = objectClassName;
-    ar->_viewCreated = YES;
-    ar->_backingView = std::move(view);
-    ar->_backingQuery = move(query);
-    ar->_realm = realm;
-    ar->_objectSchema = realm.schema[objectClassName];
+    ar->_limit = limit;
     return ar;
 }
 
@@ -98,7 +103,8 @@ static inline void RLMResultsValidateAttached(__unsafe_unretained RLMResults *co
     }
     else if (ar->_backingQuery) {
         // create backing view if needed
-        ar->_backingView = ar->_backingQuery->find_all();
+        NSUInteger limit = ar->_limit;
+        ar->_backingView = ar->_backingQuery->find_all(0, -1, limit == noLimit ? -1 : limit);
         ar->_viewCreated = YES;
         if (!ar->_sortOrder.m_column_indexes.empty()) {
             ar->_backingView.sort(ar->_sortOrder.m_column_indexes, ar->_sortOrder.m_ascending);
@@ -138,7 +144,7 @@ static RowIndexes::Sorter RLMSorterFromDescriptors(RLMObjectSchema *schema, NSAr
     }
     else {
         RLMCheckThread(_realm);
-        return _backingQuery->count();
+        return _backingQuery->count(0, -1, _limit == noLimit ? -1 : _limit);
     }
 }
 
@@ -310,6 +316,14 @@ static RowIndexes::Sorter RLMSorterFromDescriptors(RLMObjectSchema *schema, NSAr
     return [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) sort:sorter realm:_realm];
 }
 
+- (RLMResults *)limit:(NSUInteger)limit
+{
+    RLMCheckThread(_realm);
+
+    auto query = [self cloneQueryForLimit:limit forceTableViewMaterialization:NO];
+    return [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) sort:_sortOrder realm:_realm limit:limit];
+}
+
 - (id)objectAtIndexedSubscript:(NSUInteger)index {
     return [self objectAtIndex:index];
 }
@@ -474,7 +488,35 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (std::unique_ptr<Query>)cloneQuery {
+    if (_limit != noLimit) {
+        return [self cloneQueryForLimit:_limit forceTableViewMaterialization:YES];
+    }
+    return [self _cloneQuery];
+}
+
+- (std::unique_ptr<Query>)_cloneQuery {
     return std::make_unique<realm::Query>(*_backingQuery, realm::Query::TCopyExpressionTag{});
+}
+
+- (std::unique_ptr<Query>)cloneQueryForLimit:(NSUInteger)limit forceTableViewMaterialization:(BOOL)forceTableViewMaterialization {
+    BOOL materializeTableView = forceTableViewMaterialization;
+
+    if (!_sortOrder.m_column_indexes.empty()) {
+        // Materialize the table view to ensure that limiting results respects the sort order. If we didn't materialize
+        // the view here the limit would be applied before the sort as the limit is applied during query evaluation.
+        materializeTableView = YES;
+    }
+
+    if (materializeTableView) {
+        RLMResultsValidateAttached(self);
+
+        const Table& table = *_backingQuery->get_table();
+        Query query(table, &_backingView);
+        auto tableView = std::make_unique<TableView>(query.find_all(0, -1, limit));
+        return std::make_unique<Query>(table, std::move(tableView));
+    }
+
+    return [self _cloneQuery];
 }
 
 - (NSUInteger)indexInSource:(NSUInteger)index {
@@ -563,7 +605,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
     _table->clear();
 }
 
-- (std::unique_ptr<Query>)cloneQuery {
+- (std::unique_ptr<Query>)_cloneQuery {
     return std::make_unique<realm::Query>(_table->where(), realm::Query::TCopyExpressionTag{});
 }
 

@@ -163,6 +163,15 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
 
+/**
+ Get a `RLMResults` from an existing `RLMResults` limited to at most `limit` items.
+
+ @param limit  The maximum number of items to include.
+
+ @return   An RLMResults limited to at most `limit` items.
+ */
+- (RLMResults *)limit:(NSUInteger)limit;
+
 #pragma mark -
 
 

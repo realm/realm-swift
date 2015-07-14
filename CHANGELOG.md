@@ -11,6 +11,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Avoid evaluating results eagerly when filtering and sorting.
 * Add nullability annotations to the Objective-C API to provide enhanced compiler
   warnings and bridging to Swift.
+* Add `-[RLMResults limit:]` to return an `RLMResults` that contains at most the
+  given number of objects.
 
 ### Bugfixes
 
