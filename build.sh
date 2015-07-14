@@ -220,6 +220,23 @@ case "$COMMAND" in
 esac
 export CONFIGURATION
 
+: ${REALM_SWIFT_VERSION:=1.2}
+rm -f RealmSwift && ln -s "RealmSwift-swift$REALM_SWIFT_VERSION" RealmSwift
+case "$REALM_SWIFT_VERSION" in
+    "1.2")
+        DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer/"
+        REALM_SWIFT_VERSION=
+        ;;
+    "2.0")
+        DEVELOPER_DIR="/Applications/Xcode-beta.app/Contents/Developer/"
+        ;;
+    *)
+        echo "Unsupported Swift version $REALM_SWIFT_VERSION"
+        exit 1
+        ;;
+esac
+export DEVELOPER_DIR
+
 case "$COMMAND" in
 
     ######################################
@@ -284,8 +301,8 @@ case "$COMMAND" in
     "ios-swift")
         build_combined RealmSwift RealmSwift
         mkdir build/ios/swift
-        cp -R build/ios/RealmSwift.framework build/ios/swift
-        cp -R build/ios-dynamic/Realm.framework build/ios/swift
+        cp -R build/ios/RealmSwift.framework build/ios/swift$REALM_SWIFT_VERSION
+        cp -R build/ios-dynamic/Realm.framework build/ios/swift$REALM_SWIFT_VERSION
         exit 0
         ;;
 
@@ -299,7 +316,13 @@ case "$COMMAND" in
 
     "osx-swift")
         xcrealmswift "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
-        cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework build/osx
+        destination="build/osx"
+        if [[ "$REALM_SWIFT_VERSION" ]]; then
+          destination="$destination/swift$REALM_SWIFT_VERSION"
+          mkdir -p destination
+          cp -r "build/osx/Realm.framework" "$destination"
+        fi
+        cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework "$destination"
         exit 0
         ;;
 

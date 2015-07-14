@@ -11,6 +11,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 026B0EFC1A780414005E26C8 /* Build configuration list for PBXAggregateTarget "Realm" */;
 			buildPhases = (
+				C017B6531B55B61D001CEC73 /* Symlink Swift */,
 				026B0EFF1A78041A005E26C8 /* ShellScript */,
 			);
 			dependencies = (
@@ -362,6 +363,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = RLM;
+				LastSwiftUpdateCheck = 0700;
 				LastTestingUpgradeCheck = 0510;
 				LastUpgradeCheck = 0640;
 				ORGANIZATIONNAME = Realm;
@@ -434,6 +436,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "";
+		};
+		C017B6531B55B61D001CEC73 /* Symlink Swift */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Symlink Swift";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ (-L RealmSwift) || (! -d RealmSwift) ]]; then\n    version=\"$(xcrun swift --version | grep -io --color=never -E 'Apple Swift version ([^\\b ]*)' | cut -f 4 -d ' ')\"\n    rm -f RealmSwift\n    ln -s \"RealmSwift-swift$version\" RealmSwift\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
