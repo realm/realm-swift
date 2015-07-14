@@ -16,6 +16,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 
 * Processes crashing due to an uncaught exception during a write transaction will
   no longer cause other processes using the same Realm to hang indefinitely.
+* Fix incorrect results when querying for < or <= on ints which
+  requires 64 bits to represent with a CPU that supports SSE 4.2.
 
 0.93.2 Release notes (2015-06-12)
 =============================================================
@@ -126,7 +128,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Exceptions raised when incorrect object types are used with predicates now contain more detailed information.
-* Added `-[RLMMigration deleteDataForClassName:]` and `Migration.deleteData(_:)` 
+* Added `-[RLMMigration deleteDataForClassName:]` and `Migration.deleteData(_:)`
   to enable cleaning up after removing object subclasses
 
 ### Bugfixes

@@ -29,6 +29,16 @@ class TestCase: XCTestCase {
         return Realm(path: testRealmPath())
     }
 
+    override class func setUp() {
+        super.setUp()
+#if DEBUG
+        // Disable actually syncing anything to the disk to greatly speed up the
+        // tests, but only in debug mode because it can't be re-enabled and we need
+        // it enabled for performance tests
+        RLMDisableSyncToDisk();
+#endif
+    }
+
     override func invokeTest() {
         Realm.defaultPath = realmPathForFile("\(realmFilePrefix()).default.realm")
         NSFileManager.defaultManager().createDirectoryAtPath(realmPathForFile(""), withIntermediateDirectories: true, attributes: nil, error: nil)
