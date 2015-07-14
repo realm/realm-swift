@@ -245,6 +245,9 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (id)valueForKey:(NSString *)key {
+    if ([key isEqualToString:RLMInvalidatedKey]) {
+        return @NO; // Standalone arrays are never invalidated
+    }
     if (!_backingArray) {
         return @[];
     }
