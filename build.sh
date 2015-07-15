@@ -341,7 +341,7 @@ case "$COMMAND" in
 
     "ios-swift")
         build_combined RealmSwift RealmSwift
-        mkdir build/ios/swift
+        mkdir build/ios/swift$REALM_SWIFT_VERSION
         cp -R build/ios/RealmSwift.framework build/ios/swift$REALM_SWIFT_VERSION
         cp -R build/ios-dynamic/Realm.framework build/ios/swift$REALM_SWIFT_VERSION
         exit 0
@@ -360,7 +360,7 @@ case "$COMMAND" in
         destination="build/osx"
         if [[ "$REALM_SWIFT_VERSION" ]]; then
           destination="$destination/swift$REALM_SWIFT_VERSION"
-          mkdir -p destination
+          mkdir -p "$destination"
           cp -r "build/osx/Realm.framework" "$destination"
         fi
         cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework "$destination"
