@@ -287,7 +287,7 @@
 				5DE0B6D51B10082A007831D9 /* TestHost.xcconfig */,
 			);
 			name = Configuration;
-			path = RealmSwift/Configuration;
+			path = Configuration/RealmSwift;
 			sourceTree = "<group>";
 		};
 		C0F5D2931B14FC10001C4543 /* Realm */ = {
