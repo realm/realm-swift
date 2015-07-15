@@ -458,11 +458,16 @@ static id RLMAutorelease(id value) {
 }
 
 + (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path {
-    if (RLMGetAnyCachedRealmForPath(path)) {
-        @throw RLMException(@"Cannot set encryption key for Realms that are already open.");
-    }
+    @synchronized (s_keysPerPath) {
+        if (RLMGetAnyCachedRealmForPath(path)) {
+            NSData *existingKey = keyForPath(path);
+            if (!(existingKey == key || [existingKey isEqual:key])) {
+                @throw RLMException(@"Cannot set encryption key for Realms that are already open.");
+            }
+        }
 
-    setKeyForPath(validatedKey(key), path);
+        setKeyForPath(validatedKey(key), path);
+    }
 }
 
 + (void)resetRealmState {
@@ -798,15 +803,15 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (void)setSchemaVersion:(uint64_t)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block {
-    if (RLMGetAnyCachedRealmForPath(realmPath)) {
-        @throw RLMException(@"Cannot set schema version for Realms that are already open.");
-    }
-
-    if (version == realm::ObjectStore::NotVersioned) {
-        @throw RLMException(@"Cannot set schema version to RLMNotVersioned.");
-    }
-
     @synchronized(s_migrationBlocks) {
+        if (RLMGetAnyCachedRealmForPath(realmPath) && schemaVersionForPath(realmPath) != version) {
+            @throw RLMException(@"Cannot set schema version for Realms that are already open.");
+        }
+
+        if (version == realm::ObjectStore::NotVersioned) {
+            @throw RLMException(@"Cannot set schema version to RLMNotVersioned.");
+        }
+
         if (block) {
             s_migrationBlocks[realmPath] = block;
         }
