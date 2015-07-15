@@ -654,18 +654,22 @@ case "$COMMAND" in
 
     "package-ios-swift")
         cd tightdb_objc
-        sh build.sh ios-swift
+        REALM_SWIFT_VERSION=1.2 sh build.sh ios-swift
+        REALM_SWIFT_VERSION=2.0 sh build.sh ios-swift
 
-        cd build/ios/swift
-        zip --symlinks -r realm-swift-framework-ios.zip RealmSwift.framework Realm.framework
+        cd build/ios
+        zip --symlinks -r realm-swift-framework-ios.zip swift-1.2 swift-2.0
         ;;
 
     "package-osx-swift")
         cd tightdb_objc
-        sh build.sh osx-swift
+        REALM_SWIFT_VERSION=1.2 sh build.sh osx-swift
+        REALM_SWIFT_VERSION=2.0 sh build.sh osx-swift
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip RealmSwift.framework Realm.framework
+        cp -R Realm.framework swift-1.2
+        cp -R Realm.framework swift-2.0
+        zip --symlinks -r realm-swift-framework-osx.zip swift-1.2 swift-2.0
         ;;
 
     "package-release")
@@ -725,7 +729,7 @@ case "$COMMAND" in
             unzip ${WORKSPACE}/realm-examples.zip
             cd examples
             if [[ "${LANG}" == "objc" ]]; then
-                rm -rf ios/swift
+                rm -rf ios/swift-1.2 ios/swift-2.0
             else
                 rm -rf ios/objc ios/rubymotion osx
             fi
