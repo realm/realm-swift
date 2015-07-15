@@ -291,8 +291,20 @@ case "$COMMAND" in
         if [[ -z "$version" ]]; then
             version="$(xcrun swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p')"
         fi
-        rm -f RealmSwift && ln -s "RealmSwift-swift$version" RealmSwift && (git update-index --assume-unchanged RealmSwift || true)
-        (cd Realm/Tests && rm -f Swift && ln -s "Swift$version" Swift && (git update-index --assume-unchanged Swift || true))
+
+        # Update symlinks to point to this swift version's directories
+        #
+        # `git update-index --assume-unchanged` tells git to assume that the
+        # given file has no changes to it, which should make it possible for us
+        # to commit the symlinks without having to remember to unstage them
+        # before every commit
+        (rm -f RealmSwift &&
+         ln -s "RealmSwift-swift$version" RealmSwift &&
+         (git update-index --assume-unchanged RealmSwift || true))
+        (cd Realm/Tests &&
+         rm -f Swift &&
+         ln -s "Swift$version" Swift &&
+         (git update-index --assume-unchanged Swift || true))
         exit 0
         ;;
 
