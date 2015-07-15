@@ -291,8 +291,8 @@ case "$COMMAND" in
         if [[ -z "$version" ]]; then
             version="$(xcrun swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p')"
         fi
-        rm -f RealmSwift && ln -s "RealmSwift-swift$version" RealmSwift && git update-index --assume-unchanged RealmSwift
-        (cd Realm/Tests && rm -f Swift && ln -s "Swift$version" Swift && git update-index --assume-unchanged Swift)
+        rm -f RealmSwift && ln -s "RealmSwift-swift$version" RealmSwift && (git update-index --assume-unchanged RealmSwift || true)
+        (cd Realm/Tests && rm -f Swift && ln -s "Swift$version" Swift && (git update-index --assume-unchanged Swift || true))
         exit 0
         ;;
 
