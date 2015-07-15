@@ -403,17 +403,19 @@ class SwiftPerformanceTests: TestCase {
             let queue = dispatch_queue_create("background", nil)
             let semaphore = dispatch_semaphore_create(0)
             dispatch_async(queue) {
-                let realm = Realm(inMemoryIdentifier: "test")
-                let object = realm.objects(SwiftIntObject).first!
-                var stop = false
-                let token = realm.addNotificationBlock { _, _ in
-                    stop = object.intCol == stopValue
+                autoreleasepool {
+                    let realm = Realm(inMemoryIdentifier: "test")
+                    let object = realm.objects(SwiftIntObject).first!
+                    var stop = false
+                    let token = realm.addNotificationBlock { _, _ in
+                        stop = object.intCol == stopValue
+                    }
+                    dispatch_semaphore_signal(semaphore)
+                    while !stop {
+                        NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as! NSDate)
+                    }
+                    realm.removeNotification(token)
                 }
-                dispatch_semaphore_signal(semaphore)
-                while !stop {
-                    NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as! NSDate)
-                }
-                realm.removeNotification(token)
             }
 
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
@@ -437,18 +439,20 @@ class SwiftPerformanceTests: TestCase {
             let queue = dispatch_queue_create("background", nil)
             let semaphore = dispatch_semaphore_create(0)
             dispatch_async(queue) {
-                let realm = Realm(inMemoryIdentifier: "test")
-                let object = realm.objects(SwiftIntObject).first!
-                let token = realm.addNotificationBlock { _, _ in
-                    if object.intCol % 2 == 0 && object.intCol < stopValue {
-                        realm.write { _ = object.intCol++ }
+                autoreleasepool {
+                    let realm = Realm(inMemoryIdentifier: "test")
+                    let object = realm.objects(SwiftIntObject).first!
+                    let token = realm.addNotificationBlock { _, _ in
+                        if object.intCol % 2 == 0 && object.intCol < stopValue {
+                            realm.write { _ = object.intCol++ }
+                        }
                     }
+                    dispatch_semaphore_signal(semaphore)
+                    while object.intCol < stopValue {
+                        NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as! NSDate)
+                    }
+                    realm.removeNotification(token)
                 }
-                dispatch_semaphore_signal(semaphore)
-                while object.intCol < stopValue {
-                    NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as! NSDate)
-                }
-                realm.removeNotification(token)
             }
 
             let token = realm.addNotificationBlock { _, _ in

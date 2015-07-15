@@ -60,7 +60,11 @@ class TestCase: XCTestCase {
 
     func dispatchSyncNewThread(block: dispatch_block_t) {
         let queue = dispatch_queue_create("background", nil)
-        dispatch_async(queue, block)
+        dispatch_async(queue) {
+            autoreleasepool {
+                block()
+            }
+        }
         dispatch_sync(queue) {}
     }
 
