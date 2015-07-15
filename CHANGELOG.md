@@ -26,6 +26,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 * An exception will no longer be thrown when attempt to reset the schema version or
   encryption key on an open Realm to the current value.
 * Date properties on 32 bit devices will retain 64 bit second precision.
+* Wrap calls to the block passed to `enumerate` in an autoreleasepool to reduce
+  memory growth when migrating a large amount of objects.
 
 0.93.2 Release notes (2015-06-12)
 =============================================================
