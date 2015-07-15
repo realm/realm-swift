@@ -329,7 +329,7 @@ class ResultsFromLinkViewTests: ResultsTests {
 }
 
 class LocationResultsTests : TestCase {
-    func testBoundingBoxQueries() {
+    override func setUp() {
         Realm().write {
             Realm().create(SwiftLocationObject.self, value: [ "Angel Stadium of Anaheim", 33.800278, -117.882778 ])
             Realm().create(SwiftLocationObject.self, value: [ "AT&T Park", 37.778611, -122.389167 ])
@@ -338,7 +338,9 @@ class LocationResultsTests : TestCase {
             Realm().create(SwiftLocationObject.self, value: [ "Citi Field", 40.756944, -73.845833 ])
             Realm().create(SwiftLocationObject.self, value: [ "Citizens Bank Park", 39.905833, -75.166389 ])
         }
+    }
 
+    func testBoundingBoxQueries() {
         let anaheimToPhoenix = BoundingBox(corner1: Coordinate2D(latitude: 33.3, longitude: -118), corner2: Coordinate2D(latitude: 34, longitude: -112))
         var results = Realm().objects(SwiftLocationObject).filter(withinBoundingBox: anaheimToPhoenix, latitudeProperty: "latitude", longitudeProperty: "longitude")
         results = results.sorted("name", ascending: true)
@@ -350,6 +352,15 @@ class LocationResultsTests : TestCase {
         results = Realm().objects(SwiftLocationObject).filter("name BEGINSWITH 'Chase'").filter(withinBoundingBox: anaheimToPhoenix, latitudeProperty: "latitude", longitudeProperty: "longitude")
         XCTAssertEqual(results.count, 1)
         XCTAssertEqual(results[0].name, "Chase Field")
+    }
 
+    func testDistanceQueries() {
+        let statueOfLiberty = Coordinate2D(latitude: 40.689167, longitude: -74.044444)
+        let twoHundredAndFiftyKilometers = Distance(250000)
+        var results = Realm().objects(SwiftLocationObject).filter(withinDistance:twoHundredAndFiftyKilometers, referencePoint: statueOfLiberty, latitudeProperty: "latitude", longitudeProperty: "longitude")
+        results = results.sorted("name", ascending: true)
+        XCTAssertEqual(results.count, 2)
+        XCTAssertEqual(results[0].name, "Citi Field")
+        XCTAssertEqual(results[1].name, "Citizens Bank Park")
     }
 }
