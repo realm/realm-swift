@@ -78,7 +78,7 @@ xcode() {
     mkdir -p build/DerivedData
     CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@"
     echo "Building with command:" $CMD
-    eval $CMD
+    eval "$CMD"
 }
 
 xc() {
@@ -220,6 +220,10 @@ case "$COMMAND" in
 esac
 export CONFIGURATION
 
+get_swift_version() {
+    "$1/usr/bin/xcrun" swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p'
+}
+
 xcode_for_swift() {
     local xcodes dev_dir
     xcodes=()
@@ -229,18 +233,25 @@ xcode_for_swift() {
     done
 
     for dir in "${xcodes[@]}"; do
-        version="$("$dir/usr/bin/xcrun" swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p')"
+        version="$(get_swift_version "$dir")"
         if [[ "$version" = "$1" ]]; then
             echo "$dir"
-            break;
+            return 0
         fi
     done
+
+    >&2 echo "No version of Xcode found that supports Swift $1"
+    return 1
 }
 
-: ${REALM_SWIFT_VERSION:=1.2}
-: ${DEVELOPER_DIR:="$(xcode_for_swift "$REALM_SWIFT_VERSION")"}
-export DEVELOPER_DIR
-if [[ "$REALM_SWIFT_VERSION" = "1.2" ]]; then
+if [ "x$REALM_SWIFT_VERSION" != x ]; then
+    DEVELOPER_DIR=$(xcode_for_swift $REALM_SWIFT_VERSION)
+    export DEVELOPER_DIR
+else
+    REALM_SWIFT_VERSION=$(get_swift_version)
+fi
+
+if [ "$REALM_SWIFT_VERSION" = "1.2" ]; then
    REALM_SWIFT_VERSION=
 fi
 
