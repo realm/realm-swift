@@ -220,6 +220,30 @@ case "$COMMAND" in
 esac
 export CONFIGURATION
 
+xcode_for_swift() {
+    local xcodes dev_dir
+    xcodes=()
+    dev_dir="Contents/Developer"
+    for dir in $(mdfind "kMDItemCFBundleIdentifier == 'com.apple.dt.Xcode'" 2>/dev/null); do
+        [[ -d "$dir" && -n "$(ls -A "$dir/$dev_dir")" ]] && xcodes+=("$dir/$dev_dir")
+    done
+
+    for dir in "${xcodes[@]}"; do
+        version="$("$dir/usr/bin/xcrun" swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p')"
+        if [[ "$version" = "$1" ]]; then
+            echo "$dir"
+            break;
+        fi
+    done
+}
+
+: ${REALM_SWIFT_VERSION:=1.2}
+: ${DEVELOPER_DIR:="$(xcode_for_swift "$REALM_SWIFT_VERSION")"}
+export DEVELOPER_DIR
+if [[ "$REALM_SWIFT_VERSION" = "1.2" ]]; then
+   REALM_SWIFT_VERSION=
+fi
+
 case "$COMMAND" in
 
     ######################################
@@ -260,6 +284,31 @@ case "$COMMAND" in
         ;;
 
     ######################################
+    # Swift versioning
+    ######################################
+    "set-swift-version")
+        version="$2"
+        if [[ -z "$version" ]]; then
+            version="$(xcrun swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p')"
+        fi
+
+        # Update symlinks to point to this swift version's directories
+        #
+        # `git update-index --assume-unchanged` tells git to assume that the
+        # given file has no changes to it, which should make it possible for us
+        # to commit the symlinks without having to remember to unstage them
+        # before every commit
+        (rm -f RealmSwift &&
+         ln -s "RealmSwift-swift$version" RealmSwift &&
+         (git update-index --assume-unchanged RealmSwift || true))
+        (cd Realm/Tests &&
+         rm -f Swift &&
+         ln -s "Swift$version" Swift &&
+         (git update-index --assume-unchanged Swift || true))
+        exit 0
+        ;;
+
+    ######################################
     # Building
     ######################################
     "build")
@@ -284,8 +333,8 @@ case "$COMMAND" in
     "ios-swift")
         build_combined RealmSwift RealmSwift
         mkdir build/ios/swift
-        cp -R build/ios/RealmSwift.framework build/ios/swift
-        cp -R build/ios-dynamic/Realm.framework build/ios/swift
+        cp -R build/ios/RealmSwift.framework build/ios/swift$REALM_SWIFT_VERSION
+        cp -R build/ios-dynamic/Realm.framework build/ios/swift$REALM_SWIFT_VERSION
         exit 0
         ;;
 
@@ -299,7 +348,13 @@ case "$COMMAND" in
 
     "osx-swift")
         xcrealmswift "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
-        cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework build/osx
+        destination="build/osx"
+        if [[ "$REALM_SWIFT_VERSION" ]]; then
+          destination="$destination/swift$REALM_SWIFT_VERSION"
+          mkdir -p destination
+          cp -r "build/osx/Realm.framework" "$destination"
+        fi
+        cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework "$destination"
         exit 0
         ;;
 
@@ -481,12 +536,13 @@ case "$COMMAND" in
         ;;
 
     "examples-ios-swift")
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        project="examples/ios/swift$REALM_SWIFT_VERSION/RealmExamples.xcodeproj"
+        xc "-project $project -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 

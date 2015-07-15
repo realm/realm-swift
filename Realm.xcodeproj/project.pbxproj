@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		C04B4BD71B55C47600FAE58E /* Set Swift Version */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Set Swift Version" */;
+			buildPhases = (
+				C04B4BDB1B55C47A00FAE58E /* Set Swift Version */,
+			);
+			dependencies = (
+			);
+			name = "Set Swift Version";
+			productName = "Swift Version";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		0207AB7F195DF9FB007EFB12 /* RLMMigration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 0207AB7C195DF9FB007EFB12 /* RLMMigration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0207AB80195DF9FB007EFB12 /* RLMMigration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 0207AB7C195DF9FB007EFB12 /* RLMMigration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -354,6 +368,27 @@
 			proxyType = 1;
 			remoteGlobalIDString = E856D1D4195614A300FB2FCF;
 			remoteInfo = iOS;
+		};
+		C04B4BDC1B55C51500FAE58E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
+			remoteInfo = "Swift Version";
+		};
+		C04B4BDE1B55C51C00FAE58E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
+			remoteInfo = "Swift Version";
+		};
+		C04B4BE01B55C52100FAE58E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
+			remoteInfo = "Swift Version";
 		};
 		E81A20081955FE3B00FDED82 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -962,6 +997,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				C04B4BDF1B55C51C00FAE58E /* PBXTargetDependency */,
 				02DC515C1A82EA39002A6433 /* PBXTargetDependency */,
 			);
 			name = "iOS Dynamic Tests";
@@ -1017,6 +1053,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				C04B4BE11B55C52100FAE58E /* PBXTargetDependency */,
 				3F8DCA8019930FF70008BD7F /* PBXTargetDependency */,
 				3F8DCA6119930F580008BD7F /* PBXTargetDependency */,
 			);
@@ -1054,6 +1091,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				C04B4BDD1B55C51500FAE58E /* PBXTargetDependency */,
 				02DC51521A82E52B002A6433 /* PBXTargetDependency */,
 			);
 			name = "iOS Tests";
@@ -1120,6 +1158,9 @@
 						CreatedOnToolsVersion = 6.0;
 						TestTargetID = 3F1A5E711992EB7400F45F4C;
 					};
+					C04B4BD71B55C47600FAE58E = {
+						CreatedOnToolsVersion = 6.4;
+					};
 					E856D1D4195614A300FB2FCF = {
 						CreatedOnToolsVersion = 6.0;
 					};
@@ -1156,6 +1197,7 @@
 				026B0F041A780680005E26C8 /* iOS Dynamic Tests */,
 				3F8DCA5619930F550008BD7F /* iOS Device Tests */,
 				3F1A5E711992EB7400F45F4C /* TestHost */,
+				C04B4BD71B55C47600FAE58E /* Set Swift Version */,
 			);
 		};
 /* End PBXProject section */
@@ -1234,6 +1276,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "echo \"#define REALM_COCOA_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
+		};
+		C04B4BDB1B55C47A00FAE58E /* Set Swift Version */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Set Swift Version";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh build.sh set-swift-version";
 		};
 		E81A1FB71955FCE700FDED82 /* Download Core */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1544,6 +1600,21 @@
 			target = E856D1D4195614A300FB2FCF /* iOS */;
 			targetProxy = 3F8DCA7F19930FF70008BD7F /* PBXContainerItemProxy */;
 		};
+		C04B4BDD1B55C51500FAE58E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
+			targetProxy = C04B4BDC1B55C51500FAE58E /* PBXContainerItemProxy */;
+		};
+		C04B4BDF1B55C51C00FAE58E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
+			targetProxy = C04B4BDE1B55C51C00FAE58E /* PBXContainerItemProxy */;
+		};
+		C04B4BE11B55C52100FAE58E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
+			targetProxy = C04B4BE01B55C52100FAE58E /* PBXContainerItemProxy */;
+		};
 		E81A20091955FE3B00FDED82 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E8D89B971955FC6D00CF2B9A /* OSX */;
@@ -1778,6 +1849,26 @@
 				SDKROOT = iphoneos;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C04B4BD81B55C47600FAE58E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator";
+			};
+			name = Debug;
+		};
+		C04B4BD91B55C47600FAE58E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator";
 			};
 			name = Release;
 		};
@@ -2141,6 +2232,15 @@
 			buildConfigurations = (
 				3F8DCA5E19930F550008BD7F /* Debug */,
 				3F8DCA5F19930F550008BD7F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Set Swift Version" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C04B4BD81B55C47600FAE58E /* Debug */,
+				C04B4BD91B55C47600FAE58E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
