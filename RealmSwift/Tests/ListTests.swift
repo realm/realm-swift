@@ -63,10 +63,10 @@ class ListTests: TestCase {
         super.tearDown()
     }
 
-    override class func defaultTestSuite() -> XCTestSuite! {
+    override class func defaultTestSuite() -> XCTestSuite {
         // Don't run tests for the base class
         if isEqual(ListTests) {
-            return nil
+            return XCTestSuite(name: "empty")
         }
         return super.defaultTestSuite()
     }
@@ -175,17 +175,17 @@ class ListTests: TestCase {
     }
 
     func testValueForKey() {
-        let expected = map(array) { $0.stringCol }
+        let expected = array.map { $0.stringCol }
         let actual = array.valueForKey("stringCol") as! [String]!
         XCTAssertEqual(expected, actual)
 
-        XCTAssertEqual(map(array) { $0 }, array.valueForKey("self") as! [SwiftStringObject])
+        XCTAssertEqual(array.map { $0 }, array.valueForKey("self") as! [SwiftStringObject])
     }
 
     func testSetValueForKey() {
         array.setValue("hi there!", forKey: "stringCol")
-        let expected = map(array!) { _ in "hi there!" }
-        let actual = map(array) { $0.stringCol }
+        let expected = array!.map { _ in "hi there!" }
+        let actual = array.map { $0.stringCol }
         XCTAssertEqual(expected, actual)
     }
 
@@ -429,7 +429,7 @@ class ListTests: TestCase {
 
         // Make sure we can enumerate
         for obj in array {
-            XCTAssertTrue(count(obj.description) > 0, "Object should have description")
+            XCTAssertTrue(obj.description.utf16.count > 0, "Object should have description")
         }
     }
 
@@ -504,7 +504,7 @@ class ListNewlyAddedTests: ListTests {
 
     override func createArrayWithLinks() -> SwiftListOfSwiftObject {
         let array = SwiftListOfSwiftObject()
-        let realm = Realm()
+        let realm = try! Realm()
         realm.write { realm.add(array) }
 
         XCTAssertNotNil(array.realm)
@@ -524,7 +524,7 @@ class ListNewlyCreatedTests: ListTests {
     }
 
     override func createArrayWithLinks() -> SwiftListOfSwiftObject {
-        let realm = Realm()
+        let realm = try! Realm()
         realm.beginWrite()
         let array = realm.create(SwiftListOfSwiftObject)
         realm.commitWrite()
@@ -547,7 +547,7 @@ class ListRetrievedTests: ListTests {
     }
 
     override func createArrayWithLinks() -> SwiftListOfSwiftObject {
-        let realm = Realm()
+        let realm = try! Realm()
         realm.beginWrite()
         realm.create(SwiftListOfSwiftObject)
         realm.commitWrite()

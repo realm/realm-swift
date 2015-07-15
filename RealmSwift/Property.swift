@@ -27,7 +27,7 @@ introspecting the database's schema.
 
 These properties map to columns in the core database.
 */
-public final class Property: Printable {
+public final class Property: CustomStringConvertible {
 
     // MARK: Properties
 

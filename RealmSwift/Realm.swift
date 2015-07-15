@@ -81,16 +81,17 @@ public final class Realm {
 
     :param: path Path to the realm file.
     */
-    public convenience init(path: String = Realm.defaultPath) {
-        self.init(RLMRealm(path: path, readOnly: false, error: nil)!)
+    public convenience init(path: String = Realm.defaultPath) throws {
+        let rlmRealm = try RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: false, schema: nil)
+        self.init(rlmRealm)
     }
     
     /**
     Obtains a `Realm` instance with persistence to a specific file path with
     options.
 
-    Like `init(path:)`, but with the ability to open read-only realms and get
-    errors as an `NSError` inout parameter rather than exceptions.
+    Like `init(path:)`, but with the ability to open read-only realms and
+    encrypted realms.
 
     :warning: Read-only Realms do not support changes made to the file while the
               `Realm` exists. This means that you cannot open a Realm as both read-only
@@ -101,17 +102,10 @@ public final class Realm {
     :param: path            Path to the file you want the data saved in.
     :param: readOnly        Bool indicating if this Realm is read-only (must use for read-only files).
     :param: encryptionKey   64-byte key to use to encrypt the data.
-    :param: error           If an error occurs, upon return contains an `NSError` object
-                            that describes the problem. If you are not interested in
-                            possible errors, omit the argument, or pass in `nil`.
     */
-    public convenience init?(path: String, readOnly: Bool, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, key: encryptionKey, readOnly: readOnly, inMemory: false, dynamic: false, schema: nil, error: error) as RLMRealm? {
-            self.init(rlmRealm)
-        } else {
-            self.init(RLMRealm())
-            return nil
-        }
+    public convenience init(path: String, readOnly: Bool, encryptionKey: NSData? = nil) throws {
+        let rlmRealm = try RLMRealm(path: path, key: encryptionKey, readOnly: readOnly, inMemory: false, dynamic: false, schema: nil)
+        self.init(rlmRealm)
     }
 
     /**
@@ -286,10 +280,12 @@ public final class Realm {
     :returns: The created object.
     */
     public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
-        if update && schema[T.className()]?.primaryKeyProperty == nil {
-          throwRealmException("'\(T.className())' does not have a primary key and can not be updated")
+        // FIXME: use T.className()
+        let className = (T.self as Object.Type).className()
+        if update && schema[className]?.primaryKeyProperty == nil {
+          throwRealmException("'\(className)' does not have a primary key and can not be updated")
         }
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, update), T.self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), T.self)
     }
 
     // MARK: Deleting objects
@@ -356,7 +352,8 @@ public final class Realm {
     :returns: All objects of the given type in Realm.
     */
     public func objects<T: Object>(type: T.Type) -> Results<T> {
-        return Results<T>(RLMGetObjects(rlmRealm, T.className(), nil))
+        // FIXME: use T.className()
+        return Results<T>(RLMGetObjects(rlmRealm, (T.self as Object.Type).className(), nil))
     }
 
     /**
@@ -374,7 +371,8 @@ public final class Realm {
     :returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
     public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, type.className(), key), Optional<T>.self)
+        // FIXME: use T.className()
+        return unsafeBitCast(RLMGetObject(rlmRealm, (T.self as Object.Type).className(), key), Optional<T>.self)
     }
 
 
@@ -494,18 +492,13 @@ public final class Realm {
 
     :param: path          Path to save the Realm to.
     :param: encryptionKey Optional 64-byte encryption key to encrypt the new file with.
-    :returns:             If an error occurs, returns an `NSError` object, otherwise `nil`.
-
-    :returns: Whether the realm was copied successfully.
     */
-    public func writeCopyToPath(path: String, encryptionKey: NSData? = nil) -> NSError? {
-        var error: NSError?
+    public func writeCopyToPath(path: String, encryptionKey: NSData? = nil) throws {
         if let encryptionKey = encryptionKey {
-            rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: &error)
+            try rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey)
         } else {
-            rlmRealm.writeCopyToPath(path, error: &error)
+            try rlmRealm.writeCopyToPath(path)
         }
-        return error
     }
 
     // MARK: Encryption

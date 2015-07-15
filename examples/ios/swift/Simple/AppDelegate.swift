@@ -39,18 +39,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
 
-        NSFileManager.defaultManager().removeItemAtPath(Realm.defaultPath, error: nil)
+        try! NSFileManager.defaultManager().removeItemAtPath(Realm.defaultPath)
 
         // Create a standalone object
-        var mydog = Dog()
+        let mydog = Dog()
 
         // Set & read properties
         mydog.name = "Rex"
         mydog.age = 9
-        println("Name of dog: \(mydog.name)")
+        print("Name of dog: \(mydog.name)")
 
         // Realms are used to group data together
-        let realm = Realm() // Create realm pointing to default file
+        let realm = try! Realm() // Create realm pointing to default file
 
         // Save your object
         realm.beginWrite()
@@ -58,14 +58,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         realm.commitWrite()
 
         // Query
-        var results = realm.objects(Dog).filter(NSPredicate(format:"name contains 'x'"))
+        let results = realm.objects(Dog).filter(NSPredicate(format:"name contains 'x'"))
 
         // Queries are chainable!
-        var results2 = results.filter("age > 8")
-        println("Number of dogs: \(results.count)")
+        let results2 = results.filter("age > 8")
+        print("Number of dogs: \(results.count)")
+        print("Dogs older than eight: \(results2.count)")
 
         // Link objects
-        var person = Person()
+        let person = Person()
         person.name = "Tim"
         person.dogs.append(mydog)
 
@@ -75,9 +76,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Multi-threading
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-            let otherRealm = Realm()
-            var otherResults = otherRealm.objects(Dog).filter(NSPredicate(format:"name contains 'Rex'"))
-            println("Number of dogs \(otherResults.count)")
+            let otherRealm = try! Realm()
+            let otherResults = otherRealm.objects(Dog).filter(NSPredicate(format:"name contains 'Rex'"))
+            print("Number of dogs \(otherResults.count)")
         }
 
         return true

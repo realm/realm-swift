@@ -88,10 +88,10 @@ class ResultsTests: TestCase {
         super.tearDown()
     }
 
-    override class func defaultTestSuite() -> XCTestSuite! {
+    override class func defaultTestSuite() -> XCTestSuite {
         // Don't run tests for the base class
         if self.isEqual(ResultsTests) {
-            return nil
+            return XCTestSuite(name: "empty")
         }
         return super.defaultTestSuite()
     }
@@ -158,17 +158,17 @@ class ResultsTests: TestCase {
     }
 
     func testValueForKey() {
-        let expected = map(results) { $0.stringCol }
+        let expected = results.map { $0.stringCol }
         let actual = results.valueForKey("stringCol") as! [String]!
         XCTAssertEqual(expected, actual)
 
-        XCTAssertEqual(map(results) { $0 }, results.valueForKey("self") as! [SwiftStringObject])
+        XCTAssertEqual(results.map { $0 }, results.valueForKey("self") as! [SwiftStringObject])
     }
 
     func testSetValueForKey() {
         results.setValue("hi there!", forKey: "stringCol")
-        let expected = map(results as Results<SwiftStringObject>) { _ in "hi there!" }
-        let actual = map(results) { $0.stringCol }
+        let expected = (results as Results<SwiftStringObject>).map { _ in "hi there!" }
+        let actual = results.map { $0.stringCol }
         XCTAssertEqual(expected, actual)
     }
 
@@ -260,8 +260,8 @@ class ResultsTests: TestCase {
     func testSum() {
         let results = getAggregateableResults()
         XCTAssertEqual(Int(6), results.sum("intCol") as Int)
-        XCTAssertEqualWithAccuracy(Float(5.5), results.sum("floatCol") as Float, 0.001)
-        XCTAssertEqualWithAccuracy(Double(5.55), results.sum("doubleCol") as Double, 0.001)
+        XCTAssertEqualWithAccuracy(Float(5.5), results.sum("floatCol") as Float, accuracy: 0.001)
+        XCTAssertEqualWithAccuracy(Double(5.55), results.sum("doubleCol") as Double, accuracy: 0.001)
 
         assertThrows(results.sum("noSuchCol") as Float, named: "Invalid property name")
     }
@@ -269,8 +269,8 @@ class ResultsTests: TestCase {
     func testAverage() {
         let results = getAggregateableResults()
         XCTAssertEqual(Int(2), results.average("intCol") as Int!)
-        XCTAssertEqualWithAccuracy(Float(1.8333), results.average("floatCol") as Float!, 0.001)
-        XCTAssertEqualWithAccuracy(Double(1.85), results.average("doubleCol") as Double!, 0.001)
+        XCTAssertEqualWithAccuracy(Float(1.8333), results.average("floatCol") as Float!, accuracy: 0.001)
+        XCTAssertEqualWithAccuracy(Double(1.85), results.average("doubleCol") as Double!, accuracy: 0.001)
 
         assertThrows(results.average("noSuchCol")! as Float, named: "Invalid property name")
     }

@@ -21,6 +21,7 @@
 #import "RLMArray.h"
 #import "RLMObject.h"
 #import "RLMSchema_Private.h"
+#import "RLMObject_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
@@ -179,7 +180,7 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
 
                 _type = RLMPropertyTypeObject;
                 _optional = true;
-                _objectClassName = className;
+                _objectClassName = [cls className] ?: className;
             }
             return YES;
         }
@@ -256,7 +257,11 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
         }
     }
     if (_objcType == 'c') {
-        _type = RLMPropertyTypeInt;
+        // Check if it's a BOOL or Int8 by trying to set it to 2 and seeing if
+        // it actually sets it to 1.
+        [obj setValue:@2 forKey:name];
+        NSNumber *value = [obj valueForKey:name];
+        _type = value.intValue == 2 ? RLMPropertyTypeInt : RLMPropertyTypeBool;
     }
 
     // update getter/setter names

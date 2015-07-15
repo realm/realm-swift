@@ -50,7 +50,7 @@ public class ResultsBase: NSObject, NSFastEnumeration {
     /// Returns a human-readable description of the objects contained in these results.
     public override var description: String {
         let type = "Results<\(rlmResults.objectClassName)>"
-        return gsub("RLMResults <0x[a-z0-9]+>", type, rlmResults.description) ?? type
+        return gsub("RLMResults <0x[a-z0-9]+>", template: type, string: rlmResults.description) ?? type
     }
 
     // MARK: Initializers
@@ -125,8 +125,8 @@ public final class Results<T: Object>: ResultsBase {
 
     :returns: The index of the given object, or `nil` if no objects match.
     */
-    public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
-        return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
+    public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
+        return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
     // MARK: Object Retrieval
@@ -185,8 +185,8 @@ public final class Results<T: Object>: ResultsBase {
 
     :returns: Results containing objects that match the given predicate.
     */
-    public func filter(predicateFormat: String, _ args: CVarArgType...) -> Results<T> {
-        return Results<T>(rlmResults.objectsWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
+    public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T> {
+        return Results<T>(rlmResults.objectsWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
     /**
@@ -220,7 +220,7 @@ public final class Results<T: Object>: ResultsBase {
     :returns: `Results` with elements sorted by the given sort descriptors.
     */
     public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T> {
-        return Results<T>(rlmResults.sortedResultsUsingDescriptors(map(sortDescriptors) { $0.rlmSortDescriptorValue }))
+        return Results<T>(rlmResults.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Aggregate Operations
@@ -278,17 +278,28 @@ public final class Results<T: Object>: ResultsBase {
     }
 }
 
+public class RLMGenerator<T: Object>: AnyGenerator<T> {
+    private let generatorBase: NSFastGenerator
+
+    init(collection: RLMCollection) {
+        generatorBase = NSFastGenerator(collection)
+    }
+
+    public override func next() -> Element? {
+        let accessor = generatorBase.next() as! Element?
+        if let accessor = accessor {
+            RLMInitializeSwiftListAccessor(accessor)
+        }
+        return accessor
+    }
+}
+
 extension Results: CollectionType {
     // MARK: Sequence Support
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
-    public func generate() -> GeneratorOf<T> {
-        let base = NSFastGenerator(rlmResults)
-        return GeneratorOf<T>() {
-            let accessor = base.next() as! T?
-            RLMInitializeSwiftListAccessor(accessor)
-            return accessor
-        }
+    public func generate() -> RLMGenerator<T> {
+        return RLMGenerator(collection: rlmResults)
     }
 
     // MARK: Collection Support
