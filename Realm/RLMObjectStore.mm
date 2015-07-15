@@ -535,31 +535,8 @@ void RLMDeleteAllObjectsFromRealm(RLMRealm *realm) {
     }
 }
 
-RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) {
-    RLMCheckThread(realm);
-
-    // create view from table and predicate
-    RLMObjectSchema *objectSchema = realm.schema[objectClassName];
-    if (!objectSchema.table) {
-        // read-only realms may be missing tables since we can't add any
-        // missing ones on init
-        return [RLMEmptyResults emptyResultsWithObjectClassName:objectClassName realm:realm];
-    }
-
-    if (predicate) {
-        realm::Query query = objectSchema.table->where();
-        RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
-
-        // create and populate array
-        return [RLMResults resultsWithObjectClassName:objectClassName
-                                                query:std::make_unique<Query>(query)
-                                                realm:realm];
-    }
-
-    return [RLMTableResults tableResultsWithObjectSchema:objectSchema realm:realm];
-}
-
-RLMResults *RLMGetObjectsWithinBoundingBox(RLMRealm *realm, NSString *objectClassName, RLMBoundingBox box, NSString *latitudePropertyName, NSString *longitudePropertyName) {
+template <typename F>
+RLMResults *RLMGetObjectsApplyingFilterToQuery(__unsafe_unretained RLMRealm *realm, __unsafe_unretained NSString *objectClassName, F applyFilter) {
     RLMCheckThread(realm);
 
     // create view from table and predicate
@@ -571,12 +548,31 @@ RLMResults *RLMGetObjectsWithinBoundingBox(RLMRealm *realm, NSString *objectClas
     }
 
     realm::Query query = objectSchema.table->where();
-    RLMUpdateQueryWithBoundingBoxSearch(&query, box.corner1, box.corner2, latitudePropertyName, longitudePropertyName, realm.schema, objectSchema);
+    if (!applyFilter(&query, objectSchema)) {
+        return [RLMTableResults tableResultsWithObjectSchema:objectSchema realm:realm];
+    }
 
     // create and populate array
     return [RLMResults resultsWithObjectClassName:objectClassName
                                             query:std::make_unique<Query>(query)
                                             realm:realm];
+}
+
+RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) {
+    return RLMGetObjectsApplyingFilterToQuery(realm, objectClassName, [&] (Query *query, RLMObjectSchema *objectSchema) {
+        if (predicate) {
+            RLMUpdateQueryWithPredicate(query, predicate, realm.schema, objectSchema);
+            return true;
+        }
+        return false;
+    });
+}
+
+RLMResults *RLMGetObjectsWithinBoundingBox(RLMRealm *realm, NSString *objectClassName, RLMBoundingBox box, NSString *latitudePropertyName, NSString *longitudePropertyName) {
+    return RLMGetObjectsApplyingFilterToQuery(realm, objectClassName, [&] (Query *query, RLMObjectSchema *objectSchema) {
+        RLMUpdateQueryWithBoundingBoxSearch(query, box.corner1, box.corner2, latitudePropertyName, longitudePropertyName, realm.schema, objectSchema);
+        return true;
+    });
 }
 
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
