@@ -18,6 +18,8 @@ x.xx.x Release notes (yyyy-MM-dd)
   no longer cause other processes using the same Realm to hang indefinitely.
 * Fix incorrect results when querying for < or <= on ints which
   requires 64 bits to represent with a CPU that supports SSE 4.2.
+* An exception will no longer be thrown when attempt to reset the schema version or
+  encryption key on an open Realm to the current value.
 
 0.93.2 Release notes (2015-06-12)
 =============================================================
