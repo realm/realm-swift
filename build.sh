@@ -109,6 +109,7 @@ build_combined() {
     local scheme="$1"
     local module_name="$2"
     local scope_suffix="$3"
+    local version_suffix="$4"
     local config="$CONFIGURATION"
 
     # Derive build paths
@@ -117,7 +118,7 @@ build_combined() {
     local binary_path="$module_name"
     local iphoneos_path="$build_products_path/$config-iphoneos$scope_suffix/$product_name"
     local iphonesimulator_path="$build_products_path/$config-iphonesimulator$scope_suffix/$product_name"
-    local out_path="build/ios$scope_suffix"
+    local out_path="build/ios$scope_suffix$version_suffix"
 
     # Build for each platform
     cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]') # lowercase the module name to generate command (xcrealm or xcrealmswift)
@@ -251,10 +252,6 @@ else
     REALM_SWIFT_VERSION=$(get_swift_version)
 fi
 
-if [ "$REALM_SWIFT_VERSION" = "1.2" ]; then
-   REALM_SWIFT_VERSION=
-fi
-
 case "$COMMAND" in
 
     ######################################
@@ -340,10 +337,8 @@ case "$COMMAND" in
         ;;
 
     "ios-swift")
-        build_combined RealmSwift RealmSwift
-        mkdir build/ios/swift$REALM_SWIFT_VERSION
-        cp -R build/ios/RealmSwift.framework build/ios/swift$REALM_SWIFT_VERSION
-        cp -R build/ios-dynamic/Realm.framework build/ios/swift$REALM_SWIFT_VERSION
+        build_combined RealmSwift RealmSwift '' "/swift-$REALM_SWIFT_VERSION"
+        cp -R build/ios-dynamic/Realm.framework build/ios/swift-$REALM_SWIFT_VERSION
         exit 0
         ;;
 
@@ -357,12 +352,8 @@ case "$COMMAND" in
 
     "osx-swift")
         xcrealmswift "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
-        destination="build/osx"
-        if [[ "$REALM_SWIFT_VERSION" ]]; then
-          destination="$destination/swift$REALM_SWIFT_VERSION"
-          mkdir -p "$destination"
-          cp -r "build/osx/Realm.framework" "$destination"
-        fi
+        destination="build/osx/swift-$REALM_SWIFT_VERSION"
+        mkdir -p "$destination"
         cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework "$destination"
         exit 0
         ;;
