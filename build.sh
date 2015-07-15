@@ -433,7 +433,8 @@ case "$COMMAND" in
     "verify-docs")
         sh scripts/build-docs.sh
         if [ -s docs/swift_output/undocumented.txt ]; then
-          echo "Undocumented RealmSwift declarations"
+          echo "Undocumented RealmSwift declarations:"
+          echo "$(cat docs/swift_output/undocumented.txt)"
           exit 1
         fi
         exit 0
