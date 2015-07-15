@@ -244,8 +244,8 @@ xcode_for_swift() {
     return 1
 }
 
-if [ "x$REALM_SWIFT_VERSION" != x ]; then
-    DEVELOPER_DIR=$(xcode_for_swift $REALM_SWIFT_VERSION)
+if [[ "$REALM_SWIFT_VERSION" ]]; then
+    DEVELOPER_DIR="$(xcode_for_swift $REALM_SWIFT_VERSION)"
     export DEVELOPER_DIR
 else
     REALM_SWIFT_VERSION=$(get_swift_version)
