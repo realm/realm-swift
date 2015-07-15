@@ -313,6 +313,19 @@ static RowIndexes::Sorter RLMSorterFromDescriptors(RLMObjectSchema *schema, NSAr
                                             realm:_realm];
 }
 
+- (RLMResults *)objectsWithinDistance:(RLMDistance)distance ofReferencePoint:(RLMCoordinate2D)referencePoint latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty
+{
+    RLMCheckThread(_realm);
+
+    // copy array and apply new predicate creating a new query and view
+    auto query = [self cloneQuery];
+    RLMUpdateQueryWithDistanceSearch(query.get(), referencePoint, distance, latitudeProperty, longitudeProperty, _realm.schema, _realm.schema[self.objectClassName]);
+    return [RLMResults resultsWithObjectClassName:self.objectClassName
+                                            query:move(query)
+                                             sort:_sortOrder
+                                            realm:_realm];
+}
+
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending {
     return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
 }

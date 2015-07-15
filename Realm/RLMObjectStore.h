@@ -83,6 +83,7 @@ void RLMDeleteAllObjectsFromRealm(RLMRealm *realm);
 RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) NS_RETURNS_RETAINED;
 
 RLMResults *RLMGetObjectsWithinBoundingBox(RLMRealm *realm, NSString *objectClassName, RLMBoundingBox box, NSString *latitudePropertyName, NSString *longitudePropertyName) NS_RETURNS_RETAINED;
+RLMResults *RLMGetObjectsWithinDistanceOfReferencePoint(RLMRealm *realm, NSString *objectClassName, RLMDistance distance, RLMCoordinate2D referencePoint, NSString *latitudePropertyName, NSString *longitudePropertyName) NS_RETURNS_RETAINED;
 
 
 // get an object with the given primary key

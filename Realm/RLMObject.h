@@ -323,6 +323,17 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (RLMResults *)objectsWithinBoundingBox:(RLMBoundingBox)box latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty;
 
+/**
+ Get objects whose location is within the specified distance of a reference point.
+
+ @param distance           The distance in meters.
+ @param referencePoint     The reference point.
+ @param latitudeProperty   The property of the object to interpret as the latitude.
+ @param longitudeProperty  The property of the object to interpret as the longitude.
+
+ @return                   An RLMResults of objects whose locations are within the specified distance of the reference point.
+ */
++ (RLMResults *)objectsWithinDistance:(RLMDistance)distance ofReferencePoint:(RLMCoordinate2D)referencePoint latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty;
 
 /**---------------------------------------------------------------------------------------
  *  @name Querying Specific Realms
@@ -383,6 +394,19 @@ RLM_ASSUME_NONNULL_BEGIN
  @return                   An RLMResults of objects of the subclass type in the specified Realm whose locations are within the bounding box.
  */
 + (RLMResults *)objectsInRealm:(RLMRealm *)realm withinBoundingBox:(RLMBoundingBox)box latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty;
+
+/**
+ Get objects whose location is within the specified distance of a reference point from the specified Realm.
+
+ @param realm              The Realm instance to query.
+ @param distance           The distance in meters.
+ @param referencePoint     The reference point.
+ @param latitudeProperty   The property of the object to interpret as the latitude.
+ @param longitudeProperty  The property of the object to interpret as the longitude.
+
+ @return                   An RLMResults of objects whose locations are within the specified distance of the reference point.
+ */
++ (RLMResults *)objectsInRealm:(RLMRealm *)realm withinDistance:(RLMDistance)distance ofReferencePoint:(RLMCoordinate2D)referencePoint latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty;
 
 /**
  Get an `NSArray` of objects of type `className` which have this object as the given property value. This can

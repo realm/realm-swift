@@ -23,6 +23,11 @@
 typedef double RLMDegrees;
 
 /**
+ RLMDistance represents a distance in meters.
+ */
+typedef double RLMDistance;
+
+/**
  RLMCoordinate2D represents a geographical coordinate.
  */
 typedef struct {

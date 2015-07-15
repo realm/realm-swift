@@ -575,6 +575,14 @@ RLMResults *RLMGetObjectsWithinBoundingBox(RLMRealm *realm, NSString *objectClas
     });
 }
 
+RLMResults *RLMGetObjectsWithinDistanceOfReferencePoint(RLMRealm *realm, NSString *objectClassName, RLMDistance distance, RLMCoordinate2D referencePoint, NSString *latitudePropertyName, NSString *longitudePropertyName)
+{
+    return RLMGetObjectsApplyingFilterToQuery(realm, objectClassName, [&] (Query *query, RLMObjectSchema *objectSchema) {
+        RLMUpdateQueryWithDistanceSearch(query, referencePoint, distance, latitudePropertyName, longitudePropertyName, realm.schema, objectSchema);
+        return true;
+    });
+}
+
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     RLMCheckThread(realm);
 

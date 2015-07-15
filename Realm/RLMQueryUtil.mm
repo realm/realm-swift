@@ -857,6 +857,81 @@ void validate_location_property_names(NSString *latitudePropertyName, NSString *
                     @"Invalid property", @"Longitude property must be of floating point type, but was %@", RLMTypeToString(latitudeProperty.type));
 }
 
+double degrees_to_radians(double d) {
+    return d * M_PI / 180.0;
+}
+
+static double radians_to_degrees(double r) {
+    return r / M_PI * 180.0;
+}
+
+static std::pair<double, double> coordinate_to_radians(RLMCoordinate2D c)
+{
+    return { degrees_to_radians(c.latitude), degrees_to_radians(c.longitude) };
+}
+
+static std::pair<RLMCoordinate2D, RLMCoordinate2D> bounding_box_for_distance_search(std::pair<double, double> referencePoint, double distanceInRadians) {
+
+    // The distance between degrees of latitude doesn't vary with longitude. This means we can determine the minimum
+    // and maximum latitudes that may contain points within our distance by offseting the reference latitude by the distance.
+    double minimumLatitude = radians_to_degrees(referencePoint.first - distanceInRadians);
+    double maximumLatitude = radians_to_degrees(referencePoint.first + distanceInRadians);
+
+    double minimumLongitude;
+    double maximumLongitude;
+    // If one of the poles is within the query circle, clamp the bounding box to a box that touches the pole and covers 360 degrees in longitude.
+    if (minimumLatitude < -90 || maximumLatitude > 90) {
+        minimumLatitude = std::max(-90., minimumLatitude);
+        maximumLatitude = std::min(90., maximumLatitude);
+        minimumLongitude = -180;
+        maximumLongitude = 180;
+    } else {
+        // The distance between degrees of longitude varies with latitude. Compute the maximum change in longitude that will be
+        // observed from our reference latitude.
+        double longitudeDelta = asin(sin(distanceInRadians) / cos(referencePoint.first));
+        minimumLongitude = radians_to_degrees(referencePoint.second - longitudeDelta);
+        maximumLongitude = radians_to_degrees(referencePoint.second + longitudeDelta);
+    }
+
+    return { (RLMCoordinate2D){ minimumLatitude, minimumLongitude }, (RLMCoordinate2D){ maximumLatitude, maximumLongitude } };
+}
+
+namespace query_expressions {
+    namespace impl {
+        template <typename T> struct FunctionTraits;
+
+        template <typename R, typename... Args>
+        struct FunctionTraits<R(Args...)> {
+            using ReturnType = R;
+        };
+
+        template<class T, T(*function)(T)> struct UnaryFunction {
+            T operator()(T v) const { return function(v); }
+            typedef T type;
+        };
+
+        template <typename F, F* function, typename T> auto& unary_function(Subexpr2<T>& left) {
+            return *new UnaryOperator<UnaryFunction<typename FunctionTraits<F>::ReturnType, function>>(left.clone(), true);
+        }
+    };
+
+    template <typename T> auto& sin(Subexpr2<T>& left) {
+        return impl::unary_function<decltype(::sin), ::sin>(left);
+    }
+
+    template <class T> auto& cos(Subexpr2<T>& left) {
+        return impl::unary_function<decltype(::cos), ::cos>(left);
+    }
+
+    template <class T> auto& acos(Subexpr2<T>& left) {
+        return impl::unary_function<decltype(::acos), ::acos>(left);
+    }
+
+    template <class T> auto& degrees_to_radians(Subexpr2<T>& left) {
+        return impl::unary_function<decltype(::degrees_to_radians), ::degrees_to_radians>(left);
+    }
+};
+
 } // namespace
 
 void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RLMSchema *schema,
@@ -907,6 +982,38 @@ void RLMUpdateQueryWithBoundingBoxSearch(realm::Query *query, RLMCoordinate2D co
 
     NSPredicate *predicate = [[NSCompoundPredicate alloc] initWithType:NSAndPredicateType subpredicates:@[ latitudePredicate, longitudePredicate ]];
     RLMUpdateQueryWithPredicate(query, predicate, schema, objectSchema);
+}
+
+void RLMUpdateQueryWithDistanceSearch(realm::Query *query, RLMCoordinate2D referencePointInDegrees, RLMDistance distance,
+                                      NSString *latitudePropertyName, NSString *longitudePropertyName,
+                                      RLMSchema *schema, RLMObjectSchema *objectSchema) {
+    validate_location_property_names(latitudePropertyName, longitudePropertyName, objectSchema);
+    validate_coordinate(referencePointInDegrees);
+
+    RLMProperty *latitudeProperty = objectSchema[latitudePropertyName];
+    RLMProperty *longitudeProperty = objectSchema[longitudePropertyName];
+
+    // Distance computations below use a spherical model of the earth with radius 6371km. This gives an error of < 0.6%.
+    const double radiusOfEarthInMeters = 6371000;
+    auto distanceInRadians = distance / radiusOfEarthInMeters;
+    auto referencePoint = coordinate_to_radians(referencePointInDegrees);
+
+    // Filter results that cannot possibly be within the specified distance using a bounding box search.
+    auto boundingBox = bounding_box_for_distance_search(referencePoint, distanceInRadians);
+    RLMUpdateQueryWithBoundingBoxSearch(query, boundingBox.first, boundingBox.second, latitudePropertyName, longitudePropertyName, schema, objectSchema);
+
+    namespace q = query_expressions;
+    auto latitudeColumn = query->get_table()->column<double>(latitudeProperty.column);
+    auto longitudeColumn = query->get_table()->column<double>(longitudeProperty.column);
+
+    // Use law of cosines to compute distance in radians between two points on a sphere.
+    auto& distanceExpression = q::acos(q::sin(q::degrees_to_radians(latitudeColumn)) * sin(referencePoint.first)
+                                       + q::cos(q::degrees_to_radians(latitudeColumn)) * cos(referencePoint.first) * q::cos(referencePoint.second - q::degrees_to_radians(longitudeColumn)));
+    query->and_query(distanceExpression < distanceInRadians);
+
+    // Test the constructed query in core
+    std::string validateMessage = query->validate();
+    RLMPrecondition(validateMessage.empty(), @"Invalid query", @"%.*s", (int)validateMessage.size(), validateMessage.c_str());
 }
 
 void RLMGetColumnIndices(RLMObjectSchema *schema, NSArray *properties,

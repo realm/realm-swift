@@ -1878,4 +1878,46 @@
     RLMAssertThrowsWithReasonMatching([LocationObject objectsWithinBoundingBox:invalidBox latitudeProperty:@"latitude" longitudeProperty:@"longitude"], @"Coordinate longitude.*range -180..180");
 }
 
+- (void)testDistanceQueries {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    [LocationObject createInDefaultRealmWithValue:@[ @"Angel Stadium of Anaheim", @33.800278, @-117.882778 ]];
+    [LocationObject createInDefaultRealmWithValue:@[ @"AT&T Park", @37.778611, @-122.389167 ]];
+    [LocationObject createInDefaultRealmWithValue:@[ @"Busch Stadium", @38.6225, @-90.193056 ]];
+    [LocationObject createInDefaultRealmWithValue:@[ @"Chase Field", @33.445278, @-112.066944 ]];
+    [LocationObject createInDefaultRealmWithValue:@[ @"Citi Field", @40.756944, @-73.845833 ]];
+    [LocationObject createInDefaultRealmWithValue:@[ @"Citizens Bank Park", @39.905833, @-75.166389 ]];
+
+    [realm commitWriteTransaction];
+
+    RLMCoordinate2D lakeportCA = (RLMCoordinate2D){ 39.043056, -122.915833 };
+    RLMDistance twoHundredAndFiftyKilometers = 250000;
+    RLMResults *results = [[LocationObject allObjects] objectsWithinDistance:twoHundredAndFiftyKilometers ofReferencePoint:lakeportCA latitudeProperty:@"latitude" longitudeProperty:@"longitude"];
+    results = [results sortedResultsUsingProperty:@"name" ascending:YES];
+    XCTAssertEqual(results.count, 1U);
+    XCTAssertEqualObjects([results[0] name], @"AT&T Park");
+
+    RLMDistance oneThousandKilometers = 1000000;
+    results = [[LocationObject allObjects] objectsWithinDistance:oneThousandKilometers ofReferencePoint:lakeportCA latitudeProperty:@"latitude" longitudeProperty:@"longitude"];
+    XCTAssertEqual(results.count, 2U);
+    XCTAssertEqualObjects([results[0] name], @"Angel Stadium of Anaheim");
+    XCTAssertEqualObjects([results[1] name], @"AT&T Park");
+
+    RLMDistance threeThousandKilometers = 3000000;
+    results = [[LocationObject allObjects] objectsWithinDistance:threeThousandKilometers ofReferencePoint:lakeportCA latitudeProperty:@"latitude" longitudeProperty:@"longitude"];
+    XCTAssertEqual(results.count, 4U);
+    XCTAssertEqualObjects([results[0] name], @"Angel Stadium of Anaheim");
+    XCTAssertEqualObjects([results[1] name], @"AT&T Park");
+    XCTAssertEqualObjects([results[2] name], @"Busch Stadium");
+    XCTAssertEqualObjects([results[3] name], @"Chase Field");
+
+    RLMCoordinate2D statueOfLiberty = (RLMCoordinate2D){ 40.689167, -74.044444 };
+    results = [[LocationObject allObjects] objectsWithinDistance:twoHundredAndFiftyKilometers ofReferencePoint:statueOfLiberty latitudeProperty:@"latitude" longitudeProperty:@"longitude"];
+    results = [results sortedResultsUsingProperty:@"name" ascending:YES];
+    XCTAssertEqual(results.count, 2U);
+    XCTAssertEqualObjects([results[0] name], @"Citi Field");
+    XCTAssertEqualObjects([results[1] name], @"Citizens Bank Park");
+}
+
 @end

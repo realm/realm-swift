@@ -157,6 +157,18 @@ RLM_ASSUME_NONNULL_BEGIN
 - (RLMResults *)objectsWithinBoundingBox:(RLMBoundingBox)box latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty;
 
 /**
+ Get objects whose location is within the specified distance of a reference point.
+
+ @param distance           The distance in meters.
+ @param referencePoint     The reference point.
+ @param latitudeProperty   The property of the object to interpret as the latitude.
+ @param longitudeProperty  The property of the object to interpret as the longitude.
+
+ @return                   An RLMResults of objects whose locations are within the specified distance of the reference point.
+ */
+- (RLMResults *)objectsWithinDistance:(RLMDistance)distance ofReferencePoint:(RLMCoordinate2D)referencePoint latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty;
+
+/**
  Get a sorted `RLMResults` from an existing `RLMResults` sorted by a property.
 
  @param property    The property name to sort by.

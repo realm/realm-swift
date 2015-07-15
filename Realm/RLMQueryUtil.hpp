@@ -38,6 +38,10 @@ void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RL
 void RLMUpdateQueryWithBoundingBoxSearch(realm::Query *query, RLMCoordinate2D corner1, RLMCoordinate2D corner2,
                                          NSString *latitudePropertyName, NSString *longitudePropertyName,
                                          RLMSchema *schema, RLMObjectSchema *objectSchema);
+void RLMUpdateQueryWithDistanceSearch(realm::Query *query, RLMCoordinate2D referencePointInDegrees, RLMDistance distance,
+                                      NSString *latitudePropertyName, NSString *longitudePropertyName,
+                                      RLMSchema *schema, RLMObjectSchema *objectSchema);
+
 
 // return column index - throw for invalid column name
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *schema, NSString *columnName);
