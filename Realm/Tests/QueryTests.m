@@ -1856,6 +1856,15 @@
     results = [LocationObject objectsWithinBoundingBox:sanFranciscoOverlapping180thMeridian latitudeProperty:@"latitude" longitudeProperty:@"longitude"];
     XCTAssertEqual(results.count, 1U);
     XCTAssertEqualObjects([results.firstObject name], @"AT&T Park");
+
+    // Verify that a box with longitudes -180 and 180 is treated as including all longitudes.
+    RLMBoundingBox everythingNorthOfNapa = (RLMBoundingBox){ { 38.3, -180 }, { 90, 180 } };
+    results = [LocationObject objectsWithinBoundingBox:everythingNorthOfNapa latitudeProperty:@"latitude" longitudeProperty:@"longitude"];
+    results = [results sortedResultsUsingProperty:@"name" ascending:YES];
+    XCTAssertEqual(results.count, 3U);
+    XCTAssertEqualObjects([results[0] name], @"Busch Stadium");
+    XCTAssertEqualObjects([results[1] name], @"Citi Field");
+    XCTAssertEqualObjects([results[2] name], @"Citizens Bank Park");
 }
 
 - (void)testInvalidBoundingBoxQueries {

@@ -889,6 +889,12 @@ void RLMUpdateQueryWithBoundingBoxSearch(realm::Query *query, RLMCoordinate2D co
     RLMCoordinate2D topRight = { std::max(corner1.latitude, corner2.latitude), std::max(corner1.longitude, corner2.longitude) };
 
     NSPredicate *latitudePredicate = [NSPredicate predicateWithFormat:@"%K BETWEEN {%f, %f}", latitudePropertyName, bottomLeft.latitude, topRight.latitude];
+    if (topRight.longitude == 180 && bottomLeft.longitude == -180) {
+        // Longitude is unconstrained.
+        RLMUpdateQueryWithPredicate(query, latitudePredicate, schema, objectSchema);
+        return;
+    }
+
     // The coordinate pair represents two possible boxes due to the discontinuity in longitudes at the 180th meridian.
     // We always interpret the bounding box as smallest of the two alternatives.
     NSPredicate *longitudePredicate;
