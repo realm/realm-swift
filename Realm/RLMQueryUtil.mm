@@ -837,9 +837,13 @@ RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *prop
     return prop;
 }
 
-void validate_parameters_for_bounding_box_search(RLMCoordinate2D corner1, RLMCoordinate2D corner2,
-                                                 NSString *latitudePropertyName, NSString *longitudePropertyName,
-                                                 RLMObjectSchema *objectSchema)
+void validate_coordinate(RLMCoordinate2D coordinate)
+{
+    RLMPrecondition(coordinate.latitude >= -90 && coordinate.latitude <= 90, @"Invalid coordinate", @"Coordinate latitude must be in the range -90..90.");
+    RLMPrecondition(coordinate.longitude >= -180 && coordinate.longitude <= 180, @"Invalid coordinate", @"Coordinate longitude must be in the range -180..180.");
+}
+
+void validate_location_property_names(NSString *latitudePropertyName, NSString *longitudePropertyName, RLMObjectSchema *objectSchema)
 {
     RLMPrecondition(latitudePropertyName && longitudePropertyName, @"Invalid argument", @"Latitude and longitude property names must be non-nil");
 
@@ -851,11 +855,6 @@ void validate_parameters_for_bounding_box_search(RLMCoordinate2D corner1, RLMCoo
                     @"Invalid property", @"Latitude property must be of floating point type, but was %@", RLMTypeToString(latitudeProperty.type));
     RLMPrecondition(longitudeProperty.type == RLMPropertyTypeDouble || longitudeProperty.type == RLMPropertyTypeFloat,
                     @"Invalid property", @"Longitude property must be of floating point type, but was %@", RLMTypeToString(latitudeProperty.type));
-
-    RLMPrecondition(corner1.latitude >= -90 && corner1.latitude <= 90, @"Invalid coordinate", @"Coordinate latitude must be in the range -90..90.");
-    RLMPrecondition(corner2.latitude >= -90 && corner2.latitude <= 90, @"Invalid coordinate", @"Coordinate latitude must be in the range -90..90.");
-    RLMPrecondition(corner1.longitude >= -180 && corner1.longitude <= 180, @"Invalid coordinate", @"Coordinate longitude must be in the range -180..180.");
-    RLMPrecondition(corner2.longitude >= -180 && corner2.longitude <= 180, @"Invalid coordinate", @"Coordinate longitude must be in the range -180..180.");
 }
 
 } // namespace
@@ -883,7 +882,9 @@ void RLMUpdateQueryWithBoundingBoxSearch(realm::Query *query, RLMCoordinate2D co
                                          NSString *latitudePropertyName, NSString *longitudePropertyName,
                                          RLMSchema *schema, RLMObjectSchema *objectSchema)
 {
-    validate_parameters_for_bounding_box_search(corner1, corner2, latitudePropertyName, longitudePropertyName, objectSchema);
+    validate_location_property_names(latitudePropertyName, longitudePropertyName, objectSchema);
+    validate_coordinate(corner1);
+    validate_coordinate(corner2);
 
     RLMCoordinate2D bottomLeft = { std::min(corner1.latitude, corner2.latitude), std::min(corner1.longitude, corner2.longitude) };
     RLMCoordinate2D topRight = { std::max(corner1.latitude, corner2.latitude), std::max(corner1.longitude, corner2.longitude) };
