@@ -220,21 +220,29 @@ case "$COMMAND" in
 esac
 export CONFIGURATION
 
+xcode_for_swift() {
+    local xcodes dev_dir
+    xcodes=()
+    dev_dir="Contents/Developer"
+    for dir in $(mdfind "kMDItemCFBundleIdentifier == 'com.apple.dt.Xcode'" 2>/dev/null); do
+        [[ -d "$dir" && -n "$(ls -A "$dir/$dev_dir")" ]] && xcodes+=("$dir/$dev_dir")
+    done
+
+    for dir in "${xcodes[@]}"; do
+        version="$("$dir/usr/bin/xcrun" swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p')"
+        if [[ "$version" = "$1" ]]; then
+            echo "$dir"
+            break;
+        fi
+    done
+}
+
 : ${REALM_SWIFT_VERSION:=1.2}
-case "$REALM_SWIFT_VERSION" in
-    "1.2")
-        DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer/"
-        REALM_SWIFT_VERSION=
-        ;;
-    "2.0")
-        DEVELOPER_DIR="/Applications/Xcode-beta.app/Contents/Developer/"
-        ;;
-    *)
-        echo "Unsupported Swift version $REALM_SWIFT_VERSION"
-        exit 1
-        ;;
-esac
+: ${DEVELOPER_DIR:="$(xcode_for_swift "$REALM_SWIFT_VERSION")"}
 export DEVELOPER_DIR
+if [[ "$REALM_SWIFT_VERSION" = "1.2" ]]; then
+   REALM_SWIFT_VERSION=
+fi
 
 case "$COMMAND" in
 
@@ -280,11 +288,11 @@ case "$COMMAND" in
     ######################################
     "set-swift-version")
         version="$2"
-        if [[ -n "$version" ]]; then
-            version="$(xcrun swift --version | grep -io --color=never -E 'Apple Swift version ([^\b ]*)' | cut -f 4 -d ' ')"
+        if [[ -z "$version" ]]; then
+            version="$(xcrun swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p')"
         fi
         rm -f RealmSwift && ln -s "RealmSwift-swift$version" RealmSwift && git update-index --assume-unchanged RealmSwift
-        rm -f Realm/Tests/Swift && ln -s "Realm/Tests/Swift$version" Swift && git update-index --assume-unchanged Realm/Tests/Swift
+        (cd Realm/Tests && rm -f Swift && ln -s "Swift$version" Swift && git update-index --assume-unchanged Swift)
         exit 0
         ;;
 
