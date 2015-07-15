@@ -129,7 +129,6 @@ void RLMObservationInfo::prepareForInvalidation() {
 void RLMObservationInfo::setRow(realm::Table &table, size_t newRow) {
     REALM_ASSERT_DEBUG(!row);
     REALM_ASSERT_DEBUG(objectSchema);
-    skipUnregisteringObservers = true;
     row = table[newRow];
     for (auto info : objectSchema->_observedObjects) {
         if (info->row && info->row.get_index() == row.get_index()) {
