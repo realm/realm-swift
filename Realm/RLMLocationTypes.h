@@ -16,12 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <CoreLocation/CoreLocation.h>
+/**
+ RLMDegrees represents an angle in degrees. It is used to represent latitudes and longitudes,
+ with positive numbers representing North and East, and negative numbers representing South and West.
+ */
+typedef double RLMDegrees;
+
+/**
+ RLMCoordinate2D represents a geographical coordinate.
+ */
+typedef struct {
+    RLMDegrees latitude;
+    RLMDegrees longitude;
+} RLMCoordinate2D;
 
 /**
  A bounding box is rectangle that is represented by coordinates for opposing corners.
  */
 typedef struct {
-    CLLocationCoordinate2D corner1;
-    CLLocationCoordinate2D corner2;
+    RLMCoordinate2D corner1;
+    RLMCoordinate2D corner2;
 } RLMBoundingBox;

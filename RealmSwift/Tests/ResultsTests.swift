@@ -18,7 +18,6 @@
 
 import XCTest
 import RealmSwift
-import CoreLocation
 
 class SwiftAggregateObjectList: Object {
     let list = List<SwiftAggregateObject>()
@@ -340,7 +339,7 @@ class LocationResultsTests {
             Realm().create(SwiftLocationObject.self, value: [ "Citizens Bank Park", 39.905833, -75.166389 ]);
         }
 
-        let anaheimToPhoenix = BoundingBox(corner1: CLLocationCoordinate2D(latitude: 33.3, longitude: -118), corner2: CLLocationCoordinate2D(latitude: 34, longitude: -112))
+        let anaheimToPhoenix = BoundingBox(corner1: Coordinate2D(latitude: 33.3, longitude: -118), corner2: Coordinate2D(latitude: 34, longitude: -112))
         var results = Realm().objects(SwiftLocationObject).filter(withinBoundingBox: anaheimToPhoenix, latitudeProperty: "latitude", longitudeProperty: "longitude")
         results = results.sorted("name", ascending: true)
         XCTAssertEqual(results.count, 2);

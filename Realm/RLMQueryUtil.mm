@@ -837,7 +837,7 @@ RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *prop
     return prop;
 }
 
-void validate_parameters_for_bounding_box_search(CLLocationCoordinate2D corner1, CLLocationCoordinate2D corner2,
+void validate_parameters_for_bounding_box_search(RLMCoordinate2D corner1, RLMCoordinate2D corner2,
                                                  NSString *latitudePropertyName, NSString *longitudePropertyName,
                                                  RLMObjectSchema *objectSchema)
 {
@@ -879,14 +879,14 @@ void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RL
                     (int)validateMessage.size(), validateMessage.c_str());
 }
 
-void RLMUpdateQueryWithBoundingBoxSearch(realm::Query *query, CLLocationCoordinate2D corner1, CLLocationCoordinate2D corner2,
+void RLMUpdateQueryWithBoundingBoxSearch(realm::Query *query, RLMCoordinate2D corner1, RLMCoordinate2D corner2,
                                          NSString *latitudePropertyName, NSString *longitudePropertyName,
                                          RLMSchema *schema, RLMObjectSchema *objectSchema)
 {
     validate_parameters_for_bounding_box_search(corner1, corner2, latitudePropertyName, longitudePropertyName, objectSchema);
 
-    CLLocationCoordinate2D bottomLeft = { std::min(corner1.latitude, corner2.latitude), std::min(corner1.longitude, corner2.longitude) };
-    CLLocationCoordinate2D topRight = { std::max(corner1.latitude, corner2.latitude), std::max(corner1.longitude, corner2.longitude) };
+    RLMCoordinate2D bottomLeft = { std::min(corner1.latitude, corner2.latitude), std::min(corner1.longitude, corner2.longitude) };
+    RLMCoordinate2D topRight = { std::max(corner1.latitude, corner2.latitude), std::max(corner1.longitude, corner2.longitude) };
 
     NSPredicate *latitudePredicate = [NSPredicate predicateWithFormat:@"%K BETWEEN {%f, %f}", latitudePropertyName, bottomLeft.latitude, topRight.latitude];
     // The coordinate pair represents two possible boxes due to the discontinuity in longitudes at the 180th meridian.

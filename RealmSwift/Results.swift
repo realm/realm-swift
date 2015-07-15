@@ -19,6 +19,7 @@
 import Foundation
 import Realm
 
+public typealias Coordinate2D = RLMCoordinate2D
 public typealias BoundingBox = RLMBoundingBox
 
 // MARK: MinMaxType
