@@ -291,8 +291,18 @@ case "$COMMAND" in
         if [[ -z "$version" ]]; then
             version="$(xcrun swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p')"
         fi
-        rm -f RealmSwift && ln -s "RealmSwift-swift$version" RealmSwift && (git update-index --assume-unchanged RealmSwift || true)
-        (cd Realm/Tests && rm -f Swift && ln -s "Swift$version" Swift && (git update-index --assume-unchanged Swift || true))
+
+        # Update the symlinks to point to the correct verion of the source, and
+        # then tell git to ignore the fact that we just changed a tracked file so
+        # that the new symlink doesn't accidentally get committed
+        rm -f RealmSwift
+        ln -s "RealmSwift-swift$version" RealmSwift
+        git update-index --assume-unchanged RealmSwift || true
+
+        cd Realm/Tests
+        rm -f Swift
+        ln -s "Swift$version" Swift
+        git update-index --assume-unchanged Swift || true
         exit 0
         ;;
 
