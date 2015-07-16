@@ -297,7 +297,11 @@ case "$COMMAND" in
     "set-swift-version")
         version="$2"
         if [[ -z "$version" ]]; then
-            version="$(xcrun swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p')"
+            if [[ $REALM_SWIFT_VERSION ]]; then
+                version="$REALM_SWIFT_VERSION"
+            else
+                version="$(get_swift_version)"
+            fi
         fi
 
         # Update the symlinks to point to the correct verion of the source, and
