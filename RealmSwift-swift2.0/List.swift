@@ -131,7 +131,7 @@ public final class List<T: Object>: ListBase {
         }
         set {
             throwForNegativeIndex(index)
-            return _rlmArray[UInt(index)] = newValue
+            return _rlmArray[UInt(index)] = unsafeBitCast(newValue, RLMObject.self)
         }
     }
 
