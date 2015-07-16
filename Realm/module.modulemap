@@ -15,9 +15,12 @@ framework module Realm {
         header "RLMObject_Private.h"
         header "RLMProperty_Private.h"
         header "RLMRealmUtil.h"
-        header "RLMRealm_Dynamic.h"
         header "RLMRealm_Private.h"
         header "RLMResults_Private.h"
         header "RLMSchema_Private.h"
+    }
+    
+    explicit module Dynamic {
+        header "RLMRealm_Dynamic.h"
     }
 }
