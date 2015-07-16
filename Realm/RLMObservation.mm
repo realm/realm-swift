@@ -590,7 +590,7 @@ public:
             [o->linkviewChangeIndexes addIndex:index];
         }
         else {
-            o->multipleLinkviewChanges = false;
+            o->multipleLinkviewChanges = true;
             o->linkviewChangeIndexes = nil;
         }
     }
