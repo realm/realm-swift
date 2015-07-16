@@ -123,7 +123,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @end
 
 @interface ArrayOfAllTypesObject : RLMObject
-@property RLMArray<AllTypesObject> *array;
+@property RLM_GENERIC_ARRAY(AllTypesObject) *array;
 @end
 
 #pragma mark - Real Life Objects
@@ -146,7 +146,7 @@ RLM_ARRAY_TYPE(EmployeeObject)
 @interface CompanyObject : RLMObject
 
 @property NSString *name;
-@property RLMArray<EmployeeObject> *employees;
+@property RLM_GENERIC_ARRAY(EmployeeObject) *employees;
 
 @end
 
@@ -160,7 +160,7 @@ RLM_ARRAY_TYPE(EmployeeObject)
 RLM_ARRAY_TYPE(DogObject)
 
 @interface DogArrayObject : RLMObject
-@property RLMArray<DogObject> *dogs;
+@property RLM_GENERIC_ARRAY(DogObject) *dogs;
 @end
 
 
@@ -223,7 +223,7 @@ RLM_ARRAY_TYPE(CircleObject);
 #pragma mark CircleArrayObject
 
 @interface CircleArrayObject : RLMObject
-@property RLMArray<CircleObject> *circles;
+@property RLM_GENERIC_ARRAY(CircleObject) *circles;
 @end
 
 #pragma mark ArrayPropertyObject
@@ -231,8 +231,8 @@ RLM_ARRAY_TYPE(CircleObject);
 @interface ArrayPropertyObject : RLMObject
 
 @property NSString *name;
-@property RLMArray<StringObject> *array;
-@property RLMArray<IntObject> *intArray;
+@property RLM_GENERIC_ARRAY(StringObject) *array;
+@property RLM_GENERIC_ARRAY(IntObject) *intArray;
 
 @end
 
