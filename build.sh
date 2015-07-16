@@ -547,7 +547,7 @@ case "$COMMAND" in
         ;;
 
     "examples-ios-swift")
-        project="examples/ios/swift$REALM_SWIFT_VERSION/RealmExamples.xcodeproj"
+        project="examples/ios/swift-$REALM_SWIFT_VERSION/RealmExamples.xcodeproj"
         xc "-project $project -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
         xc "-project $project -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
         xc "-project $project -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
