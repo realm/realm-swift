@@ -222,11 +222,19 @@ esac
 export CONFIGURATION
 
 get_swift_version() {
-    "$1/usr/bin/xcrun" swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p'
+    xcrun swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p'
 }
 
-xcode_for_swift() {
-    local xcodes dev_dir
+find_xcode_for_swift() {
+    # First check if the currently active one is fine
+    version="$(get_swift_version || true)"
+    if [[ "$version" = "$1" ]]; then
+        return 0
+    fi
+
+    local xcodes dev_dir version
+
+    # Check all installed copies of Xcode for the desired Swift version
     xcodes=()
     dev_dir="Contents/Developer"
     for dir in $(mdfind "kMDItemCFBundleIdentifier == 'com.apple.dt.Xcode'" 2>/dev/null); do
@@ -234,9 +242,9 @@ xcode_for_swift() {
     done
 
     for dir in "${xcodes[@]}"; do
-        version="$(get_swift_version "$dir")"
+        export DEVELOPER_DIR="$dir"
+        version="$(get_swift_version)"
         if [[ "$version" = "$1" ]]; then
-            echo "$dir"
             return 0
         fi
     done
@@ -246,8 +254,7 @@ xcode_for_swift() {
 }
 
 if [[ "$REALM_SWIFT_VERSION" ]]; then
-    DEVELOPER_DIR="$(xcode_for_swift $REALM_SWIFT_VERSION)"
-    export DEVELOPER_DIR
+    find_xcode_for_swift $REALM_SWIFT_VERSION
 else
     REALM_SWIFT_VERSION=$(get_swift_version)
 fi
