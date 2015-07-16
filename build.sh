@@ -803,7 +803,7 @@ EOF
 
         echo 'Packaging iOS Swift'
         sh tightdb_objc/build.sh package-ios-swift
-        cp tightdb_objc/build/ios/swift/realm-swift-framework-ios.zip .
+        cp tightdb_objc/build/ios/realm-swift-framework-ios.zip .
 
         echo 'Packaging OS X Swift'
         sh tightdb_objc/build.sh package-osx-swift
