@@ -390,6 +390,13 @@
 			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
 			remoteInfo = "Swift Version";
 		};
+		C06EFEAB1B582746009A3D8B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
+			remoteInfo = "Set Swift Version";
+		};
 		E81A20081955FE3B00FDED82 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -1129,6 +1136,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				C06EFEAC1B582746009A3D8B /* PBXTargetDependency */,
 				E8D89BA61955FC6D00CF2B9A /* PBXTargetDependency */,
 				E81A20091955FE3B00FDED82 /* PBXTargetDependency */,
 				E88AAAF1195603B700AA2020 /* PBXTargetDependency */,
@@ -1614,6 +1622,11 @@
 			isa = PBXTargetDependency;
 			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
 			targetProxy = C04B4BE01B55C52100FAE58E /* PBXContainerItemProxy */;
+		};
+		C06EFEAC1B582746009A3D8B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
+			targetProxy = C06EFEAB1B582746009A3D8B /* PBXContainerItemProxy */;
 		};
 		E81A20091955FE3B00FDED82 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
