@@ -754,7 +754,7 @@ case "$COMMAND" in
 
         FOLDER=${TEMPDIR}/realm-${LANG}-${VERSION}
 
-        mkdir -p ${FOLDER}/osx ${FOLDER}/ios
+        mkdir -p ${FOLDER}/osx ${FOLDER}/ios ${FOLDER}/watchos
 
         if [[ "${LANG}" == "objc" ]]; then
             mkdir -p ${FOLDER}/ios/static
