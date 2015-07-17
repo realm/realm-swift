@@ -19,6 +19,7 @@
 import XCTest
 import Foundation
 import Realm.Private
+import Realm.Dynamic
 
 class SwiftDynamicTests: RLMTestCase {
 

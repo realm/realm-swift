@@ -20,6 +20,7 @@ import XCTest
 import RealmSwift
 import Realm
 import Realm.Private
+import Realm.Dynamic
 import Foundation
 
 private func realmWithCustomSchema(path: String, schema :RLMSchema) -> RLMRealm {
