@@ -171,3 +171,8 @@
 + (NSString *)primaryKey { return nil; }
 + (NSArray *)requiredProperties { return nil; }
 @end
+
+#pragma mark LocationObject
+
+@implementation LocationObject
+@end

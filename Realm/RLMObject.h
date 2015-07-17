@@ -19,6 +19,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Realm/RLMObjectBase.h>
+#import <Realm/RLMLocationTypes.h>
 
 RLM_ASSUME_NONNULL_BEGIN
 
@@ -311,6 +312,17 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (nullable instancetype)objectForPrimaryKey:(nullable id)primaryKey;
 
+/**
+ Get objects whose location is within the given bounding box.
+
+ @param box                The bounding box to find objects within.
+ @param latitudeProperty   The property of the object to interpret as the latitude.
+ @param longitudeProperty  The property of the object to interpret as the longitude.
+
+ @return                   An RLMResults of objects of the subclass type in the default Realm whose locations are within the bounding box.
+ */
++ (RLMResults *)objectsWithinBoundingBox:(RLMBoundingBox)box latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty;
+
 
 /**---------------------------------------------------------------------------------------
  *  @name Querying Specific Realms
@@ -359,6 +371,18 @@ RLM_ASSUME_NONNULL_BEGIN
  @see       -primaryKey
  */
 + (nullable instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(nullable id)primaryKey;
+
+/**
+ Get objects whose location is within the given bounding box from the specified Realm.
+
+ @param realm              The Realm instance to query.
+ @param box                The bounding box to find objects within.
+ @param latitudeProperty   The property of the object to interpret as the latitude.
+ @param longitudeProperty  The property of the object to interpret as the longitude.
+
+ @return                   An RLMResults of objects of the subclass type in the specified Realm whose locations are within the bounding box.
+ */
++ (RLMResults *)objectsInRealm:(RLMRealm *)realm withinBoundingBox:(RLMBoundingBox)box latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty;
 
 /**
  Get an `NSArray` of objects of type `className` which have this object as the given property value. This can

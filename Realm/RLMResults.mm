@@ -300,6 +300,19 @@ static RowIndexes::Sorter RLMSorterFromDescriptors(RLMObjectSchema *schema, NSAr
                                             realm:_realm];
 }
 
+- (RLMResults *)objectsWithinBoundingBox:(RLMBoundingBox)box latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty
+{
+    RLMCheckThread(_realm);
+
+    // copy array and apply new predicate creating a new query and view
+    auto query = [self cloneQuery];
+    RLMUpdateQueryWithBoundingBoxSearch(query.get(), box.corner1, box.corner2, latitudeProperty, longitudeProperty, _realm.schema, _realm.schema[self.objectClassName]);
+    return [RLMResults resultsWithObjectClassName:self.objectClassName
+                                            query:move(query)
+                                             sort:_sortOrder
+                                            realm:_realm];
+}
+
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending {
     return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
 }

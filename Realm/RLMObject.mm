@@ -145,6 +145,16 @@
     return RLMGetObject(realm, self.className, primaryKey);
 }
 
++ (RLMResults *)objectsWithinBoundingBox:(RLMBoundingBox)box latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty
+{
+    return RLMGetObjectsWithinBoundingBox(RLMRealm.defaultRealm, self.className, box, latitudeProperty, longitudeProperty);
+}
+
++ (RLMResults *)objectsInRealm:(RLMRealm *)realm withinBoundingBox:(RLMBoundingBox)box latitudeProperty:(NSString *)latitudeProperty longitudeProperty:(NSString *)longitudeProperty
+{
+    return RLMGetObjectsWithinBoundingBox(realm, self.className, box, latitudeProperty, longitudeProperty);
+}
+
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
     return RLMObjectBaseLinkingObjectsOfClass(self, className, property);
 }

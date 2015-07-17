@@ -327,3 +327,29 @@ class ResultsFromLinkViewTests: ResultsTests {
         return list.list.filter("intCol != 0") // i.e. all of them
     }
 }
+
+class LocationResultsTests : TestCase {
+    func testBoundingBoxQueries() {
+        Realm().write {
+            Realm().create(SwiftLocationObject.self, value: [ "Angel Stadium of Anaheim", 33.800278, -117.882778 ])
+            Realm().create(SwiftLocationObject.self, value: [ "AT&T Park", 37.778611, -122.389167 ])
+            Realm().create(SwiftLocationObject.self, value: [ "Busch Stadium", 38.6225, -90.193056 ])
+            Realm().create(SwiftLocationObject.self, value: [ "Chase Field", 33.445278, -112.066944 ])
+            Realm().create(SwiftLocationObject.self, value: [ "Citi Field", 40.756944, -73.845833 ])
+            Realm().create(SwiftLocationObject.self, value: [ "Citizens Bank Park", 39.905833, -75.166389 ])
+        }
+
+        let anaheimToPhoenix = BoundingBox(corner1: Coordinate2D(latitude: 33.3, longitude: -118), corner2: Coordinate2D(latitude: 34, longitude: -112))
+        var results = Realm().objects(SwiftLocationObject).filter(withinBoundingBox: anaheimToPhoenix, latitudeProperty: "latitude", longitudeProperty: "longitude")
+        results = results.sorted("name", ascending: true)
+        XCTAssertEqual(results.count, 2)
+        XCTAssertEqual(results[0].name, "Angel Stadium of Anaheim")
+        XCTAssertEqual(results[1].name, "Chase Field")
+
+        // Chained queries.
+        results = Realm().objects(SwiftLocationObject).filter("name BEGINSWITH 'Chase'").filter(withinBoundingBox: anaheimToPhoenix, latitudeProperty: "latitude", longitudeProperty: "longitude")
+        XCTAssertEqual(results.count, 1)
+        XCTAssertEqual(results[0].name, "Chase Field")
+
+    }
+}

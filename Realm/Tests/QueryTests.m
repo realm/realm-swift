@@ -1811,4 +1811,62 @@
 }
 #endif
 
+- (void)testingBoundingBoxQueries {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    [LocationObject createInDefaultRealmWithValue:@[ @"Angel Stadium of Anaheim", @33.800278, @-117.882778 ]];
+    [LocationObject createInDefaultRealmWithValue:@[ @"AT&T Park", @37.778611, @-122.389167 ]];
+    [LocationObject createInDefaultRealmWithValue:@[ @"Busch Stadium", @38.6225, @-90.193056 ]];
+    [LocationObject createInDefaultRealmWithValue:@[ @"Chase Field", @33.445278, @-112.066944 ]];
+    [LocationObject createInDefaultRealmWithValue:@[ @"Citi Field", @40.756944, @-73.845833 ]];
+    [LocationObject createInDefaultRealmWithValue:@[ @"Citizens Bank Park", @39.905833, @-75.166389 ]];
+
+    [realm commitWriteTransaction];
+
+    RLMBoundingBox anaheimToPhoenix = (RLMBoundingBox){ { 33.3, -118 }, { 34, -112 } };
+    RLMResults *results = [LocationObject objectsWithinBoundingBox:anaheimToPhoenix latitudeProperty:@"latitude" longitudeProperty:@"longitude"];
+    results = [results sortedResultsUsingProperty:@"name" ascending:YES];
+    XCTAssertEqual(results.count, 2U);
+    XCTAssertEqualObjects([results[0] name], @"Angel Stadium of Anaheim");
+    XCTAssertEqualObjects([results[1] name], @"Chase Field");
+
+    // Query using RLMResults.
+    results = [[LocationObject objectsWhere:@"name BEGINSWITH 'Chase'"] objectsWithinBoundingBox:anaheimToPhoenix latitudeProperty:@"latitude" longitudeProperty:@"longitude"];
+    results = [results sortedResultsUsingProperty:@"name" ascending:YES];
+    XCTAssertEqual(results.count, 1U);
+    XCTAssertEqualObjects([results[0] name], @"Chase Field");
+
+    // The difference in longitude is <= 180, so the box should go east from San Francisco.
+    RLMBoundingBox sanFranciscoToPlus179Longitude = (RLMBoundingBox){ { 37, -123 }, { 39, 56 } };
+    results = [LocationObject objectsWithinBoundingBox:sanFranciscoToPlus179Longitude latitudeProperty:@"latitude" longitudeProperty:@"longitude"];
+    results = [results sortedResultsUsingProperty:@"name" ascending:YES];
+    XCTAssertEqual(results.count, 2U);
+    XCTAssertEqualObjects([results[0] name], @"AT&T Park");
+    XCTAssertEqualObjects([results[1] name], @"Busch Stadium");
+
+    // The difference in longitude is > 180, the box should go west from San Francisco.
+    RLMBoundingBox sanFranciscoToPlus181Longitude = (RLMBoundingBox){ { 37, -123 }, { 39, 58 } };
+    results = [LocationObject objectsWithinBoundingBox:sanFranciscoToPlus181Longitude latitudeProperty:@"latitude" longitudeProperty:@"longitude"];
+    results = [results sortedResultsUsingProperty:@"name" ascending:YES];
+    XCTAssertEqual(results.count, 0U);
+
+    // Verify that a box with coordinates that span the 180th meridian is handled correctly.
+    RLMBoundingBox sanFranciscoOverlapping180thMeridian = (RLMBoundingBox){ { 39, 170 }, { 37, -122 } };
+    results = [LocationObject objectsWithinBoundingBox:sanFranciscoOverlapping180thMeridian latitudeProperty:@"latitude" longitudeProperty:@"longitude"];
+    XCTAssertEqual(results.count, 1U);
+    XCTAssertEqualObjects([results.firstObject name], @"AT&T Park");
+}
+
+- (void)testInvalidBoundingBoxQueries {
+    RLMBoundingBox validBox = (RLMBoundingBox){ { 33.3, -118 }, { 34, -112 } };
+    RLMAssertThrowsWithReasonMatching([LocationObject objectsWithinBoundingBox:validBox latitudeProperty:@"notLatitude" longitudeProperty:@"longitude"], @"Latitude property name must refer");
+    RLMAssertThrowsWithReasonMatching([LocationObject objectsWithinBoundingBox:validBox latitudeProperty:@"latitude" longitudeProperty:@"notLongitude"], @"Longitude property name must refer");
+
+    RLMBoundingBox invalidBox = (RLMBoundingBox){ { 1000, 0 } , { 10, 10 } };
+    RLMAssertThrowsWithReasonMatching([LocationObject objectsWithinBoundingBox:invalidBox latitudeProperty:@"latitude" longitudeProperty:@"longitude"], @"Coordinate latitude.*range -90..90");
+    invalidBox = (RLMBoundingBox){ { 0, 1000 } , { 10, 10 } };
+    RLMAssertThrowsWithReasonMatching([LocationObject objectsWithinBoundingBox:invalidBox latitudeProperty:@"latitude" longitudeProperty:@"longitude"], @"Coordinate longitude.*range -180..180");
+}
+
 @end

@@ -21,6 +21,7 @@ Pod::Spec.new do |s|
                               'include/Realm/RLMConstants.h',
                               'include/Realm/RLMDefines.h',
                               'include/Realm/RLMListBase.h',
+                              'include/Realm/RLMLocationTypes.h',
                               'include/Realm/RLMMigration.h',
                               'include/Realm/RLMObject.h',
                               'include/Realm/RLMObjectBase.h',
