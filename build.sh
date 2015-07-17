@@ -706,7 +706,7 @@ case "$COMMAND" in
 
     "package-ios-dynamic")
         cd tightdb_objc
-        sh build.sh ios-dynamic
+        REALM_SWIFT_VERSION=2.0 sh build.sh ios-dynamic
 
         cd build/ios-dynamic
         zip --symlinks -r realm-dynamic-framework-ios.zip Realm.framework
@@ -714,7 +714,7 @@ case "$COMMAND" in
 
     "package-osx")
         cd tightdb_objc
-        sh build.sh test-osx
+        REALM_SWIFT_VERSION=2.0 sh build.sh test-osx
 
         cd build/DerivedData/Realm/Build/Products/Release
         zip --symlinks -r realm-framework-osx.zip Realm.framework
