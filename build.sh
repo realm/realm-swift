@@ -14,7 +14,7 @@ set -o pipefail
 set -e
 
 # You can override the version of the core library
-: ${REALM_CORE_VERSION:=0.91.1} # set to "current" to always use the current build
+: ${REALM_CORE_VERSION:=0.91.2} # set to "current" to always use the current build
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
@@ -224,16 +224,17 @@ download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
     TMP_DIR="$TMPDIR/core_bin"
     mkdir -p "${TMP_DIR}"
-    CORE_TMP_ZIP="${TMP_DIR}/core-${REALM_CORE_VERSION}.zip.tmp"
-    CORE_ZIP="${TMP_DIR}/core-${REALM_CORE_VERSION}.zip"
-    if [ ! -f "${CORE_ZIP}" ]; then
-        curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${CORE_TMP_ZIP}"
-        mv "${CORE_TMP_ZIP}" "${CORE_ZIP}"
+    CORE_TMP_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2.tmp"
+    CORE_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2"
+    if [ ! -f "${CORE_TAR}" ]; then
+        curl -f -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.bz2" -o "${CORE_TMP_TAR}"
+        mv "${CORE_TMP_TAR}" "${CORE_TAR}"
     fi
+
     (
         cd "${TMP_DIR}"
         rm -rf core
-        unzip "${CORE_ZIP}"
+        tar xjf "${CORE_TAR}"
         mv core core-${REALM_CORE_VERSION}
     )
 
