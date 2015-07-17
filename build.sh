@@ -742,7 +742,7 @@ case "$COMMAND" in
 
     "package-watchos")
         cd tightdb_objc
-        sh build.sh watchos
+        REALM_SWIFT_VERSION=2.0 sh build.sh watchos
 
         cd build/watchos
         zip --symlinks -r realm-framework-watchos.zip Realm.framework
@@ -750,7 +750,7 @@ case "$COMMAND" in
 
     "package-watchos-swift")
         cd tightdb_objc
-        sh build.sh watchos-swift
+        REALM_SWIFT_VERSION=2.0 sh build.sh watchos-swift
 
         cd build/watchos
         zip --symlinks -r realm-swift-framework-watchos.zip RealmSwift.framework Realm.framework
