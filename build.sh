@@ -633,7 +633,8 @@ case "$COMMAND" in
 
         cp $0 realm-swift-${VERSION}
         cd realm-swift-${VERSION}
-        sh build.sh examples-ios-swift
+        REALM_SWIFT_VERSION=1.2 sh build.sh examples-ios-swift
+        REALM_SWIFT_VERSION=2.0 sh build.sh examples-ios-swift
         cd ..
         rm -rf realm-swift-${VERSION}
         ;;
