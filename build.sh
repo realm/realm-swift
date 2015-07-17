@@ -325,6 +325,16 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "prelaunch-simulator")
+        killall "iOS Simulator" 2>/dev/null || true
+        killall Simulator 2>/dev/null || true
+        if [[ -a "${DEVELOPER_DIR}/Applications/iOS Simulator.app" ]]; then
+          open "${DEVELOPER_DIR}/Applications/iOS Simulator.app"
+        elif [[ -a "${DEVELOPER_DIR}/Applications/Simulator.app" ]]; then
+          open "${DEVELOPER_DIR}/Applications/Simulator.app"
+        fi
+        ;;
+
     ######################################
     # Building
     ######################################
