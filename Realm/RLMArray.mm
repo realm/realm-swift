@@ -274,6 +274,11 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
     return [_backingArray objectsAtIndexes:indexes];
 }
 
+- (void)addObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(void *)context {
+    RLMValidateArrayObservationKey(keyPath, self);
+    [super addObserver:observer forKeyPath:keyPath options:options context:context];
+}
+
 //
 // Methods unsupported on standalone RLMArray instances
 //

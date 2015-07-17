@@ -722,6 +722,13 @@ public:
     [realm cancelWriteTransaction];
 }
 
+- (void)testObserveInvalidArrayProperty {
+    KVOObject *obj = [self createObject];
+    XCTAssertThrows([obj.arrayCol addObserver:self forKeyPath:@"self" options:0 context:0]);
+    XCTAssertNoThrow([obj.arrayCol addObserver:self forKeyPath:RLMInvalidatedKey options:0 context:0]);
+    XCTAssertNoThrow([obj.arrayCol removeObserver:self forKeyPath:RLMInvalidatedKey context:0]);
+}
+
 @end
 
 // Run tests on a persisted object, modifying the actual object instance being
@@ -902,6 +909,13 @@ public:
     AssertIndexChange(NSKeyValueChangeRemoval, ([NSIndexSet indexSetWithIndexesInRange:{0, 3}]));
 }
 
+- (void)testObserveInvalidArrayProperty {
+    KVOObject *obj = [self createObject];
+    RLMArray *array = obj.arrayCol;
+    XCTAssertThrows([array addObserver:self forKeyPath:@"self" options:0 context:0]);
+    XCTAssertNoThrow([array addObserver:self forKeyPath:RLMInvalidatedKey options:0 context:0]);
+    XCTAssertNoThrow([array removeObserver:self forKeyPath:RLMInvalidatedKey context:0]);
+}
 @end
 
 // Mutate a different accessor backed by the same row as the accessor being observed

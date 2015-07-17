@@ -56,8 +56,21 @@
     return ar;
 }
 
-void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NSString *keyPath, RLMArray *array, id observed) {
-    if (!info && [keyPath isEqualToString:RLMInvalidatedKey] && array.class == [RLMArrayLinkView class]) {
+void RLMValidateArrayObservationKey(__unsafe_unretained NSString *const keyPath,
+                                    __unsafe_unretained RLMArray *const array) {
+    if (![keyPath isEqualToString:RLMInvalidatedKey]) {
+        NSString *err = [NSString stringWithFormat:@"[<%@ %p> addObserver:forKeyPath:options:context:] is not supported. Key path: %@",
+                         [array class], array, keyPath];
+        @throw RLMException(err);
+    }
+}
+
+void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
+                                   __unsafe_unretained NSString *const keyPath,
+                                   __unsafe_unretained RLMArray *const array,
+                                   __unsafe_unretained id const observed) {
+    RLMValidateArrayObservationKey(keyPath, array);
+    if (!info && array.class == [RLMArrayLinkView class]) {
         RLMArrayLinkView *lv = static_cast<RLMArrayLinkView *>(array);
         info = std::make_unique<RLMObservationInfo>(lv->_containingObjectSchema,
                                                     lv->_backingLinkView->get_origin_row_index(),
