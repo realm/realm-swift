@@ -422,7 +422,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ $PLATFORM_NAME == \"macosx\" ]]; then\n  if [[ ! -d \"build/osx/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh osx\n  fi\nelse\n  if [[ ! -d \"build/ios-dynamic/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\n  fi\nfi\n";
+			shellScript = "if [[ $PLATFORM_NAME == \"macosx\" ]]; then\n  if [[ ! -d \"build/osx/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh osx\n  fi\nelif [[ $PLATFORM_NAME == \"iphoneos\" ]] || [[ $PLATFORM_NAME == \"iphonesimulator\" ]]; then\n  if [[ ! -d \"build/ios-dynamic/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\n  fi\nelse\n  if [[ ! -d \"build/watchos/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh watchos\n  fi\nfi";
 		};
 		5DA0C4D41B16A0D70077F097 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -531,7 +531,6 @@
 			baseConfigurationReference = 5DA0C4D11B16973B0077F097 /* RealmSwift.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_BITCODE = NO;
 			};
 			name = Debug;
 		};
@@ -540,7 +539,6 @@
 			baseConfigurationReference = 5DA0C4D11B16973B0077F097 /* RealmSwift.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_BITCODE = NO;
 			};
 			name = Release;
 		};
@@ -548,7 +546,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator watchos watchsimulator";
 			};
 			name = Debug;
 		};
@@ -556,7 +554,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator watchos watchsimulator";
 			};
 			name = Release;
 		};

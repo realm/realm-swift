@@ -47,6 +47,11 @@ Pod::Spec.new do |s|
   s.osx.deployment_target   = '10.9'
   s.osx.vendored_library    = 'core/librealm.a'
 
+  if s.respond_to?(:watchos)
+    s.watchos.deployment_target = '2.0'
+    s.watchos.vendored_library = 'core/librealm-watchos.a'
+  end
+
   s.subspec 'Headers' do |s|
     s.source_files          = 'include/**/*.{h,hpp}'
     s.public_header_files   = public_header_files
