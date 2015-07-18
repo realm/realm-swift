@@ -436,8 +436,8 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 }
 
 - (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes {
-    // FIXME: this is used by KVO to add/remove observers from the objects
-    // in the array when using the bulk observation stuff
+    // FIXME: this is called by KVO when array changes are made. It's not clear
+    // why, and returning nil seems to work fine.
     return nil;
 }
 
