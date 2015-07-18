@@ -40,7 +40,7 @@ In case you don't want to use the precompiled version, you can build Realm yours
 
 Prerequisites:
 
-* Building Realm requires Xcode 6.
+* Building Realm requires Xcode 6.3, 6.4, or 7.0 beta 3.
 * Building Realm documentation requires [appledoc](https://github.com/tomaz/appledoc)
 
 Once you have all the necessary prerequisites, building Realm.framework just takes a single command: `sh build.sh build`. You'll need an internet connection the first time you build Realm to download the core binary.
@@ -48,17 +48,6 @@ Once you have all the necessary prerequisites, building Realm.framework just tak
 Run `sh build.sh help` to see all the actions you can perform (build ios/osx, generate docs, test, etc.).
 
 Executing the examples under the `examples/` folder, requires that you have built the `Realm.framework`.
-
-
-## Long-running Branches
-
-Realm maintains long-running branches for specific purposes, some of which you may wish to use.
-
-| Branch                                                             | Xcode Version    | Swift Version                                   | Associated PR for reference           |
-|:-------------------------------------------------------------------|:-----------------|:------------------------------------------------|:--------------------------------------|
-| [`master`](/realm/realm-cocoa/tree/master)                         | 6.3.2            | Swift 1.2 (swiftlang-602.0.53.1 clang-602.0.53) | -                                     |
-| [`swift-2.0`](/realm/realm-cocoa/tree/swift-2.0)                   | 7.0.0-beta3      | Swift 2.0 (swiftlang-700.0.45 clang-700.0.57.2) | [#2069](/realm/realm-cocoa/pull/2069) |
-| [`null-string-beta-2`](/realm/realm-cocoa/tree/null-string-beta-2) | same as `master` | same as `master`                                | [#628](/realm/realm-cocoa/issues/628) |
 
 ## Contributing
 

@@ -58,7 +58,8 @@ end
 # Remove RealmSwift target and dependencies from all example swift projects
 
 swift_examples = [
-  "examples/ios/swift/RealmExamples.xcodeproj"
+  "examples/ios/swift-1.2/RealmExamples.xcodeproj",
+  "examples/ios/swift-2.0/RealmExamples.xcodeproj"
 ]
 
 swift_examples.each do |example|
@@ -68,7 +69,7 @@ swift_examples.each do |example|
   filepath = File.join(example, "project.pbxproj")
   contents = File.read(filepath)
   File.open(filepath, "w") do |file|
-    file.puts contents.gsub("/build/ios/swift", "/ios")
+    file.puts contents.gsub("/build/ios", "/ios")
   end
 end
 

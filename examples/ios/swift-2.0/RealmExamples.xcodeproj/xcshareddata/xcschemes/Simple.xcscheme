@@ -14,94 +14,96 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "023B19A71A4234380067FB81"
-               BuildableName = "RealmSwift.framework"
-               BlueprintName = "RealmSwift"
-               ReferencedContainer = "container:RealmSwift.xcodeproj">
+               BlueprintIdentifier = "E8CB085D19BA6ACA0018434A"
+               BuildableName = "Simple.app"
+               BlueprintName = "Simple"
+               ReferencedContainer = "container:RealmExamples.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
             buildForTesting = "YES"
-            buildForRunning = "NO"
+            buildForRunning = "YES"
             buildForProfiling = "NO"
             buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
+            buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02B822551A532100007F28A5"
-               BuildableName = "RealmSwift Tests.xctest"
-               BlueprintName = "RealmSwift Tests"
-               ReferencedContainer = "container:RealmSwift.xcodeproj">
+               BlueprintIdentifier = "E8CB087019BA6ACB0018434A"
+               BuildableName = "SimpleTests.xctest"
+               BlueprintName = "SimpleTests"
+               ReferencedContainer = "container:RealmExamples.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      buildConfiguration = "Debug">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02B822551A532100007F28A5"
-               BuildableName = "RealmSwift Tests.xctest"
-               BlueprintName = "RealmSwift Tests"
-               ReferencedContainer = "container:RealmSwift.xcodeproj">
+               BlueprintIdentifier = "E8CB087019BA6ACB0018434A"
+               BuildableName = "SimpleTests.xctest"
+               BlueprintName = "SimpleTests"
+               ReferencedContainer = "container:RealmExamples.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "023B19A71A4234380067FB81"
-            BuildableName = "RealmSwift.framework"
-            BlueprintName = "RealmSwift"
-            ReferencedContainer = "container:RealmSwift.xcodeproj">
+            BlueprintIdentifier = "E8CB085D19BA6ACA0018434A"
+            BuildableName = "Simple.app"
+            BlueprintName = "Simple"
+            ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
+      buildConfiguration = "Debug"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "023B19A71A4234380067FB81"
-            BuildableName = "RealmSwift.framework"
-            BlueprintName = "RealmSwift"
-            ReferencedContainer = "container:RealmSwift.xcodeproj">
+            BlueprintIdentifier = "E8CB085D19BA6ACA0018434A"
+            BuildableName = "Simple.app"
+            BlueprintName = "Simple"
+            ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Release"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
+      buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "023B19A71A4234380067FB81"
-            BuildableName = "RealmSwift.framework"
-            BlueprintName = "RealmSwift"
-            ReferencedContainer = "container:RealmSwift.xcodeproj">
+            BlueprintIdentifier = "E8CB085D19BA6ACA0018434A"
+            BuildableName = "Simple.app"
+            BlueprintName = "Simple"
+            ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

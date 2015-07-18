@@ -14,24 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "023B19A71A4234380067FB81"
-               BuildableName = "RealmSwift.framework"
-               BlueprintName = "RealmSwift"
-               ReferencedContainer = "container:RealmSwift.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02B822551A532100007F28A5"
-               BuildableName = "RealmSwift Tests.xctest"
-               BlueprintName = "RealmSwift Tests"
-               ReferencedContainer = "container:RealmSwift.xcodeproj">
+               BlueprintIdentifier = "144C2F3D1B3D33D0005C8F81"
+               BuildableName = "Realm.framework"
+               BlueprintName = "watchOS"
+               ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -42,26 +28,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02B822551A532100007F28A5"
-               BuildableName = "RealmSwift Tests.xctest"
-               BlueprintName = "RealmSwift Tests"
-               ReferencedContainer = "container:RealmSwift.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "023B19A71A4234380067FB81"
-            BuildableName = "RealmSwift.framework"
-            BlueprintName = "RealmSwift"
-            ReferencedContainer = "container:RealmSwift.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -78,10 +45,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "023B19A71A4234380067FB81"
-            BuildableName = "RealmSwift.framework"
-            BlueprintName = "RealmSwift"
-            ReferencedContainer = "container:RealmSwift.xcodeproj">
+            BlueprintIdentifier = "144C2F3D1B3D33D0005C8F81"
+            BuildableName = "Realm.framework"
+            BlueprintName = "watchOS"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -96,10 +63,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "023B19A71A4234380067FB81"
-            BuildableName = "RealmSwift.framework"
-            BlueprintName = "RealmSwift"
-            ReferencedContainer = "container:RealmSwift.xcodeproj">
+            BlueprintIdentifier = "144C2F3D1B3D33D0005C8F81"
+            BuildableName = "Realm.framework"
+            BlueprintName = "watchOS"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

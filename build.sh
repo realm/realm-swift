@@ -14,7 +14,7 @@ set -o pipefail
 set -e
 
 # You can override the version of the core library
-: ${REALM_CORE_VERSION:=0.91.1} # set to "current" to always use the current build
+: ${REALM_CORE_VERSION:=0.91.2} # set to "current" to always use the current build
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
@@ -39,6 +39,8 @@ command:
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
   ios-swift:            builds RealmSwift frameworks for iOS
+  watchos:              builds watchOS framwork
+  watchos-swift:        builds RealmSwift framework for watchOS
   osx:                  builds OS X framework
   osx-swift:            builds RealmSwift framework for OS X
   test:                 tests all iOS and OS X frameworks
@@ -78,7 +80,7 @@ xcode() {
     mkdir -p build/DerivedData
     CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@"
     echo "Building with command:" $CMD
-    eval $CMD
+    eval "$CMD"
 }
 
 xc() {
@@ -105,10 +107,11 @@ xcrealmswift() {
     xc "-project $PROJECT $@"
 }
 
-build_combined() {
+build_ios_combined() {
     local scheme="$1"
     local module_name="$2"
     local scope_suffix="$3"
+    local version_suffix="$4"
     local config="$CONFIGURATION"
 
     # Derive build paths
@@ -117,7 +120,7 @@ build_combined() {
     local binary_path="$module_name"
     local iphoneos_path="$build_products_path/$config-iphoneos$scope_suffix/$product_name"
     local iphonesimulator_path="$build_products_path/$config-iphonesimulator$scope_suffix/$product_name"
-    local out_path="build/ios$scope_suffix"
+    local out_path="build/ios$scope_suffix$version_suffix"
 
     # Build for each platform
     cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]') # lowercase the module name to generate command (xcrealm or xcrealmswift)
@@ -134,6 +137,37 @@ build_combined() {
 
     # Combine ar archives
     xcrun lipo -create "$iphonesimulator_path/$binary_path" "$iphoneos_path/$binary_path" -output "$out_path/$product_name/$module_name"
+}
+
+build_watchos_combined() {
+    local scheme="$1"
+    local module_name="$2"
+    local scope_suffix="$3"
+    local config="$CONFIGURATION"
+
+    # Derive build paths
+    local build_products_path="build/DerivedData/$module_name/Build/Products"
+    local product_name="$module_name.framework"
+    local binary_path="$module_name"
+    local watchos_path="$build_products_path/$config-watchos$scope_suffix/$product_name"
+    local watchsimulator_path="$build_products_path/$config-watchsimulator$scope_suffix/$product_name"
+    local out_path="build/watchos$scope_suffix"
+
+    # Build for each platform
+    cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]') # lowercase the module name to generate command (xcrealm or xcrealmswift)
+    $cmd "-scheme '$scheme' -configuration $config -sdk watchos"
+    $cmd "-scheme '$scheme' -configuration $config -sdk watchsimulator ONLY_ACTIVE_ARCH=NO"
+
+    # Combine .swiftmodule
+    if [ -d $watchsimulator_path/Modules/$module_name.swiftmodule ]; then
+      cp $watchsimulator_path/Modules/$module_name.swiftmodule/* $watchos_path/Modules/$module_name.swiftmodule/
+    fi
+
+    # Retrieve build products
+    clean_retrieve $watchos_path $out_path $product_name
+
+    # Combine ar archives
+    xcrun lipo -create "$watchsimulator_path/$binary_path" "$watchos_path/$binary_path" -output "$out_path/$product_name/$module_name"
 }
 
 clean_retrieve() {
@@ -190,16 +224,17 @@ download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
     TMP_DIR="$TMPDIR/core_bin"
     mkdir -p "${TMP_DIR}"
-    CORE_TMP_ZIP="${TMP_DIR}/core-${REALM_CORE_VERSION}.zip.tmp"
-    CORE_ZIP="${TMP_DIR}/core-${REALM_CORE_VERSION}.zip"
-    if [ ! -f "${CORE_ZIP}" ]; then
-        curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${CORE_TMP_ZIP}"
-        mv "${CORE_TMP_ZIP}" "${CORE_ZIP}"
+    CORE_TMP_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2.tmp"
+    CORE_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2"
+    if [ ! -f "${CORE_TAR}" ]; then
+        curl -f -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.bz2" -o "${CORE_TMP_TAR}"
+        mv "${CORE_TMP_TAR}" "${CORE_TAR}"
     fi
+
     (
         cd "${TMP_DIR}"
         rm -rf core
-        unzip "${CORE_ZIP}"
+        tar xjf "${CORE_TAR}"
         mv core core-${REALM_CORE_VERSION}
     )
 
@@ -219,6 +254,44 @@ case "$COMMAND" in
     *) CONFIGURATION=${CONFIGURATION:-Release}
 esac
 export CONFIGURATION
+
+get_swift_version() {
+    xcrun swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p'
+}
+
+find_xcode_for_swift() {
+    # First check if the currently active one is fine
+    version="$(get_swift_version || true)"
+    if [[ "$version" = "$1" ]]; then
+        return 0
+    fi
+
+    local xcodes dev_dir version
+
+    # Check all installed copies of Xcode for the desired Swift version
+    xcodes=()
+    dev_dir="Contents/Developer"
+    for dir in $(mdfind "kMDItemCFBundleIdentifier == 'com.apple.dt.Xcode'" 2>/dev/null); do
+        [[ -d "$dir" && -n "$(ls -A "$dir/$dev_dir")" ]] && xcodes+=("$dir/$dev_dir")
+    done
+
+    for dir in "${xcodes[@]}"; do
+        export DEVELOPER_DIR="$dir"
+        version="$(get_swift_version)"
+        if [[ "$version" = "$1" ]]; then
+            return 0
+        fi
+    done
+
+    >&2 echo "No version of Xcode found that supports Swift $1"
+    return 1
+}
+
+if [[ "$REALM_SWIFT_VERSION" ]]; then
+    find_xcode_for_swift $REALM_SWIFT_VERSION
+else
+    REALM_SWIFT_VERSION=$(get_swift_version)
+fi
 
 case "$COMMAND" in
 
@@ -260,32 +333,79 @@ case "$COMMAND" in
         ;;
 
     ######################################
+    # Swift versioning
+    ######################################
+    "set-swift-version")
+        version="$2"
+        if [[ -z "$version" ]]; then
+            if [[ $REALM_SWIFT_VERSION ]]; then
+                version="$REALM_SWIFT_VERSION"
+            else
+                version="$(get_swift_version)"
+            fi
+        fi
+
+        # Update the symlinks to point to the correct verion of the source, and
+        # then tell git to ignore the fact that we just changed a tracked file so
+        # that the new symlink doesn't accidentally get committed
+        rm -f RealmSwift
+        ln -s "RealmSwift-swift$version" RealmSwift
+        git update-index --assume-unchanged RealmSwift || true
+
+        cd Realm/Tests
+        rm -f Swift
+        ln -s "Swift$version" Swift
+        git update-index --assume-unchanged Swift || true
+        exit 0
+        ;;
+
+    "prelaunch-simulator")
+        killall "iOS Simulator" 2>/dev/null || true
+        killall Simulator 2>/dev/null || true
+        if [[ -a "${DEVELOPER_DIR}/Applications/iOS Simulator.app" ]]; then
+          open "${DEVELOPER_DIR}/Applications/iOS Simulator.app"
+        elif [[ -a "${DEVELOPER_DIR}/Applications/Simulator.app" ]]; then
+          open "${DEVELOPER_DIR}/Applications/Simulator.app"
+        fi
+        ;;
+
+    ######################################
     # Building
     ######################################
     "build")
         sh build.sh ios-static
         sh build.sh ios-dynamic
         sh build.sh ios-swift
+        sh build.sh watchos
+        sh build.sh watchos-swift
         sh build.sh osx
         sh build.sh osx-swift
         exit 0
         ;;
 
     "ios-static")
-        build_combined iOS Realm
+        build_ios_combined iOS Realm
         exit 0
         ;;
 
     "ios-dynamic")
-        build_combined "iOS Dynamic" Realm "-dynamic"
+        build_ios_combined "iOS Dynamic" Realm "-dynamic"
         exit 0
         ;;
 
     "ios-swift")
-        build_combined RealmSwift RealmSwift
-        mkdir build/ios/swift
-        cp -R build/ios/RealmSwift.framework build/ios/swift
-        cp -R build/ios-dynamic/Realm.framework build/ios/swift
+        build_ios_combined RealmSwift RealmSwift '' "/swift-$REALM_SWIFT_VERSION"
+        cp -R build/ios-dynamic/Realm.framework build/ios/swift-$REALM_SWIFT_VERSION
+        exit 0
+        ;;
+
+    "watchos")
+        build_watchos_combined "watchOS" Realm
+        exit 0
+        ;;
+
+    "watchos-swift")
+        build_watchos_combined RealmSwift RealmSwift
         exit 0
         ;;
 
@@ -299,7 +419,9 @@ case "$COMMAND" in
 
     "osx-swift")
         xcrealmswift "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
-        cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework build/osx
+        destination="build/osx/swift-$REALM_SWIFT_VERSION"
+        mkdir -p "$destination"
+        cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework "$destination"
         exit 0
         ;;
 
@@ -481,12 +603,13 @@ case "$COMMAND" in
         ;;
 
     "examples-ios-swift")
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        project="examples/ios/swift-$REALM_SWIFT_VERSION/RealmExamples.xcodeproj"
+        xc "-project $project -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -524,12 +647,12 @@ case "$COMMAND" in
     "cocoapods-setup")
         sh build.sh download-core
 
-        # CocoaPods doesn't support symlinks
-        if [ -L core ]; then
-            mv core core-tmp
-            mv $(readlink core-tmp) core
-            rm core-tmp
-        fi
+        # CocoaPods won't automatically preserve files referenced via symlinks
+        for symlink in $(find . -type l); do
+          link="$(dirname "$symlink")/$(readlink "$symlink")"
+          rm -rf "$symlink"
+          mv "$link" "$symlink"
+        done
 
         # CocoaPods doesn't support multiple header_mappings_dir, so combine
         # both sets of headers into a single directory
@@ -566,7 +689,8 @@ case "$COMMAND" in
 
         cp $0 realm-swift-${VERSION}
         cd realm-swift-${VERSION}
-        sh build.sh examples-ios-swift
+        REALM_SWIFT_VERSION=1.2 sh build.sh examples-ios-swift
+        REALM_SWIFT_VERSION=2.0 sh build.sh examples-ios-swift
         cd ..
         rm -rf realm-swift-${VERSION}
         ;;
@@ -582,7 +706,7 @@ case "$COMMAND" in
 
     "package-ios-dynamic")
         cd tightdb_objc
-        sh build.sh ios-dynamic
+        REALM_SWIFT_VERSION=2.0 sh build.sh ios-dynamic
 
         cd build/ios-dynamic
         zip --symlinks -r realm-dynamic-framework-ios.zip Realm.framework
@@ -590,7 +714,7 @@ case "$COMMAND" in
 
     "package-osx")
         cd tightdb_objc
-        sh build.sh test-osx
+        REALM_SWIFT_VERSION=2.0 sh build.sh test-osx
 
         cd build/DerivedData/Realm/Build/Products/Release
         zip --symlinks -r realm-framework-osx.zip Realm.framework
@@ -598,18 +722,38 @@ case "$COMMAND" in
 
     "package-ios-swift")
         cd tightdb_objc
-        sh build.sh ios-swift
+        REALM_SWIFT_VERSION=1.2 sh build.sh ios-swift
+        REALM_SWIFT_VERSION=2.0 sh build.sh ios-swift
 
-        cd build/ios/swift
-        zip --symlinks -r realm-swift-framework-ios.zip RealmSwift.framework Realm.framework
+        cd build/ios
+        zip --symlinks -r realm-swift-framework-ios.zip swift-1.2 swift-2.0
         ;;
 
     "package-osx-swift")
         cd tightdb_objc
-        sh build.sh osx-swift
+        REALM_SWIFT_VERSION=1.2 sh build.sh osx-swift
+        REALM_SWIFT_VERSION=2.0 sh build.sh osx-swift
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip RealmSwift.framework Realm.framework
+        cp -R Realm.framework swift-1.2
+        cp -R Realm.framework swift-2.0
+        zip --symlinks -r realm-swift-framework-osx.zip swift-1.2 swift-2.0
+        ;;
+
+    "package-watchos")
+        cd tightdb_objc
+        REALM_SWIFT_VERSION=2.0 sh build.sh watchos
+
+        cd build/watchos
+        zip --symlinks -r realm-framework-watchos.zip Realm.framework
+        ;;
+
+    "package-watchos-swift")
+        cd tightdb_objc
+        REALM_SWIFT_VERSION=2.0 sh build.sh watchos-swift
+
+        cd build/watchos
+        zip --symlinks -r realm-swift-framework-watchos.zip RealmSwift.framework Realm.framework
         ;;
 
     "package-release")
@@ -622,7 +766,7 @@ case "$COMMAND" in
 
         FOLDER=${TEMPDIR}/realm-${LANG}-${VERSION}
 
-        mkdir -p ${FOLDER}/osx ${FOLDER}/ios
+        mkdir -p ${FOLDER}/osx ${FOLDER}/ios ${FOLDER}/watchos
 
         if [[ "${LANG}" == "objc" ]]; then
             mkdir -p ${FOLDER}/ios/static
@@ -643,6 +787,11 @@ case "$COMMAND" in
                 cd ${FOLDER}/ios/dynamic
                 unzip ${WORKSPACE}/realm-dynamic-framework-ios.zip
             )
+
+            (
+                cd ${FOLDER}/watchos
+                unzip ${WORKSPACE}/realm-framework-watchos.zip
+            )
         else
             (
                 cd ${FOLDER}/osx
@@ -652,6 +801,11 @@ case "$COMMAND" in
             (
                 cd ${FOLDER}/ios
                 unzip ${WORKSPACE}/realm-swift-framework-ios.zip
+            )
+
+            (
+                cd ${FOLDER}/watchos
+                unzip ${WORKSPACE}/realm-swift-framework-watchos.zip
             )
         fi
 
@@ -669,7 +823,7 @@ case "$COMMAND" in
             unzip ${WORKSPACE}/realm-examples.zip
             cd examples
             if [[ "${LANG}" == "objc" ]]; then
-                rm -rf ios/swift
+                rm -rf ios/swift-1.2 ios/swift-2.0
             else
                 rm -rf ios/objc ios/rubymotion osx
             fi
@@ -732,11 +886,17 @@ EOF
 
         echo 'Packaging iOS Swift'
         sh tightdb_objc/build.sh package-ios-swift
-        cp tightdb_objc/build/ios/swift/realm-swift-framework-ios.zip .
+        cp tightdb_objc/build/ios/realm-swift-framework-ios.zip .
 
         echo 'Packaging OS X Swift'
         sh tightdb_objc/build.sh package-osx-swift
         cp tightdb_objc/build/osx/realm-swift-framework-osx.zip .
+
+        echo 'Packaging watchOS'
+        sh tightdb_objc/build.sh package-watchos
+        sh tightdb_objc/build.sh package-watchos-swift
+        cp tightdb_objc/build/watchos/realm-swift-framework-watchos.zip .
+        cp tightdb_objc/build/watchos/realm-framework-watchos.zip .
 
         echo 'Building final release packages'
         sh tightdb_objc/build.sh package-release objc
