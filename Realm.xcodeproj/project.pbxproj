@@ -1127,6 +1127,7 @@
 			buildConfigurationList = 144C2F451B3D33D0005C8F81 /* Build configuration list for PBXNativeTarget "watchOS" */;
 			buildPhases = (
 				144C2F591B3D34B1005C8F81 /* Get Version Number */,
+				293F98F11A76E05A00C0199D /* Download Core */,
 				144C2F391B3D33D0005C8F81 /* Sources */,
 				144C2F3A1B3D33D0005C8F81 /* Frameworks */,
 				144C2F3B1B3D33D0005C8F81 /* Headers */,
