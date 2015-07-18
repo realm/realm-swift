@@ -649,9 +649,11 @@ case "$COMMAND" in
 
         # CocoaPods won't automatically preserve files referenced via symlinks
         for symlink in $(find . -type l); do
-          link="$(dirname "$symlink")/$(readlink "$symlink")"
-          rm -rf "$symlink"
-          mv "$link" "$symlink"
+          if [[ -L "$symlink" ]]; then
+            link="$(dirname "$symlink")/$(readlink "$symlink")"
+            rm -rf "$symlink"
+            mv "$link" "$symlink"
+          fi
         done
 
         # CocoaPods doesn't support multiple header_mappings_dir, so combine
