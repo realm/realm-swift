@@ -97,8 +97,8 @@ SharedRealm Realm::get_shared_realm(Config &config)
     else if (config.read_only) {
         // for read-only validate all existing tables
         for (auto &object_schema : *realm->m_config.schema) {
-            if (ObjectStore::table_for_object_type(realm->read_group(), object_schema.name)) {
-                ObjectStore::validate_object_schema(realm->read_group(), object_schema);
+            if (ObjectStore::table_for_object_type(realm->read_group(), object_schema.first)) {
+                ObjectStore::validate_object_schema(realm->read_group(), object_schema.second);
             }
         }
     }
@@ -231,7 +231,7 @@ bool Realm::compact()
     }
 
     for (auto &object_schema : *m_config.schema) {
-        ObjectStore::table_for_object_type(read_group(), object_schema.name)->optimize();
+        ObjectStore::table_for_object_type(read_group(), object_schema.first)->optimize();
     }
 
     m_shared_group->end_read();
@@ -294,6 +294,65 @@ bool Realm::refresh()
     send_local_notifications(DidChangeNotification);
     return true;
 }
+
+template<typename ValueType, typename DictType>
+class NativeAccessor {
+    static ValueType value_for_property(DictType dict, const string &prop_name);
+    static long long to_long(ValueType &val);
+    static string to_string(ValueType &val);
+
+    static void set(Row &row, Property &prop, ValueType value, Realm::CreationOptions options);
+};
+
+template<typename ValueType, typename DictType>
+Row Realm::create_object(std::string class_name, DictType value, bool try_update) {
+    typedef NativeAccessor<ValueType, DictType> Accessor;
+
+    check_read_write(this);
+
+    // get or create our accessor
+    bool created;
+
+    // try to get existing row if updating
+    size_t row_index = realm::not_found;
+    ObjectSchema &object_schema = m_config.schema->at(class_name);
+    realm::TableRef table = ObjectStore::table_for_object_type(read_group(), object_schema.name);
+    Property *primary_prop = object_schema.primary_key_property();
+    if (try_update && primary_prop) {
+        // search for existing object based on primary key type
+        ValueType primary_value = Accessor::value_for_property(value, object_schema.primary_key);
+        if (primary_prop->type == PropertyTypeString) {
+            row_index = table->find_first_string(primary_prop->table_column, Accessor::to_string(primary_value));
+        }
+        else {
+            row_index = table->find_first_int(primary_prop->table_column, Accessor::to_long(primary_value));
+        }
+    }
+
+    // if no existing, create row
+    created = false;
+    if (row_index == realm::not_found) {
+        row_index = table->add_empty_row();
+        created = true;
+    }
+
+    // populate
+    Row row = table->get(row_index);
+    CreationOptions creation_options = try_update ? CreationOptions::Update : CreationOptions::None;
+    for (Property &prop : object_schema.properties) {
+        ValueType prop_value = Accessor::value_for_property(value, prop.name);
+        if (prop_value) {
+            if (created || !prop.is_primary) {
+                Accessor::set(row, prop, prop_value, creation_options);
+            }
+        }
+        else if (created) {
+            throw RealmException(RealmException::Kind::MissingPropertyValue, "Missing property value for property " + prop.name);
+        }
+    }
+    return row;
+}
+
 
 SharedRealm RealmCache::get_realm(const std::string &path, std::thread::id thread_id)
 {

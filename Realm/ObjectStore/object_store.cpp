@@ -262,11 +262,11 @@ bool ObjectStore::create_tables(Group *group, ObjectStore::Schema &target_schema
     vector<ObjectSchema *> to_update;
     for (auto& object_schema : target_schema) {
         bool created = false;
-        ObjectStore::table_for_object_type_create_if_needed(group, object_schema.name, created);
+        ObjectStore::table_for_object_type_create_if_needed(group, object_schema.first, created);
 
         // we will modify tables for any new objectSchema (table was created) or for all if update_existing is true
         if (update_existing || created) {
-            to_update.push_back(&object_schema);
+            to_update.push_back(&object_schema.second);
             changed = true;
         }
     }
@@ -370,11 +370,11 @@ bool ObjectStore::update_realm_with_schema(Group *group,
 
     for (auto& target_schema : schema) {
         // read-only realms may be missing tables entirely
-        TableRef table = table_for_object_type(group, target_schema.name);
+        TableRef table = table_for_object_type(group, target_schema.first);
         if (table) {
-            auto errors = validate_object_schema(group, target_schema);
+            auto errors = validate_object_schema(group, target_schema.second);
             if (errors.size()) {
-                throw ObjectStoreException(errors, target_schema.name);
+                throw ObjectStoreException(errors, target_schema.first);
             }
         }
     }
@@ -401,7 +401,7 @@ ObjectStore::Schema ObjectStore::schema_from_group(Group *group) {
     for (size_t i = 0; i < group->size(); i++) {
         string object_type = object_type_for_table_name(group->get_table_name(i));
         if (object_type.length()) {
-            schema.emplace_back(group, move(object_type));
+            schema.emplace(object_type, move(ObjectSchema(group, object_type)));
         }
     }
     return schema;
@@ -409,13 +409,13 @@ ObjectStore::Schema ObjectStore::schema_from_group(Group *group) {
 
 bool ObjectStore::indexes_are_up_to_date(Group *group, Schema &schema) {
     for (auto &object_schema : schema) {
-        TableRef table = table_for_object_type(group, object_schema.name);
+        TableRef table = table_for_object_type(group, object_schema.first);
         if (!table) {
             continue;
         }
 
-        update_column_mapping(group, object_schema);
-        for (auto& property : object_schema.properties) {
+        update_column_mapping(group, object_schema.second);
+        for (auto& property : object_schema.second.properties) {
             if (property.requires_index() != table->has_search_index(property.table_column)) {
                 return false;
             }
@@ -427,12 +427,12 @@ bool ObjectStore::indexes_are_up_to_date(Group *group, Schema &schema) {
 bool ObjectStore::update_indexes(Group *group, Schema &schema) {
     bool changed = false;
     for (auto& object_schema : schema) {
-        TableRef table = table_for_object_type(group, object_schema.name);
+        TableRef table = table_for_object_type(group, object_schema.first);
         if (!table) {
             continue;
         }
 
-        for (auto& property : object_schema.properties) {
+        for (auto& property : object_schema.second.properties) {
             if (property.requires_index() == table->has_search_index(property.table_column)) {
                 continue;
             }
@@ -443,7 +443,7 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
                     table->add_search_index(property.table_column);
                 }
                 catch (LogicError const&) {
-                    throw ObjectStoreException(ObjectStoreException::Kind::RealmPropertyTypeNotIndexable, object_schema.name, property);
+                    throw ObjectStoreException(ObjectStoreException::Kind::RealmPropertyTypeNotIndexable, object_schema.first, property);
                 }
             }
             else {
@@ -456,14 +456,14 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
 
 void ObjectStore::validate_primary_column_uniqueness(Group *group, Schema &schema) {
     for (auto& object_schema : schema) {
-        auto primary_prop = object_schema.primary_key_property();
+        auto primary_prop = object_schema.second.primary_key_property();
         if (!primary_prop) {
             continue;
         }
 
-        TableRef table = table_for_object_type(group, object_schema.name);
+        TableRef table = table_for_object_type(group, object_schema.first);
         if (table->get_distinct_view(primary_prop->table_column).size() != table->size()) {
-            throw ObjectStoreException(ObjectStoreException::Kind::RealmDuplicatePrimaryKeyValue, object_schema.name, *primary_prop);
+            throw ObjectStoreException(ObjectStoreException::Kind::RealmDuplicatePrimaryKeyValue, object_schema.first, *primary_prop);
         }
     }
 }

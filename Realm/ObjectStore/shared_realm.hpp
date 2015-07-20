@@ -73,6 +73,14 @@ namespace realm {
         void cancel_transaction();
         bool is_in_transaction() { return m_in_transaction; }
 
+        enum CreationOptions {
+            None = 0,
+            Update = 1 << 0,
+            Promote = 2 << 0
+        };
+        template<typename ValueType, typename DictType>
+        Row create_object(std::string class_name, DictType value, bool try_update);
+        
         bool refresh();
         void set_auto_refresh(bool auto_refresh) { m_auto_refresh = auto_refresh; }
         bool auto_refresh() { return m_auto_refresh; }
@@ -145,7 +153,8 @@ namespace realm {
             IncorrectThread,
             /** Thrown when trying to open an unitialized Realm without a target schema or with a mismatching
              schema version **/
-            InvalidSchemaVersion
+            InvalidSchemaVersion,
+            MissingPropertyValue
         };
         RealmException(Kind kind, std::string message) : m_kind(kind), m_what(message) {}
 

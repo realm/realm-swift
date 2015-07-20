@@ -98,6 +98,12 @@
 		027A4D2D1AB1012500AA46F9 /* RLMMultiProcessTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 027A4D2B1AB1012500AA46F9 /* RLMMultiProcessTestCase.m */; };
 		028481CB19CCFC9C0097A416 /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */; };
 		028481EF19CD032C0097A416 /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */; };
+		02AC68071B3A8ACB008C2093 /* object_accessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02AC68051B3A8ACB008C2093 /* object_accessor.cpp */; };
+		02AC68081B3A8ACB008C2093 /* object_accessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02AC68051B3A8ACB008C2093 /* object_accessor.cpp */; };
+		02AC68091B3A8ACB008C2093 /* object_accessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02AC68051B3A8ACB008C2093 /* object_accessor.cpp */; };
+		02AC680A1B3A8ACB008C2093 /* object_accessor.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02AC68061B3A8ACB008C2093 /* object_accessor.hpp */; };
+		02AC680B1B3A8ACB008C2093 /* object_accessor.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02AC68061B3A8ACB008C2093 /* object_accessor.hpp */; };
+		02AC680C1B3A8ACB008C2093 /* object_accessor.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02AC68061B3A8ACB008C2093 /* object_accessor.hpp */; };
 		02AFB4631A80343600E11938 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4611A80343600E11938 /* PropertyTests.m */; };
 		02AFB4641A80343600E11938 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4611A80343600E11938 /* PropertyTests.m */; };
 		02AFB4651A80343600E11938 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4611A80343600E11938 /* PropertyTests.m */; };
@@ -551,6 +557,8 @@
 		027A4D291AB1012500AA46F9 /* InterprocessTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InterprocessTests.m; sourceTree = "<group>"; };
 		027A4D2A1AB1012500AA46F9 /* RLMMultiProcessTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMMultiProcessTestCase.h; sourceTree = "<group>"; };
 		027A4D2B1AB1012500AA46F9 /* RLMMultiProcessTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMMultiProcessTestCase.m; sourceTree = "<group>"; };
+		02AC68051B3A8ACB008C2093 /* object_accessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = object_accessor.cpp; path = ObjectStore/object_accessor.cpp; sourceTree = "<group>"; };
+		02AC68061B3A8ACB008C2093 /* object_accessor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = object_accessor.hpp; path = ObjectStore/object_accessor.hpp; sourceTree = "<group>"; };
 		02AFB4611A80343600E11938 /* PropertyTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PropertyTests.m; sourceTree = "<group>"; };
 		02AFB4621A80343600E11938 /* ResultsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResultsTests.m; sourceTree = "<group>"; };
 		02B8EF5819E601D80045A93D /* RLMResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults.h; sourceTree = "<group>"; };
@@ -732,6 +740,8 @@
 				023B2B2C1B28F0CF0021E54D /* object_store_exceptions.hpp */,
 				02DB99D01B32253A00934B3C /* shared_realm.cpp */,
 				02DB99D11B32253A00934B3C /* shared_realm.hpp */,
+				02AC68051B3A8ACB008C2093 /* object_accessor.cpp */,
+				02AC68061B3A8ACB008C2093 /* object_accessor.hpp */,
 			);
 			name = ObjectStore;
 			sourceTree = "<group>";
@@ -1021,6 +1031,7 @@
 				29E3C7341A71C1C700B62C1D /* RLMSwiftSupport.h in Headers */,
 				29E3C7351A71C1C700B62C1D /* RLMUpdateChecker.hpp in Headers */,
 				29E3C7361A71C1C700B62C1D /* RLMUtil.hpp in Headers */,
+				02AC680C1B3A8ACB008C2093 /* object_accessor.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1065,6 +1076,7 @@
 				3FE79FF919BA6A5900780C9A /* RLMSwiftSupport.h in Headers */,
 				3F20DA2319BE1EA6007DE308 /* RLMUpdateChecker.hpp in Headers */,
 				E856D2111956154C00FB2FCF /* RLMUtil.hpp in Headers */,
+				02AC680B1B3A8ACB008C2093 /* object_accessor.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1109,6 +1121,7 @@
 				3FE79FF819BA6A5900780C9A /* RLMSwiftSupport.h in Headers */,
 				3F20DA2219BE1EA6007DE308 /* RLMUpdateChecker.hpp in Headers */,
 				E81A1FB01955FC9300FDED82 /* RLMUtil.hpp in Headers */,
+				02AC680A1B3A8ACB008C2093 /* object_accessor.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1595,6 +1608,7 @@
 				29E3C7181A71C1C700B62C1D /* RLMUtil.mm in Sources */,
 				29E3C7191A71C1C700B62C1D /* RLMObjectBase.mm in Sources */,
 				02D9AFBF1B22488800A1BD87 /* object_schema.cpp in Sources */,
+				02AC68091B3A8ACB008C2093 /* object_accessor.cpp in Sources */,
 				02D9AFC51B22488800A1BD87 /* object_store.cpp in Sources */,
 				02DB99D41B32253A00934B3C /* shared_realm.cpp in Sources */,
 			);
@@ -1663,6 +1677,7 @@
 				3F20DA2519BE1EA6007DE308 /* RLMUpdateChecker.mm in Sources */,
 				E856D2121956154C00FB2FCF /* RLMUtil.mm in Sources */,
 				02D9AFBE1B22488800A1BD87 /* object_schema.cpp in Sources */,
+				02AC68081B3A8ACB008C2093 /* object_accessor.cpp in Sources */,
 				02D9AFC41B22488800A1BD87 /* object_store.cpp in Sources */,
 				02DB99D31B32253A00934B3C /* shared_realm.cpp in Sources */,
 			);
@@ -1734,6 +1749,7 @@
 				3F20DA2419BE1EA6007DE308 /* RLMUpdateChecker.mm in Sources */,
 				E81A1FB11955FC9300FDED82 /* RLMUtil.mm in Sources */,
 				023B2B2A1B28E5A40021E54D /* object_store.cpp in Sources */,
+				02AC68071B3A8ACB008C2093 /* object_accessor.cpp in Sources */,
 				02D9AFBD1B22488800A1BD87 /* object_schema.cpp in Sources */,
 				02DB99D21B32253A00934B3C /* shared_realm.cpp in Sources */,
 			);

@@ -330,10 +330,10 @@ static void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool ver
 
 static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema, ObjectStore::Schema &alignedSchema) {
     realm.schema = targetSchema;
-    for (ObjectSchema &aligned:alignedSchema) {
-        RLMObjectSchema *objectSchema = targetSchema[@(aligned.name.c_str())];
+    for (auto &aligned:alignedSchema) {
+        RLMObjectSchema *objectSchema = targetSchema[@(aligned.first.c_str())];
         objectSchema.realm = realm;
-        RLMCopyColumnMapping(objectSchema, aligned);
+        RLMCopyColumnMapping(objectSchema, aligned.second);
     }
 }
 
@@ -435,7 +435,8 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema, 
                 RLMSchema *targetSchema = customSchema ?: [RLMSchema.sharedSchema copy];
                 ObjectStore::Schema schema;
                 for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
-                    schema.push_back(objectSchema.objectStoreCopy);
+                    ObjectSchema toInsert = objectSchema.objectStoreCopy;
+                    schema.emplace(toInsert.name, move(toInsert));
                 }
                 uint64_t newVersion = schemaVersionForPath(path);
                 try {

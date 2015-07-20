@@ -58,7 +58,7 @@ namespace realm {
         // passed in schema ar updated with the correct column mapping
         // optionally runs migration function/lambda if schema is out of date
         // NOTE: must be performed within a write transaction
-        typedef std::vector<ObjectSchema> Schema;
+        typedef std::map<std::string, ObjectSchema> Schema;
         typedef std::function<void(Group *, Schema &)> MigrationFunction;
         static bool update_realm_with_schema(Group *group, uint64_t version, Schema &schema, MigrationFunction migration);
 
