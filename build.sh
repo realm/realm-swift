@@ -648,7 +648,7 @@ case "$COMMAND" in
         sh build.sh download-core
 
         # CocoaPods won't automatically preserve files referenced via symlinks
-        for symlink in $(find . -type l); do
+        for symlink in $(find . -not -path "./.git/*" -type l); do
           if [[ -L "$symlink" ]]; then
             link="$(dirname "$symlink")/$(readlink "$symlink")"
             rm -rf "$symlink"
