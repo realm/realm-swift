@@ -15,6 +15,7 @@ x.xx.x Release notes (yyyy-MM-dd)
   Objective-C generics where available.
 * Make `RLMResult`s support being used as an Objective-C generic.
 * Add support for building watchOS and bitcode-compatible apps with Realm and RealmSwift.
+* Make the exceptions thown in getters and setters more informative.
 
 ### Bugfixes
 
