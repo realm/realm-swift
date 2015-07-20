@@ -645,7 +645,7 @@ case "$COMMAND" in
     # CocoaPods
     ######################################
     "cocoapods-setup")
-        if [[ "$2" = "without-core"]]; then
+        if [[ "$2" != "without-core" ]]; then
             sh build.sh download-core
         fi
 
@@ -658,7 +658,7 @@ case "$COMMAND" in
           fi
         done
 
-        if [[ "$2" = "without-core"]]; then
+        if [[ "$2" != "without-core" ]]; then
           # CocoaPods doesn't support multiple header_mappings_dir, so combine
           # both sets of headers into a single directory
           rm -rf include
