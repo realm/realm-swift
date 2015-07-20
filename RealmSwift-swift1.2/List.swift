@@ -245,7 +245,7 @@ public final class List<T: Object>: ListBase {
     Inserts the given object at the given index.
 
     :warning: This method can only be called during a write transaction.
-    :warning: Throws an exception when called with an index smaller than zero or greater than 
+    :warning: Throws an exception when called with an index smaller than zero or greater than
               or equal to the number of objects in the list.
 
     :param: object An object.
@@ -304,7 +304,7 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
-    Exchanges the objects in the lsi at given indexes.
+    Exchanges the objects in the list at given indexes.
 
     :warning: Throws an exception when either index is greater than the number of objects in the list.
     :warning: This method can only be called during a write transaction.
