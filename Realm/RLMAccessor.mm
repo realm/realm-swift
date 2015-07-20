@@ -624,14 +624,10 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     RLMObjectSchema *schema = obj->_objectSchema;
     RLMProperty *prop = schema[propName];
     if (!prop) {
-        @throw RLMException(@"Invalid property name",
-                            @{@"Property name:" : propName ?: @"nil",
-                              @"Class name": obj->_objectSchema.className});
+        @throw RLMException([NSString stringWithFormat:@"Invalid property name `%@` for class `%@`.", propName, obj->_objectSchema.className]);
     }
     if (!RLMIsObjectValidForProperty(val, prop)) {
-        @throw RLMException(@"Invalid property name",
-                            @{@"Property name:" : propName ?: @"nil",
-                              @"Value": val ? [val description] : @"nil"});
+        @throw RLMException([NSString stringWithFormat:@"Invalid property value `%@` for property `%@` of class `%@`", val, propName, obj->_objectSchema.className]);
     }
     RLMDynamicSet(obj, prop, RLMNSNullToNil(val), RLMCreationOptionsPromoteStandalone);
 }
@@ -706,9 +702,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
 id RLMDynamicGet(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained NSString *propName) {
     RLMProperty *prop = obj->_objectSchema[propName];
     if (!prop) {
-        @throw RLMException(@"Invalid property name",
-                            @{@"Property name:" : propName ?: @"nil",
-                              @"Class name": obj->_objectSchema.className});
+        @throw RLMException([NSString stringWithFormat:@"Invalid property name `%@` for class `%@`.", propName, obj->_objectSchema.className]);
     }
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
