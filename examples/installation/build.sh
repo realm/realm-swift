@@ -33,6 +33,44 @@ xctest() {
     xcodebuild $XCODE_COMMAND clean build test -sdk iphonesimulator || exit 1
 }
 
+get_swift_version() {
+    xcrun swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p'
+}
+
+find_xcode_for_swift() {
+    # First check if the currently active one is fine
+    version="$(get_swift_version || true)"
+    if [[ "$version" = "$1" ]]; then
+        return 0
+    fi
+
+    local xcodes dev_dir version
+
+    # Check all installed copies of Xcode for the desired Swift version
+    xcodes=()
+    dev_dir="Contents/Developer"
+    for dir in $(mdfind "kMDItemCFBundleIdentifier == 'com.apple.dt.Xcode'" 2>/dev/null); do
+        [[ -d "$dir" && -n "$(ls -A "$dir/$dev_dir")" ]] && xcodes+=("$dir/$dev_dir")
+    done
+
+    for dir in "${xcodes[@]}"; do
+        export DEVELOPER_DIR="$dir"
+        version="$(get_swift_version)"
+        if [[ "$version" = "$1" ]]; then
+            return 0
+        fi
+    done
+
+    >&2 echo "No version of Xcode found that supports Swift $1"
+    return 1
+}
+
+if [[ "$REALM_SWIFT_VERSION" ]]; then
+    find_xcode_for_swift $REALM_SWIFT_VERSION
+else
+    REALM_SWIFT_VERSION=$(get_swift_version)
+fi
+
 case "$COMMAND" in
 
     ######################################
@@ -60,7 +98,7 @@ case "$COMMAND" in
         # CoocaPods
         ################
 
-        for path in ios/objc/CocoaPodsExample ios/objc/CocoaPodsDynamicExample ios/swift/CocoaPodsExample osx/objc/CocoaPodsExample; do
+        for path in $(find . -name CocoaPodsExample); do
             pod install --project-directory=$path
         done
 
@@ -68,7 +106,7 @@ case "$COMMAND" in
         # Carthage
         ################
 
-        for path in ios/objc/CarthageExample ios/swift/CarthageExample osx/objc/CarthageExample osx/swift/CarthageExample; do
+        for path in $(find . -name CarthageExample); do
             (cd $path; carthage bootstrap)
         done
         ;;
@@ -83,15 +121,19 @@ case "$COMMAND" in
         ./build.sh test-ios-objc-cocoapods || exit 1
         ./build.sh test-ios-objc-cocoapods-dynamic || exit 1
         ./build.sh test-ios-objc-carthage || exit 1
-        ./build.sh test-ios-swift-dynamic || exit 1
-        ./build.sh test-ios-swift-cocoapods || exit 1
-        ./build.sh test-ios-swift-carthage || exit 1
 
         ./build.sh test-osx-objc-dynamic || exit 1
         ./build.sh test-osx-objc-cocoapods || exit 1
         ./build.sh test-osx-objc-carthage || exit 1
-        ./build.sh test-osx-swift-dynamic || exit 1
-        ./build.sh test-osx-swift-carthage || exit 1
+
+        for swift_version in 1.2 2.0; do
+            REALM_SWIFT_VERSION=swift_version ./build.sh test-ios-swift-dynamic || exit 1
+            REALM_SWIFT_VERSION=swift_version ./build.sh test-ios-swift-cocoapods || exit 1
+            REALM_SWIFT_VERSION=swift_version ./build.sh test-ios-swift-carthage || exit 1
+
+            REALM_SWIFT_VERSION=swift_version ./build.sh test-osx-swift-dynamic || exit 1
+            REALM_SWIFT_VERSION=swift_version ./build.sh test-osx-swift-carthage || exit 1
+        done
         ;;
 
     "test-ios-objc-static")
@@ -115,15 +157,15 @@ case "$COMMAND" in
         ;;
 
     "test-ios-swift-dynamic")
-        xctest "-project" "ios/swift/DynamicExample/DynamicExample.xcodeproj" "-scheme" "DynamicExample"
+        xctest "-project" "ios/swift-$REALM_SWIFT_VERSION/DynamicExample/DynamicExample.xcodeproj" "-scheme" "DynamicExample"
         ;;
 
     "test-ios-swift-cocoapods")
-        xctest "-workspace" "ios/swift/CocoaPodsExample/CocoaPodsExample.xcworkspace" "-scheme" "CocoaPodsExample"
+        xctest "-workspace" "ios/swift-$REALM_SWIFT_VERSION/CocoaPodsExample/CocoaPodsExample.xcworkspace" "-scheme" "CocoaPodsExample"
         ;;
 
     "test-ios-swift-carthage")
-        xctest "-project" "ios/swift/CarthageExample/CarthageExample.xcodeproj" "-scheme" "CarthageExample"
+        xctest "-project" "ios/swift-$REALM_SWIFT_VERSION/CarthageExample/CarthageExample.xcodeproj" "-scheme" "CarthageExample"
         ;;
 
     "test-osx-objc-dynamic")
@@ -139,11 +181,11 @@ case "$COMMAND" in
         ;;
 
     "test-osx-swift-dynamic")
-        xcodebuild -project osx/swift/DynamicExample/DynamicExample.xcodeproj -scheme DynamicExample clean build test || exit 1
+        xcodebuild -project osx/swift-$REALM_SWIFT_VERSION/DynamicExample/DynamicExample.xcodeproj -scheme DynamicExample clean build test || exit 1
         ;;
 
     "test-osx-swift-carthage")
-        xcodebuild -project osx/swift/CarthageExample/CarthageExample.xcodeproj -scheme CarthageExample clean build test || exit 1
+        xcodebuild -project osx/swift-$REALM_SWIFT_VERSION/CarthageExample/CarthageExample.xcodeproj -scheme CarthageExample clean build test || exit 1
         ;;
 
     *)
