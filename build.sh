@@ -861,8 +861,10 @@ EOF
             exit 1
         fi
 
-        REALM_SOURCE=$(pwd)
-        mkdir $WORKSPACE
+        REALM_SOURCE="$(pwd)"
+        mkdir -p "$WORKSPACE"
+        WORKSPACE="$(realpath "$WORKSPACE")"
+        export WORKSPACE
         cd $WORKSPACE
         git clone $REALM_SOURCE tightdb_objc
 
