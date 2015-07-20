@@ -645,7 +645,9 @@ case "$COMMAND" in
     # CocoaPods
     ######################################
     "cocoapods-setup")
-        sh build.sh download-core
+        if [[ "$2" != "without-core" ]]; then
+            sh build.sh download-core
+        fi
 
         # CocoaPods won't automatically preserve files referenced via symlinks
         for symlink in $(find . -not -path "./.git/*" -type l); do
@@ -656,14 +658,16 @@ case "$COMMAND" in
           fi
         done
 
-        # CocoaPods doesn't support multiple header_mappings_dir, so combine
-        # both sets of headers into a single directory
-        rm -rf include
-        cp -R core/include include
-        mkdir -p include/Realm
-        cp Realm/*.{h,hpp} include/Realm
-        cp Realm/ObjectStore/*.hpp include/Realm
-        touch include/Realm/RLMPlatform.h
+        if [[ "$2" != "without-core" ]]; then
+          # CocoaPods doesn't support multiple header_mappings_dir, so combine
+          # both sets of headers into a single directory
+          rm -rf include
+          cp -R core/include include
+          mkdir -p include/Realm
+          cp Realm/*.{h,hpp} include/Realm
+          cp Realm/ObjectStore/*.hpp include/Realm
+          touch include/Realm/RLMPlatform.h
+        fi
         ;;
 
     ######################################
