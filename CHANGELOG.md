@@ -14,6 +14,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Add `RLM_GENERIC_ARRAY(ObjectType)` macro to make `RLMArray`s use
   Objective-C generics where available.
 * Make `RLMResult`s support being used as an Objective-C generic.
+* Add support for building watchOS and bitcode-compatible apps with Realm and RealmSwift.
 
 ### Bugfixes
 
