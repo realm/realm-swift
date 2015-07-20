@@ -18,7 +18,8 @@ Pod::Spec.new do |s|
   s.dependency 'Realm', "= #{s.version}"
   s.source_files = 'RealmSwift/*.swift'
 
-  s.preserve_paths          = %w(build.sh RealmSwift-swift*)
+  s.prepare_command         = 'sh build.sh cocoapods-setup without-core'
+  s.preserve_paths          = %w(build.sh)
 
   s.ios.deployment_target   = '8.0'
   s.osx.deployment_target   = '10.9'
