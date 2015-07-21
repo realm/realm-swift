@@ -52,6 +52,13 @@ ObjectStoreException::ObjectStoreException(Kind kind, const std::string &object_
     m_what = generate_what();
 }
 
+ObjectStoreException::ObjectStoreException(Kind kind, const std::string &object_type, const std::string property_name, const bool optional) : m_kind(kind) {
+    m_info[InfoKeyObjectType] = object_type;
+    m_info[InfoKeyPropertyName] = property_name;
+    m_info[InfoKeyOptional] = optional;
+    m_what = generate_what();
+}
+
 ObjectStoreException::ObjectStoreException(uint64_t old_version, uint64_t new_version) : m_kind(Kind::RealmVersionGreaterThanSchemaVersion) {
     m_info[InfoKeyOldVersion] = to_string(old_version);
     m_info[InfoKeyNewVersion] = to_string(new_version);
@@ -120,6 +127,10 @@ const ObjectStoreException::FormatStrings ObjectStoreException::s_default_format
         "Property '{InfoKeyPrimaryKey}' is no longer a primary key."},
     {Kind::ObjectSchemaNewPrimaryKey,
         "Property '{InfoKeyPrimaryKey}' has been made a primary key."},
+    {Kind::ObjectSchemaChangedOptional,
+        "Property '{InfoKeyPropertyName}' is no longer optional."},
+    {Kind::ObjectSchemaNewOptional,
+        "Property '{InfoKeyPropertyName}' is now optional."},
     {Kind::ObjectStoreValidationFailure,
         "Migration is required for object type '{InfoKeyObjectType}' due to the following errors: {ValidationErrors}"}
 };

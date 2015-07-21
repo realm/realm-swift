@@ -38,6 +38,8 @@ namespace realm {
             ObjectSchemaMismatchedObjectTypes,      // ObjectType, PropertyName, PropertyType, ObjectType, OldObjectType
             ObjectSchemaChangedPrimaryKey,          // ObjectType, PrimaryKey
             ObjectSchemaNewPrimaryKey,              // ObjectType, PrimaryKey
+            ObjectSchemaChangedOptional,            // ObjectType, PropertyName
+            ObjectSchemaNewOptional,                // ObjectType, PropertyName
             ObjectStoreValidationFailure,           // ObjectType, vector<ObjectStoreException>
         };
 
@@ -51,6 +53,9 @@ namespace realm {
 
         // ObjectSchemaChangedPrimaryKey, ObjectSchemaNewPrimaryKey
         ObjectStoreException(Kind kind, const std::string &object_type, const std::string primary_key);
+
+        // ObjectSchemaChangedOptional, ObjectSchemaNewOptional
+        ObjectStoreException(Kind kind, const std::string &object_type, const std::string property_name, const bool optional);
 
         // RealmVersionGreaterThanSchemaVersion
         ObjectStoreException(uint64_t old_version, uint64_t new_version);
@@ -88,6 +93,7 @@ namespace realm {
         INFO_KEY(NewVersion);
         INFO_KEY(ObjectType);
         INFO_KEY(PropertyName);
+        INFO_KEY(Optional);
         INFO_KEY(PropertyType);
         INFO_KEY(OldPropertyType);
         INFO_KEY(PropertyObjectType);
