@@ -373,6 +373,23 @@ public final class Realm {
         // FIXME: use T.className()
         return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
     }
+    
+    /**
+    This method is useful only in specialized circumstances, for example, when building 
+    components that integrate with Realm. If you are simply building an app on Realm, it is
+    recommended to use the typed method `objects(type:)`.
+    
+    Returns dynamic untyped objects for a given class name in the Realm
+    
+    :warning: This method is useful only in specialized circumstances.
+    
+    :param: className  The class name of the objects to be returned.
+    
+    :returns: All objects matching class name as dynamic objects
+    */
+    public func dynamicObjects(className: String) -> Results<DynamicObject> {
+        return Results<DynamicObject>(RLMGetObjects(rlmRealm, className, nil))
+    }
 
     /**
     Get an object with the given primary key.
@@ -392,7 +409,30 @@ public final class Realm {
         // FIXME: use T.className()
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), Optional<T>.self)
     }
-
+    
+    /**
+    This method is useful only in specialized circumstances, for example, when building
+    components that integrate with Realm. If you are simply building an app on Realm, it is
+    recommended to use the typed method `objectForPrimaryKey(type:key:)`.
+    
+    Get a dynamic object with the given primary key.
+    
+    Returns `nil` if no object exists with the given primary key.
+    
+    This method requires that `primaryKey()` be overridden on the given subclass.
+    
+    :see: Object.primaryKey()
+    
+    :warning: This method is useful only in specialized circumstances.
+    
+    :param: className  The class name of the object to be returned.
+    :param: key        The primary key of the desired object.
+    
+    :returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
+    */
+    public func dynamicObjectForPrimaryKey(className: String, key: AnyObject) -> DynamicObject? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, className, key), Optional<DynamicObject>.self)
+    }
 
     // MARK: Notifications
 

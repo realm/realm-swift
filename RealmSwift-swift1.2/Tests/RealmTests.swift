@@ -344,6 +344,13 @@ class RealmTests: TestCase {
         XCTAssertEqual(3, Realm().objects(SwiftIntObject).count)
         assertThrows(Realm().objects(Object))
     }
+    
+    func testDynamicObjects() {
+        XCTAssertEqual(0, Realm().dynamicObjects("SwiftStringObject").count)
+        XCTAssertEqual(3, Realm().dynamicObjects("SwiftIntObject").count)
+        XCTAssertEqual(3, Realm().dynamicObjects("SwiftIntObject").count)
+        assertThrows(Realm().dynamicObjects("Object"))
+    }
 
     func testObjectForPrimaryKey() {
         let realm = Realm()
@@ -354,6 +361,17 @@ class RealmTests: TestCase {
 
         XCTAssertNotNil(realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "a"))
         XCTAssertNil(realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "z"))
+    }
+    
+    func testDynamicObjectForPrimaryKey() {
+        let realm = Realm()
+        realm.write {
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
+            realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
+        }
+        
+        XCTAssertNotNil(realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "a"))
+        XCTAssertNil(realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "z"))
     }
 
     func testAddNotificationBlock() {
