@@ -62,16 +62,16 @@ case "$COMMAND" in
         # CoocaPods
         ################
 
-        for path in $(find . -name CocoaPodsExample); do
-            pod install --project-directory=$path
+        for path in $(find . -path "*/CocoaPodsExample/CocoaPodsExample"); do
+            pod install --project-directory="$path/.."
         done
 
         ################
         # Carthage
         ################
 
-        for path in $(find . -name CarthageExample); do
-            (cd $path; carthage bootstrap)
+        for path in $(find . -path "*/CarthageExample/CarthageExample"); do
+            (cd "$path/.."; carthage bootstrap)
         done
         ;;
 
