@@ -649,6 +649,7 @@ case "$COMMAND" in
         unzip realm-objc-${VERSION}.zip
 
         cp $0 realm-objc-${VERSION}
+        cp -r $(dirname $0)/scripts realm-objc-${VERSION}
         cd realm-objc-${VERSION}
         sh build.sh examples-ios
         sh build.sh examples-osx
@@ -658,6 +659,7 @@ case "$COMMAND" in
         unzip realm-swift-${VERSION}.zip
 
         cp $0 realm-swift-${VERSION}
+        cp -r $(dirname $0)/scripts realm-swift-${VERSION}
         cd realm-swift-${VERSION}
         REALM_SWIFT_VERSION=1.2 sh build.sh examples-ios-swift
         REALM_SWIFT_VERSION=2.0 sh build.sh examples-ios-swift
@@ -831,7 +833,7 @@ EOF
 
         REALM_SOURCE="$(pwd)"
         mkdir -p "$WORKSPACE"
-        WORKSPACE="$(realpath "$WORKSPACE")"
+        WORKSPACE="$(cd "$WORKSPACE" && pwd)"
         export WORKSPACE
         cd $WORKSPACE
         git clone $REALM_SOURCE tightdb_objc
