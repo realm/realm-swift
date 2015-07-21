@@ -289,16 +289,17 @@ public class ObjectUtil: NSObject {
 
     // Get the names of all properties in the object which are of type List<>
     @objc private class func getGenericListPropertyNames(obj: AnyObject) -> NSArray {
-        let reflection = reflect(obj)
+        let reflection = Mirror(reflecting: obj)
 
         var properties = [String]()
 
         // Skip the first property (super):
         // super is an implicit property on Swift objects
-        for i in 1..<reflection.count {
-            let mirror = reflection[i].1
-            if mirror.valueType is RLMListBase.Type {
-                properties.append(reflection[i].0)
+        for child in reflection.children {
+            if child.value.dynamicType is RLMListBase.Type {
+                if let name = child.label {
+                    properties.append(name)
+                }
             }
         }
 
@@ -311,16 +312,18 @@ public class ObjectUtil: NSObject {
     }
 
     @objc private class func getOptionalPropertyNames(object: AnyObject) -> NSArray {
-        let reflection = reflect(object)
+        let reflection = Mirror(reflecting: object)
 
         var properties = [String]()
 
         // Skip the first property (super):
         // super is an implicit property on Swift objects
-        for i in 1..<reflection.count {
-            let mirror = reflection[i].1
-            if mirror.disposition == .Optional {
-                properties.append(reflection[i].0)
+        for child in reflection.children {
+            if let name = child.label {
+                let mirror = Mirror(reflecting: child.value)
+                if mirror.displayStyle == .Optional {
+                    properties.append(name)
+                }
             }
         }
 
