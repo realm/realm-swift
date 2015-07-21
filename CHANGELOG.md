@@ -25,6 +25,7 @@ x.xx.x Release notes (yyyy-MM-dd)
   requires 64 bits to represent with a CPU that supports SSE 4.2.
 * An exception will no longer be thrown when attempt to reset the schema version or
   encryption key on an open Realm to the current value.
+* Date properties on 32 bit devices will retain 64 bit second precision.
 
 0.93.2 Release notes (2015-06-12)
 =============================================================
