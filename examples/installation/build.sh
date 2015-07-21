@@ -62,7 +62,7 @@ case "$COMMAND" in
         # CoocaPods
         ################
 
-        for path in $(find . -path "*/CocoaPodsExample/CocoaPodsExample"); do
+        for path in $(find . -path "*/CocoaPods*Example/CocoaPods*Example"); do
             pod install --project-directory="$path/.."
         done
 
