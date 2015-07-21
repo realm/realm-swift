@@ -24,42 +24,82 @@
 #include <string>
 
 namespace realm {
+    class Property;
 
     class ObjectStoreException : public std::exception {
     public:
         enum class Kind {
-            // thrown when calling update_realm_to_schema and the realm version is greater than the given version
-            RealmVersionGreaterThanSchemaVersion,   // old_version, new_version
-            RealmPropertyTypeNotIndexable,          // object_type, property_name, property_type
-            RealmDuplicatePrimaryKeyValue,          // object_type, property_name
+            RealmVersionGreaterThanSchemaVersion,   // OldVersion, NewVersion
+            RealmPropertyTypeNotIndexable,          // ObjectType, PropertyName, PropertyType
+            RealmDuplicatePrimaryKeyValue,          // ObjectType, PropertyName, PropertyType
+            ObjectSchemaMissingProperty,            // ObjectType, PropertyName, PropertyType
+            ObjectSchemaNewProperty,                // ObjectType, PropertyName, PropertyType
+            ObjectSchemaMismatchedTypes,            // ObjectType, PropertyName, PropertyType, OldPropertyType
+            ObjectSchemaMismatchedObjectTypes,      // ObjectType, PropertyName, PropertyType, ObjectType, OldObjectType
+            ObjectSchemaChangedPrimaryKey,          // ObjectType, PrimaryKey
+            ObjectSchemaNewPrimaryKey,              // ObjectType, PrimaryKey
+            ObjectSchemaChangedOptional,            // ObjectType, PropertyName
+            ObjectSchemaNewOptional,                // ObjectType, PropertyName
+            ObjectStoreValidationFailure,           // ObjectType, vector<ObjectStoreException>
         };
-        typedef std::map<std::string, std::string> Dict;
 
-        ObjectStoreException(Kind kind, Dict dict = Dict());
+        typedef const std::string InfoKey;
+        typedef std::map<InfoKey, std::string> Info;
+
+        ObjectStoreException(Kind kind, const std::string &object_type, const Property &prop);
+
+        // ObjectSchemaMismatchedTypes, ObjectSchemaMismatchedObjectTypes
+        ObjectStoreException(Kind kind, const std::string &object_type, const Property &prop, const Property &oldProp);
+
+        // ObjectSchemaChangedPrimaryKey, ObjectSchemaNewPrimaryKey
+        ObjectStoreException(Kind kind, const std::string &object_type, const std::string primary_key);
+
+        // ObjectSchemaChangedOptional, ObjectSchemaNewOptional
+        ObjectStoreException(Kind kind, const std::string &object_type, const std::string property_name, const bool optional);
+
+        // RealmVersionGreaterThanSchemaVersion
+        ObjectStoreException(uint64_t old_version, uint64_t new_version);
+
+        // ObjectStoreValidationFailure
+        ObjectStoreException(std::vector<ObjectStoreException> validation_errors, const std::string &object_type);
 
         ObjectStoreException::Kind kind() const { return m_kind; }
-        const ObjectStoreException::Dict &dict() const { return m_dict; }
+        const ObjectStoreException::Info &info() const { return m_info; }
 
         const char *what() const noexcept override  { return m_what.c_str(); }
 
+        // implement CustomWhat to customize exception messages per platform/language
+        typedef std::map<Kind, std::string> FormatStrings;
+        static void set_custom_format_strings(FormatStrings custom_format_strings) { s_custom_format_strings = custom_format_strings; }
+
     private:
+        ObjectStoreException(Kind kind, Info info = Info());
+
         Kind m_kind;
-        Dict m_dict;
-        std::string m_what;
-    };
+        Info m_info;
+        std::vector<ObjectStoreException> m_validation_errors;
 
-    class ObjectStoreValidationException : public std::exception {
+        std::string m_what;
+        std::string generate_what() const;
+        std::string validation_errors_string() const;
+        std::string populate_format_string(const std::string &format_string) const;
+
+        static const FormatStrings s_default_format_strings;
+        static FormatStrings s_custom_format_strings;
+
     public:
-        ObjectStoreValidationException(std::vector<std::string> validation_errors, std::string object_type);
-
-        const std::vector<std::string> &validation_errors() const { return m_validation_errors; }
-        std::string object_type() const { return m_object_type; }
-        const char *what() const noexcept override { return m_what.c_str(); }
-
-    private:
-        std::vector<std::string> m_validation_errors;
-        std::string m_object_type;
-        std::string m_what;
+        #define INFO_KEY(key) InfoKey InfoKey##key = "InfoKey" #key;
+        INFO_KEY(OldVersion);
+        INFO_KEY(NewVersion);
+        INFO_KEY(ObjectType);
+        INFO_KEY(PropertyName);
+        INFO_KEY(Optional);
+        INFO_KEY(PropertyType);
+        INFO_KEY(OldPropertyType);
+        INFO_KEY(PropertyObjectType);
+        INFO_KEY(OldPropertyObjectType);
+        INFO_KEY(PrimaryKey);
+        #undef INFO_KEY
     };
 }
 
