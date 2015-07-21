@@ -255,7 +255,7 @@ case "$COMMAND" in
 esac
 export CONFIGURATION
 
-source "scripts/swift-version.sh"
+source "$(dirname "$0")/scripts/swift-version.sh"
 
 case "$COMMAND" in
 
