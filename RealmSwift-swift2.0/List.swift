@@ -321,9 +321,9 @@ extension List: RangeReplaceableCollectionType {
     :param: subRange    The range of elements to be replaced.
     :param: newElements The new elements to be inserted into the list.
     */
-    public func replaceRange<C : CollectionType where C.Generator.Element == T>(subRange: Range<Int>, with newElements: C) {
-        for i in subRange {
-            removeAtIndex(i)
+    public func replaceRange<C: CollectionType where C.Generator.Element == T>(subRange: Range<Int>, with newElements: C) {
+        for _ in subRange {
+            removeAtIndex(subRange.startIndex)
         }
         for x in newElements.reverse() {
             insert(x, atIndex: subRange.startIndex)
