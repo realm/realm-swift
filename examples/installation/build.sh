@@ -33,7 +33,7 @@ xctest() {
     xcodebuild $XCODE_COMMAND clean build test -sdk iphonesimulator || exit 1
 }
 
-source "../../scripts/swift-version.sh"
+source "$(dirname "$0")/../../scripts/swift-version.sh"
 
 case "$COMMAND" in
 
