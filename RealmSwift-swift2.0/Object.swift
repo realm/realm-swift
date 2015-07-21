@@ -288,22 +288,12 @@ public class ObjectUtil: NSObject {
     }
 
     // Get the names of all properties in the object which are of type List<>
-    @objc private class func getGenericListPropertyNames(obj: AnyObject) -> NSArray {
-        let reflection = Mirror(reflecting: obj)
-
-        var properties = [String]()
-
-        // Skip the first property (super):
-        // super is an implicit property on Swift objects
-        for child in reflection.children {
-            if child.value.dynamicType is RLMListBase.Type {
-                if let name = child.label {
-                    properties.append(name)
-                }
-            }
+    @objc private class func getGenericListPropertyNames(object: AnyObject) -> NSArray {
+        return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
+            return prop.value.dynamicType is RLMListBase.Type
+        }.flatMap { (prop: Mirror.Child) in
+            return prop.label
         }
-
-        return properties
     }
 
     @objc private class func initializeListProperty(object: RLMObjectBase?, property: RLMProperty?, array: RLMArray?) {
@@ -312,22 +302,11 @@ public class ObjectUtil: NSObject {
     }
 
     @objc private class func getOptionalPropertyNames(object: AnyObject) -> NSArray {
-        let reflection = Mirror(reflecting: object)
-
-        var properties = [String]()
-
-        // Skip the first property (super):
-        // super is an implicit property on Swift objects
-        for child in reflection.children {
-            if let name = child.label {
-                let mirror = Mirror(reflecting: child.value)
-                if mirror.displayStyle == .Optional {
-                    properties.append(name)
-                }
-            }
+        return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
+            return Mirror(reflecting: prop.value).displayStyle == .Optional
+        }.flatMap { (prop: Mirror.Child) in
+            return prop.label
         }
-
-        return properties
     }
 
     @objc private class func requiredPropertiesForClass(_: AnyClass) -> NSArray? {
