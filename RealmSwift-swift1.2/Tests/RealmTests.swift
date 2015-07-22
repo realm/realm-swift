@@ -128,6 +128,16 @@ class RealmTests: TestCase {
         }
         XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
     }
+    
+    func testDynamicWrite() {
+        Realm().write {
+            self.assertThrows(Realm().beginWrite())
+            self.assertThrows(Realm().write { })
+            Realm().dynamicCreate("SwiftStringObject", value:["1"])
+            XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
+        }
+        XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
+    }
 
     func testBeginWrite() {
         Realm().beginWrite()

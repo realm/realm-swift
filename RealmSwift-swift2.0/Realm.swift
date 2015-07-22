@@ -305,6 +305,39 @@ public final class Realm {
         }
         return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), T.self)
     }
+    
+    /**
+    This method is useful only in specialized circumstances, for example, when building
+    components that integrate with Realm. If you are simply building an app on Realm, it is
+    recommended to use the typed method `create(type:value:update:)`.
+    
+    Create a `DynamicObject` with the given value.
+    
+    Creates or updates an instance of this object and adds it to the `Realm` populating
+    the object with the given value.
+    
+    When 'update' is 'true', the object must have a primary key. If no objects exist in
+    the Realm instance with the same primary key value, the object is inserted. Otherwise,
+    the existing object is updated with any changed values.
+    
+    :param: className   The class name of the object to create.
+    :param: value       The value used to populate the object. This can be any key/value coding compliant
+    object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
+    or an `Array` with one object for each persisted property. An exception will be
+    thrown if any required properties are not present and no default is set.
+    
+    When passing in an `Array`, all properties must be present,
+    valid and in the same order as the properties defined in the model.
+    :param: update      If true will try to update existing objects with the same primary key.
+    
+    :returns: The created object.
+    */
+    public func dynamicCreate(className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
+        if update && schema[className]?.primaryKeyProperty == nil {
+            throwRealmException("'\(className)' does not have a primary key and can not be updated")
+        }
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), DynamicObject.self)
+    }
 
     // MARK: Deleting objects
 
