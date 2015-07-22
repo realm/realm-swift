@@ -83,17 +83,23 @@ using namespace realm;
 
     if (objects && oldObjects) {
         for (long i = oldObjects.count - 1; i >= 0; i--) {
-            block(oldObjects[i], objects[i]);
+            @autoreleasepool {
+                block(oldObjects[i], objects[i]);
+            }
         }
     }
     else if (objects) {
         for (long i = objects.count - 1; i >= 0; i--) {
-            block(nil, objects[i]);
+            @autoreleasepool {
+                block(nil, objects[i]);
+            }
         }
     }
     else if (oldObjects) {
         for (long i = oldObjects.count - 1; i >= 0; i--) {
-            block(oldObjects[i], nil);
+            @autoreleasepool {
+                block(oldObjects[i], nil);
+            }
         }
     }
 }
