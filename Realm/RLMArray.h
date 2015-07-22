@@ -178,12 +178,12 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Exchanges the objects in the array at given indexes.
 
- Throws an exception when either index is greater than the number of objects in this RLMArray.
+ Throws an exception when either index exceeds the bounds of this RLMArray.
 
  @warning This method can only be called during a write transaction.
 
- @param index1 The index of the object with which to replace the object at index index2.
- @param index2 The index of the object with which to replace the object at index index1.
+ @param index1 The index of the object with which to replace the object at index `index2`.
+ @param index2 The index of the object with which to replace the object at index `index1`.
  */
 - (void)exchangeObjectAtIndex:(NSUInteger)index1 withObjectAtIndex:(NSUInteger)index2;
 

@@ -306,11 +306,11 @@ public final class List<T: Object>: ListBase {
     /**
     Exchanges the objects in the list at given indexes.
 
-    :warning: Throws an exception when either index is greater than the number of objects in the list.
+    :warning: Throws an exception when either index exceeds the bounds of the list.
     :warning: This method can only be called during a write transaction.
 
-    :param: index1 The index of the object with which to replace the object at index index2.
-    :param: index2 The index of the object with which to replace the object at index index1.
+    :param: index1 The index of the object with which to replace the object at index `index2`.
+    :param: index2 The index of the object with which to replace the object at index `index1`.
     */
     public func swap(index1: Int, _ index2: Int) {
         throwForNegativeIndex(index1, parameterName: "index1")
