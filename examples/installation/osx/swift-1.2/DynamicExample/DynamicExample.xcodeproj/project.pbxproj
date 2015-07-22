@@ -358,7 +358,6 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Users/jp/realm/code/realm-cocoa/examples/installation/realm-swift-latest/osx/swift-1.2",
 				);
 				INFOPLIST_FILE = DynamicExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -373,7 +372,6 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Users/jp/realm/code/realm-cocoa/examples/installation/realm-swift-latest/osx/swift-1.2",
 				);
 				INFOPLIST_FILE = DynamicExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
