@@ -144,6 +144,58 @@
     XCTAssertEqualObjects([children[0] stringCol], @"b", @"Only child should be 'b'");
 }
 
+- (void)testMove {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithValue:@[@"arrayObject", @[@[@"a"], @[@"b"]], @[]]];
+    RLM_GENERIC_ARRAY(StringObject) *children = obj.array;
+
+    [children moveObjectAtIndex:1 toIndex:0];
+
+    XCTAssertEqualObjects(children[0].stringCol, @"b");
+    XCTAssertEqualObjects(children[1].stringCol, @"a");
+
+    [children moveObjectAtIndex:0 toIndex:1];
+
+    XCTAssertEqualObjects(children[0].stringCol, @"a");
+    XCTAssertEqualObjects(children[1].stringCol, @"b");
+
+    [children moveObjectAtIndex:0 toIndex:0];
+
+    XCTAssertEqualObjects(children[0].stringCol, @"a");
+    XCTAssertEqualObjects(children[1].stringCol, @"b");
+
+    XCTAssertThrows([children moveObjectAtIndex:0 toIndex:2]);
+    XCTAssertThrows([children moveObjectAtIndex:2 toIndex:0]);
+
+    [realm beginWriteTransaction];
+
+    [realm addObject:obj];
+    children = obj.array;
+
+    [children moveObjectAtIndex:1 toIndex:0];
+
+    XCTAssertEqualObjects(children[0].stringCol, @"b");
+    XCTAssertEqualObjects(children[1].stringCol, @"a");
+
+    [children moveObjectAtIndex:0 toIndex:1];
+
+    XCTAssertEqualObjects(children[0].stringCol, @"a");
+    XCTAssertEqualObjects(children[1].stringCol, @"b");
+
+    [children moveObjectAtIndex:0 toIndex:0];
+
+    XCTAssertEqualObjects(children[0].stringCol, @"a");
+    XCTAssertEqualObjects(children[1].stringCol, @"b");
+
+    XCTAssertThrows([children moveObjectAtIndex:0 toIndex:2]);
+    XCTAssertThrows([children moveObjectAtIndex:2 toIndex:0]);
+
+    [realm commitWriteTransaction];
+
+    XCTAssertThrows([children moveObjectAtIndex:1 toIndex:0]);
+}
+
 - (void)testAddInvalidated {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
