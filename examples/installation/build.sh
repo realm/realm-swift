@@ -28,9 +28,25 @@ EOF
 
 COMMAND="$1"
 
-xctest() {
+prelaunch_simulator() {
+    killall "iOS Simulator" 2>/dev/null || true
+    killall Simulator 2>/dev/null || true
+    if [[ -a "${DEVELOPER_DIR}/Applications/iOS Simulator.app" ]]; then
+        open "${DEVELOPER_DIR}/Applications/iOS Simulator.app"
+    elif [[ -a "${DEVELOPER_DIR}/Applications/Simulator.app" ]]; then
+        open "${DEVELOPER_DIR}/Applications/Simulator.app"
+    fi
+}
+
+xctest_ios() {
+    prelaunch_simulator
     XCODE_COMMAND="$@"
     xcodebuild $XCODE_COMMAND clean build test -sdk iphonesimulator || exit 1
+}
+
+xctest_osx() {
+    XCODE_COMMAND="$@"
+    xcodebuild $XCODE_COMMAND clean build test -sdk macosx || exit 1
 }
 
 source "$(dirname "$0")/../../scripts/swift-version.sh"
@@ -102,55 +118,55 @@ case "$COMMAND" in
         ;;
 
     "test-ios-objc-static")
-        xctest "-project" "ios/objc/StaticExample/StaticExample.xcodeproj" "-scheme" "StaticExample"
+        xctest_ios "-project" "ios/objc/StaticExample/StaticExample.xcodeproj" "-scheme" "StaticExample"
         ;;
 
     "test-ios-objc-dynamic")
-        xctest "-project" "ios/objc/DynamicExample/DynamicExample.xcodeproj" "-scheme" "DynamicExample"
+        xctest_ios "-project" "ios/objc/DynamicExample/DynamicExample.xcodeproj" "-scheme" "DynamicExample"
         ;;
 
     "test-ios-objc-cocoapods")
-        xctest "-workspace" "ios/objc/CocoaPodsExample/CocoaPodsExample.xcworkspace" "-scheme" "CocoaPodsExample"
+        xctest_ios "-workspace" "ios/objc/CocoaPodsExample/CocoaPodsExample.xcworkspace" "-scheme" "CocoaPodsExample"
         ;;
 
     "test-ios-objc-cocoapods-dynamic")
-        xctest "-workspace" "ios/objc/CocoaPodsDynamicExample/CocoaPodsDynamicExample.xcworkspace" "-scheme" "CocoaPodsDynamicExample"
+        xctest_ios "-workspace" "ios/objc/CocoaPodsDynamicExample/CocoaPodsDynamicExample.xcworkspace" "-scheme" "CocoaPodsDynamicExample"
         ;;
 
     "test-ios-objc-carthage")
-        xctest "-project" "ios/objc/CarthageExample/CarthageExample.xcodeproj" "-scheme" "CarthageExample"
+        xctest_ios "-project" "ios/objc/CarthageExample/CarthageExample.xcodeproj" "-scheme" "CarthageExample"
         ;;
 
     "test-ios-swift-dynamic")
-        xctest "-project" "ios/swift-$REALM_SWIFT_VERSION/DynamicExample/DynamicExample.xcodeproj" "-scheme" "DynamicExample"
+        xctest_ios "-project" "ios/swift-$REALM_SWIFT_VERSION/DynamicExample/DynamicExample.xcodeproj" "-scheme" "DynamicExample"
         ;;
 
     "test-ios-swift-cocoapods")
-        xctest "-workspace" "ios/swift-$REALM_SWIFT_VERSION/CocoaPodsExample/CocoaPodsExample.xcworkspace" "-scheme" "CocoaPodsExample"
+        xctest_ios "-workspace" "ios/swift-$REALM_SWIFT_VERSION/CocoaPodsExample/CocoaPodsExample.xcworkspace" "-scheme" "CocoaPodsExample"
         ;;
 
     "test-ios-swift-carthage")
-        xctest "-project" "ios/swift-$REALM_SWIFT_VERSION/CarthageExample/CarthageExample.xcodeproj" "-scheme" "CarthageExample"
+        xctest_ios "-project" "ios/swift-$REALM_SWIFT_VERSION/CarthageExample/CarthageExample.xcodeproj" "-scheme" "CarthageExample"
         ;;
 
     "test-osx-objc-dynamic")
-        xcodebuild -project osx/objc/DynamicExample/DynamicExample.xcodeproj -scheme DynamicExample clean build test || exit 1
+        xctest_osx -project osx/objc/DynamicExample/DynamicExample.xcodeproj -scheme DynamicExample
         ;;
 
     "test-osx-objc-cocoapods")
-        xcodebuild -workspace osx/objc/CocoaPodsExample/CocoaPodsExample.xcworkspace -scheme CocoaPodsExample clean build test || exit 1
+        xctest_osx -workspace osx/objc/CocoaPodsExample/CocoaPodsExample.xcworkspace -scheme CocoaPodsExample
         ;;
 
     "test-osx-objc-carthage")
-        xcodebuild -project osx/objc/CarthageExample/CarthageExample.xcodeproj -scheme CarthageExample clean build test || exit 1
+        xctest_osx -project osx/objc/CarthageExample/CarthageExample.xcodeproj -scheme CarthageExample
         ;;
 
     "test-osx-swift-dynamic")
-        xcodebuild -project osx/swift-$REALM_SWIFT_VERSION/DynamicExample/DynamicExample.xcodeproj -scheme DynamicExample clean build test || exit 1
+        xctest_osx -project osx/swift-$REALM_SWIFT_VERSION/DynamicExample/DynamicExample.xcodeproj -scheme DynamicExample
         ;;
 
     "test-osx-swift-carthage")
-        xcodebuild -project osx/swift-$REALM_SWIFT_VERSION/CarthageExample/CarthageExample.xcodeproj -scheme CarthageExample clean build test || exit 1
+        xctest_osx -project osx/swift-$REALM_SWIFT_VERSION/CarthageExample/CarthageExample.xcodeproj -scheme CarthageExample
         ;;
 
     *)
