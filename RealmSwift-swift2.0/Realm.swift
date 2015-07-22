@@ -311,9 +311,7 @@ public final class Realm {
     components that integrate with Realm. If you are simply building an app on Realm, it is
     recommended to use the typed method `create(type:value:update:)`.
     
-    Create a `DynamicObject` with the given value.
-    
-    Creates or updates an instance of this object and adds it to the `Realm` populating
+    Creates or updates an object with the given class name and adds it to the `Realm` populating
     the object with the given value.
     
     When 'update' is 'true', the object must have a primary key. If no objects exist in
@@ -411,14 +409,14 @@ public final class Realm {
     This method is useful only in specialized circumstances, for example, when building 
     components that integrate with Realm. If you are simply building an app on Realm, it is
     recommended to use the typed method `objects(type:)`.
-    
-    Returns dynamic untyped objects for a given class name in the Realm
+
+    Returns all objects for a given class name in the Realm.
     
     :warning: This method is useful only in specialized circumstances.
     
     :param: className  The class name of the objects to be returned.
     
-    :returns: All objects matching class name as dynamic objects
+    :returns: All objects for the given class name as dynamic objects
     */
     public func dynamicObjects(className: String) -> Results<DynamicObject> {
         return Results<DynamicObject>(RLMGetObjects(rlmRealm, className, nil))
@@ -448,9 +446,9 @@ public final class Realm {
     components that integrate with Realm. If you are simply building an app on Realm, it is
     recommended to use the typed method `objectForPrimaryKey(type:key:)`.
     
-    Get a dynamic object with the given primary key.
+    Get a dynamic object with the given class name and primary key.
     
-    Returns `nil` if no object exists with the given primary key.
+    Returns `nil` if no object exists with the given class name and primary key.
     
     This method requires that `primaryKey()` be overridden on the given subclass.
     
@@ -461,7 +459,7 @@ public final class Realm {
     :param: className  The class name of the object to be returned.
     :param: key        The primary key of the desired object.
     
-    :returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
+    :returns: An object of type `DynamicObject` or `nil` if an object with the given primary key does not exist.
     */
     public func dynamicObjectForPrimaryKey(className: String, key: AnyObject) -> DynamicObject? {
         return unsafeBitCast(RLMGetObject(rlmRealm, className, key), Optional<DynamicObject>.self)
