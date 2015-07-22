@@ -93,11 +93,12 @@ case "$COMMAND" in
         for swift_version in 1.2 2.0; do
             REALM_SWIFT_VERSION=$swift_version ./build.sh test-ios-swift-dynamic || exit 1
             REALM_SWIFT_VERSION=$swift_version ./build.sh test-ios-swift-cocoapods || exit 1
-            REALM_SWIFT_VERSION=$swift_version ./build.sh test-ios-swift-carthage || exit 1
 
             REALM_SWIFT_VERSION=$swift_version ./build.sh test-osx-swift-dynamic || exit 1
-            REALM_SWIFT_VERSION=$swift_version ./build.sh test-osx-swift-carthage || exit 1
         done
+
+        REALM_SWIFT_VERSION=1.2 ./build.sh test-ios-swift-carthage || exit 1
+        REALM_SWIFT_VERSION=1.2 ./build.sh test-osx-swift-carthage || exit 1
         ;;
 
     "test-ios-objc-static")
