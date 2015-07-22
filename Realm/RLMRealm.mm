@@ -18,11 +18,12 @@
 
 #import "RLMRealm_Private.hpp"
 
+#import "RLMAnalytics.hpp"
 #import "RLMArray_Private.hpp"
 #import "RLMMigration_Private.h"
-#import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
+#import "RLMObject_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealmUtil.h"
 #import "RLMSchema_Private.h"
@@ -181,6 +182,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 
     RLMCheckForUpdates();
     RLMInstallUncaughtExceptionHandler();
+    RLMSendAnalytics();
 }
 
 - (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory dynamic:(BOOL)dynamic error:(NSError **)outError {
