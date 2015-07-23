@@ -694,8 +694,10 @@ case "$COMMAND" in
 
     "package-ios-swift")
         cd tightdb_objc
-        REALM_SWIFT_VERSION=1.2 sh build.sh ios-swift
-        REALM_SWIFT_VERSION=2.0 sh build.sh ios-swift
+        for version in 1.2 2.0; do
+            REALM_SWIFT_VERSION=$version sh build.sh prelaunch-simulator
+            REALM_SWIFT_VERSION=$version sh build.sh ios-swift
+        done
 
         cd build/ios
         zip --symlinks -r realm-swift-framework-ios.zip swift-1.2 swift-2.0
