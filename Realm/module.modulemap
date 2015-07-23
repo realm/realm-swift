@@ -22,5 +22,6 @@ framework module Realm {
     
     explicit module Dynamic {
         header "RLMRealm_Dynamic.h"
+        header "RLMObjectBase_Dynamic.h"
     }
 }

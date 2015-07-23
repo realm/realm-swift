@@ -209,6 +209,14 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     return [NSString stringWithString:mString];
 }
 
+- (RLMRealm *)realm {
+    return _realm;
+}
+
+- (RLMObjectSchema *)objectSchema {
+    return _objectSchema;
+}
+
 - (BOOL)isInvalidated {
     // if not standalone and our accessor has been detached, we have been deleted
     return self.class == _objectSchema.accessorClass && !_row.is_attached();

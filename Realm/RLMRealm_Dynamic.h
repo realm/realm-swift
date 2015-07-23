@@ -106,7 +106,7 @@
  
  @see       RLMObject objectForPrimaryKey:
  */
-- (RLMObject *)objectWithClassName:(NSString *)className forPrimaryKey:(NSString *)primaryKey;
+- (RLMObject *)objectWithClassName:(NSString *)className forPrimaryKey:(id)primaryKey;
 
 /**
  This method is useful only in specialized circumstances, for example, when building components

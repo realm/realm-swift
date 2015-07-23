@@ -33,7 +33,7 @@
 @implementation RLMObject
 
 // synthesized in RLMObjectBase
-@dynamic invalidated;
+@dynamic invalidated, realm, objectSchema;
 
 - (instancetype)init {
     return [super init];
@@ -91,14 +91,6 @@
 
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
     RLMObjectBaseSetObjectForKeyedSubscript(self, key, obj);
-}
-
-- (RLMRealm *)realm {
-    return _realm;
-}
-
-- (RLMObjectSchema *)objectSchema {
-    return _objectSchema;
 }
 
 + (RLMResults *)allObjects {

@@ -858,7 +858,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return RLMGetObjects(self, objectClassName, predicate);
 }
 
-- (RLMObject *)objectWithClassName:(NSString *)className forPrimaryKey:(NSString *)primaryKey {
+- (RLMObject *)objectWithClassName:(NSString *)className forPrimaryKey:(id)primaryKey {
     return RLMGetObject(self, className, primaryKey);
 }
 
