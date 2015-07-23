@@ -404,6 +404,33 @@ class ListTests: TestCase {
         assertThrows(self.array.replace(-200, object: self.str2))
     }
 
+    func testReplaceRange() {
+        array.extend([str1, str1])
+
+        array.replaceRange(0...0, with: [str2])
+        XCTAssertEqual(Int(2), array.count)
+        XCTAssertEqual(str2, array[0])
+        XCTAssertEqual(str1, array[1])
+
+        array.replaceRange(1..<2, with: [str2])
+        XCTAssertEqual(Int(2), array.count)
+        XCTAssertEqual(str2, array[0])
+        XCTAssertEqual(str2, array[1])
+
+        array.replaceRange(0..<0, with: [str2])
+        XCTAssertEqual(Int(3), array.count)
+        XCTAssertEqual(str2, array[0])
+        XCTAssertEqual(str2, array[1])
+        XCTAssertEqual(str2, array[2])
+
+        array.replaceRange(0..<3, with: [])
+        XCTAssertEqual(Int(0), array.count)
+
+        assertThrows(self.array.replaceRange(200..<201, with: [self.str2]))
+        assertThrows(self.array.replaceRange(-200...200, with: [self.str2]))
+        assertThrows(self.array.replaceRange(0...200, with: [self.str2]))
+    }
+
     func testChangesArePersisted() {
         if let realm = array.realm {
             array.extend([str1, str2])

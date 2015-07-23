@@ -305,7 +305,7 @@ public final class List<T: Object>: ListBase {
     }
 }
 
-extension List: ExtensibleCollectionType {
+extension List: RangeReplaceableCollectionType {
     // MARK: Sequence Support
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the list.
@@ -313,7 +313,22 @@ extension List: ExtensibleCollectionType {
         return RLMGenerator(collection: _rlmArray)
     }
 
-    // MARK: ExtensibleCollection Support
+    // MARK: RangeReplaceableCollection Support
+
+    /**
+    Replace the given `subRange` of elements with `newElements`.
+
+    :param: subRange    The range of elements to be replaced.
+    :param: newElements The new elements to be inserted into the list.
+    */
+    public func replaceRange<C: CollectionType where C.Generator.Element == T>(subRange: Range<Int>, with newElements: C) {
+        for _ in subRange {
+            removeAtIndex(subRange.startIndex)
+        }
+        for x in newElements.reverse() {
+            insert(x, atIndex: subRange.startIndex)
+        }
+    }
 
     /// The position of the first element in a non-empty collection.
     /// Identical to endIndex in an empty collection.
