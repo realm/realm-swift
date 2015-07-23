@@ -147,12 +147,31 @@ static NSArray * RLMPGlobFilesAtDirectoryURLWithPredicate(NSFileManager *fileMan
     
     NSDictionary *configuration = @{ NSWorkspaceLaunchConfigurationArguments : arguments };
     
+    // Show confirmation alert if 2 or more files are detected
+    if (arguments.count > 1) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setMessageText:@"Realm Browser"];
+        [alert setInformativeText:[NSString stringWithFormat:@"%ld Realm files are detected. Are you sure to open them at once?", arguments.count]];
+        [alert setAlertStyle:NSInformationalAlertStyle];
+        [alert addButtonWithTitle:@"OK"];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert beginSheetModalForWindow:[NSApp mainWindow] completionHandler:^(NSModalResponse returnCode) {
+            if (returnCode == NSAlertFirstButtonReturn) {
+                [self openRealmBrowserWithConfiguration:configuration];
+            }
+        }];
+    } else {
+        [self openRealmBrowserWithConfiguration:configuration];
+    }
+}
+
+- (void)openRealmBrowserWithConfiguration:(NSDictionary *)configuration
+{
     NSError *error;
     if (![[NSWorkspace sharedWorkspace] launchApplicationAtURL:self.browserUrl options:NSWorkspaceLaunchNewInstance configuration:configuration error:&error]) {
         // This will happen if the Browser was present at Xcode launch and then was deleted
         [self showError:error];
     }
-    
 }
 
 - (NSArray *)realmFilesURLWithDeviceUUID:(NSString *)deviceUUID
