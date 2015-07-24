@@ -8,6 +8,8 @@ command:
   bootstrap:                       downloads product dependencies and runs 'pod install'/'carthage bootstrap' where appropriate
 
   test-all:                        tests all projects in this repo.
+  test-xcode6:                     tests all Xcode 6 projects in this repo.
+  test-xcode7:                     tests all Xcode 7 projects in this repo.
 
   test-ios-objc-static:            tests iOS Objective-C static example.
   test-ios-objc-dynamic:           tests iOS Objective-C dynamic example.
@@ -109,6 +111,13 @@ case "$COMMAND" in
     ######################################
 
     "test-all")
+        ./build.sh test-xcode6 || exit 1
+        ./build.sh test-xcode7 || exit 1
+        ;;
+
+    "test-xcode6")
+        export REALM_SWIFT_VERSION=1.2
+
         ./build.sh test-ios-objc-static || exit 1
         ./build.sh test-ios-objc-dynamic || exit 1
         ./build.sh test-ios-objc-cocoapods || exit 1
@@ -119,15 +128,21 @@ case "$COMMAND" in
         ./build.sh test-osx-objc-cocoapods || exit 1
         ./build.sh test-osx-objc-carthage || exit 1
 
-        for swift_version in 1.2 2.0; do
-            REALM_SWIFT_VERSION=$swift_version ./build.sh test-ios-swift-dynamic || exit 1
-            REALM_SWIFT_VERSION=$swift_version ./build.sh test-ios-swift-cocoapods || exit 1
+        ./build.sh test-ios-swift-dynamic || exit 1
+        ./build.sh test-ios-swift-cocoapods || exit 1
 
-            REALM_SWIFT_VERSION=$swift_version ./build.sh test-osx-swift-dynamic || exit 1
-        done
+        ./build.sh test-osx-swift-dynamic || exit 1
 
-        REALM_SWIFT_VERSION=1.2 ./build.sh test-ios-swift-carthage || exit 1
-        REALM_SWIFT_VERSION=1.2 ./build.sh test-osx-swift-carthage || exit 1
+        ./build.sh test-ios-swift-carthage || exit 1
+        ./build.sh test-osx-swift-carthage || exit 1
+        ;;
+
+    "test-xcode7")
+        export REALM_SWIFT_VERSION=2.0
+
+        ./build.sh test-ios-swift-dynamic || exit 1
+        ./build.sh test-ios-swift-cocoapods || exit 1
+        ./build.sh test-osx-swift-dynamic || exit 1
         ;;
 
     "test-ios-objc-static")
