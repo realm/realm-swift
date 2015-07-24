@@ -397,6 +397,8 @@
 		E856D21D195615A900FB2FCF /* QueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC11955FE0100FDED82 /* QueryTests.m */; };
 		E856D21E195615A900FB2FCF /* RealmTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC31955FE0100FDED82 /* RealmTests.mm */; };
 		E856D21F195615B100FB2FCF /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC51955FE0100FDED82 /* RLMTestCase.m */; };
+		E869AFA01B63052700BCC147 /* RLMAnalytics.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E83591941B3DF05C0035F2F3 /* RLMAnalytics.hpp */; };
+		E869AFA11B63052C00BCC147 /* RLMAnalytics.mm in Sources */ = {isa = PBXBuildFile; fileRef = E83591931B3DF05C0035F2F3 /* RLMAnalytics.mm */; };
 		E8839B2B19E31F9D0047B1A8 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E856D1D5195614A300FB2FCF /* Realm.framework */; };
 		E8917598197A1B350068ACC6 /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8917597197A1B350068ACC6 /* UnicodeTests.m */; };
 		E8917599197A1B350068ACC6 /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8917597197A1B350068ACC6 /* UnicodeTests.m */; };
@@ -834,12 +836,10 @@
 			isa = PBXGroup;
 			children = (
 				3F8DCA5719930F550008BD7F /* iOS Device Tests.xctest */,
-				026B0F2C1A780680005E26C8 /* iOS Dynamic Tests.xctest */,
 				E856D1DF195614A400FB2FCF /* iOS Tests.xctest */,
 				E8D89BA31955FC6D00CF2B9A /* OSX Tests.xctest */,
 				E8D89B981955FC6D00CF2B9A /* Realm.framework */,
 				E856D1D5195614A300FB2FCF /* Realm.framework */,
-				29E3C73A1A71C1C700B62C1D /* Realm.framework */,
 				3F1A5E721992EB7400F45F4C /* TestHost.app */,
 				29E3C73A1A71C1C700B62C1D /* Realm.framework */,
 				026B0F2C1A780680005E26C8 /* iOS Dynamic Tests.xctest */,
@@ -978,6 +978,7 @@
 				144C2F6D1B3D3529005C8F81 /* RLMProperty_Private.h in Headers */,
 				144C2F711B3D3529005C8F81 /* RLMResults_Private.h in Headers */,
 				144C2F671B3D3529005C8F81 /* RLMArray_Private.h in Headers */,
+				E869AFA01B63052700BCC147 /* RLMAnalytics.hpp in Headers */,
 				144C2F6B1B3D3529005C8F81 /* RLMObjectSchema_Private.h in Headers */,
 				144C2F691B3D3529005C8F81 /* RLMMigration_Private.h in Headers */,
 				144C2F731B3D3539005C8F81 /* RLMAccessor.h in Headers */,
@@ -1579,6 +1580,7 @@
 				144C2F481B3D34A2005C8F81 /* RLMArrayLinkView.mm in Sources */,
 				144C2F491B3D34A2005C8F81 /* RLMConstants.m in Sources */,
 				144C2F4B1B3D34A2005C8F81 /* RLMMigration.mm in Sources */,
+				E869AFA11B63052C00BCC147 /* RLMAnalytics.mm in Sources */,
 				144C2F4C1B3D34A2005C8F81 /* RLMObject.mm in Sources */,
 				144C2F4E1B3D34A2005C8F81 /* RLMObjectSchema.mm in Sources */,
 				144C2F4F1B3D34A2005C8F81 /* RLMObjectStore.mm in Sources */,
