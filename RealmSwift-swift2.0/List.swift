@@ -246,7 +246,7 @@ public final class List<T: Object>: ListBase {
     Inserts the given object at the given index.
 
     :warning: This method can only be called during a write transaction.
-    :warning: Throws an exception when called with an index smaller than zero or greater than 
+    :warning: Throws an exception when called with an index smaller than zero or greater than
               or equal to the number of objects in the list.
 
     :param: object An object.
@@ -302,6 +302,22 @@ public final class List<T: Object>: ListBase {
     public func replace(index: Int, object: T) {
         throwForNegativeIndex(index)
         _rlmArray.replaceObjectAtIndex(UInt(index), withObject: unsafeBitCast(object, RLMObject.self))
+    }
+
+
+    /**
+    Exchanges the objects in the list at given indexes.
+
+    :warning: Throws an exception when either index exceeds the bounds of the list.
+    :warning: This method can only be called during a write transaction.
+
+    :param: index1 The index of the object with which to replace the object at index `index2`.
+    :param: index2 The index of the object with which to replace the object at index `index1`.
+    */
+    public func swap(index1: Int, _ index2: Int) {
+        throwForNegativeIndex(index1, parameterName: "index1")
+        throwForNegativeIndex(index2, parameterName: "index2")
+        _rlmArray.exchangeObjectAtIndex(UInt(index1), withObjectAtIndex: UInt(index2))
     }
 }
 

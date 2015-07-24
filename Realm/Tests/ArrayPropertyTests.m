@@ -328,6 +328,37 @@
     XCTAssertEqual(array.intArray.count, 0U, @"Should have 0 elements in int array");
 }
 
+- (void)testExchangeObjectAtIndexWithObjectAtIndex {
+
+    void (^test)(RLMArray *) = ^(RLMArray *array) {
+        [array exchangeObjectAtIndex:0 withObjectAtIndex:1];
+        XCTAssertEqual(2U, array.count);
+        XCTAssertEqualObjects(@"b", [array[0] stringCol]);
+        XCTAssertEqualObjects(@"a", [array[1] stringCol]);
+
+        [array exchangeObjectAtIndex:1 withObjectAtIndex:1];
+        XCTAssertEqual(2U, array.count);
+        XCTAssertEqualObjects(@"b", [array[0] stringCol]);
+        XCTAssertEqualObjects(@"a", [array[1] stringCol]);
+
+        [array exchangeObjectAtIndex:1 withObjectAtIndex:0];
+        XCTAssertEqual(2U, array.count);
+        XCTAssertEqualObjects(@"a", [array[0] stringCol]);
+        XCTAssertEqualObjects(@"b", [array[1] stringCol]);
+
+        XCTAssertThrows([array exchangeObjectAtIndex:1 withObjectAtIndex:20]);
+    };
+
+    ArrayPropertyObject *array = [[ArrayPropertyObject alloc] initWithValue:@[@"foo", @[@[@"a"], @[@"b"]], @[]]];
+    test(array.array);
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:array];
+    test(array.array);
+    [realm commitWriteTransaction];
+}
+
 - (void)testIndexOfObject
 {
     RLMRealm *realm = [RLMRealm defaultRealm];

@@ -404,6 +404,25 @@ class ListTests: TestCase {
         assertThrows(self.array.replace(-200, object: self.str2))
     }
 
+    func testSwap() {
+        array.extend([str1, str2])
+
+        array.swap(0, 1)
+        XCTAssertEqual(Int(2), array.count)
+        XCTAssertEqual(str2, array[0])
+        XCTAssertEqual(str1, array[1])
+
+        array.swap(1, 1)
+        XCTAssertEqual(Int(2), array.count)
+        XCTAssertEqual(str2, array[0])
+        XCTAssertEqual(str1, array[1])
+
+        assertThrows(self.array.swap(-1, 0))
+        assertThrows(self.array.swap(0, -1))
+        assertThrows(self.array.swap(1000, 0))
+        assertThrows(self.array.swap(0, 1000))
+    }
+
     func testChangesArePersisted() {
         if let realm = array.realm {
             array.extend([str1, str2])
