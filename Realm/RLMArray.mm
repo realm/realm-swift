@@ -150,6 +150,12 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
     [_backingArray replaceObjectAtIndex:index withObject:anObject];
 }
 
+- (void)exchangeObjectAtIndex:(NSUInteger)index1 withObjectAtIndex:(NSUInteger)index2 {
+    RLMValidateArrayBounds(self, index1);
+    RLMValidateArrayBounds(self, index2);
+    [_backingArray exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
+}
+
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     RLMValidateMatchingObjectType(self, object);
     NSUInteger index = 0;
