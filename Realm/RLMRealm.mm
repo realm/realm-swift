@@ -940,13 +940,13 @@ atomic<bool> s_syncLogEverything(false);
     }
     __weak RLMSyncSession *weakSelf = self;
     [msg setCompletionHandler:^{
-            [weakSelf uplaodCompletedWithVersion:uploadVersion];
+            [weakSelf uploadCompletedWithVersion:uploadVersion];
         }];
     [_connection enqueueOutputMessage:msg];
 }
 
 
-- (void)uplaodCompletedWithVersion:(Replication::version_type)version {
+- (void)uploadCompletedWithVersion:(Replication::version_type)version {
     REALM_ASSERT(version <= _latestVersionUploaded+1);
     _uploadInProgress = NO;
     if (_latestVersionUploaded < version)
