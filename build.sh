@@ -326,10 +326,23 @@ case "$COMMAND" in
     "prelaunch-simulator")
         killall "iOS Simulator" 2>/dev/null || true
         killall Simulator 2>/dev/null || true
+        # Erase all available simulators
+        (
+            IFS=$'\n' # make newlines the only separator
+            for LINE in $(xcrun simctl list); do
+                if [[ $LINE =~ unavailable ]]; then
+                    # skip unavailable simulators
+                    continue
+                fi
+                if [[ $LINE =~ ([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}) ]]; then
+                    xcrun simctl erase "${BASH_REMATCH[1]}" 2>/dev/null || true
+                fi
+            done
+        )
         if [[ -a "${DEVELOPER_DIR}/Applications/iOS Simulator.app" ]]; then
-          open "${DEVELOPER_DIR}/Applications/iOS Simulator.app"
+            open "${DEVELOPER_DIR}/Applications/iOS Simulator.app"
         elif [[ -a "${DEVELOPER_DIR}/Applications/Simulator.app" ]]; then
-          open "${DEVELOPER_DIR}/Applications/Simulator.app"
+            open "${DEVELOPER_DIR}/Applications/Simulator.app"
         fi
         ;;
 
