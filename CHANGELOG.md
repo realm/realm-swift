@@ -17,7 +17,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Add support for building watchOS and bitcode-compatible apps with Realm and RealmSwift.
 * Make the exceptions thown in getters and setters more informative.
 * Add `-[RLMArray exchangeObjectAtIndex:withObjectAtIndex]` and `List.swap(_:_:)`
-  to allow exchanging the location of two object in the given `RLMArray` / `List`.
+  to allow exchanging the location of two objects in the given `RLMArray` / `List`.
 
 ### Bugfixes
 
