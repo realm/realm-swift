@@ -18,18 +18,17 @@ CARTHAGE_ZIP = BUILD + 'Carthage.framework.zip'
 puts 'Creating Carthage release zip'
 Dir.mktmpdir do |tmp|
   Dir.chdir(tmp) do
-    FileUtils.mkdir_p %w(Carthage/Build/Mac Carthage/Build/iOS Carthage/Build/watchOS
-                         Carthage/Build-Swift-2.0/iOS Carthage/Build-Swift-2.0/Mac Carthage/Build-Swift-2.0/watchOS)
+    FileUtils.mkdir_p %w(Carthage/Build/Mac Carthage/Build/iOS
+                         Carthage/Build-Xcode-7.0/iOS Carthage/Build-Xcode-7.0/Mac Carthage/Build-Xcode-7.0/watchOS)
     system('unzip', SWIFT_ZIP.to_path, :out=>"/dev/null")
     FileUtils.rm_f CARTHAGE_ZIP
 
     FileUtils.mv(%W(realm-swift-#{VERSION}/ios/swift-1.2/Realm.framework realm-swift-#{VERSION}/ios/swift-1.2/RealmSwift.framework), 'Carthage/Build/iOS')
     FileUtils.mv(%W(realm-swift-#{VERSION}/osx/swift-1.2/Realm.framework realm-swift-#{VERSION}/osx/swift-1.2/RealmSwift.framework), 'Carthage/Build/Mac')
-    FileUtils.mv(%W(realm-swift-#{VERSION}/watchos/swift-1.2/Realm.framework realm-swift-#{VERSION}/watchos/swift-1.2/RealmSwift.framework), 'Carthage/Build/watchOS')
 
-    FileUtils.mv(%W(realm-swift-#{VERSION}/ios/swift-2.0/Realm.framework realm-swift-#{VERSION}/ios/swift-2.0/RealmSwift.framework), 'Carthage/Build-Swift-2.0/iOS')
-    FileUtils.mv(%W(realm-swift-#{VERSION}/osx/swift-2.0/Realm.framework realm-swift-#{VERSION}/osx/swift-2.0/RealmSwift.framework), 'Carthage/Build-Swift-2.0/Mac')
-    FileUtils.mv(%W(realm-swift-#{VERSION}/watchos/swift-2.0/Realm.framework realm-swift-#{VERSION}/watchos/swift-2.0/RealmSwift.framework), 'Carthage/Build-Swift-2.0/watchOS')
+    FileUtils.mv(%W(realm-swift-#{VERSION}/ios/swift-2.0/Realm.framework realm-swift-#{VERSION}/ios/swift-2.0/RealmSwift.framework), 'Carthage/Build-Xcode-7.0/iOS')
+    FileUtils.mv(%W(realm-swift-#{VERSION}/osx/swift-2.0/Realm.framework realm-swift-#{VERSION}/osx/swift-2.0/RealmSwift.framework), 'Carthage/Build-Xcode-7.0/Mac')
+    FileUtils.mv(%W(realm-swift-#{VERSION}/watchos/Realm.framework realm-swift-#{VERSION}/watchos/RealmSwift.framework), 'Carthage/Build-Xcode-7.0/watchOS')
 
     system('zip', '--symlinks', '-r', CARTHAGE_ZIP.to_path, 'Carthage', :out=>"/dev/null")
   end
