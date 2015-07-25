@@ -33,6 +33,7 @@ COMMAND="$1"
 prelaunch_simulator() {
     killall "iOS Simulator" 2>/dev/null || true
     killall Simulator 2>/dev/null || true
+    pkill CoreSimulator 2>/dev/null || true
     # Erase all available simulators
     (
         IFS=$'\n' # make newlines the only separator
@@ -46,11 +47,13 @@ prelaunch_simulator() {
             fi
         done
     )
+    sleep 5
     if [[ -a "${DEVELOPER_DIR}/Applications/iOS Simulator.app" ]]; then
         open "${DEVELOPER_DIR}/Applications/iOS Simulator.app"
     elif [[ -a "${DEVELOPER_DIR}/Applications/Simulator.app" ]]; then
         open "${DEVELOPER_DIR}/Applications/Simulator.app"
     fi
+    sleep 5
 }
 
 xctest_ios() {
