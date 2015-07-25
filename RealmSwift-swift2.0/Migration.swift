@@ -23,22 +23,22 @@ import Realm.Private
 /**
 Migration block used to migrate a Realm.
 
-:param: migration        `Migration` object used to perform the migration. The
-                         migration object allows you to enumerate and alter any
-                         existing objects which require migration.
-:param: oldSchemaVersion The schema version of the `Realm` being migrated.
+- parameter migration: `Migration` object used to perform the migration. The
+                       migration object allows you to enumerate and alter any
+                       existing objects which require migration.
+- parameter oldSchemaVersion: The schema version of the `Realm` being migrated.
 */
 public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt64) -> Void
 
-/// Object class used during migrations
+/// Object class used during migrations.
 public typealias MigrationObject = DynamicObject
 
 /**
 Provides both the old and new versions of an object in this Realm. Objects properties can only be
 accessed using subscripting.
 
-:param: oldObject Object in original `Realm` (read-only)
-:param: newObject Object in migrated `Realm` (read-write)
+- parameter oldObject: Object in original `Realm` (read-only).
+- parameter newObject: Object in migrated `Realm` (read-write).
 */
 public typealias MigrationObjectEnumerateBlock = (oldObject: MigrationObject?, newObject: MigrationObject?) -> Void
 
@@ -57,16 +57,16 @@ You should call this method before accessing any `Realm` instances which
 require migration. After registering your migration block, Realm will call your
 block automatically as needed.
 
-:warning: Unsuccessful migrations will throw exceptions when the migration block is applied.
-          This will happen in the following cases:
+- warning: Unsuccessful migrations will throw exceptions when the migration block is applied.
+           This will happen in the following cases:
 
-          - The given `schemaVersion` is lower than the target Realm's current schema version.
-          - A new property without a default was added to an object and not initialized
-            during the migration. You are required to either supply a default value or to
-            manually populate added properties during a migration.
+           - The given `schemaVersion` is lower than the target Realm's current schema version.
+           - A new property without a default was added to an object and not initialized
+             during the migration. You are required to either supply a default value or to
+             manually populate added properties during a migration.
 
-:param: version The current schema version.
-:param: block   The block which migrates the Realm to the current version.
+- parameter version: The current schema version.
+- parameter block:   The block which migrates the Realm to the current version.
 */
 public func setDefaultRealmSchemaVersion(schemaVersion: UInt64, migrationBlock: MigrationBlock) {
     RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: accessorMigrationBlock(migrationBlock))
@@ -87,9 +87,9 @@ You should call this method before accessing any `Realm` instances which
 require migration. After registering your migration block, Realm will call your
 block automatically as needed.
 
-:param: version   The current schema version.
-:param: realmPath The path of the Realms to migrate.
-:param: block     The block which migrates the Realm to the current version.
+- parameter version:   The current schema version.
+- parameter realmPath: The path of the Realms to migrate.
+- parameter block:     The block which migrates the Realm to the current version.
 */
 public func setSchemaVersion(schemaVersion: UInt64, realmPath: String, migrationBlock: MigrationBlock) {
     RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: realmPath, withMigrationBlock: accessorMigrationBlock(migrationBlock))
@@ -97,12 +97,13 @@ public func setSchemaVersion(schemaVersion: UInt64, realmPath: String, migration
 
 /**
 Get the schema version for a Realm at a given path.
-:param: realmPath     Path to a Realm file.
-:param: encryptionKey Optional 64-byte encryption key for encrypted Realms.
-:param: error         If an error occurs, upon return contains an `NSError` object
-                      that describes the problem. If you are not interested in
-                      possible errors, omit the argument, or pass in `nil`.
-:returns: The version of the Realm at `realmPath` or `nil` if the version cannot be read.
+- parameter realmPath:     Path to a Realm file.
+- parameter encryptionKey: Optional 64-byte encryption key for encrypted Realms.
+- parameter error:         If an error occurs, upon return contains an `NSError` object
+                           that describes the problem. If you are not interested in
+                           possible errors, omit the argument, or pass in `nil`.
+
+- returns: The version of the Realm at `realmPath` or `nil` if the version cannot be read.
 */
 public func schemaVersionAtPath(realmPath: String, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) -> UInt64? {
     let version = RLMRealm.schemaVersionAtPath(realmPath, encryptionKey: encryptionKey, error: error)
@@ -119,13 +120,13 @@ This method is called automatically when opening a Realm for the first time and 
 not need to be called explicitly. You can choose to call this method to control
 exactly when and how migrations are performed.
 
-:param: path          The path of the Realm to migrate.
-:param: encryptionKey Optional 64-byte encryption key for encrypted Realms.
-                      If the Realms at the given path are not encrypted, omit the argument or pass
-                      in `nil`.
+- parameter path:          The path of the Realm to migrate.
+- parameter encryptionKey: Optional 64-byte encryption key for encrypted Realms.
+                           If the Realms at the given path are not encrypted, omit the argument or pass
+                           in `nil`.
 
-:returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
-          that occured otherwise.
+- returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
+           that occured otherwise.
 */
 public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
     if let encryptionKey = encryptionKey {
@@ -160,8 +161,8 @@ public final class Migration {
     Enumerates objects of a given type in this Realm, providing both the old and new versions of
     each object. Object properties can be accessed using subscripting.
     
-    :param: className The name of the `Object` class to enumerate.
-    :param: block     The block providing both the old and new versions of an object in this Realm.
+    - parameter className: The name of the `Object` class to enumerate.
+    - parameter block:     The block providing both the old and new versions of an object in this Realm.
     */
     public func enumerate(objectClassName: String, _ block: MigrationObjectEnumerateBlock) {
         rlmMigration.enumerateObjects(objectClassName) {
@@ -172,14 +173,14 @@ public final class Migration {
     /**
     Create an `Object` of type `className` in the Realm being migrated.
 
-    :param: className The name of the `Object` class to create.
-    :param: object    The object used to populate the object. This can be any key/value coding
-                      compliant object, or a JSON object such as those returned from the methods in
-                      `NSJSONSerialization`, or an `Array` with one object for each persisted
-                      property. An exception will be thrown if any required properties are not
-                      present and no default is set.
+    - parameter className: The name of the `Object` class to create.
+    - parameter object:    The object used to populate the object. This can be any key/value coding
+                           compliant object, or a JSON object such as those returned from the methods in
+                           `NSJSONSerialization`, or an `Array` with one object for each persisted
+                           property. An exception will be thrown if any required properties are not
+                           present and no default is set.
     
-    :returns: The created object.
+    - returns: The created object.
     */
     public func create(className: String, value: AnyObject = [:]) -> MigrationObject {
         return unsafeBitCast(rlmMigration.createObject(className, withValue: value), MigrationObject.self)
@@ -189,7 +190,7 @@ public final class Migration {
     Delete an object from a Realm during a migration. This can be called within
     `enumerate(_:block:)`.
 
-    :param: object Object to be deleted from the Realm being migrated.
+    - parameter object: Object to be deleted from the Realm being migrated.
     */
     public func delete(object: MigrationObject) {
         RLMDeleteObjectFromRealm(object, RLMObjectBaseRealm(object))
@@ -200,9 +201,9 @@ public final class Migration {
     This deletes all objects of the given class, and if the Object subclass no longer exists in your program,
     cleans up any remaining metadata for the class in the Realm file.
 
-    :param:   name The name of the Object class to delete.
+    - parameter name: The name of the Object class to delete.
 
-    :returns: whether there was any data to delete.
+    - returns: whether there was any data to delete.
     */
     public func deleteData(objectClassName: String) -> Bool {
         return rlmMigration.deleteDataForClassName(objectClassName)
