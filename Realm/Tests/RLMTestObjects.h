@@ -18,6 +18,12 @@
 
 #import <Realm/Realm.h>
 
+#if __has_extension(objc_generics)
+#define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS *><CLASS>
+#else
+#define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
+#endif
+
 #pragma mark - Abstract Objects
 #pragma mark -
 
@@ -123,7 +129,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @end
 
 @interface ArrayOfAllTypesObject : RLMObject
-@property RLMArray<AllTypesObject *><AllTypesObject> *array;
+@property RLM_GENERIC_ARRAY(AllTypesObject) *array;
 @end
 
 #pragma mark - Real Life Objects
@@ -146,7 +152,7 @@ RLM_ARRAY_TYPE(EmployeeObject)
 @interface CompanyObject : RLMObject
 
 @property NSString *name;
-@property RLMArray<EmployeeObject *><EmployeeObject> *employees;
+@property RLM_GENERIC_ARRAY(EmployeeObject) *employees;
 
 @end
 
@@ -160,7 +166,7 @@ RLM_ARRAY_TYPE(EmployeeObject)
 RLM_ARRAY_TYPE(DogObject)
 
 @interface DogArrayObject : RLMObject
-@property RLMArray<DogObject *><DogObject> *dogs;
+@property RLM_GENERIC_ARRAY(DogObject) *dogs;
 @end
 
 
@@ -223,7 +229,7 @@ RLM_ARRAY_TYPE(CircleObject);
 #pragma mark CircleArrayObject
 
 @interface CircleArrayObject : RLMObject
-@property RLMArray<CircleObject *><CircleObject> *circles;
+@property RLM_GENERIC_ARRAY(CircleObject) *circles;
 @end
 
 #pragma mark ArrayPropertyObject
@@ -231,8 +237,8 @@ RLM_ARRAY_TYPE(CircleObject);
 @interface ArrayPropertyObject : RLMObject
 
 @property NSString *name;
-@property RLMArray<StringObject *><StringObject> *array;
-@property RLMArray<IntObject *><IntObject> *intArray;
+@property RLM_GENERIC_ARRAY(StringObject) *array;
+@property RLM_GENERIC_ARRAY(IntObject) *intArray;
 
 @end
 
