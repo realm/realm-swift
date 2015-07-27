@@ -527,6 +527,9 @@ extern "C" {
 {
     RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
 
+    // verify that the realm's path is in the temporary directory
+    XCTAssertEqualObjects(NSTemporaryDirectory(), [inMemoryRealm.path.stringByDeletingLastPathComponent stringByAppendingString:@"/"]);
+
     [self waitForNotification:RLMRealmDidChangeNotification realm:inMemoryRealm block:^{
         RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
         [inMemoryRealm beginWriteTransaction];
