@@ -11,9 +11,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Avoid evaluating results eagerly when filtering and sorting.
 * Add nullability annotations to the Objective-C API to provide enhanced compiler
   warnings and bridging to Swift.
-* Add `RLM_GENERIC_ARRAY(ObjectType)` macro to make `RLMArray`s use
-  Objective-C generics where available.
-* Make `RLMResult`s support being used as an Objective-C generic.
+* Make `RLMResult`s and `RLMArray`s support Objective-C generics.
 * Add support for building watchOS and bitcode-compatible apps with Realm and RealmSwift.
 * Make the exceptions thown in getters and setters more informative.
 * Add `-[RLMArray exchangeObjectAtIndex:withObjectAtIndex]` and `List.swap(_:_:)`

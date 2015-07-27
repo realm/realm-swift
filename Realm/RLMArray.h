@@ -25,11 +25,20 @@ RLM_ASSUME_NONNULL_BEGIN
 @class RLMObject, RLMRealm, RLMResults RLM_GENERIC_COLLECTION;
 
 /**
- 
+
  RLMArray is the container type in Realm used to define to-many relationships.
 
  Unlike an NSArray, RLMArrays hold a single type, specified by the `objectClassName` property.
  This is referred to in these docs as the “type” of the array.
+
+ When declaring an RLMArray property, the type must be marked as conforming to a
+ protocol by the same name as the objects it should contain (see the
+ `RLM_ARRAY_TYPE` macro). RLMArray properties can also use Objective-C generics
+ if available. For example:
+
+     RLM_ARRAY_TYPE(ObjectType)
+     ...
+     @property RLMArray<ObjectType *><ObjectType> *arrayOfObjectTypes;
  
  RLMArrays can be queried with the same predicates as RLMObject and RLMResults.
 
