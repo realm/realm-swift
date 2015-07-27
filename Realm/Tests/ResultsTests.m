@@ -508,7 +508,8 @@
     RLMResults *filtered = [sortedName objectsWhere:@"age > 0"];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"async query"];
-    [filtered deliverOnQueue:dispatch_get_main_queue() block:^(RLMResults *results) {
+    [filtered deliverOnQueue:dispatch_get_main_queue() block:^(RLMResults *results, NSError *error) {
+        XCTAssertNil(error);
         XCTAssertEqual(3U, results.count);
         XCTAssertEqual(40, [(EmployeeObject *)results[0] age]);
         [expectation fulfill];
@@ -539,7 +540,8 @@
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
     });
 
-    [filtered deliverOnQueue:resultsQueue queryQueue:queryQueue block:^(RLMResults *results) {
+    [filtered deliverOnQueue:resultsQueue queryQueue:queryQueue block:^(RLMResults *results, NSError *error) {
+        XCTAssertNil(error);
         XCTAssertEqual(3U, results.count);
         XCTAssertEqual(40, [(EmployeeObject *)results[0] age]);
         [expectation fulfill];
@@ -570,7 +572,8 @@
     dispatch_queue_t resultsQueue = dispatch_queue_create("results", NULL);
     dispatch_queue_t queryQueue = dispatch_queue_create("query", NULL);
 
-    [filtered deliverOnQueue:resultsQueue queryQueue:queryQueue block:^(RLMResults *results) {
+    [filtered deliverOnQueue:resultsQueue queryQueue:queryQueue block:^(RLMResults *results, NSError *error) {
+        XCTAssertNil(error);
         XCTAssertEqual(3U, results.count);
         XCTAssertEqual(40, [(EmployeeObject *)results[0] age]);
         [expectation fulfill];
@@ -602,7 +605,8 @@
     [filtered lastObject];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"async query"];
-    [filtered deliverOnQueue:dispatch_queue_create("background", NULL) block:^(RLMResults *results) {
+    [filtered deliverOnQueue:dispatch_queue_create("background", NULL) block:^(RLMResults *results, NSError *error) {
+        XCTAssertNil(error);
         XCTAssertEqual(3U, results.count);
         XCTAssertEqual(40, [(EmployeeObject *)results[0] age]);
         [expectation fulfill];

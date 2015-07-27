@@ -179,7 +179,7 @@ RLM_ASSUME_NONNULL_BEGIN
  @param queue The dispatch queue onto which the results should be delivered.
  @param block The block to be called on the given `queue` with the queue-local copy of the results.
  */
-- (void)deliverOnQueue:(dispatch_queue_t)queue block:(void (^)(RLMResults RLM_GENERIC_RETURN*))block;
+- (void)deliverOnQueue:(dispatch_queue_t)queue block:(void (^)( RLMResults RLM_GENERIC_RETURN * __nullable , NSError * __nullable ))block;
 
 #pragma mark -
 

@@ -233,9 +233,13 @@ public final class Results<T: Object>: ResultsBase {
     :param: queue The dispatch queue onto which the results should be delivered.
     :param: block The block to be called on the given `queue` with the queue-local copy of the results.
     */
-    public func deliver(onQueue queue: dispatch_queue_t = dispatch_get_main_queue(), block: Results<T> -> Void) {
+    public func deliver(onQueue queue: dispatch_queue_t = dispatch_get_main_queue(), block: (Results<T>?, NSError?) -> Void) {
         rlmResults.deliverOnQueue(queue) {
-            block(Results<T>($0))
+            if let results = $0 {
+                block(Results<T>(results), $1)
+            } else {
+                block(nil, $1)
+            }
         }
     }
 

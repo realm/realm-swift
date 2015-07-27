@@ -242,10 +242,11 @@ class ResultsTests: TestCase {
         let expectation = expectationWithDescription("async query delivery")
 
         let queue = dispatch_queue_create("background", nil)
-        results.deliver(onQueue: queue) { r in
-            XCTAssertEqual(2, r.count)
-            XCTAssertEqual("1", r[0].stringCol)
-            XCTAssertEqual("2", r[1].stringCol)
+        results.deliver(onQueue: queue) { r, e in
+            XCTAssertNil(e)
+            XCTAssertEqual(2, r!.count)
+            XCTAssertEqual("1", r![0].stringCol)
+            XCTAssertEqual("2", r![1].stringCol)
             expectation.fulfill()
         }
 

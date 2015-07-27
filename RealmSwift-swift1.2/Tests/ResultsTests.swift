@@ -96,23 +96,6 @@ class ResultsTests: TestCase {
         return super.defaultTestSuite()
     }
 
-    func testDeliver() {
-        results.realm.commitWrite()
-        let expectation = expectationWithDescription("async query delivery")
-
-        let queue = dispatch_queue_create("background", nil)
-        results.deliver(onQueue: queue) { r in
-            XCTAssertEqual(2, r.count)
-            XCTAssertEqual("1", r[0].stringCol)
-            XCTAssertEqual("2", r[1].stringCol)
-            expectation.fulfill()
-        }
-
-        waitForExpectationsWithTimeout(2, handler: nil)
-        dispatch_sync(queue) { }
-        results.realm.beginWrite()
-    }
-
     func testRealm() {
         XCTAssertEqual(results.realm.path, realmWithTestPath().path)
     }
@@ -253,6 +236,25 @@ class ResultsTests: TestCase {
 
         assertThrows(results.sorted([SortDescriptor(property: "noSuchCol")]), named: "Invalid sort property")
     }
+
+    func testDeliver() {
+        results.realm.commitWrite()
+        let expectation = expectationWithDescription("async query delivery")
+
+        let queue = dispatch_queue_create("background", nil)
+        results.deliver(onQueue: queue) { r, e in
+            XCTAssertNil(e)
+            XCTAssertEqual(2, r!.count)
+            XCTAssertEqual("1", r![0].stringCol)
+            XCTAssertEqual("2", r![1].stringCol)
+            expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(2, handler: nil)
+        dispatch_sync(queue) { }
+        results.realm.beginWrite()
+    }
+
 
     func testMin() {
         let results = getAggregateableResults()

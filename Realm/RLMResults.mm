@@ -324,15 +324,15 @@ namespace {
         RLMSchema *schema;
     };
 
-    RLMRealm *createWithRealmCreation(RealmCreation realmCreation, SharedGroup::VersionID version) {
+    RLMRealm *createWithRealmCreation(RealmCreation realmCreation, SharedGroup::VersionID version, NSError **error) {
         try {
-            NSError *realmCreationError = nil;
-            RLMRealm *realm = [RLMRealm realmWithPath:realmCreation.path key:realmCreation.key readOnly:realmCreation.readOnly inMemory:realmCreation.inMemory dynamic:realmCreation.dynamic schema:realmCreation.schema error:&realmCreationError];
+            RLMRealm *realm = [RLMRealm realmWithPath:realmCreation.path key:realmCreation.key readOnly:realmCreation.readOnly inMemory:realmCreation.inMemory dynamic:realmCreation.dynamic schema:realmCreation.schema error:error];
             [realm refresh];
             [realm getOrCreateGroupAtVersion:version];
             return realm;
         }
-        catch (SharedGroup::BadVersion) {
+        catch (std::exception const& ex) {
+            RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, ex), error);
             return nil;
         }
     }
@@ -340,17 +340,21 @@ namespace {
     void deliverQuery(dispatch_queue_t queryQueue, dispatch_queue_t deliveryQueue, RealmCreation realmCreation,
                       NSString *objectClassName, SharedGroup::Handover<Query> *queryHandoverPtr,
                       SharedGroup::Handover<TableView> *tableViewHandoverPtr,
-                      RowIndexes::Sorter sort, void (^resultsBlock)(RLMResults *));
+                      RowIndexes::Sorter sort, void (^resultsBlock)(RLMResults * __nullable, NSError  * __nullable));
 
     void queryOnBackgroundQueue(dispatch_queue_t queryQueue, dispatch_queue_t deliveryQueue, RealmCreation realmCreation,
                                 NSString *objectClassName, std::unique_ptr<SharedGroup::Handover<Query>> queryHandover,
-                                RowIndexes::Sorter sort, void (^resultsBlock)(RLMResults *)) {
+                                RowIndexes::Sorter sort, void (^resultsBlock)(RLMResults * __nullable, NSError  * __nullable)) {
         SharedGroup::Handover<Query> *queryHandoverPtr = queryHandover.release();
         dispatch_async(queryQueue, ^{
             @autoreleasepool {
                 std::unique_ptr<SharedGroup::Handover<Query>> queryHandover(queryHandoverPtr);
-                RLMRealm *realm = createWithRealmCreation(realmCreation, queryHandover->version);
+                NSError *realmCreationError = nil;
+                RLMRealm *realm = createWithRealmCreation(realmCreation, queryHandover->version, &realmCreationError);
                 if (!realm) {
+                    dispatch_async(deliveryQueue, ^{
+                        resultsBlock(nil, realmCreationError);
+                    });
                     return;
                 }
                 auto querySharedGroup = realm.sharedGroup;
@@ -367,12 +371,19 @@ namespace {
     void deliverQuery(dispatch_queue_t queryQueue, dispatch_queue_t deliveryQueue, RealmCreation realmCreation,
                       NSString *objectClassName, SharedGroup::Handover<Query> *queryHandoverPtr,
                       SharedGroup::Handover<TableView> *tableViewHandoverPtr,
-                      RowIndexes::Sorter sort, void (^resultsBlock)(RLMResults *)) {
+                      RowIndexes::Sorter sort, void (^resultsBlock)(RLMResults * __nullable, NSError  * __nullable)) {
         dispatch_async(deliveryQueue, ^{
             @autoreleasepool {
                 std::unique_ptr<SharedGroup::Handover<Query>> queryHandover(queryHandoverPtr);
                 std::unique_ptr<SharedGroup::Handover<TableView>> tableViewHandover(tableViewHandoverPtr);
-                RLMRealm *realm = createWithRealmCreation(realmCreation, queryHandover->version);
+                NSError *realmCreationError = nil;
+                RLMRealm *realm = createWithRealmCreation(realmCreation, queryHandover->version, &realmCreationError);
+                if (!realm) {
+                    dispatch_async(deliveryQueue, ^{
+                        resultsBlock(nil, realmCreationError);
+                    });
+                    return;
+                }
                 auto resultsSharedGroup = realm.sharedGroup;
                 if (!resultsSharedGroup || resultsSharedGroup->get_version_of_current_transaction() != queryHandover->version) {
                     queryOnBackgroundQueue(queryQueue, deliveryQueue, realmCreation, objectClassName, std::move(queryHandover), sort, resultsBlock);
@@ -381,17 +392,17 @@ namespace {
                 std::unique_ptr<Query> query = resultsSharedGroup->import_from_handover(std::move(queryHandover));
                 std::unique_ptr<TableView> tableView = resultsSharedGroup->import_from_handover(std::move(tableViewHandover));
                 RLMResults *results = [RLMResults resultsWithObjectClassName:objectClassName query:move(query) sort:sort view:std::move(*tableView) realm:realm];
-                resultsBlock(results);
+                resultsBlock(results, nil);
             }
         });
     }
 }
 
-- (void)deliverOnQueue:(dispatch_queue_t)queue block:(void (^)(RLMResults *))block {
+- (void)deliverOnQueue:(dispatch_queue_t)queue block:(void (^)(RLMResults RLM_GENERIC_PARAMETER(RLMObject) * __nullable, NSError  * __nullable))block {
     [self deliverOnQueue:queue queryQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0) block:block];
 }
 
-- (void)deliverOnQueue:(dispatch_queue_t)queue queryQueue:(dispatch_queue_t)queryQueue block:(void (^)(RLMResults *))block {
+- (void)deliverOnQueue:(dispatch_queue_t)queue queryQueue:(dispatch_queue_t)queryQueue block:(void (^)(RLMResults * __nullable, NSError  * __nullable))block {
     RLMCheckThread(_realm);
     if (_realm.readOnly) {
         @throw RLMException(@"Cannot perform query delivery on read-only realms.");
