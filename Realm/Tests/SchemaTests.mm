@@ -57,9 +57,9 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @property SchemaTestClassFirstChild *child;
 @property SchemaTestClassSecondChild *secondChild;
 
-@property RLM_GENERIC_ARRAY(SchemaTestClassBase) *baseArray;
-@property RLM_GENERIC_ARRAY(SchemaTestClassFirstChild) *childArray;
-@property RLM_GENERIC_ARRAY(SchemaTestClassSecondChild) *secondChildArray;
+@property RLMArray<SchemaTestClassBase *><SchemaTestClassBase> *baseArray;
+@property RLMArray<SchemaTestClassFirstChild *><SchemaTestClassFirstChild> *childArray;
+@property RLMArray<SchemaTestClassSecondChild *><SchemaTestClassSecondChild> *secondChildArray;
 @end
 @implementation SchemaTestClassLink
 @end

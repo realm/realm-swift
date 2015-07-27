@@ -79,8 +79,8 @@
 
 @class CycleObject;
 RLM_ARRAY_TYPE(CycleObject)
-@interface CycleObject :RLMObject
-@property RLM_GENERIC_ARRAY(CycleObject) *objects;
+@interface CycleObject : RLMObject
+@property RLMArray<CycleObject *><CycleObject> *objects;
 @end
 
 @implementation CycleObject
@@ -128,7 +128,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @property PrimaryStringObject *primaryStringObject;
 @property PrimaryStringObjectWrapper *primaryStringObjectWrapper;
 @property StringObject *stringObject;
-@property RLM_GENERIC_ARRAY(PrimaryIntObject) *primaryIntArray;
+@property RLMArray<PrimaryIntObject *><PrimaryIntObject> *primaryIntArray;
 @property NSString *stringCol;
 @end
 
@@ -169,7 +169,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
 @interface StringLinkObject : RLMObject
 @property StringObject *stringObjectCol;
-@property RLM_GENERIC_ARRAY(StringObject) *stringObjectArrayCol;
+@property RLMArray<StringObject *><StringObject> *stringObjectArrayCol;
 @end
 
 @implementation StringLinkObject
@@ -207,7 +207,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
 @interface PrimaryCompanyObject : RLMObject
 @property NSString *name;
-@property RLM_GENERIC_ARRAY(PrimaryEmployeeObject) *employees;
+@property RLMArray<PrimaryEmployeeObject *><PrimaryEmployeeObject> *employees;
 @property PrimaryEmployeeObject *intern;
 @property LinkToPrimaryEmployeeObject *wrappedIntern;
 @end
