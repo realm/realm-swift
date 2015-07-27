@@ -168,8 +168,7 @@ static NSDictionary *RLMAnalyticsPayload() {
         hashedBundleID = RLMHashData(data.bytes, data.length);
     }
 
-    NSOperatingSystemVersion osVersion = [[NSProcessInfo processInfo] operatingSystemVersion];
-    NSString *osVersionString = [@[@(osVersion.majorVersion), @(osVersion.minorVersion), @(osVersion.patchVersion)] componentsJoinedByString:@"."];
+    NSString *osVersionString = [[NSProcessInfo processInfo] operatingSystemVersionString];
     BOOL isSwift = NSClassFromString(@"RealmSwift.ObjectUtil") != nil;
 
     static NSString *kUnknownString = @"unknown";
