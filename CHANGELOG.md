@@ -29,6 +29,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Date properties on 32 bit devices will retain 64 bit second precision.
 * Wrap calls to the block passed to `enumerate` in an autoreleasepool to reduce
   memory growth when migrating a large amount of objects.
+* In-memory realms no longer write to the Documents directory on iOS or
+  Application Support on OS X.
 
 0.93.2 Release notes (2015-06-12)
 =============================================================

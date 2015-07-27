@@ -276,7 +276,12 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     s_defaultRealmPath = defaultRealmPath;
 }
 
-+ (NSString *)writeablePathForFile:(NSString*)fileName
++ (NSString *)writeableTemporaryPathForFile:(NSString *)fileName
+{
+    return [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+}
+
++ (NSString *)writeablePathForFile:(NSString *)fileName
 {
 #if TARGET_OS_IPHONE
     // On iOS the Documents directory isn't user-visible, so put files there
@@ -321,7 +326,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 + (instancetype)inMemoryRealmWithIdentifier:(NSString *)identifier {
-    return [self realmWithPath:[RLMRealm writeablePathForFile:identifier] key:nil
+    return [self realmWithPath:[RLMRealm writeableTemporaryPathForFile:identifier] key:nil
                       readOnly:NO inMemory:YES dynamic:NO schema:nil error:nil];
 }
 
