@@ -12,7 +12,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Add nullability annotations to the Objective-C API to provide enhanced compiler
   warnings and bridging to Swift.
 * Make `RLMResult`s and `RLMArray`s support Objective-C generics.
-* Add support for building watchOS and bitcode-compatible apps with Realm and RealmSwift.
+* Add support for building watchOS and bitcode-compatible apps.
 * Make the exceptions thown in getters and setters more informative.
 * Add `-[RLMArray exchangeObjectAtIndex:withObjectAtIndex]` and `List.swap(_:_:)`
   to allow exchanging the location of two objects in the given `RLMArray` / `List`.
