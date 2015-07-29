@@ -152,18 +152,18 @@
 
     [children moveObjectAtIndex:1 toIndex:0];
 
-    XCTAssertEqualObjects(children[0].stringCol, @"b");
-    XCTAssertEqualObjects(children[1].stringCol, @"a");
+    XCTAssertEqualObjects([children[0] stringCol], @"b");
+    XCTAssertEqualObjects([children[1] stringCol], @"a");
 
     [children moveObjectAtIndex:0 toIndex:1];
 
-    XCTAssertEqualObjects(children[0].stringCol, @"a");
-    XCTAssertEqualObjects(children[1].stringCol, @"b");
+    XCTAssertEqualObjects([children[0] stringCol], @"a");
+    XCTAssertEqualObjects([children[1] stringCol], @"b");
 
     [children moveObjectAtIndex:0 toIndex:0];
 
-    XCTAssertEqualObjects(children[0].stringCol, @"a");
-    XCTAssertEqualObjects(children[1].stringCol, @"b");
+    XCTAssertEqualObjects([children[0] stringCol], @"a");
+    XCTAssertEqualObjects([children[1] stringCol], @"b");
 
     XCTAssertThrows([children moveObjectAtIndex:0 toIndex:2]);
     XCTAssertThrows([children moveObjectAtIndex:2 toIndex:0]);
@@ -175,18 +175,18 @@
 
     [children moveObjectAtIndex:1 toIndex:0];
 
-    XCTAssertEqualObjects(children[0].stringCol, @"b");
-    XCTAssertEqualObjects(children[1].stringCol, @"a");
+    XCTAssertEqualObjects([children[0] stringCol], @"b");
+    XCTAssertEqualObjects([children[1] stringCol], @"a");
 
     [children moveObjectAtIndex:0 toIndex:1];
 
-    XCTAssertEqualObjects(children[0].stringCol, @"a");
-    XCTAssertEqualObjects(children[1].stringCol, @"b");
+    XCTAssertEqualObjects([children[0] stringCol], @"a");
+    XCTAssertEqualObjects([children[1] stringCol], @"b");
 
     [children moveObjectAtIndex:0 toIndex:0];
 
-    XCTAssertEqualObjects(children[0].stringCol, @"a");
-    XCTAssertEqualObjects(children[1].stringCol, @"b");
+    XCTAssertEqualObjects([children[0] stringCol], @"a");
+    XCTAssertEqualObjects([children[1] stringCol], @"b");
 
     XCTAssertThrows([children moveObjectAtIndex:0 toIndex:2]);
     XCTAssertThrows([children moveObjectAtIndex:2 toIndex:0]);
