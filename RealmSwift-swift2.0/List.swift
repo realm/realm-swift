@@ -305,14 +305,14 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
-    Moves the object at from the given source index to the given destination index.
+    Moves the object at the given source index to the given destination index.
 
     - warning: This method can only be called during a write transaction.
     - warning: Throws an exception when called with an index smaller than zero or greater than
                or equal to the number of objects in the list.
 
-    - parameter from:  The list index of the object to be replaced.
-    - parameter to:    An object to replace at the specified index.
+    - parameter from:  The index of the object to be moved.
+    - parameter to:    index to which the object at `from` should be moved.
     */
     public func move(from from: Int, to: Int) {
         throwForNegativeIndex(from)
