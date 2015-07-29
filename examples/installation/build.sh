@@ -146,6 +146,9 @@ case "$COMMAND" in
         ./build.sh test-ios-swift-dynamic || exit 1
         ./build.sh test-ios-swift-cocoapods || exit 1
         ./build.sh test-osx-swift-dynamic || exit 1
+
+        ./build.sh test-ios-swift-carthage || exit 1
+        ./build.sh test-osx-swift-carthage || exit 1
         ;;
 
     "test-ios-objc-static")
