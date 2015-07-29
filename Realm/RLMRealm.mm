@@ -112,6 +112,13 @@ static void validateNotInDebugger()
     }
 }
 
+static inline void validateNotOnWatchOS()
+{
+#if TARGET_OS_WATCH
+    @throw RLMException(@"Cannot open an encrypted Realm on watchOS.");
+#endif
+}
+
 static NSData *validatedKey(NSData *key) {
     if (shouldForciblyDisableEncryption()) {
         return nil;
@@ -203,6 +210,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
             // NOTE: we do these checks here as is this is the first time encryption keys are used
             if ((key = validatedKey(key))) {
                 validateNotInDebugger();
+                validateNotOnWatchOS();
             }
 
             if (readonly) {
@@ -475,7 +483,10 @@ static id RLMAutorelease(id value) {
             }
         }
 
-        setKeyForPath(validatedKey(key), path);
+        if ((key = validatedKey(key))) {
+            validateNotOnWatchOS();
+            setKeyForPath(key, path);
+        }
     }
 }
 
