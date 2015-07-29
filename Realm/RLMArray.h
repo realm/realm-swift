@@ -39,7 +39,7 @@ RLM_ASSUME_NONNULL_BEGIN
      RLM_ARRAY_TYPE(ObjectType)
      ...
      @property RLMArray<ObjectType *><ObjectType> *arrayOfObjectTypes;
- 
+
  RLMArrays can be queried with the same predicates as RLMObject and RLMResults.
 
  RLMArrays cannot be created directly. RLMArray properties on RLMObjects are
@@ -82,18 +82,18 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  Returns the object at the index specified.
- 
+
  @param index   The index to look up.
- 
+
  @return An RLMObject of the class contained by this RLMArray.
  */
 - (RLMObjectType)objectAtIndex:(NSUInteger)index;
 
 /**
  Returns the first object in the array.
- 
+
  Returns `nil` if called on an empty RLMArray.
- 
+
  @return An RLMObject of the class contained by this RLMArray.
  */
 - (nullable RLMObjectType)firstObject;
@@ -118,18 +118,18 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  Adds an object to the end of the array.
- 
+
  @warning This method can only be called during a write transaction.
- 
+
  @param object  An RLMObject of the class contained by this RLMArray.
  */
 - (void)addObject:(RLMObjectArgument)object;
 
 /**
  Adds an array of objects at the end of the array.
- 
+
  @warning This method can only be called during a write transaction.
- 
+
  @param objects     An enumerable object such as NSArray or RLMResults which contains objects of the
                     same class as this RLMArray.
  */
@@ -137,11 +137,11 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  Inserts an object at the given index.
- 
+
  Throws an exception when called with an index greater than the number of objects in this RLMArray.
- 
+
  @warning This method can only be called during a write transaction.
- 
+
  @param anObject  An object (of the same type as returned from the objectClassName selector).
  @param index   The array index at which the object is inserted.
  */
@@ -149,25 +149,25 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  Removes an object at a given index.
- 
+
  Throws an exception when called with an index greater than the number of objects in this RLMArray.
 
  @warning This method can only be called during a write transaction.
- 
+
  @param index   The array index identifying the object to be removed.
  */
 - (void)removeObjectAtIndex:(NSUInteger)index;
 
 /**
  Removes the last object in an RLMArray.
- 
+
  @warning This method can only be called during a write transaction.
 */
 - (void)removeLastObject;
 
 /**
  Removes all objects from an RLMArray.
- 
+
  @warning This method can only be called during a write transaction.
  */
 - (void)removeAllObjects;
@@ -178,11 +178,24 @@ RLM_ASSUME_NONNULL_BEGIN
  Throws an exception when called with an index greater than the number of objects in this RLMArray.
 
  @warning This method can only be called during a write transaction.
- 
+
  @param index       The array index of the object to be replaced.
  @param anObject    An object (of the same type as returned from the objectClassName selector).
  */
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObjectArgument)anObject;
+
+/**
+ Moves the object at the given source index to the given destination index.
+
+ Throws an exception when called with an index greater than or equal to the
+ number of objects in this RLMArray.
+
+ @warning This method can only be called during a write transaction.
+
+ @param sourceIndex      The index of the object to be moved.
+ @param destinationIndex The index to which the object at `sourceIndex` should be moved.
+ */
+- (void)moveObjectAtIndex:(NSUInteger)sourceIndex toIndex:(NSUInteger)destinationIndex;
 
 /**
  Exchanges the objects in the array at given indexes.
@@ -196,7 +209,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (void)exchangeObjectAtIndex:(NSUInteger)index1 withObjectAtIndex:(NSUInteger)index2;
 
-
 #pragma mark -
 
 
@@ -206,55 +218,55 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 /**
  Gets the index of an object.
- 
+
  Returns NSNotFound if the object is not found in this RLMArray.
- 
+
  @param object  An object (of the same type as returned from the objectClassName selector).
  */
 - (NSUInteger)indexOfObject:(RLMObjectArgument)object;
 
 /**
  Gets the index of the first object matching the predicate.
- 
+
  @param predicateFormat The predicate format string which can accept variable arguments.
- 
+
  @return    Index of object or NSNotFound if the object is not found in this RLMArray.
  */
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
 
 /**
  Gets the index of the first object matching the predicate.
- 
+
  @param predicate   The predicate to filter the objects.
- 
+
  @return    Index of object or NSNotFound if the object is not found in this RLMArray.
  */
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get objects matching the given predicate in the RLMArray.
- 
+
  @param predicateFormat The predicate format string which can accept variable arguments.
- 
+
  @return                An RLMResults of objects that match the given predicate
  */
 - (RLMResults RLM_GENERIC_RETURN*)objectsWhere:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate in the RLMArray.
- 
+
  @param predicate   The predicate to filter the objects.
- 
+
  @return            An RLMResults of objects that match the given predicate
  */
 - (RLMResults RLM_GENERIC_RETURN*)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get a sorted RLMResults from an RLMArray
- 
+
  @param property    The property name to sort by.
  @param ascending   The direction to sort by.
- 
+
  @return    An RLMResults sorted by the specified property.
  */
 - (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
