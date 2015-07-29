@@ -88,27 +88,9 @@ static NSData *keyForPath(NSString *path) {
     }
 }
 
-static void setKeyForPath(NSData *key, NSString *path) {
-    @synchronized (s_keysPerPath) {
-        if (key) {
-            s_keysPerPath[path] = key;
-        }
-        else {
-            [s_keysPerPath removeObjectForKey:path];
-        }
-    }
-}
-
 static void clearKeyCache() {
     @synchronized(s_keysPerPath) {
         [s_keysPerPath removeAllObjects];
-    }
-}
-
-static void validateNotInDebugger()
-{
-    if (RLMIsDebuggerAttached()) {
-        @throw RLMException(@"Cannot open an encrypted Realm with a debugger attached to the process");
     }
 }
 
@@ -117,10 +99,31 @@ static NSData *validatedKey(NSData *key) {
         return nil;
     }
 
-    if (key && key.length != 64) {
-        @throw RLMException(@"Encryption key must be exactly 64 bytes long");
+    if (key) {
+        if (key.length != 64) {
+            @throw RLMException(@"Encryption key must be exactly 64 bytes long");
+        }
+        if (RLMIsDebuggerAttached()) {
+            @throw RLMException(@"Cannot open an encrypted Realm with a debugger attached to the process");
+        }
+#if TARGET_OS_WATCH
+        @throw RLMException(@"Cannot open an encrypted Realm on watchOS.");
+#endif
     }
+
     return key;
+}
+
+static void setKeyForPath(NSData *key, NSString *path) {
+    key = validatedKey(key);
+    @synchronized (s_keysPerPath) {
+        if (key) {
+            s_keysPerPath[path] = key;
+        }
+        else {
+            [s_keysPerPath removeObjectForKey:path];
+        }
+    }
 }
 
 //
@@ -201,9 +204,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
         NSError *error = nil;
         try {
             // NOTE: we do these checks here as is this is the first time encryption keys are used
-            if ((key = validatedKey(key))) {
-                validateNotInDebugger();
-            }
+            key = validatedKey(key);
 
             if (readonly) {
                 _readGroup = make_unique<Group>(path.UTF8String, static_cast<const char *>(key.bytes));
@@ -475,7 +476,7 @@ static id RLMAutorelease(id value) {
             }
         }
 
-        setKeyForPath(validatedKey(key), path);
+        setKeyForPath(key, path);
     }
 }
 
@@ -888,9 +889,6 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (BOOL)writeCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
     key = validatedKey(key) ?: keyForPath(path);
-    if (key) {
-        validateNotInDebugger();
-    }
 
     try {
         self.group->write(path.UTF8String, static_cast<const char *>(key.bytes));
