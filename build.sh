@@ -227,7 +227,8 @@ download_core() {
     CORE_TMP_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2.tmp"
     CORE_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2"
     if [ ! -f "${CORE_TAR}" ]; then
-        curl -f -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.bz2" -o "${CORE_TMP_TAR}"
+        curl -f -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.bz2" -o "${CORE_TMP_TAR}" ||
+          (echo "Downloading core failed. Please try again once you have an Internet connection." && exit 1)
         mv "${CORE_TMP_TAR}" "${CORE_TAR}"
     fi
 
