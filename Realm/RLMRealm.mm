@@ -33,6 +33,8 @@
 #include "object_store.hpp"
 #include <realm/commit_log.hpp>
 #include <realm/disable_sync_to_disk.hpp>
+#include <realm/group_shared.hpp>
+#include <realm/lang_bind_helper.hpp>
 #include <realm/version.hpp>
 
 using namespace std;
