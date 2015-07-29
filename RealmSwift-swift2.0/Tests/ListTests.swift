@@ -404,6 +404,28 @@ class ListTests: TestCase {
         assertThrows(self.array.replace(-200, object: self.str2))
     }
 
+    func testMove()  {
+        array.extend([str1, str2])
+
+        array.move(from: 1, to: 0)
+
+        XCTAssertEqual(array[0].stringCol, "2")
+        XCTAssertEqual(array[1].stringCol, "1")
+
+        array.move(from: 0, to: 1)
+
+        XCTAssertEqual(array[0].stringCol, "1")
+        XCTAssertEqual(array[1].stringCol, "2")
+
+        array.move(from: 0, to: 0)
+
+        XCTAssertEqual(array[0].stringCol, "1")
+        XCTAssertEqual(array[1].stringCol, "2")
+
+        assertThrows(self.array.move(from: 0, to: 2))
+        assertThrows(self.array.move(from: 2, to: 0))
+    }
+
     func testReplaceRange() {
         array.extend([str1, str1])
 

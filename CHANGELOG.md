@@ -17,6 +17,8 @@ x.xx.x Release notes (yyyy-MM-dd)
 * Add `-[RLMArray exchangeObjectAtIndex:withObjectAtIndex]` and `List.swap(_:_:)`
   to allow exchanging the location of two objects in the given `RLMArray` / `List`.
 * Added anonymous analytics on simulator/debugger runs.
+* Add `-[RLMArray moveObjectAtIndex:toIndex:]` and `List.move(from:to:)` to
+  allow moving objects in the given `RLMArray` / `List`.
 
 ### Bugfixes
 

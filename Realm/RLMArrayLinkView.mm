@@ -204,6 +204,14 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     _backingLinkView->set(index, object->_row.get_index());
 }
 
+- (void)moveObjectAtIndex:(NSUInteger)sourceIndex toIndex:(NSUInteger)destinationIndex {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+    RLMValidateArrayBounds(self, sourceIndex);
+    RLMValidateArrayBounds(self, destinationIndex);
+
+    _backingLinkView->move(sourceIndex, destinationIndex);
+}
+
 - (void)exchangeObjectAtIndex:(NSUInteger)index1 withObjectAtIndex:(NSUInteger)index2 {
     RLMLinkViewArrayValidateInWriteTransaction(self);
     RLMValidateArrayBounds(self, index1);
