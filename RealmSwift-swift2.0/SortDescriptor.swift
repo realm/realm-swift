@@ -45,8 +45,8 @@ public struct SortDescriptor {
     /**
     Creates a `SortDescriptor` with the given property and ascending values.
 
-    :param: property  The name of the property which this sort descriptor orders results by.
-    :param: ascending Whether this descriptor sorts in ascending or descending order.
+    - parameter property:  The name of the property which this sort descriptor orders results by.
+    - parameter ascending: Whether this descriptor sorts in ascending or descending order.
     */
     public init(property: String, ascending: Bool = true) {
         self.property = property
@@ -94,7 +94,7 @@ extension SortDescriptor: StringLiteralConvertible {
     /**
     Creates a `SortDescriptor` from a `UnicodeScalarLiteralType`.
 
-    :param: unicodeScalarLiteral Property name literal.
+    - parameter unicodeScalarLiteral: Property name literal.
     */
     public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
         self.init(property: value)
@@ -103,7 +103,7 @@ extension SortDescriptor: StringLiteralConvertible {
     /**
     Creates a `SortDescriptor` from an `ExtendedGraphemeClusterLiteralType`.
 
-    :param: extendedGraphemeClusterLiteral Property name literal.
+    - parameter extendedGraphemeClusterLiteral: Property name literal.
     */
     public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
         self.init(property: value)
@@ -112,7 +112,7 @@ extension SortDescriptor: StringLiteralConvertible {
     /**
     Creates a `SortDescriptor` from a `StringLiteralType`.
 
-    :param: stringLiteral Property name literal.
+    - parameter stringLiteral: Property name literal.
     */
     public init(stringLiteral value: StringLiteralType) {
         self.init(property: value)
