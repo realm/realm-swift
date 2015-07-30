@@ -103,14 +103,22 @@ public class Object: RLMObjectBase, Equatable, Printable {
     /// Returns a human-readable description of this object.
     public override var description: String { return super.description }
 
+    #if os(OSX)
+    /// Helper to return the class name for an Object subclass.
+    public final override var className: String { return "" }
+    #else
+    /// Helper to return the class name for an Object subclass.
+    public final var className: String { return "" }
+    #endif
 
-    // MARK: Object customization
+    // MARK: Object Customization
 
     /**
     Override to designate a property as the primary key for an `Object` subclass. Only properties of
     type String and Int can be designated as the primary key. Primary key
     properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
     Indexes are created automatically for primary key properties.
+
     :returns: Name of the property designated as the primary key, or `nil` if the model has no primary key.
     */
     public class func primaryKey() -> String? { return nil }
@@ -144,26 +152,7 @@ public class Object: RLMObjectBase, Equatable, Printable {
         return RLMObjectBaseLinkingObjectsOfClass(self, T.className(), propertyName) as! [T]
     }
 
-
-    // MARK: Private functions
-
-    // FIXME: None of these functions should be exposed in the public interface.
-
-    /**
-    WARNING: This is an internal initializer not intended for public use.
-    :nodoc:
-    */
-    public override init(realm: RLMRealm, schema: RLMObjectSchema) {
-        super.init(realm: realm, schema: schema)
-    }
-
-    /**
-    WARNING: This is an internal initializer not intended for public use.
-    :nodoc:
-    */
-    public override init(value: AnyObject, schema: RLMSchema) {
-        super.init(value: value, schema: schema)
-    }
+    // MARK: Key-Value Coding & Subscripting
 
     /**
     Returns the value for the property identified by the given key.
@@ -211,6 +200,26 @@ public class Object: RLMObjectBase, Equatable, Printable {
             }
             RLMObjectBaseSetObjectForKeyedSubscript(self, key, value)
         }
+    }
+
+    // MARK: Private functions
+
+    // FIXME: None of these functions should be exposed in the public interface.
+
+    /**
+    WARNING: This is an internal initializer not intended for public use.
+    :nodoc:
+    */
+    public override init(realm: RLMRealm, schema: RLMObjectSchema) {
+        super.init(realm: realm, schema: schema)
+    }
+
+    /**
+    WARNING: This is an internal initializer not intended for public use.
+    :nodoc:
+    */
+    public override init(value: AnyObject, schema: RLMSchema) {
+        super.init(value: value, schema: schema)
     }
 
     // Helper for getting a list property for the given key

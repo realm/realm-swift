@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* `Object.className` is now marked as `final`.
+
+### Bugfixes
+
+* None.
+
 0.94.0 Release notes (2015-07-29)
 =============================================================
 
