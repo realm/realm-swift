@@ -218,7 +218,9 @@ public final class Results<T: Object>: ResultsBase {
 
     /**
     Returns `Results` with elements sorted by the given sort descriptors.
+
     :param: sortDescriptors `SortDescriptor`s to sort by.
+
     :returns: `Results` with elements sorted by the given sort descriptors.
     */
     public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T> {
