@@ -218,6 +218,60 @@ public final class List<T: Object>: ListBase {
         return Results<T>(_rlmArray.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
+    // MARK: Aggregate Operations
+
+    /**
+    Returns the minimum value of the given property.
+
+    - warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `MinMaxType` to look for a minimum on.
+
+    - returns: The minimum value for the property amongst objects in the List, or `nil` if the List is empty.
+    */
+    public func min<U: MinMaxType>(property: String) -> U? {
+        return filter("TRUEPREDICATE").min(property)
+    }
+
+    /**
+    Returns the maximum value of the given property.
+
+    - warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `MinMaxType` to look for a maximum on.
+
+    - returns: The maximum value for the property amongst objects in the List, or `nil` if the List is empty.
+    */
+    public func max<U: MinMaxType>(property: String) -> U? {
+        return filter("TRUEPREDICATE").max(property)
+    }
+
+    /**
+    Returns the sum of the given property for objects in the List.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
+
+    - returns: The sum of the given property over all objects in the List.
+    */
+    public func sum<U: AddableType>(property: String) -> U {
+        return filter("TRUEPREDICATE").sum(property)
+    }
+
+    /**
+    Returns the average of the given property for objects in the List.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate average on.
+
+    - returns: The average of the given property over all objects in the List, or `nil` if the List is empty.
+    */
+    public func average<U: AddableType>(property: String) -> U? {
+        return filter("TRUEPREDICATE").average(property)
+    }
+
     // MARK: Mutation
 
     /**
