@@ -78,6 +78,7 @@ Results cannot be created directly.
 */
 public final class Results<T: Object>: ResultsBase {
 
+    /// Element type contained in this collection.
     typealias Element = T
 
     // MARK: Properties
