@@ -78,6 +78,8 @@ Results cannot be created directly.
 */
 public final class Results<T: Object>: ResultsBase {
 
+    typealias Element = T
+
     // MARK: Properties
 
     /// Returns the Realm these results are associated with.

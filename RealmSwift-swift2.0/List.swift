@@ -51,6 +51,9 @@ When added as a property on `Object` models, the property must be declared as `l
 */
 public final class List<T: Object>: ListBase {
 
+    /// Element type contained in this collection.
+    public typealias Element = T
+
     // MARK: Properties
 
     /// The Realm the objects in this list belong to, or `nil` if the list's owning

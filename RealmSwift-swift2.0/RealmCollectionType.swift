@@ -17,4 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 public protocol RealmCollectionType: CollectionType {
+
+    /// Element type contained in this collection.
+    typealias Element: Object
 }
