@@ -333,6 +333,10 @@
 		A05FA6201B62CDD30000C9B2 /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A05FA6211B62CDD40000C9B2 /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A05FA6221B62CDD40000C9B2 /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A05AEB701B6A9B0D00072027 /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A05AEB711B6A9B0E00072027 /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A05AEB721B6A9B0F00072027 /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A05AEB731B6A9B1000072027 /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		C0CDC0841B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
@@ -1067,6 +1071,7 @@
 				29E3C7211A71C1C700B62C1D /* RLMObjectBase.h in Headers */,
 				29E3C7251A71C1C700B62C1D /* RLMObjectSchema.h in Headers */,
 				29EDB8EC1A7712E500458D80 /* RLMObjectSchema_Private.h in Headers */,
+				A05AEB721B6A9B0F00072027 /* RLMObjectBase_Dynamic.h in Headers */,
 				29E3C7261A71C1C700B62C1D /* RLMObjectSchema_Private.hpp in Headers */,
 				29EDB8DA1A7703C500458D80 /* RLMObjectStore.h in Headers */,
 				3F0F02B01B6FFF3D0046A4D5 /* RLMObservation.hpp in Headers */,
@@ -1114,6 +1119,7 @@
 				023B19601A3BA90E0067FB81 /* RLMObjectBase.h in Headers */,
 				E856D2001956154C00FB2FCF /* RLMObjectSchema.h in Headers */,
 				29EDB8EB1A7712E500458D80 /* RLMObjectSchema_Private.h in Headers */,
+				A05AEB711B6A9B0E00072027 /* RLMObjectBase_Dynamic.h in Headers */,
 				E856D1FF1956154C00FB2FCF /* RLMObjectSchema_Private.hpp in Headers */,
 				29EDB8D91A7703C500458D80 /* RLMObjectStore.h in Headers */,
 				3F0F02AF1B6FFF3D0046A4D5 /* RLMObservation.hpp in Headers */,
@@ -1161,6 +1167,7 @@
 				023B195F1A3BA90E0067FB81 /* RLMObjectBase.h in Headers */,
 				E81A1F9A1955FC9300FDED82 /* RLMObjectSchema.h in Headers */,
 				29EDB8EA1A7712E500458D80 /* RLMObjectSchema_Private.h in Headers */,
+				A05AEB701B6A9B0D00072027 /* RLMObjectBase_Dynamic.h in Headers */,
 				E81A1F991955FC9300FDED82 /* RLMObjectSchema_Private.hpp in Headers */,
 				29EDB8D81A7703C500458D80 /* RLMObjectStore.h in Headers */,
 				3F0F02AE1B6FFF3D0046A4D5 /* RLMObservation.hpp in Headers */,
