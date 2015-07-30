@@ -278,7 +278,7 @@ public final class Results<T: Object>: ResultsBase {
     }
 }
 
-extension Results: CollectionType {
+extension Results: RealmCollectionType {
     // MARK: Sequence Support
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the results.

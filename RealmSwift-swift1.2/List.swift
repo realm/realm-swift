@@ -335,7 +335,7 @@ public final class List<T: Object>: ListBase {
     }
 }
 
-extension List: ExtensibleCollectionType {
+extension List: RealmCollectionType, ExtensibleCollectionType {
     // MARK: Sequence Support
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the list.
