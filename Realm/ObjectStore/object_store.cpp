@@ -175,26 +175,25 @@ std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(G
 
         // check object_type existence
         if (current_prop.object_type.length() && schema.find(current_prop.object_type) == schema.end()) {
-            exceptions.emplace_back(InvalidPropertyException(table_schema.name, current_prop,
-                "Target type '" + current_prop.object_type + "' doesn't exist for property '" + current_prop.name + "'."));
+            exceptions.emplace_back(MissingObjectTypeException(table_schema.name, current_prop));
         }
 
         // check nullablity
-        if (current_prop.is_nullable) {
-            if (current_prop.type != PropertyTypeObject) {
-                exceptions.emplace_back(InvalidPropertyException(table_schema.name, current_prop,
-                    "Only 'Object' property types are nullable"));
+        if (current_prop.type == PropertyTypeObject) {
+            if (!current_prop.is_nullable) {
+                exceptions.emplace_back(InvalidNullabilityException(table_schema.name, current_prop));
             }
         }
-        else if (current_prop.type == PropertyTypeObject) {
-            exceptions.emplace_back(InvalidPropertyException(table_schema.name, current_prop,
-                "'Object' property '" + current_prop.name + "' must be nullable."));
+        else {
+            if (current_prop.is_nullable) {
+                exceptions.emplace_back(InvalidNullabilityException(table_schema.name, current_prop));
+            }
         }
 
         // check primary keys
         if (current_prop.is_primary) {
             if (primary) {
-                exceptions.emplace_back(InvalidPropertyException(table_schema.name, current_prop, "Duplicate primary keys."));
+                exceptions.emplace_back(DuplicatePrimaryKeysException(table_schema.name));
             }
             primary = &current_prop;
         }
@@ -503,6 +502,27 @@ MissingPropertyException::MissingPropertyException(std::string object_type, Prop
     m_what = "Property '" + property.name + "' is missing from latest object model.";
 }
 
+InvalidNullabilityException::InvalidNullabilityException(std::string object_type, Property &property) :
+    ObjectSchemaPropertyException(object_type, property)
+{
+    if (property.type == PropertyTypeObject) {
+        if (!property.is_nullable) {
+            m_what = "'Object' property '" + property.name + "' must be nullable.";
+        }
+    }
+    else {
+        if (property.is_nullable) {
+            m_what = "Only 'Object' property types are nullable";
+        }
+    }
+}
+
+MissingObjectTypeException::MissingObjectTypeException(std::string object_type, Property &property) :
+    ObjectSchemaPropertyException(object_type, property)
+{
+    m_what = "Target type '" + property.object_type + "' doesn't exist for property '" + property.name + "'.";
+}
+
 MismatchedPropertiesException::MismatchedPropertiesException(std::string object_type, Property &old_property, Property &new_property) :
     ObjectSchemaValidationException(object_type), m_old_property(old_property), m_new_property(new_property)
 {
@@ -533,3 +553,9 @@ InvalidPrimaryKeyException::InvalidPrimaryKeyException(std::string object_type, 
 {
     m_what = "Specified primary key property '" + primary + "' does not exist.";
 }
+
+DuplicatePrimaryKeysException::DuplicatePrimaryKeysException(std::string object_type) : ObjectSchemaValidationException(object_type)
+{
+    m_what = "Duplicate primary keys for object '" + object_type + "'.";
+}
+

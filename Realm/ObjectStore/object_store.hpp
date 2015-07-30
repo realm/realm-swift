@@ -192,10 +192,19 @@ namespace realm {
         MissingPropertyException(std::string object_type, Property &property);
     };
 
-    class InvalidPropertyException : public ObjectSchemaPropertyException {
+    class InvalidNullabilityException : public ObjectSchemaPropertyException {
       public:
-        InvalidPropertyException(std::string object_type, Property &property, std::string message) :
-            ObjectSchemaPropertyException(object_type, property) { m_what = message; }
+        InvalidNullabilityException(std::string object_type, Property &property);
+    };
+
+    class MissingObjectTypeException : public ObjectSchemaPropertyException {
+    public:
+        MissingObjectTypeException(std::string object_type, Property &property);
+    };
+
+    class DuplicatePrimaryKeysException : public ObjectSchemaValidationException {
+    public:
+        DuplicatePrimaryKeysException(std::string object_type);
     };
 
     class MismatchedPropertiesException : public ObjectSchemaValidationException {
