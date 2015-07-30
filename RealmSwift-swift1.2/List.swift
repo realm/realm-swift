@@ -229,7 +229,7 @@ public final class List<T: Object>: ListBase {
     :returns: The minimum value for the property amongst objects in the List, or `nil` if the List is empty.
     */
     public func min<U: MinMaxType>(property: String) -> U? {
-        return filter("TRUEPREDICATE").min(property)
+        return filter(NSPredicate(value: true)).min(property)
     }
 
     /**
@@ -242,7 +242,7 @@ public final class List<T: Object>: ListBase {
     :returns: The maximum value for the property amongst objects in the List, or `nil` if the List is empty.
     */
     public func max<U: MinMaxType>(property: String) -> U? {
-        return filter("TRUEPREDICATE").max(property)
+        return filter(NSPredicate(value: true)).max(property)
     }
 
     /**
@@ -255,7 +255,7 @@ public final class List<T: Object>: ListBase {
     :returns: The sum of the given property over all objects in the List.
     */
     public func sum<U: AddableType>(property: String) -> U {
-        return filter("TRUEPREDICATE").sum(property)
+        return filter(NSPredicate(value: true)).sum(property)
     }
 
     /**
@@ -268,7 +268,7 @@ public final class List<T: Object>: ListBase {
     :returns: The average of the given property over all objects in the List, or `nil` if the List is empty.
     */
     public func average<U: AddableType>(property: String) -> U? {
-        return filter("TRUEPREDICATE").average(property)
+        return filter(NSPredicate(value: true)).average(property)
     }
 
     // MARK: Mutation
