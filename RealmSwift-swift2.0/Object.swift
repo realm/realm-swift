@@ -103,8 +103,10 @@ public class Object: RLMObjectBase {
     /// Returns a human-readable description of this object.
     public override var description: String { return super.description }
 
+    /// Helper to return the class name for an Object subclass.
+    public final override var className: String { return super.className }
 
-    // MARK: Object customization
+    // MARK: Object Customization
 
     /**
     Override to designate a property as the primary key for an `Object` subclass. Only properties of
@@ -149,26 +151,7 @@ public class Object: RLMObjectBase {
         return RLMObjectBaseLinkingObjectsOfClass(self, (T.self as Object.Type).className(), propertyName) as! [T]
     }
 
-
-    // MARK: Private functions
-
-    // FIXME: None of these functions should be exposed in the public interface.
-
-    /**
-    WARNING: This is an internal initializer not intended for public use.
-    :nodoc:
-    */
-    public override init(realm: RLMRealm, schema: RLMObjectSchema) {
-        super.init(realm: realm, schema: schema)
-    }
-
-    /**
-    WARNING: This is an internal initializer not intended for public use.
-    :nodoc:
-    */
-    public override init(value: AnyObject, schema: RLMSchema) {
-        super.init(value: value, schema: schema)
-    }
+    // MARK: Key-Value Coding & Subscripting
 
     /**
     Returns the value for the property identified by the given key.
@@ -221,6 +204,35 @@ public class Object: RLMObjectBase {
         }
     }
 
+    // MARK: Equatable
+
+    /// Returns whether both objects are equal.
+    /// Objects are considered equal when they are both from the same Realm
+    /// and point to the same underlying object in the database.
+    public override func isEqual(object: AnyObject?) -> Bool {
+        return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase);
+    }
+
+    // MARK: Private functions
+
+    // FIXME: None of these functions should be exposed in the public interface.
+
+    /**
+    WARNING: This is an internal initializer not intended for public use.
+    :nodoc:
+    */
+    public override init(realm: RLMRealm, schema: RLMObjectSchema) {
+        super.init(realm: realm, schema: schema)
+    }
+
+    /**
+    WARNING: This is an internal initializer not intended for public use.
+    :nodoc:
+    */
+    public override init(value: AnyObject, schema: RLMSchema) {
+        super.init(value: value, schema: schema)
+    }
+
     // Helper for getting a list property for the given key
     private func listProperty(key: String) -> RLMListBase? {
         if let prop = RLMObjectBaseObjectSchema(self)?[key] {
@@ -229,15 +241,6 @@ public class Object: RLMObjectBase {
             }
         }
         return nil
-    }
-
-    // MARK: Equatable
-
-    /// Returns whether both objects are equal.
-    /// Objects are considered equal when they are both from the same Realm
-    /// and point to the same underlying object in the database.
-    public override func isEqual(object: AnyObject?) -> Bool {
-        return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase);
     }
 }
 
