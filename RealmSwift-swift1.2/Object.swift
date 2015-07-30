@@ -103,9 +103,13 @@ public class Object: RLMObjectBase, Equatable, Printable {
     /// Returns a human-readable description of this object.
     public override var description: String { return super.description }
 
+    #if os(OSX)
     /// Helper to return the class name for an Object subclass.
-    public final override var className: String { return super.className }
-
+    public final override var className: String { return "" }
+    #else
+    /// Helper to return the class name for an Object subclass.
+    public final var className: String { return "" }
+    #endif
 
     // MARK: Object Customization
 
