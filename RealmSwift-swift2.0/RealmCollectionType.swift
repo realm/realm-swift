@@ -19,6 +19,10 @@
 import Foundation
 import Realm
 
+/**
+Encapsulates iteration state and interface for iteration over a
+`RealmCollectionType`.
+*/
 public class RLMGenerator<T: Object>: GeneratorType {
     private let generatorBase: NSFastGenerator
 
@@ -26,6 +30,8 @@ public class RLMGenerator<T: Object>: GeneratorType {
         generatorBase = NSFastGenerator(collection)
     }
 
+    /// Advance to the next element and return it, or `nil` if no next element
+    /// exists.
     public func next() -> T? {
         let accessor = generatorBase.next() as! T?
         if let accessor = accessor {
@@ -35,6 +41,10 @@ public class RLMGenerator<T: Object>: GeneratorType {
     }
 }
 
+/**
+A homogenous collection of `Object`s which can be retrieved, filtered, sorted,
+and operated upon.
+*/
 public protocol RealmCollectionType: CollectionType {
 
     /// Element type contained in this collection.
