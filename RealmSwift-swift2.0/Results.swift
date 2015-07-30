@@ -283,22 +283,6 @@ public final class Results<T: Object>: ResultsBase {
     }
 }
 
-public class RLMGenerator<T: Object>: AnyGenerator<T> {
-    private let generatorBase: NSFastGenerator
-
-    init(collection: RLMCollection) {
-        generatorBase = NSFastGenerator(collection)
-    }
-
-    public override func next() -> Element? {
-        let accessor = generatorBase.next() as! Element?
-        if let accessor = accessor {
-            RLMInitializeSwiftListAccessor(accessor)
-        }
-        return accessor
-    }
-}
-
 extension Results: RealmCollectionType {
     // MARK: Sequence Support
 

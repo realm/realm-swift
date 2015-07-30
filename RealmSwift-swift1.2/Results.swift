@@ -284,13 +284,8 @@ extension Results: RealmCollectionType {
     // MARK: Sequence Support
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
-    public func generate() -> GeneratorOf<T> {
-        let base = NSFastGenerator(rlmResults)
-        return GeneratorOf<T>() {
-            let accessor = base.next() as! T?
-            RLMInitializeSwiftListAccessor(accessor)
-            return accessor
-        }
+    public func generate() -> RLMGenerator<T> {
+        return RLMGenerator(collection: rlmResults)
     }
 
     // MARK: Collection Support

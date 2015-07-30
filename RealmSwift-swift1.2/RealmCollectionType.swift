@@ -16,6 +16,25 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+import Foundation
+import Realm
+
+public class RLMGenerator<T: Object>: GeneratorType {
+    private let generatorBase: NSFastGenerator
+
+    internal init(collection: RLMCollection) {
+        generatorBase = NSFastGenerator(collection)
+    }
+
+    public func next() -> T? {
+        let accessor = generatorBase.next() as! T?
+        if let accessor = accessor {
+            RLMInitializeSwiftListAccessor(accessor)
+        }
+        return accessor
+    }
+}
+
 public protocol RealmCollectionType: CollectionType {
 
     /// Element type contained in this collection.
