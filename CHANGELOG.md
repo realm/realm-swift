@@ -93,6 +93,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * `Object.className` is now marked as `final`.
+* Functionality common to both `List` and `Results` is now declared in a
+  `RealmCollectionType` protocol that both types conform to.
 
 ### Bugfixes
 
