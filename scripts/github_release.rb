@@ -63,5 +63,5 @@ release_url = response[:url]
 uploads = [OBJC_ZIP, SWIFT_ZIP, CARTHAGE_ZIP]
 uploads.each do |upload|
   puts "Uploading #{upload.basename} to GitHub"
-  github.upload_asset(release_url, upload.to_path)
+  github.upload_asset(release_url, upload.to_path, content_type: 'application/zip')
 end
