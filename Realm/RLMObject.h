@@ -96,8 +96,11 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  Helper to return the class name for an RLMObject subclass.
+
+ @warning Do not override. Realm relies on this method returning the exact class
+          name.
  
- @return    The class name for the model class.
+ @return  The class name for the model class.
  */
 + (NSString *)className;
 
