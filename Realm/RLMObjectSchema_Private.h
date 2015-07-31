@@ -16,7 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import <Realm/RLMDefines.h>
 #import <Realm/RLMObjectSchema.h>
+
+RLM_ASSUME_NONNULL_BEGIN
 
 @class RLMRealm;
 
@@ -35,8 +38,10 @@
 @property (nonatomic, readwrite) RLMProperty *primaryKeyProperty;
 
 // The Realm retains its object schemas, so they need to not retain the Realm
-@property (nonatomic, unsafe_unretained) RLMRealm *realm;
+@property (nonatomic, unsafe_unretained, nullable) RLMRealm *realm;
 // returns a cached or new schema for a given object class
-+(instancetype)schemaForObjectClass:(Class)objectClass;
++ (instancetype)schemaForObjectClass:(Class)objectClass;
 
 @end
+
+RLM_ASSUME_NONNULL_END

@@ -18,6 +18,8 @@
 
 #import "RLMTestCase.h"
 
+#import <Realm/RLMRealm_Private.h>
+
 @interface RLMRealm ()
 + (instancetype)realmWithPath:(NSString *)path
                           key:(NSData *)key
@@ -85,6 +87,16 @@ static BOOL encryptTests() {
 
 @implementation RLMTestCase
 
+#if DEBUG
++ (void)setUp {
+    [super setUp];
+    // Disable actually syncing anything to the disk to greatly speed up the
+    // tests, but only in debug mode because it can't be re-enabled and we need
+    // it enabled for performance tests
+    RLMDisableSyncToDisk();
+}
+#endif
+
 - (void)setUp {
     @autoreleasepool {
         [super setUp];
@@ -137,15 +149,20 @@ static BOOL encryptTests() {
 
 - (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block {
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
+    RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+        XCTAssertNotNil(note, @"Note should not be nil");
         XCTAssertNotNil(realm, @"Realm should not be nil");
-        if (note == expectedNote) {
+        if ([note isEqualToString:expectedNote]) {
             [notificationFired fulfill];
         }
     }];
 
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, block);
+    dispatch_async(queue, ^{
+        @autoreleasepool {
+            block();
+        }
+    });
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
@@ -153,6 +170,11 @@ static BOOL encryptTests() {
     dispatch_sync(queue, ^{});
 
     [realm removeNotification:token];
+}
+
+- (id)nonLiteralNil
+{
+    return nil;
 }
 
 @end

@@ -128,12 +128,18 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
     return batchCount;
 }
 
+static void RLMValidateArrayBounds(__unsafe_unretained RLMArrayLinkView *const ar,
+                                   NSUInteger index, bool allowOnePastEnd=false) {
+    NSUInteger max = ar->_backingLinkView->size() + allowOnePastEnd;
+    if (index >= max) {
+        @throw RLMException([NSString stringWithFormat:@"Index %llu is out of bounds (must be less than %llu).",
+                             (unsigned long long)index, (unsigned long long)max]);
+    }
+}
+
 - (id)objectAtIndex:(NSUInteger)index {
     RLMLinkViewArrayValidateAttached(self);
-
-    if (index >= _backingLinkView->size()) {
-        @throw RLMException(@"Index is out of bounds.", @{@"index": @(index)});
-    }
+    RLMValidateArrayBounds(self, index);
     return RLMCreateObjectAccessor(_realm, _objectSchema, _backingLinkView->get(index).get_index());
 }
 
@@ -144,8 +150,8 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     if (index == NSUIntegerMax) {
         index = ar->_backingLinkView->size();
     }
-    else if (index > ar->_backingLinkView->size()) {
-        @throw RLMException(@"Trying to insert object at invalid index");
+    else {
+        RLMValidateArrayBounds(ar, index, true);
     }
 
     if (object->_realm != ar.realm) {
@@ -168,10 +174,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
     RLMLinkViewArrayValidateInWriteTransaction(self);
-
-    if (index >= _backingLinkView->size()) {
-        @throw RLMException(@"Trying to remove object at invalid index");
-    }
+    RLMValidateArrayBounds(self, index);
     _backingLinkView->remove(index);
 }
 
@@ -193,14 +196,28 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)object {
     RLMLinkViewArrayValidateInWriteTransaction(self);
     RLMValidateObjectClass(object, self.objectClassName);
+    RLMValidateArrayBounds(self, index);
 
-    if (index >= _backingLinkView->size()) {
-        @throw RLMException(@"Trying to replace object at invalid index");
-    }
     if (object->_realm != self.realm) {
         [self.realm addObject:object];
     }
     _backingLinkView->set(index, object->_row.get_index());
+}
+
+- (void)moveObjectAtIndex:(NSUInteger)sourceIndex toIndex:(NSUInteger)destinationIndex {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+    RLMValidateArrayBounds(self, sourceIndex);
+    RLMValidateArrayBounds(self, destinationIndex);
+
+    _backingLinkView->move(sourceIndex, destinationIndex);
+}
+
+- (void)exchangeObjectAtIndex:(NSUInteger)index1 withObjectAtIndex:(NSUInteger)index2 {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+    RLMValidateArrayBounds(self, index1);
+    RLMValidateArrayBounds(self, index2);
+
+    _backingLinkView->swap(index1, index2);
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
@@ -260,9 +277,9 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 
     auto query = std::make_unique<realm::Query>(_backingLinkView->get_target_table().where(_backingLinkView));
     return [RLMResults resultsWithObjectClassName:self.objectClassName
-                                                 query:move(query)
-                                                  view:_backingLinkView->get_sorted_view(move(columns), move(order))
-                                                 realm:_realm];
+                                            query:move(query)
+                                             sort:realm::RowIndexes::Sorter(columns, order)
+                                            realm:_realm];
 
 }
 

@@ -79,8 +79,8 @@
 
 @class CycleObject;
 RLM_ARRAY_TYPE(CycleObject)
-@interface CycleObject :RLMObject
-@property RLMArray<CycleObject> *objects;
+@interface CycleObject : RLMObject
+@property RLM_GENERIC_ARRAY(CycleObject) *objects;
 @end
 
 @implementation CycleObject
@@ -128,7 +128,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @property PrimaryStringObject *primaryStringObject;
 @property PrimaryStringObjectWrapper *primaryStringObjectWrapper;
 @property StringObject *stringObject;
-@property RLMArray<PrimaryIntObject> *primaryIntArray;
+@property RLM_GENERIC_ARRAY(PrimaryIntObject) *primaryIntArray;
 @property NSString *stringCol;
 @end
 
@@ -169,7 +169,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
 @interface StringLinkObject : RLMObject
 @property StringObject *stringObjectCol;
-@property RLMArray<StringObject> *stringObjectArrayCol;
+@property RLM_GENERIC_ARRAY(StringObject) *stringObjectArrayCol;
 @end
 
 @implementation StringLinkObject
@@ -207,7 +207,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
 @interface PrimaryCompanyObject : RLMObject
 @property NSString *name;
-@property RLMArray<PrimaryEmployeeObject> *employees;
+@property RLM_GENERIC_ARRAY(PrimaryEmployeeObject) *employees;
 @property PrimaryEmployeeObject *intern;
 @property LinkToPrimaryEmployeeObject *wrappedIntern;
 @end
@@ -451,7 +451,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 -(void)testObjectInitWithObjectTypeOther
 {
     XCTAssertThrows([[EmployeeObject alloc] initWithValue:@"StringObject"], @"Not an array or dictionary");
-    XCTAssertThrows([[EmployeeObject alloc] initWithValue:nil], @"Not an array or dictionary");
+    XCTAssertThrows([[EmployeeObject alloc] initWithValue:self.nonLiteralNil], @"Not an array or dictionary");
 }
 
 
@@ -604,6 +604,27 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertThrows(linkObject.stringObjectCol = obj);
     XCTAssertThrows([linkObject.stringObjectArrayCol addObject:obj]);
     [realm commitWriteTransaction];
+}
+
+- (void)testDatePrecisionPreservation
+{
+    DateObject *dateObject = [[DateObject alloc] initWithValue:@[NSDate.distantFuture]];
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:dateObject];
+    [realm commitWriteTransaction];
+    XCTAssertEqualObjects(NSDate.distantFuture, dateObject.dateCol);
+
+    [realm beginWriteTransaction];
+    NSDate *date = ({
+        NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitMonth|NSCalendarUnitYear|NSCalendarUnitDay fromDate:NSDate.date];
+        components.calendar = [NSCalendar currentCalendar];
+        components.year += 50000;
+        components.date;
+    });
+    dateObject.dateCol = date;
+    [realm commitWriteTransaction];
+    XCTAssertEqualObjects(date, dateObject.dateCol);
 }
 
 - (void)testDataSizeLimits {

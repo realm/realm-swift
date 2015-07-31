@@ -20,6 +20,9 @@
 
 @class RLMNotifier;
 
+// Disable syncing files to disk. Cannot be re-enabled. Use only for tests.
+FOUNDATION_EXTERN void RLMDisableSyncToDisk();
+
 // RLMRealm private members
 @interface RLMRealm () {
     @public

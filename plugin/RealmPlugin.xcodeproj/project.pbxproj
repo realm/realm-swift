@@ -11,6 +11,7 @@
 		2263AABC19B0A1E6007240D9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2263AABB19B0A1E6007240D9 /* Foundation.framework */; };
 		2263AAC219B0A1E6007240D9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2263AAC019B0A1E6007240D9 /* InfoPlist.strings */; };
 		2263AAC519B0A1E6007240D9 /* RLMPRealmPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 2263AAC419B0A1E6007240D9 /* RLMPRealmPlugin.m */; };
+		3CF8FC5D1B494F3B0066DC23 /* RLMPSimulatorManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CF8FC5C1B494F3B0066DC23 /* RLMPSimulatorManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,8 @@
 		22B78F2119B0A47600968525 /* TemplateIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = TemplateIcon.icns; sourceTree = "<group>"; };
 		22B78F2219B0A47600968525 /* TemplateInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = TemplateInfo.plist; sourceTree = "<group>"; };
 		22B78F2319B0A47600968525 /* install_templates.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = install_templates.sh; sourceTree = "<group>"; };
+		3CF8FC5B1B494F3B0066DC23 /* RLMPSimulatorManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPSimulatorManager.h; sourceTree = "<group>"; };
+		3CF8FC5C1B494F3B0066DC23 /* RLMPSimulatorManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPSimulatorManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +77,8 @@
 			children = (
 				2263AAC319B0A1E6007240D9 /* RLMPRealmPlugin.h */,
 				2263AAC419B0A1E6007240D9 /* RLMPRealmPlugin.m */,
+				3CF8FC5B1B494F3B0066DC23 /* RLMPSimulatorManager.h */,
+				3CF8FC5C1B494F3B0066DC23 /* RLMPSimulatorManager.m */,
 				2263AABE19B0A1E6007240D9 /* Supporting Files */,
 			);
 			path = RealmPlugin;
@@ -214,6 +219,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2263AAC519B0A1E6007240D9 /* RLMPRealmPlugin.m in Sources */,
+				3CF8FC5D1B494F3B0066DC23 /* RLMPSimulatorManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

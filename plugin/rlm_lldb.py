@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
     if not is_installed:
         with open(os.path.expanduser('~/.lldbinit'), 'a') as f:
-            f.write(load_line)
+            f.write('\n' + load_line)
 
     exit(0)
 

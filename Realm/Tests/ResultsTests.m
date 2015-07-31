@@ -19,6 +19,7 @@
 #import "RLMTestCase.h"
 
 #import <mach/mach.h>
+#import <objc/runtime.h>
 
 @interface ResultsTests : RLMTestCase
 @end
@@ -438,6 +439,57 @@
 
     XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
     XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
+}
+
+- (void)testSortingDoesNotEagerlyCreateView {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *sortedName = [sortedAge sortedResultsUsingProperty:@"name" ascending:NO];
+    RLMResults *filtered = [sortedName objectsWhere:@"age > 0"];
+
+    Ivar ivar = class_getInstanceVariable(sortedAge.class, "_viewCreated");
+    XCTAssertFalse((bool)object_getIvar(sortedAge, ivar));
+    XCTAssertFalse((bool)object_getIvar(sortedName, ivar));
+    XCTAssertFalse((bool)object_getIvar(filtered, ivar));
+}
+
+- (void)testRerunningSortedQuery {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+    [sortedAge lastObject]; // Force creation of the TableView
+    RLMResults *sortedName = [sortedAge sortedResultsUsingProperty:@"name" ascending:NO];
+    [sortedName lastObject]; // Force creation of the TableView
+    RLMResults *filtered = [sortedName objectsWhere:@"age > 20"];
+    [filtered lastObject]; // Force creation of the TableView
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(3U, sortedAge.count);
+    XCTAssertEqual(3U, sortedName.count);
+    XCTAssertEqual(2U, filtered.count);
+
+    XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
+    XCTAssertEqual(30, [(EmployeeObject *)sortedAge[1] age]);
+    XCTAssertEqual(40, [(EmployeeObject *)sortedAge[2] age]);
+
+    XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
+    XCTAssertEqual(30, [(EmployeeObject *)sortedName[1] age]);
+    XCTAssertEqual(20, [(EmployeeObject *)sortedName[2] age]);
+
+    XCTAssertEqual(40, [(EmployeeObject *)filtered[0] age]);
+    XCTAssertEqual(30, [(EmployeeObject *)filtered[1] age]);
 }
 
 static vm_size_t get_resident_size() {

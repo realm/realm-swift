@@ -18,7 +18,37 @@
 
 #import "RLMPRealmPlugin.h"
 
+#import "RLMPSimulatorManager.h"
+
 static RLMPRealmPlugin *sharedPlugin;
+
+static NSString *const RootDeviceSimulatorPath = @"Library/Developer/CoreSimulator/Devices";
+static NSString *const DeviceSimulatorApplicationPath = @"data/Containers/Data/Application";
+
+static NSString *const RLMPErrorDomain = @"io.Realm.error";
+
+static NSArray * RLMPGlobFilesAtDirectoryURLWithPredicate(NSFileManager *fileManager, NSURL *directoryURL, NSPredicate *filteredPredicate, BOOL (^handler)(NSURL *URL, NSError *error))
+{
+    NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtURL:directoryURL
+                                            includingPropertiesForKeys:@[NSURLNameKey, NSURLIsDirectoryKey]
+                                                               options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                          errorHandler:handler];
+    NSMutableArray *fileURLs = [NSMutableArray array];
+    for (NSURL *fileURL in directoryEnumerator) {
+        NSString *fileName;
+        [fileURL getResourceValue:&fileName forKey:NSURLNameKey error:nil];
+        
+        NSString *isDirectory;
+        [fileURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+        
+        // Check whether it is a directory or not
+        if (![isDirectory boolValue]) {
+            [fileURLs addObject:fileURL];
+        }
+    }
+    
+    return [fileURLs filteredArrayUsingPredicate:filteredPredicate];
+}
 
 @interface RLMPRealmPlugin()
 
@@ -45,67 +75,110 @@ static RLMPRealmPlugin *sharedPlugin;
     if (self = [super init]) {
         // Save reference to plugin's bundle, for resource acccess
         self.bundle = plugin;
-        
-        // Look for the Realm Browser
-        NSString *urlString = [[NSWorkspace sharedWorkspace] fullPathForApplication:@"Realm Browser"];
-        if (urlString) {
-            self.browserUrl = [NSURL fileURLWithPath:urlString];
-            
-            // Create menu item to open Browser under File:
-            NSMenuItem *menuItem = [[NSApp mainMenu] itemWithTitle:@"File"];
-            if (menuItem) {
-                [[menuItem submenu] addItem:[NSMenuItem separatorItem]];
-                NSMenuItem *actionMenuItem = [[NSMenuItem alloc] initWithTitle:@"Open Realm..."
-                                                                        action:@selector(openBrowser)
-                                                                 keyEquivalent:@""];
-                [actionMenuItem setTarget:self];
-                [[menuItem submenu] addItem:actionMenuItem];
-            }
-        }
-        else {
-            NSLog(@"Realm Plugin: Couldn't find Realm Browser. Will not show 'Open Realm...' menu item.");
-        }
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(didApplicationFinishLaunchingNotification:)
+                                                     name:NSApplicationDidFinishLaunchingNotification
+                                                   object:nil];
     }
     
     return self;
+}
+
+- (void)didApplicationFinishLaunchingNotification:(NSNotification *)notification
+{
+    // Look for the Realm Browser
+    NSString *urlString = [[NSWorkspace sharedWorkspace] fullPathForApplication:@"Realm Browser"];
+    if (urlString) {
+        self.browserUrl = [NSURL fileURLWithPath:urlString];
+        
+        // Create menu item to open Browser under File:
+        NSMenuItem *menuItem = [[NSApp mainMenu] itemWithTitle:@"File"];
+        if (menuItem) {
+            [[menuItem submenu] addItem:[NSMenuItem separatorItem]];
+            NSMenuItem *actionMenuItem = [[NSMenuItem alloc] initWithTitle:@"Open Realm..."
+                                                                    action:@selector(openBrowser)
+                                                             keyEquivalent:@""];
+            [actionMenuItem setTarget:self];
+            [[menuItem submenu] addItem:actionMenuItem];
+        }
+    }
+    else {
+        NSLog(@"Realm Plugin: Couldn't find Realm Browser. Will not show 'Open Realm...' menu item.");
+    }
 }
 
 - (void)openBrowser
 {
     // This shouldn't be possible to call without having the Browser installed
     if (!self.browserUrl) {
-        NSAlert *alert = [NSAlert alertWithMessageText:@"Please install the Realm Browser"
-                                         defaultButton:nil
-                                       alternateButton:nil
-                                           otherButton:nil
-                             informativeTextWithFormat:@"You need to install the Realm Browser in order to use it from this plugin. Please visit realm.io for more information."];
-        [alert runModal];
-
+        NSString *title = @"Please install the Realm Browser";
+        NSString *message = @"You need to install the Realm Browser in order to use it from this plugin. Please visit realm.io for more information.";
+        
+        NSError *error = [NSError errorWithDomain:RLMPErrorDomain
+                                             code:-1
+                                         userInfo:@{ NSLocalizedDescriptionKey : title,
+                                                     NSLocalizedRecoverySuggestionErrorKey : message }];
+        [self showError:error];
         return;
     }
     
-    NSArray *workspaceWindowControllers = [NSClassFromString(@"IDEWorkspaceWindowController") valueForKey:@"workspaceWindowControllers"];
-    NSWorkspace *workSpace;
-    for (NSWindowController *controller in workspaceWindowControllers) {
-        if ([[controller valueForKey:@"window"] isEqual:[NSApp keyWindow]]) {
-            workSpace = [controller valueForKey:@"_workspace"];
-            break;
-        }
+    // Find Device UUID
+    NSString *bootedSimulatorUUID = [RLMPSimulatorManager bootedSimulatorUUID];
+    
+    // Find Realm File URL
+    NSArray *realmFileURLs = [self realmFilesURLWithDeviceUUID:bootedSimulatorUUID];
+    
+    if (realmFileURLs.count == 0) {
+        NSString *title = @"Unable to find Realm file";
+        NSString *message = @"You must launch iOS Simulator with app that uses Realm";
+        
+        NSError *error = [NSError errorWithDomain:RLMPErrorDomain
+                                             code:-1
+                                         userInfo:@{ NSLocalizedDescriptionKey : title,
+                                                     NSLocalizedRecoverySuggestionErrorKey : message }];
+        [self showError:error];
+        return;
     }
-    NSString *workspacePath = [[workSpace valueForKey:@"representingFilePath"] valueForKey:@"_pathString"];
-    NSArray *arguments = @[@"-xcodeProjectPath", workspacePath];
-    NSDictionary *configuration = @{NSWorkspaceLaunchConfigurationArguments : arguments};
+    
+    NSMutableArray *arguments = [NSMutableArray array];
+    for (NSURL *realmFileURL in realmFileURLs) {
+        [arguments addObject:realmFileURL.path];
+    }
+    
+    NSDictionary *configuration = @{ NSWorkspaceLaunchConfigurationArguments : arguments };
     
     NSError *error;
-    if (![[NSWorkspace sharedWorkspace] launchApplicationAtURL:self.browserUrl options:0 configuration:configuration error:&error]) {
+    if (![[NSWorkspace sharedWorkspace] launchApplicationAtURL:self.browserUrl options:NSWorkspaceLaunchNewInstance configuration:configuration error:&error]) {
         // This will happen if the Browser was present at Xcode launch and then was deleted
-        NSAlert *alert = [NSAlert alertWithMessageText:@"Could not launch the Realm Browser"
-                                         defaultButton:nil
-                                       alternateButton:nil
-                                           otherButton:nil
-                             informativeTextWithFormat:@"Failed to launch the Realm Browser with error message:\n%@.", error];
-        [alert runModal];
+        [self showError:error];
     }
+    
+}
+
+- (NSArray *)realmFilesURLWithDeviceUUID:(NSString *)deviceUUID
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSURL *homeURL = [NSURL URLWithString:NSHomeDirectory()];
+    
+    NSMutableString *fullPath = [NSMutableString string];
+    [fullPath appendFormat:@"%@/%@/%@", RootDeviceSimulatorPath, deviceUUID, DeviceSimulatorApplicationPath];
+    NSURL *bootedDeviceDirectoryURL = [homeURL URLByAppendingPathComponent:fullPath];
+    
+    NSArray* fileURLs = RLMPGlobFilesAtDirectoryURLWithPredicate(fileManager, bootedDeviceDirectoryURL, [NSPredicate predicateWithFormat:@"pathExtension == 'realm'"], ^BOOL(NSURL *URL, NSError *error) {
+        if (error) {
+            NSLog(@"%@", error);
+            return NO;
+        }
+        return YES;
+    });
+    
+    return fileURLs;
+}
+
+- (void)showError:(NSError *)error
+{
+    NSAlert *alert = [NSAlert alertWithError:error];
+    [alert runModal];
 }
 
 - (void)dealloc

@@ -41,4 +41,6 @@ NSData *RLMGenerateKey(void);
 
 - (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block;
 
+- (id)nonLiteralNil;
+
 @end
