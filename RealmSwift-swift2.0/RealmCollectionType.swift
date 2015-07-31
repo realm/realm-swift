@@ -50,6 +50,15 @@ public protocol RealmCollectionType: CollectionType {
     /// Element type contained in this collection.
     typealias Element: Object
 
+
+    // MARK: Properties
+
+    /// The Realm the objects in this collection belong to, or `nil` if the
+    /// collection's owning object does not belong to a realm (the collection is
+    /// standalone).
+    var realm: Realm? { get }
+
+
     // MARK: Index Retrieval
 
     /**

@@ -84,7 +84,10 @@ public final class Results<T: Object>: ResultsBase {
     // MARK: Properties
 
     /// Returns the Realm these results are associated with.
-    public var realm: Realm { return Realm(rlmResults.realm) }
+    /// Despite returning an `Optional<Realm>` in order to conform to
+    /// `RealmCollectionType`, it will always return `.Some()` since a `Results`
+    /// cannot exist independently from a `Realm`.
+    public var realm: Realm? { return Realm(rlmResults.realm) }
 
     /// Returns the number of objects in these results.
     public var count: Int { return Int(rlmResults.count) }

@@ -97,7 +97,7 @@ class ResultsTests: TestCase {
     }
 
     func testRealm() {
-        XCTAssertEqual(results.realm.path, realmWithTestPath().path)
+        XCTAssertEqual(results.realm!.path, realmWithTestPath().path)
     }
 
     func testDescription() {

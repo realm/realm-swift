@@ -95,6 +95,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * `Object.className` is now marked as `final`.
 * Functionality common to both `List` and `Results` is now declared in a
   `RealmCollectionType` protocol that both types conform to.
+* `Results.realm` now returns an `Optional<Realm>` in order to conform to
+  `RealmCollectionType`, but will always return `.Some()` since a `Results`
+  cannot exist independently from a `Realm`.
 * Aggregate operations are now available on `List`: `min`, `max`, `sum`,
   `average`.
 
