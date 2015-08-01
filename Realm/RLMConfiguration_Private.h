@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,15 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
-#import <Realm/RLMArray.h>
 #import <Realm/RLMConfiguration.h>
-#import <Realm/RLMMigration.h>
-#import <Realm/RLMObject.h>
-#import <Realm/RLMObjectSchema.h>
-#import <Realm/RLMPlatform.h>
-#import <Realm/RLMProperty.h>
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMResults.h>
-#import <Realm/RLMSchema.h>
+
+@class RLMSchema;
+
+@interface RLMConfiguration ()
+
+@property (nonatomic, readwrite) bool dynamic;
+@property (nonatomic, copy, readwrite) RLMSchema *customSchema;
+
+@end

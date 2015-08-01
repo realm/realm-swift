@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMDefines.h>
 
-@class RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
+@class RLMConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
 RLM_ASSUME_NONNULL_BEGIN
 
@@ -63,6 +63,18 @@ RLM_ASSUME_NONNULL_BEGIN
  @return The default `RLMRealm` instance for the current thread.
  */
 + (instancetype)defaultRealm;
+
+/**
+ Obtains an `RLMRealm` instance with the given configuration.
+
+ @param configuration The configuration for the realm.
+ @param error         If an error occurs, upon return contains an `NSError` object
+                      that describes the problem. If you are not interested in
+                      possible errors, pass in `NULL`.
+
+ @return An `RLMRealm` instance.
+ */
++ (nullable instancetype)realmWithConfiguration:(RLMConfiguration *)configuration error:(NSError **)error;
 
 /**
  Obtains an `RLMRealm` instance persisted at a specific file path.

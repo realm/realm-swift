@@ -153,7 +153,7 @@ public final class Migration {
     /// The migration's new `Schema`, describing the `Realm` after applying a migration.
     public var newSchema: Schema { return Schema(rlmMigration.newSchema) }
 
-    private var rlmMigration: RLMMigration
+    internal var rlmMigration: RLMMigration
 
     // MARK: Altering Objects During a Migration
 
@@ -217,7 +217,7 @@ public final class Migration {
 
 // MARK: Private Helpers
 
-private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrationBlock {
+internal func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrationBlock {
     return { migration, oldVersion in
         // set all accessor classes to MigrationObject
         for objectSchema in migration.oldSchema.objectSchema {

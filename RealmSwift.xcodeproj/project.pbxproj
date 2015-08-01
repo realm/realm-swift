@@ -49,6 +49,7 @@
 		C0240C2B1A84090000858BFA /* RealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0240C2A1A84090000858BFA /* RealmTests.swift */; };
 		C04DAEBE1A8E7FBD008A9623 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04DAEBD1A8E7FBD008A9623 /* Util.swift */; };
 		C081AEB21AAF865C00BA3E31 /* PropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C081AEB11AAF865C00BA3E31 /* PropertyTests.swift */; };
+		C0D2DD111B6BF849004E8919 /* RealmConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD101B6BF849004E8919 /* RealmConfiguration.swift */; };
 		C0D8E12C1A8174090077C784 /* SortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E12B1A8174090077C784 /* SortDescriptor.swift */; };
 		C0D8E12F1A81749D0077C784 /* SortDescriptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */; };
 		C0D8E1371A8199420077C784 /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E1321A8196EE0077C784 /* TestUtils.mm */; };
@@ -140,6 +141,7 @@
 		C04DAEBD1A8E7FBD008A9623 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Util.swift; path = RealmSwift/Util.swift; sourceTree = SOURCE_ROOT; };
 		C081AEB11AAF865C00BA3E31 /* PropertyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PropertyTests.swift; path = RealmSwift/Tests/PropertyTests.swift; sourceTree = SOURCE_ROOT; };
 		C0CA5BCC1AC0951C007338C5 /* PerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PerformanceTests.swift; path = RealmSwift/Tests/PerformanceTests.swift; sourceTree = SOURCE_ROOT; };
+		C0D2DD101B6BF849004E8919 /* RealmConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RealmConfiguration.swift; path = "RealmSwift/RealmConfiguration.swift"; sourceTree = SOURCE_ROOT; };
 		C0D8E12B1A8174090077C784 /* SortDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDescriptor.swift; path = RealmSwift/SortDescriptor.swift; sourceTree = SOURCE_ROOT; };
 		C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDescriptorTests.swift; path = RealmSwift/Tests/SortDescriptorTests.swift; sourceTree = SOURCE_ROOT; };
 		C0D8E1311A8196EE0077C784 /* TestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtils.h; path = RealmSwift/Tests/TestUtils.h; sourceTree = SOURCE_ROOT; };
@@ -222,6 +224,7 @@
 				020F63BD1A8037AE007CB52E /* ObjectSchema.swift */,
 				020F63BE1A8037AE007CB52E /* Property.swift */,
 				020F63BF1A8037AE007CB52E /* Realm.swift */,
+				C0D2DD101B6BF849004E8919 /* RealmConfiguration.swift */,
 				020F63C01A8037AE007CB52E /* Results.swift */,
 				020F63C11A8037AE007CB52E /* Schema.swift */,
 				C0D8E12B1A8174090077C784 /* SortDescriptor.swift */,

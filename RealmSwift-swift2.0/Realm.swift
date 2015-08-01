@@ -76,12 +76,22 @@ public final class Realm {
     // MARK: Initializers
 
     /**
-    Obtains a Realm instance persisted at the specified file path. Defaults to
-    `Realm.defaultPath`
+    Obtains a Realm instance with the given configuration. Defaults to the default realm configuration.
+
+    - parameter configuration: The configuration to use when creating the Realm instance.
+    */
+    public convenience init(configuration: RealmConfiguration = RealmConfiguration.defaultConfiguration) throws {
+        print("configuration path: \(configuration.path)")
+        let rlmRealm = try RLMRealm(configuration: configuration.rlmConfiguration)
+        self.init(rlmRealm)
+    }
+
+    /**
+    Obtains a Realm instance persisted at the specified file path.
 
     - parameter path: Path to the realm file.
     */
-    public convenience init(path: String = Realm.defaultPath) throws {
+    public convenience init(path: String) throws {
         let rlmRealm = try RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: false, schema: nil)
         self.init(rlmRealm)
     }

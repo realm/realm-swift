@@ -76,6 +76,23 @@ public final class Realm {
     // MARK: Initializers
 
     /**
+    Obtains a Realm instance with the given configuration. Defaults to the default realm configuration.
+
+    :param: configuration The configuration to use when creating the Realm instance.
+    :param: error         If an error occurs, upon return contains an `NSError` object
+                          that describes the problem. If you are not interested in
+                          possible errors, omit the argument, or pass in `nil`.
+    */
+    public convenience init?(configuration: RealmConfiguration, error: NSErrorPointer = nil)  {
+        if let rlmRealm = RLMRealm(configuration: configuration.rlmConfiguration, error: error) {
+            self.init(rlmRealm)
+        } else {
+            self.init(RLMRealm())
+            return nil
+        }
+    }
+
+    /**
     Obtains a Realm instance persisted at the specified file path. Defaults to
     `Realm.defaultPath`
 
@@ -84,7 +101,7 @@ public final class Realm {
     public convenience init(path: String = Realm.defaultPath) {
         self.init(RLMRealm(path: path, readOnly: false, error: nil)!)
     }
-    
+
     /**
     Obtains a `Realm` instance with persistence to a specific file path with
     options.
@@ -268,9 +285,9 @@ public final class Realm {
 
     Creates or updates an instance of this object and adds it to the `Realm` populating
     the object with the given value.
-    
+
     When 'update' is 'true', the object must have a primary key. If no objects exist in
-    the Realm instance with the same primary key value, the object is inserted. Otherwise, 
+    the Realm instance with the same primary key value, the object is inserted. Otherwise,
     the existing object is updated with any changed values.
 
     :param: type    The object type to create.
@@ -320,7 +337,7 @@ public final class Realm {
 
     :param: object The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
                    or any other enumerable SequenceType which generates Object.
-    
+
     :nodoc:
     */
     public func delete<T: Object>(objects: List<T>) {
@@ -332,7 +349,7 @@ public final class Realm {
 
     :param: object The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
                    or any other enumerable SequenceType which generates Object.
-    
+
     :nodoc:
     */
     public func delete<T: Object>(objects: Results<T>) {
