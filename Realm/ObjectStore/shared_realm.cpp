@@ -379,6 +379,22 @@ uint64_t Realm::get_schema_version(const realm::Realm::Config &config)
     return ObjectStore::get_schema_version(Realm(config).read_group());
 }
 
+void Realm::close()
+{
+    invalidate();
+
+    if (m_notifier) {
+        m_notifier->remove_realm(this);
+    }
+
+    m_group = nullptr;
+    m_shared_group = nullptr;
+    m_history = nullptr;
+    m_read_only_group = nullptr;
+    m_notifier = nullptr;
+    m_binding_context = nullptr;
+}
+
 SharedRealm RealmCache::get_realm(const std::string &path, std::thread::id thread_id)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -451,6 +467,13 @@ void RealmCache::cache_realm(SharedRealm &realm, std::thread::id thread_id)
 void RealmCache::clear()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
+    for (auto const& path : m_cache) {
+        for (auto const& thread : path.second) {
+            if (auto realm = thread.second.lock()) {
+                realm->close();
+            }
+        }
+    }
 
     m_cache.clear();
 }
