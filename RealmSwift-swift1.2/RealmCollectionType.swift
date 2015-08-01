@@ -23,7 +23,7 @@ import Realm
 Encapsulates iteration state and interface for iteration over a
 `RealmCollectionType`.
 */
-public class RLMGenerator<T: Object>: GeneratorType {
+public final class RLMGenerator<T: Object>: GeneratorType {
     private let generatorBase: NSFastGenerator
 
     internal init(collection: RLMCollection) {
@@ -93,17 +93,6 @@ public protocol RealmCollectionType: CollectionType {
 
 
     // MARK: Object Retrieval
-
-    /**
-    Returns the object at the given `index`.
-
-    :warning: You can only set an object during a write transaction.
-
-    :param: index The index.
-
-    :returns: The object at the given `index`.
-    */
-    subscript(index: Int) -> Element { get }
 
     /// Returns the first object in the collection, or `nil` if empty.
     var first: Element? { get }

@@ -23,7 +23,7 @@ import Realm
 Encapsulates iteration state and interface for iteration over a
 `RealmCollectionType`.
 */
-public class RLMGenerator<T: Object>: GeneratorType {
+public final class RLMGenerator<T: Object>: GeneratorType {
     private let generatorBase: NSFastGenerator
 
     internal init(collection: RLMCollection) {
@@ -62,15 +62,6 @@ public protocol RealmCollectionType: CollectionType {
     // MARK: Index Retrieval
 
     /**
-    Returns the index of the given object, or `nil` if the object is not in the collection.
-
-    - parameter object: The object whose index is being queried.
-
-    - returns: The index of the given object, or `nil` if the object is not in the collection.
-    */
-    func indexOf(object: Element) -> Int?
-
-    /**
     Returns the index of the first object matching the given predicate,
     or `nil` no objects match.
 
@@ -90,26 +81,6 @@ public protocol RealmCollectionType: CollectionType {
     - returns: The index of the given object, or `nil` if no objects match.
     */
     func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int?
-
-
-    // MARK: Object Retrieval
-
-    /**
-    Returns the object at the given `index`.
-
-    - warning: You can only set an object during a write transaction.
-
-    - parameter index: The index.
-
-    - returns: The object at the given `index`.
-    */
-    subscript(index: Int) -> Element { get }
-
-    /// Returns the first object in the collection, or `nil` if empty.
-    var first: Element? { get }
-
-    /// Returns the last object in the collection, or `nil` if empty.
-    var last: Element? { get }
 
 
     // MARK: Filtering
