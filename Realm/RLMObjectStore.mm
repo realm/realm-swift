@@ -33,7 +33,9 @@
 #import "RLMUtil.hpp"
 
 #import "object_store.hpp"
+#import "results.hpp"
 #import "shared_realm.hpp"
+
 #import <objc/message.h>
 
 using namespace realm;
@@ -456,7 +458,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
     if (!objectSchema.table) {
         // read-only realms may be missing tables since we can't add any
         // missing ones on init
-        return [RLMEmptyResults emptyResultsWithObjectClassName:objectClassName realm:realm];
+        return [RLMResults resultsWithObjectClassName:objectClassName realm:realm results:{}];
     }
 
     if (predicate) {
@@ -465,11 +467,13 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
 
         // create and populate array
         return [RLMResults resultsWithObjectClassName:objectClassName
-                                                query:std::make_unique<Query>(query)
-                                                realm:realm];
+                                                realm:realm
+                                              results:realm::Results(realm->_realm, std::move(query))];
     }
 
-    return [RLMTableResults tableResultsWithObjectSchema:objectSchema realm:realm];
+    return [RLMResults resultsWithObjectClassName:objectClassName
+                                            realm:realm
+                                          results:realm::Results(realm->_realm, *objectSchema.table)];
 }
 
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
@@ -517,15 +521,21 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
         return nil;
     }
 
-    return RLMCreateObjectAccessor(realm, objectSchema, row);
+    return RLMCreateObjectAccessor(realm, objectSchema, (*objectSchema.table)[row]);
+}
+
+RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm,
+                                       __unsafe_unretained RLMObjectSchema *const objectSchema,
+                                       NSUInteger index) {
+    return RLMCreateObjectAccessor(realm, objectSchema, (*objectSchema.table)[index]);
 }
 
 // Create accessor and register with realm
 RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm,
                                        __unsafe_unretained RLMObjectSchema *const objectSchema,
-                                       NSUInteger index) {
+                                       realm::RowExpr row) {
     RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-    accessor->_row = (*objectSchema.table)[index];
+    accessor->_row = row;
     RLMInitializeSwiftAccessorGenerics(accessor);
     return accessor;
 }

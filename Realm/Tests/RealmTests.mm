@@ -1048,7 +1048,14 @@ extern "C" {
     XCTAssertEqual(results, [results sortedResultsUsingProperty:@"intCol" ascending:YES]);
     XCTAssertThrows([results objectAtIndex:0]);
     XCTAssertEqual(NSNotFound, [results indexOfObject:self.nonLiteralNil]);
+    XCTAssertEqual(NSNotFound, [results indexOfObjectWhere:@"intCol = 5"]);
     XCTAssertNoThrow([realm deleteObjects:results]);
+    XCTAssertNil([results maxOfProperty:@"intCol"]);
+    XCTAssertNil([results minOfProperty:@"intCol"]);
+    XCTAssertNil([results averageOfProperty:@"intCol"]);
+    XCTAssertNil([results sumOfProperty:@"intCol"]);
+    XCTAssertNil([results firstObject]);
+    XCTAssertNil([results lastObject]);
     for (__unused id obj in results) {
         XCTFail(@"Got an item in empty results");
     }

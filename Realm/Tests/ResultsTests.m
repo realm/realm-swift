@@ -72,6 +72,54 @@
     XCTAssertNil(objects[0], @"Object should have been released");
 }
 
+- (void)testFirst {
+    XCTAssertNil(IntObject.allObjects.firstObject);
+    XCTAssertNil([IntObject objectsWhere:@"intCol > 5"].firstObject);
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [IntObject createInDefaultRealmWithValue:@[@10]];
+    [IntObject createInDefaultRealmWithValue:@[@20]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(10, [IntObject.allObjects.firstObject intCol]);
+    XCTAssertEqual(10, [[IntObject objectsWhere:@"intCol > 5"].firstObject intCol]);
+    XCTAssertEqual(20, [[IntObject objectsWhere:@"intCol > 10"].firstObject intCol]);
+}
+
+- (void)testLast {
+    XCTAssertNil(IntObject.allObjects.lastObject);
+    XCTAssertNil([IntObject objectsWhere:@"intCol > 5"].lastObject);
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [IntObject createInDefaultRealmWithValue:@[@20]];
+    [IntObject createInDefaultRealmWithValue:@[@10]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(10, [IntObject.allObjects.lastObject intCol]);
+    XCTAssertEqual(10, [[IntObject objectsWhere:@"intCol > 5"].lastObject intCol]);
+    XCTAssertEqual(20, [[IntObject objectsWhere:@"intCol > 10"].lastObject intCol]);
+}
+
+- (void)testSubscript {
+    RLMAssertThrowsWithReasonMatching([IntObject allObjects][0], @"0.*less than 0");
+    RLMAssertThrowsWithReasonMatching([IntObject objectsWhere:@"intCol > 5"][0], @"0.*less than 0");
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [IntObject createInDefaultRealmWithValue:@[@10]];
+    [IntObject createInDefaultRealmWithValue:@[@20]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(10, [IntObject.allObjects[0] intCol]);
+    XCTAssertEqual(10, [[IntObject objectsWhere:@"intCol > 5"][0] intCol]);
+    XCTAssertEqual(20, [[IntObject objectsWhere:@"intCol > 10"][0] intCol]);
+
+    RLMAssertThrowsWithReasonMatching([IntObject allObjects][2], @"2.*less than 2");
+    RLMAssertThrowsWithReasonMatching([IntObject objectsWhere:@"intCol > 5"][2], @"2.*less than 2");
+}
+
 - (void)testValueForKey {
     RLMRealm *realm = self.realmWithTestPath;
 
@@ -94,18 +142,28 @@
     [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
     [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
 
-    XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"], (@[@0, @1, @0, @1, @0, @1, @0, @1, @0, @0]));
-    XCTAssertTrue([[[[AggregateObject allObjectsInRealm:realm] valueForKey:@"self"] firstObject] isEqualToObject:[AggregateObject allObjectsInRealm:realm].firstObject]);
-    XCTAssertTrue([[[[AggregateObject allObjectsInRealm:realm] valueForKey:@"self"] lastObject] isEqualToObject:[AggregateObject allObjectsInRealm:realm].lastObject]);
+    XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"],
+                          (@[@0, @1, @0, @1, @0, @1, @0, @1, @0, @0]));
+    XCTAssertTrue([[[[AggregateObject allObjectsInRealm:realm] valueForKey:@"self"] firstObject]
+                   isEqualToObject:[AggregateObject allObjectsInRealm:realm].firstObject]);
+    XCTAssertTrue([[[[AggregateObject allObjectsInRealm:realm] valueForKey:@"self"] lastObject]
+                   isEqualToObject:[AggregateObject allObjectsInRealm:realm].lastObject]);
 
-    XCTAssertEqualObjects([[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"intCol"], (@[@0, @0, @0, @0, @0, @0]));
-    XCTAssertTrue([[[[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"self"] firstObject] isEqualToObject:[AggregateObject objectsInRealm:realm where:@"intCol != 1"].firstObject]);
-    XCTAssertTrue([[[[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"self"] lastObject] isEqualToObject:[AggregateObject objectsInRealm:realm where:@"intCol != 1"].lastObject]);
+    XCTAssertEqualObjects([[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"intCol"],
+                          (@[@0, @0, @0, @0, @0, @0]));
+    XCTAssertTrue([[[[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"self"] firstObject]
+                   isEqualToObject:[AggregateObject objectsInRealm:realm where:@"intCol != 1"].firstObject]);
+    XCTAssertTrue([[[[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"self"] lastObject]
+                   isEqualToObject:[AggregateObject objectsInRealm:realm where:@"intCol != 1"].lastObject]);
 
     [realm commitWriteTransaction];
 
-    XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"], (@[@0, @1, @0, @1, @0, @1, @0, @1, @0, @0]));
-    XCTAssertEqualObjects([[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"intCol"], (@[@0, @0, @0, @0, @0, @0]));
+    XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"],
+                          (@[@0, @1, @0, @1, @0, @1, @0, @1, @0, @0]));
+    XCTAssertEqualObjects([[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"intCol"],
+                          (@[@0, @0, @0, @0, @0, @0]));
+
+    XCTAssertThrows([[AggregateObject allObjectsInRealm:realm] valueForKey:@"invalid"]);
 }
 
 - (void)testSetValueForKey {
@@ -129,15 +187,21 @@
     [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
 
     [[AggregateObject allObjectsInRealm:realm] setValue:@25 forKey:@"intCol"];
-    XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"], (@[@25, @25, @25, @25, @25, @25, @25, @25, @25, @25]));
+    XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"],
+                          (@[@25, @25, @25, @25, @25, @25, @25, @25, @25, @25]));
 
     [[AggregateObject objectsInRealm:realm where:@"floatCol > 1"] setValue:@10 forKey:@"intCol"];
-    XCTAssertEqualObjects([[AggregateObject objectsInRealm:realm where:@"floatCol > 1"] valueForKey:@"intCol"], (@[@10, @10, @10, @10, @10, @10]));
+    XCTAssertEqualObjects([[AggregateObject objectsInRealm:realm where:@"floatCol > 1"] valueForKey:@"intCol"],
+                          (@[@10, @10, @10, @10, @10, @10]));
+
+    XCTAssertThrows([[AggregateObject allObjectsInRealm:realm] valueForKey:@"invalid"]);
 
     [realm commitWriteTransaction];
 
-    XCTAssertThrows([[AggregateObject allObjectsInRealm:realm] setValue:@25 forKey:@"intCol"]);
-    XCTAssertThrows([[AggregateObject objectsInRealm:realm where:@"floatCol > 1"] setValue:@10 forKey:@"intCol"]);
+    RLMAssertThrowsWithReasonMatching([[AggregateObject allObjectsInRealm:realm] setValue:@25 forKey:@"intCol"],
+                                      @"write transaction");
+    RLMAssertThrowsWithReasonMatching([[AggregateObject objectsInRealm:realm where:@"floatCol > 1"] setValue:@10 forKey:@"intCol"],
+                                      @"write transaction");
 }
 
 - (void)testObjectAggregate
@@ -194,12 +258,12 @@
     XCTAssertEqualWithAccuracy([allArray sumOfProperty:@"doubleCol"].doubleValue, 10.0, 0.1f);
 
     // Test invalid column name
-    XCTAssertThrows([yesArray sumOfProperty:@"foo"]);
-    XCTAssertThrows([allArray sumOfProperty:@"foo"]);
+    RLMAssertThrowsWithReasonMatching([yesArray sumOfProperty:@"foo"], @"foo.*AggregateObject");
+    RLMAssertThrowsWithReasonMatching([allArray sumOfProperty:@"foo"], @"foo.*AggregateObject");
 
     // Test operation not supported
-    XCTAssertThrows([yesArray sumOfProperty:@"boolCol"]);
-    XCTAssertThrows([allArray sumOfProperty:@"foo"]);
+    RLMAssertThrowsWithReasonMatching([yesArray sumOfProperty:@"boolCol"], @"sum.*bool");
+    RLMAssertThrowsWithReasonMatching([allArray sumOfProperty:@"boolCol"], @"sum.*bool");
 
 
     // Average ::::::::::::::::::::::::::::::::::::::::::::::
@@ -219,12 +283,12 @@
     XCTAssertEqualWithAccuracy([allArray averageOfProperty:@"doubleCol"].doubleValue, 1.0, 0.1f);
 
     // Test invalid column name
-    XCTAssertThrows([yesArray averageOfProperty:@"foo"]);
-    XCTAssertThrows([allArray averageOfProperty:@"foo"]);
+    RLMAssertThrowsWithReasonMatching([yesArray averageOfProperty:@"foo"], @"foo.*AggregateObject");
+    RLMAssertThrowsWithReasonMatching([allArray averageOfProperty:@"foo"], @"foo.*AggregateObject");
 
     // Test operation not supported
-    XCTAssertThrows([yesArray averageOfProperty:@"boolCol"]);
-    XCTAssertThrows([allArray averageOfProperty:@"boolCol"]);
+    RLMAssertThrowsWithReasonMatching([yesArray averageOfProperty:@"boolCol"], @"average.*bool");
+    RLMAssertThrowsWithReasonMatching([allArray averageOfProperty:@"boolCol"], @"average.*bool");
 
     // MIN ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int min
@@ -248,12 +312,12 @@
     XCTAssertEqualObjects(dateMinInput, [allArray minOfProperty:@"dateCol"]);
 
     // Test invalid column name
-    XCTAssertThrows([yesArray minOfProperty:@"foo"]);
-    XCTAssertThrows([allArray minOfProperty:@"foo"]);
+    RLMAssertThrowsWithReasonMatching([yesArray minOfProperty:@"foo"], @"foo.*AggregateObject");
+    RLMAssertThrowsWithReasonMatching([allArray minOfProperty:@"foo"], @"foo.*AggregateObject");
 
     // Test operation not supported
-    XCTAssertThrows([yesArray minOfProperty:@"boolCol"]);
-    XCTAssertThrows([allArray minOfProperty:@"boolCol"]);
+    RLMAssertThrowsWithReasonMatching([yesArray minOfProperty:@"boolCol"], @"min.*bool");
+    RLMAssertThrowsWithReasonMatching([allArray minOfProperty:@"boolCol"], @"min.*bool");
 
     // MAX ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int max
@@ -277,12 +341,12 @@
     XCTAssertEqualObjects(dateMaxInput, [allArray maxOfProperty:@"dateCol"]);
 
     // Test invalid column name
-    XCTAssertThrows([yesArray maxOfProperty:@"foo"]);
-    XCTAssertThrows([allArray maxOfProperty:@"foo"]);
+    RLMAssertThrowsWithReasonMatching([yesArray maxOfProperty:@"foo"], @"foo.*AggregateObject");
+    RLMAssertThrowsWithReasonMatching([allArray maxOfProperty:@"foo"], @"foo.*AggregateObject");
 
     // Test operation not supported
-    XCTAssertThrows([yesArray maxOfProperty:@"boolCol"]);
-    XCTAssertThrows([allArray maxOfProperty:@"boolCol"]);
+    RLMAssertThrowsWithReasonMatching([yesArray maxOfProperty:@"boolCol"], @"max.*bool");
+    RLMAssertThrowsWithReasonMatching([allArray maxOfProperty:@"boolCol"], @"max.*bool");
 }
 
 - (void)testArrayDescription
@@ -330,16 +394,33 @@
     XCTAssertEqual(1U, [results indexOfObject:po3]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:standalone]);
-    XCTAssertThrows([results indexOfObject:so]);
-    XCTAssertThrows([results indexOfObject:deletedObject]);
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:so], @"StringObject.*EmployeeObject");
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been invalidated");
+
+    [results lastObject]; // Force to tableview mode
+    XCTAssertEqual(0U, [results indexOfObject:po1]);
+    XCTAssertEqual(1U, [results indexOfObject:po3]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:standalone]);
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:so], @"StringObject.*EmployeeObject");
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been invalidated");
+
+    // reverse order from sort
+    results = [[EmployeeObject objectsWhere:@"hired = YES"] sortedResultsUsingProperty:@"age" ascending:YES];
+    XCTAssertEqual(1U, [results indexOfObject:po1]);
+    XCTAssertEqual(0U, [results indexOfObject:po3]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:standalone]);
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:so], @"StringObject.*EmployeeObject");
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been invalidated");
 
     results = [EmployeeObject allObjects];
     XCTAssertEqual(0U, [results indexOfObject:po1]);
     XCTAssertEqual(1U, [results indexOfObject:po2]);
     XCTAssertEqual(2U, [results indexOfObject:po3]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:standalone]);
-    XCTAssertThrows([results indexOfObject:so]);
-    XCTAssertThrows([results indexOfObject:deletedObject]);
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:so], @"StringObject.*EmployeeObject");
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been invalidated");
 }
 
 - (void)testIndexOfObjectWhere
@@ -428,25 +509,6 @@
     XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
 }
 
-- (void)testSortingDoesNotEagerlyCreateView {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-
-    [realm beginWriteTransaction];
-    [EmployeeObject createInRealm:realm withValue:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
-    [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
-    [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
-    [realm commitWriteTransaction];
-
-    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
-    RLMResults *sortedName = [sortedAge sortedResultsUsingProperty:@"name" ascending:NO];
-    RLMResults *filtered = [sortedName objectsWhere:@"age > 0"];
-
-    Ivar ivar = class_getInstanceVariable(sortedAge.class, "_viewCreated");
-    XCTAssertFalse((bool)object_getIvar(sortedAge, ivar));
-    XCTAssertFalse((bool)object_getIvar(sortedName, ivar));
-    XCTAssertFalse((bool)object_getIvar(filtered, ivar));
-}
-
 - (void)testRerunningSortedQuery {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
@@ -511,27 +573,6 @@ static vm_size_t get_resident_size() {
     XCTAssert(get_resident_size() < size * 2);
 }
 
-- (void)testCrossThreadAccess
-{
-    RLMRealm *realm = self.realmWithTestPath;
-
-    [realm beginWriteTransaction];
-    [StringObject createInRealm:realm withValue:@[@"name1"]];
-    [StringObject createInRealm:realm withValue:@[@"name2"]];
-    [realm commitWriteTransaction];
-
-    RLMResults *results = [StringObject allObjects];
-    RLMResults *queryResults = [StringObject objectsWhere:@"stringCol = 'name1'"];
-    XCTAssertNoThrow([results lastObject]);
-    XCTAssertNoThrow([queryResults lastObject]);
-
-    // Using dispatch_async to ensure it actually lands on another thread
-    [self dispatchAsyncAndWait:^{
-        XCTAssertThrows([results lastObject]);
-        XCTAssertThrows([queryResults lastObject]);
-    }];
-}
-
 - (void)testDeleteAllObjects
 {
     RLMRealm *realm = self.realmWithTestPath;
@@ -542,7 +583,7 @@ static vm_size_t get_resident_size() {
     [realm commitWriteTransaction];
 
     RLMResults *results = [StringObject objectsInRealm:realm where:@"stringCol = 'name1'"];
-    XCTAssertThrows([realm deleteObjects:results]);
+    RLMAssertThrowsWithReasonMatching([realm deleteObjects:results], @"write transaction");
     [realm beginWriteTransaction];
     [realm deleteObjects:results];
     [realm commitWriteTransaction];
@@ -550,7 +591,7 @@ static vm_size_t get_resident_size() {
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 
     results = [StringObject allObjectsInRealm:realm];
-    XCTAssertThrows([realm deleteObjects:results]);
+    RLMAssertThrowsWithReasonMatching([realm deleteObjects:results], @"write transaction");
     [realm beginWriteTransaction];
     [realm deleteObjects:results];
     [realm commitWriteTransaction];
@@ -628,6 +669,154 @@ static vm_size_t get_resident_size() {
     }
 
     XCTAssertEqual(enumeratedCount, count);
+}
+
+- (void)testCallInvalidateDuringEnumeration {
+    RLMRealm *realm = self.realmWithTestPath;
+    const int count = 40;
+
+    [realm beginWriteTransaction];
+    for (int i = 0; i < count; ++i) {
+        [IntObject createInRealm:realm withValue:@[@(0)]];
+    }
+    [realm commitWriteTransaction];
+
+    int enumeratedCount = 0;
+    @try {
+        for (__unused IntObject *io in [IntObject objectsInRealm:realm where:@"intCol = 0"]) {
+            ++enumeratedCount;
+            [realm invalidate];
+        }
+        XCTFail(@"Should have thrown an exception");
+    }
+    @catch (NSException *e) {
+        XCTAssertEqualObjects(e.reason, @"Collection is no longer valid");
+    }
+    XCTAssertEqual(16, enumeratedCount);
+
+    // Also test with the enumeration done within a write transaction
+    [realm beginWriteTransaction];
+    enumeratedCount = 0;
+    @try {
+        for (__unused IntObject *io in [IntObject objectsInRealm:realm where:@"intCol = 0"]) {
+            ++enumeratedCount;
+            [realm invalidate];
+        }
+        XCTFail(@"Should have thrown an exception");
+    }
+    @catch (NSException *e) {
+        XCTAssertEqualObjects(e.reason, @"Collection is no longer valid");
+    }
+    XCTAssertEqual(16, enumeratedCount);
+}
+
+- (void)testBeginWriteTransactionDuringEnumeration {
+    RLMRealm *realm = self.realmWithTestPath;
+    const int count = 40;
+
+    [realm beginWriteTransaction];
+    for (int i = 0; i < count; ++i) {
+        [IntObject createInRealm:realm withValue:@[@(0)]];
+    }
+    [realm commitWriteTransaction];
+
+    for (IntObject *io in [IntObject objectsInRealm:realm where:@"intCol = 0"]) {
+        [realm beginWriteTransaction];
+        io.intCol = 1;
+        [realm commitWriteTransaction];
+    }
+
+    XCTAssertEqual(40U, [IntObject objectsInRealm:realm where:@"intCol = 1"].count);
+}
+
+- (void)testAllMethodsCheckThread {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInDefaultRealmWithValue:@[@0]];
+    }];
+
+    RLMResults *results = [IntObject allObjects];
+    XCTAssertNoThrow([results objectAtIndex:0]);
+    XCTAssertNoThrow([results firstObject]);
+    XCTAssertNoThrow([results lastObject]);
+    XCTAssertNoThrow([results indexOfObject:[IntObject allObjects].firstObject]);
+    XCTAssertNoThrow([results indexOfObjectWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([results indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([results objectsWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([results objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([results sortedResultsUsingProperty:@"intCol" ascending:YES]);
+    XCTAssertNoThrow([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+    XCTAssertNoThrow([results minOfProperty:@"intCol"]);
+    XCTAssertNoThrow([results maxOfProperty:@"intCol"]);
+    XCTAssertNoThrow([results sumOfProperty:@"intCol"]);
+    XCTAssertNoThrow([results averageOfProperty:@"intCol"]);
+    XCTAssertNoThrow(results[0]);
+    XCTAssertNoThrow([results valueForKey:@"intCol"]);
+
+    [self dispatchAsyncAndWait:^{
+        XCTAssertThrows([results objectAtIndex:0]);
+        XCTAssertThrows([results firstObject]);
+        XCTAssertThrows([results lastObject]);
+        XCTAssertThrows([results indexOfObject:[IntObject allObjects].firstObject]);
+        XCTAssertThrows([results indexOfObjectWhere:@"intCol = 0"]);
+        XCTAssertThrows([results indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+        XCTAssertThrows([results objectsWhere:@"intCol = 0"]);
+        XCTAssertThrows([results objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+        XCTAssertThrows([results sortedResultsUsingProperty:@"intCol" ascending:YES]);
+        XCTAssertThrows([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+        XCTAssertThrows([results minOfProperty:@"intCol"]);
+        XCTAssertThrows([results maxOfProperty:@"intCol"]);
+        XCTAssertThrows([results sumOfProperty:@"intCol"]);
+        XCTAssertThrows([results averageOfProperty:@"intCol"]);
+        XCTAssertThrows(results[0]);
+        XCTAssertThrows([results valueForKey:@"intCol"]);
+    }];
+}
+
+- (void)testAllMethodsCheckForInvalidation {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInDefaultRealmWithValue:@[@0]];
+    }];
+
+    RLMResults *results = [IntObject allObjects];
+    XCTAssertNoThrow([results objectAtIndex:0]);
+    XCTAssertNoThrow([results firstObject]);
+    XCTAssertNoThrow([results lastObject]);
+    XCTAssertNoThrow([results indexOfObject:[IntObject allObjects].firstObject]);
+    XCTAssertNoThrow([results indexOfObjectWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([results indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([results objectsWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([results objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([results sortedResultsUsingProperty:@"intCol" ascending:YES]);
+    XCTAssertNoThrow([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+    XCTAssertNoThrow([results minOfProperty:@"intCol"]);
+    XCTAssertNoThrow([results maxOfProperty:@"intCol"]);
+    XCTAssertNoThrow([results sumOfProperty:@"intCol"]);
+    XCTAssertNoThrow([results averageOfProperty:@"intCol"]);
+    XCTAssertNoThrow(results[0]);
+    XCTAssertNoThrow([results valueForKey:@"intCol"]);
+    XCTAssertNoThrow({for (__unused id obj in results);});
+
+    [realm invalidate];
+
+    XCTAssertThrows([results objectAtIndex:0]);
+    XCTAssertThrows([results firstObject]);
+    XCTAssertThrows([results lastObject]);
+    XCTAssertThrows([results indexOfObject:[IntObject allObjects].firstObject]);
+    XCTAssertThrows([results indexOfObjectWhere:@"intCol = 0"]);
+    XCTAssertThrows([results indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertThrows([results objectsWhere:@"intCol = 0"]);
+    XCTAssertThrows([results objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertThrows([results sortedResultsUsingProperty:@"intCol" ascending:YES]);
+    XCTAssertThrows([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+    XCTAssertThrows([results minOfProperty:@"intCol"]);
+    XCTAssertThrows([results maxOfProperty:@"intCol"]);
+    XCTAssertThrows([results sumOfProperty:@"intCol"]);
+    XCTAssertThrows([results averageOfProperty:@"intCol"]);
+    XCTAssertThrows(results[0]);
+    XCTAssertThrows([results valueForKey:@"intCol"]);
+    XCTAssertThrows({for (__unused id obj in results);});
 }
 
 @end

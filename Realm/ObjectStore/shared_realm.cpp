@@ -230,9 +230,14 @@ static void check_read_write(Realm *realm)
     }
 }
 
+bool Realm::check_thread() const noexcept
+{
+    return m_thread_id == std::this_thread::get_id();
+}
+
 void Realm::verify_thread() const
 {
-    if (m_thread_id != std::this_thread::get_id()) {
+    if (!check_thread()) {
         throw IncorrectThreadException("Realm accessed from incorrect thread.");
     }
 }

@@ -26,6 +26,10 @@
 #import <realm/string_data.hpp>
 #import <realm/util/file.hpp>
 
+namespace realm {
+    class Mixed;
+}
+
 @class RLMObjectSchema;
 @class RLMProperty;
 @protocol RLMFastEnumerable;
@@ -160,3 +164,5 @@ static inline realm::DateTime RLMDateTimeForNSDate(__unsafe_unretained NSDate *c
 static inline NSUInteger RLMConvertNotFound(size_t index) {
     return index == realm::not_found ? NSNotFound : index;
 }
+
+id RLMMixedToObjc(realm::Mixed const& value);
