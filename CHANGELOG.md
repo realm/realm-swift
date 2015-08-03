@@ -13,6 +13,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix crash when adding a property to a model without updating the schema
   version.
+* Fix crash when sorting RLMResults.
 
 0.94.0 Release notes (2015-07-29)
 =============================================================

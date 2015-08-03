@@ -102,7 +102,7 @@ static inline void RLMResultsValidateAttached(__unsafe_unretained RLMResults *co
         // create backing view if needed
         ar->_backingView = ar->_backingQuery->find_all();
         ar->_viewCreated = YES;
-        if (!ar->_sortOrder.m_column_indexes.empty()) {
+        if (!ar->_sortOrder.m_columns.empty()) {
             ar->_backingView.sort(ar->_sortOrder.m_column_indexes, ar->_sortOrder.m_ascending);
         }
     }
