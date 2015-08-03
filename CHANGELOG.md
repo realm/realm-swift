@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Persisted properties of `RLMObject`/`Object` subclasses are now Key-Value
+  Observing compliant.
+
+### Bugfixes
+
+* None.
+
 0.94.1 Release notes (2015-08-10)
 =============================================================
 
