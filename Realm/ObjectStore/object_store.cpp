@@ -222,9 +222,10 @@ void ObjectStore::update_column_mapping(Group *group, ObjectSchema &target_schem
     ObjectSchema table_schema(group, target_schema.name);
     for (auto& target_prop : target_schema.properties) {
         auto table_prop = table_schema.property_for_name(target_prop.name);
-        REALM_ASSERT_DEBUG(table_prop);
-
-        target_prop.table_column = table_prop->table_column;
+        if (table_prop) {
+            // Update target property column to match what's in the realm if it exists
+            target_prop.table_column = table_prop->table_column;
+        }
     }
 }
 
