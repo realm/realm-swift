@@ -21,7 +21,7 @@ import Realm
 import Realm.Private
 
 /**
-A `RealmConfiguration` is used to describe the different options used to 
+A `RealmConfiguration` is used to describe the different options used to
 create a `Realm` instance.
 */
 public struct RealmConfiguration {
@@ -71,7 +71,7 @@ public struct RealmConfiguration {
         return configuration
     }
 
-    private static func fromRLMConfiguration(rlmConfiguration: RLMConfiguration) -> RealmConfiguration {
+    internal static func fromRLMConfiguration(rlmConfiguration: RLMConfiguration) -> RealmConfiguration {
         var configuration = RealmConfiguration()
         configuration.path = rlmConfiguration.path
         configuration.inMemoryIdentifier = rlmConfiguration.inMemoryIdentifier

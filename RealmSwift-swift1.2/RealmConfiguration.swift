@@ -71,7 +71,7 @@ public struct RealmConfiguration {
         return configuration
     }
 
-    private static func fromRLMConfiguration(rlmConfiguration: RLMConfiguration) -> RealmConfiguration {
+    internal static func fromRLMConfiguration(rlmConfiguration: RLMConfiguration) -> RealmConfiguration {
         var configuration = RealmConfiguration()
         configuration.path = rlmConfiguration.path
         configuration.inMemoryIdentifier = rlmConfiguration.inMemoryIdentifier

@@ -196,6 +196,11 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 
+/**
+ Returns an `RLMConfiguration` that can be used to create this `RLMRealm` instance.
+ */
+@property (nonatomic, readonly) RLMConfiguration *configuration;
+
 /**---------------------------------------------------------------------------------------
  *  @name Default Realm Path
  * ---------------------------------------------------------------------------------------

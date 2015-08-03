@@ -55,6 +55,9 @@ public final class Realm {
     /// The Schema used by this realm.
     public var schema: Schema { return Schema(rlmRealm.schema) }
 
+    /// Returns a `RealmConfiguration` that can be used to create this `Realm` instance.
+    public var configuration: RealmConfiguration { return RealmConfiguration.fromRLMConfiguration(rlmRealm.configuration) }
+
     /**
     The location of the default Realm as a string. Can be overridden.
 

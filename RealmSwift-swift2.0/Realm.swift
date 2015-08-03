@@ -55,6 +55,9 @@ public final class Realm {
     /// The Schema used by this realm.
     public var schema: Schema { return Schema(rlmRealm.schema) }
 
+    /// Returns a `RealmConfiguration` that can be used to create this `Realm` instance.
+    public var configuration: RealmConfiguration { return RealmConfiguration.fromRLMConfiguration(rlmRealm.configuration) }
+
     /**
     The location of the default Realm as a string. Can be overridden.
 
@@ -95,7 +98,7 @@ public final class Realm {
         let rlmRealm = try RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: false, schema: nil)
         self.init(rlmRealm)
     }
-    
+
     /**
     Obtains a `Realm` instance with persistence to a specific file path with
     options.
@@ -272,9 +275,9 @@ public final class Realm {
 
     Creates or updates an instance of this object and adds it to the `Realm` populating
     the object with the given value.
-    
+
     When 'update' is 'true', the object must have a primary key. If no objects exist in
-    the Realm instance with the same primary key value, the object is inserted. Otherwise, 
+    the Realm instance with the same primary key value, the object is inserted. Otherwise,
     the existing object is updated with any changed values.
 
     - parameter type:   The object type to create.
@@ -325,7 +328,7 @@ public final class Realm {
 
     - parameter object: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
                         or any other enumerable SequenceType which generates Object.
-    
+
     :nodoc:
     */
     public func delete<T: Object>(objects: List<T>) {
@@ -337,7 +340,7 @@ public final class Realm {
 
     - parameter object: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
                         or any other enumerable SequenceType which generates Object.
-    
+
     :nodoc:
     */
     public func delete<T: Object>(objects: Results<T>) {

@@ -173,6 +173,8 @@ static void clearMigrationCache() {
     Group *_group;
     BOOL _readOnly;
     BOOL _inMemory;
+
+    NSData *_encryptionKey;
 }
 
 + (BOOL)isCoreDebug {
@@ -200,6 +202,7 @@ static void clearMigrationCache() {
         _readOnly = readonly;
         _inMemory = inMemory;
         _dynamic = dynamic;
+        _encryptionKey = key;
         _autorefresh = YES;
 
         NSError *error = nil;
@@ -517,6 +520,20 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             token.block(notification, self);
         }
     }
+}
+
+- (RLMConfiguration *)configuration {
+    RLMConfiguration *configuration = [[RLMConfiguration alloc] init];
+    configuration.path = self.path;
+    configuration.schemaVersion = [RLMRealm schemaVersionAtPath:_path encryptionKey:_encryptionKey error:nil];
+    if (_inMemory) {
+        configuration.inMemoryIdentifier = [_path lastPathComponent];
+    }
+    configuration.readOnly = _readOnly;
+    configuration.encryptionKey = _encryptionKey;
+    configuration.dynamic = _dynamic;
+    configuration.customSchema = _schema == RLMSchema.sharedSchema ? nil : _schema;
+    return configuration;
 }
 
 - (void)beginWriteTransaction {
