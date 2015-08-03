@@ -152,7 +152,7 @@ static BOOL encryptTests() {
     RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(note, @"Note should not be nil");
         XCTAssertNotNil(realm, @"Realm should not be nil");
-        if ([note isEqualToString:expectedNote]) {
+        if (note == expectedNote) { // Check pointer equality to ensure we're using the interned string constant
             [notificationFired fulfill];
         }
     }];
