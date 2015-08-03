@@ -21,7 +21,7 @@ import Realm
 import Realm.Private
 
 /**
-A `RealmConfiguration` is used to describe the different options used to
+A `RealmConfiguration` is used to describe the different options used to 
 create a `Realm` instance.
 */
 public struct RealmConfiguration {
@@ -61,14 +61,14 @@ public struct RealmConfiguration {
     // MARK: Private Methods
 
     internal var rlmConfiguration: RLMConfiguration {
-        return RLMConfiguration() { configurator in
-            configurator.path = self.path
-            configurator.inMemoryIdentifier = self.inMemoryIdentifier
-            configurator.encryptionKey = self.encryptionKey
-            configurator.readOnly = self.readOnly
-            configurator.schemaVersion = UInt(self.schemaVersion)
-            configurator.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
-        }
+        let configuration = RLMConfiguration()
+        configuration.path = self.path
+        configuration.inMemoryIdentifier = self.inMemoryIdentifier
+        configuration.encryptionKey = self.encryptionKey
+        configuration.readOnly = self.readOnly
+        configuration.schemaVersion = UInt(self.schemaVersion)
+        configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
+        return configuration
     }
 
     private static func fromRLMConfiguration(rlmConfiguration: RLMConfiguration) -> RealmConfiguration {

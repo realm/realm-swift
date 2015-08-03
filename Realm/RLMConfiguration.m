@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMConfiguration_Private.h"
+#import "RLMRealm_Private.h"
 
 static NSString * const c_RLMConfigurationProperties[] = {
     @"path",
@@ -29,23 +30,6 @@ static NSString * const c_RLMConfigurationProperties[] = {
     @"customSchema",
 };
 static const NSUInteger c_RLMConfigurationPropertiesCount = sizeof(c_RLMConfigurationProperties) / sizeof(NSString *);
-
-@interface RLMConfiguration ()
-
-@property (nonatomic, copy, readwrite) NSString *path;
-@property (nonatomic, copy, readwrite) NSString *inMemoryIdentifier;
-@property (nonatomic, copy, readwrite) NSData *encryptionKey;
-@property (nonatomic, readwrite)       BOOL    readOnly;
-@property (nonatomic, copy, readwrite) NSString *fileProtectionAttributes;
-
-@property (nonatomic, readwrite)       NSUInteger schemaVersion;
-@property (nonatomic, copy, readwrite) RLMMigrationBlock migrationBlock;
-
-@end
-
-@interface RLMConfiguration ()<RLMConfigurator>
-
-@end
 
 @implementation RLMConfiguration
 
@@ -90,23 +74,14 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 + (instancetype)defaultConfiguration {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if (!s_defaultConfiguration) {
-            s_defaultConfiguration = [[RLMConfiguration alloc] init];
-        }
-    });
-    return s_defaultConfiguration;
+    if (!s_defaultConfiguration) {
+        s_defaultConfiguration = [[RLMConfiguration alloc] init];
+    }
+    return [s_defaultConfiguration copy];
 }
 
 + (void)setDefaultConfiguration:(RLMConfiguration *)configuration {
     s_defaultConfiguration = configuration ?: [[RLMConfiguration alloc] init];
-}
-
-+ (instancetype)configurationWithBlock:(void (^)(id<RLMConfigurator>))block {
-    RLMConfiguration *configuration = [[[self class] alloc] init];
-    block(configuration);
-    return configuration;
 }
 
 - (instancetype)init {
@@ -118,17 +93,12 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     return self;
 }
 
-- (instancetype)copyWithZone:(__unused NSZone *)zone {
-    return self;
-}
-
-- (instancetype)copyWithChanges:(void (^)(id<RLMConfigurator>))block {
-    RLMConfiguration *configuration = [[[self class] alloc] init];
+- (instancetype)copyWithZone:(NSZone *)zone {
+    RLMConfiguration *configuration = [[[self class] allocWithZone:zone] init];
     for (NSUInteger i = 0; i < c_RLMConfigurationPropertiesCount; i++) {
         NSString *key = c_RLMConfigurationProperties[i];
         [configuration setValue:[self valueForKey:key] forKey:key];
     }
-    block(configuration);
     return configuration;
 }
 
@@ -154,6 +124,10 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     if ((_path = path)) {
         _inMemoryIdentifier = nil;
     }
+}
+
+- (void)setEncryptionKey:(NSData * __nullable)encryptionKey {
+    _encryptionKey = RLMRealmValidatedEncryptionKey(encryptionKey);
 }
 
 @end

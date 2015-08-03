@@ -22,38 +22,6 @@
 RLM_ASSUME_NONNULL_BEGIN
 
 /**
- A protocol used to construct instances of `RLMConfiguration`.
- */
-@protocol RLMConfigurator <NSObject>
-
-/// The path to the realm file.
-@property (nonatomic, copy, nullable) NSString *path;
-
-/// A string used to identify a particular in-memory Realm.
-@property (nonatomic, copy, nullable) NSString *inMemoryIdentifier;
-
-/// 64-byte key to use to encrypt the data.
-@property (nonatomic, copy, nullable) NSData *encryptionKey;
-
-/// Whether the Realm is read-only (must be used for read-only files).
-@property (nonatomic) BOOL readOnly;
-
-/// The current schema version.
-@property (nonatomic) NSUInteger schemaVersion;
-
-/// The block which migrates the Realm to the current version.
-@property (nonatomic, copy, nullable) RLMMigrationBlock migrationBlock;
-
-@end
-
-/**
- Migration block used to migrate a Realm.
-
- @param configurator `RLMConfigurator` object used to configure the `RLMConfiguration`.
- */
-typedef void(^RLMConfigurationBlock)(id <RLMConfigurator> __nonnull configurator);
-
-/**
  An `RLMConfiguration` is used to describe the different options used to
  create an `RLMRealm` instance.
  */
@@ -73,42 +41,23 @@ typedef void(^RLMConfigurationBlock)(id <RLMConfigurator> __nonnull configurator
  */
 + (void)setDefaultConfiguration:(nullable RLMConfiguration *)configuration;
 
-/**
- Constructs a new `RLMConfiguration`, configured via the given configuration block.
-
- @param block The block used to set up the configuration.
-
- @return A realm configuration suitable for creating realm instances.
- */
-+ (instancetype)configurationWithBlock:(RLMConfigurationBlock)block;
-
-/**
- Constructs a copy of the configuration, applying the given changes in the
- configuration block.
-
- @param block The block used to make changes to the copy's configuration.
-
- @return A realm configuration with the given changes applied.
- */
-- (instancetype)copyWithChanges:(RLMConfigurationBlock)block;
-
 /// The path to the realm file.
-@property (nonatomic, copy, readonly, nullable) NSString *path;
+@property (nonatomic, copy, nullable) NSString *path;
 
 /// A string used to identify a particular in-memory Realm.
-@property (nonatomic, copy, readonly, nullable) NSString *inMemoryIdentifier;
+@property (nonatomic, copy, nullable) NSString *inMemoryIdentifier;
 
 /// 64-byte key to use to encrypt the data.
-@property (nonatomic, copy, readonly, nullable) NSData *encryptionKey;
+@property (nonatomic, copy, nullable) NSData *encryptionKey;
 
 /// Whether the Realm is read-only (must be used for read-only files).
-@property (nonatomic, readonly) BOOL readOnly;
+@property (nonatomic) BOOL readOnly;
 
 /// The current schema version.
-@property (nonatomic, readonly) NSUInteger schemaVersion;
+@property (nonatomic) NSUInteger schemaVersion;
 
 /// The block which migrates the Realm to the current version.
-@property (nonatomic, copy, readonly, nullable) RLMMigrationBlock migrationBlock;
+@property (nonatomic, copy, nullable) RLMMigrationBlock migrationBlock;
 
 @end
 
