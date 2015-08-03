@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix crash when adding a property to a model without updating the schema
+  version.
 
 0.94.0 Release notes (2015-07-29)
 =============================================================

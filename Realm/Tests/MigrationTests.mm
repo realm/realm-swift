@@ -196,6 +196,17 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
     }
 }
 
+- (void)testAddingPropertyRequiresMigration {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
+    objectSchema.properties = @[objectSchema.properties[0]];
+    @autoreleasepool {
+        XCTAssertNoThrow([self realmWithSingleObject:objectSchema], @"Migration shouldn't be required on first access.");
+    }
+    @autoreleasepool {
+        XCTAssertThrows([self realmWithSingleObject:[RLMObjectSchema schemaForObjectClass:MigrationObject.class]], @"Migration should be required");
+    }
+}
+
 - (void)testAddingPropertyAtEnd {
     // create schema to migrate from with single string column
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
