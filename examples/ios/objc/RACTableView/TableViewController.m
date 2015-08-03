@@ -240,7 +240,7 @@ RLM_ARRAY_TYPE(Group)
                  [self.tableView insertRowsAtIndexPaths:paths withRowAnimation:UITableViewRowAnimationAutomatic];
              }
              else if (kind == NSKeyValueChangeRemoval) {
-                 [self.tableView insertRowsAtIndexPaths:paths withRowAnimation:UITableViewRowAnimationAutomatic];
+                 [self.tableView deleteRowsAtIndexPaths:paths withRowAnimation:UITableViewRowAnimationAutomatic];
              }
              else {
                  [self.tableView reloadData];
