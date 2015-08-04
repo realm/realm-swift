@@ -35,9 +35,6 @@ extern NSString * const RLMUnsupportedTypesFoundInPropertyComparisonException;
 void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RLMSchema *schema,
                                  RLMObjectSchema *objectSchema);
 
-// sort an existing view by the specified property name and direction
-void RLMUpdateViewWithOrder(realm::TableView &view, RLMObjectSchema *schema, NSArray *properties);
-
 // return column index - throw for invalid column name
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *schema, NSString *columnName);
 

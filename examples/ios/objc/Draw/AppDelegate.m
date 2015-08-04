@@ -24,7 +24,6 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
     [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
                       serverBaseURL:@"realm://Alexanders-MacBook-Pro.local/draw"];
     [RLMRealm setServerSyncLogLevel:1]; // `level >= 2` means "everything"

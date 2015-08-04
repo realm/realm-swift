@@ -10,10 +10,10 @@
 #import <XCTest/XCTest.h>
 #import "AppDelegate.h"
 
-@interface CocoaPodsExampleTests : XCTestCase
+@interface CarthageExampleTests : XCTestCase
 @end
 
-@implementation CocoaPodsExampleTests
+@implementation CarthageExampleTests
 
 - (void)testExample {
     XCTAssertTrue([MyModel isSubclassOfClass:[RLMObject class]]);

@@ -1,4 +1,19 @@
-x.xx.x Release notes (yyyy-MM-dd)
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* `Object.className` is now marked as `final`.
+
+### Bugfixes
+
+* None.
+
+0.94.0 Release notes (2015-07-29)
 =============================================================
 
 ### API breaking changes
@@ -8,10 +23,31 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Reduce the amount of memory used by RLMRealm notification listener threads.
+* Avoid evaluating results eagerly when filtering and sorting.
+* Add nullability annotations to the Objective-C API to provide enhanced compiler
+  warnings and bridging to Swift.
+* Make `RLMResult`s and `RLMArray`s support Objective-C generics.
+* Add support for building watchOS and bitcode-compatible apps.
+* Make the exceptions thrown in getters and setters more informative.
+* Add `-[RLMArray exchangeObjectAtIndex:withObjectAtIndex]` and `List.swap(_:_:)`
+  to allow exchanging the location of two objects in the given `RLMArray` / `List`.
+* Added anonymous analytics on simulator/debugger runs.
+* Add `-[RLMArray moveObjectAtIndex:toIndex:]` and `List.move(from:to:)` to
+  allow moving objects in the given `RLMArray` / `List`.
 
 ### Bugfixes
 
-* None.
+* Processes crashing due to an uncaught exception inside a write transaction will
+  no longer cause other processes using the same Realm to hang indefinitely.
+* Fix incorrect results when querying for < or <= on ints that
+  require 64 bits to represent with a CPU that supports SSE 4.2.
+* An exception will no longer be thrown when attempting to reset the schema
+  version or encryption key on an open Realm to the current value.
+* Date properties on 32 bit devices will retain 64 bit second precision.
+* Wrap calls to the block passed to `enumerate` in an autoreleasepool to reduce
+  memory growth when migrating a large amount of objects.
+* In-memory realms no longer write to the Documents directory on iOS or
+  Application Support on OS X.
 
 0.93.2 Release notes (2015-06-12)
 =============================================================
@@ -122,7 +158,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Exceptions raised when incorrect object types are used with predicates now contain more detailed information.
-* Added `-[RLMMigration deleteDataForClassName:]` and `Migration.deleteData(_:)` 
+* Added `-[RLMMigration deleteDataForClassName:]` and `Migration.deleteData(_:)`
   to enable cleaning up after removing object subclasses
 
 ### Bugfixes

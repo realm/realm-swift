@@ -13,8 +13,6 @@
 	<string>A Realm model object class, with implementation and header files.</string>
 	<key>Kind</key>
 	<string>Xcode.IDEKit.TextSubstitutionFileTemplateKind</string>
-	<key>MainTemplateFile</key>
-	<string>___FILEBASENAME___.m</string>
 	<key>Options</key>
 	<array>
 		<dict>
@@ -30,6 +28,44 @@
 			<true/>
 			<key>Type</key>
 			<string>text</string>
+		</dict>
+		<dict>
+			<key>AllowedTypes</key>
+			<dict>
+				<key>Objective-C</key>
+				<array>
+					<string>public.objective-c-source</string>
+					<string>public.objective-c-plus-plus-source</string>
+				</array>
+				<key>Swift</key>
+				<array>
+					<string>public.swift-source</string>
+				</array>
+			</dict>
+			<key>Default</key>
+			<string>Objective-C</string>
+			<key>Description</key>
+			<string>The implementation language</string>
+			<key>Identifier</key>
+			<string>languageChoice</string>
+			<key>MainTemplateFiles</key>
+			<dict>
+				<key>Swift</key>
+				<string>___FILEBASENAME___.swift</string>
+				<key>Objective-C</key>
+				<string>___FILEBASENAME___.m</string>
+			</dict>
+			<key>Name</key>
+			<string>Language</string>
+			<key>Required</key>
+			<true/>
+			<key>Type</key>
+			<string>popup</string>
+			<key>Values</key>
+			<array>
+				<string>Objective-C</string>
+				<string>Swift</string>
+			</array>
 		</dict>
 	</array>
 	<key>Platforms</key>

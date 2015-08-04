@@ -19,6 +19,7 @@ Pod::Spec.new do |s|
   public_header_files       = 'include/Realm/RLMArray.h',
                               'include/Realm/RLMCollection.h',
                               'include/Realm/RLMConstants.h',
+                              'include/Realm/RLMDefines.h',
                               'include/Realm/RLMListBase.h',
                               'include/Realm/RLMMigration.h',
                               'include/Realm/RLMObject.h',
@@ -45,6 +46,11 @@ Pod::Spec.new do |s|
 
   s.osx.deployment_target   = '10.9'
   s.osx.vendored_library    = 'core/librealm.a'
+
+  if s.respond_to?(:watchos)
+    s.watchos.deployment_target = '2.0'
+    s.watchos.vendored_library = 'core/librealm-watchos.a'
+  end
 
   s.subspec 'Headers' do |s|
     s.source_files          = 'include/**/*.{h,hpp}'

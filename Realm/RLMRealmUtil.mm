@@ -57,6 +57,26 @@ void RLMClearRealmCache() {
     }
 }
 
+void RLMInstallUncaughtExceptionHandler() {
+    static auto previousHandler = NSGetUncaughtExceptionHandler();
+
+    NSSetUncaughtExceptionHandler([](NSException *exception) {
+        NSNumber *threadID = @(pthread_mach_thread_np(pthread_self()));
+        @synchronized(s_realmsPerPath) {
+            for (NSMapTable *realmsPerThread in s_realmsPerPath.allValues) {
+                if (RLMRealm *realm = [realmsPerThread objectForKey:threadID]) {
+                    if (realm->_inWriteTransaction) {
+                        [realm cancelWriteTransaction];
+                    }
+                }
+            }
+        }
+        if (previousHandler) {
+            previousHandler(exception);
+        }
+    });
+}
+
 // Convert an error code to either an NSError or an exception
 static id handleError(int err, NSError **error) {
     if (!error) {

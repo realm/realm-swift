@@ -1,0 +1,70 @@
+<div class="task-group">
+  {{#name}}
+    <div class="task-name-container">
+      <a name="/{{uid}}"></a>
+      <a name="//apple_ref/swift/Section/{{name}}" class="dashAnchor"></a>
+      <a href="#/{{uid}}">
+        <h3 class="section-name">{{name}}</h3>
+      </a>
+    </div>
+  {{/name}}
+  <ul>
+    {{#items}}
+    <li class="item">
+      <div>
+        <code>
+        <a name="/{{usr}}"></a>
+        <a name="//apple_ref/swift/{{dash_type}}/{{name}}" class="dashAnchor"></a>
+        <a class="token" href="#/{{usr}}">{{name}}</a>
+        </code>
+      </div>
+      <div class="height-container">
+        <div class="pointer-container"></div>
+        <section class="section">
+          <div class="pointer"></div>
+          {{#abstract}}
+          <div class="abstract">
+            {{{abstract}}}
+            {{#url}}
+            <a href="{{{path_to_root}}}{{{url}}}" class="slightly-smaller">See more</a>
+            {{/url}}
+          </div>
+          {{/abstract}}
+          {{#declaration}}
+          <div class="declaration">
+            <h4>Declaration</h4>
+            <div class="Swift">
+              <p class="aside-title">Swift</p>
+              {{{declaration}}}
+            </div>
+          </div>
+          {{/declaration}}
+          {{#parameters.count}}
+          <div>
+            <h4>Parameters</h4>
+            <table class="graybox">
+              <tbody>
+                {{#parameters}}
+                {{> parameter}}
+                {{/parameters}}
+              </tbody>
+            </table>
+          </div>
+          {{/parameters.count}}
+          {{#return}}
+          <div>
+            <h4>Return Value</h4>
+            {{{return}}}
+          </div>
+          {{/return}}
+          {{#github_token_url}}
+          <div class="slightly-smaller">
+            <a href="{{{github_token_url}}}">Show on GitHub</a>
+          </div>
+          {{/github_token_url}}
+        </section>
+      </div>
+    </li>
+    {{/items}}
+  </ul>
+</div>

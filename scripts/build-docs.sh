@@ -29,7 +29,7 @@ appledoc \
     --ignore "Realm/RLMRealm_Dynamic.h" \
     --ignore "Realm/Realm-Bridging-Header.h" \
     --ignore "Realm/Tests" \
-    --template "${SRCROOT}/docs/templates" \
+    --template "${SRCROOT}/docs/templates/objc" \
     --exit-threshold 1 \
     Realm
 
@@ -48,3 +48,4 @@ ${jazzy} \
   --output "${SRCROOT}/docs/swift_output" \
   --root-url https://realm.io/docs/swift/${realm_version}/api/ \
   --xcodebuild-arguments "-project,${SRCROOT}/RealmSwift.xcodeproj,-dry-run" \
+  --template-directory "${SRCROOT}/docs/templates/swift" \

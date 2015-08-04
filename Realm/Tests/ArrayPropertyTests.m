@@ -144,6 +144,58 @@
     XCTAssertEqualObjects([children[0] stringCol], @"b", @"Only child should be 'b'");
 }
 
+- (void)testMove {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithValue:@[@"arrayObject", @[@[@"a"], @[@"b"]], @[]]];
+    RLM_GENERIC_ARRAY(StringObject) *children = obj.array;
+
+    [children moveObjectAtIndex:1 toIndex:0];
+
+    XCTAssertEqualObjects([children[0] stringCol], @"b");
+    XCTAssertEqualObjects([children[1] stringCol], @"a");
+
+    [children moveObjectAtIndex:0 toIndex:1];
+
+    XCTAssertEqualObjects([children[0] stringCol], @"a");
+    XCTAssertEqualObjects([children[1] stringCol], @"b");
+
+    [children moveObjectAtIndex:0 toIndex:0];
+
+    XCTAssertEqualObjects([children[0] stringCol], @"a");
+    XCTAssertEqualObjects([children[1] stringCol], @"b");
+
+    XCTAssertThrows([children moveObjectAtIndex:0 toIndex:2]);
+    XCTAssertThrows([children moveObjectAtIndex:2 toIndex:0]);
+
+    [realm beginWriteTransaction];
+
+    [realm addObject:obj];
+    children = obj.array;
+
+    [children moveObjectAtIndex:1 toIndex:0];
+
+    XCTAssertEqualObjects([children[0] stringCol], @"b");
+    XCTAssertEqualObjects([children[1] stringCol], @"a");
+
+    [children moveObjectAtIndex:0 toIndex:1];
+
+    XCTAssertEqualObjects([children[0] stringCol], @"a");
+    XCTAssertEqualObjects([children[1] stringCol], @"b");
+
+    [children moveObjectAtIndex:0 toIndex:0];
+
+    XCTAssertEqualObjects([children[0] stringCol], @"a");
+    XCTAssertEqualObjects([children[1] stringCol], @"b");
+
+    XCTAssertThrows([children moveObjectAtIndex:0 toIndex:2]);
+    XCTAssertThrows([children moveObjectAtIndex:2 toIndex:0]);
+
+    [realm commitWriteTransaction];
+
+    XCTAssertThrows([children moveObjectAtIndex:1 toIndex:0]);
+}
+
 - (void)testAddInvalidated {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
@@ -206,7 +258,7 @@
     ArrayPropertyObject *intArray = [[ArrayPropertyObject alloc] init];
     IntObject *intObj = [[IntObject alloc] init];
     intObj.intCol = 1;
-    XCTAssertThrows([intArray.array addObject:intObj], @"Addint to string array should throw");
+    XCTAssertThrows([intArray.array addObject:(StringObject *)intObj], @"Addint to string array should throw");
     [intArray.intArray addObject:intObj];
 
     XCTAssertThrows([intArray.intArray objectsWhere:@"intCol == 1"], @"Should throw on standalone RLMArray");
@@ -271,8 +323,8 @@
     XCTAssertTrue([[array.intArray objectAtIndex:1] isEqualToObject:intObj4], @"Objects should be replaced");
     XCTAssertEqual(array.intArray.count, 3U, @"Should have 3 elements in int array");
 
-    XCTAssertThrows([array.array replaceObjectAtIndex:0 withObject:intObj4], @"Throws exception throws when type mismatched");
-    XCTAssertThrows([array.intArray replaceObjectAtIndex:1 withObject:stringObj4], @"Throws exception when type mismatched");
+    XCTAssertThrows([array.array replaceObjectAtIndex:0 withObject:(StringObject *)intObj4], @"Throws exception throws when type mismatched");
+    XCTAssertThrows([array.intArray replaceObjectAtIndex:1 withObject:(IntObject *)stringObj4], @"Throws exception when type mismatched");
 }
 
 - (void)testDeleteObjectInStandaloneArray {
@@ -328,6 +380,37 @@
     XCTAssertEqual(array.intArray.count, 0U, @"Should have 0 elements in int array");
 }
 
+- (void)testExchangeObjectAtIndexWithObjectAtIndex {
+
+    void (^test)(RLMArray *) = ^(RLMArray *array) {
+        [array exchangeObjectAtIndex:0 withObjectAtIndex:1];
+        XCTAssertEqual(2U, array.count);
+        XCTAssertEqualObjects(@"b", [array[0] stringCol]);
+        XCTAssertEqualObjects(@"a", [array[1] stringCol]);
+
+        [array exchangeObjectAtIndex:1 withObjectAtIndex:1];
+        XCTAssertEqual(2U, array.count);
+        XCTAssertEqualObjects(@"b", [array[0] stringCol]);
+        XCTAssertEqualObjects(@"a", [array[1] stringCol]);
+
+        [array exchangeObjectAtIndex:1 withObjectAtIndex:0];
+        XCTAssertEqual(2U, array.count);
+        XCTAssertEqualObjects(@"a", [array[0] stringCol]);
+        XCTAssertEqualObjects(@"b", [array[1] stringCol]);
+
+        XCTAssertThrows([array exchangeObjectAtIndex:1 withObjectAtIndex:20]);
+    };
+
+    ArrayPropertyObject *array = [[ArrayPropertyObject alloc] initWithValue:@[@"foo", @[@[@"a"], @[@"b"]], @[]]];
+    test(array.array);
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:array];
+    test(array.array);
+    [realm commitWriteTransaction];
+}
+
 - (void)testIndexOfObject
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -362,7 +445,7 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:notInRealm]);
 
     // invalid object
-    XCTAssertThrows([company.employees indexOfObject:company]);
+    XCTAssertThrows([company.employees indexOfObject:(EmployeeObject *)company]);
 }
 
 - (void)testIndexOfObjectWhere
