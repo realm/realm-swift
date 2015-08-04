@@ -16,11 +16,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <UIKit/UIKit.h>
-#import "AppDelegate.h"
+#import "RLMPuzzle.h"
 
-int main(int argc, char * argv[]) {
-    @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-    }
+@implementation RLMPuzzle
+
++ (NSDictionary *)defaultPropertyValues
+{
+    return @{@"uuid":[NSUUID UUID].UUIDString,
+             @"userID":[NSUUID UUID].UUIDString,
+             @"name":@"My Puzzle",
+             @"creationTime":[NSDate date]};
 }
+
++ (NSString *)primaryKey
+{
+    return @"uuid";
+}
+
+@end

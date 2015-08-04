@@ -46,7 +46,7 @@
     
     [self.superview bringSubviewToFront:self];
     [UIView animateWithDuration:0.25f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.5f options:0 animations:^{
-        self.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.1f, 1.1f);
+        self.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.01f, 1.01f);
     } completion:nil];
 }
 

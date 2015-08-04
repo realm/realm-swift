@@ -21,5 +21,6 @@
 @interface RLMStartView : UIVisualEffectView
 
 @property (nonatomic, copy) void (^startButtonTapped)(void);
+@property (nonatomic, copy) void (^joinButtonTapped)(void);
 
 @end

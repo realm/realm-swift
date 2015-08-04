@@ -26,8 +26,27 @@
 		0295B90119D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90219D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90319D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		22C389E81B44FB6C0055CE88 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389D21B44FB6C0055CE88 /* AppDelegate.m */; };
+		22C389E91B44FB6C0055CE88 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22C389D41B44FB6C0055CE88 /* LaunchScreen.xib */; };
+		22C389EA1B44FB6C0055CE88 /* RLMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389D81B44FB6C0055CE88 /* RLMViewController.m */; };
+		22C389EB1B44FB6C0055CE88 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22C389D91B44FB6C0055CE88 /* Images.xcassets */; };
+		22C389EC1B44FB6C0055CE88 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 22C389DA1B44FB6C0055CE88 /* Info.plist */; };
+		22C389ED1B44FB6C0055CE88 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389DB1B44FB6C0055CE88 /* main.m */; };
+		22C389EE1B44FB6C0055CE88 /* RLMPuzzlePiece.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389DE1B44FB6C0055CE88 /* RLMPuzzlePiece.m */; };
+		22C389EF1B44FB6C0055CE88 /* AYVibrantButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389E11B44FB6C0055CE88 /* AYVibrantButton.m */; };
+		22C389F01B44FB6C0055CE88 /* RLMPuzzlePieceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389E31B44FB6C0055CE88 /* RLMPuzzlePieceView.m */; };
+		22C389F11B44FB6C0055CE88 /* RLMPuzzleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389E51B44FB6C0055CE88 /* RLMPuzzleView.m */; };
+		22C389F21B44FB6C0055CE88 /* RLMStartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389E71B44FB6C0055CE88 /* RLMStartView.m */; };
+		22C389F51B44FD220055CE88 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		22C389F61B44FDAE0055CE88 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
+		22C389F71B44FDB30055CE88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
+		22C389F81B44FDC10055CE88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
+		22C389F91B44FE890055CE88 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
+		22C389FC1B451F3C0055CE88 /* RLMPuzzle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389FB1B451F3C0055CE88 /* RLMPuzzle.m */; };
+		22C389FF1B452FE80055CE88 /* RLMPuzzlesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389FE1B452FE80055CE88 /* RLMPuzzlesTableViewController.m */; };
 		22CFE2871B0A393B00D5EC93 /* SwatchColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2841B0A393B00D5EC93 /* SwatchColor.m */; };
 		22CFE2881B0A393B00D5EC93 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2861B0A393B00D5EC93 /* SwatchesView.m */; };
+		22D55CCA1B54F1FA00F493A6 /* RLMPuzzleListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D55CC91B54F1FA00F493A6 /* RLMPuzzleListViewController.m */; };
 		3FC898FD1A140F550067CBEC /* LabelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FC1A140F550067CBEC /* LabelViewController.m */; };
 		C06134DF1A718BB800D22D12 /* TodayExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C0DC42061A7079D00067156A /* TodayExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C06134E41A71AA4E00D22D12 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
@@ -123,6 +142,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		22C389F31B44FCC80055CE88 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
+			remoteInfo = Realm;
+		};
 		3F6474991A79A07A008D5795 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
@@ -240,11 +266,36 @@
 
 /* Begin PBXFileReference section */
 		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/ios/Realm.framework; sourceTree = "<group>"; };
+		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
+		22C389AB1B44FB030055CE88 /* Puzzle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Puzzle.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		22C389D11B44FB6C0055CE88 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		22C389D21B44FB6C0055CE88 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		22C389D51B44FB6C0055CE88 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		22C389D71B44FB6C0055CE88 /* RLMViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMViewController.h; sourceTree = "<group>"; };
+		22C389D81B44FB6C0055CE88 /* RLMViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMViewController.m; sourceTree = "<group>"; };
+		22C389D91B44FB6C0055CE88 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		22C389DA1B44FB6C0055CE88 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		22C389DB1B44FB6C0055CE88 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		22C389DD1B44FB6C0055CE88 /* RLMPuzzlePiece.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzlePiece.h; sourceTree = "<group>"; };
+		22C389DE1B44FB6C0055CE88 /* RLMPuzzlePiece.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzlePiece.m; sourceTree = "<group>"; };
+		22C389E01B44FB6C0055CE88 /* AYVibrantButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYVibrantButton.h; sourceTree = "<group>"; };
+		22C389E11B44FB6C0055CE88 /* AYVibrantButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYVibrantButton.m; sourceTree = "<group>"; };
+		22C389E21B44FB6C0055CE88 /* RLMPuzzlePieceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzlePieceView.h; sourceTree = "<group>"; };
+		22C389E31B44FB6C0055CE88 /* RLMPuzzlePieceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzlePieceView.m; sourceTree = "<group>"; };
+		22C389E41B44FB6C0055CE88 /* RLMPuzzleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzleView.h; sourceTree = "<group>"; };
+		22C389E51B44FB6C0055CE88 /* RLMPuzzleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzleView.m; sourceTree = "<group>"; };
+		22C389E61B44FB6C0055CE88 /* RLMStartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMStartView.h; sourceTree = "<group>"; };
+		22C389E71B44FB6C0055CE88 /* RLMStartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMStartView.m; sourceTree = "<group>"; };
+		22C389FA1B451F3C0055CE88 /* RLMPuzzle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzle.h; sourceTree = "<group>"; };
+		22C389FB1B451F3C0055CE88 /* RLMPuzzle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzle.m; sourceTree = "<group>"; };
+		22C389FD1B452FE80055CE88 /* RLMPuzzlesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzlesTableViewController.h; sourceTree = "<group>"; };
+		22C389FE1B452FE80055CE88 /* RLMPuzzlesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzlesTableViewController.m; sourceTree = "<group>"; };
 		22CFE2831B0A393B00D5EC93 /* SwatchColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchColor.h; sourceTree = "<group>"; };
 		22CFE2841B0A393B00D5EC93 /* SwatchColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchColor.m; sourceTree = "<group>"; };
 		22CFE2851B0A393B00D5EC93 /* SwatchesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchesView.h; sourceTree = "<group>"; };
 		22CFE2861B0A393B00D5EC93 /* SwatchesView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchesView.m; sourceTree = "<group>"; };
-		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
+		22D55CC81B54F1FA00F493A6 /* RLMPuzzleListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzleListViewController.h; sourceTree = "<group>"; };
+		22D55CC91B54F1FA00F493A6 /* RLMPuzzleListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzleListViewController.m; sourceTree = "<group>"; };
 		3FC898FB1A140F550067CBEC /* LabelViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelViewController.h; sourceTree = "<group>"; };
 		3FC898FC1A140F550067CBEC /* LabelViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LabelViewController.m; sourceTree = "<group>"; };
 		C0658DB41A76CBD8002F7A84 /* extension WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "extension WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -341,6 +392,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		22C389A81B44FB030055CE88 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22C389F91B44FE890055CE88 /* libc++.dylib in Frameworks */,
+				22C389F81B44FDC10055CE88 /* UIKit.framework in Frameworks */,
+				22C389F71B44FDB30055CE88 /* Foundation.framework in Frameworks */,
+				22C389F61B44FDAE0055CE88 /* CoreGraphics.framework in Frameworks */,
+				22C389F51B44FD220055CE88 /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C0658DB11A76CBD8002F7A84 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -473,6 +536,69 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		22C389AC1B44FB030055CE88 /* Puzzle */ = {
+			isa = PBXGroup;
+			children = (
+				22C389D11B44FB6C0055CE88 /* AppDelegate.h */,
+				22C389D21B44FB6C0055CE88 /* AppDelegate.m */,
+				22C389D31B44FB6C0055CE88 /* Base.lproj */,
+				22C389D61B44FB6C0055CE88 /* Controllers */,
+				22C389D91B44FB6C0055CE88 /* Images.xcassets */,
+				22C389DA1B44FB6C0055CE88 /* Info.plist */,
+				22C389DB1B44FB6C0055CE88 /* main.m */,
+				22C389DC1B44FB6C0055CE88 /* Models */,
+				22C389DF1B44FB6C0055CE88 /* Views */,
+			);
+			path = Puzzle;
+			sourceTree = "<group>";
+		};
+		22C389D31B44FB6C0055CE88 /* Base.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				22C389D41B44FB6C0055CE88 /* LaunchScreen.xib */,
+			);
+			path = Base.lproj;
+			sourceTree = "<group>";
+		};
+		22C389D61B44FB6C0055CE88 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				22C389D71B44FB6C0055CE88 /* RLMViewController.h */,
+				22C389D81B44FB6C0055CE88 /* RLMViewController.m */,
+				22C389FD1B452FE80055CE88 /* RLMPuzzlesTableViewController.h */,
+				22C389FE1B452FE80055CE88 /* RLMPuzzlesTableViewController.m */,
+				22D55CC81B54F1FA00F493A6 /* RLMPuzzleListViewController.h */,
+				22D55CC91B54F1FA00F493A6 /* RLMPuzzleListViewController.m */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		22C389DC1B44FB6C0055CE88 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				22C389FA1B451F3C0055CE88 /* RLMPuzzle.h */,
+				22C389FB1B451F3C0055CE88 /* RLMPuzzle.m */,
+				22C389DD1B44FB6C0055CE88 /* RLMPuzzlePiece.h */,
+				22C389DE1B44FB6C0055CE88 /* RLMPuzzlePiece.m */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		22C389DF1B44FB6C0055CE88 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				22C389E01B44FB6C0055CE88 /* AYVibrantButton.h */,
+				22C389E11B44FB6C0055CE88 /* AYVibrantButton.m */,
+				22C389E21B44FB6C0055CE88 /* RLMPuzzlePieceView.h */,
+				22C389E31B44FB6C0055CE88 /* RLMPuzzlePieceView.m */,
+				22C389E41B44FB6C0055CE88 /* RLMPuzzleView.h */,
+				22C389E51B44FB6C0055CE88 /* RLMPuzzleView.m */,
+				22C389E61B44FB6C0055CE88 /* RLMStartView.h */,
+				22C389E71B44FB6C0055CE88 /* RLMStartView.m */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		C0658DB51A76CBD8002F7A84 /* extension WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
@@ -593,6 +719,7 @@
 				C0DC42091A7079D00067156A /* TodayExtension */,
 				C0658DB51A76CBD8002F7A84 /* extension WatchKit Extension */,
 				C0658DC31A76CBD8002F7A84 /* extension WatchKit App */,
+				22C389AC1B44FB030055CE88 /* Puzzle */,
 				E8AB71A819BA502500F3EDB4 /* Frameworks */,
 				E879D9DA1A12AA400035E2EB /* GroupedTableView */,
 				E8F70EAE19BA50A3006F60D5 /* Migration */,
@@ -618,6 +745,7 @@
 				C0658DB41A76CBD8002F7A84 /* extension WatchKit Extension.appex */,
 				C0658DBF1A76CBD8002F7A84 /* extension WatchKit App.app */,
 				E80ABD7D1AF2A9DA00A37843 /* Draw.app */,
+				22C389AB1B44FB030055CE88 /* Puzzle.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -717,6 +845,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		22C389AA1B44FB030055CE88 /* Puzzle */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22C389CF1B44FB030055CE88 /* Build configuration list for PBXNativeTarget "Puzzle" */;
+			buildPhases = (
+				22C389A71B44FB030055CE88 /* Sources */,
+				22C389A81B44FB030055CE88 /* Frameworks */,
+				22C389A91B44FB030055CE88 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				22C389F41B44FCC80055CE88 /* PBXTargetDependency */,
+			);
+			name = Puzzle;
+			productName = Puzzle;
+			productReference = 22C389AB1B44FB030055CE88 /* Puzzle.app */;
+			productType = "com.apple.product-type.application";
+		};
 		C0658DB31A76CBD8002F7A84 /* extension WatchKit Extension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C0658DD21A76CBD8002F7A84 /* Build configuration list for PBXNativeTarget "extension WatchKit Extension" */;
@@ -939,6 +1085,9 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
+					22C389AA1B44FB030055CE88 = {
+						CreatedOnToolsVersion = 6.4;
+					};
 					C0658DB31A76CBD8002F7A84 = {
 						CreatedOnToolsVersion = 6.2;
 						DevelopmentTeam = 9GCBJ97HG6;
@@ -1000,11 +1149,22 @@
 				E8F70EC719BA51B1006F60D5 /* Realm */,
 				C0658DB31A76CBD8002F7A84 /* extension WatchKit Extension */,
 				C0658DBE1A76CBD8002F7A84 /* extension WatchKit App */,
+				22C389AA1B44FB030055CE88 /* Puzzle */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		22C389A91B44FB030055CE88 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22C389E91B44FB6C0055CE88 /* LaunchScreen.xib in Resources */,
+				22C389EB1B44FB6C0055CE88 /* Images.xcassets in Resources */,
+				22C389EC1B44FB6C0055CE88 /* Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C0658DB21A76CBD8002F7A84 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1087,6 +1247,24 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		22C389A71B44FB030055CE88 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22C389EA1B44FB6C0055CE88 /* RLMViewController.m in Sources */,
+				22C389F01B44FB6C0055CE88 /* RLMPuzzlePieceView.m in Sources */,
+				22C389ED1B44FB6C0055CE88 /* main.m in Sources */,
+				22C389F11B44FB6C0055CE88 /* RLMPuzzleView.m in Sources */,
+				22C389EF1B44FB6C0055CE88 /* AYVibrantButton.m in Sources */,
+				22C389FF1B452FE80055CE88 /* RLMPuzzlesTableViewController.m in Sources */,
+				22C389F21B44FB6C0055CE88 /* RLMStartView.m in Sources */,
+				22C389EE1B44FB6C0055CE88 /* RLMPuzzlePiece.m in Sources */,
+				22C389E81B44FB6C0055CE88 /* AppDelegate.m in Sources */,
+				22D55CCA1B54F1FA00F493A6 /* RLMPuzzleListViewController.m in Sources */,
+				22C389FC1B451F3C0055CE88 /* RLMPuzzle.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C0658DB01A76CBD8002F7A84 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1200,6 +1378,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		22C389F41B44FCC80055CE88 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8F70EC719BA51B1006F60D5 /* Realm */;
+			targetProxy = 22C389F31B44FCC80055CE88 /* PBXContainerItemProxy */;
+		};
 		3F64749A1A79A07A008D5795 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E8F70EC719BA51B1006F60D5 /* Realm */;
@@ -1272,7 +1455,67 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		22C389D41B44FB6C0055CE88 /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				22C389D51B44FB6C0055CE88 /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
+		22C389CB1B44FB030055CE88 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/TiM/Projects/realm-cocoa-private/build/ios",
+				);
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = Puzzle/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		22C389CC1B44FB030055CE88 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/TiM/Projects/realm-cocoa-private/build/ios",
+				);
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = Puzzle/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		C0658DCD1A76CBD8002F7A84 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1780,6 +2023,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		22C389CF1B44FB030055CE88 /* Build configuration list for PBXNativeTarget "Puzzle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22C389CB1B44FB030055CE88 /* Debug */,
+				22C389CC1B44FB030055CE88 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C0658DD11A76CBD8002F7A84 /* Build configuration list for PBXNativeTarget "extension WatchKit App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

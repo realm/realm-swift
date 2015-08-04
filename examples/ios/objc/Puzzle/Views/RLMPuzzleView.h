@@ -18,35 +18,35 @@
 
 #import <UIKit/UIKit.h>
 
-typedef NS_ENUM(NSInteger, RLMPuzzlePieceName) {
-    RLMPuzzlePieceNameA1,
-    RLMPuzzlePieceNameA2,
-    RLMPuzzlePieceNameA3,
-    RLMPuzzlePieceNameA4,
-    RLMPuzzlePieceNameA5,
-    RLMPuzzlePieceNameB1,
-    RLMPuzzlePieceNameB2,
-    RLMPuzzlePieceNameB3,
-    RLMPuzzlePieceNameB4,
-    RLMPuzzlePieceNameB5,
-    RLMPuzzlePieceNameC1,
-    RLMPuzzlePieceNameC2,
-    RLMPuzzlePieceNameC3,
-    RLMPuzzlePieceNameC4,
-    RLMPuzzlePieceNameC5,
-    RLMPuzzlePieceNameD1,
-    RLMPuzzlePieceNameD2,
-    RLMPuzzlePieceNameD3,
-    RLMPuzzlePieceNameD4,
-    RLMPuzzlePieceNameD5,
-    RLMPuzzlePieceNameNum
+typedef NS_ENUM(NSInteger, RLMPuzzlePieceIdentifier) {
+    RLMPuzzlePieceIdentifierA1,
+    RLMPuzzlePieceIdentifierA2,
+    RLMPuzzlePieceIdentifierA3,
+    RLMPuzzlePieceIdentifierA4,
+    RLMPuzzlePieceIdentifierA5,
+    RLMPuzzlePieceIdentifierB1,
+    RLMPuzzlePieceIdentifierB2,
+    RLMPuzzlePieceIdentifierB3,
+    RLMPuzzlePieceIdentifierB4,
+    RLMPuzzlePieceIdentifierB5,
+    RLMPuzzlePieceIdentifierC1,
+    RLMPuzzlePieceIdentifierC2,
+    RLMPuzzlePieceIdentifierC3,
+    RLMPuzzlePieceIdentifierC4,
+    RLMPuzzlePieceIdentifierC5,
+    RLMPuzzlePieceIdentifierD1,
+    RLMPuzzlePieceIdentifierD2,
+    RLMPuzzlePieceIdentifierD3,
+    RLMPuzzlePieceIdentifierD4,
+    RLMPuzzlePieceIdentifierD5,
+    RLMPuzzlePieceIdentifierNum
 };
 
 @class RLMPuzzleView;
 
 @protocol RLMPuzzleViewDelegate <NSObject>
 
-- (void)puzzleView:(RLMPuzzleView *)puzzleView pieceMoved:(RLMPuzzlePieceName)piece toPoint:(CGPoint)point;
+- (void)puzzleView:(RLMPuzzleView *)puzzleView pieceMoved:(RLMPuzzlePieceIdentifier)piece toPoint:(CGPoint)point;
 
 @end
 
@@ -55,7 +55,7 @@ typedef NS_ENUM(NSInteger, RLMPuzzlePieceName) {
 @property (nonatomic, readonly) NSInteger numberOfPieces;
 @property (nonatomic, weak) id<RLMPuzzleViewDelegate> delegate;
 
-- (void)movePiece:(RLMPuzzlePieceName)piece toPoint:(CGPoint)point animated:(BOOL)animated;
+- (void)movePiece:(RLMPuzzlePieceIdentifier)piece toPoint:(CGPoint)point animated:(BOOL)animated;
 - (void)scramblePiecesAnimated;
 
 @end

@@ -22,8 +22,9 @@
 @interface RLMStartView ()
 
 @property (nonatomic, strong) AYVibrantButton *startButton;
+@property (nonatomic, strong) AYVibrantButton *joinButton;
 
-- (void)buttonTapped;
+- (void)buttonTapped:(id)sender;
 
 @end
 
@@ -33,12 +34,19 @@
 {
     if (self = [super initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]]) {
         self.frame = frame;
-        _startButton = [[AYVibrantButton alloc] initWithFrame:(CGRect){0,0,200.0f,50} style:AYVibrantButtonStyleInvert];
+        _startButton = [[AYVibrantButton alloc] initWithFrame:(CGRect){0,0,200,50} style:AYVibrantButtonStyleInvert];
         _startButton.text = @"Start";
         _startButton.vibrancyEffect = [UIVibrancyEffect effectForBlurEffect:(UIBlurEffect *)self.effect];
         _startButton.font = [UIFont systemFontOfSize:18.0];
-        [_startButton addTarget:self action:@selector(buttonTapped) forControlEvents:UIControlEventTouchUpInside];
+        [_startButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:_startButton];
+        
+        _joinButton = [[AYVibrantButton alloc] initWithFrame:(CGRect){0,0,200,50} style:AYVibrantButtonStyleInvert];
+        _joinButton.text = @"Join";
+        _joinButton.vibrancyEffect = [UIVibrancyEffect effectForBlurEffect:(UIBlurEffect *)self.effect];
+        _joinButton.font = [UIFont systemFontOfSize:18.0];
+        [_joinButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [self.contentView addSubview:_joinButton];
     }
     
     return self;
@@ -50,14 +58,22 @@
     
     CGRect frame = self.startButton.frame;
     frame.origin.x = (CGRectGetWidth(self.frame) - CGRectGetWidth(frame)) * 0.5f;
-    frame.origin.y = (CGRectGetHeight(self.frame) - CGRectGetHeight(frame)) * 0.5f;
+    frame.origin.y = ((CGRectGetHeight(self.frame) - CGRectGetHeight(frame)) * 0.5f) - 50.0f;
     self.startButton.frame = frame;
+    
+    frame = self.joinButton.frame;
+    frame.origin.x = (CGRectGetWidth(self.frame) - CGRectGetWidth(frame)) * 0.5f;
+    frame.origin.y = ((CGRectGetHeight(self.frame) - CGRectGetHeight(frame)) * 0.5f) + 50.0f;
+    self.joinButton.frame = frame;
 }
 
-- (void)buttonTapped
+- (void)buttonTapped:(id)sender
 {
-    if (self.startButtonTapped) {
+    if (sender == self.startButton && self.startButtonTapped) {
         self.startButtonTapped();
+    }
+    else if (sender == self.joinButton && self.joinButtonTapped) {
+        self.joinButtonTapped();
     }
 }
 

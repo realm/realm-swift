@@ -16,11 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <UIKit/UIKit.h>
-#import "AppDelegate.h"
+#import <Realm/Realm.h>
+#import "RLMPuzzlePiece.h"
 
-int main(int argc, char * argv[]) {
-    @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-    }
-}
+@interface RLMPuzzle : RLMObject
+
+@property NSString *uuid;
+@property NSString *name;
+@property NSString *userID;
+@property NSDate *creationTime;
+@property RLMArray<RLMPuzzlePiece> *pieces;
+
+@end
