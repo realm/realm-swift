@@ -18,6 +18,9 @@
 
 #import "RLMConfiguration_Private.h"
 #import "RLMRealm_Private.h"
+#import "RLMUtil.hpp"
+
+#include <atomic>
 
 static NSString * const c_RLMConfigurationProperties[] = {
     @"path",
@@ -30,6 +33,14 @@ static NSString * const c_RLMConfigurationProperties[] = {
     @"customSchema",
 };
 static const NSUInteger c_RLMConfigurationPropertiesCount = sizeof(c_RLMConfigurationProperties) / sizeof(NSString *);
+
+typedef NS_ENUM(NSUInteger, RLMConfigurationUsage) {
+    RLMConfigurationUsageNone,
+    RLMConfigurationUsageConfiguration,
+    RLMConfigurationUsagePerPath,
+};
+
+static std::atomic<RLMConfigurationUsage> s_configurationUsage;
 
 @implementation RLMConfiguration
 
@@ -81,7 +92,21 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 + (void)setDefaultConfiguration:(RLMConfiguration *)configuration {
+    if (s_configurationUsage.exchange(RLMConfigurationUsageConfiguration) == RLMConfigurationUsagePerPath) {
+        @throw RLMException(@"Cannot set a default configuration after using per-path configuration methods.");
+    }
     s_defaultConfiguration = [configuration copy] ?: [[RLMConfiguration alloc] init];
+}
+
++ (void)setDefaultPath:(NSString *)path {
+    RLMConfiguration *configuration = [[RLMConfiguration alloc] init];
+    configuration.path = path;
+    s_defaultConfiguration =  configuration;
+}
+
++ (void)resetRealmConfigurationState {
+    s_defaultConfiguration = nil;
+    s_configurationUsage = RLMConfigurationUsageNone;
 }
 
 - (instancetype)init {
@@ -131,3 +156,9 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 @end
+
+void RLMConfigurationUsePerPath(SEL callingMethod) {
+    if (s_configurationUsage.exchange(RLMConfigurationUsagePerPath) == RLMConfigurationUsageConfiguration) {
+        @throw RLMException([NSString stringWithFormat:@"Cannot call %@ after setting a default configuration.", NSStringFromSelector(callingMethod)]);
+    }
+}

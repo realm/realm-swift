@@ -73,16 +73,15 @@ public final class Realm {
             return RealmConfiguration.defaultConfiguration.path ?? RLMConfiguration.defaultRealmPath()
         }
         set {
-            var configuration = RealmConfiguration.defaultConfiguration
-            configuration.path = newValue
-            RealmConfiguration.defaultConfiguration = configuration
+            RLMConfigurationUsePerPath("Realm.defaultPath=")
+            RLMConfiguration.setDefaultPath(newValue)
         }
     }
 
     // MARK: Initializers
 
     /**
-    Obtains a Realm instance with the given configuration. Defaults to the default realm configuration.
+    Obtains a Realm instance with the given configuration.
 
     :param: configuration The configuration to use when creating the Realm instance.
     :param: error         If an error occurs, upon return contains an `NSError` object
@@ -99,12 +98,19 @@ public final class Realm {
     }
 
     /**
-    Obtains a Realm instance persisted at the specified file path. Defaults to
-    `Realm.defaultPath`
+    Obtains a Realm instance with the default `RealmConfiguration`.
+    */
+    public convenience init() {
+        let rlmRealm = RLMRealm.defaultRealm()
+        self.init(rlmRealm)
+    }
+
+    /**
+    Obtains a Realm instance persisted at the specified file path.
 
     :param: path Path to the realm file.
     */
-    public convenience init(path: String = Realm.defaultPath) {
+    public convenience init(path: String) {
         self.init(RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: false, schema: nil, error: nil)!)
     }
 

@@ -27,4 +27,10 @@
 
 + (NSString *)defaultRealmPath;
 
++ (void)setDefaultPath:(NSString *)path;
+
++ (void)resetRealmConfigurationState;
+
 @end
+
+FOUNDATION_EXTERN void RLMConfigurationUsePerPath(SEL methodName);
