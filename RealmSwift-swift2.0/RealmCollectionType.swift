@@ -172,3 +172,192 @@ public protocol RealmCollectionType: CollectionType {
     */
     func average<U: AddableType>(property: String) -> U?
 }
+
+private class _AnyRealmCollectionBase<T: Object>: RealmCollectionType {
+    typealias Element = T
+    var realm: Realm? { fatalError() }
+    func indexOf(object: Element) -> Int? { fatalError() }
+    func indexOf(predicate: NSPredicate) -> Int? { fatalError() }
+    func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
+    func filter(predicateFormat: String, _ args: AnyObject...) -> Results<Element> { fatalError() }
+    func filter(predicate: NSPredicate) -> Results<Element> { fatalError() }
+    func sorted(property: String, ascending: Bool) -> Results<Element> { fatalError() }
+    func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<Element> { fatalError() }
+    func min<U: MinMaxType>(property: String) -> U? { fatalError() }
+    func max<U: MinMaxType>(property: String) -> U? { fatalError() }
+    func sum<U: AddableType>(property: String) -> U { fatalError() }
+    func average<U: AddableType>(property: String) -> U? { fatalError() }
+    subscript(index: Int) -> T { fatalError() }
+    func generate() -> RLMGenerator<T> { fatalError() }
+    var startIndex: Int { fatalError() }
+    var endIndex: Int { fatalError() }
+}
+
+private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBase<C.Element> {
+    let base: C
+    init(base: C) {
+        self.base = base
+    }
+}
+
+/**
+A type-erased `RealmCollectionType`.
+
+Forwards operations to an arbitrary underlying collection having the same
+Element type, hiding the specifics of the underlying `RealmCollectionType`.
+*/
+public final class AnyRealmCollection<T: Object>: RealmCollectionType {
+
+    /// Element type contained in this collection.
+    public typealias Element = T
+    private let base: _AnyRealmCollectionBase<T>
+
+    public init<C: RealmCollectionType where C.Element == T>(_ base: C) {
+        self.base = _AnyRealmCollection(base: base)
+    }
+
+    // MARK: Properties
+
+    /// The Realm the objects in this collection belong to, or `nil` if the
+    /// collection's owning object does not belong to a realm (the collection is
+    /// standalone).
+    public var realm: Realm? { return base.realm }
+
+    // MARK: Index Retrieval
+
+    /**
+    Returns the index of the first object matching the given predicate,
+    or `nil` no objects match.
+
+    - parameter predicate: The `NSPredicate` used to filter the objects.
+
+    - returns: The index of the given object, or `nil` if no objects match.
+    */
+    public func indexOf(predicate: NSPredicate) -> Int? { return base.indexOf(predicate) }
+
+    /**
+    Returns the index of the first object matching the given predicate,
+    or `nil` if no objects match.
+
+    - parameter predicateFormat: The predicate format string, optionally followed by a variable number
+    of arguments.
+
+    - returns: The index of the given object, or `nil` if no objects match.
+    */
+    public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? { return base.indexOf(predicateFormat, args) }
+
+    // MARK: Filtering
+
+    /**
+    Returns `Results` containing collection elements that match the given predicate.
+
+    - parameter predicateFormat: The predicate format string which can accept variable arguments.
+
+    - returns: `Results` containing collection elements that match the given predicate.
+    */
+    public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<Element> { return base.filter(predicateFormat, args) }
+
+    /**
+    Returns `Results` containing collection elements that match the given predicate.
+
+    - parameter predicate: The predicate to filter the objects.
+
+    - returns: `Results` containing collection elements that match the given predicate.
+    */
+    public func filter(predicate: NSPredicate) -> Results<Element> { return base.filter(predicate) }
+
+
+    // MARK: Sorting
+
+    /**
+    Returns `Results` containing collection elements sorted by the given property.
+
+    - parameter property:  The property name to sort by.
+    - parameter ascending: The direction to sort by.
+
+    - returns: `Results` containing collection elements sorted by the given property.
+    */
+    public func sorted(property: String, ascending: Bool) -> Results<Element> { return base.sorted(property, ascending: ascending) }
+
+    /**
+    Returns `Results` with elements sorted by the given sort descriptors.
+
+    - parameter sortDescriptors: `SortDescriptor`s to sort by.
+
+    - returns: `Results` with elements sorted by the given sort descriptors.
+    */
+    public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<Element> { return base.sorted(sortDescriptors) }
+
+
+    // MARK: Aggregate Operations
+
+    /**
+    Returns the minimum value of the given property.
+
+    - warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `MinMaxType` to look for a minimum on.
+
+    - returns: The minimum value for the property amongst objects in the collection, or `nil` if the collection is empty.
+    */
+    public func min<U: MinMaxType>(property: String) -> U? { return base.min(property) }
+
+    /**
+    Returns the maximum value of the given property.
+
+    - warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `MinMaxType` to look for a maximum on.
+
+    - returns: The maximum value for the property amongst objects in the collection, or `nil` if the collection is empty.
+    */
+    public func max<U: MinMaxType>(property: String) -> U? { return base.max(property) }
+
+    /**
+    Returns the sum of the given property for objects in the collection.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
+
+    - returns: The sum of the given property over all objects in the collection.
+    */
+    public func sum<U: AddableType>(property: String) -> U { return base.sum(property) }
+
+    /**
+    Returns the average of the given property for objects in the collection.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate average on.
+
+    - returns: The average of the given property over all objects in the collection, or `nil` if the collection is empty.
+    */
+    public func average<U: AddableType>(property: String) -> U? { return base.average(property) }
+
+
+    // MARK: Sequence Support
+
+    /**
+    Returns the object at the given `index`.
+
+    - parameter index: The index.
+
+    - returns: The object at the given `index`.
+    */
+    public subscript(index: Int) -> T { return base[index] }
+
+    /// Returns a `GeneratorOf<T>` that yields successive elements in the collection.
+    public func generate() -> RLMGenerator<T> { return base.generate() }
+
+
+    // MARK: Collection Support
+
+    /// The position of the first element in a non-empty collection.
+    /// Identical to endIndex in an empty collection.
+    public var startIndex: Int { return base.startIndex }
+
+    /// The collection's "past the end" position.
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
+    public var endIndex: Int { return base.endIndex }
+}
