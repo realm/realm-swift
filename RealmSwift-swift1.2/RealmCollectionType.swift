@@ -207,7 +207,7 @@ private class _AnyRealmCollectionBase<T: Object>: RealmCollectionType {
     func max<U: MinMaxType>(property: String) -> U? { fatalError() }
     func sum<U: AddableType>(property: String) -> U { fatalError() }
     func average<U: AddableType>(property: String) -> U? { fatalError() }
-    subscript(index: Int) -> T { fatalError() }
+    subscript(index: Int) -> Element { fatalError() }
     func generate() -> RLMGenerator<T> { fatalError() }
     var startIndex: Int { fatalError() }
     var endIndex: Int { fatalError() }
@@ -218,6 +218,169 @@ private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBa
     init(base: C) {
         self.base = base
     }
+
+    // MARK: Properties
+
+    /// The Realm the objects in this collection belong to, or `nil` if the
+    /// collection's owning object does not belong to a realm (the collection is
+    /// standalone).
+    override var realm: Realm? { return base.realm }
+
+    // MARK: Index Retrieval
+
+    /**
+    Returns the index of the given object, or `nil` if the object is not in the collection.
+
+    :param: object The object whose index is being queried.
+
+    :returns: The index of the given object, or `nil` if the object is not in the collection.
+    */
+    override func indexOf(object: C.Element) -> Int? { return base.indexOf(object) }
+
+    /**
+    Returns the index of the first object matching the given predicate,
+    or `nil` no objects match.
+
+    - parameter predicate: The `NSPredicate` used to filter the objects.
+
+    - returns: The index of the given object, or `nil` if no objects match.
+    */
+    override func indexOf(predicate: NSPredicate) -> Int? { return base.indexOf(predicate) }
+
+    /**
+    Returns the index of the first object matching the given predicate,
+    or `nil` if no objects match.
+
+    - parameter predicateFormat: The predicate format string, optionally followed by a variable number
+    of arguments.
+
+    - returns: The index of the given object, or `nil` if no objects match.
+    */
+    override func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? { return base.indexOf(NSPredicate(format: predicateFormat, arguments: getVaList(args))) }
+
+
+    // MARK: Object Retrieval
+
+    /// Returns the first object in the collection, or `nil` if empty.
+    override var first: C.Element? { return base.first }
+
+    /// Returns the last object in the collection, or `nil` if empty.
+    override var last: C.Element? { return base.last }
+
+    // MARK: Filtering
+
+    /**
+    Returns `Results` containing collection elements that match the given predicate.
+
+    - parameter predicateFormat: The predicate format string which can accept variable arguments.
+
+    - returns: `Results` containing collection elements that match the given predicate.
+    */
+    override func filter(predicateFormat: String, _ args: CVarArgType...) -> Results<C.Element> { return base.filter(NSPredicate(format: predicateFormat, arguments: getVaList(args))) }
+
+    /**
+    Returns `Results` containing collection elements that match the given predicate.
+
+    - parameter predicate: The predicate to filter the objects.
+
+    - returns: `Results` containing collection elements that match the given predicate.
+    */
+    override func filter(predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
+
+
+    // MARK: Sorting
+
+    /**
+    Returns `Results` containing collection elements sorted by the given property.
+
+    - parameter property:  The property name to sort by.
+    - parameter ascending: The direction to sort by.
+
+    - returns: `Results` containing collection elements sorted by the given property.
+    */
+    override func sorted(property: String, ascending: Bool) -> Results<C.Element> { return base.sorted(property, ascending: ascending) }
+
+    /**
+    Returns `Results` with elements sorted by the given sort descriptors.
+
+    - parameter sortDescriptors: `SortDescriptor`s to sort by.
+
+    - returns: `Results` with elements sorted by the given sort descriptors.
+    */
+    override func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<C.Element> { return base.sorted(sortDescriptors) }
+
+
+    // MARK: Aggregate Operations
+
+    /**
+    Returns the minimum value of the given property.
+
+    - warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `MinMaxType` to look for a minimum on.
+
+    - returns: The minimum value for the property amongst objects in the collection, or `nil` if the collection is empty.
+    */
+    override func min<U: MinMaxType>(property: String) -> U? { return base.min(property) }
+
+    /**
+    Returns the maximum value of the given property.
+
+    - warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `MinMaxType` to look for a maximum on.
+
+    - returns: The maximum value for the property amongst objects in the collection, or `nil` if the collection is empty.
+    */
+    override func max<U: MinMaxType>(property: String) -> U? { return base.max(property) }
+
+    /**
+    Returns the sum of the given property for objects in the collection.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
+
+    - returns: The sum of the given property over all objects in the collection.
+    */
+    override func sum<U: AddableType>(property: String) -> U { return base.sum(property) }
+
+    /**
+    Returns the average of the given property for objects in the collection.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate average on.
+
+    - returns: The average of the given property over all objects in the collection, or `nil` if the collection is empty.
+    */
+    override func average<U: AddableType>(property: String) -> U? { return base.average(property) }
+
+
+    // MARK: Sequence Support
+
+    /**
+    Returns the object at the given `index`.
+
+    - parameter index: The index.
+
+    - returns: The object at the given `index`.
+    */
+    override subscript(index: Int) -> C.Element { return base[index as! C.Index] as! C.Element }
+
+    /// Returns a `GeneratorOf<Element>` that yields successive elements in the collection.
+    func generate() -> C.Generator { return base.generate() }
+
+
+    // MARK: Collection Support
+
+    /// The position of the first element in a non-empty collection.
+    /// Identical to endIndex in an empty collection.
+    override var startIndex: Int { return base.startIndex as! Int }
+
+    /// The collection's "past the end" position.
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
+    override var endIndex: Int { return base.endIndex as! Int }
 }
 
 /**
