@@ -68,8 +68,9 @@ block automatically as needed.
 :param: version The current schema version.
 :param: block   The block which migrates the Realm to the current version.
 */
+@availability(*, deprecated=1, message="Use Realm(configuration:error:)")
 public func setDefaultRealmSchemaVersion(schemaVersion: UInt64, migrationBlock: MigrationBlock) {
-    RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: accessorMigrationBlock(migrationBlock))
+    RLMRealmSetSchemaVersionForPath(schemaVersion, Realm.defaultPath, accessorMigrationBlock(migrationBlock))
 }
 
 /**
@@ -91,8 +92,9 @@ block automatically as needed.
 :param: realmPath The path of the Realms to migrate.
 :param: block     The block which migrates the Realm to the current version.
 */
+@availability(*, deprecated=1, message="Use Realm(configuration:error:)")
 public func setSchemaVersion(schemaVersion: UInt64, realmPath: String, migrationBlock: MigrationBlock) {
-    RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: realmPath, withMigrationBlock: accessorMigrationBlock(migrationBlock))
+    RLMRealmSetSchemaVersionForPath(schemaVersion, realmPath, accessorMigrationBlock(migrationBlock))
 }
 
 /**
@@ -128,11 +130,10 @@ exactly when and how migrations are performed.
           that occured otherwise.
 */
 public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
-    if let encryptionKey = encryptionKey {
-        return RLMRealm.migrateRealmAtPath(path, encryptionKey: encryptionKey)
-    } else {
-        return RLMRealm.migrateRealmAtPath(path)
-    }
+    let configuration = RLMConfiguration.defaultConfiguration()
+    configuration.path = path
+    configuration.encryptionKey = encryptionKey
+    return RLMRealm.migrateRealm(configuration)
 }
 
 

@@ -230,15 +230,15 @@ class ObjectTests: TestCase {
         }
         autoreleasepool {
             var enumerated = false
-            setSchemaVersion(1, self.testRealmPath()) { migration, _ in
+            let configuration = RealmConfiguration(schemaVersion: 1, migrationBlock: { migration, _ in
                 migration.enumerate(SwiftObject.className()) { oldObject, newObject in
                     if let newObject = newObject {
                         block(newObject, migration)
                         enumerated = true
                     }
                 }
-            }
-            self.realmWithTestPath()
+            })
+            self.realmWithTestPath(configuration)
             XCTAssert(enumerated)
         }
     }

@@ -25,7 +25,7 @@ class ObjectTests: TestCase {
     // init() Tests are in ObjectCreationTests.swift
 
     // init(value:) tests are in ObjectCreationTests.swift
-    
+
     func testRealm() {
         let standalone = SwiftStringObject()
         XCTAssertNil(standalone.realm)
@@ -230,15 +230,15 @@ class ObjectTests: TestCase {
         }
         autoreleasepool {
             var enumerated = false
-            setSchemaVersion(1, realmPath: self.testRealmPath()) { migration, _ in
+            let configuration = RealmConfiguration(schemaVersion: 1, migrationBlock: { migration, _ in
                 migration.enumerate(SwiftObject.className()) { oldObject, newObject in
                     if let newObject = newObject {
                         block(newObject, migration)
                         enumerated = true
                     }
                 }
-            }
-            self.realmWithTestPath()
+            })
+            self.realmWithTestPath(configuration)
             XCTAssert(enumerated)
         }
     }

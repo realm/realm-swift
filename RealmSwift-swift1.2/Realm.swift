@@ -67,12 +67,15 @@ public final class Realm {
 
     :returns: Location of the default Realm.
     */
+    @availability(*, deprecated=1, message="Use RealmConfiguration.defaultConfiguration")
     public class var defaultPath: String {
         get {
-            return RLMRealm.defaultRealmPath()
+            return RealmConfiguration.defaultConfiguration.path ?? RLMConfiguration.defaultRealmPath()
         }
         set {
-            RLMRealm.setDefaultRealmPath(newValue)
+            var configuration = RealmConfiguration.defaultConfiguration
+            configuration.path = newValue
+            RealmConfiguration.defaultConfiguration = configuration
         }
     }
 
@@ -102,7 +105,7 @@ public final class Realm {
     :param: path Path to the realm file.
     */
     public convenience init(path: String = Realm.defaultPath) {
-        self.init(RLMRealm(path: path, readOnly: false, error: nil)!)
+        self.init(RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: false, schema: nil, error: nil)!)
     }
 
     /**
@@ -125,6 +128,7 @@ public final class Realm {
                             that describes the problem. If you are not interested in
                             possible errors, omit the argument, or pass in `nil`.
     */
+    @availability(*, deprecated=1, message="Use Realm(configuration:error:)")
     public convenience init?(path: String, readOnly: Bool, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) {
         if let rlmRealm = RLMRealm(path: path, key: encryptionKey, readOnly: readOnly, inMemory: false, dynamic: false, schema: nil, error: error) as RLMRealm? {
             self.init(rlmRealm)
@@ -149,8 +153,10 @@ public final class Realm {
 
     :param: identifier A string used to identify a particular in-memory Realm.
     */
+    @availability(*, deprecated=1, message="Use Realm(configuration:error:)")
     public convenience init(inMemoryIdentifier: String) {
-        self.init(RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
+        let configuration = RealmConfiguration(inMemoryIdentifier: inMemoryIdentifier).rlmConfiguration
+        self.init(RLMRealm(configuration: configuration, error: nil)!)
     }
 
     // MARK: Transactions
@@ -545,8 +551,9 @@ public final class Realm {
     :param: encryptionKey 64-byte encryption key to use, or `nil` to unset.
     :param: path          Realm path to set the encryption key for.
     +*/
-    public class func setEncryptionKey(encryptionKey: NSData?, forPath: String = Realm.defaultPath) {
-        RLMRealm.setEncryptionKey(encryptionKey, forRealmsAtPath: forPath)
+    @availability(*, deprecated=1, message="Use Realm(configuration:error:)")
+    public class func setEncryptionKey(encryptionKey: NSData?, forPath path: String = Realm.defaultPath) {
+        RLMRealmSetEncryptionKeyForPath(encryptionKey, path)
     }
 
     // MARK: Internal

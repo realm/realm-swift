@@ -97,24 +97,24 @@ class RealmTests: TestCase {
 
     func testInitInMemory() {
         autoreleasepool {
-            let realm = Realm(inMemoryIdentifier: "identifier")
+            let realm = inMemoryRealm("identifier")
             realm.write {
                 realm.create(SwiftIntObject.self, value: [1])
                 return
             }
         }
-        let realm = Realm(inMemoryIdentifier: "identifier")
+        let realm = inMemoryRealm("identifier")
         XCTAssertEqual(realm.objects(SwiftIntObject).count, 0)
 
         realm.write {
             realm.create(SwiftIntObject.self, value: [1])
             XCTAssertEqual(realm.objects(SwiftIntObject).count, 1)
 
-            Realm(inMemoryIdentifier: "identifier").create(SwiftIntObject.self, value: [1])
+            inMemoryRealm("identifier").create(SwiftIntObject.self, value: [1])
             XCTAssertEqual(realm.objects(SwiftIntObject).count, 2)
         }
 
-        let realm2 = Realm(inMemoryIdentifier: "identifier2")
+        let realm2 = inMemoryRealm("identifier2")
         XCTAssertEqual(realm2.objects(SwiftIntObject).count, 0)
     }
 
@@ -437,7 +437,7 @@ class RealmTests: TestCase {
 
         XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
 
-        // refresh 
+        // refresh
         realm.refresh()
 
         XCTAssertEqual(results.count, Int(1), "There should be 1 object of type StringObject")

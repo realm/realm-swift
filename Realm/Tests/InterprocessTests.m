@@ -142,7 +142,7 @@
 }
 
 - (void)testShareInMemoryRealm {
-    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+    RLMRealm *realm = [self inMemoryRealmWithIdentifier:@"test"];
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
 
     if (self.isParent) {
@@ -161,7 +161,7 @@
 - (void)testBidirectionalCommunication {
     const int stopValue = 100;
 
-    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+    RLMRealm *realm = [self inMemoryRealmWithIdentifier:@"test"];
     [realm beginWriteTransaction];
     IntObject *obj = [IntObject allObjectsInRealm:realm].firstObject;
     if (!obj) {

@@ -18,18 +18,8 @@
 
 #import "RLMTestCase.h"
 
+#import "RLMConfiguration_Private.h"
 #import <Realm/RLMRealm_Private.h>
-
-@interface RLMRealm ()
-+ (instancetype)realmWithPath:(NSString *)path
-                          key:(NSData *)key
-                     readOnly:(BOOL)readonly
-                     inMemory:(BOOL)inMemory
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError;
-+ (void)resetRealmState;
-@end
 
 // This ensures the shared schema is initialized outside of of a test case,
 // so if an exception is thrown, it will kill the test process rather than
@@ -103,8 +93,8 @@ static BOOL encryptTests() {
         [self deleteFiles];
 
         if (encryptTests()) {
-            [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
-            [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMTestRealmPath()];
+            RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+            configuration.encryptionKey = RLMGenerateKey();
         }
     }
 }
@@ -140,11 +130,24 @@ static BOOL encryptTests() {
 
 - (RLMRealm *)realmWithTestPath
 {
-    return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+    return [RLMRealm realmWithPath:RLMTestRealmPath()];
 }
 
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema {
     return [RLMRealm realmWithPath:RLMTestRealmPath() key:nil readOnly:NO inMemory:NO dynamic:YES schema:schema error:nil];
+}
+
+- (RLMRealm *)inMemoryRealmWithIdentifier:(NSString *)identifier {
+    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    configuration.inMemoryIdentifier = identifier;
+    return [RLMRealm realmWithConfiguration:configuration error:nil];
+}
+
+- (RLMRealm *)readOnlyRealmWithPath:(NSString *)path error:(NSError **)error {
+    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    configuration.path = path;
+    configuration.readOnly = true;
+    return [RLMRealm realmWithConfiguration:configuration error:error];
 }
 
 - (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block {

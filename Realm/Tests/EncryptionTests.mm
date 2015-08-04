@@ -29,10 +29,10 @@
 @implementation EncryptionTests
 
 - (RLMRealm *)realmWithKey:(NSData *)key {
-    return [RLMRealm realmWithPath:RLMDefaultRealmPath()
-                     encryptionKey:key
-                          readOnly:NO
-                             error:nil];
+    RLMConfiguration *configuration = [[RLMConfiguration alloc] init];
+    configuration.path = RLMDefaultRealmPath();
+    configuration.encryptionKey = key;
+    return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
 + (XCTestSuite *)defaultTestSuite
@@ -53,6 +53,8 @@
 #pragma mark - Key validation
 
 - (void)testBadEncryptionKeys {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:self.nonLiteralNil readOnly:NO error:nil]);
     XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:NSData.data readOnly:NO error:nil]);
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:self.nonLiteralNil]);
@@ -60,14 +62,18 @@
     XCTAssertThrows([RLMRealm setEncryptionKey:NSData.data forRealmsAtPath:RLMRealm.defaultRealmPath]);
     XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:self.nonLiteralNil error:nil]);
     XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:NSData.data error:nil]);
+#pragma clang diagnostic pop
 }
 
 - (void)testValidEncryptionKeys {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     NSData *key = [[NSMutableData alloc] initWithLength:64];
     XCTAssertNoThrow([RLMRealm setEncryptionKey:key
                                 forRealmsAtPath:RLMRealm.defaultRealmPath]);
     XCTAssertNoThrow([RLMRealm setEncryptionKey:nil forRealmsAtPath:RLMRealm.defaultRealmPath]);
     XCTAssertNoThrow([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:key error:nil]);
+#pragma clang diagnostic pop
 }
 
 #pragma mark - realmWithPath:
@@ -124,6 +130,8 @@
 #pragma mark - Registered encryption key
 
 - (void)testRegisteredKeyIsUsed {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     NSData *key = RLMGenerateKey();
     @autoreleasepool {
         RLMRealm *realm = [self realmWithKey:key];
@@ -141,9 +149,12 @@
     @autoreleasepool {
         XCTAssertEqual(1U, [IntObject allObjects].count);
     }
+#pragma clang diagnostic pop
 }
 
 - (void)testExplicitlyPassedKeyOverridesRegisteredKey {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     NSData *key = RLMGenerateKey();
     @autoreleasepool {
         RLMRealm *realm = [self realmWithKey:key];
@@ -157,18 +168,24 @@
         RLMRealm *realm = [self realmWithKey:key];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
     }
+#pragma clang diagnostic pop
 }
 
 - (void)testCannotSetEncryptionKeyToNilWhenRealmIsOpen {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     NSData *key = RLMGenerateKey();
     RLMRealm *realm = [self realmWithTestPath];
     NSString *path = realm.path;
 
     XCTAssertNoThrow([RLMRealm setEncryptionKey:nil forRealmsAtPath:path]);
     XCTAssertThrows([RLMRealm setEncryptionKey:key forRealmsAtPath:path]);
+#pragma clang diagnostic pop
 }
 
 - (void)testCannotSetEncryptionKeyFromNilWhenRealmIsOpen {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     NSData *key = RLMGenerateKey();
     NSString *path = RLMTestRealmPath();
     [RLMRealm setEncryptionKey:key forRealmsAtPath:path];
@@ -176,6 +193,7 @@
 
     XCTAssertThrows([RLMRealm setEncryptionKey:nil forRealmsAtPath:path]);
     XCTAssertNoThrow([RLMRealm setEncryptionKey:key forRealmsAtPath:path]);
+#pragma clang diagnostic pop
 }
 
 #pragma mark - writeCopyToPath:
@@ -197,6 +215,8 @@
 }
 
 - (void)testWriteCopyToPathUsesRegisteredKey {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     NSData *key = RLMGenerateKey();
     [RLMRealm setEncryptionKey:key forRealmsAtPath:RLMTestRealmPath()];
 
@@ -212,9 +232,12 @@
         RLMRealm *realm = [self realmWithKey:key];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
     }
+#pragma clang diagnostic pop
 }
 
 - (void)testWriteCopyToPathWithNewKey {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     NSData *key1 = RLMGenerateKey();
     NSData *key2 = RLMGenerateKey();
     NSData *key3 = RLMGenerateKey();
@@ -235,6 +258,7 @@
                                             error:nil];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
     }
+#pragma clang diagnostic pop
 }
 
 #pragma mark - Migrations
@@ -253,14 +277,17 @@
                        inMemory:NO dynamic:YES schema: schema error:nil];
     }
 
-    [RLMRealm setSchemaVersion:1
-                forRealmAtPath:RLMDefaultRealmPath()
-            withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
-                *migrationRun = YES;
-            }];
+    RLMConfiguration *defaultConfiguration = [RLMConfiguration defaultConfiguration];
+    defaultConfiguration.schemaVersion = 1;
+    defaultConfiguration.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+        *migrationRun = YES;
+    };
+    [RLMConfiguration setDefaultConfiguration:defaultConfiguration];
 }
 
 - (void)testImplicitMigrationWithRegisteredKey {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     NSData *key = RLMGenerateKey();
     BOOL migrationRan = NO;
     [self createRealmRequiringMigrationWithKey:key migrationRun:&migrationRan];
@@ -271,6 +298,7 @@
     [RLMRealm setEncryptionKey:key forRealmsAtPath:RLMDefaultRealmPath()];
     XCTAssertNoThrow([RLMRealm defaultRealm]);
     XCTAssertTrue(migrationRan);
+#pragma clang diagnostic pop
 }
 
 - (void)testImplicitMigrationWithExplicitKey {
@@ -281,7 +309,10 @@
     XCTAssertThrows([RLMRealm defaultRealm]);
     XCTAssertFalse(migrationRan);
 
-    XCTAssertNoThrow([RLMRealm realmWithPath:RLMDefaultRealmPath() encryptionKey:key readOnly:NO error:nil]);
+    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    configuration.encryptionKey = key;
+
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:configuration error:nil]);
     XCTAssertTrue(migrationRan);
 }
 
@@ -290,11 +321,13 @@
     BOOL migrationRan = NO;
     [self createRealmRequiringMigrationWithKey:key migrationRun:&migrationRan];
 
-    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMDefaultRealmPath()]);
+    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+
+    XCTAssertNotNil([RLMRealm migrateRealm:configuration]);
     XCTAssertFalse(migrationRan);
 
-    [RLMRealm setEncryptionKey:key forRealmsAtPath:RLMDefaultRealmPath()];
-    XCTAssertNil([RLMRealm migrateRealmAtPath:RLMDefaultRealmPath()]);
+    configuration.encryptionKey = key;
+    XCTAssertNil([RLMRealm migrateRealm:configuration]);
     XCTAssertTrue(migrationRan);
 }
 
@@ -303,10 +336,13 @@
     BOOL migrationRan = NO;
     [self createRealmRequiringMigrationWithKey:key migrationRun:&migrationRan];
 
-    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMDefaultRealmPath()]);
+    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+
+    XCTAssertNotNil([RLMRealm migrateRealm:configuration]);
     XCTAssertFalse(migrationRan);
 
-    XCTAssertNil([RLMRealm migrateRealmAtPath:RLMDefaultRealmPath() encryptionKey:key]);
+    configuration.encryptionKey = key;
+    XCTAssertNil([RLMRealm migrateRealm:configuration]);
     XCTAssertTrue(migrationRan);
 }
 

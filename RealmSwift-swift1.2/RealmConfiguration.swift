@@ -38,16 +38,65 @@ public struct RealmConfiguration {
         }
     }
 
+    // MARK: Initialization
+
+    public init(path: String? = RLMConfiguration.defaultRealmPath(),
+        inMemoryIdentifier: String? = nil,
+        encryptionKey: NSData? = nil,
+        readOnly: Bool = false,
+        schemaVersion: UInt64 = 0,
+        migrationBlock: MigrationBlock? = nil) {
+            self.path = path
+            self.inMemoryIdentifier = inMemoryIdentifier
+            self.encryptionKey = encryptionKey
+            self.readOnly = readOnly
+            self.schemaVersion = schemaVersion
+            self.migrationBlock = migrationBlock
+    }
+
     // MARK: Configuration Properties
 
     /// The path to the realm file.
-    public var path: String? = Realm.defaultPath
+    public var path: String?  {
+        set {
+            if newValue != nil {
+                inMemoryIdentifier = nil
+            }
+            _path = newValue
+        }
+        get {
+            return _path
+        }
+    }
+
+    private var _path: String?
 
     /// A string used to identify a particular in-memory Realm.
-    public var inMemoryIdentifier: String? = nil
+    public var inMemoryIdentifier: String?  {
+        set {
+            if newValue != nil {
+                path = nil
+            }
+            _inMemoryIdentifier = newValue
+        }
+        get {
+            return _inMemoryIdentifier
+        }
+    }
+
+    private var _inMemoryIdentifier: String? = nil
 
     /// 64-byte key to use to encrypt the data.
-    public var encryptionKey: NSData? = nil
+    public var encryptionKey: NSData? {
+        set {
+            _encryptionKey = RLMRealmValidatedEncryptionKey(newValue)
+        }
+        get {
+            return _encryptionKey
+        }
+    }
+
+    private var _encryptionKey: NSData? = nil
 
     /// Whether the Realm is read-only (must be used for read-only files).
     public var readOnly: Bool = false
@@ -72,18 +121,16 @@ public struct RealmConfiguration {
     }
 
     internal static func fromRLMConfiguration(rlmConfiguration: RLMConfiguration) -> RealmConfiguration {
-        var configuration = RealmConfiguration()
-        configuration.path = rlmConfiguration.path
-        configuration.inMemoryIdentifier = rlmConfiguration.inMemoryIdentifier
-        configuration.encryptionKey = rlmConfiguration.encryptionKey
-        configuration.readOnly = rlmConfiguration.readOnly
-        configuration.schemaVersion = UInt64(rlmConfiguration.schemaVersion)
-        if let rlmMigrationBlock = rlmConfiguration.migrationBlock {
-            configuration.migrationBlock = { migration, schemaVersion in
-                rlmMigrationBlock(migration.rlmMigration, schemaVersion)
-            }
-        }
-        return configuration
+        return RealmConfiguration(path: rlmConfiguration.path,
+            inMemoryIdentifier: rlmConfiguration.inMemoryIdentifier,
+            encryptionKey: rlmConfiguration.encryptionKey,
+            readOnly: rlmConfiguration.readOnly,
+            schemaVersion: UInt64(rlmConfiguration.schemaVersion),
+            migrationBlock: map(rlmConfiguration.migrationBlock) { rlmMigration in
+                return { migration, schemaVersion in
+                    rlmMigration(migration.rlmMigration, schemaVersion)
+                }
+            })
     }
 }
 

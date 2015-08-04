@@ -71,6 +71,8 @@ extern "C" {
 
 - (void)testDefaultRealmPath
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     NSString *defaultPath = [[RLMRealm defaultRealm] path];
     @autoreleasepool {
         XCTAssertEqualObjects(defaultPath, [RLMRealm defaultRealmPath], @"Default Realm path should be correct.");
@@ -82,6 +84,7 @@ extern "C" {
 
     // we have to clean-up since dispatch_once isn't run for each test case
     [RLMRealm setDefaultRealmPath:defaultPath];
+#pragma clang diagnostic pop
 }
 
 - (void)testRealmPath
@@ -529,13 +532,16 @@ extern "C" {
 
 - (void)testInMemoryRealm
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
+#pragma clang diagnostic pop
 
     // verify that the realm's path is in the temporary directory
     XCTAssertEqualObjects(NSTemporaryDirectory(), [inMemoryRealm.path.stringByDeletingLastPathComponent stringByAppendingString:@"/"]);
 
     [self waitForNotification:RLMRealmDidChangeNotification realm:inMemoryRealm block:^{
-        RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
+        RLMRealm *inMemoryRealm = [self inMemoryRealmWithIdentifier:@"identifier"];
         [inMemoryRealm beginWriteTransaction];
         [StringObject createInRealm:inMemoryRealm withValue:@[@"a"]];
         [StringObject createInRealm:inMemoryRealm withValue:@[@"b"]];
@@ -547,7 +553,7 @@ extern "C" {
     XCTAssertEqual(3U, [StringObject allObjectsInRealm:inMemoryRealm].count);
 
     // make sure we can have another
-    RLMRealm *anotherInMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier2"];
+    RLMRealm *anotherInMemoryRealm = [self inMemoryRealmWithIdentifier:@"identifier2"];
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:anotherInMemoryRealm].count);
 
     // make sure we can't open disk-realm at same path
@@ -565,7 +571,15 @@ extern "C" {
     [[NSFileManager defaultManager] createFileAtPath:filePath contents:fileContents attributes:nil];
 
     NSError *error;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     XCTAssertNil([RLMRealm realmWithPath:filePath readOnly:NO error:&error], @"Invalid database");
+    XCTAssertNotNil(error, @"Should populate error object");
+#pragma clang diagnostic pop
+    error = nil;
+    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    configuration.path = filePath;
+    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Invalid database");
     XCTAssertNotNil(error, @"Should populate error object");
 }
 
@@ -600,7 +614,16 @@ extern "C" {
     XCTAssertThrows([self realmWithTestPath]);
 
     RLMRealm *realm;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     XCTAssertNoThrow(realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+#pragma clang diagnostic pop
+    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    configuration.path = RLMTestRealmPath();
+    configuration.readOnly = true;
+    realm = nil;
+    XCTAssertNoThrow(realm = [RLMRealm realmWithConfiguration:configuration error:nil]);
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 
     [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:RLMTestRealmPath() error:nil];
@@ -608,14 +631,14 @@ extern "C" {
 
 - (void)testReadOnlyRealmMustExist
 {
-   XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+   XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
 }
 
 - (void)testReadOnlyRealmIsImmutable
 {
     @autoreleasepool { [self realmWithTestPath]; }
 
-    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+    RLMRealm *realm = [self readOnlyRealmWithPath:RLMTestRealmPath() error:nil];
     XCTAssertThrows([realm beginWriteTransaction]);
     XCTAssertThrows([realm refresh]);
 }
@@ -624,11 +647,11 @@ extern "C" {
 {
     @autoreleasepool {
         XCTAssertNoThrow([self realmWithTestPath]);
-        XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+        XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
     }
 
     @autoreleasepool {
-        XCTAssertNoThrow([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+        XCTAssertNoThrow([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
         XCTAssertThrows([self realmWithTestPath]);
     }
 }
@@ -649,7 +672,7 @@ extern "C" {
         [realm commitWriteTransaction];
     }
 
-    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+    RLMRealm *realm = [self readOnlyRealmWithPath:RLMTestRealmPath() error:nil];
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 
     // verify that reading a missing table gives an empty array rather than
@@ -683,7 +706,7 @@ extern "C" {
         [realm commitWriteTransaction];
     }
 
-    XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil],
+    XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil],
                     @"should reject table missing column");
 }
 
@@ -1108,13 +1131,13 @@ extern "C" {
     XCTAssertThrows([array count]);
 }
 
-- (void)testInvalidteOnReadOnlyRealmIsError
+- (void)testInvalidateOnReadOnlyRealmIsError
 {
     @autoreleasepool {
         // Create the file
-        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        [self realmWithTestPath];
     }
-    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+    RLMRealm *realm = [self readOnlyRealmWithPath:RLMTestRealmPath() error:nil];
     XCTAssertThrows([realm invalidate]);
 }
 
@@ -1172,7 +1195,7 @@ extern "C" {
     // Create the realm file and lock file
     @autoreleasepool { [RLMRealm defaultRealm]; }
 
-    int fd = open([RLMRealm.defaultRealmPath stringByAppendingString:@".lock"].UTF8String, O_RDWR);
+    int fd = open([RLMConfiguration.defaultConfiguration.path stringByAppendingString:@".lock"].UTF8String, O_RDWR);
     XCTAssertNotEqual(-1, fd);
 
     // Change the value of the mutex size field in the shared info header
@@ -1185,7 +1208,7 @@ extern "C" {
     XCTAssertEqual(0, ret);
 
     NSError *error;
-    RLMRealm *realm = [RLMRealm realmWithPath:RLMRealm.defaultRealmPath readOnly:NO error:&error];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:RLMConfiguration.defaultConfiguration error:&error];
     XCTAssertNil(realm);
     XCTAssertNotNil(error);
     XCTAssertEqual(RLMErrorIncompatibleLockFile, error.code);
@@ -1195,23 +1218,32 @@ extern "C" {
 }
 
 - (void)testCannotSetSchemaVersionWhenRealmIsOpen {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     RLMRealm *realm = [self realmWithTestPath];
     NSString *path = realm.path;
 
     XCTAssertThrows([RLMRealm setSchemaVersion:1 forRealmAtPath:path withMigrationBlock:nil]);
     XCTAssertNoThrow([RLMRealm setSchemaVersion:[RLMRealm schemaVersionAtPath:path error:nil] forRealmAtPath:path withMigrationBlock:nil]);
+#pragma clang diagnostic pop
 }
 
 - (void)testCannotMigrateRealmWhenRealmIsOpen {
     RLMRealm *realm = [self realmWithTestPath];
     NSString *path = realm.path;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     XCTAssertThrows([RLMRealm migrateRealmAtPath:path]);
     XCTAssertThrows([RLMRealm migrateRealmAtPath:path encryptionKey:[[NSMutableData alloc] initWithLength:64]]);
+#pragma clang diagnostic pop
+    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    configuration.path = path;
+    XCTAssertThrows([RLMRealm migrateRealm:configuration]);
 }
 
 - (void)testNotificationPipeBufferOverfull {
-    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+    RLMRealm *realm = [self inMemoryRealmWithIdentifier:@"test"];
     // pipes have a 8 KB buffer on OS X, so verify we don't block after 8192 commits
     for (int i = 0; i < 9000; ++i) {
         [realm transactionWithBlock:^{}];

@@ -68,8 +68,9 @@ block automatically as needed.
 - parameter version: The current schema version.
 - parameter block:   The block which migrates the Realm to the current version.
 */
+@available(*, deprecated=1, message="Use Realm(configuration:error:)")
 public func setDefaultRealmSchemaVersion(schemaVersion: UInt64, migrationBlock: MigrationBlock) {
-    RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: accessorMigrationBlock(migrationBlock))
+    RLMRealmSetSchemaVersionForPath(schemaVersion, RealmConfiguration.defaultConfiguration.path, accessorMigrationBlock(migrationBlock))
 }
 
 /**
@@ -91,8 +92,9 @@ block automatically as needed.
 - parameter realmPath: The path of the Realms to migrate.
 - parameter block:     The block which migrates the Realm to the current version.
 */
+@available(*, deprecated=1, message="Use Realm(configuration:error:)")
 public func setSchemaVersion(schemaVersion: UInt64, realmPath: String, migrationBlock: MigrationBlock) {
-    RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: realmPath, withMigrationBlock: accessorMigrationBlock(migrationBlock))
+    RLMRealmSetSchemaVersionForPath(schemaVersion, realmPath, accessorMigrationBlock(migrationBlock))
 }
 
 /**
@@ -129,11 +131,10 @@ exactly when and how migrations are performed.
            that occured otherwise.
 */
 public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
-    if let encryptionKey = encryptionKey {
-        return RLMRealm.migrateRealmAtPath(path, encryptionKey: encryptionKey)
-    } else {
-        return RLMRealm.migrateRealmAtPath(path)
-    }
+  let configuration = RLMConfiguration.defaultConfiguration()
+  configuration.path = path
+  configuration.encryptionKey = encryptionKey
+  return RLMRealm.migrateRealm(configuration)
 }
 
 
@@ -160,7 +161,7 @@ public final class Migration {
     /**
     Enumerates objects of a given type in this Realm, providing both the old and new versions of
     each object. Object properties can be accessed using subscripting.
-    
+
     - parameter className: The name of the `Object` class to enumerate.
     - parameter block:     The block providing both the old and new versions of an object in this Realm.
     */
@@ -179,7 +180,7 @@ public final class Migration {
                            `NSJSONSerialization`, or an `Array` with one object for each persisted
                            property. An exception will be thrown if any required properties are not
                            present and no default is set.
-    
+
     - returns: The created object.
     */
     public func create(className: String, value: AnyObject = [:]) -> MigrationObject {

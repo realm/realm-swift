@@ -98,24 +98,24 @@ class RealmTests: TestCase {
 
     func testInitInMemory() {
         autoreleasepool {
-            var realm = Realm(inMemoryIdentifier: "identifier")
+            var realm = inMemoryRealm("identifier")
             realm.write {
                 realm.create(SwiftIntObject.self, value: [1])
                 return
             }
         }
-        var realm = Realm(inMemoryIdentifier: "identifier")
+        var realm = inMemoryRealm("identifier")
         XCTAssertEqual(realm.objects(SwiftIntObject).count, 0)
 
         realm.write {
             realm.create(SwiftIntObject.self, value: [1])
             XCTAssertEqual(realm.objects(SwiftIntObject).count, 1)
 
-            Realm(inMemoryIdentifier: "identifier").create(SwiftIntObject.self, value: [1])
+            inMemoryRealm("identifier").create(SwiftIntObject.self, value: [1])
             XCTAssertEqual(realm.objects(SwiftIntObject).count, 2)
         }
 
-        var realm2 = Realm(inMemoryIdentifier: "identifier2")
+        var realm2 = inMemoryRealm("identifier2")
         XCTAssertEqual(realm2.objects(SwiftIntObject).count, 0)
     }
 

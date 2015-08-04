@@ -286,12 +286,16 @@ static void clearMigrationCache() {
 
 + (instancetype)defaultRealm
 {
-    return [RLMRealm realmWithPath:[RLMRealm defaultRealmPath] readOnly:NO error:nil];
+    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    configuration.encryptionKey = keyForPath(configuration.path);
+    configuration.migrationBlock = migrationBlockForPath(configuration.path);
+    configuration.schemaVersion = schemaVersionForPath(configuration.path);
+    return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
 + (instancetype)realmWithPath:(NSString *)path
 {
-    return [self realmWithPath:path readOnly:NO error:nil];
+    return [self realmWithPath:path key:nil readOnly:false inMemory:false dynamic:false schema:nil error:nil];
 }
 
 + (instancetype)realmWithPath:(NSString *)path
@@ -322,17 +326,20 @@ static void clearMigrationCache() {
 + (instancetype)realmWithPath:(NSString *)path
                           key:(NSData *)key
                      readOnly:(BOOL)readonly
-                     inMemory:(__unused BOOL)inMemory
+                     inMemory:(BOOL)inMemory
                       dynamic:(BOOL)dynamic
                        schema:(RLMSchema *)customSchema
                         error:(NSError **)outError
 {
     RLMConfiguration *configuration = [[RLMConfiguration alloc] init];
     configuration.path = path;
+    configuration.inMemoryIdentifier = inMemory ? path.lastPathComponent : nil;
     configuration.encryptionKey = key;
     configuration.readOnly = readonly;
     configuration.dynamic = dynamic;
     configuration.customSchema = customSchema;
+    configuration.migrationBlock = migrationBlockForPath(path);
+    configuration.schemaVersion = schemaVersionForPath(path);
     return [RLMRealm realmWithConfiguration:configuration error:outError];
 }
 
@@ -416,7 +423,7 @@ static id RLMAutorelease(id value) {
                 // if we are the first realm at this path, set/align schema or perform migration if needed
                 RLMSchema *targetSchema = customSchema ?: RLMSchema.sharedSchema;
                 @try {
-                    RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path), [targetSchema copy], [realm migrationBlock:configuration.migrationBlock key:key]);
+                    RLMUpdateRealmToSchemaVersion(realm, configuration.schemaVersion, [targetSchema copy], [realm migrationBlock:configuration.migrationBlock key:key]);
                 }
                 @catch (NSException *exception) {
                     RLMSetErrorOrThrow(RLMMakeError(exception), error);
@@ -473,6 +480,13 @@ static id RLMAutorelease(id value) {
 
         setKeyForPath(key, path);
     }
+}
+
+void RLMRealmSetEncryptionKeyForPath(NSData *encryptionKey, NSString *path) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    [RLMRealm setEncryptionKey:encryptionKey forRealmsAtPath:path];
+#pragma clang diagnostic pop
 }
 
 + (void)resetRealmState {
@@ -851,6 +865,13 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
+void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrationBlock migrationBlock) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    [RLMRealm setSchemaVersion:version forRealmAtPath:path withMigrationBlock:migrationBlock];
+#pragma clang diagnostic pop
+}
+
 + (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error {
     return [RLMRealm schemaVersionAtPath:realmPath encryptionKey:nil error:error];
 }
@@ -871,23 +892,28 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath {
-    return [self migrateRealmAtPath:realmPath key:keyForPath(realmPath)];
+    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    configuration.path = realmPath;
+    return [self migrateRealm:configuration];
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key {
     if (!key) {
         @throw RLMException(@"Encryption key must not be nil");
     }
-
-    return [self migrateRealmAtPath:realmPath key:RLMRealmValidatedEncryptionKey(key)];
+    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    configuration.path = realmPath;
+    configuration.encryptionKey = key;
+    return [self migrateRealm:configuration];
 }
 
-+ (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
++ (NSError *)migrateRealm:(RLMConfiguration *)configuration {
+    NSString *realmPath = configuration.path;
     if (RLMGetAnyCachedRealmForPath(realmPath)) {
         @throw RLMException(@"Cannot migrate Realms that are already open.");
     }
 
-    key = RLMRealmValidatedEncryptionKey(key) ?: keyForPath(realmPath);
+    NSData *key = configuration.encryptionKey ?: keyForPath(realmPath);
 
     NSError *error;
     RLMRealm *realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES error:&error];
@@ -895,7 +921,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         return error;
 
     @try {
-        RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), [RLMSchema.sharedSchema copy], [realm migrationBlock:nil key:key]);
+        RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), configuration.customSchema ?: [RLMSchema.sharedSchema copy], [realm migrationBlock:configuration.migrationBlock key:key]);
     } @catch (NSException *ex) {
         return RLMMakeError(ex);
     }

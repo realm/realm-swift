@@ -25,6 +25,10 @@ FOUNDATION_EXTERN void RLMDisableSyncToDisk();
 
 FOUNDATION_EXTERN NSData *RLMRealmValidatedEncryptionKey(NSData *key);
 
+FOUNDATION_EXTERN void RLMRealmSetEncryptionKeyForPath(NSData *encryptionKey, NSString *path);
+
+FOUNDATION_EXTERN void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrationBlock migrationBlock);
+
 // RLMRealm private members
 @interface RLMRealm () {
     @public

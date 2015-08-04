@@ -20,7 +20,7 @@ import XCTest
 import RealmSwift
 
 private func createStringObjects(factor: Int) -> Realm {
-    let realm = Realm(inMemoryIdentifier: factor.description)
+    let realm = inMemoryRealm(factor.description)
     realm.write {
         for _ in 0..<(1000 * factor) {
             realm.create(SwiftStringObject.self, value: ["a"])
@@ -362,7 +362,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testCommitWriteTransaction() {
         inMeasureBlock {
-            let realm = Realm(inMemoryIdentifier: "test")
+            let realm = inMemoryRealm("test")
             realm.beginWrite()
             let object = realm.create(SwiftIntObject)
             realm.commitWrite()
@@ -377,7 +377,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testCommitWriteTransactionWithLocalNotification() {
         inMeasureBlock {
-            let realm = Realm(inMemoryIdentifier: "test")
+            let realm = inMemoryRealm("test")
             realm.beginWrite()
             let object = realm.create(SwiftIntObject)
             realm.commitWrite()
@@ -395,7 +395,7 @@ class SwiftPerformanceTests: TestCase {
     func testCommitWriteTransactionWithCrossThreadNotification() {
         let stopValue = 100
         inMeasureBlock {
-            let realm = Realm(inMemoryIdentifier: "test")
+            let realm = inMemoryRealm("test")
             realm.beginWrite()
             let object = realm.create(SwiftIntObject)
             realm.commitWrite()
@@ -403,7 +403,7 @@ class SwiftPerformanceTests: TestCase {
             let queue = dispatch_queue_create("background", nil)
             let semaphore = dispatch_semaphore_create(0)
             dispatch_async(queue) {
-                let realm = Realm(inMemoryIdentifier: "test")
+                let realm = inMemoryRealm("test")
                 let object = realm.objects(SwiftIntObject).first!
                 var stop = false
                 let token = realm.addNotificationBlock { _, _ in
@@ -429,7 +429,7 @@ class SwiftPerformanceTests: TestCase {
     func testCrossThreadSyncLatency() {
         let stopValue = 100
         inMeasureBlock {
-            let realm = Realm(inMemoryIdentifier: "test")
+            let realm = inMemoryRealm("test")
             realm.beginWrite()
             let object = realm.create(SwiftIntObject)
             realm.commitWrite()
@@ -437,7 +437,7 @@ class SwiftPerformanceTests: TestCase {
             let queue = dispatch_queue_create("background", nil)
             let semaphore = dispatch_semaphore_create(0)
             dispatch_async(queue) {
-                let realm = Realm(inMemoryIdentifier: "test")
+                let realm = inMemoryRealm("test")
                 let object = realm.objects(SwiftIntObject).first!
                 let token = realm.addNotificationBlock { _, _ in
                     if object.intCol % 2 == 0 && object.intCol < stopValue {

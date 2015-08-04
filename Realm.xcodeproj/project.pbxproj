@@ -318,6 +318,10 @@
 		5D30B74B1B42072600D90C5A /* RLMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D30B74A1B42039F00D90C5A /* RLMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D30B74C1B42072700D90C5A /* RLMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D30B74A1B42039F00D90C5A /* RLMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D30B74D1B42072800D90C5A /* RLMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D30B74A1B42039F00D90C5A /* RLMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C07BC7D21B702BD400A08906 /* RLMConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D2DD0F1B6BE0DD004E8919 /* RLMConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		C07BC7D31B702BD500A08906 /* RLMConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D2DD0F1B6BE0DD004E8919 /* RLMConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		C07BC7D41B702BD700A08906 /* RLMConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D2DD0F1B6BE0DD004E8919 /* RLMConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		C07BC7D51B702BD800A08906 /* RLMConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D2DD0F1B6BE0DD004E8919 /* RLMConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		C06C74021B797EEF0027FF85 /* RLMObservation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F02AD1B6FFF3D0046A4D5 /* RLMObservation.mm */; };
 		C06C74031B797EF10027FF85 /* RLMObservation.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0F02AC1B6FFF3D0046A4D5 /* RLMObservation.hpp */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
@@ -987,7 +991,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				14D7F00D1B428F260095AD87 /* object_schema.hpp in Headers */,
-				C06C74031B797EF10027FF85 /* RLMObservation.hpp in Headers */,
 				14D7F00E1B428F260095AD87 /* object_store.hpp in Headers */,
 				14D7F0101B428F260095AD87 /* object_store_exceptions.hpp in Headers */,
 				14D7F00F1B428F260095AD87 /* property.hpp in Headers */,
@@ -998,6 +1001,7 @@
 				144C2F671B3D3529005C8F81 /* RLMArray_Private.h in Headers */,
 				144C2F5D1B3D3516005C8F81 /* RLMCollection.h in Headers */,
 				C0D2DD0A1B6BDEA1004E8919 /* RLMConfiguration.h in Headers */,
+				C07BC7D51B702BD800A08906 /* RLMConfiguration_Private.h in Headers */,
 				144C2F5E1B3D3517005C8F81 /* RLMConstants.h in Headers */,
 				14F127A31B4ABD1300609829 /* RLMDefines.h in Headers */,
 				144C2F681B3D3529005C8F81 /* RLMListBase.h in Headers */,
@@ -1010,6 +1014,7 @@
 				144C2F6B1B3D3529005C8F81 /* RLMObjectSchema_Private.h in Headers */,
 				144C2F741B3D3539005C8F81 /* RLMObjectSchema_Private.hpp in Headers */,
 				144C2F6C1B3D3529005C8F81 /* RLMObjectStore.h in Headers */,
+				C06C74031B797EF10027FF85 /* RLMObservation.hpp in Headers */,
 				144C2F5A1B3D3516005C8F81 /* RLMPlatform.h in Headers */,
 				144C2F631B3D3517005C8F81 /* RLMProperty.h in Headers */,
 				144C2F6D1B3D3529005C8F81 /* RLMProperty_Private.h in Headers */,
@@ -1043,6 +1048,7 @@
 				0237B5431A856F4B004ACD57 /* RLMArray_Private.h in Headers */,
 				29E3C71F1A71C1C700B62C1D /* RLMCollection.h in Headers */,
 				C0D2DD091B6BDEA1004E8919 /* RLMConfiguration.h in Headers */,
+				C07BC7D41B702BD700A08906 /* RLMConfiguration_Private.h in Headers */,
 				29E3C7201A71C1C700B62C1D /* RLMConstants.h in Headers */,
 				5D30B74C1B42072700D90C5A /* RLMDefines.h in Headers */,
 				29E3C72C1A71C1C700B62C1D /* RLMListBase.h in Headers */,
@@ -1089,6 +1095,7 @@
 				0237B5441A856F52004ACD57 /* RLMArray_Private.h in Headers */,
 				02B8EF5D19E7048D0045A93D /* RLMCollection.h in Headers */,
 				C0D2DD081B6BDEA1004E8919 /* RLMConfiguration.h in Headers */,
+				C07BC7D31B702BD500A08906 /* RLMConfiguration_Private.h in Headers */,
 				E856D1FA1956154C00FB2FCF /* RLMConstants.h in Headers */,
 				5D30B74D1B42072800D90C5A /* RLMDefines.h in Headers */,
 				023B195A1A3BA90D0067FB81 /* RLMListBase.h in Headers */,
@@ -1135,6 +1142,7 @@
 				0237B5451A856F59004ACD57 /* RLMArray_Private.h in Headers */,
 				02B8EF5C19E7048D0045A93D /* RLMCollection.h in Headers */,
 				C0D2DD071B6BDEA1004E8919 /* RLMConfiguration.h in Headers */,
+				C07BC7D21B702BD400A08906 /* RLMConfiguration_Private.h in Headers */,
 				E81A1F921955FC9300FDED82 /* RLMConstants.h in Headers */,
 				5D30B74B1B42072600D90C5A /* RLMDefines.h in Headers */,
 				023B19591A3BA90D0067FB81 /* RLMListBase.h in Headers */,
@@ -1624,13 +1632,13 @@
 				144C2F481B3D34A2005C8F81 /* RLMArrayLinkView.mm in Sources */,
 				C0D2DD0E1B6BDEA1004E8919 /* RLMConfiguration.m in Sources */,
 				144C2F491B3D34A2005C8F81 /* RLMConstants.m in Sources */,
-				C06C74021B797EEF0027FF85 /* RLMObservation.mm in Sources */,
 				144C2F4A1B3D34A2005C8F81 /* RLMListBase.mm in Sources */,
 				144C2F4B1B3D34A2005C8F81 /* RLMMigration.mm in Sources */,
 				144C2F4C1B3D34A2005C8F81 /* RLMObject.mm in Sources */,
 				144C2F4D1B3D34A2005C8F81 /* RLMObjectBase.mm in Sources */,
 				144C2F4E1B3D34A2005C8F81 /* RLMObjectSchema.mm in Sources */,
 				144C2F4F1B3D34A2005C8F81 /* RLMObjectStore.mm in Sources */,
+				C06C74021B797EEF0027FF85 /* RLMObservation.mm in Sources */,
 				144C2F501B3D34A2005C8F81 /* RLMProperty.mm in Sources */,
 				144C2F511B3D34A2005C8F81 /* RLMQueryUtil.mm in Sources */,
 				144C2F521B3D34A2005C8F81 /* RLMRealm.mm in Sources */,

@@ -6,6 +6,7 @@ framework module Realm {
 
     explicit module Private {
         header "RLMArray_Private.h"
+        header "RLMConfiguration_Private.h"
         header "RLMListBase.h"
         header "RLMMigration_Private.h"
         header "RLMObjectSchema_Private.h"

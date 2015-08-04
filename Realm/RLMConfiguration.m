@@ -81,7 +81,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 + (void)setDefaultConfiguration:(RLMConfiguration *)configuration {
-    s_defaultConfiguration = configuration ?: [[RLMConfiguration alloc] init];
+    s_defaultConfiguration = [configuration copy] ?: [[RLMConfiguration alloc] init];
 }
 
 - (instancetype)init {
