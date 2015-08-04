@@ -21,7 +21,7 @@ import Realm
 import Realm.Private
 
 /**
-A `RealmConfiguration` is used to describe the different options used to 
+A `RealmConfiguration` is used to describe the different options used to
 create a `Realm` instance.
 */
 public struct RealmConfiguration {
@@ -40,6 +40,18 @@ public struct RealmConfiguration {
 
     // MARK: Initialization
 
+    /**
+    Initializes a `RealmConfiguration`, suitable for creating new `Realm` instances.
+
+    :param: path               The path to the realm file.
+    :param: inMemoryIdentifier A string used to identify a particular in-memory Realm.
+    :param: encryptionKey      64-byte key to use to encrypt the data.
+    :param: readOnly           Whether the Realm is read-only (must be true for read-only files).
+    :param: schemaVersion      The current schema version.
+    :param: migrationBlock     The block which migrates the Realm to the current version.
+
+    :returns: An initialized `RealmConfiguration`.
+    */
     public init(path: String? = RLMConfiguration.defaultRealmPath(),
         inMemoryIdentifier: String? = nil,
         encryptionKey: NSData? = nil,
@@ -98,7 +110,7 @@ public struct RealmConfiguration {
 
     private var _encryptionKey: NSData? = nil
 
-    /// Whether the Realm is read-only (must be used for read-only files).
+    /// Whether the Realm is read-only (must be true for read-only files).
     public var readOnly: Bool = false
 
     /// The current schema version.

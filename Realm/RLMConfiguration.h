@@ -30,7 +30,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Returns the default configuration used to create realms.
 
- @return defaultConfiguration The default realm configuration.
+ @return The default realm configuration.
  */
 + (instancetype)defaultConfiguration;
 
@@ -50,7 +50,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /// 64-byte key to use to encrypt the data.
 @property (nonatomic, copy, nullable) NSData *encryptionKey;
 
-/// Whether the Realm is read-only (must be used for read-only files).
+/// Whether the Realm is read-only (must be YES for read-only files).
 @property (nonatomic) BOOL readOnly;
 
 /// The current schema version.

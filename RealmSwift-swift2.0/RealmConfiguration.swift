@@ -40,6 +40,18 @@ public struct RealmConfiguration {
 
     // MARK: Initialization
 
+    /**
+    Initializes a `RealmConfiguration`, suitable for creating new `Realm` instances.
+
+    - parameter path:               The path to the realm file.
+    - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
+    - parameter encryptionKey:      64-byte key to use to encrypt the data.
+    - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
+    - parameter schemaVersion:      The current schema version.
+    - parameter migrationBlock:     The block which migrates the Realm to the current version.
+
+    - returns: An initialized `RealmConfiguration`.
+    */
     public init(path: String? = RLMConfiguration.defaultRealmPath(),
         inMemoryIdentifier: String? = nil,
         encryptionKey: NSData? = nil,
@@ -99,7 +111,7 @@ public struct RealmConfiguration {
     private var _encryptionKey: NSData? = nil
 
 
-    /// Whether the Realm is read-only (must be used for read-only files).
+    /// Whether the Realm is read-only (must be true for read-only files).
     public var readOnly: Bool = false
 
     /// The current schema version.
