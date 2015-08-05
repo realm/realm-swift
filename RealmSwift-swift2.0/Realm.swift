@@ -318,17 +318,19 @@ public final class Realm {
     the Realm instance with the same primary key value, the object is inserted. Otherwise,
     the existing object is updated with any changed values.
     
-    :param: className   The class name of the object to create.
-    :param: value       The value used to populate the object. This can be any key/value coding compliant
+    - parameter className:  The class name of the object to create.
+    - parameter value:      The value used to populate the object. This can be any key/value coding compliant
     object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
     or an `Array` with one object for each persisted property. An exception will be
     thrown if any required properties are not present and no default is set.
     
     When passing in an `Array`, all properties must be present,
     valid and in the same order as the properties defined in the model.
-    :param: update      If true will try to update existing objects with the same primary key.
+    - parameter update:     If true will try to update existing objects with the same primary key.
     
-    :returns: The created object.
+    - returns: The created object.
+    
+    :nodoc:
     */
     public func dynamicCreate(className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
         if update && schema[className]?.primaryKeyProperty == nil {
@@ -412,11 +414,13 @@ public final class Realm {
 
     Returns all objects for a given class name in the Realm.
     
-    :warning: This method is useful only in specialized circumstances.
+    - warning: This method is useful only in specialized circumstances.
     
-    :param: className  The class name of the objects to be returned.
+    - parameter className: The class name of the objects to be returned.
     
-    :returns: All objects for the given class name as dynamic objects
+    - returns: All objects for the given class name as dynamic objects
+    
+    :nodoc:
     */
     public func dynamicObjects(className: String) -> Results<DynamicObject> {
         return Results<DynamicObject>(RLMGetObjects(rlmRealm, className, nil))
@@ -452,14 +456,16 @@ public final class Realm {
     
     This method requires that `primaryKey()` be overridden on the given subclass.
     
-    :see: Object.primaryKey()
+    - see: Object.primaryKey()
     
-    :warning: This method is useful only in specialized circumstances.
+    - warning: This method is useful only in specialized circumstances.
     
-    :param: className  The class name of the object to be returned.
-    :param: key        The primary key of the desired object.
+    - parameter className:  The class name of the object to be returned.
+    - parameter key:        The primary key of the desired object.
     
-    :returns: An object of type `DynamicObject` or `nil` if an object with the given primary key does not exist.
+    - returns: An object of type `DynamicObject` or `nil` if an object with the given primary key does not exist.
+    
+    :nodoc:
     */
     public func dynamicObjectForPrimaryKey(className: String, key: AnyObject) -> DynamicObject? {
         return unsafeBitCast(RLMGetObject(rlmRealm, className, key), Optional<DynamicObject>.self)

@@ -347,6 +347,8 @@ public final class Realm {
     :param: update      If true will try to update existing objects with the same primary key.
     
     :returns: The created object.
+    
+    :nodoc:
     */
     public func dynamicCreate(className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
         if update && schema[className]?.primaryKeyProperty == nil {
@@ -432,6 +434,8 @@ public final class Realm {
     :param: className  The class name of the objects to be returned.
     
     :returns: All objects for the given class name as dynamic objects
+    
+    :nodoc:
     */
     public func dynamicObjects(className: String) -> Results<DynamicObject> {
         return Results<DynamicObject>(RLMGetObjects(rlmRealm, className, nil))
@@ -474,6 +478,8 @@ public final class Realm {
     :param: key        The primary key of the desired object.
     
     :returns: An object of type `DynamicObject` or `nil` if an object with the given primary key does not exist.
+    
+    :nodoc:
     */
     public func dynamicObjectForPrimaryKey(className: String, key: AnyObject) -> DynamicObject? {
         return unsafeBitCast(RLMGetObject(rlmRealm, className, key), Optional<DynamicObject>.self)

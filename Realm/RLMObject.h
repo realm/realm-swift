@@ -223,12 +223,12 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  The Realm in which this object is persisted. Returns nil for standalone objects.
  */
-@property (nonatomic, readonly, nullable, getter = realm) RLMRealm *realm;
+@property (nonatomic, readonly, nullable) RLMRealm *realm;
 
 /**
  The ObjectSchema which lists the persisted properties for this object.
  */
-@property (nonatomic, readonly, getter = objectSchema) RLMObjectSchema *objectSchema;
+@property (nonatomic, readonly) RLMObjectSchema *objectSchema;
 
 /**
  Indicates if an object can no longer be accessed.

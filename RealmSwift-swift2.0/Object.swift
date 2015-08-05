@@ -218,6 +218,7 @@ public class Object: RLMObjectBase {
 
 
 /// Object interface which allows untyped getters and setters for Objects.
+/// :nodoc:
 public final class DynamicObject : Object {
     private var listProperties = [String: List<DynamicObject>]()
 

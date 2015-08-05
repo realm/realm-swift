@@ -29,6 +29,10 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
+@property (nonatomic, readonly, nullable) RLMRealm *realm;
+
+@property (nonatomic, readonly) RLMObjectSchema *objectSchema;
+
 - (instancetype)init;
 
 + (NSString *)className;

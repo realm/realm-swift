@@ -24,6 +24,7 @@ appledoc \
     --ignore ".m" \
     --ignore ".mm" \
     --ignore ".hpp" \
+    --ignore "Realm/RLMRealm_Dynamic.h" \
     --ignore "Realm/RLMObjectBase.h" \
     --ignore "Realm/RLMObjectBase_Dynamic.h" \
     --ignore "Realm/RLMObjectStore.h" \
