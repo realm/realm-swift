@@ -38,7 +38,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
      RLM_ARRAY_TYPE(ObjectType)
      ...
-     @property RLMArray<ObjectType *><ObjectType> *arrayOfObjectTypes;
+     @property RLMArray<ObjectType> *arrayOfObjectTypes;
 
  RLMArrays can be queried with the same predicates as RLMObject and RLMResults.
 
