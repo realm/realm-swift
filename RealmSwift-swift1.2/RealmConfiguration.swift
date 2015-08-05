@@ -127,7 +127,7 @@ public struct RealmConfiguration {
         configuration.inMemoryIdentifier = self.inMemoryIdentifier
         configuration.encryptionKey = self.encryptionKey
         configuration.readOnly = self.readOnly
-        configuration.schemaVersion = UInt(self.schemaVersion)
+        configuration.schemaVersion = self.schemaVersion
         configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
         return configuration
     }

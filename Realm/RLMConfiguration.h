@@ -54,7 +54,7 @@ RLM_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL readOnly;
 
 /// The current schema version.
-@property (nonatomic) NSUInteger schemaVersion;
+@property (nonatomic) uint64_t schemaVersion;
 
 /// The block which migrates the Realm to the current version.
 @property (nonatomic, copy, nullable) RLMMigrationBlock migrationBlock;

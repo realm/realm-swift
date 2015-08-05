@@ -135,7 +135,7 @@ static bool RLMRealmHasAllTables(RLMRealm *realm, RLMSchema *targetSchema) {
     return true;
 }
 
-void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
+void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, uint64_t newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
     ObjectStore::Schema schema;
     for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
         schema.push_back(objectSchema.objectStoreCopy);
