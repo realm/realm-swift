@@ -155,7 +155,8 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
-    return [_backingArray countByEnumeratingWithState:state objects:buffer count:len];
+    __autoreleasing NSArray *copy = [[NSArray alloc] initWithArray:_backingArray];
+    return [copy countByEnumeratingWithState:state objects:buffer count:len];
 }
 
 - (void)addObjectsFromArray:(NSArray *)array {

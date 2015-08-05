@@ -551,6 +551,21 @@
     XCTAssertEqual(totalCount * 2, company.employees.count);
 
     [realm cancelWriteTransaction];
+
+    // Standalone array
+    company = [[CompanyObject alloc] init];
+    for (size_t i = 0; i < totalCount; ++i) {
+        [company.employees addObject:[[EmployeeObject alloc] initWithValue:@[@"name", @(i), @NO]]];
+    }
+
+    count = 0;
+    for (EmployeeObject *eo in company.employees) {
+        ++count;
+        [company.employees addObject:eo];
+    }
+    XCTAssertEqual(totalCount, count);
+    XCTAssertEqual(totalCount * 2, company.employees.count);
+
 }
 
 - (void)testValueForKey {
