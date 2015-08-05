@@ -22,6 +22,18 @@
 
 using namespace realm;
 
+#ifdef __has_cpp_attribute
+#define REALM_HAS_CCP_ATTRIBUTE(attr) __has_cpp_attribute(attr)
+#else
+#define REALM_HAS_CCP_ATTRIBUTE(attr) 0
+#endif
+
+#if REALM_HAS_CCP_ATTRIBUTE(clang::fallthrough)
+#define REALM_FALLTHROUGH [[clang::fallthrough]]
+#else
+#define REALM_FALLTHROUGH
+#endif
+
 Results::Results(SharedRealm r, Query q, SortOrder s)
 : m_realm(std::move(r))
 , m_query(std::move(q))
@@ -64,6 +76,7 @@ size_t Results::size()
             update_tableview();
             return m_table_view.size();
     }
+    REALM_UNREACHABLE();
 }
 
 RowExpr Results::get(size_t row_ndx)
@@ -96,10 +109,11 @@ util::Optional<RowExpr> Results::first()
             return m_table->size() == 0 ? util::none : util::Optional<RowExpr>(m_table->front());
         case Mode::Query:
             update_tableview();
-            [[clang::fallthrough]];
+            REALM_FALLTHROUGH;
         case Mode::TableView:
             return m_table_view.size() == 0 ? util::none : util::Optional<RowExpr>(m_table_view.front());
     }
+    REALM_UNREACHABLE();
 }
 
 util::Optional<RowExpr> Results::last()
@@ -112,10 +126,11 @@ util::Optional<RowExpr> Results::last()
             return m_table->size() == 0 ? util::none : util::Optional<RowExpr>(m_table->back());
         case Mode::Query:
             update_tableview();
-            [[clang::fallthrough]];
+            REALM_FALLTHROUGH;
         case Mode::TableView:
             return m_table_view.size() == 0 ? util::none : util::Optional<RowExpr>(m_table_view.back());
     }
+    REALM_UNREACHABLE();
 }
 
 void Results::update_tableview()
@@ -161,12 +176,12 @@ size_t Results::index_of(size_t row_ndx)
         case Mode::Query:
             if (!m_sort)
                 return m_query.count(row_ndx, row_ndx + 1) ? m_query.count(0, row_ndx) : not_found;
-            [[clang::fallthrough]];
+            REALM_FALLTHROUGH;
         case Mode::TableView:
             update_tableview();
             return m_table_view.find_by_source_ndx(row_ndx);
     }
-
+    REALM_UNREACHABLE();
 }
 
 template<typename Int, typename Float, typename Double, typename DateTime>
@@ -190,11 +205,12 @@ util::Optional<Mixed> Results::aggregate(size_t column, bool return_none_for_emp
                 return util::Optional<Mixed>(getter(*m_table));
             case Mode::Query:
             case Mode::TableView:
-                update_tableview();
+                this->update_tableview();
                 if (return_none_for_empty && m_table_view.size() == 0)
                     return none;
                 return util::Optional<Mixed>(getter(m_table_view));
         }
+        REALM_UNREACHABLE();
     };
 
     switch (m_table->get_column_type(column))
@@ -275,6 +291,7 @@ Query Results::get_query() const
         case Mode::Table:
             return m_table->where();
     }
+    REALM_UNREACHABLE();
 }
 
 TableView Results::get_tableview()
