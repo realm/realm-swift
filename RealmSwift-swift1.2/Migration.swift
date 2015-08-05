@@ -129,11 +129,16 @@ exactly when and how migrations are performed.
 :returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
           that occured otherwise.
 */
+@availability(*, deprecated=1, message="Use migrateRealm(configuration:)")
 public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
-    let configuration = RLMConfiguration.defaultConfiguration()
+    var configuration = RealmConfiguration.defaultConfiguration
     configuration.path = path
     configuration.encryptionKey = encryptionKey
-    return RLMRealm.migrateRealm(configuration)
+    return migrateRealm(configuration: configuration)
+}
+
+public func migrateRealm(configuration: RealmConfiguration = RealmConfiguration.defaultConfiguration) -> NSError? {
+    return RLMRealm.migrateRealm(configuration.rlmConfiguration)
 }
 
 

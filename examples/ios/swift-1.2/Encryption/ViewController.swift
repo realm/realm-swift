@@ -41,9 +41,8 @@ class ViewController: UIViewController {
         // Use an autorelease pool to close the Realm at the end of the block, so
         // that we can try to reopen it with different keys
         autoreleasepool {
-            if let realm = Realm(path: Realm.defaultPath, readOnly: false,
-                encryptionKey: getKey(), error: nil) {
-
+            let configuration = RealmConfiguration(encryptionKey: getKey())
+            if let realm = Realm(configuration: configuration, error: nil) {
                 // Add an object
                 realm.write {
                     let obj = EncryptionObject()
@@ -56,26 +55,24 @@ class ViewController: UIViewController {
         // Opening with wrong key fails since it decrypts to the wrong thing
         autoreleasepool {
             var error: NSError? = nil
-            Realm(path: Realm.defaultPath, readOnly: false,
-                encryptionKey: "1234567890123456789012345678901234567890123456789012345678901234".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false),
-                error: &error)
+            let configuration = RealmConfiguration(encryptionKey: "1234567890123456789012345678901234567890123456789012345678901234".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false))
+            Realm(configuration: configuration, error: &error)
             log("Open with wrong key: \(error)")
         }
 
         // Opening wihout supplying a key at all fails
         autoreleasepool {
             var error: NSError? = nil
-            Realm(path: Realm.defaultPath, readOnly: false, error: &error)
+            let configuration = RealmConfiguration()
+            Realm(configuration: configuration, error: &error)
             log("Open with no key: \(error)")
         }
 
         // Reopening with the correct key works and can read the data
         autoreleasepool {
             var error: NSError? = nil
-            if let realm = Realm(path: Realm.defaultPath,
-                readOnly: false,
-                encryptionKey: getKey(),
-                error: &error) {
+            let configuration = RealmConfiguration(encryptionKey: getKey())
+            if let realm = Realm(configuration: configuration, error: &error) {
                 if let stringProp = realm.objects(EncryptionObject).first?.stringProp {
                     log("Saved object: \(stringProp)")
                 }

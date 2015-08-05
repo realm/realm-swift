@@ -19,7 +19,6 @@
 import UIKit
 import RealmSwift
 
-
 class Dog: Object {
     dynamic var name = ""
     dynamic var age = 0
@@ -45,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
 
-        NSFileManager.defaultManager().removeItemAtPath(Realm.defaultPath, error: nil)
+        NSFileManager.defaultManager().removeItemAtPath(RealmConfiguration.defaultConfiguration.path!, error: nil)
 
         let realm = Realm()
         realm.write {

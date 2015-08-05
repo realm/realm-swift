@@ -931,7 +931,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = RLM;
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					C0658DB31A76CBD8002F7A84 = {

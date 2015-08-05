@@ -62,7 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
 
         // copy over old data files for migration
-        let defaultPath = Realm.defaultPath
+        let defaultPath = RealmConfiguration.defaultConfiguration.path!
         let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
 
         if let v0Path = bundlePath("default-v0.realm") {
@@ -97,7 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             println("Migration complete.")
         }
 
-        setDefaultRealmSchemaVersion(3, migrationBlock)
+        RealmConfiguration.defaultConfiguration = RealmConfiguration(schemaVersion: 3, migrationBlock: migrationBlock)
 
         // print out all migrated objects in the default realm
         // migration is performed implicitly on Realm access
@@ -109,8 +109,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let v1Path = bundlePath("default-v1.realm"), v2Path = bundlePath("default-v2.realm") {
             let realmv1Path = defaultParentPath.stringByAppendingPathComponent("default-v1.realm")
             let realmv2Path = defaultParentPath.stringByAppendingPathComponent("default-v2.realm")
-            setSchemaVersion(3, realmv1Path, migrationBlock)
-            setSchemaVersion(3, realmv2Path, migrationBlock)
+
+            let realmv1Configuration = RealmConfiguration(path: realmv1Path, schemaVersion: 3, migrationBlock: migrationBlock)
+            let realmv2Configuration = RealmConfiguration(path: realmv1Path, schemaVersion: 3, migrationBlock: migrationBlock)
 
             NSFileManager.defaultManager().removeItemAtPath(realmv1Path, error: nil)
             NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path, error: nil)
@@ -118,12 +119,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path, error: nil)
 
             // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
-            migrateRealm(realmv1Path)
+            migrateRealm(configuration: realmv1Configuration)
 
             // print out all migrated objects in the migrated realms
-            let realmv1 = Realm(path: realmv1Path)
+            let realmv1 = Realm(configuration: realmv1Configuration)!
             println("Migrated objects in the Realm migrated from v1: \(realmv1.objects(Person))")
-            let realmv2 = Realm(path: realmv2Path)
+            let realmv2 = Realm(configuration: realmv2Configuration)!
             println("Migrated objects in the Realm migrated from v2: \(realmv2.objects(Person))")
         }
 
