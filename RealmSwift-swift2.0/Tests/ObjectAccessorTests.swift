@@ -94,24 +94,24 @@ class ObjectAccessorTests: TestCase {
                 obj.objectSchema.properties.map { $0.name }.map { obj[$0] = 0 }
 
                 obj["int8"] = Int(v8)
-                XCTAssertEqual(obj["int8"]! as! Int, Int(v8))
+                XCTAssertEqual((obj["int8"]! as! Int), Int(v8))
                 obj["int16"] = Int(v16)
-                XCTAssertEqual(obj["int16"]! as! Int, Int(v16))
+                XCTAssertEqual((obj["int16"]! as! Int), Int(v16))
                 obj["int32"] = Int(v32)
-                XCTAssertEqual(obj["int32"]! as! Int, Int(v32))
+                XCTAssertEqual((obj["int32"]! as! Int), Int(v32))
                 obj["int64"] = NSNumber(longLong: v64)
-                XCTAssertEqual(obj["int64"]! as! NSNumber, NSNumber(longLong: v64))
+                XCTAssertEqual((obj["int64"]! as! NSNumber), NSNumber(longLong: v64))
 
                 obj.objectSchema.properties.map { $0.name }.map { obj[$0] = 0 }
 
                 obj.setValue(Int(v8), forKey: "int8")
-                XCTAssertEqual(obj.valueForKey("int8")! as! Int, Int(v8))
+                XCTAssertEqual((obj.valueForKey("int8")! as! Int), Int(v8))
                 obj.setValue(Int(v16), forKey: "int16")
-                XCTAssertEqual(obj.valueForKey("int16")! as! Int, Int(v16))
+                XCTAssertEqual((obj.valueForKey("int16")! as! Int), Int(v16))
                 obj.setValue(Int(v32), forKey: "int32")
-                XCTAssertEqual(obj.valueForKey("int32")! as! Int, Int(v32))
+                XCTAssertEqual((obj.valueForKey("int32")! as! Int), Int(v32))
                 obj.setValue(NSNumber(longLong: v64), forKey: "int64")
-                XCTAssertEqual(obj.valueForKey("int64")! as! NSNumber, NSNumber(longLong: v64))
+                XCTAssertEqual((obj.valueForKey("int64")! as! NSNumber), NSNumber(longLong: v64))
 
                 obj.objectSchema.properties.map { $0.name }.map { obj[$0] = 0 }
 
