@@ -137,6 +137,21 @@ public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError?
     return migrateRealm(configuration: configuration)
 }
 
+/**
+Performs the configuration's migration block on the Realm created by the given
+configuration.
+
+This method is called automatically when opening a Realm for the first time and does
+not need to be called explicitly. You can choose to call this method to control
+exactly when and how migrations are performed.
+
+:param: configuration The RealmConfiguration used to create the Realm to be
+                      migrated, and containing the schema version and migration
+                      block used to perform the migration.
+
+:returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
+          that occured otherwise.
+*/
 public func migrateRealm(configuration: RealmConfiguration = RealmConfiguration.defaultConfiguration) -> NSError? {
     return RLMRealm.migrateRealm(configuration.rlmConfiguration)
 }
@@ -165,7 +180,7 @@ public final class Migration {
     /**
     Enumerates objects of a given type in this Realm, providing both the old and new versions of
     each object. Object properties can be accessed using subscripting.
-    
+
     :param: className The name of the `Object` class to enumerate.
     :param: block     The block providing both the old and new versions of an object in this Realm.
     */
@@ -184,7 +199,7 @@ public final class Migration {
                       `NSJSONSerialization`, or an `Array` with one object for each persisted
                       property. An exception will be thrown if any required properties are not
                       present and no default is set.
-    
+
     :returns: The created object.
     */
     public func create(className: String, value: AnyObject = [:]) -> MigrationObject {
