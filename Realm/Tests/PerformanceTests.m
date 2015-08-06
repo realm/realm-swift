@@ -18,7 +18,7 @@
 
 #import "RLMTestCase.h"
 
-#if !DEBUG
+#if !DEBUG && !TARGET_OS_SIMULATOR && !TARGET_OS_MAC
 
 @interface PerformanceTests : RLMTestCase
 @end

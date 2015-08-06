@@ -20,6 +20,8 @@
 
 #import "RLMConstants.h"
 
+#if RLM_TEST_TARGET_OSX
+
 @interface InterprocessTest : RLMMultiProcessTestCase
 @end
 
@@ -329,3 +331,5 @@
 }
 
 @end
+
+#endif

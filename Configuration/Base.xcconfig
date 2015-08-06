@@ -22,8 +22,10 @@ GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 GCC_WARN_UNUSED_FUNCTION = YES;
 GCC_WARN_UNUSED_PARAMETER = YES;
 GCC_WARN_UNUSED_VARIABLE = YES;
-HEADER_SEARCH_PATHS = $(inherited) core/include;
+HEADER_SEARCH_PATHS = $(inherited) $(DERIVED_FILE_DIR) core/include;
 SWIFT_WHOLE_MODULE_OPTIMIZATION = YES;
+
+ALWAYS_USE_SEPARATE_HEADERMAPS = YES;
 
 MACOSX_DEPLOYMENT_TARGET = 10.9;
 IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -31,10 +33,8 @@ WATCHOS_DEPLOYMENT_TARGET = 2.0;
 CODE_SIGN_IDENTITY[sdk=iphone*] = iPhone Developer;
 TARGETED_DEVICE_FAMILY = 1,2,4;
 
-REALM_FRAMEWORK_PATH[sdk=iphone*] = build/ios-dynamic;
-REALM_FRAMEWORK_PATH[sdk=watch*] = build/watchos;
-REALM_FRAMEWORK_PATH[sdk=macosx*] = build/osx;
-
-REALM_OTHER_CFLAGS[sdk=iphone*] = -fembed-bitcode
-REALM_OTHER_CFLAGS[sdk=watch*] = -fembed-bitcode
-OTHER_CFLAGS = $(inherited) $(REALM_OTHER_FLAGS)
+REALM_OTHER_CFLAGS[sdk=iphone*] = -fembed-bitcode;
+REALM_OTHER_CFLAGS[sdk=watch*] = -fembed-bitcode;
+OTHER_CFLAGS = $(inherited) $(REALM_OTHER_FLAGS);
+OTHER_CPLUSPLUSFLAGS = $(inherited) -isystem core/include;
+LIBRARY_SEARCH_PATHS = core;

@@ -223,21 +223,13 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
     // if this fails (and you haven't changed the test module name), the checks
     // for swift class names and the demangling logic need to be updated
     func testNSStringFromClassDemangledTopLevelClassNames() {
-#if os(iOS)
-        XCTAssertEqual(NSStringFromClass(OuterClass), "iOS_Tests.OuterClass")
-#else
-        XCTAssertEqual(NSStringFromClass(OuterClass), "OSX_Tests.OuterClass")
-#endif
+        XCTAssertEqual(NSStringFromClass(OuterClass), "Realm_Tests.OuterClass")
     }
 
     // if this fails (and you haven't changed the test module name), the prefix
     // check in RLMSchema initialization needs to be updated
     func testNestedClassNameMangling() {
-#if os(iOS)
-        XCTAssertEqual(NSStringFromClass(OuterClass.InnerClass.self), "_TtCC9iOS_Tests10OuterClass10InnerClass")
-#else
-        XCTAssertEqual(NSStringFromClass(OuterClass.InnerClass.self), "_TtCC9OSX_Tests10OuterClass10InnerClass")
-#endif
+        XCTAssertEqual(NSStringFromClass(OuterClass.InnerClass.self), "_TtCC11Realm_Tests10OuterClass10InnerClass")
     }
 
 }
