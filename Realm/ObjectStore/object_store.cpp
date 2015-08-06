@@ -30,6 +30,7 @@
 
 using namespace realm;
 
+namespace {
 const char * const c_metadataTableName = "metadata";
 const char * const c_versionColumnName = "version";
 const size_t c_versionColumnIndex = 0;
@@ -42,8 +43,8 @@ const size_t c_primaryKeyPropertyNameColumnIndex =  1;
 
 const size_t c_zeroRowIndex = 0;
 
-const std::string c_object_table_prefix = "class_";
-const size_t c_object_table_prefix_length = c_object_table_prefix.length();
+const char c_object_table_prefix[] = "class_";
+}
 
 const uint64_t ObjectStore::NotVersioned = std::numeric_limits<uint64_t>::max();
 
@@ -119,15 +120,15 @@ void ObjectStore::set_primary_key_for_object(Group *group, StringData object_typ
     }
 }
 
-std::string ObjectStore::object_type_for_table_name(const std::string &table_name) {
-    if (table_name.size() >= c_object_table_prefix_length && table_name.compare(0, c_object_table_prefix_length, c_object_table_prefix) == 0) {
-        return table_name.substr(c_object_table_prefix_length, table_name.length() - c_object_table_prefix_length);
+StringData ObjectStore::object_type_for_table_name(StringData table_name) {
+    if (table_name.begins_with(c_object_table_prefix)) {
+        return table_name.substr(sizeof(c_object_table_prefix) - 1);
     }
-    return std::string();
+    return StringData();
 }
 
-std::string ObjectStore::table_name_for_object_type(const std::string &object_type) {
-    return c_object_table_prefix + object_type;
+std::string ObjectStore::table_name_for_object_type(StringData object_type) {
+    return std::string(c_object_table_prefix) + object_type.data();
 }
 
 TableRef ObjectStore::table_for_object_type(Group *group, StringData object_type) {
@@ -138,7 +139,7 @@ ConstTableRef ObjectStore::table_for_object_type(const Group *group, StringData 
     return group->get_table(table_name_for_object_type(object_type));
 }
 
-TableRef ObjectStore::table_for_object_type_create_if_needed(Group *group, const StringData &object_type, bool &created) {
+TableRef ObjectStore::table_for_object_type_create_if_needed(Group *group, StringData object_type, bool &created) {
     return group->get_or_add_table(table_name_for_object_type(object_type), &created);
 }
 
@@ -491,7 +492,7 @@ void ObjectStore::validate_primary_column_uniqueness(const Group *group, Schema 
     }
 }
 
-void ObjectStore::delete_data_for_object(Group *group, const StringData &object_type) {
+void ObjectStore::delete_data_for_object(Group *group, StringData object_type) {
     TableRef table = table_for_object_type(group, object_type);
     if (table) {
         group->remove_table(table->get_index_in_group());

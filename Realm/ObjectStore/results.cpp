@@ -52,17 +52,17 @@ Results::Results(SharedRealm r, Table& table)
 
 void Results::validate_read() const
 {
-    if (m_realm && !m_realm->check_thread())
-        throw Error::IncorrectThread;
+    if (m_realm)
+        m_realm->verify_thread();
     if (m_table && !m_table->is_attached())
-        throw Error::Invalidated;
+        throw InvalidatedException();
 }
 
 void Results::validate_write() const
 {
     validate_read();
     if (!m_realm || !m_realm->is_in_transaction())
-        throw Error::NotInWrite;
+        throw InvalidTransactionException("Must be in a write transaction");
 }
 
 size_t Results::size()
@@ -96,7 +96,7 @@ RowExpr Results::get(size_t row_ndx)
             break;
     }
 
-    throw Error::OutOfBoundsIndex;
+    throw OutOfBoundsIndexException{row_ndx, size()};
 }
 
 util::Optional<RowExpr> Results::first()
@@ -157,10 +157,10 @@ size_t Results::index_of(Row const& row)
 {
     validate_read();
     if (!row) {
-        throw Error::DetachedAccessor;
+        throw DetatchedAccessorException{};
     }
     if (m_table && row.get_table() != m_table) {
-        throw Error::IncorrectTable;
+        throw IncorrectTableException{m_table, row.get_table()};
     }
     return index_of(row.get_index());
 }
@@ -193,7 +193,7 @@ util::Optional<Mixed> Results::aggregate(size_t column, bool return_none_for_emp
     if (!m_table)
         return none;
     if (column > m_table->get_column_count())
-        throw Error::OutOfBoundsIndex;
+        throw OutOfBoundsIndexException{column, m_table->get_column_count()};
 
     auto do_agg = [&](auto const& getter) -> util::Optional<Mixed> {
         switch (m_mode) {
@@ -220,7 +220,7 @@ util::Optional<Mixed> Results::aggregate(size_t column, bool return_none_for_emp
         case type_Float: return do_agg(agg_float);
         case type_Int: return do_agg(agg_int);
         default:
-            throw Error::UnsupportedColumnType;
+            throw UnsupportedColumnTypeException{column, m_table};
     }
 }
 
@@ -248,7 +248,7 @@ util::Optional<Mixed> Results::sum(size_t column)
                      [=](auto const& table) { return table.sum_int(column); },
                      [=](auto const& table) { return table.sum_float(column); },
                      [=](auto const& table) { return table.sum_double(column); },
-                     [=](auto const&) -> util::None { throw Error::UnsupportedColumnType; });
+                     [=](auto const&) -> util::None { throw UnsupportedColumnTypeException{column, m_table}; });
 }
 
 util::Optional<Mixed> Results::average(size_t column)
@@ -257,7 +257,7 @@ util::Optional<Mixed> Results::average(size_t column)
                      [=](auto const& table) { return table.average_int(column); },
                      [=](auto const& table) { return table.average_float(column); },
                      [=](auto const& table) { return table.average_double(column); },
-                     [=](auto const&) -> util::None { throw Error::UnsupportedColumnType; });
+                     [=](auto const&) -> util::None { throw UnsupportedColumnTypeException{column, m_table}; });
 }
 
 void Results::clear()
@@ -318,4 +318,10 @@ Results Results::sort(realm::SortOrder&& sort) const
 Results Results::filter(Query&& q) const
 {
     return Results(m_realm, get_query().and_query(q), get_sort());
+}
+
+Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t column, const Table* table) {
+    column_index = column;
+    column_name = table->get_column_name(column);
+    column_type = table->get_column_type(column);
 }

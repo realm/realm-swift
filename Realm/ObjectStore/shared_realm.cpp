@@ -230,15 +230,17 @@ static void check_read_write(Realm *realm)
     }
 }
 
-bool Realm::check_thread() const noexcept
-{
-    return m_thread_id == std::this_thread::get_id();
-}
-
 void Realm::verify_thread() const
 {
-    if (!check_thread()) {
-        throw IncorrectThreadException("Realm accessed from incorrect thread.");
+    if (m_thread_id != std::this_thread::get_id()) {
+        throw IncorrectThreadException();
+    }
+}
+
+void Realm::verify_in_write() const
+{
+    if (!is_in_transaction()) {
+        throw InvalidTransactionException("Cannot modify persisted objects outside of a write transaction.");
     }
 }
 

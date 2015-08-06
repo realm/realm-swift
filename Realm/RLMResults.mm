@@ -150,48 +150,48 @@ static const int RLMEnumerationBufferSize = 16;
     return self;
 }
 
-namespace {
-struct ErrorInfo {
-    __unsafe_unretained RLMResults *ar = nil;
-    __unsafe_unretained RLMObject *obj = nil;
-    __unsafe_unretained NSString *aggregateMethod = nil;
-    NSUInteger index = -1;
-};
-}
-
 [[gnu::noinline]]
 [[noreturn]]
-static void throwError(Results::Error e, ErrorInfo info={}) {
-    switch (e) {
-        case Results::Error::IncorrectThread:
-            @throw RLMException(@"Realm accessed from incorrect thread");
-        case Results::Error::DetachedAccessor:
-            @throw RLMException(@"Object has been invalidated");
-        case Results::Error::IncorrectTable:
-            @throw RLMException(@"Object type '%@' does not match RLMResults type '%@'.",
-                                info.obj->_objectSchema.className, info.ar->_objectClassName);
-
-        case Results::Error::Invalidated:
-            @throw RLMException(@"RLMResults has been invalidated");
-        case Results::Error::NotInWrite:
-            @throw RLMException(@"Cannot modify Results outside of a write transaction");
-        case Results::Error::OutOfBoundsIndex:
-            @throw RLMException(@"Index %zu is out of bounds (must be less than %zu)",
-                                size_t(info.index), info.ar.count);
-        case Results::Error::UnsupportedColumnType:
-            @throw RLMException(@"%@ is not supported for '%@' properties",
-                                info.aggregateMethod,
-                                RLMTypeToString([(RLMProperty *)info.ar->_objectSchema.properties[info.index] type]));
+static void throwError(NSString *aggregateMethod) {
+    try {
+        throw;
+    }
+    catch (realm::InvalidTransactionException const&) {
+        @throw RLMException(@"Cannot modify Results outside of a write transaction");
+    }
+    catch (realm::IncorrectThreadException const&) {
+        @throw RLMException(@"Realm accessed from incorrect thread");
+    }
+    catch (realm::Results::InvalidatedException const&) {
+        @throw RLMException(@"RLMResults has been invalidated");
+    }
+    catch (realm::Results::DetatchedAccessorException const&) {
+        @throw RLMException(@"Object has been invalidated");
+    }
+    catch (realm::Results::IncorrectTableException const& e) {
+        @throw RLMException(@"Object type '%s' does not match RLMResults type '%s'.",
+                            ObjectStore::object_type_for_table_name(e.actual->get_name()).data(),
+                            ObjectStore::object_type_for_table_name(e.expected->get_name()).data());
+    }
+    catch (realm::Results::OutOfBoundsIndexException const& e) {
+        @throw RLMException(@"Index %zu is out of bounds (must be less than %zu)",
+                            e.requested, e.valid_count);
+    }
+    catch (realm::Results::UnsupportedColumnTypeException const& e) {
+        @throw RLMException(@"%@ is not supported for %@ property '%s'",
+                            aggregateMethod,
+                            RLMTypeToString((RLMPropertyType)e.column_type),
+                            e.column_name.data());
     }
 }
 
 template<typename Function>
-static auto translateErrors(Function&& f, ErrorInfo info={}) {
+static auto translateErrors(Function&& f, NSString *aggregateMethod=nil) {
     try {
         return f();
     }
-    catch (Results::Error e) {
-        throwError(e, info);
+    catch (...) {
+        throwError(aggregateMethod);
     }
 }
 
@@ -208,9 +208,7 @@ static auto translateErrors(Function&& f, ErrorInfo info={}) {
 
 static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMResults *const ar) {
     ar->_realm->_realm->verify_thread();
-    if (!ar->_realm->_realm->is_in_transaction()) {
-        throwError(Results::Error::NotInWrite);
-    }
+    ar->_realm->_realm->verify_in_write();
 }
 
 - (NSUInteger)count {
@@ -261,7 +259,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 - (id)objectAtIndex:(NSUInteger)index {
     return translateErrors([&] {
         return RLMCreateObjectAccessor(_realm, _objectSchema, _results.get(index));
-    }, {.index = index, .ar = self});
+    });
 }
 
 - (id)firstObject {
@@ -281,7 +279,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
     return translateErrors([&] {
         return RLMConvertNotFound(_results.index_of(object->_row));
-    }, {.obj = object, .ar = self});
+    });
 }
 
 - (id)valueForKey:(NSString *)key {
@@ -291,7 +289,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
-    RLMResultsValidateInWriteTransaction(self);
+    translateErrors([&] { RLMResultsValidateInWriteTransaction(self); });
     RLMCollectionSetValueForKey(self, key, value);
 }
 
@@ -340,8 +338,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 - (id)aggregate:(NSString *)property method:(util::Optional<Mixed> (Results::*)(size_t))method methodName:(NSString *)methodName {
     size_t column = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
-    auto value = translateErrors([&] { return (_results.*method)(column); },
-                                 {.aggregateMethod = methodName, .ar = self, .index = column});
+    auto value = translateErrors([&] { return (_results.*method)(column); }, methodName);
     if (!value) {
         return nil;
     }
