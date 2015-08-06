@@ -348,8 +348,8 @@ class ListTests: TestCase {
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
 
-        assertThrows(self.array.insert(self.str2, atIndex: 200))
-        assertThrows(self.array.insert(self.str2, atIndex: -200))
+        assertThrows(_ = self.array.insert(self.str2, atIndex: 200))
+        assertThrows(_ = self.array.insert(self.str2, atIndex: -200))
     }
 
     func testRemoveAtIndex() {
