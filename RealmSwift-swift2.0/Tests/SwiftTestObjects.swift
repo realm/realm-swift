@@ -90,7 +90,7 @@ class SwiftAggregateObject: Object {
     dynamic var boolCol = false
     dynamic var dateCol = NSDate()
     dynamic var trueCol = true
-    dynamic var stringListCol = List<SwiftStringObject>()
+    let stringListCol = List<SwiftStringObject>()
 }
 
 class SwiftAllIntSizesObject: Object {
@@ -107,7 +107,7 @@ class SwiftEmployeeObject: Object {
 }
 
 class SwiftCompanyObject: Object {
-    dynamic var employees = List<SwiftEmployeeObject>()
+    let employees = List<SwiftEmployeeObject>()
 }
 
 class SwiftArrayPropertyObject: Object {
