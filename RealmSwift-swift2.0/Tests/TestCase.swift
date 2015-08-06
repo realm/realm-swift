@@ -96,7 +96,7 @@ class TestCase: XCTestCase {
 }
 
 private func realmPathForFile(fileName: String) -> String {
-    var path = Realm.defaultPath.stringByDeletingLastPathComponent
+    var path: NSString = (Realm.defaultPath as NSString).stringByDeletingLastPathComponent
     if path.lastPathComponent != "testRealms" {
         path = path.stringByAppendingPathComponent("testRealms")
     }

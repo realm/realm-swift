@@ -65,7 +65,7 @@ class RealmTests: TestCase {
         let defaultPath =  try! Realm().path
         XCTAssertEqual(Realm.defaultPath, defaultPath)
 
-        let newPath = defaultPath.stringByAppendingPathExtension("new")!
+        let newPath = (defaultPath as NSString).stringByAppendingPathExtension("new")!
         Realm.defaultPath = newPath
         XCTAssertEqual(Realm.defaultPath, newPath)
         XCTAssertEqual(try! Realm().path, Realm.defaultPath)
@@ -467,7 +467,7 @@ class RealmTests: TestCase {
         realm.write {
             realm.add(SwiftObject())
         }
-        let path = Realm.defaultPath.stringByDeletingLastPathComponent.stringByAppendingPathComponent("copy.realm")
+        let path = ((Realm.defaultPath as NSString).stringByDeletingLastPathComponent as NSString ).stringByAppendingPathComponent("copy.realm")
         do {
             try realm.writeCopyToPath(path)
         } catch {
