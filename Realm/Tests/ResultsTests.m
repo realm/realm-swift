@@ -340,10 +340,13 @@
     [realm deleteObject:deletedObject];
     [realm commitWriteTransaction];
 
+    EmployeeObject *standalone = [[EmployeeObject alloc] init];
+
     RLMResults *results = [EmployeeObject objectsWhere:@"hired = YES"];
     XCTAssertEqual(0U, [results indexOfObject:po1]);
     XCTAssertEqual(1U, [results indexOfObject:po3]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:standalone]);
     XCTAssertThrows([results indexOfObject:so]);
     XCTAssertThrows([results indexOfObject:deletedObject]);
 
@@ -351,6 +354,7 @@
     XCTAssertEqual(0U, [results indexOfObject:po1]);
     XCTAssertEqual(1U, [results indexOfObject:po2]);
     XCTAssertEqual(2U, [results indexOfObject:po3]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:standalone]);
     XCTAssertThrows([results indexOfObject:so]);
     XCTAssertThrows([results indexOfObject:deletedObject]);
 }

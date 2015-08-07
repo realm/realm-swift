@@ -246,6 +246,9 @@ static RowIndexes::Sorter RLMSorterFromDescriptors(RLMObjectSchema *schema, NSAr
     if (object.invalidated) {
         @throw RLMException(@"RLMObject is no longer valid");
     }
+    if (!object->_row) {
+        return NSNotFound;
+    }
 
     // check that object types align
     if (object->_row.get_table() != &_backingView.get_parent()) {
@@ -522,6 +525,9 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
     RLMCheckThread(_realm);
     if (object.invalidated) {
         @throw RLMException(@"RLMObject is no longer valid");
+    }
+    if (!object->_row) {
+        return NSNotFound;
     }
 
     // check that object types align
