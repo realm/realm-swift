@@ -87,12 +87,12 @@ static BOOL encryptTests() {
 
 @implementation RLMTestCase
 
-#if DEBUG
+#if DEBUG || !TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 + (void)setUp {
     [super setUp];
     // Disable actually syncing anything to the disk to greatly speed up the
-    // tests, but only in debug mode because it can't be re-enabled and we need
-    // it enabled for performance tests
+    // tests, but only when not running on device because it can't be
+    // re-enabled and we need it enabled for performance tests
     RLMDisableSyncToDisk();
 }
 #endif
