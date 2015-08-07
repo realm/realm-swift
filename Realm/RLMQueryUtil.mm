@@ -856,13 +856,13 @@ void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RL
                     (int)validateMessage.size(), validateMessage.c_str());
 }
 
-RLMSortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *schema, NSArray *descriptors) {
+RLMSortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *objectSchema, NSArray *descriptors) {
     RLMSortOrder sort;
     sort.columnIndices.reserve(descriptors.count);
     sort.ascending.reserve(descriptors.count);
 
     for (RLMSortDescriptor *descriptor in descriptors) {
-        sort.columnIndices.push_back(RLMValidatedPropertyForSort(schema, descriptor.property).column);
+        sort.columnIndices.push_back(RLMValidatedPropertyForSort(objectSchema, descriptor.property).column);
         sort.ascending.push_back(descriptor.ascending);
     }
 

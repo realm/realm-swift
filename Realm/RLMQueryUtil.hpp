@@ -38,10 +38,10 @@ void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RL
                                  RLMObjectSchema *objectSchema);
 
 // return column index - throw for invalid column name
-NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *schema, NSString *columnName);
+NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *objectSchema, NSString *columnName);
 
 // validate the array of RLMSortDescriptors and convert it to an RLMSortOrder
-RLMSortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *schema, NSArray *descriptors);
+RLMSortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *objectSchema, NSArray *descriptors);
 
 // This macro validates predicate format with optional arguments
 #define RLM_VARARG(PREDICATE_FORMAT, ARGS) \
