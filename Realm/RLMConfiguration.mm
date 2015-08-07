@@ -101,7 +101,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 + (void)setDefaultPath:(NSString *)path {
     RLMConfiguration *configuration = [[RLMConfiguration alloc] init];
     configuration.path = path;
-    s_defaultConfiguration =  configuration;
+    s_defaultConfiguration = configuration;
 }
 
 + (void)resetRealmConfigurationState {
@@ -153,6 +153,12 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 
 - (void)setEncryptionKey:(NSData * __nullable)encryptionKey {
     _encryptionKey = RLMRealmValidatedEncryptionKey(encryptionKey);
+}
+
+- (void)setSchemaVersion:(uint64_t)schemaVersion {
+    if ((_schemaVersion = schemaVersion) == RLMNotVersioned) {
+        @throw RLMException([NSString stringWithFormat:@"Cannot set schema version to %llu (RLMNotVersioned)", RLMNotVersioned]);
+    }
 }
 
 @end

@@ -47,6 +47,7 @@
 		C0027B071AAF6FBC00F013A2 /* SchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0027B061AAF6FBC00F013A2 /* SchemaTests.swift */; };
 		C0027B0B1AAF736700F013A2 /* ObjectSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0027B0A1AAF736700F013A2 /* ObjectSchemaTests.swift */; };
 		C0240C2B1A84090000858BFA /* RealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0240C2A1A84090000858BFA /* RealmTests.swift */; };
+		C042A4921B753A1C00771ED2 /* RealmConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C042A4911B753A1C00771ED2 /* RealmConfigurationTests.swift */; };
 		C04DAEBE1A8E7FBD008A9623 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04DAEBD1A8E7FBD008A9623 /* Util.swift */; };
 		C081AEB21AAF865C00BA3E31 /* PropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C081AEB11AAF865C00BA3E31 /* PropertyTests.swift */; };
 		C0D2DD111B6BF849004E8919 /* RealmConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD101B6BF849004E8919 /* RealmConfiguration.swift */; };
@@ -138,6 +139,7 @@
 		C0027B061AAF6FBC00F013A2 /* SchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SchemaTests.swift; path = RealmSwift/Tests/SchemaTests.swift; sourceTree = SOURCE_ROOT; };
 		C0027B0A1AAF736700F013A2 /* ObjectSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ObjectSchemaTests.swift; path = RealmSwift/Tests/ObjectSchemaTests.swift; sourceTree = SOURCE_ROOT; };
 		C0240C2A1A84090000858BFA /* RealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RealmTests.swift; path = RealmSwift/Tests/RealmTests.swift; sourceTree = SOURCE_ROOT; };
+		C042A4911B753A1C00771ED2 /* RealmConfigurationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RealmConfigurationTests.swift; path = "RealmSwift/Tests/RealmConfigurationTests.swift"; sourceTree = SOURCE_ROOT; };
 		C04DAEBD1A8E7FBD008A9623 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Util.swift; path = RealmSwift/Util.swift; sourceTree = SOURCE_ROOT; };
 		C081AEB11AAF865C00BA3E31 /* PropertyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PropertyTests.swift; path = RealmSwift/Tests/PropertyTests.swift; sourceTree = SOURCE_ROOT; };
 		C0CA5BCC1AC0951C007338C5 /* PerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PerformanceTests.swift; path = RealmSwift/Tests/PerformanceTests.swift; sourceTree = SOURCE_ROOT; };
@@ -258,6 +260,7 @@
 				C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */,
 				C0CA5BCC1AC0951C007338C5 /* PerformanceTests.swift */,
 				C081AEB11AAF865C00BA3E31 /* PropertyTests.swift */,
+				C042A4911B753A1C00771ED2 /* RealmConfigurationTests.swift */,
 				C0240C2A1A84090000858BFA /* RealmTests.swift */,
 				020F63D51A8037DC007CB52E /* ResultsTests.swift */,
 				C0027B061AAF6FBC00F013A2 /* SchemaTests.swift */,
@@ -492,6 +495,7 @@
 				C0FE465C1A9BE7A6006E0539 /* ObjectTests.swift in Sources */,
 				5DE0B6D21B1001AE007831D9 /* PerformanceTests.swift in Sources */,
 				C081AEB21AAF865C00BA3E31 /* PropertyTests.swift in Sources */,
+				C042A4921B753A1C00771ED2 /* RealmConfigurationTests.swift in Sources */,
 				C0240C2B1A84090000858BFA /* RealmTests.swift in Sources */,
 				020F63E11A8037DC007CB52E /* ResultsTests.swift in Sources */,
 				C0027B071AAF6FBC00F013A2 /* SchemaTests.swift in Sources */,

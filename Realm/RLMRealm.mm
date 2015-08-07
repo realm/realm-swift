@@ -286,7 +286,6 @@ void RLMRealmAddPathSettingsToConfiguration(RLMConfiguration *configuration) {
 }
 
 + (void)setDefaultRealmPath:(NSString *)defaultRealmPath {
-    RLMConfigurationUsePerPath(_cmd);
     [RLMConfiguration setDefaultPath:defaultRealmPath];
 }
 
