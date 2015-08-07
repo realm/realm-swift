@@ -271,14 +271,10 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 {
     RLMLinkViewArrayValidateAttached(self);
 
-    std::vector<size_t> columns;
-    std::vector<bool> order;
-    RLMGetColumnIndices(_realm.schema[_objectClassName], properties, columns, order);
-
     auto query = std::make_unique<realm::Query>(_backingLinkView->get_target_table().where(_backingLinkView));
     return [RLMResults resultsWithObjectClassName:self.objectClassName
                                             query:move(query)
-                                             sort:realm::RowIndexes::Sorter(columns, order)
+                                             sort:RLMSortOrderFromDescriptors(_realm.schema[_objectClassName], properties)
                                             realm:_realm];
 
 }

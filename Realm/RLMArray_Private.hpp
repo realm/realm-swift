@@ -35,6 +35,15 @@ namespace realm {
 
 @class RLMObjectSchema;
 
+struct RLMSortOrder {
+    std::vector<size_t> columnIndices;
+    std::vector<bool> ascending;
+
+    explicit operator bool() const {
+        return !columnIndices.empty();
+    }
+};
+
 // RLMArray private properties/ivars for all subclasses
 @interface RLMArray () {
   @protected
@@ -76,7 +85,7 @@ namespace realm {
 
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<realm::Query>)query
-                                      sort:(realm::RowIndexes::Sorter const&)sorter
+                                      sort:(RLMSortOrder)sorter
                                      realm:(RLMRealm *)realm;
 
 - (void)deleteObjectsFromRealm;

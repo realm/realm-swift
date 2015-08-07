@@ -28,6 +28,8 @@ namespace realm {
 @class RLMObjectSchema;
 @class RLMSchema;
 
+struct RLMSortOrder;
+
 extern NSString * const RLMPropertiesComparisonTypeMismatchException;
 extern NSString * const RLMUnsupportedTypesFoundInPropertyComparisonException;
 
@@ -38,10 +40,8 @@ void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RL
 // return column index - throw for invalid column name
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *schema, NSString *columnName);
 
-// populate columns and order with the values in properties and ascending, with validation
-void RLMGetColumnIndices(RLMObjectSchema *schema, NSArray *properties,
-                         std::vector<size_t> &columns, std::vector<bool> &order);
-
+// validate the array of RLMSortDescriptors and convert it to an RLMSortOrder
+RLMSortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *schema, NSArray *descriptors);
 
 // This macro validates predicate format with optional arguments
 #define RLM_VARARG(PREDICATE_FORMAT, ARGS) \
