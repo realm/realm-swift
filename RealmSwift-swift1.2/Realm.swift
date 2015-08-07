@@ -81,7 +81,8 @@ public final class Realm {
     // MARK: Initializers
 
     /**
-    Obtains a Realm instance with the given configuration.
+    Obtains a Realm instance with the given configuration. Defaults to the default Realm configuration,
+    which can be changed by setting `RealmConfiguration.defaultConfiguration`.
 
     :param: configuration The configuration to use when creating the Realm instance.
     :param: error         If an error occurs, upon return contains an `NSError` object

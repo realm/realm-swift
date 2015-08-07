@@ -59,6 +59,9 @@ RLM_ASSUME_NONNULL_BEGIN
  default Realm is persisted as default.realm under the Documents directory of
  your Application on iOS, and in your application's Application Support
  directory on OS X.
+ 
+ The default Realm is created using the default `RLMConfiguration`, which
+ can be changed via `-[RLMConfiguration setDefaultConfiguration]`.
 
  @return The default `RLMRealm` instance for the current thread.
  */

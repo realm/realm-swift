@@ -80,7 +80,8 @@ public final class Realm {
     // MARK: Initializers
 
     /**
-    Obtains a Realm instance with the given configuration. Defaults to the default realm configuration.
+    Obtains a Realm instance with the given configuration. Defaults to the default Realm configuration,
+    which can be changed by setting `RealmConfiguration.defaultConfiguration`.
 
     - parameter configuration: The configuration to use when creating the Realm instance.
     */

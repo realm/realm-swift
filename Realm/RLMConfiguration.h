@@ -28,16 +28,17 @@ RLM_ASSUME_NONNULL_BEGIN
 @interface RLMConfiguration : NSObject<NSCopying>
 
 /**
- Returns the default configuration used to create realms.
+ Returns the default configuration used to create Realms when no other
+ configuration is explicitly specified.
 
- @return The default realm configuration.
+ @return The default Realm configuration.
  */
 + (instancetype)defaultConfiguration;
 
 /**
  Sets the default configuration to the given `RLMConfiguration`.
 
- @param configuration The new default realm configuration.
+ @param configuration The new default Realm configuration.
  */
 + (void)setDefaultConfiguration:(nullable RLMConfiguration *)configuration;
 
