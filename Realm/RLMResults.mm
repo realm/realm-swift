@@ -237,19 +237,18 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (object.invalidated) {
         @throw RLMException(@"RLMObject is no longer valid");
     }
-
-    // check that object types align
-    if (object->_row.get_table() != &_backingView.get_parent()) {
-        @throw RLMException(@"Object type does not match RLMResults");
-    }
-
-    size_t object_ndx = object->_row.get_index();
-    size_t result = _backingView.find_by_source_ndx(object_ndx);
-    if (result == realm::not_found) {
+    if (!object->_row) {
         return NSNotFound;
     }
 
-    return result;
+    // check that object types align
+    if (object->_row.get_table() != &_backingView.get_parent()) {
+        NSString *message = [NSString stringWithFormat:@"Object type '%@' does not match RLMResults type '%@'.", object->_objectSchema.className, _objectClassName];
+        @throw RLMException(message);
+    }
+
+    size_t object_ndx = object->_row.get_index();
+    return RLMConvertNotFound(_backingView.find_by_source_ndx(object_ndx));
 }
 
 - (id)valueForKey:(NSString *)key {
@@ -516,10 +515,14 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
     if (object.invalidated) {
         @throw RLMException(@"RLMObject is no longer valid");
     }
+    if (!object->_row) {
+        return NSNotFound;
+    }
 
     // check that object types align
     if (object->_row.get_table() != _table) {
-        @throw RLMException(@"Object type does not match RLMResults");
+        NSString *message = [NSString stringWithFormat:@"Object type '%@' does not match RLMResults type '%@'.", object->_objectSchema.className, _objectClassName];
+        @throw RLMException(message);
     }
 
     return RLMConvertNotFound(object->_row.get_index());

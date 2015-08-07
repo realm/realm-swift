@@ -103,7 +103,8 @@
 
 static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     if (!object || ![array->_objectClassName isEqualToString:object->_objectSchema.className]) {
-        @throw RLMException(@"Object type does not match RLMArray");
+        NSString *message = [NSString stringWithFormat:@"Object type '%@' does not match RLMArray type '%@'.", object->_objectSchema.className, array->_objectClassName];
+        @throw RLMException(message);
     }
 }
 
