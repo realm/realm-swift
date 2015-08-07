@@ -31,11 +31,11 @@ class TestCase: XCTestCase {
 
     override class func setUp() {
         super.setUp()
-#if DEBUG
+#if DEBUG || arch(i386) || arch(x86_64)
         // Disable actually syncing anything to the disk to greatly speed up the
-        // tests, but only in debug mode because it can't be re-enabled and we need
-        // it enabled for performance tests
-        RLMDisableSyncToDisk();
+        // tests, but only when not running on device because it can't be
+        // re-enabled and we need it enabled for performance tests
+        RLMDisableSyncToDisk()
 #endif
     }
 
