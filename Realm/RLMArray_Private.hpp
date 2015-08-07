@@ -20,7 +20,7 @@
 #import <Realm/RLMResults.h>
 
 #import <memory>
-#import <realm/views.hpp>
+#import <vector>
 
 namespace realm {
     class LinkView;
