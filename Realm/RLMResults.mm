@@ -30,7 +30,6 @@
 
 #import <objc/runtime.h>
 #import <realm/table_view.hpp>
-#import <realm/views.hpp>
 
 using namespace realm;
 
@@ -41,7 +40,7 @@ using namespace realm;
     std::unique_ptr<realm::Query> _backingQuery;
     realm::TableView _backingView;
     BOOL _viewCreated;
-    RowIndexes::Sorter _sortOrder;
+    RLMSortOrder _sortOrder;
 
 @protected
     RLMRealm *_realm;
@@ -56,18 +55,18 @@ using namespace realm;
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<realm::Query>)query
                                      realm:(RLMRealm *)realm {
-    return [self resultsWithObjectClassName:objectClassName query:move(query) sort:RowIndexes::Sorter{} realm:realm];
+    return [self resultsWithObjectClassName:objectClassName query:move(query) sort:{} realm:realm];
 }
 
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<realm::Query>)query
-                                      sort:(RowIndexes::Sorter const&)sorter
+                                      sort:(RLMSortOrder)sorter
                                      realm:(RLMRealm *)realm {
     RLMResults *ar = [[self alloc] initPrivate];
     ar->_objectClassName = objectClassName;
     ar->_viewCreated = NO;
     ar->_backingQuery = move(query);
-    ar->_sortOrder = sorter;
+    ar->_sortOrder = std::move(sorter);
     ar->_realm = realm;
     ar->_objectSchema = realm.schema[objectClassName];
     return ar;
@@ -102,8 +101,8 @@ static inline void RLMResultsValidateAttached(__unsafe_unretained RLMResults *co
         // create backing view if needed
         ar->_backingView = ar->_backingQuery->find_all();
         ar->_viewCreated = YES;
-        if (!ar->_sortOrder.m_column_indexes.empty()) {
-            ar->_backingView.sort(ar->_sortOrder.m_column_indexes, ar->_sortOrder.m_ascending);
+        if (ar->_sortOrder) {
+            ar->_backingView.sort(ar->_sortOrder.columnIndices, ar->_sortOrder.ascending);
         }
     }
     // otherwise we're backed by a table and don't need to update anything
@@ -120,14 +119,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (!ar->_realm->_inWriteTransaction) {
         @throw RLMException(@"Can't mutate a persisted array outside of a write transaction.");
     }
-}
-
-static RowIndexes::Sorter RLMSorterFromDescriptors(RLMObjectSchema *schema, NSArray *descriptors)
-{
-    std::vector<size_t> columns;
-    std::vector<bool> order;
-    RLMGetColumnIndices(schema, descriptors, columns, order);
-    return RowIndexes::Sorter(columns, order);
 }
 
 //
@@ -308,8 +299,10 @@ static RowIndexes::Sorter RLMSorterFromDescriptors(RLMObjectSchema *schema, NSAr
     RLMCheckThread(_realm);
 
     auto query = [self cloneQuery];
-    auto sorter = RLMSorterFromDescriptors(_objectSchema, properties);
-    return [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) sort:sorter realm:_realm];
+    return [RLMResults resultsWithObjectClassName:self.objectClassName
+                                            query:move(query)
+                                             sort:RLMSortOrderFromDescriptors(_objectSchema, properties)
+                                            realm:_realm];
 }
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index {
