@@ -252,16 +252,12 @@ static RowIndexes::Sorter RLMSorterFromDescriptors(RLMObjectSchema *schema, NSAr
 
     // check that object types align
     if (object->_row.get_table() != &_backingView.get_parent()) {
-        @throw RLMException(@"Object type does not match RLMResults");
+        NSString *message = [NSString stringWithFormat:@"Object type '%@' does not match RLMResults type '%@'.", object->_objectSchema.className, _objectClassName];
+        @throw RLMException(message);
     }
 
     size_t object_ndx = object->_row.get_index();
-    size_t result = _backingView.find_by_source_ndx(object_ndx);
-    if (result == realm::not_found) {
-        return NSNotFound;
-    }
-
-    return result;
+    return RLMConvertNotFound(_backingView.find_by_source_ndx(object_ndx));
 }
 
 - (id)valueForKey:(NSString *)key {
@@ -532,7 +528,8 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 
     // check that object types align
     if (object->_row.get_table() != _table) {
-        @throw RLMException(@"Object type does not match RLMResults");
+        NSString *message = [NSString stringWithFormat:@"Object type '%@' does not match RLMResults type '%@'.", object->_objectSchema.className, _objectClassName];
+        @throw RLMException(message);
     }
 
     return RLMConvertNotFound(object->_row.get_index());
