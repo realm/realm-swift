@@ -160,7 +160,9 @@ size_t Results::index_of(Row const& row)
         throw DetatchedAccessorException{};
     }
     if (m_table && row.get_table() != m_table) {
-        throw IncorrectTableException{m_table, row.get_table()};
+        throw IncorrectTableException{
+            ObjectStore::object_type_for_table_name(m_table->get_name()),
+            ObjectStore::object_type_for_table_name(row.get_table()->get_name())};
     }
     return index_of(row.get_index());
 }
@@ -308,6 +310,11 @@ TableView Results::get_tableview()
             return m_table->where().find_all();
     }
     REALM_UNREACHABLE();
+}
+
+StringData Results::get_object_type() const noexcept
+{
+    return ObjectStore::object_type_for_table_name(m_table->get_name());
 }
 
 Results Results::sort(realm::SortOrder&& sort) const

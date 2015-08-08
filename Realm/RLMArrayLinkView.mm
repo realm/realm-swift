@@ -396,9 +396,8 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     auto results = realm::Results(_realm->_realm,
                                   _backingLinkView->get_target_table().where(_backingLinkView),
                                   RLMSortOrderFromDescriptors(_realm.schema[_objectClassName], properties));
-    return [RLMResults resultsWithObjectClassName:self.objectClassName
-                                            realm:_realm
-                                          results:std::move(results)];
+    return [RLMResults resultsWithObjectSchema:_realm.schema[self.objectClassName]
+                                       results:std::move(results)];
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
@@ -406,9 +405,8 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 
     realm::Query query = _backingLinkView->get_target_table().where(_backingLinkView);
     RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
-    return [RLMResults resultsWithObjectClassName:self.objectClassName
-                                            realm:_realm
-                                          results:realm::Results(_realm->_realm, std::move(query))];
+    return [RLMResults resultsWithObjectSchema:_realm.schema[self.objectClassName]
+                                       results:realm::Results(_realm->_realm, std::move(query))];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {

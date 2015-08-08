@@ -142,7 +142,6 @@ static const int RLMEnumerationBufferSize = 16;
 @implementation RLMResults {
     realm::Results _results;
     RLMRealm *_realm;
-    NSString *_objectClassName;
 }
 
 - (instancetype)initPrivate {
@@ -170,8 +169,7 @@ static void throwError(NSString *aggregateMethod) {
     }
     catch (realm::Results::IncorrectTableException const& e) {
         @throw RLMException(@"Object type '%s' does not match RLMResults type '%s'.",
-                            ObjectStore::object_type_for_table_name(e.actual->get_name()).data(),
-                            ObjectStore::object_type_for_table_name(e.expected->get_name()).data());
+                            e.actual.data(), e.expected.data());
     }
     catch (realm::Results::OutOfBoundsIndexException const& e) {
         @throw RLMException(@"Index %zu is out of bounds (must be less than %zu)",
@@ -195,14 +193,12 @@ static auto translateErrors(Function&& f, NSString *aggregateMethod=nil) {
     }
 }
 
-+ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
-                                     realm:(RLMRealm *)realm
-                                   results:(realm::Results)results {
++ (instancetype)resultsWithObjectSchema:(RLMObjectSchema *)objectSchema
+                                results:(realm::Results)results {
     RLMResults *ar = [[self alloc] initPrivate];
     ar->_results = std::move(results);
-    ar->_realm = realm;
-    ar->_objectClassName = objectClassName;
-    ar->_objectSchema = realm.schema[objectClassName];
+    ar->_realm = objectSchema.realm;
+    ar->_objectSchema = objectSchema;
     return ar;
 }
 
@@ -213,6 +209,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 - (NSUInteger)count {
     return translateErrors([&] { return _results.size(); });
+}
+
+- (NSString *)objectClassName {
+    return RLMStringDataToNSString(_results.get_object_type());
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
@@ -248,7 +248,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     }
 
     Query query = translateErrors([&] { return _results.get_query(); });
-    RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
+    RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _objectSchema);
     size_t index = query.find();
     if (index == realm::not_found) {
         return (NSUInteger)NSNotFound;
@@ -309,10 +309,9 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
             return self;
         }
         auto query = _results.get_query();
-        RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
-        return [RLMResults resultsWithObjectClassName:self.objectClassName
-                                                realm:_realm
-                                              results:realm::Results(_realm->_realm, std::move(query), _results.get_sort())];
+        RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _objectSchema);
+        return [RLMResults resultsWithObjectSchema:_objectSchema
+                                           results:realm::Results(_realm->_realm, std::move(query), _results.get_sort())];
     });
 }
 
@@ -326,9 +325,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
             return self;
         }
 
-        return [RLMResults resultsWithObjectClassName:self.objectClassName
-                                                realm:_realm
-                                              results:_results.sort(RLMSortOrderFromDescriptors(_objectSchema, properties))];
+        return [RLMResults resultsWithObjectSchema:_objectSchema
+                                           results:_results.sort(RLMSortOrderFromDescriptors(_objectSchema, properties))];
     });
 }
 
@@ -337,7 +335,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)aggregate:(NSString *)property method:(util::Optional<Mixed> (Results::*)(size_t))method methodName:(NSString *)methodName {
-    size_t column = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
+    size_t column = RLMValidatedColumnIndex(_objectSchema, property);
     auto value = translateErrors([&] { return (_results.*method)(column); }, methodName);
     if (!value) {
         return nil;

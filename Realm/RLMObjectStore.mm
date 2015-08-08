@@ -458,7 +458,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
     if (!objectSchema.table) {
         // read-only realms may be missing tables since we can't add any
         // missing ones on init
-        return [RLMResults resultsWithObjectClassName:objectClassName realm:realm results:{}];
+        return [RLMResults resultsWithObjectSchema:objectSchema results:{}];
     }
 
     if (predicate) {
@@ -466,14 +466,12 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
         RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
 
         // create and populate array
-        return [RLMResults resultsWithObjectClassName:objectClassName
-                                                realm:realm
-                                              results:realm::Results(realm->_realm, std::move(query))];
+        return [RLMResults resultsWithObjectSchema:objectSchema
+                                           results:realm::Results(realm->_realm, std::move(query))];
     }
 
-    return [RLMResults resultsWithObjectClassName:objectClassName
-                                            realm:realm
-                                          results:realm::Results(realm->_realm, *objectSchema.table)];
+    return [RLMResults resultsWithObjectSchema:objectSchema
+                                       results:realm::Results(realm->_realm, *objectSchema.table)];
 }
 
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {

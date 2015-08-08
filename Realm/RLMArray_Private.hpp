@@ -84,8 +84,7 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NS
 // RLMResults private methods
 //
 @interface RLMResults () <RLMFastEnumerable>
-+ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
-                                     realm:(RLMRealm *)realm
++ (instancetype)resultsWithObjectSchema:(RLMObjectSchema *)objectSchema
                                    results:(realm::Results)results;
 
 - (void)deleteObjectsFromRealm;
