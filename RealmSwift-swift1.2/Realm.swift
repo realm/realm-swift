@@ -73,7 +73,6 @@ public final class Realm {
             return RealmConfiguration.defaultConfiguration.path ?? RLMConfiguration.defaultRealmPath()
         }
         set {
-            RLMConfigurationUsePerPath("Realm.defaultPath=")
             RLMConfiguration.setDefaultPath(newValue)
         }
     }

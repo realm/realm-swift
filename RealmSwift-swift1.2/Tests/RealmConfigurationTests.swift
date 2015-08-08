@@ -24,7 +24,7 @@ class RealmConfigurationTests: TestCase {
     func testDefaultConfiguration() {
         let defaultConfiguration = RealmConfiguration.defaultConfiguration
 
-        XCTAssertEqual(defaultConfiguration.path, try! Realm().path);
+        XCTAssertEqual(defaultConfiguration.path!, Realm().path);
         XCTAssertNil(defaultConfiguration.inMemoryIdentifier);
         XCTAssertNil(defaultConfiguration.encryptionKey);
         XCTAssertFalse(defaultConfiguration.readOnly);
@@ -36,7 +36,7 @@ class RealmConfigurationTests: TestCase {
         let path = RealmConfiguration.defaultConfiguration.path!
         let configuration = RealmConfiguration(path: "path")
         RealmConfiguration.defaultConfiguration = configuration
-        XCTAssertEqual(RealmConfiguration.defaultConfiguration.path, "path")
+        XCTAssertEqual(RealmConfiguration.defaultConfiguration.path!, "path")
         RealmConfiguration.defaultConfiguration.path = path
     }
 }
