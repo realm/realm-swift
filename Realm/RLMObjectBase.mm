@@ -131,6 +131,14 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     return [super valueForKey:key];
 }
 
+// List<> properties can't be dynamic, so KVO doesn't work for them by default
+- (id)valueForUndefinedKey:(NSString *)key {
+    if (Ivar ivar = _objectSchema[key].swiftListIvar) {
+        return object_getIvar(self, ivar);
+    }
+    return [super valueForUndefinedKey:key];
+}
+
 // overridden at runtime per-class for performance
 + (NSString *)className {
     NSString *className = NSStringFromClass(self);

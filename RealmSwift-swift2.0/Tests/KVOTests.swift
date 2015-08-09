@@ -39,7 +39,7 @@ class KVOObject: Object {
     dynamic var binaryCol: NSData = NSData()
     dynamic var dateCol: NSDate = NSDate(timeIntervalSince1970: 0)
     dynamic var objectCol: KVOObject?
-    dynamic var arrayCol = List<KVOObject>()
+    let arrayCol = List<KVOObject>()
 
     override class func primaryKey() -> String { return "pk" }
     override class func ignoredProperties() -> [String] { return ["ignored"] }
