@@ -48,7 +48,8 @@ class Person: Object {
 }
 
 func bundlePath(path: String) -> String? {
-    return NSBundle.mainBundle().resourcePath?.stringByAppendingPathComponent(path)
+    let resourcePath = NSBundle.mainBundle().resourcePath as NSString?
+    return resourcePath?.stringByAppendingPathComponent(path)
 }
 
 @UIApplicationMain
@@ -63,7 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // copy over old data files for migration
         let defaultPath = Realm.defaultPath
-        let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
+        let defaultParentPath = (defaultPath as NSString).stringByDeletingLastPathComponent
 
         if let v0Path = bundlePath("default-v0.realm") {
             try! NSFileManager.defaultManager().removeItemAtPath(defaultPath)
@@ -107,8 +108,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Migrate a realms at a custom paths
         //
         if let v1Path = bundlePath("default-v1.realm"), v2Path = bundlePath("default-v2.realm") {
-            let realmv1Path = defaultParentPath.stringByAppendingPathComponent("default-v1.realm")
-            let realmv2Path = defaultParentPath.stringByAppendingPathComponent("default-v2.realm")
+            let realmv1Path = (defaultParentPath as NSString).stringByAppendingPathComponent("default-v1.realm")
+            let realmv2Path = (defaultParentPath as NSString).stringByAppendingPathComponent("default-v2.realm")
             setSchemaVersion(3, realmPath: realmv1Path, migrationBlock: migrationBlock)
             setSchemaVersion(3, realmPath: realmv2Path, migrationBlock: migrationBlock)
 
