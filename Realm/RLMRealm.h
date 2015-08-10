@@ -61,7 +61,7 @@ RLM_ASSUME_NONNULL_BEGIN
  directory on OS X.
  
  The default Realm is created using the default `RLMConfiguration`, which
- can be changed via `-[RLMConfiguration setDefaultConfiguration]`.
+ can be changed via `+[RLMConfiguration setDefaultConfiguration:]`.
 
  @return The default `RLMRealm` instance for the current thread.
  */
