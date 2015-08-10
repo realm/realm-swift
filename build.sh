@@ -289,7 +289,10 @@ case "$COMMAND" in
             echo "core is not a symlink. Deleting..."
             rm -rf core
             download_core
-        elif ! $(head -n 1 core/release_notes.txt | grep -i ${REALM_CORE_VERSION} >/dev/null); then
+        # With a prebuilt version we only want to check the first non-empty
+        # line so that checking out an older commit will download the
+        # appropriate version of core if the already-present version is too new
+        elif ! $(grep -m 1 . core/release_notes.txt | grep -i "${REALM_CORE_VERSION} RELEASE NOTES" >/dev/null); then
             download_core
         else
             echo "The core library seems to be up to date."
