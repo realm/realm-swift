@@ -3,7 +3,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* Building for watchOS requires Xcode 7 beta 5.
 
 ### Enhancements
 
@@ -14,6 +14,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix crash when adding a property to a model without updating the schema
   version.
 * Fix unnecessary redownloading of the core library when building from source.
+* Fix crash when sorting by an integer or floating-point property on iOS 7.
 
 0.94.0 Release notes (2015-07-29)
 =============================================================
