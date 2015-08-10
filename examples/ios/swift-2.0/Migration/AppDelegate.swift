@@ -112,7 +112,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let realmv2Path = (defaultParentPath as NSString).stringByAppendingPathComponent("default-v2.realm")
 
             let realmv1Configuration = RealmConfiguration(path: realmv1Path, schemaVersion: 3, migrationBlock: migrationBlock)
-            let realmv2Configuration = RealmConfiguration(path: realmv1Path, schemaVersion: 3, migrationBlock: migrationBlock)
+            let realmv2Configuration = RealmConfiguration(path: realmv2Path, schemaVersion: 3, migrationBlock: migrationBlock)
 
             try! NSFileManager.defaultManager().removeItemAtPath(realmv1Path)
             try! NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path)
