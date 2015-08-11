@@ -318,6 +318,10 @@
 		5D30B74B1B42072600D90C5A /* RLMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D30B74A1B42039F00D90C5A /* RLMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D30B74C1B42072700D90C5A /* RLMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D30B74A1B42039F00D90C5A /* RLMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D30B74D1B42072800D90C5A /* RLMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D30B74A1B42039F00D90C5A /* RLMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C02E53E11B7A7E2B002586E8 /* RLMConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD061B6BDEA1004E8919 /* RLMConfiguration.mm */; };
+		C02E53E21B7A7E2B002586E8 /* RLMConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD061B6BDEA1004E8919 /* RLMConfiguration.mm */; };
+		C02E53E31B7A7E2C002586E8 /* RLMConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD061B6BDEA1004E8919 /* RLMConfiguration.mm */; };
+		C02E53E41B7A7E2D002586E8 /* RLMConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD061B6BDEA1004E8919 /* RLMConfiguration.mm */; };
 		C042A48D1B7522A900771ED2 /* ConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* ConfigurationTests.mm */; };
 		C042A48E1B7522A900771ED2 /* ConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* ConfigurationTests.mm */; };
 		C042A48F1B7522A900771ED2 /* ConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* ConfigurationTests.mm */; };
@@ -336,10 +340,6 @@
 		C0D2DD081B6BDEA1004E8919 /* RLMConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D2DD051B6BDEA1004E8919 /* RLMConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C0D2DD091B6BDEA1004E8919 /* RLMConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D2DD051B6BDEA1004E8919 /* RLMConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C0D2DD0A1B6BDEA1004E8919 /* RLMConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D2DD051B6BDEA1004E8919 /* RLMConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		C0D2DD0B1B6BDEA1004E8919 /* RLMConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD061B6BDEA1004E8919 /* RLMConfiguration.mm */; };
-		C0D2DD0C1B6BDEA1004E8919 /* RLMConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD061B6BDEA1004E8919 /* RLMConfiguration.mm */; };
-		C0D2DD0D1B6BDEA1004E8919 /* RLMConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD061B6BDEA1004E8919 /* RLMConfiguration.mm */; };
-		C0D2DD0E1B6BDEA1004E8919 /* RLMConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD061B6BDEA1004E8919 /* RLMConfiguration.mm */; };
 		E81A1F851955FC9300FDED82 /* RLMAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F631955FC9300FDED82 /* RLMAccessor.h */; };
 		E81A1F861955FC9300FDED82 /* RLMAccessor.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1F641955FC9300FDED82 /* RLMAccessor.mm */; };
 		E81A1F891955FC9300FDED82 /* RLMArray.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F661955FC9300FDED82 /* RLMArray.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1588,6 +1588,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				026B0F0A1A780680005E26C8 /* ArrayPropertyTests.m in Sources */,
+				C042A48F1B7522A900771ED2 /* ConfigurationTests.mm in Sources */,
 				026B0F0B1A780680005E26C8 /* DynamicTests.m in Sources */,
 				021A88341AAFB5CA00EEAC84 /* EncryptionTests.mm in Sources */,
 				026B0F0C1A780680005E26C8 /* EnumeratorTests.m in Sources */,
@@ -1611,7 +1612,6 @@
 				026B0F1A1A780680005E26C8 /* SwiftArrayPropertyTests.swift in Sources */,
 				026B0F1B1A780680005E26C8 /* SwiftArrayTests.swift in Sources */,
 				026B0F1C1A780680005E26C8 /* SwiftDynamicTests.swift in Sources */,
-				C042A48F1B7522A900771ED2 /* ConfigurationTests.mm in Sources */,
 				026B0F1D1A780680005E26C8 /* SwiftLinkTests.swift in Sources */,
 				026B0F1E1A780680005E26C8 /* SwiftMixedTests.swift in Sources */,
 				026B0F1F1A780680005E26C8 /* SwiftObjectInterfaceTests.swift in Sources */,
@@ -1637,8 +1637,7 @@
 				E869AFA11B63052C00BCC147 /* RLMAnalytics.mm in Sources */,
 				144C2F471B3D34A2005C8F81 /* RLMArray.mm in Sources */,
 				144C2F481B3D34A2005C8F81 /* RLMArrayLinkView.mm in Sources */,
-				C0D2DD0E1B6BDEA1004E8919 /* RLMConfiguration.m in Sources */,
-				C0D2DD0E1B6BDEA1004E8919 /* RLMConfiguration.mm in Sources */,
+				C02E53E41B7A7E2D002586E8 /* RLMConfiguration.mm in Sources */,
 				144C2F491B3D34A2005C8F81 /* RLMConstants.m in Sources */,
 				144C2F4A1B3D34A2005C8F81 /* RLMListBase.mm in Sources */,
 				144C2F4B1B3D34A2005C8F81 /* RLMMigration.mm in Sources */,
@@ -1670,8 +1669,7 @@
 				E83591971B3DF05C0035F2F3 /* RLMAnalytics.mm in Sources */,
 				29E3C7091A71C1C700B62C1D /* RLMArray.mm in Sources */,
 				29E3C70A1A71C1C700B62C1D /* RLMArrayLinkView.mm in Sources */,
-				C0D2DD0D1B6BDEA1004E8919 /* RLMConfiguration.m in Sources */,
-				C0D2DD0D1B6BDEA1004E8919 /* RLMConfiguration.mm in Sources */,
+				C02E53E31B7A7E2C002586E8 /* RLMConfiguration.mm in Sources */,
 				29E3C70B1A71C1C700B62C1D /* RLMConstants.m in Sources */,
 				29E3C7151A71C1C700B62C1D /* RLMListBase.mm in Sources */,
 				29E3C70C1A71C1C700B62C1D /* RLMMigration.mm in Sources */,
@@ -1705,8 +1703,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F8DCA6419930F8E0008BD7F /* ArrayPropertyTests.m in Sources */,
-				3F8DCA6919930F960008BD7F /* DynamicTests.m in Sources */,
 				C042A4901B7522A900771ED2 /* ConfigurationTests.mm in Sources */,
+				3F8DCA6919930F960008BD7F /* DynamicTests.m in Sources */,
 				021A88351AAFB5CB00EEAC84 /* EncryptionTests.mm in Sources */,
 				3F8DCA6A19930F960008BD7F /* EnumeratorTests.m in Sources */,
 				3F0F02A11B6FFE610046A4D5 /* KVOTests.mm in Sources */,
@@ -1743,8 +1741,7 @@
 				E83591961B3DF05C0035F2F3 /* RLMAnalytics.mm in Sources */,
 				E856D1F61956154C00FB2FCF /* RLMArray.mm in Sources */,
 				E856D1F81956154C00FB2FCF /* RLMArrayLinkView.mm in Sources */,
-				C0D2DD0C1B6BDEA1004E8919 /* RLMConfiguration.m in Sources */,
-				C0D2DD0C1B6BDEA1004E8919 /* RLMConfiguration.mm in Sources */,
+				C02E53E21B7A7E2B002586E8 /* RLMConfiguration.mm in Sources */,
 				E856D1FB1956154C00FB2FCF /* RLMConstants.m in Sources */,
 				023B195D1A3BA90D0067FB81 /* RLMListBase.mm in Sources */,
 				0207AB84195DF9FB007EFB12 /* RLMMigration.mm in Sources */,
@@ -1770,6 +1767,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E856D214195615A900FB2FCF /* ArrayPropertyTests.m in Sources */,
+				C042A48E1B7522A900771ED2 /* ConfigurationTests.mm in Sources */,
 				E856D216195615A900FB2FCF /* DynamicTests.m in Sources */,
 				021A88331AAFB5C900EEAC84 /* EncryptionTests.mm in Sources */,
 				E856D217195615A900FB2FCF /* EnumeratorTests.m in Sources */,
@@ -1793,7 +1791,6 @@
 				3F8DCA7619930FCB0008BD7F /* SwiftArrayPropertyTests.swift in Sources */,
 				3F8DCA7719930FCB0008BD7F /* SwiftArrayTests.swift in Sources */,
 				3F8DCA7819930FCB0008BD7F /* SwiftDynamicTests.swift in Sources */,
-				C042A48E1B7522A900771ED2 /* ConfigurationTests.mm in Sources */,
 				3F8DCA7919930FCB0008BD7F /* SwiftLinkTests.swift in Sources */,
 				3F8DCA7A19930FCB0008BD7F /* SwiftMixedTests.swift in Sources */,
 				3F8DCA7B19930FCB0008BD7F /* SwiftObjectInterfaceTests.swift in Sources */,
@@ -1819,8 +1816,7 @@
 				E83591951B3DF05C0035F2F3 /* RLMAnalytics.mm in Sources */,
 				E81A1F8A1955FC9300FDED82 /* RLMArray.mm in Sources */,
 				E81A1F8E1955FC9300FDED82 /* RLMArrayLinkView.mm in Sources */,
-				C0D2DD0B1B6BDEA1004E8919 /* RLMConfiguration.m in Sources */,
-				C0D2DD0B1B6BDEA1004E8919 /* RLMConfiguration.mm in Sources */,
+				C02E53E11B7A7E2B002586E8 /* RLMConfiguration.mm in Sources */,
 				E81A1F931955FC9300FDED82 /* RLMConstants.m in Sources */,
 				023B195C1A3BA90D0067FB81 /* RLMListBase.mm in Sources */,
 				0207AB83195DF9FB007EFB12 /* RLMMigration.mm in Sources */,
@@ -1846,10 +1842,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */,
+				C042A48D1B7522A900771ED2 /* ConfigurationTests.mm in Sources */,
 				02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */,
 				021A88321AAFB5C800EEAC84 /* EncryptionTests.mm in Sources */,
 				E81A1FDB1955FE0100FDED82 /* EnumeratorTests.m in Sources */,
-				C042A48D1B7522A900771ED2 /* ConfigurationTests.mm in Sources */,
 				027A4D2C1AB1012500AA46F9 /* InterprocessTests.m in Sources */,
 				3F0F029E1B6FFE610046A4D5 /* KVOTests.mm in Sources */,
 				E81A1FDD1955FE0100FDED82 /* LinkTests.m in Sources */,
