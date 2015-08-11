@@ -545,7 +545,7 @@ case "$COMMAND" in
 
     "verify-watchos")
         if [ $REALM_SWIFT_VERSION != '1.2' ]; then
-            sh build.sh watchos
+            sh build.sh watchos-swift
         fi
         exit 0
         ;;
