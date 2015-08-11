@@ -24,6 +24,9 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.h"
+#import "RLMObject_Private.hpp"
+#import "RLMObservation.hpp"
+#import "RLMProperty.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealmUtil.h"
 #import "RLMSchema_Private.h"
@@ -540,7 +543,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             // begin the read transaction if needed
             [self getOrCreateGroup];
 
-            LangBindHelper::promote_to_write(*_sharedGroup, *_history);
+            RLMPromoteToWrite(*_sharedGroup, *_history, _schema);
 
             // update state and make all objects in this realm writable
             _inWriteTransaction = YES;
@@ -599,7 +602,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
     if (self.inWriteTransaction) {
         try {
-            LangBindHelper::rollback_and_continue_as_read(*_sharedGroup, *_history);
+            RLMRollbackAndContinueAsRead(*_sharedGroup, *_history, _schema);
             _inWriteTransaction = NO;
         }
         catch (std::exception& ex) {
@@ -624,9 +627,19 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         return;
     }
 
+    for (RLMObjectSchema *objectSchema in _schema.objectSchema) {
+        for (RLMObservationInfo *info : objectSchema->_observedObjects) {
+            info->willChange(RLMInvalidatedKey);
+            info->prepareForInvalidation();
+        }
+    }
+
     _sharedGroup->end_read();
     _group = nullptr;
     for (RLMObjectSchema *objectSchema in _schema.objectSchema) {
+        for (RLMObservationInfo *info : objectSchema->_observedObjects) {
+            info->didChange(RLMInvalidatedKey);
+        }
         objectSchema.table = nullptr;
     }
 }
@@ -690,7 +703,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         if (_sharedGroup->has_changed()) { // Throws
             if (_autorefresh) {
                 if (_group) {
-                    LangBindHelper::advance_read(*_sharedGroup, *_history);
+                    RLMAdvanceRead(*_sharedGroup, *_history, _schema);
                 }
                 [self sendNotifications:RLMRealmDidChangeNotification];
             }
@@ -717,7 +730,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         // advance transaction if database has changed
         if (_sharedGroup->has_changed()) { // Throws
             if (_group) {
-                LangBindHelper::advance_read(*_sharedGroup, *_history);
+                RLMAdvanceRead(*_sharedGroup, *_history, _schema);
             }
             else {
                 // Create the read transaction

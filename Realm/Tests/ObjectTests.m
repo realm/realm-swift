@@ -1615,7 +1615,6 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
         [realm deleteObject:obj];
         XCTAssertThrows([obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"]);
     }];
-
 }
 
 @end

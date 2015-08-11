@@ -28,23 +28,50 @@
 #import <realm/link_view.hpp>
 
 @implementation RLMArray {
+@public
     // array for standalone
     NSMutableArray *_backingArray;
 }
 
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName standalone:(BOOL)standalone {
+template<typename IndexSetFactory>
+static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
+    if (!ar->_backingArray) {
+        ar->_backingArray = [NSMutableArray new];
+    }
+
+    if (RLMObjectBase *parent = ar->_parentObject) {
+        NSIndexSet *indexes = is();
+        [parent willChange:kind valuesAtIndexes:indexes forKey:ar->_key];
+        f();
+        [parent didChange:kind valuesAtIndexes:indexes forKey:ar->_key];
+    }
+    else {
+        f();
+    }
+}
+
+static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, NSUInteger index, dispatch_block_t f) {
+    changeArray(ar, kind, f, [=] { return [NSIndexSet indexSetWithIndex:index]; });
+}
+
+static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, NSRange range, dispatch_block_t f) {
+    changeArray(ar, kind, f, [=] { return [NSIndexSet indexSetWithIndexesInRange:range]; });
+}
+
+static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, NSIndexSet *is, dispatch_block_t f) {
+    changeArray(ar, kind, f, [=] { return is; });
+}
+
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName {
     self = [super init];
     if (self) {
         _objectClassName = objectClassName;
-        if (standalone) {
-            _backingArray = [[NSMutableArray alloc] init];
-        }
     }
     return self;
 }
 
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName {
-    return [self initWithObjectClassName:objectClassName standalone:YES];
+- (RLMRealm *)realm {
+    return nil;
 }
 
 //
@@ -83,11 +110,6 @@
     }
 }
 
-- (void)removeAllObjects
-{
-    [_backingArray removeAllObjects];
-}
-
 - (id)objectAtIndexedSubscript:(NSUInteger)index {
     return [self objectAtIndex:index];
 }
@@ -95,7 +117,6 @@
 - (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index {
     [self replaceObjectAtIndex:index withObject:newValue];
 }
-
 
 //
 // Standalone RLMArray implementation
@@ -119,6 +140,9 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (id)objectAtIndex:(NSUInteger)index {
     RLMValidateArrayBounds(self, index);
+    if (!_backingArray) {
+        _backingArray = [NSMutableArray new];
+    }
     return [_backingArray objectAtIndex:index];
 }
 
@@ -134,21 +158,53 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
     return [_backingArray countByEnumeratingWithState:state objects:buffer count:len];
 }
 
+- (void)addObjectsFromArray:(NSArray *)array {
+    for (id obj in array) {
+        RLMValidateMatchingObjectType(self, obj);
+    }
+    changeArray(self, NSKeyValueChangeInsertion, NSMakeRange(_backingArray.count, array.count), ^{
+        [_backingArray addObjectsFromArray:array];
+    });
+}
+
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
     RLMValidateMatchingObjectType(self, anObject);
     RLMValidateArrayBounds(self, index, true);
-    [_backingArray insertObject:anObject atIndex:index];
+    changeArray(self, NSKeyValueChangeInsertion, index, ^{
+        [_backingArray insertObject:anObject atIndex:index];
+    });
+}
+
+- (void)insertObjects:(id<NSFastEnumeration>)objects atIndexes:(NSIndexSet *)indexes {
+    changeArray(self, NSKeyValueChangeInsertion, indexes, ^{
+        NSUInteger currentIndex = [indexes firstIndex];
+        for (RLMObject *obj in objects) {
+            RLMValidateMatchingObjectType(self, obj);
+            [_backingArray insertObject:obj atIndex:currentIndex];
+            currentIndex = [indexes indexGreaterThanIndex:currentIndex];
+        }
+    });
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
     RLMValidateArrayBounds(self, index);
-    [_backingArray removeObjectAtIndex:index];
+    changeArray(self, NSKeyValueChangeRemoval, index, ^{
+        [_backingArray removeObjectAtIndex:index];
+    });
+}
+
+- (void)removeObjectsAtIndexes:(NSIndexSet *)indexes {
+    changeArray(self, NSKeyValueChangeRemoval, indexes, ^{
+        [_backingArray removeObjectsAtIndexes:indexes];
+    });
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
     RLMValidateMatchingObjectType(self, anObject);
     RLMValidateArrayBounds(self, index);
-    [_backingArray replaceObjectAtIndex:index withObject:anObject];
+    changeArray(self, NSKeyValueChangeReplacement, index, ^{
+        [_backingArray replaceObjectAtIndex:index withObject:anObject];
+    });
 }
 
 - (void)moveObjectAtIndex:(NSUInteger)sourceIndex toIndex:(NSUInteger)destinationIndex {
@@ -177,6 +233,12 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
     return NSNotFound;
 }
 
+- (void)removeAllObjects {
+    changeArray(self, NSKeyValueChangeRemoval, NSMakeRange(0, _backingArray.count), ^{
+        [_backingArray removeAllObjects];
+    });
+}
+
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...
 {
     va_list args;
@@ -190,6 +252,12 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (id)valueForKey:(NSString *)key {
+    if ([key isEqualToString:RLMInvalidatedKey]) {
+        return @NO; // Standalone arrays are never invalidated
+    }
+    if (!_backingArray) {
+        return @[];
+    }
     return [_backingArray valueForKey:key];
 }
 
@@ -198,9 +266,24 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
+    if (!_backingArray) {
+        return NSNotFound;
+    }
     return [_backingArray indexOfObjectPassingTest:^BOOL(id obj, NSUInteger, BOOL *) {
         return [predicate evaluateWithObject:obj];
     }];
+}
+
+- (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
+    if (!_backingArray) {
+        _backingArray = [NSMutableArray new];
+    }
+    return [_backingArray objectsAtIndexes:indexes];
+}
+
+- (void)addObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(void *)context {
+    RLMValidateArrayObservationKey(keyPath, self);
+    [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
 //

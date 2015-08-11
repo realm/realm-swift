@@ -26,7 +26,17 @@
 		0295B90119D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90219D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90319D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
+		3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
+		3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
+		3F78C9C01B431CF300A0988E /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		3F78C9C11B431CF300A0988E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
+		3F78C9C31B431CF300A0988E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E879D9DD1A12AA400035E2EB /* Images.xcassets */; };
+		3F78C9C91B431D6F00A0988E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F78C9AE1B431CDF00A0988E /* AppDelegate.m */; };
+		3F78C9CA1B431D7400A0988E /* TableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F78C9B01B431CDF00A0988E /* TableViewController.m */; };
+		3F78C9CB1B431D7A00A0988E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F78C9AF1B431CDF00A0988E /* main.m */; };
 		3FC898FD1A140F550067CBEC /* LabelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FC1A140F550067CBEC /* LabelViewController.m */; };
+		41D186AC1C6E8BA883A87D87 /* libPods-RACTableView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A6095331EBF052A74372F887 /* libPods-RACTableView.a */; };
 		C06134DF1A718BB800D22D12 /* TodayExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C0DC42061A7079D00067156A /* TodayExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C06134E41A71AA4E00D22D12 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		C06134E51A71AA5600D22D12 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
@@ -123,6 +133,13 @@
 			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
 			remoteInfo = Realm;
 		};
+		3F78C9B71B431CF300A0988E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
+			remoteInfo = Realm;
+		};
 		C06134E01A718BB800D22D12 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
@@ -209,8 +226,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				C06134DF1A718BB800D22D12 /* TodayExtension.appex in Embed App Extensions */,
 				C0658DCC1A76CBD8002F7A84 /* extension WatchKit Extension.appex in Embed App Extensions */,
+				C06134DF1A718BB800D22D12 /* TodayExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -220,8 +237,19 @@
 /* Begin PBXFileReference section */
 		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/ios/Realm.framework; sourceTree = "<group>"; };
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
+		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
+		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
+		3F78C9AD1B431CDF00A0988E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RACTableView/Images.xcassets; sourceTree = "<group>"; };
+		3F78C9AE1B431CDF00A0988E /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = RACTableView/AppDelegate.m; sourceTree = "<group>"; };
+		3F78C9AF1B431CDF00A0988E /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = RACTableView/main.m; sourceTree = "<group>"; };
+		3F78C9B01B431CDF00A0988E /* TableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TableViewController.m; path = RACTableView/TableViewController.m; sourceTree = "<group>"; };
+		3F78C9B11B431CDF00A0988E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = RACTableView/Info.plist; sourceTree = "<group>"; };
+		3F78C9C71B431CF300A0988E /* RACTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RACTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FC898FB1A140F550067CBEC /* LabelViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelViewController.h; sourceTree = "<group>"; };
 		3FC898FC1A140F550067CBEC /* LabelViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LabelViewController.m; sourceTree = "<group>"; };
+		A09DC4EDBB24E8E1D139F2D9 /* Pods-RACTableView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACTableView.release.xcconfig"; path = "Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView.release.xcconfig"; sourceTree = "<group>"; };
+		A6095331EBF052A74372F887 /* libPods-RACTableView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RACTableView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD5E18798F030DC45369A649 /* Pods-RACTableView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACTableView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView.debug.xcconfig"; sourceTree = "<group>"; };
 		C0658DB41A76CBD8002F7A84 /* extension WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "extension WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0658DB71A76CBD8002F7A84 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C0658DB81A76CBD8002F7A84 /* InterfaceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InterfaceController.h; sourceTree = "<group>"; };
@@ -303,12 +331,25 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3F78C9BC1B431CF300A0988E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */,
+				3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */,
+				3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */,
+				41D186AC1C6E8BA883A87D87 /* libPods-RACTableView.a in Frameworks */,
+				3F78C9C01B431CF300A0988E /* Realm.framework in Frameworks */,
+				3F78C9C11B431CF300A0988E /* UIKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C0658DB11A76CBD8002F7A84 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C0DBF4DE1A76D2B80099BC95 /* Realm.framework in Frameworks */,
 				C0DBF4DF1A76D2BA0099BC95 /* libc++.dylib in Frameworks */,
+				C0DBF4DE1A76D2B80099BC95 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,11 +369,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C06134E61A71AA5A00D22D12 /* CoreGraphics.framework in Frameworks */,
+				C06134E51A71AA5600D22D12 /* Foundation.framework in Frameworks */,
 				C0DC42191A707BF80067156A /* libc++.dylib in Frameworks */,
 				C0DC42081A7079D00067156A /* NotificationCenter.framework in Frameworks */,
 				C06134E41A71AA4E00D22D12 /* Realm.framework in Frameworks */,
-				C06134E51A71AA5600D22D12 /* Foundation.framework in Frameworks */,
-				C06134E61A71AA5A00D22D12 /* CoreGraphics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,14 +464,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3F78C9AA1B431CB200A0988E /* RACTableView */ = {
+			isa = PBXGroup;
+			children = (
+				3F78C9AB1B431CDF00A0988E /* AppDelegate.h */,
+				3F78C9AE1B431CDF00A0988E /* AppDelegate.m */,
+				3F78C9AD1B431CDF00A0988E /* Images.xcassets */,
+				3F78C9B11B431CDF00A0988E /* Info.plist */,
+				3F78C9AF1B431CDF00A0988E /* main.m */,
+				3F78C9AC1B431CDF00A0988E /* TableViewController.h */,
+				3F78C9B01B431CDF00A0988E /* TableViewController.m */,
+			);
+			name = RACTableView;
+			sourceTree = "<group>";
+		};
+		47280049B9F241AC6D6968C6 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				BD5E18798F030DC45369A649 /* Pods-RACTableView.debug.xcconfig */,
+				A09DC4EDBB24E8E1D139F2D9 /* Pods-RACTableView.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		C0658DB51A76CBD8002F7A84 /* extension WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
+				C0658DB61A76CBD8002F7A84 /* Supporting Files */,
 				C0DBF4E01A76D2F20099BC95 /* extension WatchKit Extension.entitlements */,
+				C0658DBB1A76CBD8002F7A84 /* Images.xcassets */,
 				C0658DB81A76CBD8002F7A84 /* InterfaceController.h */,
 				C0658DB91A76CBD8002F7A84 /* InterfaceController.m */,
-				C0658DBB1A76CBD8002F7A84 /* Images.xcassets */,
-				C0658DB61A76CBD8002F7A84 /* Supporting Files */,
 			);
 			path = "extension WatchKit Extension";
 			sourceTree = "<group>";
@@ -446,9 +510,9 @@
 		C0658DC31A76CBD8002F7A84 /* extension WatchKit App */ = {
 			isa = PBXGroup;
 			children = (
-				C0658DC61A76CBD8002F7A84 /* Interface.storyboard */,
-				C0658DC81A76CBD8002F7A84 /* Images.xcassets */,
 				C0658DC41A76CBD8002F7A84 /* Supporting Files */,
+				C0658DC81A76CBD8002F7A84 /* Images.xcassets */,
+				C0658DC61A76CBD8002F7A84 /* Interface.storyboard */,
 			);
 			path = "extension WatchKit App";
 			sourceTree = "<group>";
@@ -464,11 +528,11 @@
 		C0DC41CD1A7072670067156A /* Extension */ = {
 			isa = PBXGroup;
 			children = (
+				C0DC41D21A7072670067156A /* AppDelegate.h */,
+				C0DC41D31A7072670067156A /* AppDelegate.m */,
 				C0DC421C1A717BD00067156A /* Extension.entitlements */,
 				C0DC41FF1A70775F0067156A /* Info.plist */,
 				C0DC41FD1A7073E40067156A /* main.m */,
-				C0DC41D21A7072670067156A /* AppDelegate.h */,
-				C0DC41D31A7072670067156A /* AppDelegate.m */,
 				C0DC41FA1A7072DE0067156A /* Tick.h */,
 				C0DC41FB1A7072DE0067156A /* Tick.m */,
 			);
@@ -478,11 +542,11 @@
 		C0DC42091A7079D00067156A /* TodayExtension */ = {
 			isa = PBXGroup;
 			children = (
+				C0DC420A1A7079D00067156A /* Supporting Files */,
+				C0DC420F1A7079D00067156A /* MainInterface.storyboard */,
 				C0DC421B1A717B660067156A /* TodayExtension.entitlements */,
 				C0DC420C1A7079D00067156A /* TodayViewController.h */,
 				C0DC420D1A7079D00067156A /* TodayViewController.m */,
-				C0DC420F1A7079D00067156A /* MainInterface.storyboard */,
-				C0DC420A1A7079D00067156A /* Supporting Files */,
 			);
 			path = TodayExtension;
 			sourceTree = "<group>";
@@ -512,20 +576,22 @@
 		E8AB719D19BA502500F3EDB4 = {
 			isa = PBXGroup;
 			children = (
-				0A73D4401B1442B200E1E8EE /* README.md */,
 				E8BDBFC71A116FCB00450CFF /* Backlink */,
 				E8F70EBF19BA50AB006F60D5 /* Encryption */,
 				C0DC41CD1A7072670067156A /* Extension */,
-				C0DC42091A7079D00067156A /* TodayExtension */,
-				C0658DB51A76CBD8002F7A84 /* extension WatchKit Extension */,
 				C0658DC31A76CBD8002F7A84 /* extension WatchKit App */,
+				C0658DB51A76CBD8002F7A84 /* extension WatchKit Extension */,
 				E8AB71A819BA502500F3EDB4 /* Frameworks */,
 				E879D9DA1A12AA400035E2EB /* GroupedTableView */,
 				E8F70EAE19BA50A3006F60D5 /* Migration */,
+				47280049B9F241AC6D6968C6 /* Pods */,
 				E8AB71A719BA502500F3EDB4 /* Products */,
+				3F78C9AA1B431CB200A0988E /* RACTableView */,
 				E8F70EA319BA5093006F60D5 /* REST */,
 				E8F70E8E19BA5083006F60D5 /* Simple */,
 				E8F70E9619BA508B006F60D5 /* TableView */,
+				C0DC42091A7079D00067156A /* TodayExtension */,
+				0A73D4401B1442B200E1E8EE /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -534,15 +600,16 @@
 			children = (
 				E8BDBFA11A116FAC00450CFF /* Backlink.app */,
 				E8AB723819BA504000F3EDB4 /* Encryption.app */,
+				C0658DBF1A76CBD8002F7A84 /* extension WatchKit App.app */,
+				C0658DB41A76CBD8002F7A84 /* extension WatchKit Extension.appex */,
+				C0DC41CC1A7072670067156A /* extension.app */,
 				E879D9D81A12AA120035E2EB /* GroupedTableView.app */,
 				E8AB720A19BA503B00F3EDB4 /* Migration.app */,
+				3F78C9C71B431CF300A0988E /* RACTableView.app */,
 				E8AB729419BA504900F3EDB4 /* REST.app */,
 				E8AB71DC19BA503500F3EDB4 /* Simple.app */,
 				E8AB726619BA504500F3EDB4 /* TableView.app */,
-				C0DC41CC1A7072670067156A /* extension.app */,
 				C0DC42061A7079D00067156A /* TodayExtension.appex */,
-				C0658DB41A76CBD8002F7A84 /* extension WatchKit Extension.appex */,
-				C0658DBF1A76CBD8002F7A84 /* extension WatchKit App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -553,10 +620,11 @@
 				E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */,
 				E8AB71A919BA502500F3EDB4 /* Foundation.framework */,
 				E8F70ED019BA52E8006F60D5 /* libc++.dylib */,
+				A6095331EBF052A74372F887 /* libPods-RACTableView.a */,
+				C0DC42071A7079D00067156A /* NotificationCenter.framework */,
 				0295B8FE19D102880036D6C3 /* Realm.framework */,
 				E8AB71AD19BA502500F3EDB4 /* UIKit.framework */,
 				E8AB71C219BA502500F3EDB4 /* XCTest.framework */,
-				C0DC42071A7079D00067156A /* NotificationCenter.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -642,6 +710,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3F78C9B51B431CF300A0988E /* RACTableView */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3F78C9C41B431CF300A0988E /* Build configuration list for PBXNativeTarget "RACTableView" */;
+			buildPhases = (
+				026D2BA9FD4350CE0245BCD3 /* Check Pods Manifest.lock */,
+				3F78C9B81B431CF300A0988E /* Sources */,
+				3F78C9BC1B431CF300A0988E /* Frameworks */,
+				3F78C9C21B431CF300A0988E /* Resources */,
+				998B2F45899A851A95DECA6F /* Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3F78C9B61B431CF300A0988E /* PBXTargetDependency */,
+			);
+			name = RACTableView;
+			productName = TableView;
+			productReference = 3F78C9C71B431CF300A0988E /* RACTableView.app */;
+			productType = "com.apple.product-type.application";
+		};
 		C0658DB31A76CBD8002F7A84 /* extension WatchKit Extension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C0658DD21A76CBD8002F7A84 /* Build configuration list for PBXNativeTarget "extension WatchKit Extension" */;
@@ -899,6 +987,7 @@
 				C0DC41CB1A7072670067156A /* extension */,
 				C0DC42051A7079D00067156A /* TodayExtension */,
 				E879D9C61A12AA120035E2EB /* GroupedTableView */,
+				3F78C9B51B431CF300A0988E /* RACTableView */,
 				E8AB720919BA503B00F3EDB4 /* Migration */,
 				E8AB729319BA504900F3EDB4 /* REST */,
 				E8AB71DB19BA503500F3EDB4 /* Simple */,
@@ -911,6 +1000,14 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		3F78C9C21B431CF300A0988E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3F78C9C31B431CF300A0988E /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C0658DB21A76CBD8002F7A84 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -924,8 +1021,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C0658DC71A76CBD8002F7A84 /* Interface.storyboard in Resources */,
 				C0658DC91A76CBD8002F7A84 /* Images.xcassets in Resources */,
+				C0658DC71A76CBD8002F7A84 /* Interface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -966,6 +1063,36 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		026D2BA9FD4350CE0245BCD3 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		998B2F45899A851A95DECA6F /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		E8F70ECB19BA51C4006F60D5 /* Build Realm */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -984,12 +1111,22 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3F78C9B81B431CF300A0988E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3F78C9C91B431D6F00A0988E /* AppDelegate.m in Sources */,
+				3F78C9CB1B431D7A00A0988E /* main.m in Sources */,
+				3F78C9CA1B431D7400A0988E /* TableViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C0658DB01A76CBD8002F7A84 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C0DBF4DD1A76D1330099BC95 /* Tick.m in Sources */,
 				C0658DBA1A76CBD8002F7A84 /* InterfaceController.m in Sources */,
+				C0DBF4DD1A76D1330099BC95 /* Tick.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -997,9 +1134,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C0DC41FC1A7072DE0067156A /* Tick.m in Sources */,
-				C0DC42011A7078130067156A /* main.m in Sources */,
 				C0DC41D41A7072680067156A /* AppDelegate.m in Sources */,
+				C0DC42011A7078130067156A /* main.m in Sources */,
+				C0DC41FC1A7072DE0067156A /* Tick.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1093,6 +1230,11 @@
 			target = E8F70EC719BA51B1006F60D5 /* Realm */;
 			targetProxy = 3F64749B1A79A07F008D5795 /* PBXContainerItemProxy */;
 		};
+		3F78C9B61B431CF300A0988E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8F70EC719BA51B1006F60D5 /* Realm */;
+			targetProxy = 3F78C9B71B431CF300A0988E /* PBXContainerItemProxy */;
+		};
 		C06134E11A718BB800D22D12 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C0DC42051A7079D00067156A /* TodayExtension */;
@@ -1151,6 +1293,40 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		3F78C9C51B431CF300A0988E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BD5E18798F030DC45369A649 /* Pods-RACTableView.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/RACTableView/Info.plist";
+				PRODUCT_NAME = RACTableView;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		3F78C9C61B431CF300A0988E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A09DC4EDBB24E8E1D139F2D9 /* Pods-RACTableView.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				INFOPLIST_FILE = "$(SRCROOT)/RACTableView/Info.plist";
+				PRODUCT_NAME = RACTableView;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
 		C0658DCD1A76CBD8002F7A84 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1626,6 +1802,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3F78C9C41B431CF300A0988E /* Build configuration list for PBXNativeTarget "RACTableView" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3F78C9C51B431CF300A0988E /* Debug */,
+				3F78C9C61B431CF300A0988E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C0658DD11A76CBD8002F7A84 /* Build configuration list for PBXNativeTarget "extension WatchKit App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
