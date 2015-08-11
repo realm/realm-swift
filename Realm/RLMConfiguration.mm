@@ -95,7 +95,10 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     if (s_configurationUsage.exchange(RLMConfigurationUsageConfiguration) == RLMConfigurationUsagePerPath) {
         @throw RLMException(@"Cannot set a default configuration after using per-path configuration methods.");
     }
-    s_defaultConfiguration = [configuration copy] ?: [[RLMConfiguration alloc] init];
+    if (!configuration) {
+        @throw RLMException(@"Cannot set the default configuration to nil.");
+    }
+    s_defaultConfiguration = [configuration copy];
 }
 
 + (void)setDefaultPath:(NSString *)path {

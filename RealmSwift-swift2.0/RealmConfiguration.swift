@@ -28,7 +28,8 @@ public struct RealmConfiguration {
 
     // MARK: Default Configuration
 
-    /// Returns the default Realm Configuration.
+    /// Returns the default RealmConfiguration used to create Realms when no other
+    /// configuration is explicitly specified (i.e. `Realm()`).
     public static var defaultConfiguration: RealmConfiguration {
         get {
             return fromRLMConfiguration(RLMConfiguration.defaultConfiguration())
@@ -69,6 +70,7 @@ public struct RealmConfiguration {
     // MARK: Configuration Properties
 
     /// The path to the realm file.
+    /// Mutually exclusive with `inMemoryIdentifier`.
     public var path: String?  {
         set {
             if newValue != nil {
@@ -84,6 +86,7 @@ public struct RealmConfiguration {
     private var _path: String?
 
     /// A string used to identify a particular in-memory Realm.
+    /// Mutually exclusive with `path`.
     public var inMemoryIdentifier: String?  {
         set {
             if newValue != nil {

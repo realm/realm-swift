@@ -29,7 +29,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  Returns the default configuration used to create Realms when no other
- configuration is explicitly specified.
+ configuration is explicitly specified (i.e. `+[RLMRealm defaultRealm]`).
 
  @return The default Realm configuration.
  */
@@ -40,12 +40,12 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @param configuration The new default Realm configuration.
  */
-+ (void)setDefaultConfiguration:(nullable RLMConfiguration *)configuration;
++ (void)setDefaultConfiguration:(RLMConfiguration *)configuration;
 
-/// The path to the realm file.
+/// The path to the realm file. Mutually exclusive with `inMemoryIdentifier`.
 @property (nonatomic, copy, nullable) NSString *path;
 
-/// A string used to identify a particular in-memory Realm.
+/// A string used to identify a particular in-memory Realm. Mutually exclusive with `path`.
 @property (nonatomic, copy, nullable) NSString *inMemoryIdentifier;
 
 /// 64-byte key to use to encrypt the data.

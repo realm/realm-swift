@@ -53,23 +53,14 @@
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     if (!RLMIsDebuggerAttached()) {
         [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:@"path"];
-        RLMAssertThrowsWithReasonMatching([RLMConfiguration setDefaultConfiguration:nil], @"per-path");
+        RLMAssertThrowsWithReasonMatching([RLMConfiguration setDefaultConfiguration:[RLMConfiguration new]], @"per-path");
     }
 
     [RLMConfiguration resetRealmConfigurationState];
 
     [RLMRealm setSchemaVersion:1 forRealmAtPath:@"path" withMigrationBlock:nil];
-    RLMAssertThrowsWithReasonMatching([RLMConfiguration setDefaultConfiguration:nil], @"per-path");
+    RLMAssertThrowsWithReasonMatching([RLMConfiguration setDefaultConfiguration:[RLMConfiguration new]], @"per-path");
 #pragma clang diagnostic pop
-}
-
-- (void)testSetDefaultConfigurationtoNilResets {
-    RLMConfiguration *configuration = [[RLMConfiguration alloc] init];
-    configuration.path = @"path";
-    [RLMConfiguration setDefaultConfiguration:configuration];
-    [RLMConfiguration setDefaultConfiguration:nil];
-
-    XCTAssertEqual(RLMConfiguration.defaultConfiguration.path, [RLMConfiguration defaultRealmPath]);
 }
 
 - (void)testSetPathAndInMemoryIdentifierAreMutuallyExclusive {
