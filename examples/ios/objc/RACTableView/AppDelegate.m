@@ -16,21 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMListBase.h"
-#import <Realm/RLMArray.h>
+#import "AppDelegate.h"
+#import "TableViewController.h"
 
-@implementation RLMListBase
+@implementation AppDelegate
 
-- (instancetype)initWithArray:(RLMArray *)array {
-    self = [super init];
-    if (self) {
-        __rlmArray = array;
-    }
-    return self;
-}
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])buffer count:(NSUInteger)len {
-    return [__rlmArray countByEnumeratingWithState:state objects:buffer count:len];
+    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:
+                                      [[TableViewController alloc] initWithStyle:UITableViewStylePlain]];
+    [self.window makeKeyAndVisible];
+    return YES;
 }
 
 @end

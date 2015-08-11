@@ -16,17 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMConstants.h>
+#import <UIKit/UIKit.h>
 
-NSString * const RLMRealmRefreshRequiredNotification = @"RLMRealmRefreshRequiredNotification";
-NSString * const RLMRealmDidChangeNotification = @"RLMRealmDidChangeNotification";
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-NSString * const RLMErrorDomain = @"io.realm";
+@property (strong, nonatomic) UIWindow *window;
 
-NSString * const RLMExceptionName = @"RLMException";
-
-NSString * const RLMRealmVersionKey = @"RLMRealmVersion";
-
-NSString * const RLMRealmCoreVersionKey = @"RLMRealmCoreVersion";
-
-NSString * const RLMInvalidatedKey = @"invalidated";
+@end
