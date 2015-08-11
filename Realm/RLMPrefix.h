@@ -21,6 +21,10 @@
 #endif
 
 #ifdef __cplusplus
+
+// Defined by AssertMacros.h
+#undef verify
+
 #import <functional>
 #import <map>
 #import <memory>
