@@ -69,6 +69,7 @@ environment variables:
   XCMODE: xcodebuild (default), xcpretty or xctool
   CONFIGURATION: Debug or Release (default)
   REALM_CORE_VERSION: version in x.y.z format or "current" to use local build
+  REALM_EXTRA_BUILD_ARGUMENTS: additional arguments to pass to the build tool
 EOF
 }
 
@@ -78,7 +79,7 @@ EOF
 
 xcode() {
     mkdir -p build/DerivedData
-    CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@"
+    CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@ $REALM_EXTRA_BUILD_ARGUMENTS"
     echo "Building with command:" $CMD
     eval "$CMD"
 }
