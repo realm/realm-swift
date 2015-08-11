@@ -306,11 +306,7 @@ case "$COMMAND" in
     "set-swift-version")
         version="$2"
         if [[ -z "$version" ]]; then
-            if [[ $REALM_SWIFT_VERSION ]]; then
-                version="$REALM_SWIFT_VERSION"
-            else
-                version="$(get_swift_version)"
-            fi
+            version="$REALM_SWIFT_VERSION"
         fi
 
         # Update the symlinks to point to the correct verion of the source, and
@@ -495,6 +491,7 @@ case "$COMMAND" in
         sh build.sh verify-ios-swift
         sh build.sh verify-ios-swift-debug
         sh build.sh verify-ios-device
+        sh build.sh verify-watchos
         ;;
 
     "verify-osx")
@@ -546,9 +543,10 @@ case "$COMMAND" in
         exit 0
         ;;
 
-
-    # FIXME: remove these targets from ci
-    "verify-ios")
+    "verify-watchos")
+        if [ $REALM_SWIFT_VERSION != '1.2' ]; then
+            sh build.sh watchos-swift
+        fi
         exit 0
         ;;
 
