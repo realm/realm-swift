@@ -573,7 +573,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             // begin the read transaction if needed
             [self getOrCreateGroup];
 
-            //
+            // notify any collections currently being enumerated that they need
+            // to switch to enumerating a copy as the data may change on them
             for (RLMFastEnumerator *enumerator in _collectionEnumerators) {
                 [enumerator detach];
             }
