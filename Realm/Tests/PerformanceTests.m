@@ -18,7 +18,7 @@
 
 #import "RLMTestCase.h"
 
-#if !DEBUG && !TARGET_OS_SIMULATOR && !TARGET_OS_MAC
+#if !DEBUG && !TARGET_OS_SIMULATOR && TARGET_OS_IPHONE
 
 @interface PerformanceTests : RLMTestCase
 @end
