@@ -336,7 +336,7 @@
 		A05AEB701B6A9B0D00072027 /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A05AEB711B6A9B0E00072027 /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A05AEB721B6A9B0F00072027 /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		A05AEB731B6A9B1000072027 /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A0CCA0BF1B7C0B4A000B6B0F /* RLMObjectBase_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		C0CDC0841B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
@@ -1023,6 +1023,7 @@
 				144C2F611B3D3517005C8F81 /* RLMObjectBase.h in Headers */,
 				144C2F621B3D3517005C8F81 /* RLMObjectSchema.h in Headers */,
 				144C2F6B1B3D3529005C8F81 /* RLMObjectSchema_Private.h in Headers */,
+				A0CCA0BF1B7C0B4A000B6B0F /* RLMObjectBase_Dynamic.h in Headers */,
 				144C2F741B3D3539005C8F81 /* RLMObjectSchema_Private.hpp in Headers */,
 				144C2F6C1B3D3529005C8F81 /* RLMObjectStore.h in Headers */,
 				C06C74031B797EF10027FF85 /* RLMObservation.hpp in Headers */,
@@ -1037,7 +1038,6 @@
 				C07BC7D51B702BD800A08906 /* RLMRealmConfiguration_Private.h in Headers */,
 				144C2F701B3D3529005C8F81 /* RLMRealmUtil.h in Headers */,
 				144C2F651B3D3517005C8F81 /* RLMResults.h in Headers */,
-				A05FA6221B62CDD40000C9B2 /* RLMObjectBase_Dynamic.h in Headers */,
 				144C2F711B3D3529005C8F81 /* RLMResults_Private.h in Headers */,
 				144C2F661B3D3517005C8F81 /* RLMSchema.h in Headers */,
 				144C2F721B3D3529005C8F81 /* RLMSchema_Private.h in Headers */,
