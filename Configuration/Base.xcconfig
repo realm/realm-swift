@@ -35,6 +35,6 @@ TARGETED_DEVICE_FAMILY = 1,2,4;
 
 REALM_OTHER_CFLAGS[sdk=iphone*] = -fembed-bitcode;
 REALM_OTHER_CFLAGS[sdk=watch*] = -fembed-bitcode;
-OTHER_CFLAGS = $(inherited) $(REALM_OTHER_CFLAGS);
+OTHER_CFLAGS = $(inherited) $(REALM_OTHER_FLAGS);
 OTHER_CPLUSPLUSFLAGS = $(inherited) -isystem core/include;
 LIBRARY_SEARCH_PATHS = core;
