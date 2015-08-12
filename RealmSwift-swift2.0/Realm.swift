@@ -140,7 +140,7 @@ public final class Realm {
 
     - parameter identifier: A string used to identify a particular in-memory Realm.
     */
-    @available(*, deprecated=1, message="Use Realm(configuration:error:)")
+    @available(*, deprecated=1, message="Use Realm(configuration:)")
     public convenience init(inMemoryIdentifier: String) throws {
         let configuration = Configuration(inMemoryIdentifier: inMemoryIdentifier)
         try self.init(configuration: configuration)
@@ -535,7 +535,7 @@ public final class Realm {
     - parameter encryptionKey: 64-byte encryption key to use, or `nil` to unset.
     - parameter path:          Realm path to set the encryption key for.
     */
-    @available(*, deprecated=1, message="Use Realm(configuration:error:)")
+    @available(*, deprecated=1, message="Use Realm(configuration:)")
     public class func setEncryptionKey(encryptionKey: NSData?, forPath path: String = Realm.defaultPath) {
         RLMRealmSetEncryptionKeyForPath(encryptionKey, path)
     }

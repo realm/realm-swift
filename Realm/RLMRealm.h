@@ -109,7 +109,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return An `RLMRealm` instance.
  */
-+ (nullable instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("Use -[RLMRealm realmWithConfiguration:error:]");
++ (nullable instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("Use +[RLMRealm realmWithConfiguration:error:]");
 
 /**
  Obtains an `RLMRealm` instance persisted to an encrypted file.
@@ -136,7 +136,7 @@ RLM_ASSUME_NONNULL_BEGIN
 + (nullable instancetype)realmWithPath:(NSString *)path
                          encryptionKey:(NSData *)key
                               readOnly:(BOOL)readonly
-                                 error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("Use -[RLMRealm realmWithConfiguration:error:]");
+                                 error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("Use +[RLMRealm realmWithConfiguration:error:]");
 
 /**
  Set the encryption key to use when opening Realms at a certain path.
@@ -172,7 +172,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return An `RLMRealm` instance.
  */
-+ (instancetype)inMemoryRealmWithIdentifier:(NSString *)identifier DEPRECATED_MSG_ATTRIBUTE("Use -[RLMRealm realmWithConfiguration:error:]");
++ (instancetype)inMemoryRealmWithIdentifier:(NSString *)identifier DEPRECATED_MSG_ATTRIBUTE("Use +[RLMRealm realmWithConfiguration:error:]");
 
 /**
  Path to the file where this Realm is persisted.
