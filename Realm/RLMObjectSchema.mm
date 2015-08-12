@@ -139,12 +139,12 @@ using namespace realm;
         if (prop.optional && !RLMPropertyTypeIsNullable(type)) {
 #ifdef REALM_ENABLE_NULL
             NSString *error = [NSString stringWithFormat:@"Only 'string', 'binary', and 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)];
-#else
-            NSString *error = [NSString stringWithFormat:@"Only 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)];
-#endif
             if (prop.type == RLMPropertyTypeAny && isSwift) {
                 error = [error stringByAppendingString:@"\nIf this is a 'String?' property, it must be declared as 'NSString?' instead."];
             }
+#else
+            NSString *error = [NSString stringWithFormat:@"Only 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)];
+#endif
             @throw RLMException(error);
         }
     }
