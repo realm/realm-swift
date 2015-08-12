@@ -29,7 +29,7 @@
 @implementation EncryptionTests
 
 - (RLMRealm *)realmWithKey:(NSData *)key {
-    RLMConfiguration *configuration = [[RLMConfiguration alloc] init];
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
     configuration.path = RLMDefaultRealmPath();
     configuration.encryptionKey = key;
     return [RLMRealm realmWithConfiguration:configuration error:nil];
@@ -321,7 +321,7 @@
     BOOL migrationRan = NO;
     [self createRealmRequiringMigrationWithKey:key migrationRun:&migrationRan];
 
-    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
 
     XCTAssertNotNil([RLMRealm migrateRealm:configuration]);
     XCTAssertFalse(migrationRan);
@@ -336,7 +336,7 @@
     BOOL migrationRan = NO;
     [self createRealmRequiringMigrationWithKey:key migrationRun:&migrationRan];
 
-    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
 
     XCTAssertNotNil([RLMRealm migrateRealm:configuration]);
     XCTAssertFalse(migrationRan);

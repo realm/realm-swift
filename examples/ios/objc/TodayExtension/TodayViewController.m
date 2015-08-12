@@ -34,9 +34,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.preferredContentSize = CGSizeMake(0, 200.0);
-    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.path = [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.io.realm.examples.extension"] URLByAppendingPathComponent:@"extension.realm"].path;
-    [RLMConfiguration setDefaultConfiguration:configuration];
+    [RLMRealmConfiguration setDefaultConfiguration:configuration];
     self.tick = [Tick allObjects].firstObject;
     if (!self.tick) {
         [[RLMRealm defaultRealm] transactionWithBlock:^{

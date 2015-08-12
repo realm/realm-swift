@@ -18,18 +18,18 @@
 
 #import "RLMTestCase.h"
 
-#import "RLMConfiguration_Private.h"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMUtil.hpp"
 
-@interface ConfigurationTests : RLMTestCase
+@interface RealmConfigurationTests : RLMTestCase
 
 @end
 
-@implementation ConfigurationTests
+@implementation RealmConfigurationTests
 
 - (void)testDefaultConfiguration {
-    RLMConfiguration *defaultConfiguration = [RLMConfiguration defaultConfiguration];
-    XCTAssertEqualObjects(defaultConfiguration.path, [RLMConfiguration defaultRealmPath]);
+    RLMRealmConfiguration *defaultConfiguration = [RLMRealmConfiguration defaultConfiguration];
+    XCTAssertEqualObjects(defaultConfiguration.path, [RLMRealmConfiguration defaultRealmPath]);
     XCTAssertNil(defaultConfiguration.inMemoryIdentifier);
     XCTAssertNil(defaultConfiguration.encryptionKey);
     XCTAssertFalse(defaultConfiguration.readOnly);
@@ -42,10 +42,10 @@
 }
 
 - (void)testSetDefaultConfiguration {
-    RLMConfiguration *configuration = [[RLMConfiguration alloc] init];
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
     configuration.path = @"path";
-    [RLMConfiguration setDefaultConfiguration:configuration];
-    XCTAssertEqual(RLMConfiguration.defaultConfiguration.path, @"path");
+    [RLMRealmConfiguration setDefaultConfiguration:configuration];
+    XCTAssertEqual(RLMRealmConfiguration.defaultConfiguration.path, @"path");
 }
 
 - (void)testSetDefaultConfigurationAfterRegistingPerPathThrows {
@@ -53,18 +53,18 @@
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     if (!RLMIsDebuggerAttached()) {
         [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:@"path"];
-        RLMAssertThrowsWithReasonMatching([RLMConfiguration setDefaultConfiguration:[RLMConfiguration new]], @"per-path");
+        RLMAssertThrowsWithReasonMatching([RLMRealmConfiguration setDefaultConfiguration:[RLMRealmConfiguration new]], @"per-path");
     }
 
-    [RLMConfiguration resetRealmConfigurationState];
+    [RLMRealmConfiguration resetRealmConfigurationState];
 
     [RLMRealm setSchemaVersion:1 forRealmAtPath:@"path" withMigrationBlock:nil];
-    RLMAssertThrowsWithReasonMatching([RLMConfiguration setDefaultConfiguration:[RLMConfiguration new]], @"per-path");
+    RLMAssertThrowsWithReasonMatching([RLMRealmConfiguration setDefaultConfiguration:[RLMRealmConfiguration new]], @"per-path");
 #pragma clang diagnostic pop
 }
 
 - (void)testSetPathAndInMemoryIdentifierAreMutuallyExclusive {
-    RLMConfiguration *configuration = [[RLMConfiguration alloc] init];
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
 
     configuration.inMemoryIdentifier = @"identifier";
     XCTAssertNil(configuration.path);
@@ -78,7 +78,7 @@
 }
 
 - (void)testEncryptionKeyIsValidated {
-    RLMConfiguration *configuration = [[RLMConfiguration alloc] init];
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
 
     if (!RLMIsDebuggerAttached()) {
         RLMAssertThrowsWithReasonMatching(configuration.encryptionKey = [NSData data], @"Encryption key must be exactly 64 bytes long");
@@ -92,7 +92,7 @@
 }
 
 - (void)testSchemaVersionIsValidated {
-    RLMConfiguration *configuration = [[RLMConfiguration alloc] init];
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
 
     RLMAssertThrowsWithReasonMatching(configuration.schemaVersion = RLMNotVersioned, @"schema version.*RLMNotVersioned");
 

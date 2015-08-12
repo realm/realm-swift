@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMDefines.h>
 
-@class RLMConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
+@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
 RLM_ASSUME_NONNULL_BEGIN
 
@@ -60,8 +60,8 @@ RLM_ASSUME_NONNULL_BEGIN
  your Application on iOS, and in your application's Application Support
  directory on OS X.
  
- The default Realm is created using the default `RLMConfiguration`, which
- can be changed via `+[RLMConfiguration setDefaultConfiguration:]`.
+ The default Realm is created using the default `RLMRealmConfiguration`, which
+ can be changed via `+[RLMRealmConfiguration setDefaultConfiguration:]`.
 
  @return The default `RLMRealm` instance for the current thread.
  */
@@ -77,7 +77,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return An `RLMRealm` instance.
  */
-+ (nullable instancetype)realmWithConfiguration:(RLMConfiguration *)configuration error:(NSError **)error;
++ (nullable instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
 /**
  Obtains an `RLMRealm` instance persisted at a specific file path.
@@ -153,7 +153,7 @@ RLM_ASSUME_NONNULL_BEGIN
  @param key     64-byte encryption key to use, or `nil` to unset.
  @param path    Realm path to set the encryption key for.
  */
-+ (void)setEncryptionKey:(nullable NSData *)key forRealmsAtPath:(NSString *)path DEPRECATED_MSG_ATTRIBUTE("Use RLMConfiguration to set an encryption key");
++ (void)setEncryptionKey:(nullable NSData *)key forRealmsAtPath:(NSString *)path DEPRECATED_MSG_ATTRIBUTE("Use RLMRealmConfiguration to set an encryption key");
 
 /**
  Obtains an `RLMRealm` instance for an un-persisted in-memory Realm. The identifier
@@ -200,9 +200,9 @@ RLM_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 
 /**
- Returns an `RLMConfiguration` that can be used to create this `RLMRealm` instance.
+ Returns an `RLMRealmConfiguration` that can be used to create this `RLMRealm` instance.
  */
-@property (nonatomic, readonly) RLMConfiguration *configuration;
+@property (nonatomic, readonly) RLMRealmConfiguration *configuration;
 
 /**---------------------------------------------------------------------------------------
  *  @name Default Realm Path
@@ -219,7 +219,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @see defaultRealm
  */
-+ (NSString *)defaultRealmPath DEPRECATED_MSG_ATTRIBUTE("Use [RLMConfiguration defaultConfiguration].path");
++ (NSString *)defaultRealmPath DEPRECATED_MSG_ATTRIBUTE("Use [RLMRealmConfiguration defaultConfiguration].path");
 
 /**
  Set the default Realm path to a given path.
@@ -228,7 +228,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @see defaultRealm
  */
-+ (void)setDefaultRealmPath:(NSString *)defaultRealmPath DEPRECATED_MSG_ATTRIBUTE("Use +[RLMConfiguration setDefaultConfiguration:]");
++ (void)setDefaultRealmPath:(NSString *)defaultRealmPath DEPRECATED_MSG_ATTRIBUTE("Use +[RLMRealmConfiguration setDefaultConfiguration:]");
 
 
 #pragma mark - Notifications
@@ -546,7 +546,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
  @see               RLMMigration
  */
-+ (void)setDefaultRealmSchemaVersion:(uint64_t)version withMigrationBlock:(nullable RLMMigrationBlock)block DEPRECATED_MSG_ATTRIBUTE("Use RLMConfiguration.schemaVersion and RLMConfiguration.migrationBlock");
++ (void)setDefaultRealmSchemaVersion:(uint64_t)version withMigrationBlock:(nullable RLMMigrationBlock)block DEPRECATED_MSG_ATTRIBUTE("Use RLMRealmConfiguration.schemaVersion and RLMRealmConfiguration.migrationBlock");
 
 /**
  Specify a schema version and an associated migration block which is applied when
@@ -558,7 +558,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
  @see               RLMMigration
  */
-+ (void)setSchemaVersion:(uint64_t)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(nullable RLMMigrationBlock)block DEPRECATED_MSG_ATTRIBUTE("Use RLMConfiguration.schemaVersion and RLMConfiguration.migrationBlock");
++ (void)setSchemaVersion:(uint64_t)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(nullable RLMMigrationBlock)block DEPRECATED_MSG_ATTRIBUTE("Use RLMRealmConfiguration.schemaVersion and RLMRealmConfiguration.migrationBlock");
 
 /**
  Get the schema version for a Realm at a given path.
@@ -585,7 +585,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
  */
 + (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
-+ (NSError *)migrateRealm:(RLMConfiguration *)configuration;
++ (NSError *)migrateRealm:(RLMRealmConfiguration *)configuration;
 
 /**
  Performs the registered migration block on a Realm at the given path.

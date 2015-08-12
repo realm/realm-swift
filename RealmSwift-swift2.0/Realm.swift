@@ -56,7 +56,7 @@ public final class Realm {
     public var schema: Schema { return Schema(rlmRealm.schema) }
 
     /// Returns a `Configuration` that can be used to create this `Realm` instance.
-    public var configuration: Configuration { return Configuration.fromRLMConfiguration(rlmRealm.configuration) }
+    public var configuration: Configuration { return Configuration.fromRLMRealmConfiguration(rlmRealm.configuration) }
 
     /**
     The location of the default Realm as a string. Can be overridden.
@@ -70,10 +70,10 @@ public final class Realm {
     @available(*, deprecated=1, message="Use Realm.Configuration.defaultConfiguration")
     public class var defaultPath: String {
         get {
-            return Configuration.defaultConfiguration.path ?? RLMConfiguration.defaultRealmPath()
+            return Configuration.defaultConfiguration.path ?? RLMRealmConfiguration.defaultRealmPath()
         }
         set {
-            RLMConfiguration.setDefaultPath(newValue)
+            RLMRealmConfiguration.setDefaultPath(newValue)
         }
     }
 

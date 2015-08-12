@@ -38,9 +38,9 @@
     // Configure interface objects here.
     NSLog(@"%@ awakeWithContext", self);
 
-    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.path = [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.io.realm.examples.extension"] URLByAppendingPathComponent:@"extension.realm"].path;
-    [RLMConfiguration setDefaultConfiguration:configuration];
+    [RLMRealmConfiguration setDefaultConfiguration:configuration];
     self.tick = [Tick allObjects].firstObject;
     if (!self.tick) {
         [[RLMRealm defaultRealm] transactionWithBlock:^{

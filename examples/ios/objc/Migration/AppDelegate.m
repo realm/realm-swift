@@ -29,7 +29,7 @@
     [self.window makeKeyAndVisible];
 
     // copy over old data files for migration
-    NSString *defaultRealmPath = [RLMConfiguration defaultConfiguration].path;
+    NSString *defaultRealmPath = [RLMRealmConfiguration defaultConfiguration].path;
     NSString *defaultRealmParentPath = [defaultRealmPath stringByDeletingLastPathComponent];
     NSString *v0Path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"default-v0.realm"];
     [[NSFileManager defaultManager] removeItemAtPath:defaultRealmPath error:nil];
@@ -77,13 +77,13 @@
         NSLog(@"Migration complete.");
     };
 
-    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
 
     // set the schema verion and migration block for the defualt realm
     configuration.schemaVersion = 3;
     configuration.migrationBlock = migrationBlock;
 
-    [RLMConfiguration setDefaultConfiguration:configuration];
+    [RLMRealmConfiguration setDefaultConfiguration:configuration];
 
     // now that we have set a schema version and migration block for the configuration,
     // performing the migration and opening the Realm will succeed
@@ -105,10 +105,10 @@
     [[NSFileManager defaultManager] copyItemAtPath:v2Path toPath:realmv2Path error:nil];
 
     // set schemave versions and migration blocks form Realms at each path
-    RLMConfiguration *realmv1Configuration = [configuration copy];
+    RLMRealmConfiguration *realmv1Configuration = [configuration copy];
     realmv1Configuration.path = realmv1Path;
 
-    RLMConfiguration *realmv2Configuration = [configuration copy];
+    RLMRealmConfiguration *realmv2Configuration = [configuration copy];
     realmv2Configuration.path = realmv2Path;
 
     // manully migration v1Path, v2Path is migrated implicitly on access

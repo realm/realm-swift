@@ -18,7 +18,7 @@
 
 #import "RLMTestCase.h"
 
-#import "RLMConfiguration_Private.h"
+#import "RLMRealmConfiguration_Private.h"
 #import <Realm/RLMRealm_Private.h>
 
 // This ensures the shared schema is initialized outside of of a test case,
@@ -93,7 +93,7 @@ static BOOL encryptTests() {
         [self deleteFiles];
 
         if (encryptTests()) {
-            RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+            RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
             configuration.encryptionKey = RLMGenerateKey();
         }
     }
@@ -138,13 +138,13 @@ static BOOL encryptTests() {
 }
 
 - (RLMRealm *)inMemoryRealmWithIdentifier:(NSString *)identifier {
-    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.inMemoryIdentifier = identifier;
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
 - (RLMRealm *)readOnlyRealmWithPath:(NSString *)path error:(NSError **)error {
-    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.path = path;
     configuration.readOnly = true;
     return [RLMRealm realmWithConfiguration:configuration error:error];

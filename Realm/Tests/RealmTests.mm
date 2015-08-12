@@ -577,7 +577,7 @@ extern "C" {
     XCTAssertNotNil(error, @"Should populate error object");
 #pragma clang diagnostic pop
     error = nil;
-    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.path = filePath;
     XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Invalid database");
     XCTAssertNotNil(error, @"Should populate error object");
@@ -619,7 +619,7 @@ extern "C" {
     XCTAssertNoThrow(realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 #pragma clang diagnostic pop
-    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.path = RLMTestRealmPath();
     configuration.readOnly = true;
     realm = nil;
@@ -1195,7 +1195,7 @@ extern "C" {
     // Create the realm file and lock file
     @autoreleasepool { [RLMRealm defaultRealm]; }
 
-    int fd = open([RLMConfiguration.defaultConfiguration.path stringByAppendingString:@".lock"].UTF8String, O_RDWR);
+    int fd = open([RLMRealmConfiguration.defaultConfiguration.path stringByAppendingString:@".lock"].UTF8String, O_RDWR);
     XCTAssertNotEqual(-1, fd);
 
     // Change the value of the mutex size field in the shared info header
@@ -1208,7 +1208,7 @@ extern "C" {
     XCTAssertEqual(0, ret);
 
     NSError *error;
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:RLMConfiguration.defaultConfiguration error:&error];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:RLMRealmConfiguration.defaultConfiguration error:&error];
     XCTAssertNil(realm);
     XCTAssertNotNil(error);
     XCTAssertEqual(RLMErrorIncompatibleLockFile, error.code);
@@ -1237,7 +1237,7 @@ extern "C" {
     XCTAssertThrows([RLMRealm migrateRealmAtPath:path]);
     XCTAssertThrows([RLMRealm migrateRealmAtPath:path encryptionKey:[[NSMutableData alloc] initWithLength:64]]);
 #pragma clang diagnostic pop
-    RLMConfiguration *configuration = [RLMConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.path = path;
     XCTAssertThrows([RLMRealm migrateRealm:configuration]);
 }

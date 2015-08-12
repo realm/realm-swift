@@ -16,11 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMConfiguration.h>
+#import <Realm/RLMRealmConfiguration.h>
 
 @class RLMSchema;
 
-@interface RLMConfiguration ()
+@interface RLMRealmConfiguration ()
 
 @property (nonatomic, readwrite) bool dynamic;
 @property (nonatomic, copy, readwrite) RLMSchema *customSchema;
@@ -33,4 +33,4 @@
 
 @end
 
-FOUNDATION_EXTERN void RLMConfigurationUsePerPath(SEL methodName);
+FOUNDATION_EXTERN void RLMRealmConfigurationUsePerPath(SEL methodName);

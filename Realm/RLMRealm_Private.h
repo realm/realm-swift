@@ -29,7 +29,7 @@ FOUNDATION_EXTERN void RLMRealmSetEncryptionKeyForPath(NSData *encryptionKey, NS
 
 FOUNDATION_EXTERN void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrationBlock migrationBlock);
 
-FOUNDATION_EXTERN void RLMRealmAddPathSettingsToConfiguration(RLMConfiguration *configuration);
+FOUNDATION_EXTERN void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfiguration *configuration);
 
 // RLMRealm private members
 @interface RLMRealm () {

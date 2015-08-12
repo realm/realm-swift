@@ -22,10 +22,10 @@
 RLM_ASSUME_NONNULL_BEGIN
 
 /**
- An `RLMConfiguration` is used to describe the different options used to
+ An `RLMRealmConfiguration` is used to describe the different options used to
  create an `RLMRealm` instance.
  */
-@interface RLMConfiguration : NSObject<NSCopying>
+@interface RLMRealmConfiguration : NSObject<NSCopying>
 
 /**
  Returns the default configuration used to create Realms when no other
@@ -36,11 +36,11 @@ RLM_ASSUME_NONNULL_BEGIN
 + (instancetype)defaultConfiguration;
 
 /**
- Sets the default configuration to the given `RLMConfiguration`.
+ Sets the default configuration to the given `RLMRealmConfiguration`.
 
  @param configuration The new default Realm configuration.
  */
-+ (void)setDefaultConfiguration:(RLMConfiguration *)configuration;
++ (void)setDefaultConfiguration:(RLMRealmConfiguration *)configuration;
 
 /// The path to the realm file. Mutually exclusive with `inMemoryIdentifier`.
 @property (nonatomic, copy, nullable) NSString *path;

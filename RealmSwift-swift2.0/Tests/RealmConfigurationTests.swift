@@ -18,7 +18,7 @@
 
 import XCTest
 import RealmSwift
-import class Realm.Private.RLMConfiguration
+import class Realm.Private.RLMRealmConfiguration
 
 class RealmConfigurationTests: TestCase {
     func testDefaultConfiguration() {

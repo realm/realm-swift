@@ -33,10 +33,10 @@ extension Realm {
         /// configuration is explicitly specified (i.e. `Realm()`).
         public static var defaultConfiguration: Configuration {
             get {
-                return fromRLMConfiguration(RLMConfiguration.defaultConfiguration())
+                return fromRLMRealmConfiguration(RLMRealmConfiguration.defaultConfiguration())
             }
             set {
-                RLMConfiguration.setDefaultConfiguration(newValue.rlmConfiguration)
+                RLMRealmConfiguration.setDefaultConfiguration(newValue.rlmConfiguration)
             }
         }
 
@@ -54,7 +54,7 @@ extension Realm {
 
         - returns: An initialized `Realm.Configuration`.
         */
-        public init(path: String? = RLMConfiguration.defaultRealmPath(),
+        public init(path: String? = RLMRealmConfiguration.defaultRealmPath(),
             inMemoryIdentifier: String? = nil,
             encryptionKey: NSData? = nil,
             readOnly: Bool = false,
@@ -126,8 +126,8 @@ extension Realm {
 
         // MARK: Private Methods
 
-        internal var rlmConfiguration: RLMConfiguration {
-            let configuration = RLMConfiguration()
+        internal var rlmConfiguration: RLMRealmConfiguration {
+            let configuration = RLMRealmConfiguration()
             configuration.path = self.path
             configuration.inMemoryIdentifier = self.inMemoryIdentifier
             configuration.encryptionKey = self.encryptionKey
@@ -137,7 +137,7 @@ extension Realm {
             return configuration
         }
 
-        internal static func fromRLMConfiguration(rlmConfiguration: RLMConfiguration) -> Configuration {
+        internal static func fromRLMRealmConfiguration(rlmConfiguration: RLMRealmConfiguration) -> Configuration {
           return Configuration(path: rlmConfiguration.path,
               inMemoryIdentifier: rlmConfiguration.inMemoryIdentifier,
               encryptionKey: rlmConfiguration.encryptionKey,
@@ -157,6 +157,6 @@ extension Realm {
 extension Realm.Configuration: CustomStringConvertible {
     /// Returns a human-readable description of the configuration.
     public var description: String {
-        return gsub("\\ARLMConfiguration", template: "Realm.Configuration", string: rlmConfiguration.description) ?? ""
+        return gsub("\\ARLMRealmConfiguration", template: "Realm.Configuration", string: rlmConfiguration.description) ?? ""
     }
 }
