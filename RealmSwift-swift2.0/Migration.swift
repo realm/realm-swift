@@ -70,7 +70,7 @@ block automatically as needed.
 */
 @available(*, deprecated=1, message="Use Realm(configuration:error:)")
 public func setDefaultRealmSchemaVersion(schemaVersion: UInt64, migrationBlock: MigrationBlock) {
-    RLMRealmSetSchemaVersionForPath(schemaVersion, RealmConfiguration.defaultConfiguration.path, accessorMigrationBlock(migrationBlock))
+    RLMRealmSetSchemaVersionForPath(schemaVersion, Realm.Configuration.defaultConfiguration.path, accessorMigrationBlock(migrationBlock))
 }
 
 /**
@@ -132,7 +132,7 @@ exactly when and how migrations are performed.
 */
 @available(*, deprecated=1, message="Use migrateRealm(configuration:)")
 public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
-    var configuration = RealmConfiguration.defaultConfiguration
+    var configuration = Realm.Configuration.defaultConfiguration
     configuration.path = path
     configuration.encryptionKey = encryptionKey
     return migrateRealm(configuration)
@@ -146,14 +146,14 @@ This method is called automatically when opening a Realm for the first time and 
 not need to be called explicitly. You can choose to call this method to control
 exactly when and how migrations are performed.
 
-- parameter configuration: The RealmConfiguration used to create the Realm to be
+- parameter configuration: The Realm.Configuration used to create the Realm to be
                            migrated, and containing the schema version and migration
                            block used to perform the migration.
 
 - returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
            that occured otherwise.
 */
-public func migrateRealm(configuration: RealmConfiguration = RealmConfiguration.defaultConfiguration) -> NSError? {
+public func migrateRealm(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) -> NSError? {
     return RLMRealm.migrateRealm(configuration.rlmConfiguration)
 }
 

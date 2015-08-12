@@ -22,7 +22,7 @@ import class Realm.Private.RLMConfiguration
 
 class RealmConfigurationTests: TestCase {
     func testDefaultConfiguration() {
-        let defaultConfiguration = RealmConfiguration.defaultConfiguration
+        let defaultConfiguration = Realm.Configuration.defaultConfiguration
 
         XCTAssertEqual(defaultConfiguration.path!, Realm().path);
         XCTAssertNil(defaultConfiguration.inMemoryIdentifier);
@@ -33,10 +33,10 @@ class RealmConfigurationTests: TestCase {
     }
 
     func testSetDefaultConfiguration() {
-        let path = RealmConfiguration.defaultConfiguration.path!
-        let configuration = RealmConfiguration(path: "path")
-        RealmConfiguration.defaultConfiguration = configuration
-        XCTAssertEqual(RealmConfiguration.defaultConfiguration.path!, "path")
-        RealmConfiguration.defaultConfiguration.path = path
+        let path = Realm.Configuration.defaultConfiguration.path!
+        let configuration = Realm.Configuration(path: "path")
+        Realm.Configuration.defaultConfiguration = configuration
+        XCTAssertEqual(Realm.Configuration.defaultConfiguration.path!, "path")
+        Realm.Configuration.defaultConfiguration.path = path
     }
 }

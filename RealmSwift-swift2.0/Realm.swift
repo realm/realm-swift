@@ -55,8 +55,8 @@ public final class Realm {
     /// The Schema used by this realm.
     public var schema: Schema { return Schema(rlmRealm.schema) }
 
-    /// Returns a `RealmConfiguration` that can be used to create this `Realm` instance.
-    public var configuration: RealmConfiguration { return RealmConfiguration.fromRLMConfiguration(rlmRealm.configuration) }
+    /// Returns a `Configuration` that can be used to create this `Realm` instance.
+    public var configuration: Configuration { return Configuration.fromRLMConfiguration(rlmRealm.configuration) }
 
     /**
     The location of the default Realm as a string. Can be overridden.
@@ -67,10 +67,10 @@ public final class Realm {
 
     - returns: Location of the default Realm.
     */
-    @available(*, deprecated=1, message="Use RealmConfiguration.defaultConfiguration")
+    @available(*, deprecated=1, message="Use Realm.Configuration.defaultConfiguration")
     public class var defaultPath: String {
         get {
-            return RealmConfiguration.defaultConfiguration.path ?? RLMConfiguration.defaultRealmPath()
+            return Configuration.defaultConfiguration.path ?? RLMConfiguration.defaultRealmPath()
         }
         set {
             RLMConfiguration.setDefaultPath(newValue)
@@ -81,11 +81,11 @@ public final class Realm {
 
     /**
     Obtains a Realm instance with the given configuration. Defaults to the default Realm configuration,
-    which can be changed by setting `RealmConfiguration.defaultConfiguration`.
+    which can be changed by setting `Realm.Configuration.defaultConfiguration`.
 
     - parameter configuration: The configuration to use when creating the Realm instance.
     */
-    public convenience init(configuration: RealmConfiguration = RealmConfiguration.defaultConfiguration) throws {
+    public convenience init(configuration: Configuration = Configuration.defaultConfiguration) throws {
         let rlmConfiguration = configuration.rlmConfiguration
         RLMRealmAddPathSettingsToConfiguration(rlmConfiguration)
         let rlmRealm = try RLMRealm(configuration: rlmConfiguration)
@@ -142,7 +142,7 @@ public final class Realm {
     */
     @available(*, deprecated=1, message="Use Realm(configuration:error:)")
     public convenience init(inMemoryIdentifier: String) throws {
-        let configuration = RealmConfiguration(inMemoryIdentifier: inMemoryIdentifier)
+        let configuration = Configuration(inMemoryIdentifier: inMemoryIdentifier)
         try self.init(configuration: configuration)
     }
 

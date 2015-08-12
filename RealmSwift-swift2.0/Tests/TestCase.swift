@@ -23,13 +23,13 @@ import RealmSwift
 import XCTest
 
 func inMemoryRealm(inMememoryIdentifier: String) -> Realm {
-    return try! Realm(configuration: RealmConfiguration(inMemoryIdentifier: inMememoryIdentifier))
+    return try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: inMememoryIdentifier))
 }
 
 class TestCase: XCTestCase {
     var exceptionThrown = false
 
-    func realmWithTestPath(var configuration: RealmConfiguration = RealmConfiguration()) -> Realm {
+    func realmWithTestPath(var configuration: Realm.Configuration = Realm.Configuration()) -> Realm {
         configuration.path = testRealmPath()
         return try! Realm(configuration: configuration)
     }

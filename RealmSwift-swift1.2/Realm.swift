@@ -55,8 +55,8 @@ public final class Realm {
     /// The Schema used by this realm.
     public var schema: Schema { return Schema(rlmRealm.schema) }
 
-    /// Returns a `RealmConfiguration` that can be used to create this `Realm` instance.
-    public var configuration: RealmConfiguration { return RealmConfiguration.fromRLMConfiguration(rlmRealm.configuration) }
+    /// Returns a `Configuration` that can be used to create this `Realm` instance.
+    public var configuration: Configuration { return Configuration.fromRLMConfiguration(rlmRealm.configuration) }
 
     /**
     The location of the default Realm as a string. Can be overridden.
@@ -67,10 +67,10 @@ public final class Realm {
 
     :returns: Location of the default Realm.
     */
-    @availability(*, deprecated=1, message="Use RealmConfiguration.defaultConfiguration")
+    @availability(*, deprecated=1, message="Use Configuration.defaultConfiguration")
     public class var defaultPath: String {
         get {
-            return RealmConfiguration.defaultConfiguration.path ?? RLMConfiguration.defaultRealmPath()
+            return Configuration.defaultConfiguration.path ?? RLMConfiguration.defaultRealmPath()
         }
         set {
             RLMConfiguration.setDefaultPath(newValue)
@@ -81,14 +81,14 @@ public final class Realm {
 
     /**
     Obtains a Realm instance with the given configuration. Defaults to the default Realm configuration,
-    which can be changed by setting `RealmConfiguration.defaultConfiguration`.
+    which can be changed by setting `Realm.Configuration.defaultConfiguration`.
 
     :param: configuration The configuration to use when creating the Realm instance.
     :param: error         If an error occurs, upon return contains an `NSError` object
                           that describes the problem. If you are not interested in
                           possible errors, omit the argument, or pass in `nil`.
     */
-    public convenience init?(configuration: RealmConfiguration, error: NSErrorPointer = nil)  {
+    public convenience init?(configuration: Configuration, error: NSErrorPointer = nil)  {
         if let rlmRealm = RLMRealm(configuration: configuration.rlmConfiguration, error: error) {
             self.init(rlmRealm)
         } else {
@@ -98,7 +98,7 @@ public final class Realm {
     }
 
     /**
-    Obtains a Realm instance with the default `RealmConfiguration`.
+    Obtains a Realm instance with the default `Realm.Configuration`.
     */
     public convenience init() {
         let rlmRealm = RLMRealm.defaultRealm()
@@ -161,7 +161,7 @@ public final class Realm {
     */
     @availability(*, deprecated=1, message="Use Realm(configuration:error:)")
     public convenience init(inMemoryIdentifier: String) {
-        let configuration = RealmConfiguration(inMemoryIdentifier: inMemoryIdentifier).rlmConfiguration
+        let configuration = Configuration(inMemoryIdentifier: inMemoryIdentifier).rlmConfiguration
         self.init(RLMRealm(configuration: configuration, error: nil)!)
     }
 
