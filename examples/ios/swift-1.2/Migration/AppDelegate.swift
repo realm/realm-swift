@@ -62,7 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
 
         // copy over old data files for migration
-        let defaultPath = RealmConfiguration.defaultConfiguration.path!
+        let defaultPath = Realm.Configuration.defaultConfiguration.path!
         let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
 
         if let v0Path = bundlePath("default-v0.realm") {
@@ -97,7 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             println("Migration complete.")
         }
 
-        RealmConfiguration.defaultConfiguration = RealmConfiguration(schemaVersion: 3, migrationBlock: migrationBlock)
+        Realm.Configuration.defaultConfiguration = Realm.Configuration(schemaVersion: 3, migrationBlock: migrationBlock)
 
         // print out all migrated objects in the default realm
         // migration is performed implicitly on Realm access
@@ -110,8 +110,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let realmv1Path = defaultParentPath.stringByAppendingPathComponent("default-v1.realm")
             let realmv2Path = defaultParentPath.stringByAppendingPathComponent("default-v2.realm")
 
-            let realmv1Configuration = RealmConfiguration(path: realmv1Path, schemaVersion: 3, migrationBlock: migrationBlock)
-            let realmv2Configuration = RealmConfiguration(path: realmv2Path, schemaVersion: 3, migrationBlock: migrationBlock)
+            let realmv1Configuration = Realm.Configuration(path: realmv1Path, schemaVersion: 3, migrationBlock: migrationBlock)
+            let realmv2Configuration = Realm.Configuration(path: realmv2Path, schemaVersion: 3, migrationBlock: migrationBlock)
 
             NSFileManager.defaultManager().removeItemAtPath(realmv1Path, error: nil)
             NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path, error: nil)

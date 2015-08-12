@@ -45,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
 
-        try! NSFileManager.defaultManager().removeItemAtPath(RealmConfiguration.defaultConfiguration.path!)
+        try! NSFileManager.defaultManager().removeItemAtPath(Realm.Configuration.defaultConfiguration.path!)
 
         let realm = try! Realm()
         realm.write {
