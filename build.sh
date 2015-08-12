@@ -80,7 +80,7 @@ xcode() {
     mkdir -p build/DerivedData
     CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@"
     if [ "$REALM_BUILD_STATIC" ]; then
-      CMD="$CMD REALM_MACH_O_TYPE=staticlib REALM_OTHER_LIBTOOLFLAGS='\$(inherited) \$(OTHER_LDFLAGS)'"
+      CMD="$CMD REALM_MACH_O_TYPE=staticlib REALM_OTHER_LIBTOOLFLAGS='\$(inherited) \$(OTHER_LDFLAGS)' IPHONEOS_DEPLOYMENT_TARGET=7.0"
     fi
     echo "Building with command:" $CMD
     eval "$CMD"
