@@ -174,7 +174,6 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     // Used for both
     Group *_group;
     BOOL _readOnly;
-    BOOL _inMemory;
 }
 
 + (BOOL)isCoreDebug {
@@ -265,6 +264,22 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
         _group = &const_cast<Group&>(_sharedGroup->begin_read());
     }
     return _group;
+}
+
+- (realm::Group *)getOrCreateGroupAtVersion:(SharedGroup::VersionID)version {
+    if (_group && _sharedGroup->get_version_of_current_transaction() != version) {
+        _sharedGroup->end_read();
+        _group = nullptr;
+    }
+    if (!_group) {
+        _group = &const_cast<Group&>(_sharedGroup->begin_read(version));
+    }
+    return _group;
+}
+
+- (realm::SharedGroup *)sharedGroup {
+    NSAssert(!_readOnly, @"");
+    return _sharedGroup.get();
 }
 
 + (NSString *)defaultRealmPath
