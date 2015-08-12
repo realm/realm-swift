@@ -63,7 +63,7 @@ FOUNDATION_EXTERN BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType);
 @interface RLMProperty (Dynamic)
 /**
  This method is useful only in specialized circumstances, for example, in conjunction with
- [RLMObjectSchema initWithClassName:objectClass:properties:]. If you are simply building an
+ +[RLMObjectSchema initWithClassName:objectClass:properties:]. If you are simply building an
  app on Realm, it is not recommened to use this method.
  
  Initialize an RLMProperty
