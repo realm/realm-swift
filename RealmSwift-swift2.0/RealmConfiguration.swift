@@ -33,7 +33,7 @@ extension Realm {
         /// configuration is explicitly specified (i.e. `Realm()`).
         public static var defaultConfiguration: Configuration {
             get {
-                return fromRLMRealmConfiguration(RLMRealmConfiguration.defaultConfiguration())
+            return fromRLMRealmConfiguration(RLMRealmConfiguration.defaultConfiguration())
             }
             set {
                 RLMRealmConfiguration.setDefaultConfiguration(newValue.rlmConfiguration)
@@ -59,13 +59,15 @@ extension Realm {
             encryptionKey: NSData? = nil,
             readOnly: Bool = false,
             schemaVersion: UInt64 = 0,
-            migrationBlock: MigrationBlock? = nil) {
+            migrationBlock: MigrationBlock? = nil,
+            customSchema: Schema? = nil) {
                 self.path = path
                 self.inMemoryIdentifier = inMemoryIdentifier
                 self.encryptionKey = encryptionKey
                 self.readOnly = readOnly
                 self.schemaVersion = schemaVersion
                 self.migrationBlock = migrationBlock
+                self.customSchema = customSchema
         }
 
         // MARK: Configuration Properties
@@ -124,6 +126,9 @@ extension Realm {
         /// The block which migrates the Realm to the current version.
         public var migrationBlock: MigrationBlock? = nil
 
+        /// A custom schema to use for the Realm.
+        public var customSchema: Schema? = nil
+
         // MARK: Private Methods
 
         internal var rlmConfiguration: RLMRealmConfiguration {
@@ -134,20 +139,23 @@ extension Realm {
             configuration.readOnly = self.readOnly
             configuration.schemaVersion = self.schemaVersion
             configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
+            configuration.customSchema = self.customSchema?.rlmSchema
             return configuration
         }
 
         internal static func fromRLMRealmConfiguration(rlmConfiguration: RLMRealmConfiguration) -> Configuration {
-          return Configuration(path: rlmConfiguration.path,
-              inMemoryIdentifier: rlmConfiguration.inMemoryIdentifier,
-              encryptionKey: rlmConfiguration.encryptionKey,
-              readOnly: rlmConfiguration.readOnly,
-              schemaVersion: UInt64(rlmConfiguration.schemaVersion),
-              migrationBlock: rlmConfiguration.migrationBlock.map { rlmMigration in
-                  return { migration, schemaVersion in
-                      rlmMigration(migration.rlmMigration, schemaVersion)
-                  }
-              })
+            return Configuration(path: rlmConfiguration.path,
+                inMemoryIdentifier: rlmConfiguration.inMemoryIdentifier,
+                encryptionKey: rlmConfiguration.encryptionKey,
+                readOnly: rlmConfiguration.readOnly,
+                schemaVersion: UInt64(rlmConfiguration.schemaVersion),
+                migrationBlock: rlmConfiguration.migrationBlock.map { rlmMigration in
+                    return { migration, schemaVersion in
+                        rlmMigration(migration.rlmMigration, schemaVersion)
+                    }
+                },
+                customSchema: rlmConfiguration.customSchema.map { Schema($0) }
+            )
         }
     }
 }

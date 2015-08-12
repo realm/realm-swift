@@ -118,6 +118,13 @@ class RealmTests: TestCase {
         XCTAssertEqual(realm2.objects(SwiftIntObject).count, 0)
     }
 
+    func testInitCustomSchema() {
+        let schema = Schema(objectTypes: [SwiftStringObject.self])
+        let configuration = Realm.Configuration(customSchema: schema)
+        let realm = try! Realm(configuration: configuration)
+        XCTAssertEqual(schema, realm.schema)
+    }
+
     func testWrite() {
         try! Realm().write {
             self.assertThrows(try! Realm().beginWrite())

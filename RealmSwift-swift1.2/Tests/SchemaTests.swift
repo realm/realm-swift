@@ -28,7 +28,14 @@ class SchemaTests: TestCase {
             self.schema = Realm().schema
         }
     }
-    
+
+    func testInitCustomClassList() {
+        self.schema = Schema(objectTypes: [SwiftStringObject.self])
+        XCTAssertNil(schema["SwiftObject"])
+        XCTAssertEqual(schema.objectSchema.map { $0.className }, ["SwiftStringObject"])
+    }
+
+
     func testObjectSchema() {
         let objectSchema = schema.objectSchema
         XCTAssertTrue(objectSchema.count > 0)

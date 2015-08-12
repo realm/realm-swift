@@ -33,6 +33,8 @@ RLM_ASSUME_NONNULL_BEGIN
 
 + (NSString *)className;
 
++ (BOOL)shouldIncludeInDefaultSchema;
+
 @end
 
 RLM_ASSUME_NONNULL_END

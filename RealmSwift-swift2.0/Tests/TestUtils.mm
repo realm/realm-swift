@@ -20,13 +20,14 @@
 
 #import <Realm/Realm.h>
 #import <Realm/RLMRealmUtil.h>
+#import <Realm/RLMSchema_Private.h>
 
 // This ensures the shared schema is initialized outside of of a test case,
 // so if an exception is thrown, it will kill the test process rather than
 // allowing hundreds of test cases to fail in strange ways
 __attribute((constructor))
 static void initializeSharedSchema() {
-    [RLMSchema class];
+    [RLMSchema sharedSchema];
 }
 
 void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *name, NSString *message, NSString *fileName, NSUInteger lineNumber) {

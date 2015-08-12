@@ -37,6 +37,10 @@ RLM_ASSUME_NONNULL_BEGIN
 // schema based on runtime objects
 + (nullable instancetype)sharedSchema;
 
++ (instancetype)partialSharedSchema;
+
++ (bool)isSharedSchemaInitialized;
+
 // schema based on tables in a Realm
 + (instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm;
 

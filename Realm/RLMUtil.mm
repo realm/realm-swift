@@ -284,7 +284,8 @@ static inline BOOL RLMIsSubclass(Class class1, Class class2) {
 }
 
 BOOL RLMIsObjectSubclass(Class klass) {
-    return RLMIsSubclass(class_getSuperclass(klass), RLMObjectBase.class);
+    static Class objectBaseClass = RLMObjectBase.class;
+    return RLMIsSubclass(class_getSuperclass(klass), objectBaseClass);
 }
 
 BOOL RLMIsDebuggerAttached()

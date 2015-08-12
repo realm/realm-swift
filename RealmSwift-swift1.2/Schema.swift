@@ -44,6 +44,16 @@ public final class Schema: Printable {
 
     // MARK: Initializers
 
+    /**
+    Creates a `Schema` that contains only the given `objectTypes`.
+
+    :param: objectTypes An array of `Object` subclass types to include in the schema.
+    */
+    public init(objectTypes: [Object.Type]) {
+        self.rlmSchema = RLMSchema(objectClasses: objectTypes)
+    }
+
+
     internal init(_ rlmSchema: RLMSchema) {
         self.rlmSchema = rlmSchema
     }

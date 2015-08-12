@@ -371,7 +371,6 @@ static id RLMAutorelease(id value) {
     bool dynamic = configuration.dynamic;
     bool readOnly = configuration.readOnly;
 
-
     if (!path || path.length == 0) {
         @throw RLMException([NSString stringWithFormat:@"Path '%@' is not valid", path]);
     }
@@ -380,10 +379,6 @@ static id RLMAutorelease(id value) {
         @throw RLMException([NSString stringWithFormat:@"%@ \
                              can only be called from a thread with a runloop.",
                              NSStringFromSelector(_cmd)]);
-    }
-
-    if (customSchema && !dynamic) {
-        @throw RLMException(@"Custom schema only supported when using dynamic Realms");
     }
 
     // try to reuse existing realm first

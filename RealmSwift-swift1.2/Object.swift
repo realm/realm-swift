@@ -235,7 +235,8 @@ public final class DynamicObject : Object {
         self[key] = value
     }
 
-    @objc private class func shouldPersistToRealm() -> Bool {
+    /// :nodoc:
+    public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false;
     }
 }
