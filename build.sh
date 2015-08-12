@@ -327,19 +327,34 @@ case "$COMMAND" in
         killall "iOS Simulator" 2>/dev/null || true
         killall Simulator 2>/dev/null || true
         pkill CoreSimulator 2>/dev/null || true
-        # Erase all available simulators
+
+        # Clean up all available simulators
         (
+            previous_device=''
             IFS=$'\n' # make newlines the only separator
             for LINE in $(xcrun simctl list); do
-                if [[ $LINE =~ unavailable ]]; then
+                if [[ $LINE =~ unavailable || $LINE =~ disconnected ]]; then
                     # skip unavailable simulators
                     continue
                 fi
-                if [[ $LINE =~ ([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}) ]]; then
-                    xcrun simctl erase "${BASH_REMATCH[1]}" 2>/dev/null || true
+
+                regex='^(.*) [(]([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})[)]'
+                if [[ $LINE =~ $regex ]]; then
+                    device="${BASH_REMATCH[1]}"
+                    guid="${BASH_REMATCH[2]}"
+
+                    # Delete the simulator if it's a duplicate of the last seen one
+                    # Otherwise delete all contents and settings for it
+                    if [[ $device == $previous_device ]]; then
+                        xcrun simctl delete $guid
+                    else
+                        xcrun simctl erase $guid
+                        previous_device="$device"
+                    fi
                 fi
             done
         )
+
         sleep 5
         if [[ -a "${DEVELOPER_DIR}/Applications/iOS Simulator.app" ]]; then
             open "${DEVELOPER_DIR}/Applications/iOS Simulator.app"
