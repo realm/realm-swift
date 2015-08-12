@@ -585,6 +585,18 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
  */
 + (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
+/**
+ Performs the given Realm configuration's migration block on a Realm at the given path.
+
+ This method is called automatically when opening a Realm for the first time and does
+ not need to be called explicitly. You can choose to call this method to control
+ exactly when and how migrations are performed.
+
+ @param configuration The Realm configuration used to open and migrate the Realm.
+ @return              The error that occurred while applying the migration, if any.
+
+ @see                 RLMMigration
+ */
 + (NSError *)migrateRealm:(RLMRealmConfiguration *)configuration;
 
 /**
