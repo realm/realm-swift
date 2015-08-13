@@ -85,7 +85,7 @@ static const int RLMEnumerationBufferSize = 16;
                                     count:(NSUInteger)len {
     RLMCheckThread(_realm);
     if (!_tableView.is_attached() && !_collection) {
-        @throw RLMException(@"RLMResults is no longer valid");
+        @throw RLMException(@"Collection is no longer valid");
     }
     // The fast enumeration buffer size is currently a hardcoded number in the
     // compiler so this can't actually happen, but just in case it changes in
