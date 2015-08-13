@@ -644,6 +644,7 @@ case "$COMMAND" in
     "cocoapods-setup")
         if [[ "$2" != "without-core" ]]; then
             sh build.sh download-core
+            mv core/librealm.a core/librealm-osx.a
         fi
 
         # CocoaPods won't automatically preserve files referenced via symlinks
