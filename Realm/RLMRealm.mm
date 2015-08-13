@@ -850,7 +850,7 @@ atomic<bool> s_syncLogEverything(false);
             History::version_type prevVersion = _history->get_history_entry(version, historyEntry);
             BOOL isForeign = historyEntry.origin_client_file_ident != 0;
             if (isForeign) {
-                _serverVersionThreshold = version;
+                _serverVersionThreshold = historyEntry.remote_version;
                 break;
             }
             version = prevVersion;
