@@ -68,8 +68,9 @@ block automatically as needed.
 - parameter version: The current schema version.
 - parameter block:   The block which migrates the Realm to the current version.
 */
+@available(*, deprecated=1, message="Use Realm(configuration:error:)")
 public func setDefaultRealmSchemaVersion(schemaVersion: UInt64, migrationBlock: MigrationBlock) {
-    RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: accessorMigrationBlock(migrationBlock))
+    RLMRealmSetSchemaVersionForPath(schemaVersion, Realm.Configuration.defaultConfiguration.path, accessorMigrationBlock(migrationBlock))
 }
 
 /**
@@ -91,8 +92,9 @@ block automatically as needed.
 - parameter realmPath: The path of the Realms to migrate.
 - parameter block:     The block which migrates the Realm to the current version.
 */
+@available(*, deprecated=1, message="Use Realm(configuration:error:)")
 public func setSchemaVersion(schemaVersion: UInt64, realmPath: String, migrationBlock: MigrationBlock) {
-    RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: realmPath, withMigrationBlock: accessorMigrationBlock(migrationBlock))
+    RLMRealmSetSchemaVersionForPath(schemaVersion, realmPath, accessorMigrationBlock(migrationBlock))
 }
 
 /**
@@ -128,12 +130,31 @@ exactly when and how migrations are performed.
 - returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
            that occured otherwise.
 */
+@available(*, deprecated=1, message="Use migrateRealm(configuration:)")
 public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
-    if let encryptionKey = encryptionKey {
-        return RLMRealm.migrateRealmAtPath(path, encryptionKey: encryptionKey)
-    } else {
-        return RLMRealm.migrateRealmAtPath(path)
-    }
+    var configuration = Realm.Configuration.defaultConfiguration
+    configuration.path = path
+    configuration.encryptionKey = encryptionKey
+    return migrateRealm(configuration)
+}
+
+/**
+Performs the configuration's migration block on the Realm created by the given
+configuration.
+
+This method is called automatically when opening a Realm for the first time and does
+not need to be called explicitly. You can choose to call this method to control
+exactly when and how migrations are performed.
+
+- parameter configuration: The Realm.Configuration used to create the Realm to be
+                           migrated, and containing the schema version and migration
+                           block used to perform the migration.
+
+- returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
+           that occured otherwise.
+*/
+public func migrateRealm(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) -> NSError? {
+    return RLMRealm.migrateRealm(configuration.rlmConfiguration)
 }
 
 
@@ -153,14 +174,14 @@ public final class Migration {
     /// The migration's new `Schema`, describing the `Realm` after applying a migration.
     public var newSchema: Schema { return Schema(rlmMigration.newSchema) }
 
-    private var rlmMigration: RLMMigration
+    internal var rlmMigration: RLMMigration
 
     // MARK: Altering Objects During a Migration
 
     /**
     Enumerates objects of a given type in this Realm, providing both the old and new versions of
     each object. Object properties can be accessed using subscripting.
-    
+
     - parameter className: The name of the `Object` class to enumerate.
     - parameter block:     The block providing both the old and new versions of an object in this Realm.
     */
@@ -179,7 +200,7 @@ public final class Migration {
                            `NSJSONSerialization`, or an `Array` with one object for each persisted
                            property. An exception will be thrown if any required properties are not
                            present and no default is set.
-    
+
     - returns: The created object.
     */
     public func create(className: String, value: AnyObject = [:]) -> MigrationObject {
@@ -217,7 +238,7 @@ public final class Migration {
 
 // MARK: Private Helpers
 
-private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrationBlock {
+internal func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrationBlock {
     return { migration, oldVersion in
         // set all accessor classes to MigrationObject
         for objectSchema in migration.oldSchema.objectSchema {

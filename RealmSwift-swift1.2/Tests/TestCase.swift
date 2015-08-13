@@ -22,11 +22,16 @@ import Realm.Private
 import RealmSwift
 import XCTest
 
+func inMemoryRealm(inMememoryIdentifier: String) -> Realm {
+    return Realm(configuration: Realm.Configuration(inMemoryIdentifier: inMememoryIdentifier))!
+}
+
 class TestCase: XCTestCase {
     var exceptionThrown = false
 
-    func realmWithTestPath() -> Realm {
-        return Realm(path: testRealmPath())
+    func realmWithTestPath(var _ configuration: Realm.Configuration = Realm.Configuration()) -> Realm {
+        configuration.path = testRealmPath()
+        return Realm(configuration: configuration)!
     }
 
     override class func setUp() {

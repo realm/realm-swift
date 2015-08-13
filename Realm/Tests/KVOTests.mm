@@ -920,7 +920,9 @@ public:
 @implementation KVOPersistedObjectTests
 - (void)setUp {
     [super setUp];
-    _realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    configuration.inMemoryIdentifier = @"test";
+    _realm = [RLMRealm realmWithConfiguration:configuration error:nil];
     [_realm beginWriteTransaction];
 }
 

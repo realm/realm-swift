@@ -91,6 +91,9 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
 @interface MigrationTests : RLMTestCase
 @end
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 @implementation MigrationTests
 
 - (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {

@@ -20,6 +20,7 @@
 
 #import "RLMAnalytics.hpp"
 #import "RLMArray_Private.hpp"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMMigration_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -97,7 +98,7 @@ static void clearKeyCache() {
     }
 }
 
-static NSData *validatedKey(NSData *key) {
+NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     if (shouldForciblyDisableEncryption()) {
         return nil;
     }
@@ -118,7 +119,7 @@ static NSData *validatedKey(NSData *key) {
 }
 
 static void setKeyForPath(NSData *key, NSString *path) {
-    key = validatedKey(key);
+    key = RLMRealmValidatedEncryptionKey(key);
     @synchronized (s_keysPerPath) {
         if (key) {
             s_keysPerPath[path] = key;
@@ -158,8 +159,17 @@ static void clearMigrationCache() {
     }
 }
 
-static NSString *s_defaultRealmPath = nil;
-static NSString * const c_defaultRealmFileName = @"default.realm";
+void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfiguration *configuration) {
+    if (!configuration.encryptionKey) {
+        configuration.encryptionKey = keyForPath(configuration.path);
+    }
+    if (!configuration.migrationBlock) {
+        configuration.migrationBlock = migrationBlockForPath(configuration.path);
+    }
+    if (configuration.schemaVersion == 0) {
+        configuration.schemaVersion = schemaVersionForPath(configuration.path);
+    }
+}
 
 @implementation RLMRealm {
     // Used for read-write realms
@@ -175,6 +185,8 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     Group *_group;
     BOOL _readOnly;
     BOOL _inMemory;
+
+    NSData *_encryptionKey;
 }
 
 + (BOOL)isCoreDebug {
@@ -202,12 +214,13 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
         _readOnly = readonly;
         _inMemory = inMemory;
         _dynamic = dynamic;
+        _encryptionKey = key;
         _autorefresh = YES;
 
         NSError *error = nil;
         try {
             // NOTE: we do these checks here as is this is the first time encryption keys are used
-            key = validatedKey(key);
+            key = RLMRealmValidatedEncryptionKey(key);
 
             if (readonly) {
                 _readGroup = make_unique<Group>(path.UTF8String, static_cast<const char *>(key.bytes));
@@ -269,17 +282,11 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 
 + (NSString *)defaultRealmPath
 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if (!s_defaultRealmPath) {
-            s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
-        }
-    });
-    return s_defaultRealmPath;
+    return [RLMRealmConfiguration defaultConfiguration].path;
 }
 
 + (void)setDefaultRealmPath:(NSString *)defaultRealmPath {
-    s_defaultRealmPath = defaultRealmPath;
+    [RLMRealmConfiguration setDefaultPath:defaultRealmPath];
 }
 
 + (NSString *)writeableTemporaryPathForFile:(NSString *)fileName
@@ -287,41 +294,16 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     return [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
 }
 
-+ (NSString *)writeablePathForFile:(NSString *)fileName
-{
-#if TARGET_OS_IPHONE
-    // On iOS the Documents directory isn't user-visible, so put files there
-    NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
-#else
-    // On OS X it is, so put files in Application Support. If we aren't running
-    // in a sandbox, put it in a subdirectory based on the bundle identifier
-    // to avoid accidentally sharing files between applications
-    NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
-    if (![[NSProcessInfo processInfo] environment][@"APP_SANDBOX_CONTAINER_ID"]) {
-        NSString *identifier = [[NSBundle mainBundle] bundleIdentifier];
-        if ([identifier length] == 0) {
-            identifier = [[[NSBundle mainBundle] executablePath] lastPathComponent];
-        }
-        path = [path stringByAppendingPathComponent:identifier];
-
-        // create directory
-        [[NSFileManager defaultManager] createDirectoryAtPath:path
-                                  withIntermediateDirectories:YES
-                                                   attributes:nil
-                                                        error:nil];
-    }
-#endif
-    return [path stringByAppendingPathComponent:fileName];
-}
-
 + (instancetype)defaultRealm
 {
-    return [RLMRealm realmWithPath:[RLMRealm defaultRealmPath] readOnly:NO error:nil];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    RLMRealmAddPathSettingsToConfiguration(configuration);
+    return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
 + (instancetype)realmWithPath:(NSString *)path
 {
-    return [self realmWithPath:path readOnly:NO error:nil];
+    return [self realmWithPath:path key:nil readOnly:false inMemory:false dynamic:false schema:nil error:nil];
 }
 
 + (instancetype)realmWithPath:(NSString *)path
@@ -332,8 +314,9 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 + (instancetype)inMemoryRealmWithIdentifier:(NSString *)identifier {
-    return [self realmWithPath:[RLMRealm writeableTemporaryPathForFile:identifier] key:nil
-                      readOnly:NO inMemory:YES dynamic:NO schema:nil error:nil];
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    configuration.inMemoryIdentifier = identifier;
+    return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
 + (instancetype)realmWithPath:(NSString *)path
@@ -348,14 +331,6 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     return [self realmWithPath:path key:key readOnly:readonly inMemory:NO dynamic:NO schema:nil error:error];
 }
 
-// ARC tries to eliminate calls to autorelease when the value is then immediately
-// returned, but this results in significantly different semantics between debug
-// and release builds for RLMRealm, so force it to always autorelease.
-static id RLMAutorelease(id value) {
-    // +1 __bridge_retained, -1 CFAutorelease
-    return value ? (__bridge id)CFAutorelease((__bridge_retained CFTypeRef)value) : nil;
-}
-
 + (instancetype)realmWithPath:(NSString *)path
                           key:(NSData *)key
                      readOnly:(BOOL)readonly
@@ -364,13 +339,45 @@ static id RLMAutorelease(id value) {
                        schema:(RLMSchema *)customSchema
                         error:(NSError **)outError
 {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    configuration.path = path;
+    configuration.inMemoryIdentifier = inMemory ? path.lastPathComponent : nil;
+    configuration.encryptionKey = key;
+    configuration.readOnly = readonly;
+    configuration.dynamic = dynamic;
+    configuration.customSchema = customSchema;
+    configuration.migrationBlock = migrationBlockForPath(path);
+    configuration.schemaVersion = schemaVersionForPath(path);
+    return [RLMRealm realmWithConfiguration:configuration error:outError];
+}
+
+// ARC tries to eliminate calls to autorelease when the value is then immediately
+// returned, but this results in significantly different semantics between debug
+// and release builds for RLMRealm, so force it to always autorelease.
+static id RLMAutorelease(id value) {
+    // +1 __bridge_retained, -1 CFAutorelease
+    return value ? (__bridge id)CFAutorelease((__bridge_retained CFTypeRef)value) : nil;
+}
+
++ (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
+    NSString *path = configuration.path;
+    bool inMemory = false;
+    if (configuration.inMemoryIdentifier) {
+        inMemory = true;
+        path = [RLMRealm writeableTemporaryPathForFile:configuration.inMemoryIdentifier];
+    }
+    RLMSchema *customSchema = configuration.customSchema;
+    bool dynamic = configuration.dynamic;
+    bool readOnly = configuration.readOnly;
+
+
     if (!path || path.length == 0) {
-        @throw RLMException(@"Path is not valid", @{@"path":(path ?: @"nil")});
+        @throw RLMException([NSString stringWithFormat:@"Path '%@' is not valid", path]);
     }
 
     if (![NSRunLoop currentRunLoop]) {
         @throw RLMException([NSString stringWithFormat:@"%@ \
-                                               can only be called from a thread with a runloop.",
+                             can only be called from a thread with a runloop.",
                              NSStringFromSelector(_cmd)]);
     }
 
@@ -381,7 +388,7 @@ static id RLMAutorelease(id value) {
     // try to reuse existing realm first
     RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(path);
     if (realm) {
-        if (realm->_readOnly != readonly) {
+        if (realm->_readOnly != readOnly) {
             @throw RLMException(@"Realm at path already opened with different read permissions", @{@"path":realm.path});
         }
         if (realm->_inMemory != inMemory) {
@@ -393,9 +400,9 @@ static id RLMAutorelease(id value) {
         return RLMAutorelease(realm);
     }
 
-    key = key ?: keyForPath(path);
-    realm = [[RLMRealm alloc] initWithPath:path key:key readOnly:readonly inMemory:inMemory dynamic:dynamic error:outError];
-    if (outError && *outError) {
+    NSData *key = configuration.encryptionKey ?: keyForPath(path);
+    realm = [[RLMRealm alloc] initWithPath:path key:key readOnly:readOnly inMemory:inMemory dynamic:dynamic error:error];
+    if (error && *error) {
         return nil;
     }
 
@@ -403,13 +410,13 @@ static id RLMAutorelease(id value) {
     static id initLock = [NSObject new];
     @synchronized(initLock) {
         // create tables, set schema, and create accessors when needed
-        if (readonly || (dynamic && !customSchema)) {
+        if (readOnly || (dynamic && !customSchema)) {
             // for readonly realms and dynamic realms without a custom schema just set the schema
             if (realm::ObjectStore::get_schema_version(realm.group) == realm::ObjectStore::NotVersioned) {
-                RLMSetErrorOrThrow([NSError errorWithDomain:RLMErrorDomain code:RLMErrorFail userInfo:@{NSLocalizedDescriptionKey:@"Cannot open an uninitialized realm in read-only mode"}], outError);
+                RLMSetErrorOrThrow([NSError errorWithDomain:RLMErrorDomain code:RLMErrorFail userInfo:@{NSLocalizedDescriptionKey:@"Cannot open an uninitialized realm in read-only mode"}], error);
                 return nil;
             }
-            RLMSchema *targetSchema = readonly ? [RLMSchema.sharedSchema copy] : [RLMSchema dynamicSchemaFromRealm:realm];
+            RLMSchema *targetSchema = readOnly ? [RLMSchema.sharedSchema copy] : [RLMSchema dynamicSchemaFromRealm:realm];
             RLMRealmSetSchema(realm, targetSchema, true);
             RLMRealmCreateAccessors(realm.schema);
         }
@@ -424,10 +431,10 @@ static id RLMAutorelease(id value) {
                 // if we are the first realm at this path, set/align schema or perform migration if needed
                 RLMSchema *targetSchema = customSchema ?: RLMSchema.sharedSchema;
                 @try {
-                    RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path), [targetSchema copy], [realm migrationBlock:key]);
+                    RLMUpdateRealmToSchemaVersion(realm, configuration.schemaVersion, [targetSchema copy], [realm migrationBlock:configuration.migrationBlock key:key]);
                 }
                 @catch (NSException *exception) {
-                    RLMSetErrorOrThrow(RLMMakeError(exception), outError);
+                    RLMSetErrorOrThrow(RLMMakeError(exception), error);
                     return nil;
                 }
 
@@ -443,8 +450,8 @@ static id RLMAutorelease(id value) {
         }
     }
 
-    if (!readonly) {
-        realm.notifier = [[RLMNotifier alloc] initWithRealm:realm error:outError];
+    if (!readOnly) {
+        realm.notifier = [[RLMNotifier alloc] initWithRealm:realm error:error];
         if (!realm.notifier) {
             return nil;
         }
@@ -453,8 +460,8 @@ static id RLMAutorelease(id value) {
     return RLMAutorelease(realm);
 }
 
-- (NSError *(^)())migrationBlock:(NSData *)encryptionKey {
-    RLMMigrationBlock userBlock = migrationBlockForPath(_path);
+- (NSError *(^)())migrationBlock:(RLMMigrationBlock)userBlock key:(NSData *)encryptionKey {
+    userBlock = userBlock ?: migrationBlockForPath(_path);
     if (userBlock) {
         return ^{
             NSError *error;
@@ -471,6 +478,7 @@ static id RLMAutorelease(id value) {
 }
 
 + (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path {
+    RLMRealmConfigurationUsePerPath(_cmd);
     @synchronized (s_keysPerPath) {
         if (RLMGetAnyCachedRealmForPath(path)) {
             NSData *existingKey = keyForPath(path);
@@ -483,11 +491,18 @@ static id RLMAutorelease(id value) {
     }
 }
 
+void RLMRealmSetEncryptionKeyForPath(NSData *encryptionKey, NSString *path) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    [RLMRealm setEncryptionKey:encryptionKey forRealmsAtPath:path];
+#pragma clang diagnostic pop
+}
+
 + (void)resetRealmState {
     clearMigrationCache();
     clearKeyCache();
     RLMClearRealmCache();
-    s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
+    [RLMRealmConfiguration resetRealmConfigurationState];
 }
 
 static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a read-only Realm") {
@@ -528,6 +543,20 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             token.block(notification, self);
         }
     }
+}
+
+- (RLMRealmConfiguration *)configuration {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    configuration.path = self.path;
+    configuration.schemaVersion = [RLMRealm schemaVersionAtPath:_path encryptionKey:_encryptionKey error:nil];
+    if (_inMemory) {
+        configuration.inMemoryIdentifier = [_path lastPathComponent];
+    }
+    configuration.readOnly = _readOnly;
+    configuration.encryptionKey = _encryptionKey;
+    configuration.dynamic = _dynamic;
+    configuration.customSchema = _schema == RLMSchema.sharedSchema ? nil : _schema;
+    return configuration;
 }
 
 - (void)beginWriteTransaction {
@@ -826,6 +855,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (void)setSchemaVersion:(uint64_t)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block {
+    RLMRealmConfigurationUsePerPath(_cmd);
     @synchronized(s_migrationBlocks) {
         if (RLMGetAnyCachedRealmForPath(realmPath) && schemaVersionForPath(realmPath) != version) {
             @throw RLMException(@"Cannot set schema version for Realms that are already open.");
@@ -845,12 +875,19 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
+void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrationBlock migrationBlock) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    [RLMRealm setSchemaVersion:version forRealmAtPath:path withMigrationBlock:migrationBlock];
+#pragma clang diagnostic pop
+}
+
 + (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error {
     return [RLMRealm schemaVersionAtPath:realmPath encryptionKey:nil error:error];
 }
 
 + (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)outError {
-    key = validatedKey(key) ?: keyForPath(realmPath);
+    key = RLMRealmValidatedEncryptionKey(key) ?: keyForPath(realmPath);
     RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(realmPath);
     if (!realm) {
         NSError *error;
@@ -865,23 +902,28 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath {
-    return [self migrateRealmAtPath:realmPath key:keyForPath(realmPath)];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.path = realmPath;
+    return [self migrateRealm:configuration];
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key {
     if (!key) {
         @throw RLMException(@"Encryption key must not be nil");
     }
-
-    return [self migrateRealmAtPath:realmPath key:validatedKey(key)];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.path = realmPath;
+    configuration.encryptionKey = key;
+    return [self migrateRealm:configuration];
 }
 
-+ (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
++ (NSError *)migrateRealm:(RLMRealmConfiguration *)configuration {
+    NSString *realmPath = configuration.path;
     if (RLMGetAnyCachedRealmForPath(realmPath)) {
         @throw RLMException(@"Cannot migrate Realms that are already open.");
     }
 
-    key = validatedKey(key) ?: keyForPath(realmPath);
+    NSData *key = configuration.encryptionKey ?: keyForPath(realmPath);
 
     NSError *error;
     RLMRealm *realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES error:&error];
@@ -889,7 +931,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         return error;
 
     @try {
-        RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), [RLMSchema.sharedSchema copy], [realm migrationBlock:key]);
+        RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), configuration.customSchema ?: [RLMSchema.sharedSchema copy], [realm migrationBlock:configuration.migrationBlock key:key]);
     } @catch (NSException *ex) {
         return RLMMakeError(ex);
     }
@@ -901,7 +943,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (BOOL)writeCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
-    key = validatedKey(key) ?: keyForPath(path);
+    key = RLMRealmValidatedEncryptionKey(key) ?: keyForPath(path);
 
     try {
         self.group->write(path.UTF8String, static_cast<const char *>(key.bytes));
