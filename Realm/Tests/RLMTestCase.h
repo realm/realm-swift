@@ -46,4 +46,7 @@ NSData *RLMGenerateKey(void);
 
 - (id)nonLiteralNil;
 
+- (void)dispatchAsync:(dispatch_block_t)block;
+- (void)dispatchAsyncAndWait:(dispatch_block_t)block;
+
 @end

@@ -644,13 +644,10 @@
     RLMArray *employees = company.employees;
 
     // Standalone can be accessed from other threads
-    // Using dispatch_async to ensure it actually lands on another thread
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{
+    [self dispatchAsyncAndWait:^{
         XCTAssertNoThrow(company.employees);
         XCTAssertNoThrow([employees lastObject]);
-    });
-    dispatch_sync(queue, ^{});
+    }];
 
     [RLMRealm.defaultRealm beginWriteTransaction];
     [RLMRealm.defaultRealm addObject:company];
@@ -659,11 +656,10 @@
     employees = company.employees;
     XCTAssertNoThrow(company.employees);
     XCTAssertNoThrow([employees lastObject]);
-    dispatch_async(queue, ^{
+    [self dispatchAsyncAndWait:^{
         XCTAssertThrows(company.employees);
         XCTAssertThrows([employees lastObject]);
-    });
-    dispatch_sync(queue, ^{});
+    }];
 }
 
 - (void)testSortByMultipleColumns {

@@ -417,32 +417,29 @@ extern "C" {
     XCTestExpectation *bgReady = [self expectationWithDescription:@"background queue waiting for commit"];
     __block XCTestExpectation *bgDone = nil;
 
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{
-        @autoreleasepool {
-            RLMRealm *realm = [self realmWithTestPath];
-            __block bool fulfilled = false;
-            RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
-                XCTAssertNotNil(realm, @"Realm should not be nil");
-                XCTAssertEqual(note, RLMRealmDidChangeNotification);
-                XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-                fulfilled = true;
-            }];
+    [self dispatchAsync:^{
+        RLMRealm *realm = [self realmWithTestPath];
+        __block bool fulfilled = false;
+        RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+            XCTAssertNotNil(realm, @"Realm should not be nil");
+            XCTAssertEqual(note, RLMRealmDidChangeNotification);
+            XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+            fulfilled = true;
+        }];
 
-            // notify main thread that we're ready for it to commit
-            [bgReady fulfill];
+        // notify main thread that we're ready for it to commit
+        [bgReady fulfill];
 
-            // run for two seconds or until we receive notification
-            NSDate *end = [NSDate dateWithTimeIntervalSinceNow:5.0];
-            while (!fulfilled) {
-                [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:end];
-            }
-            XCTAssertTrue(fulfilled, @"Notification should have been received");
-
-            [realm removeNotification:token];
-            [bgDone fulfill];
+        // run for two seconds or until we receive notification
+        NSDate *end = [NSDate dateWithTimeIntervalSinceNow:5.0];
+        while (!fulfilled) {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:end];
         }
-    });
+        XCTAssertTrue(fulfilled, @"Notification should have been received");
+
+        [realm removeNotification:token];
+        [bgDone fulfill];
+    }];
 
     // wait for background realm to be created
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -453,9 +450,6 @@ extern "C" {
     [realm commitWriteTransaction];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // wait for queue to finish
-    dispatch_sync(queue, ^{});
 }
 
 - (void)testBeginWriteTransactionsNotifiesWithUpdatedObjects {
@@ -507,16 +501,12 @@ extern "C" {
     }];
 
     // dispatch to background syncronously
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{
-        @autoreleasepool {
-            RLMRealm *realm = [self realmWithTestPath];
-            [realm beginWriteTransaction];
-            [StringObject createInRealm:realm withValue:@[@"string"]];
-            [realm commitWriteTransaction];
-        }
-    });
-    dispatch_sync(queue, ^{});
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withValue:@[@"string"]];
+        [realm commitWriteTransaction];
+    }];
 
     // notification shouldnt have fired
     XCTAssertFalse(notificationFired);
@@ -587,16 +577,11 @@ extern "C" {
 {
     RLMRealm *realm = RLMRealm.defaultRealm;
 
-    // Using dispatch_async to ensure it actually lands on another thread
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{
-        @autoreleasepool {
-            XCTAssertThrows([realm beginWriteTransaction]);
-            XCTAssertThrows([IntObject allObjectsInRealm:realm]);
-            XCTAssertThrows([IntObject objectsInRealm:realm where:@"intCol = 0"]);
-        }
-    });
-    dispatch_sync(queue, ^{});
+    [self dispatchAsyncAndWait:^{
+        XCTAssertThrows([realm beginWriteTransaction]);
+        XCTAssertThrows([IntObject allObjectsInRealm:realm]);
+        XCTAssertThrows([IntObject objectsInRealm:realm where:@"intCol = 0"]);
+    }];
 }
 
 - (void)testReadOnlyFile

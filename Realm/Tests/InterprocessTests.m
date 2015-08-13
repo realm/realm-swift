@@ -92,9 +92,9 @@
     if (self.isParent) {
         // Wait on a different thread so that this thread doesn't get the chance
         // to autorefresh
-        dispatch_queue_t queue = dispatch_queue_create("background", 0);
-        dispatch_async(queue, ^{ RLMRunChildAndWait(); });
-        dispatch_sync(queue, ^{});
+        [self dispatchAsyncAndWait:^{
+            RLMRunChildAndWait();
+        }];
 
         XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
         [realm refresh];
