@@ -458,7 +458,7 @@ case "$COMMAND" in
     "test-ios-devices")
         failed=0
         test_ios_devices xcrealm "Realm" "$CONFIGURATION" || failed=1
-        # test_ios_devices xcrealm "RealmSwift" "$CONFIGURATION" || failed=1 # FIXME: Re-enable once fixed
+        test_ios_devices xcrealm "RealmSwift" "$CONFIGURATION" || failed=1
         exit $failed
         ;;
 
