@@ -46,6 +46,15 @@ struct RLMSortOrder {
     }
 };
 
+@protocol RLMFastEnumerable
+@property (nonatomic, readonly) RLMRealm *realm;
+@property (nonatomic, readonly) RLMObjectSchema *objectSchema;
+@property (nonatomic, readonly) NSUInteger count;
+
+- (NSUInteger)indexInSource:(NSUInteger)index;
+- (realm::TableView)tableView;
+@end
+
 @interface RLMArray () {
   @protected
     NSString *_objectClassName;
@@ -60,7 +69,9 @@ struct RLMSortOrder {
 //
 // LinkView backed RLMArray subclass
 //
-@interface RLMArrayLinkView : RLMArray
+@interface RLMArrayLinkView : RLMArray <RLMFastEnumerable>
+@property (nonatomic, unsafe_unretained) RLMObjectSchema *objectSchema;
+
 + (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
                                           view:(realm::LinkViewRef)view
                                          realm:(RLMRealm *)realm
@@ -80,7 +91,7 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NS
 //
 // RLMResults private methods
 //
-@interface RLMResults ()
+@interface RLMResults () <RLMFastEnumerable>
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<realm::Query>)query
                                      realm:(RLMRealm *)realm;
@@ -113,18 +124,16 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NS
 + (RLMResults *)tableResultsWithObjectSchema:(RLMObjectSchema *)objectSchema realm:(RLMRealm *)realm;
 @end
 
-//
-// A simple holder for a C array of ids to enable autoreleasing the array without
-// the runtime overhead of a NSMutableArray
-//
-@interface RLMCArrayHolder : NSObject {
-@public
-    std::unique_ptr<id[]> array;
-    NSUInteger size;
-}
+// An object which encapulates the shared logic for fast-enumerating RLMArray
+// and RLMResults, and has a buffer to store strong references to the current
+// set of enumerated items
+@interface RLMFastEnumerator : NSObject
+- (instancetype)initWithCollection:(id<RLMFastEnumerable>)collection objectSchema:(RLMObjectSchema *)objectSchema;
 
-- (instancetype)initWithSize:(NSUInteger)size;
+// Detach this enumerator from the source collection. Must be called before the
+// source collection is changed.
+- (void)detach;
 
-// Reallocate the array if it is not already the given size
-- (void)resize:(NSUInteger)size;
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                    count:(NSUInteger)len;
 @end

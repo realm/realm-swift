@@ -48,6 +48,10 @@ x.x.x Release notes (yyyy-MM-dd)
   Observing compliant.
 * The different options used to create Realm instances have been consolidated
   into a single `RLMRealmConfiguration`/`Realm.Configuration` object.
+* Enumerating Realm collections (`RLMArray`, `RLMResults`, `List<>`,
+  `Results<>`) now enumerates over a copy of the collection, making it no
+  longer an error to modify a collection during enumeration (either directly,
+  or indirectly by modifying objects to make them no longer match a query).
 
 ### Bugfixes
 
