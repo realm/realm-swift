@@ -46,7 +46,7 @@ Pod::Spec.new do |s|
   s.ios.vendored_library    = 'core/librealm-ios.a'
 
   s.osx.deployment_target   = '10.9'
-  s.osx.vendored_library    = 'core/librealm.a'
+  s.osx.vendored_library    = 'core/librealm-osx.a'
 
   if s.respond_to?(:watchos)
     s.watchos.deployment_target = '2.0'
