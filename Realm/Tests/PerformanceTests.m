@@ -57,7 +57,9 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 + (RLMRealm *)createStringObjects:(int)factor {
-    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@(factor).stringValue];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.inMemoryIdentifier = @(factor).stringValue;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     [realm beginWriteTransaction];
     for (int i = 0; i < 1000 * factor; ++i) {
         [StringObject createInRealm:realm withValue:@[@"a"]];
@@ -66,6 +68,12 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [realm commitWriteTransaction];
 
     return realm;
+}
+
+- (RLMRealm *)testRealm {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.inMemoryIdentifier = @"test";
+    return [RLMRealm realmWithConfiguration:config error:nil];
 }
 
 - (void)testInsertMultiple {
@@ -109,7 +117,9 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (RLMRealm *)getStringObjects:(int)factor {
-    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@(factor).stringValue];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.inMemoryIdentifier = @(factor).stringValue;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     [NSFileManager.defaultManager removeItemAtPath:RLMTestRealmPath() error:nil];
     [realm writeCopyToPath:RLMTestRealmPath() error:nil];
     return [self realmWithTestPath];
@@ -363,7 +373,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
 - (void)testCommitWriteTransaction {
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+        RLMRealm *realm = self.testRealm;
         [realm beginWriteTransaction];
         IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
@@ -380,7 +390,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
 - (void)testCommitWriteTransactionWithLocalNotification {
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+        RLMRealm *realm = self.testRealm;
         [realm beginWriteTransaction];
         IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
@@ -401,7 +411,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     const int stopValue = 500;
 
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+        RLMRealm *realm = self.testRealm;
         [realm beginWriteTransaction];
         IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
@@ -410,7 +420,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         dispatch_semaphore_t sema = dispatch_semaphore_create(0);
         dispatch_async(queue, ^{
             @autoreleasepool {
-                RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+                RLMRealm *realm = self.testRealm;
                 IntObject *obj = [[IntObject allObjectsInRealm:realm] firstObject];
                 __block bool stop = false;
                 RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
@@ -443,7 +453,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     const int stopValue = 500;
 
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+        RLMRealm *realm = self.testRealm;
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
         IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
@@ -453,7 +463,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         dispatch_semaphore_t sema = dispatch_semaphore_create(0);
         dispatch_async(queue, ^{
             @autoreleasepool {
-                RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+                RLMRealm *realm = self.testRealm;
                 IntObject *obj = [[IntObject allObjectsInRealm:realm] firstObject];
                 RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
                     if (obj.intCol % 2 == 0 && obj.intCol < stopValue) {
