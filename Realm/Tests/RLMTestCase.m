@@ -75,7 +75,9 @@ static BOOL encryptTests() {
     return encryptAll;
 }
 
-@implementation RLMTestCase
+@implementation RLMTestCase {
+    dispatch_queue_t _bgQueue;
+}
 
 #if DEBUG || !TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 + (void)setUp {
@@ -102,6 +104,10 @@ static BOOL encryptTests() {
 - (void)tearDown {
     @autoreleasepool {
         [super tearDown];
+        if (_bgQueue) {
+            dispatch_sync(_bgQueue, ^{});
+            _bgQueue = nil;
+        }
         [self deleteFiles];
     }
 }
@@ -173,6 +179,22 @@ static BOOL encryptTests() {
     dispatch_sync(queue, ^{});
 
     [realm removeNotification:token];
+}
+
+- (void)dispatchAsync:(dispatch_block_t)block {
+    if (!_bgQueue) {
+        _bgQueue = dispatch_queue_create("test background queue", 0);
+    }
+    dispatch_async(_bgQueue, ^{
+        @autoreleasepool {
+            block();
+        }
+    });
+}
+
+- (void)dispatchAsyncAndWait:(dispatch_block_t)block {
+    [self dispatchAsync:block];
+    dispatch_sync(_bgQueue, ^{});
 }
 
 - (id)nonLiteralNil

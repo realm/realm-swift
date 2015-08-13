@@ -543,12 +543,10 @@ static vm_size_t get_resident_size() {
     XCTAssertNoThrow([queryResults lastObject]);
 
     // Using dispatch_async to ensure it actually lands on another thread
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{
+    [self dispatchAsyncAndWait:^{
         XCTAssertThrows([results lastObject]);
         XCTAssertThrows([queryResults lastObject]);
-    });
-    dispatch_sync(queue, ^{});
+    }];
 }
 
 - (void)testDeleteAllObjects
