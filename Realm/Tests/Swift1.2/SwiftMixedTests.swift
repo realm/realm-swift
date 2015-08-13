@@ -18,7 +18,7 @@
 
 import XCTest
 
-class SwiftMixedTests: SwiftTestCase {
+class SwiftMixedTests: RLMTestCase {
 
     func testMixedInsert() {
         let data = "Hello World".dataUsingEncoding(NSUTF8StringEncoding)

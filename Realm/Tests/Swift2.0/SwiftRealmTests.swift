@@ -19,7 +19,7 @@
 import XCTest
 import Realm
 
-class SwiftRealmTests: SwiftTestCase {
+class SwiftRealmTests: RLMTestCase {
 
     // No models
 

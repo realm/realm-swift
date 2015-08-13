@@ -44,7 +44,7 @@ class SwiftDefaultObject: RLMObject {
     }
 }
 
-class SwiftObjectInterfaceTests: SwiftTestCase {
+class SwiftObjectInterfaceTests: RLMTestCase {
 
     // Swift models
 

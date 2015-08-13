@@ -18,21 +18,22 @@
 
 import XCTest
 import Foundation
+import Realm.Private
 
-class SwiftDynamicTests: SwiftTestCase {
+class SwiftDynamicTests: RLMTestCase {
 
     // Swift models
 
     func testDynamicRealmExists() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm(path: testRealmPath())
+            let realm = RLMRealm(path: RLMTestRealmPath())
             realm.beginWriteTransaction()
             SwiftDynamicObject.createInRealm(realm, withValue: ["column1", 1])
             SwiftDynamicObject.createInRealm(realm, withValue: ["column2", 2])
             realm.commitWriteTransaction()
         }
-        let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
+        let dyrealm = realmWithTestPathAndSchema(nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
         XCTAssertTrue(dyrealm.isKindOfClass(RLMRealm))
 
@@ -52,7 +53,7 @@ class SwiftDynamicTests: SwiftTestCase {
     func testDynamicProperties() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm(path: testRealmPath())
+            let realm = RLMRealm(path: RLMTestRealmPath())
             realm.beginWriteTransaction()
             SwiftDynamicObject.createInRealm(realm, withValue: ["column1", 1])
             SwiftDynamicObject.createInRealm(realm, withValue: ["column2", 2])
@@ -60,7 +61,7 @@ class SwiftDynamicTests: SwiftTestCase {
         }
 
         // verify properties
-        let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
+        let dyrealm = realmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects("SwiftDynamicObject")
 
         XCTAssertTrue((array[0] as! RLMObject)["intCol"] as! NSNumber == 1)
@@ -87,7 +88,7 @@ class SwiftDynamicTests: SwiftTestCase {
 //        }
 //
 //        // verify properties
-//        let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
+//        let dyrealm = realmWithTestPathAndSchema(nil)
 //        let array = dyrealm.allObjects(SwiftAllTypesObject.className())
 //        XCTAssertEqual(array.count, UInt(2))
 //
@@ -111,13 +112,13 @@ class SwiftDynamicTests: SwiftTestCase {
     func testDynamicRealmExists_objc() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm(path: testRealmPath())
+            let realm = RLMRealm(path: RLMTestRealmPath())
             realm.beginWriteTransaction()
             DynamicObject.createInRealm(realm, withValue: ["column1", 1])
             DynamicObject.createInRealm(realm, withValue: ["column2", 2])
             realm.commitWriteTransaction()
         }
-        let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
+        let dyrealm = realmWithTestPathAndSchema(nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
         XCTAssertTrue(dyrealm.isKindOfClass(RLMRealm), "realm should be of class RLMDynamicRealm")
 
@@ -137,7 +138,7 @@ class SwiftDynamicTests: SwiftTestCase {
     func testDynamicProperties_objc() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm(path: testRealmPath())
+            let realm = RLMRealm(path: RLMTestRealmPath())
             realm.beginWriteTransaction()
             DynamicObject.createInRealm(realm, withValue: ["column1", 1])
             DynamicObject.createInRealm(realm, withValue: ["column2", 2])
@@ -145,7 +146,7 @@ class SwiftDynamicTests: SwiftTestCase {
         }
 
         // verify properties
-        let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
+        let dyrealm = realmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects("DynamicObject")
 
         XCTAssertTrue((array[0] as! RLMObject)["intCol"] as! NSNumber == 1)
@@ -195,7 +196,7 @@ class SwiftDynamicTests: SwiftTestCase {
         }
 
         // verify properties
-        let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
+        let dyrealm = realmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects(AllTypesObject.className())
         XCTAssertEqual(array.count, UInt(2))
 
