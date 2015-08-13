@@ -67,3 +67,11 @@ typedef RLMObject * RLMObjectArgument;
 #define RLM_ASSUME_NONNULL_BEGIN
 #define RLM_ASSUME_NONNULL_END
 #endif
+
+#pragma mark - Escaping
+
+#if __has_attribute(noescape)
+#  define RLM_NOESCAPE __attribute__((noescape))
+#else
+#  define RLM_NOESCAPE
+#endif

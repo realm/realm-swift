@@ -30,7 +30,7 @@
 - (void)testDynamicRealmExists {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
-        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath()];
         [realm beginWriteTransaction];
         [DynamicObject createInRealm:realm withValue:@[@"column1", @1]];
         [DynamicObject createInRealm:realm withValue:@[@"column2", @2]];
@@ -95,7 +95,7 @@
 - (void)testDynamicProperties {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
-        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath()];
         [realm beginWriteTransaction];
         [DynamicObject createInRealm:realm withValue:@[@"column1", @1]];
         [DynamicObject createInRealm:realm withValue:@[@"column2", @2]];
@@ -122,7 +122,7 @@
     id obj2 = @[@NO, @2, @2.2f, @2.22, @"string2", [NSData dataWithBytes:"b" length:1], now, @NO, @22, now, obj];
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
-        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath()];
         [realm beginWriteTransaction];
         [AllTypesObject createInRealm:realm withValue:obj1];
         [AllTypesObject createInRealm:realm withValue:obj2];
@@ -154,7 +154,7 @@
 - (void)testDynamicAdd {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
-        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        [RLMRealm realmWithPath:RLMTestRealmPath()];
     }
 
     RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
@@ -171,7 +171,7 @@
 - (void)testDynamicArray {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
-        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        [RLMRealm realmWithPath:RLMTestRealmPath()];
     }
 
     RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];

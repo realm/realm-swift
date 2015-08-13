@@ -66,7 +66,7 @@ func dynamicRealmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
 class SwiftTestCase: XCTestCase {
 
     func realmWithTestPath() -> RLMRealm {
-        return RLMRealm(path: testRealmPath(), readOnly: false, error: nil)!
+        return RLMRealm(path: testRealmPath())
     }
 
     override func setUp() {

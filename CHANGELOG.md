@@ -3,12 +3,51 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* The following APIs have been deprecated in favor of the new `RLMRealmConfiguration` class in Realm Objective-C:
+
+| Deprecated API                                                    | New API                                                                          |
+|:------------------------------------------------------------------|:---------------------------------------------------------------------------------|
+| `+[RLMRealm realmWithPath:readOnly:error:]`                       | `+[RLMRealm realmWithConfiguration:error:]`                                      |
+| `+[RLMRealm realmWithPath:encryptionKey:readOnly:error:]`         | `+[RLMRealm realmWithConfiguration:error:]`                                      |
+| `+[RLMRealm setEncryptionKey:forRealmsAtPath:]`                   | `-[RLMRealmConfiguration setEncryptionKey:]`                                     |
+| `+[RLMRealm inMemoryRealmWithIdentifier:]`                        | `+[RLMRealm realmWithConfiguration:error:]`                                      |
+| `+[RLMRealm defaultRealmPath]`                                    | `+[RLMRealmConfiguration defaultConfiguration]`                                  |
+| `+[RLMRealm setDefaultRealmPath:]`                                | `+[RLMRealmConfiguration setDefaultConfiguration:]`                              |
+| `+[RLMRealm setDefaultRealmSchemaVersion:withMigrationBlock]`     | `RLMRealmConfiguration.schemaVersion` and `RLMRealmConfiguration.migrationBlock` |
+| `+[RLMRealm setSchemaVersion:forRealmAtPath:withMigrationBlock:]` | `RLMRealmConfiguration.schemaVersion` and `RLMRealmConfiguration.migrationBlock` |
+| `+[RLMRealm migrateRealmAtPath:]`                                 | `+[RLMRealm migrateRealm:]`                                                      |
+| `+[RLMRealm migrateRealmAtPath:encryptionKey:]`                   | `+[RLMRealm migrateRealm:]`                                                      |
+
+* The following APIs have been deprecated in favor of the new `Realm.Configuration` struct in Realm Swift for Swift 1.2:
+
+| Deprecated API                                                | New API                                                                            |
+|:--------------------------------------------------------------|:-----------------------------------------------------------------------------------|
+| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                       | |
+| `Realm(path:readOnly:encryptionKey:error:)`                   | `Realm(configuration:error:)`                                                      |
+| `Realm(inMemoryIdentifier:)`                                  | `Realm(configuration:error:)`                                                      |
+| `Realm.setEncryptionKey(:forPath:)`                           | `Realm(configuration:error:)`                                                      |
+| `setDefaultRealmSchemaVersion(schemaVersion:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock`       |
+| `setSchemaVersion(schemaVersion:realmPath:migrationBlock:)`   | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock`       |
+| `migrateRealm(path:encryptionKey:)`                           | `migrateRealm(configuration:)`                                                     |
+
+* The following APIs have been deprecated in favor of the new `Realm.Configuration` struct in Realm Swift for Swift 2.0:
+
+| Deprecated API                                                | New API                                                                            |
+|:--------------------------------------------------------------|:-----------------------------------------------------------------------------------|
+| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                       | |
+| `Realm(path:readOnly:encryptionKey:) throws`                  | `Realm(configuration:) throws`                                                     |
+| `Realm(inMemoryIdentifier:)`                                  | `Realm(configuration:) throws`                                                     |
+| `Realm.setEncryptionKey(:forPath:)`                           | `Realm(configuration:) throws`                                                     |
+| `setDefaultRealmSchemaVersion(schemaVersion:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock`       |
+| `setSchemaVersion(schemaVersion:realmPath:migrationBlock:)`   | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock`       |
+| `migrateRealm(path:encryptionKey:)`                           | `migrateRealm(configuration:)`                                                     |
 
 ### Enhancements
 
 * Persisted properties of `RLMObject`/`Object` subclasses are now Key-Value
   Observing compliant.
+* The different options used to create Realm instances have been consolidated
+  into a single `RLMRealmConfiguration`/`Realm.Configuration` object.
 
 ### Bugfixes
 
