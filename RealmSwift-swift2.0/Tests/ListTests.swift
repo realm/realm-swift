@@ -311,6 +311,18 @@ class ListTests: TestCase {
         XCTAssertEqual(str, "121")
     }
 
+    func testFastEnumerationWithMutation() {
+        array.extend([str1, str2, str1, str2, str1, str2, str1, str2, str1,
+            str2, str1, str2, str1, str2, str1, str2, str1, str2, str1, str2])
+        var str = ""
+        for obj in array {
+            str += obj.stringCol
+            array.extend([str1])
+        }
+
+        XCTAssertEqual(str, "12121212121212121212")
+    }
+
     func testAppendObject() {
         for str in [str1, str2, str1] {
             array.append(str)

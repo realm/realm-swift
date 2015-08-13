@@ -174,6 +174,7 @@ void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfiguration *configuration
 @implementation RLMRealm {
     // Used for read-write realms
     NSHashTable *_notificationHandlers;
+    NSHashTable *_collectionEnumerators;
 
     std::unique_ptr<ClientHistory> _history;
     std::unique_ptr<SharedGroup> _sharedGroup;
@@ -571,6 +572,13 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
             // begin the read transaction if needed
             [self getOrCreateGroup];
+
+            // notify any collections currently being enumerated that they need
+            // to switch to enumerating a copy as the data may change on them
+            for (RLMFastEnumerator *enumerator in _collectionEnumerators) {
+                [enumerator detach];
+            }
+            _collectionEnumerators = nil;
 
             RLMPromoteToWrite(*_sharedGroup, *_history, _schema);
 
@@ -983,6 +991,18 @@ void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrat
     }
 
     return [self writeCopyToPath:path key:key error:error];
+}
+
+- (void)registerEnumerator:(RLMFastEnumerator *)enumerator {
+    if (!_collectionEnumerators) {
+        _collectionEnumerators = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
+    }
+    [_collectionEnumerators addObject:enumerator];
+
+}
+
+- (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator {
+    [_collectionEnumerators removeObject:enumerator];
 }
 
 @end

@@ -27,6 +27,7 @@
 @class RLMProperty;
 @class RLMRealm;
 @class RLMSchema;
+@protocol RLMFastEnumerable;
 
 NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
 NSException *RLMException(std::exception const& exception);
@@ -43,9 +44,9 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 // merges with native property defaults if Swift class
 NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema);
 
-NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t index));
+NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *key);
 
-void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t index));
+void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value);
 
 BOOL RLMIsDebuggerAttached();
 

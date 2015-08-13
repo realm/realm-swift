@@ -70,23 +70,6 @@
         }
     }
     XCTAssertNil(objects[0], @"Object should have been released");
-
-    void (^mutateDuringEnumeration)() = ^{
-        bool first = true;
-        for (__unused AggregateObject *ao in result) {
-            // Only insert the first time so we don't infinite loop if the check
-            // doesn't work
-            if (first) {
-                [realm beginWriteTransaction];
-                [AggregateObject createInRealm:realm withValue:@[@10, @1.2f, @0.0, @YES, NSDate.date]];
-                [realm commitWriteTransaction];
-                first = false;
-            }
-        }
-    };
-
-    XCTAssertThrows(mutateDuringEnumeration(),
-                    @"Adding an object during fast enumeration did not throw");
 }
 
 - (void)testValueForKey {
@@ -573,6 +556,48 @@ static vm_size_t get_resident_size() {
     [realm commitWriteTransaction];
     XCTAssertEqual(0U, results.count);
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+}
+
+- (void)testEnumerateAndDeleteTableResults {
+    RLMRealm *realm = self.realmWithTestPath;
+    const int count = 40;
+
+    [realm beginWriteTransaction];
+    for (int i = 0; i < count; ++i) {
+        [IntObject createInRealm:realm withValue:@[@(i)]];
+    }
+
+    int enumeratedCount = 0;
+    for (IntObject *io in [IntObject allObjectsInRealm:realm]) {
+        ++enumeratedCount;
+        [realm deleteObject:io];
+    }
+
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+    XCTAssertEqual(count, enumeratedCount);
+
+    [realm cancelWriteTransaction];
+}
+
+- (void)testEnumerateAndMutateQueryCondition {
+    RLMRealm *realm = self.realmWithTestPath;
+    const int count = 40;
+
+    [realm beginWriteTransaction];
+    for (int i = 0; i < count; ++i) {
+        [IntObject createInRealm:realm withValue:@[@(0)]];
+    }
+
+    int enumeratedCount = 0;
+    for (IntObject *io in [IntObject objectsInRealm:realm where:@"intCol = 0"]) {
+        ++enumeratedCount;
+        io.intCol = enumeratedCount;
+    }
+
+    XCTAssertEqual(0U, [IntObject objectsInRealm:realm where:@"intCol = 0"].count);
+    XCTAssertEqual(count, enumeratedCount);
+
+    [realm cancelWriteTransaction];
 }
 
 @end

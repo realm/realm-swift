@@ -284,6 +284,14 @@ class ResultsTests: TestCase {
         XCTAssertEqual(str, "12")
     }
 
+    func testFastEnumerationWithMutation() {
+        let realm = realmWithTestPath()
+        for obj in results {
+            realm.delete(obj)
+        }
+        XCTAssertEqual(0, results.count)
+    }
+
     func testArrayAggregateWithSwiftObjectDoesntThrow() {
         let results = getAggregateableResults()
 
