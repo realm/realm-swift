@@ -1373,17 +1373,13 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     IntObject *obj = [[IntObject alloc] init];
 
     // Standalone can be accessed from other threads
-    // Using dispatch_async to ensure it actually lands on another thread
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{ XCTAssertNoThrow(obj.intCol = 5); });
-    dispatch_sync(queue, ^{});
+    [self dispatchAsyncAndWait:^{ XCTAssertNoThrow(obj.intCol = 5); }];
 
     [RLMRealm.defaultRealm beginWriteTransaction];
     [RLMRealm.defaultRealm addObject:obj];
     [RLMRealm.defaultRealm commitWriteTransaction];
 
-    dispatch_async(queue, ^{ XCTAssertThrows(obj.intCol); });
-    dispatch_sync(queue, ^{});
+    [self dispatchAsyncAndWait:^{ XCTAssertThrows(obj.intCol); }];
 }
 
 - (void)testIsDeleted {
