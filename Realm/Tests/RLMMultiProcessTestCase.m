@@ -18,6 +18,8 @@
 
 #import "RLMMultiProcessTestCase.h"
 
+#if RLM_TEST_TARGET_OSX
+
 @interface RLMMultiProcessTestCase ()
 @property (nonatomic) bool isParent;
 @property (nonatomic, strong) NSString *testName;
@@ -125,3 +127,5 @@
     return task.terminationStatus;
 }
 @end
+
+#endif

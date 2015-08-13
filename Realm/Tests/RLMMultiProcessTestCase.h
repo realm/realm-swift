@@ -18,6 +18,10 @@
 
 #import "RLMTestCase.h"
 
+#define RLM_TEST_TARGET_OSX (TARGET_OS_MAC && !TARGET_OS_SIMULATOR && !TARGET_OS_IPHONE && !TARGET_OS_WATCH)
+
+#if RLM_TEST_TARGET_OSX
+
 @interface RLMMultiProcessTestCase : RLMTestCase
 // if true, this is running the main test process
 @property (nonatomic, readonly) bool isParent;
@@ -31,3 +35,5 @@
 
 #define RLMRunChildAndWait() \
     XCTAssertEqual(0, [self runChildAndWait], @"Tests in child process failed")
+
+#endif

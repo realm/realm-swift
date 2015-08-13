@@ -1,0 +1,29 @@
+SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos watchsimulator watchos;
+APPLICATION_EXTENSION_API_ONLY = YES;
+SKIP_INSTALL = YES;
+
+DYLIB_COMPATIBILITY_VERSION = 1;
+DYLIB_CURRENT_VERSION = 1;
+DYLIB_INSTALL_NAME_BASE = @rpath;
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
+DEFINES_MODULE = YES;
+MODULEMAP_FILE = Realm/module.modulemap;
+INFOPLIST_FILE = Realm/Realm-Info.plist;
+PRODUCT_NAME = Realm;
+PRODUCT_BUNDLE_IDENTIFIER = io.realm.Realm;
+HEADER_SEARCH_PATHS = $(inherited) Realm/ObjectStore;
+
+REALM_EXCLUDED_SOURCE_FILES[sdk=iphone*] = Realm/osx/* Realm/watchos/*;
+REALM_EXCLUDED_SOURCE_FILES[sdk=macosx*] = Realm/ios/* Realm/watchos/*;
+REALM_EXCLUDED_SOURCE_FILES[sdk=watch*] = Realm/ios/* Realm/osx/*;
+
+EXCLUDED_SOURCE_FILE_NAMES = $(inherited) $(REALM_EXCLUDED_SOURCE_FILES);
+
+OTHER_LDFLAGS = $(inherited) $(REALM_CORE_LD_FLAGS);
+
+REALM_MACH_O_TYPE = mh_dylib;
+REALM_OTHER_LIBTOOLFLAGS = $(inherited);
+
+// These are needed to allow overriding to build a static lib via xcodebuild
+MACH_O_TYPE = $(REALM_MACH_O_TYPE);
+OTHER_LIBTOOLFLAGS = $(REALM_OTHER_LIBTOOLFLAGS);

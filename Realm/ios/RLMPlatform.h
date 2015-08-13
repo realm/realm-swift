@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#if !TARGET_OS_IPHONE
-#error Attempting to use Realm's iOS framework in an OSX project.
+#ifndef REALM_DISABLE_PLATFORM_CHECK
+#  if !TARGET_OS_IPHONE
+#    error Attempting to use Realm's iOS framework in an OSX or watchOS project.
+#  endif
 #endif
