@@ -371,7 +371,7 @@ public final class Realm {
     /**
     Deletes the given objects from this Realm.
 
-    :param: objects The objects to be deleted. This can be a `List`, `Results`,
+    :param: objects The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
                     or any other enumerable `SequenceType` which generates `Object`.
     */
     public func delete<S: SequenceType where S.Generator.Element: Object>(objects: S) {
