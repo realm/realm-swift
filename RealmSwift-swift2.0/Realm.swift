@@ -353,8 +353,8 @@ public final class Realm {
     /**
     Deletes the given objects from this Realm.
 
-    - parameter object: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
-                        or any other enumerable SequenceType which generates Object.
+    - parameter objects: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
+                         or any other enumerable SequenceType which generates Object.
     */
     public func delete<S: SequenceType where S.Generator.Element: Object>(objects: S) {
         for obj in objects {
@@ -365,8 +365,7 @@ public final class Realm {
     /**
     Deletes the given objects from this Realm.
 
-    - parameter object: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
-                        or any other enumerable SequenceType which generates Object.
+    - parameter objects: The objects to be deleted. Must be `List<Object>`.
 
     :nodoc:
     */
@@ -377,8 +376,7 @@ public final class Realm {
     /**
     Deletes the given objects from this Realm.
 
-    - parameter object: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
-                        or any other enumerable SequenceType which generates Object.
+    - parameter objects: The objects to be deleted. Must be `Results<Object>`.
 
     :nodoc:
     */
