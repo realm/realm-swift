@@ -25,7 +25,6 @@
 		0295B91719D103BE0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
-		3E0326FA0A3C41F99701C409 /* Pods_ReactKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8808EDBB2A3CE2C767A1F8D9 /* Pods_ReactKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		3F4AC4EE1B41B0C600882CD6 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
 		3F4AC4EF1B41B0C600882CD6 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; };
 		3F4AC4F01B41B0C600882CD6 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
@@ -219,12 +218,12 @@
 		3F4AC5161B41B66400882CD6 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ReactKit/AppDelegate.swift; sourceTree = "<group>"; };
 		3F4AC5171B41B66400882CD6 /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TableViewController.swift; path = ReactKit/TableViewController.swift; sourceTree = "<group>"; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../build/ios/swift-1.2/Realm.framework"; sourceTree = SOURCE_ROOT; };
-		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../../../build/ios/swift-1.2/RealmSwift.framework"; sourceTree = SOURCE_ROOT; };
 		5FE3B3112484BC71AB66755F /* Pods-ReactKit.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactKit.release.xcconfig"; path = "Pods/Target Support Files/Pods-ReactKit/Pods-ReactKit.release.xcconfig"; sourceTree = "<group>"; };
 		630DCA2003970F467D891300 /* Pods-ReactKitTableView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactKitTableView.release.xcconfig"; path = "Pods/Target Support Files/Pods-ReactKitTableView/Pods-ReactKitTableView.release.xcconfig"; sourceTree = "<group>"; };
 		6E29F55A41338CDEB11A041E /* Pods_ReactKitTableView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ReactKitTableView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8808EDBB2A3CE2C767A1F8D9 /* Pods_ReactKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ReactKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../build/ios/swift-1.2/Realm.framework"; sourceTree = SOURCE_ROOT; };
+		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../../../build/ios/swift-1.2/RealmSwift.framework"; sourceTree = SOURCE_ROOT; };
 		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E886FB631A12A73E00CB2D0B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E886FB641A12A73E00CB2D0B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -259,7 +258,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F4AC4F01B41B0C600882CD6 /* libc++.dylib in Frameworks */,
-				3E0326FA0A3C41F99701C409 /* Pods_ReactKit.framework in Frameworks */,
 				CB2647AF7AEB2CB3A3E4BC24 /* Pods_ReactKitTableView.framework in Frameworks */,
 				3F4AC4EE1B41B0C600882CD6 /* Realm.framework in Frameworks */,
 				3F4AC4EF1B41B0C600882CD6 /* RealmSwift.framework in Frameworks */,
@@ -904,6 +902,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/ReactKit/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = ReactKitTableView;
 			};
@@ -917,6 +916,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/ReactKit/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = ReactKitTableView;
 			};
