@@ -158,37 +158,6 @@ public class Object: RLMObjectBase {
 
     // MARK: Key-Value Coding & Subscripting
 
-    /**
-    Returns the value for the property identified by the given key.
-
-    - parameter key: The name of one of the receiver's properties.
-
-    - returns: The value for the property identified by `key`.
-    */
-    public override func valueForKey(key: String) -> AnyObject? {
-        if let list = listProperty(key) {
-            return list
-        }
-        return super.valueForKey(key)
-    }
-
-    /**
-    Sets the property of the receiver specified by the given key to the given value.
-
-    - parameter value: The value for the property identified by `key`.
-    - parameter key:   The name of one of the receiver's properties.
-    */
-    public override func setValue(value: AnyObject?, forKey key: String) {
-        if let list = listProperty(key) {
-            if let value = value as? NSFastEnumeration {
-                list._rlmArray.removeAllObjects()
-                list._rlmArray.addObjects(value)
-            }
-            return
-        }
-        super.setValue(value, forKey: key)
-    }
-
     /// Returns or sets the value of the property with the given name.
     public subscript(key: String) -> AnyObject? {
         get {

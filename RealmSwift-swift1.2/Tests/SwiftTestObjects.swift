@@ -124,6 +124,10 @@ class SwiftListOfSwiftObject: Object {
     let array = List<SwiftObject>()
 }
 
+class SwiftDynamicListOfSwiftObject: Object {
+    dynamic let array = List<SwiftObject>()
+}
+
 class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
     let boolArray = List<SwiftBoolObject>()
 }
