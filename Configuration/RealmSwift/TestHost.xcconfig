@@ -6,6 +6,7 @@ INFOPLIST_FILE = Realm/Tests/TestHost/Info.plist;
 PRODUCT_NAME = $(TARGET_NAME);
 CLANG_MODULES_AUTOLINK = NO;
 ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+PRODUCT_BUNDLE_IDENTIFIER = io.realm.TestHost;
 
 OTHER_LDFLAGS[sdk=iphone*] = -framework UIKit;
 OTHER_LDFLAGS[sdk=macosx*] = -framework Cocoa;
