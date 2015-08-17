@@ -342,7 +342,7 @@ id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key) {
     }
 
     if (object->_realm) {
-        return RLMDynamicGet(object, key);
+        return RLMDynamicGet(object, RLMValidatedGetProperty(object, key));
     }
     else {
         return [object valueForKey:key];
