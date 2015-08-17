@@ -123,7 +123,10 @@ static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange
 //
 
 static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
-    if (!object || ![array->_objectClassName isEqualToString:object->_objectSchema.className]) {
+    if (!object) {
+        @throw RLMException(@"Object must not be nil");
+    }
+    if (![array->_objectClassName isEqualToString:object->_objectSchema.className]) {
         NSString *message = [NSString stringWithFormat:@"Object type '%@' does not match RLMArray type '%@'.", object->_objectSchema.className, array->_objectClassName];
         @throw RLMException(message);
     }
