@@ -157,20 +157,22 @@ public class Object: RLMObjectBase, Equatable, Printable {
     /// Returns or sets the value of the property with the given name.
     public subscript(key: String) -> AnyObject? {
         get {
-            if let list = listProperty(key) {
-                return list
+            if realm == nil {
+                return self.valueForKey(key)
             }
-            return RLMObjectBaseObjectForKeyedSubscript(self, key)
+            let property = RLMValidatedGetProperty(self, key)
+            if property.type == .Array {
+                return self.listForProperty(property)
+            }
+            return RLMDynamicGet(self, property)
         }
         set(value) {
-            if let list = listProperty(key) {
-                if let value = value as? NSFastEnumeration {
-                    list._rlmArray.removeAllObjects()
-                    list._rlmArray.addObjects(value)
-                }
-                return
+            if realm == nil {
+                self.setValue(value, forKey: key)
             }
-            RLMObjectBaseSetObjectForKeyedSubscript(self, key, value)
+            else {
+                RLMDynamicValidatedSet(self, key, value)
+            }
         }
     }
 

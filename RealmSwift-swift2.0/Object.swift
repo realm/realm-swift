@@ -209,12 +209,14 @@ public class Object: RLMObjectBase {
 
     // Helper for getting a list property for the given key
     private func listProperty(key: String) -> RLMListBase? {
-        if let prop = RLMObjectBaseObjectSchema(self)?[key] {
-            if prop.type == .Array {
-                return object_getIvar(self, prop.swiftListIvar) as! RLMListBase?
-            }
+        if let prop = RLMObjectBaseObjectSchema(self)?[key] where prop.type == .Array {
+            return object_getIvar(self, prop.swiftListIvar) as! RLMListBase?
         }
         return nil
+    }
+
+    internal func listForProperty(prop: RLMProperty) -> RLMListBase {
+        return object_getIvar(self, prop.swiftListIvar) as! RLMListBase
     }
 }
 
@@ -225,18 +227,13 @@ public final class DynamicObject : Object {
     private var listProperties = [String: List<DynamicObject>]()
 
     // Override to create List<DynamicObject> on access
-    private override func listProperty(key: String) -> RLMListBase? {
-        if let prop = RLMObjectBaseObjectSchema(self)?[key] {
-            if prop.type == .Array {
-                if let list = listProperties[key] {
-                    return list
-                }
-                let list = List<DynamicObject>()
-                listProperties[key] = list
-                return list
-            }
+    internal override func listForProperty(prop: RLMProperty) -> RLMListBase {
+        if let list = listProperties[prop.name] {
+            return list
         }
-        return nil
+        let list = List<DynamicObject>()
+        listProperties[prop.name] = list
+        return list
     }
 
     /// :nodoc:
@@ -280,9 +277,8 @@ public class ObjectUtil: NSObject {
         }
     }
 
-    @objc private class func initializeListProperty(object: RLMObjectBase?, property: RLMProperty?, array: RLMArray?) {
-        let list = (object as! Object)[property!.name]! as! RLMListBase
-        list._rlmArray = array
+    @objc private class func initializeListProperty(object: RLMObjectBase, property: RLMProperty, array: RLMArray) {
+        (object as! Object).listForProperty(property)._rlmArray = array
     }
 
     @objc private class func getOptionalPropertyNames(object: AnyObject) -> NSArray {
