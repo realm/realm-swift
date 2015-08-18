@@ -20,9 +20,10 @@
 
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
-#import "RLMObservation.hpp"
+#import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
+#import "RLMObservation.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
@@ -137,6 +138,18 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
         return object_getIvar(self, ivar);
     }
     return [super valueForUndefinedKey:key];
+}
+
+- (void)setValue:(id)value forUndefinedKey:(NSString *)key {
+    if (Ivar ivar = _objectSchema[key].swiftListIvar) {
+        if ([value conformsToProtocol:@protocol(NSFastEnumeration)]) {
+            RLMArray *array = [object_getIvar(self, ivar) _rlmArray];
+            [array removeAllObjects];
+            [array addObjects:value];
+        }
+        return;
+    }
+    [super setValue:value forUndefinedKey:key];
 }
 
 // overridden at runtime per-class for performance
@@ -329,7 +342,7 @@ id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key) {
     }
 
     if (object->_realm) {
-        return RLMDynamicGet(object, key);
+        return RLMDynamicGet(object, RLMValidatedGetProperty(object, key));
     }
     else {
         return [object valueForKey:key];

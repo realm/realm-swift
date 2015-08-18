@@ -19,9 +19,10 @@
 #import "RLMUtil.hpp"
 
 #import "RLMArray_Private.hpp"
+#import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObject_Private.hpp"
 #import "RLMObjectStore.h"
+#import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
@@ -147,6 +148,9 @@ BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
         case RLMPropertyTypeArray: {
             if (RLMArray *array = RLMDynamicCast<RLMArray>(obj)) {
                 return [array.objectClassName isEqualToString:property.objectClassName];
+            }
+            if (RLMListBase *list = RLMDynamicCast<RLMListBase>(obj)) {
+                return [list._rlmArray.objectClassName isEqualToString:property.objectClassName];
             }
             if (NSArray *array = RLMDynamicCast<NSArray>(obj)) {
                 // check each element for compliance

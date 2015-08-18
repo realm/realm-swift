@@ -748,12 +748,12 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
     }
 }
 
-id RLMDynamicGet(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained NSString *propName) {
+RLMProperty *RLMValidatedGetProperty(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained NSString *const propName) {
     RLMProperty *prop = obj->_objectSchema[propName];
     if (!prop) {
         @throw RLMException([NSString stringWithFormat:@"Invalid property name `%@` for class `%@`.", propName, obj->_objectSchema.className]);
     }
-    return RLMDynamicGet(obj, prop);
+    return prop;
 }
 
 id RLMDynamicGet(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained RLMProperty *prop) {

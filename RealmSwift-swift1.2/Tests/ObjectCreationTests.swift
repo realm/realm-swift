@@ -377,6 +377,21 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(existingObject.intCol, 2)
     }
 
+    func testAddStandaloneObjectWithDynamicListProperty() {
+        let obj = SwiftObject()
+        obj.boolCol = true
+        let arrayObj = SwiftDynamicListOfSwiftObject()
+        arrayObj.array.append(obj)
+
+        let realm = Realm()
+        realm.write {
+            realm.add(arrayObj)
+        }
+
+        XCTAssertEqual(1, arrayObj.array.count)
+        XCTAssertEqual(true, arrayObj.array[0].boolCol)
+    }
+
     // MARK: Private utilities
     private func verifySwiftObjectWithArrayLiteral(object: SwiftObject, array: [AnyObject], boolObjectValue: Bool, boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, array[0] as! Bool)
