@@ -5,6 +5,7 @@ framework module Realm {
     module * { export * }
 
     explicit module Private {
+        header "RLMAccessor.h"
         header "RLMArray_Private.h"
         header "RLMRealmConfiguration_Private.h"
         header "RLMListBase.h"
