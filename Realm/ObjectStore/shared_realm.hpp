@@ -22,20 +22,24 @@
 #include "object_store.hpp"
 
 #include <memory>
-#include <mutex>
+#include <string>
 #include <thread>
 #include <vector>
 
 namespace realm {
-    class ClientHistory;
-    class Realm;
-    class RealmCache;
     class BindingContext;
+    class ClientHistory;
+    class Group;
+    class Realm;
+    class RealmDelegate;
+    class Schema;
+    class SharedGroup;
     typedef std::shared_ptr<Realm> SharedRealm;
     typedef std::weak_ptr<Realm> WeakRealm;
 
     namespace _impl {
         class ExternalCommitHelper;
+        class RealmCoordinator;
     }
 
     class Realm : public std::enable_shared_from_this<Realm>
@@ -53,7 +57,7 @@ namespace realm {
             std::vector<char> encryption_key;
 
             std::unique_ptr<Schema> schema;
-            uint64_t schema_version = ObjectStore::NotVersioned;
+            uint64_t schema_version;
 
             MigrationFunction migration_function;
 
@@ -89,6 +93,7 @@ namespace realm {
         void commit_transaction();
         void cancel_transaction();
         bool is_in_transaction() const { return m_in_transaction; }
+        bool is_in_read_transaction() const { return !!m_group; }
 
         bool refresh();
         void set_auto_refresh(bool auto_refresh) { m_auto_refresh = auto_refresh; }
@@ -108,9 +113,10 @@ namespace realm {
 
         ~Realm();
 
-      private:
+        void init(std::shared_ptr<_impl::RealmCoordinator> coordinator);
         Realm(Config config);
 
+      private:
         Config m_config;
         std::thread::id m_thread_id = std::this_thread::get_id();
         bool m_in_transaction = false;
@@ -122,28 +128,13 @@ namespace realm {
 
         Group *m_group = nullptr;
 
-        std::shared_ptr<_impl::ExternalCommitHelper> m_notifier;
+        std::shared_ptr<_impl::RealmCoordinator> m_coordinator;
 
       public:
         std::unique_ptr<BindingContext> m_binding_context;
 
         // FIXME private
         Group *read_group();
-        static RealmCache s_global_cache;
-    };
-
-    class RealmCache
-    {
-      public:
-        SharedRealm get_realm(const std::string &path, std::thread::id thread_id = std::this_thread::get_id());
-        SharedRealm get_any_realm(const std::string &path);
-        void remove(const std::string &path, std::thread::id thread_id);
-        void cache_realm(SharedRealm &realm, std::thread::id thread_id = std::this_thread::get_id());
-        void clear();
-
-      private:
-        std::map<std::string, std::map<std::thread::id, WeakRealm>> m_cache;
-        std::mutex m_mutex;
     };
 
     class RealmFileException : public std::runtime_error {

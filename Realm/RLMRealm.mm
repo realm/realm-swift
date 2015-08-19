@@ -35,6 +35,7 @@
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
+#include "impl/realm_coordinator.hpp"
 #include "object_store.hpp"
 #include "schema.hpp"
 #include "shared_realm.hpp"
@@ -379,7 +380,7 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
 
 + (void)resetRealmState {
     RLMClearRealmCache();
-    realm::Realm::s_global_cache.clear();
+    realm::_impl::RealmCoordinator::clear_cache();
     [RLMRealmConfiguration resetRealmConfigurationState];
 }
 

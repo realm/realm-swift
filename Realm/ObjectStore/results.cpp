@@ -18,6 +18,8 @@
 
 #include "results.hpp"
 
+#include "object_store.hpp"
+
 #include <stdexcept>
 
 using namespace realm;
