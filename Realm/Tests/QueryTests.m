@@ -1858,4 +1858,24 @@
     RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count != 'Hello'"]), @"@count can only be compared with a numeric value");
 }
 
+- (void)testMinOnCollection {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    ArrayPropertyObject *arr = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[], @[]]];
+    [arr.intArray addObject:[IntObject createInRealm:realm withValue:@[ @1234 ]]];
+    [arr.intArray addObject:[IntObject createInRealm:realm withValue:@[ @0 ]]];
+    [arr.intArray addObject:[IntObject createInRealm:realm withValue:@[ @-12345 ]]];
+
+    arr = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[], @[]]];
+    [arr.intArray addObject:[IntObject createInRealm:realm withValue:@[ @0 ]]];
+
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, ([ArrayPropertyObject objectsWhere:@"intArray.@min.intCol == -12345"].count));
+    XCTAssertEqual(1U, ([ArrayPropertyObject objectsWhere:@"intArray.@min.intCol == 0"].count));
+    XCTAssertEqual(2U, ([ArrayPropertyObject objectsWhere:@"intArray.@min.intCol < 1000"].count));
+    XCTAssertEqual(1U, ([ArrayPropertyObject objectsWhere:@"intArray.@min.intCol > -1000"].count));
+}
+
 @end
