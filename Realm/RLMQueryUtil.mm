@@ -130,6 +130,7 @@ class CollectionOperation {
 public:
     enum Type {
         Count,
+        Minimum,
     };
 
     CollectionOperation(Type type, RLMProperty *linkProperty, RLMProperty *property)
@@ -138,9 +139,13 @@ public:
         , m_property(property)
     {
         RLMPrecondition(m_link_property.type == RLMPropertyTypeArray, @"Invalid predicate", @"Collection operation can only be applied to a property of type RLMArray.");
+
         switch (m_type) {
             case Count:
                 RLMPrecondition(!m_property, @"Invalid predicate", @"Result of @count does not have any properties.");
+                break;
+            case Minimum:
+                RLMPrecondition(m_property && RLMPropertyTypeIsNumeric(m_property.type), @"Invalid predicate", @"Collection operation can only be applied to a numeric property.");
                 break;
         }
     }
@@ -153,11 +158,15 @@ public:
     Type type() const { return m_type; }
     NSUInteger linkColumnIndex() const { return m_link_property.column; }
     NSUInteger columnIndex() const { return m_property.column; }
+    RLMPropertyType columnType() const { return m_property.type; }
 
     void validate_value(id value) const {
         switch (m_type) {
             case Count:
                 RLMPrecondition([value isKindOfClass:[NSNumber class]], @"Invalid operand", @"@count can only be compared with a numeric value.");
+                break;
+            case Minimum:
+                RLMPrecondition(RLMIsObjectValidForProperty(value, m_property), @"Invalid operand", @"@min cannot be compared with '%@'", value);
                 break;
         }
     }
@@ -166,6 +175,9 @@ private:
     static Type type_for_name(NSString *name) {
         if ([name isEqualToString:@"@count"]) {
             return Count;
+        }
+        if ([name isEqualToString:@"@min"]) {
+            return Minimum;
         }
         @throw RLMPredicateException(@"Invalid predicate", @"Unsupported collection operation '%@'", name);
     }
@@ -670,15 +682,44 @@ struct ValueOfTypeWithCollectionOperationHelper<Int, CollectionOperation::Count,
     }
 };
 
+template <typename T, typename TableGetter>
+struct ValueOfTypeWithCollectionOperationHelper<T, CollectionOperation::Minimum, TableGetter> : ValueOfTypeWithCollectionOperationPassThrough<T, TableGetter> {
+    using ValueOfTypeWithCollectionOperationPassThrough<T, TableGetter>::convert;
+
+    static auto convert(TableGetter&& table, CollectionOperation operation)
+    {
+        REALM_ASSERT(operation.type() == CollectionOperation::Minimum);
+        return table()->template column<Link>(operation.linkColumnIndex()).template column<T>(operation.columnIndex()).min();
+    }
+};
+
 template <typename Requested, CollectionOperation::Type OperationType, typename TableGetter, typename T>
 auto value_of_type_for_query_with_collection_operation(TableGetter&& table, T&& value) {
     using helper = ValueOfTypeWithCollectionOperationHelper<Requested, OperationType, TableGetter>;
     return helper::convert(std::forward<TableGetter>(table), std::forward<T>(value));
 }
 
+template <CollectionOperation::Type Operation, typename TableGetter, typename... T>
+void add_collection_operation_constraint_to_query(realm::Query& query, RLMPropertyType propertyType, NSPredicateOperatorType operatorType, TableGetter&& table, T... values)
+{
+    switch (propertyType) {
+        case RLMPropertyTypeInt:
+            add_numeric_constraint_to_query(query, propertyType, operatorType, value_of_type_for_query_with_collection_operation<Int, Operation>(table, values)...);
+            break;
+        case RLMPropertyTypeFloat:
+            add_numeric_constraint_to_query(query, propertyType, operatorType, value_of_type_for_query_with_collection_operation<Float, Operation>(table, values)...);
+            break;
+        case RLMPropertyTypeDouble:
+            add_numeric_constraint_to_query(query, propertyType, operatorType, value_of_type_for_query_with_collection_operation<Double, Operation>(table, values)...);
+            break;
+        default:
+            REALM_ASSERT(false && "Only numeric property types should hit this path.");
+    }
+}
+
 template <typename... T>
 void add_collection_operation_constraint_to_query(realm::Query& query, NSPredicateOperatorType operatorType,
-                                                  CollectionOperation::Type collectionOperationType, const std::vector<NSUInteger> linkColumns, T... values)
+                                                  CollectionOperation collectionOperation, const std::vector<NSUInteger> linkColumns, T... values)
 {
     static_assert(sizeof...(T) == 2, "add_collection_operation_constraint_to_query accepts only two values as arguments");
 
@@ -690,9 +731,13 @@ void add_collection_operation_constraint_to_query(realm::Query& query, NSPredica
         return tbl.get();
     };
 
-    switch (collectionOperationType) {
+    switch (collectionOperation.type()) {
         case CollectionOperation::Count: {
             add_numeric_constraint_to_query(query, RLMPropertyTypeInt, operatorType, value_of_type_for_query_with_collection_operation<Int, CollectionOperation::Count>(table, values)...);
+            break;
+        }
+        case CollectionOperation::Minimum: {
+            add_collection_operation_constraint_to_query<CollectionOperation::Minimum>(query, collectionOperation.columnType(), operatorType, table, values...);
             break;
         }
     }
@@ -748,9 +793,9 @@ void update_query_with_collection_operator_expression(RLMSchema *schema,
     operation.validate_value(value);
 
     if (pred.leftExpression.expressionType == NSKeyPathExpressionType) {
-        add_collection_operation_constraint_to_query(query, pred.predicateOperatorType, operation.type(), indexes, operation, value);
+        add_collection_operation_constraint_to_query(query, pred.predicateOperatorType, operation, indexes, operation, value);
     } else {
-        add_collection_operation_constraint_to_query(query, pred.predicateOperatorType, operation.type(), indexes, value, operation);
+        add_collection_operation_constraint_to_query(query, pred.predicateOperatorType, operation, indexes, value, operation);
     }
 }
 

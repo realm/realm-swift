@@ -38,6 +38,17 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
     }
 }
 
+BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
+    switch (propertyType) {
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+            return YES;
+        default:
+            return NO;
+    }
+}
+
 @implementation RLMProperty {
     NSString *_objcRawType;
 }
