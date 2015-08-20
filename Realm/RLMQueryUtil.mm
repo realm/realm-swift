@@ -131,6 +131,9 @@ public:
     enum Type {
         Count,
         Minimum,
+        Maximum,
+        Sum,
+        Average,
     };
 
     CollectionOperation(Type type, RLMProperty *linkProperty, RLMProperty *property)
@@ -145,7 +148,10 @@ public:
                 RLMPrecondition(!m_property, @"Invalid predicate", @"Result of @count does not have any properties.");
                 break;
             case Minimum:
-                RLMPrecondition(m_property && RLMPropertyTypeIsNumeric(m_property.type), @"Invalid predicate", @"Collection operation can only be applied to a numeric property.");
+            case Maximum:
+            case Sum:
+            case Average:
+                RLMPrecondition(m_property && RLMPropertyTypeIsNumeric(m_property.type), @"Invalid predicate", @"%@ can only be applied to a numeric property.", name_for_type(m_type));
                 break;
         }
     }
@@ -163,10 +169,14 @@ public:
     void validate_value(id value) const {
         switch (m_type) {
             case Count:
-                RLMPrecondition([value isKindOfClass:[NSNumber class]], @"Invalid operand", @"@count can only be compared with a numeric value.");
+            case Average:
+                RLMPrecondition([value isKindOfClass:[NSNumber class]], @"Invalid operand", @"%@ can only be compared with a numeric value.", name_for_type(m_type));
                 break;
             case Minimum:
-                RLMPrecondition(RLMIsObjectValidForProperty(value, m_property), @"Invalid operand", @"@min cannot be compared with '%@'", value);
+            case Maximum:
+            case Sum:
+                RLMPrecondition(RLMIsObjectValidForProperty(value, m_property), @"Invalid operand", @"%@ on a property of type %@ cannot be compared with '%@'",
+                                name_for_type(m_type), RLMTypeToString(m_property.type), value);
                 break;
         }
     }
@@ -179,7 +189,26 @@ private:
         if ([name isEqualToString:@"@min"]) {
             return Minimum;
         }
+        if ([name isEqualToString:@"@max"]) {
+            return Maximum;
+        }
+        if ([name isEqualToString:@"@sum"]) {
+            return Sum;
+        }
+        if ([name isEqualToString:@"@avg"]) {
+            return Average;
+        }
         @throw RLMPredicateException(@"Invalid predicate", @"Unsupported collection operation '%@'", name);
+    }
+
+    static NSString *name_for_type(Type type) {
+        switch (type) {
+            case Count: return @"@count";
+            case Minimum: return @"@min";
+            case Maximum: return @"@max";
+            case Sum: return @"@sum";
+            case Average: return @"@avg";
+        }
     }
 
     Type m_type;
@@ -682,16 +711,24 @@ struct ValueOfTypeWithCollectionOperationHelper<Int, CollectionOperation::Count,
     }
 };
 
-template <typename T, typename TableGetter>
-struct ValueOfTypeWithCollectionOperationHelper<T, CollectionOperation::Minimum, TableGetter> : ValueOfTypeWithCollectionOperationPassThrough<T, TableGetter> {
-    using ValueOfTypeWithCollectionOperationPassThrough<T, TableGetter>::convert;
+#define VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER(OperationType, function) \
+template <typename T, typename TableGetter> \
+struct ValueOfTypeWithCollectionOperationHelper<T, OperationType, TableGetter> : ValueOfTypeWithCollectionOperationPassThrough<T, TableGetter> { \
+    using ValueOfTypeWithCollectionOperationPassThrough<T, TableGetter>::convert; \
+\
+    static auto convert(TableGetter&& table, CollectionOperation operation) \
+    { \
+        REALM_ASSERT(operation.type() == OperationType); \
+        auto targetColumn = table()->template column<Link>(operation.linkColumnIndex()).template column<T>(operation.columnIndex()); \
+        return targetColumn.function(); \
+    } \
+} \
 
-    static auto convert(TableGetter&& table, CollectionOperation operation)
-    {
-        REALM_ASSERT(operation.type() == CollectionOperation::Minimum);
-        return table()->template column<Link>(operation.linkColumnIndex()).template column<T>(operation.columnIndex()).min();
-    }
-};
+VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER(CollectionOperation::Minimum, min);
+VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER(CollectionOperation::Maximum, max);
+VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER(CollectionOperation::Sum, sum);
+VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER(CollectionOperation::Average, average);
+#undef VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER
 
 template <typename Requested, CollectionOperation::Type OperationType, typename TableGetter, typename T>
 auto value_of_type_for_query_with_collection_operation(TableGetter&& table, T&& value) {
@@ -738,6 +775,18 @@ void add_collection_operation_constraint_to_query(realm::Query& query, NSPredica
         }
         case CollectionOperation::Minimum: {
             add_collection_operation_constraint_to_query<CollectionOperation::Minimum>(query, collectionOperation.columnType(), operatorType, table, values...);
+            break;
+        }
+        case CollectionOperation::Maximum: {
+            add_collection_operation_constraint_to_query<CollectionOperation::Maximum>(query, collectionOperation.columnType(), operatorType, table, values...);
+            break;
+        }
+        case CollectionOperation::Sum: {
+            add_collection_operation_constraint_to_query<CollectionOperation::Sum>(query, collectionOperation.columnType(), operatorType, table, values...);
+            break;
+        }
+        case CollectionOperation::Average: {
+            add_collection_operation_constraint_to_query<CollectionOperation::Average>(query, collectionOperation.columnType(), operatorType, table, values...);
             break;
         }
     }
