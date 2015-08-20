@@ -138,6 +138,17 @@ class RealmTests: TestCase {
         }
         XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
     }
+    
+    func testDynamicWriteSubscripting() {
+        Realm().beginWrite()
+        let object = Realm().dynamicCreate("SwiftStringObject", value:["1"])
+        Realm().commitWrite()
+        
+        XCTAssertNotNil(object,"Dynamic Object Creation Failed")
+        
+        let stringVal = object["stringCol"] as! String
+        XCTAssertEqual(stringVal, "1", "Object Subscripting Failed")
+    }
 
     func testBeginWrite() {
         Realm().beginWrite()
@@ -382,6 +393,19 @@ class RealmTests: TestCase {
         
         XCTAssertNotNil(realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "a"))
         XCTAssertNil(realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "z"))
+    }
+    
+    func testDynamicObjectForPrimaryKeySubscripting() {
+        let realm = Realm()
+        realm.write {
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
+        }
+        
+        let object = realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "a")
+        
+        let stringVal = object!["stringCol"] as! String
+        
+        XCTAssertEqual(stringVal,"a", "Object Subscripting Failed!")
     }
 
     func testAddNotificationBlock() {
