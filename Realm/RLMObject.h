@@ -98,7 +98,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  @see [RLMRealm addObject:]:
  */
-- (instancetype)init;
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
 
 
 /**
