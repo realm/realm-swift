@@ -19,7 +19,6 @@
 #import "RLMProperty_Private.h"
 
 #import "RLMArray.h"
-#import "RLMObject.h"
 #import "RLMSchema_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMSwiftSupport.h"
