@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
                               'include/Realm/RLMResults.h',
                               'include/Realm/RLMSchema.h',
                               'include/Realm/Realm.h',
-			      'include/Realm/RLMRealm_Dynamic.h',
+                              'include/Realm/RLMRealm_Dynamic.h',
                               'include/Realm/RLMObjectBase_Dynamic.h'
 
   s.module_map              = 'Realm/module.modulemap'
