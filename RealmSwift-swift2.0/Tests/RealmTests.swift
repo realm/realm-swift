@@ -122,7 +122,7 @@ class RealmTests: TestCase {
         try! Realm().write {
             self.assertThrows(try! Realm().beginWrite())
             self.assertThrows(try! Realm().write { })
-            try! Realm().create(SwiftStringObject.self, value:["1"])
+            try! Realm().create(SwiftStringObject.self, value: ["1"])
             XCTAssertEqual(try! Realm().objects(SwiftStringObject).count, 1)
         }
         XCTAssertEqual(try! Realm().objects(SwiftStringObject).count, 1)
@@ -132,7 +132,7 @@ class RealmTests: TestCase {
         try! Realm().write {
             self.assertThrows(try! Realm().beginWrite())
             self.assertThrows(try! Realm().write { })
-            try! Realm().dynamicCreate("SwiftStringObject", value:["1"])
+            try! Realm().dynamicCreate("SwiftStringObject", value: ["1"])
             XCTAssertEqual(try! Realm().objects(SwiftStringObject).count, 1)
         }
         XCTAssertEqual(try! Realm().objects(SwiftStringObject).count, 1)
@@ -140,7 +140,7 @@ class RealmTests: TestCase {
     
     func testDynamicWriteSubscripting() {
         try! Realm().beginWrite()
-        let object = try! Realm().dynamicCreate("SwiftStringObject", value:["1"])
+        let object = try! Realm().dynamicCreate("SwiftStringObject", value: ["1"])
         try! Realm().commitWrite()
         
         XCTAssertNotNil(object,"Dynamic Object Creation Failed")
@@ -154,13 +154,13 @@ class RealmTests: TestCase {
         assertThrows(try! Realm().beginWrite())
         try! Realm().cancelWrite()
         try! Realm().beginWrite()
-        try! Realm().create(SwiftStringObject.self, value:["1"])
+        try! Realm().create(SwiftStringObject.self, value: ["1"])
         XCTAssertEqual(try! Realm().objects(SwiftStringObject).count, 1)
     }
 
     func testCommitWrite() {
         try! Realm().beginWrite()
-        try! Realm().create(SwiftStringObject.self, value:["1"])
+        try! Realm().create(SwiftStringObject.self, value: ["1"])
         try! Realm().commitWrite()
         XCTAssertEqual(try! Realm().objects(SwiftStringObject).count, 1)
         try! Realm().beginWrite()
@@ -169,7 +169,7 @@ class RealmTests: TestCase {
     func testCancelWrite() {
         assertThrows(try! Realm().cancelWrite())
         try! Realm().beginWrite()
-        try! Realm().create(SwiftStringObject.self, value:["1"])
+        try! Realm().create(SwiftStringObject.self, value: ["1"])
         try! Realm().cancelWrite()
         XCTAssertEqual(try! Realm().objects(SwiftStringObject).count, 0)
 
@@ -404,7 +404,7 @@ class RealmTests: TestCase {
         
         let stringVal = object!["stringCol"] as! String
         
-        XCTAssertEqual(stringVal,"a", "Object Subscripting Failed!")
+        XCTAssertEqual(stringVal, "a", "Object Subscripting Failed!")
     }
 
     func testAddNotificationBlock() {
