@@ -98,7 +98,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  @see [RLMRealm addObject:]:
  */
-- (instancetype)init;
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
 
 
 /**
@@ -109,7 +109,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  @see [RLMRealm addObject:]:
  */
-- (instancetype)initWithValue:(id)value;
+- (instancetype)initWithValue:(id)value NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)initWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use initWithValue:");
 
