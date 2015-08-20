@@ -579,7 +579,7 @@ static RLMAccessorCode accessorCodeForType(char objcTypeCode, RLMPropertyType rl
 static void RLMReplaceShouldIncludeInDefaultSchemaMethod(Class cls, bool shouldInclude) {
     Class metaClass = objc_getMetaClass(class_getName(cls));
     IMP imp = imp_implementationWithBlock(^(Class){ return shouldInclude; });
-    class_replaceMethod(metaClass, @selector(shouldIncludeInDefaultSchema), imp, "b@:");
+    class_addMethod(metaClass, @selector(shouldIncludeInDefaultSchema), imp, "b@:");
 }
 
 // implement the class method className on accessors to return the className of the
@@ -587,7 +587,7 @@ static void RLMReplaceShouldIncludeInDefaultSchemaMethod(Class cls, bool shouldI
 void RLMReplaceClassNameMethod(Class accessorClass, NSString *className) {
     Class metaClass = objc_getMetaClass(class_getName(accessorClass));
     IMP imp = imp_implementationWithBlock(^(Class){ return className; });
-    class_replaceMethod(metaClass, @selector(className), imp, "@@:");
+    class_addMethod(metaClass, @selector(className), imp, "@@:");
 }
 
 // implement the shared schema method

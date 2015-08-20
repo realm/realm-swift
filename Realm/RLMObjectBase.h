@@ -33,6 +33,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
 + (NSString *)className;
 
+/// Returns whether the class is included in the default set of classes persisted in a Realm.
 + (BOOL)shouldIncludeInDefaultSchema;
 
 @end

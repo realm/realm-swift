@@ -60,14 +60,14 @@ extension Realm {
             readOnly: Bool = false,
             schemaVersion: UInt64 = 0,
             migrationBlock: MigrationBlock? = nil,
-            customSchema: Schema? = nil) {
+            objectTypes: [Object.Type]? = nil) {
                 self.path = path
                 self.inMemoryIdentifier = inMemoryIdentifier
                 self.encryptionKey = encryptionKey
                 self.readOnly = readOnly
                 self.schemaVersion = schemaVersion
                 self.migrationBlock = migrationBlock
-                self.customSchema = customSchema
+                self.objectTypes = objectTypes
         }
 
         // MARK: Configuration Properties
@@ -126,8 +126,18 @@ extension Realm {
         /// The block which migrates the Realm to the current version.
         public var migrationBlock: MigrationBlock? = nil
 
+        /// The classes persisted in the Realm.
+        public var objectTypes: [Object.Type]? {
+            set {
+                self.customSchema = newValue.map { RLMSchema(objectClasses: $0) }
+            }
+            get {
+                return self.customSchema.map { $0.objectSchema.map { $0.objectClass as! Object.Type } }
+            }
+        }
+
         /// A custom schema to use for the Realm.
-        public var customSchema: Schema? = nil
+        private var customSchema: RLMSchema? = nil
 
         // MARK: Private Methods
 
@@ -139,12 +149,12 @@ extension Realm {
             configuration.readOnly = self.readOnly
             configuration.schemaVersion = self.schemaVersion
             configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
-            configuration.customSchema = self.customSchema?.rlmSchema
+            configuration.customSchema = self.customSchema
             return configuration
         }
 
         internal static func fromRLMRealmConfiguration(rlmConfiguration: RLMRealmConfiguration) -> Configuration {
-            return Configuration(path: rlmConfiguration.path,
+            var configuration = Configuration(path: rlmConfiguration.path,
                 inMemoryIdentifier: rlmConfiguration.inMemoryIdentifier,
                 encryptionKey: rlmConfiguration.encryptionKey,
                 readOnly: rlmConfiguration.readOnly,
@@ -153,9 +163,10 @@ extension Realm {
                     return { migration, schemaVersion in
                         rlmMigration(migration.rlmMigration, schemaVersion)
                     }
-                },
-                customSchema: rlmConfiguration.customSchema.map { Schema($0) }
+                }
             )
+            configuration.customSchema = rlmConfiguration.customSchema
+            return configuration
         }
     }
 }

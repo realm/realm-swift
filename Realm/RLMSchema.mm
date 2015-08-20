@@ -47,9 +47,9 @@ static NSMutableDictionary *s_localNameToClass;
 
 + (instancetype)schemaWithObjectClasses:(NSArray *)classes {
     NSUInteger count = classes.count;
-    Class *classArray = static_cast<Class *>(malloc(count * sizeof(Class)));
-    [classes getObjects:classArray range:NSMakeRange(0, count)];
-    [self registerClasses:classArray count:count];
+    auto classArray = std::make_unique<__unsafe_unretained Class[]>(count);
+    [classes getObjects:classArray.get() range:NSMakeRange(0, count)];
+    [self registerClasses:classArray.get() count:count];
 
     RLMSchema *schema = [[self alloc] init];
     NSMutableArray *schemas = [NSMutableArray arrayWithCapacity:count];
@@ -163,9 +163,8 @@ static NSMutableDictionary *s_localNameToClass;
         RLMSchema *schema = [[RLMSchema alloc] init];
 
         unsigned int numClasses;
-        Class *classes = objc_copyClassList(&numClasses);
-        [self registerClasses:classes count:numClasses];
-        free(classes);
+        std::unique_ptr<__unsafe_unretained Class[]> classes(objc_copyClassList(&numClasses));
+        [self registerClasses:classes.get() count:numClasses];
 
         // set class array
         schema.objectSchema = s_partialSharedSchema.objectSchema;
