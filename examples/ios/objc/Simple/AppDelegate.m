@@ -39,11 +39,6 @@ RLM_ARRAY_TYPE(Dog)
 @implementation Person
 @end
 
-@interface FooBar : RLMObject
-@end
-@implementation FooBar
-@end
-
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -51,11 +46,6 @@ RLM_ARRAY_TYPE(Dog)
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] init];
     [self.window makeKeyAndVisible];
-
-    RLMSchema *schema = [RLMSchema schemaWithObjectSubclasses:@[Person.class, Dog.class]];
-    RLMConfiguration *defaultConfiguration = [[RLMConfiguration alloc] init];
-    defaultConfiguration.customSchema = schema;
-    [RLMConfiguration setDefaultConfiguration:defaultConfiguration];
 
     [[NSFileManager defaultManager] removeItemAtPath:[RLMRealmConfiguration defaultConfiguration].path error:nil];
 
