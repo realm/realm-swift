@@ -26,6 +26,7 @@
 namespace realm {
 namespace _impl {
 class ExternalCommitHelper;
+struct CachedRealm;
 
 // RealmCoordinator manages the weak cache of Realm instances and communication
 // between per-thread Realm instances for a given file
@@ -66,7 +67,7 @@ private:
     Realm::Config m_config;
 
     std::mutex m_realm_mutex;
-    std::vector<std::weak_ptr<Realm>> m_cached_realms;
+    std::vector<CachedRealm> m_cached_realms;
 
     std::unique_ptr<_impl::ExternalCommitHelper> m_notifier;
 };

@@ -24,6 +24,11 @@
 using namespace realm;
 using namespace realm::_impl;
 
+struct realm::_impl::CachedRealm {
+    std::weak_ptr<Realm> realm;
+    std::thread::id thread_id;
+};
+
 static std::mutex s_coordinator_mutex;
 static std::map<std::string, std::weak_ptr<RealmCoordinator>> s_coordinators_per_path;
 
@@ -86,11 +91,11 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
 
     auto thread_id = std::this_thread::get_id();
     if (config.cache) {
-        for (auto& weakRealm : m_cached_realms) {
-            // can be null if we jumped in between ref count hitting zero and
-            // unregister_realm() getting the lock
-            if (auto realm = weakRealm.lock()) {
-                if (realm->thread_id() == thread_id) {
+        for (auto& cachedRealm : m_cached_realms) {
+            if (cachedRealm.thread_id == thread_id) {
+                // can be null if we jumped in between ref count hitting zero and
+                // unregister_realm() getting the lock
+                if (auto realm = cachedRealm.realm.lock()) {
                     return realm;
                 }
             }
@@ -103,7 +108,7 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
         m_notifier->add_realm(realm.get());
     }
     if (config.cache) {
-        m_cached_realms.push_back(realm);
+        m_cached_realms.push_back({realm, thread_id});
     }
     return realm;
 }
@@ -135,7 +140,7 @@ void RealmCoordinator::unregister_realm(Realm* realm)
         m_notifier->remove_realm(realm);
     }
     for (size_t i = 0; i < m_cached_realms.size(); ++i) {
-        if (m_cached_realms[i].expired()) {
+        if (m_cached_realms[i].realm.expired()) {
             if (i + 1 < m_cached_realms.size()) {
                 m_cached_realms[i] = std::move(m_cached_realms.back());
             }
@@ -159,7 +164,7 @@ void RealmCoordinator::clear_cache()
             }
 
             for (auto& cached_realm : coordinator->m_cached_realms) {
-                if (auto realm = cached_realm.lock()) {
+                if (auto realm = cached_realm.realm.lock()) {
                     realms_to_close.push_back(realm);
                 }
             }
