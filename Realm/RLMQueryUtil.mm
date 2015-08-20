@@ -174,32 +174,32 @@ void add_bool_constraint_to_query(realm::Query &query, NSPredicateOperatorType o
     }
 }
 
+template <typename T>
 void add_string_constraint_to_query(realm::Query &query,
                                     NSPredicateOperatorType operatorType,
                                     NSComparisonPredicateOptions predicateOptions,
                                     Columns<String> &&column,
-                                    NSString *value) {
+                                    T value) {
     bool caseSensitive = !(predicateOptions & NSCaseInsensitivePredicateOption);
     bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
     RLMPrecondition(!diacriticInsensitive, @"Invalid predicate option",
                     @"NSDiacriticInsensitivePredicateOption not supported for string type");
 
-    realm::StringData sd = RLMStringDataWithNSString(value);
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
-            query.and_query(column.begins_with(sd, caseSensitive));
+            query.and_query(column.begins_with(value, caseSensitive));
             break;
         case NSEndsWithPredicateOperatorType:
-            query.and_query(column.ends_with(sd, caseSensitive));
+            query.and_query(column.ends_with(value, caseSensitive));
             break;
         case NSContainsPredicateOperatorType:
-            query.and_query(column.contains(sd, caseSensitive));
+            query.and_query(column.contains(value, caseSensitive));
             break;
         case NSEqualToPredicateOperatorType:
-            query.and_query(column.equal(sd, caseSensitive));
+            query.and_query(column.equal(value, caseSensitive));
             break;
         case NSNotEqualToPredicateOperatorType:
-            query.and_query(column.not_equal(sd, caseSensitive));
+            query.and_query(column.not_equal(value, caseSensitive));
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
@@ -207,10 +207,18 @@ void add_string_constraint_to_query(realm::Query &query,
     }
 }
 
+void add_string_constraint_to_query(realm::Query &query,
+                                    NSPredicateOperatorType operatorType,
+                                    NSComparisonPredicateOptions predicateOptions,
+                                    Columns<String> &&column,
+                                    id value) {
+    add_string_constraint_to_query(query, operatorType, predicateOptions, std::forward<Columns<String>>(column), RLMStringDataWithNSString(value));
+}
+
 void add_string_constraint_to_query(realm::Query& query,
                                     NSPredicateOperatorType operatorType,
                                     NSComparisonPredicateOptions predicateOptions,
-                                    NSString *value,
+                                    id value,
                                     Columns<String>&& column) {
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
@@ -250,7 +258,7 @@ template <typename... T>
 void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
                              NSPredicateOperatorType operatorType,
                              NSComparisonPredicateOptions predicateOptions,
-                             std::vector<NSUInteger> linkColumns, T... values);
+                             const std::vector<NSUInteger>& linkColumns, T... values);
 
 void add_between_constraint_to_query(realm::Query &query, std::vector<NSUInteger> const& indexes, RLMProperty *prop, id value) {
     id from, to;
@@ -315,7 +323,7 @@ void add_binary_constraint_to_query(realm::Query & query,
     }
 }
 
-void add_binary_constraint_to_query(realm::Query& query, NSPredicateOperatorType operatorType, NSData *value, NSUInteger index) {
+void add_binary_constraint_to_query(realm::Query& query, NSPredicateOperatorType operatorType, id value, NSUInteger index) {
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
         case NSNotEqualToPredicateOperatorType:
@@ -327,6 +335,11 @@ void add_binary_constraint_to_query(realm::Query& query, NSPredicateOperatorType
                                          operatorName(operatorType));
     }
 }
+
+void add_binary_constraint_to_query(realm::Query&, NSPredicateOperatorType, NSUInteger, NSUInteger) {
+    @throw RLMPredicateException(@"Invalid predicate", @"Comparisons between two NSData properties are not supported");
+}
+
 
 void add_link_constraint_to_query(realm::Query & query,
                                  NSPredicateOperatorType operatorType,
@@ -351,6 +364,11 @@ void add_link_constraint_to_query(realm::Query& query, NSPredicateOperatorType o
     // is not important for those comparisons so we can delegate to the other implementation.
     add_link_constraint_to_query(query, operatorType, column, obj);
 }
+
+void add_link_constraint_to_query(realm::Query&, NSPredicateOperatorType, NSUInteger, NSUInteger) {
+    @throw RLMPredicateException(@"Invalid predicate", @"Comparisons between two RLMArray properties are not supported");
+}
+
 
 // iterate over an array of subpredicates, using @func to build a query from each
 // one and ORing them together
@@ -462,7 +480,7 @@ template <typename... T>
 void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
                              NSPredicateOperatorType operatorType,
                              NSComparisonPredicateOptions predicateOptions,
-                             std::vector<NSUInteger> linkColumns, T... values)
+                             const std::vector<NSUInteger>& linkColumns, T... values)
 {
     static_assert(sizeof...(T) == 2, "add_constraint_to_query accepts only two values as arguments");
 
@@ -616,29 +634,6 @@ void update_query_with_value_expression(RLMSchema *schema,
     }
 }
 
-template<typename T>
-Query column_expression(NSComparisonPredicateOptions operatorType,
-                                            NSUInteger leftColumn,
-                                            NSUInteger rightColumn,
-                                            Table *table) {
-    switch (operatorType) {
-        case NSEqualToPredicateOperatorType:
-            return table->column<T>(leftColumn) == table->column<T>(rightColumn);
-        case NSNotEqualToPredicateOperatorType:
-            return table->column<T>(leftColumn) != table->column<T>(rightColumn);
-        case NSLessThanPredicateOperatorType:
-            return table->column<T>(leftColumn) < table->column<T>(rightColumn);
-        case NSGreaterThanPredicateOperatorType:
-            return table->column<T>(leftColumn) > table->column<T>(rightColumn);
-        case NSLessThanOrEqualToPredicateOperatorType:
-            return table->column<T>(leftColumn) <= table->column<T>(rightColumn);
-        case NSGreaterThanOrEqualToPredicateOperatorType:
-            return table->column<T>(leftColumn) >= table->column<T>(rightColumn);
-        default:
-            @throw RLMPredicateException(@"Unsupported operator", @"Only ==, !=, <, <=, >, and >= are supported comparison operators");
-    }
-}
-
 void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query,
                                          NSString *leftColumnName, NSString *rightColumnName,
                                          NSComparisonPredicate *predicate)
@@ -662,54 +657,7 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query,
                     RLMTypeToString(rightType));
 
     // TODO: Should we handle special case where left row is the same as right row (tautology)
-    Table *table = query.get_table().get();
-    NSPredicateOperatorType type = predicate.predicateOperatorType;
-    switch (leftType) {
-        case type_Bool:
-            query.and_query(column_expression<Bool>(type, leftIndex, rightIndex, table));
-            break;
-        case type_Int:
-            query.and_query(column_expression<Int>(type, leftIndex, rightIndex, table));
-            break;
-        case type_Float:
-            query.and_query(column_expression<Float>(type, leftIndex, rightIndex, table));
-            break;
-        case type_Double:
-            query.and_query(column_expression<Double>(type, leftIndex, rightIndex, table));
-            break;
-        case type_DateTime:
-            query.and_query(column_expression<int64_t>(type, leftIndex, rightIndex, table));
-            break;
-        case type_String: {
-            bool caseSensitive = (predicate.options & NSCaseInsensitivePredicateOption) == 0;
-            switch (type) {
-                case NSBeginsWithPredicateOperatorType:
-                    query.and_query(table->column<String>(leftIndex).begins_with(table->column<String>(rightIndex), caseSensitive));
-                    break;
-                case NSEndsWithPredicateOperatorType:
-                    query.and_query(table->column<String>(leftIndex).ends_with(table->column<String>(rightIndex), caseSensitive));
-                    break;
-                case NSContainsPredicateOperatorType:
-                    query.and_query(table->column<String>(leftIndex).contains(table->column<String>(rightIndex), caseSensitive));
-                    break;
-                case NSEqualToPredicateOperatorType:
-                    query.and_query(table->column<String>(leftIndex).equal(table->column<String>(rightIndex), caseSensitive));
-                    break;
-                case NSNotEqualToPredicateOperatorType:
-                    query.and_query(table->column<String>(leftIndex).not_equal(table->column<String>(rightIndex), caseSensitive));
-                    break;
-                default:
-                    @throw RLMPredicateException(@"Invalid operator type",
-                                                 @"Operator '%@' not supported for string type", operatorName(type));
-            }
-            break;
-        }
-        default:
-            @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
-                                         RLMUnsupportedTypesFoundInPropertyComparisonReason,
-                                         RLMTypeToString(leftType),
-                                         RLMTypeToString(rightType));
-    }
+    add_constraint_to_query(query, leftType, predicate.predicateOperatorType, predicate.options, {}, leftIndex, rightIndex);
 }
 
 void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
