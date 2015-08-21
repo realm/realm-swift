@@ -26,6 +26,7 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+#include <mutex>
 #import "object_store.hpp"
 #import <objc/runtime.h>
 #import <realm/group.hpp>
@@ -159,7 +160,8 @@ static NSMutableDictionary *s_localNameToClass;
 
 // schema based on runtime objects
 + (instancetype)sharedSchema {
-    if (!s_sharedSchema) {
+    static std::once_flag onceFlag;
+    std::call_once(onceFlag, [&](){
         RLMSchema *schema = [[RLMSchema alloc] init];
 
         unsigned int numClasses;
@@ -171,7 +173,7 @@ static NSMutableDictionary *s_localNameToClass;
 
         // set shared schema
         s_sharedSchema = schema;
-    }
+    });
     return s_sharedSchema;
 }
 
