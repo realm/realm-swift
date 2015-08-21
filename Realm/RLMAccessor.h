@@ -56,6 +56,6 @@ void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOpt
 void RLMReplaceClassNameMethod(Class accessorClass, NSString *className);
 
 // Replace sharedSchema method for the given class
-void RLMReplaceSharedSchemaMethod(Class accessorClass,  RLMObjectSchema * __nullable schema);
+void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema * __nullable schema);
 
 RLM_ASSUME_NONNULL_END

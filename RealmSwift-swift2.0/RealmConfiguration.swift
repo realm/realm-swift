@@ -33,7 +33,7 @@ extension Realm {
         /// configuration is explicitly specified (i.e. `Realm()`).
         public static var defaultConfiguration: Configuration {
             get {
-            return fromRLMRealmConfiguration(RLMRealmConfiguration.defaultConfiguration())
+                return fromRLMRealmConfiguration(RLMRealmConfiguration.defaultConfiguration())
             }
             set {
                 RLMRealmConfiguration.setDefaultConfiguration(newValue.rlmConfiguration)
@@ -51,6 +51,7 @@ extension Realm {
         - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
         - parameter schemaVersion:      The current schema version.
         - parameter migrationBlock:     The block which migrates the Realm to the current version.
+        - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
 
         - returns: An initialized `Realm.Configuration`.
         */

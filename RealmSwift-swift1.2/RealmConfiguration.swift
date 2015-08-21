@@ -51,6 +51,7 @@ extension Realm {
         :param: readOnly           Whether the Realm is read-only (must be true for read-only files).
         :param: schemaVersion      The current schema version.
         :param: migrationBlock     The block which migrates the Realm to the current version.
+        :param: objectTypes        The subset of `Object` subclasses persisted in the Realm.
 
         :returns: An initialized `Configuration`.
         */
