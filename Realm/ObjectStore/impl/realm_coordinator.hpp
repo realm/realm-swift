@@ -25,8 +25,8 @@
 
 namespace realm {
 namespace _impl {
+class CachedRealm;
 class ExternalCommitHelper;
-struct CachedRealm;
 
 // RealmCoordinator manages the weak cache of Realm instances and communication
 // between per-thread Realm instances for a given file
@@ -62,6 +62,9 @@ public:
     // Called by Realm's destructor to ensure the cache is cleaned up promptly
     // Do not call directly
     void unregister_realm(Realm* realm);
+
+    // Called by m_notifier when there's a new commit to send notifications for
+    void on_change();
 
 private:
     Realm::Config m_config;

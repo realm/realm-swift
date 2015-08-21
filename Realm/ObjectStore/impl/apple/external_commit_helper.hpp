@@ -20,9 +20,7 @@
 #define REALM_EXTERNAL_COMMIT_HELPER_HPP
 
 #include <CoreFoundation/CFRunLoop.h>
-#include <functional>
 #include <future>
-#include <mutex>
 #include <vector>
 
 namespace realm {
@@ -31,16 +29,12 @@ class Realm;
 namespace _impl {
 class RealmCoordinator;
 
-// FIXME: split IPC from the local cross-thread stuff
-// both are platform-specific but need to be useable separately
 class ExternalCommitHelper {
 public:
     ExternalCommitHelper(RealmCoordinator& parent);
     ~ExternalCommitHelper();
 
     void notify_others();
-    void add_realm(Realm* realm);
-    void remove_realm(Realm* realm);
 
 private:
     // A RAII holder for a file descriptor which automatically closes the wrapped
@@ -75,27 +69,23 @@ private:
 
     RealmCoordinator& m_parent;
 
-    // Currently registered realms and the signal for delivering notifications
-    // to them
-    std::vector<PerRealmInfo> m_realms;
-
-    // Mutex which guards m_realms
-    std::mutex m_realms_mutex;
-
     // The listener thread
     std::future<void> m_thread;
 
-#if !TARGET_OS_TV
-    // Read-write file descriptor for the named pipe which is waited on for
-    // changes and written to when a commit is made
+    // Pipe which is waited on for changes and written to when there is a new
+    // commit to notify others of. When using a named pipe m_notify_fd is
+    // read-write and m_notify_fd_write is unused; when using an anonymous pipe
+    // (on tvOS) m_notify_fd is read-only and m_notify_fd_write is write-only.
     FdHolder m_notify_fd;
+    FdHolder m_notify_fd_write;
+
     // File descriptor for the kqueue
     FdHolder m_kq;
+
     // The two ends of an anonymous pipe used to notify the kqueue() thread that
     // it should be shut down.
     FdHolder m_shutdown_read_fd;
     FdHolder m_shutdown_write_fd;
-#endif
 };
 } // namespace _impl
 } // namespace realm

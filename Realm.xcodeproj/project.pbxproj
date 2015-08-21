@@ -59,6 +59,9 @@
 		3F0543EB1C56F71500AA5322 /* realm_coordinator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0543E91C56F71500AA5322 /* realm_coordinator.hpp */; };
 		3F0543EC1C56F71500AA5322 /* realm_coordinator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */; };
 		3F0543ED1C56F71900AA5322 /* realm_coordinator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */; };
+		3F0543F01C56F74600AA5322 /* cached_realm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0543EE1C56F74600AA5322 /* cached_realm.hpp */; };
+		3F0543F11C56F74600AA5322 /* cached_realm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543EF1C56F74600AA5322 /* cached_realm.cpp */; };
+		3F0543F21C56F74A00AA5322 /* cached_realm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543EF1C56F74600AA5322 /* cached_realm.cpp */; };
 		3F1F47821B9612B300CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F1F47831B9656B900CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F75566B1BE94CCC0058BC7E /* results.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556691BE94CCC0058BC7E /* results.cpp */; };
@@ -440,6 +443,8 @@
 		3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PerformanceTests.m; sourceTree = "<group>"; };
 		3F0543E91C56F71500AA5322 /* realm_coordinator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = realm_coordinator.hpp; path = ObjectStore/impl/realm_coordinator.hpp; sourceTree = "<group>"; };
 		3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = realm_coordinator.cpp; path = ObjectStore/impl/realm_coordinator.cpp; sourceTree = "<group>"; };
+		3F0543EE1C56F74600AA5322 /* cached_realm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = cached_realm.hpp; path = ObjectStore/impl/apple/cached_realm.hpp; sourceTree = "<group>"; };
+		3F0543EF1C56F74600AA5322 /* cached_realm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cached_realm.cpp; path = ObjectStore/impl/apple/cached_realm.cpp; sourceTree = "<group>"; };
 		3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = KVOTests.mm; sourceTree = "<group>"; };
 		3F0F02AC1B6FFF3D0046A4D5 /* RLMObservation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMObservation.hpp; sourceTree = "<group>"; };
 		3F0F02AD1B6FFF3D0046A4D5 /* RLMObservation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObservation.mm; sourceTree = "<group>"; };
@@ -679,6 +684,8 @@
 		3F2118A71B97CBAD005A4CFE /* Apple */ = {
 			isa = PBXGroup;
 			children = (
+				3F0543EF1C56F74600AA5322 /* cached_realm.cpp */,
+				3F0543EE1C56F74600AA5322 /* cached_realm.hpp */,
 				3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */,
 				3F2118A91B97CBE1005A4CFE /* external_commit_helper.hpp */,
 			);
@@ -1003,6 +1010,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5D659EA61BE04556006515A0 /* binding_context.hpp in Headers */,
+				3F0543F01C56F74600AA5322 /* cached_realm.hpp in Headers */,
 				5D659EA01BE04556006515A0 /* external_commit_helper.hpp in Headers */,
 				5D659EA11BE04556006515A0 /* index_set.hpp in Headers */,
 				5D659EA21BE04556006515A0 /* object_schema.hpp in Headers */,
@@ -1565,6 +1573,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F0543F11C56F74600AA5322 /* cached_realm.cpp in Sources */,
 				5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */,
 				5D659E821BE04556006515A0 /* index_set.cpp in Sources */,
 				5D659E831BE04556006515A0 /* object_schema.cpp in Sources */,
@@ -1654,6 +1663,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F0543F21C56F74A00AA5322 /* cached_realm.cpp in Sources */,
 				5DD7557F1BE056DE002800DA /* external_commit_helper.cpp in Sources */,
 				5DD755801BE056DE002800DA /* index_set.cpp in Sources */,
 				5DD755811BE056DE002800DA /* object_schema.cpp in Sources */,
