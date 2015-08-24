@@ -45,7 +45,7 @@ public final class RLMGenerator<T: Object>: GeneratorType {
 A homogenous collection of `Object`s which can be retrieved, filtered, sorted,
 and operated upon.
 */
-public protocol RealmCollectionType: CollectionType {
+public protocol RealmCollectionType: CollectionType, Printable {
 
     /// Element type contained in this collection.
     typealias Element: Object
@@ -57,6 +57,12 @@ public protocol RealmCollectionType: CollectionType {
     /// collection's owning object does not belong to a realm (the collection is
     /// standalone).
     var realm: Realm? { get }
+
+    /// Returns the number of objects in this collection.
+    var count: Int { get }
+
+    /// Returns a human-readable description of the objects contained in this collection.
+    var description: String { get }
 
 
     // MARK: Index Retrieval
@@ -189,11 +195,35 @@ public protocol RealmCollectionType: CollectionType {
     :returns: The average of the given property over all objects in the collection, or `nil` if the collection is empty.
     */
     func average<U: AddableType>(property: String) -> U?
+
+
+    // MARK: Key-Value Coding
+
+    /**
+    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+
+    :param: key The name of the property.
+
+    :returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    */
+    func valueForKey(key: String) -> AnyObject?
+
+    /**
+    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+
+    :warning: This method can only be called during a write transaction.
+
+    :param: value The object value.
+    :param: key   The name of the property.
+    */
+    func setValue(value: AnyObject?, forKey key: String)
 }
 
 private class _AnyRealmCollectionBase<T: Object>: RealmCollectionType {
     typealias Element = T
     var realm: Realm? { fatalError() }
+    var count: Int { fatalError() }
+    var description: String { fatalError() }
     func indexOf(object: Element) -> Int? { fatalError() }
     func indexOf(predicate: NSPredicate) -> Int? { fatalError() }
     func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? { fatalError() }
@@ -211,6 +241,8 @@ private class _AnyRealmCollectionBase<T: Object>: RealmCollectionType {
     func generate() -> RLMGenerator<T> { fatalError() }
     var startIndex: Int { fatalError() }
     var endIndex: Int { fatalError() }
+    func valueForKey(key: String) -> AnyObject? { fatalError() }
+    func setValue(value: AnyObject?, forKey key: String) { fatalError() }
 }
 
 private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBase<C.Element> {
@@ -225,6 +257,13 @@ private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBa
     /// collection's owning object does not belong to a realm (the collection is
     /// standalone).
     override var realm: Realm? { return base.realm }
+
+    /// Returns the number of objects in this collection.
+    override var count: Int { return base.count }
+
+    /// Returns a human-readable description of the objects contained in this collection.
+    override var description: String { return base.description }
+
 
     // MARK: Index Retrieval
 
@@ -369,7 +408,7 @@ private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBa
     override subscript(index: Int) -> C.Element { return base[index as! C.Index] as! C.Element } // FIXME: it should be possible to avoid this force-casting
 
     /// Returns a `GeneratorOf<Element>` that yields successive elements in the collection.
-    func generate() -> C.Generator { return base.generate() }
+    override func generate() -> RLMGenerator<Element> { return base.generate() as! RLMGenerator<Element> } // FIXME: it should be possible to avoid this force-casting
 
 
     // MARK: Collection Support
@@ -381,6 +420,28 @@ private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBa
     /// The collection's "past the end" position.
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
     override var endIndex: Int { return base.endIndex as! Int } // FIXME: it should be possible to avoid this force-casting
+
+
+    // MARK: Key-Value Coding
+
+    /**
+    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+
+    :param: key The name of the property.
+
+    :returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    */
+    override func valueForKey(key: String) -> AnyObject? { return base.valueForKey(key) }
+
+    /**
+    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+
+    :warning: This method can only be called during a write transaction.
+
+    :param: value The object value.
+    :param: key   The name of the property.
+    */
+    override func setValue(value: AnyObject?, forKey key: String) { base.setValue(value, forKey: key) }
 }
 
 /**
@@ -405,6 +466,13 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     /// collection's owning object does not belong to a realm (the collection is
     /// standalone).
     public var realm: Realm? { return base.realm }
+
+    /// Returns the number of objects in this collection.
+    public var count: Int { return base.count }
+
+    /// Returns a human-readable description of the objects contained in this collection.
+    public var description: String { return base.description }
+
 
     // MARK: Index Retrieval
 
@@ -561,4 +629,26 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     /// The collection's "past the end" position.
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
     public var endIndex: Int { return base.endIndex }
+
+
+    // MARK: Key-Value Coding
+
+    /**
+    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+
+    :param: key The name of the property.
+
+    :returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    */
+    public func valueForKey(key: String) -> AnyObject? { return base.valueForKey(key) }
+
+    /**
+    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+
+    :warning: This method can only be called during a write transaction.
+
+    :param: value The object value.
+    :param: key   The name of the property.
+    */
+    public func setValue(value: AnyObject?, forKey key: String) { base.setValue(value, forKey: key) }
 }
