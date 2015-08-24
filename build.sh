@@ -416,10 +416,8 @@ case "$COMMAND" in
     "osx-swift")
         xcrealmswift "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
         destination="build/osx/swift-$REALM_SWIFT_VERSION"
-        rm -rf "$destination"
-        mkdir "$destination"
+        clean_retrieve "build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
         cp -R build/osx/Realm.framework "$destination"
-        cp -R build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework "$destination"
         exit 0
         ;;
 
