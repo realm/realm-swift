@@ -176,10 +176,6 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
     return s_sharedSchema;
 }
 
-+ (bool)isSharedSchemaInitialized {
-    return s_sharedSchema;
-}
-
 // schema based on tables in a realm
 + (instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm {
     // generate object schema and class mapping for all tables in the realm

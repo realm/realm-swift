@@ -77,7 +77,8 @@ public class Object: RLMObjectBase {
                        thrown if any required properties are not present and no default is set.
     */
     public init(value: AnyObject) {
-        super.init(value: value, schema: RLMSchema.sharedSchema())
+        self.dynamicType.sharedSchema() // ensure this class' objectSchema is loaded in the partialSharedSchema
+        super.init(value: value, schema: RLMSchema.partialSharedSchema())
     }
 
 
