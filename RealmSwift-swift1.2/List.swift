@@ -22,7 +22,7 @@ import Realm.Private
 
 /// :nodoc:
 /// Internal class. Do not use directly.
-public class ListBase: RLMListBase, Printable {
+public class ListBase: RLMListBase {
     // Printable requires a description property defined in Swift (and not obj-c),
     // and it has to be defined as @objc override, which can't be done in a
     // generic class.
