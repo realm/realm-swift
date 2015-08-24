@@ -366,7 +366,7 @@ private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBa
 
     - returns: The object at the given `index`.
     */
-    override subscript(index: Int) -> C.Element { return base[index as! C.Index] as! C.Element }
+    override subscript(index: Int) -> C.Element { return base[index as! C.Index] as! C.Element } // FIXME: it should be possible to avoid this force-casting
 
     /// Returns a `GeneratorOf<Element>` that yields successive elements in the collection.
     func generate() -> C.Generator { return base.generate() }
@@ -376,11 +376,11 @@ private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBa
 
     /// The position of the first element in a non-empty collection.
     /// Identical to endIndex in an empty collection.
-    override var startIndex: Int { return base.startIndex as! Int }
+    override var startIndex: Int { return base.startIndex as! Int } // FIXME: it should be possible to avoid this force-casting
 
     /// The collection's "past the end" position.
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
-    override var endIndex: Int { return base.endIndex as! Int }
+    override var endIndex: Int { return base.endIndex as! Int } // FIXME: it should be possible to avoid this force-casting
 }
 
 /**
