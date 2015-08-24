@@ -277,7 +277,8 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     RLMObjectSchema *schema = [realm.schema schemaForClassName:objectClassName];
     if (!schema) {
         NSString *message = [NSString stringWithFormat:@"Object type '%@' is not persisted in the Realm. "
-                                  @"If using a custom `objectClasses` array in your configuration, add `%@` to the list of `objectClasses`.",
+                                  @"If using a custom `objectClasses` / `obejctTypes` array in your configuration, "
+                                  @"add `%@` to the list of `objectClasses` / `objectTypes`.",
                                   objectClassName, objectClassName];
         @throw RLMException(message);
     }
@@ -460,7 +461,8 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:className];
     if (!objectSchema) {
         NSString *message = [NSString stringWithFormat:@"Object type '%@' is not persisted in the Realm. "
-                             @"If using a custom `objectClasses` array in your configuration, add `%@` to the list of `objectClasses`.",
+                             @"If using a custom `objectClasses` / `obejctTypes` array in your configuration, "
+                             @"add `%@` to the list of `objectClasses` / `objectTypes`.",
                              className, className];
         @throw RLMException(message);
     }

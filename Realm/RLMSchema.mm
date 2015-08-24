@@ -124,7 +124,7 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
             s_localNameToClass[className] = cls;
 
             RLMReplaceClassNameMethod(cls, className);
-            // override sharedSchema classs method to return nil to avoid topo-sort issues when on this thread
+            // override sharedSchema class method to return nil to avoid topo-sort issues when on this thread
             // (i.e. while during schema initialization), but wait on other threads until schema initialization is done,
             // then return the just-initialized schema
             RLMReplaceSharedSchemaMethodWithBlock(cls, ^RLMObjectSchema *(Class cls) {
@@ -186,7 +186,7 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
     for (unsigned long i = 0; i < objectStoreSchema.size(); i++) {
         [schemaArray addObject:[RLMObjectSchema objectSchemaForObjectStoreSchema:objectStoreSchema[i]]];
     }
-    
+
     // set class array and mapping
     RLMSchema *schema = [RLMSchema new];
     schema.objectSchema = schemaArray;
