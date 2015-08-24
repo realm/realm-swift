@@ -458,7 +458,7 @@
     // ALL
     XCTAssertThrows([realm objects:className where:@"ALL intCol > 5"], @"ALL int > constant");
 
-    // ANY
+    // NONE
     XCTAssertThrows([realm objects:className where:@"NONE intCol > 5"], @"NONE int > constant");
 }
 
