@@ -208,8 +208,11 @@ using namespace realm;
 
     if (NSArray *optionalProperties = [objectUtil getOptionalPropertyNames:swiftObjectInstance]) {
         for (RLMProperty *property in propArray) {
-            property.optional = [optionalProperties containsObject:property.name] ||
-                                property.type == RLMPropertyTypeObject; // remove if/when core supports required link columns
+            property.optional = [optionalProperties containsObject:property.name];
+            if (!property.optional && property.type == RLMPropertyTypeObject) { // remove if/when core supports required link columns
+                NSString *message = [NSString stringWithFormat:@"The `%@.%@` property must be marked as being optional.", [objectClass className], property.name];
+                @throw RLMException(message);
+            }
         }
     }
     if (NSArray *requiredProperties = [objectUtil requiredPropertiesForClass:objectClass]) {

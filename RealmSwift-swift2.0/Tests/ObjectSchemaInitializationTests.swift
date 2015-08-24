@@ -122,6 +122,7 @@ class ObjectSchemaInitializationTests: TestCase {
 
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDatePrimaryKey.self), "Should throw when setting a non int/string primary key")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSURL.self), "Should throw when not ignoring a property of a type we can't persist")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonOptionalLinkProperty.self), "Should throw when not marking a link property as optional")
     }
 
     func testPrimaryKey() {
@@ -196,7 +197,7 @@ class SwiftObjectWithUnindexibleProperties : SwiftFakeObject {
     dynamic var doubleCol = 12.3
     dynamic var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)!
     dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
-    dynamic var objectCol = SwiftBoolObject()
+    dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
     let arrayCol = List<SwiftBoolObject>()
 
     dynamic override class func indexedProperties() -> [String] {
@@ -208,3 +209,6 @@ class SwiftObjectWithNonNullableOptionalProperties: SwiftFakeObject {
     dynamic var optDateCol: NSDate?
 }
 
+class SwiftObjectWithNonOptionalLinkProperty : SwiftFakeObject {
+    dynamic var objectCol = SwiftBoolObject()
+}

@@ -63,7 +63,7 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(object.dateCol, date)
 
         object.objectCol = SwiftBoolObject(value: [true])
-        XCTAssertEqual(object.objectCol.boolCol, true)
+        XCTAssertEqual(object.objectCol!.boolCol, true)
     }
 
     func testStandaloneAccessors() {
@@ -91,7 +91,7 @@ class ObjectAccessorTests: TestCase {
             let obj = SwiftAllIntSizesObject()
 
             let testObject: Void -> Void = {
-                obj.objectSchema.properties.map { $0.name }.map { obj[$0] = 0 }
+                obj.objectSchema.properties.map { $0.name }.forEach { obj[$0] = 0 }
 
                 obj["int8"] = Int(v8)
                 XCTAssertEqual((obj["int8"]! as! Int), Int(v8))
@@ -102,7 +102,7 @@ class ObjectAccessorTests: TestCase {
                 obj["int64"] = NSNumber(longLong: v64)
                 XCTAssertEqual((obj["int64"]! as! NSNumber), NSNumber(longLong: v64))
 
-                obj.objectSchema.properties.map { $0.name }.map { obj[$0] = 0 }
+                obj.objectSchema.properties.map { $0.name }.forEach { obj[$0] = 0 }
 
                 obj.setValue(Int(v8), forKey: "int8")
                 XCTAssertEqual((obj.valueForKey("int8")! as! Int), Int(v8))
@@ -113,7 +113,7 @@ class ObjectAccessorTests: TestCase {
                 obj.setValue(NSNumber(longLong: v64), forKey: "int64")
                 XCTAssertEqual((obj.valueForKey("int64")! as! NSNumber), NSNumber(longLong: v64))
 
-                obj.objectSchema.properties.map { $0.name }.map { obj[$0] = 0 }
+                obj.objectSchema.properties.map { $0.name }.forEach { obj[$0] = 0 }
 
                 obj.int8 = v8
                 XCTAssertEqual(obj.int8, v8)

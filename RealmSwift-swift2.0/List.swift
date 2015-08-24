@@ -236,7 +236,7 @@ public final class List<T: Object>: ListBase {
 
     - parameter objects: A sequence of objects.
     */
-    public func extend<S: SequenceType where S.Generator.Element == T>(objects: S) {
+    public func insertContentsOf<S: SequenceType where S.Generator.Element == T>(objects: S) {
         for obj in objects {
             _rlmArray.addObject(unsafeBitCast(obj, RLMObject.self))
         }
@@ -368,7 +368,4 @@ extension List: RangeReplaceableCollectionType {
     /// The collection's "past the end" position.
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
     public var endIndex: Int { return count }
-
-    /// This method has no effect.
-    public func reserveCapacity(capacity: Int) { }
 }
