@@ -43,16 +43,17 @@ namespace realm {
         struct Config
         {
             std::string path;
-            bool read_only;
-            bool in_memory;
+            bool read_only = false;
+            bool in_memory = false;
             std::unique_ptr<char[]> encryption_key;
 
             std::unique_ptr<Schema> schema;
-            uint64_t schema_version;
+            uint64_t schema_version = ObjectStore::NotVersioned;
 
             MigrationFunction migration_function;
 
-            Config() : read_only(false), in_memory(false), schema_version(ObjectStore::NotVersioned) {};
+            Config() = default;
+            Config(Config&&) = default;
             Config(const Config& c);
         };
 
