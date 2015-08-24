@@ -689,8 +689,8 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
 
     [realm beginWriteTransaction];
-    RLMAssertThrowsWithReasonMatching([realm addObject:[[IntObject alloc] initWithValue:@[@1]]], @"Object type 'IntObject' not persisted in Realm");
-    RLMAssertThrowsWithReasonMatching([IntObject createInRealm:realm withValue:@[@1]], @"Object type 'IntObject' not persisted in Realm");
+    RLMAssertThrowsWithReasonMatching([realm addObject:[[IntObject alloc] initWithValue:@[@1]]], @"Object type 'IntObject' is not persisted in the Realm.*custom `objectClasses`");
+    RLMAssertThrowsWithReasonMatching([IntObject createInRealm:realm withValue:@[@1]], @"Object type 'IntObject' is not persisted in the Realm.*custom `objectClasses`");
     XCTAssertNoThrow([realm addObject:[[StringObject alloc] initWithValue:@[@"A"]]]);
     XCTAssertNoThrow([StringObject createInRealm:realm withValue:@[@"A"]]);
     [realm cancelWriteTransaction];
