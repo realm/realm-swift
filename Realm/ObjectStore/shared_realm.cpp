@@ -299,7 +299,7 @@ void Realm::notify()
 void Realm::send_local_notifications(const std::string &type)
 {
     verify_thread();
-    for (NotificationFunction notification : m_notifications) {
+    for (NotificationFunction const& notification : m_notifications) {
         (*notification)(type);
     }
 }
