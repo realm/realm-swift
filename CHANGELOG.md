@@ -42,8 +42,8 @@ x.x.x Release notes (yyyy-MM-dd)
 | `setSchemaVersion(schemaVersion:realmPath:migrationBlock:)`   | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
 | `migrateRealm(path:encryptionKey:)`                           | `migrateRealm(configuration:)`                                               |
 
-* `List.extend` in Realm Swift for Swift 2.0 has been replaced with `List.insertContentsOf`,
-  mirror changes to `RangeReplaceableCollectionType`.
+* `List.extend` in Realm Swift for Swift 2.0 has been replaced with `List.appendContentsOf`,
+  mirroring changes to `RangeReplaceableCollectionType`.
 
 * Object properties on `Object` subclasses in Realm Swift must be marked as optional,
   otherwise a runtime exception will be thrown.

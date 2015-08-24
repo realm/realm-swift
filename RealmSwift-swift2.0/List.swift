@@ -236,7 +236,7 @@ public final class List<T: Object>: ListBase {
 
     - parameter objects: A sequence of objects.
     */
-    public func insertContentsOf<S: SequenceType where S.Generator.Element == T>(objects: S) {
+    public func appendContentsOf<S: SequenceType where S.Generator.Element == T>(objects: S) {
         for obj in objects {
             _rlmArray.addObject(unsafeBitCast(obj, RLMObject.self))
         }
