@@ -22,7 +22,6 @@
 #include <memory>
 #include <thread>
 #include <vector>
-#include <mutex>
 #include <set>
 #include <map>
 
@@ -116,8 +115,6 @@ namespace realm {
         std::unique_ptr<Group> m_read_only_group;
 
         Group *m_group;
-
-        static std::mutex s_init_mutex;
 
       public:
         ExternalNotificationFunction m_external_notifier;

@@ -23,11 +23,11 @@
 #include <realm/lang_bind_helper.hpp>
 
 #include <memory>
+#include <mutex>
 
 using namespace realm;
 
 RealmCache Realm::s_global_cache;
-std::mutex Realm::s_init_mutex;
 
 Realm::Config::Config(const Config& c) : path(c.path), read_only(c.read_only), in_memory(c.in_memory), schema_version(c.schema_version), migration_function(c.migration_function)
 {
@@ -108,6 +108,7 @@ SharedRealm Realm::get_shared_realm(Config &config)
     realm = SharedRealm(new Realm(config));
 
     // we want to ensure we are only initializing a single realm at a time
+    static std::mutex s_init_mutex;
     std::lock_guard<std::mutex> lock(s_init_mutex);
 
     uint64_t old_version = ObjectStore::get_schema_version(realm->read_group());
