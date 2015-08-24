@@ -40,7 +40,9 @@
 }
 
 - (instancetype)initWithValue:(id)value {
-    return [super initWithValue:value schema:RLMSchema.sharedSchema];
+    [self.class sharedSchema]; // ensure this class' objectSchema is loaded in the partialSharedSchema
+    RLMSchema *schema = RLMSchema.partialSharedSchema;
+    return [super initWithValue:value schema:schema];
 }
 
 - (instancetype)initWithObject:(id)object {
@@ -181,7 +183,7 @@
 
 @implementation RLMDynamicObject
 
-+ (BOOL)shouldPersistToRealm {
++ (BOOL)shouldIncludeInDefaultSchema {
     return NO;
 }
 

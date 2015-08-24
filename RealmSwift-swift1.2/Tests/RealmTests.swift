@@ -119,6 +119,12 @@ class RealmTests: TestCase {
         XCTAssertEqual(realm2.objects(SwiftIntObject).count, 0)
     }
 
+    func testInitCustomClassList() {
+        let configuration = Realm.Configuration(objectTypes: [SwiftStringObject.self])
+        let realm = Realm(configuration: configuration)!
+        XCTAssertEqual(["SwiftStringObject"], realm.schema.objectSchema.map { $0.className })
+    }
+
     func testWrite() {
         Realm().write {
             self.assertThrows(Realm().beginWrite())
@@ -435,7 +441,7 @@ class RealmTests: TestCase {
 
         XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
 
-        // refresh 
+        // refresh
         realm.refresh()
 
         XCTAssertEqual(results.count, Int(1), "There should be 1 object of type StringObject")

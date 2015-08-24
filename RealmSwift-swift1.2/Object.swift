@@ -77,7 +77,8 @@ public class Object: RLMObjectBase, Equatable, Printable {
                     thrown if any required properties are not present and no default is set.
     */
     public init(value: AnyObject) {
-        super.init(value: value, schema: RLMSchema.sharedSchema())
+        self.dynamicType.sharedSchema() // ensure this class' objectSchema is loaded in the partialSharedSchema
+        super.init(value: value, schema: RLMSchema.partialSharedSchema())
     }
 
 
@@ -235,7 +236,8 @@ public final class DynamicObject : Object {
         self[key] = value
     }
 
-    @objc private class func shouldPersistToRealm() -> Bool {
+    /// :nodoc:
+    public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false;
     }
 }

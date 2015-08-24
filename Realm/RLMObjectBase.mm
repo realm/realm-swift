@@ -38,9 +38,7 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
 // standalone init
 - (instancetype)init {
     self = [super init];
-    if (self && RLMSchema.sharedSchema) {
-        _objectSchema = [self.class sharedSchema];
-
+    if (self && (_objectSchema = [self.class sharedSchema])) {
         // set default values
         if (!_objectSchema.isSwiftClass) {
             NSDictionary *dict = RLMDefaultValuesForObjectSchema(_objectSchema);
@@ -239,7 +237,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     }
 }
 
-+ (BOOL)shouldPersistToRealm {
++ (BOOL)shouldIncludeInDefaultSchema {
     return RLMIsObjectSubclass(self);
 }
 

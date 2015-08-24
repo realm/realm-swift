@@ -137,6 +137,12 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     XCTAssertNil([schema schemaForClassName:@"RLMDynamicObject"]);
 }
 
+- (void)testSchemaWithObjectClasses {
+    RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[RLMDynamicObject.class, StringObject.class]];
+    XCTAssertEqualObjects((@[@"RLMDynamicObject", @"StringObject"]), [schema.objectSchema valueForKey:@"className"]);
+    XCTAssertNil([RLMSchema.sharedSchema schemaForClassName:@"RLMDynamicObject"]);
+}
+
 - (void)testInheritanceInitialization
 {
     Class testClasses[] = {

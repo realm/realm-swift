@@ -683,6 +683,19 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [realm commitWriteTransaction];
 }
 
+- (void)testAddingObjectNotInSchemaThrows {
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.objectClasses = @[StringObject.class];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+
+    [realm beginWriteTransaction];
+    RLMAssertThrowsWithReasonMatching([realm addObject:[[IntObject alloc] initWithValue:@[@1]]], @"Object type 'IntObject' is not persisted in the Realm.*custom `objectClasses`");
+    RLMAssertThrowsWithReasonMatching([IntObject createInRealm:realm withValue:@[@1]], @"Object type 'IntObject' is not persisted in the Realm.*custom `objectClasses`");
+    XCTAssertNoThrow([realm addObject:[[StringObject alloc] initWithValue:@[@"A"]]]);
+    XCTAssertNoThrow([StringObject createInRealm:realm withValue:@[@"A"]]);
+    [realm cancelWriteTransaction];
+}
+
 #ifdef REALM_ENABLE_NULL
 - (void)testOptionalStringProperties {
     RLMRealm *realm = [RLMRealm defaultRealm];

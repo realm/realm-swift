@@ -19,6 +19,7 @@
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMRealm_Private.h"
 #import "RLMUtil.hpp"
+#import "RLMSchema_Private.h"
 
 #include <atomic>
 
@@ -162,6 +163,14 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     if ((_schemaVersion = schemaVersion) == RLMNotVersioned) {
         @throw RLMException([NSString stringWithFormat:@"Cannot set schema version to %llu (RLMNotVersioned)", RLMNotVersioned]);
     }
+}
+
+- (void)setObjectClasses:(NSArray *)objectClasses {
+    _customSchema = [RLMSchema schemaWithObjectClasses:objectClasses];
+}
+
+- (NSArray *)objectClasses {
+    return [_customSchema.objectSchema valueForKeyPath:@"objectClass"];
 }
 
 @end
