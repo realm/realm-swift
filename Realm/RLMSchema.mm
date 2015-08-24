@@ -41,8 +41,8 @@ const uint64_t RLMNotVersioned = realm::ObjectStore::NotVersioned;
 @end
 
 static RLMSchema *s_sharedSchema;
-static RLMSchema *s_partialSharedSchema;
-static NSMutableDictionary *s_localNameToClass;
+static RLMSchema *s_partialSharedSchema = [[RLMSchema alloc] init];
+static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] init];
 
 @implementation RLMSchema
 
@@ -85,23 +85,13 @@ static NSMutableDictionary *s_localNameToClass;
     }
 }
 
-+ (void)initialize {
-    static bool initialized;
-    if (initialized) {
-        return;
-    }
-    initialized = true;
-
-    s_localNameToClass = [NSMutableDictionary dictionary];
-    s_partialSharedSchema = [[RLMSchema alloc] init];
-}
-
 + (instancetype)partialSharedSchema {
     return s_partialSharedSchema;
 }
 
 + (void)registerClasses:(Class *)classes count:(NSUInteger)count {
     @synchronized(s_localNameToClass) {
+        auto threadID = pthread_mach_thread_np(pthread_self());
         // first create class to name mapping so we can do array validation
         // when creating object schema
         for (NSUInteger i = 0; i < count; i++) {
@@ -134,8 +124,17 @@ static NSMutableDictionary *s_localNameToClass;
             s_localNameToClass[className] = cls;
 
             RLMReplaceClassNameMethod(cls, className);
-            // override sharedSchema classs method to return nil to avoid topo-sort issues
-            RLMReplaceSharedSchemaMethod(cls, nil);
+            // override sharedSchema classs method to return nil to avoid topo-sort issues when on this thread
+            // (i.e. while during schema initialization), but wait on other threads until schema initialization is done,
+            // then return the just-initialized schema
+            RLMReplaceSharedSchemaMethodWithBlock(cls, ^RLMObjectSchema *(Class cls) {
+                if (threadID == pthread_mach_thread_np(pthread_self())) {
+                    return nil;
+                }
+                @synchronized(s_localNameToClass) {
+                    return [cls sharedSchema];
+                }
+            });
         }
 
         NSMutableArray *schemas = [NSMutableArray arrayWithCapacity:s_localNameToClass.count];
@@ -165,7 +164,7 @@ static NSMutableDictionary *s_localNameToClass;
         RLMSchema *schema = [[RLMSchema alloc] init];
 
         unsigned int numClasses;
-        std::unique_ptr<__unsafe_unretained Class[]> classes(objc_copyClassList(&numClasses));
+        std::unique_ptr<__unsafe_unretained Class[], decltype(&free)> classes(objc_copyClassList(&numClasses), &free);
         [self registerClasses:classes.get() count:numClasses];
 
         // set class array

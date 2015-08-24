@@ -40,10 +40,8 @@
 }
 
 - (instancetype)initWithValue:(id)value {
+    [self.class sharedSchema]; // ensure this class' objectSchema is loaded in the partialSharedSchema
     RLMSchema *schema = RLMSchema.partialSharedSchema;
-    if (![schema schemaForClassName:self.class.className]) {
-        schema = RLMSchema.sharedSchema;
-    }
     return [super initWithValue:value schema:schema];
 }
 
