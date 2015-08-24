@@ -22,7 +22,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 | Deprecated API                                                | New API                                                                            |
 |:--------------------------------------------------------------|:-----------------------------------------------------------------------------------|
-| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                       | |
+| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                         |
 | `Realm(path:readOnly:encryptionKey:error:)`                   | `Realm(configuration:error:)`                                                      |
 | `Realm(inMemoryIdentifier:)`                                  | `Realm(configuration:error:)`                                                      |
 | `Realm.setEncryptionKey(:forPath:)`                           | `Realm(configuration:error:)`                                                      |
@@ -34,7 +34,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 | Deprecated API                                                | New API                                                                            |
 |:--------------------------------------------------------------|:-----------------------------------------------------------------------------------|
-| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                       | |
+| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                         |
 | `Realm(path:readOnly:encryptionKey:) throws`                  | `Realm(configuration:) throws`                                                     |
 | `Realm(inMemoryIdentifier:)`                                  | `Realm(configuration:) throws`                                                     |
 | `Realm.setEncryptionKey(:forPath:)`                           | `Realm(configuration:) throws`                                                     |
@@ -54,6 +54,8 @@ x.x.x Release notes (yyyy-MM-dd)
   or indirectly by modifying objects to make them no longer match a query).
 * Improve performance of object insertion in Swift to bring it roughly in line
   with Objective-C.
+* Allow specifying a specific list of `RLMObject` / `Object` subclasses to include
+  in a given Realm via `RLMRealmConfiguration.objectClasses` / `Realm.Configuration.objectTypes`. 
 
 ### Bugfixes
 

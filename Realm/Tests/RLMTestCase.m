@@ -20,14 +20,7 @@
 
 #import "RLMRealmConfiguration_Private.h"
 #import <Realm/RLMRealm_Private.h>
-
-// This ensures the shared schema is initialized outside of of a test case,
-// so if an exception is thrown, it will kill the test process rather than
-// allowing hundreds of test cases to fail in strange ways
-__attribute((constructor))
-static void initializeSharedSchema() {
-    [RLMSchema class];
-}
+#import <Realm/RLMSchema_Private.h>
 
 NSString *RLMRealmPathForFile(NSString *fileName) {
 #if TARGET_OS_IPHONE
@@ -79,15 +72,19 @@ static BOOL encryptTests() {
     dispatch_queue_t _bgQueue;
 }
 
-#if DEBUG || !TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 + (void)setUp {
     [super setUp];
+#if DEBUG || !TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
     // Disable actually syncing anything to the disk to greatly speed up the
     // tests, but only when not running on device because it can't be
     // re-enabled and we need it enabled for performance tests
     RLMDisableSyncToDisk();
-}
 #endif
+    // This ensures the shared schema is initialized outside of of a test case,
+    // so if an exception is thrown, it will kill the test process rather than
+    // allowing hundreds of test cases to fail in strange ways
+    [RLMSchema sharedSchema];
+}
 
 - (void)setUp {
     @autoreleasepool {

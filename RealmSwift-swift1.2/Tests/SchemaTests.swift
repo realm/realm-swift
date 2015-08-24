@@ -28,7 +28,7 @@ class SchemaTests: TestCase {
             self.schema = Realm().schema
         }
     }
-    
+
     func testObjectSchema() {
         let objectSchema = schema.objectSchema
         XCTAssertTrue(objectSchema.count > 0)

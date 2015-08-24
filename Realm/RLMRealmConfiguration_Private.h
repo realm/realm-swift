@@ -23,7 +23,8 @@
 @interface RLMRealmConfiguration ()
 
 @property (nonatomic, readwrite) bool dynamic;
-@property (nonatomic, copy, readwrite) RLMSchema *customSchema;
+
+@property (nonatomic, copy) RLMSchema *customSchema;
 
 + (NSString *)defaultRealmPath;
 

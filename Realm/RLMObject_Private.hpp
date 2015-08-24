@@ -31,8 +31,6 @@ struct RLMObservationInfo;
     realm::Row _row;
     std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
-
-+ (BOOL)shouldPersistToRealm;
 @end
 
 // throw an exception if the object is invalidated or on the wrong thread
