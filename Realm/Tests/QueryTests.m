@@ -457,6 +457,9 @@
 
     // ALL
     XCTAssertThrows([realm objects:className where:@"ALL intCol > 5"], @"ALL int > constant");
+
+    // ANY
+    XCTAssertThrows([realm objects:className where:@"NONE intCol > 5"], @"NONE int > constant");
 }
 
 - (void)testPredicateMisuse
@@ -1224,6 +1227,8 @@
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 10"] count], 0U);
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 5"] count], 1U);
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY array.stringCol = '1'"] count], 1U);
+    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol == 5"].count, 0U);
+    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol > 10"].count, 1U);
 
     ArrayPropertyObject *arrPropObj2 = [[ArrayPropertyObject alloc] init];
     arrPropObj2.name = @"Test";
@@ -1241,6 +1246,8 @@
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 10"] count], 0U);
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 5"] count], 1U);
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 2"] count], 2U);
+    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol == 5"].count, 1U);
+    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol > 10"].count, 2U);
 }
 
 - (void)testMultiLevelLinkQuery
@@ -1285,16 +1292,19 @@
     XCTAssertEqual(0U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '4'"].count);
     XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '3'"].count);
     XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '3'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"NONE circles.next.data = '4'"].count);
 
     XCTAssertEqual(0U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.next.data = '3'"].count);
     XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.next.data = '2'"].count);
     XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '2'"].count);
     XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '2'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"NONE circles.next.next.data = '3'"].count);
 
     XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY data = '2'"]);
     XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY circles.next = '2'"]);
     XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY data.circles = '2'"]);
     XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"circles.data = '2'"]);
+    XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"NONE data.circles = '2'"]);
 }
 
 - (void)testQueryWithObjects
@@ -1340,6 +1350,8 @@
     // check for ANY object in array
     XCTAssertEqual(2U, ([ArrayOfAllTypesObject objectsWhere:@"ANY array = %@", obj0].count));
     XCTAssertEqual(2U, ([ArrayOfAllTypesObject objectsWhere:@"ANY array != %@", obj1].count));
+    XCTAssertEqual(2U, ([ArrayOfAllTypesObject objectsWhere:@"NONE array = %@", obj0].count));
+    XCTAssertEqual(2U, ([ArrayOfAllTypesObject objectsWhere:@"NONE array != %@", obj1].count));
     XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array = %@", obj0].count));
     XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array != %@", obj0].count));
 }
@@ -1529,9 +1541,13 @@
 
     XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"ANY array.stringCol IN %@", @[@"missing"]] count]));
     XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"ANY array.stringCol IN %@", @[@"value"]] count]));
+    XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"NONE array.stringCol IN %@", @[@"missing"]] count]));
+    XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"NONE array.stringCol IN %@", @[@"value"]] count]));
 
     XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]] count]));
     XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]] count]));
+    XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"NONE array IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]] count]));
+    XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"NONE array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]] count]));
 }
 
 - (void)testQueryChaining {
