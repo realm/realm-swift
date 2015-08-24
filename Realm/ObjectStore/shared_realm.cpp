@@ -40,7 +40,7 @@ Realm::Config::Config(const Config& c) : path(c.path), read_only(c.read_only), i
     }
 }
 
-Realm::Realm(Config &config) : m_config(config), m_thread_id(std::this_thread::get_id()), m_auto_refresh(true), m_in_transaction(false)
+Realm::Realm(Config &config) : m_config(config)
 {
     try {
         if (config.read_only) {
@@ -52,7 +52,6 @@ Realm::Realm(Config &config) : m_config(config), m_thread_id(std::this_thread::g
             SharedGroup::DurabilityLevel durability = config.in_memory ? SharedGroup::durability_MemOnly :
                                                                          SharedGroup::durability_Full;
             m_shared_group = std::make_unique<SharedGroup>(*m_history, durability, config.encryption_key.get());
-            m_group = nullptr;
         }
     }
     catch (util::File::PermissionDenied const& ex) {

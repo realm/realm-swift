@@ -100,9 +100,9 @@ namespace realm {
         Realm(Config &config);
 
         Config m_config;
-        std::thread::id m_thread_id;
-        bool m_in_transaction;
-        bool m_auto_refresh;
+        std::thread::id m_thread_id = std::this_thread::get_id();
+        bool m_in_transaction = false;
+        bool m_auto_refresh = true;
 
         std::set<NotificationFunction> m_notifications;
         void send_local_notifications(const std::string &notification);
@@ -114,7 +114,7 @@ namespace realm {
         std::unique_ptr<SharedGroup> m_shared_group;
         std::unique_ptr<Group> m_read_only_group;
 
-        Group *m_group;
+        Group *m_group = nullptr;
 
       public:
         ExternalNotificationFunction m_external_notifier;
