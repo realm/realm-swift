@@ -95,6 +95,12 @@ extern "C" {
     XCTAssertEqualObjects(testRealm.path, RLMTestRealmPath(), @"Test path");
 }
 
+- (void)testRealmConfiguration {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealmConfiguration *configuration = realm.configuration;
+    XCTAssertEqual(realm, [RLMRealm realmWithConfiguration:configuration error:nil]);
+}
+
 - (void)testRealmAddAndRemoveObjects {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
