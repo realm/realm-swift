@@ -853,6 +853,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return RLMGetObjects(self, objectClassName, predicate);
 }
 
+- (RLMObject *)objectWithClassName:(NSString *)className forPrimaryKey:(id)primaryKey {
+    return RLMGetObject(self, className, primaryKey);
+}
+
 + (void)setDefaultRealmSchemaVersion:(uint64_t)version withMigrationBlock:(RLMMigrationBlock)block {
     [RLMRealm setSchemaVersion:version forRealmAtPath:[RLMRealm defaultRealmPath] withMigrationBlock:block];
 }

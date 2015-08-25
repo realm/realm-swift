@@ -18,6 +18,9 @@
 
 #import "RLMTestCase.h"
 #import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.h"
+#import "RLMProperty_Private.h"
+#import "RLMObjectSchema_Private.h"
 #import "RLMSchema_Private.h"
 
 @interface DynamicTests : RLMTestCase
@@ -52,6 +55,25 @@
     XCTAssertEqual(results.count, (NSUInteger)2, @"Array should have 2 elements");
     XCTAssertNotEqual(results.objectClassName, DynamicObject.className,
                       @"Array class should by a dynamic object class");
+}
+
+- (void)testDynamicObjectRetrieval {
+    @autoreleasepool {
+        // open realm in autoreleasepool to create tables and then dispose
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [PrimaryStringObject createInRealm:realm withValue:@[@"key", @1]];
+        [realm commitWriteTransaction];
+    }
+    
+    RLMRealm *testRealm = [self realmWithTestPath];
+    
+    RLMObject *object = [testRealm objectWithClassName:@"PrimaryStringObject" forPrimaryKey:@"key"];
+    
+    XCTAssertNotNil(object, @"Should be able to retrieve object by primary key dynamically");
+    XCTAssert([[object valueForKey:@"stringCol"] isEqualToString:@"key"],@"stringCol should equal 'key'");
+    XCTAssert([[[object class] className] isEqualToString:@"PrimaryStringObject"],@"Object class name should equal 'PrimaryStringObject'");
+    XCTAssert([object isKindOfClass:[PrimaryStringObject class]], @"Object should be of class 'PrimaryStringObject'");
 }
 
 - (void)testDynamicSchemaMatchesRegularSchema {
