@@ -153,8 +153,8 @@ public final class Realm {
 
     - parameter block: The block to be executed inside a write transaction.
     */
-    public func write(block: (() -> Void)) {
-        rlmRealm.transactionWithBlock(block)
+    public func write(block: (() -> Void)) throws {
+        try rlmRealm.transactionWithBlock(block)
     }
 
     /**
@@ -187,8 +187,8 @@ public final class Realm {
 
     Calling this when not in a write transaction will throw an exception.
     */
-    public func commitWrite() {
-        rlmRealm.commitWriteTransaction()
+    public func commitWrite() throws {
+        try rlmRealm.commitWriteTransaction()
     }
 
     /**
@@ -305,31 +305,31 @@ public final class Realm {
         }
         return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), T.self)
     }
-    
+
     /**
     This method is useful only in specialized circumstances, for example, when building
     components that integrate with Realm. If you are simply building an app on Realm, it is
     recommended to use the typed method `create(type:value:update:)`.
-    
+
     Creates or updates an object with the given class name and adds it to the `Realm` populating
     the object with the given value.
-    
+
     When 'update' is 'true', the object must have a primary key. If no objects exist in
     the Realm instance with the same primary key value, the object is inserted. Otherwise,
     the existing object is updated with any changed values.
-    
+
     - parameter className:  The class name of the object to create.
     - parameter value:      The value used to populate the object. This can be any key/value coding compliant
     object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
     or an `Array` with one object for each persisted property. An exception will be
     thrown if any required properties are not present and no default is set.
-    
+
     When passing in an `Array`, all properties must be present,
     valid and in the same order as the properties defined in the model.
     - parameter update:     If true will try to update existing objects with the same primary key.
-    
+
     - returns: The created object.
-    
+
     :nodoc:
     */
     public func dynamicCreate(className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
@@ -404,20 +404,20 @@ public final class Realm {
         // FIXME: use T.className()
         return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
     }
-    
+
     /**
-    This method is useful only in specialized circumstances, for example, when building 
+    This method is useful only in specialized circumstances, for example, when building
     components that integrate with Realm. If you are simply building an app on Realm, it is
     recommended to use the typed method `objects(type:)`.
 
     Returns all objects for a given class name in the Realm.
-    
+
     - warning: This method is useful only in specialized circumstances.
-    
+
     - parameter className: The class name of the objects to be returned.
-    
+
     - returns: All objects for the given class name as dynamic objects
-    
+
     :nodoc:
     */
     public func dynamicObjects(className: String) -> Results<DynamicObject> {
@@ -442,27 +442,27 @@ public final class Realm {
         // FIXME: use T.className()
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), Optional<T>.self)
     }
-    
+
     /**
     This method is useful only in specialized circumstances, for example, when building
     components that integrate with Realm. If you are simply building an app on Realm, it is
     recommended to use the typed method `objectForPrimaryKey(type:key:)`.
-    
+
     Get a dynamic object with the given class name and primary key.
-    
+
     Returns `nil` if no object exists with the given class name and primary key.
-    
+
     This method requires that `primaryKey()` be overridden on the given subclass.
-    
+
     - see: Object.primaryKey()
-    
+
     - warning: This method is useful only in specialized circumstances.
-    
+
     - parameter className:  The class name of the object to be returned.
     - parameter key:        The primary key of the desired object.
-    
+
     - returns: An object of type `DynamicObject` or `nil` if an object with the given primary key does not exist.
-    
+
     :nodoc:
     */
     public func dynamicObjectForPrimaryKey(className: String, key: AnyObject) -> DynamicObject? {

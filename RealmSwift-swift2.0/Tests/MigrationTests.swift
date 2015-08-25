@@ -240,7 +240,7 @@ class MigrationTests: TestCase {
     func testDeleteData() {
         autoreleasepool {
             let realm = realmWithSingleClassProperties(testRealmPath(), className: "DeletedClass", properties: [])
-            realm.transactionWithBlock {
+            try! realm.transactionWithBlock {
                 realm.createObject("DeletedClass", withValue: [])
             }
         }

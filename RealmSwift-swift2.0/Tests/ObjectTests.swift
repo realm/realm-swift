@@ -32,7 +32,7 @@ class ObjectTests: TestCase {
 
         let realm = try! Realm()
         var persisted: SwiftStringObject!
-        realm.write {
+        try! realm.write {
             persisted = realm.create(SwiftStringObject.self, value: [:])
             XCTAssertNotNil(persisted.realm)
             XCTAssertEqual(realm, persisted.realm!)
@@ -61,12 +61,12 @@ class ObjectTests: TestCase {
         XCTAssertFalse(object.invalidated)
 
         let realm = try! Realm()
-        realm.write {
+        try! realm.write {
             realm.add(object)
             XCTAssertFalse(object.invalidated)
         }
 
-        realm.write {
+        try! realm.write {
             realm.deleteAll()
             XCTAssertTrue(object.invalidated)
         }
@@ -106,7 +106,7 @@ class ObjectTests: TestCase {
         let realm = try! Realm()
         let object = SwiftEmployeeObject()
         assertThrows(object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees"))
-        realm.write {
+        try! realm.write {
             realm.add(object)
             self.assertThrows(object.linkingObjects(SwiftCompanyObject.self, forProperty: "noSuchCol"))
             XCTAssertEqual(0, object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees").count)
@@ -224,7 +224,7 @@ class ObjectTests: TestCase {
     private func withMigrationObject(block: ((MigrationObject, Migration) -> ())) {
         autoreleasepool {
             let realm = self.realmWithTestPath()
-            realm.write {
+            try! realm.write {
                 _ = realm.create(SwiftObject)
             }
         }

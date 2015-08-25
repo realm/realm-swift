@@ -87,7 +87,7 @@ class ObjectAccessorTests: TestCase {
         let v32 = Int32(1) << 30
         // 1 << 40 doesn't auto-promote to Int64 on 32-bit platforms
         let v64 = Int64(1) << 40
-        realm.write {
+        try! realm.write {
             let obj = SwiftAllIntSizesObject()
 
             let testObject: Void -> Void = {
@@ -151,7 +151,7 @@ class ObjectAccessorTests: TestCase {
         realm.create(SwiftLongObject.self, value: [NSNumber(longLong: longNumber)])
         realm.create(SwiftLongObject.self, value: [NSNumber(longLong: intNumber)])
         realm.create(SwiftLongObject.self, value: [NSNumber(longLong: negativeLongNumber)])
-        realm.commitWrite()
+        try! realm.commitWrite()
 
         let objects = realm.objects(SwiftLongObject)
         XCTAssertEqual(objects.count, Int(3), "3 rows expected")
@@ -161,7 +161,7 @@ class ObjectAccessorTests: TestCase {
 
         realm.beginWrite()
         objects[0].longCol = updatedLongNumber
-        realm.commitWrite()
+        try! realm.commitWrite()
 
         XCTAssertEqual(objects[0].longCol, updatedLongNumber, "After update: 2 ^ 33 expected")
     }
@@ -184,7 +184,7 @@ class ObjectAccessorTests: TestCase {
         object2.arrayCol.append(trueObject)
         object2.arrayCol.append(falseObject)
 
-        realm.write {
+        try! realm.write {
             realm.add(object1)
             realm.add(object2)
         }
