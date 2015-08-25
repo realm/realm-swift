@@ -416,8 +416,8 @@ RLM_ASSUME_NONNULL_BEGIN
 //     id object = rlmObject[@"propertyName"];
 //
 
-- (id)objectForKeyedSubscript:(NSString *)key;
-- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
+- (nullable id)objectForKeyedSubscript:(NSString *)key;
+- (void)setObject:(nullable id)obj forKeyedSubscript:(NSString *)key;
 
 #pragma mark -
 

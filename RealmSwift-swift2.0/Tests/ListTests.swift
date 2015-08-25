@@ -245,7 +245,7 @@ class ListTests: TestCase {
     }
 
     func testSortWithProperty() {
-        array.extend([str1, str2])
+        array.appendContentsOf([str1, str2])
 
         var sorted = array.sorted("stringCol", ascending: true)
         XCTAssertEqual("1", sorted[0].stringCol)
@@ -284,7 +284,7 @@ class ListTests: TestCase {
         obj3.boolCol = false
 
         realmWithTestPath().add([obj1, obj2, obj3])
-        array.extend([obj1, obj2, obj3])
+        array.appendContentsOf([obj1, obj2, obj3])
 
         var sorted = array.sorted([SortDescriptor(property: "intCol", ascending: true)])
         XCTAssertEqual(1, sorted[0].intCol)
@@ -302,7 +302,7 @@ class ListTests: TestCase {
     }
 
     func testFastEnumeration() {
-        array.extend([str1, str2, str1])
+        array.appendContentsOf([str1, str2, str1])
         var str = ""
         for obj in array {
             str += obj.stringCol
@@ -312,12 +312,12 @@ class ListTests: TestCase {
     }
 
     func testFastEnumerationWithMutation() {
-        array.extend([str1, str2, str1, str2, str1, str2, str1, str2, str1,
+        array.appendContentsOf([str1, str2, str1, str2, str1, str2, str1, str2, str1,
             str2, str1, str2, str1, str2, str1, str2, str1, str2, str1, str2])
         var str = ""
         for obj in array {
             str += obj.stringCol
-            array.extend([str1])
+            array.appendContentsOf([str1])
         }
 
         XCTAssertEqual(str, "12121212121212121212")
@@ -334,7 +334,7 @@ class ListTests: TestCase {
     }
 
     func testAppendArray() {
-        array.extend([str1, str2, str1])
+        array.appendContentsOf([str1, str2, str1])
         XCTAssertEqual(Int(3), array.count)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str2, array[1])
@@ -342,7 +342,7 @@ class ListTests: TestCase {
     }
 
     func testAppendResults() {
-        array.extend(realmWithTestPath().objects(SwiftStringObject))
+        array.appendContentsOf(realmWithTestPath().objects(SwiftStringObject))
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str2, array[1])
@@ -365,7 +365,7 @@ class ListTests: TestCase {
     }
 
     func testRemoveAtIndex() {
-        array.extend([str1, str2, str1])
+        array.appendContentsOf([str1, str2, str1])
 
         array.removeAtIndex(1)
         XCTAssertEqual(str1, array[0])
@@ -376,7 +376,7 @@ class ListTests: TestCase {
     }
 
     func testRemoveLast() {
-        array.extend([str1, str2])
+        array.appendContentsOf([str1, str2])
 
         array.removeLast()
         XCTAssertEqual(Int(1), array.count)
@@ -390,7 +390,7 @@ class ListTests: TestCase {
     }
 
     func testRemoveAll() {
-        array.extend([str1, str2])
+        array.appendContentsOf([str1, str2])
 
         array.removeAll()
         XCTAssertEqual(Int(0), array.count)
@@ -400,7 +400,7 @@ class ListTests: TestCase {
     }
 
     func testReplace() {
-        array.extend([str1, str1])
+        array.appendContentsOf([str1, str1])
 
         array.replace(0, object: str2)
         XCTAssertEqual(Int(2), array.count)
@@ -417,7 +417,7 @@ class ListTests: TestCase {
     }
 
     func testMove()  {
-        array.extend([str1, str2])
+        array.appendContentsOf([str1, str2])
 
         array.move(from: 1, to: 0)
 
@@ -439,7 +439,7 @@ class ListTests: TestCase {
     }
 
     func testReplaceRange() {
-        array.extend([str1, str1])
+        array.appendContentsOf([str1, str1])
 
         array.replaceRange(0...0, with: [str2])
         XCTAssertEqual(Int(2), array.count)
@@ -466,7 +466,7 @@ class ListTests: TestCase {
     }
 
     func testSwap() {
-        array.extend([str1, str2])
+        array.appendContentsOf([str1, str2])
 
         array.swap(0, 1)
         XCTAssertEqual(Int(2), array.count)
@@ -486,7 +486,7 @@ class ListTests: TestCase {
 
     func testChangesArePersisted() {
         if let realm = array.realm {
-            array.extend([str1, str2])
+            array.appendContentsOf([str1, str2])
 
             let otherArray = realm.objects(SwiftArrayPropertyObject).first!.array
             XCTAssertEqual(Int(2), otherArray.count)
@@ -526,7 +526,7 @@ class ListTests: TestCase {
 
         for object in arrayObject.array {
             XCTAssertEqual(123, object.intCol)
-            XCTAssertEqual(false, object.objectCol.boolCol)
+            XCTAssertEqual(false, object.objectCol!.boolCol)
             XCTAssertEqual(0, object.arrayCol.count)
         }
     }

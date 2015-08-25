@@ -499,7 +499,7 @@ class ListTests: TestCase {
 
         for object in arrayObject.array {
             XCTAssertEqual(123, object.intCol)
-            XCTAssertEqual(false, object.objectCol.boolCol)
+            XCTAssertEqual(false, object.objectCol!.boolCol)
             XCTAssertEqual(0, object.arrayCol.count)
         }
     }

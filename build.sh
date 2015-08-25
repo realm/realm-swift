@@ -745,8 +745,6 @@ case "$COMMAND" in
         REALM_SWIFT_VERSION=2.0 sh build.sh osx-swift
 
         cd build/osx
-        cp -R Realm.framework swift-1.2
-        cp -R Realm.framework swift-2.0
         zip --symlinks -r realm-swift-framework-osx.zip swift-1.2 swift-2.0
         ;;
 
