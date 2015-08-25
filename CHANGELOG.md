@@ -20,27 +20,33 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * The following APIs have been deprecated in favor of the new `Realm.Configuration` struct in Realm Swift for Swift 1.2:
 
-| Deprecated API                                                | New API                                                                            |
-|:--------------------------------------------------------------|:-----------------------------------------------------------------------------------|
-| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                         |
-| `Realm(path:readOnly:encryptionKey:error:)`                   | `Realm(configuration:error:)`                                                      |
-| `Realm(inMemoryIdentifier:)`                                  | `Realm(configuration:error:)`                                                      |
-| `Realm.setEncryptionKey(:forPath:)`                           | `Realm(configuration:error:)`                                                      |
-| `setDefaultRealmSchemaVersion(schemaVersion:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock`       |
-| `setSchemaVersion(schemaVersion:realmPath:migrationBlock:)`   | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock`       |
-| `migrateRealm(path:encryptionKey:)`                           | `migrateRealm(configuration:)`                                                     |
+| Deprecated API                                                | New API                                                                      |
+|:--------------------------------------------------------------|:-----------------------------------------------------------------------------|
+| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                   |
+| `Realm(path:readOnly:encryptionKey:error:)`                   | `Realm(configuration:error:)`                                                |
+| `Realm(inMemoryIdentifier:)`                                  | `Realm(configuration:error:)`                                                |
+| `Realm.setEncryptionKey(:forPath:)`                           | `Realm(configuration:error:)`                                                |
+| `setDefaultRealmSchemaVersion(schemaVersion:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `setSchemaVersion(schemaVersion:realmPath:migrationBlock:)`   | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `migrateRealm(path:encryptionKey:)`                           | `migrateRealm(configuration:)`                                               |
 
 * The following APIs have been deprecated in favor of the new `Realm.Configuration` struct in Realm Swift for Swift 2.0:
 
-| Deprecated API                                                | New API                                                                            |
-|:--------------------------------------------------------------|:-----------------------------------------------------------------------------------|
-| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                         |
-| `Realm(path:readOnly:encryptionKey:) throws`                  | `Realm(configuration:) throws`                                                     |
-| `Realm(inMemoryIdentifier:)`                                  | `Realm(configuration:) throws`                                                     |
-| `Realm.setEncryptionKey(:forPath:)`                           | `Realm(configuration:) throws`                                                     |
-| `setDefaultRealmSchemaVersion(schemaVersion:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock`       |
-| `setSchemaVersion(schemaVersion:realmPath:migrationBlock:)`   | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock`       |
-| `migrateRealm(path:encryptionKey:)`                           | `migrateRealm(configuration:)`                                                     |
+| Deprecated API                                                | New API                                                                      |
+|:--------------------------------------------------------------|:-----------------------------------------------------------------------------|
+| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                   |
+| `Realm(path:readOnly:encryptionKey:) throws`                  | `Realm(configuration:) throws`                                               |
+| `Realm(inMemoryIdentifier:)`                                  | `Realm(configuration:) throws`                                               |
+| `Realm.setEncryptionKey(:forPath:)`                           | `Realm(configuration:) throws`                                               |
+| `setDefaultRealmSchemaVersion(schemaVersion:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `setSchemaVersion(schemaVersion:realmPath:migrationBlock:)`   | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `migrateRealm(path:encryptionKey:)`                           | `migrateRealm(configuration:)`                                               |
+
+* `List.extend` in Realm Swift for Swift 2.0 has been replaced with `List.appendContentsOf`,
+  mirroring changes to `RangeReplaceableCollectionType`.
+
+* Object properties on `Object` subclasses in Realm Swift must be marked as optional,
+  otherwise a runtime exception will be thrown.
 
 ### Enhancements
 
@@ -55,11 +61,11 @@ x.x.x Release notes (yyyy-MM-dd)
 * Improve performance of object insertion in Swift to bring it roughly in line
   with Objective-C.
 * Allow specifying a specific list of `RLMObject` / `Object` subclasses to include
-  in a given Realm via `RLMRealmConfiguration.objectClasses` / `Realm.Configuration.objectTypes`. 
+  in a given Realm via `RLMRealmConfiguration.objectClasses` / `Realm.Configuration.objectTypes`.
 
 ### Bugfixes
 
-* None.
+* Subscripting on `RLMObject` is now marked as nullable.
 
 0.94.1 Release notes (2015-08-10)
 =============================================================

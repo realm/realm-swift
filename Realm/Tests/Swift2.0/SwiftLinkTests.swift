@@ -29,7 +29,7 @@ class SwiftLinkTests: RLMTestCase {
         let owner = SwiftOwnerObject()
         owner.name = "Tim"
         owner.dog = SwiftDogObject()
-        owner.dog.dogName = "Harvie"
+        owner.dog!.dogName = "Harvie"
 
         realm.beginWriteTransaction()
         realm.addObject(owner)
@@ -43,7 +43,7 @@ class SwiftLinkTests: RLMTestCase {
         XCTAssertEqual((dogs[0] as! SwiftDogObject).dogName, "Harvie", "Harvie is named Harvie")
 
         let tim = owners[0] as! SwiftOwnerObject
-        XCTAssertEqual(tim.dog.dogName, "Harvie", "Tim's dog should be Harvie")
+        XCTAssertEqual(tim.dog!.dogName, "Harvie", "Tim's dog should be Harvie")
     }
 
     func testMultipleOwnerLink() {
@@ -52,7 +52,7 @@ class SwiftLinkTests: RLMTestCase {
         let owner = SwiftOwnerObject()
         owner.name = "Tim"
         owner.dog = SwiftDogObject()
-        owner.dog.dogName = "Harvie"
+        owner.dog!.dogName = "Harvie"
 
         realm.beginWriteTransaction()
         realm.addObject(owner)
@@ -76,7 +76,7 @@ class SwiftLinkTests: RLMTestCase {
         let owner = SwiftOwnerObject()
         owner.name = "Tim"
         owner.dog = SwiftDogObject()
-        owner.dog.dogName = "Harvie"
+        owner.dog!.dogName = "Harvie"
 
         realm.beginWriteTransaction()
         realm.addObject(owner)
@@ -86,7 +86,7 @@ class SwiftLinkTests: RLMTestCase {
         XCTAssertEqual(SwiftDogObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 dog")
 
         realm.beginWriteTransaction()
-        realm.deleteObject(owner.dog)
+        realm.deleteObject(owner.dog!)
         realm.commitWriteTransaction()
 
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")

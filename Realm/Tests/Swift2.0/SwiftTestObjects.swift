@@ -65,7 +65,7 @@ class SwiftDogObject: RLMObject {
 
 class SwiftOwnerObject: RLMObject {
     dynamic var name = ""
-    dynamic var dog = SwiftDogObject()
+    dynamic var dog: SwiftDogObject? = SwiftDogObject()
 }
 
 class SwiftAggregateObject: RLMObject {
