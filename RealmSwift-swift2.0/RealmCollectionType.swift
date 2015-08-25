@@ -284,7 +284,7 @@ private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBa
 
     - returns: The index of the given object, or `nil` if no objects match.
     */
-    override func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? { return base.indexOf(predicateFormat, args) }
+    override func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? { return base.indexOf(NSPredicate(format: predicateFormat, argumentArray: args)) }
 
     // MARK: Filtering
 
@@ -295,7 +295,7 @@ private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBa
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    override func filter(predicateFormat: String, _ args: AnyObject...) -> Results<C.Element> { return base.filter(predicateFormat, args) }
+    override func filter(predicateFormat: String, _ args: AnyObject...) -> Results<C.Element> { return base.filter(NSPredicate(format: predicateFormat, argumentArray: args)) }
 
     /**
     Returns `Results` containing collection elements that match the given predicate.
@@ -485,7 +485,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
 
     - returns: The index of the given object, or `nil` if no objects match.
     */
-    public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? { return base.indexOf(predicateFormat, args) }
+    public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? { return base.indexOf(NSPredicate(format: predicateFormat, argumentArray: args)) }
 
     // MARK: Filtering
 
@@ -496,7 +496,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<Element> { return base.filter(predicateFormat, args) }
+    public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<Element> { return base.filter(NSPredicate(format: predicateFormat, argumentArray: args)) }
 
     /**
     Returns `Results` containing collection elements that match the given predicate.

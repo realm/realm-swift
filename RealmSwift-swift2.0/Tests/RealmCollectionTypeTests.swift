@@ -132,10 +132,9 @@ class RealmCollectionTypeTests: TestCase {
 
     func testIndexOfFormat() {
         XCTAssertEqual(0, collection.indexOf("stringCol = '1'")!)
-        // FIXME: uncomment this
         XCTAssertEqual(0, collection.indexOf("stringCol = %@", "1")!)
-//        XCTAssertEqual(1, collection.indexOf("stringCol = %@", "2")!)
-//        XCTAssertNil(collection.indexOf("stringCol = %@", "3"))
+        XCTAssertEqual(1, collection.indexOf("stringCol = %@", "2")!)
+        XCTAssertNil(collection.indexOf("stringCol = %@", "3"))
     }
 
     func testSubscript() {
@@ -175,10 +174,9 @@ class RealmCollectionTypeTests: TestCase {
 
     func testFilterFormat() {
         XCTAssertEqual(1, collection.filter("stringCol = '1'").count)
-        // FIXME: uncomment this
-//        XCTAssertEqual(1, collection.filter("stringCol = %@", "1").count)
-//        XCTAssertEqual(1, collection.filter("stringCol = %@", "2").count)
-//        XCTAssertEqual(0, collection.filter("stringCol = %@", "3").count)
+        XCTAssertEqual(1, collection.filter("stringCol = %@", "1").count)
+        XCTAssertEqual(1, collection.filter("stringCol = %@", "2").count)
+        XCTAssertEqual(0, collection.filter("stringCol = %@", "3").count)
     }
 
     func testFilterList() {
@@ -295,11 +293,10 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testArrayAggregateWithSwiftObjectDoesntThrow() {
-        // FIXME: uncomment this
-//        let collection = getAggregateableCollection()
-//
-//        // Should not throw a type error.
-//        collection.filter("ANY stringListCol == %@", SwiftStringObject())
+        let collection = getAggregateableCollection()
+
+        // Should not throw a type error.
+        collection.filter("ANY stringListCol == %@", SwiftStringObject())
     }
 }
 
@@ -336,7 +333,7 @@ class ResultsFromLinkViewTests: RealmCollectionTypeTests {
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
         let list = SwiftAggregateObjectList()
         realmWithTestPath().add(list)
-        list.list.extend(makeAggregateableObjects())
+        list.list.appendContentsOf(makeAggregateableObjects())
         return AnyRealmCollection(list.list.filter(NSPredicate(value: true)))
     }
 }
@@ -352,7 +349,7 @@ class LinkViewListTests: RealmCollectionTypeTests {
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
         let list = SwiftAggregateObjectList()
         realmWithTestPath().add(list)
-        list.list.extend(makeAggregateableObjects())
+        list.list.appendContentsOf(makeAggregateableObjects())
         return AnyRealmCollection(list.list)
     }
 
