@@ -67,8 +67,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let defaultParentPath = (defaultPath as NSString).stringByDeletingLastPathComponent
 
         if let v0Path = bundlePath("default-v0.realm") {
-            try! NSFileManager.defaultManager().removeItemAtPath(defaultPath)
-            try! NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath)
+            do {
+                try NSFileManager.defaultManager().removeItemAtPath(defaultPath)
+                try NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath)
+            } catch {}
         }
 
         // define a migration block
@@ -114,10 +116,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let realmv1Configuration = Realm.Configuration(path: realmv1Path, schemaVersion: 3, migrationBlock: migrationBlock)
             let realmv2Configuration = Realm.Configuration(path: realmv2Path, schemaVersion: 3, migrationBlock: migrationBlock)
 
-            try! NSFileManager.defaultManager().removeItemAtPath(realmv1Path)
-            try! NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path)
-            try! NSFileManager.defaultManager().removeItemAtPath(realmv2Path)
-            try! NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path)
+            do {
+                try NSFileManager.defaultManager().removeItemAtPath(realmv1Path)
+                try NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path)
+                try NSFileManager.defaultManager().removeItemAtPath(realmv2Path)
+                try NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path)
+            } catch {}
 
             // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
             migrateRealm(realmv1Configuration)
