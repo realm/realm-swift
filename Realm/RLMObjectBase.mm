@@ -64,7 +64,7 @@ static id RLMValidatedObjectForStandaloneProperty(id obj, RLMProperty *prop, RLM
         else if (prop.type == RLMPropertyTypeArray && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
             // for arrays, create objects for each element and return new array
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
-            RLMArray *objects = [[RLMArray alloc] initWithObjectClassName: objSchema.className standalone:YES];
+            RLMArray *objects = [[RLMArray alloc] initWithObjectClassName:prop.objectClassName];
             for (id el in obj) {
                 [objects addObject:[[objSchema.objectClass alloc] initWithValue:el schema:schema]];
             }
