@@ -45,7 +45,7 @@ public final class RLMGenerator<T: Object>: GeneratorType {
 A homogenous collection of `Object`s which can be retrieved, filtered, sorted,
 and operated upon.
 */
-public protocol RealmCollectionType: CollectionType {
+public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
 
     /// Element type contained in this collection.
     typealias Element: Object
@@ -58,8 +58,23 @@ public protocol RealmCollectionType: CollectionType {
     /// standalone).
     var realm: Realm? { get }
 
+    /// Returns the number of objects in this collection.
+    var count: Int { get }
+
+    /// Returns a human-readable description of the objects contained in this collection.
+    var description: String { get }
+
 
     // MARK: Index Retrieval
+
+    /**
+    Returns the index of the given object, or `nil` if the object is not in the collection.
+
+    - parameter object: The object whose index is being queried.
+
+    - returns: The index of the given object, or `nil` if the object is not in the collection.
+    */
+    func indexOf(object: Element) -> Int?
 
     /**
     Returns the index of the first object matching the given predicate,
@@ -171,11 +186,35 @@ public protocol RealmCollectionType: CollectionType {
     - returns: The average of the given property over all objects in the collection, or `nil` if the collection is empty.
     */
     func average<U: AddableType>(property: String) -> U?
+
+
+    // MARK: Key-Value Coding
+
+    /**
+    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+
+    - parameter key: The name of the property.
+
+    - returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    */
+    func valueForKey(key: String) -> AnyObject?
+
+    /**
+    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+
+    :warning: This method can only be called during a write transaction.
+
+    - parameter value: The object value.
+    - parameter key:   The name of the property.
+    */
+    func setValue(value: AnyObject?, forKey key: String)
 }
 
 private class _AnyRealmCollectionBase<T: Object>: RealmCollectionType {
     typealias Element = T
     var realm: Realm? { fatalError() }
+    var count: Int { fatalError() }
+    var description: String { fatalError() }
     func indexOf(object: Element) -> Int? { fatalError() }
     func indexOf(predicate: NSPredicate) -> Int? { fatalError() }
     func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
@@ -187,10 +226,12 @@ private class _AnyRealmCollectionBase<T: Object>: RealmCollectionType {
     func max<U: MinMaxType>(property: String) -> U? { fatalError() }
     func sum<U: AddableType>(property: String) -> U { fatalError() }
     func average<U: AddableType>(property: String) -> U? { fatalError() }
-    subscript(index: Int) -> T { fatalError() }
+    subscript(index: Int) -> Element { fatalError() }
     func generate() -> RLMGenerator<T> { fatalError() }
     var startIndex: Int { fatalError() }
     var endIndex: Int { fatalError() }
+    func valueForKey(key: String) -> AnyObject? { fatalError() }
+    func setValue(value: AnyObject?, forKey key: String) { fatalError() }
 }
 
 private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBase<C.Element> {
@@ -198,6 +239,189 @@ private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBa
     init(base: C) {
         self.base = base
     }
+
+    // MARK: Properties
+
+    /// The Realm the objects in this collection belong to, or `nil` if the
+    /// collection's owning object does not belong to a realm (the collection is
+    /// standalone).
+    override var realm: Realm? { return base.realm }
+
+    /// Returns the number of objects in this collection.
+    override var count: Int { return base.count }
+
+    /// Returns a human-readable description of the objects contained in this collection.
+    override var description: String { return base.description }
+
+
+    // MARK: Index Retrieval
+
+    /**
+    Returns the index of the given object, or `nil` if the object is not in the collection.
+
+    - parameter object: The object whose index is being queried.
+
+    - returns: The index of the given object, or `nil` if the object is not in the collection.
+    */
+    override func indexOf(object: C.Element) -> Int? { return base.indexOf(object) }
+
+    /**
+    Returns the index of the first object matching the given predicate,
+    or `nil` no objects match.
+
+    - parameter predicate: The `NSPredicate` used to filter the objects.
+
+    - returns: The index of the given object, or `nil` if no objects match.
+    */
+    override func indexOf(predicate: NSPredicate) -> Int? { return base.indexOf(predicate) }
+
+    /**
+    Returns the index of the first object matching the given predicate,
+    or `nil` if no objects match.
+
+    - parameter predicateFormat: The predicate format string, optionally followed by a variable number
+    of arguments.
+
+    - returns: The index of the given object, or `nil` if no objects match.
+    */
+    override func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? { return base.indexOf(predicateFormat, args) }
+
+    // MARK: Filtering
+
+    /**
+    Returns `Results` containing collection elements that match the given predicate.
+
+    - parameter predicateFormat: The predicate format string which can accept variable arguments.
+
+    - returns: `Results` containing collection elements that match the given predicate.
+    */
+    override func filter(predicateFormat: String, _ args: AnyObject...) -> Results<C.Element> { return base.filter(predicateFormat, args) }
+
+    /**
+    Returns `Results` containing collection elements that match the given predicate.
+
+    - parameter predicate: The predicate to filter the objects.
+
+    - returns: `Results` containing collection elements that match the given predicate.
+    */
+    override func filter(predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
+
+
+    // MARK: Sorting
+
+    /**
+    Returns `Results` containing collection elements sorted by the given property.
+
+    - parameter property:  The property name to sort by.
+    - parameter ascending: The direction to sort by.
+
+    - returns: `Results` containing collection elements sorted by the given property.
+    */
+    override func sorted(property: String, ascending: Bool) -> Results<C.Element> { return base.sorted(property, ascending: ascending) }
+
+    /**
+    Returns `Results` with elements sorted by the given sort descriptors.
+
+    - parameter sortDescriptors: `SortDescriptor`s to sort by.
+
+    - returns: `Results` with elements sorted by the given sort descriptors.
+    */
+    override func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<C.Element> { return base.sorted(sortDescriptors) }
+
+
+    // MARK: Aggregate Operations
+
+    /**
+    Returns the minimum value of the given property.
+
+    - warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `MinMaxType` to look for a minimum on.
+
+    - returns: The minimum value for the property amongst objects in the collection, or `nil` if the collection is empty.
+    */
+    override func min<U: MinMaxType>(property: String) -> U? { return base.min(property) }
+
+    /**
+    Returns the maximum value of the given property.
+
+    - warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `MinMaxType` to look for a maximum on.
+
+    - returns: The maximum value for the property amongst objects in the collection, or `nil` if the collection is empty.
+    */
+    override func max<U: MinMaxType>(property: String) -> U? { return base.max(property) }
+
+    /**
+    Returns the sum of the given property for objects in the collection.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
+
+    - returns: The sum of the given property over all objects in the collection.
+    */
+    override func sum<U: AddableType>(property: String) -> U { return base.sum(property) }
+
+    /**
+    Returns the average of the given property for objects in the collection.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate average on.
+
+    - returns: The average of the given property over all objects in the collection, or `nil` if the collection is empty.
+    */
+    override func average<U: AddableType>(property: String) -> U? { return base.average(property) }
+
+
+    // MARK: Sequence Support
+
+    /**
+    Returns the object at the given `index`.
+
+    - parameter index: The index.
+
+    - returns: The object at the given `index`.
+    */
+    override subscript(index: Int) -> C.Element { return unsafeBitCast(base[index as! C.Index], C.Element.self) } // FIXME: it should be possible to avoid this force-casting
+
+    /// Returns a `GeneratorOf<Element>` that yields successive elements in the collection.
+    override func generate() -> RLMGenerator<Element> { return base.generate() as! RLMGenerator<Element> } // FIXME: it should be possible to avoid this force-casting
+
+
+    // MARK: Collection Support
+
+    /// The position of the first element in a non-empty collection.
+    /// Identical to endIndex in an empty collection.
+    override var startIndex: Int { return base.startIndex as! Int } // FIXME: it should be possible to avoid this force-casting
+
+    /// The collection's "past the end" position.
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
+    override var endIndex: Int { return base.endIndex as! Int } // FIXME: it should be possible to avoid this force-casting
+
+
+    // MARK: Key-Value Coding
+
+    /**
+    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+
+    - parameter key: The name of the property.
+
+    - returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    */
+    override func valueForKey(key: String) -> AnyObject? { return base.valueForKey(key) }
+
+    /**
+    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+
+    :warning: This method can only be called during a write transaction.
+
+    - parameter value: The object value.
+    - parameter key:   The name of the property.
+    */
+    override func setValue(value: AnyObject?, forKey key: String) { base.setValue(value, forKey: key) }
 }
 
 /**
@@ -223,7 +447,23 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     /// standalone).
     public var realm: Realm? { return base.realm }
 
+    /// Returns the number of objects in this collection.
+    public var count: Int { return base.count }
+
+    /// Returns a human-readable description of the objects contained in this collection.
+    public var description: String { return base.description }
+
+
     // MARK: Index Retrieval
+
+    /**
+    Returns the index of the given object, or `nil` if the object is not in the collection.
+
+    - parameter object: The object whose index is being queried.
+
+    - returns: The index of the given object, or `nil` if the object is not in the collection.
+    */
+    public func indexOf(object: Element) -> Int? { return base.indexOf(object) }
 
     /**
     Returns the index of the first object matching the given predicate,
@@ -360,4 +600,26 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     /// The collection's "past the end" position.
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
     public var endIndex: Int { return base.endIndex }
+
+
+    // MARK: Key-Value Coding
+
+    /**
+    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+
+    - parameter key: The name of the property.
+
+    - returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    */
+    public func valueForKey(key: String) -> AnyObject? { return base.valueForKey(key) }
+
+    /**
+    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+
+    :warning: This method can only be called during a write transaction.
+
+    - parameter value: The object value.
+    - parameter key:   The name of the property.
+    */
+    public func setValue(value: AnyObject?, forKey key: String) { base.setValue(value, forKey: key) }
 }
