@@ -551,7 +551,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     configuration.readOnly = _readOnly;
     configuration.encryptionKey = _encryptionKey;
     configuration.dynamic = _dynamic;
-    configuration.customSchema = _schema == RLMSchema.sharedSchema ? nil : _schema;
+    configuration.customSchema = _schema;
     return configuration;
 }
 
