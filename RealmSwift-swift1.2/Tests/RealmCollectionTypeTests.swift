@@ -340,20 +340,147 @@ class ResultsFromLinkViewTests: RealmCollectionTypeTests {
 
 // MARK: List
 
-class LinkViewListTests: RealmCollectionTypeTests {
+class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
+    override class func defaultTestSuite() -> XCTestSuite {
+        // Don't run tests for the base class
+        if isEqual(ListRealmCollectionTypeTests) {
+            return XCTestSuite(name: "empty")
+        }
+        return super.defaultTestSuite()
+    }
+
+    override func testDescription() {
+        XCTAssertEqual(collection.description, "List<SwiftStringObject> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
+    }
+}
+
+class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
+    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
+        return AnyRealmCollection(SwiftArrayPropertyObject(value: ["", [str1, str2], []]).array)
+    }
+
+    override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
+        return AnyRealmCollection(SwiftAggregateObjectList(value: [makeAggregateableObjects()]).list)
+    }
+
+    override func testRealm() {
+        XCTAssertNil(collection.realm)
+    }
+
+    override func testCount() {
+        XCTAssertEqual(2, collection.count)
+    }
+
+    override func testIndexOfObject() {
+        XCTAssertEqual(0, collection.indexOf(str1)!)
+        XCTAssertEqual(1, collection.indexOf(str2)!)
+    }
+
+    override func testSortWithDescriptor() {
+        let collection = getAggregateableCollection()
+        assertThrows(collection.sorted([SortDescriptor(property: "intCol", ascending: true)]))
+        assertThrows(collection.sorted([SortDescriptor(property: "doubleCol", ascending: false), SortDescriptor(property: "intCol", ascending: false)]))
+    }
+
+    override func testFastEnumerationWithMutation() {
+        // No standalone removal interface provided on RealmCollectionType
+    }
+
+    override func testFirst() {
+        XCTAssertEqual(str1, collection.first!)
+    }
+
+    override func testLast() {
+        XCTAssertEqual(str2, collection.last!)
+    }
+
+    // MARK: Things not implemented in standalone
+
+    override func testSortWithProperty() {
+        assertThrows(self.collection.sorted("stringCol", ascending: true))
+        assertThrows(self.collection.sorted("noSuchCol", ascending: true))
+    }
+
+    override func testFilterFormat() {
+        assertThrows(self.collection.filter("stringCol = '1'"))
+        assertThrows(self.collection.filter("noSuchCol = '1'"))
+    }
+
+    override func testFilterPredicate() {
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "noSuchCol = '2'")
+
+        assertThrows(self.collection.filter(pred1))
+        assertThrows(self.collection.filter(pred2))
+    }
+
+    override func testArrayAggregateWithSwiftObjectDoesntThrow() {
+        assertThrows(self.collection.filter("ANY stringListCol == %@", SwiftStringObject()))
+    }
+
+    override func testMin() {
+        assertThrows(self.collection.min("intCol") as Int!)
+        assertThrows(self.collection.min("floatCol") as Float!)
+        assertThrows(self.collection.min("doubleCol") as Double!)
+        assertThrows(self.collection.min("dateCol") as NSDate!)
+    }
+
+    override func testMax() {
+        assertThrows(self.collection.max("intCol") as Int!)
+        assertThrows(self.collection.max("floatCol") as Float!)
+        assertThrows(self.collection.max("doubleCol") as Double!)
+        assertThrows(self.collection.max("dateCol") as NSDate!)
+    }
+
+    override func testSum() {
+        assertThrows(self.collection.sum("intCol") as Int)
+        assertThrows(self.collection.sum("floatCol") as Float)
+        assertThrows(self.collection.sum("doubleCol") as Double)
+    }
+
+    override func testAverage() {
+        assertThrows(self.collection.average("intCol") as Int!)
+        assertThrows(self.collection.average("floatCol") as Float!)
+        assertThrows(self.collection.average("doubleCol") as Double!)
+    }
+}
+
+class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
+    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
+        let array = SwiftArrayPropertyObject(value: ["", [str1, str2], []])
+        realmWithTestPath().add(array)
+        return AnyRealmCollection(array.array)
+    }
+
+    override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
+        let list = SwiftAggregateObjectList(value: [makeAggregateableObjects()])
+        realmWithTestPath().add(list)
+        return AnyRealmCollection(list.list)
+    }
+}
+
+class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
         let array = realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
         return AnyRealmCollection(array.array)
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
-        let list = SwiftAggregateObjectList()
-        realmWithTestPath().add(list)
-        list.list.extend(makeAggregateableObjects())
+        let list = realmWithTestPath().create(SwiftAggregateObjectList.self, value: [makeAggregateableObjects()])
         return AnyRealmCollection(list.list)
     }
+}
 
-    override func testDescription() {
-        XCTAssertEqual(collection.description, "List<SwiftStringObject> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
+class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
+    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
+        realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
+        let array = realmWithTestPath().objects(SwiftArrayPropertyObject).first!
+        return AnyRealmCollection(array.array)
+    }
+
+    override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
+        realmWithTestPath().create(SwiftAggregateObjectList.self, value: [makeAggregateableObjects()])
+        let list = realmWithTestPath().objects(SwiftAggregateObjectList.self).first!
+        return AnyRealmCollection(list.list)
     }
 }
