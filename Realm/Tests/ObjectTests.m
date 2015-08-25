@@ -400,6 +400,35 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 #endif
 }
 
+- (void)testObjectInitWithPersistedObject {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    CompanyObject *companyObject = [CompanyObject createInRealm:realm withValue:@[@"CA", @[@[@"Anna", @1, @NO], @[@"Bill", @3, @YES]]]];
+    OwnerObject *ownerObject = [OwnerObject createInRealm:realm withValue:@[@"Samuel", @[@"Fido", @8]]];
+    [realm commitWriteTransaction];
+
+    {
+        CompanyObject *standalone = [[CompanyObject alloc] initWithValue:companyObject];
+
+        XCTAssertNil(standalone.realm);
+        XCTAssertNil(standalone.employees.realm);
+        XCTAssertEqualObjects((@[NSNull.null, NSNull.null]), [standalone.employees valueForKey:@"realm"]);
+
+        XCTAssertEqualObjects(@"CA", standalone.name);
+        XCTAssertEqualObjects((@[@"Anna", @"Bill"]), [standalone.employees valueForKey:@"name"]);
+    }
+
+    {
+        OwnerObject *standalone = [[OwnerObject alloc] initWithValue:ownerObject];
+
+        XCTAssertNil(standalone.realm);
+        XCTAssertNil(standalone.dog.realm);
+
+        XCTAssertEqualObjects(@"Samuel", standalone.name);
+        XCTAssertEqualObjects(@"Fido", standalone.dog.dogName);
+    }
+}
+
 -(void)testObjectInitWithObjectLiterals {
     NSArray *array = @[@"company", @[@[@"Alex", @29, @YES]]];
     CompanyObject *company = [[CompanyObject alloc] initWithValue:array];
