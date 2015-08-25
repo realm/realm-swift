@@ -456,6 +456,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     public typealias Element = T
     private let base: _AnyRealmCollectionBase<T>
 
+    /// Creates an AnyRealmCollection wrapping `base`.
     public init<C: RealmCollectionType where C.Element == T>(_ base: C) {
         self.base = _AnyRealmCollection(base: base)
     }
