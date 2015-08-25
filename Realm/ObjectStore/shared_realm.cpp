@@ -22,47 +22,57 @@
 #include <realm/group_shared.hpp>
 #include <realm/lang_bind_helper.hpp>
 
-#include <memory>
 #include <mutex>
 
 using namespace realm;
 
 RealmCache Realm::s_global_cache;
 
-Realm::Config::Config(const Config& c) : path(c.path), read_only(c.read_only), in_memory(c.in_memory), cache(c.cache), schema_version(c.schema_version), migration_function(c.migration_function)
+Realm::Config::Config(const Config& c)
+: path(c.path)
+, read_only(c.read_only)
+, in_memory(c.in_memory)
+, cache(c.cache)
+, encryption_key(c.encryption_key)
+, schema_version(c.schema_version)
+, migration_function(c.migration_function)
 {
     if (c.schema) {
         schema = std::make_unique<Schema>(*c.schema);
     }
-    if (c.encryption_key) {
-        encryption_key = std::make_unique<char[]>(64);
-        memcpy(encryption_key.get(), c.encryption_key.get(), 64);
-    }
 }
 
-Realm::Realm(Config &config) : m_config(config)
+Realm::Config& Realm::Config::operator=(realm::Realm::Config const& c)
+{
+    if (&c != this) {
+        *this = Config(c);
+    }
+    return *this;
+}
+
+Realm::Realm(Config config) : m_config(std::move(config))
 {
     try {
-        if (config.read_only) {
-            m_read_only_group = std::make_unique<Group>(config.path, config.encryption_key.get(), Group::mode_ReadOnly);
+        if (m_config.read_only) {
+            m_read_only_group = std::make_unique<Group>(m_config.path, m_config.encryption_key.data(), Group::mode_ReadOnly);
             m_group = m_read_only_group.get();
         }
         else {
-            m_history = realm::make_client_history(config.path, config.encryption_key.get());
-            SharedGroup::DurabilityLevel durability = config.in_memory ? SharedGroup::durability_MemOnly :
-                                                                         SharedGroup::durability_Full;
-            m_shared_group = std::make_unique<SharedGroup>(*m_history, durability, config.encryption_key.get());
+            m_history = realm::make_client_history(m_config.path, m_config.encryption_key.data());
+            SharedGroup::DurabilityLevel durability = m_config.in_memory ? SharedGroup::durability_MemOnly :
+                                                                           SharedGroup::durability_Full;
+            m_shared_group = std::make_unique<SharedGroup>(*m_history, durability, m_config.encryption_key.data());
         }
     }
     catch (util::File::PermissionDenied const& ex) {
-        throw RealmFileException(RealmFileException::Kind::PermissionDenied, "Unable to open a realm at path '" + config.path +
-                             "'. Please use a path where your app has " + (config.read_only ? "read" : "read-write") + " permissions.");
+        throw RealmFileException(RealmFileException::Kind::PermissionDenied, "Unable to open a realm at path '" + m_config.path +
+                             "'. Please use a path where your app has " + (m_config.read_only ? "read" : "read-write") + " permissions.");
     }
     catch (util::File::Exists const& ex) {
-        throw RealmFileException(RealmFileException::Kind::Exists, "Unable to open a realm at path '" + config.path + "'");
+        throw RealmFileException(RealmFileException::Kind::Exists, "Unable to open a realm at path '" + m_config.path + "'");
     }
     catch (util::File::AccessError const& ex) {
-        throw RealmFileException(RealmFileException::Kind::AccessError, "Unable to open a realm at path '" + config.path + "'");
+        throw RealmFileException(RealmFileException::Kind::AccessError, "Unable to open a realm at path '" + m_config.path + "'");
     }
     catch (IncompatibleLockFile const&) {
         throw RealmFileException(RealmFileException::Kind::IncompatibleLockFile, "Realm file is currently open in another process "
@@ -78,7 +88,7 @@ Group *Realm::read_group()
     return m_group;
 }
 
-SharedRealm Realm::get_shared_realm(Config &config)
+SharedRealm Realm::get_shared_realm(Config config)
 {
     SharedRealm realm = s_global_cache.get_realm(config.path);
     if (realm) {
@@ -104,7 +114,7 @@ SharedRealm Realm::get_shared_realm(Config &config)
         return realm;
     }
 
-    realm = SharedRealm(new Realm(config));
+    realm = SharedRealm(new Realm(std::move(config)));
 
     // we want to ensure we are only initializing a single realm at a time
     static std::mutex s_init_mutex;
@@ -153,13 +163,17 @@ bool Realm::update_schema(Schema &schema, uint64_t version)
         if (!m_config.read_only && ObjectStore::realm_requires_update(read_group(), version, schema)) {
             // keep old copy to pass to migration function
             old_config.read_only = true;
-            SharedRealm old_realm = SharedRealm(new Realm(old_config)), updated_realm = shared_from_this();
+            old_config.schema_version = ObjectStore::get_schema_version(read_group());
+            old_config.schema = std::make_unique<Schema>(ObjectStore::schema_from_group(read_group()));
+            SharedRealm old_realm(new Realm(old_config));
+            auto updated_realm = shared_from_this();
 
             // update and migrate
             begin_transaction();
-            changed = ObjectStore::update_realm_with_schema(read_group(), version, *m_config.schema, [=](__unused Group *group, __unused Schema &target_schema) {
-                m_config.migration_function(old_realm, updated_realm);
-            });
+            changed = ObjectStore::update_realm_with_schema(read_group(), version, *m_config.schema,
+                                                            [=](__unused Group *group, __unused Schema &target_schema) {
+                                                                m_config.migration_function(old_realm, updated_realm);
+                                                            });
             commit_transaction();
         }
         else {

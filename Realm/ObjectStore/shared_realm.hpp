@@ -19,11 +19,11 @@
 #ifndef REALM_REALM_HPP
 #define REALM_REALM_HPP
 
+#include <map>
 #include <memory>
+#include <set>
 #include <thread>
 #include <vector>
-#include <set>
-#include <map>
 
 #include "object_store.hpp"
 
@@ -45,7 +45,7 @@ namespace realm {
             bool read_only = false;
             bool in_memory = false;
             bool cache = true;
-            std::unique_ptr<char[]> encryption_key;
+            std::vector<char> encryption_key;
 
             std::unique_ptr<Schema> schema;
             uint64_t schema_version = ObjectStore::NotVersioned;
@@ -55,18 +55,23 @@ namespace realm {
             Config() = default;
             Config(Config&&) = default;
             Config(const Config& c);
+
+            Config& operator=(Config const&);
+            Config& operator=(Config&&) = default;
         };
 
         // Get a cached Realm or create a new one if no cached copies exists
-        // Caching is done by path - mismatches for inMemory and readOnly Config properties
-        // will raise an exception
-        // If schema/schema_version is specified, update_schema is called automatically on the realm
-        // and a migration is performed. If not specified, the schema version and schema are dynamically
-        // read from the the existing Realm.
-        static SharedRealm get_shared_realm(Config &config);
+        // Caching is done by path - mismatches for in_memory and read_only
+        // Config properties will raise an exception
+        // If schema/schema_version is specified, update_schema is called
+        // automatically on the realm and a migration is performed. If not
+        // specified, the schema version and schema are dynamically read from
+        // the the existing Realm.
+        static SharedRealm get_shared_realm(Config config);
 
-        // Updates a Realm to a given target schema/version creating tables and updating indexes as necessary
-        // Uses the existing migration function on the Config, and the resulting Schema and version with updated
+        // Updates a Realm to a given target schema/version creating tables and
+        // updating indexes as necessary. Uses the existing migration function
+        // on the Config, and the resulting Schema and version with updated
         // column mappings are set on the realms config upon success.
         // returns if any changes were made
         bool update_schema(Schema &schema, uint64_t version);
@@ -98,7 +103,7 @@ namespace realm {
         const std::string DidChangeNotification = "DidChangeNotification";
 
       private:
-        Realm(Config &config);
+        Realm(Config config);
 
         Config m_config;
         std::thread::id m_thread_id = std::this_thread::get_id();

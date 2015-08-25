@@ -18,8 +18,8 @@
 
 #import <Realm/RLMConstants.h>
 
-NSString * const RLMRealmRefreshRequiredNotification = @"RefreshRequiredNotification";
-NSString * const RLMRealmDidChangeNotification = @"DidChangeNotification";
+NSString * const RLMRealmRefreshRequiredNotification = @"RLMRealmRefreshRequiredNotification";
+NSString * const RLMRealmDidChangeNotification = @"RLMRealmDidChangeNotification";
 
 NSString * const RLMErrorDomain = @"io.realm";
 
