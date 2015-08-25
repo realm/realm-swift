@@ -20,6 +20,7 @@
 
 #import <objc/runtime.h>
 #import "RLMProperty_Private.h"
+#import "RLMRealm_Dynamic.h"
 
 @interface PropertyTests : RLMTestCase
 
