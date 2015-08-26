@@ -17,12 +17,16 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "object_schema.hpp"
+
 #include "object_store.hpp"
+#include "property.hpp"
 
 #include <realm/group_shared.hpp>
 #include <realm/link_view.hpp>
 
 using namespace realm;
+
+ObjectSchema::~ObjectSchema() = default;
 
 ObjectSchema::ObjectSchema(Group *group, const std::string &name) : name(name) {
     TableRef tableRef = ObjectStore::table_for_object_type(group, name);

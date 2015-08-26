@@ -26,6 +26,7 @@
 #include <realm/group.hpp>
 
 #include "object_schema.hpp"
+#include "property.hpp"
 
 namespace realm {
     class ObjectSchemaValidationException;

@@ -22,14 +22,14 @@
 #include <string>
 #include <vector>
 
-#include "property.hpp"
-
 namespace realm {
+    class Property;
     class Group;
 
     class ObjectSchema {
     public:
-        ObjectSchema() {}
+        ObjectSchema() = default;
+        ~ObjectSchema();
 
         // create object schema from existing table
         // if no table is provided it is looked up in the group
