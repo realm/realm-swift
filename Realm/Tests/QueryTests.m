@@ -1831,20 +1831,20 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    ArrayPropertyObject *arr = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[], @[]]];
-    [arr.array addObject:[StringObject createInRealm:realm withValue:@[@"value"]]];
+    IntegerArrayPropertyObject *arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @1234, @[]]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @456 ]]];
     [realm commitWriteTransaction];
 
 
-    XCTAssertEqual(1U, ([ArrayPropertyObject objectsWhere:@"array.@count > 0"].count));
-    XCTAssertEqual(1U, ([ArrayPropertyObject objectsWhere:@"0 < array.@count"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@count > 0"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"0 < array.@count"].count));
 
     // We do not yet handle collection operations with a keypath on the other side of the comparison.
-    XCTAssertThrows(([ArrayPropertyObject objectsWhere:@"array.@count != name"]));
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count != number"]), @"'array.@count' not found in object");
 
-    RLMAssertThrowsWithReasonMatching(([ArrayPropertyObject objectsWhere:@"array.@count.foo.bar != 0"]), @"single level key");
-    RLMAssertThrowsWithReasonMatching(([ArrayPropertyObject objectsWhere:@"array.@count.stringCol > 0"]), @"@count does not have any properties");
-    RLMAssertThrowsWithReasonMatching(([ArrayPropertyObject objectsWhere:@"array.@count != 'Hello'"]), @"@count can only be compared with a numeric value");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.foo.bar != 0"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.intCol > 0"]), @"@count does not have any properties");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count != 'Hello'"]), @"@count can only be compared with a numeric value");
 }
 
 @end
