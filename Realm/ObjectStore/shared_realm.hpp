@@ -44,6 +44,7 @@ namespace realm {
             std::string path;
             bool read_only = false;
             bool in_memory = false;
+            bool cache = true;
             std::unique_ptr<char[]> encryption_key;
 
             std::unique_ptr<Schema> schema;

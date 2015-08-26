@@ -324,6 +324,7 @@ static Schema RLMObjectStoreSchemaForRLMSchema(RLMSchema *rlmSchema) {
     config.path = path.UTF8String;
     config.read_only = readOnly;
     config.in_memory = inMemory;
+    config.cache = !dynamic;
     if (key) {
         config.encryption_key = std::make_unique<char[]>(key.length);
         memcpy(config.encryption_key.get(), key.bytes, key.length);

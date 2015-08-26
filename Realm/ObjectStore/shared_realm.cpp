@@ -29,7 +29,7 @@ using namespace realm;
 
 RealmCache Realm::s_global_cache;
 
-Realm::Config::Config(const Config& c) : path(c.path), read_only(c.read_only), in_memory(c.in_memory), schema_version(c.schema_version), migration_function(c.migration_function)
+Realm::Config::Config(const Config& c) : path(c.path), read_only(c.read_only), in_memory(c.in_memory), cache(c.cache), schema_version(c.schema_version), migration_function(c.migration_function)
 {
     if (c.schema) {
         schema = std::make_unique<Schema>(*c.schema);
@@ -132,7 +132,9 @@ SharedRealm Realm::get_shared_realm(Config &config)
         realm->update_schema(*realm->m_config.schema, realm->m_config.schema_version);
     }
 
-    s_global_cache.cache_realm(realm, realm->m_thread_id);
+    if (config.cache) {
+        s_global_cache.cache_realm(realm, realm->m_thread_id);
+    }
     return realm;
 }
 
