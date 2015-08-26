@@ -126,13 +126,62 @@ NSString *operatorName(NSPredicateOperatorType operatorType)
     return [NSString stringWithFormat:@"unknown operator %lu", (unsigned long)operatorType];
 }
 
+class CollectionOperation {
+public:
+    enum Type {
+        Count,
+    };
+
+    CollectionOperation(Type type, RLMProperty *linkProperty, RLMProperty *property)
+        : m_type(type)
+        , m_link_property(linkProperty)
+        , m_property(property)
+    {
+        RLMPrecondition(m_link_property.type == RLMPropertyTypeArray, @"Invalid predicate", @"Collection operation can only be applied to a property of type RLMArray.");
+        switch (m_type) {
+            case Count:
+                RLMPrecondition(!m_property, @"Invalid predicate", @"Result of @count does not have any properties.");
+                break;
+        }
+    }
+
+    CollectionOperation(NSString *operationName, RLMProperty *linkProperty, RLMProperty *property = nil)
+        : CollectionOperation(type_for_name(operationName), linkProperty, property)
+    {
+    }
+
+    Type type() const { return m_type; }
+    NSUInteger linkColumnIndex() const { return m_link_property.column; }
+    NSUInteger columnIndex() const { return m_property.column; }
+
+    void validate_value(id value) const {
+        switch (m_type) {
+            case Count:
+                RLMPrecondition([value isKindOfClass:[NSNumber class]], @"Invalid operand", @"@count can only be compared with a numeric value.");
+                break;
+        }
+    }
+
+private:
+    static Type type_for_name(NSString *name) {
+        if ([name isEqualToString:@"@count"]) {
+            return Count;
+        }
+        @throw RLMPredicateException(@"Invalid predicate", @"Unsupported collection operation '%@'", name);
+    }
+
+    Type m_type;
+    RLMProperty *m_link_property;
+    RLMProperty *m_property;
+};
+
 // add a clause for numeric constraints based on operator type
 template <typename A, typename B>
 void add_numeric_constraint_to_query(realm::Query& query,
                                      RLMPropertyType datatype,
                                      NSPredicateOperatorType operatorType,
-                                     A lhs,
-                                     B rhs)
+                                     A&& lhs,
+                                     B&& rhs)
 {
     switch (operatorType) {
         case NSLessThanPredicateOperatorType:
@@ -539,7 +588,7 @@ void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
 }
 
 RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc,
-                                        NSString *keyPath, std::vector<NSUInteger> &indexes, bool isAny)
+                                        NSString *keyPath, std::vector<NSUInteger> &indexes, bool isAggregate)
 {
     RLMProperty *prop = nil;
 
@@ -561,15 +610,15 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
             RLMPrecondition(prop, @"Invalid property name",
                             @"Property '%@' not found in object of type '%@'", path, desc.className);
 
-            if (isAny) {
+            if (isAggregate) {
                 RLMPrecondition(prop.type == RLMPropertyTypeArray,
                                 @"Invalid predicate",
-                                @"ANY modifier can only be used for RLMArray properties");
+                                @"Aggregate operations can only be used on RLMArray properties");
             }
             else {
                 RLMPrecondition(prop.type != RLMPropertyTypeArray,
                                 @"Invalid predicate",
-                                @"RLMArray predicates must contain the ANY modifier");
+                                @"RLMArray predicates must use aggregate operations");
             }
         }
 
@@ -598,6 +647,113 @@ void validate_property_value(__unsafe_unretained RLMProperty *const prop,
     }
 }
 
+template <typename RequestedType, CollectionOperation::Type OperationType, typename TableGetter>
+struct ValueOfTypeWithCollectionOperationHelper;
+
+template <typename RequestedType, typename TableGetter>
+struct ValueOfTypeWithCollectionOperationPassThrough {
+    template <typename T>
+    static auto convert(TableGetter&& table, T&& value)
+    {
+        return value_of_type_for_query<RequestedType>(std::forward<TableGetter>(table), std::forward<T>(value));
+    }
+};
+
+template <typename TableGetter>
+struct ValueOfTypeWithCollectionOperationHelper<Int, CollectionOperation::Count, TableGetter> : ValueOfTypeWithCollectionOperationPassThrough<Int, TableGetter> {
+    using ValueOfTypeWithCollectionOperationPassThrough<Int, TableGetter>::convert;
+
+    static auto convert(TableGetter&& table, CollectionOperation operation)
+    {
+        assert(operation.type() == CollectionOperation::Count);
+        return table()->template column<Link>(operation.linkColumnIndex()).count();
+    }
+};
+
+template <typename Requested, CollectionOperation::Type OperationType, typename TableGetter, typename T>
+auto value_of_type_for_query_with_collection_operation(TableGetter&& table, T&& value) {
+    using helper = ValueOfTypeWithCollectionOperationHelper<Requested, OperationType, TableGetter>;
+    return helper::convert(std::forward<TableGetter>(table), std::forward<T>(value));
+}
+
+template <typename... T>
+void add_collection_operation_constraint_to_query(realm::Query& query, NSPredicateOperatorType operatorType,
+                                                  CollectionOperation::Type collectionOperationType, const std::vector<NSUInteger> linkColumns, T... values)
+{
+    static_assert(sizeof...(T) == 2, "add_collection_operation_constraint_to_query accepts only two values as arguments");
+
+    auto table = [&] {
+        realm::TableRef& tbl = query.get_table();
+        for (NSUInteger col : linkColumns) {
+            tbl->link(col); // mutates m_link_chain on table
+        }
+        return tbl.get();
+    };
+
+    switch (collectionOperationType) {
+        case CollectionOperation::Count: {
+            add_numeric_constraint_to_query(query, RLMPropertyTypeInt, operatorType, value_of_type_for_query_with_collection_operation<Int, CollectionOperation::Count>(table, values)...);
+            break;
+        }
+    }
+}
+
+bool key_path_contains_collection_operator(NSString *keyPath) {
+    return [keyPath rangeOfString:@"@"].location != NSNotFound;
+}
+
+NSString *get_collection_operation_name_from_key_path(NSString *keyPath, NSString **leadingKeyPath, NSString **trailingKey) {
+    NSRange at  = [keyPath rangeOfString:@"@"];
+    if (at.location == NSNotFound || at.location >= keyPath.length - 1) {
+        @throw RLMPredicateException(@"Invalid key path", @"'%@' is not a valid key path'", keyPath);
+    }
+
+    if ([keyPath characterAtIndex:at.location - 1] != '.') {
+        @throw RLMPredicateException(@"Invalid key path", @"'%@' is not a valid key path'", keyPath);
+    }
+
+    NSRange trailingKeyRange = [keyPath rangeOfString:@"." options:0 range:{at.location, keyPath.length - at.location} locale:nil];
+
+    *leadingKeyPath = [keyPath substringToIndex:at.location - 1];
+    if (trailingKeyRange.location == NSNotFound) {
+        *trailingKey = nil;
+        return [keyPath substringFromIndex:at.location];
+    } else {
+        *trailingKey = [keyPath substringFromIndex:trailingKeyRange.location + 1];
+        return [keyPath substringWithRange:{at.location, trailingKeyRange.location - at.location}];
+    }
+}
+
+void update_query_with_collection_operator_expression(RLMSchema *schema,
+                                                      RLMObjectSchema *desc,
+                                                      realm::Query &query,
+                                                      NSString *keyPath,
+                                                      id value,
+                                                      NSComparisonPredicate *pred) {
+    NSString *leadingKeyPath;
+    NSString *trailingKey;
+    NSString *collectionOperationName = get_collection_operation_name_from_key_path(keyPath, &leadingKeyPath, &trailingKey);
+
+    std::vector<NSUInteger> indexes;
+    RLMProperty *linkProperty = get_property_from_key_path(schema, desc, leadingKeyPath, indexes, true);
+    RLMProperty *property;
+    if (trailingKey) {
+        RLMPrecondition([trailingKey rangeOfString:@"."].location == NSNotFound, @"Invalid key path", @"Right side of collection operator may only have a single level key");
+        NSString *fullKeyPath = [leadingKeyPath stringByAppendingFormat:@".%@", trailingKey];
+        std::vector<NSUInteger> ignoredIndexes;
+        property = get_property_from_key_path(schema, desc, fullKeyPath, ignoredIndexes, true);
+    }
+
+    CollectionOperation operation(collectionOperationName, linkProperty, property);
+    operation.validate_value(value);
+
+    if (pred.leftExpression.expressionType == NSKeyPathExpressionType) {
+        add_collection_operation_constraint_to_query(query, pred.predicateOperatorType, operation.type(), indexes, operation, value);
+    } else {
+        add_collection_operation_constraint_to_query(query, pred.predicateOperatorType, operation.type(), indexes, value, operation);
+    }
+}
+
 void update_query_with_value_expression(RLMSchema *schema,
                                         RLMObjectSchema *desc,
                                         realm::Query &query,
@@ -605,6 +761,11 @@ void update_query_with_value_expression(RLMSchema *schema,
                                         id value,
                                         NSComparisonPredicate *pred)
 {
+    if (key_path_contains_collection_operator(keyPath)) {
+        update_query_with_collection_operator_expression(schema, desc, query, keyPath, value, pred);
+        return;
+    }
+
     bool isAny = pred.comparisonPredicateModifier == NSAnyPredicateModifier;
     std::vector<NSUInteger> indexes;
     RLMProperty *prop = get_property_from_key_path(schema, desc, keyPath, indexes, isAny);
