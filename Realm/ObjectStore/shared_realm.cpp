@@ -223,8 +223,8 @@ void Realm::begin_transaction()
     LangBindHelper::promote_to_write(*m_shared_group, *m_history);
     m_in_transaction = true;
 
-    if (announce) {
-        send_local_notifications(DidChangeNotification);
+    if (announce && m_delegate) {
+        m_delegate->did_change();
     }
 }
 
@@ -240,8 +240,10 @@ void Realm::commit_transaction()
     LangBindHelper::commit_and_continue_as_read(*m_shared_group);
     m_in_transaction = false;
 
-    send_external_notifications();
-    send_local_notifications(DidChangeNotification);
+    if (m_delegate) {
+        m_delegate->transaction_committed();
+        m_delegate->did_change();
+    }
 }
 
 void Realm::cancel_transaction()
@@ -303,20 +305,13 @@ void Realm::notify()
             if (m_group) {
                 LangBindHelper::advance_read(*m_shared_group, *m_history);
             }
-            send_local_notifications(DidChangeNotification);
+            if (m_delegate) {
+                m_delegate->did_change();
+            }
         }
-        else {
-            send_local_notifications(RefreshRequiredNotification);
+        else if (m_delegate) {
+            m_delegate->changes_available();
         }
-    }
-}
-
-
-void Realm::send_local_notifications(const std::string &type)
-{
-    verify_thread();
-    for (NotificationFunction const& notification : m_notifications) {
-        (*notification)(type);
     }
 }
 
@@ -344,7 +339,9 @@ bool Realm::refresh()
         read_group();
     }
 
-    send_local_notifications(DidChangeNotification);
+    if (m_delegate) {
+        m_delegate->did_change();
+    }
     return true;
 }
 

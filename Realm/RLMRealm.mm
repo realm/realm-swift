@@ -53,29 +53,62 @@ using util::File;
 + (instancetype)dynamicSchemaFromObjectStoreSchema:(realm::Schema &)objectStoreSchema;
 @end
 
+@interface RLMRealm ()
+- (void)sendNotifications:(NSString *)notification;
+@end
+
 void RLMDisableSyncToDisk() {
     realm::disable_sync_to_disk();
 }
 
 // Notification Token
-
-@interface RLMNotificationToken () {
-@public
-    Realm::NotificationFunction _notification;
-}
+@interface RLMNotificationToken ()
+@property (nonatomic, strong) RLMRealm *realm;
+@property (nonatomic, copy) RLMNotificationBlock block;
 @end
 
 @implementation RLMNotificationToken
 - (void)dealloc
 {
-    if (_notification) {
+    if (_realm || _block) {
         NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "
               @"on to the RLMNotificationToken returned from addNotificationBlock and call "
               @"removeNotification: when you no longer wish to recieve RLMRealm notifications.");
     }
-    _notification.reset();
 }
 @end
+
+namespace {
+class RLMNotificationHelper : public realm::RealmDelegate {
+public:
+    RLMNotificationHelper(RLMRealm *realm, NSError **error)
+    : realm(realm)
+    , notifier([[RLMNotifier alloc] initWithRealm:realm error:error])
+    {
+    }
+
+    ~RLMNotificationHelper() {
+        [notifier stop];
+    }
+
+    void transaction_committed() override {
+        [notifier notifyOtherRealms];
+    }
+
+    void changes_available() override {
+        [realm sendNotifications:RLMRealmRefreshRequiredNotification];
+    }
+
+    void did_change() override {
+        [realm sendNotifications:RLMRealmDidChangeNotification];
+    }
+
+private:
+    // This is owned by the realm, so it needs to not retain the realm
+    __unsafe_unretained RLMRealm *const realm;
+    RLMNotifier *notifier;
+};
+}
 
 static bool shouldForciblyDisableEncryption() {
     static bool disableEncryption = getenv("REALM_DISABLE_ENCRYPTION");
@@ -104,6 +137,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 
 @implementation RLMRealm {
     NSHashTable *_collectionEnumerators;
+    NSHashTable *_notificationHandlers;
 }
 
 + (BOOL)isCoreDebug {
@@ -359,15 +393,7 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
     if (!readOnly) {
         // initializing the schema started a read transaction, so end it
         [realm invalidate];
-
-        realm.notifier = [[RLMNotifier alloc] initWithRealm:realm error:error];
-        if (!realm.notifier) {
-            return nil;
-        }
-        __weak RLMNotifier *weakNotifier = realm.notifier;
-        realm->_realm->m_external_notifier = std::make_unique<std::function<void()>>([=]() {
-            [weakNotifier notifyOtherRealms];
-        });
+        realm->_realm->m_delegate = std::make_unique<RLMNotificationHelper>(realm, error);
     }
 
     return RLMAutorelease(realm);
@@ -392,24 +418,34 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         @throw RLMException(@"The notification block should not be nil");
     }
 
+    if (!_notificationHandlers) {
+        _notificationHandlers = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
+    }
+
     RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
-    __weak RLMRealm *weakRealm = self;
-    token->_notification = token->_notification.make_shared([weakRealm, block](const std::string notification) {
-        RLMRealm *self = weakRealm;
-        if (notification == _realm->RefreshRequiredNotification)
-            block(RLMRealmRefreshRequiredNotification, self);
-        else
-            block(RLMRealmDidChangeNotification, self);
-    });
-    _realm->add_notification(token->_notification);
+    token.realm = self;
+    token.block = block;
+    [_notificationHandlers addObject:token];
     return token;
 }
 
 - (void)removeNotification:(RLMNotificationToken *)token {
     [self verifyThread];
     if (token) {
-        _realm->remove_notification(token->_notification);
-        token->_notification.reset();
+        [_notificationHandlers removeObject:token];
+        token.realm = nil;
+        token.block = nil;
+    }
+}
+
+- (void)sendNotifications:(NSString *)notification {
+    NSAssert(!self.readOnly, @"Read-only realms do not have notifications");
+
+    // call this realms notification blocks
+    for (RLMNotificationToken *token in [_notificationHandlers allObjects]) {
+        if (token.block) {
+            token.block(notification, self);
+        }
     }
 }
 
@@ -521,9 +557,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
                   "pending changes have been rolled back. Make sure to retain a reference to the "
                   "RLMRealm for the duration of the write transaction.");
         }
-        _realm->remove_all_notifications();
     }
-    [_notifier stop];
 }
 
 - (void)notify {

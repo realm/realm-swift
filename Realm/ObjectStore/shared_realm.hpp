@@ -21,18 +21,18 @@
 
 #include <map>
 #include <memory>
-#include <set>
 #include <thread>
 #include <vector>
 
 #include "object_store.hpp"
 
 namespace realm {
-    class RealmCache;
+    class ClientHistory;
     class Realm;
+    class RealmCache;
+    class RealmDelegate;
     typedef std::shared_ptr<Realm> SharedRealm;
     typedef std::weak_ptr<Realm> WeakRealm;
-    class ClientHistory;
 
     class Realm : public std::enable_shared_from_this<Realm>
     {
@@ -90,19 +90,11 @@ namespace realm {
         bool auto_refresh() { return m_auto_refresh; }
         void notify();
 
-        typedef std::shared_ptr<std::function<void(const std::string)>> NotificationFunction;
-        void add_notification(NotificationFunction &notification) { m_notifications.insert(notification); }
-        void remove_notification(NotificationFunction notification) { m_notifications.erase(notification); }
-        void remove_all_notifications() { m_notifications.clear(); }
-
         void invalidate();
         bool compact();
 
         std::thread::id thread_id() const { return m_thread_id; }
         void verify_thread();
-
-        const std::string RefreshRequiredNotification = "RefreshRequiredNotification";
-        const std::string DidChangeNotification = "DidChangeNotification";
 
       private:
         Realm(Config config);
@@ -112,12 +104,6 @@ namespace realm {
         bool m_in_transaction = false;
         bool m_auto_refresh = true;
 
-        std::set<NotificationFunction> m_notifications;
-        void send_local_notifications(const std::string &notification);
-
-        typedef std::unique_ptr<std::function<void()>> ExternalNotificationFunction;
-        void send_external_notifications() { if (m_external_notifier) (*m_external_notifier)(); }
-
         std::unique_ptr<ClientHistory> m_history;
         std::unique_ptr<SharedGroup> m_shared_group;
         std::unique_ptr<Group> m_read_only_group;
@@ -125,7 +111,7 @@ namespace realm {
         Group *m_group = nullptr;
 
       public:
-        ExternalNotificationFunction m_external_notifier;
+        std::unique_ptr<RealmDelegate> m_delegate;
 
         // FIXME private
         Group *read_group();
@@ -144,6 +130,23 @@ namespace realm {
       private:
         std::map<std::string, std::map<std::thread::id, WeakRealm>> m_cache;
         std::mutex m_mutex;
+    };
+
+    class RealmDelegate
+    {
+    public:
+        virtual ~RealmDelegate() = default;
+
+        // The Realm has committed a write transaction, and other Realms at the
+        // same path should be notified
+        virtual void transaction_committed() = 0;
+
+        // There are now new versions available for the Realm, but it has not
+        // had its read version advanced
+        virtual void changes_available() = 0;
+
+        // The Realm's read version has advanced
+        virtual void did_change() = 0;
     };
 
     class RealmFileException : public std::runtime_error
