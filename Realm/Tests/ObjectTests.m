@@ -508,6 +508,31 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 #endif
 }
 
+- (void)testCannotUpdatePrimaryKey {
+    PrimaryIntObject *intObj = [[PrimaryIntObject alloc] init];
+    intObj.intCol = 1;
+    XCTAssertNoThrow(intObj.intCol = 0);
+
+    PrimaryStringObject *stringObj = [[PrimaryStringObject alloc] init];
+    stringObj.stringCol = @"a";
+    XCTAssertNoThrow(stringObj.stringCol = @"b");
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:intObj];
+
+    XCTAssertThrows(intObj.intCol = 1);
+    XCTAssertThrows(intObj[@"intCol"] = @1);
+    XCTAssertThrows([intObj setValue:@1 forKey:@"intCol"]);
+
+    [realm addObject:stringObj];
+
+    XCTAssertThrows(stringObj.stringCol = @"a");
+    XCTAssertThrows(stringObj[@"stringCol"] = @"a");
+    XCTAssertThrows([stringObj setValue:@"a" forKey:@"stringCol"]);
+    [realm cancelWriteTransaction];
+}
+
 - (void)testDataTypes
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
