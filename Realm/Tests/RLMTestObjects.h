@@ -263,6 +263,8 @@ RLM_ARRAY_TYPE(CircleObject);
 
 @end
 
+#pragma mark PrimaryStringObject
+
 @interface PrimaryStringObject : RLMObject
 @property NSString *stringCol;
 @property int intCol;
@@ -271,6 +273,15 @@ RLM_ARRAY_TYPE(CircleObject);
 @interface ReadOnlyPropertyObject : RLMObject
 @property (readonly) NSNumber *readOnlyUnsupportedProperty;
 @property (readonly) int readOnlyPropertyMadeReadWriteInClassExtension;
+@end
+
+#pragma mark IntegerArrayPropertyObject
+
+@interface IntegerArrayPropertyObject : RLMObject
+
+@property NSInteger number;
+@property RLM_GENERIC_ARRAY(IntObject) *array;
+
 @end
 
 #pragma mark FakeObject
