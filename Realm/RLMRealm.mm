@@ -348,10 +348,13 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
                 RLMSetErrorOrThrow(RLMMakeError(RLMException(exception)), error);
                 return nil;
             }
+
+            if (!dynamic) {
+                RLMRealmCreateAccessors(realm.schema);
+            }
         }
 
         if (!dynamic) {
-            RLMRealmCreateAccessors(realm.schema);
             RLMCacheRealm(realm);
         }
     }
