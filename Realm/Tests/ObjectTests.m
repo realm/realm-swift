@@ -20,6 +20,7 @@
 #import "RLMPredicateUtil.h"
 
 #import <libkern/OSAtomic.h>
+#import <objc/runtime.h>
 
 #pragma mark - Test Objects
 
@@ -837,6 +838,36 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [realm cancelWriteTransaction];
 }
 #endif
+
+- (void)testObjectSubclassAddedAtRuntime {
+    Class objectClass = objc_allocateClassPair(RLMObject.class, "RuntimeGeneratedObject", 0);
+    objc_property_attribute_t objectColAttrs[] = {
+        { "T", "@\"RuntimeGeneratedObject\"" },
+    };
+    class_addIvar(objectClass, "objectCol", sizeof(id), 64, "@\"RuntimeGeneratedObject\"");
+    class_addProperty(objectClass, "objectCol", objectColAttrs, sizeof(objectColAttrs) / sizeof(objc_property_attribute_t));
+    objc_property_attribute_t intColAttrs[] = {
+        { "T", "i" },
+    };
+    class_addIvar(objectClass, "intCol", sizeof(int), 64, "i");
+    class_addProperty(objectClass, "intCol", intColAttrs, sizeof(intColAttrs) / sizeof(objc_property_attribute_t));
+    objc_registerClassPair(objectClass);
+    XCTAssertEqualObjects([objectClass className], @"RuntimeGeneratedObject");
+
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.objectClasses = @[objectClass];
+    XCTAssertEqualObjects([objectClass className], @"RuntimeGeneratedObject");
+
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    [realm beginWriteTransaction];
+    id object = [objectClass createInRealm:realm withValue:@{@"objectCol": [[objectClass alloc] init], @"intCol": @17}];
+    RLMObjectSchema *schema = [object objectSchema];
+    XCTAssertNotNil(schema[@"objectCol"]);
+    XCTAssertNotNil(schema[@"intCol"]);
+    XCTAssert([[object objectCol] isKindOfClass:objectClass]);
+    XCTAssertEqual([object intCol], 17);
+    [realm commitWriteTransaction];
+}
 
 #pragma mark - Default Property Values
 
