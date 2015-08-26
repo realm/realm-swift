@@ -533,12 +533,6 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return _realm->refresh();
 }
 
-- (void)cacheTableAccessors {
-    for (RLMObjectSchema *objectSchema in _schema.objectSchema) {
-        objectSchema.table = ObjectStore::table_for_object_type(_realm->read_group(), objectSchema.className.UTF8String).get();
-    }
-}
-
 - (void)addObject:(__unsafe_unretained RLMObject *const)object {
     RLMAddObjectToRealm(object, self, false);
 }

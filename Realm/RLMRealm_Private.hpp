@@ -41,5 +41,4 @@ namespace realm {
 @property (nonatomic, readonly) realm::Group *group;
 - (void)verifyThread;
 - (void)notify;
-- (void)cacheTableAccessors;
 @end
