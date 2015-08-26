@@ -234,7 +234,7 @@ private class _AnyRealmCollectionBase<T: Object>: RealmCollectionType {
     func setValue(value: AnyObject?, forKey key: String) { fatalError() }
 }
 
-private class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBase<C.Element> {
+private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBase<C.Element> {
     let base: C
     init(base: C) {
         self.base = base
