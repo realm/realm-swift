@@ -132,7 +132,7 @@ extension Realm {
                 if let types = newValue {
                     let classes = NSMutableArray() // This is necessary to due bridging bugs fixed in 2.0
                     for cls in types {
-                      classes.addObject(cls as! AnyClass)
+                        classes.addObject(cls)
                     }
                     self.customSchema = RLMSchema(objectClasses: classes as [AnyObject])
                 } else {
