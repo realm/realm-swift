@@ -227,11 +227,12 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 
     // FIXME: can any of this throw?
     if (_customSchema) {
-        _config.schema = std::make_unique<realm::Schema>();
+        std::vector<realm::ObjectSchema> schema;
+        schema.reserve(customSchema.objectSchema.count);
         for (RLMObjectSchema *objectSchema in customSchema.objectSchema) {
-            auto os = objectSchema.objectStoreCopy;
-            _config.schema->emplace(os.name, std::move(os));
+            schema.push_back(objectSchema.objectStoreCopy);
         }
+        _config.schema = std::make_unique<realm::Schema>(std::move(schema));
     }
     else {
         _config.schema = nullptr;

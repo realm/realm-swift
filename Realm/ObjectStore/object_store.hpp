@@ -19,7 +19,6 @@
 #ifndef REALM_OBJECT_STORE_HPP
 #define REALM_OBJECT_STORE_HPP
 
-#include <map>
 #include <vector>
 #include <functional>
 #include <realm/link_view.hpp>
@@ -30,8 +29,7 @@
 
 namespace realm {
     class ObjectSchemaValidationException;
-    class Schema : public std::map<std::string, ObjectSchema> {
-    };
+    using Schema = std::vector<ObjectSchema>;
 
     class ObjectStore {
       public:

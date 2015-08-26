@@ -219,8 +219,8 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
     RLMSchema *sharedSchema = [RLMSchema sharedSchema];
 
     realm.schema = targetSchema;
-    for (auto &aligned:*realm->_realm->config().schema) {
-        RLMObjectSchema *objectSchema = targetSchema[@(aligned.first.c_str())];
+    for (auto &aligned : *realm->_realm->config().schema) {
+        RLMObjectSchema *objectSchema = targetSchema[@(aligned.name.c_str())];
         objectSchema.realm = realm;
         if (RLMObjectSchema *sharedObjectSchema = [sharedSchema schemaForClassName:objectSchema.className]) {
             objectSchema.objectClass = sharedObjectSchema.objectClass;
@@ -228,7 +228,7 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
             objectSchema.accessorClass = sharedObjectSchema.accessorClass;
             objectSchema.standaloneClass = sharedObjectSchema.standaloneClass;
         }
-        RLMCopyColumnMapping(objectSchema, aligned.second);
+        RLMCopyColumnMapping(objectSchema, aligned);
     }
 }
 

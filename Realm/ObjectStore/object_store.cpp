@@ -136,18 +136,24 @@ static inline bool property_has_changed(Property &p1, Property &p2) {
     return p1.type != p2.type || p1.name != p2.name || p1.object_type != p2.object_type || p1.is_nullable != p2.is_nullable;
 }
 
+static bool compare_by_name(ObjectSchema const& lft, ObjectSchema const& rgt) {
+    return lft.name < rgt.name;
+}
+
 void ObjectStore::verify_schema(Group *group, Schema &target_schema, bool allow_missing_tables) {
+    std::sort(begin(target_schema), end(target_schema), compare_by_name);
+
     std::vector<ObjectSchemaValidationException> errors;
     for (auto &object_schema : target_schema) {
-        if (!table_for_object_type(group, object_schema.first)) {
+        if (!table_for_object_type(group, object_schema.name)) {
             if (!allow_missing_tables) {
-                errors.emplace_back(ObjectSchemaValidationException(object_schema.first,
-                                    "Missing table for object type '" + object_schema.first + "'."));
+                errors.emplace_back(ObjectSchemaValidationException(object_schema.name,
+                                    "Missing table for object type '" + object_schema.name + "'."));
             }
             continue;
         }
 
-        auto more_errors = verify_object_schema(group, object_schema.second, target_schema);
+        auto more_errors = verify_object_schema(group, object_schema, target_schema);
         errors.insert(errors.end(), more_errors.begin(), more_errors.end());
     }
     if (errors.size()) {
@@ -158,6 +164,12 @@ void ObjectStore::verify_schema(Group *group, Schema &target_schema, bool allow_
 std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(Group *group, ObjectSchema &target_schema, Schema &schema) {
     std::vector<ObjectSchemaValidationException> exceptions;
     ObjectSchema table_schema(group, target_schema.name);
+
+    ObjectSchema cmp;
+    auto schema_contains_table = [&](std::string const& name) {
+        cmp.name = name;
+        return std::binary_search(begin(schema), end(schema), cmp, compare_by_name);
+    };
 
     // check to see if properties are the same
     Property *primary = nullptr;
@@ -174,7 +186,7 @@ std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(G
         }
 
         // check object_type existence
-        if (current_prop.object_type.length() && schema.find(current_prop.object_type) == schema.end()) {
+        if (current_prop.object_type.length() && !schema_contains_table(current_prop.object_type)) {
             exceptions.emplace_back(MissingObjectTypeException(table_schema.name, current_prop));
         }
 
@@ -245,11 +257,11 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
     std::vector<ObjectSchema *> to_update;
     for (auto& object_schema : target_schema) {
         bool created = false;
-        ObjectStore::table_for_object_type_create_if_needed(group, object_schema.first, created);
+        ObjectStore::table_for_object_type_create_if_needed(group, object_schema.name, created);
 
         // we will modify tables for any new objectSchema (table was created) or for all if update_existing is true
         if (update_existing || created) {
-            to_update.push_back(&object_schema.second);
+            to_update.push_back(&object_schema);
             changed = true;
         }
     }
@@ -325,7 +337,7 @@ bool ObjectStore::realm_requires_update(Group *group, uint64_t version, Schema &
         return true;
     }
     for (auto& target_schema : schema) {
-        TableRef table = table_for_object_type(group, target_schema.first);
+        TableRef table = table_for_object_type(group, target_schema.name);
         if (!table) {
             return true;
         }
@@ -373,7 +385,7 @@ Schema ObjectStore::schema_from_group(Group *group) {
     for (size_t i = 0; i < group->size(); i++) {
         std::string object_type = object_type_for_table_name(group->get_table_name(i));
         if (object_type.length()) {
-            schema.emplace(object_type, std::move(ObjectSchema(group, object_type)));
+            schema.emplace_back(group, object_type);
         }
     }
     return schema;
@@ -381,13 +393,13 @@ Schema ObjectStore::schema_from_group(Group *group) {
 
 bool ObjectStore::indexes_are_up_to_date(Group *group, Schema &schema) {
     for (auto &object_schema : schema) {
-        TableRef table = table_for_object_type(group, object_schema.first);
+        TableRef table = table_for_object_type(group, object_schema.name);
         if (!table) {
             continue;
         }
 
-        update_column_mapping(group, object_schema.second);
-        for (auto& property : object_schema.second.properties) {
+        update_column_mapping(group, object_schema);
+        for (auto& property : object_schema.properties) {
             if (property.requires_index() != table->has_search_index(property.table_column)) {
                 return false;
             }
@@ -399,12 +411,12 @@ bool ObjectStore::indexes_are_up_to_date(Group *group, Schema &schema) {
 bool ObjectStore::update_indexes(Group *group, Schema &schema) {
     bool changed = false;
     for (auto& object_schema : schema) {
-        TableRef table = table_for_object_type(group, object_schema.first);
+        TableRef table = table_for_object_type(group, object_schema.name);
         if (!table) {
             continue;
         }
 
-        for (auto& property : object_schema.second.properties) {
+        for (auto& property : object_schema.properties) {
             if (property.requires_index() == table->has_search_index(property.table_column)) {
                 continue;
             }
@@ -415,7 +427,7 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
                     table->add_search_index(property.table_column);
                 }
                 catch (LogicError const&) {
-                    throw PropertyTypeNotIndexableException(object_schema.first, property);
+                    throw PropertyTypeNotIndexableException(object_schema.name, property);
                 }
             }
             else {
@@ -428,14 +440,14 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
 
 void ObjectStore::validate_primary_column_uniqueness(Group *group, Schema &schema) {
     for (auto& object_schema : schema) {
-        auto primary_prop = object_schema.second.primary_key_property();
+        auto primary_prop = object_schema.primary_key_property();
         if (!primary_prop) {
             continue;
         }
 
-        TableRef table = table_for_object_type(group, object_schema.first);
+        TableRef table = table_for_object_type(group, object_schema.name);
         if (table->get_distinct_view(primary_prop->table_column).size() != table->size()) {
-            throw DuplicatePrimaryKeyValueException(object_schema.first, *primary_prop);
+            throw DuplicatePrimaryKeyValueException(object_schema.name, *primary_prop);
         }
     }
 }

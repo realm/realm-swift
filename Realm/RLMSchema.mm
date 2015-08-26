@@ -26,10 +26,12 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#include <mutex>
 #import "object_store.hpp"
-#import <objc/runtime.h>
+
 #import <realm/group.hpp>
+
+#import <objc/runtime.h>
+#include <mutex>
 
 using namespace realm;
 
@@ -206,7 +208,7 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
     // cache descriptors for all subclasses of RLMObject
     NSMutableArray *schemaArray = [NSMutableArray arrayWithCapacity:objectStoreSchema.size()];
     for (auto &objectSchema : objectStoreSchema) {
-        RLMObjectSchema *schema = [RLMObjectSchema objectSchemaForObjectStoreSchema:objectSchema.second];
+        RLMObjectSchema *schema = [RLMObjectSchema objectSchemaForObjectStoreSchema:objectSchema];
         [schemaArray addObject:schema];
     }
 

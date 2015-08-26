@@ -284,7 +284,7 @@ bool Realm::compact()
     }
 
     for (auto &object_schema : *m_config.schema) {
-        ObjectStore::table_for_object_type(read_group(), object_schema.first)->optimize();
+        ObjectStore::table_for_object_type(read_group(), object_schema.name)->optimize();
     }
 
     m_shared_group->end_read();
