@@ -3,7 +3,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* CocoaPods v0.38 or greater is now required to install Realm and RealmSwift
+  as pods.
 
 ### Enhancements
 
