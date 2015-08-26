@@ -329,6 +329,7 @@ static Schema RLMObjectStoreSchemaForRLMSchema(RLMSchema *rlmSchema) {
         memcpy(config.encryption_key.get(), key.bytes, key.length);
     }
 
+    config.schema_version = configuration.schemaVersion;
     config.migration_function = [=](SharedRealm old_realm, SharedRealm realm) {
         if (RLMMigrationBlock userBlock = configuration.migrationBlock) {
             RLMMigration *migration = [[RLMMigration alloc] initWithRealm:[RLMRealm realmWithSharedRealm:realm]
