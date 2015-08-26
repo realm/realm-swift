@@ -13,6 +13,13 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Setting the primary key property on persisted `RLMObject`s / `Object`s
   via subscripting or key-value coding will cause an exception to be thrown.
+* Functionality common to both `List` and `Results` is now declared in a
+  `RealmCollectionType` protocol that both types conform to.
+* `Results.realm` now returns an `Optional<Realm>` in order to conform to
+  `RealmCollectionType`, but will always return `.Some()` since a `Results`
+  cannot exist independently from a `Realm`.
+* Aggregate operations are now available on `List`: `min`, `max`, `sum`,
+  `average`.
 
 0.95.0 Release notes (2015-08-25)
 =============================================================
@@ -78,13 +85,6 @@ x.x.x Release notes (yyyy-MM-dd)
   with Objective-C.
 * Allow specifying a specific list of `RLMObject` / `Object` subclasses to include
   in a given Realm via `RLMRealmConfiguration.objectClasses` / `Realm.Configuration.objectTypes`.
-* Functionality common to both `List` and `Results` is now declared in a
-  `RealmCollectionType` protocol that both types conform to.
-* `Results.realm` now returns an `Optional<Realm>` in order to conform to
-  `RealmCollectionType`, but will always return `.Some()` since a `Results`
-  cannot exist independently from a `Realm`.
-* Aggregate operations are now available on `List`: `min`, `max`, `sum`,
-  `average`.
 
 ### Bugfixes
 
