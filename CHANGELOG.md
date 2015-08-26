@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Setting the primary key property on persisted `RLMObject`s / `Object`s
+  via subscripting or key-value coding will cause an exception to be thrown.
+
 0.95.0 Release notes (2015-08-25)
 =============================================================
 
