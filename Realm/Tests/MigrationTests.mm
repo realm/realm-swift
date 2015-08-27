@@ -97,15 +97,9 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
 @implementation MigrationTests
 
 - (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {
-    // modify object schema to use RLMObject class (or else bad accessors will get created)
-    objectSchema.objectClass = RLMDynamicObject.class;
-    objectSchema.accessorClass = RLMDynamicObject.class;
-
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
-    RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
-    
-    return realm;
+    return [self realmWithTestPathAndSchema:schema];
 }
 
 - (void)testSchemaVersion {
