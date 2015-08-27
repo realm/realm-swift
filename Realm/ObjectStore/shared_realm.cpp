@@ -133,7 +133,7 @@ SharedRealm Realm::get_shared_realm(Config config)
     }
     else if (realm->m_config.read_only) {
         if (old_version == ObjectStore::NotVersioned) {
-            throw UnitializedRealmException("Can't open an un-initizliazed Realm without a Schema");
+            throw UnitializedRealmException("Can't open an un-initialized Realm without a Schema");
         }
         ObjectStore::verify_schema(realm->read_group(), *realm->m_config.schema, true);
     }
@@ -346,6 +346,16 @@ bool Realm::refresh()
 
     send_local_notifications(DidChangeNotification);
     return true;
+}
+
+uint64_t Realm::get_schema_version(const realm::Realm::Config &config)
+{
+    auto existing_realm = s_global_cache.get_any_realm(config.path);
+    if (existing_realm) {
+        return existing_realm->config().schema_version;
+    }
+
+    return ObjectStore::get_schema_version(Realm(config).read_group());
 }
 
 SharedRealm RealmCache::get_realm(const std::string &path, std::thread::id thread_id)

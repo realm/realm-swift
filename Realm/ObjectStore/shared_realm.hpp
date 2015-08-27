@@ -76,6 +76,8 @@ namespace realm {
         // returns if any changes were made
         bool update_schema(Schema &schema, uint64_t version);
 
+        static uint64_t get_schema_version(Config const& config);
+
         const Config &config() const { return m_config; }
 
         void begin_transaction();
