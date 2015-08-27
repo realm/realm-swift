@@ -147,16 +147,32 @@ class ObjectSchemaInitializationTests: TestCase {
         }
     }
 
-    func testNonNullableOptionalPropertiesAreCoerced() {
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonNullableOptionalProperties.self), "Should throw when marking non-String and non-Data properties as optional")
+    func testOptionalProperties() {
+        let schema = RLMObjectSchema(forObjectClass: SwiftOptionalObject.self)
+
+        for prop in schema.properties {
+            XCTAssertTrue((prop as! RLMProperty).optional)
+        }
+
+        let types = Set(schema.properties.map { prop in
+            (prop as! RLMProperty).type
+        })
+
+#if REALM_ENABLE_NULL
+        XCTAssertEqual(types, Set([.String, .String, .Data, .Date, .Object, .Int, .Float, .Double, .Bool]))
+#else
+        XCTAssertEqual(types, Set([.Object]))
+#endif
     }
 
     func testImplicitlyUnwrappedOptionalsAreParsedAsOptionals() {
         let schema = SwiftImplicitlyUnwrappedOptionalObject().objectSchema
         XCTAssertTrue(schema["optObjectCol"]!.optional)
 #if REALM_ENABLE_NULL
+        XCTAssertTrue(schema["optNSStringCol"]!.optional)
         XCTAssertTrue(schema["optStringCol"]!.optional)
         XCTAssertTrue(schema["optBinaryCol"]!.optional)
+        XCTAssertTrue(schema["optDateCol"]!.optional)
 #endif
     }
 }
