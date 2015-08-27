@@ -16,49 +16,45 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealmUtil.h"
+#import "RLMRealmUtil.hpp"
 
 #import "RLMRealm_Private.hpp"
 
+#import <map>
+#import <mutex>
 #import <sys/event.h>
 #import <sys/stat.h>
 #import <sys/time.h>
 #import <unistd.h>
 
 // Global realm state
-static NSMutableDictionary *s_realmsPerPath = [NSMutableDictionary new];
+static std::mutex s_realmCacheMutex;
+static std::map<std::string, NSMapTable *> s_realmsPerPath;
 
-void RLMCacheRealm(RLMRealm *realm) {
-    @synchronized(s_realmsPerPath) {
-        NSMapTable *realms = s_realmsPerPath[realm.path];
-        if (!realms) {
-            s_realmsPerPath[realm.path] = realms = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality
-                                                                         valueOptions:NSPointerFunctionsWeakMemory];
-        }
-        [realms setObject:realm forKey:@(pthread_mach_thread_np(pthread_self()))];
+void RLMCacheRealm(std::string const& path, RLMRealm *realm) {
+    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
+    NSMapTable *realms = s_realmsPerPath[path];
+    if (!realms) {
+        s_realmsPerPath[path] = realms = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality
+                                                               valueOptions:NSPointerFunctionsWeakMemory];
     }
+    [realms setObject:realm forKey:@(pthread_mach_thread_np(pthread_self()))];
 }
 
-RLMRealm *RLMGetAnyCachedRealmForPath(NSString *path) {
-    @synchronized(s_realmsPerPath) {
-        return [s_realmsPerPath[path] objectEnumerator].nextObject;
-    }
+RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path) {
+    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
+    return [s_realmsPerPath[path] objectEnumerator].nextObject;
 }
 
-RLMRealm *RLMGetThreadLocalCachedRealmForPath(NSString *path) {
+RLMRealm *RLMGetThreadLocalCachedRealmForPath(std::string const& path) {
     mach_port_t threadID = pthread_mach_thread_np(pthread_self());
-    @synchronized(s_realmsPerPath) {
-        return [s_realmsPerPath[path] objectForKey:@(threadID)];
-    }
+    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
+    return [s_realmsPerPath[path] objectForKey:@(threadID)];
 }
 
 void RLMClearRealmCache() {
-    @synchronized(s_realmsPerPath) {
-        /*for (NSMapTable *table in s_realmsPerPath.allValues) {
-            assert(table.objectEnumerator.allObjects.count == 0);
-        }*/
-        [s_realmsPerPath removeAllObjects];
-    }
+    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
+    s_realmsPerPath.clear();
 }
 
 void RLMInstallUncaughtExceptionHandler() {
@@ -66,9 +62,10 @@ void RLMInstallUncaughtExceptionHandler() {
 
     NSSetUncaughtExceptionHandler([](NSException *exception) {
         NSNumber *threadID = @(pthread_mach_thread_np(pthread_self()));
-        @synchronized(s_realmsPerPath) {
-            for (NSMapTable *realmsPerThread in s_realmsPerPath.allValues) {
-                if (RLMRealm *realm = [realmsPerThread objectForKey:threadID]) {
+        {
+            std::lock_guard<std::mutex> lock(s_realmCacheMutex);
+            for (auto const& realmsPerThread : s_realmsPerPath) {
+                if (RLMRealm *realm = [realmsPerThread.second objectForKey:threadID]) {
                     if (realm.inWriteTransaction) {
                         [realm cancelWriteTransaction];
                     }

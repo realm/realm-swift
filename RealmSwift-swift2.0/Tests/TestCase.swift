@@ -72,8 +72,8 @@ class TestCase: XCTestCase {
             RLMDeallocateRealm(testRealmPath())
         }
         else {
-            XCTAssertNil(RLMGetThreadLocalCachedRealmForPath(defaultRealmPath()))
-            XCTAssertNil(RLMGetThreadLocalCachedRealmForPath(testRealmPath()))
+            XCTAssertFalse(RLMHasCachedRealmForPath(defaultRealmPath()))
+            XCTAssertFalse(RLMHasCachedRealmForPath(testRealmPath()))
         }
 
         do {

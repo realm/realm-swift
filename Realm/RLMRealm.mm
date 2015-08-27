@@ -30,7 +30,7 @@
 #import "RLMObservation.hpp"
 #import "RLMProperty.h"
 #import "RLMQueryUtil.hpp"
-#import "RLMRealmUtil.h"
+#import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
@@ -278,12 +278,11 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
     configuration = [configuration copy];
     Realm::Config& config = configuration.config;
 
-    NSString *path = configuration.path;
     bool dynamic = configuration.dynamic;
     bool readOnly = configuration.readOnly;
 
     // try to reuse existing realm first
-    RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(path);
+    RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path);
     if (realm) {
         auto const& old_config = realm->_realm->config();
         if (old_config.read_only != config.read_only) {
@@ -323,7 +322,7 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
         }
 
         // if we have a cached realm on another thread, copy without a transaction
-        if (RLMRealm *cachedRealm = RLMGetAnyCachedRealmForPath(path)) {
+        if (RLMRealm *cachedRealm = RLMGetAnyCachedRealmForPath(config.path)) {
             realm.schema = [cachedRealm.schema shallowCopy];
             for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
                 objectSchema.realm = realm;
@@ -349,7 +348,7 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
         }
 
         if (!dynamic) {
-            RLMCacheRealm(realm);
+            RLMCacheRealm(config.path, realm);
         }
     }
 
@@ -631,8 +630,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (NSError *)migrateRealm:(RLMRealmConfiguration *)configuration {
-    NSString *realmPath = configuration.path;
-    if (RLMGetAnyCachedRealmForPath(realmPath)) {
+    if (RLMGetAnyCachedRealmForPath(configuration.config.path)) {
         @throw RLMException(@"Cannot migrate Realms that are already open.");
     }
 
