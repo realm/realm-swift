@@ -146,6 +146,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertNil(firstObj.optObjectCol)
         XCTAssertNil(firstObj.optStringCol)
         XCTAssertNil(firstObj.optBinaryCol)
+        XCTAssertNil(firstObj.optDateCol)
 
         realm.transactionWithBlock {
             firstObj.optObjectCol = SwiftBoolObject()
@@ -153,19 +154,23 @@ class SwiftObjectInterfaceTests: RLMTestCase {
 
             firstObj.optStringCol = "Hi!"
             firstObj.optBinaryCol = NSData(bytes: "hi", length: 2)
+            firstObj.optDateCol = NSDate(timeIntervalSinceReferenceDate: 10)
         }
         XCTAssertTrue(firstObj.optObjectCol!.boolCol)
         XCTAssertEqual(firstObj.optStringCol!, "Hi!")
         XCTAssertEqual(firstObj.optBinaryCol!, NSData(bytes: "hi", length: 2))
+        XCTAssertEqual(firstObj.optDateCol!,  NSDate(timeIntervalSinceReferenceDate: 10))
 
         realm.transactionWithBlock {
             firstObj.optObjectCol = nil
             firstObj.optStringCol = nil
             firstObj.optBinaryCol = nil
+            firstObj.optDateCol = nil
         }
         XCTAssertNil(firstObj.optObjectCol)
         XCTAssertNil(firstObj.optStringCol)
         XCTAssertNil(firstObj.optBinaryCol)
+        XCTAssertNil(firstObj.optDateCol)
     }
 #endif
 
