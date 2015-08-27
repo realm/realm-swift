@@ -30,11 +30,12 @@ static NSMutableDictionary *s_realmsPerPath = [NSMutableDictionary new];
 
 void RLMCacheRealm(RLMRealm *realm) {
     @synchronized(s_realmsPerPath) {
-        if (!s_realmsPerPath[realm.path]) {
-            s_realmsPerPath[realm.path] = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality
-                                                                valueOptions:NSPointerFunctionsWeakMemory];
+        NSMapTable *realms = s_realmsPerPath[realm.path];
+        if (!realms) {
+            s_realmsPerPath[realm.path] = realms = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality
+                                                                         valueOptions:NSPointerFunctionsWeakMemory];
         }
-        [s_realmsPerPath[realm.path] setObject:realm forKey:@(pthread_mach_thread_np(pthread_self()))];
+        [realms setObject:realm forKey:@(pthread_mach_thread_np(pthread_self()))];
     }
 }
 
