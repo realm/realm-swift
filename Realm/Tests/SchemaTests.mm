@@ -326,9 +326,9 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     schema.objectSchema = objectSchema;
 
 #ifdef REALM_ENABLE_NULL
-#   define StringOrBinaryOptionalString @"\t\t\toptional = YES;\n"
+#   define OptionalString @"\t\t\toptional = YES;\n"
 #else
-#   define StringOrBinaryOptionalString @"\t\t\toptional = NO;\n"
+#   define OptionalString @"\t\t\toptional = NO;\n"
 #endif
 
     XCTAssertEqualObjects(schema.description, @"Schema {\n"
@@ -366,21 +366,21 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              StringOrBinaryOptionalString
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t\tbinaryCol {\n"
                                               @"\t\t\ttype = data;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              StringOrBinaryOptionalString
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t\tdateCol {\n"
                                               @"\t\t\ttype = date;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              @"\t\t\toptional = NO;\n"
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t\tcBoolCol {\n"
                                               @"\t\t\ttype = bool;\n"
@@ -417,7 +417,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              StringOrBinaryOptionalString
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t}\n"
                                               @"\tIntObject {\n"
@@ -431,7 +431,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t}\n"
                                               @"}");
 
-#undef StringOrBinaryOptionalString
+#undef OptionalString
 }
 
 - (void)testClassWithDuplicateProperties

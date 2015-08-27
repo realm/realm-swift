@@ -69,13 +69,17 @@ class ObjectAccessorTests: TestCase {
     func testStandaloneAccessors() {
         let object = SwiftObject()
         setAndTestAllProperties(object)
+
+        let optionalObject = SwiftOptionalObject()
+        setAndTestAllOptionalProperties(optionalObject)
     }
 
     func testPersistedAccessors() {
-        let object = SwiftObject()
         Realm().beginWrite()
-        Realm().create(SwiftObject)
+        let object = Realm().create(SwiftObject)
+        let optionalObject = Realm().create(SwiftOptionalObject)
         setAndTestAllProperties(object)
+        setAndTestAllOptionalProperties(optionalObject)
         Realm().commitWrite()
     }
 
@@ -204,5 +208,73 @@ class ObjectAccessorTests: TestCase {
         for obj in objects {
             XCTAssertEqual(2, obj.arrayCol.count)
         }
+    }
+
+    func setAndTestAllOptionalProperties(object: SwiftOptionalObject) {
+        object.optNSStringCol = ""
+        XCTAssertEqual(object.optNSStringCol!, "")
+        let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+        object.optNSStringCol = utf8TestString
+        XCTAssertEqual(object.optNSStringCol!, utf8TestString)
+        object.optNSStringCol = nil
+        XCTAssertNil(object.optNSStringCol)
+
+        object.optStringCol = ""
+        XCTAssertEqual(object.optStringCol!, "")
+        object.optStringCol = utf8TestString
+        XCTAssertEqual(object.optStringCol!, utf8TestString)
+        object.optStringCol = nil
+        XCTAssertNil(object.optStringCol)
+
+        let data = "b".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+        object.optBinaryCol = data
+        XCTAssertEqual(object.optBinaryCol!, data)
+        object.optBinaryCol = nil
+        XCTAssertNil(object.optBinaryCol)
+
+        let date = NSDate(timeIntervalSinceReferenceDate: 2) as NSDate
+        object.optDateCol = date
+        XCTAssertEqual(object.optDateCol!, date)
+        object.optDateCol = nil
+        XCTAssertNil(object.optDateCol)
+
+        object.optIntCol.value = -1
+        XCTAssertEqual(object.optIntCol.value!, -1)
+        object.optIntCol.value = 0
+        XCTAssertEqual(object.optIntCol.value!, 0)
+        object.optIntCol.value = 1
+        XCTAssertEqual(object.optIntCol.value!, 1)
+        object.optIntCol.value = nil
+        XCTAssertNil(object.optIntCol.value)
+
+        object.optFloatCol.value = 20
+        XCTAssertEqual(object.optFloatCol.value!, 20 as Float)
+        object.optFloatCol.value = 20.2
+        XCTAssertEqual(object.optFloatCol.value!, 20.2 as Float)
+        object.optFloatCol.value = 16777217
+        XCTAssertEqual(Double(object.optFloatCol.value!), 16777216.0 as Double)
+        object.optFloatCol.value = nil
+        XCTAssertNil(object.optFloatCol.value)
+
+        object.optDoubleCol.value = 20
+        XCTAssertEqual(object.optDoubleCol.value!, 20)
+        object.optDoubleCol.value = 20.2
+        XCTAssertEqual(object.optDoubleCol.value!, 20.2)
+        object.optDoubleCol.value = 16777217
+        XCTAssertEqual(object.optDoubleCol.value!, 16777217)
+        object.optDoubleCol.value = nil
+        XCTAssertNil(object.optDoubleCol.value)
+
+        object.optBoolCol.value = true
+        XCTAssertEqual(object.optBoolCol.value!, true)
+        object.optBoolCol.value = false
+        XCTAssertEqual(object.optBoolCol.value!, false)
+        object.optBoolCol.value = nil
+        XCTAssertNil(object.optBoolCol.value)
+
+        object.optObjectCol = SwiftBoolObject(value: [true])
+        XCTAssertEqual(object.optObjectCol!.boolCol, true)
+        object.optObjectCol = nil
+        XCTAssertNil(object.optObjectCol)
     }
 }

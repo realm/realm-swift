@@ -23,6 +23,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
+#import "RLMOptionalBase.h"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
@@ -106,7 +107,7 @@ static inline bool object_has_valid_type(__unsafe_unretained id const obj)
 
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
                                  __unsafe_unretained RLMProperty *const property) {
-    if (property.optional && (!obj || obj == [NSNull null])) {
+    if (property.optional && (!obj || obj == [NSNull null] || (RLMIsKindOfClass(object_getClass(obj), RLMOptionalBase.class) && ![obj underlyingValue]))) {
         return YES;
     }
 
@@ -215,7 +216,7 @@ NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *ke
     for (size_t i = 0; i < count; i++) {
         size_t rowIndex = [collection indexInSource:i];
         accessor->_row = (*table)[rowIndex];
-        RLMInitializeSwiftListAccessor(accessor);
+        RLMInitializeSwiftAccessorGenerics(accessor);
         [results addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
 
@@ -235,7 +236,7 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
     for (size_t i = 0; i < count; i++) {
         size_t rowIndex = [collection indexInSource:i];
         accessor->_row = (*table)[rowIndex];
-        RLMInitializeSwiftListAccessor(accessor);
+        RLMInitializeSwiftAccessorGenerics(accessor);
         [accessor setValue:value forKey:key];
     }
 }

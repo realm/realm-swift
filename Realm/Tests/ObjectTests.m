@@ -903,10 +903,16 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    
+
+#ifdef REALM_ENABLE_NULL
+    // Test #1
+    DateObject *dateObject = [[DateObject alloc] init];
+    XCTAssertNoThrow(([realm addObject:dateObject]), @"Adding object with no values specified for NSObject properties shouldn't throw exception if NSObject property is nil");
+#else 
     // Test #1
     DateObject *dateObject = [[DateObject alloc] init];
     XCTAssertThrows(([realm addObject:dateObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
+#endif
 
     // Test #2
     dateObject = [[DateObject alloc] init];
@@ -1279,7 +1285,11 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     DateObjectNoThrow *object = [DateObjectNoThrow createInDefaultRealmWithValue:@[NSDate.date, NSDate.date]];
 
     // create subclass with instance of base class with/without default objects
+#ifdef REALM_ENABLE_NULL
+    XCTAssertNoThrow([DateSubclassObject createInDefaultRealmWithValue:object]);
+#else
     XCTAssertThrows([DateSubclassObject createInDefaultRealmWithValue:object]);
+#endif
     XCTAssertNoThrow([DateObjectNoThrow createInDefaultRealmWithValue:object]);
 
     // create using non-realm object with custom getter

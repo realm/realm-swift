@@ -24,6 +24,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
+#import "RLMOptionalBase.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
@@ -135,20 +136,25 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     return [super valueForKey:key];
 }
 
-// List<> properties can't be dynamic, so KVO doesn't work for them by default
+// Generic Swift properties can't be dynamic, so KVO doesn't work for them by default
 - (id)valueForUndefinedKey:(NSString *)key {
-    if (Ivar ivar = _objectSchema[key].swiftListIvar) {
+    if (Ivar ivar = _objectSchema[key].swiftIvar) {
         return object_getIvar(self, ivar);
     }
     return [super valueForUndefinedKey:key];
 }
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
-    if (Ivar ivar = _objectSchema[key].swiftListIvar) {
-        if ([value conformsToProtocol:@protocol(NSFastEnumeration)]) {
+    RLMProperty *property = _objectSchema[key];
+    if (Ivar ivar = property.swiftIvar) {
+        if (property.type == RLMPropertyTypeArray && [value conformsToProtocol:@protocol(NSFastEnumeration)]) {
             RLMArray *array = [object_getIvar(self, ivar) _rlmArray];
             [array removeAllObjects];
             [array addObjects:value];
+        }
+        else if (property.optional) {
+            RLMOptionalBase *optional = object_getIvar(self, ivar);
+            optional.underlyingValue = value;
         }
         return;
     }
