@@ -3,16 +3,11 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* CocoaPods v0.38 or greater is now required to install Realm and RealmSwift
+  as pods.
 
 ### Enhancements
 
-* None.
-
-### Bugfixes
-
-* Setting the primary key property on persisted `RLMObject`s / `Object`s
-  via subscripting or key-value coding will cause an exception to be thrown.
 * Functionality common to both `List` and `Results` is now declared in a
   `RealmCollectionType` protocol that both types conform to.
 * `Results.realm` now returns an `Optional<Realm>` in order to conform to
@@ -20,6 +15,11 @@ x.x.x Release notes (yyyy-MM-dd)
   cannot exist independently from a `Realm`.
 * Aggregate operations are now available on `List`: `min`, `max`, `sum`,
   `average`.
+
+### Bugfixes
+
+* Setting the primary key property on persisted `RLMObject`s / `Object`s
+  via subscripting or key-value coding will cause an exception to be thrown.
 
 0.95.0 Release notes (2015-08-25)
 =============================================================
