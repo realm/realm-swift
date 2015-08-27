@@ -215,7 +215,7 @@ public class Object: RLMObjectBase {
 
     // Helper for getting the list object for a property
     internal func listForProperty(prop: RLMProperty) -> RLMListBase {
-        return object_getIvar(self, prop.swiftListIvar) as! RLMListBase
+        return object_getIvar(self, prop.swiftIvar) as! RLMListBase
     }
 }
 
@@ -282,11 +282,34 @@ public class ObjectUtil: NSObject {
         (object as! Object).listForProperty(property)._rlmArray = array
     }
 
-    @objc private class func getOptionalPropertyNames(object: AnyObject) -> NSArray {
-        return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
-            return Mirror(reflecting: prop.value).displayStyle == .Optional
-        }.flatMap { (prop: Mirror.Child) in
-            return prop.label
+    @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
+        return Mirror(reflecting: object).children.reduce([String:AnyObject]()) { (var properties: [String:AnyObject], prop: Mirror.Child) in
+            guard let name = prop.label else { return properties }
+            let mirror = Mirror(reflecting: prop.value)
+            let type = mirror.subjectType
+            if type is Optional<String>.Type || type is Optional<NSString>.Type {
+                properties[name] = Int(PropertyType.String.rawValue)
+            } else if type is Optional<NSDate>.Type {
+                properties[name] = Int(PropertyType.Date.rawValue)
+            } else if type is Optional<NSData>.Type {
+                properties[name] = Int(PropertyType.Data.rawValue)
+            } else if type is Optional<Object>.Type {
+                properties[name] = Int(PropertyType.Object.rawValue)
+            } else if type is RealmOptional<Int>.Type ||
+                type is RealmOptional<Int16>.Type ||
+                type is RealmOptional<Int32>.Type ||
+                type is RealmOptional<Int64>.Type {
+                    properties[name] = Int(PropertyType.Int.rawValue)
+            } else if type is RealmOptional<Float>.Type {
+                properties[name] = Int(PropertyType.Float.rawValue)
+            } else if type is RealmOptional<Double>.Type {
+                properties[name] = Int(PropertyType.Double.rawValue)
+            } else if type is RealmOptional<Bool>.Type {
+                properties[name] = Int(PropertyType.Bool.rawValue)
+            } else if mirror.displayStyle == .Optional {
+                properties[name] = NSNull()
+            }
+            return properties
         }
     }
 
