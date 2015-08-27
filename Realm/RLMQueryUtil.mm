@@ -410,7 +410,7 @@ struct ColumnOfTypeHelper {
 // FIXME: This specialization can be removed when core v0.92.x is no longer used.
 template <typename TableGetter>
 struct ColumnOfTypeHelper<realm::DateTime, TableGetter> {
-    template <typename ColumnType=std::conditional_t<std::is_convertible<DateTime, int64_t>::value, DateTime, Int>>
+    using ColumnType = std::conditional_t<std::is_convertible<DateTime, int64_t>::value, DateTime, Int>;
     static Columns<ColumnType> convert(TableGetter&& table, NSUInteger idx)
     {
         return table()->template column<ColumnType>(idx);
@@ -423,7 +423,7 @@ struct ValueOfTypeHelper;
 template <typename TableGetter>
 struct ValueOfTypeHelper<realm::DateTime, TableGetter> {
     // FIXME: The return type can simply be DateTime when core v0.92.x is no longer used.
-    template <typename ResultType=std::conditional_t<std::is_convertible<DateTime, int64_t>::value, DateTime, Int>>
+    using ResultType = std::conditional_t<std::is_convertible<DateTime, int64_t>::value, DateTime, Int>;
     static ResultType convert(TableGetter&&, id value)
     {
         return [value timeIntervalSince1970];
