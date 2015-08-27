@@ -35,7 +35,7 @@ public final class RLMGenerator<T: Object>: GeneratorType {
     public func next() -> T? {
         let accessor = generatorBase.next() as! T?
         if let accessor = accessor {
-            RLMInitializeSwiftListAccessor(accessor)
+            RLMInitializeSwiftAccessorGenerics(accessor)
         }
         return accessor
     }

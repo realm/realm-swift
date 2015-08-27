@@ -154,14 +154,14 @@ class ObjectSchemaInitializationTests: TestCase {
             XCTAssertTrue((prop as! RLMProperty).optional)
         }
 
-        let types = map(schema.properties) { prop in
+        let types = Set(map(schema.properties) { prop in
             (prop as! RLMProperty).type
-        }
+        })
 
 #if REALM_ENABLE_NULL
-        XCTAssertEqual(types, [.String, .String, .Data, .Date, .Object])
+        XCTAssertEqual(types, Set([.String, .String, .Data, .Date, .Object, .Int, .Float, .Double, .Bool]))
 #else
-        XCTAssertEqual(types, [.Object])
+        XCTAssertEqual(types, Set([.Object]))
 #endif
     }
 
@@ -169,8 +169,10 @@ class ObjectSchemaInitializationTests: TestCase {
         let schema = SwiftImplicitlyUnwrappedOptionalObject().objectSchema
         XCTAssertTrue(schema["optObjectCol"]!.optional)
 #if REALM_ENABLE_NULL
+        XCTAssertTrue(schema["optNSStringCol"]!.optional)
         XCTAssertTrue(schema["optStringCol"]!.optional)
         XCTAssertTrue(schema["optBinaryCol"]!.optional)
+        XCTAssertTrue(schema["optDateCol"]!.optional)
 #endif
     }
 }

@@ -24,6 +24,7 @@
 #import "RLMObservation.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMOptionalBase.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
@@ -196,7 +197,7 @@ static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *con
     RLMCheckThread(realm);
 }
 
-void RLMInitializeSwiftListAccessor(__unsafe_unretained RLMObjectBase *const object) {
+void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const object) {
     if (!object || !object->_row || !object->_objectSchema.isSwiftClass) {
         return;
     }
@@ -214,6 +215,10 @@ void RLMInitializeSwiftListAccessor(__unsafe_unretained RLMObjectBase *const obj
                                                                      key:prop.name
                                                             parentSchema:object->_objectSchema];
             [RLMObjectUtilClass(YES) initializeListProperty:object property:prop array:array];
+        } else if (auto ivar = prop.swiftIvar) {
+            auto optional = static_cast<RLMOptionalBase *>(object_getIvar(object, ivar));
+            optional.object = object;
+            optional.property = prop;
         }
     }
 }
@@ -299,8 +304,13 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     for (RLMProperty *prop in schema.properties) {
         // get object from ivar using key value coding
         id value = nil;
-        if (prop.swiftListIvar) {
-            value = static_cast<RLMListBase *>(object_getIvar(object, prop.swiftListIvar))._rlmArray;
+        if (prop.swiftIvar) {
+            if (prop.type == RLMPropertyTypeArray) {
+                value = static_cast<RLMListBase *>(object_getIvar(object, prop.swiftIvar))._rlmArray;
+            }
+            else { // optional
+                value = static_cast<RLMOptionalBase *>(object_getIvar(object, prop.swiftIvar)).underlyingValue;
+            }
         }
         else if ([object respondsToSelector:prop.getterSel]) {
             value = [object valueForKey:prop.getterName];
@@ -324,7 +334,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         // as it's not obvious that the user has to set the *ivars* to nil to
         // avoid leaking memory
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
-            if (!prop.swiftListIvar) {
+            if (!prop.swiftIvar) {
                 ((void(*)(id, SEL, id))objc_msgSend)(object, prop.setterSel, nil);
             }
         }
@@ -333,7 +343,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     // set to proper accessor class
     object_setClass(object, schema.accessorClass);
 
-    RLMInitializeSwiftListAccessor(object);
+    RLMInitializeSwiftAccessorGenerics(object);
 }
 
 static void RLMValidateValueForProperty(__unsafe_unretained id const obj,
@@ -525,7 +535,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         }
     }
 
-    RLMInitializeSwiftListAccessor(object);
+    RLMInitializeSwiftAccessorGenerics(object);
     return object;
 }
 
@@ -634,6 +644,6 @@ RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm
                                        NSUInteger index) {
     RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
     accessor->_row = (*objectSchema.table)[index];
-    RLMInitializeSwiftListAccessor(accessor);
+    RLMInitializeSwiftAccessorGenerics(accessor);
     return accessor;
 }
