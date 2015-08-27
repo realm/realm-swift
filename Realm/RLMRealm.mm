@@ -216,28 +216,20 @@ static void RLMCopyColumnMapping(RLMObjectSchema *targetSchema, const ObjectSche
 }
 
 static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) {
-    RLMSchema *sharedSchema = [RLMSchema sharedSchema];
-
     realm.schema = targetSchema;
-    for (auto &aligned : *realm->_realm->config().schema) {
-        RLMObjectSchema *objectSchema = targetSchema[@(aligned.name.c_str())];
-        objectSchema.realm = realm;
-        if (RLMObjectSchema *sharedObjectSchema = [sharedSchema schemaForClassName:objectSchema.className]) {
-            objectSchema.objectClass = sharedObjectSchema.objectClass;
-            objectSchema.isSwiftClass = sharedObjectSchema.isSwiftClass;
-            objectSchema.accessorClass = sharedObjectSchema.accessorClass;
-            objectSchema.standaloneClass = sharedObjectSchema.standaloneClass;
+    for (auto const& aligned : *realm->_realm->config().schema) {
+        if (RLMObjectSchema *objectSchema = [targetSchema schemaForClassName:@(aligned.name.c_str())]) {
+            objectSchema.realm = realm;
+            RLMCopyColumnMapping(objectSchema, aligned);
         }
-        RLMCopyColumnMapping(objectSchema, aligned);
     }
 }
 
-+ (instancetype)realmWithSharedRealm:(SharedRealm)sharedRealm {
++ (instancetype)realmWithSharedRealm:(SharedRealm)sharedRealm schema:(RLMSchema *)schema {
     RLMRealm *realm = [RLMRealm new];
     realm->_realm = sharedRealm;
     realm->_dynamic = YES;
-    RLMRealmSetSchemaAndAlign(realm, [RLMSchema dynamicSchemaFromObjectStoreSchema:*sharedRealm->config().schema]);
-
+    RLMRealmSetSchemaAndAlign(realm, schema);
     return RLMAutorelease(realm);
 }
 
@@ -314,8 +306,10 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
 
     config.migration_function = [=](SharedRealm old_realm, SharedRealm realm) {
         if (RLMMigrationBlock userBlock = configuration.migrationBlock) {
-            RLMMigration *migration = [[RLMMigration alloc] initWithRealm:[RLMRealm realmWithSharedRealm:realm]
-                                                                 oldRealm:[RLMRealm realmWithSharedRealm:old_realm]];
+            RLMSchema *oldSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:*old_realm->config().schema];
+            RLMSchema *newSchema = configuration.customSchema ?: [RLMSchema.sharedSchema copy];
+            RLMMigration *migration = [[RLMMigration alloc] initWithRealm:[RLMRealm realmWithSharedRealm:realm schema:newSchema]
+                                                                 oldRealm:[RLMRealm realmWithSharedRealm:old_realm schema:oldSchema]];
             [migration execute:userBlock];
         }
     };
