@@ -60,32 +60,27 @@ class SwiftObject: Object {
 }
 
 class SwiftOptionalObject: Object {
-//    FIXME: Support all optional property types
-//    dynamic var optBoolCol: Bool?
-//    dynamic var optIntCol: Int?
-//    dynamic var optFloatCol: Float?
-//    dynamic var optDoubleCol: Double?
 #if REALM_ENABLE_NULL
     dynamic var optNSStringCol: NSString?
     dynamic var optStringCol: String?
     dynamic var optBinaryCol: NSData?
     dynamic var optDateCol: NSDate?
+    let optIntCol = RealmOptional<Int>()
+    let optFloatCol = RealmOptional<Float>()
+    let optDoubleCol = RealmOptional<Double>()
+    let optBoolCol = RealmOptional<Bool>()
 #endif
     dynamic var optObjectCol: SwiftBoolObject?
 //    let arrayCol = List<SwiftBoolObject?>()
 }
 
 class SwiftImplicitlyUnwrappedOptionalObject: Object {
-//    FIXME: Support all optional property types
-//    dynamic var optBoolCol: Bool!
-//    dynamic var optIntCol: Int!
-//    dynamic var optFloatCol: Float!
-//    dynamic var optDoubleCol: Double!
 #if REALM_ENABLE_NULL
-    dynamic var optStringCol: NSString!
+    dynamic var optNSStringCol: NSString!
+    dynamic var optStringCol: String!
     dynamic var optBinaryCol: NSData!
+    dynamic var optDateCol: NSDate!
 #endif
-//    dynamic var optDateCol: NSDate!
     dynamic var optObjectCol: SwiftBoolObject!
 //    let arrayCol = List<SwiftBoolObject!>()
 }

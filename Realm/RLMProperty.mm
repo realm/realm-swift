@@ -26,19 +26,11 @@
 #import "RLMUtil.hpp"
 
 BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
-    switch (propertyType) {
-        case RLMPropertyTypeObject:
 #ifdef REALM_ENABLE_NULL
-        case RLMPropertyTypeString:
-        case RLMPropertyTypeData:
-        case RLMPropertyTypeDate:
-        case RLMPropertyTypeInt:
-        case RLMPropertyTypeBool:
+    return propertyType != RLMPropertyTypeAny && propertyType != RLMPropertyTypeArray;
+#else
+    return propertyType == RLMPropertyTypeObject
 #endif
-            return YES;
-        default:
-            return NO;
-    }
 }
 
 BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
@@ -52,10 +44,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     }
 }
 
-@implementation RLMProperty {
-    NSString *_objcRawType;
-}
-
+@implementation RLMProperty
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
@@ -364,7 +353,26 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     _type = RLMPropertyTypeArray;
     _objectClassName = objectClassName;
     _objcType = 't';
-    _swiftListIvar = ivar;
+    _swiftIvar = ivar;
+
+    // no obj-c property for generic lists, and thus no getter/setter names
+
+    return self;
+}
+
+- (instancetype)initSwiftOptionalPropertyWithName:(NSString *)name
+                                             ivar:(Ivar)ivar
+                                     propertyType:(RLMPropertyType)propertyType {
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+
+    _name = name;
+    _type = propertyType;
+    _objcType = '@';
+    _swiftIvar = ivar;
+    _optional = true;
 
     // no obj-c property for generic lists, and thus no getter/setter names
 
@@ -383,7 +391,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     prop->_getterSel = _getterSel;
     prop->_setterSel = _setterSel;
     prop->_isPrimary = _isPrimary;
-    prop->_swiftListIvar = _swiftListIvar;
+    prop->_swiftIvar = _swiftIvar;
     prop->_optional = _optional;
     
     return prop;

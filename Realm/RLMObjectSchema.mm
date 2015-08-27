@@ -208,16 +208,27 @@ using namespace realm;
 
     if (NSDictionary *optionalProperties = [objectUtil getOptionalProperties:swiftObjectInstance]) {
         for (RLMProperty *property in propArray) {
-            NSNumber *optionalType = optionalProperties[property.name];
-            property.optional = optionalType != nil;
-            if (auto type = RLMNSNullToNil(optionalType)) {
-                property.type = RLMPropertyType(type.intValue);
-            }
-            if (!property.optional && property.type == RLMPropertyTypeObject) { // remove if/when core supports required link columns
-                NSString *message = [NSString stringWithFormat:@"The `%@.%@` property must be marked as being optional.", [objectClass className], property.name];
-                @throw RLMException(message);
-            }
+            property.optional = false;
         }
+        [optionalProperties enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSNumber *propertyType, __unused BOOL *stop) {
+            NSUInteger existing = [propArray indexOfObjectPassingTest:^BOOL(RLMProperty *obj, __unused NSUInteger idx, __unused BOOL *stop) {
+                return [obj.name isEqualToString:propertyName];
+            }];
+            RLMProperty *property;
+            if (existing != NSNotFound) {
+                property = propArray[existing];
+                property.optional = true;
+            }
+            if (auto type = RLMNSNullToNil(propertyType)) {
+                if (existing == NSNotFound) {
+                    property = [[RLMProperty alloc] initSwiftOptionalPropertyWithName:propertyName ivar:class_getInstanceVariable(objectClass, propertyName.UTF8String) propertyType:RLMPropertyType(type.intValue)];
+                    [propArray addObject:property];
+                }
+                else {
+                    property.type = RLMPropertyType(type.intValue);
+                }
+            }
+        }];
     }
     if (NSArray *requiredProperties = [objectUtil requiredPropertiesForClass:objectClass]) {
         for (RLMProperty *property in propArray) {
@@ -228,6 +239,13 @@ using namespace realm;
                 @throw RLMException(error);
             }
             property.optional &= !required;
+        }
+    }
+
+    for (RLMProperty *property in propArray) {
+        if (!property.optional && property.type == RLMPropertyTypeObject) { // remove if/when core supports required link columns
+            NSString *message = [NSString stringWithFormat:@"The `%@.%@` property must be marked as being optional.", [objectClass className], property.name];
+            @throw RLMException(message);
         }
     }
 
