@@ -40,7 +40,7 @@ Pod::Spec.new do |s|
   s.prepare_command         = 'sh build.sh cocoapods-setup'
   s.source_files            = 'Realm/*.{m,mm}', 'Realm/ObjectStore/*.cpp'
   s.header_mappings_dir     = 'include'
-  s.xcconfig                = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
+  s.pod_target_xcconfig     = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)' }
   s.preserve_paths          = %w(build.sh)
 
