@@ -307,9 +307,13 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
         if (RLMMigrationBlock userBlock = configuration.migrationBlock) {
             RLMSchema *oldSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:*old_realm->config().schema];
             RLMSchema *newSchema = configuration.customSchema ?: [RLMSchema.sharedSchema copy];
-            RLMMigration *migration = [[RLMMigration alloc] initWithRealm:[RLMRealm realmWithSharedRealm:realm schema:newSchema]
-                                                                 oldRealm:[RLMRealm realmWithSharedRealm:old_realm schema:oldSchema]];
-            [migration execute:userBlock];
+            RLMRealm *oldRealm = [RLMRealm realmWithSharedRealm:old_realm schema:oldSchema];
+            RLMRealm *newRealm = [RLMRealm realmWithSharedRealm:realm schema:newSchema];
+
+            [[[RLMMigration alloc] initWithRealm:newRealm oldRealm:oldRealm] execute:userBlock];
+
+            oldRealm->_realm = nullptr;
+            newRealm->_realm = nullptr;
         }
     };
 

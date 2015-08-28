@@ -107,6 +107,9 @@ using namespace realm;
         // apply block and set new schema version
         uint64_t oldVersion = _oldRealm->_realm->config().schema_version;
         block(self, oldVersion);
+
+        _oldRealm = nil;
+        _realm = nil;
     }
 }
 
