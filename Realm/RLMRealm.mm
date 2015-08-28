@@ -394,11 +394,12 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
     RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
     __weak RLMRealm *weakRealm = self;
-    token->_notification = token->_notification.make_shared([=](const std::string notification) {
+    token->_notification = token->_notification.make_shared([weakRealm, block](const std::string notification) {
+        RLMRealm *self = weakRealm;
         if (notification == _realm->RefreshRequiredNotification)
-            block(RLMRealmRefreshRequiredNotification, weakRealm);
+            block(RLMRealmRefreshRequiredNotification, self);
         else
-            block(RLMRealmDidChangeNotification, weakRealm);
+            block(RLMRealmDidChangeNotification, self);
     });
     _realm->add_notification(token->_notification);
     return token;
