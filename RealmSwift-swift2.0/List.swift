@@ -69,7 +69,6 @@ public final class List<T: Object>: ListBase {
 
     /// Creates a `List` that holds objects of type `T`.
     public override init() {
-        // FIXME: use T.className()
         super.init(array: RLMArray(objectClassName: (T.self as Object.Type).className()))
     }
 
@@ -405,7 +404,8 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
     - parameter subRange:    The range of elements to be replaced.
     - parameter newElements: The new elements to be inserted into the List.
     */
-    public func replaceRange<C: CollectionType where C.Generator.Element == T>(subRange: Range<Int>, with newElements: C) {
+    public func replaceRange<C: CollectionType where C.Generator.Element == T>(subRange: Range<Int>,
+        with newElements: C) {
         for _ in subRange {
             removeAtIndex(subRange.startIndex)
         }
@@ -419,6 +419,7 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
     public var startIndex: Int { return 0 }
 
     /// The collection's "past the end" position.
-    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
+    /// zero or more applications of successor().
     public var endIndex: Int { return count }
 }

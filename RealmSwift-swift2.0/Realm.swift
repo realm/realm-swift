@@ -248,7 +248,6 @@ public final class Realm {
     - returns: The created object.
     */
     public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
-        // FIXME: use T.className()
         let className = (type as Object.Type).className()
         if update && schema[className]?.primaryKeyProperty == nil {
           throwRealmException("'\(className)' does not have a primary key and can not be updated")
@@ -363,7 +362,6 @@ public final class Realm {
     - returns: All objects of the given type in Realm.
     */
     public func objects<T: Object>(type: T.Type) -> Results<T> {
-        // FIXME: use T.className()
         return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
     }
 
@@ -401,7 +399,6 @@ public final class Realm {
     - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
     public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T? {
-        // FIXME: use T.className()
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), Optional<T>.self)
     }
 
