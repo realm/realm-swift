@@ -44,7 +44,7 @@ class ListTests: TestCase {
         array = arrayObject.array
 
         let realm = realmWithTestPath()
-        realm.write {
+        try! realm.write {
             realm.add(self.str1)
             realm.add(self.str2)
         }
@@ -53,7 +53,7 @@ class ListTests: TestCase {
     }
 
     override func tearDown() {
-        realmWithTestPath().commitWrite()
+        try! realmWithTestPath().commitWrite()
 
         str1 = nil
         str2 = nil
@@ -289,7 +289,7 @@ class ListTests: TestCase {
         for _ in 0..<10 {
             arrayObject.array.append(SwiftObject())
         }
-        arrayObject.realm?.commitWrite()
+        try! arrayObject.realm?.commitWrite()
 
         XCTAssertEqual(10, arrayObject.array.count)
 
@@ -320,7 +320,7 @@ class ListNewlyAddedTests: ListTests {
         let array = SwiftArrayPropertyObject()
         array.name = "name"
         let realm = realmWithTestPath()
-        realm.write { realm.add(array) }
+        try! realm.write { realm.add(array) }
 
         XCTAssertNotNil(array.realm)
         return array
@@ -329,7 +329,7 @@ class ListNewlyAddedTests: ListTests {
     override func createArrayWithLinks() -> SwiftListOfSwiftObject {
         let array = SwiftListOfSwiftObject()
         let realm = try! Realm()
-        realm.write { realm.add(array) }
+        try! realm.write { realm.add(array) }
 
         XCTAssertNotNil(array.realm)
         return array
@@ -341,7 +341,7 @@ class ListNewlyCreatedTests: ListTests {
         let realm = realmWithTestPath()
         realm.beginWrite()
         let array = realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
-        realm.commitWrite()
+        try! realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
         return array
@@ -351,7 +351,7 @@ class ListNewlyCreatedTests: ListTests {
         let realm = try! Realm()
         realm.beginWrite()
         let array = realm.create(SwiftListOfSwiftObject)
-        realm.commitWrite()
+        try! realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
         return array
@@ -363,7 +363,7 @@ class ListRetrievedTests: ListTests {
         let realm = realmWithTestPath()
         realm.beginWrite()
         realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
-        realm.commitWrite()
+        try! realm.commitWrite()
         let array = realm.objects(SwiftArrayPropertyObject).first!
 
         XCTAssertNotNil(array.realm)
@@ -374,7 +374,7 @@ class ListRetrievedTests: ListTests {
         let realm = try! Realm()
         realm.beginWrite()
         realm.create(SwiftListOfSwiftObject)
-        realm.commitWrite()
+        try! realm.commitWrite()
         let array = realm.objects(SwiftListOfSwiftObject).first!
 
         XCTAssertNotNil(array.realm)
