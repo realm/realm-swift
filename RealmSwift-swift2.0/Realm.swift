@@ -572,7 +572,7 @@ public final class Realm {
 extension Realm: Equatable { }
 
 /// Returns whether the two realms are equal.
-public func ==(lhs: Realm, rhs: Realm) -> Bool {
+public func == (lhs: Realm, rhs: Realm) -> Bool {
     return lhs.rlmRealm == rhs.rlmRealm
 }
 
