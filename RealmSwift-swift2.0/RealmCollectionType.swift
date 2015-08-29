@@ -337,8 +337,8 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    override func sorted<S: SequenceType where
-        S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<C.Element> {
+    override func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>
+                        (sortDescriptors: S) -> Results<C.Element> {
         return base.sorted(sortDescriptors)
     }
 

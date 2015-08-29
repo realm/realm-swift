@@ -137,11 +137,8 @@ public final class Results<T: Object>: ResultsBase {
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
     public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
-        return notFoundToNil(
-            rlmResults.indexOfObjectWithPredicate(
-                NSPredicate(format: predicateFormat, argumentArray: args)
-            )
-        )
+        return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat,
+            argumentArray: args)))
     }
 
     // MARK: Object Retrieval

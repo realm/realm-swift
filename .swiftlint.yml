@@ -5,10 +5,10 @@ excluded:
   - RealmSwift/Tests
 disabled_rules:
   - force_cast
-  # - todo
+  - todo
 line_length:
   - 120
-# file_length:
-#   - 670
-# type_body_length:
-#   - 581
+file_length:
+  - 670
+type_body_length:
+  - 581
