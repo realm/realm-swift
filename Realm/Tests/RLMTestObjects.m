@@ -18,7 +18,7 @@
 
 #import "RLMTestObjects.h"
 
-@implementation NSNumberObject
+@implementation NumberObject
 @end
 
 #pragma mark - Abstract Objects
