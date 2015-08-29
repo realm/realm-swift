@@ -148,11 +148,12 @@ static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSDat
 
 // Date convertion utilities
 static inline NSDate *RLMDateTimeToNSDate(realm::DateTime dateTime) {
-    return [NSDate dateWithTimeIntervalSince1970:dateTime.get_datetime()];
+    auto timeInterval = static_cast<NSTimeInterval>(dateTime.get_datetime());
+    return [NSDate dateWithTimeIntervalSince1970:timeInterval];
 }
 
 static inline realm::DateTime RLMDateTimeForNSDate(__unsafe_unretained NSDate *const date) {
-    int64_t time = date.timeIntervalSince1970;
+    auto time = static_cast<int64_t>(date.timeIntervalSince1970);
     return realm::DateTime(time);
 }
 
