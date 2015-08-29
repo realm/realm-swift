@@ -24,7 +24,7 @@
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
 #endif
 
-@interface NSNumberObject : RLMObject
+@interface NumberObject : RLMObject
 @property NSNumber<RLMInt> *intObj;
 @property NSNumber<RLMFloat> *floatObj;
 @property NSNumber<RLMDouble> *doubleObj;
