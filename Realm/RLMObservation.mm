@@ -675,8 +675,30 @@ public:
         return true;
     }
 
-    // Will need to handle this once it's exposed in RLMArray
-    bool link_list_move(size_t, size_t) { return true; }
+    bool link_list_move(size_t from, size_t to) {
+        ObserverState::change *o = activeLinkList;
+        if (!o || o->multipleLinkviewChanges) {
+            return true;
+        }
+        if (from > to) {
+            std::swap(from, to);
+        }
+
+        NSRange range{from, to - from + 1};
+        if (!o->linkviewChangeIndexes) {
+            o->linkviewChangeIndexes = [NSMutableIndexSet indexSetWithIndexesInRange:range];
+            o->linkviewChangeKind = NSKeyValueChangeReplacement;
+            o->changed = true;
+        }
+        else if (o->linkviewChangeKind == NSKeyValueChangeReplacement) {
+            [o->linkviewChangeIndexes addIndexesInRange:range];
+        }
+        else {
+            o->linkviewChangeIndexes = nil;
+            o->multipleLinkviewChanges = true;
+        }
+        return true;
+    }
 
     // Things that just mark the field as modified
     bool set_int(size_t col, size_t row, int_fast64_t) { return markDirty(row, col); }
