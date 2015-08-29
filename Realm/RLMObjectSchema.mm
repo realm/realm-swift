@@ -219,7 +219,7 @@ using namespace realm;
                 property = propArray[existing];
                 property.optional = true;
             }
-            if (auto type = RLMNSNullToNil(propertyType)) {
+            if (auto type = RLMCoerceToNil(propertyType)) {
                 if (existing == NSNotFound) {
                     property = [[RLMProperty alloc] initSwiftOptionalPropertyWithName:propertyName ivar:class_getInstanceVariable(objectClass, propertyName.UTF8String) propertyType:RLMPropertyType(type.intValue)];
                     [propArray addObject:property];
