@@ -7,7 +7,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add missing KVO handling for moving and exchanging objects in `RLMArray` and
+  `List`.
 
 ### Bugfixes
 
