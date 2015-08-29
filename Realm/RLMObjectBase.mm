@@ -94,7 +94,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
         }
         for (NSUInteger i = 0; i < array.count; i++) {
             id propertyValue = RLMValidatedObjectForProperty(array[i], properties[i], schema);
-            [self setValue:RLMNSNullToNil(propertyValue) forKeyPath:[properties[i] name]];
+            [self setValue:RLMCoerceToNil(propertyValue) forKeyPath:[properties[i] name]];
         }
     }
     else {
@@ -112,7 +112,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
             }
 
             obj = RLMValidatedObjectForProperty(obj, prop, schema);
-            [self setValue:RLMNSNullToNil(obj) forKeyPath:prop.name];
+            [self setValue:RLMCoerceToNil(obj) forKeyPath:prop.name];
         }
     }
 
