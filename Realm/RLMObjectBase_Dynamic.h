@@ -53,7 +53,7 @@ FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *obje
  
  @return An NSArray of objects of type `className` which have this object as thier value for the `property` property.
  */
-FOUNDATION_EXTERN NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property);
+FOUNDATION_EXTERN RLMResults *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property);
 
 /**
  This function is useful only in specialized circumstances, for example, when building components

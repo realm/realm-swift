@@ -150,11 +150,12 @@ public class Object: RLMObjectBase {
     - parameter className: The type of object on which the relationship to query is defined.
     - parameter property:  The name of the property which defines the relationship.
 
-    - returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
+    - returns: A `Results` of objects of type `className` which have this object as their value for the `propertyName` property.
     */
-    public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
+    public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> Results<T> {
         // FIXME: use T.className()
-        return RLMObjectBaseLinkingObjectsOfClass(self, (T.self as Object.Type).className(), propertyName) as! [T]
+        let rlmResults = RLMObjectBaseLinkingObjectsOfClass(self, (T.self as Object.Type).className(), propertyName)
+        return Results<T>(rlmResults)
     }
 
     // MARK: Key-Value Coding & Subscripting

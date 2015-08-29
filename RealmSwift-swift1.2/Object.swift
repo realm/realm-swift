@@ -147,10 +147,11 @@ public class Object: RLMObjectBase, Equatable, Printable {
     be used to get the inverse relationship value for `Object` and `List` properties.
     :param: className The type of object on which the relationship to query is defined.
     :param: property  The name of the property which defines the relationship.
-    :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
+    :returns: An `Results` of objects of type `className` which have this object as their value for the `propertyName` property.
     */
-    public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
-        return RLMObjectBaseLinkingObjectsOfClass(self, T.className(), propertyName) as! [T]
+    public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> Results<T> {
+        let rlmResults = RLMObjectBaseLinkingObjectsOfClass(self, T.className(), propertyName)
+        return Results<T>(rlmResults)
     }
 
     // MARK: Key-Value Coding & Subscripting

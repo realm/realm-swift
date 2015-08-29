@@ -390,9 +390,9 @@ RLM_ASSUME_NONNULL_BEGIN
  @param className   The type of object on which the relationship to query is defined.
  @param property    The name of the property which defines the relationship.
 
- @return    An NSArray of objects of type `className` which have this object as thier value for the `property` property.
+ @return    An RLMResults of objects of type `className` which have this object as thier value for the `property` property.
  */
-- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
+- (RLMResults *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
 
 /**
  Returns YES if another RLMObject points to the same object in an RLMRealm. For RLMObject types

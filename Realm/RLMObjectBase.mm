@@ -30,6 +30,8 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+#import <realm/table_view.hpp>
+
 using namespace realm;
 
 const NSUInteger RLMDescriptionMaxDepth = 5;
@@ -304,7 +306,7 @@ RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *ob
     return object ? object->_objectSchema : nil;
 }
 
-NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property) {
+RLMResults *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property) {
     if (!object) {
         return nil;
     }
@@ -330,16 +332,14 @@ NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *cla
 
     Table *table = schema.table;
     if (!table) {
-        return @[];
+        return [RLMEmptyResults emptyResultsWithObjectClassName:schema.className realm:object->_realm];
     }
 
-    size_t col = prop.column;
-    NSUInteger count = object->_row.get_backlink_count(*table, col);
-    NSMutableArray *links = [NSMutableArray arrayWithCapacity:count];
-    for (NSUInteger i = 0; i < count; i++) {
-        [links addObject:RLMCreateObjectAccessor(object->_realm, schema, object->_row.get_backlink(*table, col, i))];
-    }
-    return [links copy];
+    TableView tableView = object->_row.get_table()->get_backlink_view(object->_row.get_index(), table, prop.column);
+    TableView tv(tableView);
+    const Table& constTable = tv.get_parent();
+    auto query = std::make_unique<realm::Query>(constTable, &tv);
+    return [RLMResults resultsWithObjectClassName:schema.className query:std::move(query) view:std::move(tableView) realm:object->_realm];
 }
 
 id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key) {
