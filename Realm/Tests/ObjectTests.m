@@ -266,7 +266,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 @implementation ObjectTests
 
 - (void)testNSNumberProperties {
-    NSNumberObject *obj = [NSNumberObject new];
+    NumberObject *obj = [NumberObject new];
     obj.intObj = @20;
     obj.floatObj = @0.7f;
     obj.doubleObj = @33.3;
