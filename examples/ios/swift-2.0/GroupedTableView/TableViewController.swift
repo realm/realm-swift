@@ -139,5 +139,5 @@ func randomTitle() -> String {
 }
 
 func randomSectionTitle() -> String {
-    return sectionTitles[Int(arc4random()) % sectionTitles.count]
+    return sectionTitles[Int(rand()) % sectionTitles.count]
 }
