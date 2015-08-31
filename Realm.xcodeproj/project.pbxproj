@@ -2478,6 +2478,7 @@
 					"-isystem",
 					core/include,
 				);
+				OTHER_SWIFT_FLAGS = "-DREALM_ENABLE_NULL";
 				SDKROOT = iphoneos;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_FILE = "$(PRODUCT_NAME)_vers.m";
@@ -2535,6 +2536,7 @@
 					"-isystem",
 					core/include,
 				);
+				OTHER_SWIFT_FLAGS = "-DREALM_ENABLE_NULL";
 				SDKROOT = iphoneos;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_FILE = "$(PRODUCT_NAME)_vers.m";
