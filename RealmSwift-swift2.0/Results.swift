@@ -64,11 +64,11 @@ public class ResultsBase: NSObject, NSFastEnumeration {
     // MARK: Fast Enumeration
 
     public func countByEnumeratingWithState(state: UnsafeMutablePointer<NSFastEnumerationState>,
-        objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>,
-        count len: Int) -> Int {
-            return Int(rlmResults.countByEnumeratingWithState(state,
-                objects: buffer,
-                count: UInt(len)))
+                                            objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>,
+                                            count len: Int) -> Int {
+        return Int(rlmResults.countByEnumeratingWithState(state,
+            objects: buffer,
+            count: UInt(len)))
     }
 }
 

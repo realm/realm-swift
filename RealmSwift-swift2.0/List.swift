@@ -405,13 +405,13 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
     - parameter newElements: The new elements to be inserted into the List.
     */
     public func replaceRange<C: CollectionType where C.Generator.Element == T>(subRange: Range<Int>,
-        with newElements: C) {
-            for _ in subRange {
-                removeAtIndex(subRange.startIndex)
-            }
-            for x in newElements.reverse() {
-                insert(x, atIndex: subRange.startIndex)
-            }
+                                                                               with newElements: C) {
+        for _ in subRange {
+            removeAtIndex(subRange.startIndex)
+        }
+        for x in newElements.reverse() {
+            insert(x, atIndex: subRange.startIndex)
+        }
     }
 
     /// The position of the first element in a non-empty collection.
