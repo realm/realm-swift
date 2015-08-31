@@ -181,7 +181,9 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
                     _type = RLMPropertyTypeBool;
                 }
                 else {
-                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an NSNumber object type. NSNumbers can only be RLMInt at the moment. See http://realm.io/docs/cocoa/ for more information.", self.objectClassName]);
+                    NSString *message = [NSString stringWithFormat:@"'%@' is not supported as an NSNumber object type. NSNumbers can only be RLMInt, RLMFloat, RLMDouble, and RLMBool at the moment. "
+                                                                   @"See http://realm.io/docs/cocoa/ for more information.", self.objectClassName];
+                    @throw RLMException(message);
                 }
                 _objectClassName = nil;
             }
