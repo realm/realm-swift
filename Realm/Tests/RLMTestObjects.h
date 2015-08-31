@@ -24,13 +24,6 @@
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
 #endif
 
-@interface NumberObject : RLMObject
-@property NSNumber<RLMInt> *intObj;
-@property NSNumber<RLMFloat> *floatObj;
-@property NSNumber<RLMDouble> *doubleObj;
-@property NSNumber<RLMBool> *boolObj;
-@end
-
 #pragma mark - Abstract Objects
 #pragma mark -
 
@@ -279,6 +272,13 @@ RLM_ARRAY_TYPE(CircleObject);
 @interface ReadOnlyPropertyObject : RLMObject
 @property (readonly) NSNumber *readOnlyUnsupportedProperty;
 @property (readonly) int readOnlyPropertyMadeReadWriteInClassExtension;
+@end
+
+@interface NumberObject : RLMObject
+@property NSNumber<RLMInt> *intObj;
+@property NSNumber<RLMFloat> *floatObj;
+@property NSNumber<RLMDouble> *doubleObj;
+@property NSNumber<RLMBool> *boolObj;
 @end
 
 #pragma mark FakeObject

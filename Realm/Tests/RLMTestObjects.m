@@ -18,9 +18,6 @@
 
 #import "RLMTestObjects.h"
 
-@implementation NumberObject
-@end
-
 #pragma mark - Abstract Objects
 #pragma mark -
 
@@ -164,6 +161,9 @@
 - (NSNumber *)readOnlyUnsupportedProperty {
     return nil;
 }
+@end
+
+@implementation NumberObject
 @end
 
 #pragma mark FakeObject
