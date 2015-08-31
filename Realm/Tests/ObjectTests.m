@@ -21,6 +21,7 @@
 
 #import <libkern/OSAtomic.h>
 #import <objc/runtime.h>
+#import <stdalign.h>
 
 #pragma mark - Test Objects
 
@@ -844,12 +845,12 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     objc_property_attribute_t objectColAttrs[] = {
         { "T", "@\"RuntimeGeneratedObject\"" },
     };
-    class_addIvar(objectClass, "objectCol", sizeof(id), 64, "@\"RuntimeGeneratedObject\"");
+    class_addIvar(objectClass, "objectCol", sizeof(id), alignof(id), "@\"RuntimeGeneratedObject\"");
     class_addProperty(objectClass, "objectCol", objectColAttrs, sizeof(objectColAttrs) / sizeof(objc_property_attribute_t));
     objc_property_attribute_t intColAttrs[] = {
         { "T", "i" },
     };
-    class_addIvar(objectClass, "intCol", sizeof(int), 64, "i");
+    class_addIvar(objectClass, "intCol", sizeof(int), alignof(int), "i");
     class_addProperty(objectClass, "intCol", intColAttrs, sizeof(intColAttrs) / sizeof(objc_property_attribute_t));
     objc_registerClassPair(objectClass);
     XCTAssertEqualObjects([objectClass className], @"RuntimeGeneratedObject");
