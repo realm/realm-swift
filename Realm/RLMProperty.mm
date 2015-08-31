@@ -134,6 +134,9 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
             _type = RLMPropertyTypeBool;
             return YES;
         case '@': {
+#if REALM_ENABLE_NULL
+            _optional = true;
+#endif
             static const char arrayPrefix[] = "@\"RLMArray<";
             static const int arrayPrefixLen = sizeof(arrayPrefix) - 1;
 
@@ -143,26 +146,19 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
             if (code[1] == '\0') {
                 // string is "@"
                 _type = RLMPropertyTypeAny;
+                _optional = false;
             }
             else if (strcmp(code, "@\"NSString\"") == 0) {
                 _type = RLMPropertyTypeString;
-#if REALM_ENABLE_NULL
-                _optional = YES;
-#endif
             }
             else if (strcmp(code, "@\"NSDate\"") == 0) {
                 _type = RLMPropertyTypeDate;
-#if REALM_ENABLE_NULL
-                _optional = YES;
-#endif
             }
             else if (strcmp(code, "@\"NSData\"") == 0) {
                 _type = RLMPropertyTypeData;
-#if REALM_ENABLE_NULL
-                _optional = YES;
-#endif
             }
             else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
+                _optional = false;
                 // get object class from type string - @"RLMArray<objectClassName>"
                 _type = RLMPropertyTypeArray;
                 _objectClassName = [[NSString alloc] initWithBytes:code + arrayPrefixLen
@@ -184,9 +180,6 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 
                 if ([_objectClassName isEqualToString:@"RLMInt"]) {
                     _type = RLMPropertyTypeInt;
-#if REALM_ENABLE_NULL
-                    _optional = YES;
-#endif
                 }
                 else if ([_objectClassName isEqualToString:@"RLMFloat"]) {
                     _type = RLMPropertyTypeFloat;
@@ -196,9 +189,6 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
                 }
                 else if ([_objectClassName isEqualToString:@"RLMBool"]) {
                     _type = RLMPropertyTypeBool;
-#if REALM_ENABLE_NULL
-                    _optional = YES;
-#endif
                 }
                 else {
                     @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an NSNumber object type. NSNumbers can only be RLMInt at the moment. See http://realm.io/docs/cocoa/ for more information.", self.objectClassName]);
