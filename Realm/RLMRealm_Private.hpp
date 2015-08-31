@@ -37,6 +37,4 @@ namespace realm {
 
 // FIXME - group should not be exposed
 @property (nonatomic, readonly) realm::Group *group;
-- (void)verifyThread;
-- (void)notify;
 @end

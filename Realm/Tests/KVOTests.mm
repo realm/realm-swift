@@ -22,6 +22,7 @@
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMPredicateUtil.h"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 
@@ -1468,9 +1469,9 @@ public:
 @implementation KVOMultipleRealmsTests
 - (void)setUp {
     [super setUp];
-    // use private constructor to bypass cache and get a second instance on the
-    // same thread
-    self.secondaryRealm = [RLMRealm realmWithPath:self.realm.path key:nil readOnly:NO inMemory:YES dynamic:NO schema:[self.realm.schema shallowCopy] error:nil];
+    RLMRealmConfiguration *config = self.realm.configuration;
+    config.cache = false;
+    self.secondaryRealm = [RLMRealm realmWithConfiguration:config error:nil];
 }
 
 - (void)tearDown {

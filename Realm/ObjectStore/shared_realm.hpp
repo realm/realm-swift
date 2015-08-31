@@ -132,23 +132,6 @@ namespace realm {
         std::mutex m_mutex;
     };
 
-    class RealmDelegate
-    {
-    public:
-        virtual ~RealmDelegate() = default;
-
-        // The Realm has committed a write transaction, and other Realms at the
-        // same path should be notified
-        virtual void transaction_committed() = 0;
-
-        // There are now new versions available for the Realm, but it has not
-        // had its read version advanced
-        virtual void changes_available() = 0;
-
-        // The Realm's read version has advanced
-        virtual void did_change() = 0;
-    };
-
     class RealmFileException : public std::runtime_error
     {
       public:
