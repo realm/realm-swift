@@ -65,7 +65,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         obj.objectCol = SwiftBoolObject()
         obj.objectCol.boolCol = true
         obj.arrayCol.addObject(obj.objectCol)
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let data = NSString(string: "abcd").dataUsingEncoding(NSUTF8StringEncoding)
 
@@ -86,7 +86,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
         realm.addObject(SwiftObject())
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let data = NSString(string: "a").dataUsingEncoding(NSUTF8StringEncoding)
 
@@ -106,7 +106,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         let realm = self.realmWithTestPath()
         realm.beginWriteTransaction()
         SwiftDefaultObject.createInRealm(realm, withValue: NSDictionary())
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let object = SwiftDefaultObject.allObjectsInRealm(realm).firstObject() as! SwiftDefaultObject
         XCTAssertEqual(object.intCol, 2, "defaultPropertyValues should override native property default value")
@@ -123,13 +123,13 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         SwiftStringObject.createInDefaultRealmWithValue(["string"])
 
         SwiftStringObjectSubclass.createInDefaultRealmWithValue(["string", "string2"])
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         // ensure creation in proper table
         XCTAssertEqual(UInt(1), SwiftStringObjectSubclass.allObjects().count)
         XCTAssertEqual(UInt(1), SwiftStringObject.allObjects().count)
 
-        realm.transactionWithBlock { () -> Void in
+        try! realm.transactionWithBlock {
             // create self referencing subclass
             let sub = SwiftSelfRefrencingSubclass.createInDefaultRealmWithValue(["string", []])
             let sub2 = SwiftSelfRefrencingSubclass()
@@ -184,7 +184,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(ca.name!, "name", "name property should be name.")
         ca.age = 99
         XCTAssertEqual(ca.age, Int32(99), "age property should be 99")
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
     }
 
     func testClassExtension() {
@@ -195,7 +195,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         bObject.intCol = 1
         bObject.stringCol = "stringVal"
         realm.addObject(bObject)
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let objectFromRealm = BaseClassStringObject.allObjectsInRealm(realm)[0] as! BaseClassStringObject
         XCTAssertEqual(objectFromRealm.intCol, Int32(1), "Should be 1")
@@ -217,7 +217,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(objects.count, UInt(2), "Should have 2 objects")
         XCTAssertEqual((objects[0] as! SwiftPrimaryStringObject).intCol, 3, "Value should be 3");
 
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
     }
 
     // if this fails (and you haven't changed the test module name), the checks

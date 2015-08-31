@@ -33,7 +33,7 @@ class SwiftPropertyTypeTest: RLMTestCase {
         SwiftLongObject.createInRealm(realm, withValue: [NSNumber(longLong: longNumber)])
         SwiftLongObject.createInRealm(realm, withValue: [NSNumber(longLong: intNumber)])
         SwiftLongObject.createInRealm(realm, withValue: [NSNumber(longLong: negativeLongNumber)])
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
         
         let objects = SwiftLongObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, UInt(3), "3 rows expected")
@@ -43,7 +43,7 @@ class SwiftPropertyTypeTest: RLMTestCase {
         
         realm.beginWriteTransaction()
         (objects[0] as! SwiftLongObject).longCol = updatedLongNumber
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
         
         XCTAssertEqual((objects[0] as! SwiftLongObject).longCol, updatedLongNumber, "After update: 2 ^ 33 expected")
     }
@@ -56,7 +56,7 @@ class SwiftPropertyTypeTest: RLMTestCase {
         let v32 = Int32(1) << 30
         // 1 << 40 doesn't auto-promote to Int64 on 32-bit platforms
         let v64 = Int64(1) << 40
-        realm.transactionWithBlock() {
+        try! realm.transactionWithBlock() {
             let obj = SwiftAllIntSizesObject()
 
             obj.int8  = v8
@@ -85,7 +85,7 @@ class SwiftPropertyTypeTest: RLMTestCase {
         let v32 = Int32(1) << 30
         // 1 << 40 doesn't auto-promote to Int64 on 32-bit platforms
         let v64 = Int64(1) << 40
-        realm.transactionWithBlock() {
+        try! realm.transactionWithBlock() {
             let obj = AllIntSizesObject()
 
             obj.int16 = v16

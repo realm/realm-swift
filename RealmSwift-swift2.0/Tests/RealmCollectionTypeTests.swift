@@ -79,7 +79,7 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     override func tearDown() {
-        realmWithTestPath().commitWrite()
+        try! realmWithTestPath().commitWrite()
 
         str1 = nil
         str2 = nil

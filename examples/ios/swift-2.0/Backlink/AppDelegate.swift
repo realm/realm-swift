@@ -50,7 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {}
 
         let realm = try! Realm()
-        realm.write {
+        try! realm.write {
             realm.create(Person.self, value: ["John", [["Fido", 1]]])
             realm.create(Person.self, value: ["Mary", [["Rex", 2]]])
         }

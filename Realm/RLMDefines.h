@@ -75,3 +75,11 @@ typedef RLMObject * RLMObjectArgument;
 #else
 #  define RLM_NOESCAPE
 #endif
+
+#pragma mark - Swift Availability
+
+#if defined(NS_SWIFT_UNAVAILABLE)
+#  define RLM_SWIFT_UNAVAILABLE(msg) NS_SWIFT_UNAVAILABLE(msg)
+#else
+#  define RLM_SWIFT_UNAVAILABLE(msg)
+#endif

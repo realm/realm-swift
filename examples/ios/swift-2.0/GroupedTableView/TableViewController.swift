@@ -97,7 +97,7 @@ class TableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            realm.write {
+            try! realm.write {
                 self.realm.delete(objectForIndexPath(indexPath)!)
             }
         }
@@ -116,12 +116,12 @@ class TableViewController: UITableViewController {
                 // Add row via dictionary. Order is ignored.
                 realm.create(DemoObject.self, value: ["title": randomTitle(), "date": NSDate(), "sectionTitle": randomSectionTitle()])
             }
-            realm.commitWrite()
+            try! realm.commitWrite()
         }
     }
 
     func add() {
-        realm.write {
+        try! realm.write {
             let object = [randomTitle(), NSDate(), randomSectionTitle()]
             self.realm.create(DemoObject.self, value: object)
         }

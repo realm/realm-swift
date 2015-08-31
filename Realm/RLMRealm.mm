@@ -596,6 +596,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)commitWriteTransaction {
+    [self commitWriteTransaction:nil];
+}
+
+- (BOOL)commitWriteTransaction:(NSError **)outError {
     CheckReadWrite(self);
     RLMCheckThread(self);
 
@@ -608,24 +612,30 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
             // notify other realm instances of changes
             [self.notifier notifyOtherRealms];
-
-            // send local notification
-            [self sendNotifications:RLMRealmDidChangeNotification];
         }
         catch (std::exception& ex) {
-            @throw RLMException(ex);
+            RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, ex), outError);
+            return NO;
         }
+        // send local notification
+        [self sendNotifications:RLMRealmDidChangeNotification];
     } else {
-       @throw RLMException(@"Can't commit a non-existing write transaction");
+        @throw RLMException(@"Can't commit a non-existing write transaction");
     }
+    return YES;
 }
 
 - (void)transactionWithBlock:(void(^)(void))block {
+    [self transactionWithBlock:block error:nil];
+}
+
+- (BOOL)transactionWithBlock:(void(^)(void))block error:(NSError **)outError {
     [self beginWriteTransaction];
     block();
     if (_inWriteTransaction) {
-        [self commitWriteTransaction];
+        return [self commitWriteTransaction:outError];
     }
+    return YES;
 }
 
 - (void)cancelWriteTransaction {

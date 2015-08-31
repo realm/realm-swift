@@ -45,7 +45,7 @@ class ViewController: UIViewController {
             let realm = try! Realm(configuration: configuration)
 
             // Add an object
-            realm.write {
+            try! realm.write {
                 let obj = EncryptionObject()
                 obj.stringProp = "abcd"
                 realm.add(obj)

@@ -171,9 +171,14 @@ public final class Realm {
     Helper to perform actions contained within the given block inside a write transation.
 
     :param: block The block to be executed inside a write transaction.
+    :param: error If an error occurs, upon return contains an `NSError` object
+                  that describes the problem. If you are not interested in
+                  possible errors, omit the argument, or pass in `nil`.
+    
+    :returns: Whether the transaction succeeded.
     */
-    public func write(block: (() -> Void)) {
-        rlmRealm.transactionWithBlock(block)
+    public func write(error: NSErrorPointer = nil, block: (() -> Void)) -> Bool {
+        return rlmRealm.transactionWithBlock(block, error: error)
     }
 
     /**
@@ -205,9 +210,15 @@ public final class Realm {
     After this is called, the `Realm` reverts back to being read-only.
 
     Calling this when not in a write transaction will throw an exception.
+    
+    :param: error If an error occurs, upon return contains an `NSError` object
+            that describes the problem. If you are not interested in
+            possible errors, omit the argument, or pass in `nil`.
+
+    :returns: Whether the transaction succeeded.
     */
-    public func commitWrite() {
-        rlmRealm.commitWriteTransaction()
+    public func commitWrite(error: NSErrorPointer = nil) -> Bool {
+        return rlmRealm.commitWriteTransaction(error)
     }
 
     /**

@@ -34,7 +34,7 @@ class SwiftMixedTests: RLMTestCase {
         MixedObject.createInRealm(realm, withValue: [true, 3.1 as Double, 54] as NSArray)
         MixedObject.createInRealm(realm, withValue: [true, NSDate(), 55] as NSArray)
         MixedObject.createInRealm(realm, withValue: [true, data!, 50] as NSArray)
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let objects = MixedObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, UInt(5), "5 rows expected")

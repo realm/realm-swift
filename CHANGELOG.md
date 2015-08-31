@@ -17,6 +17,9 @@ x.x.x Release notes (yyyy-MM-dd)
   `average`.
 * Add missing KVO handling for moving and exchanging objects in `RLMArray` and
   `List`.
+* Committing write transactions (via `commitWrite` / `commitWriteTransaction` and
+  `write` / `transactionWithBlock`) now optionally allow for handling errors when
+  the disk is out of space.
 
 ### Bugfixes
 

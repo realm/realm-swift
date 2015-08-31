@@ -32,7 +32,7 @@ class SwiftDynamicTests: RLMTestCase {
             realm.beginWriteTransaction()
             SwiftDynamicObject.createInRealm(realm, withValue: ["column1", 1])
             SwiftDynamicObject.createInRealm(realm, withValue: ["column2", 2])
-            realm.commitWriteTransaction()
+            try! realm.commitWriteTransaction()
         }
         let dyrealm = realmWithTestPathAndSchema(nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
@@ -58,7 +58,7 @@ class SwiftDynamicTests: RLMTestCase {
             realm.beginWriteTransaction()
             SwiftDynamicObject.createInRealm(realm, withValue: ["column1", 1])
             SwiftDynamicObject.createInRealm(realm, withValue: ["column2", 2])
-            realm.commitWriteTransaction()
+            try! realm.commitWriteTransaction()
         }
 
         // verify properties
@@ -78,7 +78,7 @@ class SwiftDynamicTests: RLMTestCase {
             realm.beginWriteTransaction()
             DynamicObject.createInRealm(realm, withValue: ["column1", 1])
             DynamicObject.createInRealm(realm, withValue: ["column2", 2])
-            realm.commitWriteTransaction()
+            try! realm.commitWriteTransaction()
         }
         let dyrealm = realmWithTestPathAndSchema(nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
@@ -104,7 +104,7 @@ class SwiftDynamicTests: RLMTestCase {
             realm.beginWriteTransaction()
             DynamicObject.createInRealm(realm, withValue: ["column1", 1])
             DynamicObject.createInRealm(realm, withValue: ["column2", 2])
-            realm.commitWriteTransaction()
+            try! realm.commitWriteTransaction()
         }
 
         // verify properties
@@ -154,7 +154,7 @@ class SwiftDynamicTests: RLMTestCase {
             realm.beginWriteTransaction()
             AllTypesObject.createInRealm(realm, withValue: obj1)
             AllTypesObject.createInRealm(realm, withValue: obj2)
-            realm.commitWriteTransaction()
+            try! realm.commitWriteTransaction()
         }
 
         // verify properties
