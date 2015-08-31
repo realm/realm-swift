@@ -79,12 +79,11 @@ void RLMInstallUncaughtExceptionHandler() {
 }
 
 // Convert an error code to either an NSError or an exception
-static id handleError(int err, NSError **error) {
+static void handleError(int err, NSError **error) {
     if (!error) {
         @throw RLMException(@"%@", @(strerror(err)));
     }
     *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil];
-    return nil;
 }
 
 // Write a byte to a pipe to notify anyone waiting for data on the pipe
@@ -122,7 +121,7 @@ class FdHolder {
     FdHolder(FdHolder const&) = delete;
 
 public:
-    FdHolder() { }
+    FdHolder() = default;
     ~FdHolder() { close(); }
     operator int() const { return fd; }
 
@@ -132,7 +131,6 @@ public:
         return *this;
     }
 };
-}
 
 // Inter-thread and inter-process notifications of changes are done using a
 // named pipe in the filesystem next to the Realm file. Everyone who wants to be
@@ -158,11 +156,38 @@ public:
 // written to the anonymous pipe the background thread removes the runloop
 // source from the runloop and and shuts down.
 
-@implementation RLMNotifier {
-    // Realm to notify of changes
-    __weak RLMRealm *_realm;
+class RLMNotificationHelper : public realm::RealmDelegate {
+public:
+    RLMNotificationHelper(RLMRealm *realm, NSError **error);
+
+    ~RLMNotificationHelper() {
+        notifyFd(_shutdownWriteFd);
+        pthread_join(_thread, nullptr); // Wait for the thread to exit
+    }
+
+    void transaction_committed() override {
+        notifyFd(_notifyFd);
+    }
+
+    void changes_available() override {
+        [_realm sendNotifications:RLMRealmRefreshRequiredNotification];
+    }
+
+    void did_change() override {
+        [_realm sendNotifications:RLMRealmDidChangeNotification];
+    }
+
+    void listen();
+
+private:
+    // This is owned by the realm, so it needs to not retain the realm
+    __unsafe_unretained RLMRealm *const _realm;
+
     // Runloop which notifications are delivered on
     CFRunLoopRef _runLoop;
+
+    // The listener thread
+    pthread_t _thread;
 
     // Read-write file descriptor for the named pipe which is waited on for
     // changes and written to when a commit is made
@@ -173,81 +198,93 @@ public:
     // it should be shut down.
     FdHolder _shutdownReadFd;
     FdHolder _shutdownWriteFd;
-}
+};
+} // anonymous namespace
 
-- (instancetype)initWithRealm:(RLMRealm *)realm error:(NSError **)error {
-    self = [super init];
-    if (self) {
-        _realm = realm;
-        _runLoop = CFRunLoopGetCurrent();
-        CFRetain(_runLoop);
+RLMNotificationHelper::RLMNotificationHelper(RLMRealm *realm, NSError **error)
+: _realm(realm)
+, _runLoop(CFRunLoopGetCurrent())
+{
+    CFRetain(_runLoop);
 
-        _kq = kqueue();
-        if (_kq == -1) {
-            return handleError(errno, error);
-        }
-
-        const char *path = [realm.path stringByAppendingString:@".note"].UTF8String;
-
-        // Create and open the named pipe
-        int ret = mkfifo(path, 0600);
-        if (ret == -1) {
-            int err = errno;
-            if (err == ENOTSUP) {
-                // Filesystem doesn't support named pipes, so try putting it in tmp instead
-                // Hash collisions are okay here because they just result in doing
-                // extra work, as opposed to correctness problems
-                static NSString *tmpDir = NSTemporaryDirectory();
-                path = [tmpDir stringByAppendingFormat:@"realm_%llu.note", (unsigned long long)[realm.path hash]].UTF8String;
-                ret = mkfifo(path, 0600);
-                err = errno;
-            }
-            // the fifo already existing isn't an error
-            if (ret == -1 && err != EEXIST) {
-                return handleError(err, error);
-            }
-        }
-
-        _notifyFd = open(path, O_RDWR);
-        if (_notifyFd == -1) {
-            return handleError(errno, error);
-        }
-
-        // Make writing to the pipe return -1 when the pipe's buffer is full
-        // rather than blocking until there's space available
-        ret = fcntl(_notifyFd, F_SETFL, O_NONBLOCK);
-        if (ret == -1) {
-            return handleError(errno, error);
-        }
-
-        // Create the anonymous pipe
-        int pipeFd[2];
-        ret = pipe(pipeFd);
-        if (ret == -1) {
-            return handleError(errno, error);
-        }
-
-        _shutdownReadFd = pipeFd[0];
-        _shutdownWriteFd = pipeFd[1];
-
-        NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(listen) object:nil];
-        // Use the minimum allowed stack size, as we need very little in our listener
-        // https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/Multithreading/CreatingThreads/CreatingThreads.html#//apple_ref/doc/uid/10000057i-CH15-SW7
-        thread.stackSize = 16 * 1024;
-        thread.name = @"RLMRealm notification listener";
-        [thread start];
+    _kq = kqueue();
+    if (_kq == -1) {
+        handleError(errno, error);
+        return;
     }
-    return self;
+
+    const char *path = [realm.path stringByAppendingString:@".note"].UTF8String;
+
+    // Create and open the named pipe
+    int ret = mkfifo(path, 0600);
+    if (ret == -1) {
+        int err = errno;
+        if (err == ENOTSUP) {
+            // Filesystem doesn't support named pipes, so try putting it in tmp instead
+            // Hash collisions are okay here because they just result in doing
+            // extra work, as opposed to correctness problems
+            static NSString *tmpDir = NSTemporaryDirectory();
+            path = [tmpDir stringByAppendingFormat:@"realm_%llu.note", (unsigned long long)[realm.path hash]].UTF8String;
+            ret = mkfifo(path, 0600);
+            err = errno;
+        }
+        // the fifo already existing isn't an error
+        if (ret == -1 && err != EEXIST) {
+            handleError(err, error);
+            return;
+        }
+    }
+
+    _notifyFd = open(path, O_RDWR);
+    if (_notifyFd == -1) {
+        handleError(errno, error);
+        return;
+    }
+
+    // Make writing to the pipe return -1 when the pipe's buffer is full
+    // rather than blocking until there's space available
+    ret = fcntl(_notifyFd, F_SETFL, O_NONBLOCK);
+    if (ret == -1) {
+        handleError(errno, error);
+        return;
+    }
+
+    // Create the anonymous pipe
+    int pipeFd[2];
+    ret = pipe(pipeFd);
+    if (ret == -1) {
+        handleError(errno, error);
+        return;
+    }
+
+    _shutdownReadFd = pipeFd[0];
+    _shutdownWriteFd = pipeFd[1];
+
+    // Use the minimum allowed stack size, as we need very little in our listener
+    // https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/Multithreading/CreatingThreads/CreatingThreads.html#//apple_ref/doc/uid/10000057i-CH15-SW7
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setstacksize(&attr, 16 * 1024);
+
+    auto fn = [](void *self) -> void * {
+        static_cast<RLMNotificationHelper *>(self)->listen();
+        return nullptr;
+    };
+    ret = pthread_create(&_thread, &attr, fn, this);
+    pthread_attr_destroy(&attr);
+    if (ret != 0) {
+        handleError(ret, error);
+    }
 }
 
-- (void)listen {
+void RLMNotificationHelper::listen() {
+    pthread_setname_np("RLMRealm notification listener");
 
     // Create the runloop source
     CFRunLoopSourceContext ctx{};
-    ctx.info = (__bridge void *)self;
+    ctx.info = this;
     ctx.perform = [](void *info) {
-        RLMNotifier *notifier = (__bridge RLMNotifier *)info;
-        [notifier->_realm notify];
+        [static_cast<RLMNotificationHelper *>(info)->_realm notify];
     };
 
     CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
@@ -294,11 +331,10 @@ public:
     }
 }
 
-- (void)stop {
-    notifyFd(_shutdownWriteFd);
+std::unique_ptr<realm::RealmDelegate> RLMCreateRealmDelegate(RLMRealm *realm, NSError **error) {
+    std::unique_ptr<realm::RealmDelegate> delegate(new RLMNotificationHelper(realm, error));
+    if (error && *error) {
+        return nullptr;
+    }
+    return delegate;
 }
-
-- (void)notifyOtherRealms {
-    notifyFd(_notifyFd);
-}
-@end

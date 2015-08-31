@@ -17,9 +17,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <memory>
 #import <string>
 
 @class RLMRealm;
+
+namespace realm {
+    class RealmDelegate;
+}
 
 // Add a Realm to the weak cache
 void RLMCacheRealm(std::string const& path, RLMRealm *realm);
@@ -43,3 +48,5 @@ void RLMInstallUncaughtExceptionHandler();
 // notify other Realm instances for the same path that a change has occurred
 - (void)notifyOtherRealms;
 @end
+
+std::unique_ptr<realm::RealmDelegate> RLMCreateRealmDelegate(RLMRealm *realm, NSError **error);

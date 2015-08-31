@@ -72,6 +72,5 @@ FOUNDATION_EXTERN NSData *RLMRealmValidatedEncryptionKey(NSData *key);
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator;
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator;
 
-+ (NSString *)writeableTemporaryPathForFile:(NSString *)fileName;
-
+- (void)sendNotifications:(NSString *)notification;
 @end
