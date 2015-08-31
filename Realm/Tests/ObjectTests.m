@@ -265,26 +265,6 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
 @implementation ObjectTests
 
-- (void)testNSNumberProperties {
-    NumberObject *obj = [NumberObject new];
-    obj.intObj = @20;
-    obj.floatObj = @0.7f;
-    obj.doubleObj = @33.3;
-    obj.boolObj = @YES;
-    XCTAssertEqualObjects(@20, obj.intObj);
-    XCTAssertEqualObjects(@0.7f, obj.floatObj);
-    XCTAssertEqualObjects(@33.3, obj.doubleObj);
-    XCTAssertEqualObjects(@YES, obj.boolObj);
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    [realm beginWriteTransaction];
-    [realm addObject:obj];
-    [realm commitWriteTransaction];
-    XCTAssertEqualObjects(@20, obj.intObj);
-    XCTAssertEqualObjects(@0.7f, obj.floatObj);
-    XCTAssertEqualObjects(@33.3, obj.doubleObj);
-    XCTAssertEqualObjects(@YES, obj.boolObj);
-}
-
 - (void)testObjectInit
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -743,6 +723,26 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [realm cancelWriteTransaction];
 }
 
+- (void)testNSNumberProperties {
+    NumberObject *obj = [NumberObject new];
+    obj.intObj = @20;
+    obj.floatObj = @0.7f;
+    obj.doubleObj = @33.3;
+    obj.boolObj = @YES;
+    XCTAssertEqualObjects(@20, obj.intObj);
+    XCTAssertEqualObjects(@0.7f, obj.floatObj);
+    XCTAssertEqualObjects(@33.3, obj.doubleObj);
+    XCTAssertEqualObjects(@YES, obj.boolObj);
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqualObjects(@20, obj.intObj);
+    XCTAssertEqualObjects(@0.7f, obj.floatObj);
+    XCTAssertEqualObjects(@33.3, obj.doubleObj);
+    XCTAssertEqualObjects(@YES, obj.boolObj);
+}
+
 #ifdef REALM_ENABLE_NULL
 - (void)testOptionalStringProperties {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -837,6 +837,89 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertEqualObjects(bo.binaryCol, emptyData);
     XCTAssertEqualObjects([bo valueForKey:@"binaryCol"], emptyData);
     XCTAssertEqualObjects(bo[@"binaryCol"], emptyData);
+}
+
+- (void)testOptionalNumberProperties {
+    void (^assertNullProperties)(NumberObject *) = ^(NumberObject *no){
+        XCTAssertNil(no.intObj);
+        XCTAssertNil(no.doubleObj);
+        XCTAssertNil(no.floatObj);
+        XCTAssertNil(no.boolObj);
+
+        XCTAssertNil([no valueForKey:@"intObj"]);
+        XCTAssertNil([no valueForKey:@"doubleObj"]);
+        XCTAssertNil([no valueForKey:@"floatObj"]);
+        XCTAssertNil([no valueForKey:@"boolObj"]);
+
+        XCTAssertNil(no[@"intObj"]);
+        XCTAssertNil(no[@"doubleObj"]);
+        XCTAssertNil(no[@"floatObj"]);
+        XCTAssertNil(no[@"boolObj"]);
+    };
+
+    void (^assertNonNullProperties)(NumberObject *) = ^(NumberObject *no){
+        XCTAssertEqualObjects(no.intObj, @1);
+        XCTAssertEqualObjects(no.doubleObj, @1.1);
+        XCTAssertEqualObjects(no.floatObj, @2.2f);
+        XCTAssertEqualObjects(no.boolObj, @YES);
+
+        XCTAssertEqualObjects([no valueForKey:@"intObj"], @1);
+        XCTAssertEqualObjects([no valueForKey:@"doubleObj"], @1.1);
+        XCTAssertEqualObjects([no valueForKey:@"floatObj"], @2.2f);
+        XCTAssertEqualObjects([no valueForKey:@"boolObj"], @YES);
+
+        XCTAssertEqualObjects(no[@"intObj"], @1);
+        XCTAssertEqualObjects(no[@"doubleObj"], @1.1);
+        XCTAssertEqualObjects(no[@"floatObj"], @2.2f);
+        XCTAssertEqualObjects(no[@"boolObj"], @YES);
+    };
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    NumberObject *no = [[NumberObject alloc] init];
+
+    assertNullProperties(no);
+
+    no.intObj = @1;
+    no.doubleObj = @1.1;
+    no.floatObj = @2.2f;
+    no.boolObj = @YES;
+
+    assertNonNullProperties(no);
+
+    no.intObj = nil;
+    no.doubleObj = nil;
+    no.floatObj = nil;
+    no.boolObj = nil;
+
+    assertNullProperties(no);
+
+    no[@"intObj"] = @1;
+    no[@"doubleObj"] = @1.1;
+    no[@"floatObj"] = @2.2f;
+    no[@"boolObj"] = @YES;
+
+    assertNonNullProperties(no);
+
+    no.intObj = nil;
+    no.doubleObj = nil;
+    no.floatObj = nil;
+    no.boolObj = nil;
+
+    [realm transactionWithBlock:^{
+        [realm addObject:no];
+        assertNullProperties(no);
+    }];
+
+    no = [NumberObject allObjectsInRealm:realm].firstObject;
+    assertNullProperties(no);
+
+    [realm transactionWithBlock:^{
+        no.intObj = @1;
+        no.doubleObj = @1.1;
+        no.floatObj = @2.2f;
+        no.boolObj = @YES;
+    }];
+    assertNonNullProperties(no);
 }
 
 - (void)testSettingNonOptionalPropertiesToNil {

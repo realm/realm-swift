@@ -18,9 +18,6 @@
 
 #import "RLMTestObjects.h"
 
-@implementation NumberObject
-@end
-
 #pragma mark - Abstract Objects
 #pragma mark -
 
@@ -172,6 +169,9 @@
 #pragma mark IntegerArrayPropertyObject
 
 @implementation IntegerArrayPropertyObject
+@end
+
+@implementation NumberObject
 @end
 
 #pragma mark FakeObject

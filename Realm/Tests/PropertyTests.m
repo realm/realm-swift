@@ -19,6 +19,7 @@
 #import "RLMTestCase.h"
 
 #import <objc/runtime.h>
+#import "RLMObjectSchema_Private.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
 
