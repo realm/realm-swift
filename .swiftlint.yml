@@ -1,8 +1,8 @@
 # Realm Swift's SwiftLint configuration file
 # Uncomment the commented lines to avoid any violations
 
-excluded:
-  - RealmSwift/Tests
+included:
+  - RealmSwift
 disabled_rules:
   - force_cast
   - todo
