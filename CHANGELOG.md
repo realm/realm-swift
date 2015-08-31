@@ -15,6 +15,8 @@ x.x.x Release notes (yyyy-MM-dd)
   cannot exist independently from a `Realm`.
 * Aggregate operations are now available on `List`: `min`, `max`, `sum`,
   `average`.
+* Add missing KVO handling for moving and exchanging objects in `RLMArray` and
+  `List`.
 
 ### Bugfixes
 

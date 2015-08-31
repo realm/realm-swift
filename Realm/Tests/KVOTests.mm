@@ -778,12 +778,21 @@ public:
     [mutator removeObjectsAtIndexes:indexes];
     AssertIndexChange(NSKeyValueChangeRemoval, indexes);
 
-    // We deliberately diverge from NSMutableArray for `removeAllObjects` and
-    // `addObjectsFromArray:`, because generating a separate notification for
-    // each object added or removed is needlessly pessimal.
     if (![obj.array isKindOfClass:[NSArray class]]) {
+        // We deliberately diverge from NSMutableArray for `removeAllObjects` and
+        // `addObjectsFromArray:`, because generating a separate notification for
+        // each object added or removed is needlessly pessimal.
         [mutator addObjectsFromArray:@[obj.obj, obj.obj]];
         AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(1, 2)]);
+
+        // NSArray sends multiple notifications for exchange, which we can't do
+        // on refresh
+        [mutator exchangeObjectAtIndex:0 withObjectAtIndex:1];
+        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
+
+        // NSArray doesn't have move
+        [mutator moveObjectAtIndex:1 toIndex:0];
+        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
 
         [mutator removeLastObject];
         AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:2]);
