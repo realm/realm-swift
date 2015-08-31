@@ -125,6 +125,18 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 }
 @end
 
+@interface InvalidNSNumberProtocolObject : FakeObject
+@property NSNumber<RLMFastEnumerable> *number;
+@end
+@implementation InvalidNSNumberProtocolObject
+@end
+
+@interface InvalidNSNumberNoProtocolObject : FakeObject
+@property NSNumber *number;
+@end
+@implementation InvalidNSNumberNoProtocolObject
+@end
+
 @interface SchemaTests : RLMMultiProcessTestCase
 @end
 
@@ -460,6 +472,14 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 - (void)testClassWithRequiredLinkProperty {
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:RequiredLinkProperty.class], @"cannot be made required.*'object'");
+}
+
+- (void)testClassWithInvalidNSNumberProtocolProperty {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberProtocolObject.class], @"RLMFastEnumerable' is not supported as an NSNumber object type.");
+}
+
+- (void)testClassWithInvalidNSNumberNoProtocolProperty {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberNoProtocolObject.class], @"NSNumber properties require a protocol defining the contained type");
 }
 
 // Can't spawn child processes on iOS
