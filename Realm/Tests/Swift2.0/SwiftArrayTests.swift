@@ -43,7 +43,7 @@ class SwiftArrayTests: RLMTestCase {
         SwiftAggregateObject.createInRealm(realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
         SwiftAggregateObject.createInRealm(realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
 
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let result = SwiftAggregateObject.objectsInRealm(realm, "intCol < %d", 100)
         XCTAssertEqual(result.count, UInt(10), "10 objects added")
@@ -78,7 +78,7 @@ class SwiftArrayTests: RLMTestCase {
         SwiftAggregateObject.createInRealm(realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
         SwiftAggregateObject.createInRealm(realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
 
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let noArray = SwiftAggregateObject.objectsInRealm(realm, "boolCol == NO")
         let yesArray = SwiftAggregateObject.objectsInRealm(realm, "boolCol == YES")
@@ -173,7 +173,7 @@ class SwiftArrayTests: RLMTestCase {
             realm.addObject(person)
         }
 
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let description = SwiftEmployeeObject.allObjectsInRealm(realm).description
 
@@ -214,14 +214,14 @@ class SwiftArrayTests: RLMTestCase {
         realm.addObject(company)
         company.employees.addObjects(SwiftEmployeeObject.allObjectsInRealm(realm))
 
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let peopleInCompany = company.employees
         XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
 
         realm.beginWriteTransaction()
         peopleInCompany.removeObjectAtIndex(1) // Should delete link to employee
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
 
@@ -246,7 +246,7 @@ class SwiftArrayTests: RLMTestCase {
         XCTAssertEqual(peopleInCompany.count, UInt(2), "2 links")
         peopleInCompany.removeAllObjects()
         XCTAssertEqual(peopleInCompany.count, UInt(0), "0 remaining links")
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
     }
 
     // Objective-C models
@@ -270,7 +270,7 @@ class SwiftArrayTests: RLMTestCase {
         AggregateObject.createInRealm(realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
         AggregateObject.createInRealm(realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
 
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let result = AggregateObject.objectsInRealm(realm, "intCol < %d", 100)
         XCTAssertEqual(result.count, UInt(10), "10 objects added")
@@ -305,7 +305,7 @@ class SwiftArrayTests: RLMTestCase {
         AggregateObject.createInRealm(realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
         AggregateObject.createInRealm(realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
 
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let noArray = AggregateObject.objectsInRealm(realm, "boolCol == NO")
         let yesArray = AggregateObject.objectsInRealm(realm, "boolCol == YES")
@@ -400,7 +400,7 @@ class SwiftArrayTests: RLMTestCase {
             realm.addObject(person)
         }
 
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let description = EmployeeObject.allObjectsInRealm(realm).description
         XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
@@ -435,14 +435,14 @@ class SwiftArrayTests: RLMTestCase {
         realm.addObject(company)
         company.employees.addObjects(EmployeeObject.allObjectsInRealm(realm))
 
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let peopleInCompany = company.employees
         XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
 
         realm.beginWriteTransaction()
         peopleInCompany.removeObjectAtIndex(1) // Should delete link to employee
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
 
@@ -469,7 +469,7 @@ class SwiftArrayTests: RLMTestCase {
         let po1 = makeEmployee(realm, 40, "Joe", true)
         let po2 = makeEmployee(realm, 30, "John", false)
         let po3 = makeEmployee(realm, 25, "Jill", true)
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let results = EmployeeObject.objectsInRealm(realm, "hired = YES")
         XCTAssertEqual(UInt(2), results.count)
@@ -485,7 +485,7 @@ class SwiftArrayTests: RLMTestCase {
         makeEmployee(realm, 40, "Joe", true)
         makeEmployee(realm, 30, "John", false)
         makeEmployee(realm, 25, "Jill", true)
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let results = EmployeeObject.objectsInRealm(realm, "hired = YES")
         XCTAssertEqual(UInt(2), results.count)
@@ -501,7 +501,7 @@ class SwiftArrayTests: RLMTestCase {
         makeEmployee(realm, 20, "A", true)
         makeEmployee(realm, 30, "B", false)
         makeEmployee(realm, 40, "C", true)
-        realm.commitWriteTransaction()
+        try! realm.commitWriteTransaction()
 
         let sortedByAge = EmployeeObject.allObjectsInRealm(realm).sortedResultsUsingProperty("age", ascending: true)
         let sortedByName = sortedByAge.sortedResultsUsingProperty("name", ascending: false)

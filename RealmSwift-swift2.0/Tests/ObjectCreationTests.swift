@@ -134,7 +134,7 @@ class ObjectCreationTests: TestCase {
         var object: SwiftObject!
         let objects = realm.objects(SwiftObject)
         XCTAssertEqual(0, objects.count)
-        realm.write {
+        try! realm.write {
             // test create with all defaults
             object = realm.create(SwiftObject)
             return
@@ -194,7 +194,7 @@ class ObjectCreationTests: TestCase {
         let realm = try! Realm()
         realm.beginWrite()
         let objectWithInt = realm.create(SwiftObject.self, value: ["intCol": 200])
-        realm.commitWrite()
+        try! realm.commitWrite()
 
         let valueDict = defaultSwiftObjectValuesWithReplacements(["intCol": 200])
         verifySwiftObjectWithDictionaryLiteral(objectWithInt, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
@@ -297,7 +297,7 @@ class ObjectCreationTests: TestCase {
 
         realmWithTestPath().beginWrite()
         let otherRealmObject = realmWithTestPath().create(SwiftObject.self, value: values)
-        realmWithTestPath().commitWrite()
+        try! realmWithTestPath().commitWrite()
 
         try! Realm().beginWrite()
         let object = try! Realm().create(SwiftObject.self, value: otherRealmObject)
@@ -310,7 +310,7 @@ class ObjectCreationTests: TestCase {
     func testUpdateWithObjectsFromAnotherRealm() {
         realmWithTestPath().beginWrite()
         let otherRealmObject = realmWithTestPath().create(SwiftLinkToPrimaryStringObject.self, value: ["primary", NSNull(), [["2", 2], ["4", 4]]])
-        realmWithTestPath().commitWrite()
+        try! realmWithTestPath().commitWrite()
 
         try! Realm().beginWrite()
         try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["primary", ["10", 10], [["11", 11]]])
@@ -337,7 +337,7 @@ class ObjectCreationTests: TestCase {
 
         realmWithTestPath().beginWrite()
         let object = realmWithTestPath().create(SwiftObject.self, value: values)
-        realmWithTestPath().commitWrite()
+        try! realmWithTestPath().commitWrite()
 
         XCTAssert(object.objectCol == nil) // XCTAssertNil caused a NULL deref inside _swift_getClass
         XCTAssertEqual(object.arrayCol.count, 0)

@@ -21,7 +21,7 @@ import RealmSwift
 
 private func createStringObjects(factor: Int) -> Realm {
     let realm = inMemoryRealm(factor.description)
-    realm.write {
+    try! realm.write {
         for _ in 0..<(1000 * factor) {
             realm.create(SwiftStringObject.self, value: ["a"])
             realm.create(SwiftStringObject.self, value: ["b"])
@@ -94,7 +94,7 @@ class SwiftPerformanceTests: TestCase {
         inMeasureBlock {
             let realm = self.realmWithTestPath()
             self.startMeasuring()
-            realm.write {
+            try! realm.write {
                 for _ in 0..<5000 {
                     let obj = SwiftStringObject()
                     obj.stringCol = "a"
@@ -111,7 +111,7 @@ class SwiftPerformanceTests: TestCase {
             let realm = self.realmWithTestPath()
             self.startMeasuring()
             for _ in 0..<50 {
-                realm.write {
+                try! realm.write {
                     _ = realm.create(SwiftStringObject.self, value: ["a"])
                 }
             }
@@ -124,7 +124,7 @@ class SwiftPerformanceTests: TestCase {
         inMeasureBlock {
             let realm = self.realmWithTestPath()
             self.startMeasuring()
-            realm.write {
+            try! realm.write {
                 for _ in 0..<5000 {
                     realm.create(SwiftStringObject.self, value: ["a"])
                 }
@@ -187,7 +187,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(mediumRealm)
         realm.beginWrite()
         let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
-        realm.commitWrite()
+        try! realm.commitWrite()
 
         measureBlock {
             for stringObject in arrayPropertyObject.array {
@@ -200,7 +200,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(mediumRealm)
         realm.beginWrite()
         let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
-        realm.commitWrite()
+        try! realm.commitWrite()
 
         measureBlock {
             let list = arrayPropertyObject.array
@@ -213,7 +213,7 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndMutateAll() {
         let realm = copyRealmToTestPath(mediumRealm)
         measureBlock {
-            realm.write {
+            try! realm.write {
                 for stringObject in realm.objects(SwiftStringObject) {
                     stringObject.stringCol = "c"
                 }
@@ -224,7 +224,7 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndMutateQuery() {
         let realm = copyRealmToTestPath(smallRealm)
         measureBlock {
-            realm.write {
+            try! realm.write {
                 for stringObject in realm.objects(SwiftStringObject).filter("stringCol != 'b'") {
                     stringObject.stringCol = "c"
                 }
@@ -247,7 +247,7 @@ class SwiftPerformanceTests: TestCase {
         inMeasureBlock {
             let realm = self.copyRealmToTestPath(largeRealm)
             self.startMeasuring()
-            realm.write {
+            try! realm.write {
                 realm.delete(realm.objects(SwiftStringObject))
             }
             self.stopMeasuring()
@@ -258,7 +258,7 @@ class SwiftPerformanceTests: TestCase {
         inMeasureBlock {
             let realm = self.copyRealmToTestPath(mediumRealm)
             self.startMeasuring()
-            realm.write {
+            try! realm.write {
                 realm.delete(realm.objects(SwiftStringObject).filter("stringCol = 'a' OR stringCol = 'b'"))
             }
             self.stopMeasuring()
@@ -270,7 +270,7 @@ class SwiftPerformanceTests: TestCase {
             let realm = self.copyRealmToTestPath(mediumRealm)
             let objects = realm.objects(SwiftStringObject).map { $0 }
             self.startMeasuring()
-            realm.write {
+            try! realm.write {
                 realm.delete(objects)
             }
             self.stopMeasuring()
@@ -279,7 +279,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testUnindexedStringLookup() {
         let realm = realmWithTestPath()
-        realm.write {
+        try! realm.write {
             for i in 0..<1000 {
                 realm.create(SwiftStringObject.self, value: [i.description])
             }
@@ -293,7 +293,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testIndexedStringLookup() {
         let realm = realmWithTestPath()
-        realm.write {
+        try! realm.write {
             for i in 0..<1000 {
                 realm.create(SwiftIndexedPropertiesObject.self, value: [i.description, i])
             }
@@ -315,7 +315,7 @@ class SwiftPerformanceTests: TestCase {
                 ids.append(i)
             }
         }
-        realm.commitWrite()
+        try! realm.commitWrite()
         measureBlock {
             _ = realm.objects(SwiftIntObject).filter("intCol IN %@", ids).first
         }
@@ -323,7 +323,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testSortingAllObjects() {
         let realm = realmWithTestPath()
-        realm.write {
+        try! realm.write {
             for _ in 0..<3000 {
                 let randomNumber = Int(arc4random_uniform(UInt32(INT_MAX)))
                 realm.create(SwiftIntObject.self, value: [randomNumber])
@@ -365,11 +365,11 @@ class SwiftPerformanceTests: TestCase {
             let realm = inMemoryRealm("test")
             realm.beginWrite()
             let object = realm.create(SwiftIntObject)
-            realm.commitWrite()
+            try! realm.commitWrite()
 
             self.startMeasuring()
             while object.intCol < 100 {
-                realm.write { _ = object.intCol++ }
+                try! realm.write { _ = object.intCol++ }
             }
             self.stopMeasuring()
         }
@@ -380,12 +380,12 @@ class SwiftPerformanceTests: TestCase {
             let realm = inMemoryRealm("test")
             realm.beginWrite()
             let object = realm.create(SwiftIntObject)
-            realm.commitWrite()
+            try! realm.commitWrite()
 
             let token = realm.addNotificationBlock { _, _ in }
             self.startMeasuring()
             while object.intCol < 100 {
-                realm.write { _ = object.intCol++ }
+                try! realm.write { _ = object.intCol++ }
             }
             self.stopMeasuring()
             realm.removeNotification(token)
@@ -398,7 +398,7 @@ class SwiftPerformanceTests: TestCase {
             let realm = inMemoryRealm("test")
             realm.beginWrite()
             let object = realm.create(SwiftIntObject)
-            realm.commitWrite()
+            try! realm.commitWrite()
 
             let queue = dispatch_queue_create("background", nil)
             let semaphore = dispatch_semaphore_create(0)
@@ -419,7 +419,7 @@ class SwiftPerformanceTests: TestCase {
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
             self.startMeasuring()
             while object.intCol < stopValue {
-                realm.write { _ = object.intCol++ }
+                try! realm.write { _ = object.intCol++ }
             }
             dispatch_sync(queue) {}
             self.stopMeasuring()
@@ -432,7 +432,7 @@ class SwiftPerformanceTests: TestCase {
             let realm = inMemoryRealm("test")
             realm.beginWrite()
             let object = realm.create(SwiftIntObject)
-            realm.commitWrite()
+            try! realm.commitWrite()
 
             let queue = dispatch_queue_create("background", nil)
             let semaphore = dispatch_semaphore_create(0)
@@ -441,7 +441,7 @@ class SwiftPerformanceTests: TestCase {
                 let object = realm.objects(SwiftIntObject).first!
                 let token = realm.addNotificationBlock { _, _ in
                     if object.intCol % 2 == 0 && object.intCol < stopValue {
-                        realm.write { _ = object.intCol++ }
+                        try! realm.write { _ = object.intCol++ }
                     }
                 }
                 dispatch_semaphore_signal(semaphore)
@@ -453,13 +453,13 @@ class SwiftPerformanceTests: TestCase {
 
             let token = realm.addNotificationBlock { _, _ in
                 if object.intCol % 2 == 1 && object.intCol < stopValue {
-                    realm.write { _ = object.intCol++ }
+                    try! realm.write { _ = object.intCol++ }
                 }
             }
 
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
             self.startMeasuring()
-            realm.write { _ = object.intCol++ }
+            try! realm.write { _ = object.intCol++ }
             while object.intCol < stopValue {
                 NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
             }

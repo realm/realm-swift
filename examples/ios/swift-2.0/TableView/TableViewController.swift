@@ -83,7 +83,7 @@ class TableViewController: UITableViewController {
         if editingStyle == .Delete {
             realm.beginWrite()
             realm.delete(array[indexPath.row])
-            realm.commitWrite()
+            try! realm.commitWrite()
         }
     }
 
@@ -100,14 +100,14 @@ class TableViewController: UITableViewController {
                 // Add row via dictionary. Order is ignored.
                 realm.create(DemoObject.self, value: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
             }
-            realm.commitWrite()
+            try! realm.commitWrite()
         }
     }
 
     func add() {
         realm.beginWrite()
         realm.create(DemoObject.self, value: [TableViewController.randomString(), TableViewController.randomDate()])
-        realm.commitWrite()
+        try! realm.commitWrite()
     }
 
     // Helpers
