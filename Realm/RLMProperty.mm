@@ -278,6 +278,28 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     if ([_objcRawType isEqualToString:@"@\"RLMArray\""]) {
         _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [[obj valueForKey:_name] objectClassName]];
     }
+    else if ([_objcRawType isEqualToString:@"@\"NSNumber\""]) {
+        const char *numberType = [[obj valueForKey:_name] objCType];
+        switch (*numberType) {
+            case 'i':
+            case 'l':
+            case 'q':
+                _objcRawType = @"@\"NSNumber<RLMInt>\"";
+                break;
+            case 'f':
+                _objcRawType = @"@\"NSNumber<RLMFloat>\"";
+                break;
+            case 'd':
+                _objcRawType = @"@\"NSNumber<RLMDouble>\"";
+                break;
+            case 'B':
+            case 'c':
+                _objcRawType = @"@\"NSNumber<RLMBool>\"";
+                break;
+            default:
+                @throw RLMException([NSString stringWithFormat:@"Can't persist NSNumber of type '%s', only integers, floats, doubles, and bools are currently supported.", numberType]);
+        }
+    }
 
     if (![self setTypeFromRawType]) {
         NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
