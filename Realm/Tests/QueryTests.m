@@ -1833,11 +1833,22 @@
 
     IntegerArrayPropertyObject *arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @1234, @[]]];
     [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @456 ]]];
+
+    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @4567, @[]]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @1 ]]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @2 ]]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @3 ]]];
+
+    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @4567, @[]]];
+
     [realm commitWriteTransaction];
 
-
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@count > 0"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"0 < array.@count"].count));
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@count > 0"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@count == 3"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@count < 1"].count));
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"0 < array.@count"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"3 == array.@count"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"1 >  array.@count"].count));
 
     // We do not yet handle collection operations with a keypath on the other side of the comparison.
     RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count != number"]), @"'array.@count' not found in object");
