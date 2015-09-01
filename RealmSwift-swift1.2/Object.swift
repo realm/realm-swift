@@ -304,9 +304,9 @@ public class ObjectUtil: NSObject {
             } else if mirror.valueType is Optional<Object>.Type {
                 properties[name] = Int(PropertyType.Object.rawValue)
             } else if mirror.valueType is RealmOptional<Int>.Type ||
-                mirror.valueType is RealmOptional<Int16>.Type ||
-                mirror.valueType is RealmOptional<Int32>.Type ||
-                mirror.valueType is RealmOptional<Int64>.Type {
+                      mirror.valueType is RealmOptional<Int16>.Type ||
+                      mirror.valueType is RealmOptional<Int32>.Type ||
+                      mirror.valueType is RealmOptional<Int64>.Type {
                 properties[name] = Int(PropertyType.Int.rawValue)
             } else if mirror.valueType is RealmOptional<Float>.Type {
                 properties[name] = Int(PropertyType.Float.rawValue)
@@ -314,6 +314,8 @@ public class ObjectUtil: NSObject {
                 properties[name] = Int(PropertyType.Double.rawValue)
             } else if mirror.valueType is RealmOptional<Bool>.Type {
                 properties[name] = Int(PropertyType.Bool.rawValue)
+            } else if mirror.value as? RLMOptionalBase != nil {
+                throwRealmException("'\(mirror.valueType)' is not a a valid RealmOptional type.")
             } else if mirror.disposition == .Optional {
                 properties[name] = NSNull()
             }

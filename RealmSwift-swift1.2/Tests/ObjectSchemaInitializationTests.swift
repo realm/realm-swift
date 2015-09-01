@@ -175,6 +175,10 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertTrue(schema["optDateCol"]!.optional)
 #endif
     }
+
+    func testNonRealmOptionalTypesDeclaredAsRealmOptional() {
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonRealmOptionalType.self))
+    }
 }
 
 class SwiftFakeObject : NSObject {
@@ -237,4 +241,10 @@ class SwiftObjectWithNonNullableOptionalProperties: SwiftFakeObject {
 
 class SwiftObjectWithNonOptionalLinkProperty : SwiftFakeObject {
     dynamic var objectCol = SwiftBoolObject()
+}
+
+extension Set : RealmOptionalType { }
+
+class SwiftObjectWithNonRealmOptionalType : SwiftFakeObject {
+    let set = RealmOptional<Set<Int>>()
 }
