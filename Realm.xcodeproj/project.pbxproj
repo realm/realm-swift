@@ -328,10 +328,10 @@
 		C0004BEE1B8E4FCF00304BF3 /* RLMOptionalBase.h in Headers */ = {isa = PBXBuildFile; fileRef = C0004BEB1B8E4FCF00304BF3 /* RLMOptionalBase.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		C0004BEF1B8E4FCF00304BF3 /* RLMOptionalBase.h in Headers */ = {isa = PBXBuildFile; fileRef = C0004BEB1B8E4FCF00304BF3 /* RLMOptionalBase.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		C0004BF01B8E4FCF00304BF3 /* RLMOptionalBase.h in Headers */ = {isa = PBXBuildFile; fileRef = C0004BEB1B8E4FCF00304BF3 /* RLMOptionalBase.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		C0004BF11B8E4FCF00304BF3 /* RLMOptionalBase.m in Sources */ = {isa = PBXBuildFile; fileRef = C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.m */; };
-		C0004BF21B8E4FCF00304BF3 /* RLMOptionalBase.m in Sources */ = {isa = PBXBuildFile; fileRef = C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.m */; };
-		C0004BF31B8E4FCF00304BF3 /* RLMOptionalBase.m in Sources */ = {isa = PBXBuildFile; fileRef = C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.m */; };
-		C0004BF41B8E4FCF00304BF3 /* RLMOptionalBase.m in Sources */ = {isa = PBXBuildFile; fileRef = C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.m */; };
+		C0004BF11B8E4FCF00304BF3 /* RLMOptionalBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.mm */; };
+		C0004BF21B8E4FCF00304BF3 /* RLMOptionalBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.mm */; };
+		C0004BF31B8E4FCF00304BF3 /* RLMOptionalBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.mm */; };
+		C0004BF41B8E4FCF00304BF3 /* RLMOptionalBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.mm */; };
 		C02E53E11B7A7E2B002586E8 /* RLMRealmConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD061B6BDEA1004E8919 /* RLMRealmConfiguration.mm */; };
 		C02E53E21B7A7E2B002586E8 /* RLMRealmConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD061B6BDEA1004E8919 /* RLMRealmConfiguration.mm */; };
 		C02E53E31B7A7E2C002586E8 /* RLMRealmConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D2DD061B6BDEA1004E8919 /* RLMRealmConfiguration.mm */; };
@@ -652,7 +652,7 @@
 		5D30B74A1B42039F00D90C5A /* RLMDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMDefines.h; sourceTree = "<group>"; };
 		A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMObjectBase_Dynamic.h; sourceTree = "<group>"; };
 		C0004BEB1B8E4FCF00304BF3 /* RLMOptionalBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMOptionalBase.h; sourceTree = "<group>"; };
-		C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMOptionalBase.m; sourceTree = "<group>"; };
+		C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMOptionalBase.mm; sourceTree = "<group>"; };
 		C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RealmConfigurationTests.mm; sourceTree = "<group>"; };
 		C073E1201AE9B705002C0A30 /* RLMObject_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMObject_Private.hpp; sourceTree = "<group>"; };
 		C0D2DD051B6BDEA1004E8919 /* RLMRealmConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration.h; sourceTree = "<group>"; };
@@ -950,7 +950,7 @@
 				3F0F02AC1B6FFF3D0046A4D5 /* RLMObservation.hpp */,
 				3F0F02AD1B6FFF3D0046A4D5 /* RLMObservation.mm */,
 				C0004BEB1B8E4FCF00304BF3 /* RLMOptionalBase.h */,
-				C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.m */,
+				C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.mm */,
 				3F68BFCD1B558CA800D50FBD /* RLMPrefix.h */,
 				E81A1F761955FC9300FDED82 /* RLMProperty.h */,
 				E81A1F771955FC9300FDED82 /* RLMProperty.mm */,
@@ -1671,7 +1671,7 @@
 				144C2F4E1B3D34A2005C8F81 /* RLMObjectSchema.mm in Sources */,
 				144C2F4F1B3D34A2005C8F81 /* RLMObjectStore.mm in Sources */,
 				C06C74021B797EEF0027FF85 /* RLMObservation.mm in Sources */,
-				C0004BF41B8E4FCF00304BF3 /* RLMOptionalBase.m in Sources */,
+				C0004BF41B8E4FCF00304BF3 /* RLMOptionalBase.mm in Sources */,
 				144C2F501B3D34A2005C8F81 /* RLMProperty.mm in Sources */,
 				144C2F511B3D34A2005C8F81 /* RLMQueryUtil.mm in Sources */,
 				144C2F521B3D34A2005C8F81 /* RLMRealm.mm in Sources */,
@@ -1704,7 +1704,7 @@
 				29E3C70E1A71C1C700B62C1D /* RLMObjectSchema.mm in Sources */,
 				29E3C70F1A71C1C700B62C1D /* RLMObjectStore.mm in Sources */,
 				3F0F02B31B6FFF3D0046A4D5 /* RLMObservation.mm in Sources */,
-				C0004BF31B8E4FCF00304BF3 /* RLMOptionalBase.m in Sources */,
+				C0004BF31B8E4FCF00304BF3 /* RLMOptionalBase.mm in Sources */,
 				29E3C7101A71C1C700B62C1D /* RLMProperty.mm in Sources */,
 				29E3C7111A71C1C700B62C1D /* RLMQueryUtil.mm in Sources */,
 				29E3C7121A71C1C700B62C1D /* RLMRealm.mm in Sources */,
@@ -1778,7 +1778,7 @@
 				E856D2011956154C00FB2FCF /* RLMObjectSchema.mm in Sources */,
 				E856D2031956154C00FB2FCF /* RLMObjectStore.mm in Sources */,
 				3F0F02B21B6FFF3D0046A4D5 /* RLMObservation.mm in Sources */,
-				C0004BF21B8E4FCF00304BF3 /* RLMOptionalBase.m in Sources */,
+				C0004BF21B8E4FCF00304BF3 /* RLMOptionalBase.mm in Sources */,
 				E856D2061956154C00FB2FCF /* RLMProperty.mm in Sources */,
 				E856D2081956154C00FB2FCF /* RLMQueryUtil.mm in Sources */,
 				E856D20B1956154C00FB2FCF /* RLMRealm.mm in Sources */,
@@ -1854,7 +1854,7 @@
 				E81A1F9B1955FC9300FDED82 /* RLMObjectSchema.mm in Sources */,
 				E81A1F9E1955FC9300FDED82 /* RLMObjectStore.mm in Sources */,
 				3F0F02B11B6FFF3D0046A4D5 /* RLMObservation.mm in Sources */,
-				C0004BF11B8E4FCF00304BF3 /* RLMOptionalBase.m in Sources */,
+				C0004BF11B8E4FCF00304BF3 /* RLMOptionalBase.mm in Sources */,
 				E81A1FA21955FC9300FDED82 /* RLMProperty.mm in Sources */,
 				E81A1FA51955FC9300FDED82 /* RLMQueryUtil.mm in Sources */,
 				E81A1FA91955FC9300FDED82 /* RLMRealm.mm in Sources */,

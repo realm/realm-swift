@@ -166,6 +166,17 @@
 @implementation NumberObject
 @end
 
+@implementation NumberDefaultsObject
++ (nullable NSDictionary *)defaultPropertyValues {
+    return @{
+             @"intObj" : @1,
+             @"floatObj" : @2.2f,
+             @"doubleObj" : @3.3,
+             @"boolObj" : @NO,
+             };
+}
+@end
+
 #pragma mark FakeObject
 
 @implementation FakeObject

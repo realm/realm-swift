@@ -85,6 +85,35 @@ class SwiftImplicitlyUnwrappedOptionalObject: Object {
     //    let arrayCol = List<SwiftBoolObject!>()
 }
 
+class SwiftOptionalDefaultValuesObject: Object {
+#if REALM_ENABLE_NULL
+    dynamic var optNSStringCol: NSString? = "A"
+    dynamic var optStringCol: String? = "B"
+    dynamic var optBinaryCol: NSData? = "C".dataUsingEncoding(NSUTF8StringEncoding)
+    dynamic var optDateCol: NSDate? = NSDate(timeIntervalSince1970: 10)
+    let optIntCol = RealmOptional<Int>(1)
+    let optFloatCol = RealmOptional<Float>(2.2)
+    let optDoubleCol = RealmOptional<Double>(3.3)
+    let optBoolCol = RealmOptional<Bool>(true)
+#endif
+    dynamic var optObjectCol: SwiftBoolObject? = SwiftBoolObject(value: [true])
+    //    let arrayCol = List<SwiftBoolObject?>()
+
+    class func defaultValues() -> [String: AnyObject] {
+        return [
+            "optNSStringCol" : "A",
+            "optStringCol" : "B",
+            "optBinaryCol" : "C".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+            "optDateCol" : NSDate(timeIntervalSince1970: 10),
+            "optIntCol" : 1,
+            "optFloatCol" : 2.2 as Float,
+            "optDoubleCol" : 3.3,
+            "optBoolCol" : true,
+        ]
+    }
+}
+
+
 
 class SwiftDogObject: Object {
     dynamic var dogName = ""
