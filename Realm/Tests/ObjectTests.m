@@ -1094,6 +1094,22 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     }
 }
 
+- (void)testDefaultNSNumberPropertyValues {
+    void (^assertDefaults)(NumberObject *) = ^(NumberObject *no) {
+        XCTAssertEqualObjects(no.intObj, @1);
+        XCTAssertEqualObjects(no.floatObj, @2.2f);
+        XCTAssertEqualObjects(no.doubleObj, @3.3);
+        XCTAssertEqualObjects(no.boolObj, @NO);
+    };
+
+    assertDefaults([[NumberDefaultsObject alloc] init]);
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    assertDefaults([NumberDefaultsObject createInRealm:realm withValue:@{}]);
+    [realm cancelWriteTransaction];
+}
+
 #pragma mark - Ignored Properties
 
 - (void)testIgnoredUnsupportedProperty

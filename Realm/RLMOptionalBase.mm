@@ -20,6 +20,9 @@
 #import "RLMOptionalBase.h"
 #import "RLMObject_Private.h"
 #import "RLMObjectStore.h"
+#import "RLMUtil.hpp"
+
+#import <objc/runtime.h>
 
 @interface RLMOptionalBase ()
 @property (nonatomic) id standaloneValue;
@@ -47,6 +50,10 @@
     else {
         _standaloneValue = underlyingValue;
     }
+}
+
+- (BOOL)isKindOfClass:(Class)aClass {
+    return [self.underlyingValue isKindOfClass:aClass] || RLMIsKindOfClass(object_getClass(self), aClass);
 }
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
