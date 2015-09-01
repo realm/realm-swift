@@ -204,17 +204,13 @@ static void RLMCopyColumnMapping(RLMObjectSchema *targetSchema, const ObjectSche
     REALM_ASSERT_DEBUG(targetSchema.properties.count == tableSchema.properties.size());
 
     // copy updated column mapping
-    for (auto &prop : tableSchema.properties) {
+    for (auto const& prop : tableSchema.properties) {
         RLMProperty *targetProp = targetSchema[@(prop.name.c_str())];
         targetProp.column = prop.table_column;
     }
 
     // re-order properties
-    targetSchema.properties = [targetSchema.properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
-        if (p1.column < p2.column) return NSOrderedAscending;
-        if (p1.column > p2.column) return NSOrderedDescending;
-        return NSOrderedSame;
-    }];
+    [targetSchema sortPropertiesByColumn];
 }
 
 static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) {

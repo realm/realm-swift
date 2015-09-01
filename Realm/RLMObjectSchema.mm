@@ -368,7 +368,13 @@ using namespace realm;
     return schema;
 }
 
+- (void)sortPropertiesByColumn {
+    _properties = [_properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
+        if (p1.column < p2.column) return NSOrderedAscending;
+        if (p1.column > p2.column) return NSOrderedDescending;
+        return NSOrderedSame;
+    }];
+    // No need to update the dictionary
+}
 
 @end
-
-
