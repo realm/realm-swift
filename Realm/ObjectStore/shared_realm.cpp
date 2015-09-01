@@ -90,31 +90,31 @@ Group *Realm::read_group()
 
 SharedRealm Realm::get_shared_realm(Config config)
 {
-    SharedRealm realm = s_global_cache.get_realm(config.path);
-    if (realm) {
-        if (realm->config().read_only != config.read_only) {
-            throw MismatchedConfigException("Realm at path already opened with different read permissions.");
-        }
-        if (realm->config().in_memory != config.in_memory) {
-            throw MismatchedConfigException("Realm at path already opened with different inMemory settings.");
-        }
-        if (realm->config().encryption_key != config.encryption_key) {
-            throw MismatchedConfigException("Realm at path already opened with a different encryption key.");
-        }
-        if (realm->config().schema_version != config.schema_version && config.schema_version != ObjectStore::NotVersioned) {
-            throw MismatchedConfigException("Realm at path already opened with different schema version.");
-        }
-        // FIXME - enable schma comparison
-        /*if (realm->config().schema != config.schema) {
-            throw MismatchedConfigException("Realm at path already opened with different schema");
-        }*/
+    if (config.cache) {
+        if (SharedRealm realm = s_global_cache.get_realm(config.path)) {
+            if (realm->config().read_only != config.read_only) {
+                throw MismatchedConfigException("Realm at path already opened with different read permissions.");
+            }
+            if (realm->config().in_memory != config.in_memory) {
+                throw MismatchedConfigException("Realm at path already opened with different inMemory settings.");
+            }
+            if (realm->config().encryption_key != config.encryption_key) {
+                throw MismatchedConfigException("Realm at path already opened with a different encryption key.");
+            }
+            if (realm->config().schema_version != config.schema_version && config.schema_version != ObjectStore::NotVersioned) {
+                throw MismatchedConfigException("Realm at path already opened with different schema version.");
+            }
+            // FIXME - enable schma comparison
+            /*if (realm->config().schema != config.schema) {
+                throw MismatchedConfigException("Realm at path already opened with different schema");
+            }*/
+            realm->m_config.migration_function = config.migration_function;
 
-        realm->m_config.migration_function = config.migration_function;
-        
-        return realm;
+            return realm;
+        }
     }
 
-    realm = SharedRealm(new Realm(std::move(config)));
+    SharedRealm realm(new Realm(std::move(config)));
 
     // we want to ensure we are only initializing a single realm at a time
     static std::mutex s_init_mutex;

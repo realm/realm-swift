@@ -222,6 +222,14 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     _config.cache = !dynamic;
 }
 
+- (bool)cache {
+    return _config.cache;
+}
+
+- (void)setCache:(bool)cache {
+    _config.cache = cache;
+}
+
 - (void)setCustomSchema:(RLMSchema *)customSchema {
     _customSchema = customSchema;
 

@@ -284,25 +284,27 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
     bool readOnly = configuration.readOnly;
 
     // try to reuse existing realm first
-    RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path);
-    if (realm) {
-        auto const& old_config = realm->_realm->config();
-        if (old_config.read_only != config.read_only) {
-            @throw RLMException(@"Realm at path '%@' already opened with different read permissions", path);
+    if (config.cache || dynamic) {
+        RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path);
+        if (realm) {
+            auto const& old_config = realm->_realm->config();
+            if (old_config.read_only != config.read_only) {
+                @throw RLMException(@"Realm at path '%s' already opened with different read permissions", config.path.c_str());
+            }
+            if (old_config.in_memory != config.in_memory) {
+                @throw RLMException(@"Realm at path '%s' already opened with different inMemory settings", config.path.c_str());
+            }
+            if (realm->_dynamic != dynamic) {
+                @throw RLMException(@"Realm at path '%s' already opened with different dynamic settings", config.path.c_str());
+            }
+            if (old_config.encryption_key != config.encryption_key) {
+                @throw RLMException(@"Realm at path '%s' already opened with different encryption key", config.path.c_str());
+            }
+            return RLMAutorelease(realm);
         }
-        if (old_config.in_memory != config.in_memory) {
-            @throw RLMException(@"Realm at path '%@' already opened with different inMemory settings", path);
-        }
-        if (realm->_dynamic != dynamic) {
-            @throw RLMException(@"Realm at path '%@' already opened with different dynamic settings", path);
-        }
-        if (old_config.encryption_key != config.encryption_key) {
-            @throw RLMException(@"Realm at path '%@' already opened with different encryption key", path);
-        }
-        return RLMAutorelease(realm);
     }
 
-    realm = [RLMRealm new];
+    RLMRealm *realm = [RLMRealm new];
     realm->_dynamic = dynamic;
 
     config.migration_function = [=](SharedRealm old_realm, SharedRealm realm) {
@@ -353,7 +355,7 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
             }
         }
 
-        if (!dynamic) {
+        if (config.cache) {
             RLMCacheRealm(config.path, realm);
         }
     }
