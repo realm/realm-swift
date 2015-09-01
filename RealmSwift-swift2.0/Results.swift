@@ -67,8 +67,8 @@ public class ResultsBase: NSObject, NSFastEnumeration {
                                             objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>,
                                             count len: Int) -> Int {
         return Int(rlmResults.countByEnumeratingWithState(state,
-            objects: buffer,
-            count: UInt(len)))
+                   objects: buffer,
+                   count: UInt(len)))
     }
 }
 
@@ -138,7 +138,7 @@ public final class Results<T: Object>: ResultsBase {
     */
     public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat,
-            argumentArray: args)))
+                                                                               argumentArray: args)))
     }
 
     // MARK: Object Retrieval

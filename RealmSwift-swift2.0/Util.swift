@@ -42,7 +42,8 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
     do {
         let regex = try NSRegularExpression(pattern: pattern, options: [])
         return regex.stringByReplacingMatchesInString(string, options: [],
-            range: NSRange(location: 0, length: string.utf16.count), withTemplate: template)
+                                                      range: NSRange(location: 0, length: string.utf16.count),
+                                                      withTemplate: template)
     } catch {
         // no-op
     }

@@ -169,7 +169,7 @@ extension Realm.Configuration: CustomStringConvertible {
     /// Returns a human-readable description of the configuration.
     public var description: String {
         return gsub("\\ARLMRealmConfiguration",
-            template: "Realm.Configuration",
-            string: rlmConfiguration.description) ?? ""
+                    template: "Realm.Configuration",
+                    string: rlmConfiguration.description) ?? ""
     }
 }

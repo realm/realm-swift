@@ -563,8 +563,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    public func sorted<S: SequenceType where
-        S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<Element> {
+    public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>
+                      (sortDescriptors: S) -> Results<Element> {
         return base.sorted(sortDescriptors)
     }
 

@@ -111,7 +111,7 @@ public final class Migration {
     public func enumerate(objectClassName: String, _ block: MigrationObjectEnumerateBlock) {
         rlmMigration.enumerateObjects(objectClassName) {
             block(oldObject: unsafeBitCast($0, MigrationObject.self),
-                newObject: unsafeBitCast($1, MigrationObject.self))
+                  newObject: unsafeBitCast($1, MigrationObject.self))
         }
     }
 
