@@ -262,6 +262,14 @@ NSError *RLMMakeError(RLMError code, std::exception const& exception) {
                                       @"Error Code": @(code)}];
 }
 
+NSError *RLMMakeError(RLMError code, const realm::util::File::AccessError& exception) {
+    return [NSError errorWithDomain:RLMErrorDomain
+                               code:code
+                           userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
+                                      NSFilePathErrorKey: @(exception.get_path().c_str()),
+                                      @"Error Code": @(code)}];
+}
+
 NSError *RLMMakeError(NSException *exception) {
     return [NSError errorWithDomain:RLMErrorDomain
                                code:0
