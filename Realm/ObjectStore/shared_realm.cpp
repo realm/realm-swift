@@ -430,7 +430,7 @@ SharedRealm Realm::get_shared_realm(Config config)
     return realm;
 }
 
-bool Realm::update_schema(Schema &schema, uint64_t version)
+bool Realm::update_schema(Schema const& schema, uint64_t version)
 {
     bool changed = false;
     Config old_config(m_config);

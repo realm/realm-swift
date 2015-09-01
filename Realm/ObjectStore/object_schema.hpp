@@ -19,6 +19,8 @@
 #ifndef REALM_OBJECT_SCHEMA_HPP
 #define REALM_OBJECT_SCHEMA_HPP
 
+#include <realm/string_data.hpp>
+
 #include <string>
 #include <vector>
 
@@ -39,7 +41,8 @@ namespace realm {
         std::vector<Property> properties;
         std::string primary_key;
 
-        Property *property_for_name(const std::string &name);
+        Property *property_for_name(StringData name);
+        const Property *property_for_name(StringData name) const;
         Property *primary_key_property() {
             return property_for_name(primary_key);
         }

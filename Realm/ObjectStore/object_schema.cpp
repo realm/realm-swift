@@ -60,12 +60,15 @@ ObjectSchema::ObjectSchema(Group *group, const std::string &name) : name(name) {
     }
 }
 
-Property *ObjectSchema::property_for_name(const std::string &name) {
-    for (auto& prop:properties) {
-        if (prop.name == name) {
+Property *ObjectSchema::property_for_name(StringData name) {
+    for (auto& prop : properties) {
+        if (StringData(prop.name) == name) {
             return &prop;
         }
     }
     return nullptr;
 }
 
+const Property *ObjectSchema::property_for_name(StringData name) const {
+    return const_cast<ObjectSchema *>(this)->property_for_name(name);
+}

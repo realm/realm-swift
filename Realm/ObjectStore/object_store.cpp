@@ -332,19 +332,29 @@ bool ObjectStore::is_schema_at_version(Group *group, uint64_t version) {
     return old_version == version;
 }
 
-bool ObjectStore::realm_requires_update(Group *group, uint64_t version, Schema &schema) {
+bool ObjectStore::realm_requires_update(Group *group, uint64_t version, Schema const& schema) {
     if (!is_schema_at_version(group, version)) {
         return true;
     }
-    for (auto& target_schema : schema) {
+
+    for (auto const& target_schema : schema) {
         TableRef table = table_for_object_type(group, target_schema.name);
         if (!table) {
             return true;
         }
+
+        // Check that all of the property indexes are up to date
+        size_t count = table->get_column_count();
+        for (size_t col = 0; col < count; ++col) {
+            StringData name = table->get_column_name(col);
+            bool is_indexed = table->has_search_index(col);
+            auto prop = target_schema.property_for_name(name);
+            if (prop && prop->requires_index() != is_indexed) {
+                return true;
+            }
+        }
     }
-    if (!indexes_are_up_to_date(group, schema)) {
-        return true;
-    }
+
     return false;
 }
 
@@ -389,23 +399,6 @@ Schema ObjectStore::schema_from_group(Group *group) {
         }
     }
     return schema;
-}
-
-bool ObjectStore::indexes_are_up_to_date(Group *group, Schema &schema) {
-    for (auto &object_schema : schema) {
-        TableRef table = table_for_object_type(group, object_schema.name);
-        if (!table) {
-            continue;
-        }
-
-        update_column_mapping(group, object_schema);
-        for (auto& property : object_schema.properties) {
-            if (property.requires_index() != table->has_search_index(property.table_column)) {
-                return false;
-            }
-        }
-    }
-    return true;
 }
 
 bool ObjectStore::update_indexes(Group *group, Schema &schema) {

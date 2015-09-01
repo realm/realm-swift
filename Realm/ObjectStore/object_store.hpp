@@ -53,7 +53,7 @@ namespace realm {
         // determines if you must call update_realm_with_schema for a given realm.
         // returns true if there is a schema version mismatch, if there tables which still need to be created,
         // or if file format or other changes/updates need to be made
-        static bool realm_requires_update(Group *group, uint64_t version, Schema &schema);
+        static bool realm_requires_update(Group *group, uint64_t version, Schema const& schema);
         
         // updates a Realm to a given target schema/version creating tables and updating indexes as necessary
         // returns if any changes were made
@@ -103,9 +103,6 @@ namespace realm {
         static TableRef table_for_object_type_create_if_needed(Group *group, const StringData &object_type, bool &created);
         static std::string table_name_for_object_type(const std::string &class_name);
         static std::string object_type_for_table_name(const std::string &table_name);
-
-        // check if indexes are up to date - if false you need to call update_realm_with_schema
-        static bool indexes_are_up_to_date(Group *group, Schema &schema);
 
         // returns if any indexes were changed
         static bool update_indexes(Group *group, Schema &schema);
