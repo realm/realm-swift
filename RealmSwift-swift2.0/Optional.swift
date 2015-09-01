@@ -33,16 +33,12 @@ public final class RealmOptional<T: RealmOptionalType> : RLMOptionalBase {
             return underlyingValue as! T?
         }
         set {
-            if let value = newValue {
-                self.underlyingValue = value as! AnyObject
-            } else {
-                self.underlyingValue = nil
-            }
+            self.underlyingValue = newValue as! AnyObject?
         }
     }
 
-    public init(_ v: T? = nil) {
+    public init(_ value: T? = nil) {
         super.init()
-        value = v
+        self.value = value
     }
 }

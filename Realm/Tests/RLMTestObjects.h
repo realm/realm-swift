@@ -292,6 +292,9 @@ RLM_ARRAY_TYPE(CircleObject);
 @property NSNumber<RLMBool> *boolObj;
 @end
 
+@interface NumberDefaultsObject : NumberObject
+@end
+
 #pragma mark FakeObject
 
 @interface FakeObject : NSObject
