@@ -296,16 +296,18 @@ public class ObjectUtil: NSObject {
             } else if type is Optional<Object>.Type {
                 properties[name] = Int(PropertyType.Object.rawValue)
             } else if type is RealmOptional<Int>.Type ||
-                type is RealmOptional<Int16>.Type ||
-                type is RealmOptional<Int32>.Type ||
-                type is RealmOptional<Int64>.Type {
-                    properties[name] = Int(PropertyType.Int.rawValue)
+                      type is RealmOptional<Int16>.Type ||
+                      type is RealmOptional<Int32>.Type ||
+                      type is RealmOptional<Int64>.Type {
+                properties[name] = Int(PropertyType.Int.rawValue)
             } else if type is RealmOptional<Float>.Type {
                 properties[name] = Int(PropertyType.Float.rawValue)
             } else if type is RealmOptional<Double>.Type {
                 properties[name] = Int(PropertyType.Double.rawValue)
             } else if type is RealmOptional<Bool>.Type {
                 properties[name] = Int(PropertyType.Bool.rawValue)
+            } else if prop.value as? RLMOptionalBase != nil {
+                throwRealmException("'\(type)' is not a a valid RealmOptional type.")
             } else if mirror.displayStyle == .Optional {
                 properties[name] = NSNull()
             }
