@@ -233,7 +233,6 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 - (void)setCustomSchema:(RLMSchema *)customSchema {
     _customSchema = customSchema;
 
-    // FIXME: can any of this throw?
     if (_customSchema) {
         std::vector<realm::ObjectSchema> schema;
         schema.reserve(customSchema.objectSchema.count);

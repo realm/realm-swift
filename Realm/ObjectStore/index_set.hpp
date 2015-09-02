@@ -24,40 +24,38 @@
 namespace realm {
 class IndexSet {
 public:
-    struct iterator {
-        size_t operator*() const;
-        iterator& operator++();
-        bool operator==(iterator) const;
-        bool operator!=(iterator) const;
+    using value_type = std::pair<size_t, size_t>;
+    using iterator = std::vector<value_type>::iterator;
+    using const_iterator = std::vector<value_type>::const_iterator;
 
-        iterator(std::pair<size_t, size_t>* data) noexcept : m_data(data) { }
-
-    private:
-        std::pair<size_t, size_t>* m_data;
-        size_t m_offset = 0;
-    };
-
-    iterator begin() { return iterator(&m_ranges[0]); }
-    iterator end() { return iterator(&m_ranges[m_ranges.size()]); }
-
-    size_t size() const;
+    const_iterator begin() const { return m_ranges.begin(); }
+    const_iterator end() const { return m_ranges.end(); }
+    bool empty() const { return m_ranges.empty(); }
+    size_t size() const { return m_ranges.size(); }
 
     // Add an index to the set, doing nothing if it's already present
     void add(size_t index);
-    // Set the index set to a single range starting at 0 with length `len`
+
+    // Remove all indexes from the set and then add a single range starting from
+    // zero with the given length
     void set(size_t len);
-    // Insert an index at the given position, shifting existing indexes back
+
+    // Insert an index at the given position, shifting existing indexes at or
+    // after that point back by one
     void insert_at(size_t index);
+
+    // Add an index which has had all of the ranges in the set before it removed
     void add_shifted(size_t index);
 
 private:
-    using Range = std::pair<size_t, size_t>;
-    std::vector<Range> m_ranges;
+    std::vector<value_type> m_ranges;
 
     // Find the range which contains the index, or the first one after it if
     // none do
-    std::vector<Range>::iterator find(size_t index);
-    void do_add(std::vector<Range>::iterator pos, size_t index);
+    iterator find(size_t index);
+    // Insert the index before the given position, combining existing ranges as
+    // applicable
+    void do_add(iterator pos, size_t index);
 };
 } // namespace realm
 

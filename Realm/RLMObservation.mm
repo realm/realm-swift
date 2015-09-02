@@ -425,7 +425,7 @@ std::vector<realm::RealmDelegate::ObserverState> RLMGetObservedRows(NSArray *sch
     return observers;
 }
 
-static NSKeyValueChange map(realm::RealmDelegate::ColumnInfo::Kind kind) {
+static NSKeyValueChange convert(realm::RealmDelegate::ColumnInfo::Kind kind) {
     switch (kind) {
         case realm::RealmDelegate::ColumnInfo::Kind::None:
         case realm::RealmDelegate::ColumnInfo::Kind::SetAll:
@@ -439,18 +439,28 @@ static NSKeyValueChange map(realm::RealmDelegate::ColumnInfo::Kind kind) {
     }
 }
 
-void RLMWillChange(std::vector<realm::RealmDelegate::ObserverState> const& observed, std::vector<void *> const& invalidated) {
+static NSIndexSet *convert(realm::IndexSet const& in, NSMutableIndexSet *out) {
+    if (in.empty()) {
+        return nil;
+    }
+
+    [out removeAllIndexes];
+    for (auto range : in) {
+        [out addIndexesInRange:{range.first, range.second - range.first}];
+    }
+    return out;
+}
+
+void RLMWillChange(std::vector<realm::RealmDelegate::ObserverState> const& observed,
+                   std::vector<void *> const& invalidated) {
     NSMutableIndexSet *indexes = [NSMutableIndexSet new];
     for (auto info : invalidated) {
         static_cast<RLMObservationInfo *>(info)->willChange(RLMInvalidatedKey);
     }
     for (auto const& o : observed) {
         forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
-            [indexes removeAllIndexes];
-            for (size_t index : const_cast<realm::IndexSet&>(change.indices))
-                [indexes addIndex:index];
             info->willChange([info->getObjectSchema().properties[i] name],
-                             map(change.kind), indexes.count ? indexes : nil);
+                             convert(change.kind), convert(change.indices, indexes));
         });
     }
     for (auto info : invalidated) {
@@ -458,16 +468,14 @@ void RLMWillChange(std::vector<realm::RealmDelegate::ObserverState> const& obser
     }
 }
 
-void RLMDidChange(std::vector<realm::RealmDelegate::ObserverState> const& observed, std::vector<void *> const& invalidated) {
+void RLMDidChange(std::vector<realm::RealmDelegate::ObserverState> const& observed,
+                  std::vector<void *> const& invalidated) {
     // Loop in reverse order to avoid O(N^2) behavior in Foundation
     NSMutableIndexSet *indexes = [NSMutableIndexSet new];
     for (auto const& o : reverse(observed)) {
         forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
-            [indexes removeAllIndexes];
-            for (size_t index : const_cast<realm::IndexSet&>(change.indices))
-                [indexes addIndex:index];
             info->didChange([info->getObjectSchema().properties[i] name],
-                            map(change.kind), indexes.count ? indexes : nil);
+                            convert(change.kind), convert(change.indices, indexes));
         });
     }
     for (auto const& info : reverse(invalidated)) {

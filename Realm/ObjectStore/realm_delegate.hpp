@@ -29,6 +29,7 @@ class RealmDelegate {
 public:
     virtual ~RealmDelegate() = default;
 
+    // Change information for a single field of a row
     struct ColumnInfo {
         bool changed = false;
         enum class Kind {
@@ -41,10 +42,19 @@ public:
         IndexSet indices;
     };
 
+    // Information about an observed row in a table
     struct ObserverState {
+        // Initial table and row which is observed
+        // May be updated by row insertions and removals
         size_t table_ndx;
         size_t row_ndx;
-        void* info; // opaque user info
+
+        // Opaque userdata for the delegate's use
+        void* info;
+
+        // Populated with information about which columns were changed
+        // May be shorter than the actual number of columns if the later columns
+        // are not modified
         std::vector<ColumnInfo> changes;
 
         // Simple lexographic ordering
@@ -68,10 +78,16 @@ public:
 
     // The Realm's read version will change
     // Only called if get_observed_row() returned a non-empty array.
-    virtual void will_change(std::vector<ObserverState> const&, std::vector<void*> const&) = 0;
+    // observers is the vector returned from get_observed_rows()
+    // invalidated is the `info` pointers for each observed object which was deleted
+    virtual void will_change(std::vector<ObserverState> const& observers,
+                             std::vector<void*> const& invalidated) = 0;
 
     // The Realm's read version has changed
-    virtual void did_change(std::vector<ObserverState> const&, std::vector<void*> const&) = 0;
+    // observers is the vector returned from get_observed_rows()
+    // invalidated is the `info` pointers for each observed object which was deleted
+    virtual void did_change(std::vector<ObserverState> const& observers,
+                            std::vector<void*> const& invalidated) = 0;
 };
 } // namespace realm
 

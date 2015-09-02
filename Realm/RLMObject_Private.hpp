@@ -38,7 +38,7 @@ static inline void RLMVerifyAttached(__unsafe_unretained RLMObjectBase *const ob
     if (!obj->_row.is_attached()) {
         @throw RLMException(@"Object has been deleted or invalidated.");
     }
-    [obj->_realm verifyThread]; // FIXME: test perf impact of message send here
+    [obj->_realm verifyThread];
 }
 
 // throw an exception if the object can't be modified for any reason

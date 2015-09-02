@@ -20,16 +20,7 @@
 
 using namespace realm;
 
-size_t IndexSet::size() const
-{
-    size_t size = 0;
-    for (auto const& range : m_ranges) {
-        size += range.second - range.first;
-    }
-    return size;
-}
-
-std::vector<IndexSet::Range>::iterator IndexSet::find(size_t index)
+IndexSet::iterator IndexSet::find(size_t index)
 {
     for (auto it = m_ranges.begin(), end = m_ranges.end(); it != end; ++it) {
         if (it->second > index)
@@ -43,14 +34,14 @@ void IndexSet::add(size_t index)
     do_add(find(index), index);
 }
 
-void IndexSet::do_add(std::vector<Range>::iterator it, size_t index)
+void IndexSet::do_add(iterator it, size_t index)
 {
     bool more_before = it != m_ranges.begin(), valid = it != m_ranges.end();
     if (valid && it->first <= index && it->second > index) {
         // index is already in set
     }
     else if (more_before && (it - 1)->second == index) {
-        // index is immediate after an existing range
+        // index is immediately after an existing range
         ++(it - 1)->second;
     }
     else if (more_before && valid && (it - 1)->second == it->first) {
@@ -98,29 +89,4 @@ void IndexSet::add_shifted(size_t index)
         index += it->second - it->first;
     }
     do_add(it, index);
-}
-
-size_t IndexSet::iterator::operator*() const
-{
-    return m_data->first + m_offset;
-}
-
-IndexSet::iterator& IndexSet::iterator::operator++()
-{
-    ++m_offset;
-    if (m_offset + m_data->first == m_data->second) {
-        ++m_data;
-        m_offset = 0;
-    }
-    return *this;
-}
-
-bool IndexSet::iterator::operator==(iterator other) const
-{
-    return m_data == other.m_data && m_offset == other.m_offset;
-}
-
-bool IndexSet::iterator::operator!=(iterator other) const
-{
-    return m_data != other.m_data || m_offset != other.m_offset;
 }
