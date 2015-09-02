@@ -579,7 +579,70 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
-- (void)observeObject:(RLMObject *)object keyPath:(NSString *)keyPath until:(BOOL (^)id)block {
+- (void)testArrayKVOIndexHandlingInsertCompact {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:50];
+        [realm beginWriteTransaction];
+        ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+        [realm commitWriteTransaction];
+
+        const NSUInteger count = [StringObject allObjectsInRealm:realm].count;
+        const NSUInteger factor = count / 10;
+
+        [self observeObject:obj keyPath:@"array"
+                      until:^(id obj) { return [obj array].count == count; }];
+
+        [self startMeasuring];
+        [realm beginWriteTransaction];
+        for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+            [obj.array addObject:so];
+            if (obj.array.count % factor == 0) {
+                [realm commitWriteTransaction];
+                dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
+                [realm beginWriteTransaction];
+            }
+        }
+        [realm commitWriteTransaction];
+
+        dispatch_sync(_queue, ^{});
+    }];
+}
+
+- (void)testArrayKVOIndexHandlingInsertSparse {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:50];
+        [realm beginWriteTransaction];
+        ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+        [realm commitWriteTransaction];
+
+        const NSUInteger count = [StringObject allObjectsInRealm:realm].count;
+        const NSUInteger factor = count / 10;
+
+        [self observeObject:obj keyPath:@"array"
+                      until:^(id obj) { return [obj array].count == count; }];
+
+        [self startMeasuring];
+        [realm beginWriteTransaction];
+        for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+            NSUInteger index = obj.array.count;
+            if (obj.array.count > factor) {
+                index = index * 3 % factor;
+            }
+            [obj.array insertObject:so atIndex:index];
+
+            if (obj.array.count % factor == 0) {
+                [realm commitWriteTransaction];
+                dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
+                [realm beginWriteTransaction];
+            }
+        }
+        [realm commitWriteTransaction];
+
+        dispatch_sync(_queue, ^{});
+    }];
+}
+
+- (void)observeObject:(RLMObject *)object keyPath:(NSString *)keyPath until:(int (^)(id))block {
     self.sema = dispatch_semaphore_create(0);
     self.queue = dispatch_queue_create("bg", 0);
 
