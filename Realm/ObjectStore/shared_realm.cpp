@@ -193,14 +193,7 @@ public:
         }
         else if (o->kind == kind) {
             if (kind == ColumnInfo::Kind::Remove) {
-                // Shift the index to compensate for already-removed indices
-                for (auto i : o->indices) {
-                    if (i <= index)
-                        ++index;
-                    else
-                        break;
-                }
-                o->indices.add(index);
+                o->indices.add_shifted(index);
             }
             else if (kind == ColumnInfo::Kind::Insert) {
                 o->indices.insert_at(index);

@@ -91,6 +91,15 @@ void IndexSet::insert_at(size_t index)
     do_add(pos, index);
 }
 
+void IndexSet::add_shifted(size_t index)
+{
+    auto it = m_ranges.begin();
+    for (auto end = m_ranges.end(); it != end && it->first <= index; ++it) {
+        index += it->second - it->first;
+    }
+    do_add(it, index);
+}
+
 size_t IndexSet::iterator::operator*() const
 {
     return m_data->first + m_offset;

@@ -48,6 +48,7 @@ public:
     void set(size_t len);
     // Insert an index at the given position, shifting existing indexes back
     void insert_at(size_t index);
+    void add_shifted(size_t index);
 
 private:
     using Range = std::pair<size_t, size_t>;
