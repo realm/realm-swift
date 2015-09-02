@@ -18,11 +18,13 @@
 
 #import "RLMTestCase.h"
 
-#import "RLMRealm_Private.h"
+#import "RLMRealm_Dynamic.h"
 
 #if !DEBUG
 
 @interface PerformanceTests : RLMTestCase
+@property (nonatomic) dispatch_queue_t queue;
+@property (nonatomic) dispatch_semaphore_t sema;
 @end
 
 static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
@@ -529,68 +531,15 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
-- (void)testArrayKVOIndexHandling {
+- (void)testArrayKVOIndexHandlingRemoveForward {
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = [self getStringObjects:50];
         [realm beginWriteTransaction];
         ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
         [realm commitWriteTransaction];
 
-        RLMRealmConfiguration *config = realm.configuration;
-        dispatch_queue_t queue = dispatch_queue_create("bg", 0);
-        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-        dispatch_async(queue, ^{
-            RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-            ArrayPropertyObject *obj = [ArrayPropertyObject allObjectsInRealm:realm].firstObject;
-            [obj addObserver:self forKeyPath:@"array" options:0 context:(__bridge void *)sema];
-
-            dispatch_semaphore_signal(sema);
-            while (obj.array.count > 0) {
-                [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-            }
-
-            [obj removeObserver:self forKeyPath:@"array" context:(__bridge void *)sema];
-        });
-        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-
-        [self startMeasuring];
-        while (obj.array.count > 0) {
-            [realm beginWriteTransaction];
-            for (NSUInteger i = obj.array.count; i > 0; i -= i > 5 ? 5 : i) {
-                [obj.array removeObjectAtIndex:i - 1];
-            }
-            [realm commitWriteTransaction];
-            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-        }
-
-
-        dispatch_sync(queue, ^{});
-    }];
-}
-
-- (void)testArrayKVOIndexHandlingForward {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        RLMRealm *realm = [self getStringObjects:50];
-        [realm beginWriteTransaction];
-        ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
-        [realm commitWriteTransaction];
-
-        RLMRealmConfiguration *config = realm.configuration;
-        dispatch_queue_t queue = dispatch_queue_create("bg", 0);
-        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-        dispatch_async(queue, ^{
-            RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-            ArrayPropertyObject *obj = [ArrayPropertyObject allObjectsInRealm:realm].firstObject;
-            [obj addObserver:self forKeyPath:@"array" options:0 context:(__bridge void *)sema];
-
-            dispatch_semaphore_signal(sema);
-            while (obj.array.count > 0) {
-                [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-            }
-
-            [obj removeObserver:self forKeyPath:@"array" context:(__bridge void *)sema];
-        });
-        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+        [self observeObject:obj keyPath:@"array"
+                      until:^(id obj) { return [obj array].count == 0; }];
 
         [self startMeasuring];
         while (obj.array.count > 0) {
@@ -599,12 +548,56 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
                 [obj.array removeObjectAtIndex:i];
             }
             [realm commitWriteTransaction];
-            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+            dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
         }
 
-
-        dispatch_sync(queue, ^{});
+        dispatch_sync(_queue, ^{});
     }];
+}
+
+- (void)testArrayKVOIndexHandlingRemoveBackwards {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:50];
+        [realm beginWriteTransaction];
+        ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
+        [realm commitWriteTransaction];
+
+        [self observeObject:obj keyPath:@"array"
+                      until:^(id obj) { return [obj array].count == 0; }];
+
+        [self startMeasuring];
+        while (obj.array.count > 0) {
+            [realm beginWriteTransaction];
+            for (NSUInteger i = obj.array.count; i > 0; i -= i > 5 ? 5 : i) {
+                [obj.array removeObjectAtIndex:i - 1];
+            }
+            [realm commitWriteTransaction];
+            dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
+        }
+
+        dispatch_sync(_queue, ^{});
+    }];
+}
+
+- (void)observeObject:(RLMObject *)object keyPath:(NSString *)keyPath until:(BOOL (^)id)block {
+    self.sema = dispatch_semaphore_create(0);
+    self.queue = dispatch_queue_create("bg", 0);
+
+    RLMRealmConfiguration *config = object.realm.configuration;
+    NSString *className = [object.class className];
+    dispatch_async(_queue, ^{
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        id obj = [[realm allObjects:className] firstObject];
+        [obj addObserver:self forKeyPath:keyPath options:0 context:(__bridge void *)_sema];
+
+        dispatch_semaphore_signal(_sema);
+        while (!block(obj)) {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+        }
+
+        [obj removeObserver:self forKeyPath:keyPath context:(__bridge void *)_sema];
+    });
+    dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
 }
 
 - (void)observeValueForKeyPath:(__unused NSString *)keyPath
