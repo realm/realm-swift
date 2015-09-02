@@ -379,6 +379,21 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
+- (void)testRealmFileCreation {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    __block int measurement = 0;
+    const int iterations = 50;
+    [self measureBlock:^{
+        for (int i = 0; i < iterations; ++i) {
+            @autoreleasepool {
+                config.inMemoryIdentifier = @(measurement * iterations + i).stringValue;
+                [RLMRealm realmWithConfiguration:config error:nil];
+            }
+        }
+        ++measurement;
+    }];
+}
+
 - (void)testCommitWriteTransaction {
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = self.testRealm;
