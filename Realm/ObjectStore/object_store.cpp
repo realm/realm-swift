@@ -382,9 +382,9 @@ bool ObjectStore::update_realm_with_schema(Group *group,
     // apply the migration block if provided and there's any old data
     if (get_schema_version(group) != ObjectStore::NotVersioned) {
         migration(group, schema);
-    }
 
-    validate_primary_column_uniqueness(group, schema);
+        validate_primary_column_uniqueness(group, schema);
+    }
 
     set_schema_version(group, version);
     return true;
