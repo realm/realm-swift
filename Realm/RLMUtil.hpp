@@ -79,8 +79,8 @@ static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
     if (static_cast<id>(obj) == NSNull.null) {
         return nil;
     }
-    else if (RLMIsKindOfClass(object_getClass(obj), [RLMOptionalBase class])) {
-        return [static_cast<RLMOptionalBase *>(obj) underlyingValue];
+    else if (__unsafe_unretained auto optional = RLMDynamicCast<RLMOptionalBase>(obj)) {
+        return optional.underlyingValue;
     }
     return obj;
 }

@@ -608,9 +608,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
         return nil;
     }
 
-    if (key == NSNull.null) {
-        key = nil;
-    }
+    key = RLMCoerceToNil(key);
 
     size_t row = realm::not_found;
     if (primaryProperty.type == RLMPropertyTypeString) {
@@ -623,8 +621,12 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
         }
     }
     else {
-        if (NSNumber *number = RLMDynamicCast<NSNumber>(key)) {
+        NSNumber *number = RLMDynamicCast<NSNumber>(key);
+        if (number) {
             row = objectSchema.table->find_first_int(primaryProperty.column, number.longLongValue);
+        }
+        else if (key) {
+            row = objectSchema.table->find_first_null(primaryProperty.column);
         }
         else {
             @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' for primary key", key]);
