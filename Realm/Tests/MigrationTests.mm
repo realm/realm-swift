@@ -88,6 +88,18 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
 @implementation MigrationTwoStringObject
 @end
 
+@interface AllOptionalTypes : RLMObject
+@property NSNumber<RLMInt> *intObj;
+@property NSNumber<RLMFloat> *floatObj;
+@property NSNumber<RLMDouble> *doubleObj;
+@property NSNumber<RLMBool> *boolObj;
+@property NSString *string;
+@property NSData *data;
+@property NSDate *date;
+@end
+@implementation AllOptionalTypes
+@end
+
 @interface MigrationTests : RLMTestCase
 @end
 
@@ -931,10 +943,10 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
 
 - (void)testRequiredToNullableAutoMigration {
     RLMSchema *nullable = [[RLMSchema alloc] init];
-    nullable.objectSchema = @[[RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class]];
+    nullable.objectSchema = @[[RLMObjectSchema schemaForObjectClass:AllOptionalTypes.class]];
 
     RLMSchema *nonnull = [[RLMSchema alloc] init];
-    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:AllOptionalTypes.class];
     [objectSchema.properties setValue:@NO forKey:@"optional"];
     nonnull.objectSchema = @[objectSchema];
 
@@ -942,15 +954,34 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
     @autoreleasepool {
         RLMRealm *realm = [self realmWithTestPathAndSchema:nonnull];
         [realm transactionWithBlock:^{
-            [MigrationTwoStringObject createInRealm:realm withValue:@[@"string", @"string2"]];
+            [AllOptionalTypes createInRealm:realm withValue:@[@1, @1, @1, @1, @"str", [@"data" dataUsingEncoding:NSUTF8StringEncoding], [NSDate dateWithTimeIntervalSince1970:1]]];
+            [AllOptionalTypes createInRealm:realm withValue:@[@2, @2, @2, @0, @"str2", [@"data2" dataUsingEncoding:NSUTF8StringEncoding], [NSDate dateWithTimeIntervalSince1970:2]]];
         }];
     }
 
     @autoreleasepool {
         [RLMRealm setSchemaVersion:1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
         RLMRealm *realm = [self realmWithTestPathAndSchema:nullable];
-        XCTAssertEqualObjects([[MigrationTwoStringObject allObjectsInRealm:realm] valueForKey:@"col2"], @[@"string2"]);
-        XCTAssertTrue(realm.schema[@"MigrationTwoStringObject"][@"col1"].optional);
+        RLMResults *allObjects = [AllOptionalTypes allObjectsInRealm:realm];
+        XCTAssertEqual(2U, allObjects.count);
+
+        AllOptionalTypes *obj = allObjects[0];
+        XCTAssertEqualObjects(@1, obj.intObj);
+        XCTAssertEqualObjects(@1, obj.floatObj);
+        XCTAssertEqualObjects(@1, obj.doubleObj);
+        XCTAssertEqualObjects(@1, obj.boolObj);
+        XCTAssertEqualObjects(@"str", obj.string);
+        XCTAssertEqualObjects([@"data" dataUsingEncoding:NSUTF8StringEncoding], obj.data);
+        XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:1], obj.date);
+
+        obj = allObjects[1];
+        XCTAssertEqualObjects(@2, obj.intObj);
+        XCTAssertEqualObjects(@2, obj.floatObj);
+        XCTAssertEqualObjects(@2, obj.doubleObj);
+        XCTAssertEqualObjects(@0, obj.boolObj);
+        XCTAssertEqualObjects(@"str2", obj.string);
+        XCTAssertEqualObjects([@"data2" dataUsingEncoding:NSUTF8StringEncoding], obj.data);
+        XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:2], obj.date);
     }
 }
 #endif
