@@ -333,7 +333,7 @@ void commit(SharedGroup& sg, ClientHistory&, RealmDelegate* delegate) {
     LangBindHelper::commit_and_continue_as_read(sg);
 
     if (delegate) {
-        delegate->transaction_committed();
+        delegate->did_change({}, {});
     }
 }
 

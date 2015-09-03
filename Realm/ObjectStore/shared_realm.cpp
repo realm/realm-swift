@@ -18,6 +18,7 @@
 
 #include "shared_realm.hpp"
 
+#include "external_commit_helper.hpp"
 #include "realm_delegate.hpp"
 #include "transact_log_handler.hpp"
 
@@ -52,7 +53,9 @@ Realm::Config& Realm::Config::operator=(realm::Realm::Config const& c)
     return *this;
 }
 
-Realm::Realm(Config config) : m_config(std::move(config))
+Realm::Realm(Config config)
+: m_config(std::move(config))
+, m_notifier(new ExternalCommitHelper(this))
 {
     try {
         if (m_config.read_only) {
@@ -234,6 +237,7 @@ void Realm::commit_transaction()
 
     m_in_transaction = false;
     transaction::commit(*m_shared_group, *m_history, m_delegate.get());
+    m_notifier->notify_others();
 }
 
 void Realm::cancel_transaction()
@@ -416,4 +420,3 @@ void RealmCache::clear()
 
     m_cache.clear();
 }
-

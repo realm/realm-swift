@@ -28,6 +28,7 @@
 
 namespace realm {
     class ClientHistory;
+    class ExternalCommitHelper;
     class Realm;
     class RealmCache;
     class RealmDelegate;
@@ -109,6 +110,8 @@ namespace realm {
         std::unique_ptr<Group> m_read_only_group;
 
         Group *m_group = nullptr;
+
+        std::unique_ptr<ExternalCommitHelper> m_notifier;
 
       public:
         std::unique_ptr<RealmDelegate> m_delegate;

@@ -264,12 +264,14 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
                 RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, ex), outError);
                 break;
         }
-        return nullptr;
     }
-    catch (std::exception const& ex) {
-        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, ex), outError);
-        return nullptr;
+    catch (std::system_error const& ex) {
+        RLMSetErrorOrThrow([NSError errorWithDomain:NSPOSIXErrorDomain code:ex.code().value() userInfo:nil], outError);
     }
+    catch (const std::exception &exp) {
+        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), outError);
+    }
+    return nullptr;
 }
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
@@ -359,7 +361,7 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
     if (!readOnly) {
         // initializing the schema started a read transaction, so end it
         [realm invalidate];
-        realm->_realm->m_delegate = RLMCreateRealmDelegate(realm, error);
+        realm->_realm->m_delegate = RLMCreateRealmDelegate(realm);
     }
 
     return RLMAutorelease(realm);

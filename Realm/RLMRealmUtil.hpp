@@ -49,4 +49,4 @@ void RLMInstallUncaughtExceptionHandler();
 - (void)notifyOtherRealms;
 @end
 
-std::unique_ptr<realm::RealmDelegate> RLMCreateRealmDelegate(RLMRealm *realm, NSError **error);
+std::unique_ptr<realm::RealmDelegate> RLMCreateRealmDelegate(RLMRealm *realm);

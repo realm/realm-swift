@@ -245,6 +245,14 @@
 		3F20DA2319BE1EA6007DE308 /* RLMUpdateChecker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F20DA2019BE1EA6007DE308 /* RLMUpdateChecker.hpp */; };
 		3F20DA2419BE1EA6007DE308 /* RLMUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F20DA2119BE1EA6007DE308 /* RLMUpdateChecker.mm */; };
 		3F20DA2519BE1EA6007DE308 /* RLMUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F20DA2119BE1EA6007DE308 /* RLMUpdateChecker.mm */; };
+		3F2118AA1B97CBE1005A4CFE /* external_commit_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */; };
+		3F2118AB1B97CBE1005A4CFE /* external_commit_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */; };
+		3F2118AC1B97CBE1005A4CFE /* external_commit_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */; };
+		3F2118AD1B97CBE1005A4CFE /* external_commit_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */; };
+		3F2118AE1B97CBE1005A4CFE /* external_commit_helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F2118A91B97CBE1005A4CFE /* external_commit_helper.hpp */; };
+		3F2118AF1B97CBE1005A4CFE /* external_commit_helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F2118A91B97CBE1005A4CFE /* external_commit_helper.hpp */; };
+		3F2118B01B97CBE1005A4CFE /* external_commit_helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F2118A91B97CBE1005A4CFE /* external_commit_helper.hpp */; };
+		3F2118B11B97CBE1005A4CFE /* external_commit_helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F2118A91B97CBE1005A4CFE /* external_commit_helper.hpp */; };
 		3F3243C019A6C7ED0035E94B /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E856D1D5195614A300FB2FCF /* Realm.framework */; };
 		3F452EC619C2279800AFC154 /* RLMSwiftSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */; };
 		3F62BA9F1BA0AB9000A4CEB2 /* realm_delegate.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F62BA9E1BA0AB9000A4CEB2 /* realm_delegate.hpp */; };
@@ -654,6 +662,8 @@
 		3F1F47891B97ABA300CD99A3 /* transact_log_handler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = transact_log_handler.cpp; path = ObjectStore/transact_log_handler.cpp; sourceTree = "<group>"; };
 		3F20DA2019BE1EA6007DE308 /* RLMUpdateChecker.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUpdateChecker.hpp; sourceTree = "<group>"; };
 		3F20DA2119BE1EA6007DE308 /* RLMUpdateChecker.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUpdateChecker.mm; sourceTree = "<group>"; };
+		3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = external_commit_helper.cpp; path = ObjectStore/apple/external_commit_helper.cpp; sourceTree = "<group>"; };
+		3F2118A91B97CBE1005A4CFE /* external_commit_helper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = external_commit_helper.hpp; path = ObjectStore/apple/external_commit_helper.hpp; sourceTree = "<group>"; };
 		3F44109E19953F5900223146 /* RLMTestObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMTestObjects.h; sourceTree = "<group>"; };
 		3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMSwiftSupport.m; path = Realm/RLMSwiftSupport.m; sourceTree = SOURCE_ROOT; };
 		3F62BA9E1BA0AB9000A4CEB2 /* realm_delegate.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = realm_delegate.hpp; path = ObjectStore/realm_delegate.hpp; sourceTree = "<group>"; };
@@ -815,6 +825,7 @@
 		02D9AFB61B22487E00A1BD87 /* ObjectStore */ = {
 			isa = PBXGroup;
 			children = (
+				3F2118A71B97CBAD005A4CFE /* Apple */,
 				3FBD05FA1B94E1C3004559CF /* index_set.cpp */,
 				3FBD05FB1B94E1C3004559CF /* index_set.hpp */,
 				3FAE25561B8CEBBE00D01405 /* object_schema.cpp */,
@@ -839,6 +850,15 @@
 			);
 			name = TestHost;
 			path = ../../TestHost;
+			sourceTree = "<group>";
+		};
+		3F2118A71B97CBAD005A4CFE /* Apple */ = {
+			isa = PBXGroup;
+			children = (
+				3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */,
+				3F2118A91B97CBE1005A4CFE /* external_commit_helper.hpp */,
+			);
+			name = Apple;
 			sourceTree = "<group>";
 		};
 		E81A1FC81955FE0100FDED82 /* Swift */ = {
@@ -1049,6 +1069,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F2118B11B97CBE1005A4CFE /* external_commit_helper.hpp in Headers */,
 				3FBD06031B94E1C3004559CF /* index_set.hpp in Headers */,
 				3FAE257C1B8CEBBE00D01405 /* object_schema.hpp in Headers */,
 				3FAE25641B8CEBBE00D01405 /* object_store.hpp in Headers */,
@@ -1100,6 +1121,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F2118B01B97CBE1005A4CFE /* external_commit_helper.hpp in Headers */,
 				3FBD06021B94E1C3004559CF /* index_set.hpp in Headers */,
 				3FAE257B1B8CEBBE00D01405 /* object_schema.hpp in Headers */,
 				3FAE25631B8CEBBE00D01405 /* object_store.hpp in Headers */,
@@ -1151,6 +1173,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F2118AF1B97CBE1005A4CFE /* external_commit_helper.hpp in Headers */,
 				3FBD06011B94E1C3004559CF /* index_set.hpp in Headers */,
 				3FAE257A1B8CEBBE00D01405 /* object_schema.hpp in Headers */,
 				3FAE25621B8CEBBE00D01405 /* object_store.hpp in Headers */,
@@ -1202,6 +1225,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F2118AE1B97CBE1005A4CFE /* external_commit_helper.hpp in Headers */,
 				3FBD06001B94E1C3004559CF /* index_set.hpp in Headers */,
 				3FAE25791B8CEBBE00D01405 /* object_schema.hpp in Headers */,
 				3FAE25611B8CEBBE00D01405 /* object_store.hpp in Headers */,
@@ -1691,6 +1715,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F2118AD1B97CBE1005A4CFE /* external_commit_helper.cpp in Sources */,
 				3FBD05FF1B94E1C3004559CF /* index_set.cpp in Sources */,
 				3FAE25741B8CEBBE00D01405 /* object_schema.cpp in Sources */,
 				3FAE25601B8CEBBE00D01405 /* object_store.cpp in Sources */,
@@ -1726,6 +1751,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F2118AC1B97CBE1005A4CFE /* external_commit_helper.cpp in Sources */,
 				3FBD05FE1B94E1C3004559CF /* index_set.cpp in Sources */,
 				3FAE25731B8CEBBE00D01405 /* object_schema.cpp in Sources */,
 				3FAE255F1B8CEBBE00D01405 /* object_store.cpp in Sources */,
@@ -1803,6 +1829,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F2118AB1B97CBE1005A4CFE /* external_commit_helper.cpp in Sources */,
 				3FBD05FD1B94E1C3004559CF /* index_set.cpp in Sources */,
 				3FAE25721B8CEBBE00D01405 /* object_schema.cpp in Sources */,
 				3FAE255E1B8CEBBE00D01405 /* object_store.cpp in Sources */,
@@ -1881,6 +1908,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F2118AA1B97CBE1005A4CFE /* external_commit_helper.cpp in Sources */,
 				3FBD05FC1B94E1C3004559CF /* index_set.cpp in Sources */,
 				3FAE25711B8CEBBE00D01405 /* object_schema.cpp in Sources */,
 				3FAE255D1B8CEBBE00D01405 /* object_store.cpp in Sources */,

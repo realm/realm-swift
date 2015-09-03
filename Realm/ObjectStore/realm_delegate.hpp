@@ -63,10 +63,6 @@ public:
         }
     };
 
-    // The Realm has committed a write transaction, and other Realms at the
-    // same path should be notified
-    virtual void transaction_committed() = 0;
-
     // There are now new versions available for the Realm, but it has not
     // had its read version advanced
     virtual void changes_available() = 0;
@@ -86,6 +82,8 @@ public:
     // The Realm's read version has changed
     // observers is the vector returned from get_observed_rows()
     // invalidated is the `info` pointers for each observed object which was deleted
+    // Is called with empty change information following a local commit or if
+    // the Realm isn't in a read transaction yet
     virtual void did_change(std::vector<ObserverState> const& observers,
                             std::vector<void*> const& invalidated) = 0;
 };
