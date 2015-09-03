@@ -261,4 +261,13 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
     return [NSString stringWithFormat:@"Schema {\n%@}", objectSchemaString];
 }
 
+- (std::unique_ptr<Schema>)objectStoreCopy {
+    std::vector<realm::ObjectSchema> schema;
+    schema.reserve(_objectSchema.count);
+    for (RLMObjectSchema *objectSchema in _objectSchema) {
+        schema.push_back(objectSchema.objectStoreCopy);
+    }
+    return std::make_unique<realm::Schema>(std::move(schema));
+}
+
 @end

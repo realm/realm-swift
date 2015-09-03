@@ -20,7 +20,7 @@
 
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Private.h"
-#import "RLMSchema_Private.h"
+#import "RLMSchema_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import "shared_realm.hpp"
@@ -232,18 +232,7 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 
 - (void)setCustomSchema:(RLMSchema *)customSchema {
     _customSchema = customSchema;
-
-    if (_customSchema) {
-        std::vector<realm::ObjectSchema> schema;
-        schema.reserve(customSchema.objectSchema.count);
-        for (RLMObjectSchema *objectSchema in customSchema.objectSchema) {
-            schema.push_back(objectSchema.objectStoreCopy);
-        }
-        _config.schema = std::make_unique<realm::Schema>(std::move(schema));
-    }
-    else {
-        _config.schema = nullptr;
-    }
+    _config.schema = [_customSchema objectStoreCopy];
 }
 
 @end

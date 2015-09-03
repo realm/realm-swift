@@ -132,20 +132,24 @@ TableRef ObjectStore::table_for_object_type_create_if_needed(Group *group, const
     return group->get_or_add_table(table_name_for_object_type(object_type), &created);
 }
 
-static inline bool property_has_changed(Property &p1, Property &p2) {
-    return p1.type != p2.type || p1.name != p2.name || p1.object_type != p2.object_type || p1.is_nullable != p2.is_nullable;
+static inline bool property_has_changed(Property const& p1, Property const& p2) {
+    return p1.type != p2.type
+        || p1.name != p2.name
+        || p1.object_type != p2.object_type
+        || p1.is_nullable != p2.is_nullable;
 }
 
 static bool compare_by_name(ObjectSchema const& lft, ObjectSchema const& rgt) {
     return lft.name < rgt.name;
 }
 
-void ObjectStore::verify_schema(Group *group, Schema &target_schema, bool allow_missing_tables) {
+void ObjectStore::verify_schema(Schema const& actual_schema, Schema &target_schema, bool allow_missing_tables) {
     std::sort(begin(target_schema), end(target_schema), compare_by_name);
 
     std::vector<ObjectSchemaValidationException> errors;
     for (auto &object_schema : target_schema) {
-        if (!table_for_object_type(group, object_schema.name)) {
+        auto matching_schema = std::lower_bound(begin(actual_schema), end(actual_schema), object_schema, compare_by_name);
+        if (matching_schema == end(actual_schema) || matching_schema->name != object_schema.name) {
             if (!allow_missing_tables) {
                 errors.emplace_back(ObjectSchemaValidationException(object_schema.name,
                                     "Missing table for object type '" + object_schema.name + "'."));
@@ -153,7 +157,7 @@ void ObjectStore::verify_schema(Group *group, Schema &target_schema, bool allow_
             continue;
         }
 
-        auto more_errors = verify_object_schema(group, object_schema, target_schema);
+        auto more_errors = verify_object_schema(*matching_schema, object_schema, target_schema);
         errors.insert(errors.end(), more_errors.begin(), more_errors.end());
     }
     if (errors.size()) {
@@ -161,9 +165,8 @@ void ObjectStore::verify_schema(Group *group, Schema &target_schema, bool allow_
     }
 }
 
-std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(Group *group, ObjectSchema &target_schema, Schema &schema) {
+std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(ObjectSchema const& table_schema, ObjectSchema &target_schema, Schema &schema) {
     std::vector<ObjectSchemaValidationException> exceptions;
-    ObjectSchema table_schema(group, target_schema.name);
 
     ObjectSchema cmp;
     auto schema_contains_table = [&](std::string const& name) {
@@ -172,7 +175,7 @@ std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(G
     };
 
     // check to see if properties are the same
-    Property *primary = nullptr;
+    const Property *primary = nullptr;
     for (auto& current_prop : table_schema.properties) {
         auto target_prop = target_schema.property_for_name(current_prop.name);
 
@@ -272,12 +275,27 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
         ObjectSchema current_schema(group, target_object_schema->name);
         std::vector<Property> &target_props = target_object_schema->properties;
 
+        // remove extra columns
+        size_t deleted = 0;
+        for (auto& current_prop : current_schema.properties) {
+            auto target_prop = target_object_schema->property_for_name(current_prop.name);
+            if (!target_prop || property_has_changed(current_prop, *target_prop)) {
+                table->remove_column(current_prop.table_column - deleted);
+                ++deleted;
+                current_prop.table_column = npos;
+                changed = true;
+            }
+            else {
+                current_prop.table_column -= deleted;
+            }
+        }
+
         // add missing columns
         for (auto& target_prop : target_props) {
             auto current_prop = current_schema.property_for_name(target_prop.name);
 
             // add any new properties (new name or different type)
-            if (!current_prop || property_has_changed(*current_prop, target_prop)) {
+            if (!current_prop || current_prop->table_column == npos) {
                 switch (target_prop.type) {
                         // for objects and arrays, we have to specify target table
                     case PropertyTypeObject:
@@ -293,17 +311,8 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
 
                 changed = true;
             }
-        }
-
-        // remove extra columns
-        sort(begin(current_schema.properties), end(current_schema.properties), [](Property &i, Property &j) {
-            return j.table_column < i.table_column;
-        });
-        for (auto& current_prop : current_schema.properties) {
-            auto target_prop = target_object_schema->property_for_name(current_prop.name);
-            if (!target_prop || property_has_changed(current_prop, *target_prop)) {
-                table->remove_column(current_prop.table_column);
-                changed = true;
+            else {
+                target_prop.table_column = current_prop->table_column;
             }
         }
 
@@ -332,24 +341,22 @@ bool ObjectStore::is_schema_at_version(Group *group, uint64_t version) {
     return old_version == version;
 }
 
-bool ObjectStore::realm_requires_update(Group *group, uint64_t version, Schema const& schema) {
-    if (!is_schema_at_version(group, version)) {
-        return true;
-    }
-
+bool ObjectStore::needs_update(Schema const& old_schema, Schema& schema) {
     for (auto const& target_schema : schema) {
-        TableRef table = table_for_object_type(group, target_schema.name);
-        if (!table) {
+        auto matching_schema = std::lower_bound(begin(old_schema), end(old_schema), target_schema, compare_by_name);
+        if (matching_schema == end(old_schema) || matching_schema->name != target_schema.name) {
+            // Table doesn't exist
             return true;
         }
 
+        if (matching_schema->properties.size() != target_schema.properties.size()) {
+            // If the number of properties don't match then a migration is required
+            return false;
+        }
+
         // Check that all of the property indexes are up to date
-        size_t count = table->get_column_count();
-        for (size_t col = 0; col < count; ++col) {
-            StringData name = table->get_column_name(col);
-            bool is_indexed = table->has_search_index(col);
-            auto prop = target_schema.property_for_name(name);
-            if (prop && prop->requires_index() != is_indexed) {
+        for (size_t i = 0, count = target_schema.properties.size(); i < count; ++i) {
+            if (target_schema.properties[i].is_indexed != matching_schema->properties[i].is_indexed) {
                 return true;
             }
         }
@@ -358,9 +365,8 @@ bool ObjectStore::realm_requires_update(Group *group, uint64_t version, Schema c
     return false;
 }
 
-bool ObjectStore::update_realm_with_schema(Group *group,
-                                           uint64_t version,
-                                           Schema &schema,
+bool ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schema,
+                                           uint64_t version, Schema &schema,
                                            MigrationFunction migration) {
     // Recheck the schema version after beginning the write transaction as
     // another process may have done the migration after we opened the read
@@ -371,7 +377,11 @@ bool ObjectStore::update_realm_with_schema(Group *group,
     bool changed = create_metadata_tables(group);
     changed = create_tables(group, schema, migrating) || changed;
 
-    verify_schema(group, schema);
+    if (!migrating) {
+        // If we aren't migrating, then verify that all of the tables which
+        // were already present are valid (newly created ones always are)
+        verify_schema(old_schema, schema, true);
+    }
 
     changed = update_indexes(group, schema) || changed;
 
@@ -398,6 +408,7 @@ Schema ObjectStore::schema_from_group(Group *group) {
             schema.emplace_back(group, object_type);
         }
     }
+    std::sort(begin(schema), end(schema), compare_by_name);
     return schema;
 }
 
@@ -473,7 +484,7 @@ InvalidSchemaVersionException::InvalidSchemaVersionException(uint64_t old_versio
     m_what = "Provided schema version " + std::to_string(old_version) + " is less than last set version " + std::to_string(new_version) + ".";
 }
 
-DuplicatePrimaryKeyValueException::DuplicatePrimaryKeyValueException(std::string object_type, Property &property) :
+DuplicatePrimaryKeyValueException::DuplicatePrimaryKeyValueException(std::string object_type, Property const& property) :
     m_object_type(object_type), m_property(property)
 {
     m_what = "Primary key property '" + property.name + "' has duplicate values after migration.";
@@ -489,25 +500,25 @@ SchemaValidationException::SchemaValidationException(std::vector<ObjectSchemaVal
     }
 }
 
-PropertyTypeNotIndexableException::PropertyTypeNotIndexableException(std::string object_type, Property &property) :
+PropertyTypeNotIndexableException::PropertyTypeNotIndexableException(std::string object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
     m_what = "Can't index property " + object_type + "." + property.name + ": indexing a property of type '" + string_for_property_type(property.type) + "' is currently not supported";
 }
 
-ExtraPropertyException::ExtraPropertyException(std::string object_type, Property &property) :
+ExtraPropertyException::ExtraPropertyException(std::string object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
     m_what = "Property '" + property.name + "' has been added to latest object model.";
 }
 
-MissingPropertyException::MissingPropertyException(std::string object_type, Property &property) :
+MissingPropertyException::MissingPropertyException(std::string object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
     m_what = "Property '" + property.name + "' is missing from latest object model.";
 }
 
-InvalidNullabilityException::InvalidNullabilityException(std::string object_type, Property &property) :
+InvalidNullabilityException::InvalidNullabilityException(std::string object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
     if (property.type == PropertyTypeObject) {
@@ -522,13 +533,13 @@ InvalidNullabilityException::InvalidNullabilityException(std::string object_type
     }
 }
 
-MissingObjectTypeException::MissingObjectTypeException(std::string object_type, Property &property) :
+MissingObjectTypeException::MissingObjectTypeException(std::string object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
     m_what = "Target type '" + property.object_type + "' doesn't exist for property '" + property.name + "'.";
 }
 
-MismatchedPropertiesException::MismatchedPropertiesException(std::string object_type, Property &old_property, Property &new_property) :
+MismatchedPropertiesException::MismatchedPropertiesException(std::string object_type, Property const& old_property, Property const& new_property) :
     ObjectSchemaValidationException(object_type), m_old_property(old_property), m_new_property(new_property)
 {
     if (new_property.type != old_property.type) {

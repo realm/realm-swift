@@ -42,26 +42,26 @@ namespace realm {
         // checks if the schema in the group is at the given version
         static bool is_schema_at_version(realm::Group *group, uint64_t version);
 
-        // verify a target schema against tables in the given group
-        // updates the column mapping on all ObjectSchema properties
-        // throws if the schema is invalid or does not match tables in the given group
-        static void verify_schema(Group *group, Schema &target_schema, bool allow_missing_tables = false);
+        // verify that schema from a group and a target schema are compatible
+        // updates the column mapping on all ObjectSchema properties of the target schema
+        // throws if the schema is invalid or does not match
+        static void verify_schema(Schema const& actual_schema, Schema &target_schema, bool allow_missing_tables = false);
 
         // updates the target_column member for all properties based on the column indexes in the passed in group
         static void update_column_mapping(Group *group, ObjectSchema &target_schema);
 
-        // determines if you must call update_realm_with_schema for a given realm.
-        // returns true if there is a schema version mismatch, if there tables which still need to be created,
-        // or if file format or other changes/updates need to be made
-        static bool realm_requires_update(Group *group, uint64_t version, Schema const& schema);
+        // determines if a realm with the given old schema needs non-migration
+        // changes to make it compatible with the given target schema
+        static bool needs_update(Schema const& old_schema, Schema& schema);
         
-        // updates a Realm to a given target schema/version creating tables and updating indexes as necessary
+        // updates a Realm from old_schema to the given target schema, creating and updating tables as needed
         // returns if any changes were made
-        // passed in schema ar updated with the correct column mapping
-        // optionally runs migration function/lambda if schema is out of date
+        // passed in target schema is updated with the correct column mapping
+        // optionally runs migration function if schema is out of date
         // NOTE: must be performed within a write transaction
         typedef std::function<void(Group *, Schema &)> MigrationFunction;
-        static bool update_realm_with_schema(Group *group, uint64_t version, Schema &schema, MigrationFunction migration);
+        static bool update_realm_with_schema(Group *group, Schema const& old_schema, uint64_t version,
+                                             Schema &schema, MigrationFunction migration);
 
         // get a table for an object type
         static realm::TableRef table_for_object_type(Group *group, StringData object_type);
@@ -88,10 +88,10 @@ namespace realm {
         // if update existing is true, updates existing tables, otherwise only adds and initializes new tables
         static bool create_tables(realm::Group *group, Schema &target_schema, bool update_existing);
 
-        // verify a target schema against its table, setting the table_column property on each schema object
+        // verify a target schema against an expected schema, setting the table_column property on each schema object
         // updates the column mapping on the target_schema
         // returns array of validation errors
-        static std::vector<ObjectSchemaValidationException> verify_object_schema(Group *group, ObjectSchema &target_schema, Schema &schema);
+        static std::vector<ObjectSchemaValidationException> verify_object_schema(ObjectSchema const& expected, ObjectSchema &target_schema, Schema &schema);
 
         // get primary key property name for object type
         static StringData get_primary_key_for_object(Group *group, StringData object_type);
@@ -118,7 +118,7 @@ namespace realm {
       public:
         ObjectStoreException() = default;
         ObjectStoreException(const std::string &what) : m_what(what) {}
-        virtual const char* what() const noexcept { return m_what.c_str(); }
+        const char* what() const noexcept override { return m_what.c_str(); }
       protected:
         std::string m_what;
     };
@@ -137,9 +137,9 @@ namespace realm {
 
     class DuplicatePrimaryKeyValueException : public MigrationException {
       public:
-        DuplicatePrimaryKeyValueException(std::string object_type, Property &property);
+        DuplicatePrimaryKeyValueException(std::string object_type, Property const& property);
         std::string object_type() { return m_object_type; }
-        Property &property() { return m_property; }
+        Property const& property() { return m_property; }
       private:
         std::string m_object_type;
         Property m_property;
@@ -166,36 +166,36 @@ namespace realm {
 
     class ObjectSchemaPropertyException : public ObjectSchemaValidationException {
       public:
-        ObjectSchemaPropertyException(std::string object_type, Property &property) :
+        ObjectSchemaPropertyException(std::string object_type, Property const& property) :
             ObjectSchemaValidationException(object_type), m_property(property) {}
-        Property &property() { return m_property; }
+        Property const& property() { return m_property; }
       private:
         Property m_property;
     };
 
     class PropertyTypeNotIndexableException : public ObjectSchemaPropertyException {
       public:
-        PropertyTypeNotIndexableException(std::string object_type, Property &property);
+        PropertyTypeNotIndexableException(std::string object_type, Property const& property);
     };
 
     class ExtraPropertyException : public ObjectSchemaPropertyException {
       public:
-        ExtraPropertyException(std::string object_type, Property &property);
+        ExtraPropertyException(std::string object_type, Property const& property);
     };
 
     class MissingPropertyException : public ObjectSchemaPropertyException {
       public:
-        MissingPropertyException(std::string object_type, Property &property);
+        MissingPropertyException(std::string object_type, Property const& property);
     };
 
     class InvalidNullabilityException : public ObjectSchemaPropertyException {
       public:
-        InvalidNullabilityException(std::string object_type, Property &property);
+        InvalidNullabilityException(std::string object_type, Property const& property);
     };
 
     class MissingObjectTypeException : public ObjectSchemaPropertyException {
     public:
-        MissingObjectTypeException(std::string object_type, Property &property);
+        MissingObjectTypeException(std::string object_type, Property const& property);
     };
 
     class DuplicatePrimaryKeysException : public ObjectSchemaValidationException {
@@ -205,9 +205,9 @@ namespace realm {
 
     class MismatchedPropertiesException : public ObjectSchemaValidationException {
       public:
-        MismatchedPropertiesException(std::string object_type, Property &old_property, Property &new_property);
-        Property &old_property() { return m_old_property; }
-        Property &new_property() { return m_new_property; }
+        MismatchedPropertiesException(std::string object_type, Property const& old_property, Property const& new_property);
+        Property const& old_property() { return m_old_property; }
+        Property const& new_property() { return m_new_property; }
       private:
         Property m_old_property, m_new_property;
     };

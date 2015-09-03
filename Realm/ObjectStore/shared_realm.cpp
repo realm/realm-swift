@@ -121,30 +121,36 @@ SharedRealm Realm::get_shared_realm(Config config)
 
     SharedRealm realm(new Realm(std::move(config)));
 
+    auto target_schema = std::move(realm->m_config.schema);
+    auto target_schema_version = realm->m_config.schema_version;
+    realm->m_config.schema_version = ObjectStore::get_schema_version(realm->read_group());
+
     // we want to ensure we are only initializing a single realm at a time
     static std::mutex s_init_mutex;
     std::lock_guard<std::mutex> lock(s_init_mutex);
-
-    uint64_t old_version = ObjectStore::get_schema_version(realm->read_group());
     if (auto existing = s_global_cache.get_any_realm(realm->config().path)) {
         // if there is an existing realm at the current path steal its schema/column mapping
         // FIXME - need to validate that schemas match
         realm->m_config.schema = std::make_unique<Schema>(*existing->m_config.schema);
     }
-    else if (!realm->m_config.schema) {
-        // get schema from group and skip validation
-        realm->m_config.schema_version = old_version;
-        realm->m_config.schema = std::make_unique<Schema>(ObjectStore::schema_from_group(realm->read_group()));
-    }
-    else if (realm->m_config.read_only) {
-        if (old_version == ObjectStore::NotVersioned) {
-            throw UnitializedRealmException("Can't open an un-initialized Realm without a Schema");
-        }
-        ObjectStore::verify_schema(realm->read_group(), *realm->m_config.schema, true);
-    }
     else {
-        // its a non-cached realm so update/migrate if needed
-        realm->update_schema(*realm->m_config.schema, realm->m_config.schema_version);
+        // otherwise get the schema from the group
+        realm->m_config.schema = std::make_unique<Schema>(ObjectStore::schema_from_group(realm->read_group()));
+
+        // if a target schema is supplied, verify that it matches or migrate to
+        // it, as neeeded
+        if (target_schema) {
+            if (realm->m_config.read_only) {
+                if (realm->m_config.schema_version == ObjectStore::NotVersioned) {
+                    throw UnitializedRealmException("Can't open an un-initialized Realm without a Schema");
+                }
+                ObjectStore::verify_schema(*realm->m_config.schema, *target_schema, true);
+                realm->m_config.schema = std::move(target_schema);
+            }
+            else {
+                realm->update_schema(std::move(target_schema), target_schema_version);
+            }
+        }
     }
 
     if (config.cache) {
@@ -153,47 +159,49 @@ SharedRealm Realm::get_shared_realm(Config config)
     return realm;
 }
 
-bool Realm::update_schema(Schema const& schema, uint64_t version)
+bool Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
 {
-    bool changed = false;
-    Config old_config(m_config);
-
-    // set new version/schema
-    if (m_config.schema.get() != &schema) {
-        m_config.schema = std::make_unique<Schema>(schema);
+    bool needs_update = !m_config.read_only && (m_config.schema_version != version || ObjectStore::needs_update(*m_config.schema, *schema));
+    if (!needs_update) {
+        ObjectStore::verify_schema(*m_config.schema, *schema, m_config.read_only);
+        m_config.schema = std::move(schema);
+        m_config.schema_version = version;
+        return false;
     }
+
+    // Store the old config/schema for the migration function, and update
+    // our schema to the new one
+    auto old_schema = std::move(m_config.schema);
+    Config old_config(m_config);
+    old_config.read_only = true;
+    old_config.schema = std::move(old_schema);
+
+    m_config.schema = std::move(schema);
     m_config.schema_version = version;
 
-    try {
-        if (!m_config.read_only && ObjectStore::realm_requires_update(read_group(), version, schema)) {
-            // keep old copy to pass to migration function
-            old_config.read_only = true;
-            old_config.schema_version = ObjectStore::get_schema_version(read_group());
-            old_config.schema = std::make_unique<Schema>(ObjectStore::schema_from_group(read_group()));
-            SharedRealm old_realm(new Realm(old_config));
-            auto updated_realm = shared_from_this();
+    auto migration_function = [&](Group*,  Schema&) {
+        SharedRealm old_realm(new Realm(old_config));
+        auto updated_realm = shared_from_this();
+        m_config.migration_function(old_realm, updated_realm);
+    };
 
-            // update and migrate
-            begin_transaction();
-            changed = ObjectStore::update_realm_with_schema(read_group(), version, *m_config.schema,
-                                                            [=](__unused Group *group, __unused Schema &target_schema) {
-                                                                m_config.migration_function(old_realm, updated_realm);
-                                                            });
-            commit_transaction();
-        }
-        else {
-            ObjectStore::verify_schema(read_group(), *m_config.schema, m_config.read_only);
-        }
+    try {
+        // update and migrate
+        begin_transaction();
+        bool changed = ObjectStore::update_realm_with_schema(read_group(), *old_config.schema,
+                                                             version, *m_config.schema,
+                                                             migration_function);
+        commit_transaction();
+        return changed;
     }
     catch (...) {
         if (is_in_transaction()) {
             cancel_transaction();
         }
         m_config.schema_version = old_config.schema_version;
-        m_config.schema = std::move(old_config.schema);
+        m_config.schema = std::move(m_config.schema);
         throw;
     }
-    return changed;
 }
 
 static void check_read_write(Realm *realm)
