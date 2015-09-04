@@ -295,7 +295,7 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
         for (auto& target_prop : target_props) {
             auto current_prop = current_schema.property_for_name(target_prop.name);
 
-            // add any new properties (new name or different type)
+            // add any new properties (no old column or old column was removed due to not matching)
             if (!current_prop || current_prop->table_column == npos) {
                 switch (target_prop.type) {
                         // for objects and arrays, we have to specify target table
