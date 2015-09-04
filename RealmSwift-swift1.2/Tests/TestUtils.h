@@ -29,3 +29,4 @@ FOUNDATION_EXTERN void RLMAssertThrows(XCTestCase *self,
 FOUNDATION_EXTERN void RLMDeallocateRealm(NSString *path);
 
 FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
+
