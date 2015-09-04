@@ -215,7 +215,7 @@ bool Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
             cancel_transaction();
         }
         m_config.schema_version = old_config.schema_version;
-        m_config.schema = std::move(m_config.schema);
+        m_config.schema = std::move(old_config.schema);
         throw;
     }
 }
