@@ -291,20 +291,21 @@ bool Realm::compact()
 {
     verify_thread();
 
-    bool success = false;
+    if (m_config.read_only) {
+        throw InvalidTransactionException("Can't compact a read-only Realm");
+    }
     if (m_in_transaction) {
         throw InvalidTransactionException("Can't compact a Realm within a write transaction");
     }
 
+    Group* group = read_group();
     for (auto &object_schema : *m_config.schema) {
-        ObjectStore::table_for_object_type(read_group(), object_schema.name)->optimize();
+        ObjectStore::table_for_object_type(group, object_schema.name)->optimize();
     }
-
     m_shared_group->end_read();
-    success = m_shared_group->compact();
-    m_shared_group->begin_read();
+    m_group = nullptr;
 
-    return success;
+    return m_shared_group->compact();
 }
 
 void Realm::notify()
