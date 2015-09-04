@@ -45,6 +45,10 @@ const size_t c_object_table_prefix_length = c_object_table_prefix.length();
 
 const uint64_t ObjectStore::NotVersioned = std::numeric_limits<uint64_t>::max();
 
+bool ObjectStore::has_metadata_tables(const Group *group) {
+    return group->get_table(c_primaryKeyTableName) && group->get_table(c_metadataTableName);
+}
+
 bool ObjectStore::create_metadata_tables(Group *group) {
     bool changed = false;
     TableRef table = group->get_or_add_table(c_primaryKeyTableName);
@@ -67,8 +71,8 @@ bool ObjectStore::create_metadata_tables(Group *group) {
     return changed;
 }
 
-uint64_t ObjectStore::get_schema_version(Group *group) {
-    TableRef table = group->get_table(c_metadataTableName);
+uint64_t ObjectStore::get_schema_version(const Group *group) {
+    ConstTableRef table = group->get_table(c_metadataTableName);
     if (!table || table->get_column_count() == 0) {
         return ObjectStore::NotVersioned;
     }
@@ -80,8 +84,8 @@ void ObjectStore::set_schema_version(Group *group, uint64_t version) {
     table->set_int(c_versionColumnIndex, c_zeroRowIndex, version);
 }
 
-StringData ObjectStore::get_primary_key_for_object(Group *group, StringData object_type) {
-    TableRef table = group->get_table(c_primaryKeyTableName);
+StringData ObjectStore::get_primary_key_for_object(const Group *group, StringData object_type) {
+    ConstTableRef table = group->get_table(c_primaryKeyTableName);
     if (!table) {
         return "";
     }
@@ -128,6 +132,10 @@ TableRef ObjectStore::table_for_object_type(Group *group, StringData object_type
     return group->get_table(table_name_for_object_type(object_type));
 }
 
+ConstTableRef ObjectStore::table_for_object_type(const Group *group, StringData object_type) {
+    return group->get_table(table_name_for_object_type(object_type));
+}
+
 TableRef ObjectStore::table_for_object_type_create_if_needed(Group *group, const StringData &object_type, bool &created) {
     return group->get_or_add_table(table_name_for_object_type(object_type), &created);
 }
@@ -143,7 +151,7 @@ static bool compare_by_name(ObjectSchema const& lft, ObjectSchema const& rgt) {
     return lft.name < rgt.name;
 }
 
-void ObjectStore::verify_schema(Schema const& actual_schema, Schema &target_schema, bool allow_missing_tables) {
+void ObjectStore::verify_schema(Schema const& actual_schema, Schema& target_schema, bool allow_missing_tables) {
     std::sort(begin(target_schema), end(target_schema), compare_by_name);
 
     std::vector<ObjectSchemaValidationException> errors;
@@ -165,7 +173,9 @@ void ObjectStore::verify_schema(Schema const& actual_schema, Schema &target_sche
     }
 }
 
-std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(ObjectSchema const& table_schema, ObjectSchema &target_schema, Schema &schema) {
+std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(ObjectSchema const& table_schema,
+                                                                               ObjectSchema& target_schema,
+                                                                               Schema const& schema) {
     std::vector<ObjectSchemaValidationException> exceptions;
 
     ObjectSchema cmp;
@@ -328,7 +338,7 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
     return changed;
 }
 
-bool ObjectStore::is_schema_at_version(Group *group, uint64_t version) {
+bool ObjectStore::is_schema_at_version(const Group *group, uint64_t version) {
     uint64_t old_version = get_schema_version(group);
     if (old_version > version && old_version != NotVersioned) {
         throw InvalidSchemaVersionException(old_version, version);
@@ -336,7 +346,7 @@ bool ObjectStore::is_schema_at_version(Group *group, uint64_t version) {
     return old_version == version;
 }
 
-bool ObjectStore::needs_update(Schema const& old_schema, Schema& schema) {
+bool ObjectStore::needs_update(Schema const& old_schema, Schema const& schema) {
     for (auto const& target_schema : schema) {
         auto matching_schema = std::lower_bound(begin(old_schema), end(old_schema), target_schema, compare_by_name);
         if (matching_schema == end(old_schema) || matching_schema->name != target_schema.name) {
@@ -395,7 +405,7 @@ bool ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
     return true;
 }
 
-Schema ObjectStore::schema_from_group(Group *group) {
+Schema ObjectStore::schema_from_group(const Group *group) {
     Schema schema;
     for (size_t i = 0; i < group->size(); i++) {
         std::string object_type = object_type_for_table_name(group->get_table_name(i));
@@ -437,14 +447,14 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
     return changed;
 }
 
-void ObjectStore::validate_primary_column_uniqueness(Group *group, Schema &schema) {
+void ObjectStore::validate_primary_column_uniqueness(const Group *group, Schema const& schema) {
     for (auto& object_schema : schema) {
         auto primary_prop = object_schema.primary_key_property();
         if (!primary_prop) {
             continue;
         }
 
-        TableRef table = table_for_object_type(group, object_schema.name);
+        ConstTableRef table = table_for_object_type(group, object_schema.name);
         if (table->get_distinct_view(primary_prop->table_column).size() != table->size()) {
             throw DuplicatePrimaryKeyValueException(object_schema.name, *primary_prop);
         }
@@ -573,4 +583,3 @@ DuplicatePrimaryKeysException::DuplicatePrimaryKeysException(std::string object_
 {
     m_what = "Duplicate primary keys for object '" + object_type + "'.";
 }
-

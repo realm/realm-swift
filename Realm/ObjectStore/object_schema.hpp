@@ -35,7 +35,7 @@ namespace realm {
 
         // create object schema from existing table
         // if no table is provided it is looked up in the group
-        ObjectSchema(Group *group, const std::string &name);
+        ObjectSchema(const Group *group, const std::string &name);
 
         std::string name;
         std::vector<Property> properties;
@@ -44,6 +44,9 @@ namespace realm {
         Property *property_for_name(StringData name);
         const Property *property_for_name(StringData name) const;
         Property *primary_key_property() {
+            return property_for_name(primary_key);
+        }
+        const Property *primary_key_property() const {
             return property_for_name(primary_key);
         }
     };

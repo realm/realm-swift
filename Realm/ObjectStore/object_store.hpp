@@ -37,19 +37,19 @@ namespace realm {
         static const uint64_t NotVersioned;
 
         // get the last set schema version
-        static uint64_t get_schema_version(Group *group);
+        static uint64_t get_schema_version(const Group *group);
 
         // checks if the schema in the group is at the given version
-        static bool is_schema_at_version(realm::Group *group, uint64_t version);
+        static bool is_schema_at_version(const Group *group, uint64_t version);
 
         // verify that schema from a group and a target schema are compatible
         // updates the column mapping on all ObjectSchema properties of the target schema
         // throws if the schema is invalid or does not match
-        static void verify_schema(Schema const& actual_schema, Schema &target_schema, bool allow_missing_tables = false);
+        static void verify_schema(Schema const& actual_schema, Schema& target_schema, bool allow_missing_tables = false);
 
         // determines if a realm with the given old schema needs non-migration
         // changes to make it compatible with the given target schema
-        static bool needs_update(Schema const& old_schema, Schema& schema);
+        static bool needs_update(Schema const& old_schema, Schema const& schema);
         
         // updates a Realm from old_schema to the given target schema, creating and updating tables as needed
         // returns if any changes were made
@@ -62,9 +62,10 @@ namespace realm {
 
         // get a table for an object type
         static realm::TableRef table_for_object_type(Group *group, StringData object_type);
+        static realm::ConstTableRef table_for_object_type(const Group *group, StringData object_type);
 
         // get existing Schema from a group
-        static Schema schema_from_group(Group *group);
+        static Schema schema_from_group(const Group *group);
 
         // deletes the table for the given type
         static void delete_data_for_object(Group *group, const StringData &object_type);
@@ -75,6 +76,9 @@ namespace realm {
     private:
         // set a new schema version
         static void set_schema_version(Group *group, uint64_t version);
+
+        // check if the realm already has all metadata tables
+        static bool has_metadata_tables(const Group *group);
 
         // create any metadata tables that don't already exist
         // must be in write transaction to set
@@ -88,10 +92,12 @@ namespace realm {
         // verify a target schema against an expected schema, setting the table_column property on each schema object
         // updates the column mapping on the target_schema
         // returns array of validation errors
-        static std::vector<ObjectSchemaValidationException> verify_object_schema(ObjectSchema const& expected, ObjectSchema &target_schema, Schema &schema);
+        static std::vector<ObjectSchemaValidationException> verify_object_schema(ObjectSchema const& expected,
+                                                                                 ObjectSchema &target_schema,
+                                                                                 Schema const& schema);
 
         // get primary key property name for object type
-        static StringData get_primary_key_for_object(Group *group, StringData object_type);
+        static StringData get_primary_key_for_object(const Group *group, StringData object_type);
 
         // sets primary key property for object type
         // must be in write transaction to set
@@ -105,7 +111,7 @@ namespace realm {
         static bool update_indexes(Group *group, Schema &schema);
 
         // validates that all primary key properties have unique values
-        static void validate_primary_column_uniqueness(Group *group, Schema &schema);
+        static void validate_primary_column_uniqueness(const Group *group, Schema const& schema);
 
         friend ObjectSchema;
     };
@@ -126,8 +132,8 @@ namespace realm {
     class InvalidSchemaVersionException : public MigrationException {
       public:
         InvalidSchemaVersionException(uint64_t old_version, uint64_t new_version);
-        uint64_t old_version() { return m_old_version; }
-        uint64_t new_version() { return m_new_version; }
+        uint64_t old_version() const { return m_old_version; }
+        uint64_t new_version() const { return m_new_version; }
       private:
         uint64_t m_old_version, m_new_version;
     };
@@ -135,8 +141,8 @@ namespace realm {
     class DuplicatePrimaryKeyValueException : public MigrationException {
       public:
         DuplicatePrimaryKeyValueException(std::string object_type, Property const& property);
-        std::string object_type() { return m_object_type; }
-        Property const& property() { return m_property; }
+        std::string object_type() const { return m_object_type; }
+        Property const& property() const { return m_property; }
       private:
         std::string m_object_type;
         Property m_property;
@@ -156,7 +162,7 @@ namespace realm {
         ObjectSchemaValidationException(std::string object_type) : m_object_type(object_type) {}
         ObjectSchemaValidationException(std::string object_type, std::string message) :
             m_object_type(object_type) { m_what = message; }
-        std::string object_type() { return m_object_type; }
+        std::string object_type() const { return m_object_type; }
       protected:
         std::string m_object_type;
     };
@@ -165,7 +171,7 @@ namespace realm {
       public:
         ObjectSchemaPropertyException(std::string object_type, Property const& property) :
             ObjectSchemaValidationException(object_type), m_property(property) {}
-        Property const& property() { return m_property; }
+        Property const& property() const { return m_property; }
       private:
         Property m_property;
     };
@@ -203,8 +209,8 @@ namespace realm {
     class MismatchedPropertiesException : public ObjectSchemaValidationException {
       public:
         MismatchedPropertiesException(std::string object_type, Property const& old_property, Property const& new_property);
-        Property const& old_property() { return m_old_property; }
-        Property const& new_property() { return m_new_property; }
+        Property const& old_property() const { return m_old_property; }
+        Property const& new_property() const { return m_new_property; }
       private:
         Property m_old_property, m_new_property;
     };
@@ -212,8 +218,8 @@ namespace realm {
     class ChangedPrimaryKeyException : public ObjectSchemaValidationException {
       public:
         ChangedPrimaryKeyException(std::string object_type, std::string old_primary, std::string new_primary);
-        std::string old_primary() { return m_old_primary; }
-        std::string new_primary() { return m_new_primary; }
+        std::string old_primary() const { return m_old_primary; }
+        std::string new_primary() const { return m_new_primary; }
       private:
         std::string m_old_primary, m_new_primary;
     };
@@ -221,11 +227,10 @@ namespace realm {
     class InvalidPrimaryKeyException : public ObjectSchemaValidationException {
       public:
         InvalidPrimaryKeyException(std::string object_type, std::string primary_key);
-        std::string primary_key() { return m_primary_key; }
+        std::string primary_key() const { return m_primary_key; }
       private:
         std::string m_primary_key;
     };
 }
 
 #endif /* defined(REALM_OBJECT_STORE_HPP) */
-

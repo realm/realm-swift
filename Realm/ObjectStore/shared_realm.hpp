@@ -84,18 +84,18 @@ namespace realm {
         void begin_transaction();
         void commit_transaction();
         void cancel_transaction();
-        bool is_in_transaction() { return m_in_transaction; }
+        bool is_in_transaction() const { return m_in_transaction; }
 
         bool refresh();
         void set_auto_refresh(bool auto_refresh) { m_auto_refresh = auto_refresh; }
-        bool auto_refresh() { return m_auto_refresh; }
+        bool auto_refresh() const { return m_auto_refresh; }
         void notify();
 
         void invalidate();
         bool compact();
 
         std::thread::id thread_id() const { return m_thread_id; }
-        void verify_thread();
+        void verify_thread() const;
 
         ~Realm();
 
