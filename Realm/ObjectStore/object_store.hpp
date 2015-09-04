@@ -19,13 +19,13 @@
 #ifndef REALM_OBJECT_STORE_HPP
 #define REALM_OBJECT_STORE_HPP
 
-#include <vector>
-#include <functional>
-#include <realm/link_view.hpp>
-#include <realm/group.hpp>
-
 #include "object_schema.hpp"
 #include "property.hpp"
+
+#include <functional>
+
+#include <realm/group.hpp>
+#include <realm/link_view.hpp>
 
 namespace realm {
     class ObjectSchemaValidationException;
@@ -140,7 +140,7 @@ namespace realm {
 
     class DuplicatePrimaryKeyValueException : public MigrationException {
       public:
-        DuplicatePrimaryKeyValueException(std::string object_type, Property const& property);
+        DuplicatePrimaryKeyValueException(std::string const& object_type, Property const& property);
         std::string object_type() const { return m_object_type; }
         Property const& property() const { return m_property; }
       private:
@@ -151,16 +151,16 @@ namespace realm {
     // Schema validation exceptions
     class SchemaValidationException : public ObjectStoreException {
       public:
-        SchemaValidationException(std::vector<ObjectSchemaValidationException> errors);
-        std::vector<ObjectSchemaValidationException> &validation_errors() { return m_validation_errors; }
+        SchemaValidationException(std::vector<ObjectSchemaValidationException> const& errors);
+        std::vector<ObjectSchemaValidationException> const& validation_errors() const { return m_validation_errors; }
       private:
         std::vector<ObjectSchemaValidationException> m_validation_errors;
     };
 
     class ObjectSchemaValidationException : public ObjectStoreException {
       public:
-        ObjectSchemaValidationException(std::string object_type) : m_object_type(object_type) {}
-        ObjectSchemaValidationException(std::string object_type, std::string message) :
+        ObjectSchemaValidationException(std::string const& object_type) : m_object_type(object_type) {}
+        ObjectSchemaValidationException(std::string const& object_type, std::string const& message) :
             m_object_type(object_type) { m_what = message; }
         std::string object_type() const { return m_object_type; }
       protected:
@@ -169,7 +169,7 @@ namespace realm {
 
     class ObjectSchemaPropertyException : public ObjectSchemaValidationException {
       public:
-        ObjectSchemaPropertyException(std::string object_type, Property const& property) :
+        ObjectSchemaPropertyException(std::string const& object_type, Property const& property) :
             ObjectSchemaValidationException(object_type), m_property(property) {}
         Property const& property() const { return m_property; }
       private:
@@ -178,37 +178,37 @@ namespace realm {
 
     class PropertyTypeNotIndexableException : public ObjectSchemaPropertyException {
       public:
-        PropertyTypeNotIndexableException(std::string object_type, Property const& property);
+        PropertyTypeNotIndexableException(std::string const& object_type, Property const& property);
     };
 
     class ExtraPropertyException : public ObjectSchemaPropertyException {
       public:
-        ExtraPropertyException(std::string object_type, Property const& property);
+        ExtraPropertyException(std::string const& object_type, Property const& property);
     };
 
     class MissingPropertyException : public ObjectSchemaPropertyException {
       public:
-        MissingPropertyException(std::string object_type, Property const& property);
+        MissingPropertyException(std::string const& object_type, Property const& property);
     };
 
     class InvalidNullabilityException : public ObjectSchemaPropertyException {
       public:
-        InvalidNullabilityException(std::string object_type, Property const& property);
+        InvalidNullabilityException(std::string const& object_type, Property const& property);
     };
 
     class MissingObjectTypeException : public ObjectSchemaPropertyException {
     public:
-        MissingObjectTypeException(std::string object_type, Property const& property);
+        MissingObjectTypeException(std::string const& object_type, Property const& property);
     };
 
     class DuplicatePrimaryKeysException : public ObjectSchemaValidationException {
     public:
-        DuplicatePrimaryKeysException(std::string object_type);
+        DuplicatePrimaryKeysException(std::string const& object_type);
     };
 
     class MismatchedPropertiesException : public ObjectSchemaValidationException {
       public:
-        MismatchedPropertiesException(std::string object_type, Property const& old_property, Property const& new_property);
+        MismatchedPropertiesException(std::string const& object_type, Property const& old_property, Property const& new_property);
         Property const& old_property() const { return m_old_property; }
         Property const& new_property() const { return m_new_property; }
       private:
@@ -217,7 +217,7 @@ namespace realm {
 
     class ChangedPrimaryKeyException : public ObjectSchemaValidationException {
       public:
-        ChangedPrimaryKeyException(std::string object_type, std::string old_primary, std::string new_primary);
+        ChangedPrimaryKeyException(std::string const& object_type, std::string const& old_primary, std::string const& new_primary);
         std::string old_primary() const { return m_old_primary; }
         std::string new_primary() const { return m_new_primary; }
       private:
@@ -226,7 +226,7 @@ namespace realm {
 
     class InvalidPrimaryKeyException : public ObjectSchemaValidationException {
       public:
-        InvalidPrimaryKeyException(std::string object_type, std::string primary_key);
+        InvalidPrimaryKeyException(std::string const& object_type, std::string const& primary_key);
         std::string primary_key() const { return m_primary_key; }
       private:
         std::string m_primary_key;

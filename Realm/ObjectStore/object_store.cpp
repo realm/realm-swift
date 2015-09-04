@@ -19,8 +19,8 @@
 #include "object_store.hpp"
 
 #include <realm/group.hpp>
-#include <realm/table.hpp>
 #include <realm/link_view.hpp>
+#include <realm/table.hpp>
 #include <realm/table_view.hpp>
 #include <realm/util/assert.hpp>
 
@@ -489,41 +489,41 @@ InvalidSchemaVersionException::InvalidSchemaVersionException(uint64_t old_versio
     m_what = "Provided schema version " + std::to_string(old_version) + " is less than last set version " + std::to_string(new_version) + ".";
 }
 
-DuplicatePrimaryKeyValueException::DuplicatePrimaryKeyValueException(std::string object_type, Property const& property) :
+DuplicatePrimaryKeyValueException::DuplicatePrimaryKeyValueException(std::string const& object_type, Property const& property) :
     m_object_type(object_type), m_property(property)
 {
     m_what = "Primary key property '" + property.name + "' has duplicate values after migration.";
 };
 
 
-SchemaValidationException::SchemaValidationException(std::vector<ObjectSchemaValidationException> errors) :
+SchemaValidationException::SchemaValidationException(std::vector<ObjectSchemaValidationException> const& errors) :
     m_validation_errors(errors)
 {
     m_what ="Migration is required due to the following errors: ";
-    for (auto error : errors) {
+    for (auto const& error : errors) {
         m_what += std::string("\n- ") + error.what();
     }
 }
 
-PropertyTypeNotIndexableException::PropertyTypeNotIndexableException(std::string object_type, Property const& property) :
+PropertyTypeNotIndexableException::PropertyTypeNotIndexableException(std::string const& object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
     m_what = "Can't index property " + object_type + "." + property.name + ": indexing a property of type '" + string_for_property_type(property.type) + "' is currently not supported";
 }
 
-ExtraPropertyException::ExtraPropertyException(std::string object_type, Property const& property) :
+ExtraPropertyException::ExtraPropertyException(std::string const& object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
     m_what = "Property '" + property.name + "' has been added to latest object model.";
 }
 
-MissingPropertyException::MissingPropertyException(std::string object_type, Property const& property) :
+MissingPropertyException::MissingPropertyException(std::string const& object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
     m_what = "Property '" + property.name + "' is missing from latest object model.";
 }
 
-InvalidNullabilityException::InvalidNullabilityException(std::string object_type, Property const& property) :
+InvalidNullabilityException::InvalidNullabilityException(std::string const& object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
 #if REALM_NULL_STRINGS == 1
@@ -542,13 +542,13 @@ InvalidNullabilityException::InvalidNullabilityException(std::string object_type
 #endif
 }
 
-MissingObjectTypeException::MissingObjectTypeException(std::string object_type, Property const& property) :
+MissingObjectTypeException::MissingObjectTypeException(std::string const& object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
     m_what = "Target type '" + property.object_type + "' doesn't exist for property '" + property.name + "'.";
 }
 
-MismatchedPropertiesException::MismatchedPropertiesException(std::string object_type, Property const& old_property, Property const& new_property) :
+MismatchedPropertiesException::MismatchedPropertiesException(std::string const& object_type, Property const& old_property, Property const& new_property) :
     ObjectSchemaValidationException(object_type), m_old_property(old_property), m_new_property(new_property)
 {
     if (new_property.type != old_property.type) {
@@ -563,7 +563,7 @@ MismatchedPropertiesException::MismatchedPropertiesException(std::string object_
     }
 }
 
-ChangedPrimaryKeyException::ChangedPrimaryKeyException(std::string object_type, std::string old_primary, std::string new_primary) : ObjectSchemaValidationException(object_type), m_old_primary(old_primary), m_new_primary(new_primary)
+ChangedPrimaryKeyException::ChangedPrimaryKeyException(std::string const& object_type, std::string const& old_primary, std::string const& new_primary) : ObjectSchemaValidationException(object_type), m_old_primary(old_primary), m_new_primary(new_primary)
 {
     if (old_primary.size()) {
         m_what = "Property '" + old_primary + "' is no longer a primary key.";
@@ -573,13 +573,13 @@ ChangedPrimaryKeyException::ChangedPrimaryKeyException(std::string object_type, 
     }
 }
 
-InvalidPrimaryKeyException::InvalidPrimaryKeyException(std::string object_type, std::string primary) :
+InvalidPrimaryKeyException::InvalidPrimaryKeyException(std::string const& object_type, std::string const& primary) :
     ObjectSchemaValidationException(object_type), m_primary_key(primary)
 {
     m_what = "Specified primary key property '" + primary + "' does not exist.";
 }
 
-DuplicatePrimaryKeysException::DuplicatePrimaryKeysException(std::string object_type) : ObjectSchemaValidationException(object_type)
+DuplicatePrimaryKeysException::DuplicatePrimaryKeysException(std::string const& object_type) : ObjectSchemaValidationException(object_type)
 {
     m_what = "Duplicate primary keys for object '" + object_type + "'.";
 }
