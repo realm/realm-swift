@@ -97,6 +97,8 @@ namespace realm {
         std::thread::id thread_id() const { return m_thread_id; }
         void verify_thread();
 
+        ~Realm();
+
       private:
         Realm(Config config);
 
@@ -111,7 +113,7 @@ namespace realm {
 
         Group *m_group = nullptr;
 
-        std::unique_ptr<ExternalCommitHelper> m_notifier;
+        std::shared_ptr<ExternalCommitHelper> m_notifier;
 
       public:
         std::unique_ptr<RealmDelegate> m_delegate;

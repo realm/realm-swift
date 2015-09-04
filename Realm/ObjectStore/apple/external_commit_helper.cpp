@@ -86,10 +86,8 @@ void ExternalCommitHelper::FdHolder::close()
 // written to the anonymous pipe the background thread removes the runloop
 // source from the runloop and and shuts down.
 ExternalCommitHelper::ExternalCommitHelper(Realm* realm)
-: m_realm(realm)
-, m_run_loop(CFRunLoopGetCurrent())
 {
-    CFRetain(m_run_loop);
+    add_realm(realm);
 
     m_kq = kqueue();
     if (m_kq == -1) {
@@ -160,23 +158,49 @@ ExternalCommitHelper::ExternalCommitHelper(Realm* realm)
 
 ExternalCommitHelper::~ExternalCommitHelper()
 {
+    REALM_ASSERT_DEBUG(m_realms.empty());
     notify_fd(m_shutdown_write_fd);
     pthread_join(m_thread, nullptr); // Wait for the thread to exit
+}
+
+void ExternalCommitHelper::add_realm(realm::Realm* realm)
+{
+    std::lock_guard<std::mutex> lock(m_realms_mutex);
+
+    // Create the runloop source
+    CFRunLoopSourceContext ctx{};
+    ctx.info = realm;
+    ctx.perform = [](void* info) {
+        static_cast<Realm*>(info)->notify();
+    };
+
+    CFRunLoopRef runloop = CFRunLoopGetCurrent();
+    CFRetain(runloop);
+    CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
+    CFRunLoopAddSource(runloop, signal, kCFRunLoopDefaultMode);
+
+    m_realms.push_back({realm, runloop, signal});
+}
+
+void ExternalCommitHelper::remove_realm(realm::Realm* realm)
+{
+    std::lock_guard<std::mutex> lock(m_realms_mutex);
+    for (auto it = m_realms.begin(); it != m_realms.end(); ++it) {
+        if (it->realm == realm) {
+            CFRunLoopSourceInvalidate(it->signal);
+            CFRelease(it->signal);
+            CFRelease(it->runloop);
+            m_realms.erase(it);
+            return;
+        }
+    }
+    REALM_TERMINATE("Realm not registered");
 }
 
 void ExternalCommitHelper::listen()
 {
     pthread_setname_np("RLMRealm notification listener");
 
-    // Create the runloop source
-    CFRunLoopSourceContext ctx{};
-    ctx.info = this;
-    ctx.perform = [](void *info) {
-        static_cast<ExternalCommitHelper *>(info)->m_realm->notify();
-    };
-
-    CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
-    CFRunLoopAddSource(m_run_loop, signal, kCFRunLoopDefaultMode);
 
     // Set up the kqueue
     // EVFILT_READ indicates that we care about data being available to read
@@ -204,18 +228,18 @@ void ExternalCommitHelper::listen()
         // pipe, then someone called -stop; otherwise it's the named pipe
         // and someone committed a write transaction
         if (event.ident == (uint32_t)m_shutdown_read_fd) {
-            CFRunLoopSourceInvalidate(signal);
-            CFRelease(signal);
-            CFRelease(m_run_loop);
             return;
         }
         assert(event.ident == (uint32_t)m_notify_fd);
 
-        CFRunLoopSourceSignal(signal);
-        // Signalling the source makes it run the next time the runloop gets
-        // to it, but doesn't make the runloop start if it's currently idle
-        // waiting for events
-        CFRunLoopWakeUp(m_run_loop);
+        std::lock_guard<std::mutex> lock(m_realms_mutex);
+        for (auto const& realm : m_realms) {
+            CFRunLoopSourceSignal(realm.signal);
+            // Signalling the source makes it run the next time the runloop gets
+            // to it, but doesn't make the runloop start if it's currently idle
+            // waiting for events
+            CFRunLoopWakeUp(realm.runloop);
+        }
     }
 }
 

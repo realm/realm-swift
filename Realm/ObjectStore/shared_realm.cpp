@@ -55,7 +55,6 @@ Realm::Config& Realm::Config::operator=(realm::Realm::Config const& c)
 
 Realm::Realm(Config config)
 : m_config(std::move(config))
-, m_notifier(new ExternalCommitHelper(this))
 {
     try {
         if (m_config.read_only) {
@@ -82,6 +81,12 @@ Realm::Realm(Config config)
     catch (IncompatibleLockFile const&) {
         throw RealmFileException(RealmFileException::Kind::IncompatibleLockFile, "Realm file is currently open in another process "
         "which cannot share access with this process. All processes sharing a single file must be the same architecture.");
+    }
+}
+
+Realm::~Realm() {
+    if (m_notifier) { // might not exist yet if an error occurred during init
+        m_notifier->remove_realm(this);
     }
 }
 
@@ -132,8 +137,13 @@ SharedRealm Realm::get_shared_realm(Config config)
         // if there is an existing realm at the current path steal its schema/column mapping
         // FIXME - need to validate that schemas match
         realm->m_config.schema = std::make_unique<Schema>(*existing->m_config.schema);
+
+        realm->m_notifier = existing->m_notifier;
+        realm->m_notifier->add_realm(realm.get());
     }
     else {
+        realm->m_notifier = std::make_shared<ExternalCommitHelper>(realm.get());
+
         // otherwise get the schema from the group
         realm->m_config.schema = std::make_unique<Schema>(ObjectStore::schema_from_group(realm->read_group()));
 

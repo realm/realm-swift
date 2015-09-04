@@ -20,6 +20,8 @@
 #define REALM_EXTERNAL_COMMIT_HELPER_HPP
 
 #include <CoreFoundation/CFRunLoop.h>
+#include <mutex>
+#include <vector>
 
 namespace realm {
 class Realm;
@@ -30,6 +32,8 @@ public:
     ~ExternalCommitHelper();
 
     void notify_others();
+    void add_realm(Realm* realm);
+    void remove_realm(Realm* realm);
 
 private:
     // A RAII holder for a file descriptor which automatically closes the wrapped
@@ -54,13 +58,20 @@ private:
         FdHolder(FdHolder const&) = delete;
     };
 
+    struct PerRealmInfo {
+        Realm* realm;
+        CFRunLoopRef runloop;
+        CFRunLoopSourceRef signal;
+    };
+
     void listen();
 
-    // This is owned by the realm, so it needs to not retain the realm
-    Realm *const m_realm;
+    // Currently registered realms and the signal for delivering notifications
+    // to them
+    std::vector<PerRealmInfo> m_realms;
 
-    // Runloop which notifications are delivered on
-    CFRunLoopRef m_run_loop;
+    // Mutex which guards m_realms
+    std::mutex m_realms_mutex;
 
     // The listener thread
     pthread_t m_thread;
