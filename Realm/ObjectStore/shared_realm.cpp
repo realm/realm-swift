@@ -355,8 +355,7 @@ bool Realm::refresh()
 
 uint64_t Realm::get_schema_version(const realm::Realm::Config &config)
 {
-    auto existing_realm = s_global_cache.get_any_realm(config.path);
-    if (existing_realm) {
+    if (auto existing_realm = s_global_cache.get_any_realm(config.path)) {
         return existing_realm->config().schema_version;
     }
 
