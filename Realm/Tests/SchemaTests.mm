@@ -336,11 +336,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = objectSchema;
 
-#ifdef REALM_ENABLE_NULL
 #   define OptionalString @"\t\t\toptional = YES;\n"
-#else
-#   define OptionalString @"\t\t\toptional = NO;\n"
-#endif
 
     XCTAssertEqualObjects(schema.description, @"Schema {\n"
                                               @"\tAllTypesObject {\n"

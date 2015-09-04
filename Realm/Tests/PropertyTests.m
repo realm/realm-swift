@@ -43,11 +43,7 @@
 }
 
 - (void)testEqualityFromObjectSchema {
-#ifdef REALM_ENABLE_NULL
     BOOL optionalsEnabled = YES;
-#else
-    BOOL optionalsEnabled = NO;
-#endif
 
     // Test all property types
     {
