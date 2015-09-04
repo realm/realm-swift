@@ -233,13 +233,9 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
     }
     catch (RealmFileException &ex) {
         switch (ex.kind()) {
-            case RealmFileException::Kind::PermissionDenied: {
-                NSString *mode = config.read_only ? @"read" : @"read-write";
-                NSString *additionalMessage = [NSString stringWithFormat:@"Unable to open a realm at path '%@'. Please use a path where your app has %@ permissions.", @(config.path.c_str()), mode];
-                NSString *newMessage = [NSString stringWithFormat:@"%s\n%@", ex.what(), additionalMessage];
-                RLMSetErrorOrThrow(RLMMakeError(RLMErrorFilePermissionDenied, File::PermissionDenied(newMessage.UTF8String, "FIXME: ex.get_path()")), outError);
+            case RealmFileException::Kind::PermissionDenied:
+                RLMSetErrorOrThrow(RLMMakeError(RLMErrorFilePermissionDenied, ex), outError);
                 break;
-            }
             case RealmFileException::Kind::IncompatibleLockFile: {
                 NSString *err = @"Realm file is currently open in another process "
                                  "which cannot share access with this process. All "
