@@ -2457,7 +2457,6 @@
 					REALM_DEBUG,
 					REALM_HAVE_CONFIG,
 					__ASSERTMACROS__,
-					"REALM_ENABLE_NULL=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -2478,7 +2477,6 @@
 					"-isystem",
 					core/include,
 				);
-				OTHER_SWIFT_FLAGS = "-DREALM_ENABLE_NULL";
 				SDKROOT = iphoneos;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_FILE = "$(PRODUCT_NAME)_vers.m";
@@ -2517,7 +2515,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					REALM_HAVE_CONFIG,
 					__ASSERTMACROS__,
-					"REALM_ENABLE_NULL=1",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -2536,7 +2533,6 @@
 					"-isystem",
 					core/include,
 				);
-				OTHER_SWIFT_FLAGS = "-DREALM_ENABLE_NULL";
 				SDKROOT = iphoneos;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_FILE = "$(PRODUCT_NAME)_vers.m";

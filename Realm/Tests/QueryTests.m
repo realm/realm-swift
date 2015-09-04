@@ -1782,7 +1782,6 @@
 
 @end
 
-#if REALM_ENABLE_NULL
 @interface NullQueryTests : QueryTests
 @end
 
@@ -2014,4 +2013,3 @@
 }
 
 @end
-#endif
