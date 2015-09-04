@@ -204,22 +204,18 @@ std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(O
         }
 
         // check nullablity
+        if (current_prop.is_nullable) {
 #if REALM_NULL_STRINGS == 1
-        if (current_prop.type == PropertyTypeArray && current_prop.is_nullable) {
+            if (current_prop.type == PropertyTypeArray || current_prop.type == PropertyTypeAny) {
+#else
+            if (current_prop.type != PropertyTypeObject) {
+#endif
+                exceptions.emplace_back(InvalidNullabilityException(table_schema.name, current_prop));
+            }
+        }
+        else if (current_prop.type == PropertyTypeObject) {
             exceptions.emplace_back(InvalidNullabilityException(table_schema.name, current_prop));
         }
-#else
-        if (current_prop.type == PropertyTypeObject) {
-            if (!current_prop.is_nullable) {
-                exceptions.emplace_back(InvalidNullabilityException(table_schema.name, current_prop));
-            }
-        }
-        else {
-            if (current_prop.is_nullable) {
-                exceptions.emplace_back(InvalidNullabilityException(table_schema.name, current_prop));
-            }
-        }
-#endif
 
         // check primary keys
         if (current_prop.is_primary) {
@@ -526,20 +522,16 @@ MissingPropertyException::MissingPropertyException(std::string const& object_typ
 InvalidNullabilityException::InvalidNullabilityException(std::string const& object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
-#if REALM_NULL_STRINGS == 1
-    m_what = "'Array' property '" + property.name + "' cannot be nullable";
-#else
     if (property.type == PropertyTypeObject) {
-        if (!property.is_nullable) {
-            m_what = "'Object' property '" + property.name + "' must be nullable.";
-        }
+        m_what = "'Object' property '" + property.name + "' must be nullable.";
     }
     else {
-        if (property.is_nullable) {
-            m_what = "Only 'Object' property types are nullable";
-        }
-    }
+#if REALM_NULL_STRINGS == 1
+        m_what = "Array or Mixed property '" + property.name + "' cannot be nullable";
+#else
+        m_what = "Only 'Object' property types are nullable";
 #endif
+    }
 }
 
 MissingObjectTypeException::MissingObjectTypeException(std::string const& object_type, Property const& property) :
