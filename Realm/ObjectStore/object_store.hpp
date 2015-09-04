@@ -47,9 +47,6 @@ namespace realm {
         // throws if the schema is invalid or does not match
         static void verify_schema(Schema const& actual_schema, Schema &target_schema, bool allow_missing_tables = false);
 
-        // updates the target_column member for all properties based on the column indexes in the passed in group
-        static void update_column_mapping(Group *group, ObjectSchema &target_schema);
-
         // determines if a realm with the given old schema needs non-migration
         // changes to make it compatible with the given target schema
         static bool needs_update(Schema const& old_schema, Schema& schema);

@@ -245,17 +245,6 @@ std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(O
     return exceptions;
 }
 
-void ObjectStore::update_column_mapping(Group *group, ObjectSchema &target_schema) {
-    ObjectSchema table_schema(group, target_schema.name);
-    for (auto& target_prop : target_schema.properties) {
-        auto table_prop = table_schema.property_for_name(target_prop.name);
-        if (table_prop) {
-            // Update target property column to match what's in the realm if it exists
-            target_prop.table_column = table_prop->table_column;
-        }
-    }
-}
-
 // set references to tables on targetSchema and create/update any missing or out-of-date tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
