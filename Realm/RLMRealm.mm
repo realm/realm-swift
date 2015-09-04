@@ -306,7 +306,7 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
 
             // The destination RLMRealm can't just use the schema from the
             // SharedRealm because it doesn't have information about whether or
-            // not a calss was defined in Swift, which effects how new objects
+            // not a class was defined in Swift, which effects how new objects
             // are created
             RLMSchema *newSchema = [customSchema ?: RLMSchema.sharedSchema copy];
             RLMRealm *newRealm = [RLMRealm realmWithSharedRealm:realm schema:newSchema];
