@@ -297,8 +297,10 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
     RLMRealm *realm = [RLMRealm new];
     realm->_dynamic = dynamic;
 
-    config.migration_function = [=](SharedRealm old_realm, SharedRealm realm) {
-        if (RLMMigrationBlock userBlock = configuration.migrationBlock) {
+    auto migrationBlock = configuration.migrationBlock;
+    if (migrationBlock && config.schema_version > 0) {
+        auto customSchema = configuration.customSchema;
+        config.migration_function = [=](SharedRealm old_realm, SharedRealm realm) {
             RLMSchema *oldSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:*old_realm->config().schema];
             RLMRealm *oldRealm = [RLMRealm realmWithSharedRealm:old_realm schema:oldSchema];
 
@@ -306,15 +308,18 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
             // SharedRealm because it doesn't have information about whether or
             // not a calss was defined in Swift, which effects how new objects
             // are created
-            RLMSchema *newSchema = configuration.customSchema ?: [RLMSchema.sharedSchema copy];
+            RLMSchema *newSchema = [customSchema ?: RLMSchema.sharedSchema copy];
             RLMRealm *newRealm = [RLMRealm realmWithSharedRealm:realm schema:newSchema];
 
-            [[[RLMMigration alloc] initWithRealm:newRealm oldRealm:oldRealm] execute:userBlock];
+            [[[RLMMigration alloc] initWithRealm:newRealm oldRealm:oldRealm] execute:migrationBlock];
 
             oldRealm->_realm = nullptr;
             newRealm->_realm = nullptr;
-        }
-    };
+        };
+    }
+    else {
+        config.migration_function = [](SharedRealm, SharedRealm) { };
+    }
 
     // protects the realm cache and accessors cache
     static id initLock = [NSObject new];
