@@ -22,8 +22,8 @@
 #import <vector>
 
 namespace realm {
+    class Schema;
     class ObjectSchema;
-    using Schema = std::vector<ObjectSchema>;
 }
 
 @interface RLMSchema ()

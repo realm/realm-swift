@@ -36,6 +36,7 @@
 #import "RLMUtil.hpp"
 
 #include "object_store.hpp"
+#include "schema.hpp"
 #include "shared_realm.hpp"
 
 #include <realm/commit_log.hpp>

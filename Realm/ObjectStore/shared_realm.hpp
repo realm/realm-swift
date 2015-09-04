@@ -56,6 +56,7 @@ namespace realm {
             Config() = default;
             Config(Config&&) = default;
             Config(const Config& c);
+            ~Config();
 
             Config& operator=(Config const&);
             Config& operator=(Config&&) = default;

@@ -236,7 +236,6 @@
 		3F1F47831B9656B900CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F1F47841B9656BA00CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F1F47851B9656BB00CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
-		3F1F47871B97599300CD99A3 /* PerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */; };
 		3F1F478A1B97ABA300CD99A3 /* transact_log_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F1F47891B97ABA300CD99A3 /* transact_log_handler.cpp */; };
 		3F1F478B1B97ABA300CD99A3 /* transact_log_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F1F47891B97ABA300CD99A3 /* transact_log_handler.cpp */; };
 		3F1F478C1B97ABA300CD99A3 /* transact_log_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F1F47891B97ABA300CD99A3 /* transact_log_handler.cpp */; };
@@ -339,6 +338,14 @@
 		3FDCFEB619F6A8D3005E414A /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FDE338C19C37E4C003B7DBA /* RLMSwiftSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */; };
 		3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
+		3FE556441B9A43E5002A1129 /* schema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FE556421B9A43E5002A1129 /* schema.cpp */; };
+		3FE556451B9A43E5002A1129 /* schema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FE556421B9A43E5002A1129 /* schema.cpp */; };
+		3FE556461B9A43E5002A1129 /* schema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FE556421B9A43E5002A1129 /* schema.cpp */; };
+		3FE556471B9A43E5002A1129 /* schema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FE556421B9A43E5002A1129 /* schema.cpp */; };
+		3FE556481B9A43E5002A1129 /* schema.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FE556431B9A43E5002A1129 /* schema.hpp */; };
+		3FE556491B9A43E5002A1129 /* schema.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FE556431B9A43E5002A1129 /* schema.hpp */; };
+		3FE5564A1B9A43E5002A1129 /* schema.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FE556431B9A43E5002A1129 /* schema.hpp */; };
+		3FE5564B1B9A43E5002A1129 /* schema.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FE556431B9A43E5002A1129 /* schema.hpp */; };
 		3FE79FF819BA6A5900780C9A /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
 		3FE79FF919BA6A5900780C9A /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
 		3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */; settings = {ASSET_TAGS = (); }; };
@@ -680,6 +687,8 @@
 		3FAE25581B8CEBBE00D01405 /* object_schema.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = object_schema.hpp; path = ObjectStore/object_schema.hpp; sourceTree = "<group>"; };
 		3FBD05FA1B94E1C3004559CF /* index_set.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = index_set.cpp; path = ObjectStore/index_set.cpp; sourceTree = "<group>"; };
 		3FBD05FB1B94E1C3004559CF /* index_set.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = index_set.hpp; path = ObjectStore/index_set.hpp; sourceTree = "<group>"; };
+		3FE556421B9A43E5002A1129 /* schema.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = schema.cpp; path = ObjectStore/schema.cpp; sourceTree = "<group>"; };
+		3FE556431B9A43E5002A1129 /* schema.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = schema.hpp; path = ObjectStore/schema.hpp; sourceTree = "<group>"; };
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftSchemaTests.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
 		5D30B74A1B42039F00D90C5A /* RLMDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMDefines.h; sourceTree = "<group>"; };
@@ -835,6 +844,8 @@
 				3FAE25521B8CEBBE00D01405 /* object_store.hpp */,
 				3FAE25571B8CEBBE00D01405 /* property.hpp */,
 				3F62BA9E1BA0AB9000A4CEB2 /* realm_delegate.hpp */,
+				3FE556421B9A43E5002A1129 /* schema.cpp */,
+				3FE556431B9A43E5002A1129 /* schema.hpp */,
 				3FAE25531B8CEBBE00D01405 /* shared_realm.cpp */,
 				3FAE25541B8CEBBE00D01405 /* shared_realm.hpp */,
 				3F1F47891B97ABA300CD99A3 /* transact_log_handler.cpp */,
@@ -1115,6 +1126,7 @@
 				144C2F761B3D3539005C8F81 /* RLMSwiftSupport.h in Headers */,
 				144C2F771B3D3539005C8F81 /* RLMUpdateChecker.hpp in Headers */,
 				144C2F781B3D3539005C8F81 /* RLMUtil.hpp in Headers */,
+				3FE5564B1B9A43E5002A1129 /* schema.hpp in Headers */,
 				3FAE256C1B8CEBBE00D01405 /* shared_realm.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1167,6 +1179,7 @@
 				29E3C7341A71C1C700B62C1D /* RLMSwiftSupport.h in Headers */,
 				29E3C7351A71C1C700B62C1D /* RLMUpdateChecker.hpp in Headers */,
 				29E3C7361A71C1C700B62C1D /* RLMUtil.hpp in Headers */,
+				3FE5564A1B9A43E5002A1129 /* schema.hpp in Headers */,
 				3FAE256B1B8CEBBE00D01405 /* shared_realm.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1219,6 +1232,7 @@
 				3FE79FF919BA6A5900780C9A /* RLMSwiftSupport.h in Headers */,
 				3F20DA2319BE1EA6007DE308 /* RLMUpdateChecker.hpp in Headers */,
 				E856D2111956154C00FB2FCF /* RLMUtil.hpp in Headers */,
+				3FE556491B9A43E5002A1129 /* schema.hpp in Headers */,
 				3FAE256A1B8CEBBE00D01405 /* shared_realm.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1271,6 +1285,7 @@
 				3FE79FF819BA6A5900780C9A /* RLMSwiftSupport.h in Headers */,
 				3F20DA2219BE1EA6007DE308 /* RLMUpdateChecker.hpp in Headers */,
 				E81A1FB01955FC9300FDED82 /* RLMUtil.hpp in Headers */,
+				3FE556481B9A43E5002A1129 /* schema.hpp in Headers */,
 				3FAE25691B8CEBBE00D01405 /* shared_realm.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1744,6 +1759,7 @@
 				144C2F561B3D34A2005C8F81 /* RLMSwiftSupport.m in Sources */,
 				144C2F571B3D34A2005C8F81 /* RLMUpdateChecker.mm in Sources */,
 				144C2F581B3D34A2005C8F81 /* RLMUtil.mm in Sources */,
+				3FE556471B9A43E5002A1129 /* schema.cpp in Sources */,
 				3FAE25681B8CEBBE00D01405 /* shared_realm.cpp in Sources */,
 				3F1F478D1B97ABA300CD99A3 /* transact_log_handler.cpp in Sources */,
 			);
@@ -1781,6 +1797,7 @@
 				29E3C7161A71C1C700B62C1D /* RLMSwiftSupport.m in Sources */,
 				29E3C7171A71C1C700B62C1D /* RLMUpdateChecker.mm in Sources */,
 				29E3C7181A71C1C700B62C1D /* RLMUtil.mm in Sources */,
+				3FE556461B9A43E5002A1129 /* schema.cpp in Sources */,
 				3FAE25671B8CEBBE00D01405 /* shared_realm.cpp in Sources */,
 				3F1F478C1B97ABA300CD99A3 /* transact_log_handler.cpp in Sources */,
 			);
@@ -1858,6 +1875,7 @@
 				3FDE338C19C37E4C003B7DBA /* RLMSwiftSupport.m in Sources */,
 				3F20DA2519BE1EA6007DE308 /* RLMUpdateChecker.mm in Sources */,
 				E856D2121956154C00FB2FCF /* RLMUtil.mm in Sources */,
+				3FE556451B9A43E5002A1129 /* schema.cpp in Sources */,
 				3FAE25661B8CEBBE00D01405 /* shared_realm.cpp in Sources */,
 				3F1F478B1B97ABA300CD99A3 /* transact_log_handler.cpp in Sources */,
 			);
@@ -1937,6 +1955,7 @@
 				3F452EC619C2279800AFC154 /* RLMSwiftSupport.m in Sources */,
 				3F20DA2419BE1EA6007DE308 /* RLMUpdateChecker.mm in Sources */,
 				E81A1FB11955FC9300FDED82 /* RLMUtil.mm in Sources */,
+				3FE556441B9A43E5002A1129 /* schema.cpp in Sources */,
 				3FAE25651B8CEBBE00D01405 /* shared_realm.cpp in Sources */,
 				3F1F478A1B97ABA300CD99A3 /* transact_log_handler.cpp in Sources */,
 			);

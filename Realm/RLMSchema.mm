@@ -27,6 +27,7 @@
 #import "RLMUtil.hpp"
 
 #import "object_store.hpp"
+#import "schema.hpp"
 
 #import <realm/group.hpp>
 

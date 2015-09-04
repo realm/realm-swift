@@ -29,7 +29,7 @@
 
 namespace realm {
     class ObjectSchemaValidationException;
-    using Schema = std::vector<ObjectSchema>;
+    class Schema;
 
     class ObjectStore {
       public:
@@ -93,8 +93,7 @@ namespace realm {
         // updates the column mapping on the target_schema
         // returns array of validation errors
         static std::vector<ObjectSchemaValidationException> verify_object_schema(ObjectSchema const& expected,
-                                                                                 ObjectSchema &target_schema,
-                                                                                 Schema const& schema);
+                                                                                 ObjectSchema &target_schema);
 
         // get primary key property name for object type
         static StringData get_primary_key_for_object(const Group *group, StringData object_type);

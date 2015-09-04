@@ -20,6 +20,7 @@
 
 #include "external_commit_helper.hpp"
 #include "realm_delegate.hpp"
+#include "schema.hpp"
 #include "transact_log_handler.hpp"
 
 #include <realm/commit_log.hpp>
@@ -44,6 +45,8 @@ Realm::Config::Config(const Config& c)
         schema = std::make_unique<Schema>(*c.schema);
     }
 }
+
+Realm::Config::~Config() = default;
 
 Realm::Config& Realm::Config::operator=(realm::Realm::Config const& c)
 {
@@ -154,6 +157,7 @@ SharedRealm Realm::get_shared_realm(Config config)
                 if (realm->m_config.schema_version == ObjectStore::NotVersioned) {
                     throw UnitializedRealmException("Can't open an un-initialized Realm without a Schema");
                 }
+                target_schema->validate();
                 ObjectStore::verify_schema(*realm->m_config.schema, *target_schema, true);
                 realm->m_config.schema = std::move(target_schema);
             }
@@ -171,6 +175,8 @@ SharedRealm Realm::get_shared_realm(Config config)
 
 bool Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
 {
+    schema->validate();
+
     bool needs_update = !m_config.read_only && (m_config.schema_version != version || ObjectStore::needs_update(*m_config.schema, *schema));
     if (!needs_update) {
         ObjectStore::verify_schema(*m_config.schema, *schema, m_config.read_only);

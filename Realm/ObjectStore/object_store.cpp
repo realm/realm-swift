@@ -18,6 +18,8 @@
 
 #include "object_store.hpp"
 
+#include "schema.hpp"
+
 #include <realm/group.hpp>
 #include <realm/link_view.hpp>
 #include <realm/table.hpp>
@@ -147,17 +149,11 @@ static inline bool property_has_changed(Property const& p1, Property const& p2) 
         || p1.is_nullable != p2.is_nullable;
 }
 
-static bool compare_by_name(ObjectSchema const& lft, ObjectSchema const& rgt) {
-    return lft.name < rgt.name;
-}
-
 void ObjectStore::verify_schema(Schema const& actual_schema, Schema& target_schema, bool allow_missing_tables) {
-    std::sort(begin(target_schema), end(target_schema), compare_by_name);
-
     std::vector<ObjectSchemaValidationException> errors;
     for (auto &object_schema : target_schema) {
-        auto matching_schema = std::lower_bound(begin(actual_schema), end(actual_schema), object_schema, compare_by_name);
-        if (matching_schema == end(actual_schema) || matching_schema->name != object_schema.name) {
+        auto matching_schema = actual_schema.find(object_schema);
+        if (matching_schema == actual_schema.end()) {
             if (!allow_missing_tables) {
                 errors.emplace_back(ObjectSchemaValidationException(object_schema.name,
                                     "Missing table for object type '" + object_schema.name + "'."));
@@ -165,7 +161,7 @@ void ObjectStore::verify_schema(Schema const& actual_schema, Schema& target_sche
             continue;
         }
 
-        auto more_errors = verify_object_schema(*matching_schema, object_schema, target_schema);
+        auto more_errors = verify_object_schema(*matching_schema, object_schema);
         errors.insert(errors.end(), more_errors.begin(), more_errors.end());
     }
     if (errors.size()) {
@@ -174,18 +170,10 @@ void ObjectStore::verify_schema(Schema const& actual_schema, Schema& target_sche
 }
 
 std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(ObjectSchema const& table_schema,
-                                                                               ObjectSchema& target_schema,
-                                                                               Schema const& schema) {
+                                                                               ObjectSchema& target_schema) {
     std::vector<ObjectSchemaValidationException> exceptions;
 
-    ObjectSchema cmp;
-    auto schema_contains_table = [&](std::string const& name) {
-        cmp.name = name;
-        return std::binary_search(begin(schema), end(schema), cmp, compare_by_name);
-    };
-
     // check to see if properties are the same
-    const Property *primary = nullptr;
     for (auto& current_prop : table_schema.properties) {
         auto target_prop = target_schema.property_for_name(current_prop.name);
 
@@ -196,40 +184,6 @@ std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(O
         if (property_has_changed(current_prop, *target_prop)) {
             exceptions.emplace_back(MismatchedPropertiesException(table_schema.name, current_prop, *target_prop));
             continue;
-        }
-
-        // check object_type existence
-        if (current_prop.object_type.length() && !schema_contains_table(current_prop.object_type)) {
-            exceptions.emplace_back(MissingObjectTypeException(table_schema.name, current_prop));
-        }
-
-        // check nullablity
-        if (current_prop.is_nullable) {
-#if REALM_NULL_STRINGS == 1
-            if (current_prop.type == PropertyTypeArray || current_prop.type == PropertyTypeAny) {
-#else
-            if (current_prop.type != PropertyTypeObject) {
-#endif
-                exceptions.emplace_back(InvalidNullabilityException(table_schema.name, current_prop));
-            }
-        }
-        else if (current_prop.type == PropertyTypeObject) {
-            exceptions.emplace_back(InvalidNullabilityException(table_schema.name, current_prop));
-        }
-
-        // check primary keys
-        if (current_prop.is_primary) {
-            if (primary) {
-                exceptions.emplace_back(DuplicatePrimaryKeysException(table_schema.name));
-            }
-            primary = &current_prop;
-        }
-
-        // check indexable
-        if (current_prop.is_indexed) {
-            if (current_prop.type != PropertyTypeString && current_prop.type != PropertyTypeInt) {
-                exceptions.emplace_back(PropertyTypeNotIndexableException(table_schema.name, current_prop));
-            }
         }
 
         // create new property with aligned column
@@ -344,8 +298,8 @@ bool ObjectStore::is_schema_at_version(const Group *group, uint64_t version) {
 
 bool ObjectStore::needs_update(Schema const& old_schema, Schema const& schema) {
     for (auto const& target_schema : schema) {
-        auto matching_schema = std::lower_bound(begin(old_schema), end(old_schema), target_schema, compare_by_name);
-        if (matching_schema == end(old_schema) || matching_schema->name != target_schema.name) {
+        auto matching_schema = old_schema.find(target_schema);
+        if (matching_schema == end(old_schema)) {
             // Table doesn't exist
             return true;
         }
@@ -402,14 +356,13 @@ bool ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
 }
 
 Schema ObjectStore::schema_from_group(const Group *group) {
-    Schema schema;
+    std::vector<ObjectSchema> schema;
     for (size_t i = 0; i < group->size(); i++) {
         std::string object_type = object_type_for_table_name(group->get_table_name(i));
         if (object_type.length()) {
             schema.emplace_back(group, object_type);
         }
     }
-    std::sort(begin(schema), end(schema), compare_by_name);
     return schema;
 }
 

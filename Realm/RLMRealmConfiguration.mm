@@ -23,6 +23,7 @@
 #import "RLMSchema_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import "schema.hpp"
 #import "shared_realm.hpp"
 
 static NSString *const c_RLMRealmConfigurationProperties[] = {
