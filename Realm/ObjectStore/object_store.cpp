@@ -233,15 +233,14 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
         // remove extra columns
         size_t deleted = 0;
         for (auto& current_prop : current_schema.properties) {
+            current_prop.table_column -= deleted;
+
             auto target_prop = target_object_schema->property_for_name(current_prop.name);
             if (!target_prop || property_has_changed(current_prop, *target_prop)) {
-                table->remove_column(current_prop.table_column - deleted);
+                table->remove_column(current_prop.table_column);
                 ++deleted;
                 current_prop.table_column = npos;
                 changed = true;
-            }
-            else {
-                current_prop.table_column -= deleted;
             }
         }
 
