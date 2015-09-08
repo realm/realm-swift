@@ -242,6 +242,14 @@ RLM_ARRAY_TYPE(CircleObject);
 
 @end
 
+#pragma mark StringLinkObject
+
+@interface StringLinkObject : RLMObject
+@property NSString *stringCol;
+@property StringObject *stringObjectCol;
+@property RLM_GENERIC_ARRAY(StringObject) *stringObjectArrayCol;
+@end
+
 #pragma mark DynamicObject
 
 @interface DynamicObject : RLMObject
