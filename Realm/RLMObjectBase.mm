@@ -336,10 +336,7 @@ RLMResults *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *
     }
 
     TableView tableView = object->_row.get_table()->get_backlink_view(object->_row.get_index(), table, prop.column);
-    TableView tv(tableView);
-    const Table& constTable = tv.get_parent();
-    auto query = std::make_unique<realm::Query>(constTable, &tv);
-    return [RLMResults resultsWithObjectClassName:schema.className query:std::move(query) view:std::move(tableView) realm:object->_realm];
+    return [RLMResults resultsWithObjectClassName:schema.className query:nullptr view:std::move(tableView) realm:object->_realm];
 }
 
 id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key) {
