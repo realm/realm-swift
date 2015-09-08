@@ -148,14 +148,14 @@ class SwiftObjectInterfaceTests: RLMTestCase {
     func testOptionalNSNumberProperties() {
         let realm = realmWithTestPath()
         let no = SwiftOptionalNumberObject()
-        XCTAssertEqual([.Int, .Float, .Double, .Bool], map(no.objectSchema.properties) { $0.type })
+        XCTAssertEqual([.Int, .Float, .Double, .Bool], no.objectSchema.properties.map { $0.type })
 
         XCTAssertEqual(1, no.intCol!)
         XCTAssertEqual(2.2 as Float, no.floatCol!)
         XCTAssertEqual(3.3, no.doubleCol!)
         XCTAssertEqual(true, no.boolCol!)
 
-        realm.transactionWithBlock {
+        try! realm.transactionWithBlock {
             realm.addObject(no)
             no.intCol = nil
             no.floatCol = nil
@@ -168,7 +168,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertNil(no.doubleCol)
         XCTAssertNil(no.boolCol)
 
-        realm.transactionWithBlock {
+        try! realm.transactionWithBlock {
             no.intCol = 1.1
             no.floatCol = 2.2 as Float
             no.doubleCol = 3.3
@@ -183,7 +183,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
 
     func testOptionalSwiftProperties() {
         let realm = realmWithTestPath()
-        realm.transactionWithBlock { realm.addObject(SwiftOptionalObject()) }
+        try! realm.transactionWithBlock { realm.addObject(SwiftOptionalObject()) }
 
         let firstObj = SwiftOptionalObject.allObjectsInRealm(realm).firstObject() as! SwiftOptionalObject
         XCTAssertNil(firstObj.optObjectCol)
@@ -191,7 +191,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertNil(firstObj.optBinaryCol)
         XCTAssertNil(firstObj.optDateCol)
 
-        realm.transactionWithBlock {
+        try! realm.transactionWithBlock {
             firstObj.optObjectCol = SwiftBoolObject()
             firstObj.optObjectCol!.boolCol = true
 
@@ -204,7 +204,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.optBinaryCol!, NSData(bytes: "hi", length: 2))
         XCTAssertEqual(firstObj.optDateCol!,  NSDate(timeIntervalSinceReferenceDate: 10))
 
-        realm.transactionWithBlock {
+        try! realm.transactionWithBlock {
             firstObj.optObjectCol = nil
             firstObj.optStringCol = nil
             firstObj.optBinaryCol = nil
