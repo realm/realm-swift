@@ -948,9 +948,11 @@ void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrat
     if (error)
         return error;
 
-    @try {
+    try {
         RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), configuration.customSchema ?: [RLMSchema.sharedSchema copy], [realm migrationBlock:configuration.migrationBlock key:key]);
-    } @catch (NSException *ex) {
+    } catch (std::exception const& ex) {
+        return RLMMakeError(RLMErrorFail, ex);
+    } catch (NSException *ex) {
         return RLMMakeError(ex);
     }
     return nil;
