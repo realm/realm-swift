@@ -38,6 +38,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Add missing KVO handling for moving and exchanging objects in `RLMArray` and
   `List`.
+* Added `-[RLMMigration renameClassFrom:to:]`/`Migration.renameClass(_:to:)`.
 
 ### Bugfixes
 

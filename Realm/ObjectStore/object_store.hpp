@@ -77,6 +77,9 @@ namespace realm {
         // indicates if this group contains any objects
         static bool is_empty(const Group *group);
 
+        // translates class name to table name
+        static std::string table_name_for_object_type(const std::string &class_name);
+
     private:
         // set a new schema version
         static void set_schema_version(Group *group, uint64_t version);
@@ -101,7 +104,6 @@ namespace realm {
         static void set_primary_key_for_object(Group *group, StringData object_type, StringData primary_key);
 
         static TableRef table_for_object_type_create_if_needed(Group *group, const StringData &object_type, bool &created);
-        static std::string table_name_for_object_type(const std::string &class_name);
         static std::string object_type_for_table_name(const std::string &table_name);
 
         // returns if any indexes were changed

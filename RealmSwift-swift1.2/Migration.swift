@@ -229,6 +229,21 @@ public final class Migration {
         return rlmMigration.deleteDataForClassName(objectClassName)
     }
 
+    /**
+    Renames the underlying database table from the original name to the new name. The new class's
+    properties must be identical to the old class.
+
+    :param: originalName The name of the original object class to rename.
+    :param: newName      The new name of the object class after renaming.
+
+    :warning: The rename occurs only in the new realm, which means that enumerating the old class name &
+              accessing the `oldObject` is equivalent to  enumerating the new class name & accessing the
+              `newObject`.
+    */
+    public func renameClass(originalName: String, to newName: String) {
+        rlmMigration.renameClassFrom(originalName, to: newName)
+    }
+
     private init(_ rlmMigration: RLMMigration) {
         self.rlmMigration = rlmMigration
     }

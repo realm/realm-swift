@@ -123,7 +123,7 @@ using namespace realm;
     }
 }
 
--(RLMObject *)createObject:(NSString *)className withValue:(id)value {
+- (RLMObject *)createObject:(NSString *)className withValue:(id)value {
     return [_realm createObject:className withValue:value];
 }
 
@@ -153,6 +153,56 @@ using namespace realm;
     }
 
     return true;
+}
+
+- (void)renameClassFrom:(NSString *)originalName to:(NSString *)newName {
+    // Validate names.
+    if ([originalName isEqualToString:newName]) {
+        NSString *message = [NSString stringWithFormat:@"Cannot rename '%@' class to the same name.", originalName];
+        @throw RLMException(message);
+    }
+
+    // Validate original table.
+    realm::TableRef originalTable = realm::ObjectStore::table_for_object_type(_realm.group, originalName.UTF8String);
+    if (!originalTable) {
+        NSString *message = [NSString stringWithFormat:@"Cannot rename '%@' class because it doesn't exist in the realm.", originalName];
+        @throw RLMException(message);
+    }
+
+    // Validate new table.
+    realm::TableRef newTable = realm::ObjectStore::table_for_object_type(_realm.group, newName.UTF8String);
+    if (!newTable) {
+        NSString *message = [NSString stringWithFormat:@"Cannot rename '%@' class to '%@' because there is no RLMObject subclass with the new name.", originalName, newName];
+        @throw RLMException(message);
+    }
+
+    // Validate that old class was removed.
+    if ([self.newSchema schemaForClassName:originalName] != nil) {
+        NSString *message = [NSString stringWithFormat:@"Cannot rename '%@' class because it is still defined as an RLMObject subclass.", originalName];
+        @throw RLMException(message);
+    }
+
+    // Validate that new class wasn't already there before.
+    if ([self.oldSchema schemaForClassName:newName] != nil) {
+        NSString *message = [NSString stringWithFormat:@"Cannot rename '%@' class to '%@' because the new class was already defined as an RLMObject subclass prior to this migration.", originalName, newName];
+        @throw RLMException(message);
+    }
+
+    // Validate that object schemas match.
+    if (![self.oldSchema[originalName] isEqualToObjectSchema:self.newSchema[newName]]) {
+        NSString *message = [NSString stringWithFormat:@"Cannot rename '%@' class to '%@' because their properties don't match.", originalName, newName];
+        @throw RLMException(message);
+    }
+
+    // Rename table.
+    realm::StringData newTableName = newTable->get_name();
+    realm::ObjectStore::delete_data_for_object(_realm.group, newName.UTF8String);
+    try {
+        _realm.group->rename_table(originalTable->get_name(), newTableName);
+    }
+    catch (std::exception const& e) {
+        @throw RLMException(e);
+    }
 }
 
 @end
