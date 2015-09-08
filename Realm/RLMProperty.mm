@@ -172,30 +172,27 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
             }
             else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
                 // get number type from type string - @"NSNumber<objectClassName>"
-                _type = RLMPropertyTypeArray;
-                _objectClassName = [[NSString alloc] initWithBytes:code + numberPrefixLen
-                                                            length:strlen(code + numberPrefixLen) - 2 // drop trailing >"
-                                                          encoding:NSUTF8StringEncoding];
+                NSString *numberType = [[NSString alloc] initWithBytes:code + numberPrefixLen
+                                                                length:strlen(code + numberPrefixLen) - 2 // drop trailing >"
+                                                              encoding:NSUTF8StringEncoding];
 
-
-                if ([_objectClassName isEqualToString:@"RLMInt"]) {
+                if ([numberType isEqualToString:@"RLMInt"]) {
                     _type = RLMPropertyTypeInt;
                 }
-                else if ([_objectClassName isEqualToString:@"RLMFloat"]) {
+                else if ([numberType isEqualToString:@"RLMFloat"]) {
                     _type = RLMPropertyTypeFloat;
                 }
-                else if ([_objectClassName isEqualToString:@"RLMDouble"]) {
+                else if ([numberType isEqualToString:@"RLMDouble"]) {
                     _type = RLMPropertyTypeDouble;
                 }
-                else if ([_objectClassName isEqualToString:@"RLMBool"]) {
+                else if ([numberType isEqualToString:@"RLMBool"]) {
                     _type = RLMPropertyTypeBool;
                 }
                 else {
                     NSString *message = [NSString stringWithFormat:@"'%@' is not supported as an NSNumber object type. NSNumbers can only be RLMInt, RLMFloat, RLMDouble, and RLMBool at the moment. "
-                                                                   @"See http://realm.io/docs/cocoa/ for more information.", self.objectClassName];
+                                                                   @"See http://realm.io/docs/cocoa/ for more information.", numberType];
                     @throw RLMException(message);
                 }
-                _objectClassName = nil;
             }
             else if (strcmp(code, "@\"NSNumber\"") == 0) {
                 @throw RLMException([NSString stringWithFormat:@"NSNumber properties require a protocol defining the contained type - example: NSNumber<RLMInt>."]);
@@ -297,7 +294,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
                 _objcRawType = @"@\"NSNumber<RLMBool>\"";
                 break;
             default:
-                @throw RLMException([NSString stringWithFormat:@"Can't persist NSNumber of type '%s', only integers, floats, doubles, and bools are currently supported.", numberType]);
+                @throw RLMException([NSString stringWithFormat:@"Can't persist NSNumber of type '%s': only integers, floats, doubles, and bools are currently supported.", numberType]);
         }
     }
 
@@ -388,7 +385,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     _swiftIvar = ivar;
     _optional = true;
 
-    // no obj-c property for generic lists, and thus no getter/setter names
+    // no obj-c property for generic optionals, and thus no getter/setter names
 
     return self;
 }
