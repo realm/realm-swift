@@ -86,8 +86,10 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 + (instancetype)defaultConfiguration {
-    if (!s_defaultConfiguration) {
-        s_defaultConfiguration = [[RLMRealmConfiguration alloc] init];
+    @synchronized(c_defaultRealmFileName) {
+        if (!s_defaultConfiguration) {
+            s_defaultConfiguration = [[RLMRealmConfiguration alloc] init];
+        }
     }
     return [s_defaultConfiguration copy];
 }
@@ -99,17 +101,23 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     if (!configuration) {
         @throw RLMException(@"Cannot set the default configuration to nil.");
     }
-    s_defaultConfiguration = [configuration copy];
+    @synchronized(c_defaultRealmFileName) {
+        s_defaultConfiguration = [configuration copy];
+    }
 }
 
 + (void)setDefaultPath:(NSString *)path {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
     configuration.path = path;
-    s_defaultConfiguration = configuration;
+    @synchronized(c_defaultRealmFileName) {
+        s_defaultConfiguration = configuration;
+    }
 }
 
 + (void)resetRealmConfigurationState {
-    s_defaultConfiguration = nil;
+    @synchronized(c_defaultRealmFileName) {
+        s_defaultConfiguration = nil;
+    }
     s_configurationUsage = RLMRealmConfigurationUsageNone;
 }
 
