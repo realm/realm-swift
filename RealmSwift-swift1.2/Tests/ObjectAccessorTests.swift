@@ -211,6 +211,7 @@ class ObjectAccessorTests: TestCase {
     }
 
     func setAndTestAllOptionalProperties(object: SwiftOptionalObject) {
+#if REALM_ENABLE_NULL
         object.optNSStringCol = ""
         XCTAssertEqual(object.optNSStringCol!, "")
         let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
@@ -271,6 +272,7 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(object.optBoolCol.value!, false)
         object.optBoolCol.value = nil
         XCTAssertNil(object.optBoolCol.value)
+#endif
 
         object.optObjectCol = SwiftBoolObject(value: [true])
         XCTAssertEqual(object.optObjectCol!.boolCol, true)

@@ -613,7 +613,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     size_t row = realm::not_found;
     if (primaryProperty.type == RLMPropertyTypeString) {
         NSString *str = RLMDynamicCast<NSString>(key);
-        if (str || !key) {
+        if (str || (!key && primaryProperty.optional)) {
             row = objectSchema.table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(str));
         }
         else {
@@ -625,7 +625,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
         if (number) {
             row = objectSchema.table->find_first_int(primaryProperty.column, number.longLongValue);
         }
-        else if (!key) {
+        else if (!key && primaryProperty.optional) {
             row = objectSchema.table->find_first_null(primaryProperty.column);
         }
         else {

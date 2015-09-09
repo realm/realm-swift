@@ -29,7 +29,7 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
 #ifdef REALM_ENABLE_NULL
     return propertyType != RLMPropertyTypeAny && propertyType != RLMPropertyTypeArray;
 #else
-    return propertyType == RLMPropertyTypeObject
+    return propertyType == RLMPropertyTypeObject;
 #endif
 }
 
