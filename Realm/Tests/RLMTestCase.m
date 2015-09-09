@@ -209,16 +209,22 @@ static BOOL encryptTests() {
     return nil;
 }
 
-// TODO: add support for:
-//
-// - RLMPropertyTypeObject & RLMPropertyTypeArray
-// - indexedProperties, ignoredProperties, primaryKey
+// TODO: add support for indexedProperties, ignoredProperties, primaryKey
 - (Class)runtimeClassWithName:(NSString *)className properties:(NSArray *)properties {
     Class objectClass = objc_allocateClassPair(RLMObject.class, className.UTF8String, 0);
     for (RLMProperty *property in properties) {
-        const char *type = [NSString stringWithFormat:@"%c", property.objcType].UTF8String;
+        char *type = nil;
+        if (property.type == RLMPropertyTypeObject) {
+            type = (char *)[[NSString stringWithFormat:@"@\"%@\"", property.objectClassName] UTF8String];
+        } else if (property.type == RLMPropertyTypeArray) {
+            type = (char *)[[NSString stringWithFormat:@"@\"RLMArray<%@>\"", property.objectClassName] UTF8String];
+        } else {
+            type = malloc(2*sizeof(char));
+            type[0] = property.objcType;
+            type[1] = '\0';
+        }
         objc_property_attribute_t propertyAttributes[] = {
-            { "T",  type},
+            { "T",  type },
         };
         size_t typeSize = 0;
         uint8_t typeAlignment = 0;
@@ -227,6 +233,8 @@ static BOOL encryptTests() {
             case RLMPropertyTypeData:
             case RLMPropertyTypeAny:
             case RLMPropertyTypeDate:
+            case RLMPropertyTypeObject:
+            case RLMPropertyTypeArray:
                 typeSize = sizeof(id);
                 typeAlignment = alignof(id);
                 break;
@@ -246,8 +254,6 @@ static BOOL encryptTests() {
                 typeSize = sizeof(double);
                 typeAlignment = alignof(double);
                 break;
-            default:
-                @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Cannot create class at runtime with given property type" userInfo:nil];
         }
         class_addIvar(objectClass, property.name.UTF8String, typeSize, typeAlignment, type);
         class_addProperty(objectClass, property.name.UTF8String, propertyAttributes, sizeof(propertyAttributes) / sizeof(objc_property_attribute_t));

@@ -165,7 +165,7 @@ using namespace realm;
     // Validate original table.
     realm::TableRef originalTable = realm::ObjectStore::table_for_object_type(_realm.group, originalName.UTF8String);
     if (!originalTable) {
-        NSString *message = [NSString stringWithFormat:@"Cannot rename '%@' class because it doesn't exist in the realm.", originalName];
+        NSString *message = [NSString stringWithFormat:@"Cannot rename '%@' class because it doesn't exist in the Realm file.", originalName];
         @throw RLMException(message);
     }
 
