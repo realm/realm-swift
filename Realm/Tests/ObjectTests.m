@@ -1646,12 +1646,13 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
     [PrimaryNullableIntObject createInDefaultRealmWithValue:@[@1]];
     PrimaryNullableIntObject *obj3 = [PrimaryNullableIntObject createInDefaultRealmWithValue:(@{@"optIntCol": @2})];
-    XCTAssertThrows([PrimaryNullableIntObject createInDefaultRealmWithValue:(@[@1])], @"Duplicate primary key should throw");
     XCTAssertThrows(obj3.optIntCol = @2, @"Setting primary key should throw");
     XCTAssertThrows(obj3.optIntCol = nil, @"Setting primary key should throw");
     PrimaryNullableIntObject *obj4 = [PrimaryNullableIntObject createInDefaultRealmWithValue:@[NSNull.null]];
     XCTAssertThrows(obj4.optIntCol = @2, @"Setting primary key should throw");
     XCTAssertThrows(obj4.optIntCol = nil, @"Setting primary key should throw");
+    XCTAssertThrows([PrimaryNullableIntObject createInDefaultRealmWithValue:(@[@1])], @"Duplicate primary key should throw");
+    XCTAssertThrows([PrimaryNullableIntObject createInDefaultRealmWithValue:(@[NSNull.null])], @"Duplicate primary key should throw");
 
     [[RLMRealm defaultRealm] commitWriteTransaction];
 }
@@ -1773,7 +1774,8 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 #ifdef REALM_ENABLE_NULL
     PrimaryStringObject *nullStrObj = [PrimaryStringObject createInDefaultRealmWithValue:@[NSNull.null, @0]];
     PrimaryIntObject *intObj = [PrimaryIntObject createInDefaultRealmWithValue:@[@0]];
-    PrimaryNullableIntObject *nullIntObj = [PrimaryNullableIntObject createInDefaultRealmWithValue:@[@0]];
+    PrimaryNullableIntObject *nonNullIntObj = [PrimaryNullableIntObject createInDefaultRealmWithValue:@[@0]];
+    PrimaryNullableIntObject *nullIntObj = [PrimaryNullableIntObject createInDefaultRealmWithValue:@[NSNull.null]];
 #endif
     [RLMRealm.defaultRealm commitWriteTransaction];
 
@@ -1798,6 +1800,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 #ifdef REALM_ENABLE_NULL
     XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectForPrimaryKey:NSNull.null]);
     XCTAssertEqualObjects(intObj, [PrimaryIntObject objectForPrimaryKey:@0]);
+    XCTAssertEqualObjects(nonNullIntObj, [PrimaryNullableIntObject objectForPrimaryKey:@0]);
     XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectForPrimaryKey:NSNull.null]);
 #endif
 }

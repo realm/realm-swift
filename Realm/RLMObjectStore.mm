@@ -623,7 +623,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
         if (number) {
             row = objectSchema.table->find_first_int(primaryProperty.column, number.longLongValue);
         }
-        else if (key) {
+        else if (!key) {
             row = objectSchema.table->find_first_null(primaryProperty.column);
         }
         else {

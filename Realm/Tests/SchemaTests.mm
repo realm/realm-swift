@@ -288,7 +288,6 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         NSUInteger occurrenceCount = 0;
         
         for (RLMObjectSchema *objectSchema in objectSchemas) {
-            NSLog(@"Scheme %@", objectSchema.className);
             if ([objectSchema.className isEqualToString:expectedType]) {
                 occurrenceCount++;
             }
