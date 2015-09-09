@@ -38,3 +38,4 @@ REALM_FRAMEWORK_PATH[sdk=macosx*] = build/osx;
 REALM_OTHER_CFLAGS[sdk=iphone*] = -fembed-bitcode
 REALM_OTHER_CFLAGS[sdk=watch*] = -fembed-bitcode
 OTHER_CFLAGS = $(inherited) $(REALM_OTHER_FLAGS)
+OTHER_SWIFT_FLAGS = $(inherited) -DREALM_ENABLE_NULL
