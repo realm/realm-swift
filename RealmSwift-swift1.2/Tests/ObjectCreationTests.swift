@@ -466,6 +466,7 @@ class ObjectCreationTests: TestCase {
             if let _ = val as? NSNull { return nil }
             return val
         }
+#if REALM_ENABLE_NULL
         XCTAssert(object.optBoolCol.value == (get("optBoolCol") as! Bool?))
         XCTAssert(object.optIntCol.value == (get("optIntCol") as! Int?))
         XCTAssert(object.optFloatCol.value == (get("optFloatCol") as! Float?))
@@ -474,6 +475,7 @@ class ObjectCreationTests: TestCase {
         XCTAssert(object.optNSStringCol == (get("optNSStringCol") as! String?))
         XCTAssert(object.optBinaryCol == (get("optBinaryCol") as! NSData?))
         XCTAssert(object.optDateCol == (get("optDateCol") as! NSDate?))
+#endif
         XCTAssert(object.optObjectCol?.boolCol == boolObjectValue)
     }
 

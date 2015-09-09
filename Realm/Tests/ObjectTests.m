@@ -1644,6 +1644,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertThrows([PrimaryInt64Object createInDefaultRealmWithValue:(@[@(1LL << 40)])], @"Duplicate primary key should throw");
     XCTAssertThrows(obj2.int64Col = 1LL << 41, @"Setting primary key should throw");
 
+#if REALM_ENABLE_NULL
     [PrimaryNullableIntObject createInDefaultRealmWithValue:@[@1]];
     PrimaryNullableIntObject *obj3 = [PrimaryNullableIntObject createInDefaultRealmWithValue:(@{@"optIntCol": @2})];
     XCTAssertThrows(obj3.optIntCol = @2, @"Setting primary key should throw");
@@ -1653,6 +1654,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertThrows(obj4.optIntCol = nil, @"Setting primary key should throw");
     XCTAssertThrows([PrimaryNullableIntObject createInDefaultRealmWithValue:(@[@1])], @"Duplicate primary key should throw");
     XCTAssertThrows([PrimaryNullableIntObject createInDefaultRealmWithValue:(@[NSNull.null])], @"Duplicate primary key should throw");
+#endif
 
     [[RLMRealm defaultRealm] commitWriteTransaction];
 }

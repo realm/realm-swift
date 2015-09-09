@@ -167,7 +167,7 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithOptionalWithoutDefaults() {
         let realm = try! Realm()
-        realm.write {
+        try! realm.write {
             let object = realm.create(SwiftOptionalObject)
             for prop in object.objectSchema.properties {
                 XCTAssertNil(object[prop.name])
@@ -177,7 +177,7 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithOptionalDefaults() {
         let realm = try! Realm()
-        realm.write {
+        try! realm.write {
             let object = realm.create(SwiftOptionalDefaultValuesObject)
             self.verifySwiftOptionalObjectWithDictionaryLiteral(object, dictionary: SwiftOptionalDefaultValuesObject.defaultValues(), boolObjectValue: true)
         }
@@ -444,6 +444,7 @@ class ObjectCreationTests: TestCase {
     }
 
     private func verifySwiftOptionalObjectWithDictionaryLiteral(object: SwiftOptionalDefaultValuesObject, dictionary: [String:AnyObject], boolObjectValue: Bool?) {
+#if REALM_ENABLE_NULL
         XCTAssertEqual(object.optBoolCol.value, (dictionary["optBoolCol"] as! Bool?))
         XCTAssertEqual(object.optIntCol.value, (dictionary["optIntCol"] as! Int?))
         XCTAssertEqual(object.optFloatCol.value, (dictionary["optFloatCol"] as! Float?))
@@ -452,6 +453,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.optNSStringCol, (dictionary["optNSStringCol"] as! String?))
         XCTAssertEqual(object.optBinaryCol, (dictionary["optBinaryCol"] as! NSData?))
         XCTAssertEqual(object.optDateCol, (dictionary["optDateCol"] as! NSDate?))
+#endif
         XCTAssertEqual(object.optObjectCol?.boolCol, boolObjectValue)
     }
 
