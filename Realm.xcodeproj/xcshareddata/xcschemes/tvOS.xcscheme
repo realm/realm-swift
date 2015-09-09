@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E856D1D4195614A300FB2FCF"
+               BlueprintIdentifier = "C0325CF71BA0D67500B9DA2C"
                BuildableName = "Realm.framework"
-               BlueprintName = "iOS"
+               BlueprintName = "tvOS"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E856D1D4195614A300FB2FCF"
+            BlueprintIdentifier = "C0325CF71BA0D67500B9DA2C"
             BuildableName = "Realm.framework"
-            BlueprintName = "iOS"
+            BlueprintName = "tvOS"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -63,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E856D1D4195614A300FB2FCF"
+            BlueprintIdentifier = "C0325CF71BA0D67500B9DA2C"
             BuildableName = "Realm.framework"
-            BlueprintName = "iOS"
+            BlueprintName = "tvOS"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
