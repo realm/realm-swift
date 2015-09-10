@@ -187,11 +187,11 @@ class SwiftFakeObject : NSObject {
     dynamic class func indexedProperties() -> [String] { return [] }
 }
 
-class SwiftObjectWithNSURL : SwiftFakeObject {
+class SwiftObjectWithNSURL: SwiftFakeObject {
     dynamic var URL = NSURL(string: "http://realm.io")!
 }
 
-class SwiftObjectWithAnyObject : SwiftFakeObject {
+class SwiftObjectWithAnyObject: SwiftFakeObject {
     dynamic var anyObject: AnyObject = NSString(string: "")
 }
 
@@ -200,15 +200,15 @@ enum SwiftEnum {
     case Case2
 }
 
-class SwiftObjectWithEnum : SwiftFakeObject {
+class SwiftObjectWithEnum: SwiftFakeObject {
     var swiftEnum = SwiftEnum.Case1
 }
 
-class SwiftObjectWithStruct : SwiftFakeObject {
+class SwiftObjectWithStruct: SwiftFakeObject {
     var swiftStruct = SortDescriptor(property: "prop")
 }
 
-class SwiftObjectWithDatePrimaryKey : SwiftFakeObject {
+class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {
     dynamic var date = NSDate()
 
     dynamic override class func primaryKey() -> String! {
@@ -216,11 +216,11 @@ class SwiftObjectWithDatePrimaryKey : SwiftFakeObject {
     }
 }
 
-class SwiftFakeObjectSubclass : SwiftFakeObject {
+class SwiftFakeObjectSubclass: SwiftFakeObject {
     dynamic var dateCol = NSDate()
 }
 
-class SwiftObjectWithUnindexibleProperties : SwiftFakeObject {
+class SwiftObjectWithUnindexibleProperties: SwiftFakeObject {
     dynamic var boolCol = false
     dynamic var intCol = 123
     dynamic var floatCol = 1.23 as Float
@@ -239,12 +239,12 @@ class SwiftObjectWithNonNullableOptionalProperties: SwiftFakeObject {
     dynamic var optDateCol: NSDate?
 }
 
-class SwiftObjectWithNonOptionalLinkProperty : SwiftFakeObject {
+class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
     dynamic var objectCol = SwiftBoolObject()
 }
 
-extension Set : RealmOptionalType { }
+extension Set: Set { }
 
-class SwiftObjectWithNonRealmOptionalType : SwiftFakeObject {
+class SwiftObjectWithNonRealmOptionalType: SwiftFakeObject {
     let set = RealmOptional<Set<Int>>()
 }
