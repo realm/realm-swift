@@ -167,7 +167,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 
                 Class cls = [RLMSchema classForString:_objectClassName];
                 if (!RLMIsObjectSubclass(cls)) {
-                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/cocoa/#to-many for more information.", self.objectClassName]);
+                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/objc/#to-many for more information.", self.objectClassName]);
                 }
             }
             else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
@@ -190,7 +190,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
                 }
                 else {
                     NSString *message = [NSString stringWithFormat:@"'%@' is not supported as an NSNumber object type. NSNumbers can only be RLMInt, RLMFloat, RLMDouble, and RLMBool at the moment. "
-                                                                   @"See http://realm.io/docs/cocoa/ for more information.", numberType];
+                                                                   @"See http://realm.io/docs/objc/ for more information.", numberType];
                     @throw RLMException(message);
                 }
             }
@@ -207,7 +207,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
                 // verify type
                 Class cls = [RLMSchema classForString:className];
                 if (!RLMIsObjectSubclass(cls)) {
-                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/api/Classes/RLMObject.html for more information.", className]);
+                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/objc/api/Classes/RLMObject.html for more information.", className]);
                 }
 
                 _type = RLMPropertyTypeObject;
@@ -404,7 +404,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     prop->_isPrimary = _isPrimary;
     prop->_swiftIvar = _swiftIvar;
     prop->_optional = _optional;
-    
+
     return prop;
 }
 
