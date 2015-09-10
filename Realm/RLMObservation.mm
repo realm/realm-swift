@@ -181,6 +181,12 @@ void RLMObservationInfo::recordObserver(realm::Row& objectRow,
             array->_key = key;
             array->_parentObject = object;
         }
+        else if (auto swiftIvar = prop.swiftIvar) {
+            if (auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
+                optional.property = prop;
+                optional.object = object;
+            }
+        }
     }
 }
 
