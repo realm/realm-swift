@@ -125,6 +125,15 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(obj1.boolCol, obj2.boolCol, "object created via generic initializer should equal object created by calling initializer directly")
     }
 
+    func testGenericInitWithValue() {
+        func createObject<T: Object>(#value: AnyObject) -> T {
+            return T(value: value)
+        }
+        let obj1: SwiftBoolObject = createObject(value: ["boolCol": true])
+        let obj2 = SwiftBoolObject(value: ["boolCol": true])
+        XCTAssertEqual(obj1.boolCol, obj2.boolCol, "object created via generic initializer should equal object created by calling initializer directly")
+    }
+
     // MARK: Creation tests
 
     func testCreateWithDefaults() {
