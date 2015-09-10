@@ -91,7 +91,9 @@ public:
     RLMNotificationHelper(RLMRealm *realm) : _realm(realm) { }
 
     void changes_available() override {
-        [_realm sendNotifications:RLMRealmRefreshRequiredNotification];
+        if (!_realm.autorefresh) {
+            [_realm sendNotifications:RLMRealmRefreshRequiredNotification];
+        }
     }
 
     std::vector<ObserverState> get_observed_rows() override {

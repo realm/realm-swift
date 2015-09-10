@@ -319,6 +319,9 @@ void Realm::notify()
     verify_thread();
 
     if (m_shared_group->has_changed()) { // Throws
+        if (m_delegate) {
+            m_delegate->changes_available();
+        }
         if (m_auto_refresh) {
             if (m_group) {
                 transaction::advance(*m_shared_group, *m_history, m_delegate.get());
@@ -326,9 +329,6 @@ void Realm::notify()
             else if (m_delegate) {
                 m_delegate->did_change({}, {});
             }
-        }
-        else if (m_delegate) {
-            m_delegate->changes_available();
         }
     }
 }
