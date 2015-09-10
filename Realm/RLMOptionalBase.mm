@@ -20,6 +20,7 @@
 #import "RLMOptionalBase.h"
 #import "RLMObject_Private.h"
 #import "RLMObjectStore.h"
+#import "RLMProperty.h"
 #import "RLMUtil.hpp"
 
 #import <objc/runtime.h>
@@ -44,12 +45,15 @@
 }
 
 - (void)setUnderlyingValue:(id)underlyingValue {
+    NSString *propertyName = _property.name;
+    [_object willChangeValueForKey:propertyName];
     if ((_object && _object->_realm) || _object.isInvalidated) {
         RLMDynamicSet(_object, _property, underlyingValue, RLMCreationOptionsNone);
     }
     else {
         _standaloneValue = underlyingValue;
     }
+    [_object didChangeValueForKey:propertyName];
 }
 
 - (BOOL)isKindOfClass:(Class)aClass {
