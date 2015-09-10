@@ -1136,7 +1136,6 @@ atomic<bool> s_syncLogEverything(false);
     const char *data2 = static_cast<const char *>(data.bytes);
     size_t size = data.length;
     BinaryData changeset(data2, size);
-    bool schemaCreationsMerged = false;
     HistoryEntry::version_type newVersion;
     try {
         Transformer &transformer = *_backgroundTransformer;
@@ -1146,8 +1145,7 @@ atomic<bool> s_syncLogEverything(false);
         newVersion =
             transformer.integrate_remote_changeset(*_backgroundSharedGroup, originTimestamp,
                                                    originFileIdent, lastIntegratedLocalVersion,
-                                                   serverVersion, remoteChangeset, applyLog,
-                                                   &schemaCreationsMerged); // Throws
+                                                   serverVersion, remoteChangeset, applyLog); // Throws
     }
     catch (BadInitialSchemaCreation& e) {
         NSString *message = [NSString stringWithFormat:@"Unresolvable conflict between initial "
@@ -1161,17 +1159,10 @@ atomic<bool> s_syncLogEverything(false);
 
     [[[RLMRealm realmWithPath:_clientPath] notifier] notifyOtherRealms];
 
-    if (schemaCreationsMerged) {
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Conflict between initial schema-creating "
-              "changesets resolved (temporary hack), producing client version %llu",
-              _connection.ident, _sessionIdent, ulonglong(newVersion));
-    }
-    else {
-        if (s_syncLogEverything) {
-            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Server changeset (%llu -> %llu) "
-                  "integrated, producing client version %llu", _connection.ident, _sessionIdent,
-                  ulonglong(serverVersion-1), ulonglong(serverVersion), ulonglong(newVersion));
-        }
+    if (s_syncLogEverything) {
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Server changeset (%llu -> %llu) "
+              "integrated, producing client version %llu", _connection.ident, _sessionIdent,
+              ulonglong(serverVersion-1), ulonglong(serverVersion), ulonglong(newVersion));
     }
 }
 
