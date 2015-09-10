@@ -1883,7 +1883,51 @@
 }
 
 - (void)testSortingColumnsWithNull {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
 
+    {
+        NumberObject *no1 = [NumberObject createInRealm:realm withValue:@[@1, @1.1f, @1.1, @YES]];
+        NumberObject *noNull = [NumberObject createInRealm:realm withValue:@[NSNull.null, NSNull.null, NSNull.null, NSNull.null]];
+        NumberObject *no0 = [NumberObject createInRealm:realm withValue:@[@0, @0.0f, @0.0, @NO]];
+        for (RLMProperty *property in [[NumberObject alloc] init].objectSchema.properties) {
+            NSString *name = property.name;
+            RLMResults *ascending = [[NumberObject allObjectsInRealm:realm] sortedResultsUsingProperty:name ascending:YES];
+            XCTAssertEqualObjects([ascending valueForKey:name], ([@[noNull, no0, no1] valueForKey:name]));
+
+            RLMResults *descending = [[NumberObject allObjectsInRealm:realm] sortedResultsUsingProperty:name ascending:NO];
+            XCTAssertEqualObjects([descending valueForKey:name], ([@[no1, no0, noNull] valueForKey:name]));
+        }
+    }
+
+    {
+        DateObject *doPositive = [DateObject createInRealm:realm withValue:@[[NSDate dateWithTimeIntervalSince1970:100]]];
+        DateObject *doNegative = [DateObject createInRealm:realm withValue:@[[NSDate dateWithTimeIntervalSince1970:-100]]];
+        DateObject *doZero = [DateObject createInRealm:realm withValue:@[[NSDate dateWithTimeIntervalSince1970:0]]];
+        DateObject *doNull = [DateObject createInRealm:realm withValue:@[NSNull.null]];
+
+        RLMResults *ascending = [[DateObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"dateCol" ascending:YES];
+        XCTAssertEqualObjects([ascending valueForKey:@"dateCol"], ([@[doNull, doNegative, doZero, doPositive] valueForKey:@"dateCol"]));
+
+        RLMResults *descending = [[DateObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"dateCol" ascending:NO];
+        XCTAssertEqualObjects([descending valueForKey:@"dateCol"], ([@[doPositive, doZero, doNegative, doNull] valueForKey:@"dateCol"]));
+    }
+
+    {
+        StringObject *soA = [StringObject createInRealm:realm withValue:@[@"A"]];
+        StringObject *soEmpty = [StringObject createInRealm:realm withValue:@[@""]];
+        StringObject *soB = [StringObject createInRealm:realm withValue:@[@"B"]];
+        StringObject *soNull = [StringObject createInRealm:realm withValue:@[NSNull.null]];
+        StringObject *soAB = [StringObject createInRealm:realm withValue:@[@"AB"]];
+
+        RLMResults *ascending = [[StringObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"stringCol" ascending:YES];
+        XCTAssertEqualObjects([ascending valueForKey:@"stringCol"], ([@[soNull, soEmpty, soA, soAB, soB] valueForKey:@"stringCol"]));
+
+        RLMResults *descending = [[StringObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"stringCol" ascending:NO];
+        XCTAssertEqualObjects([descending valueForKey:@"stringCol"], ([@[soB, soAB, soA, soEmpty, soNull] valueForKey:@"stringCol"]));
+    }
+
+    [realm cancelWriteTransaction];
 }
 
 - (void)testCountOnCollection {
