@@ -21,7 +21,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix assertion failure when inserting NSData between 8MB and 16MB in size.
+* Fix assertion failure when rolling back a migration which removed an object
+  link or `RLMArray`/`List` property.
+* Add the path of the file being opened to file open errors.
 
 0.95.1 Release notes (2015-09-23)
 =============================================================
