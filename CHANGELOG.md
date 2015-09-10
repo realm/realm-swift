@@ -25,6 +25,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Setting the primary key property on persisted `RLMObject`s / `Object`s
   via subscripting or key-value coding will cause an exception to be thrown.
+* Fix crash due to race condition in `RLMRealmConfiguration` where the default
+  configuration was in the process of being copied in one thread, while
+  released in another.
 
 0.95.0 Release notes (2015-08-25)
 =============================================================
