@@ -5,6 +5,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * CocoaPods v0.38 or greater is now required to install Realm and RealmSwift
   as pods.
+* `-[RLMObject linkingObjectsOfClass:forProperty:]` / 
+  `Object.linkingObjects(_:forProperty:)` now return `RLMResults` / `Results`.
 
 ### Enhancements
 
