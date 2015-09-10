@@ -211,6 +211,21 @@ class ObjectAccessorTests: TestCase {
         }
     }
 
+    func testSettingOptionalPropertyOnDeletedObjectsThrows() {
+        let realm = try! Realm()
+        try! realm.write {
+            let obj = realm.create(SwiftOptionalObject)
+            let copy = realm.objects(SwiftOptionalObject).first!
+            realm.delete(obj)
+
+            self.assertThrows(copy.optIntCol.value = 1)
+            self.assertThrows(copy.optIntCol.value = nil)
+
+            self.assertThrows(obj.optIntCol.value = 1)
+            self.assertThrows(obj.optIntCol.value = nil)
+        }
+    }
+
     func setAndTestAllOptionalProperties(object: SwiftOptionalObject) {
 #if REALM_ENABLE_NULL
         object.optNSStringCol = ""
