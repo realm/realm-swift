@@ -44,7 +44,7 @@
 }
 
 - (void)setUnderlyingValue:(id)underlyingValue {
-    if (_object && _object->_realm) {
+    if ((_object && _object->_realm) || _object.isInvalidated) {
         RLMDynamicSet(_object, _property, underlyingValue, RLMCreationOptionsNone);
     }
     else {
