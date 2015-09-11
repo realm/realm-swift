@@ -80,7 +80,7 @@ static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
         return nil;
     }
     else if (__unsafe_unretained auto optional = RLMDynamicCast<RLMOptionalBase>(obj)) {
-        return optional.underlyingValue;
+        return RLMCoerceToNil(optional.underlyingValue);
     }
     return obj;
 }
