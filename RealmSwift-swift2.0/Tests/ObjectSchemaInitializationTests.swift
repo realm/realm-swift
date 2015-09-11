@@ -243,7 +243,7 @@ class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
     dynamic var objectCol = SwiftBoolObject()
 }
 
-extension Set: Set { }
+extension Set: RealmOptionalType { }
 
 class SwiftObjectWithNonRealmOptionalType: SwiftFakeObject {
     let set = RealmOptional<Set<Int>>()
