@@ -133,6 +133,16 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLM_GENERIC_ARRAY(AllTypesObject) *array;
 @end
 
+@interface AllOptionalTypes : RLMObject
+@property NSNumber<RLMInt> *intObj;
+@property NSNumber<RLMFloat> *floatObj;
+@property NSNumber<RLMDouble> *doubleObj;
+@property NSNumber<RLMBool> *boolObj;
+@property NSString *string;
+@property NSData *data;
+@property NSDate *date;
+@end
+
 #pragma mark - Real Life Objects
 #pragma mark -
 

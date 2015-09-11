@@ -297,18 +297,10 @@ void add_string_constraint_to_query(realm::Query &query,
     }
 }
 
-void add_string_constraint_to_query(realm::Query &query,
-                                    NSPredicateOperatorType operatorType,
-                                    NSComparisonPredicateOptions predicateOptions,
-                                    Columns<String> &&column,
-                                    id value) {
-    add_string_constraint_to_query(query, operatorType, predicateOptions, std::forward<Columns<String>>(column), RLMStringDataWithNSString(value));
-}
-
 void add_string_constraint_to_query(realm::Query& query,
                                     NSPredicateOperatorType operatorType,
                                     NSComparisonPredicateOptions predicateOptions,
-                                    id value,
+                                    StringData value,
                                     Columns<String>&& column) {
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
@@ -344,11 +336,11 @@ void validate_and_extract_between_range(id value, RLMProperty *prop, id *from, i
                     @"NSArray objects must be of type %@ for BETWEEN operations", RLMTypeToString(prop.type));
 }
 
-template <typename... T>
+template <typename L, typename R>
 void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
                              NSPredicateOperatorType operatorType,
                              NSComparisonPredicateOptions predicateOptions,
-                             const std::vector<NSUInteger>& linkColumns, T... values);
+                             const std::vector<NSUInteger>& linkColumns, L lhs, R rhs);
 
 void add_between_constraint_to_query(realm::Query &query, std::vector<NSUInteger> const& indexes, RLMProperty *prop, id value) {
     id from, to;
@@ -386,31 +378,35 @@ void add_between_constraint_to_query(realm::Query &query, std::vector<NSUInteger
     }
 }
 
+template<typename T>
 void add_binary_constraint_to_query(realm::Query & query,
                                     NSPredicateOperatorType operatorType,
                                     NSUInteger index,
-                                    NSData *value) {
-    realm::BinaryData binData = RLMBinaryDataForNSData(value);
+                                    T value) {
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
-            query.begins_with(index, binData);
+            query.begins_with(index, value);
             break;
         case NSEndsWithPredicateOperatorType:
-            query.ends_with(index, binData);
+            query.ends_with(index, value);
             break;
         case NSContainsPredicateOperatorType:
-            query.contains(index, binData);
+            query.contains(index, value);
             break;
         case NSEqualToPredicateOperatorType:
-            query.equal(index, binData);
+            query.equal(index, value);
             break;
         case NSNotEqualToPredicateOperatorType:
-            query.not_equal(index, binData);
+            query.not_equal(index, value);
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
                                          @"Operator '%@' not supported for binary type", operatorName(operatorType));
     }
+}
+
+void add_binary_constraint_to_query(realm::Query& query, NSPredicateOperatorType operatorType, NSUInteger index, id value) {
+    add_binary_constraint_to_query(query, operatorType, index, RLMBinaryDataForNSData(value));
 }
 
 void add_binary_constraint_to_query(realm::Query& query, NSPredicateOperatorType operatorType, id value, NSUInteger index) {
@@ -430,7 +426,6 @@ void add_binary_constraint_to_query(realm::Query&, NSPredicateOperatorType, NSUI
     @throw RLMPredicateException(@"Invalid predicate", @"Comparisons between two NSData properties are not supported");
 }
 
-
 void add_link_constraint_to_query(realm::Query & query,
                                  NSPredicateOperatorType operatorType,
                                  NSUInteger column,
@@ -441,15 +436,24 @@ void add_link_constraint_to_query(realm::Query & query,
         query.Not();
     }
 
-    if (obj) {
-        query.links_to(column, obj->_row.get_index());
-    }
-    else {
-        query.and_query(query.get_table()->column<Link>(column).is_null());
-    }
+    query.links_to(column, obj->_row.get_index());
 }
 
-void add_link_constraint_to_query(realm::Query& query, NSPredicateOperatorType operatorType, RLMObject *obj, NSUInteger column) {
+void add_link_constraint_to_query(realm::Query & query,
+                                 NSPredicateOperatorType operatorType,
+                                 NSUInteger column,
+                                 realm::null) {
+    RLMPrecondition(operatorType == NSEqualToPredicateOperatorType || operatorType == NSNotEqualToPredicateOperatorType,
+                    @"Invalid operator type", @"Only 'Equal' and 'Not Equal' operators supported for object comparison");
+    if (operatorType == NSNotEqualToPredicateOperatorType) {
+        query.Not();
+    }
+
+    query.and_query(query.get_table()->column<Link>(column).is_null());
+}
+
+template<typename T>
+void add_link_constraint_to_query(realm::Query& query, NSPredicateOperatorType operatorType, T obj, NSUInteger column) {
     // Link constraints only support the equal-to and not-equal-to operators. The order of operands
     // is not important for those comparisons so we can delegate to the other implementation.
     add_link_constraint_to_query(query, operatorType, column, obj);
@@ -491,73 +495,48 @@ void process_or_group(Query &query, id array, Func&& func) {
 
 template <typename RequestedType, typename TableGetter>
 struct ColumnOfTypeHelper {
-    static realm::Columns<RequestedType> convert(TableGetter&& table, NSUInteger idx)
-    {
+    static realm::Columns<RequestedType> convert(TableGetter&& table, NSUInteger idx) {
         return table()->template column<RequestedType>(idx);
     }
 };
 
-// FIXME: This specialization can be removed when core v0.92.x is no longer used.
-template <typename TableGetter>
-struct ColumnOfTypeHelper<realm::DateTime, TableGetter> {
-    using ColumnType = std::conditional_t<std::is_convertible<DateTime, int64_t>::value, DateTime, Int>;
-    static Columns<ColumnType> convert(TableGetter&& table, NSUInteger idx)
-    {
-        return table()->template column<ColumnType>(idx);
-    }
-};
+template <typename RequestedType>
+RequestedType convert(id value);
+
+template <>
+DateTime convert<DateTime>(id value) {
+    return [value timeIntervalSince1970];
+}
+
+template <>
+bool convert<bool>(id value) {
+    return [value boolValue];
+}
+
+template <>
+Double convert<Double>(id value) {
+    return [value doubleValue];
+}
+
+template <>
+Float convert<Float>(id value) {
+    return [value floatValue];
+}
+
+template <>
+Int convert<Int>(id value) {
+    return [value longLongValue];
+}
+
+template <>
+String convert<String>(id value) {
+    return RLMStringDataWithNSString(value);
+}
 
 template <typename RequestedType, typename TableGetter>
-struct ValueOfTypeHelper;
-
-template <typename TableGetter>
-struct ValueOfTypeHelper<realm::DateTime, TableGetter> {
-    // FIXME: The return type can simply be DateTime when core v0.92.x is no longer used.
-    using ResultType = std::conditional_t<std::is_convertible<DateTime, int64_t>::value, DateTime, Int>;
-    static ResultType convert(TableGetter&&, id value)
-    {
-        return [value timeIntervalSince1970];
-    }
-};
-
-template <typename TableGetter>
-struct ValueOfTypeHelper<bool, TableGetter> {
-    static bool convert(TableGetter&&, id value)
-    {
-        return [value boolValue];
-    }
-};
-
-template <typename TableGetter>
-struct ValueOfTypeHelper<Double, TableGetter> {
-    static Double convert(TableGetter&&, id value)
-    {
-        return [value doubleValue];
-    }
-};
-
-template <typename TableGetter>
-struct ValueOfTypeHelper<Float, TableGetter> {
-    static Float convert(TableGetter&&, id value)
-    {
-        return [value floatValue];
-    }
-};
-
-template <typename TableGetter>
-struct ValueOfTypeHelper<Int, TableGetter> {
-    static Int convert(TableGetter&&, id value)
-    {
-        return [value longLongValue];
-    }
-};
-
-template <typename TableGetter>
-struct ValueOfTypeHelper<String, TableGetter> {
-    static id convert(TableGetter&&, id value)
-    {
-        return value;
-    }
+struct ValueOfTypeHelper {
+    static realm::null convert(TableGetter&&, realm::null) { return realm::null(); }
+    static auto convert(TableGetter&&, id value) { return ::convert<RequestedType>(value); }
 };
 
 template <typename RequestedType, typename Value, typename TableGetter>
@@ -571,12 +550,12 @@ auto value_of_type_for_query(TableGetter&& tables, Value&& value)
 }
 
 template <typename... T>
-void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
-                             NSPredicateOperatorType operatorType,
-                             NSComparisonPredicateOptions predicateOptions,
-                             const std::vector<NSUInteger>& linkColumns, T... values)
+void do_add_constraint_to_query(realm::Query &query, RLMPropertyType type,
+                                NSPredicateOperatorType operatorType,
+                                NSComparisonPredicateOptions predicateOptions,
+                                const std::vector<NSUInteger>& linkColumns, T... values)
 {
-    static_assert(sizeof...(T) == 2, "add_constraint_to_query accepts only two values as arguments");
+    static_assert(sizeof...(T) == 2, "do_add_constraint_to_query accepts only two values as arguments");
 
     auto table = [&] {
         realm::TableRef& tbl = query.get_table();
@@ -625,6 +604,43 @@ void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
                                          @"Object type %@ not supported", RLMTypeToString(type));
+    }
+}
+
+void do_add_constraint_to_query(realm::Query&, RLMPropertyType, NSPredicateOperatorType,
+                                NSComparisonPredicateOptions, const std::vector<NSUInteger>&,
+                                id, realm::null)
+{
+    // This probably isn't actually reachable since there's earlier checks for
+    // it, but they're done before null is un-type-erased
+    @throw RLMPredicateException(@"Invalid predicate expressions",
+                                 @"Predicate expressions must compare a keypath and another keypath or a constant value");
+}
+
+bool is_nsnull(id value) {
+    return !value || value == NSNull.null;
+}
+
+template<typename T>
+bool is_nsnull(T) {
+    return false;
+}
+
+template <typename L, typename R>
+void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
+                             NSPredicateOperatorType operatorType,
+                             NSComparisonPredicateOptions predicateOptions,
+                             const std::vector<NSUInteger>& linkColumns, L lhs, R rhs)
+{
+    // The expression operators are only overloaded for realm::null on the rhs
+    RLMPrecondition(!is_nsnull(lhs), @"Unsupported operator",
+                    @"Nil is only supported on the right side of operators");
+
+    if (is_nsnull(rhs)) {
+        do_add_constraint_to_query(query, type, operatorType, predicateOptions, linkColumns, lhs, realm::null());
+    }
+    else {
+        do_add_constraint_to_query(query, type, operatorType, predicateOptions, linkColumns, lhs, rhs);
     }
 }
 
