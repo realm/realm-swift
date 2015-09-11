@@ -209,11 +209,11 @@ id RLMObservationInfo::valueForKey(NSString *key) {
 
     static auto superValueForKey = reinterpret_cast<id(*)(id, SEL, NSString *)>([NSObject methodForSelector:@selector(valueForKey:)]);
     if (!lastProp) {
-        return superValueForKey(object, @selector(valueForKey:), key);
+        return RLMCoerceToNil(superValueForKey(object, @selector(valueForKey:), key));
     }
 
     auto getSuper = [&] {
-        return row ? RLMDynamicGet(object, lastProp) : superValueForKey(object, @selector(valueForKey:), key);
+        return row ? RLMDynamicGet(object, lastProp) : RLMCoerceToNil(superValueForKey(object, @selector(valueForKey:), key));
     };
 
     // We need to return the same object each time for observing over keypaths to work

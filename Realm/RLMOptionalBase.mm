@@ -36,7 +36,7 @@
 }
 
 - (id)underlyingValue {
-    if (_object && _object->_realm) {
+    if ((_object && _object->_realm) || _object.isInvalidated) {
         return RLMDynamicGet(_object, _property);
     }
     else {
@@ -65,14 +65,22 @@
 }
 
 - (void)forwardInvocation:(NSInvocation *)invocation {
-    id val = self.underlyingValue;
-    if (val) {
-        [invocation invokeWithTarget:self.underlyingValue];
-    }
+    [invocation invokeWithTarget:self.underlyingValue];
 }
 
 - (id)forwardingTargetForSelector:(__unused SEL)sel {
     return self.underlyingValue;
+}
+
+- (BOOL)respondsToSelector:(SEL)aSelector {
+    if (id val = self.underlyingValue) {
+        return [val respondsToSelector:aSelector];
+    }
+    return NO;
+}
+
+- (void)doesNotRecognizeSelector:(SEL)aSelector {
+    [self.underlyingValue doesNotRecognizeSelector:aSelector];
 }
 
 @end
