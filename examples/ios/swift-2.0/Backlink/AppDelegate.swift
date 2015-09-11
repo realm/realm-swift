@@ -23,7 +23,7 @@ import RealmSwift
 class Dog: Object {
     dynamic var name = ""
     dynamic var age = 0
-    var owners: [Person] {
+    var owners: Results<Person> {
         // Realm doesn't persist this property because it only has a getter defined
         // Define "owners" as the inverse relationship to Person.dogs
         return linkingObjects(Person.self, forProperty: "dogs")

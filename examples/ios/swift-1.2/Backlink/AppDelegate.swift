@@ -22,7 +22,7 @@ import RealmSwift
 class Dog: Object {
     dynamic var name = ""
     dynamic var age = 0
-    var owners: [Person] {
+    var owners: Results<Person> {
         // Realm doesn't persist this property because it only has a getter defined
         // Define "owners" as the inverse relationship to Person.dogs
         return linkingObjects(Person.self, forProperty: "dogs")
@@ -55,7 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Log all dogs and their owners using the "owners" inverse relationship
         let allDogs = realm.objects(Dog)
         for dog in allDogs {
-            let ownerNames = dog.owners.map { $0.name }
+            let ownerNames = map(dog.owners) { $0.name }
             println("\(dog.name) has \(ownerNames.count) owners (\(ownerNames))")
         }
         return true
