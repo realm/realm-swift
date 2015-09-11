@@ -50,6 +50,9 @@ mkdir -p ${SRCROOT}/docs/output
 rm -rf ${SRCROOT}/docs/output/${realm_version}
 mv ${SRCROOT}/docs/html ${SRCROOT}/docs/output/${realm_version}
 
+: ${REALM_SWIFT_VERSION:=1.2}
+./build.sh set-swift-version
+
 ${jazzy} \
   --author Realm \
   --author_url "https://realm.io" \
@@ -62,3 +65,4 @@ ${jazzy} \
   --root-url https://realm.io/docs/swift/${realm_version}/api/ \
   --xcodebuild-arguments "-project,${SRCROOT}/RealmSwift.xcodeproj,-dry-run" \
   --template-directory "${SRCROOT}/docs/templates/swift" \
+  --swift-version=${REALM_SWIFT_VERSION}
