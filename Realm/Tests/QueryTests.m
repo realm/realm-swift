@@ -631,29 +631,18 @@
     XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"string1 ENDSWITH[c] string2"].count);
     XCTAssertEqual(4U, [self.queryObjectClass objectsWhere:@"string2 ENDSWITH[c] string1"].count);
 
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"int1 == float1"
-                                              expectedReason:@"Property type mismatch between int and float"];
-
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"float2 >= double1"
-                                              expectedReason:@"Property type mismatch between float and double"];
-
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"double2 <= int2"
-                                              expectedReason:@"Property type mismatch between double and int"];
-
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"int2 != string1"
-                                              expectedReason:@"Property type mismatch between int and string"];
-
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"float1 > string1"
-                                              expectedReason:@"Property type mismatch between float and string"];
-
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"double1 < string1"
-                                              expectedReason:@"Property type mismatch between double and string"];
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"int1 == float1"],
+                                      @"Property type mismatch between int and float");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"float2 >= double1"],
+                                      @"Property type mismatch between float and double");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"double2 <= int2"],
+                                      @"Property type mismatch between double and int");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"int2 != string1"],
+                                      @"Property type mismatch between int and string");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"float1 > string1"],
+                                      @"Property type mismatch between float and string");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"double1 < string1"],
+                                      @"Property type mismatch between double and string");
 }
 
 - (void)testValidOperatorsInNumericComparison:(NSString *) comparisonType
@@ -957,15 +946,6 @@
                                  NSException, @"Invalid predicate expressions",
                                  @"Key path in absent in an integer comparison.");
 }
-
-- (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(NSString *)className
-                                                 predicate:(NSString *)predicate
-                                            expectedReason:(NSString *)expectedReason
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:predicate], expectedReason);
-}
-
 
 - (void)testFloatQuery
 {
