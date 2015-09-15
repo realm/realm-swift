@@ -316,6 +316,7 @@ public:
 } // anonymous namespace
 
 namespace realm {
+namespace _impl {
 namespace transaction {
 void advance(SharedGroup& sg, ClientHistory& history, RealmDelegate* delegate) {
     TransactLogHandler(delegate, sg, [&](auto&&... args) {
@@ -344,4 +345,5 @@ void cancel(SharedGroup& sg, ClientHistory& history, RealmDelegate* delegate) {
 }
 
 } // namespace transaction
+} // namespace _impl
 } // namespace realm

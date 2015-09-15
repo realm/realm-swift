@@ -26,6 +26,7 @@
 namespace realm {
 class Realm;
 
+namespace _impl {
 class ExternalCommitHelper {
 public:
     ExternalCommitHelper(Realm* realm);
@@ -87,6 +88,7 @@ private:
     FdHolder m_shutdown_write_fd;
 };
 
+} // namespace _impl
 } // namespace realm
 
 #endif /* REALM_EXTERNAL_COMMIT_HELPER_HPP */

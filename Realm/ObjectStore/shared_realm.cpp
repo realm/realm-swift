@@ -29,6 +29,7 @@
 #include <mutex>
 
 using namespace realm;
+using namespace realm::_impl;
 
 RealmCache Realm::s_global_cache;
 

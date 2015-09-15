@@ -28,12 +28,15 @@
 
 namespace realm {
     class ClientHistory;
-    class ExternalCommitHelper;
     class Realm;
     class RealmCache;
     class RealmDelegate;
     typedef std::shared_ptr<Realm> SharedRealm;
     typedef std::weak_ptr<Realm> WeakRealm;
+
+    namespace _impl {
+        class ExternalCommitHelper;
+    }
 
     class Realm : public std::enable_shared_from_this<Realm>
     {
@@ -114,7 +117,7 @@ namespace realm {
 
         Group *m_group = nullptr;
 
-        std::shared_ptr<ExternalCommitHelper> m_notifier;
+        std::shared_ptr<_impl::ExternalCommitHelper> m_notifier;
 
       public:
         std::unique_ptr<RealmDelegate> m_delegate;

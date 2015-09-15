@@ -24,6 +24,7 @@ class RealmDelegate;
 class SharedGroup;
 class ClientHistory;
 
+namespace _impl {
 namespace transaction {
 // Advance the read transaction version, with change notifications sent to delegate
 // Must not be called from within a write transaction.
@@ -41,6 +42,7 @@ void commit(SharedGroup& sg, ClientHistory& history, RealmDelegate* delegate);
 // for reverting to the old values sent to delegate
 void cancel(SharedGroup& sg, ClientHistory& history, RealmDelegate* delegate);
 } // namespace transaction
+} // namespace _impl
 } // namespace realm
 
 #endif /* REALM_TRANSACT_LOG_HANDLER_HPP */

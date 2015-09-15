@@ -30,6 +30,7 @@
 #include <sstream>
 
 using namespace realm;
+using namespace realm::_impl;
 
 namespace {
 // Write a byte to a pipe to notify anyone waiting for data on the pipe
