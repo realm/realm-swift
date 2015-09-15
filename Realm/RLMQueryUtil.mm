@@ -590,7 +590,7 @@ void do_add_constraint_to_query(realm::Query &query, RLMPropertyType type,
                 break;
             }
             else {
-                @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
+                @throw RLMPredicateException(@"Unsupported operator", @"NSData properties cannot be queried over an object link.");
             }
         case type_Link:
         case type_LinkList:
