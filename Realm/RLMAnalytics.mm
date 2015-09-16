@@ -111,10 +111,10 @@ static NSString *RLMOSVersion() {
 
 // Hash the data in the given buffer and convert it to a hex-format string
 static NSString *RLMHashData(const void *bytes, size_t length) {
-    unsigned char buffer[CC_SHA256_DIGEST_LENGTH * 2];
+    unsigned char buffer[CC_SHA256_DIGEST_LENGTH];
     CC_SHA256(bytes, static_cast<CC_LONG>(length), buffer);
 
-    char formatted[CC_SHA256_DIGEST_LENGTH * 2];
+    char formatted[CC_SHA256_DIGEST_LENGTH * 2 + 1];
     for (int i = 0; i < CC_SHA256_DIGEST_LENGTH; ++i) {
         sprintf(formatted + i * 2, "%02x", buffer[i]);
     }
