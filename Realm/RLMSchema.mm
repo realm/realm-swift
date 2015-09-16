@@ -90,8 +90,10 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
 }
 
 + (void)registerClasses:(Class *)classes count:(NSUInteger)count {
+    auto newClasses = [NSMutableArray new];
+    auto threadID = pthread_mach_thread_np(pthread_self());
+
     @synchronized(s_localNameToClass) {
-        auto threadID = pthread_mach_thread_np(pthread_self());
         // first create class to name mapping so we can do array validation
         // when creating object schema
         for (NSUInteger i = 0; i < count; i++) {
@@ -122,6 +124,7 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
             }
 
             s_localNameToClass[className] = cls;
+            [newClasses addObject:cls];
 
             RLMReplaceClassNameMethod(cls, className);
             // override sharedSchema class method to return nil to avoid topo-sort issues when on this thread
@@ -137,8 +140,8 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
             });
         }
 
-        NSMutableArray *schemas = [NSMutableArray arrayWithCapacity:s_localNameToClass.count];
-        for (Class cls in s_localNameToClass.allValues) {
+        NSMutableArray *schemas = [NSMutableArray arrayWithCapacity:newClasses.count];
+        for (Class cls in newClasses) {
             RLMObjectSchema *schema = [RLMObjectSchema schemaForObjectClass:cls];
 
             // set standalone class on shared shema for standalone object creation
