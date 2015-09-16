@@ -460,6 +460,8 @@ void add_link_constraint_to_query(realm::Query& query, NSPredicateOperatorType o
 }
 
 void add_link_constraint_to_query(realm::Query&, NSPredicateOperatorType, NSUInteger, NSUInteger) {
+    // This is not actually reachable as this case is caught earlier, but this
+    // overload is needed for the code to compile
     @throw RLMPredicateException(@"Invalid predicate", @"Comparisons between two RLMArray properties are not supported");
 }
 
@@ -611,8 +613,8 @@ void do_add_constraint_to_query(realm::Query&, RLMPropertyType, NSPredicateOpera
                                 NSComparisonPredicateOptions, const std::vector<NSUInteger>&,
                                 id, realm::null)
 {
-    // This probably isn't actually reachable since there's earlier checks for
-    // it, but they're done before null is un-type-erased
+    // This is not actually reachable as this case is caught earlier, but this
+    // overload is needed for the code to compile
     @throw RLMPredicateException(@"Invalid predicate expressions",
                                  @"Predicate expressions must compare a keypath and another keypath or a constant value");
 }
