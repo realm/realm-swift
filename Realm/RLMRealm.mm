@@ -1268,7 +1268,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
             NSString *additionalMessage = [NSString stringWithFormat:@"Unable to open a realm at path '%@'. Please use a path where your app has %@ permissions.", path, mode];
             NSString *newMessage = [NSString stringWithFormat:@"%s\n%@", ex.what(), additionalMessage];
             error = RLMMakeError(RLMErrorFilePermissionDenied,
-                                     File::PermissionDenied(newMessage.UTF8String));
+                                     File::PermissionDenied(newMessage.UTF8String, _path.UTF8String));
         }
         catch (File::Exists const& ex) {
             error = RLMMakeError(RLMErrorFileExists, ex);
