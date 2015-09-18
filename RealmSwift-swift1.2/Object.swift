@@ -28,21 +28,32 @@ You then instantiate and use your custom subclasses instead of using the Object 
 class Dog: Object {
     dynamic var name: String = ""
     dynamic var adopted: Bool = false
-    let siblings = List<Dog>
+    let siblings = List<Dog>()
 }
 ```
 
 ### Supported property types
 
-- `String`
+- `String`, `NSString`
 - `Int`
 - `Float`
 - `Double`
 - `Bool`
 - `NSDate`
 - `NSData`
+- `RealmOptional<T>` for optional numeric properties
 - `Object` subclasses for to-one relationships
 - `List<T: Object>` for to-many relationships
+
+`String`, `NSString`, `NSDate`, `NSData` and `Object` subclass properties can be
+optional. `Int`, `Float`, `Double`, `Bool` and `List` properties cannot. To store
+an optional number, instead use `RealmOptional<Int>`, `RealmOptional<Float>`,
+`RealmOptional<Double>`, or `RealmOptional<Bool>` instead, which wraps an optional
+value of the generic type.
+
+All property types except for `List` and `RealmOptional` *must* be declared as
+`dynamic var`. `List` and `RealmOptional` properties must be declared as
+non-dynamic `let` properties.
 
 ### Querying
 

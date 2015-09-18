@@ -48,6 +48,7 @@ RLM_ASSUME_NONNULL_BEGIN
  - `BOOL` or `bool`
  - `NSDate`
  - `NSData`
+ - `NSNumber<X>`, where X is one of RLMInt, RLMFloat, RLMDouble or RLMBool, for optional number properties
  - `RLMObject` subclasses, so you can have many-to-one relationships.
  - `RLMArray<X>`, where X is an `RLMObject` subclass, so you can have many-to-many relationships.
 
