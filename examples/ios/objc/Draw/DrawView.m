@@ -24,6 +24,7 @@
 
 @interface DrawView ()
 
+@property DrawPath *drawPath;
 @property NSString *pathID;
 @property NSMutableSet *drawnPathIDs;
 @property RLMResults *paths;
@@ -74,21 +75,28 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    self.pathID = [[NSUUID UUID] UUIDString];
+    NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
+    self.drawPath = [[DrawPath alloc] init];
+    self.drawPath.color = colorName;
+    
     CGPoint point = [[touches anyObject] locationInView:self];
-    [[RLMRealm defaultRealm] transactionWithBlock:^{
-        NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
-        [DrawPath createInDefaultRealmWithValue:@[self.pathID, self.vendorID, colorName, @[]]];
-        [DrawPoint createInDefaultRealmWithValue:@[[NSUUID UUID].UUIDString, @(point.x), @(point.y)]];
+    DrawPoint *drawPoint = [[DrawPoint alloc] init];
+    drawPoint.x = point.x;
+    drawPoint.y = point.y;
+    
+    [self.drawPath.points addObject:drawPoint];
+    
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    [defaultRealm transactionWithBlock:^{
+        [defaultRealm addObject:self.drawPath];
     }];
 }
 
 - (void)addPoint:(CGPoint)point
 {
-    DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        DrawPoint *newPoint = [DrawPoint createInDefaultRealmWithValue:@[[NSUUID UUID].UUIDString, @(point.x), @(point.y)]];
-        [currentPath.points addObject:newPoint];
+        DrawPoint *newPoint = [DrawPoint createInDefaultRealmWithValue:@[@(point.x), @(point.y)]];
+        [self.drawPath.points addObject:newPoint];
     }];
 }
 
@@ -103,9 +111,10 @@
     CGPoint point = [[touches anyObject] locationInView:self];
     [self addPoint:point];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
-        currentPath.drawerID = @""; // mark this path as ended
+        self.drawPath.drawerID = @""; // mark this path as ended
     }];
+
+    self.drawPath = nil;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
@@ -145,12 +154,12 @@
     for (DrawPath *path in self.paths) {
         BOOL pathEnded = [path.drawerID isEqualToString:@""];
         if (pathEnded) {
-            BOOL pathAlreadyDrawn = [self.drawnPathIDs containsObject:path.pathID];
-            if (pathAlreadyDrawn) {
-                continue;
-            }
+            //BOOL pathAlreadyDrawn = [self.drawnPathIDs containsObject:path.pathID];
+            //if (pathAlreadyDrawn) {
+            //    continue;
+            //}
             [self drawPath:path withContext:self.offscreenContext];
-            [self.drawnPathIDs addObject:path.pathID];
+            //[self.drawnPathIDs addObject:path.pathID];
         } else {
             [activePaths addObject:path];
         }

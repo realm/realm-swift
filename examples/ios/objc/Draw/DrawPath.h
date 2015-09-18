@@ -22,7 +22,6 @@
 
 @interface DrawPath : RLMObject
 
-@property NSString *pathID;
 @property NSString *drawerID;
 @property NSString *color;
 @property RLMArray<DrawPoint> *points;
