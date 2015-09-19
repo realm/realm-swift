@@ -27,6 +27,10 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix assertion failure when rolling back a migration which removed an object
   link or `RLMArray`/`List` property.
 * Add the path of the file being opened to file open errors.
+* Fix a crash that could be triggered by rapidly opening and closing a Realm
+  many times on multiple threads at once.
+* Fix several places where exception messages included the name of the wrong
+  function which failed.
 
 0.95.3 Release notes (2015-10-05)
 =============================================================
