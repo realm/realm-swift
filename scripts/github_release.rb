@@ -22,8 +22,8 @@ Dir.mktmpdir do |tmp|
     system('unzip', SWIFT_ZIP.to_path, :out=>"/dev/null")
     FileUtils.rm_f CARTHAGE_ZIP
 
-    FileUtils.mv(%W(realm-swift-#{VERSION}/ios/swift-1.2/Realm.framework realm-swift-#{VERSION}/ios/swift-1.2/RealmSwift.framework), 'Carthage/Build/iOS')
-    FileUtils.mv(%W(realm-swift-#{VERSION}/osx/swift-1.2/Realm.framework realm-swift-#{VERSION}/osx/swift-1.2/RealmSwift.framework), 'Carthage/Build/Mac')
+    FileUtils.mv(%W(realm-swift-#{VERSION}/ios/swift-2.0/Realm.framework realm-swift-#{VERSION}/ios/swift-2.0/RealmSwift.framework), 'Carthage/Build/iOS')
+    FileUtils.mv(%W(realm-swift-#{VERSION}/osx/swift-2.0/Realm.framework realm-swift-#{VERSION}/osx/swift-2.0/RealmSwift.framework), 'Carthage/Build/Mac')
 
     system('zip', '--symlinks', '-r', CARTHAGE_ZIP.to_path, 'Carthage', :out=>"/dev/null")
   end
