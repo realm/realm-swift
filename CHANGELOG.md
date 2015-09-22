@@ -28,6 +28,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix crash due to race condition in `RLMRealmConfiguration` where the default
   configuration was in the process of being copied in one thread, while
   released in another.
+* Fix crash when a migration which removed an object or array property is
+  rolled back due to an error.
 
 0.95.0 Release notes (2015-08-25)
 =============================================================
