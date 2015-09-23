@@ -34,4 +34,7 @@ if [[ "$REALM_SWIFT_VERSION" ]]; then
     find_xcode_for_swift $REALM_SWIFT_VERSION
 else
     REALM_SWIFT_VERSION=$(get_swift_version)
+    if [[ -z "$DEVELOPER_DIR" ]]; then
+        export DEVELOPER_DIR="$(xcode-select -p)"
+    fi
 fi
