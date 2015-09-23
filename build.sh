@@ -177,6 +177,14 @@ clean_retrieve() {
   cp -R "$1" "$2"
 }
 
+shutdown_simulators() {
+    # Shut down simulators until there's no booted ones left
+    # Only do one at a time because devices sometimes show up multiple times
+    while xcrun simctl list | grep -q Booted; do
+      xcrun simctl list | grep Booted | sed 's/.* (\(.*\)) (Booted)/\1/' | head -n 1 | xargs xcrun simctl shutdown
+    done
+}
+
 ######################################
 # Device Test Helper
 ######################################
@@ -325,9 +333,13 @@ case "$COMMAND" in
         ;;
 
     "prelaunch-simulator")
-        killall "iOS Simulator" 2>/dev/null || true
-        killall Simulator 2>/dev/null || true
-        pkill CoreSimulator 2>/dev/null || true
+        # Kill all the current simulator processes as they may be from a
+        # different Xcode version
+        pkill Simulator 2>/dev/null || true
+        # CoreSimulatorService doesn't exit when sent SIGTERM
+        pkill -9 Simulator 2>/dev/null || true
+
+        shutdown_simulators
 
         # Clean up all available simulators
         (
@@ -356,13 +368,11 @@ case "$COMMAND" in
             done
         )
 
-        sleep 5
         if [[ -a "${DEVELOPER_DIR}/Applications/iOS Simulator.app" ]]; then
             open "${DEVELOPER_DIR}/Applications/iOS Simulator.app"
         elif [[ -a "${DEVELOPER_DIR}/Applications/Simulator.app" ]]; then
             open "${DEVELOPER_DIR}/Applications/Simulator.app"
         fi
-        sleep 5
         ;;
 
     ######################################
@@ -446,25 +456,29 @@ case "$COMMAND" in
 
     "test-ios-static")
         xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        shutdown_simulators
+        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
         exit 0
         ;;
 
     "test-ios7-static")
         xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' test"
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S,OS=7.1' test"
+        shutdown_simulators
+        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s,OS=7.1' test"
         exit 0
         ;;
 
     "test-ios-dynamic")
         xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        shutdown_simulators
+        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
         exit 0
         ;;
 
     "test-ios-swift")
         xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        shutdown_simulators
+        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
         exit 0
         ;;
 
