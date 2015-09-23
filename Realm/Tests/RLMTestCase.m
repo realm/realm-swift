@@ -22,14 +22,17 @@
 #import <Realm/RLMRealm_Private.h>
 #import <Realm/RLMSchema_Private.h>
 
-NSString *RLMRealmPathForFile(NSString *fileName) {
+static NSString *documentsDir() {
 #if TARGET_OS_IPHONE
-    NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
+    return NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
 #else
     NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
-    path = [path stringByAppendingPathComponent:[[[NSBundle mainBundle] executablePath] lastPathComponent]];
+    return [path stringByAppendingPathComponent:[[[NSBundle mainBundle] executablePath] lastPathComponent]];
 #endif
-    return [path stringByAppendingPathComponent:fileName];
+}
+
+NSString *RLMRealmPathForFile(NSString *fileName) {
+    return [documentsDir() stringByAppendingPathComponent:fileName];
 }
 
 NSString *RLMDefaultRealmPath() {
@@ -84,6 +87,10 @@ static BOOL encryptTests() {
     // so if an exception is thrown, it will kill the test process rather than
     // allowing hundreds of test cases to fail in strange ways
     [RLMSchema sharedSchema];
+
+    // Ensure the documents directory exists as it sometimes doesn't after
+    // resetting the simulator
+    [NSFileManager.defaultManager createDirectoryAtPath:documentsDir() withIntermediateDirectories:YES attributes:nil error:nil];
 }
 
 - (void)setUp {
