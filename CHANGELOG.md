@@ -15,11 +15,21 @@ x.x.x Release notes (yyyy-MM-dd)
   cannot exist independently from a `Realm`.
 * Aggregate operations are now available on `List`: `min`, `max`, `sum`,
   `average`.
-* Add missing KVO handling for moving and exchanging objects in `RLMArray` and
-  `List`.
 * Committing write transactions (via `commitWrite` / `commitWriteTransaction` and
   `write` / `transactionWithBlock`) now optionally allow for handling errors when
   the disk is out of space.
+
+### Bugfixes
+
+* None.
+
+0.95.1 Release notes (2015-09-23)
+=============================================================
+
+### Enhancements
+
+* Add missing KVO handling for moving and exchanging objects in `RLMArray` and
+  `List`.
 
 ### Bugfixes
 
@@ -28,6 +38,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix crash due to race condition in `RLMRealmConfiguration` where the default
   configuration was in the process of being copied in one thread, while
   released in another.
+* Fix crash when a migration which removed an object or array property is
+  rolled back due to an error.
 
 0.95.0 Release notes (2015-08-25)
 =============================================================
