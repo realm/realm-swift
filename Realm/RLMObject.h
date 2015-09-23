@@ -232,6 +232,9 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  Indicates if an object can no longer be accessed.
+ 
+ An object can no longer be accessed if the object has been deleted from the containing `realm` or
+ if `invalidate` is called on the containing `realm`.
  */
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
