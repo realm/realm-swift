@@ -1,4 +1,10 @@
-0.95.1 Release notes (2015-09-09)
+0.95.2 Release notes (2015-09-24)
+=============================================================
+
+* Enable bitcode for iOS and watchOS frameworks.
+* Build libraries with Xcode 7 final rather than the GM.
+
+0.95.1 Release notes (2015-09-23)
 =============================================================
 
 ### Enhancements
