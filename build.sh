@@ -666,8 +666,8 @@ case "$COMMAND" in
         for symlink in $(find . -not -path "./.git/*" -type l); do
           if [[ -L "$symlink" ]]; then
             link="$(dirname "$symlink")/$(readlink "$symlink")"
-            rm -rf "$symlink"
-            mv "$link" "$symlink"
+            rm "$symlink"
+            cp -R "$link" "$symlink"
           fi
         done
 
