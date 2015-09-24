@@ -136,8 +136,9 @@ case "$COMMAND" in
 
         ./build.sh test-osx-swift-dynamic || exit 1
 
-        ./build.sh test-ios-swift-carthage || exit 1
-        ./build.sh test-osx-swift-carthage || exit 1
+        # FIXME: Re-enable once Carthage supports multiple build folders.
+        # ./build.sh test-ios-swift-carthage || exit 1
+        # ./build.sh test-osx-swift-carthage || exit 1
         ;;
 
     "test-xcode7")
@@ -147,9 +148,8 @@ case "$COMMAND" in
         ./build.sh test-ios-swift-cocoapods || exit 1
         ./build.sh test-osx-swift-dynamic || exit 1
 
-        # FIXME: Re-enable once Carthage supports multiple build folders.
-        # ./build.sh test-ios-swift-carthage || exit 1
-        # ./build.sh test-osx-swift-carthage || exit 1
+        ./build.sh test-ios-swift-carthage || exit 1
+        ./build.sh test-osx-swift-carthage || exit 1
         ;;
 
     "test-ios-objc-static")
