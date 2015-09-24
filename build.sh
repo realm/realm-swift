@@ -333,46 +333,7 @@ case "$COMMAND" in
         ;;
 
     "prelaunch-simulator")
-        # Kill all the current simulator processes as they may be from a
-        # different Xcode version
-        pkill Simulator 2>/dev/null || true
-        # CoreSimulatorService doesn't exit when sent SIGTERM
-        pkill -9 Simulator 2>/dev/null || true
-
-        shutdown_simulators
-
-        # Clean up all available simulators
-        (
-            previous_device=''
-            IFS=$'\n' # make newlines the only separator
-            for LINE in $(xcrun simctl list); do
-                if [[ $LINE =~ unavailable || $LINE =~ disconnected ]]; then
-                    # skip unavailable simulators
-                    continue
-                fi
-
-                regex='^(.*) [(]([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})[)]'
-                if [[ $LINE =~ $regex ]]; then
-                    device="${BASH_REMATCH[1]}"
-                    guid="${BASH_REMATCH[2]}"
-
-                    # Delete the simulator if it's a duplicate of the last seen one
-                    # Otherwise delete all contents and settings for it
-                    if [[ $device == $previous_device ]]; then
-                        xcrun simctl delete $guid
-                    else
-                        xcrun simctl erase $guid
-                        previous_device="$device"
-                    fi
-                fi
-            done
-        )
-
-        if [[ -a "${DEVELOPER_DIR}/Applications/iOS Simulator.app" ]]; then
-            open "${DEVELOPER_DIR}/Applications/iOS Simulator.app"
-        elif [[ -a "${DEVELOPER_DIR}/Applications/Simulator.app" ]]; then
-            open "${DEVELOPER_DIR}/Applications/Simulator.app"
-        fi
+        sh scripts/reset-simulators.sh
         ;;
 
     ######################################
