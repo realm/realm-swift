@@ -99,6 +99,9 @@ public class Object: RLMObjectBase {
     }
 
     /// Indicates if an object can no longer be accessed.
+    ///
+    /// An object can no longer be accessed if the object has been deleted from the containing
+    /// `realm` or if `invalidate` is called on the containing `realm`.
     public override var invalidated: Bool { return super.invalidated }
 
     /// Returns a human-readable description of this object.
