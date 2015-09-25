@@ -58,6 +58,9 @@ public final class Realm {
     /// Returns a `Configuration` that can be used to create this `Realm` instance.
     public var configuration: Configuration { return Configuration.fromRLMRealmConfiguration(rlmRealm.configuration) }
 
+    /// Indicates if this Realm contains any objects.
+    public var isEmpty: Bool { return rlmRealm.isEmpty }
+
     /**
     The location of the default Realm as a string. Can be overridden.
 

@@ -190,6 +190,11 @@ void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfiguration *configuration
     NSData *_encryptionKey;
 }
 
+- (BOOL)isEmpty
+{
+    return realm::ObjectStore::is_empty(self.group);
+}
+
 + (BOOL)isCoreDebug {
     return realm::Version::has_feature(realm::feature_Debug);
 }

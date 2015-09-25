@@ -204,6 +204,11 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMRealmConfiguration *configuration;
 
+/**
+ Indicates if this Realm contains any objects.
+ */
+@property (nonatomic, readonly) BOOL isEmpty;
+
 /**---------------------------------------------------------------------------------------
  *  @name Default Realm Path
  * ---------------------------------------------------------------------------------------
