@@ -17,7 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+#if DEBUG
+@testable import RealmSwift
+#else
 import RealmSwift
+#endif
 import Realm
 import Realm.Private
 import Realm.Dynamic
@@ -33,9 +37,12 @@ private func realmWithSingleClass(path: String, objectSchema: RLMObjectSchema) -
     return realmWithCustomSchema(path, schema: schema)
 }
 
-private func realmWithSingleClassProperties(path: String, className: String, properties: [AnyObject]) -> RLMRealm {
-    let objectSchema = RLMObjectSchema(className: className, objectClass: MigrationObject.self, properties: properties)
-    return realmWithSingleClass(path, objectSchema: objectSchema)
+private func realmWithClassBlueprint(path: String, classesDict: [String: [RLMProperty!]]) -> RLMRealm {
+    let schema = RLMSchema()
+    schema.objectSchema = classesDict.map {
+        RLMObjectSchema(className: $0.0, objectClass: MigrationObject.self, properties: $0.1)
+    }
+    return realmWithCustomSchema(path, schema: schema)
 }
 
 private func dynamicRealm(path: String) -> RLMRealm {
@@ -123,8 +130,8 @@ class MigrationTests: TestCase {
 
     func testMigrationProperties() {
         let prop = RLMProperty(name: "stringCol", type: RLMPropertyType.Int, objectClassName: nil, indexed: false, optional: false)
-        autoreleasepool { () -> () in
-            realmWithSingleClassProperties(Realm.defaultPath, className: "SwiftStringObject", properties: [prop])
+        autoreleasepool {
+            realmWithClassBlueprint(Realm.defaultPath, classesDict: ["SwiftStringObject": [prop]])
             return
         }
 
@@ -239,7 +246,7 @@ class MigrationTests: TestCase {
 
     func testDeleteData() {
         autoreleasepool {
-            let realm = realmWithSingleClassProperties(testRealmPath(), className: "DeletedClass", properties: [])
+            let realm = realmWithClassBlueprint(testRealmPath(), classesDict: ["DeletedClass": []])
             try! realm.transactionWithBlock {
                 realm.createObject("DeletedClass", withValue: [])
             }
@@ -264,6 +271,63 @@ class MigrationTests: TestCase {
             XCTAssertEqual(0, realm.allObjects("SwiftStringObject").count)
         }
     }
+
+#if DEBUG
+    func testRenamingClass() {
+        var migrationCompleted = false
+        let originalClassName = "OriginalClass"
+        let unusedClassName = "UnusedClass"
+        let props = [RLMProperty(name: "boolCol", type: .Bool, objectClassName: nil, indexed: false, optional: false)]
+        autoreleasepool {
+            let realm = Realm(realmWithClassBlueprint(testRealmPath(), classesDict: [originalClassName: props, unusedClassName: props]))
+            try! realm.write {
+                realm.dynamicCreate(originalClassName, value: [true])
+            }
+            XCTAssertEqual(1, realm.dynamicObjects(originalClassName).count)
+        }
+
+        autoreleasepool {
+            let newClassName = "NewClass"
+            let mismatchedClassName = "MismatchedClass"
+            var config = Realm.Configuration(path: testRealmPath(), schemaVersion: 1, migrationBlock: { migration, oldSchemaVersion in
+                XCTAssertEqual(oldSchemaVersion, 0, "Initial schema version should be 0")
+                self.assertThrows(migration.renameClass(originalClassName, to: originalClassName))
+                self.assertThrows(migration.renameClass(SwiftStringObject.className(), to: newClassName))
+                self.assertThrows(migration.renameClass(originalClassName, to: SwiftStringObject.className()))
+                self.assertThrows(migration.renameClass(unusedClassName, to: newClassName))
+                self.assertThrows(migration.renameClass(originalClassName, to: unusedClassName))
+                self.assertThrows(migration.renameClass(originalClassName, to: mismatchedClassName))
+                migration.renameClass(originalClassName, to: newClassName)
+
+                var enumerateCount = 0
+                migration.enumerate(originalClassName) { oldObject, newObject in
+                    XCTAssertNotNil(oldObject)
+                    XCTAssertNil(newObject)
+                    enumerateCount++
+                }
+                XCTAssertEqual(enumerateCount, 1)
+
+                enumerateCount = 0
+                migration.enumerate(newClassName) { oldObject, newObject in
+                    XCTAssertNil(oldObject)
+                    XCTAssertNotNil(newObject)
+                    enumerateCount++
+                }
+                XCTAssertEqual(enumerateCount, 1)
+                migrationCompleted = true
+            })
+            let schema = RLMSchema()
+            schema.objectSchema = [
+                RLMObjectSchema(className: unusedClassName, objectClass: MigrationObject.self, properties: props),
+                RLMObjectSchema(className: mismatchedClassName, objectClass: MigrationObject.self, properties: []),
+                RLMObjectSchema(className: newClassName, objectClass: MigrationObject.self, properties: props),
+            ]
+            config.customSchema = schema
+            try! Realm(configuration: config)
+        }
+        XCTAssert(migrationCompleted)
+    }
+#endif
 
     // test getting/setting all property types
     func testMigrationObject() {

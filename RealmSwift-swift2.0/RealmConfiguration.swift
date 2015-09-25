@@ -130,15 +130,15 @@ extension Realm {
         /// The classes persisted in the Realm.
         public var objectTypes: [Object.Type]? {
             set {
-                self.customSchema = newValue.map { RLMSchema(objectClasses: $0) }
+                customSchema = newValue.map { RLMSchema(objectClasses: $0) }
             }
             get {
-                return self.customSchema.map { $0.objectSchema.map { $0.objectClass as! Object.Type } }
+                return customSchema.map { $0.objectSchema.map { $0.objectClass as! Object.Type } }
             }
         }
 
         /// A custom schema to use for the Realm.
-        private var customSchema: RLMSchema? = nil
+        internal var customSchema: RLMSchema? = nil
 
         // MARK: Private Methods
 
