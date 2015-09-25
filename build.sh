@@ -354,7 +354,7 @@ case "$COMMAND" in
         ;;
 
     "prelaunch-simulator")
-        sh scripts/reset-simulators.sh
+        sh $(dirname $0)/scripts/reset-simulators.sh
         ;;
 
     ######################################
