@@ -95,6 +95,24 @@ extern "C" {
     XCTAssertEqualObjects(testRealm.path, RLMTestRealmPath(), @"Test path");
 }
 
+- (void)testIsEmpty
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertTrue(realm.isEmpty, @"Realm should be empty on creation.");
+
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withValue:@[@"a"]];
+    XCTAssertFalse(realm.isEmpty, @"Realm should not be empty within a write transaction after adding an object.");
+    [realm cancelWriteTransaction];
+
+    XCTAssertTrue(realm.isEmpty, @"Realm should be empty after canceling a write transaction that added an object.");
+
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withValue:@[@"a"]];
+    [realm commitWriteTransaction];
+    XCTAssertFalse(realm.isEmpty, @"Realm should not be empty after committing a write transaction that added an object.");
+}
+
 - (void)testRealmConfiguration {
     RLMRealm *realm = [RLMRealm defaultRealm];
     RLMRealmConfiguration *configuration = realm.configuration;

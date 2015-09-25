@@ -61,6 +61,24 @@ class RealmTests: TestCase {
         XCTAssertEqual(1, schema.objectSchema.filter({ $0.className == "SwiftStringObject" }).count)
     }
 
+    func testIsEmpty() {
+        try! NSFileManager.defaultManager().removeItemAtPath(Realm.defaultPath)
+        let realm = try! Realm()
+        XCTAssert(realm.isEmpty, "Realm should be empty on creation.")
+
+        realm.beginWrite()
+        realm.create(SwiftStringObject.self, value: ["a"])
+        XCTAssertFalse(realm.isEmpty, "Realm should not be empty within a write transaction after adding an object.")
+        realm.cancelWrite()
+
+        XCTAssertTrue(realm.isEmpty, "Realm should be empty after canceling a write transaction that added an object.")
+
+        realm.beginWrite()
+        realm.create(SwiftStringObject.self, value: ["a"])
+        try! realm.commitWrite()
+        XCTAssertFalse(realm.isEmpty, "Realm should not be empty after committing a write transaction that added an object.")
+    }
+
     func testDefaultPath() {
         let defaultPath =  try! Realm().path
         XCTAssertEqual(Realm.defaultPath, defaultPath)

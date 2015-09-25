@@ -18,6 +18,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Committing write transactions (via `commitWrite` / `commitWriteTransaction` and
   `write` / `transactionWithBlock`) now optionally allow for handling errors when
   the disk is out of space.
+* Added `isEmpty` property on `RLMRealm`/`Realm` to indicate if it contains any
+  objects.
 
 ### Bugfixes
 
