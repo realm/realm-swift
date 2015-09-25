@@ -33,12 +33,20 @@ FOUNDATION_EXPORT void RLMClearRealmCache();
 // for all cached realms on the current thread
 FOUNDATION_EXPORT void RLMInstallUncaughtExceptionHandler();
 
-@interface RLMNotifier : NSObject
+@protocol RLMNotifier
 // listens to changes to the realm's file and notifies it when they occur
 // does not retain the Realm
-- (instancetype)initWithRealm:(RLMRealm *)realm error:(NSError **)error;
++ (id<RLMNotifier>)listenToRealm:(RLMRealm *)realm error:(NSError **)error;
+// resets internal state, if applicable
++ (void)reset;
 // stop listening for changes
 - (void)stop;
 // notify other Realm instances for the same path that a change has occurred
 - (void)notifyOtherRealms;
+@end
+
+@interface RLMInterProcessNotifier : NSObject<RLMNotifier>
+@end
+
+@interface RLMInterThreadNotifier : NSObject<RLMNotifier>
 @end

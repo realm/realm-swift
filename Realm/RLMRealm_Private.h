@@ -18,7 +18,8 @@
 
 #import <Realm/RLMRealm.h>
 
-@class RLMFastEnumerator, RLMNotifier;
+@class RLMFastEnumerator;
+@protocol RLMNotifier;
 
 // Disable syncing files to disk. Cannot be re-enabled. Use only for tests.
 FOUNDATION_EXTERN void RLMDisableSyncToDisk();
@@ -41,7 +42,7 @@ FOUNDATION_EXTERN void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfigurat
 
 @property (nonatomic, readonly) BOOL dynamic;
 @property (nonatomic, readwrite) RLMSchema *schema;
-@property (nonatomic, strong) RLMNotifier *notifier;
+@property (nonatomic, strong) id<RLMNotifier> notifier;
 
 + (void)resetRealmState;
 

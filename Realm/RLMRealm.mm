@@ -67,6 +67,12 @@ void RLMDisableSyncToDisk() {
 }
 @end
 
+#if TARGET_OS_TV
+    static Class RLMNotifierClass = RLMInterThreadNotifier.class;
+#else
+    static Class RLMNotifierClass = RLMInterProcessNotifier.class;
+#endif
+
 using namespace std;
 using namespace realm;
 using namespace realm::util;
@@ -451,7 +457,7 @@ static id RLMAutorelease(id value) {
     }
 
     if (!readOnly) {
-        realm.notifier = [[RLMNotifier alloc] initWithRealm:realm error:error];
+        realm.notifier = [RLMNotifierClass listenToRealm:realm error:error];
         if (!realm.notifier) {
             return nil;
         }
@@ -502,6 +508,7 @@ void RLMRealmSetEncryptionKeyForPath(NSData *encryptionKey, NSString *path) {
     clearMigrationCache();
     clearKeyCache();
     RLMClearRealmCache();
+    [RLMNotifierClass reset];
     [RLMRealmConfiguration resetRealmConfigurationState];
 }
 
