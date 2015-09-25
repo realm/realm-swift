@@ -138,8 +138,9 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 }
 
 - (void)testSchemaWithObjectClasses {
-    RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[RLMDynamicObject.class, StringObject.class]];
-    XCTAssertEqualObjects((@[@"RLMDynamicObject", @"StringObject"]), [schema.objectSchema valueForKey:@"className"]);
+    XCTAssertThrows([RLMSchema schemaWithObjectClasses:@[RLMDynamicObject.class]], @"RLMDynamicObject is not persisted in the Realm.");
+    RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[StringObject.class]];
+    XCTAssertEqualObjects((@[@"StringObject"]), [schema.objectSchema valueForKey:@"className"]);
     XCTAssertNil([RLMSchema.sharedSchema schemaForClassName:@"RLMDynamicObject"]);
 }
 

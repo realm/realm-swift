@@ -97,7 +97,7 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
         for (NSUInteger i = 0; i < count; i++) {
             Class cls = classes[i];
 
-            if (!RLMIsObjectSubclass(cls)) {
+            if (!RLMIsObjectSubclass(cls) || ![cls shouldIncludeInDefaultSchema]) {
                 continue;
             }
 
@@ -147,9 +147,7 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
             // override sharedSchema classs methods for performance
             RLMReplaceSharedSchemaMethod(cls, schema);
 
-            if ([cls shouldIncludeInDefaultSchema]) {
-                [schemas addObject:schema];
-            }
+            [schemas addObject:schema];
         }
 
         // protected by the @synchronized around s_localNameToClass

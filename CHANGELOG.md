@@ -21,7 +21,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix an issue where an 'unrecognized selector' exception would be thrown when
+  specifying `RLMRealmConfiguration.objectClasses`/`Realm.Configuration.objectTypes`.
 
 0.95.1 Release notes (2015-09-23)
 =============================================================
