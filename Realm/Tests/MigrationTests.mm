@@ -198,12 +198,11 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
     NSString *originalClassName = @"OriginalClass";
     NSString *newClassName = @"NewClass";
     NSArray *props = @[[[RLMProperty alloc] initWithName:@"boolCol" type:RLMPropertyTypeBool objectClassName:nil indexed:NO optional:NO]];
+    Class originalClass = [self runtimeClassWithName:originalClassName properties:props];
+    Class unusedClass = [self runtimeClassWithName:@"UnusedClass" properties:props];
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.path = RLMTestRealmPath();
-    config.customSchema = [[RLMSchema alloc] init];
-    RLMObjectSchema *unusedClassSchema = [[RLMObjectSchema alloc] initWithClassName:@"UnusedClass" objectClass:RLMObject.class properties:props];
-    RLMObjectSchema *originalClassSchema = [[RLMObjectSchema alloc] initWithClassName:originalClassName objectClass:RLMObject.class properties:props];
-    config.customSchema.objectSchema = @[unusedClassSchema, originalClassSchema];
+    config.objectClasses = @[unusedClass, originalClass];
 
     @autoreleasepool {
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
@@ -214,9 +213,9 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
     }
 
     @autoreleasepool {
-        RLMObjectSchema *mismatchedClassSchema = [[RLMObjectSchema alloc] initWithClassName:@"MismatchedClass" objectClass:RLMObject.class properties:@[]];
-        RLMObjectSchema *newClassSchema = [[RLMObjectSchema alloc] initWithClassName:newClassName objectClass:RLMObject.class properties:props];
-        config.customSchema.objectSchema = @[unusedClassSchema, mismatchedClassSchema, newClassSchema];
+        Class newClass = [self runtimeClassWithName:newClassName properties:props];
+        Class mismatchedClass = [self runtimeClassWithName:@"MismatchedClass" properties:@[]];
+        config.objectClasses = @[unusedClass, mismatchedClass, newClass];
         config.schemaVersion = 1;
         // apply migration
         [config setMigrationBlock:^(RLMMigration *migration, uint64_t oldSchemaVersion) {
@@ -231,13 +230,13 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
             RLMAssertThrowsWithReasonMatching([migration renameClassFrom:originalClassName to:StringObject.className],
                                               @"Cannot rename '\\w+' class to '\\w+' because there is no RLMObject subclass with the new name.");
 
-            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:unusedClassSchema.className to:newClassName],
+            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:[unusedClass className] to:newClassName],
                                               @"Cannot rename '\\w+' class because it is still defined as an RLMObject subclass.");
 
-            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:originalClassName to:unusedClassSchema.className],
+            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:originalClassName to:[unusedClass className]],
                                               @"Cannot rename '\\w+' class to '\\w+' because the new class was already defined as an RLMObject subclass prior to this migration.");
 
-            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:originalClassName to:mismatchedClassSchema.className],
+            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:originalClassName to:[mismatchedClass className]],
                                               @"Cannot rename '\\w+' class to '\\w+' because their properties don't match.");
 
             XCTAssertNoThrow([migration renameClassFrom:originalClassName to:newClassName]);
