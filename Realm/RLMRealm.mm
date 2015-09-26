@@ -285,32 +285,35 @@ void RLMRealmTranslateException(NSError **error) {
 }
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
-    configuration = [configuration copy];
-    Realm::Config& config = configuration.config;
-
     bool dynamic = configuration.dynamic;
     bool readOnly = configuration.readOnly;
 
-    // try to reuse existing realm first
-    if (config.cache || dynamic) {
-        RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path);
-        if (realm) {
-            auto const& old_config = realm->_realm->config();
-            if (old_config.read_only != config.read_only) {
-                @throw RLMException(@"Realm at path '%s' already opened with different read permissions", config.path.c_str());
+    {
+        Realm::Config& config = configuration.config;
+
+        // try to reuse existing realm first
+        if (config.cache || dynamic) {
+            if (RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path)) {
+                auto const& old_config = realm->_realm->config();
+                if (old_config.read_only != config.read_only) {
+                    @throw RLMException(@"Realm at path '%s' already opened with different read permissions", config.path.c_str());
+                }
+                if (old_config.in_memory != config.in_memory) {
+                    @throw RLMException(@"Realm at path '%s' already opened with different inMemory settings", config.path.c_str());
+                }
+                if (realm->_dynamic != dynamic) {
+                    @throw RLMException(@"Realm at path '%s' already opened with different dynamic settings", config.path.c_str());
+                }
+                if (old_config.encryption_key != config.encryption_key) {
+                    @throw RLMException(@"Realm at path '%s' already opened with different encryption key", config.path.c_str());
+                }
+                return RLMAutorelease(realm);
             }
-            if (old_config.in_memory != config.in_memory) {
-                @throw RLMException(@"Realm at path '%s' already opened with different inMemory settings", config.path.c_str());
-            }
-            if (realm->_dynamic != dynamic) {
-                @throw RLMException(@"Realm at path '%s' already opened with different dynamic settings", config.path.c_str());
-            }
-            if (old_config.encryption_key != config.encryption_key) {
-                @throw RLMException(@"Realm at path '%s' already opened with different encryption key", config.path.c_str());
-            }
-            return RLMAutorelease(realm);
         }
     }
+
+    configuration = [configuration copy];
+    Realm::Config& config = configuration.config;
 
     RLMRealm *realm = [RLMRealm new];
     realm->_dynamic = dynamic;
