@@ -169,14 +169,6 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 @end
 
-@interface StringLinkObject : RLMObject
-@property StringObject *stringObjectCol;
-@property RLM_GENERIC_ARRAY(StringObject) *stringObjectArrayCol;
-@end
-
-@implementation StringLinkObject
-@end
-
 @interface ReadOnlyPropertyObject ()
 @property (readwrite) int readOnlyPropertyMadeReadWriteInClassExtension;
 @end
@@ -627,7 +619,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
     // ensure exceptions on when using polymorphism
     [realm beginWriteTransaction];
-    StringLinkObject *linkObject = [StringLinkObject createInDefaultRealmWithValue:@[NSNull.null, @[]]];
+    StringLinkObject *linkObject = [StringLinkObject createInDefaultRealmWithValue:@[@"string", NSNull.null, @[]]];
     XCTAssertThrows(linkObject.stringObjectCol = obj);
     XCTAssertThrows([linkObject.stringObjectArrayCol addObject:obj]);
     [realm commitWriteTransaction];
@@ -1667,7 +1659,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertEqual(0U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
 
     [realm transactionWithBlock:^{
-        StringLinkObject *lObj = [StringLinkObject createInDefaultRealmWithValue:@[obj, @[]]];
+        StringLinkObject *lObj = [StringLinkObject createInDefaultRealmWithValue:@[@"string", obj, @[]]];
         XCTAssertEqual(1U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
 
         lObj.stringObjectCol = nil;

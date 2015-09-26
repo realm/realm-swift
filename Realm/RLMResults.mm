@@ -535,7 +535,13 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (std::unique_ptr<Query>)cloneQuery {
-    return std::make_unique<realm::Query>(*_backingQuery, realm::Query::TCopyExpressionTag{});
+    if (_backingQuery) {
+        return std::make_unique<realm::Query>(*_backingQuery, realm::Query::TCopyExpressionTag{});
+    }
+    else {
+        std::unique_ptr<TableViewBase> tableView(new TableView(_backingView));
+        return std::make_unique<realm::Query>(*_objectSchema.table, std::move(tableView));
+    }
 }
 
 - (NSUInteger)indexInSource:(NSUInteger)index {

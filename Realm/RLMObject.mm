@@ -139,7 +139,7 @@
     return RLMGetObject(realm, self.className, primaryKey);
 }
 
-- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
+- (RLMResults *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
     return RLMObjectBaseLinkingObjectsOfClass(self, className, property);
 }
 

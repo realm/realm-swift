@@ -136,6 +136,11 @@
 @implementation ArrayPropertyObject
 @end
 
+#pragma mark StringLinkObject
+
+@implementation StringLinkObject
+@end
+
 #pragma mark DynamicObject
 
 @implementation DynamicObject

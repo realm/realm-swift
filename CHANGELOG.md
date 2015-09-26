@@ -5,6 +5,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * CocoaPods v0.38 or greater is now required to install Realm and RealmSwift
   as pods.
+* `-[RLMObject linkingObjectsOfClass:forProperty:]` / 
+  `Object.linkingObjects(_:forProperty:)` now return `RLMResults` / `Results`.
 
 ### Enhancements
 
@@ -23,7 +25,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix assertion failure when inserting NSData between 8MB and 16MB in size.
+* Fix assertion failure when rolling back a migration which removed an object
+  link or `RLMArray`/`List` property.
+* Add the path of the file being opened to file open errors.
 
 0.95.2 Release notes (2015-09-24)
 =============================================================
@@ -48,6 +53,10 @@ x.x.x Release notes (yyyy-MM-dd)
   released in another.
 * Fix crash when a migration which removed an object or array property is
   rolled back due to an error.
+* Fix assertion failure when inserting NSData between 8MB and 16MB in size.
+* Fix assertion failure when rolling back a migration which removed an object
+  link or `RLMArray`/`List` property.
+* Add the path of the file being opened to file open errors.
 
 0.95.0 Release notes (2015-08-25)
 =============================================================

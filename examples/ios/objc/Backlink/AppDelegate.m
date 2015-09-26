@@ -28,7 +28,7 @@
 
 @implementation Dog
 // Define "owners" as the inverse relationship to Person.dogs
-- (NSArray *)owners {
+- (RLMResults *)owners {
     return [self linkingObjectsOfClass:@"Person" forProperty:@"dogs"];
 }
 @end

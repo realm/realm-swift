@@ -600,4 +600,56 @@ static vm_size_t get_resident_size() {
     [realm cancelWriteTransaction];
 }
 
+- (void)testQueryOnBacklinks {
+    StringObject *obj = [[StringObject alloc] initWithValue:@[@"string"]];
+
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    StringLinkObject *aObj = [StringLinkObject createInDefaultRealmWithValue:@[@"a", obj, @[obj, obj]]];
+    [StringLinkObject createInDefaultRealmWithValue:@[@"b", obj, @[obj, obj]]];
+    [realm commitWriteTransaction];
+
+    { // Arrays
+        RLMResults *backlinks = [obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectArrayCol"];
+        RLMResults *filtered = [backlinks objectsWhere:@"stringCol == 'a'"];
+        XCTAssertEqual(2U, filtered.count);
+        XCTAssert([aObj isEqualToObject:filtered.firstObject]);
+    }
+
+    { // Links
+        RLMResults *backlinks = [obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"];
+        RLMResults *filtered = [backlinks objectsWhere:@"stringCol == 'a'"];
+        XCTAssertEqual(1U, filtered.count);
+        XCTAssert([aObj isEqualToObject:filtered.firstObject]);
+    }
+}
+
+- (void)testSortingBacklinks {
+    StringObject *obj = [[StringObject alloc] initWithValue:@[@"string"]];
+
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    StringLinkObject *bObj = [StringLinkObject createInDefaultRealmWithValue:@[@"b", obj, @[obj, obj]]];
+    StringLinkObject *aObj = [StringLinkObject createInDefaultRealmWithValue:@[@"a", obj, @[obj, obj]]];
+    [realm commitWriteTransaction];
+
+    { // Arrays
+        RLMResults *backlinks = [obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectArrayCol"];
+        RLMResults *sorted = [backlinks sortedResultsUsingProperty:@"stringCol" ascending:YES];
+        XCTAssertEqual(4U, sorted.count);
+        XCTAssert([aObj isEqualToObject:sorted.firstObject]);
+        XCTAssert([bObj isEqualToObject:sorted.lastObject]);
+    }
+
+    { // Links
+        RLMResults *backlinks = [obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"];
+        RLMResults *sorted = [backlinks sortedResultsUsingProperty:@"stringCol" ascending:YES];
+        XCTAssertEqual(2U, sorted.count);
+        XCTAssert([aObj isEqualToObject:sorted.firstObject]);
+        XCTAssert([bObj isEqualToObject:sorted.lastObject]);
+    }
+}
+
 @end
