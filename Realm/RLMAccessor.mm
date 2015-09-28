@@ -597,6 +597,19 @@ void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema) 
     class_replaceMethod(metaClass, @selector(sharedSchema), imp, "@@:");
 }
 
+static NSMutableSet *s_generatedClasses = [NSMutableSet new];
+static void RLMMarkClassAsGenerated(Class cls) {
+    @synchronized (s_generatedClasses) {
+        [s_generatedClasses addObject:cls];
+    }
+}
+
+bool RLMIsGeneratedClass(Class cls) {
+    @synchronized (s_generatedClasses) {
+        return [s_generatedClasses containsObject:cls];
+    }
+}
+
 void RLMReplaceSharedSchemaMethodWithBlock(Class accessorClass, RLMObjectSchema *(^method)(Class)) {
     Class metaClass = objc_getMetaClass(class_getName(accessorClass));
     IMP imp = imp_implementationWithBlock(method);
@@ -645,6 +658,7 @@ static Class RLMCreateAccessorClass(Class objectClass,
     // implement className for accessor to return base className
     RLMReplaceClassNameMethod(accClass, schema.className);
     RLMReplaceShouldIncludeInDefaultSchemaMethod(accClass, false);
+    RLMMarkClassAsGenerated(accClass);
 
     return accClass;
 }
