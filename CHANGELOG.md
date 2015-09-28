@@ -23,7 +23,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix crashes when the first Realm opened uses a class subset and later Realms
+  opened do not.
 
 0.95.2 Release notes (2015-09-24)
 =============================================================

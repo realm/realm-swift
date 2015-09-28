@@ -18,7 +18,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import "RLMTestCase.h"
+#import "RLMMultiProcessTestCase.h"
 
 #import "RLMAccessor.h"
 #import "RLMObjectSchema_Private.hpp"
@@ -125,7 +125,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 }
 @end
 
-@interface SchemaTests : RLMTestCase
+@interface SchemaTests : RLMMultiProcessTestCase
 @end
 
 @implementation SchemaTests
@@ -461,5 +461,48 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 - (void)testClassWithRequiredLinkProperty {
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:RequiredLinkProperty.class], @"cannot be made required.*'object'");
 }
+
+// Can't spawn child processes on iOS
+#if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
+- (void)testPartialSharedSchemaInit {
+    if (self.isParent) {
+        RLMRunChildAndWait();
+        return;
+    }
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+
+    // Verify that opening with class subsets without the shared schema being
+    // initialized works
+    config.objectClasses = @[IntObject.class];
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        XCTAssertEqual(1U, realm.schema.objectSchema.count);
+    }
+
+    config.objectClasses = @[IntObject.class, StringObject.class];
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        XCTAssertEqual(2U, realm.schema.objectSchema.count);
+    }
+
+    // Verify that the shared schema generated afterwards is valid
+    config.objectClasses = nil;
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm defaultRealm];
+
+        // Shared schema shouldn't have accessor classes
+        for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+            const char *actualClassName = class_getName(objectSchema.objectClass);
+            XCTAssertEqual(nullptr, strstr(actualClassName, "RLMAccessor"));
+            XCTAssertEqual(nullptr, strstr(actualClassName, "RLMStandalone"));
+        }
+
+        // Shared schema shouldn't have duplicate entries
+        XCTAssertEqual(realm.schema.objectSchema.count,
+                       [NSSet setWithArray:[realm.schema.objectSchema valueForKey:@"className"]].count);
+    }
+}
+#endif
 
 @end
