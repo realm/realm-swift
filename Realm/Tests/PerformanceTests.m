@@ -18,6 +18,8 @@
 
 #import "RLMTestCase.h"
 
+#import "RLMRealm_Private.h"
+
 #if !DEBUG
 
 @interface PerformanceTests : RLMTestCase
@@ -59,6 +61,12 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 + (RLMRealm *)createStringObjects:(int)factor {
     RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     config.inMemoryIdentifier = @(factor).stringValue;
+
+    // If a previous run of the tests crashed there could be a lingering
+    // copy of the in-memory realm
+    // FIXME: remove this once core does it automatically
+    [NSFileManager.defaultManager removeItemAtPath:[RLMRealm writeableTemporaryPathForFile:config.inMemoryIdentifier] error:nil];
+
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     [realm beginWriteTransaction];
     for (int i = 0; i < 1000 * factor; ++i) {
