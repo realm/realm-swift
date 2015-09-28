@@ -75,6 +75,7 @@
     // Do nothing so that we can test global schema init in child processes
 }
 
+#if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
 - (NSTask *)childTask {
     NSString *testName = [NSString stringWithFormat:@"%@/%@", self.className, self.testName];
     NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];
@@ -128,4 +129,13 @@
 
     return task.terminationStatus;
 }
+#else
+- (NSTask *)childTask {
+    return nil;
+}
+
+- (int)runChildAndWait {
+    return 1;
+}
+#endif
 @end

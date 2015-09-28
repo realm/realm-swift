@@ -18,6 +18,8 @@
 
 #import "RLMTestCase.h"
 
+@class NSTask;
+
 @interface RLMMultiProcessTestCase : RLMTestCase
 // if true, this is running the main test process
 @property (nonatomic, readonly) bool isParent;
