@@ -463,7 +463,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 }
 
 // Can't spawn child processes on iOS
-#if !TARGET_OS_IOS
+#if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
 - (void)testPartialSharedSchemaInit {
     if (self.isParent) {
         RLMRunChildAndWait();
