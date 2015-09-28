@@ -71,6 +71,10 @@
     }
 }
 
++ (void)preintializeSchema {
+    // Do nothing so that we can test global schema init in child processes
+}
+
 - (NSTask *)childTask {
     NSString *testName = [NSString stringWithFormat:@"%@/%@", self.className, self.testName];
     NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];

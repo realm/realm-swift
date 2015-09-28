@@ -83,10 +83,7 @@ static BOOL encryptTests() {
     // re-enabled and we need it enabled for performance tests
     RLMDisableSyncToDisk();
 #endif
-    // This ensures the shared schema is initialized outside of of a test case,
-    // so if an exception is thrown, it will kill the test process rather than
-    // allowing hundreds of test cases to fail in strange ways
-    [RLMSchema sharedSchema];
+    [self preintializeSchema];
 
     // Ensure the documents directory exists as it sometimes doesn't after
     // resetting the simulator
@@ -114,6 +111,14 @@ static BOOL encryptTests() {
         }
         [self deleteFiles];
     }
+}
+
+// This ensures the shared schema is initialized outside of of a test case,
+// so if an exception is thrown, it will kill the test process rather than
+// allowing hundreds of test cases to fail in strange ways
+// This is overridden by RLMMultiProcessTestCase to support testing the schema init
++ (void)preintializeSchema {
+    [RLMSchema sharedSchema];
 }
 
 - (void)deleteFiles {
