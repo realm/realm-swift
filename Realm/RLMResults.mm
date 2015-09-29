@@ -98,10 +98,13 @@ static const int RLMEnumerationBufferSize = 16;
 
     Class accessorClass = _objectSchema.accessorClass;
     for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
-        size_t row = _collection ? [_collection indexInSource:index] : _tableView.get_source_ndx(index);
-
         RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:_objectSchema];
-        accessor->_row = (*_objectSchema.table)[row];
+        if (_collection) {
+            accessor->_row = (*_objectSchema.table)[[_collection indexInSource:index]];
+        }
+        else if (_tableView.is_row_attached(index)) {
+            accessor->_row = (*_objectSchema.table)[_tableView.get_source_ndx(index)];
+        }
         _strongBuffer[batchCount] = accessor;
         batchCount++;
     }
