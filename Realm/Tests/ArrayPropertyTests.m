@@ -565,7 +565,28 @@
     }
     XCTAssertEqual(totalCount, count);
     XCTAssertEqual(totalCount * 2, company.employees.count);
+}
 
+- (void)testDeleteDuringEnumeration {
+    RLMRealm *realm = self.realmWithTestPath;
+
+    [realm beginWriteTransaction];
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+    [realm addObject:company];
+
+    const size_t totalCount = 40;
+    for (size_t i = 0; i < totalCount; ++i) {
+        [company.employees addObject:[EmployeeObject createInRealm:realm withValue:@[@"name", @(i), @NO]]];
+    }
+
+    [realm commitWriteTransaction];
+
+    [realm beginWriteTransaction];
+    for (__unused EmployeeObject *eo in company.employees) {
+        [realm deleteObjects:company.employees];
+    }
+    [realm commitWriteTransaction];
 }
 
 - (void)testValueForKey {
