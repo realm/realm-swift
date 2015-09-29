@@ -90,7 +90,7 @@ class TestCase: XCTestCase {
 
     private func deleteRealmFiles() {
         do {
-            try NSFileManager.defaultManager().removeItemAtPath(realmPathForFile(""))
+            try NSFileManager.defaultManager().removeItemAtPath((Realm.defaultPath as NSString).stringByDeletingLastPathComponent)
         } catch {
             XCTFail("Unable to delete realm files")
         }

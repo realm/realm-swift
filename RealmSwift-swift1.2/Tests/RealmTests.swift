@@ -139,6 +139,7 @@ class RealmTests: TestCase {
 
     func testInitCustomClassList() {
         let configuration = Realm.Configuration(objectTypes: [SwiftStringObject.self])
+        NSFileManager.defaultManager().removeItemAtPath(configuration.path, error: nil)
         let realm = Realm(configuration: configuration)!
         XCTAssertEqual(["SwiftStringObject"], realm.schema.objectSchema.map { $0.className })
     }
