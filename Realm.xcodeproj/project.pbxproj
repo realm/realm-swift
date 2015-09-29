@@ -187,6 +187,7 @@
 		144C2F761B3D3539005C8F81 /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
 		144C2F771B3D3539005C8F81 /* RLMUpdateChecker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F20DA2019BE1EA6007DE308 /* RLMUpdateChecker.hpp */; };
 		144C2F781B3D3539005C8F81 /* RLMUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F811955FC9300FDED82 /* RLMUtil.hpp */; };
+		148FF9F61BB9A738000C7028 /* strip-frameworks.sh in Copy Strip Frameworks Script */ = {isa = PBXBuildFile; fileRef = E81C393E1AE5CE6A00F03B56 /* strip-frameworks.sh */; };
 		14D7F00D1B428F260095AD87 /* object_schema.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFB81B22488800A1BD87 /* object_schema.hpp */; };
 		14D7F00E1B428F260095AD87 /* object_store.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFBA1B22488800A1BD87 /* object_store.hpp */; };
 		14D7F00F1B428F260095AD87 /* property.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02D9AFBC1B22488800A1BD87 /* property.hpp */; };
@@ -557,6 +558,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		148FF9F51BB9A727000C7028 /* Copy Strip Frameworks Script */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				148FF9F61BB9A738000C7028 /* strip-frameworks.sh in Copy Strip Frameworks Script */,
+			);
+			name = "Copy Strip Frameworks Script";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E81C393F1AE5CE7B00F03B56 /* Copy Strip Frameworks Script */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -709,13 +721,6 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		026B0F271A780680005E26C8 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		144C2F3A1B3D33D0005C8F81 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1220,9 +1225,8 @@
 				144C2F591B3D34B1005C8F81 /* Get Version Number */,
 				293F98F11A76E05A00C0199D /* Download Core */,
 				144C2F391B3D33D0005C8F81 /* Sources */,
-				144C2F3A1B3D33D0005C8F81 /* Frameworks */,
 				144C2F3B1B3D33D0005C8F81 /* Headers */,
-				144C2F3C1B3D33D0005C8F81 /* Resources */,
+				148FF9F51BB9A727000C7028 /* Copy Strip Frameworks Script */,
 			);
 			buildRules = (
 			);
@@ -1437,13 +1441,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		144C2F3C1B3D33D0005C8F81 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		E8D89B961955FC6D00CF2B9A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
