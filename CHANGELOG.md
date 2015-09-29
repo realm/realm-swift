@@ -25,6 +25,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix crashes when the first Realm opened uses a class subset and later Realms
   opened do not.
+* Fix assertion failure when inserting NSData between 8MB and 16MB in size.
+* Fix assertion failure when rolling back a migration which removed an object
+  link or `RLMArray`/`List` property.
+* Add the path of the file being opened to file open errors.
 
 0.95.2 Release notes (2015-09-24)
 =============================================================

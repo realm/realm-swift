@@ -22,6 +22,7 @@
 #import <realm/array.hpp>
 #import <realm/binary_data.hpp>
 #import <realm/string_data.hpp>
+#import <realm/util/file.hpp>
 
 @class RLMObjectSchema;
 @class RLMProperty;
@@ -33,6 +34,7 @@ NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
 NSException *RLMException(std::exception const& exception);
 
 NSError *RLMMakeError(RLMError code, std::exception const& exception);
+NSError *RLMMakeError(RLMError code, const realm::util::File::AccessError&);
 NSError *RLMMakeError(NSException *exception);
 
 void RLMSetErrorOrThrow(NSError *error, NSError **outError);

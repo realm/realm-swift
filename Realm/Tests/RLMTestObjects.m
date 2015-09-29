@@ -146,12 +146,15 @@
 @implementation AggregateObject
 @end
 
+#pragma mark PrimaryStringObject
 
 @implementation PrimaryStringObject
 + (NSString *)primaryKey {
     return @"stringCol";
 }
 @end
+
+#pragma mark ReadOnlyPropertyObject
 
 @interface ReadOnlyPropertyObject ()
 @property (readwrite) int readOnlyPropertyMadeReadWriteInClassExtension;
@@ -161,6 +164,11 @@
 - (NSNumber *)readOnlyUnsupportedProperty {
     return nil;
 }
+@end
+
+#pragma mark IntegerArrayPropertyObject
+
+@implementation IntegerArrayPropertyObject
 @end
 
 #pragma mark FakeObject

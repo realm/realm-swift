@@ -1827,4 +1827,87 @@
 }
 #endif
 
+- (void)testCountOnCollection {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    IntegerArrayPropertyObject *arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @1234, @[]]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @456 ]]];
+
+    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @4567, @[]]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @1 ]]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @2 ]]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @3 ]]];
+
+    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @4567, @[]]];
+
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@count > 0"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@count == 3"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@count < 1"].count));
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"0 < array.@count"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"3 == array.@count"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"1 >  array.@count"].count));
+
+    // We do not yet handle collection operations with a keypath on the other side of the comparison.
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count != number"]), @"'array.@count' not found in object");
+
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.foo.bar != 0"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.intCol > 0"]), @"@count does not have any properties");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count != 'Hello'"]), @"@count can only be compared with a numeric value");
+}
+
+- (void)testAggregateCollectionOperators {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    IntegerArrayPropertyObject *arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @1111, @[] ]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @1234 ]]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @2 ]]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @-12345 ]]];
+
+    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @2222, @[] ]];
+    [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @100 ]]];
+
+    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @3333, @[] ]];
+
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == -12345"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == 100"].count));
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol < 1000"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol > -1000"].count));
+
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol == 1234"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol == 100"].count));
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol > -1000"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol > 1000"].count));
+
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol == 100"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol == -11109"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol == 0"].count));
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol > -50"].count));
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol < 50"].count));
+
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol == 100"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol == -3703.0"].count));
+    XCTAssertEqual(0U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol == 0"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol < -50"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol > 50"].count));
+
+    // We do not yet handle collection operations with a keypath on the other side of the comparison.
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == number"]), @"'array.@min.intCol' not found in object");
+
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol.foo.bar == 1.23"]), @"single level key");
+
+    // Average is omitted from this test as its result is always a double.
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == 1.23"]), @"@min.*type int cannot be compared");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol == 1.23"]), @"@max.*type int cannot be compared");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol == 1.23"]), @"@sum.*type int cannot be compared");
+}
+
 @end
