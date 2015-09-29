@@ -81,6 +81,11 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 
 - (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
     self = [self init];
+    if (!_objectSchema) {
+        // _objectSchema will not be set if we're called during schema init
+        return self;
+    }
+
     NSArray *properties = _objectSchema.properties;
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         if (array.count != properties.count) {
