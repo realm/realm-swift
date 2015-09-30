@@ -908,7 +908,6 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
     [RLMRealm setSchemaVersion:RLMNotVersioned - 1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
 }
 
-#ifdef REALM_ENABLE_NULL
 - (void)testChangingColumnNullability {
     RLMSchema *nullable = [[RLMSchema alloc] init];
     nullable.objectSchema = @[[RLMObjectSchema schemaForObjectClass:StringObject.class]];
@@ -984,6 +983,5 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
         XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:2], obj.date);
     }
 }
-#endif
 
 @end

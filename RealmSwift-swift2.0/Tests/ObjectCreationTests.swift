@@ -444,7 +444,6 @@ class ObjectCreationTests: TestCase {
     }
 
     private func verifySwiftOptionalObjectWithDictionaryLiteral(object: SwiftOptionalDefaultValuesObject, dictionary: [String:AnyObject], boolObjectValue: Bool?) {
-#if REALM_ENABLE_NULL
         XCTAssertEqual(object.optBoolCol.value, (dictionary["optBoolCol"] as! Bool?))
         XCTAssertEqual(object.optIntCol.value, (dictionary["optIntCol"] as! Int?))
         XCTAssertEqual(object.optFloatCol.value, (dictionary["optFloatCol"] as! Float?))
@@ -453,7 +452,6 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.optNSStringCol, (dictionary["optNSStringCol"] as! String?))
         XCTAssertEqual(object.optBinaryCol, (dictionary["optBinaryCol"] as! NSData?))
         XCTAssertEqual(object.optDateCol, (dictionary["optDateCol"] as! NSDate?))
-#endif
         XCTAssertEqual(object.optObjectCol?.boolCol, boolObjectValue)
     }
 

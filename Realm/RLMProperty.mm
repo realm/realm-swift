@@ -26,11 +26,7 @@
 #import "RLMUtil.hpp"
 
 BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
-#ifdef REALM_ENABLE_NULL
     return propertyType != RLMPropertyTypeAny && propertyType != RLMPropertyTypeArray;
-#else
-    return propertyType == RLMPropertyTypeObject;
-#endif
 }
 
 
@@ -124,9 +120,7 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
             _type = RLMPropertyTypeBool;
             return YES;
         case '@': {
-#if REALM_ENABLE_NULL
             _optional = true;
-#endif
             static const char arrayPrefix[] = "@\"RLMArray<";
             static const int arrayPrefixLen = sizeof(arrayPrefix) - 1;
 

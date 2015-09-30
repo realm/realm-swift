@@ -60,7 +60,6 @@ class SwiftObject: Object {
 }
 
 class SwiftOptionalObject: Object {
-#if REALM_ENABLE_NULL
     dynamic var optNSStringCol: NSString?
     dynamic var optStringCol: String?
     dynamic var optBinaryCol: NSData?
@@ -69,24 +68,20 @@ class SwiftOptionalObject: Object {
     let optFloatCol = RealmOptional<Float>()
     let optDoubleCol = RealmOptional<Double>()
     let optBoolCol = RealmOptional<Bool>()
-#endif
     dynamic var optObjectCol: SwiftBoolObject?
 //    let arrayCol = List<SwiftBoolObject?>()
 }
 
 class SwiftImplicitlyUnwrappedOptionalObject: Object {
-#if REALM_ENABLE_NULL
     dynamic var optNSStringCol: NSString!
     dynamic var optStringCol: String!
     dynamic var optBinaryCol: NSData!
     dynamic var optDateCol: NSDate!
-#endif
     dynamic var optObjectCol: SwiftBoolObject!
 //    let arrayCol = List<SwiftBoolObject!>()
 }
 
 class SwiftOptionalDefaultValuesObject: Object {
-#if REALM_ENABLE_NULL
     dynamic var optNSStringCol: NSString? = "A"
     dynamic var optStringCol: String? = "B"
     dynamic var optBinaryCol: NSData? = "C".dataUsingEncoding(NSUTF8StringEncoding)
@@ -95,7 +90,6 @@ class SwiftOptionalDefaultValuesObject: Object {
     let optFloatCol = RealmOptional<Float>()
     let optDoubleCol = RealmOptional<Double>()
     let optBoolCol = RealmOptional<Bool>()
-#endif
     dynamic var optObjectCol: SwiftBoolObject? = SwiftBoolObject(value: [true])
     //    let arrayCol = List<SwiftBoolObject?>()
 

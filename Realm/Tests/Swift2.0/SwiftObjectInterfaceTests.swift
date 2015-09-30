@@ -144,7 +144,6 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         }
     }
 
-#if REALM_ENABLE_NULL
     func testOptionalNSNumberProperties() {
         let realm = realmWithTestPath()
         let no = SwiftOptionalNumberObject()
@@ -215,7 +214,6 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertNil(firstObj.optBinaryCol)
         XCTAssertNil(firstObj.optDateCol)
     }
-#endif
 
     func testSwiftClassNameIsDemangled() {
         XCTAssertEqual(SwiftObject.className(), "SwiftObject", "Calling className() on Swift class should return demangled name")
