@@ -19,6 +19,7 @@
 #import "RLMTestCase.h"
 
 #import "RLMRealmConfiguration_Private.h"
+#import "RLMTestObjects.h"
 #import "RLMUtil.hpp"
 
 @interface RealmConfigurationTests : RLMTestCase
@@ -98,6 +99,16 @@
 
     configuration.schemaVersion = 1;
     XCTAssertEqual(configuration.schemaVersion, 1U);
+}
+
+- (void)testClassSubsetsValidateLinks {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+
+    XCTAssertThrows(configuration.objectClasses = @[LinkStringObject.class]);
+    XCTAssertNoThrow(configuration.objectClasses = (@[LinkStringObject.class, StringObject.class]));
+
+    XCTAssertThrows(configuration.objectClasses = @[CompanyObject.class]);
+    XCTAssertNoThrow(configuration.objectClasses = (@[CompanyObject.class, EmployeeObject.class]));
 }
 
 @end
