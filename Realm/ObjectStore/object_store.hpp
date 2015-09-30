@@ -81,9 +81,6 @@ namespace realm {
         // set a new schema version
         static void set_schema_version(Group *group, uint64_t version);
 
-        // check if the realm already has all metadata tables
-        static bool has_metadata_tables(Group *group);
-
         // create any metadata tables that don't already exist
         // must be in write transaction to set
         // returns true if it actually did anything

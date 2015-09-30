@@ -46,10 +46,6 @@ const size_t c_object_table_prefix_length = c_object_table_prefix.length();
 
 const uint64_t ObjectStore::NotVersioned = numeric_limits<uint64_t>::max();
 
-bool ObjectStore::has_metadata_tables(Group *group) {
-    return group->get_table(c_primaryKeyTableName) && group->get_table(c_metadataTableName);
-}
-
 bool ObjectStore::create_metadata_tables(Group *group) {
     bool changed = false;
     TableRef table = group->get_or_add_table(c_primaryKeyTableName);
