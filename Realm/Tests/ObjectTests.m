@@ -1751,13 +1751,15 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertThrows([StringObject objectForPrimaryKey:@""]);
     XCTAssertThrows([IntObject objectForPrimaryKey:@0]);
     XCTAssertThrows([StringObject objectForPrimaryKey:NSNull.null]);
-    XCTAssertThrows([IntObject objectForPrimaryKey:NSNull.null]);
+    XCTAssertThrows([StringObject objectForPrimaryKey:nil]);
+    XCTAssertThrows([IntObject objectForPrimaryKey:nil]);
 
     // wrong PK type
     XCTAssertThrows([PrimaryStringObject objectForPrimaryKey:@0]);
     XCTAssertThrows([PrimaryIntObject objectForPrimaryKey:@""]);
     XCTAssertThrows([PrimaryIntObject objectForPrimaryKey:@""]);
     XCTAssertThrows([PrimaryIntObject objectForPrimaryKey:NSNull.null]);
+    XCTAssertThrows([PrimaryIntObject objectForPrimaryKey:nil]);
 
     // no object with key
     XCTAssertNil([PrimaryStringObject objectForPrimaryKey:@"bad key"]);
@@ -1766,9 +1768,11 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     // object with key exists
     XCTAssertEqualObjects(strObj, [PrimaryStringObject objectForPrimaryKey:@"key"]);
     XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectForPrimaryKey:NSNull.null]);
+    XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectForPrimaryKey:nil]);
     XCTAssertEqualObjects(intObj, [PrimaryIntObject objectForPrimaryKey:@0]);
     XCTAssertEqualObjects(nonNullIntObj, [PrimaryNullableIntObject objectForPrimaryKey:@0]);
     XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectForPrimaryKey:NSNull.null]);
+    XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectForPrimaryKey:nil]);
 }
 
 - (void)testBacklinks {
