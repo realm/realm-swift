@@ -19,14 +19,15 @@
 #import "RLMTestCase.h"
 
 #import "RLMMigration.h"
-#import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMObjectStore.h"
+#import "RLMObject_Private.h"
 #import "RLMProperty_Private.h"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
-#import "RLMObjectStore.h"
 
 #import "object_store.hpp"
 #import <realm/table.hpp>
@@ -107,12 +108,16 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
 @implementation MigrationTests
-
-- (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {
+- (RLMSchema *)schemaWithSingleObject:(RLMObjectSchema *)objectSchema {
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
-    return [self realmWithTestPathAndSchema:schema];
+    return schema;
 }
+
+- (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {
+    return [self realmWithTestPathAndSchema:[self schemaWithSingleObject:objectSchema]];
+}
+
 
 - (void)testSchemaVersion {
     [RLMRealm setDefaultRealmSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
@@ -429,65 +434,103 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
     XCTAssertEqualObjects(mig1[@"stringCol"], @"2", @"stringCol should be string after migration.");
 }
 
-- (void)testPrimaryKeyMigration {
-    // make string an int
+- (void)testAddingPrimaryKeyRequiresMigration {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.path = RLMTestRealmPath();
+
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
     objectSchema.primaryKeyProperty.isPrimary = NO;
     objectSchema.primaryKeyProperty = nil;
+    config.customSchema = [self schemaWithSingleObject:objectSchema];
 
-    // create realm with old schema and populate
-    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
-    [realm beginWriteTransaction];
-    [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
-    [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
-    [realm commitWriteTransaction];
+    // Create Realm file without the primary key set
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        [realm beginWriteTransaction];
+        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
+        [realm commitWriteTransaction];
+    }
 
-    // apply migration
-    [RLMRealm setSchemaVersion:1
-                forRealmAtPath:RLMTestRealmPath()
-            withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {}];
-    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMTestRealmPath()],
-                    @"Migration should return error due to duplicate primary keys)");
+    // Should not be able to open as the schema version needs to be increased
+    config.customSchema = nil;
+    config.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+        XCTFail(@"Migration block should not have been called");
+    };
+    XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
 
-    [RLMRealm setSchemaVersion:1
-                forRealmAtPath:RLMTestRealmPath()
-            withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+    config.schemaVersion = 1;
+    config.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) { };
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
+
+    // Verify that indexes were updated correctly
+    RLMAssertRealmSchemaMatchesTable(self, [self realmWithTestPath]);
+}
+
+- (void)testRemovingPrimaryKeyRequiresMigration {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.path = RLMTestRealmPath();
+    // Create Realm file with the primary key set
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        [realm beginWriteTransaction];
+        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
+        [realm commitWriteTransaction];
+    }
+
+    // Should not be able to open as the schema version needs to be increased
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+    objectSchema.primaryKeyProperty.isPrimary = NO;
+    objectSchema.primaryKeyProperty = nil;
+    config.customSchema = [self schemaWithSingleObject:objectSchema];
+    config.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+        XCTFail(@"Migration block should not have been called");
+    };
+    XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
+
+    config.schemaVersion = 1;
+    config.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) { };
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
+
+    // Verify that indexes were updated correctly
+    RLMAssertRealmSchemaMatchesTable(self, [self realmWithTestPath]);
+}
+
+- (void)testAddingPrimaryKeyShouldRejectDuplicateValues {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.path = RLMTestRealmPath();
+
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+    objectSchema.primaryKeyProperty.isPrimary = NO;
+    objectSchema.primaryKeyProperty = nil;
+    config.customSchema = [self schemaWithSingleObject:objectSchema];
+
+    // Create Realm file without the primary key set and duplicate values for
+    // the property which will become the primary key
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        [realm beginWriteTransaction];
+        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
+        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
+        [realm commitWriteTransaction];
+    }
+
+    // Should fail due to the duplicate primary keys
+    config.customSchema = nil;
+    config.schemaVersion = 1;
+    config.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) { };
+    XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
+
+    // Should work after giving them all unique values
+    config.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
         __block int objectID = 0;
         [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
             newObject[@"intCol"] = @(objectID++);
         }];
-    }];
-    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    };
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
+
+    // Verify that indexes were updated correctly
     RLMAssertRealmSchemaMatchesTable(self, [self realmWithTestPath]);
-}
-
-- (void)testRemovePrimaryKeyMigration {
-    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
-
-    // create realm with old schema and populate
-    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
-    [realm beginWriteTransaction];
-    [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
-    [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@2]];
-    [realm commitWriteTransaction];
-
-    objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
-    objectSchema.primaryKeyProperty.isPrimary = NO;
-    objectSchema.primaryKeyProperty = nil;
-
-    // needs a no-op migration
-    XCTAssertThrows([self realmWithSingleObject:objectSchema]);
-
-    [RLMRealm setSchemaVersion:1
-                forRealmAtPath:RLMTestRealmPath()
-            withMigrationBlock:^(RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
-        [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(RLMObject *oldObject, RLMObject *newObject) {
-            XCTAssertEqualObjects(oldObject[@"intCol"], newObject[@"intCol"]);
-        }];
-    }];
-
-    XCTAssertNoThrow([self realmWithSingleObject:objectSchema]);
-    RLMAssertRealmSchemaMatchesTable(self, [self realmWithSingleObject:objectSchema]);
 }
 
 - (void)testStringPrimaryKeyMigration {
