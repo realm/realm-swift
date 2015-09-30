@@ -90,18 +90,6 @@ RLM_ARRAY_TYPE(MigrationObject);
 @implementation MigrationTwoStringObject
 @end
 
-@interface AllOptionalTypes : RLMObject
-@property NSNumber<RLMInt> *intObj;
-@property NSNumber<RLMFloat> *floatObj;
-@property NSNumber<RLMDouble> *doubleObj;
-@property NSNumber<RLMBool> *boolObj;
-@property NSString *string;
-@property NSData *data;
-@property NSDate *date;
-@end
-@implementation AllOptionalTypes
-@end
-
 @interface MigrationLinkObject : RLMObject
 @property MigrationObject *object;
 @property RLMArray<MigrationObject> *array;

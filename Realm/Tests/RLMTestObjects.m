@@ -80,6 +80,9 @@
 @implementation LinkToAllTypesObject
 @end
 
+@implementation AllOptionalTypes
+@end
+
 #pragma mark - Real Life Objects
 #pragma mark -
 
