@@ -469,21 +469,43 @@
 
 - (void)testPredicateNotSupported
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    // These are things which are valid predicates, but which we do not support
 
-    NSString *className = PersonObject.className;
+    // Aggregate operators on non-arrays
+    XCTAssertThrows([PersonObject objectsWhere:@"ANY age > 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"ALL age > 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"SOME age > 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"NONE age > 5"]);
 
-    // testing for null
-    XCTAssertThrows([realm objects:className where:@"stringCol = nil"], @"test for nil");
+    // nil on LHS of comparison with nullable property
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = boolObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = intObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = floatObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = doubleObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = string"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = data"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = date"]);
 
-    // ANY
-    XCTAssertThrows([realm objects:className where:@"ANY intCol > 5"], @"ANY int > constant");
+    // comparing two constants
+    XCTAssertThrows([PersonObject objectsWhere:@"5 = 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"nil = nil"]);
 
-    // ALL
-    XCTAssertThrows([realm objects:className where:@"ALL intCol > 5"], @"ALL int > constant");
+    // substring operations with constant on LHS
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' CONTAINS string"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' BEGINSWITH string"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' ENDSWITH string"]);
+    XCTAssertThrows(([AllOptionalTypes objectsWhere:@"%@ CONTAINS data", [NSData data]]));
 
-    // NONE
-    XCTAssertThrows([realm objects:className where:@"NONE intCol > 5"], @"NONE int > constant");
+    // data is missing stuff
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"data = data"]);
+    XCTAssertThrows(([LinkToAllTypesObject objectsWhere:@"%@ = allTypesCol.binaryCol", [NSData data]]));
+    XCTAssertThrows(([LinkToAllTypesObject objectsWhere:@"allTypesCol.binaryCol CONTAINS %@", [NSData data]]));
+
+    // LinkList equality is unsupport since the semantics are unclear
+    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"ANY array = array"]));
+
+    // subquery
+    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"SUBQUERY(array, $obj, $obj.intCol = 5).@count > 1"]));
 }
 
 - (void)testPredicateMisuse
@@ -631,29 +653,18 @@
     XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"string1 ENDSWITH[c] string2"].count);
     XCTAssertEqual(4U, [self.queryObjectClass objectsWhere:@"string2 ENDSWITH[c] string1"].count);
 
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"int1 == float1"
-                                              expectedReason:@"Property type mismatch between int and float"];
-
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"float2 >= double1"
-                                              expectedReason:@"Property type mismatch between float and double"];
-
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"double2 <= int2"
-                                              expectedReason:@"Property type mismatch between double and int"];
-
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"int2 != string1"
-                                              expectedReason:@"Property type mismatch between int and string"];
-
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"float1 > string1"
-                                              expectedReason:@"Property type mismatch between float and string"];
-
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[self.queryObjectClass className]
-                                                   predicate:@"double1 < string1"
-                                              expectedReason:@"Property type mismatch between double and string"];
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"int1 == float1"],
+                                      @"Property type mismatch between int and float");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"float2 >= double1"],
+                                      @"Property type mismatch between float and double");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"double2 <= int2"],
+                                      @"Property type mismatch between double and int");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"int2 != string1"],
+                                      @"Property type mismatch between int and string");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"float1 > string1"],
+                                      @"Property type mismatch between float and string");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"double1 < string1"],
+                                      @"Property type mismatch between double and string");
 }
 
 - (void)testValidOperatorsInNumericComparison:(NSString *) comparisonType
@@ -957,24 +968,6 @@
                                  NSException, @"Invalid predicate expressions",
                                  @"Key path in absent in an integer comparison.");
 }
-
-- (void)executeTwoColumnKeypathComparisonQueryWithPredicate:(NSString *)predicate
-                                              expectedCount:(NSUInteger)expectedCount
-{
-    RLMResults *queryResult = [self.queryObjectClass objectsWhere:predicate];
-    NSUInteger actualCount = queryResult.count;
-    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
-                   predicate, expectedCount, actualCount);
-}
-
-- (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(NSString *)className
-                                                 predicate:(NSString *)predicate
-                                            expectedReason:(NSString *)expectedReason
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:predicate], expectedReason);
-}
-
 
 - (void)testFloatQuery
 {
@@ -1447,7 +1440,7 @@
 
     [realm beginWriteTransaction];
     StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
-    [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], [NSDate dateWithTimeIntervalSince1970:1], @YES, @1LL, @1, so]];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"abc", [@"a" dataUsingEncoding:NSUTF8StringEncoding], [NSDate dateWithTimeIntervalSince1970:1], @YES, @1LL, @1, so]];
     [realm commitWriteTransaction];
 
     // Tests for each type always follow: none, some, more
@@ -1477,11 +1470,11 @@
     [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"doubleCol IN {1, 2}"];
 
     // NSString
-    [self testClass:[StringObject class] withNormalCount:1 notCount:0 where:@"stringCol IN {'abc'}"];
-    [self testClass:[StringObject class] withNormalCount:0 notCount:1 where:@"stringCol IN {'def'}"];
-    [self testClass:[StringObject class] withNormalCount:0 notCount:1 where:@"stringCol IN {'ABC'}"];
-    [self testClass:[StringObject class] withNormalCount:1 notCount:0 where:@"stringCol IN[c] {'abc'}"];
-    [self testClass:[StringObject class] withNormalCount:1 notCount:0 where:@"stringCol IN[c] {'ABC'}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"stringCol IN {'abc'}"];
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"stringCol IN {'def'}"];
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"stringCol IN {'ABC'}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"stringCol IN[c] {'abc'}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"stringCol IN[c] {'ABC'}"];
 
     // NSData
     // Can't represent NSData with NSPredicate literal. See format predicates below
@@ -1536,11 +1529,11 @@
     [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"doubleCol IN %@", @[@1, @2]];
 
     // NSString
-    [self testClass:[StringObject class] withNormalCount:1U notCount:0U where:@"stringCol IN %@", @[@"abc"]];
-    [self testClass:[StringObject class] withNormalCount:0U notCount:1U where:@"stringCol IN %@", @[@"def"]];
-    [self testClass:[StringObject class] withNormalCount:0U notCount:1U where:@"stringCol IN %@", @[@"ABC"]];
-    [self testClass:[StringObject class] withNormalCount:1U notCount:0U where:@"stringCol IN[c] %@", @[@"abc"]];
-    [self testClass:[StringObject class] withNormalCount:1U notCount:0U where:@"stringCol IN[c] %@", @[@"ABC"]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"stringCol IN %@", @[@"abc"]];
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"stringCol IN %@", @[@"def"]];
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"stringCol IN %@", @[@"ABC"]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"stringCol IN[c] %@", @[@"abc"]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"stringCol IN[c] %@", @[@"ABC"]];
 
     // NSData
     [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"binaryCol IN %@", @[[@"" dataUsingEncoding:NSUTF8StringEncoding]]];
@@ -1927,6 +1920,271 @@
     }
 
     [realm cancelWriteTransaction];
+}
+
+struct NullTestData {
+    __unsafe_unretained NSString *propertyName;
+    __unsafe_unretained NSString *nonMatchingStr;
+    __unsafe_unretained NSString *matchingStr;
+    __unsafe_unretained id nonMatchingValue;
+    __unsafe_unretained id matchingValue;
+    bool orderable;
+    bool substringOperations;
+};
+
+- (void)testPrimitiveOperatorsOnAllNullablePropertyTypes {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    // nil on LHS is currently not supported by core
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = boolObj"]);
+
+    // These need to be stored in variables because the struct does not retain them
+    NSData *matchingData = [@"" dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *notMatchingData = [@"a" dataUsingEncoding:NSUTF8StringEncoding];
+    NSDate *matchingDate = [NSDate dateWithTimeIntervalSince1970:1];
+    NSDate *notMatchingDate = [NSDate dateWithTimeIntervalSince1970:2];
+
+    struct NullTestData data[] = {
+        {@"boolObj", @"YES", @"NO", @YES, @NO},
+        {@"intObj", @"1", @"0", @1, @0, true},
+        {@"floatObj", @"1", @"0", @1, @0, true},
+        {@"doubleObj", @"1", @"0", @1, @0, true},
+        {@"string", @"'a'", @"''", @"a", @"", false, true},
+        {@"data", nil, nil, notMatchingData, matchingData},
+        {@"date", nil, nil, notMatchingDate, matchingDate, true},
+    };
+
+    // Assert that the query "prop op value" gives expectedCount results when
+    // assembled via string formatting
+#define RLMAssertCountWithString(expectedCount, op, prop, value) \
+    do { \
+        NSString *queryStr = [NSString stringWithFormat:@"%@ " #op " %@", prop, value]; \
+        NSUInteger actual = [AllOptionalTypes objectsWhere:queryStr].count; \
+        XCTAssertEqual(expectedCount, actual, @"%@: expected %@, got %@", queryStr, @(expectedCount), @(actual)); \
+    } while (0)
+
+    // Assert that the query "prop op value" gives expectedCount results when
+    // assembled via predicateWithFormat
+#define RLMAssertCountWithPredicate(expectedCount, op, prop, value) \
+    do { \
+        NSPredicate *query = [NSPredicate predicateWithFormat:@"%K " #op " %@", prop, value]; \
+        NSUInteger actual = [AllOptionalTypes objectsWithPredicate:query].count; \
+        XCTAssertEqual(expectedCount, actual, @"%@ " #op " %@: expected %@, got %@", prop, value, @(expectedCount), @(actual)); \
+    } while (0)
+
+    // Assert that the given operator gives the expected count for each of the
+    // stored value, a different value, and nil
+#define RLMAssertOperator(op, matchingCount, notMatchingCount, nilCount) \
+    do { \
+        if (d.matchingStr) { \
+            RLMAssertCountWithString(matchingCount, op, d.propertyName, d.matchingStr); \
+            RLMAssertCountWithString(notMatchingCount, op, d.propertyName, d.nonMatchingStr); \
+        } \
+        RLMAssertCountWithString(nilCount, op, d.propertyName, nil); \
+ \
+        RLMAssertCountWithPredicate(matchingCount, op, d.propertyName, d.matchingValue); \
+        RLMAssertCountWithPredicate(notMatchingCount, op, d.propertyName, d.nonMatchingValue); \
+        RLMAssertCountWithPredicate(nilCount, op, d.propertyName, nil); \
+    } while (0)
+
+    // First test with the `matchingValue` stored in each property
+
+    [realm beginWriteTransaction];
+    [AllOptionalTypes createInRealm:realm withValue:@[@NO, @0, @0, @0, @"", matchingData, matchingDate]];
+    [realm commitWriteTransaction];
+
+    for (size_t i = 0; i < sizeof(data) / sizeof(data[0]); ++i) {
+        struct NullTestData d = data[i];
+        RLMAssertOperator(=,  1U, 0U, 0U);
+        RLMAssertOperator(!=, 0U, 1U, 1U);
+
+        if (d.orderable) {
+            RLMAssertOperator(<,  0U, 1U, 0U);
+            RLMAssertOperator(<=, 1U, 1U, 0U);
+            RLMAssertOperator(>,  0U, 0U, 0U);
+            RLMAssertOperator(>=, 1U, 0U, 0U);
+        }
+        if (d.substringOperations) {
+            RLMAssertOperator(BEGINSWITH, 1U, 0U, 1U);
+            RLMAssertOperator(ENDSWITH, 1U, 0U, 1U);
+            RLMAssertOperator(CONTAINS, 1U, 0U, 1U);
+        }
+    }
+
+    // Retest with all properties nil
+
+    [realm beginWriteTransaction];
+    [realm deleteAllObjects];
+    [AllOptionalTypes createInRealm:realm withValue:@[NSNull.null, NSNull.null,
+                                                      NSNull.null, NSNull.null,
+                                                      NSNull.null, NSNull.null,
+                                                      NSNull.null]];
+    [realm commitWriteTransaction];
+
+    for (size_t i = 0; i < sizeof(data) / sizeof(data[0]); ++i) {
+        struct NullTestData d = data[i];
+        RLMAssertOperator(=, 0U, 0U, 1U);
+        RLMAssertOperator(!=, 1U, 1U, 0U);
+
+        if (d.orderable) {
+            RLMAssertOperator(<,  0U, 0U, 0U);
+            RLMAssertOperator(<=, 0U, 0U, 1U);
+            RLMAssertOperator(>,  0U, 0U, 0U);
+            RLMAssertOperator(>=, 0U, 0U, 1U);
+        }
+        if (d.substringOperations) {
+            RLMAssertOperator(BEGINSWITH, 0U, 0U, 1U);
+            RLMAssertOperator(ENDSWITH, 0U, 0U, 1U);
+            RLMAssertOperator(CONTAINS, 0U, 0U, 1U);
+        }
+    }
+}
+
+- (void)testINPredicateOnNullWithNonNullValues
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [AllOptionalTypes createInRealm:realm withValue:@[@YES, @1, @1, @1, @"abc",
+                                                      [@"a" dataUsingEncoding:NSUTF8StringEncoding],
+                                                      [NSDate dateWithTimeIntervalSince1970:1]]];
+    [realm commitWriteTransaction];
+
+    ////////////////////////
+    // Literal Predicates
+    ////////////////////////
+
+    // BOOL
+    [self testClass:[AllOptionalTypes class] withNormalCount:0 notCount:1 where:@"boolObj IN {NULL}"];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1 notCount:0 where:@"boolObj IN {YES}"];
+
+    // int
+    [self testClass:[AllOptionalTypes class] withNormalCount:0 notCount:1 where:@"intObj IN {NULL}"];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1 notCount:0 where:@"intObj IN {1}"];
+
+    // float
+    [self testClass:[AllOptionalTypes class] withNormalCount:0 notCount:1 where:@"floatObj IN {NULL}"];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1 notCount:0 where:@"floatObj IN {1}"];
+
+    // double
+    [self testClass:[AllOptionalTypes class] withNormalCount:0 notCount:1 where:@"doubleObj IN {NULL}"];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1 notCount:0 where:@"doubleObj IN {1}"];
+
+    // NSString
+    [self testClass:[AllOptionalTypes class] withNormalCount:0 notCount:1 where:@"string IN {NULL}"];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1 notCount:0 where:@"string IN {'abc'}"];
+
+    // NSData
+    // Can't represent NSData with NSPredicate literal. See format predicates below
+
+    // NSDate
+    // Can't represent NSDate with NSPredicate literal. See format predicates below
+
+    ////////////////////////
+    // Format Predicates
+    ////////////////////////
+
+    // BOOL
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"boolObj IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"boolObj IN %@", @[@YES]];
+
+    // int
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"intObj IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"intObj IN %@", @[@1]];
+
+    // float
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"floatObj IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"floatObj IN %@", @[@1]];
+
+    // double
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"doubleObj IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"doubleObj IN %@", @[@1]];
+
+    // NSString
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"string IN %@", @[@"abc"]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"string IN %@", @[NSNull.null]];
+
+    // NSData
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"data IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"data IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding]]];
+
+    // NSDate
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"date IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"date IN %@", @[[NSDate dateWithTimeIntervalSince1970:1]]];
+}
+
+- (void)testINPredicateOnNullWithNullValues
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [AllOptionalTypes createInRealm:realm withValue:@[NSNull.null, NSNull.null,
+                                                      NSNull.null, NSNull.null,
+                                                      NSNull.null, NSNull.null,
+                                                      NSNull.null]];
+    [realm commitWriteTransaction];
+
+    ////////////////////////
+    // Literal Predicates
+    ////////////////////////
+
+    // BOOL
+    [self testClass:[AllOptionalTypes class] withNormalCount:1 notCount:0 where:@"boolObj IN {NULL}"];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0 notCount:1 where:@"boolObj IN {YES}"];
+
+    // int
+    [self testClass:[AllOptionalTypes class] withNormalCount:1 notCount:0 where:@"intObj IN {NULL}"];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0 notCount:1 where:@"intObj IN {1}"];
+
+    // float
+    [self testClass:[AllOptionalTypes class] withNormalCount:1 notCount:0 where:@"floatObj IN {NULL}"];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0 notCount:1 where:@"floatObj IN {1}"];
+
+    // double
+    [self testClass:[AllOptionalTypes class] withNormalCount:1 notCount:0 where:@"doubleObj IN {NULL}"];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0 notCount:1 where:@"doubleObj IN {1}"];
+
+    // NSString
+    [self testClass:[AllOptionalTypes class] withNormalCount:1 notCount:0 where:@"string IN {NULL}"];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0 notCount:1 where:@"string IN {'abc'}"];
+
+    // NSData
+    // Can't represent NSData with NSPredicate literal. See format predicates below
+
+    // NSDate
+    // Can't represent NSDate with NSPredicate literal. See format predicates below
+
+    ////////////////////////
+    // Format Predicates
+    ////////////////////////
+
+    // BOOL
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"boolObj IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"boolObj IN %@", @[@YES]];
+
+    // int
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"intObj IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"intObj IN %@", @[@1]];
+
+    // float
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"floatObj IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"floatObj IN %@", @[@1]];
+
+    // double
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"doubleObj IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"doubleObj IN %@", @[@1]];
+
+    // NSString
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"string IN %@", @[@"abc"]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"string IN %@", @[NSNull.null]];
+
+    // NSData
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"data IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"data IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding]]];
+
+    // NSDate
+    [self testClass:[AllOptionalTypes class] withNormalCount:1U notCount:0U where:@"date IN %@", @[NSNull.null]];
+    [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"date IN %@", @[[NSDate dateWithTimeIntervalSince1970:1]]];
 }
 
 @end
