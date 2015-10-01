@@ -958,15 +958,6 @@
                                  @"Key path in absent in an integer comparison.");
 }
 
-- (void)executeTwoColumnKeypathComparisonQueryWithPredicate:(NSString *)predicate
-                                              expectedCount:(NSUInteger)expectedCount
-{
-    RLMResults *queryResult = [self.queryObjectClass objectsWhere:predicate];
-    NSUInteger actualCount = queryResult.count;
-    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
-                   predicate, expectedCount, actualCount);
-}
-
 - (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(NSString *)className
                                                  predicate:(NSString *)predicate
                                             expectedReason:(NSString *)expectedReason
