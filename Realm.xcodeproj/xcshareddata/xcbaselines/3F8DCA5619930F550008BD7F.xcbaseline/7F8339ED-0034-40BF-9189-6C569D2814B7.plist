@@ -24,6 +24,8 @@
 					<real>0.37</real>
 					<key>baselineIntegrationDisplayName</key>
 					<string>Local Baseline</string>
+					<key>maxStandardDeviation</key>
+					<real>0.400</real>
 				</dict>
 			</dict>
 			<key>testCommitWriteTransactionWithLocalNotification</key>
