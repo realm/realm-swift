@@ -1932,7 +1932,7 @@ struct NullTestData {
     bool substringOperations;
 };
 
-- (void)testEqualityOnNull {
+- (void)testPrimitiveOperatorsOnAllNullablePropertyTypes {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     // nil on LHS is currently not supported by core
