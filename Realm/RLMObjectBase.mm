@@ -102,6 +102,11 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
         for (RLMProperty *prop in properties) {
             id obj = RLMValidatedValueForProperty(value, prop.name, _objectSchema.className);
 
+            // also check for json-esque naming
+            if (!obj) {
+                obj = RLMValidatedValueForUnderscoredProperty(value, prop.name, _objectSchema.className);
+            }
+
             // get default for nil object
             if (!obj) {
                 if (!defaultValues) {
@@ -403,6 +408,21 @@ BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2) {
 id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
     @try {
         return [object valueForKey:key];
+    }
+    @catch (NSException *e) {
+        if ([e.name isEqualToString:NSUndefinedKeyException]) {
+            @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' to initialize object of type '%@': missing key '%@'",
+                                 object, className, key]);
+        }
+        @throw;
+    }
+}
+
+id RLMValidatedValueForUnderscoredProperty(id object, NSString *key, NSString *className) {
+    @try {
+        NSRegularExpression *regexp = [NSRegularExpression regularExpressionWithPattern:@"([a-z])([A-Z])" options:0 error:NULL];
+        NSString *underScoreKey = [regexp stringByReplacingMatchesInString:key options:0 range:NSMakeRange(0, key.length) withTemplate:@"$1_$2"].lowercaseString;
+        return [object valueForKey:underScoreKey];
     }
     @catch (NSException *e) {
         if ([e.name isEqualToString:NSUndefinedKeyException]) {
