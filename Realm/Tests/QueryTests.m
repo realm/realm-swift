@@ -469,21 +469,43 @@
 
 - (void)testPredicateNotSupported
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    // These are things which are valid predicates, but which we do not support
 
-    NSString *className = PersonObject.className;
+    // Aggregate operators on non-arrays
+    XCTAssertThrows([PersonObject objectsWhere:@"ANY age > 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"ALL age > 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"SOME age > 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"NONE age > 5"]);
 
-    // testing for null
-    XCTAssertThrows([realm objects:className where:@"stringCol = nil"], @"test for nil");
+    // nil on LHS of comparison with nullable property
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = boolObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = intObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = floatObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = doubleObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = string"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = data"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = date"]);
 
-    // ANY
-    XCTAssertThrows([realm objects:className where:@"ANY intCol > 5"], @"ANY int > constant");
+    // comparing two constants
+    XCTAssertThrows([PersonObject objectsWhere:@"5 = 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"nil = nil"]);
 
-    // ALL
-    XCTAssertThrows([realm objects:className where:@"ALL intCol > 5"], @"ALL int > constant");
+    // substring operations with constant on LHS
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' CONTAINS string"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' BEGINSWITH string"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' ENDSWITH string"]);
+    XCTAssertThrows(([AllOptionalTypes objectsWhere:@"%@ CONTAINS data", [NSData data]]));
 
-    // NONE
-    XCTAssertThrows([realm objects:className where:@"NONE intCol > 5"], @"NONE int > constant");
+    // data is missing stuff
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"data = data"]);
+    XCTAssertThrows(([LinkToAllTypesObject objectsWhere:@"%@ = allTypesCol.binaryCol", [NSData data]]));
+    XCTAssertThrows(([LinkToAllTypesObject objectsWhere:@"allTypesCol.binaryCol CONTAINS %@", [NSData data]]));
+
+    // LinkList equality is unsupport since the semantics are unclear
+    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"ANY array = array"]));
+
+    // subquery
+    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"SUBQUERY(array, $obj, $obj.intCol = 5).@count > 1"]));
 }
 
 - (void)testPredicateMisuse
