@@ -61,6 +61,23 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
         [schemas addObject:[cls sharedSchema]];
     }
     schema.objectSchema = schemas;
+
+    NSMutableArray *errors = [NSMutableArray new];
+    // Verify that all of the targets of links are included in the class list
+    for (RLMObjectSchema *objectSchema in schema->_objectSchema) {
+        for (RLMProperty *prop in objectSchema.properties) {
+            if (prop.type != RLMPropertyTypeObject && prop.type != RLMPropertyTypeArray) {
+                continue;
+            }
+            if (!schema->_objectSchemaByName[prop.objectClassName]) {
+                [errors addObject:[NSString stringWithFormat:@"- '%@.%@' links to class '%@', which is missing from the list of classes to persist", objectSchema.className, prop.name, prop.objectClassName]];
+            }
+        }
+    }
+    if (errors.count) {
+        @throw RLMException([@"Invalid class subset list:\n" stringByAppendingString:[errors componentsJoinedByString:@"\n"]]);
+    }
+
     return schema;
 }
 

@@ -27,6 +27,8 @@ x.x.x Release notes (yyyy-MM-dd)
   opened do not.
 * Fix inconsistent errors when `Object(value: ...)` is used to initialize the
   default value of a property of an `Object` subclass.
+* Throw an exception when a class subset has objects with array or object
+  properties of a type that are not part of the class subset.
 
 0.95.2 Release notes (2015-09-24)
 =============================================================
