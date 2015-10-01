@@ -61,6 +61,7 @@ FOUNDATION_EXTERN void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *ob
 
 // Calls valueForKey: and re-raises NSUndefinedKeyExceptions
 FOUNDATION_EXTERN id RLMValidatedValueForProperty(id object, NSString *key, NSString *className);
+FOUNDATION_EXTERN id RLMValidatedValueForUnderscoredProperty(id object, NSString *key, NSString *className);
 
 // Compare two RLObjectBases
 FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2);
