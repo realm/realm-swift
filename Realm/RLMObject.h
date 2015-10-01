@@ -44,7 +44,7 @@ RLM_ASSUME_NONNULL_BEGIN
  ### Supported property types
  
  - `NSString`
- - `NSInteger`, `CGFloat`, `int`, `long`, `float`, and `double`
+ - `NSInteger`, `int`, `long`, `float`, and `double`
  - `BOOL` or `bool`
  - `NSDate`
  - `NSData`
