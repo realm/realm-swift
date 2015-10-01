@@ -245,8 +245,7 @@ void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfiguration *configuration
             NSString *mode = readonly ? @"read" : @"read-write";
             NSString *additionalMessage = [NSString stringWithFormat:@"Unable to open a realm at path '%@'. Please use a path where your app has %@ permissions.", path, mode];
             NSString *newMessage = [NSString stringWithFormat:@"%s\n%@", ex.what(), additionalMessage];
-            error = RLMMakeError(RLMErrorFilePermissionDenied,
-                                     File::PermissionDenied(newMessage.UTF8String));
+            error = RLMMakeError(RLMErrorFilePermissionDenied, File::PermissionDenied(newMessage.UTF8String, ex.get_path()));
         }
         catch (File::Exists const& ex) {
             error = RLMMakeError(RLMErrorFileExists, ex);
@@ -952,9 +951,11 @@ void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrat
     if (error)
         return error;
 
-    @try {
+    try {
         RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), configuration.customSchema ?: [RLMSchema.sharedSchema copy], [realm migrationBlock:configuration.migrationBlock key:key]);
-    } @catch (NSException *ex) {
+    } catch (std::exception const& ex) {
+        return RLMMakeError(RLMErrorFail, ex);
+    } catch (NSException *ex) {
         return RLMMakeError(ex);
     }
     return nil;

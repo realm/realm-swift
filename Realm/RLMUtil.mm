@@ -106,7 +106,7 @@ static inline bool object_has_valid_type(__unsafe_unretained id const obj)
 
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
                                  __unsafe_unretained RLMProperty *const property) {
-    if (property.optional && (!obj || obj == [NSNull null])) {
+    if (property.optional && !RLMCoerceToNil(obj)) {
         return YES;
     }
 
@@ -215,7 +215,7 @@ NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *ke
     for (size_t i = 0; i < count; i++) {
         size_t rowIndex = [collection indexInSource:i];
         accessor->_row = (*table)[rowIndex];
-        RLMInitializeSwiftListAccessor(accessor);
+        RLMInitializeSwiftAccessorGenerics(accessor);
         [results addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
 
@@ -235,7 +235,7 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
     for (size_t i = 0; i < count; i++) {
         size_t rowIndex = [collection indexInSource:i];
         accessor->_row = (*table)[rowIndex];
-        RLMInitializeSwiftListAccessor(accessor);
+        RLMInitializeSwiftAccessorGenerics(accessor);
         [accessor setValue:value forKey:key];
     }
 }
@@ -259,6 +259,14 @@ NSError *RLMMakeError(RLMError code, std::exception const& exception) {
     return [NSError errorWithDomain:RLMErrorDomain
                                code:code
                            userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
+                                      @"Error Code": @(code)}];
+}
+
+NSError *RLMMakeError(RLMError code, const realm::util::File::AccessError& exception) {
+    return [NSError errorWithDomain:RLMErrorDomain
+                               code:code
+                           userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
+                                      NSFilePathErrorKey: @(exception.get_path().c_str()),
                                       @"Error Code": @(code)}];
 }
 

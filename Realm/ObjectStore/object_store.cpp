@@ -29,30 +29,6 @@
 using namespace realm;
 using namespace std;
 
-template <typename T>
-static inline
-T get_value(TableRef table, size_t row, size_t column);
-
-template <>
-StringData get_value(TableRef table, size_t row, size_t column) {
-    return table->get_string(column, row);
-}
-
-static inline
-void set_value(TableRef table, size_t row, size_t column, StringData value) {
-    table->set_string(column, row, value);
-}
-
-template <>
-BinaryData get_value(TableRef table, size_t row, size_t column) {
-    return table->get_binary(column, row);
-}
-
-static inline
-void set_value(TableRef table, size_t row, size_t column, BinaryData value) {
-    table->set_binary(column, row, value);
-}
-
 const char * const c_metadataTableName = "metadata";
 const char * const c_versionColumnName = "version";
 const size_t c_versionColumnIndex = 0;
@@ -69,10 +45,6 @@ const string c_object_table_prefix = "class_";
 const size_t c_object_table_prefix_length = c_object_table_prefix.length();
 
 const uint64_t ObjectStore::NotVersioned = numeric_limits<uint64_t>::max();
-
-bool ObjectStore::has_metadata_tables(Group *group) {
-    return group->get_table(c_primaryKeyTableName) && group->get_table(c_metadataTableName);
-}
 
 bool ObjectStore::create_metadata_tables(Group *group) {
     bool changed = false;
@@ -240,12 +212,13 @@ static bool property_can_be_migrated_to_nullable(Property &old_property, Propert
 }
 
 template <typename T>
-static void copy_property_to_property(Property &old_property, Property &new_property, TableRef table) {
+static void copy_property_values(Property const& old_property, Property const& new_property, Table& table,
+                                 T (Table::*getter)(std::size_t, std::size_t) const noexcept,
+                                 void (Table::*setter)(std::size_t, std::size_t, T)) {
     size_t old_column = old_property.table_column, new_column = new_property.table_column;
-    size_t count = table->size();
+    size_t count = table.size();
     for (size_t i = 0; i < count; i++) {
-        T old_value = get_value<T>(table, i, old_column);
-        set_value(table, i, new_column, old_value);
+        (table.*setter)(new_column, i, (table.*getter)(old_column, i));
     }
 }
 
@@ -289,24 +262,35 @@ bool ObjectStore::create_tables(Group *group, ObjectStore::Schema &target_schema
                         break;
                     }
                     default:
-#ifdef REALM_ENABLE_NULL
                         target_prop.table_column = table->add_column(DataType(target_prop.type), target_prop.name, target_prop.is_nullable);
-#else
-                        target_prop.table_column = table->add_column(DataType(target_prop.type), target_prop.name);
-#endif
                         break;
                 }
 
                 if (current_prop && property_can_be_migrated_to_nullable(*current_prop, target_prop)) {
                     switch (target_prop.type) {
                         case PropertyTypeString:
-                            copy_property_to_property<StringData>(*current_prop, target_prop, table);
+                            copy_property_values(*current_prop, target_prop, *table, &Table::get_string, &Table::set_string);
                             break;
                         case PropertyTypeData:
-                            copy_property_to_property<BinaryData>(*current_prop, target_prop, table);
+                            copy_property_values(*current_prop, target_prop, *table, &Table::get_binary, &Table::set_binary);
+                            break;
+                        case PropertyTypeBool:
+                            copy_property_values(*current_prop, target_prop, *table, &Table::get_bool, &Table::set_bool);
+                            break;
+                        case PropertyTypeInt:
+                            copy_property_values(*current_prop, target_prop, *table, &Table::get_int, &Table::set_int);
+                            break;
+                        case PropertyTypeFloat:
+                            copy_property_values(*current_prop, target_prop, *table, &Table::get_float, &Table::set_float);
+                            break;
+                        case PropertyTypeDouble:
+                            copy_property_values(*current_prop, target_prop, *table, &Table::get_double, &Table::set_double);
+                            break;
+                        case PropertyTypeDate:
+                            copy_property_values(*current_prop, target_prop, *table, &Table::get_datetime, &Table::set_datetime);
                             break;
                         default:
-                            REALM_UNREACHABLE();
+                            break;
                     }
                 }
 

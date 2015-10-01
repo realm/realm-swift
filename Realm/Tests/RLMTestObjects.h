@@ -102,6 +102,7 @@ RLM_ARRAY_TYPE(IntObject)
 @interface RequiredPropertiesObject : RLMObject
 @property NSString *stringCol;
 @property NSData *binaryCol;
+@property NSDate *dateCol;
 @end
 
 #pragma mark AllTypesObject
@@ -130,6 +131,16 @@ RLM_ARRAY_TYPE(AllTypesObject)
 
 @interface ArrayOfAllTypesObject : RLMObject
 @property RLM_GENERIC_ARRAY(AllTypesObject) *array;
+@end
+
+@interface AllOptionalTypes : RLMObject
+@property NSNumber<RLMInt> *intObj;
+@property NSNumber<RLMFloat> *floatObj;
+@property NSNumber<RLMDouble> *doubleObj;
+@property NSNumber<RLMBool> *boolObj;
+@property NSString *string;
+@property NSData *data;
+@property NSDate *date;
 @end
 
 #pragma mark - Real Life Objects
@@ -271,6 +282,16 @@ RLM_ARRAY_TYPE(CircleObject);
 @interface ReadOnlyPropertyObject : RLMObject
 @property (readonly) NSNumber *readOnlyUnsupportedProperty;
 @property (readonly) int readOnlyPropertyMadeReadWriteInClassExtension;
+@end
+
+@interface NumberObject : RLMObject
+@property NSNumber<RLMInt> *intObj;
+@property NSNumber<RLMFloat> *floatObj;
+@property NSNumber<RLMDouble> *doubleObj;
+@property NSNumber<RLMBool> *boolObj;
+@end
+
+@interface NumberDefaultsObject : NumberObject
 @end
 
 #pragma mark FakeObject

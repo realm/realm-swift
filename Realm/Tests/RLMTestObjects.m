@@ -80,6 +80,9 @@
 @implementation LinkToAllTypesObject
 @end
 
+@implementation AllOptionalTypes
+@end
+
 #pragma mark - Real Life Objects
 #pragma mark -
 
@@ -160,6 +163,20 @@
 @implementation ReadOnlyPropertyObject
 - (NSNumber *)readOnlyUnsupportedProperty {
     return nil;
+}
+@end
+
+@implementation NumberObject
+@end
+
+@implementation NumberDefaultsObject
++ (nullable NSDictionary *)defaultPropertyValues {
+    return @{
+             @"intObj" : @1,
+             @"floatObj" : @2.2f,
+             @"doubleObj" : @3.3,
+             @"boolObj" : @NO,
+             };
 }
 @end
 

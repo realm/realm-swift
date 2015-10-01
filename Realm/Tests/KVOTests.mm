@@ -48,6 +48,11 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSDate              *dateCol;
 @property KVOObject           *objectCol;
 @property RLMArray<KVOObject> *arrayCol;
+
+@property NSNumber<RLMInt> *optIntCol;
+@property NSNumber<RLMFloat> *optFloatCol;
+@property NSNumber<RLMDouble> *optDoubleCol;
+@property NSNumber<RLMBool> *optBoolCol;
 @end
 @implementation KVOObject
 + (NSString *)primaryKey {
@@ -95,6 +100,11 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSDate         *dateCol;
 @property PlainKVOObject *objectCol;
 @property NSMutableArray *arrayCol;
+
+@property NSNumber<RLMInt> *optIntCol;
+@property NSNumber<RLMFloat> *optFloatCol;
+@property NSNumber<RLMDouble> *optDoubleCol;
+@property NSNumber<RLMBool> *optBoolCol;
 @end
 @implementation PlainKVOObject
 @end
@@ -162,7 +172,6 @@ public:
         @catch (NSException *e) {
             XCTFail(@"%@", e.description);
         }
-//        assert(_notifications.count == 0);
         XCTAssertEqual(0U, _notifications.count);
     }
 
@@ -560,6 +569,8 @@ public:
         KVORecorder r(self, obj, @"stringCol");
         obj.stringCol = @"abc";
         AssertChanged(r, @"", @"abc");
+        obj.stringCol = nil;
+        AssertChanged(r, @"abc", NSNull.null);
     }
 
     {
@@ -567,6 +578,8 @@ public:
         NSData *data = [@"abc" dataUsingEncoding:NSUTF8StringEncoding];
         obj.binaryCol = data;
         AssertChanged(r, NSData.data, data);
+        obj.binaryCol = nil;
+        AssertChanged(r, data, NSNull.null);
     }
 
     {
@@ -574,12 +587,16 @@ public:
         NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:1];
         obj.dateCol = date;
         AssertChanged(r, [NSDate dateWithTimeIntervalSinceReferenceDate:0], date);
+        obj.dateCol = nil;
+        AssertChanged(r, date, NSNull.null);
     }
 
     {
         KVORecorder r(self, obj, @"objectCol");
         obj.objectCol = obj;
         AssertChanged(r, NSNull.null, [self observableForObject:obj]);
+        obj.objectCol = nil;
+        AssertChanged(r, [self observableForObject:obj], NSNull.null);
     }
 
     {
@@ -587,6 +604,38 @@ public:
         obj.arrayCol = obj.arrayCol;
         r.refresh();
         r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"optIntCol");
+        obj.optIntCol = @1;
+        AssertChanged(r, NSNull.null, @1);
+        obj.optIntCol = nil;
+        AssertChanged(r, @1, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"optFloatCol");
+        obj.optFloatCol = @1.1f;
+        AssertChanged(r, NSNull.null, @1.1f);
+        obj.optFloatCol = nil;
+        AssertChanged(r, @1.1f, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"optDoubleCol");
+        obj.optDoubleCol = @1.1;
+        AssertChanged(r, NSNull.null, @1.1);
+        obj.optDoubleCol = nil;
+        AssertChanged(r, @1.1, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"optBoolCol");
+        obj.optBoolCol = @YES;
+        AssertChanged(r, NSNull.null, @YES);
+        obj.optBoolCol = nil;
+        AssertChanged(r, @YES, NSNull.null);
     }
 }
 
@@ -639,6 +688,8 @@ public:
         KVORecorder r(self, obj, @"stringCol");
         [obj setValue:@"abc" forKey:@"stringCol"];
         AssertChanged(r, @"", @"abc");
+        [obj setValue:nil forKey:@"stringCol"];
+        AssertChanged(r, @"abc", NSNull.null);
     }
 
     {
@@ -646,6 +697,8 @@ public:
         NSData *data = [@"abc" dataUsingEncoding:NSUTF8StringEncoding];
         [obj setValue:data forKey:@"binaryCol"];
         AssertChanged(r, NSData.data, data);
+        [obj setValue:nil forKey:@"binaryCol"];
+        AssertChanged(r, data, NSNull.null);
     }
 
     {
@@ -653,12 +706,16 @@ public:
         NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:1];
         [obj setValue:date forKey:@"dateCol"];
         AssertChanged(r, [NSDate dateWithTimeIntervalSinceReferenceDate:0], date);
+        [obj setValue:nil forKey:@"dateCol"];
+        AssertChanged(r, date, NSNull.null);
     }
 
     {
         KVORecorder r(self, obj, @"objectCol");
         [obj setValue:obj forKey:@"objectCol"];
         AssertChanged(r, NSNull.null, [self observableForObject:obj]);
+        [obj setValue:nil forKey:@"objectCol"];
+        AssertChanged(r, [self observableForObject:obj], NSNull.null);
     }
 
     {
@@ -666,6 +723,38 @@ public:
         [obj setValue:obj.arrayCol forKey:@"arrayCol"];
         r.refresh();
         r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"optIntCol");
+        [obj setValue:@1 forKey:@"optIntCol"];
+        AssertChanged(r, NSNull.null, @1);
+        [obj setValue:nil forKey:@"optIntCol"];
+        AssertChanged(r, @1, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"optFloatCol");
+        [obj setValue:@1.1f forKey:@"optFloatCol"];
+        AssertChanged(r, NSNull.null, @1.1f);
+        [obj setValue:nil forKey:@"optFloatCol"];
+        AssertChanged(r, @1.1f, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"optDoubleCol");
+        [obj setValue:@1.1 forKey:@"optDoubleCol"];
+        AssertChanged(r, NSNull.null, @1.1);
+        [obj setValue:nil forKey:@"optDoubleCol"];
+        AssertChanged(r, @1.1, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"optBoolCol");
+        [obj setValue:@YES forKey:@"optBoolCol"];
+        AssertChanged(r, NSNull.null, @YES);
+        [obj setValue:nil forKey:@"optBoolCol"];
+        AssertChanged(r, @YES, NSNull.null);
     }
 }
 
@@ -721,6 +810,8 @@ public:
         KVORecorder r(self, obj, @"stringCol");
         obj[@"stringCol"] = @"abc";
         AssertChanged(r, @"", @"abc");
+        obj[@"stringCol"] = nil;
+        AssertChanged(r, @"abc", NSNull.null);
     }
 
     {
@@ -728,6 +819,8 @@ public:
         NSData *data = [@"abc" dataUsingEncoding:NSUTF8StringEncoding];
         obj[@"binaryCol"] = data;
         AssertChanged(r, NSData.data, data);
+        obj[@"binaryCol"] = nil;
+        AssertChanged(r, data, NSNull.null);
     }
 
     {
@@ -735,12 +828,16 @@ public:
         NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:1];
         obj[@"dateCol"] = date;
         AssertChanged(r, [NSDate dateWithTimeIntervalSinceReferenceDate:0], date);
+        obj[@"dateCol"] = nil;
+        AssertChanged(r, date, NSNull.null);
     }
 
     {
         KVORecorder r(self, obj, @"objectCol");
         obj[@"objectCol"] = obj;
         AssertChanged(r, NSNull.null, [self observableForObject:obj]);
+        obj[@"objectCol"] = nil;
+        AssertChanged(r, [self observableForObject:obj], NSNull.null);
     }
 
     {
@@ -748,6 +845,38 @@ public:
         obj[@"arrayCol"] = obj.arrayCol;
         r.refresh();
         r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"optIntCol");
+        obj[@"optIntCol"] = @1;
+        AssertChanged(r, NSNull.null, @1);
+        obj[@"optIntCol"] = nil;
+        AssertChanged(r, @1, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"optFloatCol");
+        obj[@"optFloatCol"] = @1.1f;
+        AssertChanged(r, NSNull.null, @1.1f);
+        obj[@"optFloatCol"] = nil;
+        AssertChanged(r, @1.1f, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"optDoubleCol");
+        obj[@"optDoubleCol"] = @1.1;
+        AssertChanged(r, NSNull.null, @1.1);
+        obj[@"optDoubleCol"] = nil;
+        AssertChanged(r, @1.1, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"optBoolCol");
+        obj[@"optBoolCol"] = @YES;
+        AssertChanged(r, NSNull.null, @YES);
+        obj[@"optBoolCol"] = nil;
+        AssertChanged(r, @YES, NSNull.null);
     }
 }
 
@@ -946,7 +1075,8 @@ public:
     return [KVOObject createInRealm:_realm withValue:@[@(++pk),
                                                        @NO, @1, @2, @3, @0, @0, @NO, @"",
                                                        NSData.data, [NSDate dateWithTimeIntervalSinceReferenceDate:0],
-                                                       NSNull.null, NSNull.null]];
+                                                       NSNull.null, NSNull.null,
+                                                       NSNull.null, NSNull.null, NSNull.null, NSNull.null]];
 }
 
 - (id)createLinkObject {

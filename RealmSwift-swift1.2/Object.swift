@@ -202,7 +202,7 @@ public class Object: RLMObjectBase, Equatable, Printable {
 
     // Helper for getting the list object for a property
     internal func listForProperty(prop: RLMProperty) -> RLMListBase {
-        return object_getIvar(self, prop.swiftListIvar) as! RLMListBase
+        return object_getIvar(self, prop.swiftIvar) as! RLMListBase
     }
 }
 
@@ -285,17 +285,39 @@ public class ObjectUtil: NSObject {
         (object as! Object).listForProperty(property)._rlmArray = array
     }
 
-    @objc private class func getOptionalPropertyNames(object: AnyObject) -> NSArray {
+    @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
         let reflection = reflect(object)
 
-        var properties = [String]()
+        var properties = [String:AnyObject]()
 
         // Skip the first property (super):
         // super is an implicit property on Swift objects
         for i in 1..<reflection.count {
             let mirror = reflection[i].1
-            if mirror.disposition == .Optional {
-                properties.append(reflection[i].0)
+            let name = reflection[i].0
+            if mirror.valueType is Optional<String>.Type || mirror.valueType is Optional<NSString>.Type {
+                properties[name] = Int(PropertyType.String.rawValue)
+            } else if mirror.valueType is Optional<NSDate>.Type {
+                properties[name] = Int(PropertyType.Date.rawValue)
+            } else if mirror.valueType is Optional<NSData>.Type {
+                properties[name] = Int(PropertyType.Data.rawValue)
+            } else if mirror.valueType is Optional<Object>.Type {
+                properties[name] = Int(PropertyType.Object.rawValue)
+            } else if mirror.valueType is RealmOptional<Int>.Type ||
+                      mirror.valueType is RealmOptional<Int16>.Type ||
+                      mirror.valueType is RealmOptional<Int32>.Type ||
+                      mirror.valueType is RealmOptional<Int64>.Type {
+                properties[name] = Int(PropertyType.Int.rawValue)
+            } else if mirror.valueType is RealmOptional<Float>.Type {
+                properties[name] = Int(PropertyType.Float.rawValue)
+            } else if mirror.valueType is RealmOptional<Double>.Type {
+                properties[name] = Int(PropertyType.Double.rawValue)
+            } else if mirror.valueType is RealmOptional<Bool>.Type {
+                properties[name] = Int(PropertyType.Bool.rawValue)
+            } else if mirror.value as? RLMOptionalBase != nil {
+                throwRealmException("'\(mirror.valueType)' is not a a valid RealmOptional type.")
+            } else if mirror.disposition == .Optional {
+                properties[name] = NSNull()
             }
         }
 

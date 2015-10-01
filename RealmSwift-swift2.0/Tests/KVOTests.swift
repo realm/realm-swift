@@ -40,6 +40,13 @@ class KVOObject: Object {
     dynamic var dateCol: NSDate = NSDate(timeIntervalSince1970: 0)
     dynamic var objectCol: KVOObject?
     let arrayCol = List<KVOObject>()
+    let optIntCol = RealmOptional<Int>()
+    let optFloatCol = RealmOptional<Float>()
+    let optDoubleCol = RealmOptional<Double>()
+    let optBoolCol = RealmOptional<Bool>()
+    dynamic var optStringCol: String?
+    dynamic var optBinaryCol: NSData?
+    dynamic var optDateCol: NSDate?
 
     override class func primaryKey() -> String { return "pk" }
     override class func ignoredProperties() -> [String] { return ["ignored"] }
@@ -129,6 +136,22 @@ class KVOTests: TestCase {
         observeListChange(obj, "arrayCol", .Removal, NSIndexSet(index: 0)) {
             obj.arrayCol.removeAll()
         }
+
+        observeChange(obj, "optIntCol", NSNull(), 10) { obj.optIntCol.value = 10 }
+        observeChange(obj, "optFloatCol", NSNull(), 10) { obj.optFloatCol.value = 10 }
+        observeChange(obj, "optDoubleCol", NSNull(), 10) { obj.optDoubleCol.value = 10 }
+        observeChange(obj, "optBoolCol", NSNull(), true) { obj.optBoolCol.value = true }
+        observeChange(obj, "optStringCol", NSNull(), "abc") { obj.optStringCol = "abc" }
+        observeChange(obj, "optBinaryCol", NSNull(), data) { obj.optBinaryCol = data }
+        observeChange(obj, "optDateCol", NSNull(), date) { obj.optDateCol = date }
+
+        observeChange(obj, "optIntCol", 10, NSNull()) { obj.optIntCol.value = nil }
+        observeChange(obj, "optFloatCol", 10, NSNull()) { obj.optFloatCol.value = nil }
+        observeChange(obj, "optDoubleCol", 10, NSNull()) { obj.optDoubleCol.value = nil }
+        observeChange(obj, "optBoolCol", true, NSNull()) { obj.optBoolCol.value = nil }
+        observeChange(obj, "optStringCol", "abc", NSNull()) { obj.optStringCol = nil }
+        observeChange(obj, "optBinaryCol", data, NSNull()) { obj.optBinaryCol = nil }
+        observeChange(obj, "optDateCol", date, NSNull()) { obj.optDateCol = nil }
     }
 
     func testAllPropertyTypesPersisted() {
@@ -157,6 +180,22 @@ class KVOTests: TestCase {
         observeListChange(obj, "arrayCol", .Removal, NSIndexSet(index: 0)) {
             obj.arrayCol.removeAll()
         }
+
+        observeChange(obj, "optIntCol", NSNull(), 10) { obj.optIntCol.value = 10 }
+        observeChange(obj, "optFloatCol", NSNull(), 10) { obj.optFloatCol.value = 10 }
+        observeChange(obj, "optDoubleCol", NSNull(), 10) { obj.optDoubleCol.value = 10 }
+        observeChange(obj, "optBoolCol", NSNull(), true) { obj.optBoolCol.value = true }
+        observeChange(obj, "optStringCol", NSNull(), "abc") { obj.optStringCol = "abc" }
+        observeChange(obj, "optBinaryCol", NSNull(), data) { obj.optBinaryCol = data }
+        observeChange(obj, "optDateCol", NSNull(), date) { obj.optDateCol = date }
+
+        observeChange(obj, "optIntCol", 10, NSNull()) { obj.optIntCol.value = nil }
+        observeChange(obj, "optFloatCol", 10, NSNull()) { obj.optFloatCol.value = nil }
+        observeChange(obj, "optDoubleCol", 10, NSNull()) { obj.optDoubleCol.value = nil }
+        observeChange(obj, "optBoolCol", true, NSNull()) { obj.optBoolCol.value = nil }
+        observeChange(obj, "optStringCol", "abc", NSNull()) { obj.optStringCol = nil }
+        observeChange(obj, "optBinaryCol", data, NSNull()) { obj.optBinaryCol = nil }
+        observeChange(obj, "optDateCol", date, NSNull()) { obj.optDateCol = nil }
 
         observeChange(obj, "invalidated", false, true) {
             self.realm.delete(obj)
@@ -196,6 +235,22 @@ class KVOTests: TestCase {
         observeListChange(obs, "arrayCol", .Removal, NSIndexSet(index: 0)) {
             obj.arrayCol.removeAll()
         }
+
+        observeChange(obj, "optIntCol", NSNull(), 10) { obj.optIntCol.value = 10 }
+        observeChange(obj, "optFloatCol", NSNull(), 10) { obj.optFloatCol.value = 10 }
+        observeChange(obj, "optDoubleCol", NSNull(), 10) { obj.optDoubleCol.value = 10 }
+        observeChange(obj, "optBoolCol", NSNull(), true) { obj.optBoolCol.value = true }
+        observeChange(obj, "optStringCol", NSNull(), "abc") { obj.optStringCol = "abc" }
+        observeChange(obj, "optBinaryCol", NSNull(), data) { obj.optBinaryCol = data }
+        observeChange(obj, "optDateCol", NSNull(), date) { obj.optDateCol = date }
+
+        observeChange(obj, "optIntCol", 10, NSNull()) { obj.optIntCol.value = nil }
+        observeChange(obj, "optFloatCol", 10, NSNull()) { obj.optFloatCol.value = nil }
+        observeChange(obj, "optDoubleCol", 10, NSNull()) { obj.optDoubleCol.value = nil }
+        observeChange(obj, "optBoolCol", true, NSNull()) { obj.optBoolCol.value = nil }
+        observeChange(obj, "optStringCol", "abc", NSNull()) { obj.optStringCol = nil }
+        observeChange(obj, "optBinaryCol", data, NSNull()) { obj.optBinaryCol = nil }
+        observeChange(obj, "optDateCol", date, NSNull()) { obj.optDateCol = nil }
 
         observeChange(obs, "invalidated", false, true) {
             self.realm.delete(obj)

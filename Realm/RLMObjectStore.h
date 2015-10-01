@@ -98,7 +98,7 @@ RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm,
                                        NSUInteger index) NS_RETURNS_RETAINED;
 
 // switch List<> properties from being backed by standalone RLMArrays to RLMArrayLinkView
-void RLMInitializeSwiftListAccessor(RLMObjectBase *object);
+void RLMInitializeSwiftAccessorGenerics(RLMObjectBase *object);
 
 #ifdef __cplusplus
 }
