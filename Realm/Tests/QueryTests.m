@@ -1900,68 +1900,96 @@
     [realm cancelWriteTransaction];
 }
 
+struct NullTestData {
+    __unsafe_unretained NSString *propertyName;
+    __unsafe_unretained NSString *nonMatchingStr;
+    __unsafe_unretained NSString *matchingStr;
+    __unsafe_unretained id nonMatchingValue;
+    __unsafe_unretained id matchingValue;
+    bool orderable;
+    bool substringOperations;
+};
+
 - (void)testEqualityOnNull {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    [realm beginWriteTransaction];
-    [AllOptionalTypes createInRealm:realm withValue:@[@NO, @0, @0, @0, @"",
-                                                      [@"" dataUsingEncoding:NSUTF8StringEncoding],
-                                                      [NSDate dateWithTimeIntervalSince1970:1]]];
-    [realm commitWriteTransaction];
-
+    // nil on LHS is currently not supported by core
     XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = boolObj"]);
 
-    // Querying with non-nil values in Realm, with literal strings
+    // These need to be stored in variables because the struct does not retain them
+    NSData *matchingData = [@"" dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *notMatchingData = [@"a" dataUsingEncoding:NSUTF8StringEncoding];
+    NSDate *matchingDate = [NSDate dateWithTimeIntervalSince1970:1];
+    NSDate *notMatchingDate = [NSDate dateWithTimeIntervalSince1970:2];
 
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"boolObj = nil"].count);
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"boolObj = YES"].count);
-    XCTAssertEqual(1U, [AllOptionalTypes objectsWhere:@"boolObj = NO"].count);
+    struct NullTestData data[] = {
+        {@"boolObj", @"YES", @"NO", @YES, @NO},
+        {@"intObj", @"1", @"0", @1, @0, true},
+        {@"floatObj", @"1", @"0", @1, @0, true},
+        {@"doubleObj", @"1", @"0", @1, @0, true},
+        {@"string", @"'a'", @"''", @"a", @"", false, true},
+        {@"data", nil, nil, notMatchingData, matchingData},
+        {@"date", nil, nil, notMatchingDate, matchingDate, true},
+    };
 
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"intObj = nil"].count);
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"intObj = 1"].count);
-    XCTAssertEqual(1U, [AllOptionalTypes objectsWhere:@"intObj = 0"].count);
+    // Assert that the query "prop op value" gives expectedCount results when
+    // assembled via string formatting
+#define RLMAssertCountWithString(expectedCount, op, prop, value) \
+    do { \
+        NSString *queryStr = [NSString stringWithFormat:@"%@ " #op " %@", prop, value]; \
+        NSUInteger actual = [AllOptionalTypes objectsWhere:queryStr].count; \
+        XCTAssertEqual(expectedCount, actual, @"%@: expected %@, got %@", queryStr, @(expectedCount), @(actual)); \
+    } while (0)
 
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"floatObj = nil"].count);
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"floatObj = 1"].count);
-    XCTAssertEqual(1U, [AllOptionalTypes objectsWhere:@"floatObj = 0"].count);
+    // Assert that the query "prop op value" gives expectedCount results when
+    // assembled via predicateWithFormat
+#define RLMAssertCountWithPredicate(expectedCount, op, prop, value) \
+    do { \
+        NSPredicate *query = [NSPredicate predicateWithFormat:@"%K " #op " %@", prop, value]; \
+        NSUInteger actual = [AllOptionalTypes objectsWithPredicate:query].count; \
+        XCTAssertEqual(expectedCount, actual, @"%@ " #op " %@: expected %@, got %@", prop, value, @(expectedCount), @(actual)); \
+    } while (0)
 
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"doubleObj = nil"].count);
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"doubleObj = 1"].count);
-    XCTAssertEqual(1U, [AllOptionalTypes objectsWhere:@"doubleObj = 0"].count);
+    // Assert that the given operator gives the expected count for each of the
+    // stored value, a different value, and nil
+#define RLMAssertOperator(op, matchingCount, notMatchingCount, nilCount) \
+    do { \
+        if (d.matchingStr) { \
+            RLMAssertCountWithString(matchingCount, op, d.propertyName, d.matchingStr); \
+            RLMAssertCountWithString(notMatchingCount, op, d.propertyName, d.nonMatchingStr); \
+        } \
+        RLMAssertCountWithString(nilCount, op, d.propertyName, nil); \
+ \
+        RLMAssertCountWithPredicate(matchingCount, op, d.propertyName, d.matchingValue); \
+        RLMAssertCountWithPredicate(notMatchingCount, op, d.propertyName, d.nonMatchingValue); \
+        RLMAssertCountWithPredicate(nilCount, op, d.propertyName, nil); \
+    } while (0)
 
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"string = nil"].count);
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"string = 'a'"].count);
-    XCTAssertEqual(1U, [AllOptionalTypes objectsWhere:@"string = ''"].count);
+    // First test with the `matchingValue` stored in each property
 
-    // Querying with non-nil values in Realm, with NSPredicate formatting
+    [realm beginWriteTransaction];
+    [AllOptionalTypes createInRealm:realm withValue:@[@NO, @0, @0, @0, @"", matchingData, matchingDate]];
+    [realm commitWriteTransaction];
 
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"boolObj = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"boolObj = %@", @YES].count));
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"boolObj = %@", @NO].count));
+    for (size_t i = 0; i < sizeof(data) / sizeof(data[0]); ++i) {
+        struct NullTestData d = data[i];
+        RLMAssertOperator(=,  1U, 0U, 0U);
+        RLMAssertOperator(!=, 0U, 1U, 1U);
 
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"intObj = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"intObj = %@", @1].count));
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"intObj = %@", @0].count));
+        if (d.orderable) {
+            RLMAssertOperator(<,  0U, 1U, 0U);
+            RLMAssertOperator(<=, 1U, 1U, 0U);
+            RLMAssertOperator(>,  0U, 0U, 0U);
+            RLMAssertOperator(>=, 1U, 0U, 0U);
+        }
+        if (d.substringOperations) {
+            RLMAssertOperator(BEGINSWITH, 1U, 0U, 1U);
+            RLMAssertOperator(ENDSWITH, 1U, 0U, 1U);
+            RLMAssertOperator(CONTAINS, 1U, 0U, 1U);
+        }
+    }
 
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"floatObj = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"floatObj = %@", @1].count));
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"floatObj = %@", @0].count));
-
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"doubleObj = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"doubleObj = %@", @1].count));
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"doubleObj = %@", @0].count));
-
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"string = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"string = %@", @"a"].count));
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"string = %@", @""].count));
-
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"data = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"data = %@", [@"a" dataUsingEncoding:NSUTF8StringEncoding]].count));
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"data = %@", [@"" dataUsingEncoding:NSUTF8StringEncoding]].count));
-
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"date = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"date = %@", [NSDate dateWithTimeIntervalSince1970:2]].count));
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"date = %@", [NSDate dateWithTimeIntervalSince1970:1]].count));
+    // Retest with all properties nil
 
     [realm beginWriteTransaction];
     [realm deleteAllObjects];
@@ -1971,45 +1999,23 @@
                                                       NSNull.null]];
     [realm commitWriteTransaction];
 
-    // Querying with nil values in Realm, with literal strings
+    for (size_t i = 0; i < sizeof(data) / sizeof(data[0]); ++i) {
+        struct NullTestData d = data[i];
+        RLMAssertOperator(=, 0U, 0U, 1U);
+        RLMAssertOperator(!=, 1U, 1U, 0U);
 
-    XCTAssertEqual(1U, [AllOptionalTypes objectsWhere:@"boolObj = nil"].count);
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"boolObj = NO"].count);
-
-    XCTAssertEqual(1U, [AllOptionalTypes objectsWhere:@"intObj = nil"].count);
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"intObj = 0"].count);
-
-    XCTAssertEqual(1U, [AllOptionalTypes objectsWhere:@"floatObj = nil"].count);
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"floatObj = 0"].count);
-
-    XCTAssertEqual(1U, [AllOptionalTypes objectsWhere:@"doubleObj = nil"].count);
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"doubleObj = 0"].count);
-
-    XCTAssertEqual(1U, [AllOptionalTypes objectsWhere:@"string = nil"].count);
-    XCTAssertEqual(0U, [AllOptionalTypes objectsWhere:@"string = ''"].count);
-
-    // Querying with nil values in Realm, with NSPredicate formatting
-
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"boolObj = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"boolObj = %@", @NO].count));
-
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"intObj = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"intObj = %@", @0].count));
-
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"floatObj = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"floatObj = %@", @0].count));
-
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"doubleObj = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"doubleObj = %@", @0].count));
-
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"string = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"string = %@", @""].count));
-
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"data = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"data = %@", [@"" dataUsingEncoding:NSUTF8StringEncoding]].count));
-
-    XCTAssertEqual(1U, ([AllOptionalTypes objectsWhere:@"date = %@", nil].count));
-    XCTAssertEqual(0U, ([AllOptionalTypes objectsWhere:@"date = %@", [NSDate dateWithTimeIntervalSince1970:1]].count));
+        if (d.orderable) {
+            RLMAssertOperator(<,  0U, 0U, 0U);
+            RLMAssertOperator(<=, 0U, 0U, 1U);
+            RLMAssertOperator(>,  0U, 0U, 0U);
+            RLMAssertOperator(>=, 0U, 0U, 1U);
+        }
+        if (d.substringOperations) {
+            RLMAssertOperator(BEGINSWITH, 0U, 0U, 1U);
+            RLMAssertOperator(ENDSWITH, 0U, 0U, 1U);
+            RLMAssertOperator(CONTAINS, 0U, 0U, 1U);
+        }
+    }
 }
 
 - (void)testINPredicateOnNullWithNonNullValues
