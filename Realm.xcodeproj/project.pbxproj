@@ -1247,7 +1247,7 @@
 			buildConfigurationList = E856D1E8195614A400FB2FCF /* Build configuration list for PBXNativeTarget "iOS" */;
 			buildPhases = (
 				3F69DF9E19CA0DF900607109 /* Get Version Number */,
-				E856D1EE1956151D00FB2FCF /* Download Core */,
+				E856D1EE1956151D00FB2FCF /* Download Core & Set Bitcode Symlink */,
 				E856D1D0195614A300FB2FCF /* Sources */,
 				E856D1D2195614A300FB2FCF /* Headers */,
 			);
@@ -1486,19 +1486,19 @@
 			shellPath = /bin/sh;
 			shellScript = "sh build.sh download-core";
 		};
-		E856D1EE1956151D00FB2FCF /* Download Core */ = {
+		E856D1EE1956151D00FB2FCF /* Download Core & Set Bitcode Symlink */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Download Core";
+			name = "Download Core & Set Bitcode Symlink";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh build.sh download-core";
+			shellScript = "sh build.sh download-core\nsh build.sh set-core-bitcode-symlink";
 		};
 /* End PBXShellScriptBuildPhase section */
 
