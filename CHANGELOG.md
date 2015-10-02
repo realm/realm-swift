@@ -30,6 +30,11 @@ x.x.x Release notes (yyyy-MM-dd)
 * Throw an exception when a class subset has objects with array or object
   properties of a type that are not part of the class subset.
 
+0.95.3 Release notes (2015-10-02)
+=============================================================
+
+* Compile iOS Simulator framework architectures with `-fembed-bitcode-marker`.
+
 0.95.2 Release notes (2015-09-24)
 =============================================================
 
