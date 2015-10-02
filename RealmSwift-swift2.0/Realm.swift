@@ -405,7 +405,18 @@ public final class Realm {
     */
     public func objects<T: Object>(type: T.Type) -> Results<T> {
         // FIXME: use T.className()
-        return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
+        return self.objects((type as Object.Type).className())
+    }
+    
+    /**
+    Returns all objects of the given type as string in the Realm.
+    
+    - parameter type: The type as string of the objects to be returned.
+    
+    - returns: All objects of the given type in Realm.
+    */
+    public func objects<T: Object>(type: String) -> Results<T> {
+        return Results<T>(RLMGetObjects(rlmRealm, type, nil))
     }
 
     /**
