@@ -312,7 +312,7 @@ case "$COMMAND" in
 
     "set-core-bitcode-symlink")
         cd core
-        rm librealm-ios.a librealm-ios-dbg.a || true
+        rm -f librealm-ios.a librealm-ios-dbg.a
         if [ $REALM_SWIFT_VERSION = '1.2' ]; then
             echo "Using core without bitcode"
             ln -s librealm-ios-no-bitcode.a librealm-ios.a
