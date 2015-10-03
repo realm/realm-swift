@@ -44,8 +44,8 @@ Pod::Spec.new do |s|
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)' }
   s.preserve_paths          = %w(build.sh)
 
-  s.ios.deployment_target   = '7.0'
-  s.ios.vendored_library    = 'core/librealm-ios.a'
+  s.ios.deployment_target   = '8.0'
+  s.ios.vendored_library    = 'core/librealm-ios-bitcode.a'
 
   s.osx.deployment_target   = '10.9'
   s.osx.vendored_library    = 'core/librealm-osx.a'
