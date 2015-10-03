@@ -1226,7 +1226,7 @@
 			buildConfigurationList = 144C2F451B3D33D0005C8F81 /* Build configuration list for PBXNativeTarget "watchOS" */;
 			buildPhases = (
 				144C2F591B3D34B1005C8F81 /* Get Version Number */,
-				293F98F11A76E05A00C0199D /* Download Core */,
+				293F98F11A76E05A00C0199D /* Download Core & Set Bitcode Symlink */,
 				144C2F391B3D33D0005C8F81 /* Sources */,
 				144C2F3B1B3D33D0005C8F81 /* Headers */,
 				148FF9F51BB9A727000C7028 /* Copy Strip Frameworks Script */,
@@ -1245,7 +1245,7 @@
 			buildConfigurationList = 29E3C7371A71C1C700B62C1D /* Build configuration list for PBXNativeTarget "iOS Dynamic" */;
 			buildPhases = (
 				293F98F01A76E05700C0199D /* Get Version Number */,
-				293F98F11A76E05A00C0199D /* Download Core */,
+				293F98F11A76E05A00C0199D /* Download Core & Set Bitcode Symlink */,
 				29E3C7071A71C1C700B62C1D /* Sources */,
 				29E3C71A1A71C1C700B62C1D /* Headers */,
 				E81C393F1AE5CE7B00F03B56 /* Copy Strip Frameworks Script */,
@@ -1302,7 +1302,7 @@
 			buildConfigurationList = E856D1E8195614A400FB2FCF /* Build configuration list for PBXNativeTarget "iOS" */;
 			buildPhases = (
 				3F69DF9E19CA0DF900607109 /* Get Version Number */,
-				E856D1EE1956151D00FB2FCF /* Download Core */,
+				E856D1EE1956151D00FB2FCF /* Download Core & Set Bitcode Symlink */,
 				E856D1D0195614A300FB2FCF /* Sources */,
 				E856D1D2195614A300FB2FCF /* Headers */,
 			);
@@ -1504,19 +1504,19 @@
 			shellPath = /bin/sh;
 			shellScript = "echo \"#define REALM_COCOA_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
 		};
-		293F98F11A76E05A00C0199D /* Download Core */ = {
+		293F98F11A76E05A00C0199D /* Download Core & Set Bitcode Symlink */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Download Core";
+			name = "Download Core & Set Bitcode Symlink";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh build.sh download-core";
+			shellScript = "sh build.sh download-core\nsh build.sh set-core-bitcode-symlink";
 		};
 		3F69DF9E19CA0DF900607109 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1562,19 +1562,19 @@
 			shellPath = /bin/sh;
 			shellScript = "sh build.sh download-core";
 		};
-		E856D1EE1956151D00FB2FCF /* Download Core */ = {
+		E856D1EE1956151D00FB2FCF /* Download Core & Set Bitcode Symlink */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Download Core";
+			name = "Download Core & Set Bitcode Symlink";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh build.sh download-core";
+			shellScript = "sh build.sh download-core\nsh build.sh set-core-bitcode-symlink";
 		};
 		E8DFDD901B5EAA3100282424 /* Set Swift Version */ = {
 			isa = PBXShellScriptBuildPhase;
