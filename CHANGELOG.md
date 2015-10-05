@@ -1,3 +1,16 @@
+0.95.3 Release notes (2015-10-05)
+=============================================================
+
+### Bugfixes
+
+* Compile iOS Simulator framework architectures with `-fembed-bitcode-marker`.
+* Fix crashes when the first Realm opened uses a class subset and later Realms
+  opened do not.
+* Fix inconsistent errors when `Object(value: ...)` is used to initialize the
+  default value of a property of an `Object` subclass.
+* Throw an exception when a class subset has objects with array or object
+  properties of a type that are not part of the class subset.
+
 0.95.2 Release notes (2015-09-24)
 =============================================================
 

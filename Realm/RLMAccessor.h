@@ -38,6 +38,9 @@ RLM_ASSUME_NONNULL_BEGIN
 Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema, NSString *prefix);
 Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
+// Check if a given class is a generated accessor class
+bool RLMIsGeneratedClass(Class cls);
+
 //
 // Dynamic getters/setters
 //
