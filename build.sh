@@ -675,6 +675,13 @@ case "$COMMAND" in
         if [[ "$2" != "without-core" ]]; then
             sh build.sh download-core
             mv core/librealm.a core/librealm-osx.a
+            if [[ "$REALM_SWIFT_VERSION" = "1.2" ]]; then
+                echo 'Installing for Xcode 6.'
+                mv core/librealm-ios-no-bitcode.a core/librealm-ios.a
+              else
+                echo 'Installing for Xcode 7+.'
+                mv core/librealm-ios-bitcode.a core/librealm-ios.a
+            fi
         fi
 
         # CocoaPods won't automatically preserve files referenced via symlinks
