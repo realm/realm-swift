@@ -774,7 +774,6 @@ case "$COMMAND" in
     "package-osx")
         cd tightdb_objc
         REALM_SWIFT_VERSION=2.0 sh build.sh test-osx
-        REALM_SWIFT_VERSION=2.0 sh build.sh osx
 
         cd build/DerivedData/Realm/Build/Products/Release
         zip --symlinks -r realm-framework-osx.zip Realm.framework
