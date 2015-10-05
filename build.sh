@@ -621,12 +621,20 @@ case "$COMMAND" in
         ;;
 
     "examples-ios")
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        if [[ -f "examples/ios/objc" ]]; then
+            project="examples/ios/objc/RealmExamples.xcodeproj"
+        elif [[ "$REALM_SWIFT_VERSION" = 1.2 ]]; then
+            project="examples/ios/xcode-6/objc/RealmExamples.xcodeproj"
+        else
+            project="examples/ios/xcode-7/objc/RealmExamples.xcodeproj"
+        fi
+
+        xc "-project $project -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
 
         if [ ! -z "${JENKINS_HOME}" ]; then
             xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Extension -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
@@ -728,7 +736,8 @@ case "$COMMAND" in
         cp $0 realm-objc-${VERSION}
         cp -r $(dirname $0)/scripts realm-objc-${VERSION}
         cd realm-objc-${VERSION}
-        sh build.sh examples-ios
+        REALM_SWIFT_VERSION=1.2 sh build.sh examples-ios
+        REALM_SWIFT_VERSION=2.0 sh build.sh examples-ios
         sh build.sh examples-osx
         cd ..
         rm -rf realm-objc-${VERSION}
