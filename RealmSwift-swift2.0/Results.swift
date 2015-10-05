@@ -61,6 +61,7 @@ public class ResultsBase: NSObject, NSFastEnumeration {
 
     // MARK: Fast Enumeration
 
+    /// :nodoc:
     public func countByEnumeratingWithState(state: UnsafeMutablePointer<NSFastEnumerationState>, objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>, count len: Int) -> Int {
         let enumeration: NSFastEnumeration = rlmResults // FIXME: no idea why this is needed, but doesn't compile otherwise
         return enumeration.countByEnumeratingWithState(state, objects: buffer, count: len)
@@ -280,6 +281,7 @@ public final class Results<T: Object>: ResultsBase {
     }
 }
 
+/// :nodoc:
 public class RLMGenerator<T: Object>: AnyGenerator<T> {
     private let generatorBase: NSFastGenerator
 
@@ -287,6 +289,7 @@ public class RLMGenerator<T: Object>: AnyGenerator<T> {
         generatorBase = NSFastGenerator(collection)
     }
 
+    /// :nodoc:
     public override func next() -> Element? {
         let accessor = generatorBase.next() as! Element?
         if let accessor = accessor {
