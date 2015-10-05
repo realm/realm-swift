@@ -621,7 +621,7 @@ case "$COMMAND" in
         ;;
 
     "examples-ios")
-        if [[ -f "examples/ios/objc" ]]; then
+        if [[ -d "examples/ios/objc" ]]; then
             project="examples/ios/objc/RealmExamples.xcodeproj"
         elif [[ "$REALM_SWIFT_VERSION" = 1.2 ]]; then
             project="examples/ios/xcode-6/objc/RealmExamples.xcodeproj"
