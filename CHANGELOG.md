@@ -1,39 +1,15 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.95.3 Release notes (2015-10-05)
 =============================================================
-
-### API breaking changes
-
-* CocoaPods v0.38 or greater is now required to install Realm and RealmSwift
-  as pods.
-
-### Enhancements
-
-* Functionality common to both `List` and `Results` is now declared in a
-  `RealmCollectionType` protocol that both types conform to.
-* `Results.realm` now returns an `Optional<Realm>` in order to conform to
-  `RealmCollectionType`, but will always return `.Some()` since a `Results`
-  cannot exist independently from a `Realm`.
-* Aggregate operations are now available on `List`: `min`, `max`, `sum`,
-  `average`.
-* Committing write transactions (via `commitWrite` / `commitWriteTransaction` and
-  `write` / `transactionWithBlock`) now optionally allow for handling errors when
-  the disk is out of space.
-* Added `isEmpty` property on `RLMRealm`/`Realm` to indicate if it contains any
-  objects.
 
 ### Bugfixes
 
+* Compile iOS Simulator framework architectures with `-fembed-bitcode-marker`.
 * Fix crashes when the first Realm opened uses a class subset and later Realms
   opened do not.
 * Fix inconsistent errors when `Object(value: ...)` is used to initialize the
   default value of a property of an `Object` subclass.
 * Throw an exception when a class subset has objects with array or object
   properties of a type that are not part of the class subset.
-
-0.95.3 Release notes (2015-10-02)
-=============================================================
-
-* Compile iOS Simulator framework architectures with `-fembed-bitcode-marker`.
 
 0.95.2 Release notes (2015-09-24)
 =============================================================
