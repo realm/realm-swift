@@ -178,6 +178,12 @@ clean_retrieve() {
   cp -R "$1" "$2"
 }
 
+move_to_clean_dir() {
+    rm -rf "$2"
+    mkdir -p "$2"
+    mv "$1" "$2"
+}
+
 shutdown_simulators() {
     # Shut down simulators until there's no booted ones left
     # Only do one at a time because devices sometimes show up multiple times
@@ -576,12 +582,20 @@ case "$COMMAND" in
         ;;
 
     "examples-ios")
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        if [[ -d "examples/ios/objc" ]]; then
+            project="examples/ios/objc/RealmExamples.xcodeproj"
+        elif [[ "$REALM_SWIFT_VERSION" = 1.2 ]]; then
+            project="examples/ios/xcode-6/objc/RealmExamples.xcodeproj"
+        else
+            project="examples/ios/xcode-7/objc/RealmExamples.xcodeproj"
+        fi
+
+        xc "-project $project -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project $project -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
 
         if [ ! -z "${JENKINS_HOME}" ]; then
             xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Extension -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
@@ -683,7 +697,8 @@ case "$COMMAND" in
         cp $0 realm-objc-${VERSION}
         cp -r $(dirname $0)/scripts realm-objc-${VERSION}
         cd realm-objc-${VERSION}
-        sh build.sh examples-ios
+        REALM_SWIFT_VERSION=1.2 sh build.sh examples-ios
+        REALM_SWIFT_VERSION=2.0 sh build.sh examples-ios
         sh build.sh examples-osx
         cd ..
         rm -rf realm-objc-${VERSION}
@@ -701,19 +716,29 @@ case "$COMMAND" in
 
     "package-ios-static")
         cd tightdb_objc
-        sh build.sh test-ios-static
-        sh build.sh ios-static
 
-        cd build/ios
-        zip --symlinks -r realm-framework-ios.zip Realm.framework
+        REALM_SWIFT_VERSION=1.2 sh build.sh test-ios-static
+        REALM_SWIFT_VERSION=1.2 sh build.sh ios-static
+        move_to_clean_dir build/ios/Realm.framework xcode-6
+        rm -rf build
+
+        REALM_SWIFT_VERSION=2.0 sh build.sh test-ios-static
+        REALM_SWIFT_VERSION=2.0 sh build.sh ios-static
+        move_to_clean_dir build/ios/Realm.framework xcode-7
+
+        zip --symlinks -r build/ios/realm-framework-ios.zip xcode-6 xcode-7
         ;;
 
     "package-ios-dynamic")
         cd tightdb_objc
-        REALM_SWIFT_VERSION=2.0 sh build.sh ios-dynamic
+        REALM_SWIFT_VERSION=1.2 sh build.sh ios-dynamic
+        move_to_clean_dir build/ios-dynamic/Realm.framework xcode-6
+        rm -rf build
 
-        cd build/ios-dynamic
-        zip --symlinks -r realm-dynamic-framework-ios.zip Realm.framework
+        REALM_SWIFT_VERSION=2.0 sh build.sh ios-dynamic
+        move_to_clean_dir build/ios-dynamic/Realm.framework xcode-7
+
+        zip --symlinks -r build/ios-dynamic/realm-dynamic-framework-ios.zip xcode-6 xcode-7
         ;;
 
     "package-osx")

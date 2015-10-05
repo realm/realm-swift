@@ -44,7 +44,7 @@
 		E88ABBC81AFA9DE400FA1E1D /* StaticExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StaticExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E88ABBCD1AFA9DE400FA1E1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E88ABBCE1AFA9DE400FA1E1D /* StaticExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StaticExampleTests.m; sourceTree = "<group>"; };
-		E88ABBDA1AFAA5D600FA1E1D /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../realm-objc-latest/ios/static/Realm.framework"; sourceTree = "<group>"; };
+		E88ABBDA1AFAA5D600FA1E1D /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../realm-objc-latest/ios/static/xcode-6/Realm.framework"; sourceTree = "<group>"; };
 		E88ABBDC1AFAA5E000FA1E1D /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -361,7 +361,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"../../../realm-objc-latest/ios/static",
+					"../../../realm-objc-latest/ios/static/xcode-6",
 				);
 				INFOPLIST_FILE = StaticExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -375,7 +375,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"../../../realm-objc-latest/ios/static",
+					"../../../realm-objc-latest/ios/static/xcode-6",
 				);
 				INFOPLIST_FILE = StaticExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -391,7 +391,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
-					"../../../realm-objc-latest/ios/static/",
+					"../../../realm-objc-latest/ios/static/xcode-6/",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -413,7 +413,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
-					"../../../realm-objc-latest/ios/static/",
+					"../../../realm-objc-latest/ios/static/xcode-6/",
 				);
 				INFOPLIST_FILE = StaticExampleTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
