@@ -1,10 +1,12 @@
 # Uncomment this line to define a global platform for your project
 # platform :ios, '6.0'
 
+branch = ENV['sha']
+
 target 'CocoaPodsExample' do
-  pod 'Realm', :git => 'git@github.com:realm/realm-cocoa.git'
+  pod 'Realm', git: 'git@github.com:realm/realm-cocoa.git', branch: branch
 end
 
 target 'CocoaPodsExampleTests' do
-  pod 'Realm/Headers', :git => 'git@github.com:realm/realm-cocoa.git'
+  pod 'Realm/Headers', git: 'git@github.com:realm/realm-cocoa.git', branch: branch
 end
