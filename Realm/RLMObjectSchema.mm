@@ -49,6 +49,7 @@ using namespace realm;
     self.className = objectClassName;
     self.properties = properties;
     self.objectClass = objectClass;
+    self.accessorClass = RLMDynamicObject.class;
     return self;
 }
 
