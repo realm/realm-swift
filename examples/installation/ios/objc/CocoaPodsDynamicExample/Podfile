@@ -4,10 +4,10 @@
 use_frameworks!
 branch = ENV['sha']
 
-target 'CocoaPodsExample' do
+target 'CocoaPodsDynamicExample' do
   pod 'Realm', git: 'git@github.com:realm/realm-cocoa.git', branch: branch
 end
 
-target 'CocoaPodsExampleTests' do
+target 'CocoaPodsDynamicExampleTests' do
   pod 'Realm', git: 'git@github.com:realm/realm-cocoa.git', branch: branch
 end
