@@ -292,6 +292,10 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(0, collection.count)
     }
 
+    func testAssignListProperty() {
+        fatalError("abstract")
+    }
+
     func testArrayAggregateWithSwiftObjectDoesntThrow() {
         let collection = getAggregateableCollection()
 
@@ -302,9 +306,35 @@ class RealmCollectionTypeTests: TestCase {
 
 // MARK: Results
 
-class ResultsFromTableTests: RealmCollectionTypeTests {
+// MARK: Results
+
+class ResultsTests: RealmCollectionTypeTests {
+    override class func defaultTestSuite() -> XCTestSuite {
+        // Don't run tests for the base class
+        if isEqual(ResultsTests) {
+            return XCTestSuite(name: "empty")
+        }
+        return super.defaultTestSuite()
+    }
+
+    func base() -> Results<SwiftStringObject> {
+        fatalError("abstract")
+    }
+
     override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
-        return AnyRealmCollection(realmWithTestPath().objects(SwiftStringObject))
+        return AnyRealmCollection(base())
+    }
+
+    override func testAssignListProperty() {
+        let array = SwiftArrayPropertyObject()
+        realmWithTestPath().add(array)
+        array["array"] = base()
+    }
+}
+
+class ResultsFromTableTests: ResultsTests {
+    override func base() -> Results<SwiftStringObject> {
+        return realmWithTestPath().objects(SwiftStringObject)
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
@@ -313,9 +343,9 @@ class ResultsFromTableTests: RealmCollectionTypeTests {
     }
 }
 
-class ResultsFromTableViewTests: RealmCollectionTypeTests {
-    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
-        return AnyRealmCollection(realmWithTestPath().objects(SwiftStringObject).filter("stringCol != ''"))
+class ResultsFromTableViewTests: ResultsTests {
+    override func base() -> Results<SwiftStringObject> {
+        return realmWithTestPath().objects(SwiftStringObject).filter("stringCol != ''")
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
@@ -324,10 +354,10 @@ class ResultsFromTableViewTests: RealmCollectionTypeTests {
     }
 }
 
-class ResultsFromLinkViewTests: RealmCollectionTypeTests {
-    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
+class ResultsFromLinkViewTests: ResultsTests {
+    override func base() -> Results<SwiftStringObject> {
         let array = realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
-        return AnyRealmCollection(array.array.filter(NSPredicate(value: true)))
+        return array.array.filter(NSPredicate(value: true))
     }
     
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
@@ -349,14 +379,28 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         return super.defaultTestSuite()
     }
 
+    func base() -> List<SwiftStringObject> {
+        fatalError("abstract")
+    }
+
+    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
+        return AnyRealmCollection(base())
+    }
+
+    override func testAssignListProperty() {
+        let array = SwiftArrayPropertyObject()
+        realmWithTestPath().add(array)
+        array["array"] = base()
+    }
+
     override func testDescription() {
         XCTAssertEqual(collection.description, "List<SwiftStringObject> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
     }
 }
 
 class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
-        return AnyRealmCollection(SwiftArrayPropertyObject(value: ["", [str1, str2], []]).array)
+    override func base() -> List<SwiftStringObject> {
+        return SwiftArrayPropertyObject(value: ["", [str1, str2], []]).array
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
@@ -446,10 +490,10 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 }
 
 class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
+    override func base() -> List<SwiftStringObject> {
         let array = SwiftArrayPropertyObject(value: ["", [str1, str2], []])
         realmWithTestPath().add(array)
-        return AnyRealmCollection(array.array)
+        return array.array
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
@@ -460,9 +504,9 @@ class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 }
 
 class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
+    override func base() -> List<SwiftStringObject> {
         let array = realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
-        return AnyRealmCollection(array.array)
+        return array.array
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
@@ -472,10 +516,10 @@ class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 }
 
 class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
+    override func base() -> List<SwiftStringObject> {
         realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
         let array = realmWithTestPath().objects(SwiftArrayPropertyObject).first!
-        return AnyRealmCollection(array.array)
+        return array.array
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
