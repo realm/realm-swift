@@ -27,6 +27,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
 #import "RLMObjectStore.h"
+#import "RLMRealmConfiguration_Private.h"
 
 #import "object_store.hpp"
 #import <realm/table.hpp>
@@ -190,6 +191,84 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
         RLMAssertRealmSchemaMatchesTable(self, realm);
         XCTAssertFalse(ObjectStore::table_for_object_type(realm.group, "DeletedClass"), @"The deleted class should not have a table.");
         XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+    }
+}
+
+- (void)testRenamingClass {
+    NSString *originalClassName = @"OriginalClass";
+    NSString *newClassName = @"NewClass";
+    NSArray *props = @[[[RLMProperty alloc] initWithName:@"boolCol" type:RLMPropertyTypeBool objectClassName:nil indexed:NO optional:NO]];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.path = RLMTestRealmPath();
+    config.customSchema = [[RLMSchema alloc] init];
+    RLMObjectSchema *unusedClassSchema = [[RLMObjectSchema alloc] initWithClassName:@"UnusedClass" objectClass:RLMObject.class properties:props];
+    RLMObjectSchema *originalClassSchema = [[RLMObjectSchema alloc] initWithClassName:originalClassName objectClass:RLMObject.class properties:props];
+    config.customSchema.objectSchema = @[unusedClassSchema, originalClassSchema];
+
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        [realm transactionWithBlock:^{
+            [realm createObject:originalClassName withValue:@[@YES]];
+        }];
+        XCTAssertEqual(1U, [realm allObjects:originalClassName].count);
+    }
+
+    @autoreleasepool {
+        RLMObjectSchema *mismatchedClassSchema = [[RLMObjectSchema alloc] initWithClassName:@"MismatchedClass" objectClass:RLMObject.class properties:@[]];
+        RLMObjectSchema *newClassSchema = [[RLMObjectSchema alloc] initWithClassName:newClassName objectClass:RLMObject.class properties:props];
+        config.customSchema.objectSchema = @[unusedClassSchema, mismatchedClassSchema, newClassSchema];
+        config.schemaVersion = 1;
+        // apply migration
+        [config setMigrationBlock:^(RLMMigration *migration, uint64_t oldSchemaVersion) {
+            XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
+
+            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:originalClassName to:originalClassName],
+                                              @"Cannot rename '\\w+' class to the same name.");
+
+            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:StringObject.className to:newClassName],
+                                              @"Cannot rename '\\w+' class because it doesn't exist in the Realm file.");
+
+            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:originalClassName to:StringObject.className],
+                                              @"Cannot rename '\\w+' class to '\\w+' because there is no RLMObject subclass with the new name.");
+
+            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:unusedClassSchema.className to:newClassName],
+                                              @"Cannot rename '\\w+' class because it is still defined as an RLMObject subclass.");
+
+            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:originalClassName to:unusedClassSchema.className],
+                                              @"Cannot rename '\\w+' class to '\\w+' because the new class was already defined as an RLMObject subclass prior to this migration.");
+
+            RLMAssertThrowsWithReasonMatching([migration renameClassFrom:originalClassName to:mismatchedClassSchema.className],
+                                              @"Cannot rename '\\w+' class to '\\w+' because their properties don't match.");
+
+            XCTAssertNoThrow([migration renameClassFrom:originalClassName to:newClassName]);
+
+            __block NSUInteger enumerateCount = 0;
+            [migration enumerateObjects:originalClassName
+                                  block:^(RLMObject *oldObject, RLMObject *newObject) {
+                XCTAssertNotNil(oldObject);
+                XCTAssertNil(newObject);
+                enumerateCount++;
+            }];
+            XCTAssertEqual(enumerateCount, 1U);
+
+            enumerateCount = 0;
+            [migration enumerateObjects:newClassName
+                                  block:^(RLMObject *oldObject, RLMObject *newObject) {
+                XCTAssertNil(oldObject);
+                XCTAssertNotNil(newObject);
+                enumerateCount++;
+            }];
+            XCTAssertEqual(enumerateCount, 1U);
+        }];
+        [RLMRealm realmWithConfiguration:config error:nil];
+    }
+
+    @autoreleasepool {
+        // verify migration
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        RLMAssertRealmSchemaMatchesTable(self, realm);
+        XCTAssertFalse(ObjectStore::table_for_object_type(realm.group, originalClassName.UTF8String), @"The original class name should not yield a table.");
+        XCTAssertEqual(1U, [realm allObjects:newClassName].count);
     }
 }
 

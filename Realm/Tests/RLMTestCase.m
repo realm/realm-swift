@@ -21,6 +21,9 @@
 #import "RLMRealmConfiguration_Private.h"
 #import <Realm/RLMRealm_Private.h>
 #import <Realm/RLMSchema_Private.h>
+#import <Realm/RLMProperty_Private.h>
+#import <objc/runtime.h>
+#import <stdalign.h>
 
 static NSString *documentsDir() {
 #if TARGET_OS_IPHONE
@@ -211,5 +214,57 @@ static BOOL encryptTests() {
     return nil;
 }
 
-@end
+// TODO: add support for indexedProperties, ignoredProperties, primaryKey
+- (Class)runtimeClassWithName:(NSString *)className properties:(NSArray *)properties {
+    Class objectClass = objc_allocateClassPair(RLMObject.class, className.UTF8String, 0);
+    for (RLMProperty *property in properties) {
+        char *type = nil;
+        if (property.type == RLMPropertyTypeObject) {
+            type = (char *)[[NSString stringWithFormat:@"@\"%@\"", property.objectClassName] UTF8String];
+        } else if (property.type == RLMPropertyTypeArray) {
+            type = (char *)[[NSString stringWithFormat:@"@\"RLMArray<%@>\"", property.objectClassName] UTF8String];
+        } else {
+            type = malloc(2*sizeof(char));
+            type[0] = property.objcType;
+            type[1] = '\0';
+        }
+        objc_property_attribute_t propertyAttributes[] = {
+            { "T",  type },
+        };
+        size_t typeSize = 0;
+        uint8_t typeAlignment = 0;
+        switch (property.type) {
+            case RLMPropertyTypeString:
+            case RLMPropertyTypeData:
+            case RLMPropertyTypeAny:
+            case RLMPropertyTypeDate:
+            case RLMPropertyTypeObject:
+            case RLMPropertyTypeArray:
+                typeSize = sizeof(id);
+                typeAlignment = alignof(id);
+                break;
+            case RLMPropertyTypeInt:
+                typeSize = sizeof(int);
+                typeAlignment = alignof(int);
+                break;
+            case RLMPropertyTypeBool:
+                typeSize = sizeof(char);
+                typeAlignment = alignof(char);
+                break;
+            case RLMPropertyTypeFloat:
+                typeSize = sizeof(float);
+                typeAlignment = alignof(float);
+                break;
+            case RLMPropertyTypeDouble:
+                typeSize = sizeof(double);
+                typeAlignment = alignof(double);
+                break;
+        }
+        class_addIvar(objectClass, property.name.UTF8String, typeSize, typeAlignment, type);
+        class_addProperty(objectClass, property.name.UTF8String, propertyAttributes, sizeof(propertyAttributes) / sizeof(objc_property_attribute_t));
+    }
+    objc_registerClassPair(objectClass);
+    return objectClass;
+}
 
+@end

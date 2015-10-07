@@ -18,6 +18,7 @@
 
 #import "RLMTestCase.h"
 #import "RLMPredicateUtil.h"
+#import "RLMProperty_Private.h"
 
 #import <libkern/OSAtomic.h>
 #import <objc/runtime.h>
@@ -841,18 +842,12 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 #endif
 
 - (void)testObjectSubclassAddedAtRuntime {
-    Class objectClass = objc_allocateClassPair(RLMObject.class, "RuntimeGeneratedObject", 0);
-    objc_property_attribute_t objectColAttrs[] = {
-        { "T", "@\"RuntimeGeneratedObject\"" },
-    };
-    class_addIvar(objectClass, "objectCol", sizeof(id), alignof(id), "@\"RuntimeGeneratedObject\"");
-    class_addProperty(objectClass, "objectCol", objectColAttrs, sizeof(objectColAttrs) / sizeof(objc_property_attribute_t));
-    objc_property_attribute_t intColAttrs[] = {
-        { "T", "i" },
-    };
-    class_addIvar(objectClass, "intCol", sizeof(int), alignof(int), "i");
-    class_addProperty(objectClass, "intCol", intColAttrs, sizeof(intColAttrs) / sizeof(objc_property_attribute_t));
-    objc_registerClassPair(objectClass);
+    NSString *className = @"RuntimeGeneratedObject";
+    NSArray *props = @[
+       [[RLMProperty alloc] initWithName:@"objectCol" type:RLMPropertyTypeObject objectClassName:className indexed:NO optional:NO],
+       [[RLMProperty alloc] initWithName:@"intCol" type:RLMPropertyTypeInt objectClassName:nil indexed:NO optional:NO]
+    ];
+    Class objectClass = [self runtimeClassWithName:className properties:props];
     XCTAssertEqualObjects([objectClass className], @"RuntimeGeneratedObject");
 
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];

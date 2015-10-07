@@ -49,4 +49,6 @@ NSData *RLMGenerateKey(void);
 - (void)dispatchAsync:(dispatch_block_t)block;
 - (void)dispatchAsyncAndWait:(dispatch_block_t)block;
 
+- (Class)runtimeClassWithName:(NSString *)className properties:(NSArray *)properties;
+
 @end
