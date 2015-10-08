@@ -439,6 +439,11 @@ void add_link_constraint_to_query(realm::Query & query,
         query.Not();
     }
 
+    if (!obj->_row.is_attached()) {
+        query.and_query(new FalseExpression);
+        return;
+    }
+
     query.links_to(column, obj->_row.get_index());
 }
 

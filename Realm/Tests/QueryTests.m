@@ -1113,6 +1113,15 @@
     [realm commitWriteTransaction];
 }
 
+- (void)testLinkQueryNewObjectCausesEmptyResults
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [self makeDogWithName:@"Harvie" owner:@"Tim"];
+    DogObject *newDogObject = [[DogObject alloc] init];
+    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog = %@", newDogObject].count), 0U);
+}
+
 - (void)testLinkQueryString
 {
     RLMRealm *realm = [self realmWithTestPath];
