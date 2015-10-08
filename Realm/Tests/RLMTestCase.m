@@ -21,19 +21,7 @@
 #import "RLMRealmConfiguration_Private.h"
 #import <Realm/RLMRealm_Private.h>
 #import <Realm/RLMSchema_Private.h>
-
-static NSString *documentsDir() {
-#if TARGET_OS_IPHONE
-    return NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
-#else
-    NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
-    return [path stringByAppendingPathComponent:[[[NSBundle mainBundle] executablePath] lastPathComponent]];
-#endif
-}
-
-NSString *RLMRealmPathForFile(NSString *fileName) {
-    return [documentsDir() stringByAppendingPathComponent:fileName];
-}
+#import <Realm/RLMRealmConfiguration_Private.h>
 
 NSString *RLMDefaultRealmPath() {
     return RLMRealmPathForFile(@"default.realm");
@@ -87,7 +75,8 @@ static BOOL encryptTests() {
 
     // Ensure the documents directory exists as it sometimes doesn't after
     // resetting the simulator
-    [NSFileManager.defaultManager createDirectoryAtPath:documentsDir() withIntermediateDirectories:YES attributes:nil error:nil];
+    [NSFileManager.defaultManager createDirectoryAtPath:RLMDefaultRealmPath().stringByDeletingLastPathComponent
+                            withIntermediateDirectories:YES attributes:nil error:nil];
 }
 
 - (void)setUp {

@@ -239,8 +239,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
-@property (nonatomic, readonly, getter = isDeletedFromRealm) BOOL deletedFromRealm __attribute__((deprecated("Use `invalidated` instead.")));
-
 
 /**---------------------------------------------------------------------------------------
  *  @name Customizing your Objects

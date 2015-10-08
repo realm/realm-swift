@@ -231,10 +231,6 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     return self.class == _objectSchema.accessorClass && !_row.is_attached();
 }
 
-- (BOOL)isDeletedFromRealm {
-    return self.isInvalidated;
-}
-
 - (BOOL)isEqual:(id)object {
     if (RLMObjectBase *other = RLMDynamicCast<RLMObjectBase>(object)) {
         if (_objectSchema.primaryKeyProperty) {

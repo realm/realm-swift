@@ -61,25 +61,6 @@ public final class Realm {
     /// Indicates if this Realm contains any objects.
     public var isEmpty: Bool { return rlmRealm.isEmpty }
 
-    /**
-    The location of the default Realm as a string. Can be overridden.
-
-    `~/Library/Application Support/{bundle ID}/default.realm` on OS X.
-
-    `default.realm` in your application's documents directory on iOS.
-
-    - returns: Location of the default Realm.
-    */
-    @available(*, deprecated=1, message="Use Realm.Configuration.defaultConfiguration")
-    public class var defaultPath: String {
-        get {
-            return Configuration.defaultConfiguration.path ?? RLMRealmConfiguration.defaultRealmPath()
-        }
-        set {
-            RLMRealmConfiguration.setDefaultPath(newValue)
-        }
-    }
-
     // MARK: Initializers
 
     /**
@@ -89,9 +70,7 @@ public final class Realm {
     - parameter configuration: The configuration to use when creating the Realm instance.
     */
     public convenience init(configuration: Configuration = Configuration.defaultConfiguration) throws {
-        let rlmConfiguration = configuration.rlmConfiguration
-        RLMRealmAddPathSettingsToConfiguration(rlmConfiguration)
-        let rlmRealm = try RLMRealm(configuration: rlmConfiguration)
+        let rlmRealm = try RLMRealm(configuration: configuration.rlmConfiguration)
         self.init(rlmRealm)
     }
 
@@ -103,50 +82,6 @@ public final class Realm {
     public convenience init(path: String) throws {
         let rlmRealm = try RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: false, schema: nil)
         self.init(rlmRealm)
-    }
-
-    /**
-    Obtains a `Realm` instance with persistence to a specific file path with
-    options.
-
-    Like `init(path:)`, but with the ability to open read-only realms and
-    encrypted realms.
-
-    - warning: Read-only Realms do not support changes made to the file while the
-               `Realm` exists. This means that you cannot open a Realm as both read-only
-               and read-write at the same time. Read-only Realms should normally only be used
-               on files which cannot be opened in read-write mode, and not just for enforcing
-               correctness in code that should not need to write to the Realm.
-
-    - parameter path:          Path to the file you want the data saved in.
-    - parameter readOnly:      Bool indicating if this Realm is read-only (must use for read-only files).
-    - parameter encryptionKey: 64-byte key to use to encrypt the data.
-    */
-    @available(*, deprecated=1, message="Use Realm(configuration:)")
-    public convenience init(path: String, readOnly: Bool, encryptionKey: NSData? = nil) throws {
-        let rlmRealm = try RLMRealm(path: path, key: encryptionKey, readOnly: readOnly, inMemory: false, dynamic: false, schema: nil)
-        self.init(rlmRealm)
-    }
-
-    /**
-    Obtains a Realm instance for an un-persisted in-memory Realm. The identifier
-    used to create this instance can be used to access the same in-memory Realm from
-    multiple threads.
-
-    Because in-memory Realms are not persisted, you must be sure to hold on to a
-    reference to the `Realm` object returned from this for as long as you want
-    the data to last. Realm's internal cache of `Realm`s will not keep the
-    in-memory Realm alive across cycles of the run loop, so without a strong
-    reference to the `Realm` a new Realm will be created each time. Note that
-    `Object`s, `List`s, and `Results` that refer to objects persisted in a Realm have a
-    strong reference to the relevant `Realm`, as do `NotifcationToken`s.
-
-    - parameter identifier: A string used to identify a particular in-memory Realm.
-    */
-    @available(*, deprecated=1, message="Use Realm(configuration:)")
-    public convenience init(inMemoryIdentifier: String) throws {
-        let configuration = Configuration(inMemoryIdentifier: inMemoryIdentifier)
-        try self.init(configuration: configuration)
     }
 
     // MARK: Transactions
@@ -594,28 +529,6 @@ public final class Realm {
         } else {
             try rlmRealm.writeCopyToPath(path)
         }
-    }
-
-    // MARK: Encryption
-
-    /**
-    Set the encryption key to use when opening Realms at a certain path.
-
-    This can be used as an alternative to explicitly passing the key to
-    `Realm(path:, encryptionKey:, readOnly:, error:)` each time a Realm instance is
-    needed. The encryption key will be used any time a Realm is opened with
-    `Realm(path:)` or `Realm()`.
-
-    If you do not want Realm to hold on to your encryption keys any longer than
-    needed, then use `Realm(path:, encryptionKey:, readOnly:, error:)` rather than this
-    method.
-
-    - parameter encryptionKey: 64-byte encryption key to use, or `nil` to unset.
-    - parameter path:          Realm path to set the encryption key for.
-    */
-    @available(*, deprecated=1, message="Use Realm(configuration:)")
-    public class func setEncryptionKey(encryptionKey: NSData?, forPath path: String = Realm.defaultPath) {
-        RLMRealmSetEncryptionKeyForPath(encryptionKey, path)
     }
 
     // MARK: Internal

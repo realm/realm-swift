@@ -17,13 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealmConfiguration_Private.h"
+
 #import "RLMRealm_Private.h"
-#import "RLMUtil.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMUtil.hpp"
 
-#include <atomic>
-
-static NSString * const c_RLMRealmConfigurationProperties[] = {
+static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"path",
     @"inMemoryIdentifier",
     @"encryptionKey",
@@ -33,14 +32,6 @@ static NSString * const c_RLMRealmConfigurationProperties[] = {
     @"dynamic",
     @"customSchema",
 };
-
-typedef NS_ENUM(NSUInteger, RLMRealmConfigurationUsage) {
-    RLMRealmConfigurationUsageNone,
-    RLMRealmConfigurationUsageConfiguration,
-    RLMRealmConfigurationUsagePerPath,
-};
-
-static std::atomic<RLMRealmConfigurationUsage> s_configurationUsage;
 
 static NSString *const c_defaultRealmFileName = @"default.realm";
 RLMRealmConfiguration *s_defaultConfiguration;
@@ -73,24 +64,11 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
 
 @implementation RLMRealmConfiguration
 
-+ (NSString *)defaultRealmPath {
-    static NSString *defaultRealmPath = RLMRealmPathForFile(c_defaultRealmFileName);
-    return defaultRealmPath;
-}
-
 + (instancetype)defaultConfiguration {
-    @synchronized(c_defaultRealmFileName) {
-        if (!s_defaultConfiguration) {
-            s_defaultConfiguration = [[RLMRealmConfiguration alloc] init];
-        }
-    }
-    return [s_defaultConfiguration copy];
+    return [[self rawDefaultConfiguration] copy];
 }
 
 + (void)setDefaultConfiguration:(RLMRealmConfiguration *)configuration {
-    if (s_configurationUsage.exchange(RLMRealmConfigurationUsageConfiguration) == RLMRealmConfigurationUsagePerPath) {
-        @throw RLMException(@"Cannot set a default configuration after using per-path configuration methods.");
-    }
     if (!configuration) {
         @throw RLMException(@"Cannot set the default configuration to nil.");
     }
@@ -99,25 +77,26 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     }
 }
 
-+ (void)setDefaultPath:(NSString *)path {
-    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    configuration.path = path;
++ (RLMRealmConfiguration *)rawDefaultConfiguration {
     @synchronized(c_defaultRealmFileName) {
-        s_defaultConfiguration = configuration;
+        if (!s_defaultConfiguration) {
+            s_defaultConfiguration = [[RLMRealmConfiguration alloc] init];
+        }
     }
+    return s_defaultConfiguration;
 }
 
 + (void)resetRealmConfigurationState {
     @synchronized(c_defaultRealmFileName) {
         s_defaultConfiguration = nil;
     }
-    s_configurationUsage = RLMRealmConfigurationUsageNone;
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.path = [[self class] defaultRealmPath];
+        static NSString *defaultRealmPath = RLMRealmPathForFile(c_defaultRealmFileName);
+        self.path = defaultRealmPath;
     }
 
     return self;
@@ -185,8 +164,3 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
 
 @end
 
-void RLMRealmConfigurationUsePerPath(SEL callingMethod) {
-    if (s_configurationUsage.exchange(RLMRealmConfigurationUsagePerPath) == RLMRealmConfigurationUsageConfiguration) {
-        @throw RLMException(@"Cannot call %@ after setting a default configuration.", NSStringFromSelector(callingMethod));
-    }
-}

@@ -55,7 +55,7 @@ extension Realm {
 
         :returns: An initialized `Configuration`.
         */
-        public init(path: String? = RLMRealmConfiguration.defaultRealmPath(),
+        public init(path: String? = RLMRealmPathForFile("default.realm"),
             inMemoryIdentifier: String? = nil,
             encryptionKey: NSData? = nil,
             readOnly: Bool = false,
