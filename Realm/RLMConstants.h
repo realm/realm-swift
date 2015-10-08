@@ -65,7 +65,7 @@ typedef NS_ENUM(NSInteger, RLMError) {
     /** Returned by RLMRealm if no other specific error is returned when a realm is opened. */
     RLMErrorFail                  = 1,
     /** Returned by RLMRealm for any I/O related exception scenarios when a realm is opened. */
-    RLMErrorFileAccessError       = 2,
+    RLMErrorFileAccess            = 2,
     /** Returned by RLMRealm if the user does not have permission to open or create
         the specified file in the specified access mode when the realm is opened. */
     RLMErrorFilePermissionDenied  = 3,

@@ -249,7 +249,7 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
                 RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileExists, ex), outError);
                 break;
             case RealmFileException::Kind::AccessError:
-                RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileAccessError, ex), outError);
+                RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileAccess, ex), outError);
                 break;
             case RealmFileException::Kind::FormatUpgradeRequired:
                 RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileFormatUpgradeRequired, ex), outError);
@@ -703,7 +703,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
     catch (File::AccessError &ex) {
         if (error) {
-            *error = RLMMakeError(RLMErrorFileAccessError, ex);
+            *error = RLMMakeError(RLMErrorFileAccess, ex);
         }
     }
     catch (std::exception &ex) {

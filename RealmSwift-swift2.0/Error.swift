@@ -48,8 +48,8 @@ public enum Error: ErrorType {
         switch self {
         case .Fail:
             return RLMError.Fail
-        case .FileAccessError:
-            return RLMError.FileAccessError
+        case .FileAccess:
+            return RLMError.FileAccess
         case .FilePermissionDenied:
             return RLMError.FilePermissionDenied
         case .FileExists:
@@ -65,7 +65,7 @@ public enum Error: ErrorType {
     case Fail
 
     /// Error thrown by Realm for any I/O related exception scenarios when a realm is opened.
-    case FileAccessError
+    case FileAccess
 
     /// Error thrown by Realm if the user does not have permission to open or create
     /// the specified file in the specified access mode when the realm is opened.
