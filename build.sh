@@ -437,37 +437,40 @@ case "$COMMAND" in
         ;;
 
     "test-ios-static")
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
         shutdown_simulators
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
+        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
         exit 0
         ;;
 
     "test-ios7-static")
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' test"
+        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' build test"
         shutdown_simulators
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s,OS=7.1' test"
+        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s,OS=7.1' build test"
         exit 0
         ;;
 
     "test-ios-dynamic")
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
         shutdown_simulators
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
+        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
         exit 0
         ;;
 
     "test-ios-swift")
-        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
         shutdown_simulators
-        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
+        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s'"
+        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
         exit 0
         ;;
 
     "test-ios-devices")
         failed=0
         test_ios_devices xcrealm "iOS Device Tests" "$CONFIGURATION" || failed=1
-        # test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION" || failed=1 # FIXME: Re-enable once fixed
+        if [ $REALM_SWIFT_VERSION != '1.2' ]; then
+            test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION" || failed=1
+        fi
         exit $failed
         ;;
 
