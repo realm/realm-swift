@@ -29,6 +29,7 @@ func inMemoryRealm(inMememoryIdentifier: String) -> Realm {
 
 class TestCase: XCTestCase {
     var exceptionThrown = false
+    var testDir: String! = nil
 
     func realmWithTestPath(var configuration: Realm.Configuration = Realm.Configuration()) -> Realm {
         configuration.path = testRealmPath()
@@ -46,8 +47,16 @@ class TestCase: XCTestCase {
     }
 
     override func invokeTest() {
-        Realm.Configuration.defaultConfiguration = Realm.Configuration(path: realmPathForFile("\(realmFilePrefix()).default.realm"))
-        try! NSFileManager.defaultManager().createDirectoryAtPath(realmPathForFile(""), withIntermediateDirectories: true, attributes: nil)
+        testDir = RLMRealmPathForFile(realmFilePrefix())
+
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(testDir)
+        } catch {
+            // The directory shouldn't actually already exist, so not an error
+        }
+        try! NSFileManager.defaultManager().createDirectoryAtPath(testDir, withIntermediateDirectories: true, attributes: nil)
+
+        Realm.Configuration.defaultConfiguration = Realm.Configuration(path: defaultRealmPath())
 
         exceptionThrown = false
         autoreleasepool { super.invokeTest() }
@@ -60,7 +69,20 @@ class TestCase: XCTestCase {
             XCTAssertNil(RLMGetThreadLocalCachedRealmForPath(defaultRealmPath()))
             XCTAssertNil(RLMGetThreadLocalCachedRealmForPath(testRealmPath()))
         }
-        deleteRealmFiles()
+
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(testDir)
+        } catch {
+            XCTFail("Unable to delete realm files")
+        }
+
+        // Verify that there are no remaining realm files after the test
+        let parentDir = (testDir as NSString).stringByDeletingLastPathComponent
+        for url in NSFileManager().enumeratorAtPath(parentDir)! {
+            XCTAssertNotEqual(url.pathExtension, "realm", "Lingering realm file at \(parentDir)/\(url)")
+            assert(url.pathExtension != "realm")
+        }
+
         RLMRealm.resetRealmState()
     }
 
@@ -88,27 +110,15 @@ class TestCase: XCTestCase {
         return self.name.stringByTrimmingCharactersInSet(remove)
     }
 
-    private func deleteRealmFiles() {
-        do {
-            try NSFileManager.defaultManager().removeItemAtPath(realmPathForFile(""))
-        } catch {
-            XCTFail("Unable to delete realm files")
-        }
-    }
-
     internal func testRealmPath() -> String {
-        return realmPathForFile("\(realmFilePrefix()).realm")
+        return realmPathForFile("test.realm")
     }
 
     internal func defaultRealmPath() -> String {
-        return realmPathForFile("\(realmFilePrefix()).default.realm")
+        return realmPathForFile("default.realm")
     }
-}
 
-private func realmPathForFile(fileName: String) -> String {
-    var path: NSString = (Realm.Configuration.defaultConfiguration.path! as NSString).stringByDeletingLastPathComponent
-    if path.lastPathComponent != "testRealms" {
-        path = path.stringByAppendingPathComponent("testRealms")
+    private func realmPathForFile(fileName: String) -> String {
+        return (testDir as NSString).stringByAppendingPathComponent(fileName)
     }
-    return path.stringByAppendingPathComponent(fileName)
 }

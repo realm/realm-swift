@@ -35,3 +35,6 @@
 @end
 
 FOUNDATION_EXTERN void RLMRealmConfigurationUsePerPath(SEL methodName);
+
+// Get a path in the platform-appropriate documents directory with the given filename
+FOUNDATION_EXTERN NSString *RLMRealmPathForFile(NSString *fileName);
