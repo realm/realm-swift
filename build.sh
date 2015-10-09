@@ -42,6 +42,8 @@ command:
   ios-swift:            builds RealmSwift frameworks for iOS
   watchos:              builds watchOS framwork
   watchos-swift:        builds RealmSwift framework for watchOS
+  tvos:                 builds tvOS framework
+  tvos-swift:           builds RealmSwift framework for tvOS
   osx:                  builds OS X framework
   osx-swift:            builds RealmSwift framework for OS X
   test:                 tests all iOS and OS X frameworks
