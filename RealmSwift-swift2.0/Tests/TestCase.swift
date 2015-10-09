@@ -46,18 +46,18 @@ class TestCase: XCTestCase {
     }
 
     override func invokeTest() {
-        Realm.defaultPath = realmPathForFile("\(realmFilePrefix()).default.realm")
+        Realm.Configuration.defaultConfiguration = Realm.Configuration(path: realmPathForFile("\(realmFilePrefix()).default.realm"))
         try! NSFileManager.defaultManager().createDirectoryAtPath(realmPathForFile(""), withIntermediateDirectories: true, attributes: nil)
 
         exceptionThrown = false
         autoreleasepool { super.invokeTest() }
 
         if exceptionThrown {
-            RLMDeallocateRealm(Realm.defaultPath)
+            RLMDeallocateRealm(defaultRealmPath())
             RLMDeallocateRealm(testRealmPath())
         }
         else {
-            XCTAssertNil(RLMGetThreadLocalCachedRealmForPath(Realm.defaultPath))
+            XCTAssertNil(RLMGetThreadLocalCachedRealmForPath(defaultRealmPath()))
             XCTAssertNil(RLMGetThreadLocalCachedRealmForPath(testRealmPath()))
         }
         deleteRealmFiles()
@@ -99,10 +99,14 @@ class TestCase: XCTestCase {
     internal func testRealmPath() -> String {
         return realmPathForFile("\(realmFilePrefix()).realm")
     }
+
+    internal func defaultRealmPath() -> String {
+        return realmPathForFile("\(realmFilePrefix()).default.realm")
+    }
 }
 
 private func realmPathForFile(fileName: String) -> String {
-    var path: NSString = (Realm.defaultPath as NSString).stringByDeletingLastPathComponent
+    var path: NSString = (Realm.Configuration.defaultConfiguration.path! as NSString).stringByDeletingLastPathComponent
     if path.lastPathComponent != "testRealms" {
         path = path.stringByAppendingPathComponent("testRealms")
     }
