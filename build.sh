@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ##################################################################################
-# Custom build tool for Realm Objective C binding.
+# Custom build tool for Realm Objective-C binding.
 #
 # (C) Copyright 2011-2015 by realm.io.
 ##################################################################################
@@ -35,6 +35,7 @@ Usage: sh $0 command [argument]
 command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
+  set-core-bitcode-symlink: set core symlink to bitcode version for Xcode 7+ or non-bitcode version otherwise
   build:                builds all iOS  and OS X frameworks
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
@@ -269,7 +270,7 @@ case "$COMMAND" in
         ;;
 
     ######################################
-    # Download Core Library
+    # Core
     ######################################
     "download-core")
         exit 0
@@ -296,6 +297,20 @@ case "$COMMAND" in
             echo "The core library seems to be up to date."
         fi
         exit 0
+        ;;
+
+    "set-core-bitcode-symlink")
+        cd core
+        rm -f librealm-ios.a librealm-ios-dbg.a
+        if [ $REALM_SWIFT_VERSION = '1.2' ]; then
+            echo "Using core without bitcode"
+            ln -s librealm-ios-no-bitcode.a librealm-ios.a
+            ln -s librealm-ios-no-bitcode-dbg.a librealm-ios-dbg.a
+        else
+            echo "Using core with bitcode"
+            ln -s librealm-ios-bitcode.a librealm-ios.a
+            ln -s librealm-ios-bitcode-dbg.a librealm-ios-dbg.a
+        fi
         ;;
 
     ######################################

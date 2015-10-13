@@ -1452,7 +1452,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh build.sh download-core";
+			shellScript = "sh build.sh download-core\nsh build.sh set-core-bitcode-symlink\n";
 		};
 		3F69DF9E19CA0DF900607109 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1510,7 +1510,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh build.sh download-core";
+			shellScript = "sh build.sh download-core\nsh build.sh set-core-bitcode-symlink\n";
 		};
 		E8DFDD901B5EAA3100282424 /* Set Swift Version */ = {
 			isa = PBXShellScriptBuildPhase;
