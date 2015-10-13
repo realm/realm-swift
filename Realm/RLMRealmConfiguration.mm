@@ -155,7 +155,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
         @throw RLMException(@"In-memory identifier must not be empty");
     }
 
-    _inMemoryIdentifier = inMemoryIdentifier;
+    _inMemoryIdentifier = [inMemoryIdentifier copy];
     _path = nil;
 }
 
@@ -164,12 +164,12 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
         @throw RLMException(@"Realm path must not be empty");
     }
 
-    _path = path;
+    _path = [path copy];
     _inMemoryIdentifier = nil;
 }
 
 - (void)setEncryptionKey:(NSData * __nullable)encryptionKey {
-    _encryptionKey = RLMRealmValidatedEncryptionKey(encryptionKey);
+    _encryptionKey = [RLMRealmValidatedEncryptionKey(encryptionKey) copy];
 }
 
 - (void)setSchemaVersion:(uint64_t)schemaVersion {
