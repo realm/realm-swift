@@ -375,7 +375,7 @@ void process_or_group(Query &query, id array, Func&& func) {
         // Queries can't be empty, so if there's zero things in the OR group
         // validation will fail. Work around this by adding an expression which
         // will never find any rows in a table.
-        query.expression(new FalseExpression);
+        query.and_query(new FalseExpression);
     }
 
     query.end_group();
@@ -730,7 +730,7 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                     query.end_group();
                 } else {
                     // NSCompoundPredicate's documentation states that an AND predicate with no subpredicates evaluates to TRUE.
-                    query.expression(new TrueExpression);
+                    query.and_query(new TrueExpression);
                 }
                 break;
 
@@ -802,9 +802,9 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
         }
     }
     else if ([predicate isEqual:[NSPredicate predicateWithValue:YES]]) {
-        query.expression(new TrueExpression);
+        query.and_query(new TrueExpression);
     } else if ([predicate isEqual:[NSPredicate predicateWithValue:NO]]) {
-        query.expression(new FalseExpression);
+        query.and_query(new FalseExpression);
     }
     else {
         // invalid predicate type
