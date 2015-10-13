@@ -693,8 +693,7 @@ case "$COMMAND" in
         ;;
 
     "package-test-examples")
-        VERSION=$(echo realm-objc-*.zip | grep -o '\d*\.\d*\.\d*-[a-z]*')
-        if [[ -z "$VERSION" ]]; then
+        if ! VERSION=$(echo realm-objc-*.zip | grep -o '\d*\.\d*\.\d*-[a-z]*'); then
             VERSION=$(echo realm-objc-*.zip | grep -o '\d*\.\d*\.\d*')
         fi
         OBJC="realm-objc-${VERSION}"
