@@ -137,7 +137,7 @@ class RealmTests: TestCase {
     }
 
     func testInitCustomClassList() {
-        let configuration = Realm.Configuration(objectTypes: [SwiftStringObject.self])
+        let configuration = Realm.Configuration(path: Realm.Configuration.defaultConfiguration.path, objectTypes: [SwiftStringObject.self])
         XCTAssert(configuration.objectTypes! is [SwiftStringObject.Type])
         let realm = try! Realm(configuration: configuration)
         XCTAssertEqual(["SwiftStringObject"], realm.schema.objectSchema.map { $0.className })
