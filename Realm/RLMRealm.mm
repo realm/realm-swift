@@ -346,8 +346,12 @@ void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfiguration *configuration
                         error:(NSError **)outError
 {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    configuration.path = path;
-    configuration.inMemoryIdentifier = inMemory ? path.lastPathComponent : nil;
+    if (inMemory) {
+        configuration.inMemoryIdentifier = path.lastPathComponent;
+    }
+    else {
+        configuration.path = path;
+    }
     configuration.encryptionKey = key;
     configuration.readOnly = readonly;
     configuration.dynamic = dynamic;
@@ -375,16 +379,6 @@ static id RLMAutorelease(id value) {
     RLMSchema *customSchema = configuration.customSchema;
     bool dynamic = configuration.dynamic;
     bool readOnly = configuration.readOnly;
-
-    if (!path || path.length == 0) {
-        @throw RLMException([NSString stringWithFormat:@"Path '%@' is not valid", path]);
-    }
-
-    if (![NSRunLoop currentRunLoop]) {
-        @throw RLMException([NSString stringWithFormat:@"%@ \
-                             can only be called from a thread with a runloop.",
-                             NSStringFromSelector(_cmd)]);
-    }
 
     // try to reuse existing realm first
     RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(path);

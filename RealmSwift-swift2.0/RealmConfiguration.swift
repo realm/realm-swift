@@ -106,17 +106,7 @@ extension Realm {
         private var _inMemoryIdentifier: String? = nil
 
         /// 64-byte key to use to encrypt the data.
-        public var encryptionKey: NSData? {
-            set {
-                _encryptionKey = RLMRealmValidatedEncryptionKey(newValue)
-            }
-            get {
-                return _encryptionKey
-            }
-        }
-
-        private var _encryptionKey: NSData? = nil
-
+        public var encryptionKey: NSData? = nil
 
         /// Whether the Realm is read-only (must be true for read-only files).
         public var readOnly: Bool = false
@@ -144,8 +134,11 @@ extension Realm {
 
         internal var rlmConfiguration: RLMRealmConfiguration {
             let configuration = RLMRealmConfiguration()
-            configuration.path = self.path
-            configuration.inMemoryIdentifier = self.inMemoryIdentifier
+            if path != nil {
+                configuration.path = self.path
+            } else {
+                configuration.inMemoryIdentifier = self.inMemoryIdentifier
+            }
             configuration.encryptionKey = self.encryptionKey
             configuration.readOnly = self.readOnly
             configuration.schemaVersion = self.schemaVersion

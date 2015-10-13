@@ -28,9 +28,69 @@
 
 @implementation RealmConfigurationTests
 
+#pragma mark - Setter Validation
+
+- (void)testSetPathAndInMemoryIdentifierAreMutuallyExclusive {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+
+    configuration.inMemoryIdentifier = @"identifier";
+    XCTAssertNil(configuration.path);
+    XCTAssertEqual(configuration.inMemoryIdentifier, @"identifier");
+
+    configuration.path = @"path";
+    XCTAssertNil(configuration.inMemoryIdentifier);
+    XCTAssertEqual(configuration.path, @"path");
+}
+
+- (void)testPathValidation {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    XCTAssertThrows(configuration.path = nil);
+    XCTAssertThrows(configuration.path = @"");
+}
+
+- (void)testEncryptionKeyValidation {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    XCTAssertNoThrow(configuration.encryptionKey = nil);
+
+    if (RLMIsDebuggerAttached()) {
+        XCTAssertThrows(configuration.encryptionKey = RLMGenerateKey());
+        return;
+    }
+
+    RLMAssertThrowsWithReasonMatching(configuration.encryptionKey = [NSData data], @"Encryption key must be exactly 64 bytes long");
+
+    NSData *key = RLMGenerateKey();
+    configuration.encryptionKey = key;
+    XCTAssertEqual(configuration.encryptionKey, key);
+}
+
+- (void)testSchemaVersionValidation {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+
+    RLMAssertThrowsWithReasonMatching(configuration.schemaVersion = RLMNotVersioned, @"schema version.*RLMNotVersioned");
+
+    configuration.schemaVersion = 1;
+    XCTAssertEqual(configuration.schemaVersion, 1U);
+
+    configuration.schemaVersion = std::numeric_limits<uint64_t>::max() - 1;
+    XCTAssertEqual(configuration.schemaVersion, std::numeric_limits<uint64_t>::max() - 1);
+}
+
+- (void)testClassSubsetsValidateLinks {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+
+    XCTAssertThrows(configuration.objectClasses = @[LinkStringObject.class]);
+    XCTAssertNoThrow(configuration.objectClasses = (@[LinkStringObject.class, StringObject.class]));
+
+    XCTAssertThrows(configuration.objectClasses = @[CompanyObject.class]);
+    XCTAssertNoThrow(configuration.objectClasses = (@[CompanyObject.class, EmployeeObject.class]));
+}
+
+#pragma mark - Default Confiugration
+
 - (void)testDefaultConfiguration {
     RLMRealmConfiguration *defaultConfiguration = [RLMRealmConfiguration defaultConfiguration];
-    XCTAssertEqualObjects(defaultConfiguration.path, [RLMRealmConfiguration defaultRealmPath]);
+    XCTAssertEqualObjects(defaultConfiguration.path, RLMDefaultRealmPath());
     XCTAssertNil(defaultConfiguration.inMemoryIdentifier);
     XCTAssertNil(defaultConfiguration.encryptionKey);
     XCTAssertFalse(defaultConfiguration.readOnly);
@@ -49,66 +109,79 @@
     XCTAssertEqual(RLMRealmConfiguration.defaultConfiguration.path, @"path");
 }
 
-- (void)testSetDefaultConfigurationAfterRegistingPerPathThrows {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    if (!RLMIsDebuggerAttached()) {
-        [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:@"path"];
-        RLMAssertThrowsWithReasonMatching([RLMRealmConfiguration setDefaultConfiguration:[RLMRealmConfiguration new]], @"per-path");
+- (void)testDefaultConfiugrationUsesValueSemantics {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.path = @"path";
+    XCTAssertNotEqualObjects(config.path, RLMRealmConfiguration.defaultConfiguration.path);
+
+    [RLMRealmConfiguration setDefaultConfiguration:config];
+    XCTAssertEqualObjects(config.path, RLMRealmConfiguration.defaultConfiguration.path);
+
+    config.path = @"path2";
+    XCTAssertNotEqualObjects(config.path, RLMRealmConfiguration.defaultConfiguration.path);
+}
+
+- (void)testDefaultRealmUsesDefaultConfiguration {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.path, config.path); }
+
+    config.path = RLMTestRealmPath();
+    @autoreleasepool { XCTAssertNotEqualObjects(RLMRealm.defaultRealm.path, config.path); }
+    RLMRealmConfiguration.defaultConfiguration = config;
+    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.path, config.path); }
+
+    config.inMemoryIdentifier = @"default";
+    RLMRealmConfiguration.defaultConfiguration = config;
+    @autoreleasepool {
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        XCTAssertTrue([realm.path hasSuffix:@"/default"]);
+        XCTAssertTrue([realm.path hasPrefix:NSTemporaryDirectory()]);
     }
 
-    [RLMRealmConfiguration resetRealmConfigurationState];
-
-    [RLMRealm setSchemaVersion:1 forRealmAtPath:@"path" withMigrationBlock:nil];
-    RLMAssertThrowsWithReasonMatching([RLMRealmConfiguration setDefaultConfiguration:[RLMRealmConfiguration new]], @"per-path");
-#pragma clang diagnostic pop
-}
-
-- (void)testSetPathAndInMemoryIdentifierAreMutuallyExclusive {
-    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-
-    configuration.inMemoryIdentifier = @"identifier";
-    XCTAssertNil(configuration.path);
-    configuration.path = nil;
-    XCTAssertEqual(configuration.inMemoryIdentifier, @"identifier");
-
-    configuration.path = @"path";
-    XCTAssertNil(configuration.inMemoryIdentifier);
-    configuration.inMemoryIdentifier = nil;
-    XCTAssertEqual(configuration.path, @"path");
-}
-
-- (void)testEncryptionKeyIsValidated {
-    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-
-    if (!RLMIsDebuggerAttached()) {
-        RLMAssertThrowsWithReasonMatching(configuration.encryptionKey = [NSData data], @"Encryption key must be exactly 64 bytes long");
-
-        NSData *key = RLMGenerateKey();
-        configuration.encryptionKey = key;
-        XCTAssertEqual(configuration.encryptionKey, key);
+    config.schemaVersion = 1;
+    RLMRealmConfiguration.defaultConfiguration = config;
+    @autoreleasepool {
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:realm.path error:nil]);
     }
 
-    XCTAssertNoThrow(configuration.encryptionKey = nil);
-}
+    config.path = RLMDefaultRealmPath();
+    RLMRealmConfiguration.defaultConfiguration = config;
 
-- (void)testSchemaVersionIsValidated {
-    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    if (!RLMIsDebuggerAttached()) {
+        config.encryptionKey = RLMGenerateKey();
+        RLMRealmConfiguration.defaultConfiguration = config;
+        @autoreleasepool {
+            // Realm with no encryption key already exists from above
+            XCTAssertThrows([RLMRealm defaultRealm]);
+        }
 
-    RLMAssertThrowsWithReasonMatching(configuration.schemaVersion = RLMNotVersioned, @"schema version.*RLMNotVersioned");
+        [self deleteRealmFileAtPath:config.path];
+        // Create and then re-open with same key
+        @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
+        @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
 
-    configuration.schemaVersion = 1;
-    XCTAssertEqual(configuration.schemaVersion, 1U);
-}
+        // Fail to re-open with a different key
+        config.encryptionKey = RLMGenerateKey();
+        RLMRealmConfiguration.defaultConfiguration = config;
+        @autoreleasepool { XCTAssertThrows([RLMRealm defaultRealm]); }
+    }
 
-- (void)testClassSubsetsValidateLinks {
-    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    // Verify that the default realm's migration block is used implicitly
+    // when needed
+    [self deleteRealmFileAtPath:config.path];
+    @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
 
-    XCTAssertThrows(configuration.objectClasses = @[LinkStringObject.class]);
-    XCTAssertNoThrow(configuration.objectClasses = (@[LinkStringObject.class, StringObject.class]));
+    config.schemaVersion = 2;
+    __block bool migrationCalled = false;
+    config.migrationBlock = ^(RLMMigration *, uint64_t) {
+        migrationCalled = true;
+    };
+    RLMRealmConfiguration.defaultConfiguration = config;
 
-    XCTAssertThrows(configuration.objectClasses = @[CompanyObject.class]);
-    XCTAssertNoThrow(configuration.objectClasses = (@[CompanyObject.class, EmployeeObject.class]));
+    XCTAssertFalse(migrationCalled);
+    @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
+    XCTAssertTrue(migrationCalled);
 }
 
 @end
