@@ -127,6 +127,11 @@
     }
 }
 
+- (void)testOpenWithNewKeyWhileAlreadyOpenThrows {
+    [self realmWithKey:RLMGenerateKey()];
+    XCTAssertThrows([self realmWithKey:RLMGenerateKey()]);
+}
+
 #pragma mark - Registered encryption key
 
 - (void)testRegisteredKeyIsUsed {
