@@ -32,6 +32,8 @@
   the disk is out of space.
 * Added `isEmpty` property on `RLMRealm`/`Realm` to indicate if it contains any
   objects.
+* The `@count`, `@min`, `@max`, `@sum` and `@avg` collection operators are now
+  supported in queries
 
 ### Bugfixes
 
