@@ -41,7 +41,8 @@ Pod::Spec.new do |s|
   s.source_files            = 'Realm/*.{m,mm}', 'Realm/ObjectStore/*.cpp'
   s.header_mappings_dir     = 'include'
   s.pod_target_xcconfig     = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
-                                'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)' }
+                                'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)',
+                                'APPLICATION_EXTENSION_API_ONLY' => 'YES' }
   s.preserve_paths          = %w(build.sh)
 
   s.ios.deployment_target   = '7.0'
