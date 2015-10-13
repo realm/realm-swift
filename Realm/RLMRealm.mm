@@ -251,7 +251,8 @@ void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfiguration *configuration
             NSString *mode = readonly ? @"read" : @"read-write";
             NSString *additionalMessage = [NSString stringWithFormat:@"Unable to open a realm at path '%@'. Please use a path where your app has %@ permissions.", path, mode];
             NSString *newMessage = [NSString stringWithFormat:@"%s\n%@", ex.what(), additionalMessage];
-            error = RLMMakeError(RLMErrorFilePermissionDenied, File::PermissionDenied(newMessage.UTF8String, ex.get_path()));
+            error = RLMMakeError(RLMErrorFilePermissionDenied,
+                                     File::PermissionDenied(newMessage.UTF8String));
         }
         catch (File::Exists const& ex) {
             error = RLMMakeError(RLMErrorFileExists, ex);
