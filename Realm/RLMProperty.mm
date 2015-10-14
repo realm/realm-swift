@@ -26,22 +26,21 @@
 #import "RLMUtil.hpp"
 
 BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
+    return propertyType != RLMPropertyTypeAny && propertyType != RLMPropertyTypeArray;
+}
+
+BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     switch (propertyType) {
-        case RLMPropertyTypeObject:
-#ifdef REALM_ENABLE_NULL
-        case RLMPropertyTypeString:
-        case RLMPropertyTypeData:
-#endif
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
             return YES;
         default:
             return NO;
     }
 }
 
-@implementation RLMProperty {
-    NSString *_objcRawType;
-}
-
+@implementation RLMProperty
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
@@ -80,6 +79,9 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
 }
 
 -(void)setObjcCodeFromType {
+    if (_optional) {
+        _objcType = '@';
+    }
     switch (_type) {
         case RLMPropertyTypeInt:
             _objcType = 'q';
@@ -128,29 +130,29 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
             _type = RLMPropertyTypeBool;
             return YES;
         case '@': {
+            _optional = true;
             static const char arrayPrefix[] = "@\"RLMArray<";
             static const int arrayPrefixLen = sizeof(arrayPrefix) - 1;
+
+            static const char numberPrefix[] = "@\"NSNumber<";
+            static const int numberPrefixLen = sizeof(numberPrefix) - 1;
 
             if (code[1] == '\0') {
                 // string is "@"
                 _type = RLMPropertyTypeAny;
+                _optional = false;
             }
             else if (strcmp(code, "@\"NSString\"") == 0) {
                 _type = RLMPropertyTypeString;
-#if REALM_ENABLE_NULL
-                _optional = YES;
-#endif
             }
             else if (strcmp(code, "@\"NSDate\"") == 0) {
                 _type = RLMPropertyTypeDate;
             }
             else if (strcmp(code, "@\"NSData\"") == 0) {
                 _type = RLMPropertyTypeData;
-#if REALM_ENABLE_NULL
-                _optional = YES;
-#endif
             }
             else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
+                _optional = false;
                 // get object class from type string - @"RLMArray<objectClassName>"
                 _type = RLMPropertyTypeArray;
                 _objectClassName = [[NSString alloc] initWithBytes:code + arrayPrefixLen
@@ -159,14 +161,38 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
 
                 Class cls = [RLMSchema classForString:_objectClassName];
                 if (!RLMIsObjectSubclass(cls)) {
-                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/cocoa/#to-many for more information.", self.objectClassName]);
+                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/objc/#to-many for more information.", self.objectClassName]);
+                }
+            }
+            else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
+                // get number type from type string - @"NSNumber<objectClassName>"
+                NSString *numberType = [[NSString alloc] initWithBytes:code + numberPrefixLen
+                                                                length:strlen(code + numberPrefixLen) - 2 // drop trailing >"
+                                                              encoding:NSUTF8StringEncoding];
+
+                if ([numberType isEqualToString:@"RLMInt"]) {
+                    _type = RLMPropertyTypeInt;
+                }
+                else if ([numberType isEqualToString:@"RLMFloat"]) {
+                    _type = RLMPropertyTypeFloat;
+                }
+                else if ([numberType isEqualToString:@"RLMDouble"]) {
+                    _type = RLMPropertyTypeDouble;
+                }
+                else if ([numberType isEqualToString:@"RLMBool"]) {
+                    _type = RLMPropertyTypeBool;
+                }
+                else {
+                    NSString *message = [NSString stringWithFormat:@"'%@' is not supported as an NSNumber object type. NSNumbers can only be RLMInt, RLMFloat, RLMDouble, and RLMBool at the moment. "
+                                                                   @"See http://realm.io/docs/objc/ for more information.", numberType];
+                    @throw RLMException(message);
                 }
             }
             else if (strcmp(code, "@\"NSNumber\"") == 0) {
-                @throw RLMException([NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types. See http://realm.io/docs/cocoa/api/Constants/RLMPropertyType.html for all supported types."]);
+                @throw RLMException([NSString stringWithFormat:@"NSNumber properties require a protocol defining the contained type - example: NSNumber<RLMInt>."]);
             }
             else if (strcmp(code, "@\"RLMArray\"") == 0) {
-                @throw RLMException(@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>");
+                @throw RLMException(@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>.");
             }
             else {
                 // for objects strip the quotes and @
@@ -175,7 +201,7 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
                 // verify type
                 Class cls = [RLMSchema classForString:className];
                 if (!RLMIsObjectSubclass(cls)) {
-                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/api/Classes/RLMObject.html for more information.", className]);
+                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/objc/api/Classes/RLMObject.html for more information.", className]);
                 }
 
                 _type = RLMPropertyTypeObject;
@@ -242,6 +268,28 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
     // convert array types to objc variant
     if ([_objcRawType isEqualToString:@"@\"RLMArray\""]) {
         _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [[obj valueForKey:_name] objectClassName]];
+    }
+    else if ([_objcRawType isEqualToString:@"@\"NSNumber\""]) {
+        const char *numberType = [[obj valueForKey:_name] objCType];
+        switch (*numberType) {
+            case 'i':
+            case 'l':
+            case 'q':
+                _objcRawType = @"@\"NSNumber<RLMInt>\"";
+                break;
+            case 'f':
+                _objcRawType = @"@\"NSNumber<RLMFloat>\"";
+                break;
+            case 'd':
+                _objcRawType = @"@\"NSNumber<RLMDouble>\"";
+                break;
+            case 'B':
+            case 'c':
+                _objcRawType = @"@\"NSNumber<RLMBool>\"";
+                break;
+            default:
+                @throw RLMException([NSString stringWithFormat:@"Can't persist NSNumber of type '%s': only integers, floats, doubles, and bools are currently supported.", numberType]);
+        }
     }
 
     if (![self setTypeFromRawType]) {
@@ -310,9 +358,28 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
     _type = RLMPropertyTypeArray;
     _objectClassName = objectClassName;
     _objcType = 't';
-    _swiftListIvar = ivar;
+    _swiftIvar = ivar;
 
     // no obj-c property for generic lists, and thus no getter/setter names
+
+    return self;
+}
+
+- (instancetype)initSwiftOptionalPropertyWithName:(NSString *)name
+                                             ivar:(Ivar)ivar
+                                     propertyType:(RLMPropertyType)propertyType {
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+
+    _name = name;
+    _type = propertyType;
+    _objcType = '@';
+    _swiftIvar = ivar;
+    _optional = true;
+
+    // no obj-c property for generic optionals, and thus no getter/setter names
 
     return self;
 }
@@ -329,9 +396,9 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
     prop->_getterSel = _getterSel;
     prop->_setterSel = _setterSel;
     prop->_isPrimary = _isPrimary;
-    prop->_swiftListIvar = _swiftListIvar;
+    prop->_swiftIvar = _swiftIvar;
     prop->_optional = _optional;
-    
+
     return prop;
 }
 

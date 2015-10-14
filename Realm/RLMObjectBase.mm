@@ -24,6 +24,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
+#import "RLMOptionalBase.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
@@ -93,7 +94,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
         }
         for (NSUInteger i = 0; i < array.count; i++) {
             id propertyValue = RLMValidatedObjectForProperty(array[i], properties[i], schema);
-            [self setValue:RLMNSNullToNil(propertyValue) forKeyPath:[properties[i] name]];
+            [self setValue:RLMCoerceToNil(propertyValue) forKeyPath:[properties[i] name]];
         }
     }
     else {
@@ -111,7 +112,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
             }
 
             obj = RLMValidatedObjectForProperty(obj, prop, schema);
-            [self setValue:RLMNSNullToNil(obj) forKeyPath:prop.name];
+            [self setValue:RLMCoerceToNil(obj) forKeyPath:prop.name];
         }
     }
 
@@ -135,20 +136,25 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     return [super valueForKey:key];
 }
 
-// List<> properties can't be dynamic, so KVO doesn't work for them by default
+// Generic Swift properties can't be dynamic, so KVO doesn't work for them by default
 - (id)valueForUndefinedKey:(NSString *)key {
-    if (Ivar ivar = _objectSchema[key].swiftListIvar) {
-        return object_getIvar(self, ivar);
+    if (Ivar ivar = _objectSchema[key].swiftIvar) {
+        return RLMCoerceToNil(object_getIvar(self, ivar));
     }
     return [super valueForUndefinedKey:key];
 }
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
-    if (Ivar ivar = _objectSchema[key].swiftListIvar) {
-        if ([value conformsToProtocol:@protocol(NSFastEnumeration)]) {
+    RLMProperty *property = _objectSchema[key];
+    if (Ivar ivar = property.swiftIvar) {
+        if (property.type == RLMPropertyTypeArray && [value conformsToProtocol:@protocol(NSFastEnumeration)]) {
             RLMArray *array = [object_getIvar(self, ivar) _rlmArray];
             [array removeAllObjects];
             [array addObjects:value];
+        }
+        else if (property.optional) {
+            RLMOptionalBase *optional = object_getIvar(self, ivar);
+            optional.underlyingValue = value;
         }
         return;
     }
@@ -436,7 +442,7 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 + (void)initializeListProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property array:(__unused RLMArray *)array {
 }
 
-+ (NSArray *)getOptionalPropertyNames:(__unused id)obj {
++ (NSDictionary *)getOptionalProperties:(__unused id)obj {
     return nil;
 }
 

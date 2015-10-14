@@ -17,11 +17,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMConstants.h>
+#import <Realm/RLMOptionalBase.h>
 #import <objc/runtime.h>
 
 #import <realm/array.hpp>
 #import <realm/binary_data.hpp>
+#import <realm/datetime.hpp>
 #import <realm/string_data.hpp>
+#import <realm/util/file.hpp>
 
 @class RLMObjectSchema;
 @class RLMProperty;
@@ -33,6 +36,7 @@ NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
 NSException *RLMException(std::exception const& exception);
 
 NSError *RLMMakeError(RLMError code, std::exception const& exception);
+NSError *RLMMakeError(RLMError code, const realm::util::File::AccessError&);
 NSError *RLMMakeError(NSException *exception);
 
 void RLMSetErrorOrThrow(NSError *error, NSError **outError);
@@ -71,9 +75,12 @@ static inline T *RLMDynamicCast(__unsafe_unretained id obj) {
 }
 
 template<typename T>
-static inline T *RLMNSNullToNil(T *obj) {
-    if (obj == NSNull.null) {
+static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
+    if (static_cast<id>(obj) == NSNull.null) {
         return nil;
+    }
+    else if (__unsafe_unretained auto optional = RLMDynamicCast<RLMOptionalBase>(obj)) {
+        return RLMCoerceToNil(optional.underlyingValue);
     }
     return obj;
 }
@@ -137,6 +144,17 @@ static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSDat
     // the casting bit ensures that we create a data with a non-null pointer
     auto bytes = static_cast<const char *>(data.bytes) ?: static_cast<char *>((__bridge void *)data);
     return realm::BinaryData(bytes, data.length);
+}
+
+// Date convertion utilities
+static inline NSDate *RLMDateTimeToNSDate(realm::DateTime dateTime) {
+    auto timeInterval = static_cast<NSTimeInterval>(dateTime.get_datetime());
+    return [NSDate dateWithTimeIntervalSince1970:timeInterval];
+}
+
+static inline realm::DateTime RLMDateTimeForNSDate(__unsafe_unretained NSDate *const date) {
+    auto time = static_cast<int64_t>(date.timeIntervalSince1970);
+    return realm::DateTime(time);
 }
 
 static inline NSUInteger RLMConvertNotFound(size_t index) {

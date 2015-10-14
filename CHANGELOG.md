@@ -1,4 +1,16 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.96.0 Release notes (2015-10-14)
+=============================================================
+
+* No functional changes since beta2.
+
+0.96.0-beta2 Release notes (2015-10-08)
+=============================================================
+
+### Bugfixes
+
+* Add RLMOptionalBase.h to the podspec.
+
+0.96.0-beta Release notes (2015-10-07)
 =============================================================
 
 ### API breaking changes
@@ -20,10 +32,19 @@ x.x.x Release notes (yyyy-MM-dd)
   the disk is out of space.
 * Added `isEmpty` property on `RLMRealm`/`Realm` to indicate if it contains any
   objects.
+* The `@count`, `@min`, `@max`, `@sum` and `@avg` collection operators are now
+  supported in queries
 
 ### Bugfixes
 
-* None.
+* Fix assertion failure when inserting NSData between 8MB and 16MB in size.
+* Fix assertion failure when rolling back a migration which removed an object
+  link or `RLMArray`/`List` property.
+* Add the path of the file being opened to file open errors.
+* Fix a crash that could be triggered by rapidly opening and closing a Realm
+  many times on multiple threads at once.
+* Fix several places where exception messages included the name of the wrong
+  function which failed.
 
 0.95.3 Release notes (2015-10-05)
 =============================================================

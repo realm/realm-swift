@@ -14,7 +14,7 @@ set -o pipefail
 set -e
 
 # You can override the version of the core library
-: ${REALM_CORE_VERSION:=0.92.4} # set to "current" to always use the current build
+: ${REALM_CORE_VERSION:=0.94.0} # set to "current" to always use the current build
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
@@ -693,27 +693,31 @@ case "$COMMAND" in
         ;;
 
     "package-test-examples")
-        VERSION=$(file realm-objc-*.zip | grep -o '\d*\.\d*\.\d*')
-        unzip realm-objc-${VERSION}.zip
+        if ! VERSION=$(echo realm-objc-*.zip | grep -o '\d*\.\d*\.\d*-[a-z]*'); then
+            VERSION=$(echo realm-objc-*.zip | grep -o '\d*\.\d*\.\d*')
+        fi
+        OBJC="realm-objc-${VERSION}"
+        SWIFT="realm-swift-${VERSION}"
+        unzip ${OBJC}.zip
 
-        cp $0 realm-objc-${VERSION}
-        cp -r $(dirname $0)/scripts realm-objc-${VERSION}
-        cd realm-objc-${VERSION}
+        cp $0 ${OBJC}
+        cp -r $(dirname $0)/scripts ${OBJC}
+        cd ${OBJC}
         REALM_SWIFT_VERSION=1.2 sh build.sh examples-ios
         REALM_SWIFT_VERSION=2.0 sh build.sh examples-ios
         sh build.sh examples-osx
         cd ..
-        rm -rf realm-objc-${VERSION}
+        rm -rf ${OBJC}
 
-        unzip realm-swift-${VERSION}.zip
+        unzip ${SWIFT}.zip
 
-        cp $0 realm-swift-${VERSION}
-        cp -r $(dirname $0)/scripts realm-swift-${VERSION}
-        cd realm-swift-${VERSION}
+        cp $0 ${SWIFT}
+        cp -r $(dirname $0)/scripts ${SWIFT}
+        cd ${SWIFT}
         REALM_SWIFT_VERSION=1.2 sh build.sh examples-ios-swift
         REALM_SWIFT_VERSION=2.0 sh build.sh examples-ios-swift
         cd ..
-        rm -rf realm-swift-${VERSION}
+        rm -rf ${SWIFT}
         ;;
 
     "package-ios-static")
