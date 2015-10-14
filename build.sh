@@ -691,6 +691,7 @@ case "$COMMAND" in
           # CocoaPods doesn't support multiple header_mappings_dir, so combine
           # both sets of headers into a single directory
           rm -rf include
+          cp -R core/include/realm core/include/Realm
           cp -R core/include include
           mkdir -p include/Realm
           cp Realm/*.{h,hpp} include/Realm
