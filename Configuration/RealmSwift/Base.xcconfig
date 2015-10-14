@@ -28,13 +28,16 @@ SWIFT_WHOLE_MODULE_OPTIMIZATION = YES;
 MACOSX_DEPLOYMENT_TARGET = 10.9;
 IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 WATCHOS_DEPLOYMENT_TARGET = 2.0;
+TVOS_DEPLOYMENT_TARGET = 9.0;
 CODE_SIGN_IDENTITY[sdk=iphone*] = iPhone Developer;
-TARGETED_DEVICE_FAMILY = 1,2,4;
+TARGETED_DEVICE_FAMILY = 1,2,3,4;
 
 REALM_FRAMEWORK_PATH[sdk=iphone*] = build/ios-dynamic;
 REALM_FRAMEWORK_PATH[sdk=watch*] = build/watchos;
 REALM_FRAMEWORK_PATH[sdk=macosx*] = build/osx;
+REALM_FRAMEWORK_PATH[sdk=appletv*] = build/tvos;
 
 REALM_OTHER_CFLAGS[sdk=iphone*] = -fembed-bitcode
 REALM_OTHER_CFLAGS[sdk=watch*] = -fembed-bitcode
+REALM_OTHER_CFLAGS[sdk=appletv*] = -fembed-bitcode
 OTHER_CFLAGS = $(inherited) $(REALM_OTHER_FLAGS)

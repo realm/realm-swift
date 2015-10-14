@@ -157,7 +157,7 @@ public:
 // written to the anonymous pipe the background thread removes the runloop
 // source from the runloop and and shuts down.
 
-@implementation RLMNotifier {
+@implementation RLMInterProcessNotifier {
     // Realm to notify of changes
     __weak RLMRealm *_realm;
     // Runloop which notifications are delivered on
@@ -172,6 +172,14 @@ public:
     // it should be shut down.
     FdHolder _shutdownReadFd;
     FdHolder _shutdownWriteFd;
+}
+
++ (id<RLMNotifier>)listenToRealm:(RLMRealm *)realm error:(NSError **)error {
+    return [[self alloc] initWithRealm:realm error:error];
+}
+
++ (void)reset {
+    // Nothing to do here. Instances are stopped individually.
 }
 
 - (instancetype)initWithRealm:(RLMRealm *)realm error:(NSError **)error {
@@ -245,7 +253,7 @@ public:
     CFRunLoopSourceContext ctx{};
     ctx.info = (__bridge void *)self;
     ctx.perform = [](void *info) {
-        RLMNotifier *notifier = (__bridge RLMNotifier *)info;
+        RLMInterProcessNotifier *notifier = (__bridge RLMInterProcessNotifier *)info;
         [notifier->_realm handleExternalCommit];
     };
 
@@ -300,4 +308,87 @@ public:
 - (void)notifyOtherRealms {
     notifyFd(_notifyFd);
 }
+@end
+
+
+@implementation RLMInterThreadNotifier {
+    // Realm to notify of changes
+    __weak RLMRealm *_realm;
+
+    NSThread *_thread;
+
+    // flag used to avoid queuing up redundant notifications
+    std::atomic_flag _hasPendingNotification;
+}
+
+static NSMutableDictionary<NSString *, NSMapTable<RLMRealm *, RLMInterThreadNotifier *>*> *s_notifiersPerPath = [NSMutableDictionary new];
+
++ (id<RLMNotifier>)listenToRealm:(RLMRealm *)realm error:(__attribute__((unused)) NSError **)error {
+    return [[self alloc] initWithRealm:realm];
+}
+
++ (void)reset {
+    @synchronized(s_notifiersPerPath) {
+        [s_notifiersPerPath removeAllObjects];
+    }
+}
+
+- (id)initWithRealm:(RLMRealm *)realm {
+    self = [super init];
+    if (self) {
+        _realm = realm;
+        _thread = [NSThread currentThread];
+        _hasPendingNotification.clear();
+        [self listen];
+    }
+    return self;
+}
+
+- (void)listen {
+    @synchronized (s_notifiersPerPath) {
+        NSMapTable<RLMRealm *, RLMInterThreadNotifier *> *notifiers = s_notifiersPerPath[_realm.path];
+        if (!notifiers) {
+            notifiers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
+            s_notifiersPerPath[_realm.path] = notifiers;
+        }
+        [notifiers setObject:self forKey:_realm];
+    }
+}
+
+- (void)stop {
+    @synchronized (s_notifiersPerPath) {
+        NSMapTable *notifiers = s_notifiersPerPath[_realm.path];
+        if (!notifiers) {
+            return;
+        }
+
+        [notifiers removeObjectForKey:_realm];
+        if (!notifiers.objectEnumerator.nextObject) {
+            [s_notifiersPerPath removeObjectForKey:_realm.path];
+        }
+    }
+}
+
+- (void)notifyOtherRealms {
+    @synchronized (s_notifiersPerPath) {
+        for (RLMInterThreadNotifier *notifier in [s_notifiersPerPath[_realm.path] objectEnumerator]) {
+            if (notifier->_realm != _realm) {
+                [notifier notifyOnTargetThread];
+            }
+        }
+    }
+}
+
+- (void)notifyOnTargetThread {
+    if (!_hasPendingNotification.test_and_set()) {
+        [self performSelector:@selector(notify)
+                     onThread:_thread withObject:nil waitUntilDone:NO];
+    }
+}
+
+- (void)notify {
+    _hasPendingNotification.clear();
+    [_realm handleExternalCommit];
+}
+
 @end

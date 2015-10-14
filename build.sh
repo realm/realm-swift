@@ -14,7 +14,7 @@ set -o pipefail
 set -e
 
 # You can override the version of the core library
-: ${REALM_CORE_VERSION:=0.92.4} # set to "current" to always use the current build
+: ${REALM_CORE_VERSION:=tvos-beta3} # set to "current" to always use the current build
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
@@ -42,6 +42,8 @@ command:
   ios-swift:            builds RealmSwift frameworks for iOS
   watchos:              builds watchOS framwork
   watchos-swift:        builds RealmSwift framework for watchOS
+  tvos:                 builds tvOS framework
+  tvos-swift:           builds RealmSwift framework for tvOS
   osx:                  builds OS X framework
   osx-swift:            builds RealmSwift framework for OS X
   test:                 tests all iOS and OS X frameworks
@@ -170,6 +172,37 @@ build_watchos_combined() {
 
     # Combine ar archives
     xcrun lipo -create "$watchsimulator_path/$binary_path" "$watchos_path/$binary_path" -output "$out_path/$product_name/$module_name"
+}
+
+build_tvos_combined() {
+    local scheme="$1"
+    local module_name="$2"
+    local scope_suffix="$3"
+    local config="$CONFIGURATION"
+
+    # Derive build paths
+    local build_products_path="build/DerivedData/$module_name/Build/Products"
+    local product_name="$module_name.framework"
+    local binary_path="$module_name"
+    local tvos_path="$build_products_path/$config-appletvos$scope_suffix/$product_name"
+    local tvsimulator_path="$build_products_path/$config-appletvsimulator$scope_suffix/$product_name"
+    local out_path="build/tvos$scope_suffix"
+
+    # Build for each platform
+    cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]') # lowercase the module name to generate command (xcrealm or xcrealmswift)
+    $cmd "-scheme '$scheme' -configuration $config -sdk appletvos"
+    $cmd "-scheme '$scheme' -configuration $config -sdk appletvsimulator ONLY_ACTIVE_ARCH=NO"
+
+    # Combine .swiftmodule
+    if [ -d $tvsimulator_path/Modules/$module_name.swiftmodule ]; then
+      cp $tvsimulator_path/Modules/$module_name.swiftmodule/* $tvos_path/Modules/$module_name.swiftmodule/
+    fi
+
+    # Retrieve build products
+    clean_retrieve $tvos_path $out_path $product_name
+
+    # Combine ar archives
+    xcrun lipo -create "$tvsimulator_path/$binary_path" "$tvos_path/$binary_path" -output "$out_path/$product_name/$module_name"
 }
 
 clean_retrieve() {
@@ -397,6 +430,16 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "tvos")
+        build_tvos_combined "tvOS" Realm
+        exit 0
+        ;;
+
+    "tvos-swift")
+        build_tvos_combined RealmSwift RealmSwift
+        exit 0
+        ;;
+
     "osx")
         xcrealm "-scheme OSX -configuration $CONFIGURATION"
         rm -rf build/osx
@@ -506,6 +549,7 @@ case "$COMMAND" in
         sh build.sh verify-ios-swift-debug
         sh build.sh verify-ios-device
         sh build.sh verify-watchos
+        sh build.sh verify-tvos
         ;;
 
     "verify-osx")
@@ -560,6 +604,13 @@ case "$COMMAND" in
     "verify-watchos")
         if [ $REALM_SWIFT_VERSION != '1.2' ]; then
             sh build.sh watchos-swift
+        fi
+        exit 0
+        ;;
+
+    "verify-tvos")
+        if [ $REALM_SWIFT_VERSION != '1.2' ]; then
+            sh build.sh tvos-swift
         fi
         exit 0
         ;;
@@ -792,6 +843,22 @@ case "$COMMAND" in
         zip --symlinks -r realm-swift-framework-watchos.zip RealmSwift.framework Realm.framework
         ;;
 
+    "package-tvos")
+        cd tightdb_objc
+        REALM_SWIFT_VERSION=2.0 sh build.sh tvos
+
+        cd build/tvos
+        zip --symlinks -r realm-framework-tvos.zip Realm.framework
+        ;;
+
+    "package-tvos-swift")
+        cd tightdb_objc
+        REALM_SWIFT_VERSION=2.0 sh build.sh tvos-swift
+
+        cd build/tvos
+        zip --symlinks -r realm-swift-framework-tvos.zip RealmSwift.framework Realm.framework
+        ;;
+
     "package-release")
         LANG="$2"
         TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
@@ -802,7 +869,7 @@ case "$COMMAND" in
 
         FOLDER=${TEMPDIR}/realm-${LANG}-${VERSION}
 
-        mkdir -p ${FOLDER}/osx ${FOLDER}/ios ${FOLDER}/watchos
+        mkdir -p ${FOLDER}/osx ${FOLDER}/ios ${FOLDER}/watchos ${FOLDER}/tvos
 
         if [[ "${LANG}" == "objc" ]]; then
             mkdir -p ${FOLDER}/ios/static
@@ -828,6 +895,11 @@ case "$COMMAND" in
                 cd ${FOLDER}/watchos
                 unzip ${WORKSPACE}/realm-framework-watchos.zip
             )
+
+            (
+                cd ${FOLDER}/tvos
+                unzip ${WORKSPACE}/realm-framework-tvos.zip
+            )
         else
             (
                 cd ${FOLDER}/osx
@@ -842,6 +914,11 @@ case "$COMMAND" in
             (
                 cd ${FOLDER}/watchos
                 unzip ${WORKSPACE}/realm-swift-framework-watchos.zip
+            )
+
+            (
+                cd ${FOLDER}/tvos
+                unzip ${WORKSPACE}/realm-swift-framework-tvos.zip
             )
         fi
 
@@ -935,6 +1012,12 @@ EOF
         sh tightdb_objc/build.sh package-watchos-swift
         cp tightdb_objc/build/watchos/realm-swift-framework-watchos.zip .
         cp tightdb_objc/build/watchos/realm-framework-watchos.zip .
+
+        echo 'Packaging tvOS'
+        sh tightdb_objc/build.sh package-tvos
+        sh tightdb_objc/build.sh package-tvos-swift
+        cp tightdb_objc/build/tvos/realm-swift-framework-tvos.zip .
+        cp tightdb_objc/build/tvos/realm-framework-tvos.zip .
 
         echo 'Building final release packages'
         sh tightdb_objc/build.sh package-release objc
