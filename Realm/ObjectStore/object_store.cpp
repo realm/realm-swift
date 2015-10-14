@@ -478,11 +478,7 @@ InvalidNullabilityException::InvalidNullabilityException(std::string const& obje
         m_what = "'Object' property '" + property.name + "' must be nullable.";
     }
     else {
-#if REALM_NULL_STRINGS == 1
         m_what = "Array or Mixed property '" + property.name + "' cannot be nullable";
-#else
-        m_what = "Only 'Object' property types are nullable";
-#endif
     }
 }
 

@@ -71,11 +71,7 @@ void Schema::validate() const
 
             // check nullablity
             if (prop.is_nullable) {
-#if REALM_NULL_STRINGS == 1
                 if (prop.type == PropertyTypeArray || prop.type == PropertyTypeAny) {
-#else
-                if (prop.type != PropertyTypeObject) {
-#endif
                     exceptions.emplace_back(InvalidNullabilityException(object.name, prop));
                 }
             }
