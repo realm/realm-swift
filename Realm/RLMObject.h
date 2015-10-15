@@ -112,8 +112,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithValue:(id)value NS_DESIGNATED_INITIALIZER;
 
-- (instancetype)initWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use initWithValue:");
-
 
 /**
  Helper to return the class name for an RLMObject subclass.
@@ -145,8 +143,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)createInDefaultRealmWithValue:(id)value;
 
-+ (instancetype)createInDefaultRealmWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createInDefaultRealmWithValue:");
-
 /**
  Create an RLMObject in a Realm with a given object.
  
@@ -167,8 +163,6 @@ RLM_ASSUME_NONNULL_BEGIN
  @see   defaultPropertyValues
  */
 + (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value;
-
-+ (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createInRealm:withValue:");
 
 /**
  Create or update an RLMObject in the default Realm with a given object.
@@ -193,8 +187,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)createOrUpdateInDefaultRealmWithValue:(id)value;
 
-+ (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createOrUpdateInDefaultRealmWithValue:");
-
 /**
  Create or update an RLMObject with a given object.
 
@@ -218,8 +210,6 @@ RLM_ASSUME_NONNULL_BEGIN
  @see   defaultPropertyValues, primaryKey
  */
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value;
-
-+ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createOrUpdateInRealm:withValue:");
 
 /**
  The Realm in which this object is persisted. Returns nil for standalone objects.
