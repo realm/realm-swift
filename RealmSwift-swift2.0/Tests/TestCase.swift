@@ -44,6 +44,12 @@ class TestCase: XCTestCase {
         // re-enabled and we need it enabled for performance tests
         RLMDisableSyncToDisk()
 #endif
+        do {
+            // Clean up any potentially lingering Realm files from previous runs
+            try NSFileManager.defaultManager().removeItemAtPath(RLMRealmPathForFile(""))
+        } catch {
+            // The directory might not actually already exist, so not an error
+        }
     }
 
     override func invokeTest() {
