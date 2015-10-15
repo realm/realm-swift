@@ -73,8 +73,10 @@ static BOOL encryptTests() {
 #endif
     [self preintializeSchema];
 
-    // Clean up any potentially lingering Realm files from previous runs
-    [NSFileManager.defaultManager removeItemAtPath:RLMRealmPathForFile(@"") error:nil];
+    if (!getenv("RLMProcessIsChild")) {
+        // Clean up any potentially lingering Realm files from previous runs
+        [NSFileManager.defaultManager removeItemAtPath:RLMRealmPathForFile(@"") error:nil];
+    }
 
     // Ensure the documents directory exists as it sometimes doesn't after
     // resetting the simulator
