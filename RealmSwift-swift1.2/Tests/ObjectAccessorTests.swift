@@ -262,6 +262,33 @@ class ObjectAccessorTests: TestCase {
         object.optIntCol.value = nil
         XCTAssertNil(object.optIntCol.value)
 
+        object.optInt16Col.value = -1
+        XCTAssertEqual(object.optInt16Col.value!, -1)
+        object.optInt16Col.value = 0
+        XCTAssertEqual(object.optInt16Col.value!, 0)
+        object.optInt16Col.value = 1
+        XCTAssertEqual(object.optInt16Col.value!, 1)
+        object.optInt16Col.value = nil
+        XCTAssert(object.optInt16Col.value == nil)
+
+        object.optInt32Col.value = -1
+        XCTAssertEqual(object.optInt32Col.value!, -1)
+        object.optInt32Col.value = 0
+        XCTAssertEqual(object.optInt32Col.value!, 0)
+        object.optInt32Col.value = 1
+        XCTAssertEqual(object.optInt32Col.value!, 1)
+        object.optInt32Col.value = nil
+        XCTAssert(object.optInt32Col.value == nil)
+
+        object.optInt64Col.value = -1
+        XCTAssertEqual(object.optInt64Col.value!, -1)
+        object.optInt64Col.value = 0
+        XCTAssertEqual(object.optInt64Col.value!, 0)
+        object.optInt64Col.value = 1
+        XCTAssertEqual(object.optInt64Col.value!, 1)
+        object.optInt64Col.value = nil
+        XCTAssert(object.optInt64Col.value == nil)
+
         object.optFloatCol.value = 20
         XCTAssertEqual(object.optFloatCol.value!, 20 as Float)
         object.optFloatCol.value = 20.2

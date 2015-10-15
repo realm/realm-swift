@@ -468,6 +468,9 @@ class ObjectCreationTests: TestCase {
         }
         XCTAssert(object.optBoolCol.value == (get("optBoolCol") as! Bool?))
         XCTAssert(object.optIntCol.value == (get("optIntCol") as! Int?))
+        XCTAssert(object.optInt16Col.value == (get("optInt16Col") as! Int16?))
+        XCTAssert(object.optInt32Col.value == (get("optInt32Col") as! Int32?))
+        XCTAssert(object.optInt64Col.value == (get("optInt64Col") as! Int64?))
         XCTAssert(object.optFloatCol.value == (get("optFloatCol") as! Float?))
         XCTAssert(object.optDoubleCol.value == (get("optDoubleCol") as! Double?))
         XCTAssert(object.optStringCol == (get("optStringCol") as! String?))

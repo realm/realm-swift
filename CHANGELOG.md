@@ -13,6 +13,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Support assigning `Results` to `List` properties via KVC.
 * Honor the schema version set in the configuration in `+[RLMRealm migrateRealm:]`.
+* Fix crash when using optional Int16/Int32/Int64 properties in Swift.
 
 0.96.0 Release notes (2015-10-14)
 =============================================================

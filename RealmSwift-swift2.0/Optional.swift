@@ -35,14 +35,26 @@ declared as `dynamic` in Swift, such as `Int`s, `Float`, `Double`, and `Bool`.
 It encapsulates a value in its `value` property, which is the only way to mutate
 a `RealmOptional` property on an `Object`.
 */
-public final class RealmOptional<T: RealmOptionalType> : RLMOptionalBase {
+public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
     /// The value this optional represents.
     public var value: T? {
         get {
             return underlyingValue as! T?
         }
         set {
-            self.underlyingValue = newValue as! AnyObject?
+            guard let unwrappedValue = newValue else {
+                underlyingValue = nil
+                return
+            }
+            if let int64Value = unwrappedValue as? Int64 {
+                underlyingValue = NSNumber(longLong: int64Value)
+            } else if let int32Value = unwrappedValue as? Int32 {
+                underlyingValue = NSNumber(long: Int(int32Value))
+            } else if let int16Value = unwrappedValue as? Int16 {
+                underlyingValue = NSNumber(long: Int(int16Value))
+            } else {
+                underlyingValue = unwrappedValue as! AnyObject
+            }
         }
     }
 
