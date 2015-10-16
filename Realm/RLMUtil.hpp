@@ -32,7 +32,8 @@
 @class RLMSchema;
 @protocol RLMFastEnumerable;
 
-NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
+__attribute__((format(NSString, 1, 2)))
+NSException *RLMException(NSString *fmt, ...);
 NSException *RLMException(std::exception const& exception);
 
 NSError *RLMMakeError(RLMError code, std::exception const& exception);

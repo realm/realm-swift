@@ -69,8 +69,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
         return;
     }
     if (row != realm::not_found) {
-        NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%lld'.", propName, val];
-        @throw RLMException(reason);
+        @throw RLMException(@"Can't set primary key property '%@' to existing value '%lld'.", propName, val);
     }
     obj->_row.set_int(colIndex, val);
 }
@@ -128,8 +127,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
         return;
     }
     if (row != realm::not_found) {
-        NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%@'.", propName, val];
-        @throw RLMException(reason);
+        @throw RLMException(@"Can't set primary key property '%@' to existing value '%@'.", propName, val);
     }
     try {
         obj->_row.set_string(colIndex, str);
@@ -233,9 +231,8 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
         RLMObjectSchema *valSchema = val->_objectSchema;
         RLMObjectSchema *objSchema = obj->_objectSchema;
         if (![[objSchema.properties[colIndex] objectClassName] isEqualToString:valSchema.className]) {
-            NSString *reason = [NSString stringWithFormat:@"Can't set object of type '%@' to property of type '%@'",
-                                valSchema.className, [objSchema.properties[colIndex] objectClassName]];
-            @throw RLMException(reason);
+            @throw RLMException(@"Can't set object of type '%@' to property of type '%@'",
+                                valSchema.className, [objSchema.properties[colIndex] objectClassName]);
         }
         RLMObjectBase *link = RLMGetLinkedObjectForValue(obj->_realm, valSchema.className, val, RLMCreationOptionsPromoteStandalone);
         obj->_row.set_link(colIndex, link->_row.get_index());
@@ -308,8 +305,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
         return;
     }
     if (row != realm::not_found) {
-        NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%@'.", propName, intObject];
-        @throw RLMException(reason);
+        @throw RLMException(@"Can't set primary key property '%@' to existing value '%@'.", propName, intObject);
     }
 
     if (intObject) {
@@ -454,7 +450,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
                 return;
         }
     }
-    @throw RLMException([NSString stringWithFormat:@"Inserting invalid object of class %@ for an RLMPropertyTypeAny property (%@).", [val class], [obj->_objectSchema.properties[col_ndx] name]]);
+    @throw RLMException(@"Inserting invalid object of class %@ for an RLMPropertyTypeAny property (%@).", [val class], [obj->_objectSchema.properties[col_ndx] name]);
 }
 
 // dynamic getter with column closure
@@ -839,13 +835,13 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     RLMObjectSchema *schema = obj->_objectSchema;
     RLMProperty *prop = schema[propName];
     if (!prop) {
-        @throw RLMException([NSString stringWithFormat:@"Invalid property name `%@` for class `%@`.", propName, obj->_objectSchema.className]);
+        @throw RLMException(@"Invalid property name `%@` for class `%@`.", propName, obj->_objectSchema.className);
     }
     if (prop.isPrimary) {
         @throw RLMException(@"Primary key can't be changed to '%@' after an object is inserted.", val);
     }
     if (!RLMIsObjectValidForProperty(val, prop)) {
-        @throw RLMException([NSString stringWithFormat:@"Invalid property value `%@` for property `%@` of class `%@`", val, propName, obj->_objectSchema.className]);
+        @throw RLMException(@"Invalid property value `%@` for property `%@` of class `%@`", val, propName, obj->_objectSchema.className);
     }
 
     RLMWrapSetter(obj, prop.name, [&] {
@@ -940,7 +936,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
 RLMProperty *RLMValidatedGetProperty(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained NSString *const propName) {
     RLMProperty *prop = obj->_objectSchema[propName];
     if (!prop) {
-        @throw RLMException([NSString stringWithFormat:@"Invalid property name `%@` for class `%@`.", propName, obj->_objectSchema.className]);
+        @throw RLMException(@"Invalid property name `%@` for class `%@`.", propName, obj->_objectSchema.className);
     }
     return prop;
 }

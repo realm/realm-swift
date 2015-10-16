@@ -77,7 +77,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     }
 
     // if not convertible to prop throw
-    @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' for property '%@'", obj, prop.name]);
+    @throw RLMException(@"Invalid value '%@' for property '%@'", obj, prop.name);
 }
 
 - (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
@@ -332,11 +332,11 @@ NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *cla
     RLMObjectSchema *schema = object->_realm.schema[className];
     RLMProperty *prop = schema[property];
     if (!prop) {
-        @throw RLMException([NSString stringWithFormat:@"Invalid property '%@'", property]);
+        @throw RLMException(@"Invalid property '%@'", property);
     }
 
     if (![prop.objectClassName isEqualToString:object->_objectSchema.className]) {
-        @throw RLMException([NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, object->_objectSchema.className]);
+        @throw RLMException(@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, object->_objectSchema.className);
     }
 
     Table *table = schema.table;
@@ -412,8 +412,8 @@ id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
     }
     @catch (NSException *e) {
         if ([e.name isEqualToString:NSUndefinedKeyException]) {
-            @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' to initialize object of type '%@': missing key '%@'",
-                                 object, className, key]);
+            @throw RLMException(@"Invalid value '%@' to initialize object of type '%@': missing key '%@'",
+                                object, className, key);
         }
         @throw;
     }

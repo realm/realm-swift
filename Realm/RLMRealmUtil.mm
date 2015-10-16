@@ -80,7 +80,7 @@ void RLMInstallUncaughtExceptionHandler() {
 // Convert an error code to either an NSError or an exception
 static id handleError(int err, NSError **error) {
     if (!error) {
-        @throw RLMException(@(strerror(err)));
+        @throw RLMException(@"%@", @(strerror(err)));
     }
     *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil];
     return nil;

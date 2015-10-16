@@ -281,7 +281,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMResultsValidate(self);
 
     if (index >= self.count) {
-        @throw RLMException(@"Index is out of bounds.", @{@"index": @(index)});
+        @throw RLMException(@"Index %@ is out of bounds.", @(index));
     }
     return RLMCreateObjectAccessor(_realm, _objectSchema, [self indexInSource:index]);
 }
@@ -317,8 +317,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
     // check that object types align
     if (object->_row.get_table() != &_backingView.get_parent()) {
-        NSString *message = [NSString stringWithFormat:@"Object type '%@' does not match RLMResults type '%@'.", object->_objectSchema.className, _objectClassName];
-        @throw RLMException(message);
+        @throw RLMException(@"Object type '%@' does not match RLMResults type '%@'.", object->_objectSchema.className, _objectClassName);
     }
 
     size_t object_ndx = object->_row.get_index();
@@ -581,8 +580,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 
     // check that object types align
     if (object->_row.get_table() != _table) {
-        NSString *message = [NSString stringWithFormat:@"Object type '%@' does not match RLMResults type '%@'.", object->_objectSchema.className, _objectClassName];
-        @throw RLMException(message);
+        @throw RLMException(@"Object type '%@' does not match RLMResults type '%@'.", object->_objectSchema.className, _objectClassName);
     }
 
     return RLMConvertNotFound(object->_row.get_index());
@@ -665,7 +663,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
-    @throw RLMException(@"Index is out of bounds.", @{@"index": @(index)});
+    @throw RLMException(@"Index %@ is out of bounds.", @(index));
 }
 
 - (id)valueForKey:(NSString *)key {
