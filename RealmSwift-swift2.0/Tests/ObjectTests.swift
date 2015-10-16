@@ -288,6 +288,6 @@ class ObjectTests: TestCase {
     func testDynamicList() {
         XCTAssertEqual(SwiftArrayPropertyObject.dynamicList("array").count, 0)
         XCTAssertEqual(SwiftArrayPropertyObject.dynamicList("intArray").count, 0)
-        assertThrows(SwiftArraypropertyObject.dynamicList("noSuchList"))
+        assertThrows(SwiftArrayPropertyObject.dynamicList("noSuchList"))
     }
 }
