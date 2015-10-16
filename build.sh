@@ -49,7 +49,9 @@ command:
   test-ios-static:      tests static iOS framework on 32-bit and 64-bit simulators
   test-ios-dynamic:     tests dynamic iOS framework on 32-bit and 64-bit simulators
   test-ios-swift:       tests RealmSwift iOS framework on 32-bit and 64-bit simulators
-  test-ios-devices:     tests dynamic and Swift iOS frameworks on all attached iOS devices
+  test-ios-devices:     tests ObjC & Swift iOS frameworks on all attached iOS devices
+  test-ios-devices-objc:  tests ObjC iOS framework on all attached iOS devices
+  test-ios-devices-swift: tests Swift iOS framework on all attached iOS devices
   test-osx:             tests OS X framework
   test-osx-swift:       tests RealmSwift OS X framework
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device in both Debug and Release configurations
@@ -466,11 +468,19 @@ case "$COMMAND" in
 
     "test-ios-devices")
         failed=0
-        test_ios_devices xcrealm "iOS Device Tests" "$CONFIGURATION" || failed=1
-        if [ $REALM_SWIFT_VERSION != '1.2' ]; then
-            test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION" || failed=1
-        fi
+        sh build.sh test-ios-devices-objc || failed=1
+        sh build.sh test-ios-devices-swift || failed=1
         exit $failed
+        ;;
+
+    "test-ios-devices-objc")
+        test_ios_devices xcrealm "iOS Device Tests" "$CONFIGURATION" || exit 1
+        exit 0
+        ;;
+
+    "test-ios-devices-swift")
+        test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION" || exit 1
+        exit 0
         ;;
 
     "test-osx")
