@@ -284,4 +284,10 @@ class ObjectTests: TestCase {
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
     }
+
+    func testDynamicList() {
+        XCTAssertEqual(SwiftArrayPropertyObject.dynamicList("array").count, 0)
+        XCTAssertEqual(SwiftArrayPropertyObject.dynamicList("intArray").count, 0)
+        assertThrows(SwiftArraypropertyObject.dynamicList("noSuchList"))
+    }
 }
