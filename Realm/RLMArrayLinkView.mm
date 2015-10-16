@@ -97,12 +97,12 @@ static inline void RLMLinkViewArrayValidateInWriteTransaction(__unsafe_unretaine
 }
 static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained NSString *const expected) {
     if (!obj) {
-        @throw RLMException(@"Object is `nil`", @{@"expected class" : expected});
+        @throw RLMException([NSString stringWithFormat:@"Cannot add `nil` to RLMArray<%@>", expected]);
     }
 
     NSString *objectClassName = obj->_objectSchema.className;
     if (![objectClassName isEqualToString:expected]) {
-        @throw RLMException(@"Object type is incorrect.", @{@"expected class" : expected, @"actual class" : objectClassName});
+        @throw RLMException([NSString stringWithFormat:@"Cannot add object of type '%@' to RLMArray<%@>", objectClassName, expected]);
     }
 }
 

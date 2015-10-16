@@ -241,14 +241,10 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
 }
 
 
-NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
-    NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:userInfo];
-    [info addEntriesFromDictionary:@{
-                                     RLMRealmVersionKey : REALM_COCOA_VERSION,
-                                     RLMRealmCoreVersionKey : @REALM_VERSION
-                                     }];
-
-    return [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:info];
+NSException *RLMException(NSString *reason) {
+    return [NSException exceptionWithName:RLMExceptionName reason:reason
+                                 userInfo:@{RLMRealmVersionKey: REALM_COCOA_VERSION,
+                                            RLMRealmCoreVersionKey: @REALM_VERSION}];
 }
 
 NSException *RLMException(std::exception const& exception) {
@@ -281,7 +277,7 @@ void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
         *outError = error;
     }
     else {
-        @throw RLMException(error.localizedDescription, error.userInfo);
+        @throw RLMException(error.localizedDescription);
     }
 }
 

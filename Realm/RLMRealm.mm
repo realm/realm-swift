@@ -384,16 +384,16 @@ static id RLMAutorelease(id value) {
     RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(path);
     if (realm) {
         if (realm->_readOnly != readOnly) {
-            @throw RLMException(@"Realm at path already opened with different read permissions", @{@"path":realm.path});
+            @throw RLMException([NSString stringWithFormat:@"Realm at path '%@' already opened with different read permissions", path]);
         }
         if (realm->_inMemory != inMemory) {
-            @throw RLMException(@"Realm at path already opened with different inMemory settings", @{@"path":realm.path});
+            @throw RLMException([NSString stringWithFormat:@"Realm at path '%@' already opened with different inMemory settings", path]);
         }
         if (realm->_dynamic != dynamic) {
-            @throw RLMException(@"Realm at path already opened with different dynamic settings", @{@"path":realm.path});
+            @throw RLMException([NSString stringWithFormat:@"Realm at path '%@' already opened with different dynamic settings", path]);
         }
         if (realm->_encryptionKey != key && (!key || ![realm->_encryptionKey isEqualToData:key])) {
-            @throw RLMException(@"Realm at path already opened with different encryption key", @{@"path":realm.path});
+            @throw RLMException([NSString stringWithFormat:@"Realm at path '%@' already opened with different encryption key", path]);
         }
         return RLMAutorelease(realm);
     }

@@ -281,7 +281,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMResultsValidate(self);
 
     if (index >= self.count) {
-        @throw RLMException(@"Index is out of bounds.", @{@"index": @(index)});
+        @throw RLMException([NSString stringWithFormat:@"Index %@ is out of bounds.", @(index)]);
     }
     return RLMCreateObjectAccessor(_realm, _objectSchema, [self indexInSource:index]);
 }
@@ -665,7 +665,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
-    @throw RLMException(@"Index is out of bounds.", @{@"index": @(index)});
+    @throw RLMException([NSString stringWithFormat:@"Index %@ is out of bounds.", @(index)]);
 }
 
 - (id)valueForKey:(NSString *)key {
