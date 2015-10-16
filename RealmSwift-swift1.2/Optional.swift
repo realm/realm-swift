@@ -35,7 +35,7 @@ declared as `dynamic` in Swift, such as `Int`s, `Float`, `Double`, and `Bool`.
 It encapsulates a value in its `value` property, which is the only way to mutate
 a `RealmOptional` property on an `Object`.
 */
-public final class RealmOptional<T: RealmOptionalType> : RLMOptionalBase {
+public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
     /// The value this optional represents.
     public var value: T? {
         get {

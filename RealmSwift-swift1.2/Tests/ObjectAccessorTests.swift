@@ -269,7 +269,7 @@ class ObjectAccessorTests: TestCase {
         object.optInt16Col.value = Int16.max
         XCTAssertEqual(object.optInt16Col.value!, Int16.max)
         object.optInt16Col.value = nil
-        XCTAssertNil(object.optInt16Col.value)
+        XCTAssert(object.optInt16Col.value == nil)
 
         object.optInt32Col.value = Int32.min
         XCTAssertEqual(object.optInt32Col.value!, Int32.min)
@@ -278,7 +278,7 @@ class ObjectAccessorTests: TestCase {
         object.optInt32Col.value = Int32.max
         XCTAssertEqual(object.optInt32Col.value!, Int32.max)
         object.optInt32Col.value = nil
-        XCTAssertNil(object.optInt32Col.value)
+        XCTAssert(object.optInt32Col.value == nil)
 
         object.optInt64Col.value = Int64.min
         XCTAssertEqual(object.optInt64Col.value!, Int64.min)
@@ -287,7 +287,7 @@ class ObjectAccessorTests: TestCase {
         object.optInt64Col.value = Int64.max
         XCTAssertEqual(object.optInt64Col.value!, Int64.max)
         object.optInt64Col.value = nil
-        XCTAssertNil(object.optInt64Col.value)
+        XCTAssert(object.optInt64Col.value == nil)
 
         object.optFloatCol.value = -FLT_MAX
         XCTAssertEqual(object.optFloatCol.value!, -FLT_MAX)

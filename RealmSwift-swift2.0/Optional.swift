@@ -39,6 +39,13 @@ public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
     /// The value this optional represents.
     public var value: T? {
         get {
+            if T.self is Int16.Type {
+                return ((underlyingValue as! NSNumber?)?.longValue).map { Int16($0) } as! T?
+            } else if T.self is Int32.Type {
+                return ((underlyingValue as! NSNumber?)?.longValue).map { Int32($0) } as! T?
+            } else if T.self is Int64.Type {
+                return ((underlyingValue as! NSNumber?)?.longLongValue).map { Int64($0) } as! T?
+            }
             return underlyingValue as! T?
         }
         set {
