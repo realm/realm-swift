@@ -1276,9 +1276,12 @@ extern "C" {
 - (void)testCompact
 {
     RLMRealm *realm = self.realmWithTestPath;
+    NSString *uuid = [[NSUUID UUID] UUIDString];
+    NSUInteger count = 1000;
     [realm transactionWithBlock:^{
-        [StringObject createInRealm:realm withValue:@[@"A"]];
-        [StringObject createInRealm:realm withValue:@[@"A"]];
+        for (NSUInteger i = 0; i < count; ++i) {
+            [StringObject createInRealm:realm withValue:@[uuid]];
+        }
     }];
     auto fileSize = ^(NSString *path) {
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
@@ -1286,7 +1289,7 @@ extern "C" {
     };
     unsigned long long fileSizeBefore = fileSize(realm.path);
     XCTAssertTrue([realm compact]);
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 2U);
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], count);
     unsigned long long fileSizeAfter = fileSize(realm.path);
     XCTAssertGreaterThan(fileSizeBefore, fileSizeAfter);
 }
