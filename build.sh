@@ -468,19 +468,20 @@ case "$COMMAND" in
 
     "test-ios-devices")
         failed=0
-        sh build.sh test-ios-devices-objc || failed=1
-        sh build.sh test-ios-devices-swift || failed=1
+        trap "failed=1" ERR
+        sh build.sh test-ios-devices-objc
+        sh build.sh test-ios-devices-swift
         exit $failed
         ;;
 
     "test-ios-devices-objc")
-        test_ios_devices xcrealm "iOS Device Tests" "$CONFIGURATION" || exit 1
-        exit 0
+        test_ios_devices xcrealm "iOS Device Tests" "$CONFIGURATION"
+        exit $?
         ;;
 
     "test-ios-devices-swift")
-        test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION" || exit 1
-        exit 0
+        test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION"
+        exit $?
         ;;
 
     "test-osx")
