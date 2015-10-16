@@ -25,7 +25,6 @@ class ObjectTests: TestCase {
     // init() Tests are in ObjectCreationTests.swift
 
     // init(value:) tests are in ObjectCreationTests.swift
-
     func testRealm() {
         let standalone = SwiftStringObject()
         XCTAssertNil(standalone.realm)
