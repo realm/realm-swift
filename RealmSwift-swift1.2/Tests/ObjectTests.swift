@@ -286,12 +286,13 @@ class ObjectTests: TestCase {
     }
 
     func testDynamicList() {
-        let realm = try! Realm()
+        let realm = Realm()
         let arrayObject = SwiftArrayPropertyObject()
         let str1 = SwiftStringObject()
         let str2 = SwiftStringObject()
-        arrayObject.array.appendContentsOf([str1, str2])
-        try! realm.write {
+        arrayObject.array.append(str1)
+        arrayObject.array.append(str2)
+        realm.write {
             realm.add(arrayObject)
         }
         let dynamicArray = arrayObject.dynamicList("array")
