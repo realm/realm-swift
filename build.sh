@@ -515,7 +515,8 @@ case "$COMMAND" in
         sh build.sh verify-ios-dynamic-debug
         sh build.sh verify-ios-swift
         sh build.sh verify-ios-swift-debug
-        sh build.sh verify-ios-device
+        sh build.sh verify-ios-device-objc
+        sh build.sh verify-ios-device-swift
         sh build.sh verify-watchos
         ;;
 
@@ -553,8 +554,13 @@ case "$COMMAND" in
         sh build.sh examples-ios-swift
         ;;
 
-    "verify-ios-device")
-        sh build.sh test-ios-devices
+    "verify-ios-device-objc")
+        sh build.sh test-ios-devices-objc
+        exit 0
+        ;;
+
+    "verify-ios-device-swift")
+        sh build.sh test-ios-devices-swift
         exit 0
         ;;
 
