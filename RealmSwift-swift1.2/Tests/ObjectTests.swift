@@ -25,7 +25,7 @@ class ObjectTests: TestCase {
     // init() Tests are in ObjectCreationTests.swift
 
     // init(value:) tests are in ObjectCreationTests.swift
-    
+
     func testRealm() {
         let standalone = SwiftStringObject()
         XCTAssertNil(standalone.realm)
@@ -283,5 +283,22 @@ class ObjectTests: TestCase {
             let persistedObject = Realm().create(SwiftObject.self, value: [:])
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
+    }
+
+    func testDynamicList() {
+        let realm = try! Realm()
+        let arrayObject = SwiftArrayPropertyObject()
+        let str1 = SwiftStringObject()
+        let str2 = SwiftStringObject()
+        arrayObject.array.appendContentsOf([str1, str2])
+        try! realm.write {
+            realm.add(arrayObject)
+        }
+        let dynamicArray = arrayObject.dynamicList("array")
+        XCTAssertEqual(dynamicArray.count, 2)
+        XCTAssertEqual(dynamicArray[0], str1)
+        XCTAssertEqual(dynamicArray[1], str2)
+        XCTAssertEqual(arrayObject.dynamicList("intArray").count, 0)
+        assertThrows(arrayObject.dynamicList("noSuchList"))
     }
 }
