@@ -246,6 +246,8 @@
 					<real>4.95</real>
 					<key>baselineIntegrationDisplayName</key>
 					<string>Local Baseline</string>
+					<key>maxStandardDeviation</key>
+					<real>0.15</real>
 				</dict>
 			</dict>
 			<key>testSortingAllObjects</key>
