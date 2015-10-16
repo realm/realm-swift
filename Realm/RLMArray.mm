@@ -136,8 +136,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
         @throw RLMException(@"Object must not be nil");
     }
     if (![array->_objectClassName isEqualToString:object->_objectSchema.className]) {
-        NSString *message = [NSString stringWithFormat:@"Object type '%@' does not match RLMArray type '%@'.", object->_objectSchema.className, array->_objectClassName];
-        @throw RLMException(message);
+        @throw RLMException(@"Object type '%@' does not match RLMArray type '%@'.", object->_objectSchema.className, array->_objectClassName);
     }
 }
 
@@ -145,8 +144,8 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
                                    NSUInteger index, bool allowOnePastEnd=false) {
     NSUInteger max = ar->_backingArray.count + allowOnePastEnd;
     if (index >= max) {
-        @throw RLMException([NSString stringWithFormat:@"Index %llu is out of bounds (must be less than %llu).",
-                             (unsigned long long)index, (unsigned long long)max]);
+        @throw RLMException(@"Index %llu is out of bounds (must be less than %llu).",
+                            (unsigned long long)index, (unsigned long long)max);
     }
 }
 

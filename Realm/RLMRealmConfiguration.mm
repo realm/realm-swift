@@ -174,7 +174,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 
 - (void)setSchemaVersion:(uint64_t)schemaVersion {
     if ((_schemaVersion = schemaVersion) == RLMNotVersioned) {
-        @throw RLMException([NSString stringWithFormat:@"Cannot set schema version to %llu (RLMNotVersioned)", RLMNotVersioned]);
+        @throw RLMException(@"Cannot set schema version to %llu (RLMNotVersioned)", RLMNotVersioned);
     }
 }
 
@@ -190,6 +190,6 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 
 void RLMRealmConfigurationUsePerPath(SEL callingMethod) {
     if (s_configurationUsage.exchange(RLMRealmConfigurationUsagePerPath) == RLMRealmConfigurationUsageConfiguration) {
-        @throw RLMException([NSString stringWithFormat:@"Cannot call %@ after setting a default configuration.", NSStringFromSelector(callingMethod)]);
+        @throw RLMException(@"Cannot call %@ after setting a default configuration.", NSStringFromSelector(callingMethod));
     }
 }

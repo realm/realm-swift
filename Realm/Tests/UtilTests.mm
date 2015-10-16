@@ -33,7 +33,7 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) { \
 @implementation UtilTests
 
 - (void)testRLMExceptionWithReasonAndUserInfo {
-    NSString *reason = @"Reason";
+    NSString *const reason = @"Reason";
     NSDictionary *expectedUserInfo = @{
                                        RLMRealmVersionKey : REALM_COCOA_VERSION,
                                        RLMRealmCoreVersionKey : @REALM_VERSION,

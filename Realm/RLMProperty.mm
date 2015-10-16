@@ -161,7 +161,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 
                 Class cls = [RLMSchema classForString:_objectClassName];
                 if (!RLMIsObjectSubclass(cls)) {
-                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/objc/#to-many for more information.", self.objectClassName]);
+                    @throw RLMException(@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/objc/#to-many for more information.", self.objectClassName);
                 }
             }
             else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
@@ -183,13 +183,13 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
                     _type = RLMPropertyTypeBool;
                 }
                 else {
-                    NSString *message = [NSString stringWithFormat:@"'%@' is not supported as an NSNumber object type. NSNumbers can only be RLMInt, RLMFloat, RLMDouble, and RLMBool at the moment. "
-                                                                   @"See http://realm.io/docs/objc/ for more information.", numberType];
-                    @throw RLMException(message);
+                    @throw RLMException(@"'%@' is not supported as an NSNumber object type. "
+                                        @"NSNumbers can only be RLMInt, RLMFloat, RLMDouble, and RLMBool at the moment. "
+                                        @"See http://realm.io/docs/objc/ for more information.", numberType);
                 }
             }
             else if (strcmp(code, "@\"NSNumber\"") == 0) {
-                @throw RLMException([NSString stringWithFormat:@"NSNumber properties require a protocol defining the contained type - example: NSNumber<RLMInt>."]);
+                @throw RLMException(@"NSNumber properties require a protocol defining the contained type - example: NSNumber<RLMInt>.");
             }
             else if (strcmp(code, "@\"RLMArray\"") == 0) {
                 @throw RLMException(@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>.");
@@ -201,7 +201,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
                 // verify type
                 Class cls = [RLMSchema classForString:className];
                 if (!RLMIsObjectSubclass(cls)) {
-                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/objc/api/Classes/RLMObject.html for more information.", className]);
+                    @throw RLMException(@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/objc/api/Classes/RLMObject.html for more information.", className);
                 }
 
                 _type = RLMPropertyTypeObject;
@@ -288,14 +288,13 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
                 _objcRawType = @"@\"NSNumber<RLMBool>\"";
                 break;
             default:
-                @throw RLMException([NSString stringWithFormat:@"Can't persist NSNumber of type '%s': only integers, floats, doubles, and bools are currently supported.", numberType]);
+                @throw RLMException(@"Can't persist NSNumber of type '%s': only integers, floats, doubles, and bools are currently supported.", numberType);
         }
     }
 
     if (![self setTypeFromRawType]) {
-        NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
-                            "Add to ignoredPropertyNames: method to ignore.", self.name];
-        @throw RLMException(reason);
+        @throw RLMException(@"Can't persist property '%@' with incompatible type. "
+                            "Add to ignoredPropertyNames: method to ignore.", self.name);
     }
 
     // convert type for any swift property types (which are parsed as Any)
@@ -335,9 +334,8 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     }
 
     if (![self setTypeFromRawType]) {
-        NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
-                             "Add to ignoredPropertyNames: method to ignore.", self.name];
-        @throw RLMException(reason);
+        @throw RLMException(@"Can't persist property '%@' with incompatible type. "
+                             "Add to ignoredPropertyNames: method to ignore.", self.name);
     }
 
     // update getter/setter names

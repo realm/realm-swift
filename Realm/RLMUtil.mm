@@ -241,14 +241,19 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
 }
 
 
-NSException *RLMException(NSString *reason) {
-    return [NSException exceptionWithName:RLMExceptionName reason:reason
-                                 userInfo:@{RLMRealmVersionKey: REALM_COCOA_VERSION,
-                                            RLMRealmCoreVersionKey: @REALM_VERSION}];
+NSException *RLMException(NSString *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    NSException *e = [NSException exceptionWithName:RLMExceptionName
+                                             reason:[[NSString alloc] initWithFormat:fmt arguments:args]
+                                           userInfo:@{RLMRealmVersionKey: REALM_COCOA_VERSION,
+                                                      RLMRealmCoreVersionKey: @REALM_VERSION}];
+    va_end(args);
+    return e;
 }
 
 NSException *RLMException(std::exception const& exception) {
-    return RLMException(@(exception.what()));
+    return RLMException(@"%@", @(exception.what()));
 }
 
 NSError *RLMMakeError(RLMError code, std::exception const& exception) {
@@ -277,7 +282,7 @@ void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
         *outError = error;
     }
     else {
-        @throw RLMException(error.localizedDescription);
+        @throw RLMException(@"%@", error.localizedDescription);
     }
 }
 
