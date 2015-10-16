@@ -691,6 +691,8 @@ case "$COMMAND" in
           # CocoaPods doesn't support multiple header_mappings_dir, so combine
           # both sets of headers into a single directory
           rm -rf include
+          # Create uppercase `Realm` header directory for a case-sensitive filesystem.
+          # Both `Realm` and `realm` directories are required.
           if [ ! -e core/include/Realm ]; then
             cp -R core/include/realm core/include/Realm
           fi
