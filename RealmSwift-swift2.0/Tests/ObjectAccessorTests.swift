@@ -254,57 +254,57 @@ class ObjectAccessorTests: TestCase {
         object.optDateCol = nil
         XCTAssertNil(object.optDateCol)
 
-        object.optIntCol.value = -1
-        XCTAssertEqual(object.optIntCol.value!, -1)
+        object.optIntCol.value = Int.min
+        XCTAssertEqual(object.optIntCol.value!, Int.min)
         object.optIntCol.value = 0
         XCTAssertEqual(object.optIntCol.value!, 0)
-        object.optIntCol.value = 1
-        XCTAssertEqual(object.optIntCol.value!, 1)
+        object.optIntCol.value = Int.max
+        XCTAssertEqual(object.optIntCol.value!, Int.max)
         object.optIntCol.value = nil
         XCTAssertNil(object.optIntCol.value)
 
-        object.optInt16Col.value = -1
-        XCTAssertEqual(object.optInt16Col.value!, -1)
+        object.optInt16Col.value = Int16.min
+        XCTAssertEqual(object.optInt16Col.value!, Int16.min)
         object.optInt16Col.value = 0
         XCTAssertEqual(object.optInt16Col.value!, 0)
-        object.optInt16Col.value = 1
-        XCTAssertEqual(object.optInt16Col.value!, 1)
+        object.optInt16Col.value = Int16.max
+        XCTAssertEqual(object.optInt16Col.value!, Int16.max)
         object.optInt16Col.value = nil
         XCTAssertNil(object.optInt16Col.value)
 
-        object.optInt32Col.value = -1
-        XCTAssertEqual(object.optInt32Col.value!, -1)
+        object.optInt32Col.value = Int32.min
+        XCTAssertEqual(object.optInt32Col.value!, Int32.min)
         object.optInt32Col.value = 0
         XCTAssertEqual(object.optInt32Col.value!, 0)
-        object.optInt32Col.value = 1
-        XCTAssertEqual(object.optInt32Col.value!, 1)
+        object.optInt32Col.value = Int32.max
+        XCTAssertEqual(object.optInt32Col.value!, Int32.max)
         object.optInt32Col.value = nil
         XCTAssertNil(object.optInt32Col.value)
 
-        object.optInt64Col.value = -1
-        XCTAssertEqual(object.optInt64Col.value!, -1)
+        object.optInt64Col.value = Int64.min
+        XCTAssertEqual(object.optInt64Col.value!, Int64.min)
         object.optInt64Col.value = 0
         XCTAssertEqual(object.optInt64Col.value!, 0)
-        object.optInt64Col.value = 1
-        XCTAssertEqual(object.optInt64Col.value!, 1)
+        object.optInt64Col.value = Int64.max
+        XCTAssertEqual(object.optInt64Col.value!, Int64.max)
         object.optInt64Col.value = nil
         XCTAssertNil(object.optInt64Col.value)
 
-        object.optFloatCol.value = 20
-        XCTAssertEqual(object.optFloatCol.value!, 20 as Float)
-        object.optFloatCol.value = 20.2
-        XCTAssertEqual(object.optFloatCol.value!, 20.2 as Float)
-        object.optFloatCol.value = 16777217
-        XCTAssertEqual(Double(object.optFloatCol.value!), 16777216.0 as Double)
+        object.optFloatCol.value = -FLT_MAX
+        XCTAssertEqual(object.optFloatCol.value!, -FLT_MAX)
+        object.optFloatCol.value = 0
+        XCTAssertEqual(object.optFloatCol.value!, 0)
+        object.optFloatCol.value = FLT_MAX
+        XCTAssertEqual(object.optFloatCol.value!, FLT_MAX)
         object.optFloatCol.value = nil
         XCTAssertNil(object.optFloatCol.value)
 
-        object.optDoubleCol.value = 20
-        XCTAssertEqual(object.optDoubleCol.value!, 20)
-        object.optDoubleCol.value = 20.2
-        XCTAssertEqual(object.optDoubleCol.value!, 20.2)
-        object.optDoubleCol.value = 16777217
-        XCTAssertEqual(object.optDoubleCol.value!, 16777217)
+        object.optDoubleCol.value = -DBL_MAX
+        XCTAssertEqual(object.optDoubleCol.value!, -DBL_MAX)
+        object.optDoubleCol.value = 0
+        XCTAssertEqual(object.optDoubleCol.value!, 0)
+        object.optDoubleCol.value = DBL_MAX
+        XCTAssertEqual(object.optDoubleCol.value!, DBL_MAX)
         object.optDoubleCol.value = nil
         XCTAssertNil(object.optDoubleCol.value)
 
