@@ -531,9 +531,13 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
  @return YES if the compaction succeeded.
  */
-- (BOOL)compact
-{
-    return _realm->compact();
+- (BOOL)compact {
+    try {
+        return _realm->compact();
+    }
+    catch (std::exception const& ex) {
+        @throw RLMException(ex);
+    }
 }
 
 - (void)dealloc {
