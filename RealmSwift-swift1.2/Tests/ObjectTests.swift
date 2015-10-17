@@ -290,8 +290,7 @@ class ObjectTests: TestCase {
         let arrayObject = SwiftArrayPropertyObject()
         let str1 = SwiftStringObject()
         let str2 = SwiftStringObject()
-        arrayObject.array.append(str1)
-        arrayObject.array.append(str2)
+        arrayObject.array.extend([str1, str2])
         realm.write {
             realm.add(arrayObject)
         }

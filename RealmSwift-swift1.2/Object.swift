@@ -200,16 +200,16 @@ public class Object: RLMObjectBase, Equatable, Printable {
 
     Returns a List of DynamicObjects for a property name
 
-    - warning: This method is useful only in specialized circumstances
+    :warning: This method is useful only in specialized circumstances
 
-    - parameter propertyName: The name of the property to get a List<DynamicObject>
+    :param: propertyName The name of the property to get a List<DynamicObject>
 
-    - returns: A List of DynamicObjects
+    :returns: A List of DynamicObjects
 
     :nodoc:
     */
     public func dynamicList(propertyName: String) -> List<DynamicObject> {
-        return unsafeBitCast(self.listForProperty(RLMValidatedGetProperty(self, propertyName)), List<DynamicObject>.self)
+        return unsafeBitCast(listForProperty(RLMValidatedGetProperty(self, propertyName)), List<DynamicObject>.self)
     }
 
     // MARK: Private functions

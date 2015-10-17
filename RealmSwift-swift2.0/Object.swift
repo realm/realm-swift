@@ -213,7 +213,7 @@ public class Object: RLMObjectBase {
     :nodoc:
     */
     public func dynamicList(propertyName: String) -> List<DynamicObject> {
-        return unsafeBitCast(self.listForProperty(RLMValidatedGetProperty(self, propertyName)), List<DynamicObject>.self)
+        return unsafeBitCast(listForProperty(RLMValidatedGetProperty(self, propertyName)), List<DynamicObject>.self)
     }
 
     // MARK: Equatable
