@@ -195,6 +195,27 @@ public class Object: RLMObjectBase {
         }
     }
 
+    // MARK: Dynamic list
+
+    /**
+    This method is useful only in specialized circumstances, for example, when building
+    components that integrate with Realm. If you are simply building an app on Realm, it is
+    recommended to use instance variables or cast the KVC returns.
+
+    Returns a List of DynamicObjects for a property name
+
+    - warning: This method is useful only in specialized circumstances
+
+    - parameter propertyName: The name of the property to get a List<DynamicObject>
+
+    - returns: A List of DynamicObjects
+
+    :nodoc:
+    */
+    public func dynamicList(propertyName: String) -> List<DynamicObject> {
+        return unsafeBitCast(listForProperty(RLMValidatedGetProperty(self, propertyName)), List<DynamicObject>.self)
+    }
+
     // MARK: Equatable
 
     /// Returns whether both objects are equal.
