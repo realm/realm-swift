@@ -152,9 +152,9 @@ BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
             if (RLMListBase *list = RLMDynamicCast<RLMListBase>(obj)) {
                 return [list._rlmArray.objectClassName isEqualToString:property.objectClassName];
             }
-            if (NSArray *array = RLMDynamicCast<NSArray>(obj)) {
+            if ([obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
                 // check each element for compliance
-                for (id el in array) {
+                for (id el in (id<NSFastEnumeration>)obj) {
                     RLMObjectBase *obj = RLMDynamicCast<RLMObjectBase>(el);
                     if (!obj || ![obj->_objectSchema.className isEqualToString:property.objectClassName]) {
                         return NO;

@@ -11,7 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Support assigning `Results` to `List` properties via KVC.
 
 0.96.0 Release notes (2015-10-14)
 =============================================================
@@ -48,7 +48,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Added `isEmpty` property on `RLMRealm`/`Realm` to indicate if it contains any
   objects.
 * The `@count`, `@min`, `@max`, `@sum` and `@avg` collection operators are now
-  supported in queries
+  supported in queries.
 
 ### Bugfixes
 
