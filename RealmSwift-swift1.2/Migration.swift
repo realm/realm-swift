@@ -131,10 +131,12 @@ exactly when and how migrations are performed.
 */
 @availability(*, deprecated=1, message="Use migrateRealm(configuration:)")
 public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
-    var configuration = Realm.Configuration.defaultConfiguration
+    let configuration = RLMRealmConfiguration.defaultConfiguration()
     configuration.path = path
     configuration.encryptionKey = encryptionKey
-    return migrateRealm(configuration: configuration)
+    configuration.schemaVersion = UInt64(RLMRealmSchemaVersionForPath(path))
+    configuration.migrationBlock = RLMRealmMigrationBlockForPath(path)
+    return RLMRealm.migrateRealm(configuration)
 }
 
 /**

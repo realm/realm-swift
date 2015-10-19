@@ -136,7 +136,7 @@ static void setKeyForPath(NSData *key, NSString *path) {
 static NSMutableDictionary *s_migrationBlocks = [NSMutableDictionary new];
 static NSMutableDictionary *s_schemaVersions = [NSMutableDictionary new];
 
-static NSUInteger schemaVersionForPath(NSString *path) {
+NSUInteger RLMRealmSchemaVersionForPath(NSString *path) {
     @synchronized(s_migrationBlocks) {
         NSNumber *version = s_schemaVersions[path];
         if (version) {
@@ -146,7 +146,7 @@ static NSUInteger schemaVersionForPath(NSString *path) {
     }
 }
 
-static RLMMigrationBlock migrationBlockForPath(NSString *path) {
+RLMMigrationBlock RLMRealmMigrationBlockForPath(NSString *path) {
     @synchronized(s_migrationBlocks) {
         return s_migrationBlocks[path];
     }
@@ -164,10 +164,10 @@ void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfiguration *configuration
         configuration.encryptionKey = keyForPath(configuration.path);
     }
     if (!configuration.migrationBlock) {
-        configuration.migrationBlock = migrationBlockForPath(configuration.path);
+        configuration.migrationBlock = RLMRealmMigrationBlockForPath(configuration.path);
     }
     if (configuration.schemaVersion == 0) {
-        configuration.schemaVersion = schemaVersionForPath(configuration.path);
+        configuration.schemaVersion = RLMRealmSchemaVersionForPath(configuration.path);
     }
 }
 
@@ -355,8 +355,8 @@ void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfiguration *configuration
     configuration.readOnly = readonly;
     configuration.dynamic = dynamic;
     configuration.customSchema = customSchema;
-    configuration.migrationBlock = migrationBlockForPath(path);
-    configuration.schemaVersion = schemaVersionForPath(path);
+    configuration.migrationBlock = RLMRealmMigrationBlockForPath(path);
+    configuration.schemaVersion = RLMRealmSchemaVersionForPath(path);
     return [RLMRealm realmWithConfiguration:configuration error:outError];
 }
 
@@ -458,7 +458,7 @@ static id RLMAutorelease(id value) {
 }
 
 - (NSError *(^)())migrationBlock:(RLMMigrationBlock)userBlock key:(NSData *)encryptionKey {
-    userBlock = userBlock ?: migrationBlockForPath(_path);
+    userBlock = userBlock ?: RLMRealmMigrationBlockForPath(_path);
     if (userBlock) {
         return ^{
             NSError *error;
@@ -874,7 +874,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 + (void)setSchemaVersion:(uint64_t)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block {
     RLMRealmConfigurationUsePerPath(_cmd);
     @synchronized(s_migrationBlocks) {
-        if (RLMGetAnyCachedRealmForPath(realmPath) && schemaVersionForPath(realmPath) != version) {
+        if (RLMGetAnyCachedRealmForPath(realmPath) && RLMRealmSchemaVersionForPath(realmPath) != version) {
             @throw RLMException(@"Cannot set schema version for Realms that are already open.");
         }
 
@@ -921,7 +921,8 @@ void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrat
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.path = realmPath;
-    configuration.schemaVersion = schemaVersionForPath(realmPath);
+    configuration.schemaVersion = RLMRealmSchemaVersionForPath(realmPath);
+    configuration.migrationBlock = RLMRealmMigrationBlockForPath(realmPath);
     return [self migrateRealm:configuration];
 }
 
@@ -931,7 +932,8 @@ void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrat
     }
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.path = realmPath;
-    configuration.schemaVersion = schemaVersionForPath(realmPath);
+    configuration.schemaVersion = RLMRealmSchemaVersionForPath(realmPath);
+    configuration.migrationBlock = RLMRealmMigrationBlockForPath(realmPath);
     configuration.encryptionKey = key;
     return [self migrateRealm:configuration];
 }

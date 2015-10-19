@@ -1044,10 +1044,15 @@ RLM_ARRAY_TYPE(MigrationObject);
 
     // Migrate it with RLMRealmConfiguration
     @autoreleasepool {
+        __block bool called = false;
         RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
         config.schemaVersion = 1;
+        config.migrationBlock = ^(RLMMigration *, uint64_t) {
+            called = true;
+        };
         config.path = RLMTestRealmPath();
         XCTAssertNil([RLMRealm migrateRealm:config]);
+        XCTAssertTrue(called);
     }
 
     @autoreleasepool {
