@@ -43,11 +43,11 @@ xctest() {
     LANG="$2"
     NAME="$3"
     DIRECTORY="$PLATFORM/$LANG/$NAME"
-    PROJ="$DIRECTORY/$NAME.xcodeproj"
-    WORK="$DIRECTORY/$NAME.xcworkspace"
-    CMD="-project $PROJ"
-    if [ -d $WORK ]; then
-        CMD="-workspace $WORK"
+    PROJECT="$DIRECTORY/$NAME.xcodeproj"
+    WORKSPACE="$DIRECTORY/$NAME.xcworkspace"
+    CMD="-project $PROJECT"
+    if [ -d $WORKSPACE ]; then
+        CMD="-workspace $WORKSPACE"
     fi
     if [[ $PLATFORM == ios ]]; then
         sh "$(dirname "$0")/../../scripts/reset-simulators.sh"
