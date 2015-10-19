@@ -12,6 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Support assigning `Results` to `List` properties via KVC.
+* Honor the schema version set in the configuration in `+[RLMRealm migrateRealm:]`.
 
 0.96.0 Release notes (2015-10-14)
 =============================================================

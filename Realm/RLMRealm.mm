@@ -921,6 +921,7 @@ void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrat
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.path = realmPath;
+    configuration.schemaVersion = schemaVersionForPath(realmPath);
     return [self migrateRealm:configuration];
 }
 
@@ -930,6 +931,7 @@ void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrat
     }
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.path = realmPath;
+    configuration.schemaVersion = schemaVersionForPath(realmPath);
     configuration.encryptionKey = key;
     return [self migrateRealm:configuration];
 }
@@ -948,7 +950,9 @@ void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrat
         return error;
 
     try {
-        RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), configuration.customSchema ?: [RLMSchema.sharedSchema copy], [realm migrationBlock:configuration.migrationBlock key:key]);
+        RLMUpdateRealmToSchemaVersion(realm, configuration.schemaVersion,
+                                      configuration.customSchema ?: [RLMSchema.sharedSchema copy],
+                                      [realm migrationBlock:configuration.migrationBlock key:key]);
     } catch (std::exception const& ex) {
         return RLMMakeError(RLMErrorFail, ex);
     } catch (NSException *ex) {
