@@ -293,6 +293,8 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testAssignListProperty() {
+        // no way to make RealmCollectionType conform to NSFastEnumeration
+        // so test the concrete collections directly.
         fatalError("abstract")
     }
 
@@ -315,23 +317,23 @@ class ResultsTests: RealmCollectionTypeTests {
         return super.defaultTestSuite()
     }
 
-    func base() -> Results<SwiftStringObject> {
+    func collectionBase() -> Results<SwiftStringObject> {
         fatalError("abstract")
     }
 
     override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
-        return AnyRealmCollection(base())
+        return AnyRealmCollection(collectionBase())
     }
 
     override func testAssignListProperty() {
         let array = SwiftArrayPropertyObject()
         realmWithTestPath().add(array)
-        array["array"] = base()
+        array["array"] = collectionBase()
     }
 }
 
 class ResultsFromTableTests: ResultsTests {
-    override func base() -> Results<SwiftStringObject> {
+    override func collectionBase() -> Results<SwiftStringObject> {
         return realmWithTestPath().objects(SwiftStringObject)
     }
 
@@ -342,7 +344,7 @@ class ResultsFromTableTests: ResultsTests {
 }
 
 class ResultsFromTableViewTests: ResultsTests {
-    override func base() -> Results<SwiftStringObject> {
+    override func collectionBase() -> Results<SwiftStringObject> {
         return realmWithTestPath().objects(SwiftStringObject).filter("stringCol != ''")
     }
 
@@ -353,7 +355,7 @@ class ResultsFromTableViewTests: ResultsTests {
 }
 
 class ResultsFromLinkViewTests: ResultsTests {
-    override func base() -> Results<SwiftStringObject> {
+    override func collectionBase() -> Results<SwiftStringObject> {
         let array = realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
         return array.array.filter(NSPredicate(value: true))
     }
@@ -377,18 +379,18 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         return super.defaultTestSuite()
     }
 
-    func base() -> List<SwiftStringObject> {
+    func collectionBase() -> List<SwiftStringObject> {
         fatalError("abstract")
     }
 
     override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
-        return AnyRealmCollection(base())
+        return AnyRealmCollection(collectionBase())
     }
 
     override func testAssignListProperty() {
         let array = SwiftArrayPropertyObject()
         realmWithTestPath().add(array)
-        array["array"] = base()
+        array["array"] = collectionBase()
     }
 
     override func testDescription() {
@@ -397,7 +399,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
 }
 
 class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func base() -> List<SwiftStringObject> {
+    override func collectionBase() -> List<SwiftStringObject> {
         return SwiftArrayPropertyObject(value: ["", [str1, str2], []]).array
     }
 
@@ -488,7 +490,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 }
 
 class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func base() -> List<SwiftStringObject> {
+    override func collectionBase() -> List<SwiftStringObject> {
         let array = SwiftArrayPropertyObject(value: ["", [str1, str2], []])
         realmWithTestPath().add(array)
         return array.array
@@ -502,7 +504,7 @@ class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 }
 
 class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func base() -> List<SwiftStringObject> {
+    override func collectionBase() -> List<SwiftStringObject> {
         let array = realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
         return array.array
     }
@@ -514,7 +516,7 @@ class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 }
 
 class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func base() -> List<SwiftStringObject> {
+    override func collectionBase() -> List<SwiftStringObject> {
         realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
         let array = realmWithTestPath().objects(SwiftArrayPropertyObject).first!
         return array.array
