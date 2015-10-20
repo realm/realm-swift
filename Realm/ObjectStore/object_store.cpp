@@ -149,6 +149,13 @@ static inline bool property_has_changed(Property const& p1, Property const& p2) 
         || p1.is_nullable != p2.is_nullable;
 }
 
+static inline bool property_can_be_migrated_to_nullable(const Property& old_property, const Property& new_property) {
+    return old_property.type == new_property.type
+        && !old_property.is_nullable
+        && new_property.is_nullable
+        && new_property.name == old_property.name;
+}
+
 void ObjectStore::verify_schema(Schema const& actual_schema, Schema& target_schema, bool allow_missing_tables) {
     std::vector<ObjectSchemaValidationException> errors;
     for (auto &object_schema : target_schema) {
@@ -205,6 +212,45 @@ std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(O
     return exceptions;
 }
 
+template <typename T>
+static void copy_property_values(const Property& old_property, const Property& new_property, Table& table,
+                                 T (Table::*getter)(std::size_t, std::size_t) const noexcept,
+                                 void (Table::*setter)(std::size_t, std::size_t, T)) {
+    size_t old_column = old_property.table_column, new_column = new_property.table_column;
+    size_t count = table.size();
+    for (size_t i = 0; i < count; i++) {
+        (table.*setter)(new_column, i, (table.*getter)(old_column, i));
+    }
+}
+
+static void copy_property_values(const Property& source, const Property& destination, Table& table) {
+    switch (destination.type) {
+        case PropertyTypeInt:
+            copy_property_values(source, destination, table, &Table::get_int, &Table::set_int);
+            break;
+        case PropertyTypeBool:
+            copy_property_values(source, destination, table, &Table::get_bool, &Table::set_bool);
+            break;
+        case PropertyTypeFloat:
+            copy_property_values(source, destination, table, &Table::get_float, &Table::set_float);
+            break;
+        case PropertyTypeDouble:
+            copy_property_values(source, destination, table, &Table::get_double, &Table::set_double);
+            break;
+        case PropertyTypeString:
+            copy_property_values(source, destination, table, &Table::get_string, &Table::set_string);
+            break;
+        case PropertyTypeData:
+            copy_property_values(source, destination, table, &Table::get_binary, &Table::set_binary);
+            break;
+        case PropertyTypeDate:
+            copy_property_values(source, destination, table, &Table::get_datetime, &Table::set_datetime);
+            break;
+        default:
+            break;
+    }
+}
+
 // set references to tables on targetSchema and create/update any missing or out-of-date tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
@@ -230,13 +276,31 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
         ObjectSchema current_schema(group, target_object_schema->name);
         std::vector<Property> &target_props = target_object_schema->properties;
 
+        // handle columns changing from required to optional
+        for (auto& current_prop : current_schema.properties) {
+            auto target_prop = target_object_schema->property_for_name(current_prop.name);
+            if (!target_prop || !property_can_be_migrated_to_nullable(current_prop, *target_prop))
+                continue;
+
+            target_prop->table_column = current_prop.table_column;
+            current_prop.table_column = current_prop.table_column + 1;
+
+            table->insert_column(target_prop->table_column, DataType(target_prop->type), target_prop->name, target_prop->is_nullable);
+            copy_property_values(current_prop, *target_prop, *table);
+            table->remove_column(current_prop.table_column);
+
+            current_prop.table_column = target_prop->table_column;
+            changed = true;
+        }
+
         // remove extra columns
         size_t deleted = 0;
         for (auto& current_prop : current_schema.properties) {
             current_prop.table_column -= deleted;
 
             auto target_prop = target_object_schema->property_for_name(current_prop.name);
-            if (!target_prop || property_has_changed(current_prop, *target_prop)) {
+            if (!target_prop || (property_has_changed(current_prop, *target_prop)
+                                 && !property_can_be_migrated_to_nullable(current_prop, *target_prop))) {
                 table->remove_column(current_prop.table_column);
                 ++deleted;
                 current_prop.table_column = npos;
