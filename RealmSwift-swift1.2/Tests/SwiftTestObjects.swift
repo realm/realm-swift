@@ -65,6 +65,9 @@ class SwiftOptionalObject: Object {
     dynamic var optBinaryCol: NSData?
     dynamic var optDateCol: NSDate?
     let optIntCol = RealmOptional<Int>()
+    let optInt16Col = RealmOptional<Int16>()
+    let optInt32Col = RealmOptional<Int32>()
+    let optInt64Col = RealmOptional<Int64>()
     let optFloatCol = RealmOptional<Float>()
     let optDoubleCol = RealmOptional<Double>()
     let optBoolCol = RealmOptional<Bool>()
@@ -87,6 +90,9 @@ class SwiftOptionalDefaultValuesObject: Object {
     dynamic var optBinaryCol: NSData? = "C".dataUsingEncoding(NSUTF8StringEncoding)
     dynamic var optDateCol: NSDate? = NSDate(timeIntervalSince1970: 10)
     let optIntCol = RealmOptional<Int>()
+    let optInt16Col = RealmOptional<Int16>()
+    let optInt32Col = RealmOptional<Int32>()
+    let optInt64Col = RealmOptional<Int64>()
     let optFloatCol = RealmOptional<Float>()
     let optDoubleCol = RealmOptional<Double>()
     let optBoolCol = RealmOptional<Bool>()
@@ -100,6 +106,9 @@ class SwiftOptionalDefaultValuesObject: Object {
             "optBinaryCol" : "C".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
             "optDateCol" : NSDate(timeIntervalSince1970: 10),
             "optIntCol" : NSNull(),
+            "optInt16Col" : NSNull(),
+            "optInt32Col" : NSNull(),
+            "optInt64Col" : NSNull(),
             "optFloatCol" : NSNull(),
             "optDoubleCol" : NSNull(),
             "optBoolCol" : NSNull()
