@@ -293,6 +293,8 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
             changed = true;
         }
 
+        bool inserted_placeholder_column = false;
+
         // remove extra columns
         size_t deleted = 0;
         for (auto& current_prop : current_schema.properties) {
@@ -301,6 +303,13 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
             auto target_prop = target_object_schema->property_for_name(current_prop.name);
             if (!target_prop || (property_has_changed(current_prop, *target_prop)
                                  && !property_can_be_migrated_to_nullable(current_prop, *target_prop))) {
+                if (deleted == current_schema.properties.size() - 1) {
+                    // We're about to remove the last column from the table. Insert a placeholder column to preserve
+                    // the number of rows in the table for the addition of new columns below.
+                    table->add_column(type_Bool, "placeholder");
+                    inserted_placeholder_column = true;
+                }
+
                 table->remove_column(current_prop.table_column);
                 ++deleted;
                 current_prop.table_column = npos;
@@ -331,6 +340,15 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
             }
             else {
                 target_prop.table_column = current_prop->table_column;
+            }
+        }
+
+        if (inserted_placeholder_column) {
+            // We inserted a placeholder due to removing all columns from the table. Remove it, and update the indices
+            // of any columns that we inserted after it.
+            table->remove_column(0);
+            for (auto& target_prop : target_props) {
+                target_prop.table_column--;
             }
         }
 

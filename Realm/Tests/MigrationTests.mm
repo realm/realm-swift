@@ -914,4 +914,52 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:2], obj.date);
 }
 
+- (void)testNullableToRequiredMigration {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:AllOptionalTypes.class];
+
+    // create initial nullable column
+    [self createTestRealmWithSchema:@[objectSchema] block:^(RLMRealm *realm) {
+        [AllOptionalTypes createInRealm:realm withValue:@[ [NSNull null], [NSNull null], [NSNull null], [NSNull null],
+                                                           [NSNull null], [NSNull null], [NSNull null]]];
+        [AllOptionalTypes createInRealm:realm withValue:@[@2, @2, @2, @0, @"str2",
+                                                          [@"data2" dataUsingEncoding:NSUTF8StringEncoding],
+                                                          [NSDate dateWithTimeIntervalSince1970:2]]];
+    }];
+
+    [objectSchema.properties setValue:@NO forKey:@"optional"];
+
+    RLMRealm *realm;
+    @autoreleasepool {
+        RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+        config.path = RLMTestRealmPath();
+        config.customSchema = [self schemaWithObjects:@[ objectSchema ]];
+        config.schemaVersion = 1;
+        XCTAssertNil([RLMRealm migrateRealm:config]);
+
+        realm = [RLMRealm realmWithConfiguration:config error:nil];
+        RLMAssertRealmSchemaMatchesTable(self, realm);
+    }
+
+    RLMResults *allObjects = [AllOptionalTypes allObjectsInRealm:realm];
+    XCTAssertEqual(2U, allObjects.count);
+
+    AllOptionalTypes *obj = allObjects[0];
+    XCTAssertEqualObjects(@0, obj.intObj);
+    XCTAssertEqualObjects(@0, obj.floatObj);
+    XCTAssertEqualObjects(@0, obj.doubleObj);
+    XCTAssertEqualObjects(@0, obj.boolObj);
+    XCTAssertEqualObjects(@"", obj.string);
+    XCTAssertEqualObjects(nil, obj.data);
+    XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:0], obj.date);
+
+    obj = allObjects[1];
+    XCTAssertEqualObjects(@0, obj.intObj);
+    XCTAssertEqualObjects(@0, obj.floatObj);
+    XCTAssertEqualObjects(@0, obj.doubleObj);
+    XCTAssertEqualObjects(@0, obj.boolObj);
+    XCTAssertEqualObjects(@"", obj.string);
+    XCTAssertEqualObjects(nil, obj.data);
+    XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:0], obj.date);
+}
+
 @end
