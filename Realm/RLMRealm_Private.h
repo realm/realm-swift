@@ -27,6 +27,8 @@ FOUNDATION_EXTERN NSData *RLMRealmValidatedEncryptionKey(NSData *key);
 
 FOUNDATION_EXTERN void RLMRealmSetEncryptionKeyForPath(NSData *encryptionKey, NSString *path);
 
+FOUNDATION_EXTERN NSUInteger RLMRealmSchemaVersionForPath(NSString *path);
+FOUNDATION_EXTERN RLMMigrationBlock RLMRealmMigrationBlockForPath(NSString *path);
 FOUNDATION_EXTERN void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrationBlock migrationBlock);
 
 FOUNDATION_EXTERN void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfiguration *configuration);

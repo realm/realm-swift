@@ -1034,6 +1034,32 @@ RLM_ARRAY_TYPE(MigrationObject);
     [RLMRealm setSchemaVersion:RLMNotVersioned - 1 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
 }
 
+- (void)testSchemaVersionIsUsedForExplicitMigration {
+    // Create a realm requiring a migration
+    @autoreleasepool {
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
+        objectSchema.properties = @[objectSchema.properties[0]];
+        [self realmWithSingleObject:objectSchema];
+    }
+
+    // Migrate it with RLMRealmConfiguration
+    @autoreleasepool {
+        __block bool called = false;
+        RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+        config.schemaVersion = 1;
+        config.migrationBlock = ^(RLMMigration *, uint64_t) {
+            called = true;
+        };
+        config.path = RLMTestRealmPath();
+        XCTAssertNil([RLMRealm migrateRealm:config]);
+        XCTAssertTrue(called);
+    }
+
+    @autoreleasepool {
+        XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:RLMTestRealmPath() error:nil]);
+    }
+}
+
 - (void)testChangingColumnNullability {
     RLMSchema *nullable = [[RLMSchema alloc] init];
     nullable.objectSchema = @[[RLMObjectSchema schemaForObjectClass:StringObject.class]];

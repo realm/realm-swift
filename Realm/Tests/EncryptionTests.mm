@@ -322,26 +322,31 @@
 }
 
 - (void)testExplicitMigrationWithRegisteredKey {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     NSData *key = RLMGenerateKey();
     BOOL migrationRan = NO;
     [self createRealmRequiringMigrationWithKey:key migrationRun:&migrationRan];
 
-    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-
-    XCTAssertNotNil([RLMRealm migrateRealm:configuration]);
+    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath]);
     XCTAssertFalse(migrationRan);
 
-    configuration.encryptionKey = key;
-    XCTAssertNil([RLMRealm migrateRealm:configuration]);
+    [RLMRealm setEncryptionKey:key forRealmsAtPath:RLMRealm.defaultRealmPath];
+    XCTAssertNil([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath]);
     XCTAssertTrue(migrationRan);
+#pragma clang diagnostic pop
 }
 
 - (void)testExplicitMigrationWithExplicitKey {
     NSData *key = RLMGenerateKey();
-    BOOL migrationRan = NO;
+    __block BOOL migrationRan = NO;
     [self createRealmRequiringMigrationWithKey:key migrationRun:&migrationRan];
 
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.schemaVersion = 1;
+    configuration.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+        migrationRan = YES;
+    };
 
     XCTAssertNotNil([RLMRealm migrateRealm:configuration]);
     XCTAssertFalse(migrationRan);
