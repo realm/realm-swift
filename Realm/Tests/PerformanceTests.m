@@ -19,6 +19,7 @@
 #import "RLMTestCase.h"
 
 #import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.h"
 
 #if !DEBUG
 

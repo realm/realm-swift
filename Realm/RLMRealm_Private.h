@@ -75,4 +75,7 @@ FOUNDATION_EXTERN NSData *RLMRealmValidatedEncryptionKey(NSData *key);
 - (void)sendNotifications:(NSString *)notification;
 - (void)notify;
 - (void)verifyThread;
+
++ (NSString *)writeableTemporaryPathForFile:(NSString *)fileName;
+
 @end
