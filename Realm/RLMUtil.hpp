@@ -28,8 +28,6 @@
 
 @class RLMObjectSchema;
 @class RLMProperty;
-@class RLMRealm;
-@class RLMSchema;
 @protocol RLMFastEnumerable;
 
 __attribute__((format(NSString, 1, 2)))
