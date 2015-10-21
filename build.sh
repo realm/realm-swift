@@ -532,6 +532,7 @@ case "$COMMAND" in
     # Full verification
     ######################################
     "verify")
+        sh build.sh verify-cocoapods
         sh build.sh verify-docs
         sh build.sh verify-osx
         sh build.sh verify-osx-debug
@@ -548,6 +549,12 @@ case "$COMMAND" in
         sh build.sh verify-ios-device-objc
         sh build.sh verify-ios-device-swift
         sh build.sh verify-watchos
+        ;;
+
+    "verify-cocoapods")
+        cd examples/installation
+        ./build.sh test-ios-objc-cocoapods || exit 1
+        ./build.sh test-ios-swift-cocoapods || exit 1
         ;;
 
     "verify-osx")
