@@ -39,7 +39,10 @@ Pod::Spec.new do |s|
   s.module_map              = 'Realm/module.modulemap'
   s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
-  s.source_files            = 'Realm/*.{m,mm}', 'Realm/ObjectStore/*.cpp'
+  s.source_files            = 'Realm/*.{m,mm}',
+                              'Realm/ObjectStore/*.cpp',
+                              'Realm/ObjectStore/impl/*.cpp',
+                              'Realm/ObjectStore/impl/apple/*.cpp'
   s.header_mappings_dir     = 'include'
   s.pod_target_xcconfig     = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)',
