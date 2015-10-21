@@ -738,6 +738,8 @@ case "$COMMAND" in
           mkdir -p include/Realm
           cp Realm/*.{h,hpp} include/Realm
           cp Realm/ObjectStore/*.hpp include/Realm
+          cp Realm/ObjectStore/impl/*.hpp include/Realm
+          cp Realm/ObjectStore/impl/apple/*.hpp include/Realm
           touch include/Realm/RLMPlatform.h
         fi
         ;;
