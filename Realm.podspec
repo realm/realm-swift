@@ -62,6 +62,7 @@ Pod::Spec.new do |s|
     s.public_header_files   = public_header_files
     s.private_header_files  = 'include/Realm/*{Accessor,RealmUtil,ListBase,ObjectStore,Private}.h',
                               'include/Realm/ObjectStore/*.hpp',
-                              'include/Realm/ObjectStore/impl/*.hpp'
+                              'include/Realm/ObjectStore/impl/*.hpp',
+                              'include/Realm/ObjectStore/impl/apple/*.hpp'
   end
 end
