@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "realm_delegate.hpp"
+
 #import <realm/link_view.hpp> // required by row.hpp
 #import <realm/row.hpp>
 
@@ -133,13 +135,12 @@ public:
 // for a matching one otherwise, and return null if there are none
 RLMObservationInfo *RLMGetObservationInfo(RLMObservationInfo *info, size_t row, RLMObjectSchema *objectSchema);
 
-// Call the appropriate SharedGroup member function, with change notifications
-void RLMAdvanceRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
-void RLMRollbackAndContinueAsRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
-void RLMPromoteToWrite(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema);
-
 // delete all objects from a single table with change notifications
 void RLMClearTable(RLMObjectSchema *realm);
 
 // invoke the block, sending notifications for cascading deletes/link nullifications
 void RLMTrackDeletions(RLMRealm *realm, dispatch_block_t block);
+
+std::vector<realm::RealmDelegate::ObserverState> RLMGetObservedRows(NSArray *schema);
+void RLMWillChange(std::vector<realm::RealmDelegate::ObserverState> const& observed, std::vector<void *> const& invalidated);
+void RLMDidChange(std::vector<realm::RealmDelegate::ObserverState> const& observed, std::vector<void *> const& invalidated);

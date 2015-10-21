@@ -18,9 +18,13 @@
 
 #import "RLMRealmConfiguration_Private.h"
 
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Private.h"
-#import "RLMSchema_Private.h"
+#import "RLMSchema_Private.hpp"
 #import "RLMUtil.hpp"
+
+#import "schema.hpp"
+#import "shared_realm.hpp"
 
 static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"path",
@@ -62,7 +66,13 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     return [path stringByAppendingPathComponent:fileName];
 }
 
-@implementation RLMRealmConfiguration
+@implementation RLMRealmConfiguration {
+    realm::Realm::Config _config;
+}
+
+- (realm::Realm::Config&)config {
+    return _config;
+}
 
 + (instancetype)defaultConfiguration {
     return [[self rawDefaultConfiguration] copy];
@@ -97,6 +107,7 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     if (self) {
         static NSString *defaultRealmPath = RLMRealmPathForFile(c_defaultRealmFileName);
         self.path = defaultRealmPath;
+        self.schemaVersion = 0;
     }
 
     return self;
@@ -104,13 +115,9 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
 
 - (instancetype)copyWithZone:(NSZone *)zone {
     RLMRealmConfiguration *configuration = [[[self class] allocWithZone:zone] init];
-    configuration->_path = _path;
-    configuration->_inMemoryIdentifier = _inMemoryIdentifier;
-    configuration->_encryptionKey = _encryptionKey;
-    configuration->_readOnly = _readOnly;
-    configuration->_schemaVersion = _schemaVersion;
-    configuration->_migrationBlock = _migrationBlock;
+    configuration->_config = _config;
     configuration->_dynamic = _dynamic;
+    configuration->_migrationBlock = _migrationBlock;
     configuration->_customSchema = _customSchema;
     return configuration;
 }
@@ -126,13 +133,23 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     return [string stringByAppendingString:@"}"];
 }
 
-- (void)setInMemoryIdentifier:(NSString *)inMemoryIdentifier {
-    if (inMemoryIdentifier.length == 0) {
-        @throw RLMException(@"In-memory identifier must not be empty");
+- (NSString *)path {
+    return _config.in_memory ? nil :@(_config.path.c_str());
+}
+
+static void RLMNSStringToStdString(std::string &out, NSString *in) {
+    out.resize([in maximumLengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+    if (out.empty()) {
+        return;
     }
 
-    _inMemoryIdentifier = [inMemoryIdentifier copy];
-    _path = nil;
+    NSUInteger size = out.size();
+    [in getBytes:&out[0]
+       maxLength:size
+      usedLength:&size
+        encoding:NSUTF8StringEncoding
+         options:0 range:{0, in.length} remainingRange:nullptr];
+    out.resize(size);
 }
 
 - (void)setPath:(NSString *)path {
@@ -140,26 +157,83 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
         @throw RLMException(@"Realm path must not be empty");
     }
 
-    _path = [path copy];
-    _inMemoryIdentifier = nil;
+    RLMNSStringToStdString(_config.path, path);
+    _config.in_memory = false;
+}
+
+- (NSString *)inMemoryIdentifier {
+    if (!_config.in_memory) {
+        return nil;
+    }
+    return [@(_config.path.c_str()) lastPathComponent];
+}
+
+- (void)setInMemoryIdentifier:(NSString *)inMemoryIdentifier {
+    if (inMemoryIdentifier.length == 0) {
+        @throw RLMException(@"In-memory identifier must not be empty");
+    }
+
+    RLMNSStringToStdString(_config.path, [NSTemporaryDirectory() stringByAppendingPathComponent:inMemoryIdentifier]);
+    _config.in_memory = true;
+}
+
+- (NSData *)encryptionKey {
+    return _config.encryption_key.empty() ? nil : [NSData dataWithBytes:_config.encryption_key.data() length:_config.encryption_key.size()];
 }
 
 - (void)setEncryptionKey:(NSData * __nullable)encryptionKey {
-    _encryptionKey = [RLMRealmValidatedEncryptionKey(encryptionKey) copy];
-}
-
-- (void)setSchemaVersion:(uint64_t)schemaVersion {
-    if ((_schemaVersion = schemaVersion) == RLMNotVersioned) {
-        @throw RLMException(@"Cannot set schema version to %llu (RLMNotVersioned)", RLMNotVersioned);
+    if (NSData *key = RLMRealmValidatedEncryptionKey(encryptionKey)) {
+        auto bytes = static_cast<const char *>(key.bytes);
+        _config.encryption_key.assign(bytes, bytes + key.length);
+    }
+    else {
+        _config.encryption_key.clear();
     }
 }
 
-- (void)setObjectClasses:(NSArray *)objectClasses {
-    _customSchema = [RLMSchema schemaWithObjectClasses:objectClasses];
+- (BOOL)readOnly {
+    return _config.read_only;
+}
+
+- (void)setReadOnly:(BOOL)readOnly {
+    _config.read_only = readOnly;
+}
+
+- (uint64_t)schemaVersion {
+    return _config.schema_version;
+}
+
+- (void)setSchemaVersion:(uint64_t)schemaVersion {
+    if (schemaVersion == RLMNotVersioned) {
+        @throw RLMException(@"Cannot set schema version to %llu (RLMNotVersioned)", RLMNotVersioned);
+    }
+    _config.schema_version = schemaVersion;
 }
 
 - (NSArray *)objectClasses {
     return [_customSchema.objectSchema valueForKeyPath:@"objectClass"];
+}
+
+- (void)setObjectClasses:(NSArray *)objectClasses {
+    self.customSchema = [RLMSchema schemaWithObjectClasses:objectClasses];
+}
+
+- (void)setDynamic:(bool)dynamic {
+    _dynamic = dynamic;
+    _config.cache = !dynamic;
+}
+
+- (bool)cache {
+    return _config.cache;
+}
+
+- (void)setCache:(bool)cache {
+    _config.cache = cache;
+}
+
+- (void)setCustomSchema:(RLMSchema *)customSchema {
+    _customSchema = customSchema;
+    _config.schema = [_customSchema objectStoreCopy];
 }
 
 @end

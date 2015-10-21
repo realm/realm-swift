@@ -35,11 +35,11 @@
 
     configuration.inMemoryIdentifier = @"identifier";
     XCTAssertNil(configuration.path);
-    XCTAssertEqual(configuration.inMemoryIdentifier, @"identifier");
+    XCTAssertEqualObjects(configuration.inMemoryIdentifier, @"identifier");
 
     configuration.path = @"path";
     XCTAssertNil(configuration.inMemoryIdentifier);
-    XCTAssertEqual(configuration.path, @"path");
+    XCTAssertEqualObjects(configuration.path, @"path");
 }
 
 - (void)testPathValidation {
@@ -61,7 +61,7 @@
 
     NSData *key = RLMGenerateKey();
     configuration.encryptionKey = key;
-    XCTAssertEqual(configuration.encryptionKey, key);
+    XCTAssertEqualObjects(configuration.encryptionKey, key);
 }
 
 - (void)testSchemaVersionValidation {
@@ -106,7 +106,7 @@
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
     configuration.path = @"path";
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
-    XCTAssertEqual(RLMRealmConfiguration.defaultConfiguration.path, @"path");
+    XCTAssertEqualObjects(RLMRealmConfiguration.defaultConfiguration.path, @"path");
 }
 
 - (void)testDefaultConfiugrationUsesValueSemantics {

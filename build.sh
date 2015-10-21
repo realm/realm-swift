@@ -229,7 +229,7 @@ test_ios_devices() {
 # Input Validation
 ######################################
 
-if [ "$#" -eq 0 -o "$#" -gt 2 ]; then
+if [ "$#" -eq 0 -o "$#" -gt 3 ]; then
     usage
     exit 1
 fi
@@ -330,6 +330,36 @@ case "$COMMAND" in
             ln -s librealm-ios-bitcode.a librealm-ios.a
             ln -s librealm-ios-bitcode-dbg.a librealm-ios-dbg.a
         fi
+        ;;
+
+    ######################################
+    # Object Store
+    ######################################
+    "push-object-store-changes")
+        commit="$2"
+        path="$3"
+        if [ -z "$commit" -o -z "$path" ]; then
+            echo "usage: sh build.sh push-object-store-changes [base commit] [path to objectore repo]"
+            exit 1
+        fi
+
+        # List all commits since $commit which touched the objecstore, generate
+        # patches for each of them, and then apply those patches to the
+        # objectstore repo
+        git rev-list --reverse $commit..HEAD -- Realm/ObjectStore \
+            | xargs -I@ git format-patch --stdout @^! Realm/ObjectStore \
+            | git -C $path am -p 3
+        ;;
+
+    "pull-object-store-changes")
+        commit="$2"
+        path="$3"
+        if [ -z "$commit" -o -z "$path" ]; then
+            echo "usage: sh build.sh pull-object-store-changes [base commit] [path to objectore repo]"
+            exit 1
+        fi
+
+        git -C $path format-patch --stdout $commit..HEAD | git am --directory Realm/ObjectStore
         ;;
 
     ######################################
