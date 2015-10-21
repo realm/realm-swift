@@ -1,0 +1,484 @@
+////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2015 Realm Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
+
+#import "RLMObservation.hpp"
+
+#import "RLMAccessor.h"
+#import "RLMArray_Private.hpp"
+#import "RLMListBase.h"
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMProperty_Private.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema.h"
+
+#import <realm/lang_bind_helper.hpp>
+
+using namespace realm;
+
+namespace {
+    template<typename Iterator>
+    struct IteratorPair {
+        Iterator first;
+        Iterator second;
+    };
+    template<typename Iterator>
+    Iterator begin(IteratorPair<Iterator> const& p) {
+        return p.first;
+    }
+    template<typename Iterator>
+    Iterator end(IteratorPair<Iterator> const& p) {
+        return p.second;
+    }
+
+    template<typename Container>
+    auto reverse(Container const& c) {
+        return IteratorPair<typename Container::const_reverse_iterator>{c.rbegin(), c.rend()};
+    }
+}
+
+RLMObservationInfo::RLMObservationInfo(RLMObjectSchema *objectSchema, std::size_t row, id object)
+: object(object)
+, objectSchema(objectSchema)
+{
+    REALM_ASSERT_DEBUG(objectSchema);
+    setRow(*objectSchema.table, row);
+}
+
+RLMObservationInfo::RLMObservationInfo(id object)
+: object(object)
+{
+}
+
+RLMObservationInfo::~RLMObservationInfo() {
+    if (prev) {
+        // Not the head of the linked list, so just detach from the list
+        REALM_ASSERT_DEBUG(prev->next == this);
+        prev->next = next;
+        if (next) {
+            REALM_ASSERT_DEBUG(next->prev == this);
+            next->prev = prev;
+        }
+    }
+    else if (objectSchema) {
+        // The head of the list, so remove self from the object schema's array
+        // of observation info, either replacing self with the next info or
+        // removing entirely if there is no next
+        auto end = objectSchema->_observedObjects.end();
+        auto it = find(objectSchema->_observedObjects.begin(), end, this);
+        if (it != end) {
+            if (next) {
+                *it = next;
+                next->prev = nullptr;
+            }
+            else {
+                iter_swap(it, std::prev(end));
+                objectSchema->_observedObjects.pop_back();
+            }
+        }
+    }
+    // Otherwise the observed object was standalone, so nothing to do
+
+#ifdef DEBUG
+    // ensure that incorrect cleanup fails noisily
+    object = (__bridge id)(void *)-1;
+    prev = (RLMObservationInfo *)-1;
+    next = (RLMObservationInfo *)-1;
+#endif
+}
+
+void RLMObservationInfo::willChange(NSString *key, NSKeyValueChange kind, NSIndexSet *indexes) const {
+    if (indexes) {
+        forEach([=](__unsafe_unretained auto o) {
+            [o willChange:kind valuesAtIndexes:indexes forKey:key];
+        });
+    }
+    else {
+        forEach([=](__unsafe_unretained auto o) {
+            [o willChangeValueForKey:key];
+        });
+    }
+}
+
+void RLMObservationInfo::didChange(NSString *key, NSKeyValueChange kind, NSIndexSet *indexes) const {
+    if (indexes) {
+        forEach([=](__unsafe_unretained auto o) {
+            [o didChange:kind valuesAtIndexes:indexes forKey:key];
+        });
+    }
+    else {
+        forEach([=](__unsafe_unretained auto o) {
+            [o didChangeValueForKey:key];
+        });
+    }
+}
+
+void RLMObservationInfo::prepareForInvalidation() {
+    REALM_ASSERT_DEBUG(objectSchema);
+    REALM_ASSERT_DEBUG(!prev);
+    for (auto info = this; info; info = info->next)
+        info->invalidated = true;
+}
+
+void RLMObservationInfo::setRow(realm::Table &table, size_t newRow) {
+    REALM_ASSERT_DEBUG(!row);
+    REALM_ASSERT_DEBUG(objectSchema);
+    row = table[newRow];
+    for (auto info : objectSchema->_observedObjects) {
+        if (info->row && info->row.get_index() == row.get_index()) {
+            prev = info;
+            next = info->next;
+            if (next)
+                next->prev = this;
+            info->next = this;
+            return;
+        }
+    }
+    objectSchema->_observedObjects.push_back(this);
+}
+
+void RLMObservationInfo::recordObserver(realm::Row& objectRow,
+                                        __unsafe_unretained RLMObjectSchema *const objectSchema,
+                                        __unsafe_unretained NSString *const keyPath) {
+    ++observerCount;
+
+    // add ourselves to the list of observed objects if this is the first time
+    // an observer is being added to a persisted object
+    if (objectRow && !row) {
+        this->objectSchema = objectSchema;
+        setRow(*objectRow.get_table(), objectRow.get_index());
+    }
+
+    if (!row) {
+        // Arrays need a reference to their containing object to avoid having to
+        // go through the awful proxy object from mutableArrayValueForKey.
+        // For persisted objects we do this when the object is added or created
+        // (and have to to support notifications from modifying an object which
+        // was never observed), but for Swift classes (both RealmSwift and
+        // RLMObject) we can't do it then because we don't know what the parent
+        // object is.
+
+        NSUInteger sep = [keyPath rangeOfString:@"."].location;
+        NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
+        RLMProperty *prop = objectSchema[key];
+        if (prop && prop.type == RLMPropertyTypeArray) {
+            id value = valueForKey(key);
+            RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmArray] : value;
+            array->_key = key;
+            array->_parentObject = object;
+        }
+        else if (auto swiftIvar = prop.swiftIvar) {
+            if (auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
+                optional.property = prop;
+                optional.object = object;
+            }
+        }
+    }
+}
+
+void RLMObservationInfo::removeObserver() {
+    --observerCount;
+}
+
+id RLMObservationInfo::valueForKey(NSString *key) {
+    if (invalidated) {
+        if ([key isEqualToString:RLMInvalidatedKey]) {
+            return @YES;
+        }
+        return cachedObjects[key];
+    }
+
+    if (key != lastKey) {
+        lastKey = key;
+        lastProp = objectSchema[key];
+    }
+
+    static auto superValueForKey = reinterpret_cast<id(*)(id, SEL, NSString *)>([NSObject methodForSelector:@selector(valueForKey:)]);
+    if (!lastProp) {
+        return RLMCoerceToNil(superValueForKey(object, @selector(valueForKey:), key));
+    }
+
+    auto getSuper = [&] {
+        return row ? RLMDynamicGet(object, lastProp) : RLMCoerceToNil(superValueForKey(object, @selector(valueForKey:), key));
+    };
+
+    // We need to return the same object each time for observing over keypaths to work
+    if (lastProp.type == RLMPropertyTypeArray) {
+        RLMArray *value = cachedObjects[key];
+        if (!value) {
+            value = getSuper();
+            if (!cachedObjects) {
+                cachedObjects = [NSMutableDictionary new];
+            }
+            cachedObjects[key] = value;
+        }
+        return value;
+    }
+
+    if (lastProp.type == RLMPropertyTypeObject) {
+        if (row.is_null_link(lastProp.column)) {
+            [cachedObjects removeObjectForKey:key];
+            return nil;
+        }
+
+        RLMObjectBase *value = cachedObjects[key];
+        if (value && value->_row.get_index() == row.get_link(lastProp.column)) {
+            return value;
+        }
+        value = getSuper();
+        if (!cachedObjects) {
+            cachedObjects = [NSMutableDictionary new];
+        }
+        cachedObjects[key] = value;
+        return value;
+    }
+
+    return getSuper();
+}
+
+RLMObservationInfo *RLMGetObservationInfo(RLMObservationInfo *info,
+                                          size_t row,
+                                          __unsafe_unretained RLMObjectSchema *objectSchema) {
+    if (info) {
+        return info;
+    }
+
+    for (RLMObservationInfo *info : objectSchema->_observedObjects) {
+        if (info->isForRow(row)) {
+            return info;
+        }
+    }
+
+    return nullptr;
+}
+
+void RLMClearTable(RLMObjectSchema *objectSchema) {
+    for (auto info : objectSchema->_observedObjects) {
+        info->willChange(RLMInvalidatedKey);
+    }
+
+    RLMTrackDeletions(objectSchema.realm, ^{
+        objectSchema.table->clear();
+
+        for (auto info : objectSchema->_observedObjects) {
+            info->prepareForInvalidation();
+        }
+    });
+
+    for (auto info : reverse(objectSchema->_observedObjects)) {
+        info->didChange(RLMInvalidatedKey);
+    }
+
+    objectSchema->_observedObjects.clear();
+}
+
+void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block_t block) {
+    std::vector<std::vector<RLMObservationInfo *> *> observers;
+
+    // Build up an array of observation info arrays which is indexed by table
+    // index (the object schemata may be in an entirely different order)
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        if (objectSchema->_observedObjects.empty()) {
+            continue;
+        }
+        size_t ndx = objectSchema.table->get_index_in_group();
+        if (ndx >= observers.size()) {
+            observers.resize(std::max(observers.size() * 2, ndx + 1));
+        }
+        observers[ndx] = &objectSchema->_observedObjects;
+    }
+
+    // No need for change tracking if no objects are observed
+    if (observers.empty()) {
+        block();
+        return;
+    }
+
+    struct change {
+        RLMObservationInfo *info;
+        __unsafe_unretained NSString *property;
+        NSMutableIndexSet *indexes;
+    };
+
+    std::vector<change> changes;
+    std::vector<RLMObservationInfo *> invalidated;
+
+    // This callback is called by core with a list of row deletions and
+    // resulting link nullifications immediately before things are deleted and nullified
+    realm.group->set_cascade_notification_handler([&](realm::Group::CascadeNotification const& cs) {
+        for (auto const& link : cs.links) {
+            size_t table_ndx = link.origin_table->get_index_in_group();
+            if (table_ndx >= observers.size() || !observers[table_ndx]) {
+                // The modified table has no observers
+                continue;
+            }
+
+            for (auto observer : *observers[table_ndx]) {
+                if (!observer->isForRow(link.origin_row_ndx)) {
+                    continue;
+                }
+
+                RLMProperty *prop = observer->getObjectSchema().properties[link.origin_col_ndx];
+                NSString *name = prop.name;
+                if (prop.type != RLMPropertyTypeArray) {
+                    changes.push_back({observer, name});
+                    continue;
+                }
+
+                auto c = find_if(begin(changes), end(changes), [&](auto const& c) {
+                    return c.info == observer && c.property == name;
+                });
+                if (c == end(changes)) {
+                    changes.push_back({observer, name, [NSMutableIndexSet new]});
+                    c = prev(end(changes));
+                }
+
+                // We know what row index is being removed from the LinkView,
+                // but what we actually want is the indexes in the LinkView that
+                // are going away
+                auto linkview = observer->getRow().get_linklist(prop.column);
+                size_t start = 0, index;
+                while ((index = linkview->find(link.old_target_row_ndx, start)) != realm::not_found) {
+                    [c->indexes addIndex:index];
+                    start = index + 1;
+                }
+            }
+        }
+
+        for (auto const& row : cs.rows) {
+            if (row.table_ndx >= observers.size() || !observers[row.table_ndx]) {
+                // The modified table has no observers
+                continue;
+            }
+
+            for (auto observer : *observers[row.table_ndx]) {
+                if (observer->isForRow(row.row_ndx)) {
+                    invalidated.push_back(observer);
+                    break;
+                }
+            }
+        }
+
+        // The relative order of these loops is very important
+        for (auto info : invalidated) {
+            info->willChange(RLMInvalidatedKey);
+        }
+        for (auto const& change : changes) {
+            change.info->willChange(change.property, NSKeyValueChangeRemoval, change.indexes);
+        }
+        for (auto info : invalidated) {
+            info->prepareForInvalidation();
+        }
+    });
+
+    block();
+
+    for (auto const& change : reverse(changes)) {
+        change.info->didChange(change.property, NSKeyValueChangeRemoval, change.indexes);
+    }
+    for (auto info : reverse(invalidated)) {
+        info->didChange(RLMInvalidatedKey);
+    }
+
+    realm.group->set_cascade_notification_handler(nullptr);
+}
+
+namespace {
+template<typename Func>
+void forEach(realm::RealmDelegate::ObserverState const& state, Func&& func) {
+    for (size_t i = 0, size = state.changes.size(); i < size; ++i) {
+        if (state.changes[i].changed) {
+            func(i, state.changes[i], static_cast<RLMObservationInfo *>(state.info));
+        }
+    }
+}
+}
+
+std::vector<realm::RealmDelegate::ObserverState> RLMGetObservedRows(NSArray *schema) {
+    std::vector<realm::RealmDelegate::ObserverState> observers;
+    for (RLMObjectSchema *objectSchema in schema) {
+        for (auto info : objectSchema->_observedObjects) {
+            auto const& row = info->getRow();
+            if (!row.is_attached())
+                continue;
+            observers.push_back({
+                row.get_table()->get_index_in_group(),
+                row.get_index(),
+                info});
+        }
+    }
+    sort(begin(observers), end(observers));
+    return observers;
+}
+
+static NSKeyValueChange convert(realm::RealmDelegate::ColumnInfo::Kind kind) {
+    switch (kind) {
+        case realm::RealmDelegate::ColumnInfo::Kind::None:
+        case realm::RealmDelegate::ColumnInfo::Kind::SetAll:
+            return NSKeyValueChangeSetting;
+        case realm::RealmDelegate::ColumnInfo::Kind::Set:
+            return NSKeyValueChangeReplacement;
+        case realm::RealmDelegate::ColumnInfo::Kind::Insert:
+            return NSKeyValueChangeInsertion;
+        case realm::RealmDelegate::ColumnInfo::Kind::Remove:
+            return NSKeyValueChangeRemoval;
+    }
+}
+
+static NSIndexSet *convert(realm::IndexSet const& in, NSMutableIndexSet *out) {
+    if (in.empty()) {
+        return nil;
+    }
+
+    [out removeAllIndexes];
+    for (auto range : in) {
+        [out addIndexesInRange:{range.first, range.second - range.first}];
+    }
+    return out;
+}
+
+void RLMWillChange(std::vector<realm::RealmDelegate::ObserverState> const& observed,
+                   std::vector<void *> const& invalidated) {
+    NSMutableIndexSet *indexes = [NSMutableIndexSet new];
+    for (auto info : invalidated) {
+        static_cast<RLMObservationInfo *>(info)->willChange(RLMInvalidatedKey);
+    }
+    for (auto const& o : observed) {
+        forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
+            info->willChange([info->getObjectSchema().properties[i] name],
+                             convert(change.kind), convert(change.indices, indexes));
+        });
+    }
+    for (auto info : invalidated) {
+        static_cast<RLMObservationInfo *>(info)->prepareForInvalidation();
+    }
+}
+
+void RLMDidChange(std::vector<realm::RealmDelegate::ObserverState> const& observed,
+                  std::vector<void *> const& invalidated) {
+    // Loop in reverse order to avoid O(N^2) behavior in Foundation
+    NSMutableIndexSet *indexes = [NSMutableIndexSet new];
+    for (auto const& o : reverse(observed)) {
+        forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
+            info->didChange([info->getObjectSchema().properties[i] name],
+                            convert(change.kind), convert(change.indices, indexes));
+        });
+    }
+    for (auto const& info : reverse(invalidated)) {
+        static_cast<RLMObservationInfo *>(info)->didChange(RLMInvalidatedKey);
+    }
+}

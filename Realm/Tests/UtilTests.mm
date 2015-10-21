@@ -33,22 +33,14 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) { \
 @implementation UtilTests
 
 - (void)testRLMExceptionWithReasonAndUserInfo {
-    NSString *reason = @"Reason";
-    NSDictionary *userInfo = @{ @"key" : @"value" };
+    NSString *const reason = @"Reason";
     NSDictionary *expectedUserInfo = @{
                                        RLMRealmVersionKey : REALM_COCOA_VERSION,
                                        RLMRealmCoreVersionKey : @REALM_VERSION,
                                        };
 
-    XCTAssertTrue(RLMEqualExceptions(RLMException(reason), [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]));
-    XCTAssertTrue(RLMEqualExceptions(RLMException(reason, nil), [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]));
-
-    expectedUserInfo = @{
-                         @"key" : @"value",
-                         RLMRealmVersionKey : REALM_COCOA_VERSION,
-                         RLMRealmCoreVersionKey : @REALM_VERSION,
-                         };
-    XCTAssertTrue(RLMEqualExceptions(RLMException(reason, userInfo), [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]));
+    XCTAssertTrue(RLMEqualExceptions(RLMException(reason),
+                                     [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]));
 }
 
 - (void)testRLMExceptionWithCPlusPlusException {
@@ -58,7 +50,8 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) { \
                                        RLMRealmCoreVersionKey : @REALM_VERSION,
                                        };
 
-    XCTAssertTrue(RLMEqualExceptions(RLMException(exception), [NSException exceptionWithName:RLMExceptionName reason:@"Reason" userInfo:expectedUserInfo]));
+    XCTAssertTrue(RLMEqualExceptions(RLMException(exception),
+                                     [NSException exceptionWithName:RLMExceptionName reason:@"Reason" userInfo:expectedUserInfo]));
 }
 
 - (void)testRLMMakeError {
@@ -69,7 +62,8 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) { \
                                        @"Error Code" : @(code),
                                        };
 
-    XCTAssertEqualObjects(RLMMakeError(code, exception), ([NSError errorWithDomain:RLMErrorDomain code:code userInfo:expectedUserInfo]));
+    XCTAssertEqualObjects(RLMMakeError(code, exception),
+                          [NSError errorWithDomain:RLMErrorDomain code:code userInfo:expectedUserInfo]);
 }
 
 - (void)testRLMSetErrorOrThrowWithNilErrorPointer {

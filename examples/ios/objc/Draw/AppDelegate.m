@@ -24,8 +24,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                      serverBaseURL:@"realm://Alexanders-MacBook-Pro.local/draw"];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.syncServerURL = [NSURL URLWithString:@"realm://Alexanders-MacBook-Pro.local/draw"];
+    [RLMRealmConfiguration setDefaultConfiguration:configuration];
+
     [RLMRealm setServerSyncLogLevel:1]; // `level >= 2` means "everything"
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];

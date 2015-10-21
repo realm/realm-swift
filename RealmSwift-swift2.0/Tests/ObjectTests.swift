@@ -25,14 +25,14 @@ class ObjectTests: TestCase {
     // init() Tests are in ObjectCreationTests.swift
 
     // init(value:) tests are in ObjectCreationTests.swift
-    
+
     func testRealm() {
         let standalone = SwiftStringObject()
         XCTAssertNil(standalone.realm)
 
         let realm = try! Realm()
         var persisted: SwiftStringObject!
-        realm.write {
+        try! realm.write {
             persisted = realm.create(SwiftStringObject.self, value: [:])
             XCTAssertNotNil(persisted.realm)
             XCTAssertEqual(realm, persisted.realm!)
@@ -61,12 +61,12 @@ class ObjectTests: TestCase {
         XCTAssertFalse(object.invalidated)
 
         let realm = try! Realm()
-        realm.write {
+        try! realm.write {
             realm.add(object)
             XCTAssertFalse(object.invalidated)
         }
 
-        realm.write {
+        try! realm.write {
             realm.deleteAll()
             XCTAssertTrue(object.invalidated)
         }
@@ -106,7 +106,7 @@ class ObjectTests: TestCase {
         let realm = try! Realm()
         let object = SwiftEmployeeObject()
         assertThrows(object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees"))
-        realm.write {
+        try! realm.write {
             realm.add(object)
             self.assertThrows(object.linkingObjects(SwiftCompanyObject.self, forProperty: "noSuchCol"))
             XCTAssertEqual(0, object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees").count)
@@ -125,7 +125,7 @@ class ObjectTests: TestCase {
             XCTAssertEqual(object.valueForKey("floatCol") as! Float!, 1.23 as Float)
             XCTAssertEqual(object.valueForKey("doubleCol") as! Double!, 12.3)
             XCTAssertEqual(object.valueForKey("stringCol") as! String!, "a")
-            XCTAssertEqual(object.valueForKey("binaryCol") as! NSData, "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
+            XCTAssertEqual((object.valueForKey("binaryCol") as! NSData), "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
             XCTAssertEqual(object.valueForKey("dateCol") as! NSDate!, NSDate(timeIntervalSince1970: 1))
             XCTAssertEqual((object.valueForKey("objectCol")! as! SwiftBoolObject).boolCol, false)
             XCTAssert(object.valueForKey("arrayCol")! is List<SwiftBoolObject>)
@@ -155,7 +155,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual(getter(object, "stringCol") as! String!, "z")
 
         setter(object, "z".dataUsingEncoding(NSUTF8StringEncoding), "binaryCol")
-        XCTAssertEqual(getter(object, "binaryCol") as! NSData, "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
+        XCTAssertEqual((getter(object, "binaryCol") as! NSData), "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
 
         setter(object, NSDate(timeIntervalSince1970: 333), "dateCol")
         XCTAssertEqual(getter(object, "dateCol") as! NSDate!, NSDate(timeIntervalSince1970: 333))
@@ -182,29 +182,29 @@ class ObjectTests: TestCase {
 
     func dynamicSetAndTestAllTypes(setter: (DynamicObject, AnyObject?, String) -> (), getter: (DynamicObject, String) -> (AnyObject?), object: DynamicObject, boolObject: DynamicObject) {
         setter(object, true, "boolCol")
-        XCTAssertEqual(getter(object, "boolCol") as! Bool, true)
+        XCTAssertEqual((getter(object, "boolCol") as! Bool), true)
 
         setter(object, 321, "intCol")
-        XCTAssertEqual(getter(object, "intCol") as! Int, 321)
+        XCTAssertEqual((getter(object, "intCol") as! Int), 321)
 
         setter(object, 32.1 as Float, "floatCol")
-        XCTAssertEqual(getter(object, "floatCol") as! Float, 32.1 as Float)
+        XCTAssertEqual((getter(object, "floatCol") as! Float), 32.1 as Float)
 
         setter(object, 3.21, "doubleCol")
-        XCTAssertEqual(getter(object, "doubleCol") as! Double, 3.21)
+        XCTAssertEqual((getter(object, "doubleCol") as! Double), 3.21)
 
         setter(object, "z", "stringCol")
-        XCTAssertEqual(getter(object, "stringCol") as! String, "z")
+        XCTAssertEqual((getter(object, "stringCol") as! String), "z")
 
         setter(object, "z".dataUsingEncoding(NSUTF8StringEncoding), "binaryCol")
-        XCTAssertEqual(getter(object, "binaryCol") as! NSData, "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
+        XCTAssertEqual((getter(object, "binaryCol") as! NSData), "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
 
         setter(object, NSDate(timeIntervalSince1970: 333), "dateCol")
-        XCTAssertEqual(getter(object, "dateCol") as! NSDate, NSDate(timeIntervalSince1970: 333))
+        XCTAssertEqual((getter(object, "dateCol") as! NSDate), NSDate(timeIntervalSince1970: 333))
 
         setter(object, boolObject, "objectCol")
-        XCTAssertEqual(getter(object, "objectCol") as! DynamicObject, boolObject)
-        XCTAssertEqual((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! NSNumber, true as NSNumber)
+        XCTAssertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)
+        XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! NSNumber), true as NSNumber)
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
@@ -224,21 +224,21 @@ class ObjectTests: TestCase {
     private func withMigrationObject(block: ((MigrationObject, Migration) -> ())) {
         autoreleasepool {
             let realm = self.realmWithTestPath()
-            realm.write {
+            try! realm.write {
                 _ = realm.create(SwiftObject)
             }
         }
         autoreleasepool {
             var enumerated = false
-            setSchemaVersion(1, realmPath: self.testRealmPath()) { migration, _ in
+            let configuration = Realm.Configuration(schemaVersion: 1, migrationBlock: { migration, _ in
                 migration.enumerate(SwiftObject.className()) { oldObject, newObject in
                     if let newObject = newObject {
                         block(newObject, migration)
                         enumerated = true
                     }
                 }
-            }
-            self.realmWithTestPath()
+            })
+            self.realmWithTestPath(configuration)
             XCTAssert(enumerated)
         }
     }
@@ -283,5 +283,22 @@ class ObjectTests: TestCase {
             let persistedObject = try! Realm().create(SwiftObject.self, value: [:])
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
+    }
+
+    func testDynamicList() {
+        let realm = try! Realm()
+        let arrayObject = SwiftArrayPropertyObject()
+        let str1 = SwiftStringObject()
+        let str2 = SwiftStringObject()
+        arrayObject.array.appendContentsOf([str1, str2])
+        try! realm.write {
+            realm.add(arrayObject)
+        }
+        let dynamicArray = arrayObject.dynamicList("array")
+        XCTAssertEqual(dynamicArray.count, 2)
+        XCTAssertEqual(dynamicArray[0], str1)
+        XCTAssertEqual(dynamicArray[1], str2)
+        XCTAssertEqual(arrayObject.dynamicList("intArray").count, 0)
+        assertThrows(arrayObject.dynamicList("noSuchList"))
     }
 }

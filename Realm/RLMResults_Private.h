@@ -20,8 +20,6 @@
 
 @class RLMObjectSchema;
 
-@interface RLMResults () {
-  @public
-    RLMObjectSchema *_objectSchema;
-}
+@interface RLMResults ()
+@property (nonatomic, unsafe_unretained) RLMObjectSchema *objectSchema;
 @end

@@ -18,7 +18,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import "RLMTestCase.h"
+#import "RLMMultiProcessTestCase.h"
 
 #import "RLMAccessor.h"
 #import "RLMObjectSchema_Private.hpp"
@@ -125,7 +125,19 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 }
 @end
 
-@interface SchemaTests : RLMTestCase
+@interface InvalidNSNumberProtocolObject : FakeObject
+@property NSNumber<RLMFastEnumerable> *number;
+@end
+@implementation InvalidNSNumberProtocolObject
+@end
+
+@interface InvalidNSNumberNoProtocolObject : FakeObject
+@property NSNumber *number;
+@end
+@implementation InvalidNSNumberNoProtocolObject
+@end
+
+@interface SchemaTests : RLMMultiProcessTestCase
 @end
 
 @implementation SchemaTests
@@ -135,6 +147,12 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     XCTAssertNil([schema schemaForClassName:@"RLMObject"]);
     XCTAssertNil([schema schemaForClassName:@"RLMObjectBase"]);
     XCTAssertNil([schema schemaForClassName:@"RLMDynamicObject"]);
+}
+
+- (void)testSchemaWithObjectClasses {
+    RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[RLMDynamicObject.class, StringObject.class]];
+    XCTAssertEqualObjects((@[@"RLMDynamicObject", @"StringObject"]), [schema.objectSchema valueForKey:@"className"]);
+    XCTAssertNil([RLMSchema.sharedSchema schemaForClassName:@"RLMDynamicObject"]);
 }
 
 - (void)testInheritanceInitialization
@@ -270,7 +288,6 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         NSUInteger occurrenceCount = 0;
         
         for (RLMObjectSchema *objectSchema in objectSchemas) {
-            NSLog(@"Scheme %@", objectSchema.className);
             if ([objectSchema.className isEqualToString:expectedType]) {
                 occurrenceCount++;
             }
@@ -319,11 +336,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = objectSchema;
 
-#ifdef REALM_ENABLE_NULL
-#   define StringOrBinaryOptionalString @"\t\t\toptional = YES;\n"
-#else
-#   define StringOrBinaryOptionalString @"\t\t\toptional = NO;\n"
-#endif
+#   define OptionalString @"\t\t\toptional = YES;\n"
 
     XCTAssertEqualObjects(schema.description, @"Schema {\n"
                                               @"\tAllTypesObject {\n"
@@ -360,21 +373,21 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              StringOrBinaryOptionalString
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t\tbinaryCol {\n"
                                               @"\t\t\ttype = data;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              StringOrBinaryOptionalString
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t\tdateCol {\n"
                                               @"\t\t\ttype = date;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              @"\t\t\toptional = NO;\n"
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t\tcBoolCol {\n"
                                               @"\t\t\ttype = bool;\n"
@@ -411,7 +424,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              StringOrBinaryOptionalString
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t}\n"
                                               @"\tIntObject {\n"
@@ -425,7 +438,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t}\n"
                                               @"}");
 
-#undef StringOrBinaryOptionalString
+#undef OptionalString
 }
 
 - (void)testClassWithDuplicateProperties
@@ -455,5 +468,56 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 - (void)testClassWithRequiredLinkProperty {
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:RequiredLinkProperty.class], @"cannot be made required.*'object'");
 }
+
+- (void)testClassWithInvalidNSNumberProtocolProperty {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberProtocolObject.class], @"RLMFastEnumerable' is not supported as an NSNumber object type.");
+}
+
+- (void)testClassWithInvalidNSNumberNoProtocolProperty {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberNoProtocolObject.class], @"NSNumber properties require a protocol defining the contained type");
+}
+
+// Can't spawn child processes on iOS
+#if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
+- (void)testPartialSharedSchemaInit {
+    if (self.isParent) {
+        RLMRunChildAndWait();
+        return;
+    }
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+
+    // Verify that opening with class subsets without the shared schema being
+    // initialized works
+    config.objectClasses = @[IntObject.class];
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        XCTAssertEqual(1U, realm.schema.objectSchema.count);
+    }
+
+    config.objectClasses = @[IntObject.class, StringObject.class];
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        XCTAssertEqual(2U, realm.schema.objectSchema.count);
+    }
+
+    // Verify that the shared schema generated afterwards is valid
+    config.objectClasses = nil;
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm defaultRealm];
+
+        // Shared schema shouldn't have accessor classes
+        for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+            const char *actualClassName = class_getName(objectSchema.objectClass);
+            XCTAssertEqual(nullptr, strstr(actualClassName, "RLMAccessor"));
+            XCTAssertEqual(nullptr, strstr(actualClassName, "RLMStandalone"));
+        }
+
+        // Shared schema shouldn't have duplicate entries
+        XCTAssertEqual(realm.schema.objectSchema.count,
+                       [NSSet setWithArray:[realm.schema.objectSchema valueForKey:@"className"]].count);
+    }
+}
+#endif
 
 @end

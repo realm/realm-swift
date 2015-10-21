@@ -20,7 +20,7 @@
 #import <Realm/RLMResults.h>
 
 #import <memory>
-#import <realm/views.hpp>
+#import <vector>
 
 namespace realm {
     class LinkView;
@@ -33,38 +33,65 @@ namespace realm {
     typedef util::bind_ptr<LinkView> LinkViewRef;
 }
 
+@class RLMObjectBase;
 @class RLMObjectSchema;
+class RLMObservationInfo;
 
-// RLMArray private properties/ivars for all subclasses
+struct RLMSortOrder {
+    std::vector<size_t> columnIndices;
+    std::vector<bool> ascending;
+
+    explicit operator bool() const {
+        return !columnIndices.empty();
+    }
+};
+
+@protocol RLMFastEnumerable
+@property (nonatomic, readonly) RLMRealm *realm;
+@property (nonatomic, readonly) RLMObjectSchema *objectSchema;
+@property (nonatomic, readonly) NSUInteger count;
+
+- (NSUInteger)indexInSource:(NSUInteger)index;
+- (realm::TableView)tableView;
+@end
+
 @interface RLMArray () {
   @protected
-    // accessor ivars
-    RLMRealm *_realm;
     NSString *_objectClassName;
+  @public
+    // The name of the property which this RLMArray represents
+    NSString *_key;
+    __weak RLMObjectBase *_parentObject;
 }
-
-// initializer
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName standalone:(BOOL)standalone;
 @end
 
 
 //
 // LinkView backed RLMArray subclass
 //
-@interface RLMArrayLinkView : RLMArray
-+ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                    view:(realm::LinkViewRef)view
-                                   realm:(RLMRealm *)realm;
+@interface RLMArrayLinkView : RLMArray <RLMFastEnumerable>
+@property (nonatomic, unsafe_unretained) RLMObjectSchema *objectSchema;
+
++ (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
+                                          view:(realm::LinkViewRef)view
+                                         realm:(RLMRealm *)realm
+                                           key:(NSString *)key
+                                  parentSchema:(RLMObjectSchema *)parentSchema;
 
 // deletes all objects in the RLMArray from their containing realms
 - (void)deleteObjectsFromRealm;
 @end
 
+void RLMValidateArrayObservationKey(NSString *keyPath, RLMArray *array);
+
+// Initialize the observation info for an array if needed
+void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NSString *keyPath, RLMArray *array, id observed);
+
 
 //
 // RLMResults private methods
 //
-@interface RLMResults ()
+@interface RLMResults () <RLMFastEnumerable>
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<realm::Query>)query
                                      realm:(RLMRealm *)realm;
@@ -76,7 +103,7 @@ namespace realm {
 
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<realm::Query>)query
-                                      sort:(realm::RowIndexes::Sorter const&)sorter
+                                      sort:(RLMSortOrder)sorter
                                      realm:(RLMRealm *)realm;
 
 - (void)deleteObjectsFromRealm;
@@ -97,18 +124,16 @@ namespace realm {
 + (RLMResults *)tableResultsWithObjectSchema:(RLMObjectSchema *)objectSchema realm:(RLMRealm *)realm;
 @end
 
-//
-// A simple holder for a C array of ids to enable autoreleasing the array without
-// the runtime overhead of a NSMutableArray
-//
-@interface RLMCArrayHolder : NSObject {
-@public
-    std::unique_ptr<id[]> array;
-    NSUInteger size;
-}
+// An object which encapulates the shared logic for fast-enumerating RLMArray
+// and RLMResults, and has a buffer to store strong references to the current
+// set of enumerated items
+@interface RLMFastEnumerator : NSObject
+- (instancetype)initWithCollection:(id<RLMFastEnumerable>)collection objectSchema:(RLMObjectSchema *)objectSchema;
 
-- (instancetype)initWithSize:(NSUInteger)size;
+// Detach this enumerator from the source collection. Must be called before the
+// source collection is changed.
+- (void)detach;
 
-// Reallocate the array if it is not already the given size
-- (void)resize:(NSUInteger)size;
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                    count:(NSUInteger)len;
 @end

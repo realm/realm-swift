@@ -21,12 +21,24 @@ appledoc \
     --no-warn-invalid-crossref \
     --no-warn-undocumented-object \
     --no-warn-undocumented-member \
+    --ignore ".m" \
+    --ignore ".mm" \
+    --ignore ".hpp" \
     --ignore "Realm/RLMRealm_Dynamic.h" \
-    --ignore "Realm/RLMArrayAccessor.h" \
-    --ignore "Realm/RLMArrayAccessor.mm" \
-    --ignore "Realm/RLMQueryUtil.h" \
-    --ignore "Realm/RLMUtil.h" \
-    --ignore "Realm/RLMRealm_Dynamic.h" \
+    --ignore "Realm/RLMObjectBase.h" \
+    --ignore "Realm/RLMObjectBase_Dynamic.h" \
+    --ignore "Realm/RLMObjectStore.h" \
+    --ignore "Realm/RLMListBase.h" \
+    --ignore "Realm/RLMSchema_Private.h" \
+    --ignore "Realm/RLMRealm_Private.h" \
+    --ignore "Realm/RLMObject_Private.h" \
+    --ignore "Realm/RLMProperty_Private.h" \
+    --ignore "Realm/RLMResults_Private.h" \
+    --ignore "Realm/RLMArray_Private.h" \
+    --ignore "Realm/RLMObjectSchema_Private.h" \
+    --ignore "Realm/RLMMigration_Private.h" \
+    --ignore "Realm/RLMAccessor.h" \
+    --ignore "Realm/RLMSwiftSupport.h" \
     --ignore "Realm/Realm-Bridging-Header.h" \
     --ignore "Realm/Tests" \
     --template "${SRCROOT}/docs/templates/objc" \
@@ -36,6 +48,9 @@ appledoc \
 mkdir -p ${SRCROOT}/docs/output
 rm -rf ${SRCROOT}/docs/output/${realm_version}
 mv ${SRCROOT}/docs/html ${SRCROOT}/docs/output/${realm_version}
+
+: ${REALM_SWIFT_VERSION:=2.0}
+./build.sh set-swift-version
 
 ${jazzy} \
   --author Realm \
@@ -49,3 +64,4 @@ ${jazzy} \
   --root-url https://realm.io/docs/swift/${realm_version}/api/ \
   --xcodebuild-arguments "-project,${SRCROOT}/RealmSwift.xcodeproj,-dry-run" \
   --template-directory "${SRCROOT}/docs/templates/swift" \
+  --swift-version=${REALM_SWIFT_VERSION}

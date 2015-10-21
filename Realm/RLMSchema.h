@@ -36,17 +36,17 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  An NSArray containing RLMObjectSchema's for all object types in this Realm. Meant
  to be used during migrations for dynamic introspection.
- 
+
  @see RLMObjectSchema
  */
 @property (nonatomic, readonly, copy) NSArray *objectSchema;
 
 /**
  Returns an RLMObjectSchema for the given class name in this RLMSchema.
- 
+
  @param className   The object class name.
  @return            RLMObjectSchema for the given class in this RLMSchema.
- 
+
  @see               RLMObjectSchema
  */
 - (nullable RLMObjectSchema *)schemaForClassName:(NSString *)className;
@@ -54,10 +54,10 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Look up an RLMObjectSchema for the given class name in this Realm. Throws if there
  is no object of type className in this RLMSchema instance.
- 
+
  @param className   The object class name.
  @return            RLMObjectSchema for the given class in this Realm.
- 
+
  @see               RLMObjectSchema
  */
 - (RLMObjectSchema *)objectForKeyedSubscript:(id <NSCopying>)className;

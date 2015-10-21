@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+
 #import <Realm/RLMCollection.h>
 #import <Realm/RLMDefines.h>
 
@@ -44,6 +45,18 @@ RLM_ASSUME_NONNULL_BEGIN
 
  RLMArrays cannot be created directly. RLMArray properties on RLMObjects are
  lazily created when accessed, or can be obtained by querying a Realm.
+
+ ### Key-Value Observing
+
+ RLMArray supports array key-value observing on RLMArray properties on RLMObject
+ subclasses, and the `invalidated` property on RLMArray instances themselves is
+ key-value observing compliant when the RLMArray is attached to a persisted
+ RLMObject (RLMArrays on standalone RLMObjects will never become invalidated).
+
+ Because RLMArrays are attached to the object which they are a property of, they
+ do not require using the mutable collection proxy objects from
+ `-mutableArrayValueForKey:` or KVC-compatible mutation methods on the containing
+ object. Instead, you can call the mutation methods on the RLMArray directly.
  */
 
 @interface RLMArray RLM_GENERIC_COLLECTION : NSObject<RLMCollection, NSFastEnumeration>

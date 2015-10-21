@@ -39,7 +39,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
 
-        try! NSFileManager.defaultManager().removeItemAtPath(Realm.defaultPath)
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(Realm.Configuration.defaultConfiguration.path!)
+        } catch {}
 
         // Create a standalone object
         let mydog = Dog()
@@ -55,7 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Save your object
         realm.beginWrite()
         realm.add(mydog)
-        realm.commitWrite()
+        try! realm.commitWrite()
 
         // Query
         let results = realm.objects(Dog).filter(NSPredicate(format:"name contains 'x'"))
@@ -70,7 +72,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         person.name = "Tim"
         person.dogs.append(mydog)
 
-        realm.write {
+        try! realm.write {
             realm.add(person)
         }
 

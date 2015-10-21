@@ -19,7 +19,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
 #import <Realm/RLMSchema.h>
 #import <Realm/RLMDefines.h>
 
@@ -30,12 +30,24 @@ RLM_ASSUME_NONNULL_BEGIN
 //
 // RLMSchema private interface
 //
-@class RLMRealm;
 @interface RLMSchema ()
+
+/**
+ Returns an `RLMSchema` containing only the given `RLMObject` subclasses.
+
+ @param classes The classes to be included in the schema.
+
+ @return An `RLMSchema` containing only the given classes.
+ */
++ (instancetype)schemaWithObjectClasses:(NSArray *)classes;
+
 @property (nonatomic, readwrite, copy) NSArray *objectSchema;
 
 // schema based on runtime objects
-+ (nullable instancetype)sharedSchema;
++ (instancetype)sharedSchema;
+
+// schema based upon all currently registered object classes
++ (instancetype)partialSharedSchema;
 
 // schema based on tables in a Realm
 + (instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm;

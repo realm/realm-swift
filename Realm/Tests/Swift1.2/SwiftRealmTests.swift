@@ -19,7 +19,7 @@
 import XCTest
 import Realm
 
-class SwiftRealmTests: SwiftTestCase {
+class SwiftRealmTests: RLMTestCase {
 
     // No models
 
@@ -27,10 +27,6 @@ class SwiftRealmTests: SwiftTestCase {
         let realm = realmWithTestPath()
         XCTAssertNotNil(realm, "realm should not be nil");
         XCTAssertTrue((realm as AnyObject) is RLMRealm, "realm should be of class RLMRealm")
-    }
-
-    func testDefaultRealmPath() {
-        XCTAssertEqual(RLMRealm.defaultRealm().path, RLMRealm.defaultRealmPath(), "Default Realm path should be correct.")
     }
 
     func testEmptyWriteTransaction() {
@@ -76,7 +72,7 @@ class SwiftRealmTests: SwiftTestCase {
             notificationFired.fulfill()
         }
 
-        dispatch_async(dispatch_queue_create("background", nil)) {
+        dispatchAsync {
             let realm = self.realmWithTestPath()
             realm.beginWriteTransaction()
             SwiftStringObject.createInRealm(realm, withValue: ["string"])
@@ -127,7 +123,7 @@ class SwiftRealmTests: SwiftTestCase {
             updateComplete.fulfill()
         }
 
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
+        dispatchAsync {
             let realm = self.realmWithTestPath()
             realm.transactionWithBlock() {
                 var obj = SwiftIntObject()
@@ -153,7 +149,7 @@ class SwiftRealmTests: SwiftTestCase {
             notificationFired.fulfill()
         }
 
-        dispatch_async(dispatch_queue_create("background", nil)) {
+        dispatchAsync {
             let realm = self.realmWithTestPath()
             let obj = SwiftStringObject(value: ["string"])
             realm.beginWriteTransaction()
@@ -213,7 +209,7 @@ class SwiftRealmTests: SwiftTestCase {
             }
         }
 
-        dispatch_async(dispatch_queue_create("background", nil)) {
+        dispatchAsync {
             let realm = self.realmWithTestPath()
             realm.beginWriteTransaction()
             StringObject.createInRealm(realm, withValue: ["string"])
@@ -238,7 +234,7 @@ class SwiftRealmTests: SwiftTestCase {
             notificationFired.fulfill()
         }
 
-        dispatch_async(dispatch_queue_create("background", nil)) {
+        dispatchAsync {
             let realm = self.realmWithTestPath()
             let obj = StringObject(value: ["string"])
             realm.transactionWithBlock() {

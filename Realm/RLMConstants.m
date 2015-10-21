@@ -28,3 +28,5 @@ NSString * const RLMExceptionName = @"RLMException";
 NSString * const RLMRealmVersionKey = @"RLMRealmVersion";
 
 NSString * const RLMRealmCoreVersionKey = @"RLMRealmCoreVersion";
+
+NSString * const RLMInvalidatedKey = @"invalidated";

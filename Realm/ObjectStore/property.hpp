@@ -27,9 +27,9 @@ namespace realm {
         PropertyTypeInt    = 0,
         /** Boolean type: BOOL, bool, Bool (Swift) */
         PropertyTypeBool   = 1,
-        /** Float type: CGFloat (32bit), float, Float (Swift) */
+        /** Float type: float, Float (Swift) */
         PropertyTypeFloat  = 9,
-        /** Double type: CGFloat (64bit), double, Double (Swift) */
+        /** Double type: double, Double (Swift) */
         PropertyTypeDouble = 10,
         /** String type: NSString, String (Swift) */
         PropertyTypeString = 2,
@@ -46,16 +46,15 @@ namespace realm {
     };
 
     struct Property {
-    public:
         std::string name;
         PropertyType type;
         std::string object_type;
-        bool is_primary;
-        bool is_indexed;
-        bool is_nullable;
+        bool is_primary = false;
+        bool is_indexed = false;
+        bool is_nullable = false;
 
         size_t table_column;
-        bool requires_index() { return is_primary || is_indexed; }
+        bool requires_index() const { return is_primary || is_indexed; }
     };
 
     static inline const char *string_for_property_type(PropertyType type) {

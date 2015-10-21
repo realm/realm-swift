@@ -52,10 +52,10 @@
     // Use an autorelease pool to close the Realm at the end of the block, so
     // that we can try to reopen it with different keys
     @autoreleasepool {
-        RLMRealm *realm = [RLMRealm realmWithPath:[RLMRealm defaultRealmPath]
-                                    encryptionKey:[self getKey]
-                                         readOnly:NO
-                                            error:nil];
+        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        configuration.encryptionKey = [self getKey];
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration
+                                                     error:nil];
 
         // Add an object
         [realm beginWriteTransaction];
@@ -71,26 +71,26 @@
         SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
 
         NSError *error;
-        [RLMRealm realmWithPath:[RLMRealm defaultRealmPath]
-                  encryptionKey:[[NSData alloc] initWithBytes:buffer length:sizeof(buffer)]
-                       readOnly:NO
-                          error:&error];
+        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        configuration.encryptionKey = [[NSData alloc] initWithBytes:buffer length:sizeof(buffer)];
+        [RLMRealm realmWithConfiguration:configuration
+                                   error:&error];
         [self log:@"Open with wrong key: %@", error];
     }
 
     // Opening wihout supplying a key at all fails
     @autoreleasepool {
         NSError *error;
-        [RLMRealm realmWithPath:[RLMRealm defaultRealmPath] readOnly:NO error:&error];
+        [RLMRealm realmWithConfiguration:[RLMRealmConfiguration defaultConfiguration] error:&error];
         [self log:@"Open with no key: %@", error];
     }
 
     // Reopening with the correct key works and can read the data
     @autoreleasepool {
-        RLMRealm *realm = [RLMRealm realmWithPath:[RLMRealm defaultRealmPath]
-                                    encryptionKey:[self getKey]
-                                         readOnly:NO
-                                            error:nil];
+        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        configuration.encryptionKey = [self getKey];
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration
+                                                     error:nil];
 
         [self log:@"Saved object: %@", [[[StringObject allObjectsInRealm:realm] firstObject] stringProp]];
     }
