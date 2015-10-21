@@ -532,6 +532,7 @@ case "$COMMAND" in
     # Full verification
     ######################################
     "verify")
+        sh build.sh verify-cocoapods
         sh build.sh verify-docs
         sh build.sh verify-osx
         sh build.sh verify-osx-debug
@@ -548,6 +549,13 @@ case "$COMMAND" in
         sh build.sh verify-ios-device-objc
         sh build.sh verify-ios-device-swift
         sh build.sh verify-watchos
+        ;;
+
+    "verify-cocoapods")
+        cd examples/installation
+        # FIXME: tests are duplicated to work around https://github.com/realm/realm-cocoa/issues/2701
+        ./build.sh test-ios-objc-cocoapods || ./build.sh test-ios-objc-cocoapods || exit 1
+        ./build.sh test-ios-swift-cocoapods || ./build.sh test-ios-swift-cocoapods || exit 1
         ;;
 
     "verify-osx")
@@ -730,6 +738,8 @@ case "$COMMAND" in
           mkdir -p include/Realm
           cp Realm/*.{h,hpp} include/Realm
           cp Realm/ObjectStore/*.hpp include/Realm
+          cp Realm/ObjectStore/impl/*.hpp include/Realm
+          cp Realm/ObjectStore/impl/apple/*.hpp include/Realm
           touch include/Realm/RLMPlatform.h
         fi
         ;;
