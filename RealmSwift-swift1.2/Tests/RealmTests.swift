@@ -21,36 +21,21 @@ import RealmSwift
 import Foundation
 
 class RealmTests: TestCase {
-    override func setUp() {
-        super.setUp()
-
-        autoreleasepool {
-            self.realmWithTestPath().write {
-                self.realmWithTestPath().create(SwiftStringObject.self, value: ["1"])
-                self.realmWithTestPath().create(SwiftStringObject.self, value: ["2"])
-                self.realmWithTestPath().create(SwiftStringObject.self, value: ["3"])
-            }
-
-            Realm().write {
-                Realm().create(SwiftIntObject.self, value: [100])
-                Realm().create(SwiftIntObject.self, value: [200])
-                Realm().create(SwiftIntObject.self, value: [300])
-            }
-        }
-    }
-
     func testPath() {
-        XCTAssertEqual(Realm.defaultPath, Realm().path)
         XCTAssertEqual(testRealmPath(), realmWithTestPath().path)
     }
 
     func testReadOnly() {
         autoreleasepool {
             XCTAssertEqual(Realm().readOnly, false)
+            Realm().write {
+                Realm().create(SwiftIntObject.self, value: [100])
+            }
         }
-        let readOnlyRealm = Realm(path: Realm.defaultPath, readOnly: true, error: nil)!
+
+        let readOnlyRealm = Realm(configuration: Realm.Configuration(path: defaultRealmPath(), readOnly: true))!
         XCTAssertEqual(true, readOnlyRealm.readOnly)
-        XCTAssertEqual(3, readOnlyRealm.objects(SwiftIntObject).count)
+        XCTAssertEqual(1, readOnlyRealm.objects(SwiftIntObject).count)
 
         assertThrows(Realm(), "Realm has different readOnly settings")
     }
@@ -62,7 +47,6 @@ class RealmTests: TestCase {
     }
 
     func testIsEmpty() {
-        NSFileManager.defaultManager().removeItemAtPath(Realm.defaultPath, error: nil)
         let realm = Realm()
         XCTAssert(realm.isEmpty, "Realm should be empty on creation.")
 
@@ -79,18 +63,7 @@ class RealmTests: TestCase {
         XCTAssertFalse(realm.isEmpty, "Realm should not be empty after committing a write transaction that added an object.")
     }
 
-    func testDefaultPath() {
-        let defaultPath =  Realm().path
-        XCTAssertEqual(Realm.defaultPath, defaultPath)
-
-        let newPath = defaultPath.stringByAppendingPathExtension("new")!
-        Realm.defaultPath = newPath
-        XCTAssertEqual(Realm.defaultPath, newPath)
-        XCTAssertEqual(Realm().path, Realm.defaultPath)
-    }
-
     func testInit() {
-        XCTAssertEqual(Realm().path, Realm.defaultPath)
         XCTAssertEqual(Realm(path: testRealmPath()).path, testRealmPath())
         assertThrows(Realm(path: ""))
     }
@@ -98,20 +71,18 @@ class RealmTests: TestCase {
     func testInitFailable() {
         var error: NSError?
         autoreleasepool {
-            Realm(path: Realm.defaultPath, readOnly: false)
+            Realm()
             XCTAssertNil(error)
         }
 
-        NSFileManager.defaultManager().createFileAtPath(Realm.defaultPath,
+        NSFileManager.defaultManager().createFileAtPath(defaultRealmPath(),
             contents: "a".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false),
             attributes: nil)
-        XCTAssertNil(Realm(path: Realm.defaultPath, readOnly: false, error: &error), "Should not throw with error")
+        XCTAssertNil(Realm(configuration: Realm.Configuration.defaultConfiguration, error: &error), "Should not throw with error")
         XCTAssertNotNil(error)
 
-        assertThrows(Realm(path: Realm.defaultPath, readOnly: false, error: nil))
-        assertThrows(Realm(path: Realm.defaultPath, readOnly: false))
-        assertThrows(Realm(path: Realm.defaultPath, readOnly: false, encryptionKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false), error: &error))
-        assertThrows(Realm(path: "", readOnly: false, error: &error))
+        assertThrows(Realm(configuration: Realm.Configuration.defaultConfiguration, error: nil))
+        assertThrows(Realm(configuration: Realm.Configuration.defaultConfiguration))
     }
 
     func testInitInMemory() {
@@ -384,6 +355,12 @@ class RealmTests: TestCase {
     }
 
     func testObjects() {
+        Realm().write {
+            Realm().create(SwiftIntObject.self, value: [100])
+            Realm().create(SwiftIntObject.self, value: [200])
+            Realm().create(SwiftIntObject.self, value: [300])
+        }
+
         XCTAssertEqual(0, Realm().objects(SwiftStringObject).count)
         XCTAssertEqual(3, Realm().objects(SwiftIntObject).count)
         XCTAssertEqual(3, Realm().objects(SwiftIntObject).count)
@@ -391,6 +368,12 @@ class RealmTests: TestCase {
     }
 
     func testDynamicObjects() {
+        Realm().write {
+            Realm().create(SwiftIntObject.self, value: [100])
+            Realm().create(SwiftIntObject.self, value: [200])
+            Realm().create(SwiftIntObject.self, value: [300])
+        }
+
         XCTAssertEqual(0, Realm().dynamicObjects("SwiftStringObject").count)
         XCTAssertEqual(3, Realm().dynamicObjects("SwiftIntObject").count)
         XCTAssertEqual(3, Realm().dynamicObjects("SwiftIntObject").count)
@@ -436,7 +419,7 @@ class RealmTests: TestCase {
         let realm = Realm()
         var notificationCalled = false
         let token = realm.addNotificationBlock { (notification, realm) -> Void in
-            XCTAssertEqual(realm.path, Realm.defaultPath)
+            XCTAssertEqual(realm.path, self.defaultRealmPath())
             notificationCalled = true
         }
         XCTAssertFalse(notificationCalled)
@@ -448,7 +431,7 @@ class RealmTests: TestCase {
         let realm = Realm()
         var notificationCalled = false
         let token = realm.addNotificationBlock { (notification, realm) -> Void in
-            XCTAssertEqual(realm.path, Realm.defaultPath)
+            XCTAssertEqual(realm.path, self.defaultRealmPath())
             notificationCalled = true
         }
         realm.removeNotification(token)
@@ -541,19 +524,13 @@ class RealmTests: TestCase {
         realm.write {
             realm.add(SwiftObject())
         }
-        let path = Realm.defaultPath.stringByDeletingLastPathComponent.stringByAppendingPathComponent("copy.realm")
+        let path = defaultRealmPath().stringByDeletingLastPathComponent.stringByAppendingPathComponent("copy.realm")
         XCTAssertNil(realm.writeCopyToPath(path))
         autoreleasepool {
             let copy = Realm(path: path)
             XCTAssertEqual(1, copy.objects(SwiftObject).count)
         }
         NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
-    }
-
-    func testSetEncryptionKey() {
-        Realm.setEncryptionKey(NSMutableData(length: 64))
-        Realm.setEncryptionKey(nil, forPath: Realm.defaultPath)
-        XCTAssert(true, "setting those keys should not throw")
     }
 
     func testEquals() {

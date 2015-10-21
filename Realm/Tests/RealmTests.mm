@@ -45,8 +45,7 @@ extern "C" {
 
 @implementation RealmTests
 
-- (void)deleteFiles
-{
+- (void)deleteFiles {
     [super deleteFiles];
 
     for (NSString *realmPath in self.pathsFor100Realms) {
@@ -54,70 +53,61 @@ extern "C" {
     }
 }
 
-#pragma mark - Tests
+#pragma mark - Opening Realms
 
-- (void)testCoreDebug {
-#if DEBUG
-    XCTAssertTrue([RLMRealm isCoreDebug], @"Debug version of Realm should use librealm{-ios}-dbg");
-#else
-    XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use librealm{-ios}");
-#endif
+- (void)testOpeningInvalidPathThrows {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.path = @"/dev/null/foo";
+    XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
 }
 
-- (void)testRealmFailure
-{
-    XCTAssertThrows([RLMRealm realmWithPath:@"/dev/null"], @"Shouldn't exist");
+- (void)testPathCannotBeBothInMemoryAndRegularDurability {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.inMemoryIdentifier = @"identifier";
+    RLMRealm *inMemoryRealm = [RLMRealm realmWithConfiguration:config error:nil];
+
+    // make sure we can't open disk-realm at same path
+    config.path = inMemoryRealm.path;
+    XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
 }
 
-- (void)testDefaultRealmPath
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    NSString *defaultPath = [[RLMRealm defaultRealm] path];
+- (void)testReadOnlyFile {
     @autoreleasepool {
-        XCTAssertEqualObjects(defaultPath, [RLMRealm defaultRealmPath], @"Default Realm path should be correct.");
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withValue:@[@"a"]];
+        [realm commitWriteTransaction];
     }
 
-    NSString *newPath = [defaultPath stringByAppendingPathExtension:@"new"];
-    [RLMRealm setDefaultRealmPath:newPath];
-    XCTAssertEqualObjects(newPath, [RLMRealm defaultRealmPath], @"Default Realm path should be correct.");
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:RLMTestRealmPath() error:nil];
 
-    // we have to clean-up since dispatch_once isn't run for each test case
-    [RLMRealm setDefaultRealmPath:defaultPath];
-#pragma clang diagnostic pop
+    // Should not be able to open read-write
+    XCTAssertThrows([self realmWithTestPath]);
+
+    RLMRealm *realm;
+    XCTAssertNoThrow(realm = [self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:RLMTestRealmPath() error:nil];
 }
 
-- (void)testRealmPath
-{
-    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
-    XCTAssertEqualObjects(defaultRealm.path, RLMDefaultRealmPath(), @"Default path");
-    RLMRealm *testRealm = [self realmWithTestPath];
-    XCTAssertEqualObjects(testRealm.path, RLMTestRealmPath(), @"Test path");
+- (void)testReadOnlyRealmMustExist {
+   XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
 }
 
-- (void)testIsEmpty
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    XCTAssertTrue(realm.isEmpty, @"Realm should be empty on creation.");
+- (void)testCannotHaveReadOnlyAndReadWriteRealmsAtSamePathAtSameTime {
+    @autoreleasepool {
+        XCTAssertNoThrow([self realmWithTestPath]);
+        XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
+    }
 
-    [realm beginWriteTransaction];
-    [StringObject createInRealm:realm withValue:@[@"a"]];
-    XCTAssertFalse(realm.isEmpty, @"Realm should not be empty within a write transaction after adding an object.");
-    [realm cancelWriteTransaction];
-
-    XCTAssertTrue(realm.isEmpty, @"Realm should be empty after canceling a write transaction that added an object.");
-
-    [realm beginWriteTransaction];
-    [StringObject createInRealm:realm withValue:@[@"a"]];
-    [realm commitWriteTransaction];
-    XCTAssertFalse(realm.isEmpty, @"Realm should not be empty after committing a write transaction that added an object.");
+    @autoreleasepool {
+        XCTAssertNoThrow([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
+        XCTAssertThrows([self realmWithTestPath]);
+    }
 }
 
-- (void)testRealmConfiguration {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    RLMRealmConfiguration *configuration = realm.configuration;
-    XCTAssertEqual(realm, [RLMRealm realmWithConfiguration:configuration error:nil]);
-}
+#pragma mark - Adding and Removing Objects
 
 - (void)testRealmAddAndRemoveObjects {
     RLMRealm *realm = [self realmWithTestPath];
@@ -372,374 +362,6 @@ extern "C" {
     XCTAssertEqualObjects(@"1", c2.next.next.data);
 }
 
-- (void)testRealmTransactionBlock {
-    RLMRealm *realm = [self realmWithTestPath];
-    [realm transactionWithBlock:^{
-        [StringObject createInRealm:realm withValue:@[@"b"]];
-    }];
-    RLMResults *objects = [StringObject allObjectsInRealm:realm];
-    XCTAssertEqual(objects.count, 1U, @"Expecting 1 object");
-    XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
-}
-
-- (void)testInWriteTransaction {
-    RLMRealm *realm = [self realmWithTestPath];
-    XCTAssertFalse(realm.inWriteTransaction);
-    [realm beginWriteTransaction];
-    XCTAssertTrue(realm.inWriteTransaction);
-    [realm cancelWriteTransaction];
-    [realm transactionWithBlock:^{
-        XCTAssertTrue(realm.inWriteTransaction);
-        [realm cancelWriteTransaction];
-        XCTAssertFalse(realm.inWriteTransaction);
-    }];
-
-    [realm beginWriteTransaction];
-    [realm invalidate];
-    XCTAssertFalse(realm.inWriteTransaction);
-}
-
-- (void)testAutorefreshAfterBackgroundUpdate {
-    RLMRealm *realm = [self realmWithTestPath];
-
-    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
-
-    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
-        RLMRealm *realm = [self realmWithTestPath];
-        [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withValue:@[@"string"]];
-        [realm commitWriteTransaction];
-    }];
-
-    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-}
-
-- (void)testBackgroundUpdateWithoutAutorefresh {
-    RLMRealm *realm = [self realmWithTestPath];
-    realm.autorefresh = NO;
-
-    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
-
-    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
-        RLMRealm *realm = [self realmWithTestPath];
-        [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withValue:@[@"string"]];
-        [realm commitWriteTransaction];
-
-        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-    }];
-
-    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
-
-    [realm refresh];
-    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-}
-
-- (void)testBackgroundRealmIsNotified {
-    RLMRealm *realm = [self realmWithTestPath];
-
-    XCTestExpectation *bgReady = [self expectationWithDescription:@"background queue waiting for commit"];
-    __block XCTestExpectation *bgDone = nil;
-
-    [self dispatchAsync:^{
-        RLMRealm *realm = [self realmWithTestPath];
-        __block bool fulfilled = false;
-        RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
-            XCTAssertNotNil(realm, @"Realm should not be nil");
-            XCTAssertEqual(note, RLMRealmDidChangeNotification);
-            XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-            fulfilled = true;
-        }];
-
-        // notify main thread that we're ready for it to commit
-        [bgReady fulfill];
-
-        // run for two seconds or until we receive notification
-        NSDate *end = [NSDate dateWithTimeIntervalSinceNow:5.0];
-        while (!fulfilled) {
-            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:end];
-        }
-        XCTAssertTrue(fulfilled, @"Notification should have been received");
-
-        [realm removeNotification:token];
-        [bgDone fulfill];
-    }];
-
-    // wait for background realm to be created
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    bgDone = [self expectationWithDescription:@"background queue done"];;
-
-    [realm beginWriteTransaction];
-    [StringObject createInRealm:realm withValue:@[@"string"]];
-    [realm commitWriteTransaction];
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-}
-
-- (void)testBeginWriteTransactionsNotifiesWithUpdatedObjects {
-    RLMRealm *realm = [self realmWithTestPath];
-    realm.autorefresh = NO;
-
-    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
-
-    // Create an object in a background thread and wait for that to complete,
-    // without refreshing the main thread realm
-    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
-        RLMRealm *realm = [self realmWithTestPath];
-        [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withValue:@[@"string"]];
-        [realm commitWriteTransaction];
-
-        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-    }];
-
-    // Verify that the main thread realm still doesn't have any objects
-    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
-
-    // Verify that the local notification sent by the beginWriteTransaction
-    // below when it advances the realm to the latest version occurs *after*
-    // the advance
-    __block bool notificationFired = false;
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
-        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-        notificationFired = true;
-    }];
-
-    [realm beginWriteTransaction];
-    [realm commitWriteTransaction];
-
-    [realm removeNotification:token];
-    XCTAssertTrue(notificationFired);
-}
-
-- (void)testBeginWriteTransactionsRefreshesRealm {
-    // auto refresh on by default
-    RLMRealm *realm = [self realmWithTestPath];
-
-    // Set up notification which will be triggered when calling beginWriteTransaction
-    __block bool notificationFired = false;
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
-        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-        XCTAssertThrows([realm beginWriteTransaction], @"We should already be in a write transaction");
-        notificationFired = true;
-    }];
-
-    // dispatch to background syncronously
-    [self dispatchAsyncAndWait:^{
-        RLMRealm *realm = [self realmWithTestPath];
-        [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withValue:@[@"string"]];
-        [realm commitWriteTransaction];
-    }];
-
-    // notification shouldnt have fired
-    XCTAssertFalse(notificationFired);
-
-    [realm beginWriteTransaction];
-
-    // notification should have fired
-    XCTAssertTrue(notificationFired);
-
-    [realm cancelWriteTransaction];
-    [realm removeNotification:token];
-}
-
-- (void)testInMemoryRealm
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
-#pragma clang diagnostic pop
-
-    // verify that the realm's path is in the temporary directory
-    XCTAssertEqualObjects(NSTemporaryDirectory(), [inMemoryRealm.path.stringByDeletingLastPathComponent stringByAppendingString:@"/"]);
-
-    [self waitForNotification:RLMRealmDidChangeNotification realm:inMemoryRealm block:^{
-        RLMRealm *inMemoryRealm = [self inMemoryRealmWithIdentifier:@"identifier"];
-        [inMemoryRealm beginWriteTransaction];
-        [StringObject createInRealm:inMemoryRealm withValue:@[@"a"]];
-        [StringObject createInRealm:inMemoryRealm withValue:@[@"b"]];
-        [StringObject createInRealm:inMemoryRealm withValue:@[@"c"]];
-        XCTAssertEqual(3U, [StringObject allObjectsInRealm:inMemoryRealm].count);
-        [inMemoryRealm commitWriteTransaction];
-    }];
-
-    XCTAssertEqual(3U, [StringObject allObjectsInRealm:inMemoryRealm].count);
-
-    // make sure we can have another
-    RLMRealm *anotherInMemoryRealm = [self inMemoryRealmWithIdentifier:@"identifier2"];
-    XCTAssertEqual(0U, [StringObject allObjectsInRealm:anotherInMemoryRealm].count);
-
-    // make sure we can't open disk-realm at same path
-    XCTAssertThrows([RLMRealm realmWithPath:anotherInMemoryRealm.path], @"Should throw");
-}
-
-- (void)testRealmFileAccess
-{
-    XCTAssertThrows([RLMRealm realmWithPath:self.nonLiteralNil], @"nil path");
-    XCTAssertThrows([RLMRealm realmWithPath:@""], @"empty path");
-
-    NSString *content = @"Some content";
-    NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
-    NSString *filePath = RLMRealmPathForFile(@"filename.realm");
-    [[NSFileManager defaultManager] createFileAtPath:filePath contents:fileContents attributes:nil];
-
-    NSError *error;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertNil([RLMRealm realmWithPath:filePath readOnly:NO error:&error], @"Invalid database");
-    XCTAssertNotNil(error, @"Should populate error object");
-#pragma clang diagnostic pop
-    error = nil;
-    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.path = filePath;
-    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Invalid database");
-    XCTAssertNotNil(error, @"Should populate error object");
-}
-
-- (void)testCrossThreadAccess
-{
-    RLMRealm *realm = RLMRealm.defaultRealm;
-
-    [self dispatchAsyncAndWait:^{
-        XCTAssertThrows([realm beginWriteTransaction]);
-        XCTAssertThrows([IntObject allObjectsInRealm:realm]);
-        XCTAssertThrows([IntObject objectsInRealm:realm where:@"intCol = 0"]);
-    }];
-}
-
-- (void)testReadOnlyFile
-{
-    @autoreleasepool {
-        RLMRealm *realm = self.realmWithTestPath;
-        [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withValue:@[@"a"]];
-        [realm commitWriteTransaction];
-    }
-
-    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:RLMTestRealmPath() error:nil];
-
-    // Should not be able to open read-write
-    XCTAssertThrows([self realmWithTestPath]);
-
-    RLMRealm *realm;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertNoThrow(realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
-    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-#pragma clang diagnostic pop
-    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.path = RLMTestRealmPath();
-    configuration.readOnly = true;
-    realm = nil;
-    XCTAssertNoThrow(realm = [RLMRealm realmWithConfiguration:configuration error:nil]);
-    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-
-    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:RLMTestRealmPath() error:nil];
-}
-
-- (void)testReadOnlyRealmMustExist
-{
-   XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
-}
-
-- (void)testReadOnlyRealmIsImmutable
-{
-    @autoreleasepool { [self realmWithTestPath]; }
-
-    RLMRealm *realm = [self readOnlyRealmWithPath:RLMTestRealmPath() error:nil];
-    XCTAssertThrows([realm beginWriteTransaction]);
-    XCTAssertThrows([realm refresh]);
-}
-
-- (void)testCannotHaveReadOnlyAndReadWriteRealmsAtSamePathAtSameTime
-{
-    @autoreleasepool {
-        XCTAssertNoThrow([self realmWithTestPath]);
-        XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
-    }
-
-    @autoreleasepool {
-        XCTAssertNoThrow([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
-        XCTAssertThrows([self realmWithTestPath]);
-    }
-}
-
-- (void)testReadOnlyRealmWithMissingTables
-{
-    // create a realm with only a StringObject table
-    @autoreleasepool {
-        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
-        objectSchema.objectClass = RLMObject.class;
-
-        RLMSchema *schema = [[RLMSchema alloc] init];
-        schema.objectSchema = @[objectSchema];
-        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
-
-        [realm beginWriteTransaction];
-        [realm createObject:StringObject.className withValue:@[@"a"]];
-        [realm commitWriteTransaction];
-    }
-
-    RLMRealm *realm = [self readOnlyRealmWithPath:RLMTestRealmPath() error:nil];
-    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-
-    // verify that reading a missing table gives an empty array rather than
-    // crashing
-    RLMResults *results = [IntObject allObjectsInRealm:realm];
-    XCTAssertEqual(0U, results.count);
-    XCTAssertEqual(results, [results objectsWhere:@"intCol = 5"]);
-    XCTAssertEqual(results, [results sortedResultsUsingProperty:@"intCol" ascending:YES]);
-    XCTAssertThrows([results objectAtIndex:0]);
-    XCTAssertEqual(NSNotFound, [results indexOfObject:self.nonLiteralNil]);
-    XCTAssertNoThrow([realm deleteObjects:results]);
-    for (__unused id obj in results) {
-        XCTFail(@"Got an item in empty results");
-    }
-}
-
-- (void)testReadOnlyRealmWithMissingColumns
-{
-    // create a realm with only a zero-column StringObject table
-    @autoreleasepool {
-        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
-        objectSchema.objectClass = RLMObject.class;
-        objectSchema.properties = @[];
-
-        RLMSchema *schema = [[RLMSchema alloc] init];
-        schema.objectSchema = @[objectSchema];
-        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
-
-        [realm beginWriteTransaction];
-        [realm createObject:StringObject.className withValue:@[]];
-        [realm commitWriteTransaction];
-    }
-
-    XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil],
-                    @"should reject table missing column");
-}
-
-- (void)testMultipleRealms
-{
-    // Create one StringObject in two different realms
-    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
-    RLMRealm *testRealm = self.realmWithTestPath;
-    [defaultRealm beginWriteTransaction];
-    [testRealm beginWriteTransaction];
-    [StringObject createInRealm:defaultRealm withValue:@[@"a"]];
-    [StringObject createInRealm:testRealm withValue:@[@"b"]];
-    [testRealm commitWriteTransaction];
-    [defaultRealm commitWriteTransaction];
-
-    // Confirm that objects were added to the correct realms
-    RLMResults *defaultObjects = [StringObject allObjectsInRealm:defaultRealm];
-    RLMResults *testObjects = [StringObject allObjectsInRealm:testRealm];
-    XCTAssertEqual(defaultObjects.count, 1U, @"Expecting 1 object");
-    XCTAssertEqual(testObjects.count, 1U, @"Expecting 1 object");
-    XCTAssertEqualObjects([defaultObjects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
-    XCTAssertEqualObjects([testObjects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
-}
-
 - (void)testAddOrUpdate {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
@@ -872,6 +494,164 @@ extern "C" {
 
     XCTAssertEqual(0U, OwnerObject.allObjects.count);
     XCTAssertEqual(0U, DogObject.allObjects.count);
+}
+
+- (void)testAddObjectsFromArray
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    XCTAssertThrows(([realm addObjects:@[@[@"Rex", @10]]]),
+                    @"should reject non-RLMObject in array");
+
+    DogObject *dog = [DogObject new];
+    dog.dogName = @"Rex";
+    dog.age = 10;
+    XCTAssertNoThrow([realm addObjects:@[dog]], @"should allow RLMObject in array");
+    XCTAssertEqual(1U, [[DogObject allObjectsInRealm:realm] count]);
+    [realm cancelWriteTransaction];
+}
+
+#pragma mark - Transactions
+
+- (void)testRealmTransactionBlock {
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm transactionWithBlock:^{
+        [StringObject createInRealm:realm withValue:@[@"b"]];
+    }];
+    RLMResults *objects = [StringObject allObjectsInRealm:realm];
+    XCTAssertEqual(objects.count, 1U, @"Expecting 1 object");
+    XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
+}
+
+- (void)testInWriteTransaction {
+    RLMRealm *realm = [self realmWithTestPath];
+    XCTAssertFalse(realm.inWriteTransaction);
+    [realm beginWriteTransaction];
+    XCTAssertTrue(realm.inWriteTransaction);
+    [realm cancelWriteTransaction];
+    [realm transactionWithBlock:^{
+        XCTAssertTrue(realm.inWriteTransaction);
+        [realm cancelWriteTransaction];
+        XCTAssertFalse(realm.inWriteTransaction);
+    }];
+
+    [realm beginWriteTransaction];
+    [realm invalidate];
+    XCTAssertFalse(realm.inWriteTransaction);
+}
+
+- (void)testAutorefreshAfterBackgroundUpdate {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withValue:@[@"string"]];
+        [realm commitWriteTransaction];
+    }];
+
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+}
+
+- (void)testBackgroundUpdateWithoutAutorefresh {
+    RLMRealm *realm = [self realmWithTestPath];
+    realm.autorefresh = NO;
+
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+
+    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withValue:@[@"string"]];
+        [realm commitWriteTransaction];
+
+        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+    }];
+
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+
+    [realm refresh];
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+}
+
+- (void)testBeginWriteTransactionsNotifiesWithUpdatedObjects {
+    RLMRealm *realm = [self realmWithTestPath];
+    realm.autorefresh = NO;
+
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+
+    // Create an object in a background thread and wait for that to complete,
+    // without refreshing the main thread realm
+    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withValue:@[@"string"]];
+        [realm commitWriteTransaction];
+
+        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+    }];
+
+    // Verify that the main thread realm still doesn't have any objects
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+
+    // Verify that the local notification sent by the beginWriteTransaction
+    // below when it advances the realm to the latest version occurs *after*
+    // the advance
+    __block bool notificationFired = false;
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
+        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+        notificationFired = true;
+    }];
+
+    [realm beginWriteTransaction];
+    [realm commitWriteTransaction];
+
+    [realm removeNotification:token];
+    XCTAssertTrue(notificationFired);
+}
+
+- (void)testBeginWriteTransactionsRefreshesRealm {
+    // auto refresh on by default
+    RLMRealm *realm = [self realmWithTestPath];
+
+    // Set up notification which will be triggered when calling beginWriteTransaction
+    __block bool notificationFired = false;
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
+        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+        XCTAssertThrows([realm beginWriteTransaction], @"We should already be in a write transaction");
+        notificationFired = true;
+    }];
+
+    // dispatch to background syncronously
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withValue:@[@"string"]];
+        [realm commitWriteTransaction];
+    }];
+
+    // notification shouldnt have fired
+    XCTAssertFalse(notificationFired);
+
+    [realm beginWriteTransaction];
+
+    // notification should have fired
+    XCTAssertTrue(notificationFired);
+
+    [realm cancelWriteTransaction];
+    [realm removeNotification:token];
+}
+
+- (void)testReadOnlyRealmIsImmutable
+{
+    @autoreleasepool { [self realmWithTestPath]; }
+
+    RLMRealm *realm = [self readOnlyRealmWithPath:RLMTestRealmPath() error:nil];
+    XCTAssertThrows([realm beginWriteTransaction]);
+    XCTAssertThrows([realm refresh]);
 }
 
 - (void)testRollbackInsert
@@ -1029,62 +809,6 @@ extern "C" {
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:[self realmWithTestPath]].count);
 }
 
-- (void)testAddObjectsFromArray
-{
-    RLMRealm *realm = [self realmWithTestPath];
-
-    [realm beginWriteTransaction];
-    XCTAssertThrows(([realm addObjects:@[@[@"Rex", @10]]]),
-                    @"should reject non-RLMObject in array");
-
-    DogObject *dog = [DogObject new];
-    dog.dogName = @"Rex";
-    dog.age = 10;
-    XCTAssertNoThrow([realm addObjects:@[dog]], @"should allow RLMObject in array");
-    XCTAssertEqual(1U, [[DogObject allObjectsInRealm:realm] count]);
-    [realm cancelWriteTransaction];
-}
-
-- (void)testWriteCopyOfRealm
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    [realm transactionWithBlock:^{
-        [IntObject createInRealm:realm withValue:@[@0]];
-    }];
-
-    NSError *writeError;
-    XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
-    XCTAssertNil(writeError);
-    RLMRealm *copy = [self realmWithTestPath];
-    XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
-}
-
-- (void)testCannotOverwriteWithWriteCopy
-{
-    RLMRealm *realm = [self realmWithTestPath];
-    [realm transactionWithBlock:^{
-        [IntObject createInRealm:realm withValue:@[@0]];
-    }];
-
-    NSError *writeError;
-    XCTAssertFalse([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
-    XCTAssertNotNil(writeError);
-}
-
-- (void)testWritingCopyUsesWriteTransactionInProgress
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    [realm transactionWithBlock:^{
-        [IntObject createInRealm:realm withValue:@[@0]];
-
-        NSError *writeError;
-        XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
-        XCTAssertNil(writeError);
-        RLMRealm *copy = [self realmWithTestPath];
-        XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
-    }];
-}
-
 - (void)testCanRestartReadTransactionAfterInvalidate
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -1199,6 +923,266 @@ extern "C" {
     XCTAssertEqual(2U, [IntObject allObjects].count);
 }
 
+#pragma mark - Threads
+
+- (void)testCrossThreadAccess
+{
+    RLMRealm *realm = RLMRealm.defaultRealm;
+
+    [self dispatchAsyncAndWait:^{
+        XCTAssertThrows([realm beginWriteTransaction]);
+        XCTAssertThrows([IntObject allObjectsInRealm:realm]);
+        XCTAssertThrows([IntObject objectsInRealm:realm where:@"intCol = 0"]);
+    }];
+}
+
+- (void)testHoldRealmAfterSourceThreadIsDestroyed {
+    __block RLMRealm *realm;
+
+    // Using an NSThread to ensure the thread (and thus runloop) is actually destroyed
+    NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(runBlock:) object:^{
+        realm = [RLMRealm defaultRealm];
+    }];
+    [thread start];
+    while (!thread.isFinished)
+        usleep(100);
+
+    [realm path]; // ensure ARC releases the object after the thread has finished
+}
+
+- (void)testBackgroundRealmIsNotified {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    XCTestExpectation *bgReady = [self expectationWithDescription:@"background queue waiting for commit"];
+    __block XCTestExpectation *bgDone = nil;
+
+    [self dispatchAsync:^{
+        RLMRealm *realm = [self realmWithTestPath];
+        __block bool fulfilled = false;
+        RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+            XCTAssertNotNil(realm, @"Realm should not be nil");
+            XCTAssertEqual(note, RLMRealmDidChangeNotification);
+            XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+            fulfilled = true;
+        }];
+
+        // notify main thread that we're ready for it to commit
+        [bgReady fulfill];
+
+        // run for two seconds or until we receive notification
+        NSDate *end = [NSDate dateWithTimeIntervalSinceNow:5.0];
+        while (!fulfilled) {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:end];
+        }
+        XCTAssertTrue(fulfilled, @"Notification should have been received");
+
+        [realm removeNotification:token];
+        [bgDone fulfill];
+    }];
+
+    // wait for background realm to be created
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    bgDone = [self expectationWithDescription:@"background queue done"];;
+
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withValue:@[@"string"]];
+    [realm commitWriteTransaction];
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+#pragma mark - In-memory Realms
+
+- (void)testInMemoryRealm {
+    @autoreleasepool {
+        RLMRealm *inMemoryRealm = [self inMemoryRealmWithIdentifier:@"identifier"];
+
+        [self waitForNotification:RLMRealmDidChangeNotification realm:inMemoryRealm block:^{
+            RLMRealm *inMemoryRealm = [self inMemoryRealmWithIdentifier:@"identifier"];
+            [inMemoryRealm beginWriteTransaction];
+            [StringObject createInRealm:inMemoryRealm withValue:@[@"a"]];
+            [StringObject createInRealm:inMemoryRealm withValue:@[@"b"]];
+            [StringObject createInRealm:inMemoryRealm withValue:@[@"c"]];
+            XCTAssertEqual(3U, [StringObject allObjectsInRealm:inMemoryRealm].count);
+            [inMemoryRealm commitWriteTransaction];
+        }];
+
+        XCTAssertEqual(3U, [StringObject allObjectsInRealm:inMemoryRealm].count);
+
+        // make sure we can have another
+        RLMRealm *anotherInMemoryRealm = [self inMemoryRealmWithIdentifier:@"identifier2"];
+        XCTAssertEqual(0U, [StringObject allObjectsInRealm:anotherInMemoryRealm].count);
+    }
+
+    // Should now be empty
+    RLMRealm *inMemoryRealm = [self inMemoryRealmWithIdentifier:@"identifier"];
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:inMemoryRealm].count);
+}
+
+#pragma mark - Read-only Realms
+
+- (void)testReadOnlyRealmWithMissingTables
+{
+    // create a realm with only a StringObject table
+    @autoreleasepool {
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+        objectSchema.objectClass = RLMObject.class;
+
+        RLMSchema *schema = [[RLMSchema alloc] init];
+        schema.objectSchema = @[objectSchema];
+        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
+
+        [realm beginWriteTransaction];
+        [realm createObject:StringObject.className withValue:@[@"a"]];
+        [realm commitWriteTransaction];
+    }
+
+    RLMRealm *realm = [self readOnlyRealmWithPath:RLMTestRealmPath() error:nil];
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+
+    // verify that reading a missing table gives an empty array rather than
+    // crashing
+    RLMResults *results = [IntObject allObjectsInRealm:realm];
+    XCTAssertEqual(0U, results.count);
+    XCTAssertEqual(results, [results objectsWhere:@"intCol = 5"]);
+    XCTAssertEqual(results, [results sortedResultsUsingProperty:@"intCol" ascending:YES]);
+    XCTAssertThrows([results objectAtIndex:0]);
+    XCTAssertEqual(NSNotFound, [results indexOfObject:self.nonLiteralNil]);
+    XCTAssertNoThrow([realm deleteObjects:results]);
+    for (__unused id obj in results) {
+        XCTFail(@"Got an item in empty results");
+    }
+}
+
+- (void)testReadOnlyRealmWithMissingColumns
+{
+    // create a realm with only a zero-column StringObject table
+    @autoreleasepool {
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+        objectSchema.objectClass = RLMObject.class;
+        objectSchema.properties = @[];
+
+        RLMSchema *schema = [[RLMSchema alloc] init];
+        schema.objectSchema = @[objectSchema];
+        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
+
+        [realm beginWriteTransaction];
+        [realm createObject:StringObject.className withValue:@[]];
+        [realm commitWriteTransaction];
+    }
+
+    XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil],
+                    @"should reject table missing column");
+}
+#pragma mark - Write Copy to Path
+
+- (void)testWriteCopyOfRealm
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withValue:@[@0]];
+    }];
+
+    NSError *writeError;
+    XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+    XCTAssertNil(writeError);
+    RLMRealm *copy = [self realmWithTestPath];
+    XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+}
+
+- (void)testCannotOverwriteWithWriteCopy
+{
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withValue:@[@0]];
+    }];
+
+    NSError *writeError;
+    XCTAssertFalse([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+    XCTAssertNotNil(writeError);
+}
+
+- (void)testWritingCopyUsesWriteTransactionInProgress
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withValue:@[@0]];
+
+        NSError *writeError;
+        XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+        XCTAssertNil(writeError);
+        RLMRealm *copy = [self realmWithTestPath];
+        XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+    }];
+}
+
+#pragma mark - Assorted tests
+
+- (void)testCoreDebug {
+#if DEBUG
+    XCTAssertTrue([RLMRealm isCoreDebug], @"Debug version of Realm should use librealm{-ios}-dbg");
+#else
+    XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use librealm{-ios}");
+#endif
+}
+
+- (void)testIsEmpty {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertTrue(realm.isEmpty, @"Realm should be empty on creation.");
+
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withValue:@[@"a"]];
+    XCTAssertFalse(realm.isEmpty, @"Realm should not be empty within a write transaction after adding an object.");
+    [realm cancelWriteTransaction];
+
+    XCTAssertTrue(realm.isEmpty, @"Realm should be empty after canceling a write transaction that added an object.");
+
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withValue:@[@"a"]];
+    [realm commitWriteTransaction];
+    XCTAssertFalse(realm.isEmpty, @"Realm should not be empty after committing a write transaction that added an object.");
+}
+
+
+- (void)testRealmFileAccess
+{
+    XCTAssertThrows([RLMRealm realmWithPath:self.nonLiteralNil], @"nil path");
+    XCTAssertThrows([RLMRealm realmWithPath:@""], @"empty path");
+
+    NSString *content = @"Some content";
+    NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *filePath = RLMRealmPathForFile(@"filename.realm");
+    [[NSFileManager defaultManager] createFileAtPath:filePath contents:fileContents attributes:nil];
+
+    NSError *error;
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.path = filePath;
+    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Invalid database");
+    XCTAssertNotNil(error, @"Should populate error object");
+}
+
+- (void)testMultipleRealms
+{
+    // Create one StringObject in two different realms
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    RLMRealm *testRealm = self.realmWithTestPath;
+    [defaultRealm beginWriteTransaction];
+    [testRealm beginWriteTransaction];
+    [StringObject createInRealm:defaultRealm withValue:@[@"a"]];
+    [StringObject createInRealm:testRealm withValue:@[@"b"]];
+    [testRealm commitWriteTransaction];
+    [defaultRealm commitWriteTransaction];
+
+    // Confirm that objects were added to the correct realms
+    RLMResults *defaultObjects = [StringObject allObjectsInRealm:defaultRealm];
+    RLMResults *testObjects = [StringObject allObjectsInRealm:testRealm];
+    XCTAssertEqual(defaultObjects.count, 1U, @"Expecting 1 object");
+    XCTAssertEqual(testObjects.count, 1U, @"Expecting 1 object");
+    XCTAssertEqualObjects([defaultObjects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
+    XCTAssertEqualObjects([testObjects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
+}
+
+
 - (void)testInvalidLockFile
 {
     // Create the realm file and lock file
@@ -1226,28 +1210,11 @@ extern "C" {
     close(fd);
 }
 
-- (void)testCannotSetSchemaVersionWhenRealmIsOpen {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    RLMRealm *realm = [self realmWithTestPath];
-    NSString *path = realm.path;
-
-    XCTAssertThrows([RLMRealm setSchemaVersion:1 forRealmAtPath:path withMigrationBlock:nil]);
-    XCTAssertNoThrow([RLMRealm setSchemaVersion:[RLMRealm schemaVersionAtPath:path error:nil] forRealmAtPath:path withMigrationBlock:nil]);
-#pragma clang diagnostic pop
-}
-
 - (void)testCannotMigrateRealmWhenRealmIsOpen {
     RLMRealm *realm = [self realmWithTestPath];
-    NSString *path = realm.path;
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:path]);
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:path encryptionKey:[[NSMutableData alloc] initWithLength:64]]);
-#pragma clang diagnostic pop
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.path = path;
+    configuration.path = realm.path;
     XCTAssertThrows([RLMRealm migrateRealm:configuration]);
 }
 
@@ -1257,20 +1224,6 @@ extern "C" {
     for (int i = 0; i < 9000; ++i) {
         [realm transactionWithBlock:^{}];
     }
-}
-
-- (void)testHoldRealmAfterSourceThreadIsDestroyed {
-    __block RLMRealm *realm;
-
-    // Using an NSThread to ensure the thread (and thus runloop) is actually destroyed
-    NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(runBlock:) object:^{
-        realm = [RLMRealm defaultRealm];
-    }];
-    [thread start];
-    while (!thread.isFinished)
-        usleep(100);
-
-    [realm path]; // ensure ARC releases the object after the thread has finished
 }
 
 - (void)testCompact
