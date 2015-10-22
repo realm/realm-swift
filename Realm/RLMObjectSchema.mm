@@ -205,6 +205,9 @@ using namespace realm;
             property.optional = false;
         }
         [optionalProperties enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSNumber *propertyType, __unused BOOL *stop) {
+            if ([ignoredProperties containsObject:propertyName]) {
+                return;
+            }
             NSUInteger existing = [propArray indexOfObjectPassingTest:^BOOL(RLMProperty *obj, __unused NSUInteger idx, __unused BOOL *stop) {
                 return [obj.name isEqualToString:propertyName];
             }];
