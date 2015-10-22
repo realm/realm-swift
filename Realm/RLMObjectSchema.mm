@@ -109,9 +109,9 @@ using namespace realm;
         }]];
 
         if (duplicatePropertyNames.count == 1) {
-            @throw RLMException([NSString stringWithFormat:@"Property '%@' is declared multiple times in the class hierarchy of '%@'", duplicatePropertyNames.allObjects.firstObject, className]);
+            @throw RLMException(@"Property '%@' is declared multiple times in the class hierarchy of '%@'", duplicatePropertyNames.allObjects.firstObject, className);
         } else {
-            @throw RLMException([NSString stringWithFormat:@"Object '%@' has properties that are declared multiple times in its class hierarchy: '%@'", className, [duplicatePropertyNames.allObjects componentsJoinedByString:@"', '"]]);
+            @throw RLMException(@"Object '%@' has properties that are declared multiple times in its class hierarchy: '%@'", className, [duplicatePropertyNames.allObjects componentsJoinedByString:@"', '"]);
         }
     }
 
@@ -125,9 +125,7 @@ using namespace realm;
         }
 
         if (!schema.primaryKeyProperty) {
-            NSString *message = [NSString stringWithFormat:@"Primary key property '%@' does not exist on object '%@'",
-                                 primaryKey, className];
-            @throw RLMException(message);
+            @throw RLMException(@"Primary key property '%@' does not exist on object '%@'", primaryKey, className);
         }
         if (schema.primaryKeyProperty.type != RLMPropertyTypeInt && schema.primaryKeyProperty.type != RLMPropertyTypeString) {
             @throw RLMException(@"Only 'string' and 'int' properties can be designated the primary key");
@@ -137,15 +135,11 @@ using namespace realm;
     for (RLMProperty *prop in schema.properties) {
         RLMPropertyType type = prop.type;
         if (prop.optional && !RLMPropertyTypeIsNullable(type)) {
-#ifdef REALM_ENABLE_NULL
             NSString *error = [NSString stringWithFormat:@"Only 'string', 'binary', and 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)];
             if (prop.type == RLMPropertyTypeAny && isSwift) {
                 error = [error stringByAppendingString:@"\nIf this is a 'String?' property, it must be declared as 'NSString?' instead."];
             }
-#else
-            NSString *error = [NSString stringWithFormat:@"Only 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)];
-#endif
-            @throw RLMException(error);
+            @throw RLMException(@"%@", error);
         }
     }
 
@@ -206,24 +200,44 @@ using namespace realm;
         }
     }
 
-    if (NSArray *optionalProperties = [objectUtil getOptionalPropertyNames:swiftObjectInstance]) {
+    if (NSDictionary *optionalProperties = [objectUtil getOptionalProperties:swiftObjectInstance]) {
         for (RLMProperty *property in propArray) {
-            property.optional = [optionalProperties containsObject:property.name];
-            if (!property.optional && property.type == RLMPropertyTypeObject) { // remove if/when core supports required link columns
-                NSString *message = [NSString stringWithFormat:@"The `%@.%@` property must be marked as being optional.", [objectClass className], property.name];
-                @throw RLMException(message);
-            }
+            property.optional = false;
         }
+        [optionalProperties enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSNumber *propertyType, __unused BOOL *stop) {
+            NSUInteger existing = [propArray indexOfObjectPassingTest:^BOOL(RLMProperty *obj, __unused NSUInteger idx, __unused BOOL *stop) {
+                return [obj.name isEqualToString:propertyName];
+            }];
+            RLMProperty *property;
+            if (existing != NSNotFound) {
+                property = propArray[existing];
+                property.optional = true;
+            }
+            if (auto type = RLMCoerceToNil(propertyType)) {
+                if (existing == NSNotFound) {
+                    property = [[RLMProperty alloc] initSwiftOptionalPropertyWithName:propertyName ivar:class_getInstanceVariable(objectClass, propertyName.UTF8String) propertyType:RLMPropertyType(type.intValue)];
+                    [propArray addObject:property];
+                }
+                else {
+                    property.type = RLMPropertyType(type.intValue);
+                }
+            }
+        }];
     }
     if (NSArray *requiredProperties = [objectUtil requiredPropertiesForClass:objectClass]) {
         for (RLMProperty *property in propArray) {
             bool required = [requiredProperties containsObject:property.name];
             if (required && property.type == RLMPropertyTypeObject) {
-                NSString *error = [NSString stringWithFormat:@"Object properties cannot be made required, " \
-                                                              "but '+[%@ requiredProperties]' included '%@'", objectClass, property.name];
-                @throw RLMException(error);
+                @throw RLMException(@"Object properties cannot be made required, "
+                                    "but '+[%@ requiredProperties]' included '%@'", objectClass, property.name);
             }
             property.optional &= !required;
+        }
+    }
+
+    for (RLMProperty *property in propArray) {
+        if (!property.optional && property.type == RLMPropertyTypeObject) { // remove if/when core supports required link columns
+            @throw RLMException(@"The `%@.%@` property must be marked as being optional.", [objectClass className], property.name);
         }
     }
 
@@ -343,8 +357,7 @@ using namespace realm;
         NSString *primaryKeyString = [NSString stringWithUTF8String:objectSchema.primary_key.c_str()];
         schema.primaryKeyProperty = schema[primaryKeyString];
         if (!schema.primaryKeyProperty) {
-            NSString *reason = [NSString stringWithFormat:@"No property matching primary key '%@'", primaryKeyString];
-            @throw RLMException(reason);
+            @throw RLMException(@"No property matching primary key '%@'", primaryKeyString);
         }
     }
 

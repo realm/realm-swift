@@ -5,8 +5,6 @@ cat <<EOF
 Usage: sh $0 command [argument]
 
 command:
-  bootstrap:                       downloads product dependencies and runs 'pod install'/'carthage bootstrap' where appropriate
-
   test-all:                        tests all projects in this repo.
   test-xcode6:                     tests all Xcode 6 projects in this repo.
   test-xcode7:                     tests all Xcode 7 projects in this repo.
@@ -30,152 +28,121 @@ EOF
 
 COMMAND="$1"
 
-xctest_ios() {
-    sh "$(dirname "$0")/../../scripts/reset-simulators.sh"
-    XCODE_COMMAND="$@"
-    xcodebuild $XCODE_COMMAND clean build test -sdk iphonesimulator || exit 1
+download_zip_if_needed() {
+    LANG="$1"
+    DIRECTORY=realm-$LANG-latest
+    if [ ! -f $DIRECTORY.zip ]; then
+        curl -o $DIRECTORY.zip -L https://static.realm.io/downloads/$LANG/latest
+        unzip $DIRECTORY.zip
+        mv realm-$LANG-0.* $DIRECTORY
+    fi
 }
 
-xctest_osx() {
-    XCODE_COMMAND="$@"
-    xcodebuild $XCODE_COMMAND clean build test -sdk macosx || exit 1
+xctest() {
+    PLATFORM="$1"
+    LANG="$2"
+    NAME="$3"
+    DIRECTORY="$PLATFORM/$LANG/$NAME"
+    PROJECT="$DIRECTORY/$NAME.xcodeproj"
+    WORKSPACE="$DIRECTORY/$NAME.xcworkspace"
+    CMD="-project $PROJECT"
+    if [ -d $WORKSPACE ]; then
+        CMD="-workspace $WORKSPACE"
+    fi
+    if [[ $PLATFORM == ios ]]; then
+        sh "$(dirname "$0")/../../scripts/reset-simulators.sh"
+    fi
+    if [[ $NAME == CocoaPods* ]]; then
+        pod install --project-directory="$DIRECTORY"
+    elif [[ $NAME == Carthage* ]]; then
+        (cd "$DIRECTORY"; carthage update)
+    elif [[ $LANG == swift* ]]; then
+        download_zip_if_needed swift
+    else
+        download_zip_if_needed $LANG
+    fi
+    SDK="macosx"
+    if [[ $PLATFORM == ios ]]; then
+        SDK="iphonesimulator"
+    fi
+    xcodebuild $CMD -scheme $NAME clean build test -sdk $SDK
 }
 
 source "$(dirname "$0")/../../scripts/swift-version.sh"
 
 case "$COMMAND" in
-
-    ######################################
-    # Bootsrap
-    ######################################
-
-    "bootstrap")
-        ################
-        # Release zips
-        ################
-
-        # Download zips if there are none
-        shopt -s nullglob
-        set -- *.zip
-        if [ "$#" -eq 0 ]; then
-            for lang in swift objc; do
-                rm -rf realm-$lang-latest
-                curl -o realm-$lang-latest.zip -L https://static.realm.io/downloads/$lang/latest
-                unzip realm-$lang-latest.zip
-                mv realm-$lang-0.* realm-$lang-latest
-            done
-        fi
-
-        ################
-        # CoocaPods
-        ################
-
-        for path in $(find . -path "*/CocoaPods*Example/CocoaPods*Example"); do
-            pod install --project-directory="$path/.."
-        done
-
-        ################
-        # Carthage
-        ################
-
-        for path in $(find . -path "*/CarthageExample/CarthageExample"); do
-            (cd "$path/.."; carthage bootstrap)
-        done
-        ;;
-
-    ######################################
-    # Test
-    ######################################
-
     "test-all")
         ./build.sh test-xcode6 || exit 1
         ./build.sh test-xcode7 || exit 1
         ;;
 
     "test-xcode6")
-        export REALM_SWIFT_VERSION=1.2
-
-        ./build.sh test-ios-objc-static || exit 1
-        ./build.sh test-ios-objc-dynamic || exit 1
-        ./build.sh test-ios-objc-cocoapods || exit 1
-        ./build.sh test-ios-objc-cocoapods-dynamic || exit 1
-        ./build.sh test-ios-objc-carthage || exit 1
-
-        ./build.sh test-osx-objc-dynamic || exit 1
-        ./build.sh test-osx-objc-cocoapods || exit 1
-        ./build.sh test-osx-objc-carthage || exit 1
-
-        ./build.sh test-ios-swift-dynamic || exit 1
-        ./build.sh test-ios-swift-cocoapods || exit 1
-
-        ./build.sh test-osx-swift-dynamic || exit 1
+        for target in ios-objc-static ios-objc-dynamic ios-objc-cocoapods ios-objc-cocoapods-dynamic ios-objc-carthage osx-objc-dynamic osx-objc-cocoapods osx-objc-carthage ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic; do
+            REALM_SWIFT_VERSION=1.2 ./build.sh test-$target || exit 1
+        done
 
         # FIXME: Re-enable once Carthage supports multiple build folders.
+        # export REALM_SWIFT_VERSION=1.2
         # ./build.sh test-ios-swift-carthage || exit 1
         # ./build.sh test-osx-swift-carthage || exit 1
         ;;
 
     "test-xcode7")
-        export REALM_SWIFT_VERSION=2.0
-
-        ./build.sh test-ios-swift-dynamic || exit 1
-        ./build.sh test-ios-swift-cocoapods || exit 1
-        ./build.sh test-osx-swift-dynamic || exit 1
-
-        ./build.sh test-ios-swift-carthage || exit 1
-        ./build.sh test-osx-swift-carthage || exit 1
+        for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage; do
+            REALM_SWIFT_VERSION=2.0 ./build.sh test-$target || exit 1
+        done
         ;;
 
     "test-ios-objc-static")
-        xctest_ios "-project" "ios/objc/StaticExample/StaticExample.xcodeproj" "-scheme" "StaticExample"
+        xctest ios objc StaticExample
         ;;
 
     "test-ios-objc-dynamic")
-        xctest_ios "-project" "ios/objc/DynamicExample/DynamicExample.xcodeproj" "-scheme" "DynamicExample"
+        xctest ios objc DynamicExample
         ;;
 
     "test-ios-objc-cocoapods")
-        xctest_ios "-workspace" "ios/objc/CocoaPodsExample/CocoaPodsExample.xcworkspace" "-scheme" "CocoaPodsExample"
+        xctest ios objc CocoaPodsExample
         ;;
 
     "test-ios-objc-cocoapods-dynamic")
-        xctest_ios "-workspace" "ios/objc/CocoaPodsDynamicExample/CocoaPodsDynamicExample.xcworkspace" "-scheme" "CocoaPodsDynamicExample"
+        xctest ios objc CocoaPodsDynamicExample
         ;;
 
     "test-ios-objc-carthage")
-        xctest_ios "-project" "ios/objc/CarthageExample/CarthageExample.xcodeproj" "-scheme" "CarthageExample"
+        xctest ios objc CarthageExample
         ;;
 
     "test-ios-swift-dynamic")
-        xctest_ios "-project" "ios/swift-$REALM_SWIFT_VERSION/DynamicExample/DynamicExample.xcodeproj" "-scheme" "DynamicExample"
+        xctest ios swift-$REALM_SWIFT_VERSION DynamicExample
         ;;
 
     "test-ios-swift-cocoapods")
-        xctest_ios "-workspace" "ios/swift-$REALM_SWIFT_VERSION/CocoaPodsExample/CocoaPodsExample.xcworkspace" "-scheme" "CocoaPodsExample"
+        xctest ios swift-$REALM_SWIFT_VERSION CocoaPodsExample
         ;;
 
     "test-ios-swift-carthage")
-        xctest_ios "-project" "ios/swift-$REALM_SWIFT_VERSION/CarthageExample/CarthageExample.xcodeproj" "-scheme" "CarthageExample"
+        xctest ios swift-$REALM_SWIFT_VERSION CarthageExample
         ;;
 
     "test-osx-objc-dynamic")
-        xctest_osx -project osx/objc/DynamicExample/DynamicExample.xcodeproj -scheme DynamicExample
+        xctest osx objc DynamicExample
         ;;
 
     "test-osx-objc-cocoapods")
-        xctest_osx -workspace osx/objc/CocoaPodsExample/CocoaPodsExample.xcworkspace -scheme CocoaPodsExample
+        xctest osx objc CocoaPodsExample
         ;;
 
     "test-osx-objc-carthage")
-        xctest_osx -project osx/objc/CarthageExample/CarthageExample.xcodeproj -scheme CarthageExample
+        xctest osx objc CarthageExample
         ;;
 
     "test-osx-swift-dynamic")
-        xctest_osx -project osx/swift-$REALM_SWIFT_VERSION/DynamicExample/DynamicExample.xcodeproj -scheme DynamicExample
+        xctest osx swift-$REALM_SWIFT_VERSION DynamicExample
         ;;
 
     "test-osx-swift-carthage")
-        xctest_osx -project osx/swift-$REALM_SWIFT_VERSION/CarthageExample/CarthageExample.xcodeproj -scheme CarthageExample
+        xctest osx swift-$REALM_SWIFT_VERSION CarthageExample
         ;;
 
     *)

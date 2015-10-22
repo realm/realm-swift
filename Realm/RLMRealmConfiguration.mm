@@ -33,7 +33,6 @@ static NSString * const c_RLMRealmConfigurationProperties[] = {
     @"dynamic",
     @"customSchema",
 };
-static const NSUInteger c_RLMRealmConfigurationPropertiesCount = sizeof(c_RLMRealmConfigurationProperties) / sizeof(NSString *);
 
 typedef NS_ENUM(NSUInteger, RLMRealmConfigurationUsage) {
     RLMRealmConfigurationUsageNone,
@@ -132,17 +131,17 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 
 - (instancetype)copyWithZone:(NSZone *)zone {
     RLMRealmConfiguration *configuration = [[[self class] allocWithZone:zone] init];
-    for (NSUInteger i = 0; i < c_RLMRealmConfigurationPropertiesCount; i++) {
-        NSString *key = c_RLMRealmConfigurationProperties[i];
-        [configuration setValue:[self valueForKey:key] forKey:key];
+    for (NSString *key : c_RLMRealmConfigurationProperties) {
+        if (id value = [self valueForKey:key]) {
+            [configuration setValue:value forKey:key];
+        }
     }
     return configuration;
 }
 
 - (NSString *)description {
     NSMutableString *string = [NSMutableString stringWithFormat:@"%@ {\n", self.class];
-    for (NSUInteger i = 0; i < c_RLMRealmConfigurationPropertiesCount; i++) {
-        NSString *key = c_RLMRealmConfigurationProperties[i];
+    for (NSString *key : c_RLMRealmConfigurationProperties) {
         NSString *description = [[self valueForKey:key] description];
         description = [description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"];
 
@@ -152,24 +151,30 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 - (void)setInMemoryIdentifier:(NSString *)inMemoryIdentifier {
-    if ((_inMemoryIdentifier = inMemoryIdentifier)) {
-        _path = nil;
+    if (inMemoryIdentifier.length == 0) {
+        @throw RLMException(@"In-memory identifier must not be empty");
     }
+
+    _inMemoryIdentifier = [inMemoryIdentifier copy];
+    _path = nil;
 }
 
 - (void)setPath:(NSString *)path {
-    if ((_path = path)) {
-        _inMemoryIdentifier = nil;
+    if (path.length == 0) {
+        @throw RLMException(@"Realm path must not be empty");
     }
+
+    _path = [path copy];
+    _inMemoryIdentifier = nil;
 }
 
 - (void)setEncryptionKey:(NSData * __nullable)encryptionKey {
-    _encryptionKey = RLMRealmValidatedEncryptionKey(encryptionKey);
+    _encryptionKey = [RLMRealmValidatedEncryptionKey(encryptionKey) copy];
 }
 
 - (void)setSchemaVersion:(uint64_t)schemaVersion {
     if ((_schemaVersion = schemaVersion) == RLMNotVersioned) {
-        @throw RLMException([NSString stringWithFormat:@"Cannot set schema version to %llu (RLMNotVersioned)", RLMNotVersioned]);
+        @throw RLMException(@"Cannot set schema version to %llu (RLMNotVersioned)", RLMNotVersioned);
     }
 }
 
@@ -185,6 +190,6 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 
 void RLMRealmConfigurationUsePerPath(SEL callingMethod) {
     if (s_configurationUsage.exchange(RLMRealmConfigurationUsagePerPath) == RLMRealmConfigurationUsageConfiguration) {
-        @throw RLMException([NSString stringWithFormat:@"Cannot call %@ after setting a default configuration.", NSStringFromSelector(callingMethod)]);
+        @throw RLMException(@"Cannot call %@ after setting a default configuration.", NSStringFromSelector(callingMethod));
     }
 }

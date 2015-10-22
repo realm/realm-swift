@@ -69,14 +69,19 @@ class ObjectAccessorTests: TestCase {
     func testStandaloneAccessors() {
         let object = SwiftObject()
         setAndTestAllProperties(object)
+
+        let optionalObject = SwiftOptionalObject()
+        setAndTestAllOptionalProperties(optionalObject)
     }
 
     func testPersistedAccessors() {
-        let object = SwiftObject()
-        try! Realm().beginWrite()
-        try! Realm().create(SwiftObject)
+        let realm = try! Realm()
+        realm.beginWrite()
+        let object = realm.create(SwiftObject)
+        let optionalObject = realm.create(SwiftOptionalObject)
         setAndTestAllProperties(object)
-        try! Realm().commitWrite()
+        setAndTestAllOptionalProperties(optionalObject)
+        try! realm.commitWrite()
     }
 
     func testIntSizes() {
@@ -204,5 +209,115 @@ class ObjectAccessorTests: TestCase {
         for obj in objects {
             XCTAssertEqual(2, obj.arrayCol.count)
         }
+    }
+
+    func testSettingOptionalPropertyOnDeletedObjectsThrows() {
+        let realm = try! Realm()
+        try! realm.write {
+            let obj = realm.create(SwiftOptionalObject)
+            let copy = realm.objects(SwiftOptionalObject).first!
+            realm.delete(obj)
+
+            self.assertThrows(copy.optIntCol.value = 1)
+            self.assertThrows(copy.optIntCol.value = nil)
+
+            self.assertThrows(obj.optIntCol.value = 1)
+            self.assertThrows(obj.optIntCol.value = nil)
+        }
+    }
+
+    func setAndTestAllOptionalProperties(object: SwiftOptionalObject) {
+        object.optNSStringCol = ""
+        XCTAssertEqual(object.optNSStringCol!, "")
+        let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+        object.optNSStringCol = utf8TestString
+        XCTAssertEqual(object.optNSStringCol!, utf8TestString)
+        object.optNSStringCol = nil
+        XCTAssertNil(object.optNSStringCol)
+
+        object.optStringCol = ""
+        XCTAssertEqual(object.optStringCol!, "")
+        object.optStringCol = utf8TestString
+        XCTAssertEqual(object.optStringCol!, utf8TestString)
+        object.optStringCol = nil
+        XCTAssertNil(object.optStringCol)
+
+        let data = "b".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+        object.optBinaryCol = data
+        XCTAssertEqual(object.optBinaryCol!, data)
+        object.optBinaryCol = nil
+        XCTAssertNil(object.optBinaryCol)
+
+        let date = NSDate(timeIntervalSinceReferenceDate: 2) as NSDate
+        object.optDateCol = date
+        XCTAssertEqual(object.optDateCol!, date)
+        object.optDateCol = nil
+        XCTAssertNil(object.optDateCol)
+
+        object.optIntCol.value = Int.min
+        XCTAssertEqual(object.optIntCol.value!, Int.min)
+        object.optIntCol.value = 0
+        XCTAssertEqual(object.optIntCol.value!, 0)
+        object.optIntCol.value = Int.max
+        XCTAssertEqual(object.optIntCol.value!, Int.max)
+        object.optIntCol.value = nil
+        XCTAssertNil(object.optIntCol.value)
+
+        object.optInt16Col.value = Int16.min
+        XCTAssertEqual(object.optInt16Col.value!, Int16.min)
+        object.optInt16Col.value = 0
+        XCTAssertEqual(object.optInt16Col.value!, 0)
+        object.optInt16Col.value = Int16.max
+        XCTAssertEqual(object.optInt16Col.value!, Int16.max)
+        object.optInt16Col.value = nil
+        XCTAssertNil(object.optInt16Col.value)
+
+        object.optInt32Col.value = Int32.min
+        XCTAssertEqual(object.optInt32Col.value!, Int32.min)
+        object.optInt32Col.value = 0
+        XCTAssertEqual(object.optInt32Col.value!, 0)
+        object.optInt32Col.value = Int32.max
+        XCTAssertEqual(object.optInt32Col.value!, Int32.max)
+        object.optInt32Col.value = nil
+        XCTAssertNil(object.optInt32Col.value)
+
+        object.optInt64Col.value = Int64.min
+        XCTAssertEqual(object.optInt64Col.value!, Int64.min)
+        object.optInt64Col.value = 0
+        XCTAssertEqual(object.optInt64Col.value!, 0)
+        object.optInt64Col.value = Int64.max
+        XCTAssertEqual(object.optInt64Col.value!, Int64.max)
+        object.optInt64Col.value = nil
+        XCTAssertNil(object.optInt64Col.value)
+
+        object.optFloatCol.value = -FLT_MAX
+        XCTAssertEqual(object.optFloatCol.value!, -FLT_MAX)
+        object.optFloatCol.value = 0
+        XCTAssertEqual(object.optFloatCol.value!, 0)
+        object.optFloatCol.value = FLT_MAX
+        XCTAssertEqual(object.optFloatCol.value!, FLT_MAX)
+        object.optFloatCol.value = nil
+        XCTAssertNil(object.optFloatCol.value)
+
+        object.optDoubleCol.value = -DBL_MAX
+        XCTAssertEqual(object.optDoubleCol.value!, -DBL_MAX)
+        object.optDoubleCol.value = 0
+        XCTAssertEqual(object.optDoubleCol.value!, 0)
+        object.optDoubleCol.value = DBL_MAX
+        XCTAssertEqual(object.optDoubleCol.value!, DBL_MAX)
+        object.optDoubleCol.value = nil
+        XCTAssertNil(object.optDoubleCol.value)
+
+        object.optBoolCol.value = true
+        XCTAssertEqual(object.optBoolCol.value!, true)
+        object.optBoolCol.value = false
+        XCTAssertEqual(object.optBoolCol.value!, false)
+        object.optBoolCol.value = nil
+        XCTAssertNil(object.optBoolCol.value)
+
+        object.optObjectCol = SwiftBoolObject(value: [true])
+        XCTAssertEqual(object.optObjectCol!.boolCol, true)
+        object.optObjectCol = nil
+        XCTAssertNil(object.optObjectCol)
     }
 }

@@ -11,9 +11,33 @@ When filing an issue, please provide as much of the following information as pos
 3. **Actual results**
 4. **Steps to reproduce**
 5. **Code sample that highlights the issue** (full Xcode projects that we can compile ourselves are ideal)
-6. **Version of Realm/Xcode/OSX**
+6. **Version of Realm / Xcode / OSX**
+7. **Version of involved dependency manager (CocoaPods / Carthage)**
 
 If you'd like to send us sensitive sample code to help troubleshoot your issue, you can email <help@realm.io> directly.
+
+### Speeding things up :runner:
+
+You may just copy this little script below and run it directly in your project directory in **Terminal.app**. It will take of compiling a list of relevant data as described in points 6. and 7. in the list above. It copies the list directly to your pasteboard for your convenience, so you can attach it easily when filing a new issue without having to worry about formatting and we may help you faster because we don't have to ask for particular details of your local setup first.
+
+```shell
+echo "\`\`\`
+$(sw_vers)
+
+$(xcode-select -p)
+$(xcodebuild -version)
+
+$(which pod && pod --version)
+$(test -e Podfile.lock && cat Podfile.lock | sed -nE 's/^  - (Realm(Swift)? [^:]*):?/\1/p' || echo "(not in use here)")
+
+$(which bash && bash -version | head -n1)
+
+$(which carthage && carthage version)
+$(test -e Cartfile.resolved && cat Cartfile.resolved | grep --color=no realm || echo "(not in use here)")
+
+$(which git && git --version)
+\`\`\`" | tee /dev/tty | pbcopy
+```
 
 ## Contributing Enhancements
 

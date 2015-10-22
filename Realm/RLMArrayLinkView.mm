@@ -59,9 +59,8 @@
 void RLMValidateArrayObservationKey(__unsafe_unretained NSString *const keyPath,
                                     __unsafe_unretained RLMArray *const array) {
     if (![keyPath isEqualToString:RLMInvalidatedKey]) {
-        NSString *err = [NSString stringWithFormat:@"[<%@ %p> addObserver:forKeyPath:options:context:] is not supported. Key path: %@",
-                         [array class], array, keyPath];
-        @throw RLMException(err);
+        @throw RLMException(@"[<%@ %p> addObserver:forKeyPath:options:context:] is not supported. Key path: %@",
+                            [array class], array, keyPath);
     }
 }
 
@@ -97,12 +96,12 @@ static inline void RLMLinkViewArrayValidateInWriteTransaction(__unsafe_unretaine
 }
 static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained NSString *const expected) {
     if (!obj) {
-        @throw RLMException(@"Object is `nil`", @{@"expected class" : expected});
+        @throw RLMException(@"Cannot add `nil` to RLMArray<%@>", expected);
     }
 
     NSString *objectClassName = obj->_objectSchema.className;
     if (![objectClassName isEqualToString:expected]) {
-        @throw RLMException(@"Object type is incorrect.", @{@"expected class" : expected, @"actual class" : objectClassName});
+        @throw RLMException(@"Cannot add object of type '%@' to RLMArray<%@>", objectClassName, expected);
     }
 }
 
@@ -185,8 +184,8 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArrayLinkView *const a
                                    NSUInteger index, bool allowOnePastEnd=false) {
     NSUInteger max = ar->_backingLinkView->size() + allowOnePastEnd;
     if (index >= max) {
-        @throw RLMException([NSString stringWithFormat:@"Index %llu is out of bounds (must be less than %llu).",
-                             (unsigned long long)index, (unsigned long long)max]);
+        @throw RLMException(@"Index %llu is out of bounds (must be less than %llu).",
+                             (unsigned long long)index, (unsigned long long)max);
     }
 }
 
@@ -343,8 +342,8 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 
     // check that object types align
     if (![_objectClassName isEqualToString:object->_objectSchema.className]) {
-        @throw RLMException([NSString stringWithFormat:@"Object of type (%@) does not match RLMArray type (%@)",
-                             object->_objectSchema.className, _objectClassName]);
+        @throw RLMException(@"Object of type (%@) does not match RLMArray type (%@)",
+                            object->_objectSchema.className, _objectClassName);
     }
 
     // if different tables then no match

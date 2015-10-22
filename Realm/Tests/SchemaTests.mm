@@ -125,6 +125,18 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 }
 @end
 
+@interface InvalidNSNumberProtocolObject : FakeObject
+@property NSNumber<RLMFastEnumerable> *number;
+@end
+@implementation InvalidNSNumberProtocolObject
+@end
+
+@interface InvalidNSNumberNoProtocolObject : FakeObject
+@property NSNumber *number;
+@end
+@implementation InvalidNSNumberNoProtocolObject
+@end
+
 @interface SchemaTests : RLMMultiProcessTestCase
 @end
 
@@ -276,7 +288,6 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         NSUInteger occurrenceCount = 0;
         
         for (RLMObjectSchema *objectSchema in objectSchemas) {
-            NSLog(@"Scheme %@", objectSchema.className);
             if ([objectSchema.className isEqualToString:expectedType]) {
                 occurrenceCount++;
             }
@@ -325,11 +336,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = objectSchema;
 
-#ifdef REALM_ENABLE_NULL
-#   define StringOrBinaryOptionalString @"\t\t\toptional = YES;\n"
-#else
-#   define StringOrBinaryOptionalString @"\t\t\toptional = NO;\n"
-#endif
+#   define OptionalString @"\t\t\toptional = YES;\n"
 
     XCTAssertEqualObjects(schema.description, @"Schema {\n"
                                               @"\tAllTypesObject {\n"
@@ -366,21 +373,21 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              StringOrBinaryOptionalString
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t\tbinaryCol {\n"
                                               @"\t\t\ttype = data;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              StringOrBinaryOptionalString
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t\tdateCol {\n"
                                               @"\t\t\ttype = date;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              @"\t\t\toptional = NO;\n"
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t\tcBoolCol {\n"
                                               @"\t\t\ttype = bool;\n"
@@ -417,7 +424,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              StringOrBinaryOptionalString
+                                              OptionalString
                                               @"\t\t}\n"
                                               @"\t}\n"
                                               @"\tIntObject {\n"
@@ -431,7 +438,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t}\n"
                                               @"}");
 
-#undef StringOrBinaryOptionalString
+#undef OptionalString
 }
 
 - (void)testClassWithDuplicateProperties
@@ -460,6 +467,14 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 - (void)testClassWithRequiredLinkProperty {
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:RequiredLinkProperty.class], @"cannot be made required.*'object'");
+}
+
+- (void)testClassWithInvalidNSNumberProtocolProperty {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberProtocolObject.class], @"RLMFastEnumerable' is not supported as an NSNumber object type.");
+}
+
+- (void)testClassWithInvalidNSNumberNoProtocolProperty {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberNoProtocolObject.class], @"NSNumber properties require a protocol defining the contained type");
 }
 
 // Can't spawn child processes on iOS
