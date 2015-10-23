@@ -691,7 +691,7 @@ case "$COMMAND" in
           if [[ -L "$symlink" ]]; then
             link="$(dirname "$symlink")/$(readlink "$symlink")"
             rm "$symlink"
-            cp -R "$link" "$symlink"
+            cp -RH "$link" "$symlink"
           fi
         done
 
