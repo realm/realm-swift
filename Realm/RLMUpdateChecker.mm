@@ -30,8 +30,8 @@ void RLMCheckForUpdates() {
         return;
     }
 
-    auto handler = ^(NSData *data, __unused NSURLResponse *response, NSError *error) {
-        if (error) {
+    auto handler = ^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error || ((NSHTTPURLResponse *)response).statusCode != 200) {
             return;
         }
 

@@ -36,11 +36,17 @@ NSData *RLMGenerateKey(void);
 - (RLMRealm *)realmWithTestPath;
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
 
+- (RLMRealm *)inMemoryRealmWithIdentifier:(NSString *)identifier;
+- (RLMRealm *)readOnlyRealmWithPath:(NSString *)path error:(NSError **)error;
+
 - (void)deleteFiles;
 - (void)deleteRealmFileAtPath:(NSString *)realmPath;
 
 - (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block;
 
 - (id)nonLiteralNil;
+
+- (void)dispatchAsync:(dispatch_block_t)block;
+- (void)dispatchAsyncAndWait:(dispatch_block_t)block;
 
 @end

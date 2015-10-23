@@ -21,7 +21,7 @@ import Realm
 
 let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 
-class SwiftUnicodeTests: SwiftTestCase {
+class SwiftUnicodeTests: RLMTestCase {
 
     // Swift models
 

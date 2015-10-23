@@ -28,8 +28,8 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  
- In Realm you define your model classes by subclassing RLMObject and adding properties to be persisted.
- You then instantiate and use your custom subclasses instead of using the RLMObject class directly.
+ In Realm you define your model classes by subclassing `RLMObject` and adding properties to be persisted.
+ You then instantiate and use your custom subclasses instead of using the `RLMObject` class directly.
  
      // Dog.h
      @interface Dog : RLMObject
@@ -44,24 +44,45 @@ RLM_ASSUME_NONNULL_BEGIN
  ### Supported property types
  
  - `NSString`
- - `NSInteger`, `CGFloat`, `int`, `long`, `float`, and `double`
+ - `NSInteger`, `int`, `long`, `float`, and `double`
  - `BOOL` or `bool`
  - `NSDate`
  - `NSData`
- - RLMObject subclasses, so you can have many-to-one relationships.
- - `RLMArray<X>`, where X is an RLMObject subclass, so you can have many-to-many relationships.
+ - `NSNumber<X>`, where X is one of RLMInt, RLMFloat, RLMDouble or RLMBool, for optional number properties
+ - `RLMObject` subclasses, so you can have many-to-one relationships.
+ - `RLMArray<X>`, where X is an `RLMObject` subclass, so you can have many-to-many relationships.
 
  ### Querying
  
- You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
+ You can query an object directly via the class methods: `allObjects`, `objectsWhere:`, and `objectsWithPredicate:`.
  These methods allow you to easily query a custom subclass for instances of this class in the
  default Realm. To search in a Realm other than the default Realm use the interface on an RLMRealm instance.
  
  ### Relationships
  
  See our [Cocoa guide](http://realm.io/docs/cocoa/latest) for more details.
- */
 
+ ### Key-Value Observing
+
+ All `RLMObject` properties (including properties you create in subclasses) are
+ [Key-Value Observing compliant](https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/KeyValueObserving/KeyValueObserving.html),
+ except for `realm` and `objectSchema`. There are several Realm-specific things
+ to keep in mind when observing Realm objects:
+
+ 1. Unlike `NSMutableArray` properties, `RLMArray` properties do not require
+    using the proxy object returned from `-mutableArrayValueForKey:`, or defining
+    KVC mutation methods on the containing class. You can simply call methods on
+    the RLMArray directly and the changes will be observed by the containing
+    object.
+ 2. Standalone `RLMObjects` cannot be added to a Realm while they have any
+    observed properties.
+ 3. Modifying persisted `RLMObjects` in `-observeValueForKeyPath:ofObject:change:context:`
+    is problematic. Properties may change when the Realm is not in a write
+    transaction (for example, when `-[RLMRealm refresh]` is called after changes
+    are made on a different thread), and notifications sent prior to the change
+    being applied (when `NSKeyValueObservingOptionPrior` is used) may be sent at
+    times when you *cannot* begin a write transaction.
+ */
 
 @interface RLMObject : RLMObjectBase
 
@@ -78,7 +99,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  @see [RLMRealm addObject:]:
  */
-- (instancetype)init;
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
 
 
 /**
@@ -89,9 +110,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  @see [RLMRealm addObject:]:
  */
-- (instancetype)initWithValue:(id)value;
-
-- (instancetype)initWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use initWithValue:");
+- (instancetype)initWithValue:(id)value NS_DESIGNATED_INITIALIZER;
 
 
 /**
@@ -124,8 +143,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)createInDefaultRealmWithValue:(id)value;
 
-+ (instancetype)createInDefaultRealmWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createInDefaultRealmWithValue:");
-
 /**
  Create an RLMObject in a Realm with a given object.
  
@@ -146,8 +163,6 @@ RLM_ASSUME_NONNULL_BEGIN
  @see   defaultPropertyValues
  */
 + (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value;
-
-+ (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createInRealm:withValue:");
 
 /**
  Create or update an RLMObject in the default Realm with a given object.
@@ -171,8 +186,6 @@ RLM_ASSUME_NONNULL_BEGIN
  @see   defaultPropertyValues, primaryKey
  */
 + (instancetype)createOrUpdateInDefaultRealmWithValue:(id)value;
-
-+ (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createOrUpdateInDefaultRealmWithValue:");
 
 /**
  Create or update an RLMObject with a given object.
@@ -198,8 +211,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value;
 
-+ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createOrUpdateInRealm:withValue:");
-
 /**
  The Realm in which this object is persisted. Returns nil for standalone objects.
  */
@@ -212,10 +223,11 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  Indicates if an object can no longer be accessed.
+ 
+ An object can no longer be accessed if the object has been deleted from the containing `realm` or
+ if `invalidate` is called on the containing `realm`.
  */
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
-
-@property (nonatomic, readonly, getter = isDeletedFromRealm) BOOL deletedFromRealm __attribute__((deprecated("Use `invalidated` instead.")));
 
 
 /**---------------------------------------------------------------------------------------
@@ -259,11 +271,13 @@ RLM_ASSUME_NONNULL_BEGIN
  Implement to return an array of property names that should not allow storing nil.
 
  By default, all properties of a type that support storing nil are considered optional properties.
- To require that an object in a Realm always have a non-nil value for a property, add the name of the property to the array returned from this method.
-
- Currently only String, Data, and Object properties support storing nil, and all other properties are implicitly treated as if they were required properties.
- Support for additional types will come in the future.
+ To require that an object in a Realm always have a non-nil value for a property,
+ add the name of the property to the array returned from this method.
  
+ Currently Object properties cannot be required. Array and NSNumber properties
+ can, but it makes little sense to do so: arrays do not support storing nil, and
+ if you want a non-optional number you should instead use the primitive type.
+
  @return    NSArray of property names that are required.
  */
 + (NSArray *)requiredProperties;
@@ -396,8 +410,8 @@ RLM_ASSUME_NONNULL_BEGIN
 //     id object = rlmObject[@"propertyName"];
 //
 
-- (id)objectForKeyedSubscript:(NSString *)key;
-- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
+- (nullable id)objectForKeyedSubscript:(NSString *)key;
+- (void)setObject:(nullable id)obj forKeyedSubscript:(NSString *)key;
 
 #pragma mark -
 

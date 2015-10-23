@@ -19,7 +19,7 @@
 import XCTest
 import Realm
 
-class SwiftLinkTests: SwiftTestCase {
+class SwiftLinkTests: RLMTestCase {
 
     // Swift models
 

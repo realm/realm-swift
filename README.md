@@ -31,7 +31,6 @@ The API reference is located at [realm.io/docs/swift/latest/api](https://realm.i
 - **Need help with your code?**: Look for previous questions on the  [#realm tag](https://stackoverflow.com/questions/tagged/realm?sort=newest) — or [ask a new question](https://stackoverflow.com/questions/ask?tags=realm). We activtely monitor & answer questions on SO!
 - **Have a bug to report?** [Open an issue](https://github.com/realm/realm-cocoa/issues/new). If possible, include the version of Realm, a full log, the Realm file, and a project that shows the issue.
 - **Have a feature request?** [Open an issue](https://github.com/realm/realm-cocoa/issues/new). Tell us what the feature should do, and why you want the feature.
-- **Want to ask in-depth questions?** [Join our online office hours](https://attendee.gotowebinar.com/rt/1182038037080364033). We host these once a month, and you can join via chat, audio call, or video call.
 - Sign up for our [**Community Newsletter**](http://eepurl.com/VEKCn) to get regular tips, learn about other use-cases and get alerted of blogposts and tutorials about Realm.
 
 ## Building Realm
@@ -40,7 +39,7 @@ In case you don't want to use the precompiled version, you can build Realm yours
 
 Prerequisites:
 
-* Building Realm requires Xcode 6.3, 6.4, or 7.0 beta 4.
+* Building Realm requires Xcode 6.3, 6.4, or 7.0.
 * Building Realm documentation requires [appledoc](https://github.com/tomaz/appledoc)
 
 Once you have all the necessary prerequisites, building Realm.framework just takes a single command: `sh build.sh build`. You'll need an internet connection the first time you build Realm to download the core binary.
@@ -57,6 +56,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more details!
 
 Realm Objective-C & Realm Swift are published under the Apache 2.0 license.  
 The underlying core is available under the [Realm Core Binary License](https://github.com/realm/realm-cocoa/blob/master/LICENSE#L210-L243) while we [work to open-source it under the Apache 2.0 license](https://realm.io/docs/objc/latest/#faq).
+
+**This product is not being made available to any person located in Cuba, Iran,
+North Korea, Sudan, Syria or the Crimea region, or to any other person that is
+not eligible to receive the product under U.S. law.**
 
 ## Feedback
 

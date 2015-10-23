@@ -20,7 +20,7 @@ import XCTest
 import Realm
 import Foundation
 
-class SwiftArrayTests: SwiftTestCase {
+class SwiftArrayTests: RLMTestCase {
 
     // Swift models
 

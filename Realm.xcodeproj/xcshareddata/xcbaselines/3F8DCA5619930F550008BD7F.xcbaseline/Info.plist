@@ -4,6 +4,18 @@
 <dict>
 	<key>runDestinationsByUUID</key>
 	<dict>
+		<key>02FEA37F-2419-44D8-B00E-E0A4939BEDDB</key>
+		<dict>
+			<key>targetArchitecture</key>
+			<string>arm64</string>
+			<key>targetDevice</key>
+			<dict>
+				<key>modelCode</key>
+				<string>iPhone6,2</string>
+				<key>platformIdentifier</key>
+				<string>com.apple.platform.iphoneos</string>
+			</dict>
+		</dict>
 		<key>7F8339ED-0034-40BF-9189-6C569D2814B7</key>
 		<dict>
 			<key>targetArchitecture</key>
@@ -16,14 +28,14 @@
 				<string>com.apple.platform.iphoneos</string>
 			</dict>
 		</dict>
-		<key>E15E6DC2-362A-47E4-8E27-83A9497D3A20</key>
+		<key>A4B676B6-55C6-4B74-8D3F-AC3B2CFE23C4</key>
 		<dict>
 			<key>targetArchitecture</key>
 			<string>arm64</string>
 			<key>targetDevice</key>
 			<dict>
 				<key>modelCode</key>
-				<string>iPhone7,2</string>
+				<string>iPad4,4</string>
 				<key>platformIdentifier</key>
 				<string>com.apple.platform.iphoneos</string>
 			</dict>

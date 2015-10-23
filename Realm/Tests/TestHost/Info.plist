@@ -26,6 +26,8 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>NSPrincipalClass</key>
+	<string>$(PRINCIPAL_CLASS)</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

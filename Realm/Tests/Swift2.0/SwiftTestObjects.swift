@@ -54,7 +54,7 @@ class SwiftOptionalObject: RLMObject {
 //    dynamic var optDoubleCol: Double?
     dynamic var optStringCol: NSString?
     dynamic var optBinaryCol: NSData?
-//    dynamic var optDateCol: NSDate?
+    dynamic var optDateCol: NSDate?
     dynamic var optObjectCol: SwiftBoolObject?
 //    dynamic var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
 }
@@ -65,7 +65,7 @@ class SwiftDogObject: RLMObject {
 
 class SwiftOwnerObject: RLMObject {
     dynamic var name = ""
-    dynamic var dog = SwiftDogObject()
+    dynamic var dog: SwiftDogObject? = SwiftDogObject()
 }
 
 class SwiftAggregateObject: RLMObject {

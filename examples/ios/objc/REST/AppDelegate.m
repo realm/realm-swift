@@ -37,7 +37,7 @@ NSString *clientSecret = @"YOUR CLIENT SECRET";
     [self.window makeKeyAndVisible];
 
     // Ensure we start with an empty database
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealmConfiguration defaultConfiguration].path error:nil];
 
     // Query Foursquare API
     NSDictionary *foursquareVenues = [self getFoursquareVenues];

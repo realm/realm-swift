@@ -2,11 +2,12 @@
 # platform :ios, '6.0'
 
 use_frameworks!
+branch = ENV['sha']
 
 target 'CocoaPodsDynamicExample' do
-  pod 'Realm', :git => 'git@github.com:realm/realm-cocoa.git'
+  pod 'Realm', git: 'git@github.com:realm/realm-cocoa.git', branch: branch
 end
 
 target 'CocoaPodsDynamicExampleTests' do
-  pod 'Realm', :git => 'git@github.com:realm/realm-cocoa.git'
+  pod 'Realm', git: 'git@github.com:realm/realm-cocoa.git', branch: branch
 end

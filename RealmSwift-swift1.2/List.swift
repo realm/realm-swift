@@ -22,7 +22,7 @@ import Realm.Private
 
 /// :nodoc:
 /// Internal class. Do not use directly.
-public class ListBase: RLMListBase, Printable {
+public class ListBase: RLMListBase {
     // Printable requires a description property defined in Swift (and not obj-c),
     // and it has to be defined as @objc override, which can't be done in a
     // generic class.
@@ -51,16 +51,15 @@ When added as a property on `Object` models, the property must be declared as `l
 */
 public final class List<T: Object>: ListBase {
 
+    /// Element type contained in this collection.
+    typealias Element = T
+
     // MARK: Properties
 
-    /// The Realm the objects in this list belong to, or `nil` if the list's owning
-    /// object does not belong to a realm (the list is standalone).
+    /// The Realm the objects in this list belong to, or `nil` if the list's
+    /// owning object does not belong to a realm (the list is standalone).
     public var realm: Realm? {
-        if let rlmRealm = _rlmArray.realm {
-            return Realm(rlmRealm)
-        } else {
-            return nil
-        }
+        return map(_rlmArray.realm) { Realm($0) }
     }
 
     /// Indicates if the list can no longer be accessed.
@@ -214,6 +213,60 @@ public final class List<T: Object>: ListBase {
         return Results<T>(_rlmArray.sortedResultsUsingDescriptors(map(sortDescriptors) { $0.rlmSortDescriptorValue }))
     }
 
+    // MARK: Aggregate Operations
+
+    /**
+    Returns the minimum value of the given property.
+
+    :warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+
+    :param: property The name of a property conforming to `MinMaxType` to look for a minimum on.
+
+    :returns: The minimum value for the property amongst objects in the List, or `nil` if the List is empty.
+    */
+    public func min<U: MinMaxType>(property: String) -> U? {
+        return filter(NSPredicate(value: true)).min(property)
+    }
+
+    /**
+    Returns the maximum value of the given property.
+
+    :warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+
+    :param: property The name of a property conforming to `MinMaxType` to look for a maximum on.
+
+    :returns: The maximum value for the property amongst objects in the List, or `nil` if the List is empty.
+    */
+    public func max<U: MinMaxType>(property: String) -> U? {
+        return filter(NSPredicate(value: true)).max(property)
+    }
+
+    /**
+    Returns the sum of the given property for objects in the List.
+
+    :warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    :param: property The name of a property conforming to `AddableType` to calculate sum on.
+
+    :returns: The sum of the given property over all objects in the List.
+    */
+    public func sum<U: AddableType>(property: String) -> U {
+        return filter(NSPredicate(value: true)).sum(property)
+    }
+
+    /**
+    Returns the average of the given property for objects in the List.
+
+    :warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    :param: property The name of a property conforming to `AddableType` to calculate average on.
+
+    :returns: The average of the given property over all objects in the List, or `nil` if the List is empty.
+    */
+    public func average<U: AddableType>(property: String) -> U? {
+        return filter(NSPredicate(value: true)).average(property)
+    }
+
     // MARK: Mutation
 
     /**
@@ -335,17 +388,12 @@ public final class List<T: Object>: ListBase {
     }
 }
 
-extension List: ExtensibleCollectionType {
+extension List: RealmCollectionType, ExtensibleCollectionType {
     // MARK: Sequence Support
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the list.
-    public func generate() -> GeneratorOf<T> {
-        let base = NSFastGenerator(_rlmArray)
-        return GeneratorOf<T>() {
-            let accessor = base.next() as! T?
-            RLMInitializeSwiftListAccessor(accessor)
-            return accessor
-        }
+    public func generate() -> RLMGenerator<T> {
+        return RLMGenerator(collection: _rlmArray)
     }
 
     // MARK: ExtensibleCollection Support

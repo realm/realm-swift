@@ -28,11 +28,15 @@
 
 @implementation EncryptionTests
 
+- (RLMRealmConfiguration *)configurationWithKey:(NSData *)key {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    configuration.path = RLMDefaultRealmPath();
+    configuration.encryptionKey = key;
+    return configuration;
+}
+
 - (RLMRealm *)realmWithKey:(NSData *)key {
-    return [RLMRealm realmWithPath:RLMDefaultRealmPath()
-                     encryptionKey:key
-                          readOnly:NO
-                             error:nil];
+    return [RLMRealm realmWithConfiguration:[self configurationWithKey:key] error:nil];
 }
 
 + (XCTestSuite *)defaultTestSuite
@@ -53,20 +57,12 @@
 #pragma mark - Key validation
 
 - (void)testBadEncryptionKeys {
-    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:self.nonLiteralNil readOnly:NO error:nil]);
-    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:NSData.data readOnly:NO error:nil]);
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:self.nonLiteralNil]);
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:NSData.data]);
-    XCTAssertThrows([RLMRealm setEncryptionKey:NSData.data forRealmsAtPath:RLMRealm.defaultRealmPath]);
     XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:self.nonLiteralNil error:nil]);
     XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:NSData.data error:nil]);
 }
 
 - (void)testValidEncryptionKeys {
     NSData *key = [[NSMutableData alloc] initWithLength:64];
-    XCTAssertNoThrow([RLMRealm setEncryptionKey:key
-                                forRealmsAtPath:RLMRealm.defaultRealmPath]);
-    XCTAssertNoThrow([RLMRealm setEncryptionKey:nil forRealmsAtPath:RLMRealm.defaultRealmPath]);
     XCTAssertNoThrow([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:key error:nil]);
 }
 
@@ -121,66 +117,14 @@
     }
 }
 
-#pragma mark - Registered encryption key
-
-- (void)testRegisteredKeyIsUsed {
-    NSData *key = RLMGenerateKey();
-    @autoreleasepool {
-        RLMRealm *realm = [self realmWithKey:key];
-        [realm transactionWithBlock:^{
-            [IntObject createInRealm:realm withValue:@[@1]];
-        }];
-    }
-
-    [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
-    @autoreleasepool {
-        XCTAssertThrows([IntObject allObjects]);
-    }
-
-    [RLMRealm setEncryptionKey:key forRealmsAtPath:RLMDefaultRealmPath()];
-    @autoreleasepool {
-        XCTAssertEqual(1U, [IntObject allObjects].count);
-    }
-}
-
-- (void)testExplicitlyPassedKeyOverridesRegisteredKey {
-    NSData *key = RLMGenerateKey();
-    @autoreleasepool {
-        RLMRealm *realm = [self realmWithKey:key];
-        [realm transactionWithBlock:^{
-            [IntObject createInRealm:realm withValue:@[@1]];
-        }];
-    }
-
-    [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
-    @autoreleasepool {
-        RLMRealm *realm = [self realmWithKey:key];
-        XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
-    }
-}
-
-- (void)testCannotSetEncryptionKeyToNilWhenRealmIsOpen {
-    NSData *key = RLMGenerateKey();
-    RLMRealm *realm = [self realmWithTestPath];
-    NSString *path = realm.path;
-
-    XCTAssertNoThrow([RLMRealm setEncryptionKey:nil forRealmsAtPath:path]);
-    XCTAssertThrows([RLMRealm setEncryptionKey:key forRealmsAtPath:path]);
-}
-
-- (void)testCannotSetEncryptionKeyFromNilWhenRealmIsOpen {
-    NSData *key = RLMGenerateKey();
-    NSString *path = RLMTestRealmPath();
-    [RLMRealm setEncryptionKey:key forRealmsAtPath:path];
-    [self realmWithTestPath];
-
-    XCTAssertThrows([RLMRealm setEncryptionKey:nil forRealmsAtPath:path]);
-    XCTAssertNoThrow([RLMRealm setEncryptionKey:key forRealmsAtPath:path]);
+- (void)testOpenWithNewKeyWhileAlreadyOpenThrows {
+    [self realmWithKey:RLMGenerateKey()];
+    XCTAssertThrows([self realmWithKey:RLMGenerateKey()]);
 }
 
 #pragma mark - writeCopyToPath:
 
-- (void)testWriteCopyToPathWithNoRegisteredKeyWritesDecrypted {
+- (void)testWriteCopyToPathWithNoKeyWritesDecrypted {
     NSData *key = RLMGenerateKey();
     @autoreleasepool {
         RLMRealm *realm = [self realmWithKey:key];
@@ -196,29 +140,9 @@
     }
 }
 
-- (void)testWriteCopyToPathUsesRegisteredKey {
-    NSData *key = RLMGenerateKey();
-    [RLMRealm setEncryptionKey:key forRealmsAtPath:RLMTestRealmPath()];
-
-    @autoreleasepool {
-        RLMRealm *realm = [self realmWithKey:key];
-        [realm transactionWithBlock:^{
-            [IntObject createInRealm:realm withValue:@[@1]];
-        }];
-        [realm writeCopyToPath:RLMTestRealmPath() error:nil];
-    }
-
-    @autoreleasepool {
-        RLMRealm *realm = [self realmWithKey:key];
-        XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
-    }
-}
-
 - (void)testWriteCopyToPathWithNewKey {
     NSData *key1 = RLMGenerateKey();
     NSData *key2 = RLMGenerateKey();
-    NSData *key3 = RLMGenerateKey();
-    [RLMRealm setEncryptionKey:key3 forRealmsAtPath:RLMTestRealmPath()];
 
     @autoreleasepool {
         RLMRealm *realm = [self realmWithKey:key1];
@@ -229,10 +153,9 @@
     }
 
     @autoreleasepool {
-        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath()
-                                    encryptionKey:key2
-                                         readOnly:NO
-                                            error:nil];
+        RLMRealmConfiguration *config = [self configurationWithKey:key2];
+        config.path = RLMTestRealmPath();
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
     }
 }
@@ -253,14 +176,15 @@
                        inMemory:NO dynamic:YES schema: schema error:nil];
     }
 
-    [RLMRealm setSchemaVersion:1
-                forRealmAtPath:RLMDefaultRealmPath()
-            withMigrationBlock:^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
-                *migrationRun = YES;
-            }];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.schemaVersion = 1;
+    config.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+        *migrationRun = YES;
+    };
+    [RLMRealmConfiguration setDefaultConfiguration:config];
 }
 
-- (void)testImplicitMigrationWithRegisteredKey {
+- (void)testImplicitMigration {
     NSData *key = RLMGenerateKey();
     BOOL migrationRan = NO;
     [self createRealmRequiringMigrationWithKey:key migrationRun:&migrationRan];
@@ -268,45 +192,28 @@
     XCTAssertThrows([RLMRealm defaultRealm]);
     XCTAssertFalse(migrationRan);
 
-    [RLMRealm setEncryptionKey:key forRealmsAtPath:RLMDefaultRealmPath()];
-    XCTAssertNoThrow([RLMRealm defaultRealm]);
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.encryptionKey = key;
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
     XCTAssertTrue(migrationRan);
 }
 
-- (void)testImplicitMigrationWithExplicitKey {
+- (void)testExplicitMigration {
     NSData *key = RLMGenerateKey();
-    BOOL migrationRan = NO;
+    __block BOOL migrationRan = NO;
     [self createRealmRequiringMigrationWithKey:key migrationRun:&migrationRan];
 
-    XCTAssertThrows([RLMRealm defaultRealm]);
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.schemaVersion = 1;
+    configuration.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+        migrationRan = YES;
+    };
+
+    XCTAssertNotNil([RLMRealm migrateRealm:configuration]);
     XCTAssertFalse(migrationRan);
 
-    XCTAssertNoThrow([RLMRealm realmWithPath:RLMDefaultRealmPath() encryptionKey:key readOnly:NO error:nil]);
-    XCTAssertTrue(migrationRan);
-}
-
-- (void)testExplicitMigrationWithRegisteredKey {
-    NSData *key = RLMGenerateKey();
-    BOOL migrationRan = NO;
-    [self createRealmRequiringMigrationWithKey:key migrationRun:&migrationRan];
-
-    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMDefaultRealmPath()]);
-    XCTAssertFalse(migrationRan);
-
-    [RLMRealm setEncryptionKey:key forRealmsAtPath:RLMDefaultRealmPath()];
-    XCTAssertNil([RLMRealm migrateRealmAtPath:RLMDefaultRealmPath()]);
-    XCTAssertTrue(migrationRan);
-}
-
-- (void)testExplicitMigrationWithExplicitKey {
-    NSData *key = RLMGenerateKey();
-    BOOL migrationRan = NO;
-    [self createRealmRequiringMigrationWithKey:key migrationRun:&migrationRan];
-
-    XCTAssertNotNil([RLMRealm migrateRealmAtPath:RLMDefaultRealmPath()]);
-    XCTAssertFalse(migrationRan);
-
-    XCTAssertNil([RLMRealm migrateRealmAtPath:RLMDefaultRealmPath() encryptionKey:key]);
+    configuration.encryptionKey = key;
+    XCTAssertNil([RLMRealm migrateRealm:configuration]);
     XCTAssertTrue(migrationRan);
 }
 

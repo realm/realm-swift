@@ -45,10 +45,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
 
-        try! NSFileManager.defaultManager().removeItemAtPath(Realm.defaultPath)
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(Realm.Configuration.defaultConfiguration.path!)
+        } catch {}
 
         let realm = try! Realm()
-        realm.write {
+        try! realm.write {
             realm.create(Person.self, value: ["John", [["Fido", 1]]])
             realm.create(Person.self, value: ["Mary", [["Rex", 2]]])
         }
