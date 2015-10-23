@@ -26,10 +26,13 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#include <mutex>
 #import "object_store.hpp"
-#import <objc/runtime.h>
+#import "schema.hpp"
+
 #import <realm/group.hpp>
+
+#import <objc/runtime.h>
+#include <mutex>
 
 using namespace realm;
 
@@ -56,7 +59,7 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
     NSMutableArray *schemas = [NSMutableArray arrayWithCapacity:count];
     for (Class cls in classes) {
         if (!RLMIsObjectSubclass(cls)) {
-            @throw RLMException([NSString stringWithFormat:@"Can't add non-Object type '%@' to a schema.", cls]);
+            @throw RLMException(@"Can't add non-Object type '%@' to a schema.", cls);
         }
         [schemas addObject:[cls sharedSchema]];
     }
@@ -75,7 +78,7 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
         }
     }
     if (errors.count) {
-        @throw RLMException([@"Invalid class subset list:\n" stringByAppendingString:[errors componentsJoinedByString:@"\n"]]);
+        @throw RLMException(@"Invalid class subset list:\n%@", [errors componentsJoinedByString:@"\n"]);
     }
 
     return schema;
@@ -88,8 +91,7 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
 - (RLMObjectSchema *)objectForKeyedSubscript:(__unsafe_unretained id<NSCopying> const)className {
     RLMObjectSchema *schema = _objectSchemaByName[className];
     if (!schema) {
-        NSString *message = [NSString stringWithFormat:@"Object type '%@' not persisted in Realm", className];
-        @throw RLMException(message);
+        @throw RLMException(@"Object type '%@' not persisted in Realm", className);
     }
     return schema;
 }
@@ -128,14 +130,13 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
             // but not for nested classes. _T indicates it's a Swift symbol, t
             // indicates it's a type, and C indicates it's a class.
             else if ([className hasPrefix:@"_TtC"]) {
-                NSString *message = [NSString stringWithFormat:@"RLMObject subclasses cannot be nested within other declarations. Please move %@ to global scope.", className];
-                @throw RLMException(message);
+                @throw RLMException(@"RLMObject subclasses cannot be nested within other declarations. Please move %@ to global scope.", className);
             }
 
             if (Class existingClass = s_localNameToClass[className]) {
                 if (existingClass != cls) {
-                    NSString *message = [NSString stringWithFormat:@"RLMObject subclasses with the same name cannot be included twice in the same target. Please make sure '%@' is only linked once to your current target.", className];
-                    @throw RLMException(message);
+                    @throw RLMException(@"RLMObject subclasses with the same name cannot be included twice in the same target. "
+                                        @"Please make sure '%@' is only linked once to your current target.", className);
                 }
                 continue;
             }
@@ -199,12 +200,17 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
 // schema based on tables in a realm
 + (instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm {
     // generate object schema and class mapping for all tables in the realm
-    ObjectStore::Schema objectStoreSchema = ObjectStore::schema_from_group(realm.group);
+    Schema objectStoreSchema = ObjectStore::schema_from_group(realm.group);
+    return [self dynamicSchemaFromObjectStoreSchema:objectStoreSchema];
+}
 
+// schema based on tables in a realm
++ (instancetype)dynamicSchemaFromObjectStoreSchema:(Schema &)objectStoreSchema {
     // cache descriptors for all subclasses of RLMObject
     NSMutableArray *schemaArray = [NSMutableArray arrayWithCapacity:objectStoreSchema.size()];
-    for (unsigned long i = 0; i < objectStoreSchema.size(); i++) {
-        [schemaArray addObject:[RLMObjectSchema objectSchemaForObjectStoreSchema:objectStoreSchema[i]]];
+    for (auto &objectSchema : objectStoreSchema) {
+        RLMObjectSchema *schema = [RLMObjectSchema objectSchemaForObjectStoreSchema:objectSchema];
+        [schemaArray addObject:schema];
     }
 
     // set class array and mapping
@@ -254,6 +260,15 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
         [objectSchemaString appendFormat:@"\t%@\n", [objectSchema.description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"]];
     }
     return [NSString stringWithFormat:@"Schema {\n%@}", objectSchemaString];
+}
+
+- (std::unique_ptr<Schema>)objectStoreCopy {
+    std::vector<realm::ObjectSchema> schema;
+    schema.reserve(_objectSchema.count);
+    for (RLMObjectSchema *objectSchema in _objectSchema) {
+        schema.push_back(objectSchema.objectStoreCopy);
+    }
+    return std::make_unique<realm::Schema>(std::move(schema));
 }
 
 @end

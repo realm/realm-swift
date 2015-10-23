@@ -25,23 +25,8 @@ extern "C" {
 @class RLMRealm, RLMSchema, RLMObjectSchema, RLMObjectBase, RLMResults, RLMProperty;
 
 //
-// Table modifications
+// Accessor Creation
 //
-
-// updates a Realm to a given target schema/version
-// creates tables as necessary
-// optionally runs migration block if schema is out of date
-//
-// NOTE: the schema passed in will be set on the Realm and may later be mutated. sharing a targetSchema accross
-// even the same Realm with different column orderings will cause issues
-void RLMUpdateRealmToSchemaVersion(RLMRealm *realm, uint64_t version, RLMSchema *targetSchema, NSError *(^migrationBlock)());
-
-// sets a realm's schema to a copy of targetSchema
-// caches table accessors on each objectSchema
-//
-// NOTE: the schema passed in will be set on the Realm and may later be mutated. sharing a targetSchema accross
-// even the same Realm with different column orderings will cause issues
-void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndAlignColumns);
 
 // create or get cached accessors for the given schema
 void RLMRealmCreateAccessors(RLMSchema *schema);
@@ -98,7 +83,7 @@ RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm,
                                        NSUInteger index) NS_RETURNS_RETAINED;
 
 // switch List<> properties from being backed by standalone RLMArrays to RLMArrayLinkView
-void RLMInitializeSwiftListAccessor(RLMObjectBase *object);
+void RLMInitializeSwiftAccessorGenerics(RLMObjectBase *object);
 
 #ifdef __cplusplus
 }

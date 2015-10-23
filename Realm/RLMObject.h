@@ -48,6 +48,7 @@ RLM_ASSUME_NONNULL_BEGIN
  - `BOOL` or `bool`
  - `NSDate`
  - `NSData`
+ - `NSNumber<X>`, where X is one of RLMInt, RLMFloat, RLMDouble or RLMBool, for optional number properties
  - `RLMObject` subclasses, so you can have many-to-one relationships.
  - `RLMArray<X>`, where X is an `RLMObject` subclass, so you can have many-to-many relationships.
 
@@ -111,8 +112,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithValue:(id)value NS_DESIGNATED_INITIALIZER;
 
-- (instancetype)initWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use initWithValue:");
-
 
 /**
  Helper to return the class name for an RLMObject subclass.
@@ -144,8 +143,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)createInDefaultRealmWithValue:(id)value;
 
-+ (instancetype)createInDefaultRealmWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createInDefaultRealmWithValue:");
-
 /**
  Create an RLMObject in a Realm with a given object.
  
@@ -166,8 +163,6 @@ RLM_ASSUME_NONNULL_BEGIN
  @see   defaultPropertyValues
  */
 + (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value;
-
-+ (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createInRealm:withValue:");
 
 /**
  Create or update an RLMObject in the default Realm with a given object.
@@ -191,8 +186,6 @@ RLM_ASSUME_NONNULL_BEGIN
  @see   defaultPropertyValues, primaryKey
  */
 + (instancetype)createOrUpdateInDefaultRealmWithValue:(id)value;
-
-+ (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createOrUpdateInDefaultRealmWithValue:");
 
 /**
  Create or update an RLMObject with a given object.
@@ -218,8 +211,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value;
 
-+ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createOrUpdateInRealm:withValue:");
-
 /**
  The Realm in which this object is persisted. Returns nil for standalone objects.
  */
@@ -237,8 +228,6 @@ RLM_ASSUME_NONNULL_BEGIN
  if `invalidate` is called on the containing `realm`.
  */
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
-
-@property (nonatomic, readonly, getter = isDeletedFromRealm) BOOL deletedFromRealm __attribute__((deprecated("Use `invalidated` instead.")));
 
 
 /**---------------------------------------------------------------------------------------
@@ -282,11 +271,13 @@ RLM_ASSUME_NONNULL_BEGIN
  Implement to return an array of property names that should not allow storing nil.
 
  By default, all properties of a type that support storing nil are considered optional properties.
- To require that an object in a Realm always have a non-nil value for a property, add the name of the property to the array returned from this method.
-
- Currently only String, Data, and Object properties support storing nil, and all other properties are implicitly treated as if they were required properties.
- Support for additional types will come in the future.
+ To require that an object in a Realm always have a non-nil value for a property,
+ add the name of the property to the array returned from this method.
  
+ Currently Object properties cannot be required. Array and NSNumber properties
+ can, but it makes little sense to do so: arrays do not support storing nil, and
+ if you want a non-optional number you should instead use the primitive type.
+
  @return    NSArray of property names that are required.
  */
 + (NSArray *)requiredProperties;

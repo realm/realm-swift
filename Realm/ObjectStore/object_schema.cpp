@@ -17,17 +17,19 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "object_schema.hpp"
-#include "object_store.hpp"
 
-#include <realm/group.hpp>
-#include <realm/table.hpp>
+#include "object_store.hpp"
+#include "property.hpp"
+
+#include <realm/group_shared.hpp>
+#include <realm/link_view.hpp>
 
 using namespace realm;
-using namespace std;
 
-ObjectSchema::ObjectSchema(Group *group, const std::string &name) : name(name) {
-    TableRef tableRef = ObjectStore::table_for_object_type(group, name);
-    Table *table = tableRef.get();
+ObjectSchema::~ObjectSchema() = default;
+
+ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(name) {
+    ConstTableRef table = ObjectStore::table_for_object_type(group, name);
 
     size_t count = table->get_column_count();
     properties.reserve(count);
@@ -37,36 +39,35 @@ ObjectSchema::ObjectSchema(Group *group, const std::string &name) : name(name) {
         property.type = (PropertyType)table->get_column_type(col);
         property.is_indexed = table->has_search_index(col);
         property.is_primary = false;
-#ifdef REALM_ENABLE_NULL
         property.is_nullable = table->is_nullable(col) || property.type == PropertyTypeObject;
-#else
-        property.is_nullable = property.type == PropertyTypeObject;
-#endif
         property.table_column = col;
         if (property.type == PropertyTypeObject || property.type == PropertyTypeArray) {
             // set link type for objects and arrays
-            realm::TableRef linkTable = table->get_link_target(col);
+            ConstTableRef linkTable = table->get_link_target(col);
             property.object_type = ObjectStore::object_type_for_table_name(linkTable->get_name().data());
         }
-        properties.push_back(move(property));
+        properties.push_back(std::move(property));
     }
 
     primary_key = realm::ObjectStore::get_primary_key_for_object(group, name);
     if (primary_key.length()) {
         auto primary_key_prop = primary_key_property();
         if (!primary_key_prop) {
-            throw ObjectStoreValidationException({"No property matching primary key '" + primary_key + "'"}, name);
+            throw InvalidPrimaryKeyException(name, primary_key);
         }
         primary_key_prop->is_primary = true;
     }
 }
 
-Property *ObjectSchema::property_for_name(const std::string &name) {
-    for (auto& prop:properties) {
-        if (prop.name == name) {
+Property *ObjectSchema::property_for_name(StringData name) {
+    for (auto& prop : properties) {
+        if (StringData(prop.name) == name) {
             return &prop;
         }
     }
     return nullptr;
 }
 
+const Property *ObjectSchema::property_for_name(StringData name) const {
+    return const_cast<ObjectSchema *>(this)->property_for_name(name);
+}

@@ -173,7 +173,7 @@
     }
 
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
-        if (obj.intCol % 2 != self.isParent && obj.intCol < stopValue) {
+        if (obj.intCol % 2 == self.isParent && obj.intCol < stopValue) {
             [realm transactionWithBlock:^{
                 obj.intCol++;
             }];
@@ -300,31 +300,6 @@
     }
     else {
         XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
-    }
-}
-
-- (void)testNotificationsForChangesWhileSuspended {
-    RLMRealm *realm = RLMRealm.defaultRealm;
-    if (self.isParent) {
-        // Launch the child and wait for it to make a commit to signal that it's done launching
-        NSTask *child = [self childTask];
-        [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
-            [child launch];
-        }];
-
-        // Suspend it, make a commit, then resume it
-        [child suspend];
-        [realm transactionWithBlock:^{}];
-        [child resume];
-
-        // blocks forever if the child doesn't get notified
-        [child waitUntilExit];
-    }
-    else {
-        // Tell the parent we've launched
-        [realm transactionWithBlock:^{}];
-        // Wait for a commit notification from the parent
-        [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{}];
     }
 }
 

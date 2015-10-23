@@ -60,34 +60,81 @@ class SwiftObject: Object {
 }
 
 class SwiftOptionalObject: Object {
-//    FIXME: Support all optional property types
-//    dynamic var optBoolCol: Bool?
-//    dynamic var optIntCol: Int?
-//    dynamic var optFloatCol: Float?
-//    dynamic var optDoubleCol: Double?
-#if REALM_ENABLE_NULL
-    dynamic var optStringCol: NSString?
+    dynamic var optNSStringCol: NSString?
+    dynamic var optStringCol: String?
     dynamic var optBinaryCol: NSData?
-#endif
-//    dynamic var optDateCol: NSDate?
+    dynamic var optDateCol: NSDate?
+    let optIntCol = RealmOptional<Int>()
+    let optInt16Col = RealmOptional<Int16>()
+    let optInt32Col = RealmOptional<Int32>()
+    let optInt64Col = RealmOptional<Int64>()
+    let optFloatCol = RealmOptional<Float>()
+    let optDoubleCol = RealmOptional<Double>()
+    let optBoolCol = RealmOptional<Bool>()
     dynamic var optObjectCol: SwiftBoolObject?
-//    let arrayCol = List<SwiftBoolObject?>()
+    //    let arrayCol = List<SwiftBoolObject?>()
 }
 
 class SwiftImplicitlyUnwrappedOptionalObject: Object {
-//    FIXME: Support all optional property types
-//    dynamic var optBoolCol: Bool!
-//    dynamic var optIntCol: Int!
-//    dynamic var optFloatCol: Float!
-//    dynamic var optDoubleCol: Double!
-#if REALM_ENABLE_NULL
-    dynamic var optStringCol: NSString!
+    dynamic var optNSStringCol: NSString!
+    dynamic var optStringCol: String!
     dynamic var optBinaryCol: NSData!
-#endif
-//    dynamic var optDateCol: NSDate!
+    dynamic var optDateCol: NSDate!
     dynamic var optObjectCol: SwiftBoolObject!
-//    let arrayCol = List<SwiftBoolObject!>()
+    //    let arrayCol = List<SwiftBoolObject!>()
 }
+
+class SwiftOptionalDefaultValuesObject: Object {
+    dynamic var optNSStringCol: NSString? = "A"
+    dynamic var optStringCol: String? = "B"
+    dynamic var optBinaryCol: NSData? = "C".dataUsingEncoding(NSUTF8StringEncoding)
+    dynamic var optDateCol: NSDate? = NSDate(timeIntervalSince1970: 10)
+    let optIntCol = RealmOptional<Int>(1)
+    let optInt16Col = RealmOptional<Int16>(1)
+    let optInt32Col = RealmOptional<Int32>(1)
+    let optInt64Col = RealmOptional<Int64>(1)
+    let optFloatCol = RealmOptional<Float>(2.2)
+    let optDoubleCol = RealmOptional<Double>(3.3)
+    let optBoolCol = RealmOptional<Bool>(true)
+    dynamic var optObjectCol: SwiftBoolObject? = SwiftBoolObject(value: [true])
+    //    let arrayCol = List<SwiftBoolObject?>()
+
+    class func defaultValues() -> [String: AnyObject] {
+        return [
+            "optNSStringCol" : "A",
+            "optStringCol" : "B",
+            "optBinaryCol" : "C".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+            "optDateCol" : NSDate(timeIntervalSince1970: 10),
+            "optIntCol" : 1,
+            "optInt16Col" : 1,
+            "optInt32Col" : 1,
+            "optInt64Col" : 1,
+            "optFloatCol" : 2.2 as Float,
+            "optDoubleCol" : 3.3,
+            "optBoolCol" : true,
+        ]
+    }
+}
+
+class SwiftOptionalIgnoredPropertiesObject: Object {
+    dynamic var optNSStringCol: NSString? = "A"
+    dynamic var optStringCol: String? = "B"
+    dynamic var optBinaryCol: NSData? = "C".dataUsingEncoding(NSUTF8StringEncoding)
+    dynamic var optDateCol: NSDate? = NSDate(timeIntervalSince1970: 10)
+    dynamic var optObjectCol: SwiftBoolObject? = SwiftBoolObject(value: [true])
+
+    override class func ignoredProperties() -> [String] {
+        return [
+            "optNSStringCol",
+            "optStringCol",
+            "optBinaryCol",
+            "optDateCol",
+            "optObjectCol"
+        ]
+    }
+}
+
+
 
 class SwiftDogObject: Object {
     dynamic var dogName = ""

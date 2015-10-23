@@ -44,6 +44,13 @@ class SwiftDefaultObject: RLMObject {
     }
 }
 
+class SwiftOptionalNumberObject: RLMObject {
+    dynamic var intCol: NSNumber? = 1
+    dynamic var floatCol: NSNumber? = 2.2 as Float
+    dynamic var doubleCol: NSNumber? = 3.3 as Double
+    dynamic var boolCol: NSNumber? = true
+}
+
 class SwiftObjectInterfaceTests: RLMTestCase {
 
     // Swift models
@@ -137,7 +144,42 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         }
     }
 
-#if REALM_ENABLE_NULL
+    func testOptionalNSNumberProperties() {
+        let realm = realmWithTestPath()
+        let no = SwiftOptionalNumberObject()
+        XCTAssertEqual([.Int, .Float, .Double, .Bool], map(no.objectSchema.properties) { $0.type })
+
+        XCTAssertEqual(1, no.intCol!)
+        XCTAssertEqual(2.2 as Float, no.floatCol!)
+        XCTAssertEqual(3.3, no.doubleCol!)
+        XCTAssertEqual(true, no.boolCol!)
+
+        realm.transactionWithBlock {
+            realm.addObject(no)
+            no.intCol = nil
+            no.floatCol = nil
+            no.doubleCol = nil
+            no.boolCol = nil
+        }
+
+        XCTAssertNil(no.intCol)
+        XCTAssertNil(no.floatCol)
+        XCTAssertNil(no.doubleCol)
+        XCTAssertNil(no.boolCol)
+
+        realm.transactionWithBlock {
+            no.intCol = 1.1
+            no.floatCol = 2.2 as Float
+            no.doubleCol = 3.3
+            no.boolCol = false
+        }
+
+        XCTAssertEqual(1, no.intCol!)
+        XCTAssertEqual(2.2 as Float, no.floatCol!)
+        XCTAssertEqual(3.3, no.doubleCol!)
+        XCTAssertEqual(false, no.boolCol!)
+    }
+
     func testOptionalSwiftProperties() {
         let realm = realmWithTestPath()
         realm.transactionWithBlock { realm.addObject(SwiftOptionalObject()) }
@@ -146,6 +188,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertNil(firstObj.optObjectCol)
         XCTAssertNil(firstObj.optStringCol)
         XCTAssertNil(firstObj.optBinaryCol)
+        XCTAssertNil(firstObj.optDateCol)
 
         realm.transactionWithBlock {
             firstObj.optObjectCol = SwiftBoolObject()
@@ -153,21 +196,24 @@ class SwiftObjectInterfaceTests: RLMTestCase {
 
             firstObj.optStringCol = "Hi!"
             firstObj.optBinaryCol = NSData(bytes: "hi", length: 2)
+            firstObj.optDateCol = NSDate(timeIntervalSinceReferenceDate: 10)
         }
         XCTAssertTrue(firstObj.optObjectCol!.boolCol)
         XCTAssertEqual(firstObj.optStringCol!, "Hi!")
         XCTAssertEqual(firstObj.optBinaryCol!, NSData(bytes: "hi", length: 2))
+        XCTAssertEqual(firstObj.optDateCol!,  NSDate(timeIntervalSinceReferenceDate: 10))
 
         realm.transactionWithBlock {
             firstObj.optObjectCol = nil
             firstObj.optStringCol = nil
             firstObj.optBinaryCol = nil
+            firstObj.optDateCol = nil
         }
         XCTAssertNil(firstObj.optObjectCol)
         XCTAssertNil(firstObj.optStringCol)
         XCTAssertNil(firstObj.optBinaryCol)
+        XCTAssertNil(firstObj.optDateCol)
     }
-#endif
 
     func testSwiftClassNameIsDemangled() {
         XCTAssertEqual(SwiftObject.className(), "SwiftObject", "Calling className() on Swift class should return demangled name")

@@ -28,21 +28,32 @@ You then instantiate and use your custom subclasses instead of using the Object 
 class Dog: Object {
     dynamic var name: String = ""
     dynamic var adopted: Bool = false
-    let siblings = List<Dog>
+    let siblings = List<Dog>()
 }
 ```
 
 ### Supported property types
 
-- `String`
+- `String`, `NSString`
 - `Int`
 - `Float`
 - `Double`
 - `Bool`
 - `NSDate`
 - `NSData`
+- `RealmOptional<T>` for optional numeric properties
 - `Object` subclasses for to-one relationships
 - `List<T: Object>` for to-many relationships
+
+`String`, `NSString`, `NSDate`, `NSData` and `Object` subclass properties can be
+optional. `Int`, `Float`, `Double`, `Bool` and `List` properties cannot. To store
+an optional number, instead use `RealmOptional<Int>`, `RealmOptional<Float>`,
+`RealmOptional<Double>`, or `RealmOptional<Bool>` instead, which wraps an optional
+value of the generic type.
+
+All property types except for `List` and `RealmOptional` *must* be declared as
+`dynamic var`. `List` and `RealmOptional` properties must be declared as
+non-dynamic `let` properties.
 
 ### Querying
 
@@ -184,6 +195,27 @@ public class Object: RLMObjectBase {
         }
     }
 
+    // MARK: Dynamic list
+
+    /**
+    This method is useful only in specialized circumstances, for example, when building
+    components that integrate with Realm. If you are simply building an app on Realm, it is
+    recommended to use instance variables or cast the KVC returns.
+
+    Returns a List of DynamicObjects for a property name
+
+    - warning: This method is useful only in specialized circumstances
+
+    - parameter propertyName: The name of the property to get a List<DynamicObject>
+
+    - returns: A List of DynamicObjects
+
+    :nodoc:
+    */
+    public func dynamicList(propertyName: String) -> List<DynamicObject> {
+        return unsafeBitCast(listForProperty(RLMValidatedGetProperty(self, propertyName)), List<DynamicObject>.self)
+    }
+
     // MARK: Equatable
 
     /// Returns whether both objects are equal.
@@ -215,7 +247,7 @@ public class Object: RLMObjectBase {
 
     // Helper for getting the list object for a property
     internal func listForProperty(prop: RLMProperty) -> RLMListBase {
-        return object_getIvar(self, prop.swiftListIvar) as! RLMListBase
+        return object_getIvar(self, prop.swiftIvar) as! RLMListBase
     }
 }
 
@@ -223,7 +255,7 @@ public class Object: RLMObjectBase {
 
 /// Object interface which allows untyped getters and setters for Objects.
 /// :nodoc:
-public final class DynamicObject : Object {
+public final class DynamicObject: Object {
     private var listProperties = [String: List<DynamicObject>]()
 
     // Override to create List<DynamicObject> on access
@@ -282,11 +314,36 @@ public class ObjectUtil: NSObject {
         (object as! Object).listForProperty(property)._rlmArray = array
     }
 
-    @objc private class func getOptionalPropertyNames(object: AnyObject) -> NSArray {
-        return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
-            return Mirror(reflecting: prop.value).displayStyle == .Optional
-        }.flatMap { (prop: Mirror.Child) in
-            return prop.label
+    @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
+        return Mirror(reflecting: object).children.reduce([String:AnyObject]()) { (var properties: [String:AnyObject], prop: Mirror.Child) in
+            guard let name = prop.label else { return properties }
+            let mirror = Mirror(reflecting: prop.value)
+            let type = mirror.subjectType
+            if type is Optional<String>.Type || type is Optional<NSString>.Type {
+                properties[name] = Int(PropertyType.String.rawValue)
+            } else if type is Optional<NSDate>.Type {
+                properties[name] = Int(PropertyType.Date.rawValue)
+            } else if type is Optional<NSData>.Type {
+                properties[name] = Int(PropertyType.Data.rawValue)
+            } else if type is Optional<Object>.Type {
+                properties[name] = Int(PropertyType.Object.rawValue)
+            } else if type is RealmOptional<Int>.Type ||
+                      type is RealmOptional<Int16>.Type ||
+                      type is RealmOptional<Int32>.Type ||
+                      type is RealmOptional<Int64>.Type {
+                properties[name] = Int(PropertyType.Int.rawValue)
+            } else if type is RealmOptional<Float>.Type {
+                properties[name] = Int(PropertyType.Float.rawValue)
+            } else if type is RealmOptional<Double>.Type {
+                properties[name] = Int(PropertyType.Double.rawValue)
+            } else if type is RealmOptional<Bool>.Type {
+                properties[name] = Int(PropertyType.Bool.rawValue)
+            } else if prop.value as? RLMOptionalBase != nil {
+                throwRealmException("'\(type)' is not a a valid RealmOptional type.")
+            } else if mirror.displayStyle == .Optional {
+                properties[name] = NSNull()
+            }
+            return properties
         }
     }
 

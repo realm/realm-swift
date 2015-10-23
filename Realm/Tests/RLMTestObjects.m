@@ -80,6 +80,9 @@
 @implementation LinkToAllTypesObject
 @end
 
+@implementation AllOptionalTypes
+@end
+
 #pragma mark - Real Life Objects
 #pragma mark -
 
@@ -146,12 +149,15 @@
 @implementation AggregateObject
 @end
 
+#pragma mark PrimaryStringObject
 
 @implementation PrimaryStringObject
 + (NSString *)primaryKey {
     return @"stringCol";
 }
 @end
+
+#pragma mark ReadOnlyPropertyObject
 
 @interface ReadOnlyPropertyObject ()
 @property (readwrite) int readOnlyPropertyMadeReadWriteInClassExtension;
@@ -160,6 +166,25 @@
 @implementation ReadOnlyPropertyObject
 - (NSNumber *)readOnlyUnsupportedProperty {
     return nil;
+}
+@end
+
+#pragma mark IntegerArrayPropertyObject
+
+@implementation IntegerArrayPropertyObject
+@end
+
+@implementation NumberObject
+@end
+
+@implementation NumberDefaultsObject
++ (nullable NSDictionary *)defaultPropertyValues {
+    return @{
+             @"intObj" : @1,
+             @"floatObj" : @2.2f,
+             @"doubleObj" : @3.3,
+             @"boolObj" : @NO,
+             };
 }
 @end
 

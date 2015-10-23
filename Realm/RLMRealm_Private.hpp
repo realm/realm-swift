@@ -18,23 +18,21 @@
 
 #import "RLMRealm_Private.h"
 #import "RLMUtil.hpp"
+#import "shared_realm.hpp"
 
-#import <realm/link_view.hpp>
 #import <realm/group.hpp>
-#import <pthread.h>
 
 namespace realm {
     class Group;
+    class Realm;
+    typedef std::shared_ptr<realm::Realm> SharedRealm;
 }
 
-@interface RLMRealm ()
-@property (nonatomic, readonly, getter=getOrCreateGroup) realm::Group *group;
-- (void)handleExternalCommit;
+@interface RLMRealm () {
+    @public
+    realm::SharedRealm _realm;
+}
+
+// FIXME - group should not be exposed
+@property (nonatomic, readonly) realm::Group *group;
 @end
-
-// throw an exception if the realm is being used from the wrong thread
-static inline void RLMCheckThread(__unsafe_unretained RLMRealm *const realm) {
-    if (realm->_threadID != pthread_mach_thread_np(pthread_self())) {
-        @throw RLMException(@"Realm accessed from incorrect thread");
-    }
-}

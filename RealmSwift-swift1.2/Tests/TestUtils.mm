@@ -19,7 +19,7 @@
 #import "TestUtils.h"
 
 #import <Realm/Realm.h>
-#import <Realm/RLMRealmUtil.h>
+#import <Realm/RLMRealmUtil.hpp>
 #import <Realm/RLMSchema_Private.h>
 
 // This ensures the shared schema is initialized outside of of a test case,
@@ -28,6 +28,15 @@
 __attribute((constructor))
 static void initializeSharedSchema() {
     [RLMSchema sharedSchema];
+}
+
+// Thread-local storage is used to store information about in-flight exceptions.
+// Something (no idea what) is using up all of the TLS slots, so creating the
+// TLS slot on-demand is failing. Work around this by throwing an exception very
+// early in startup to pre-allocate the main thread's exception TLS key.
+__attribute((constructor))
+static void allocateExceptionPthreadKey() {
+    try { throw 0; } catch (int) { }
 }
 
 void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *name, NSString *message, NSString *fileName, NSUInteger lineNumber) {
@@ -54,7 +63,7 @@ void RLMDeallocateRealm(NSString *path) {
     __weak RLMRealm *realm;
 
     @autoreleasepool {
-        realm = RLMGetThreadLocalCachedRealmForPath(path);
+        realm = RLMGetThreadLocalCachedRealmForPath(path.UTF8String);
     }
 
     while (true) {
@@ -65,4 +74,8 @@ void RLMDeallocateRealm(NSString *path) {
         }
         CFRelease((__bridge void *)realm);
     }
+}
+
+bool RLMHasCachedRealmForPath(NSString *path) {
+    return RLMGetAnyCachedRealmForPath(path.UTF8String);
 }

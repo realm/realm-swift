@@ -20,7 +20,7 @@
 
 #import <Realm/RLMDefines.h>
 
-@class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMRealm, RLMProperty;
+@class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMProperty;
 
 #ifdef __cplusplus
 typedef NSUInteger RLMCreationOptions;
@@ -49,7 +49,7 @@ FOUNDATION_EXTERN RLMProperty *RLMValidatedGetProperty(RLMObjectBase *obj, NSStr
 FOUNDATION_EXTERN id __nullable RLMDynamicGet(RLMObjectBase *obj, RLMProperty *prop);
 
 // by property/column
-void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOptions options);
+FOUNDATION_EXTERN void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOptions options);
 
 //
 // Class modification

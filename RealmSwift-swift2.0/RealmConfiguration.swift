@@ -55,7 +55,7 @@ extension Realm {
 
         - returns: An initialized `Realm.Configuration`.
         */
-        public init(path: String? = RLMRealmConfiguration.defaultRealmPath(),
+        public init(path: String? = RLMRealmPathForFile("default.realm"),
             inMemoryIdentifier: String? = nil,
             encryptionKey: NSData? = nil,
             readOnly: Bool = false,
@@ -63,7 +63,9 @@ extension Realm {
             migrationBlock: MigrationBlock? = nil,
             objectTypes: [Object.Type]? = nil) {
                 self.path = path
-                self.inMemoryIdentifier = inMemoryIdentifier
+                if inMemoryIdentifier != nil {
+                    self.inMemoryIdentifier = inMemoryIdentifier
+                }
                 self.encryptionKey = encryptionKey
                 self.readOnly = readOnly
                 self.schemaVersion = schemaVersion
@@ -77,9 +79,7 @@ extension Realm {
         /// Mutually exclusive with `inMemoryIdentifier`.
         public var path: String?  {
             set {
-                if newValue != nil {
-                    inMemoryIdentifier = nil
-                }
+                _inMemoryIdentifier = nil
                 _path = newValue
             }
             get {
@@ -93,9 +93,7 @@ extension Realm {
         /// Mutually exclusive with `path`.
         public var inMemoryIdentifier: String?  {
             set {
-                if newValue != nil {
-                    path = nil
-                }
+                _path = nil
                 _inMemoryIdentifier = newValue
             }
             get {
@@ -106,17 +104,7 @@ extension Realm {
         private var _inMemoryIdentifier: String? = nil
 
         /// 64-byte key to use to encrypt the data.
-        public var encryptionKey: NSData? {
-            set {
-                _encryptionKey = RLMRealmValidatedEncryptionKey(newValue)
-            }
-            get {
-                return _encryptionKey
-            }
-        }
-
-        private var _encryptionKey: NSData? = nil
-
+        public var encryptionKey: NSData? = nil
 
         /// Whether the Realm is read-only (must be true for read-only files).
         public var readOnly: Bool = false
@@ -144,8 +132,11 @@ extension Realm {
 
         internal var rlmConfiguration: RLMRealmConfiguration {
             let configuration = RLMRealmConfiguration()
-            configuration.path = self.path
-            configuration.inMemoryIdentifier = self.inMemoryIdentifier
+            if path != nil {
+                configuration.path = self.path
+            } else {
+                configuration.inMemoryIdentifier = self.inMemoryIdentifier
+            }
             configuration.encryptionKey = self.encryptionKey
             configuration.readOnly = self.readOnly
             configuration.schemaVersion = self.schemaVersion
@@ -155,17 +146,17 @@ extension Realm {
         }
 
         internal static func fromRLMRealmConfiguration(rlmConfiguration: RLMRealmConfiguration) -> Configuration {
-            var configuration = Configuration(path: rlmConfiguration.path,
-                inMemoryIdentifier: rlmConfiguration.inMemoryIdentifier,
-                encryptionKey: rlmConfiguration.encryptionKey,
-                readOnly: rlmConfiguration.readOnly,
-                schemaVersion: UInt64(rlmConfiguration.schemaVersion),
-                migrationBlock: rlmConfiguration.migrationBlock.map { rlmMigration in
-                    return { migration, schemaVersion in
-                        rlmMigration(migration.rlmMigration, schemaVersion)
-                    }
+            var configuration = Configuration()
+            configuration._path = rlmConfiguration.path
+            configuration._inMemoryIdentifier = rlmConfiguration.inMemoryIdentifier
+            configuration.encryptionKey = rlmConfiguration.encryptionKey
+            configuration.readOnly = rlmConfiguration.readOnly
+            configuration.schemaVersion = rlmConfiguration.schemaVersion
+            configuration.migrationBlock = rlmConfiguration.migrationBlock.map { rlmMigration in
+                return { migration, schemaVersion in
+                    rlmMigration(migration.rlmMigration, schemaVersion)
                 }
-            )
+            }
             configuration.customSchema = rlmConfiguration.customSchema
             return configuration
         }

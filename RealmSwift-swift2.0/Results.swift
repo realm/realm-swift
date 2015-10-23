@@ -62,8 +62,7 @@ public class ResultsBase: NSObject, NSFastEnumeration {
     // MARK: Fast Enumeration
 
     public func countByEnumeratingWithState(state: UnsafeMutablePointer<NSFastEnumerationState>, objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>, count len: Int) -> Int {
-        let enumeration: NSFastEnumeration = rlmResults // FIXME: no idea why this is needed, but doesn't compile otherwise
-        return enumeration.countByEnumeratingWithState(state, objects: buffer, count: len)
+        return Int(rlmResults.countByEnumeratingWithState(state, objects: buffer, count: UInt(len)))
     }
 }
 

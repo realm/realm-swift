@@ -43,61 +43,6 @@ accessed using subscripting.
 public typealias MigrationObjectEnumerateBlock = (oldObject: MigrationObject?, newObject: MigrationObject?) -> Void
 
 /**
-Specify a schema version and an associated migration block which is applied when
-opening the default Realm with an old schema version.
-
-Before you can open an existing `Realm` which has a different on-disk schema
-from the schema defined in your object interfaces, you must provide a migration
-block which converts from the disk schema to your current object schema. At the
-minimum your migration block must initialize any properties which were added to
-existing objects without defaults and ensure uniqueness if a primary key
-property is added to an existing object.
-
-You should call this method before accessing any `Realm` instances which
-require migration. After registering your migration block, Realm will call your
-block automatically as needed.
-
-- warning: Unsuccessful migrations will throw exceptions when the migration block is applied.
-           This will happen in the following cases:
-
-           - The given `schemaVersion` is lower than the target Realm's current schema version.
-           - A new property without a default was added to an object and not initialized
-             during the migration. You are required to either supply a default value or to
-             manually populate added properties during a migration.
-
-- parameter version: The current schema version.
-- parameter block:   The block which migrates the Realm to the current version.
-*/
-@available(*, deprecated=1, message="Use Realm(configuration:error:)")
-public func setDefaultRealmSchemaVersion(schemaVersion: UInt64, migrationBlock: MigrationBlock) {
-    RLMRealmSetSchemaVersionForPath(schemaVersion, Realm.Configuration.defaultConfiguration.path, accessorMigrationBlock(migrationBlock))
-}
-
-/**
-Specify a schema version and an associated migration block which is applied when
-opening a Realm at the specified path with an old schema version.
-
-Before you can open an existing `Realm` which has a different on-disk schema
-from the schema defined in your object interfaces, you must provide a migration
-block which converts from the disk schema to your current object schema. At the
-minimum your migration block must initialize any properties which were added to
-existing objects without defaults and ensure uniqueness if a primary key
-property is added to an existing object.
-
-You should call this method before accessing any `Realm` instances which
-require migration. After registering your migration block, Realm will call your
-block automatically as needed.
-
-- parameter version:   The current schema version.
-- parameter realmPath: The path of the Realms to migrate.
-- parameter block:     The block which migrates the Realm to the current version.
-*/
-@available(*, deprecated=1, message="Use Realm(configuration:error:)")
-public func setSchemaVersion(schemaVersion: UInt64, realmPath: String, migrationBlock: MigrationBlock) {
-    RLMRealmSetSchemaVersionForPath(schemaVersion, realmPath, accessorMigrationBlock(migrationBlock))
-}
-
-/**
 Get the schema version for a Realm at a given path.
 - parameter realmPath:     Path to a Realm file.
 - parameter encryptionKey: Optional 64-byte encryption key for encrypted Realms.
@@ -113,29 +58,6 @@ public func schemaVersionAtPath(realmPath: String, encryptionKey: NSData? = nil,
         return nil
     }
     return version
-}
-
-/**
-Performs the registered migration block on a Realm at the given path.
-
-This method is called automatically when opening a Realm for the first time and does
-not need to be called explicitly. You can choose to call this method to control
-exactly when and how migrations are performed.
-
-- parameter path:          The path of the Realm to migrate.
-- parameter encryptionKey: Optional 64-byte encryption key for encrypted Realms.
-                           If the Realms at the given path are not encrypted, omit the argument or pass
-                           in `nil`.
-
-- returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
-           that occured otherwise.
-*/
-@available(*, deprecated=1, message="Use migrateRealm(configuration:)")
-public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
-    var configuration = Realm.Configuration.defaultConfiguration
-    configuration.path = path
-    configuration.encryptionKey = encryptionKey
-    return migrateRealm(configuration)
 }
 
 /**
