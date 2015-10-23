@@ -28,7 +28,7 @@
 #import "RLMResults_Private.h"
 #import "RLMSchema_Private.h"
 
-#import "object_store.hpp"
+#import "shared_realm.hpp"
 
 using namespace realm;
 
@@ -50,20 +50,13 @@ using namespace realm;
 
 @implementation RLMMigration
 
-- (instancetype)initWithRealm:(RLMRealm *)realm key:(NSData *)key error:(NSError **)error {
+- (instancetype)initWithRealm:(RLMRealm *)realm oldRealm:(RLMRealm *)oldRealm {
     self = [super init];
     if (self) {
         // create rw realm to migrate with current on disk table
         _realm = realm;
-
-        // create read only realm used during migration with current on disk schema
-        _oldRealm = [[RLMMigrationRealm alloc] initWithPath:realm.path key:key readOnly:NO inMemory:NO dynamic:YES error:error];
-        if (_oldRealm) {
-            RLMRealmSetSchema(_oldRealm, [RLMSchema dynamicSchemaFromRealm:_oldRealm], true);
-        }
-        if (error && *error) {
-            return nil;
-        }
+        _oldRealm = oldRealm;
+        object_setClass(_oldRealm, RLMMigrationRealm.class);
     }
     return self;
 }
@@ -106,20 +99,17 @@ using namespace realm;
 
 - (void)execute:(RLMMigrationBlock)block {
     @autoreleasepool {
-        // copy old schema and reset after migration
-        RLMSchema *savedSchema = [_realm.schema copy];
-
         // disable all primary keys for migration
         for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
             objectSchema.primaryKeyProperty.isPrimary = NO;
         }
 
         // apply block and set new schema version
-        uint64_t oldVersion = realm::ObjectStore::get_schema_version(_realm.group);
+        uint64_t oldVersion = _oldRealm->_realm->config().schema_version;
         block(self, oldVersion);
 
-        // reset schema to saved schema since it has been altered
-        RLMRealmSetSchema(_realm, savedSchema, true);
+        _oldRealm = nil;
+        _realm = nil;
     }
 }
 

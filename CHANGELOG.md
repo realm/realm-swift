@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* All functionality deprecated in previous releases has been removed entirely.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
 0.96.1 Release notes (2015-10-20)
 =============================================================
 

@@ -31,7 +31,6 @@ appledoc \
     --ignore "Realm/RLMListBase.h" \
     --ignore "Realm/RLMSchema_Private.h" \
     --ignore "Realm/RLMRealm_Private.h" \
-    --ignore "Realm/RLMRealmUtil.h" \
     --ignore "Realm/RLMObject_Private.h" \
     --ignore "Realm/RLMProperty_Private.h" \
     --ignore "Realm/RLMResults_Private.h" \

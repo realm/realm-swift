@@ -173,7 +173,7 @@
     }
 
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
-        if (obj.intCol % 2 != self.isParent && obj.intCol < stopValue) {
+        if (obj.intCol % 2 == self.isParent && obj.intCol < stopValue) {
             [realm transactionWithBlock:^{
                 obj.intCol++;
             }];

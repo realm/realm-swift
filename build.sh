@@ -229,7 +229,7 @@ test_ios_devices() {
 # Input Validation
 ######################################
 
-if [ "$#" -eq 0 -o "$#" -gt 2 ]; then
+if [ "$#" -eq 0 -o "$#" -gt 3 ]; then
     usage
     exit 1
 fi
@@ -330,6 +330,36 @@ case "$COMMAND" in
             ln -s librealm-ios-bitcode.a librealm-ios.a
             ln -s librealm-ios-bitcode-dbg.a librealm-ios-dbg.a
         fi
+        ;;
+
+    ######################################
+    # Object Store
+    ######################################
+    "push-object-store-changes")
+        commit="$2"
+        path="$3"
+        if [ -z "$commit" -o -z "$path" ]; then
+            echo "usage: sh build.sh push-object-store-changes [base commit] [path to objectore repo]"
+            exit 1
+        fi
+
+        # List all commits since $commit which touched the objecstore, generate
+        # patches for each of them, and then apply those patches to the
+        # objectstore repo
+        git rev-list --reverse $commit..HEAD -- Realm/ObjectStore \
+            | xargs -I@ git format-patch --stdout @^! Realm/ObjectStore \
+            | git -C $path am -p 3
+        ;;
+
+    "pull-object-store-changes")
+        commit="$2"
+        path="$3"
+        if [ -z "$commit" -o -z "$path" ]; then
+            echo "usage: sh build.sh pull-object-store-changes [base commit] [path to objectore repo]"
+            exit 1
+        fi
+
+        git -C $path format-patch --stdout $commit..HEAD | git am --directory Realm/ObjectStore
         ;;
 
     ######################################
@@ -502,6 +532,7 @@ case "$COMMAND" in
     # Full verification
     ######################################
     "verify")
+        sh build.sh verify-cocoapods
         sh build.sh verify-docs
         sh build.sh verify-osx
         sh build.sh verify-osx-debug
@@ -518,6 +549,13 @@ case "$COMMAND" in
         sh build.sh verify-ios-device-objc
         sh build.sh verify-ios-device-swift
         sh build.sh verify-watchos
+        ;;
+
+    "verify-cocoapods")
+        cd examples/installation
+        # FIXME: tests are duplicated to work around https://github.com/realm/realm-cocoa/issues/2701
+        ./build.sh test-ios-objc-cocoapods || ./build.sh test-ios-objc-cocoapods || exit 1
+        ./build.sh test-ios-swift-cocoapods || ./build.sh test-ios-swift-cocoapods || exit 1
         ;;
 
     "verify-osx")
@@ -691,10 +729,17 @@ case "$COMMAND" in
           # CocoaPods doesn't support multiple header_mappings_dir, so combine
           # both sets of headers into a single directory
           rm -rf include
+          # Create uppercase `Realm` header directory for a case-sensitive filesystem.
+          # Both `Realm` and `realm` directories are required.
+          if [ ! -e core/include/Realm ]; then
+            cp -R core/include/realm core/include/Realm
+          fi
           cp -R core/include include
           mkdir -p include/Realm
           cp Realm/*.{h,hpp} include/Realm
           cp Realm/ObjectStore/*.hpp include/Realm
+          cp Realm/ObjectStore/impl/*.hpp include/Realm
+          cp Realm/ObjectStore/impl/apple/*.hpp include/Realm
           touch include/Realm/RLMPlatform.h
         fi
         ;;

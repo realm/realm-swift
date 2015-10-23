@@ -84,13 +84,13 @@ static inline void RLMLinkViewArrayValidateAttached(__unsafe_unretained RLMArray
     if (!ar->_backingLinkView->is_attached()) {
         @throw RLMException(@"RLMArray is no longer valid");
     }
-    RLMCheckThread(ar->_realm);
+    [ar->_realm verifyThread];
 }
 static inline void RLMLinkViewArrayValidateInWriteTransaction(__unsafe_unretained RLMArrayLinkView *const ar) {
     // first verify attached
     RLMLinkViewArrayValidateAttached(ar);
 
-    if (!ar->_realm->_inWriteTransaction) {
+    if (!ar->_realm.inWriteTransaction) {
         @throw RLMException(@"Can't mutate a persisted array outside of a write transaction.");
     }
 }
@@ -210,7 +210,9 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
         [ar.realm addObject:object];
     }
     else if (object->_realm) {
-        RLMVerifyAttached(object);
+        if (!object->_row.is_attached()) {
+            @throw RLMException(@"Object has been deleted or invalidated.");
+        }
     }
 
     changeArray(ar, NSKeyValueChangeInsertion, index, ^{
@@ -238,9 +240,10 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
             if (obj->_realm != _realm) {
                 [_realm addObject:obj];
             }
-            else {
-                RLMVerifyAttached(obj);
+            else if (!obj->_row.is_attached()) {
+                @throw RLMException(@"Object has been deleted or invalidated.");
             }
+
             _backingLinkView->insert(index, obj->_row.get_index());
             index = [indexes indexGreaterThanIndex:index];
         }

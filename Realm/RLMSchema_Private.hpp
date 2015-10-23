@@ -16,17 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import <XCTest/XCTestCase.h>
+#import "RLMSchema_Private.h"
 
-FOUNDATION_EXTERN void RLMAssertThrows(XCTestCase *self,
-                                       __attribute__((noescape)) dispatch_block_t block,
-                                       NSString *name, NSString *message,
-                                       NSString *fileName, NSUInteger lineNumber);
+#import <memory>
 
-// Forcibly deallocate the RLMRealm for the given path on the main thread
-// Will cause crashes if it's alive for a reason other than being leaked by RLMAssertThrows
-FOUNDATION_EXTERN void RLMDeallocateRealm(NSString *path);
+namespace realm {
+    class Schema;
+    class ObjectSchema;
+}
 
-FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
-
+@interface RLMSchema ()
++ (instancetype)dynamicSchemaFromObjectStoreSchema:(realm::Schema &)objectStoreSchema;
+- (std::unique_ptr<realm::Schema>)objectStoreCopy;
+@end

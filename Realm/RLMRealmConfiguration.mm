@@ -17,13 +17,16 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealmConfiguration_Private.h"
+
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Private.h"
+#import "RLMSchema_Private.hpp"
 #import "RLMUtil.hpp"
-#import "RLMSchema_Private.h"
 
-#include <atomic>
+#import "schema.hpp"
+#import "shared_realm.hpp"
 
-static NSString * const c_RLMRealmConfigurationProperties[] = {
+static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"path",
     @"inMemoryIdentifier",
     @"encryptionKey",
@@ -34,31 +37,10 @@ static NSString * const c_RLMRealmConfigurationProperties[] = {
     @"customSchema",
 };
 
-typedef NS_ENUM(NSUInteger, RLMRealmConfigurationUsage) {
-    RLMRealmConfigurationUsageNone,
-    RLMRealmConfigurationUsageConfiguration,
-    RLMRealmConfigurationUsagePerPath,
-};
-
-static std::atomic<RLMRealmConfigurationUsage> s_configurationUsage;
-
-@implementation RLMRealmConfiguration
-
+static NSString *const c_defaultRealmFileName = @"default.realm";
 RLMRealmConfiguration *s_defaultConfiguration;
-static NSString * const c_defaultRealmFileName = @"default.realm";
 
-+ (NSString *)defaultRealmPath
-{
-    static NSString *defaultRealmPath;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        defaultRealmPath = [[self class] writeablePathForFile:c_defaultRealmFileName];
-    });
-    return defaultRealmPath;
-}
-
-+ (NSString *)writeablePathForFile:(NSString*)fileName
-{
+NSString *RLMRealmPathForFile(NSString *fileName) {
 #if TARGET_OS_IPHONE
     // On iOS the Documents directory isn't user-visible, so put files there
     NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
@@ -84,19 +66,19 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     return [path stringByAppendingPathComponent:fileName];
 }
 
+@implementation RLMRealmConfiguration {
+    realm::Realm::Config _config;
+}
+
+- (realm::Realm::Config&)config {
+    return _config;
+}
+
 + (instancetype)defaultConfiguration {
-    @synchronized(c_defaultRealmFileName) {
-        if (!s_defaultConfiguration) {
-            s_defaultConfiguration = [[RLMRealmConfiguration alloc] init];
-        }
-    }
-    return [s_defaultConfiguration copy];
+    return [[self rawDefaultConfiguration] copy];
 }
 
 + (void)setDefaultConfiguration:(RLMRealmConfiguration *)configuration {
-    if (s_configurationUsage.exchange(RLMRealmConfigurationUsageConfiguration) == RLMRealmConfigurationUsagePerPath) {
-        @throw RLMException(@"Cannot set a default configuration after using per-path configuration methods.");
-    }
     if (!configuration) {
         @throw RLMException(@"Cannot set the default configuration to nil.");
     }
@@ -105,25 +87,27 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     }
 }
 
-+ (void)setDefaultPath:(NSString *)path {
-    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    configuration.path = path;
++ (RLMRealmConfiguration *)rawDefaultConfiguration {
     @synchronized(c_defaultRealmFileName) {
-        s_defaultConfiguration = configuration;
+        if (!s_defaultConfiguration) {
+            s_defaultConfiguration = [[RLMRealmConfiguration alloc] init];
+        }
     }
+    return s_defaultConfiguration;
 }
 
 + (void)resetRealmConfigurationState {
     @synchronized(c_defaultRealmFileName) {
         s_defaultConfiguration = nil;
     }
-    s_configurationUsage = RLMRealmConfigurationUsageNone;
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.path = [[self class] defaultRealmPath];
+        static NSString *defaultRealmPath = RLMRealmPathForFile(c_defaultRealmFileName);
+        self.path = defaultRealmPath;
+        self.schemaVersion = 0;
     }
 
     return self;
@@ -131,11 +115,10 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 
 - (instancetype)copyWithZone:(NSZone *)zone {
     RLMRealmConfiguration *configuration = [[[self class] allocWithZone:zone] init];
-    for (NSString *key : c_RLMRealmConfigurationProperties) {
-        if (id value = [self valueForKey:key]) {
-            [configuration setValue:value forKey:key];
-        }
-    }
+    configuration->_config = _config;
+    configuration->_dynamic = _dynamic;
+    configuration->_migrationBlock = _migrationBlock;
+    configuration->_customSchema = _customSchema;
     return configuration;
 }
 
@@ -150,13 +133,23 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     return [string stringByAppendingString:@"}"];
 }
 
-- (void)setInMemoryIdentifier:(NSString *)inMemoryIdentifier {
-    if (inMemoryIdentifier.length == 0) {
-        @throw RLMException(@"In-memory identifier must not be empty");
+- (NSString *)path {
+    return _config.in_memory ? nil :@(_config.path.c_str());
+}
+
+static void RLMNSStringToStdString(std::string &out, NSString *in) {
+    out.resize([in maximumLengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+    if (out.empty()) {
+        return;
     }
 
-    _inMemoryIdentifier = [inMemoryIdentifier copy];
-    _path = nil;
+    NSUInteger size = out.size();
+    [in getBytes:&out[0]
+       maxLength:size
+      usedLength:&size
+        encoding:NSUTF8StringEncoding
+         options:0 range:{0, in.length} remainingRange:nullptr];
+    out.resize(size);
 }
 
 - (void)setPath:(NSString *)path {
@@ -164,32 +157,84 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
         @throw RLMException(@"Realm path must not be empty");
     }
 
-    _path = [path copy];
-    _inMemoryIdentifier = nil;
+    RLMNSStringToStdString(_config.path, path);
+    _config.in_memory = false;
+}
+
+- (NSString *)inMemoryIdentifier {
+    if (!_config.in_memory) {
+        return nil;
+    }
+    return [@(_config.path.c_str()) lastPathComponent];
+}
+
+- (void)setInMemoryIdentifier:(NSString *)inMemoryIdentifier {
+    if (inMemoryIdentifier.length == 0) {
+        @throw RLMException(@"In-memory identifier must not be empty");
+    }
+
+    RLMNSStringToStdString(_config.path, [NSTemporaryDirectory() stringByAppendingPathComponent:inMemoryIdentifier]);
+    _config.in_memory = true;
+}
+
+- (NSData *)encryptionKey {
+    return _config.encryption_key.empty() ? nil : [NSData dataWithBytes:_config.encryption_key.data() length:_config.encryption_key.size()];
 }
 
 - (void)setEncryptionKey:(NSData * __nullable)encryptionKey {
-    _encryptionKey = [RLMRealmValidatedEncryptionKey(encryptionKey) copy];
-}
-
-- (void)setSchemaVersion:(uint64_t)schemaVersion {
-    if ((_schemaVersion = schemaVersion) == RLMNotVersioned) {
-        @throw RLMException(@"Cannot set schema version to %llu (RLMNotVersioned)", RLMNotVersioned);
+    if (NSData *key = RLMRealmValidatedEncryptionKey(encryptionKey)) {
+        auto bytes = static_cast<const char *>(key.bytes);
+        _config.encryption_key.assign(bytes, bytes + key.length);
+    }
+    else {
+        _config.encryption_key.clear();
     }
 }
 
-- (void)setObjectClasses:(NSArray *)objectClasses {
-    _customSchema = [RLMSchema schemaWithObjectClasses:objectClasses];
+- (BOOL)readOnly {
+    return _config.read_only;
+}
+
+- (void)setReadOnly:(BOOL)readOnly {
+    _config.read_only = readOnly;
+}
+
+- (uint64_t)schemaVersion {
+    return _config.schema_version;
+}
+
+- (void)setSchemaVersion:(uint64_t)schemaVersion {
+    if (schemaVersion == RLMNotVersioned) {
+        @throw RLMException(@"Cannot set schema version to %llu (RLMNotVersioned)", RLMNotVersioned);
+    }
+    _config.schema_version = schemaVersion;
 }
 
 - (NSArray *)objectClasses {
     return [_customSchema.objectSchema valueForKeyPath:@"objectClass"];
 }
 
+- (void)setObjectClasses:(NSArray *)objectClasses {
+    self.customSchema = [RLMSchema schemaWithObjectClasses:objectClasses];
+}
+
+- (void)setDynamic:(bool)dynamic {
+    _dynamic = dynamic;
+    _config.cache = !dynamic;
+}
+
+- (bool)cache {
+    return _config.cache;
+}
+
+- (void)setCache:(bool)cache {
+    _config.cache = cache;
+}
+
+- (void)setCustomSchema:(RLMSchema *)customSchema {
+    _customSchema = customSchema;
+    _config.schema = [_customSchema objectStoreCopy];
+}
+
 @end
 
-void RLMRealmConfigurationUsePerPath(SEL callingMethod) {
-    if (s_configurationUsage.exchange(RLMRealmConfigurationUsagePerPath) == RLMRealmConfigurationUsageConfiguration) {
-        @throw RLMException(@"Cannot call %@ after setting a default configuration.", NSStringFromSelector(callingMethod));
-    }
-}

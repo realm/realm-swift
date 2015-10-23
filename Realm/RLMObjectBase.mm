@@ -231,10 +231,6 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     return self.class == _objectSchema.accessorClass && !_row.is_attached();
 }
 
-- (BOOL)isDeletedFromRealm {
-    return self.isInvalidated;
-}
-
 - (BOOL)isEqual:(id)object {
     if (RLMObjectBase *other = RLMDynamicCast<RLMObjectBase>(object)) {
         if (_objectSchema.primaryKeyProperty) {
@@ -323,7 +319,7 @@ NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *cla
     if (!object->_realm) {
         @throw RLMException(@"Linking object only available for objects in a Realm.");
     }
-    RLMCheckThread(object->_realm);
+    [object->_realm verifyThread];
 
     if (!object->_row.is_attached()) {
         @throw RLMException(@"Object has been deleted or invalidated and is no longer valid.");

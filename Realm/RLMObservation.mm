@@ -398,363 +398,87 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
 }
 
 namespace {
-class TransactLogHandler {
-    // For advance_read() and friends, we need to batch up the change
-    // notifications and send them all at once, since all of the changes are
-    // applied atomically. ObserverState tracks everything needed to send the
-    // notifications for a single observed row.
-    struct ObserverState {
-        size_t table;
-        size_t row;
-        RLMObservationInfo *info;
-
-        // Change information for a single property/column
-        struct change {
-            bool changed = false;
-            bool multipleLinkviewChanges = false;
-            NSKeyValueChange linkviewChangeKind = NSKeyValueChangeSetting;
-            NSMutableIndexSet *linkviewChangeIndexes = nil;
-        };
-        std::vector<change> changes;
-
-        // Get the change info for the given column, creating it if needed
-        change& getChange(size_t i) {
-            if (changes.size() <= i) {
-                changes.resize(std::max(changes.size() * 2, i + 1));
-            }
-            return changes[i];
+template<typename Func>
+void forEach(realm::RealmDelegate::ObserverState const& state, Func&& func) {
+    for (size_t i = 0, size = state.changes.size(); i < size; ++i) {
+        if (state.changes[i].changed) {
+            func(i, state.changes[i], static_cast<RLMObservationInfo *>(state.info));
         }
+    }
+}
+}
 
-        // Loop over the columns which were changed
-        template<typename Func>
-        void forEach(Func&& f) const {
-            for (size_t i = 0; i < changes.size(); ++i) {
-                auto const& change = changes[i];
-                if (change.changed) {
-                    f(i, change);
-                }
-            }
+std::vector<realm::RealmDelegate::ObserverState> RLMGetObservedRows(NSArray *schema) {
+    std::vector<realm::RealmDelegate::ObserverState> observers;
+    for (RLMObjectSchema *objectSchema in schema) {
+        for (auto info : objectSchema->_observedObjects) {
+            auto const& row = info->getRow();
+            if (!row.is_attached())
+                continue;
+            observers.push_back({
+                row.get_table()->get_index_in_group(),
+                row.get_index(),
+                info});
         }
+    }
+    sort(begin(observers), end(observers));
+    return observers;
+}
 
-        // Simple lexographic ordering
-        friend bool operator<(ObserverState const& lft, ObserverState const& rgt) {
-            return std::tie(lft.table, lft.row) < std::tie(rgt.table, rgt.row);
-        }
-    };
+static NSKeyValueChange convert(realm::RealmDelegate::ColumnInfo::Kind kind) {
+    switch (kind) {
+        case realm::RealmDelegate::ColumnInfo::Kind::None:
+        case realm::RealmDelegate::ColumnInfo::Kind::SetAll:
+            return NSKeyValueChangeSetting;
+        case realm::RealmDelegate::ColumnInfo::Kind::Set:
+            return NSKeyValueChangeReplacement;
+        case realm::RealmDelegate::ColumnInfo::Kind::Insert:
+            return NSKeyValueChangeInsertion;
+        case realm::RealmDelegate::ColumnInfo::Kind::Remove:
+            return NSKeyValueChangeRemoval;
+    }
+}
 
-    size_t currentTable = 0;
-    std::vector<ObserverState> observers;
-    std::vector<RLMObservationInfo *> invalidated;
-
-    ObserverState::change *activeLinkList = nullptr;
-
-    // Find all observed objects in the given object schema and build up the
-    // array of observers to notify from them
-    void findObservers(NSArray *schema) {
-        for (RLMObjectSchema *objectSchema in schema) {
-            for (auto info : objectSchema->_observedObjects) {
-                auto const& row = info->getRow();
-                if (!row.is_attached())
-                    continue;
-                observers.push_back({
-                    row.get_table()->get_index_in_group(),
-                    row.get_index(),
-                    info});
-            }
-        }
-        sort(begin(observers), end(observers));
+static NSIndexSet *convert(realm::IndexSet const& in, NSMutableIndexSet *out) {
+    if (in.empty()) {
+        return nil;
     }
 
-    // Send didChange notifications to all observers marked as needing them
+    [out removeAllIndexes];
+    for (auto range : in) {
+        [out addIndexesInRange:{range.first, range.second - range.first}];
+    }
+    return out;
+}
+
+void RLMWillChange(std::vector<realm::RealmDelegate::ObserverState> const& observed,
+                   std::vector<void *> const& invalidated) {
+    NSMutableIndexSet *indexes = [NSMutableIndexSet new];
+    for (auto info : invalidated) {
+        static_cast<RLMObservationInfo *>(info)->willChange(RLMInvalidatedKey);
+    }
+    for (auto const& o : observed) {
+        forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
+            info->willChange([info->getObjectSchema().properties[i] name],
+                             convert(change.kind), convert(change.indices, indexes));
+        });
+    }
+    for (auto info : invalidated) {
+        static_cast<RLMObservationInfo *>(info)->prepareForInvalidation();
+    }
+}
+
+void RLMDidChange(std::vector<realm::RealmDelegate::ObserverState> const& observed,
+                  std::vector<void *> const& invalidated) {
     // Loop in reverse order to avoid O(N^2) behavior in Foundation
-    void notifyObservers() {
-        for (auto const& o : reverse(observers)) {
-            o.forEach([&](size_t i, auto const& change) {
-                o.info->didChange([o.info->getObjectSchema().properties[i] name],
-                                  change.linkviewChangeKind,
-                                  change.linkviewChangeIndexes);
-            });
-        }
-        for (auto const& info : reverse(invalidated)) {
-            info->didChange(RLMInvalidatedKey);
-        }
+    NSMutableIndexSet *indexes = [NSMutableIndexSet new];
+    for (auto const& o : reverse(observed)) {
+        forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
+            info->didChange([info->getObjectSchema().properties[i] name],
+                            convert(change.kind), convert(change.indices, indexes));
+        });
     }
-
-    // Mark the given row/col as needing notifications sent
-    bool markDirty(size_t row_ndx, size_t col_ndx) {
-        auto it = lower_bound(begin(observers), end(observers), ObserverState{currentTable, row_ndx, nullptr});
-        if (it != end(observers) && it->table == currentTable && it->row == row_ndx) {
-            it->getChange(col_ndx).changed = true;
-        }
-        return true;
+    for (auto const& info : reverse(invalidated)) {
+        static_cast<RLMObservationInfo *>(info)->didChange(RLMInvalidatedKey);
     }
-
-    // Remove the given observer from the list of observed objects and add it
-    // to the listed of invalidated objects
-    void invalidate(ObserverState *o) {
-        invalidated.push_back(o->info);
-        observers.erase(observers.begin() + (o - &observers[0]));
-    }
-
-public:
-    template<typename Func>
-    TransactLogHandler(NSArray *schema, Func&& func) {
-        findObservers(schema);
-        if (observers.empty()) {
-            func();
-            return;
-        }
-
-        func(*this);
-        notifyObservers();
-    }
-
-    // Called at the end of the transaction log immediately before the version
-    // is advanced
-    void parse_complete() {
-        for (auto info : invalidated) {
-            info->willChange(RLMInvalidatedKey);
-        }
-        for (auto const& o : observers) {
-            o.forEach([&](size_t i, auto const& change) {
-                o.info->willChange([o.info->getObjectSchema().properties[i] name],
-                                   change.linkviewChangeKind,
-                                   change.linkviewChangeIndexes);
-            });
-        }
-        for (auto info : invalidated) {
-            info->prepareForInvalidation();
-        }
-    }
-
-    // These would require having an observer before schema init
-    // Maybe do something here to throw an error when multiple processes have different schemas?
-    bool insert_group_level_table(size_t, size_t, StringData) noexcept { return false; }
-    bool erase_group_level_table(size_t, size_t) noexcept { return false; }
-    bool rename_group_level_table(size_t, StringData) noexcept { return false; }
-    bool insert_column(size_t, DataType, StringData, bool) { return false; }
-    bool insert_link_column(size_t, DataType, StringData, size_t, size_t) { return false; }
-    bool erase_column(size_t) { return false; }
-    bool erase_link_column(size_t, size_t, size_t) { return false; }
-    bool rename_column(size_t, StringData) { return false; }
-    bool add_search_index(size_t) { return false; }
-    bool remove_search_index(size_t) { return false; }
-    bool add_primary_key(size_t) { return false; }
-    bool remove_primary_key() { return false; }
-    bool set_link_type(size_t, LinkType) { return false; }
-
-    bool select_table(size_t group_level_ndx, int, const size_t*) noexcept {
-        currentTable = group_level_ndx;
-        return true;
-    }
-
-    bool insert_empty_rows(size_t, size_t, size_t, bool) {
-        // rows are only inserted at the end, so no need to do anything
-        return true;
-    }
-
-    bool erase_rows(size_t row_ndx, size_t, size_t last_row_ndx, bool unordered) noexcept {
-        for (size_t i = 0; i < observers.size(); ++i) {
-            auto& o = observers[i];
-            if (o.table == currentTable) {
-                if (o.row == row_ndx) {
-                    invalidate(&o);
-                    --i;
-                }
-                else if (unordered && o.row == last_row_ndx) {
-                    o.row = row_ndx;
-                }
-                else if (!unordered && o.row > row_ndx) {
-                    o.row -= 1;
-                }
-            }
-        }
-        return true;
-    }
-
-    bool clear_table() noexcept {
-        for (size_t i = 0; i < observers.size(); ) {
-            auto& o = observers[i];
-            if (o.table == currentTable) {
-                invalidate(&o);
-            }
-            else {
-                ++i;
-            }
-        }
-        return true;
-    }
-
-    bool select_link_list(size_t col, size_t row) {
-        activeLinkList = nullptr;
-        for (auto& o : observers) {
-            if (o.table == currentTable && o.row == row) {
-                activeLinkList = &o.getChange(col);
-                break;
-            }
-        }
-        return true;
-    }
-
-    void append_link_list_change(NSKeyValueChange kind, NSUInteger index) {
-        ObserverState::change *o = activeLinkList;
-        if (!o || o->multipleLinkviewChanges) {
-            return;
-        }
-
-        if (!o->linkviewChangeIndexes) {
-            o->linkviewChangeIndexes = [NSMutableIndexSet indexSetWithIndex:index];
-            o->linkviewChangeKind = kind;
-            o->changed = true;
-        }
-        else if (o->linkviewChangeKind == kind) {
-            if (kind == NSKeyValueChangeRemoval) {
-                // Shift the index to compensate for already-removed indices
-                NSUInteger i = [o->linkviewChangeIndexes firstIndex];
-                while (i <= index) {
-                    ++index;
-                    i = [o->linkviewChangeIndexes indexGreaterThanIndex:i];
-                }
-            }
-            else if (kind == NSKeyValueChangeInsertion) {
-                [o->linkviewChangeIndexes shiftIndexesStartingAtIndex:index by:1];
-            }
-            [o->linkviewChangeIndexes addIndex:index];
-        }
-        else {
-            // Array KVO can only send a single kind of change at a time, so
-            // if there's multiple just give up and send "Set"
-            o->multipleLinkviewChanges = true;
-            o->linkviewChangeIndexes = nil;
-        }
-    }
-
-    bool link_list_set(size_t index, size_t) {
-        append_link_list_change(NSKeyValueChangeReplacement, index);
-        return true;
-    }
-
-    bool link_list_insert(size_t index, size_t) {
-        append_link_list_change(NSKeyValueChangeInsertion, index);
-        return true;
-    }
-
-    bool link_list_erase(size_t index) {
-        append_link_list_change(NSKeyValueChangeRemoval, index);
-        return true;
-    }
-
-    bool link_list_nullify(size_t index) {
-        append_link_list_change(NSKeyValueChangeRemoval, index);
-        return true;
-    }
-
-    bool link_list_swap(size_t index1, size_t index2) {
-        append_link_list_change(NSKeyValueChangeReplacement, index1);
-        append_link_list_change(NSKeyValueChangeReplacement, index2);
-        return true;
-    }
-
-    bool link_list_clear(size_t old_size) {
-        ObserverState::change *o = activeLinkList;
-        if (!o || o->multipleLinkviewChanges) {
-            return true;
-        }
-
-        NSRange range{0, old_size};
-        if (!o->linkviewChangeIndexes) {
-            o->linkviewChangeIndexes = [NSMutableIndexSet indexSet];
-        }
-        else if (o->linkviewChangeKind == NSKeyValueChangeRemoval) {
-            range.length += [o->linkviewChangeIndexes count];
-        }
-        else if (o->linkviewChangeKind == NSKeyValueChangeInsertion) {
-            range.length -= [o->linkviewChangeIndexes count];
-            [o->linkviewChangeIndexes removeAllIndexes];
-        }
-        else { // Replacement
-            [o->linkviewChangeIndexes removeAllIndexes];
-        }
-        o->linkviewChangeKind = NSKeyValueChangeRemoval;
-        [o->linkviewChangeIndexes addIndexesInRange:range];
-        o->changed = true;
-        return true;
-    }
-
-    bool link_list_move(size_t from, size_t to) {
-        ObserverState::change *o = activeLinkList;
-        if (!o || o->multipleLinkviewChanges) {
-            return true;
-        }
-        if (from > to) {
-            std::swap(from, to);
-        }
-
-        NSRange range{from, to - from + 1};
-        if (!o->linkviewChangeIndexes) {
-            o->linkviewChangeIndexes = [NSMutableIndexSet indexSetWithIndexesInRange:range];
-            o->linkviewChangeKind = NSKeyValueChangeReplacement;
-            o->changed = true;
-        }
-        else if (o->linkviewChangeKind == NSKeyValueChangeReplacement) {
-            [o->linkviewChangeIndexes addIndexesInRange:range];
-        }
-        else {
-            o->linkviewChangeIndexes = nil;
-            o->multipleLinkviewChanges = true;
-        }
-        return true;
-    }
-
-    // Things that just mark the field as modified
-    bool set_int(size_t col, size_t row, int_fast64_t) { return markDirty(row, col); }
-    bool set_bool(size_t col, size_t row, bool) { return markDirty(row, col); }
-    bool set_float(size_t col, size_t row, float) { return markDirty(row, col); }
-    bool set_double(size_t col, size_t row, double) { return markDirty(row, col); }
-    bool set_string(size_t col, size_t row, StringData) { return markDirty(row, col); }
-    bool set_binary(size_t col, size_t row, BinaryData) { return markDirty(row, col); }
-    bool set_date_time(size_t col, size_t row, DateTime) { return markDirty(row, col); }
-    bool set_table(size_t col, size_t row) { return markDirty(row, col); }
-    bool set_mixed(size_t col, size_t row, const Mixed&) { return markDirty(row, col); }
-    bool set_link(size_t col, size_t row, size_t) { return markDirty(row, col); }
-    bool set_null(size_t col, size_t row) { return markDirty(row, col); }
-    bool nullify_link(size_t col, size_t row) { return markDirty(row, col); }
-
-    // Things we don't need to do anything for
-    bool optimize_table() { return false; }
-
-    // Things that we don't do in the binding
-    bool select_descriptor(int, const size_t*) { return true; }
-    bool row_insert_complete() { return false; }
-    bool add_int_to_column(size_t, int_fast64_t) { return false; }
-    bool insert_int(size_t, size_t, size_t, int_fast64_t) { return false; }
-    bool insert_bool(size_t, size_t, size_t, bool) { return false; }
-    bool insert_float(size_t, size_t, size_t, float) { return false; }
-    bool insert_double(size_t, size_t, size_t, double) { return false; }
-    bool insert_string(size_t, size_t, size_t, StringData) { return false; }
-    bool insert_binary(size_t, size_t, size_t, BinaryData) { return false; }
-    bool insert_date_time(size_t, size_t, size_t, DateTime) { return false; }
-    bool insert_table(size_t, size_t, size_t) { return false; }
-    bool insert_mixed(size_t, size_t, size_t, const Mixed&) { return false; }
-    bool insert_link(size_t, size_t, size_t, size_t) { return false; }
-    bool insert_link_list(size_t, size_t, size_t) { return false; }
-};
-}
-
-void RLMAdvanceRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema) {
-    TransactLogHandler(schema.objectSchema, [&](auto&&... args) {
-        LangBindHelper::advance_read(sg, history, std::move(args)...);
-    });
-}
-
-void RLMRollbackAndContinueAsRead(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema) {
-    TransactLogHandler(schema.objectSchema, [&](auto&&... args) {
-        LangBindHelper::rollback_and_continue_as_read(sg, history, std::move(args)...);
-    });
-}
-
-void RLMPromoteToWrite(realm::SharedGroup &sg, realm::History &history, RLMSchema *schema) {
-    TransactLogHandler(schema.objectSchema, [&](auto&&... args) {
-        LangBindHelper::promote_to_write(sg, history, std::move(args)...);
-    });
 }

@@ -28,9 +28,6 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#import "object_store.hpp"
-#import <realm/group.hpp>
-
 using namespace realm;
 
 // private properties
@@ -49,6 +46,8 @@ using namespace realm;
     self.className = objectClassName;
     self.properties = properties;
     self.objectClass = objectClass;
+    self.accessorClass = objectClass;
+    self.standaloneClass = objectClass;
     return self;
 }
 
@@ -205,6 +204,9 @@ using namespace realm;
             property.optional = false;
         }
         [optionalProperties enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSNumber *propertyType, __unused BOOL *stop) {
+            if ([ignoredProperties containsObject:propertyName]) {
+                return;
+            }
             NSUInteger existing = [propArray indexOfObjectPassingTest:^BOOL(RLMProperty *obj, __unused NSUInteger idx, __unused BOOL *stop) {
                 return [obj.name isEqualToString:propertyName];
             }];
@@ -369,7 +371,13 @@ using namespace realm;
     return schema;
 }
 
+- (void)sortPropertiesByColumn {
+    _properties = [_properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
+        if (p1.column < p2.column) return NSOrderedAscending;
+        if (p1.column > p2.column) return NSOrderedDescending;
+        return NSOrderedSame;
+    }];
+    // No need to update the dictionary
+}
 
 @end
-
-
