@@ -823,7 +823,7 @@ case "$COMMAND" in
 
     "package-ios-swift")
         cd tightdb_objc
-        for version in 1.2 2.0; do
+        for version in 1.2 2.1; do
             rm -rf build/ios-dynamic
             REALM_SWIFT_VERSION=$version sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION=$version sh build.sh ios-swift
