@@ -267,7 +267,17 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 
     // convert array types to objc variant
     if ([_objcRawType isEqualToString:@"@\"RLMArray\""]) {
-        _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [[obj valueForKey:_name] objectClassName]];
+        id arrayValue = [obj valueForKey:_name];
+        if (![arrayValue isKindOfClass:[RLMArray class]]) {
+            NSString *hint = @"";
+            NSString *kvoFirstGuessGetterName = [NSString stringWithFormat:@"get%@", _name.capitalizedString];
+            bool hasCustomKvoGetter = [obj respondsToSelector:NSSelectorFromString(kvoFirstGuessGetterName)];
+            if (hasCustomKvoGetter) {
+                hint = [NSString stringWithFormat:@" Consider to rename KVO-relevant method '%@'.", kvoFirstGuessGetterName];
+            }
+            @throw RLMException(@"Property '%@' of class '%@' may not return illegal type '%@' instead of excepted type '%@'.%@", _name, [obj class], [arrayValue class], [RLMArray class], hint);
+        }
+        _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [arrayValue objectClassName]];
     }
     else if ([_objcRawType isEqualToString:@"@\"NSNumber\""]) {
         const char *numberType = [[obj valueForKey:_name] objCType];
