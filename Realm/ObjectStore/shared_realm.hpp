@@ -49,6 +49,7 @@ namespace realm {
             bool read_only = false;
             bool in_memory = false;
             bool cache = true;
+            bool disable_format_upgrade = false;
             std::vector<char> encryption_key;
 
             std::unique_ptr<Schema> schema;
@@ -159,6 +160,8 @@ namespace realm {
              process which cannot share with the current process due to an
              architecture mismatch. */
             IncompatibleLockFile,
+            /** Thrown if the file needs to be upgraded to a new format, but upgrades have been explicitly disabled. */
+            UpgradeRequired,
         };
         RealmFileException(Kind kind, std::string message) : std::runtime_error(message), m_kind(kind) {}
         Kind kind() const { return m_kind; }
