@@ -228,6 +228,11 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 }
 
 - (void)setCache:(bool)cache {
+    if (_config.disable_format_upgrade) {
+        _config.cache = false;
+        return;
+    }
+    
     _config.cache = cache;
 }
 
@@ -239,6 +244,7 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 - (void)setDisableFormatUpgrade:(bool)disableFormatUpgrade
 {
     _config.disable_format_upgrade = disableFormatUpgrade;
+    _config.cache = false;
 }
 
 - (bool)disableFormatUpgrade
