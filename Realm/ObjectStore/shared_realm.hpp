@@ -161,7 +161,7 @@ namespace realm {
              architecture mismatch. */
             IncompatibleLockFile,
             /** Thrown if the file needs to be upgraded to a new format, but upgrades have been explicitly disabled. */
-            UpgradeRequired,
+            FormatUpgradeRequired,
         };
         RealmFileException(Kind kind, std::string message) : std::runtime_error(message), m_kind(kind) {}
         Kind kind() const { return m_kind; }
