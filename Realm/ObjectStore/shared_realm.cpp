@@ -69,7 +69,7 @@ Realm::Realm(Config config)
             m_history = realm::make_client_history(m_config.path, m_config.encryption_key.data());
             SharedGroup::DurabilityLevel durability = m_config.in_memory ? SharedGroup::durability_MemOnly :
                                                                            SharedGroup::durability_Full;
-            m_shared_group = std::make_unique<SharedGroup>(*m_history, durability, m_config.encryption_key.data(), m_config.disable_format_upgrade);
+            m_shared_group = std::make_unique<SharedGroup>(*m_history, durability, m_config.encryption_key.data(), !m_config.disable_format_upgrade);
         }
     }
     catch (util::File::PermissionDenied const& ex) {
