@@ -50,7 +50,7 @@ Pod::Spec.new do |s|
   s.preserve_paths          = %w(build.sh)
 
   s.ios.deployment_target   = '7.0'
-  s.ios.vendored_library    = 'core/librealm-ios-no-bitcode.a'
+  s.ios.vendored_library    = 'core/librealm-ios.a'
 
   s.osx.deployment_target   = '10.9'
   s.osx.vendored_library    = 'core/librealm-osx.a'
