@@ -70,7 +70,7 @@ end
 
 swift_examples = [
   "examples/ios/swift-1.2/RealmExamples.xcodeproj",
-  "examples/ios/swift-2.0/RealmExamples.xcodeproj"
+  "examples/ios/swift-2.1/RealmExamples.xcodeproj"
 ]
 
 swift_examples.each do |example|

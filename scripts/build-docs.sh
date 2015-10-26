@@ -49,7 +49,7 @@ mkdir -p ${SRCROOT}/docs/output
 rm -rf ${SRCROOT}/docs/output/${realm_version}
 mv ${SRCROOT}/docs/html ${SRCROOT}/docs/output/${realm_version}
 
-: ${REALM_SWIFT_VERSION:=2.0}
+: ${REALM_SWIFT_VERSION:=2.1}
 ./build.sh set-swift-version
 
 ${jazzy} \

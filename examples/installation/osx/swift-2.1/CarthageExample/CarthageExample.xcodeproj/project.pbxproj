@@ -179,6 +179,7 @@
 		E8219DC81B3CD4A2006F2638 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
