@@ -66,8 +66,6 @@
 		3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */; };
 		5D6156EE1BE0689200A4BD3F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D659ED91BE04556006515A0 /* Realm.framework */; };
-		5D6156F61BE077E600A4BD3F /* RLMPlatform.h.in in Resources */ = {isa = PBXBuildFile; fileRef = 5D6156F51BE077E600A4BD3F /* RLMPlatform.h.in */; };
-		5D6156F81BE07B6B00A4BD3F /* TestHost.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */; };
 		5D6156FB1BE08E7E00A4BD3F /* PerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */; };
 		5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */; };
 		5D659E821BE04556006515A0 /* index_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FBD05FA1B94E1C3004559CF /* index_set.cpp */; };
@@ -221,9 +219,7 @@
 		5DD755C91BE056DE002800DA /* RLMUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F811955FC9300FDED82 /* RLMUtil.hpp */; };
 		5DD755CA1BE056DE002800DA /* schema.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FE556431B9A43E5002A1129 /* schema.hpp */; };
 		5DD755CB1BE056DE002800DA /* shared_realm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FAE25541B8CEBBE00D01405 /* shared_realm.hpp */; };
-		5DD755E11BE05C19002800DA /* Tests.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5DD755E01BE05C19002800DA /* Tests.xcconfig */; };
 		5DD755E21BE05DAF002800DA /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DD755CF1BE056DE002800DA /* Realm.framework */; };
-		5DD755E41BE05EA1002800DA /* Tests iOS static.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */; };
 		C042A48D1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
@@ -258,6 +254,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		5D6157011BE0A3A100A4BD3F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3F1A5E711992EB7400F45F4C;
+			remoteInfo = TestHost;
+		};
+		5D6157031BE0A3A400A4BD3F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3F1A5E711992EB7400F45F4C;
+			remoteInfo = TestHost;
+		};
 		5DD755D11BE05828002800DA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -923,6 +933,7 @@
 			dependencies = (
 				C04B4BDD1B55C51500FAE58E /* PBXTargetDependency */,
 				5DD755D41BE0582A002800DA /* PBXTargetDependency */,
+				5D6157041BE0A3A400A4BD3F /* PBXTargetDependency */,
 			);
 			name = "iOS static tests";
 			productName = iOSTests;
@@ -942,6 +953,7 @@
 			dependencies = (
 				5DD755DF1BE05B26002800DA /* PBXTargetDependency */,
 				5DD755D21BE05828002800DA /* PBXTargetDependency */,
+				5D6157021BE0A3A100A4BD3F /* PBXTargetDependency */,
 			);
 			name = Tests;
 			productName = RealmTests;
@@ -1003,12 +1015,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5D6156F81BE07B6B00A4BD3F /* TestHost.xcconfig in Resources */,
 				5D659ED21BE04556006515A0 /* CHANGELOG.md in Resources */,
-				5D6156F61BE077E600A4BD3F /* RLMPlatform.h.in in Resources */,
 				5D659ED51BE04556006515A0 /* LICENSE in Resources */,
-				5DD755E41BE05EA1002800DA /* Tests iOS static.xcconfig in Resources */,
-				5DD755E11BE05C19002800DA /* Tests.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1310,6 +1318,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5D6157021BE0A3A100A4BD3F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
+			targetProxy = 5D6157011BE0A3A100A4BD3F /* PBXContainerItemProxy */;
+		};
+		5D6157041BE0A3A400A4BD3F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
+			targetProxy = 5D6157031BE0A3A400A4BD3F /* PBXContainerItemProxy */;
+		};
 		5DD755D21BE05828002800DA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5D659E7D1BE04556006515A0 /* Realm */;
