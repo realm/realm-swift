@@ -129,7 +129,7 @@ build_ios_combined() {
     # Build for each platform
     cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]') # lowercase the module name to generate command (xcrealm or xcrealmswift)
     $cmd "-scheme '$scheme' -configuration $config -sdk iphoneos"
-    $cmd "-scheme '$scheme' -configuration $config -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
+    $cmd "-scheme '$scheme' -configuration $config -sdk iphonesimulator -destination 'name=iPhone 6' ONLY_ACTIVE_ARCH=NO"
 
     # Combine .swiftmodule
     if [ -d $iphonesimulator_path/Modules/$module_name.swiftmodule ]; then
@@ -160,7 +160,7 @@ build_watchos_combined() {
     # Build for each platform
     cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]') # lowercase the module name to generate command (xcrealm or xcrealmswift)
     $cmd "-scheme '$scheme' -configuration $config -sdk watchos"
-    $cmd "-scheme '$scheme' -configuration $config -sdk watchsimulator ONLY_ACTIVE_ARCH=NO"
+    $cmd "-scheme '$scheme' -configuration $config -sdk watchsimulator -destination 'name=Apple Watch - 42mm' ONLY_ACTIVE_ARCH=NO"
 
     # Combine .swiftmodule
     if [ -d $watchsimulator_path/Modules/$module_name.swiftmodule ]; then
