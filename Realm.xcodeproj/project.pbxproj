@@ -65,6 +65,8 @@
 		3FDCFEB619F6A8D3005E414A /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */; };
+		5D6156EE1BE0689200A4BD3F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D659ED91BE04556006515A0 /* Realm.framework */; };
+		5D6156F61BE077E600A4BD3F /* RLMPlatform.h.in in Resources */ = {isa = PBXBuildFile; fileRef = 5D6156F51BE077E600A4BD3F /* RLMPlatform.h.in */; };
 		5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */; };
 		5D659E821BE04556006515A0 /* index_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FBD05FA1B94E1C3004559CF /* index_set.cpp */; };
 		5D659E831BE04556006515A0 /* object_schema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAE25561B8CEBBE00D01405 /* object_schema.cpp */; };
@@ -122,7 +124,6 @@
 		5D659EB81BE04556006515A0 /* RLMObjectStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 29EDB8D71A7703C500458D80 /* RLMObjectStore.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		5D659EB91BE04556006515A0 /* RLMObservation.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0F02AC1B6FFF3D0046A4D5 /* RLMObservation.hpp */; };
 		5D659EBA1BE04556006515A0 /* RLMOptionalBase.h in Headers */ = {isa = PBXBuildFile; fileRef = C0004BEB1B8E4FCF00304BF3 /* RLMOptionalBase.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		5D659EBB1BE04556006515A0 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 024E6096198B2D59002FA042 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D659EBC1BE04556006515A0 /* RLMProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F761955FC9300FDED82 /* RLMProperty.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D659EBD1BE04556006515A0 /* RLMProperty_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F751955FC9300FDED82 /* RLMProperty_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		5D659EBE1BE04556006515A0 /* RLMQueryUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F781955FC9300FDED82 /* RLMQueryUtil.hpp */; };
@@ -200,7 +201,6 @@
 		5DD755B61BE056DE002800DA /* RLMObjectStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 29EDB8D71A7703C500458D80 /* RLMObjectStore.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		5DD755B71BE056DE002800DA /* RLMObservation.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0F02AC1B6FFF3D0046A4D5 /* RLMObservation.hpp */; };
 		5DD755B81BE056DE002800DA /* RLMOptionalBase.h in Headers */ = {isa = PBXBuildFile; fileRef = C0004BEB1B8E4FCF00304BF3 /* RLMOptionalBase.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		5DD755B91BE056DE002800DA /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 024E6093198B2D51002FA042 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5DD755BA1BE056DE002800DA /* RLMProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F761955FC9300FDED82 /* RLMProperty.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5DD755BB1BE056DE002800DA /* RLMProperty_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F751955FC9300FDED82 /* RLMProperty_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		5DD755BC1BE056DE002800DA /* RLMQueryUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F781955FC9300FDED82 /* RLMQueryUtil.hpp */; };
@@ -219,8 +219,6 @@
 		5DD755C91BE056DE002800DA /* RLMUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F811955FC9300FDED82 /* RLMUtil.hpp */; };
 		5DD755CA1BE056DE002800DA /* schema.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FE556431B9A43E5002A1129 /* schema.hpp */; };
 		5DD755CB1BE056DE002800DA /* shared_realm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FAE25541B8CEBBE00D01405 /* shared_realm.hpp */; };
-		5DD755DB1BE05967002800DA /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 024E6096198B2D59002FA042 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5DD755DC1BE0596A002800DA /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 024E6093198B2D51002FA042 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5DD755E11BE05C19002800DA /* Tests.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5DD755E01BE05C19002800DA /* Tests.xcconfig */; };
 		5DD755E21BE05DAF002800DA /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DD755CF1BE056DE002800DA /* Realm.framework */; };
 		5DD755E41BE05EA1002800DA /* Tests iOS static.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */; };
@@ -317,8 +315,6 @@
 		023B19571A3BA90D0067FB81 /* RLMObjectBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectBase.h; sourceTree = "<group>"; };
 		023B19581A3BA90D0067FB81 /* RLMObjectBase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObjectBase.mm; sourceTree = "<group>"; };
 		023B19F71A423BD20067FB81 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		024E6093198B2D51002FA042 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
-		024E6096198B2D59002FA042 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
 		027A4D211AB100E000AA46F9 /* RLMRealmUtil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMRealmUtil.hpp; sourceTree = "<group>"; };
 		027A4D221AB100E000AA46F9 /* RLMRealmUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMRealmUtil.mm; sourceTree = "<group>"; };
 		027A4D291AB1012500AA46F9 /* InterprocessTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InterprocessTests.m; sourceTree = "<group>"; };
@@ -366,6 +362,7 @@
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
 		5D30B74A1B42039F00D90C5A /* RLMDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMDefines.h; sourceTree = "<group>"; };
+		5D6156F51BE077E600A4BD3F /* RLMPlatform.h.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = RLMPlatform.h.in; sourceTree = "<group>"; };
 		5D659E6D1BE0398E006515A0 /* Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		5D659E6E1BE0398E006515A0 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		5D659E6F1BE0398E006515A0 /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
@@ -474,28 +471,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5D6156EE1BE0689200A4BD3F /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		024E6092198B2D51002FA042 /* ios */ = {
-			isa = PBXGroup;
-			children = (
-				024E6093198B2D51002FA042 /* RLMPlatform.h */,
-			);
-			path = ios;
-			sourceTree = "<group>";
-		};
-		024E6095198B2D59002FA042 /* osx */ = {
-			isa = PBXGroup;
-			children = (
-				024E6096198B2D59002FA042 /* RLMPlatform.h */,
-			);
-			path = osx;
-			sourceTree = "<group>";
-		};
 		02D9AFB61B22487E00A1BD87 /* ObjectStore */ = {
 			isa = PBXGroup;
 			children = (
@@ -653,9 +635,7 @@
 		E8D89B9A1955FC6D00CF2B9A /* Realm */ = {
 			isa = PBXGroup;
 			children = (
-				024E6092198B2D51002FA042 /* ios */,
 				02D9AFB61B22487E00A1BD87 /* ObjectStore */,
-				024E6095198B2D59002FA042 /* osx */,
 				E8D89B9B1955FC6D00CF2B9A /* Supporting Files */,
 				E88C36FE19745E3200C9963D /* Swift */,
 				E8D89B9D1955FC6D00CF2B9A /* Realm.h */,
@@ -694,6 +674,7 @@
 				3F0F02AD1B6FFF3D0046A4D5 /* RLMObservation.mm */,
 				C0004BEB1B8E4FCF00304BF3 /* RLMOptionalBase.h */,
 				C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.mm */,
+				5D6156F51BE077E600A4BD3F /* RLMPlatform.h.in */,
 				3F68BFCD1B558CA800D50FBD /* RLMPrefix.h */,
 				E81A1F761955FC9300FDED82 /* RLMProperty.h */,
 				E81A1F771955FC9300FDED82 /* RLMProperty.mm */,
@@ -788,13 +769,11 @@
 				5D659EB31BE04556006515A0 /* RLMObjectBase.h in Headers */,
 				5D659EB41BE04556006515A0 /* RLMObjectBase_Dynamic.h in Headers */,
 				5D659EB51BE04556006515A0 /* RLMObjectSchema.h in Headers */,
-				5DD755DC1BE0596A002800DA /* RLMPlatform.h in Headers */,
 				5D659EB61BE04556006515A0 /* RLMObjectSchema_Private.h in Headers */,
 				5D659EB71BE04556006515A0 /* RLMObjectSchema_Private.hpp in Headers */,
 				5D659EB81BE04556006515A0 /* RLMObjectStore.h in Headers */,
 				5D659EB91BE04556006515A0 /* RLMObservation.hpp in Headers */,
 				5D659EBA1BE04556006515A0 /* RLMOptionalBase.h in Headers */,
-				5D659EBB1BE04556006515A0 /* RLMPlatform.h in Headers */,
 				5D659EBC1BE04556006515A0 /* RLMProperty.h in Headers */,
 				5D659EBD1BE04556006515A0 /* RLMProperty_Private.h in Headers */,
 				5D659EBE1BE04556006515A0 /* RLMQueryUtil.hpp in Headers */,
@@ -842,13 +821,11 @@
 				5DD755B11BE056DE002800DA /* RLMObjectBase.h in Headers */,
 				5DD755B21BE056DE002800DA /* RLMObjectBase_Dynamic.h in Headers */,
 				5DD755B31BE056DE002800DA /* RLMObjectSchema.h in Headers */,
-				5DD755DB1BE05967002800DA /* RLMPlatform.h in Headers */,
 				5DD755B41BE056DE002800DA /* RLMObjectSchema_Private.h in Headers */,
 				5DD755B51BE056DE002800DA /* RLMObjectSchema_Private.hpp in Headers */,
 				5DD755B61BE056DE002800DA /* RLMObjectStore.h in Headers */,
 				5DD755B71BE056DE002800DA /* RLMObservation.hpp in Headers */,
 				5DD755B81BE056DE002800DA /* RLMOptionalBase.h in Headers */,
-				5DD755B91BE056DE002800DA /* RLMPlatform.h in Headers */,
 				5DD755BA1BE056DE002800DA /* RLMProperty.h in Headers */,
 				5DD755BB1BE056DE002800DA /* RLMProperty_Private.h in Headers */,
 				5DD755BC1BE056DE002800DA /* RLMQueryUtil.hpp in Headers */,
@@ -899,6 +876,7 @@
 				5D659E801BE04556006515A0 /* Sources */,
 				5D659E9F1BE04556006515A0 /* Headers */,
 				5D659ECE1BE04556006515A0 /* Resources */,
+				5D6156F41BE06FF500A4BD3F /* Generate RLMPlatform.h */,
 			);
 			buildRules = (
 			);
@@ -917,6 +895,7 @@
 				5DD7557D1BE056DE002800DA /* Download Core & Set Bitcode Symlink */,
 				5DD7557E1BE056DE002800DA /* Sources */,
 				5DD7559D1BE056DE002800DA /* Headers */,
+				5D6156F91BE083C600A4BD3F /* Generate RLMPlatform.h */,
 			);
 			buildRules = (
 			);
@@ -1021,6 +1000,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5D659ED21BE04556006515A0 /* CHANGELOG.md in Resources */,
+				5D6156F61BE077E600A4BD3F /* RLMPlatform.h.in in Resources */,
 				5D659ED51BE04556006515A0 /* LICENSE in Resources */,
 				5DD755E41BE05EA1002800DA /* Tests iOS static.xcconfig in Resources */,
 				5DD755E11BE05C19002800DA /* Tests.xcconfig in Resources */,
@@ -1045,6 +1025,34 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "echo \"#define REALM_COCOA_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
+		};
+		5D6156F41BE06FF500A4BD3F /* Generate RLMPlatform.h */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate RLMPlatform.h";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "exec \"${SRCROOT}/scripts/generate-rlmplatform.sh\"\n";
+		};
+		5D6156F91BE083C600A4BD3F /* Generate RLMPlatform.h */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate RLMPlatform.h";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "exec \"${SRCROOT}/scripts/generate-rlmplatform.sh\"\n";
 		};
 		5D659E7E1BE04556006515A0 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;

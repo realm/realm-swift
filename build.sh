@@ -404,23 +404,23 @@ case "$COMMAND" in
         ;;
 
     "ios-static")
-        build_ios_combined iOS Realm
+        build_ios_combined 'Realm iOS static' Realm "-static"
         exit 0
         ;;
 
     "ios-dynamic")
-        build_ios_combined "iOS Dynamic" Realm "-dynamic"
+        build_ios_combined "Realm" Realm
         exit 0
         ;;
 
     "ios-swift")
         build_ios_combined RealmSwift RealmSwift '' "/swift-$REALM_SWIFT_VERSION"
-        cp -R build/ios-dynamic/Realm.framework build/ios/swift-$REALM_SWIFT_VERSION
+        cp -R build/ios/Realm.framework build/ios/swift-$REALM_SWIFT_VERSION
         exit 0
         ;;
 
     "watchos")
-        build_watchos_combined "watchOS" Realm
+        build_watchos_combined Realm Realm
         exit 0
         ;;
 
@@ -430,7 +430,7 @@ case "$COMMAND" in
         ;;
 
     "osx")
-        xcrealm "-scheme OSX -configuration $CONFIGURATION"
+        xcrealm "-scheme Realm -configuration $CONFIGURATION"
         rm -rf build/osx
         mkdir build/osx
         cp -R build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework build/osx
@@ -469,23 +469,23 @@ case "$COMMAND" in
         ;;
 
     "test-ios-static")
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
+        xcrealm "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
         shutdown_simulators
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
+        xcrealm "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
         exit 0
         ;;
 
     "test-ios7-static")
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' build test"
+        xcrealm "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' build test"
         shutdown_simulators
-        xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s,OS=7.1' build test"
+        xcrealm "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s,OS=7.1' build test"
         exit 0
         ;;
 
     "test-ios-dynamic")
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
+        xcrealm "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
         shutdown_simulators
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
+        xcrealm "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
         exit 0
         ;;
 
@@ -505,7 +505,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios-devices-objc")
-        test_ios_devices xcrealm "iOS Device Tests" "$CONFIGURATION"
+        test_ios_devices xcrealm "Realm iOS static" "$CONFIGURATION"
         exit $?
         ;;
 
@@ -519,7 +519,7 @@ case "$COMMAND" in
         if [[ "$CONFIGURATION" == "Debug" ]]; then
             COVERAGE_PARAMS="GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
         fi
-        xcrealm "-scheme OSX -configuration $CONFIGURATION test $COVERAGE_PARAMS"
+        xcrealm "-scheme Realm -configuration $CONFIGURATION test $COVERAGE_PARAMS"
         exit 0
         ;;
 
@@ -788,29 +788,29 @@ case "$COMMAND" in
         REALM_SWIFT_VERSION=1.2 sh build.sh prelaunch-simulator
         REALM_SWIFT_VERSION=1.2 sh build.sh test-ios-static
         REALM_SWIFT_VERSION=1.2 sh build.sh ios-static
-        move_to_clean_dir build/ios/Realm.framework xcode-6
+        move_to_clean_dir build/ios-static/Realm.framework xcode-6
         rm -rf build
 
         REALM_SWIFT_VERSION=2.1 sh build.sh prelaunch-simulator
         REALM_SWIFT_VERSION=2.1 sh build.sh test-ios-static
         REALM_SWIFT_VERSION=2.1 sh build.sh ios-static
-        move_to_clean_dir build/ios/Realm.framework xcode-7
+        move_to_clean_dir build/ios-static/Realm.framework xcode-7
 
-        zip --symlinks -r build/ios/realm-framework-ios.zip xcode-6 xcode-7
+        zip --symlinks -r build/ios-static/realm-framework-ios.zip xcode-6 xcode-7
         ;;
 
     "package-ios-dynamic")
         cd tightdb_objc
         REALM_SWIFT_VERSION=1.2 sh build.sh prelaunch-simulator
         REALM_SWIFT_VERSION=1.2 sh build.sh ios-dynamic
-        move_to_clean_dir build/ios-dynamic/Realm.framework xcode-6
+        move_to_clean_dir build/ios/Realm.framework xcode-6
         rm -rf build
 
         REALM_SWIFT_VERSION=2.1 sh build.sh prelaunch-simulator
         REALM_SWIFT_VERSION=2.1 sh build.sh ios-dynamic
-        move_to_clean_dir build/ios-dynamic/Realm.framework xcode-7
+        move_to_clean_dir build/ios/Realm.framework xcode-7
 
-        zip --symlinks -r build/ios-dynamic/realm-dynamic-framework-ios.zip xcode-6 xcode-7
+        zip --symlinks -r build/ios/realm-dynamic-framework-ios.zip xcode-6 xcode-7
         ;;
 
     "package-osx")
@@ -824,7 +824,7 @@ case "$COMMAND" in
     "package-ios-swift")
         cd tightdb_objc
         for version in 1.2 2.1; do
-            rm -rf build/ios-dynamic
+            rm -rf build/ios
             REALM_SWIFT_VERSION=$version sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION=$version sh build.sh ios-swift
         done
@@ -970,11 +970,11 @@ EOF
 
         echo 'Packaging iOS static'
         sh tightdb_objc/build.sh package-ios-static
-        cp tightdb_objc/build/ios/realm-framework-ios.zip .
+        cp tightdb_objc/build/ios-static/realm-framework-ios.zip .
 
         echo 'Packaging iOS dynamic'
         sh tightdb_objc/build.sh package-ios-dynamic
-        cp tightdb_objc/build/ios-dynamic/realm-dynamic-framework-ios.zip .
+        cp tightdb_objc/build/ios/realm-dynamic-framework-ios.zip .
 
         echo 'Packaging OS X'
         sh tightdb_objc/build.sh package-osx

@@ -29,6 +29,3 @@ OTHER_LDFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
 OTHER_LIBTOOLFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
 OTHER_LDFLAGS[sdk=watch*] = -lrealm-watchos$(REALM_LIBRARY_SUFFIX);
 OTHER_LIBTOOLFLAGS[sdk=watch*] = -lrealm-watchos$(REALM_LIBRARY_SUFFIX);
-
-EXCLUDED_SOURCE_FILE_NAMES[sdk=macosx*] = ios/*;
-EXCLUDED_SOURCE_FILE_NAMES[sdk=iphone*] = osx/*;
