@@ -1,3 +1,0 @@
-#include "Realm.xcconfig"
-
-SUPPORTED_PLATFORMS = macosx;

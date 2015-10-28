@@ -9,21 +9,21 @@
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
-               BuildableName = "iOS Device Tests.xctest"
-               BlueprintName = "iOS Device Tests"
+               BlueprintIdentifier = "29E3C7041A71C1C700B62C1D"
+               BuildableName = "Realm.framework"
+               BlueprintName = "iOS Dynamic"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
@@ -32,19 +32,27 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
-               BuildableName = "iOS Device Tests.xctest"
-               BlueprintName = "iOS Device Tests"
+               BlueprintIdentifier = "026B0F041A780680005E26C8"
+               BuildableName = "iOS Dynamic Tests.xctest"
+               BlueprintName = "iOS Dynamic Tests"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "SwiftObjectInterfaceTests/testNSStringFromClassDemangledTopLevelClassNames()">
+               </Test>
+               <Test
+                  Identifier = "SwiftObjectInterfaceTests/testNestedClassNameMangling()">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
-            BuildableName = "iOS Device Tests.xctest"
-            BlueprintName = "iOS Device Tests"
+            BlueprintIdentifier = "29E3C7041A71C1C700B62C1D"
+            BuildableName = "Realm.framework"
+            BlueprintName = "iOS Dynamic"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -64,9 +72,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
-            BuildableName = "iOS Device Tests.xctest"
-            BlueprintName = "iOS Device Tests"
+            BlueprintIdentifier = "29E3C7041A71C1C700B62C1D"
+            BuildableName = "Realm.framework"
+            BlueprintName = "iOS Dynamic"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -79,6 +87,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "29E3C7041A71C1C700B62C1D"
+            BuildableName = "Realm.framework"
+            BlueprintName = "iOS Dynamic"
+            ReferencedContainer = "container:Realm.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

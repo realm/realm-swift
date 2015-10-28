@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0710"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "144C2F3D1B3D33D0005C8F81"
+               BlueprintIdentifier = "5DD7557B1BE056DE002800DA"
                BuildableName = "Realm.framework"
-               BlueprintName = "watchOS"
+               BlueprintName = "Realm iOS static"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "144C2F3D1B3D33D0005C8F81"
+            BlueprintIdentifier = "5DD7557B1BE056DE002800DA"
             BuildableName = "Realm.framework"
-            BlueprintName = "watchOS"
+            BlueprintName = "Realm iOS static"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -63,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "144C2F3D1B3D33D0005C8F81"
+            BlueprintIdentifier = "5DD7557B1BE056DE002800DA"
             BuildableName = "Realm.framework"
-            BlueprintName = "watchOS"
+            BlueprintName = "Realm iOS static"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
