@@ -13,3 +13,5 @@ SWIFT_OBJC_BRIDGING_HEADER = Realm/Tests/Swift/Swift-Tests-Bridging-Header.h;
 SWIFT_OPTIMIZATION_LEVEL = -Onone;
 
 TEST_HOST = $(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestHost;
+
+EXCLUDED_SOURCE_FILE_NAMES[sdk=iphone*] = InterprocessTests.m SwiftSchemaTests.swift;

@@ -37,6 +37,14 @@
                BlueprintName = "iOS static tests"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "SwiftObjectInterfaceTests/testNSStringFromClassDemangledTopLevelClassNames()">
+               </Test>
+               <Test
+                  Identifier = "SwiftObjectInterfaceTests/testNestedClassNameMangling()">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>
