@@ -646,7 +646,8 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
     [realm beginWriteTransaction];
     NSDate *date = ({
-        NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitMonth|NSCalendarUnitYear|NSCalendarUnitDay fromDate:NSDate.date];
+        NSCalendarUnit units = (NSCalendarUnit)(NSCalendarUnitMonth | NSCalendarUnitYear | NSCalendarUnitDay);
+        NSDateComponents *components = [[NSCalendar currentCalendar] components:units fromDate:NSDate.date];
         components.calendar = [NSCalendar currentCalendar];
         components.year += 50000;
         components.date;
