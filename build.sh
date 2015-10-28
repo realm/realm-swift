@@ -103,6 +103,10 @@ xc() {
     fi
 }
 
+copy_bcsymbolmap() {
+    find "$1" -name '*.bcsymbolmap' -type f -exec cp {} "$2" \;
+}
+
 xcrealm() {
     PROJECT=Realm.xcodeproj
     xc "-project $PROJECT $@"
@@ -137,6 +141,9 @@ build_ios_combined() {
     if [ -d $iphonesimulator_path/Modules/$module_name.swiftmodule ]; then
       cp $iphonesimulator_path/Modules/$module_name.swiftmodule/* $iphoneos_path/Modules/$module_name.swiftmodule/
     fi
+    
+    # Copy *.bcsymbolmap to .framework for submitting app with bitcode
+    copy_bcsymbolmap "$build_products_path/$config-iphoneos$scope_suffix" "$iphoneos_path"
 
     # Retrieve build products
     clean_retrieve $iphoneos_path $out_path $product_name
@@ -168,6 +175,9 @@ build_watchos_combined() {
     if [ -d $watchsimulator_path/Modules/$module_name.swiftmodule ]; then
       cp $watchsimulator_path/Modules/$module_name.swiftmodule/* $watchos_path/Modules/$module_name.swiftmodule/
     fi
+    
+    # Copy *.bcsymbolmap
+    copy_bcsymbolmap "$build_products_path/$config-watchos$scope_suffix" "$watchos_path"
 
     # Retrieve build products
     clean_retrieve $watchos_path $out_path $product_name
