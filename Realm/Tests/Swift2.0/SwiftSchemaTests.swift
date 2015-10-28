@@ -19,6 +19,8 @@
 import XCTest
 import Realm
 
+#if false
+
 class InitLinkedToClass: RLMObject {
     dynamic var value = SwiftIntObject(value: [0])
 }
@@ -43,3 +45,5 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         RLMSchema.registerClasses([InitLinkedToClass.self, SwiftIntObject.self], count: 2)
     }
 }
+
+#endif
