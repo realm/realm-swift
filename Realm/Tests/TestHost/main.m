@@ -8,7 +8,7 @@
 
 #import <TargetConditionals.h>
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import <UIKit/UIKit.h>
 
@@ -23,6 +23,12 @@ int main(int argc, char *argv[]) {
     @autoreleasepool {
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
+}
+
+#elif TARGET_OS_TV || TARGET_OS_WATCH
+
+// tvOS and watchOS don't support testing at this time.
+int main(int argc, const char *argv[]) {
 }
 
 #else
