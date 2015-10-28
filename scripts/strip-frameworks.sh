@@ -60,3 +60,12 @@ for file in $(find . -type f -perm +111); do
     fi
   fi
 done
+
+if [ "$ACTION" = "install" ]; then
+  echo "Copy .bcsymbolmap files to .xcarchive"
+  mv Realm.framework/*.bcsymbolmap RealmSwift.framework/*.bcsymbolmap "${CONFIGURATION_BUILD_DIR}"
+else
+  # Delete *.bcsymbolmap files from framework bundle unless archiving
+  rm -f Realm.framework/*.bcsymbolmap
+  rm -f RealmSwift.framework/*.bcsymbolmap
+fi
