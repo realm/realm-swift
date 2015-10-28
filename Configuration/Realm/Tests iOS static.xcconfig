@@ -1,0 +1,3 @@
+#include "Tests.xcconfig"
+
+CONFIGURATION_BUILD_DIR = $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static;
