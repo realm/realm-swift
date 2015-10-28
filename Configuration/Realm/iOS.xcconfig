@@ -2,11 +2,6 @@
 
 SUPPORTED_PLATFORMS = iphoneos iphonesimulator;
 TARGETED_DEVICE_FAMILY = 1,2;
-
-LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
+IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 
 MACH_O_TYPE = staticlib;
-
-ENABLE_BITCODE = YES;
-OTHER_LDFLAGS = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
-OTHER_LIBTOOLFLAGS = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
