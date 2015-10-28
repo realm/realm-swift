@@ -876,7 +876,7 @@
 			buildConfigurationList = 5D659ED61BE04556006515A0 /* Build configuration list for PBXNativeTarget "Realm" */;
 			buildPhases = (
 				5D659E7E1BE04556006515A0 /* Get Version Number */,
-				5D659E7F1BE04556006515A0 /* Download Core */,
+				5D659E7F1BE04556006515A0 /* Download Core & Set Bitcode Symlink */,
 				5D659E801BE04556006515A0 /* Sources */,
 				5D659E9F1BE04556006515A0 /* Headers */,
 				5D659ECE1BE04556006515A0 /* Resources */,
@@ -1075,19 +1075,19 @@
 			shellPath = /bin/sh;
 			shellScript = "echo \"#define REALM_COCOA_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
 		};
-		5D659E7F1BE04556006515A0 /* Download Core */ = {
+		5D659E7F1BE04556006515A0 /* Download Core & Set Bitcode Symlink */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Download Core";
+			name = "Download Core & Set Bitcode Symlink";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh build.sh download-core";
+			shellScript = "sh build.sh download-core\nsh build.sh set-core-bitcode-symlink";
 		};
 		5DD7557C1BE056DE002800DA /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
