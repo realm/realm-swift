@@ -3,6 +3,21 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
 * All functionality deprecated in previous releases has been removed entirely.
 
 ### Enhancements
@@ -13,16 +28,18 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * None.
 
-0.96.1 Release notes (2015-10-20)
+0.96.2 Release notes (2015-10-26)
 =============================================================
 
-### API breaking changes
+Prebuilt frameworks are now built with Xcode 7.1.
 
-* None.
+### Bugfixes
 
-### Enhancements
+* Fix ignoring optional properties in Swift.
+* Fix CocoaPods installation on case-sensitive file systems.
 
-* None.
+0.96.1 Release notes (2015-10-20)
+=============================================================
 
 ### Bugfixes
 
