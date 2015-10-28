@@ -67,6 +67,7 @@
 		3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */; };
 		5D6156EE1BE0689200A4BD3F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D659ED91BE04556006515A0 /* Realm.framework */; };
 		5D6156FB1BE08E7E00A4BD3F /* PerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */; };
+		5D6157051BE13CBB00A4BD3F /* strip-frameworks.sh in Resources */ = {isa = PBXBuildFile; fileRef = E81C393E1AE5CE6A00F03B56 /* strip-frameworks.sh */; };
 		5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */; };
 		5D659E821BE04556006515A0 /* index_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FBD05FA1B94E1C3004559CF /* index_set.cpp */; };
 		5D659E831BE04556006515A0 /* object_schema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAE25561B8CEBBE00D01405 /* object_schema.cpp */; };
@@ -1017,6 +1018,7 @@
 			files = (
 				5D659ED21BE04556006515A0 /* CHANGELOG.md in Resources */,
 				5D659ED51BE04556006515A0 /* LICENSE in Resources */,
+				5D6157051BE13CBB00A4BD3F /* strip-frameworks.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
