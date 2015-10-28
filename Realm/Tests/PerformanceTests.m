@@ -21,7 +21,7 @@
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.h"
 
-#if !DEBUG
+#if !DEBUG && TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
 
 @interface PerformanceTests : RLMTestCase
 @property (nonatomic) dispatch_queue_t queue;
