@@ -7,26 +7,15 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		C04B4BD71B55C47600FAE58E /* Set Swift Version iOS */ = {
+		C04B4BD71B55C47600FAE58E /* Set Swift Version */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Set Swift Version iOS" */;
+			buildConfigurationList = C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Set Swift Version" */;
 			buildPhases = (
 				C04B4BDB1B55C47A00FAE58E /* Set Swift Version */,
 			);
 			dependencies = (
 			);
-			name = "Set Swift Version iOS";
-			productName = "Swift Version";
-		};
-		E8DFDD8F1B5EAA3100282424 /* Set Swift Version OSX */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = E8DFDD911B5EAA3100282424 /* Build configuration list for PBXAggregateTarget "Set Swift Version OSX" */;
-			buildPhases = (
-				E8DFDD901B5EAA3100282424 /* Set Swift Version */,
-			);
-			dependencies = (
-			);
-			name = "Set Swift Version OSX";
+			name = "Set Swift Version";
 			productName = "Swift Version";
 		};
 /* End PBXAggregateTarget section */
@@ -364,6 +353,13 @@
 			remoteGlobalIDString = 5DD7557B1BE056DE002800DA;
 			remoteInfo = "Realm iOS static";
 		};
+		5DD755DE1BE05B26002800DA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
+			remoteInfo = "Set Swift Version";
+		};
 		C04B4BDC1B55C51500FAE58E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -384,13 +380,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
 			remoteInfo = "Swift Version";
-		};
-		E8DFDD941B5EAA5600282424 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8DFDD8F1B5EAA3100282424;
-			remoteInfo = "Set Swift Version OSX";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -1128,7 +1117,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8DFDD951B5EAA5600282424 /* PBXTargetDependency */,
+				5DD755DF1BE05B26002800DA /* PBXTargetDependency */,
 				5DD755D21BE05828002800DA /* PBXTargetDependency */,
 			);
 			name = "OS X Tests";
@@ -1187,8 +1176,7 @@
 				026B0F041A780680005E26C8 /* iOS Dynamic Tests */,
 				3F8DCA5619930F550008BD7F /* iOS Device Tests */,
 				3F1A5E711992EB7400F45F4C /* TestHost */,
-				C04B4BD71B55C47600FAE58E /* Set Swift Version iOS */,
-				E8DFDD8F1B5EAA3100282424 /* Set Swift Version OSX */,
+				C04B4BD71B55C47600FAE58E /* Set Swift Version */,
 			);
 		};
 /* End PBXProject section */
@@ -1283,20 +1271,6 @@
 			shellScript = "sh build.sh download-core\nsh build.sh set-core-bitcode-symlink";
 		};
 		C04B4BDB1B55C47A00FAE58E /* Set Swift Version */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Set Swift Version";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "sh build.sh set-swift-version";
-		};
-		E8DFDD901B5EAA3100282424 /* Set Swift Version */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1587,25 +1561,25 @@
 			target = 5DD7557B1BE056DE002800DA /* Realm iOS static */;
 			targetProxy = 5DD755D91BE05875002800DA /* PBXContainerItemProxy */;
 		};
+		5DD755DF1BE05B26002800DA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
+			targetProxy = 5DD755DE1BE05B26002800DA /* PBXContainerItemProxy */;
+		};
 		C04B4BDD1B55C51500FAE58E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C04B4BD71B55C47600FAE58E /* Set Swift Version iOS */;
+			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
 			targetProxy = C04B4BDC1B55C51500FAE58E /* PBXContainerItemProxy */;
 		};
 		C04B4BDF1B55C51C00FAE58E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C04B4BD71B55C47600FAE58E /* Set Swift Version iOS */;
+			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
 			targetProxy = C04B4BDE1B55C51C00FAE58E /* PBXContainerItemProxy */;
 		};
 		C04B4BE11B55C52100FAE58E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C04B4BD71B55C47600FAE58E /* Set Swift Version iOS */;
+			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
 			targetProxy = C04B4BE01B55C52100FAE58E /* PBXContainerItemProxy */;
-		};
-		E8DFDD951B5EAA5600282424 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8DFDD8F1B5EAA3100282424 /* Set Swift Version OSX */;
-			targetProxy = E8DFDD941B5EAA5600282424 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1785,7 +1759,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = "";
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 			};
 			name = Debug;
 		};
@@ -1795,7 +1768,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = "";
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 			};
 			name = Release;
 		};
@@ -1910,24 +1882,6 @@
 			};
 			name = Release;
 		};
-		E8DFDD921B5EAA3100282424 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "Set Swift Version OSX";
-				SDKROOT = "";
-				SUPPORTED_PLATFORMS = macosx;
-			};
-			name = Debug;
-		};
-		E8DFDD931B5EAA3100282424 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "Set Swift Version OSX";
-				SDKROOT = "";
-				SUPPORTED_PLATFORMS = macosx;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1976,7 +1930,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Set Swift Version iOS" */ = {
+		C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Set Swift Version" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C04B4BD81B55C47600FAE58E /* Debug */,
@@ -2008,15 +1962,6 @@
 			buildConfigurations = (
 				E8D89BB21955FC6D00CF2B9A /* Debug */,
 				E8D89BB31955FC6D00CF2B9A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E8DFDD911B5EAA3100282424 /* Build configuration list for PBXAggregateTarget "Set Swift Version OSX" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E8DFDD921B5EAA3100282424 /* Debug */,
-				E8DFDD931B5EAA3100282424 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
