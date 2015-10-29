@@ -532,9 +532,11 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
  @return YES if the compaction succeeded.
  */
 - (BOOL)compact {
+    // compact() automatically ends the read transaction, but we need to clean
+    // up cached state and send invalidated notifications when that happens, so
+    // explicitly end it first unless we're in a write transaction (in which
+    // case compact() will throw an exception)
     if (!_realm->is_in_transaction()) {
-        // compact() leaves us outside a read transaction, so we need to make
-        // sure all of our cached things are cleaned up first
         [self invalidate];
     }
 
