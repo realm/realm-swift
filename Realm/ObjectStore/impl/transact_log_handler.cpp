@@ -18,7 +18,7 @@
 
 #include "transact_log_handler.hpp"
 
-#include "realm_delegate.hpp"
+#include "realm_binding_context.hpp"
 
 #include <realm/commit_log.hpp>
 #include <realm/group_shared.hpp>
@@ -28,15 +28,15 @@ using namespace realm;
 
 namespace {
 class TransactLogHandler {
-    using ColumnInfo = RealmDelegate::ColumnInfo;
-    using ObserverState = RealmDelegate::ObserverState;
+    using ColumnInfo = RealmBindingContext::ColumnInfo;
+    using ObserverState = RealmBindingContext::ObserverState;
 
     // Observed table rows which need change information
     std::vector<ObserverState> m_observers;
     // Userdata pointers for rows which have been deleted
     std::vector<void *> invalidated;
     // Delegate to send change information to
-    RealmDelegate* m_delegate;
+    RealmBindingContext* m_delegate;
 
     // Index of currently selected table
     size_t m_current_table = 0;
@@ -84,7 +84,7 @@ class TransactLogHandler {
 
 public:
     template<typename Func>
-    TransactLogHandler(RealmDelegate* delegate, SharedGroup& sg, Func&& func)
+    TransactLogHandler(RealmBindingContext* delegate, SharedGroup& sg, Func&& func)
     : m_delegate(delegate)
     {
         if (!delegate) {
@@ -325,19 +325,19 @@ public:
 namespace realm {
 namespace _impl {
 namespace transaction {
-void advance(SharedGroup& sg, ClientHistory& history, RealmDelegate* delegate) {
+void advance(SharedGroup& sg, ClientHistory& history, RealmBindingContext* delegate) {
     TransactLogHandler(delegate, sg, [&](auto&&... args) {
         LangBindHelper::advance_read(sg, history, std::move(args)...);
     });
 }
 
-void begin(SharedGroup& sg, ClientHistory& history, RealmDelegate* delegate) {
+void begin(SharedGroup& sg, ClientHistory& history, RealmBindingContext* delegate) {
     TransactLogHandler(delegate, sg, [&](auto&&... args) {
         LangBindHelper::promote_to_write(sg, history, std::move(args)...);
     });
 }
 
-void commit(SharedGroup& sg, ClientHistory&, RealmDelegate* delegate) {
+void commit(SharedGroup& sg, ClientHistory&, RealmBindingContext* delegate) {
     LangBindHelper::commit_and_continue_as_read(sg);
 
     if (delegate) {
@@ -345,7 +345,7 @@ void commit(SharedGroup& sg, ClientHistory&, RealmDelegate* delegate) {
     }
 }
 
-void cancel(SharedGroup& sg, ClientHistory& history, RealmDelegate* delegate) {
+void cancel(SharedGroup& sg, ClientHistory& history, RealmBindingContext* delegate) {
     TransactLogHandler(delegate, sg, [&](auto&&... args) {
         LangBindHelper::rollback_and_continue_as_read(sg, history, std::move(args)...);
     });

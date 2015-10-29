@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "realm_delegate.hpp"
+#import "realm_binding_context.hpp"
 
 #import <realm/link_view.hpp> // required by row.hpp
 #import <realm/row.hpp>
@@ -141,6 +141,6 @@ void RLMClearTable(RLMObjectSchema *realm);
 // invoke the block, sending notifications for cascading deletes/link nullifications
 void RLMTrackDeletions(RLMRealm *realm, dispatch_block_t block);
 
-std::vector<realm::RealmDelegate::ObserverState> RLMGetObservedRows(NSArray *schema);
-void RLMWillChange(std::vector<realm::RealmDelegate::ObserverState> const& observed, std::vector<void *> const& invalidated);
-void RLMDidChange(std::vector<realm::RealmDelegate::ObserverState> const& observed, std::vector<void *> const& invalidated);
+std::vector<realm::RealmBindingContext::ObserverState> RLMGetObservedRows(NSArray *schema);
+void RLMWillChange(std::vector<realm::RealmBindingContext::ObserverState> const& observed, std::vector<void *> const& invalidated);
+void RLMDidChange(std::vector<realm::RealmBindingContext::ObserverState> const& observed, std::vector<void *> const& invalidated);

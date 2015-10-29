@@ -20,7 +20,7 @@
 #define REALM_TRANSACT_LOG_HANDLER_HPP
 
 namespace realm {
-class RealmDelegate;
+class RealmBindingContext;
 class SharedGroup;
 class ClientHistory;
 
@@ -28,19 +28,19 @@ namespace _impl {
 namespace transaction {
 // Advance the read transaction version, with change notifications sent to delegate
 // Must not be called from within a write transaction.
-void advance(SharedGroup& sg, ClientHistory& history, RealmDelegate* delegate);
+void advance(SharedGroup& sg, ClientHistory& history, RealmBindingContext* delegate);
 
 // Begin a write transaction
 // If the read transaction version is not up to date, will first advance to the
 // most recent read transaction and sent notifications to delegate
-void begin(SharedGroup& sg, ClientHistory& history, RealmDelegate* delegate);
+void begin(SharedGroup& sg, ClientHistory& history, RealmBindingContext* delegate);
 
 // Commit a write transaction
-void commit(SharedGroup& sg, ClientHistory& history, RealmDelegate* delegate);
+void commit(SharedGroup& sg, ClientHistory& history, RealmBindingContext* delegate);
 
 // Cancel a write transaction and roll back all changes, with change notifications
 // for reverting to the old values sent to delegate
-void cancel(SharedGroup& sg, ClientHistory& history, RealmDelegate* delegate);
+void cancel(SharedGroup& sg, ClientHistory& history, RealmBindingContext* delegate);
 } // namespace transaction
 } // namespace _impl
 } // namespace realm
