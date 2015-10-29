@@ -40,7 +40,7 @@ static NSString *const c_RLMRealmConfigurationProperties[] = {
 static NSString *const c_defaultRealmFileName = @"default.realm";
 RLMRealmConfiguration *s_defaultConfiguration;
 
-NSString *RLMRealmPathForFile(NSString *fileName) {
+NSString *RLMRealmPathForFileAndBundleIdentifier(NSString *fileName, NSString *bundleIdentifier) {
 #if TARGET_OS_IPHONE
     // On iOS the Documents directory isn't user-visible, so put files there
     NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
@@ -50,11 +50,14 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     // to avoid accidentally sharing files between applications
     NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
     if (![[NSProcessInfo processInfo] environment][@"APP_SANDBOX_CONTAINER_ID"]) {
-        NSString *identifier = [[NSBundle mainBundle] bundleIdentifier];
-        if ([identifier length] == 0) {
-            identifier = [[[NSBundle mainBundle] executablePath] lastPathComponent];
+        if (!bundleIdentifier) {
+            bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
         }
-        path = [path stringByAppendingPathComponent:identifier];
+        if (!bundleIdentifier) {
+            bundleIdentifier = [NSBundle mainBundle].executablePath.lastPathComponent;
+        }
+
+        path = [path stringByAppendingPathComponent:bundleIdentifier];
 
         // create directory
         [[NSFileManager defaultManager] createDirectoryAtPath:path
@@ -64,6 +67,10 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     }
 #endif
     return [path stringByAppendingPathComponent:fileName];
+}
+
+NSString *RLMRealmPathForFile(NSString *fileName) {
+    return RLMRealmPathForFileAndBundleIdentifier(fileName, nil);
 }
 
 @implementation RLMRealmConfiguration {

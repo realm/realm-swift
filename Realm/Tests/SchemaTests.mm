@@ -30,8 +30,6 @@
 #import <algorithm>
 #import <objc/runtime.h>
 
-#if 0
-
 @interface SchemaTestClassBase : RLMObject
 @property IntObject *baseCol;
 @end
@@ -523,5 +521,3 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 #endif
 
 @end
-
-#endif
