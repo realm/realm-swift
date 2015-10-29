@@ -42,6 +42,7 @@ RLMRealmConfiguration *s_defaultConfiguration;
 
 NSString *RLMRealmPathForFileAndBundleIdentifier(NSString *fileName, NSString *bundleIdentifier) {
 #if TARGET_OS_IPHONE
+    (void)bundleIdentifier;
     // On iOS the Documents directory isn't user-visible, so put files there
     NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
 #else
