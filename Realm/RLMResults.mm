@@ -537,7 +537,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (std::unique_ptr<Query>)cloneQuery {
-    return std::make_unique<realm::Query>(*_backingQuery, realm::Query::TCopyExpressionTag{});
+    return std::make_unique<realm::Query>(*_backingQuery);
 }
 
 - (NSUInteger)indexInSource:(NSUInteger)index {
@@ -620,7 +620,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (std::unique_ptr<Query>)cloneQuery {
-    return std::make_unique<realm::Query>(_table->where(), realm::Query::TCopyExpressionTag{});
+    return std::make_unique<realm::Query>(_table->where());
 }
 
 - (NSUInteger)indexInSource:(NSUInteger)index {
