@@ -638,8 +638,8 @@ static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, RLMAccessorCode access
 }
 
 // macros/helpers to generate objc type strings for registering methods
-#define GETTER_TYPES(C) C ":@"
-#define SETTER_TYPES(C) "v:@" C
+#define GETTER_TYPES(C) C "@:"
+#define SETTER_TYPES(C) "v@:" C
 
 // getter type strings
 // NOTE: this typecode is really the the first charachter of the objc/runtime.h type
