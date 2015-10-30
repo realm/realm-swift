@@ -928,7 +928,6 @@
 				293F98F01A76E05700C0199D /* Get Version Number */,
 				E856D1DB195614A400FB2FCF /* Sources */,
 				E856D1DC195614A400FB2FCF /* Frameworks */,
-				5D61570B1BE3250000A4BD3F /* Exit After Building Tests If Requested */,
 			);
 			buildRules = (
 			);
@@ -949,7 +948,6 @@
 				293F98F01A76E05700C0199D /* Get Version Number */,
 				E8D89B9F1955FC6D00CF2B9A /* Sources */,
 				E8D89BA01955FC6D00CF2B9A /* Frameworks */,
-				5D61570A1BE324A300A4BD3F /* Exit After Building Tests If Requested */,
 			);
 			buildRules = (
 			);
@@ -1070,34 +1068,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "exec \"${SRCROOT}/scripts/generate-rlmplatform.sh\"\n";
-		};
-		5D61570A1BE324A300A4BD3F /* Exit After Building Tests If Requested */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Exit After Building Tests If Requested";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [[ $REALM_EXIT_AFTER_BUILDING_TESTS == \"YES\" ]]; then\n    echo \"Exiting as requested.\"\n    exit 1\nfi\n";
-		};
-		5D61570B1BE3250000A4BD3F /* Exit After Building Tests If Requested */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Exit After Building Tests If Requested";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [[ $REALM_EXIT_AFTER_BUILDING_TESTS == \"YES\" ]]; then\n    echo \"Exiting as requested.\"\n    exit 1\nfi\n";
 		};
 		5D659E7E1BE04556006515A0 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
