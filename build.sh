@@ -176,9 +176,9 @@ build_watchos_combined() {
 
 xcrealm_work_around_rdar_23055637() {
     # xcodebuild times out waiting for the iOS simulator to launch if it takes > 120 seconds for the tests to
-    # build (<http://openradar.appspot.com/23055637>). Work around this by prelaunching the simulator.
-    open "$(mdfind kMDItemCFBundleIdentifier == com.apple.iphonesimulator | grep "^${DEVELOPER_DIR}")"
-
+    # build (<http://openradar.appspot.com/23055637>). Work around this by having the test phases intentionally
+    # exit after they finish building the first time, then run the tests for real.
+    REALM_EXIT_AFTER_BUILDING_TESTS=YES xcrealm "$1" || true
     xcrealm "$1"
 }
 
