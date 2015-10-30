@@ -175,7 +175,7 @@ public:
         return true;
     }
 
-    bool select_link_list(size_t col, size_t row)
+    bool select_link_list(size_t col, size_t row, size_t)
     {
         m_active_linklist = nullptr;
         for (auto& o : m_observers) {
@@ -303,15 +303,22 @@ public:
     bool set_date_time(size_t col, size_t row, DateTime) { return mark_dirty(row, col); }
     bool set_table(size_t col, size_t row) { return mark_dirty(row, col); }
     bool set_mixed(size_t col, size_t row, const Mixed&) { return mark_dirty(row, col); }
-    bool set_link(size_t col, size_t row, size_t) { return mark_dirty(row, col); }
+    bool set_link(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
     bool set_null(size_t col, size_t row) { return mark_dirty(row, col); }
-    bool nullify_link(size_t col, size_t row) { return mark_dirty(row, col); }
+    bool nullify_link(size_t col, size_t row, size_t) { return mark_dirty(row, col); }
 
     // Doesn't change any data
     bool optimize_table() { return true; }
 
     // Used for subtables, which we currently don't support
     bool select_descriptor(int, const size_t*) { return false; }
+
+    // Not implemented
+    bool insert_substring(size_t, size_t, size_t, StringData) { return false; }
+    bool erase_substring(size_t, size_t, size_t, size_t) { return false; }
+    bool swap_rows(size_t, size_t) { return false; }
+    bool move_column(size_t, size_t) { return false; }
+    bool move_group_level_table(size_t, size_t) { return false; }
 };
 } // anonymous namespace
 

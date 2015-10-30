@@ -3,26 +3,11 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
-
-### Enhancements
-
-* None.
-
-### Bugfixes
-
-* None.
-
-x.x.x Release notes (yyyy-MM-dd)
-=============================================================
-
-### API breaking changes
-
 * All functionality deprecated in previous releases has been removed entirely.
 
 ### Enhancements
 
-* None.
+* Queries are no longer limited to 16 levels of grouping.
 
 ### Bugfixes
 
