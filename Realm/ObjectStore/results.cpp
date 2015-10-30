@@ -19,6 +19,7 @@
 #include "results.hpp"
 
 #include "object_store.hpp"
+#include "realm_coordinator.hpp"
 
 #include <stdexcept>
 
@@ -52,11 +53,23 @@ Results::Results(SharedRealm r, Table& table)
 {
 }
 
+Results::Results(SharedRealm r, Query q, SortOrder s, TableView tv)
+: m_realm(std::move(r))
+, m_query(std::move(q))
+, m_table_view(std::move(tv))
+, m_table(&m_table_view.get_parent())
+, m_sort(std::move(s))
+, m_mode(Mode::TableView)
+{
+}
+
 void Results::validate_read() const
 {
     if (m_realm)
         m_realm->verify_thread();
     if (m_table && !m_table->is_attached())
+        throw InvalidatedException();
+    if (m_mode == Mode::TableView && !m_table_view.is_attached())
         throw InvalidatedException();
 }
 
@@ -331,4 +344,32 @@ Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t c
     column_index = column;
     column_name = table->get_column_name(column);
     column_type = table->get_column_type(column);
+}
+
+AsyncQueryCancelationToken Results::async(std::unique_ptr<AsyncQueryCallback> target)
+{
+    return _impl::RealmCoordinator::register_query(*this, std::move(target));
+}
+
+AsyncQueryCancelationToken::~AsyncQueryCancelationToken()
+{
+    if (m_registration) {
+        _impl::RealmCoordinator::unregister_query(*m_registration);
+    }
+}
+
+AsyncQueryCancelationToken::AsyncQueryCancelationToken(AsyncQueryCancelationToken&& rgt)
+: m_registration(std::move(rgt.m_registration))
+{
+}
+
+AsyncQueryCancelationToken& AsyncQueryCancelationToken::operator=(realm::AsyncQueryCancelationToken&& rgt)
+{
+    if (this != &rgt) {
+        if (m_registration) {
+            _impl::RealmCoordinator::unregister_query(*m_registration);
+        }
+        m_registration = std::move(rgt.m_registration);
+    }
+    return *this;
 }

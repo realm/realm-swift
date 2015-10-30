@@ -307,7 +307,11 @@ void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
         *outError = error;
     }
     else {
-        @throw RLMException(error.localizedDescription, @{ NSUnderlyingErrorKey: error });
+        NSString *msg = error.localizedDescription;
+        if (error.userInfo[NSFilePathErrorKey]) {
+            msg = [NSString stringWithFormat:@"%@: %@", error.userInfo[NSFilePathErrorKey], error.localizedDescription];
+        }
+        @throw RLMException(msg, @{NSUnderlyingErrorKey: error});
     }
 }
 

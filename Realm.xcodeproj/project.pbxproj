@@ -65,11 +65,16 @@
 		3F0543F41C56F76700AA5322 /* cached_realm_base.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0543F31C56F76700AA5322 /* cached_realm_base.hpp */; };
 		3F0543F71C56F78300AA5322 /* cached_realm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0543F51C56F78300AA5322 /* cached_realm.hpp */; };
 		3F0543F81C56F78300AA5322 /* external_commit_helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0543F61C56F78300AA5322 /* external_commit_helper.hpp */; };
+		3F0543FB1C56FABE00AA5322 /* async_query.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0543F91C56FABE00AA5322 /* async_query.hpp */; };
+		3F0543FC1C56FABE00AA5322 /* async_query.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543FA1C56FABE00AA5322 /* async_query.cpp */; };
+		3F0543FD1C56FAC200AA5322 /* async_query.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543FA1C56FABE00AA5322 /* async_query.cpp */; };
 		3F1F47821B9612B300CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F1F47831B9656B900CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F75566B1BE94CCC0058BC7E /* results.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556691BE94CCC0058BC7E /* results.cpp */; };
 		3F75566C1BE94CCC0058BC7E /* results.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F75566A1BE94CCC0058BC7E /* results.hpp */; };
 		3F75566D1BE94CEA0058BC7E /* results.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556691BE94CCC0058BC7E /* results.cpp */; };
+		3F7556751BE95A0C0058BC7E /* AsyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.m */; };
+		3F7556761BE95A0D0058BC7E /* AsyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.m */; };
 		3F8DCA7519930FCB0008BD7F /* SwiftTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */; };
 		3F8DCA7619930FCB0008BD7F /* SwiftArrayPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */; };
 		3F8DCA7719930FCB0008BD7F /* SwiftArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */; };
@@ -451,6 +456,8 @@
 		3F0543F31C56F76700AA5322 /* cached_realm_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = cached_realm_base.hpp; path = ObjectStore/impl/cached_realm_base.hpp; sourceTree = "<group>"; };
 		3F0543F51C56F78300AA5322 /* cached_realm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = cached_realm.hpp; path = ObjectStore/impl/cached_realm.hpp; sourceTree = "<group>"; };
 		3F0543F61C56F78300AA5322 /* external_commit_helper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = external_commit_helper.hpp; path = ObjectStore/impl/external_commit_helper.hpp; sourceTree = "<group>"; };
+		3F0543F91C56FABE00AA5322 /* async_query.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = async_query.hpp; path = ObjectStore/impl/async_query.hpp; sourceTree = "<group>"; };
+		3F0543FA1C56FABE00AA5322 /* async_query.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = async_query.cpp; path = ObjectStore/impl/async_query.cpp; sourceTree = "<group>"; };
 		3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = KVOTests.mm; sourceTree = "<group>"; };
 		3F0F02AC1B6FFF3D0046A4D5 /* RLMObservation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMObservation.hpp; sourceTree = "<group>"; };
 		3F0F02AD1B6FFF3D0046A4D5 /* RLMObservation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObservation.mm; sourceTree = "<group>"; };
@@ -469,6 +476,7 @@
 		3F6B89AE19EF40BA004E8EA8 /* librealm-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "librealm-ios.a"; path = "../core/librealm-ios.a"; sourceTree = "<group>"; };
 		3F7556691BE94CCC0058BC7E /* results.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = results.cpp; path = ObjectStore/results.cpp; sourceTree = "<group>"; };
 		3F75566A1BE94CCC0058BC7E /* results.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = results.hpp; path = ObjectStore/results.hpp; sourceTree = "<group>"; };
+		3F7556731BE95A050058BC7E /* AsyncTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncTests.m; sourceTree = "<group>"; };
 		3FAE25511B8CEBBE00D01405 /* object_store.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = object_store.cpp; path = ObjectStore/object_store.cpp; sourceTree = "<group>"; };
 		3FAE25521B8CEBBE00D01405 /* object_store.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = object_store.hpp; path = ObjectStore/object_store.hpp; sourceTree = "<group>"; };
 		3FAE25531B8CEBBE00D01405 /* shared_realm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shared_realm.cpp; path = ObjectStore/shared_realm.cpp; sourceTree = "<group>"; };
@@ -702,6 +710,8 @@
 			isa = PBXGroup;
 			children = (
 				3F2118A71B97CBAD005A4CFE /* Apple */,
+				3F0543FA1C56FABE00AA5322 /* async_query.cpp */,
+				3F0543F91C56FABE00AA5322 /* async_query.hpp */,
 				3F0543F51C56F78300AA5322 /* cached_realm.hpp */,
 				3F0543F31C56F76700AA5322 /* cached_realm_base.hpp */,
 				3F0543F61C56F78300AA5322 /* external_commit_helper.hpp */,
@@ -833,6 +843,7 @@
 			isa = PBXGroup;
 			children = (
 				E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */,
+				3F7556731BE95A050058BC7E /* AsyncTests.m */,
 				E81A1FBA1955FE0100FDED82 /* DynamicTests.m */,
 				021A882F1AAFB5BE00EEAC84 /* EncryptionTests.mm */,
 				E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */,
@@ -1018,6 +1029,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F0543FB1C56FABE00AA5322 /* async_query.hpp in Headers */,
 				5D659EA61BE04556006515A0 /* binding_context.hpp in Headers */,
 				3F0543F01C56F74600AA5322 /* cached_realm.hpp in Headers */,
 				3F0543F71C56F78300AA5322 /* cached_realm.hpp in Headers */,
@@ -1585,6 +1597,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F0543FC1C56FABE00AA5322 /* async_query.cpp in Sources */,
 				3F0543F11C56F74600AA5322 /* cached_realm.cpp in Sources */,
 				5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */,
 				5D659E821BE04556006515A0 /* index_set.cpp in Sources */,
@@ -1675,6 +1688,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F0543FD1C56FAC200AA5322 /* async_query.cpp in Sources */,
 				3F0543F21C56F74A00AA5322 /* cached_realm.cpp in Sources */,
 				5DD7557F1BE056DE002800DA /* external_commit_helper.cpp in Sources */,
 				5DD755801BE056DE002800DA /* index_set.cpp in Sources */,
@@ -1716,6 +1730,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E856D214195615A900FB2FCF /* ArrayPropertyTests.m in Sources */,
+				3F7556761BE95A0D0058BC7E /* AsyncTests.m in Sources */,
 				E856D216195615A900FB2FCF /* DynamicTests.m in Sources */,
 				021A88331AAFB5C900EEAC84 /* EncryptionTests.mm in Sources */,
 				E856D217195615A900FB2FCF /* EnumeratorTests.m in Sources */,
@@ -1759,6 +1774,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */,
+				3F7556751BE95A0C0058BC7E /* AsyncTests.m in Sources */,
 				02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */,
 				021A88321AAFB5C800EEAC84 /* EncryptionTests.mm in Sources */,
 				E81A1FDB1955FE0100FDED82 /* EnumeratorTests.m in Sources */,

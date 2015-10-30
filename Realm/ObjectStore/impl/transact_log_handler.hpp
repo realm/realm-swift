@@ -19,6 +19,8 @@
 #ifndef REALM_TRANSACT_LOG_HANDLER_HPP
 #define REALM_TRANSACT_LOG_HANDLER_HPP
 
+#include <realm/group_shared.hpp>
+
 namespace realm {
 class BindingContext;
 class SharedGroup;
@@ -28,7 +30,8 @@ namespace _impl {
 namespace transaction {
 // Advance the read transaction version, with change notifications sent to delegate
 // Must not be called from within a write transaction.
-void advance(SharedGroup& sg, ClientHistory& history, BindingContext* binding_context);
+void advance(SharedGroup& sg, ClientHistory& history, BindingContext* binding_context,
+             SharedGroup::VersionID version=SharedGroup::VersionID{});
 
 // Begin a write transaction
 // If the read transaction version is not up to date, will first advance to the

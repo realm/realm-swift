@@ -22,7 +22,7 @@
 
 RLM_ASSUME_NONNULL_BEGIN
 
-@class RLMObject, RLMRealm;
+@class RLMObject, RLMRealm, RLMNotificationToken;
 
 /**
  RLMResults is an auto-updating container type in Realm returned from object
@@ -156,6 +156,67 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingDescriptors:(NSArray *)properties;
 
+#pragma mark - Asynchronous Queries
+
+/**
+ Asynchronously run this query and then pass the result to the block on the given dispatch queue.
+
+ The block will be called again after each write transaction which changes the
+ result of the query. You must retain the returned token for as long as you want
+ the results to continue to be sent to the block. To stop receiving updates,
+ call -stop on the token.
+
+ The determination for if the results have changed is currently very coarse, but
+ will become more precise in future versions.
+
+ If an error occurs the block will be called with `nil` for the results
+ parameter and a non-`nil` error. Currently the only errors that can occur are
+ when opening the RLMRealm on the background worker thread or the destination
+ queue fails.
+
+ The RLMResults passed to the block is a normal auto-updating RLMResults object.
+ This means that if you perform a write transaction or explicitly call
+ -[RLMRealm refresh] from within the block, the query may be synchronously rerun
+ the next time you access the results.
+
+ @warning This method cannot be called during a write transaction, or when the
+          containing realm is read-only.
+
+ @param queue The dispatch queue onto which the results should be delivered.
+ @param block The block to be called on the given `queue` with the queue-local copy of the results.
+ @return A token which must be held for as long as you want query results to be delivered.
+ */
+- (RLMNotificationToken *)deliverOn:(dispatch_queue_t)queue
+                              block:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results, NSError *__nullable error))block;
+
+/**
+ Asynchronously run this query and then pass the result to the block on the main thread
+
+ The block will be called again after each write transaction which changes the
+ result of the query. You must retain the returned token for as long as you want
+ the results to continue to be sent to the block. To stop receiving updates,
+ call -stop on the token.
+
+ The determination for if the results have changed is currently very coarse, but
+ will become more precise in future versions.
+
+ If an error occurs the block will be called with `nil` for the results
+ parameter and a non-`nil` error. Currently the only errors that can occur are
+ when opening the RLMRealm on the background worker thread or the destination
+ queue fails.
+
+ The RLMResults passed to the block is a normal auto-updating RLMResults object.
+ This means that if you perform a write transaction or explicitly call
+ -[RLMRealm refresh] from within the block, the query may be synchronously rerun
+ the next time you access the results.
+
+ @warning This method cannot be called during a write transaction, or when the
+          containing realm is read-only.
+
+ @param block The block to be called with the evaluated results
+ @return A token which must be held for as long as you want query results to be delivered.
+ */
+- (RLMNotificationToken *)deliverOnMainThread:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results, NSError *__nullable error))block;
 
 #pragma mark - Aggregating Property Values
 
