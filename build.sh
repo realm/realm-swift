@@ -174,6 +174,14 @@ build_watchos_combined() {
     xcrun lipo -create "$watchsimulator_path/$binary_path" "$watchos_path/$binary_path" -output "$out_path/$product_name/$module_name"
 }
 
+xcrealm_work_around_rdar_23055637() {
+    # xcodebuild times out waiting for the iOS simulator to launch if it takes > 120 seconds for the tests to
+    # build (<http://openradar.appspot.com/23055637>). Work around this by having the test phases intentionally
+    # exit after they finish building the first time, then run the tests for real.
+    REALM_EXIT_AFTER_BUILDING_TESTS=YES xcrealm "$1" || true
+    xcrealm "$1"
+}
+
 clean_retrieve() {
   mkdir -p "$2"
   rm -rf "$2/$3"
@@ -469,23 +477,23 @@ case "$COMMAND" in
         ;;
 
     "test-ios-static")
-        xcrealm "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
+        xcrealm_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         shutdown_simulators
-        xcrealm "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
+        xcrealm_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
         exit 0
         ;;
 
     "test-ios7-static")
-        xcrealm "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' build test"
+        xcrealm_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' test"
         shutdown_simulators
-        xcrealm "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s,OS=7.1' build test"
+        xcrealm_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s,OS=7.1' test"
         exit 0
         ;;
 
     "test-ios-dynamic")
-        xcrealm "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
+        xcrealm_work_around_rdar_23055637 "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         shutdown_simulators
-        xcrealm "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
+        xcrealm_work_around_rdar_23055637 "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
         exit 0
         ;;
 
