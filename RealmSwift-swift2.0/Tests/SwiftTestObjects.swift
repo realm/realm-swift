@@ -116,6 +116,24 @@ class SwiftOptionalDefaultValuesObject: Object {
     }
 }
 
+class SwiftOptionalIgnoredPropertiesObject: Object {
+    dynamic var optNSStringCol: NSString? = "A"
+    dynamic var optStringCol: String? = "B"
+    dynamic var optBinaryCol: NSData? = "C".dataUsingEncoding(NSUTF8StringEncoding)
+    dynamic var optDateCol: NSDate? = NSDate(timeIntervalSince1970: 10)
+    dynamic var optObjectCol: SwiftBoolObject? = SwiftBoolObject(value: [true])
+
+    override class func ignoredProperties() -> [String] {
+        return [
+            "optNSStringCol",
+            "optStringCol",
+            "optBinaryCol",
+            "optDateCol",
+            "optObjectCol"
+        ]
+    }
+}
+
 
 
 class SwiftDogObject: Object {

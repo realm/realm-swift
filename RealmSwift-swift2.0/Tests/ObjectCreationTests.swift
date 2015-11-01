@@ -183,6 +183,15 @@ class ObjectCreationTests: TestCase {
         }
     }
 
+    func testCreateWithOptionalIgnoredProperties() {
+        let realm = try! Realm()
+        try! realm.write {
+            let object = realm.create(SwiftOptionalIgnoredPropertiesObject)
+            let properties = object.objectSchema.properties
+            XCTAssertEqual(properties, [])
+        }
+    }
+
     func testCreateWithDictionary() {
         // dictionary with all values specified
         let baselineValues =

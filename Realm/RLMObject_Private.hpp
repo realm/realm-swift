@@ -23,7 +23,7 @@
 #import <realm/link_view.hpp> // required by row.hpp
 #import <realm/row.hpp>
 
-struct RLMObservationInfo;
+class RLMObservationInfo;
 
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {

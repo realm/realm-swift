@@ -19,7 +19,6 @@
 #import "RLMSchema_Private.h"
 
 #import <memory>
-#import <vector>
 
 namespace realm {
     class Schema;

@@ -324,6 +324,13 @@ public:
 
     // Used for subtables, which we currently don't support
     bool select_descriptor(int, const size_t*) { return false; }
+
+    // Not implemented
+    bool insert_substring(size_t, size_t, size_t, StringData) { return false; }
+    bool erase_substring(size_t, size_t, size_t, size_t) { return false; }
+    bool swap_rows(size_t, size_t) { return false; }
+    bool move_column(size_t, size_t) { return false; }
+    bool move_group_level_table(size_t, size_t) { return false; }
 };
 } // anonymous namespace
 

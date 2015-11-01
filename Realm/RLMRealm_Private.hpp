@@ -20,9 +20,7 @@
 #import "RLMUtil.hpp"
 #import "shared_realm.hpp"
 
-#import <realm/link_view.hpp>
 #import <realm/group.hpp>
-#import <pthread.h>
 
 namespace realm {
     class Group;

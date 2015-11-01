@@ -1232,17 +1232,26 @@ extern "C" {
     NSString *uuid = [[NSUUID UUID] UUIDString];
     NSUInteger count = 1000;
     [realm transactionWithBlock:^{
+        [StringObject createInRealm:realm withValue:@[@"A"]];
         for (NSUInteger i = 0; i < count; ++i) {
             [StringObject createInRealm:realm withValue:@[uuid]];
         }
+        [StringObject createInRealm:realm withValue:@[@"B"]];
     }];
     auto fileSize = ^(NSString *path) {
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
         return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
     };
     unsigned long long fileSizeBefore = fileSize(realm.path);
+    StringObject *object = [StringObject allObjectsInRealm:realm].firstObject;
+
     XCTAssertTrue([realm compact]);
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], count);
+
+    XCTAssertTrue(object.isInvalidated);
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], count + 2);
+    XCTAssertEqualObjects(@"A", [[StringObject allObjectsInRealm:realm].firstObject stringCol]);
+    XCTAssertEqualObjects(@"B", [[StringObject allObjectsInRealm:realm].lastObject stringCol]);
+
     unsigned long long fileSizeAfter = fileSize(realm.path);
     XCTAssertGreaterThan(fileSizeBefore, fileSizeAfter);
 }

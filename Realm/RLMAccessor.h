@@ -20,7 +20,7 @@
 
 #import <Realm/RLMDefines.h>
 
-@class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMRealm, RLMProperty;
+@class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMProperty;
 
 #ifdef __cplusplus
 typedef NSUInteger RLMCreationOptions;
