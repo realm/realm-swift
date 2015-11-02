@@ -244,7 +244,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Helper to perform a block within a transaction.
  */
-- (void)transactionWithBlock:(void(^)(void))block RLM_SWIFT_UNAVAILABLE("");
+- (void)transactionWithBlock:(RLM_NOESCAPE void(^)(void))block RLM_SWIFT_UNAVAILABLE("");
 
 /**
  Helper to perform a block within a transaction.
@@ -256,7 +256,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  @return Whether the transaction succeeded.
  */
-- (BOOL)transactionWithBlock:(void(^)(void))block error:(NSError **)error;
+- (BOOL)transactionWithBlock:(RLM_NOESCAPE void(^)(void))block error:(NSError **)error;
 
 /**
  Update an `RLMRealm` and outstanding objects to point to the most recent data for this `RLMRealm`.
