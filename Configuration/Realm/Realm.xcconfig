@@ -1,0 +1,31 @@
+SUPPORTED_PLATFORMS = macosx iphoneos iphonesimulator watchos watchsimulator;
+TARGETED_DEVICE_FAMILY = 1,2,4;
+
+INFOPLIST_FILE = Realm/Realm-Info.plist;
+MODULEMAP_FILE = $(SRCROOT)/Realm/module.modulemap;
+PRODUCT_BUNDLE_IDENTIFIER = io.Realm.${PRODUCT_NAME:rfc1034identifier};
+PRODUCT_NAME = Realm;
+SKIP_INSTALL = YES;
+
+DEFINES_MODULE = YES;
+DYLIB_COMPATIBILITY_VERSION = 1;
+DYLIB_CURRENT_VERSION = 1;
+DYLIB_INSTALL_NAME_BASE = @rpath;
+MACH_O_TYPE = mh_dylib;
+FRAMEWORK_VERSION = A;
+
+APPLICATION_EXTENSION_API_ONLY = YES;
+HEADER_SEARCH_PATHS = $(inherited) $(DERIVED_FILE_DIR);
+LIBRARY_SEARCH_PATHS = core;
+
+ENABLE_BITCODE[sdk=iphone*] = YES;
+
+LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks;
+LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
+
+OTHER_LDFLAGS[sdk=macosx*] = -lrealm$(REALM_LIBRARY_SUFFIX);
+OTHER_LIBTOOLFLAGS[sdk=macosx*] = -lrealm$(REALM_LIBRARY_SUFFIX);
+OTHER_LDFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
+OTHER_LIBTOOLFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
+OTHER_LDFLAGS[sdk=watch*] = -lrealm-watchos$(REALM_LIBRARY_SUFFIX);
+OTHER_LIBTOOLFLAGS[sdk=watch*] = -lrealm-watchos$(REALM_LIBRARY_SUFFIX);
