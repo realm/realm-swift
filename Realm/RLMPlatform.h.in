@@ -16,6 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#if REALM_BUILDING_FOR_OS_X
+
 #if TARGET_OS_IPHONE
-#error Attempting to use Realm's OSX framework in an iOS project.
+#error Attempting to use Realm''s OSX framework in an iOS project.
+#endif
+
+#else
+
+#if !TARGET_OS_IPHONE
+#error Attempting to use Realm''s iOS framework in an OSX project.
+#endif
+
 #endif

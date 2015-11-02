@@ -23,12 +23,24 @@
 #import <Realm/RLMSchema_Private.h>
 #import <Realm/RLMRealmConfiguration_Private.h>
 
+static NSString *parentProcessBundleIdentifier()
+{
+    static BOOL hasInitializedIdentifier;
+    static NSString *identifier;
+    if (!hasInitializedIdentifier) {
+        identifier = [NSProcessInfo processInfo].environment[@"RLMParentProcessBundleID"];
+        hasInitializedIdentifier = YES;
+    }
+
+    return identifier;
+}
+
 NSString *RLMDefaultRealmPath() {
-    return RLMRealmPathForFile(@"default.realm");
+    return RLMRealmPathForFileAndBundleIdentifier(@"default.realm", parentProcessBundleIdentifier());
 }
 
 NSString *RLMTestRealmPath() {
-    return RLMRealmPathForFile(@"test.realm");
+    return RLMRealmPathForFileAndBundleIdentifier(@"test.realm", parentProcessBundleIdentifier());
 }
 
 static void deleteOrThrow(NSString *path) {

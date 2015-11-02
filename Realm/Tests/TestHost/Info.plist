@@ -28,6 +28,8 @@
 	</array>
 	<key>NSPrincipalClass</key>
 	<string>$(PRINCIPAL_CLASS)</string>
+	<key>LSUIElement</key>
+	<true/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

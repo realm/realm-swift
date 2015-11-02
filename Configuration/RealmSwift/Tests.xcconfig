@@ -10,6 +10,6 @@ LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks 
 LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks;
 
 EXCLUDED_SOURCE_FILE_NAMES[sdk=iphone*] = build/osx/*;
-EXCLUDED_SOURCE_FILE_NAMES[sdk=macosx*] = build/ios-dynamic/*;
+EXCLUDED_SOURCE_FILE_NAMES[sdk=macosx*] = build/ios/*;
 
 TEST_HOST = $(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestHost;

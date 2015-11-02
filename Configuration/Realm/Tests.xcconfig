@@ -1,0 +1,18 @@
+SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos;
+SKIP_INSTALL = YES;
+
+INFOPLIST_FILE = Realm/Tests/RealmTests-Info.plist;
+PRODUCT_BUNDLE_IDENTIFIER = io.Realm.${PRODUCT_NAME:rfc1034identifier};
+
+LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
+LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks;
+
+OTHER_CFLAGS = -fobjc-arc-exceptions;
+
+SWIFT_OBJC_BRIDGING_HEADER = Realm/Tests/Swift/Swift-Tests-Bridging-Header.h;
+SWIFT_OPTIMIZATION_LEVEL = -Onone;
+
+TEST_HOST = $(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestHost;
+
+EXCLUDED_SOURCE_FILE_NAMES[sdk=iphone*] = InterprocessTests.m SwiftSchemaTests.swift;
+EXCLUDED_SOURCE_FILE_NAMES[sdk=watch*] = *;

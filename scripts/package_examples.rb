@@ -50,8 +50,8 @@ FileUtils.move 'examples/ios/rubymotion', 'examples/ios/xcode-6'
 FileUtils.cp_r 'examples/ios/xcode-6', 'examples/ios/xcode-7'
 
 # Update the paths to the prebuilt frameworks
-replace_in_file('examples/ios/xcode-6/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/ios', '/../ios/static/xcode-6')
-replace_in_file('examples/ios/xcode-7/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/ios', '/../ios/static/xcode-7')
+replace_in_file('examples/ios/xcode-6/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/ios-static', '/../ios/static/xcode-6')
+replace_in_file('examples/ios/xcode-7/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/ios-static', '/../ios/static/xcode-7')
 replace_in_file('examples/osx/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/osx', '/osx')
 
 # Remove Realm target and dependencies from all example objc projects
