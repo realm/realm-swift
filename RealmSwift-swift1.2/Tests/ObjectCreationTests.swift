@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import Realm.Private
 import RealmSwift
 import Foundation
 
@@ -33,9 +34,27 @@ class ObjectCreationTests: TestCase {
 
         // test realm properties are nil for standalone
         XCTAssertNil(object.realm)
-        XCTAssertNil(object.objectCol.realm)
+        XCTAssertNil(object.objectCol!.realm)
         XCTAssertNil(object.arrayCol.realm)
     }
+
+    func testInitWithOptionalWithoutDefaults() {
+        let object = SwiftOptionalObject()
+        for prop in object.objectSchema.properties {
+            let value: AnyObject? = object[prop.name]
+            if let value = value as? RLMOptionalBase {
+                XCTAssertNil(value.underlyingValue)
+            } else {
+                XCTAssertNil(value)
+            }
+        }
+    }
+
+    func testInitWithOptionalDefaults() {
+        let object = SwiftOptionalDefaultValuesObject()
+        verifySwiftOptionalObjectWithDictionaryLiteral(object, dictionary: SwiftOptionalDefaultValuesObject.defaultValues(), boolObjectValue: true)
+    }
+
 
     func testInitWithDictionary() {
         // dictionary with all values specified
@@ -143,8 +162,35 @@ class ObjectCreationTests: TestCase {
 
         // test realm properties are populated correctly
         XCTAssertEqual(object.realm!, realm)
-        XCTAssertEqual(object.objectCol.realm!, realm)
+        XCTAssertEqual(object.objectCol!.realm!, realm)
         XCTAssertEqual(object.arrayCol.realm!, realm)
+    }
+
+    func testCreateWithOptionalWithoutDefaults() {
+        let realm = Realm()
+        realm.write {
+            let object = realm.create(SwiftOptionalObject)
+            for prop in object.objectSchema.properties {
+                XCTAssertNil(object[prop.name])
+            }
+        }
+    }
+
+    func testCreateWithOptionalDefaults() {
+        let realm = Realm()
+        realm.write {
+            let object = realm.create(SwiftOptionalDefaultValuesObject)
+            self.verifySwiftOptionalObjectWithDictionaryLiteral(object, dictionary: SwiftOptionalDefaultValuesObject.defaultValues(), boolObjectValue: true)
+        }
+    }
+
+    func testCreateWithOptionalIgnoredProperties() {
+        let realm = Realm()
+        realm.write {
+            let object = realm.create(SwiftOptionalIgnoredPropertiesObject)
+            let properties = object.objectSchema.properties
+            XCTAssertEqual(properties, [])
+        }
     }
 
     func testCreateWithDictionary() {
@@ -359,7 +405,7 @@ class ObjectCreationTests: TestCase {
         Realm().commitWrite()
 
         XCTAssertNotNil(object.realm)
-        XCTAssertEqual(object.objectCol, existingObject)
+        XCTAssertEqual(object.objectCol!, existingObject)
     }
 
     func testAddAndUpdateWithExisingNestedObjects() {
@@ -377,6 +423,21 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(existingObject.intCol, 2)
     }
 
+    func testAddStandaloneObjectWithDynamicListProperty() {
+        let obj = SwiftObject()
+        obj.boolCol = true
+        let arrayObj = SwiftDynamicListOfSwiftObject()
+        arrayObj.array.append(obj)
+
+        let realm = Realm()
+        realm.write {
+            realm.add(arrayObj)
+        }
+
+        XCTAssertEqual(1, arrayObj.array.count)
+        XCTAssertEqual(true, arrayObj.array[0].boolCol)
+    }
+
     // MARK: Private utilities
     private func verifySwiftObjectWithArrayLiteral(object: SwiftObject, array: [AnyObject], boolObjectValue: Bool, boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, array[0] as! Bool)
@@ -386,7 +447,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.stringCol, array[4] as! String)
         XCTAssertEqual(object.binaryCol, array[5] as! NSData)
         XCTAssertEqual(object.dateCol, array[6] as! NSDate)
-        XCTAssertEqual(object.objectCol.boolCol, boolObjectValue)
+        XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {
             XCTAssertEqual(object.arrayCol[i].boolCol, boolObjectListValues[i])
@@ -401,11 +462,31 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.stringCol, dictionary["stringCol"] as! String)
         XCTAssertEqual(object.binaryCol, dictionary["binaryCol"] as! NSData)
         XCTAssertEqual(object.dateCol, dictionary["dateCol"] as! NSDate)
-        XCTAssertEqual(object.objectCol.boolCol, boolObjectValue)
+        XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {
             XCTAssertEqual(object.arrayCol[i].boolCol, boolObjectListValues[i])
         }
+    }
+
+    private func verifySwiftOptionalObjectWithDictionaryLiteral(object: SwiftOptionalDefaultValuesObject, dictionary: [String:AnyObject], boolObjectValue: Bool?) {
+        let get = { (key: String) -> AnyObject? in
+            let val: AnyObject? = dictionary[key]
+            if let _ = val as? NSNull { return nil }
+            return val
+        }
+        XCTAssert(object.optBoolCol.value == (get("optBoolCol") as! Bool?))
+        XCTAssert(object.optIntCol.value == (get("optIntCol") as! Int?))
+        XCTAssert(object.optInt16Col.value == (get("optInt16Col") as! Int16?))
+        XCTAssert(object.optInt32Col.value == (get("optInt32Col") as! Int32?))
+        XCTAssert(object.optInt64Col.value == (get("optInt64Col") as! Int64?))
+        XCTAssert(object.optFloatCol.value == (get("optFloatCol") as! Float?))
+        XCTAssert(object.optDoubleCol.value == (get("optDoubleCol") as! Double?))
+        XCTAssert(object.optStringCol == (get("optStringCol") as! String?))
+        XCTAssert(object.optNSStringCol == (get("optNSStringCol") as! String?))
+        XCTAssert(object.optBinaryCol == (get("optBinaryCol") as! NSData?))
+        XCTAssert(object.optDateCol == (get("optDateCol") as! NSDate?))
+        XCTAssert(object.optObjectCol?.boolCol == boolObjectValue)
     }
 
     private func defaultSwiftObjectValuesWithReplacements(replace: [String: AnyObject]) -> [String: AnyObject] {
@@ -455,4 +536,3 @@ class ObjectCreationTests: TestCase {
         return []
     }
 }
-

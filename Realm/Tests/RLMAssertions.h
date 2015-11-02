@@ -42,8 +42,8 @@
 #define RLMPrimitiveAssertMatches(self, expression, regexString, format...) \
 ({ \
     NSString *string = (expression); \
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: regexString options: 0 error:nil]; \
-    if ([regex numberOfMatchesInString:string options:0 range:NSMakeRange(0, string.length)] == 0) { \
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexString options:(NSRegularExpressionOptions)0 error:nil]; \
+    if ([regex numberOfMatchesInString:string options:(NSMatchingOptions)0 range:NSMakeRange(0, string.length)] == 0) { \
         _XCTRegisterFailure(self, [_XCTFailureDescription(_XCTAssertion_True, 0, @#expression @" (EXPR_STRING) matches " @#regexString) stringByReplacingOccurrencesOfString:@"EXPR_STRING" withString:string ?: @"<nil>"], format); \
     } \
 })

@@ -25,7 +25,7 @@ class ObjectTests: TestCase {
     // init() Tests are in ObjectCreationTests.swift
 
     // init(value:) tests are in ObjectCreationTests.swift
-    
+
     func testRealm() {
         let standalone = SwiftStringObject()
         XCTAssertNil(standalone.realm)
@@ -230,15 +230,15 @@ class ObjectTests: TestCase {
         }
         autoreleasepool {
             var enumerated = false
-            setSchemaVersion(1, self.testRealmPath()) { migration, _ in
+            let configuration = Realm.Configuration(schemaVersion: 1, migrationBlock: { migration, _ in
                 migration.enumerate(SwiftObject.className()) { oldObject, newObject in
                     if let newObject = newObject {
                         block(newObject, migration)
                         enumerated = true
                     }
                 }
-            }
-            self.realmWithTestPath()
+            })
+            self.realmWithTestPath(configuration)
             XCTAssert(enumerated)
         }
     }
@@ -283,5 +283,22 @@ class ObjectTests: TestCase {
             let persistedObject = Realm().create(SwiftObject.self, value: [:])
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
+    }
+
+    func testDynamicList() {
+        let realm = Realm()
+        let arrayObject = SwiftArrayPropertyObject()
+        let str1 = SwiftStringObject()
+        let str2 = SwiftStringObject()
+        arrayObject.array.extend([str1, str2])
+        realm.write {
+            realm.add(arrayObject)
+        }
+        let dynamicArray = arrayObject.dynamicList("array")
+        XCTAssertEqual(dynamicArray.count, 2)
+        XCTAssertEqual(dynamicArray[0], str1)
+        XCTAssertEqual(dynamicArray[1], str2)
+        XCTAssertEqual(arrayObject.dynamicList("intArray").count, 0)
+        assertThrows(arrayObject.dynamicList("noSuchList"))
     }
 }

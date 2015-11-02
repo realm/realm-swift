@@ -29,7 +29,7 @@
     [self.window makeKeyAndVisible];
 
     // copy over old data files for migration
-    NSString *defaultRealmPath = [RLMRealm defaultRealmPath];
+    NSString *defaultRealmPath = [RLMRealmConfiguration defaultConfiguration].path;
     NSString *defaultRealmParentPath = [defaultRealmPath stringByDeletingLastPathComponent];
     NSString *v0Path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"default-v0.realm"];
     [[NSFileManager defaultManager] removeItemAtPath:defaultRealmPath error:nil];
@@ -77,11 +77,16 @@
         NSLog(@"Migration complete.");
     };
 
-    // set the schema verion and migration block for the defualt realm
-    [RLMRealm setDefaultRealmSchemaVersion:3 withMigrationBlock:migrationBlock];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
 
-    // now that we have called `setSchemaVersion:withMigrationBlock` opening an outdated Realm will automatically
-    // perform the migration and opening the Realm will succeed
+    // set the schema verion and migration block for the defualt realm
+    configuration.schemaVersion = 3;
+    configuration.migrationBlock = migrationBlock;
+
+    [RLMRealmConfiguration setDefaultConfiguration:configuration];
+
+    // now that we have set a schema version and migration block for the configuration,
+    // performing the migration and opening the Realm will succeed
     [RLMRealm defaultRealm];
 
     // print out all migrated objects in the default realm
@@ -100,16 +105,19 @@
     [[NSFileManager defaultManager] copyItemAtPath:v2Path toPath:realmv2Path error:nil];
 
     // set schemave versions and migration blocks form Realms at each path
-    [RLMRealm setSchemaVersion:3 forRealmAtPath:realmv1Path withMigrationBlock:migrationBlock];
-    [RLMRealm setSchemaVersion:3 forRealmAtPath:realmv2Path withMigrationBlock:migrationBlock];
+    RLMRealmConfiguration *realmv1Configuration = [configuration copy];
+    realmv1Configuration.path = realmv1Path;
+
+    RLMRealmConfiguration *realmv2Configuration = [configuration copy];
+    realmv2Configuration.path = realmv2Path;
 
     // manully migration v1Path, v2Path is migrated implicitly on access
-    [RLMRealm migrateRealmAtPath:realmv1Path];
+    [RLMRealm migrateRealm:realmv1Configuration];
 
     // print out all migrated objects in the migrated realms
-    RLMRealm *realmv1 = [RLMRealm realmWithPath:realmv1Path];
+    RLMRealm *realmv1 = [RLMRealm realmWithConfiguration:realmv1Configuration error:nil];
     NSLog(@"Migrated objects in the Realm migrated from v1: %@", [[Person allObjectsInRealm:realmv1] description]);
-    RLMRealm *realmv2 = [RLMRealm realmWithPath:realmv2Path];
+    RLMRealm *realmv2 = [RLMRealm realmWithConfiguration:realmv2Configuration error:nil];
     NSLog(@"Migrated objects in the Realm migrated from v2: %@", [[Person allObjectsInRealm:realmv2] description]);
 
     return YES;

@@ -18,9 +18,17 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObjectSchema, RLMProperty, RLMObjectBase;
+#import <Realm/RLMDefines.h>
 
+@class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMProperty;
+
+#ifdef __cplusplus
 typedef NSUInteger RLMCreationOptions;
+#else
+typedef NS_OPTIONS(NSUInteger, RLMCreationOptions);
+#endif
+
+RLM_ASSUME_NONNULL_BEGIN
 
 //
 // Accessors Class Creation/Caching
@@ -30,14 +38,18 @@ typedef NSUInteger RLMCreationOptions;
 Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema, NSString *prefix);
 Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
+// Check if a given class is a generated accessor class
+bool RLMIsGeneratedClass(Class cls);
+
 //
 // Dynamic getters/setters
 //
-void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val);
-id RLMDynamicGet(RLMObjectBase *obj, NSString *propName);
+FOUNDATION_EXTERN void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id __nullable val);
+FOUNDATION_EXTERN RLMProperty *RLMValidatedGetProperty(RLMObjectBase *obj, NSString *propName);
+FOUNDATION_EXTERN id __nullable RLMDynamicGet(RLMObjectBase *obj, RLMProperty *prop);
 
 // by property/column
-void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOptions options);
+FOUNDATION_EXTERN void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOptions options);
 
 //
 // Class modification
@@ -47,5 +59,7 @@ void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOpt
 void RLMReplaceClassNameMethod(Class accessorClass, NSString *className);
 
 // Replace sharedSchema method for the given class
-void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema);
+void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema * __nullable schema);
+void RLMReplaceSharedSchemaMethodWithBlock(Class accessorClass, RLMObjectSchema *(^method)(Class));
 
+RLM_ASSUME_NONNULL_END

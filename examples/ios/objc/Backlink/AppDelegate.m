@@ -51,7 +51,7 @@ RLM_ARRAY_TYPE(Dog)
     self.window.rootViewController = [[UIViewController alloc] init];
     [self.window makeKeyAndVisible];
 
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealmConfiguration defaultConfiguration].path error:nil];
 
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{

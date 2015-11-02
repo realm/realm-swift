@@ -3,7 +3,195 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
+* All functionality deprecated in previous releases has been removed entirely.
+
+### Enhancements
+
+* Queries are no longer limited to 16 levels of grouping.
+
+### Bugfixes
+
 * None.
+
+0.96.2 Release notes (2015-10-26)
+=============================================================
+
+Prebuilt frameworks are now built with Xcode 7.1.
+
+### Bugfixes
+
+* Fix ignoring optional properties in Swift.
+* Fix CocoaPods installation on case-sensitive file systems.
+
+0.96.1 Release notes (2015-10-20)
+=============================================================
+
+### Bugfixes
+
+* Support assigning `Results` to `List` properties via KVC.
+* Honor the schema version set in the configuration in `+[RLMRealm migrateRealm:]`.
+* Fix crash when using optional Int16/Int32/Int64 properties in Swift.
+
+0.96.0 Release notes (2015-10-14)
+=============================================================
+
+* No functional changes since beta2.
+
+0.96.0-beta2 Release notes (2015-10-08)
+=============================================================
+
+### Bugfixes
+
+* Add RLMOptionalBase.h to the podspec.
+
+0.96.0-beta Release notes (2015-10-07)
+=============================================================
+
+### API breaking changes
+
+* CocoaPods v0.38 or greater is now required to install Realm and RealmSwift
+  as pods.
+
+### Enhancements
+
+* Functionality common to both `List` and `Results` is now declared in a
+  `RealmCollectionType` protocol that both types conform to.
+* `Results.realm` now returns an `Optional<Realm>` in order to conform to
+  `RealmCollectionType`, but will always return `.Some()` since a `Results`
+  cannot exist independently from a `Realm`.
+* Aggregate operations are now available on `List`: `min`, `max`, `sum`,
+  `average`.
+* Committing write transactions (via `commitWrite` / `commitWriteTransaction` and
+  `write` / `transactionWithBlock`) now optionally allow for handling errors when
+  the disk is out of space.
+* Added `isEmpty` property on `RLMRealm`/`Realm` to indicate if it contains any
+  objects.
+* The `@count`, `@min`, `@max`, `@sum` and `@avg` collection operators are now
+  supported in queries.
+
+### Bugfixes
+
+* Fix assertion failure when inserting NSData between 8MB and 16MB in size.
+* Fix assertion failure when rolling back a migration which removed an object
+  link or `RLMArray`/`List` property.
+* Add the path of the file being opened to file open errors.
+* Fix a crash that could be triggered by rapidly opening and closing a Realm
+  many times on multiple threads at once.
+* Fix several places where exception messages included the name of the wrong
+  function which failed.
+
+0.95.3 Release notes (2015-10-05)
+=============================================================
+
+### Bugfixes
+
+* Compile iOS Simulator framework architectures with `-fembed-bitcode-marker`.
+* Fix crashes when the first Realm opened uses a class subset and later Realms
+  opened do not.
+* Fix inconsistent errors when `Object(value: ...)` is used to initialize the
+  default value of a property of an `Object` subclass.
+* Throw an exception when a class subset has objects with array or object
+  properties of a type that are not part of the class subset.
+
+0.95.2 Release notes (2015-09-24)
+=============================================================
+
+* Enable bitcode for iOS and watchOS frameworks.
+* Build libraries with Xcode 7 final rather than the GM.
+
+0.95.1 Release notes (2015-09-23)
+=============================================================
+
+### Enhancements
+
+* Add missing KVO handling for moving and exchanging objects in `RLMArray` and
+  `List`.
+
+### Bugfixes
+
+* Setting the primary key property on persisted `RLMObject`s / `Object`s
+  via subscripting or key-value coding will cause an exception to be thrown.
+* Fix crash due to race condition in `RLMRealmConfiguration` where the default
+  configuration was in the process of being copied in one thread, while
+  released in another.
+* Fix crash when a migration which removed an object or array property is
+  rolled back due to an error.
+
+0.95.0 Release notes (2015-08-25)
+=============================================================
+
+### API breaking changes
+
+* The following APIs have been deprecated in favor of the new `RLMRealmConfiguration` class in Realm Objective-C:
+
+| Deprecated API                                                    | New API                                                                          |
+|:------------------------------------------------------------------|:---------------------------------------------------------------------------------|
+| `+[RLMRealm realmWithPath:readOnly:error:]`                       | `+[RLMRealm realmWithConfiguration:error:]`                                      |
+| `+[RLMRealm realmWithPath:encryptionKey:readOnly:error:]`         | `+[RLMRealm realmWithConfiguration:error:]`                                      |
+| `+[RLMRealm setEncryptionKey:forRealmsAtPath:]`                   | `-[RLMRealmConfiguration setEncryptionKey:]`                                     |
+| `+[RLMRealm inMemoryRealmWithIdentifier:]`                        | `+[RLMRealm realmWithConfiguration:error:]`                                      |
+| `+[RLMRealm defaultRealmPath]`                                    | `+[RLMRealmConfiguration defaultConfiguration]`                                  |
+| `+[RLMRealm setDefaultRealmPath:]`                                | `+[RLMRealmConfiguration setDefaultConfiguration:]`                              |
+| `+[RLMRealm setDefaultRealmSchemaVersion:withMigrationBlock]`     | `RLMRealmConfiguration.schemaVersion` and `RLMRealmConfiguration.migrationBlock` |
+| `+[RLMRealm setSchemaVersion:forRealmAtPath:withMigrationBlock:]` | `RLMRealmConfiguration.schemaVersion` and `RLMRealmConfiguration.migrationBlock` |
+| `+[RLMRealm migrateRealmAtPath:]`                                 | `+[RLMRealm migrateRealm:]`                                                      |
+| `+[RLMRealm migrateRealmAtPath:encryptionKey:]`                   | `+[RLMRealm migrateRealm:]`                                                      |
+
+* The following APIs have been deprecated in favor of the new `Realm.Configuration` struct in Realm Swift for Swift 1.2:
+
+| Deprecated API                                                | New API                                                                      |
+|:--------------------------------------------------------------|:-----------------------------------------------------------------------------|
+| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                   |
+| `Realm(path:readOnly:encryptionKey:error:)`                   | `Realm(configuration:error:)`                                                |
+| `Realm(inMemoryIdentifier:)`                                  | `Realm(configuration:error:)`                                                |
+| `Realm.setEncryptionKey(:forPath:)`                           | `Realm(configuration:error:)`                                                |
+| `setDefaultRealmSchemaVersion(schemaVersion:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `setSchemaVersion(schemaVersion:realmPath:migrationBlock:)`   | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `migrateRealm(path:encryptionKey:)`                           | `migrateRealm(configuration:)`                                               |
+
+* The following APIs have been deprecated in favor of the new `Realm.Configuration` struct in Realm Swift for Swift 2.0:
+
+| Deprecated API                                                | New API                                                                      |
+|:--------------------------------------------------------------|:-----------------------------------------------------------------------------|
+| `Realm.defaultPath`                                           | `Realm.Configuration.defaultConfiguration`                                   |
+| `Realm(path:readOnly:encryptionKey:) throws`                  | `Realm(configuration:) throws`                                               |
+| `Realm(inMemoryIdentifier:)`                                  | `Realm(configuration:) throws`                                               |
+| `Realm.setEncryptionKey(:forPath:)`                           | `Realm(configuration:) throws`                                               |
+| `setDefaultRealmSchemaVersion(schemaVersion:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `setSchemaVersion(schemaVersion:realmPath:migrationBlock:)`   | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `migrateRealm(path:encryptionKey:)`                           | `migrateRealm(configuration:)`                                               |
+
+* `List.extend` in Realm Swift for Swift 2.0 has been replaced with `List.appendContentsOf`,
+  mirroring changes to `RangeReplaceableCollectionType`.
+
+* Object properties on `Object` subclasses in Realm Swift must be marked as optional,
+  otherwise a runtime exception will be thrown.
+
+### Enhancements
+
+* Persisted properties of `RLMObject`/`Object` subclasses are now Key-Value
+  Observing compliant.
+* The different options used to create Realm instances have been consolidated
+  into a single `RLMRealmConfiguration`/`Realm.Configuration` object.
+* Enumerating Realm collections (`RLMArray`, `RLMResults`, `List<>`,
+  `Results<>`) now enumerates over a copy of the collection, making it no
+  longer an error to modify a collection during enumeration (either directly,
+  or indirectly by modifying objects to make them no longer match a query).
+* Improve performance of object insertion in Swift to bring it roughly in line
+  with Objective-C.
+* Allow specifying a specific list of `RLMObject` / `Object` subclasses to include
+  in a given Realm via `RLMRealmConfiguration.objectClasses` / `Realm.Configuration.objectTypes`.
+
+### Bugfixes
+
+* Subscripting on `RLMObject` is now marked as nullable.
+
+0.94.1 Release notes (2015-08-10)
+=============================================================
+
+### API breaking changes
+
+* Building for watchOS requires Xcode 7 beta 5.
 
 ### Enhancements
 
@@ -11,7 +199,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix crash when adding a property to a model without updating the schema
+  version.
+* Fix unnecessary redownloading of the core library when building from source.
+* Fix crash when sorting by an integer or floating-point property on iOS 7.
 
 0.94.0 Release notes (2015-07-29)
 =============================================================

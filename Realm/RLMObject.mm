@@ -33,14 +33,16 @@
 @implementation RLMObject
 
 // synthesized in RLMObjectBase
-@dynamic invalidated;
+@dynamic invalidated, realm, objectSchema;
 
 - (instancetype)init {
     return [super init];
 }
 
 - (instancetype)initWithValue:(id)value {
-    return [super initWithValue:value schema:RLMSchema.sharedSchema];
+    [self.class sharedSchema]; // ensure this class' objectSchema is loaded in the partialSharedSchema
+    RLMSchema *schema = RLMSchema.partialSharedSchema;
+    return [super initWithValue:value schema:schema];
 }
 
 - (instancetype)initWithObject:(id)object {
@@ -91,14 +93,6 @@
 
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
     RLMObjectBaseSetObjectForKeyedSubscript(self, key, obj);
-}
-
-- (RLMRealm *)realm {
-    return _realm;
-}
-
-- (RLMObjectSchema *)objectSchema {
-    return _objectSchema;
 }
 
 + (RLMResults *)allObjects {
@@ -181,12 +175,12 @@
 
 @implementation RLMDynamicObject
 
-+ (BOOL)shouldPersistToRealm {
++ (BOOL)shouldIncludeInDefaultSchema {
     return NO;
 }
 
 - (id)valueForUndefinedKey:(NSString *)key {
-    return RLMDynamicGet(self, key);
+    return RLMDynamicGet(self, RLMValidatedGetProperty(self, key));
 }
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {

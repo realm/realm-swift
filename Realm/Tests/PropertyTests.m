@@ -19,7 +19,9 @@
 #import "RLMTestCase.h"
 
 #import <objc/runtime.h>
+#import "RLMObjectSchema_Private.h"
 #import "RLMProperty_Private.h"
+#import "RLMRealm_Dynamic.h"
 
 @interface PropertyTests : RLMTestCase
 
@@ -41,11 +43,7 @@
 }
 
 - (void)testEqualityFromObjectSchema {
-#ifdef REALM_ENABLE_NULL
-    BOOL stringAndBinaryAreOptional = YES;
-#else
-    BOOL stringAndBinaryAreOptional = NO;
-#endif
+    BOOL optionalsEnabled = YES;
 
     // Test all property types
     {
@@ -55,9 +53,9 @@
                                              @"intCol":    [[RLMProperty alloc] initWithName:@"intCol"    type:RLMPropertyTypeInt    objectClassName:nil             indexed:NO optional:NO],
                                              @"floatCol":  [[RLMProperty alloc] initWithName:@"floatCol"  type:RLMPropertyTypeFloat  objectClassName:nil             indexed:NO optional:NO],
                                              @"doubleCol": [[RLMProperty alloc] initWithName:@"doubleCol" type:RLMPropertyTypeDouble objectClassName:nil             indexed:NO optional:NO],
-                                             @"stringCol": [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil             indexed:NO optional:stringAndBinaryAreOptional],
-                                             @"binaryCol": [[RLMProperty alloc] initWithName:@"binaryCol" type:RLMPropertyTypeData   objectClassName:nil             indexed:NO optional:stringAndBinaryAreOptional],
-                                             @"dateCol":   [[RLMProperty alloc] initWithName:@"dateCol"   type:RLMPropertyTypeDate   objectClassName:nil             indexed:NO optional:NO],
+                                             @"stringCol": [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil             indexed:NO optional:optionalsEnabled],
+                                             @"binaryCol": [[RLMProperty alloc] initWithName:@"binaryCol" type:RLMPropertyTypeData   objectClassName:nil             indexed:NO optional:optionalsEnabled],
+                                             @"dateCol":   [[RLMProperty alloc] initWithName:@"dateCol"   type:RLMPropertyTypeDate   objectClassName:nil             indexed:NO optional:optionalsEnabled],
                                              @"cBoolCol":  [[RLMProperty alloc] initWithName:@"cBoolCol"  type:RLMPropertyTypeBool   objectClassName:nil             indexed:NO optional:NO],
                                              @"longCol":   [[RLMProperty alloc] initWithName:@"longCol"   type:RLMPropertyTypeInt    objectClassName:nil             indexed:NO optional:NO],
                                              @"mixedCol":  [[RLMProperty alloc] initWithName:@"mixedCol"  type:RLMPropertyTypeAny    objectClassName:nil             indexed:NO optional:NO],
@@ -74,14 +72,14 @@
     {
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[IndexedStringObject class]];
         RLMProperty *stringProperty = objectSchema[@"stringCol"];
-        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES optional:stringAndBinaryAreOptional];
+        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES optional:optionalsEnabled];
         XCTAssertTrue([stringProperty isEqualToProperty:expectedProperty]);
     }
     // Test primary key property
     {
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[PrimaryStringObject class]];
         RLMProperty *stringProperty = objectSchema[@"stringCol"];
-        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES optional:stringAndBinaryAreOptional];
+        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES optional:optionalsEnabled];
         expectedProperty.isPrimary = YES;
         XCTAssertTrue([stringProperty isEqualToProperty:expectedProperty]);
     }

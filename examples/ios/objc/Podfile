@@ -1,0 +1,5 @@
+platform :ios, '7.0'
+
+target 'RACTableView' do
+  pod 'ReactiveCocoa'
+end
