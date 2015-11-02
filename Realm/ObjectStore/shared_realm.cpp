@@ -23,7 +23,7 @@
 #include "schema.hpp"
 #include "transact_log_handler.hpp"
 
-#include <realm/commit_log.hpp>
+#include <realm/sync/commit_log.hpp>
 #include <realm/group_shared.hpp>
 
 #include <mutex>
@@ -73,7 +73,7 @@ Realm::Realm(Config config)
             // probably has to be transmuted to an NSError.
             bool server_synchronization_mode = bool(config.sync_server_url);
             if (server_synchronization_mode) {
-                m_history = realm::make_client_sync_history(m_config.path, m_config.encryption_key.data());
+                m_history = realm::make_client_transform_history(m_config.path, m_config.encryption_key.data());
             }
             else {
                 m_history = realm::make_client_history(m_config.path, m_config.encryption_key.data());

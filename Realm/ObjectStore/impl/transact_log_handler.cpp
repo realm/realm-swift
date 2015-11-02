@@ -163,11 +163,13 @@ public:
         return true;
     }
 
+/*
     bool swap_rows(size_t, size_t)
     {
         // FIXME: Implement this.
         return true;
     }
+*/
 
     bool clear_table()
     {
@@ -302,8 +304,8 @@ public:
     }
 
     // FIXME: Implement these.
-    bool insert_substring(size_t, size_t, size_t, StringData) { return true; }
-    bool erase_substring(size_t, size_t, size_t, size_t) { return true; }
+//    bool insert_substring(size_t, size_t, size_t, StringData) { return true; }
+//    bool erase_substring(size_t, size_t, size_t, size_t) { return true; }
 
     // Things that just mark the field as modified
     bool set_int(size_t col, size_t row, int_fast64_t) { return mark_dirty(row, col); }
@@ -329,8 +331,8 @@ public:
     bool insert_substring(size_t, size_t, size_t, StringData) { return false; }
     bool erase_substring(size_t, size_t, size_t, size_t) { return false; }
     bool swap_rows(size_t, size_t) { return false; }
-    bool move_column(size_t, size_t) { return false; }
-    bool move_group_level_table(size_t, size_t) { return false; }
+//    bool move_column(size_t, size_t) { return false; }
+//    bool move_group_level_table(size_t, size_t) { return false; }
 };
 } // anonymous namespace
 

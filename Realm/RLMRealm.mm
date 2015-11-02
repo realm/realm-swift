@@ -39,7 +39,7 @@
 #include "schema.hpp"
 #include "shared_realm.hpp"
 
-#include <realm/commit_log.hpp>
+#include <realm/sync/commit_log.hpp>
 #include <realm/disable_sync_to_disk.hpp>
 #include <realm/lang_bind_helper.hpp>
 #include <realm/util/memory_stream.hpp>
@@ -90,13 +90,13 @@ std::atomic<bool> s_syncLogEverything(false);
 - (void)connectionIsClosed;
 - (void)handleAllocMessageWithServerFileIdent:(uint_fast64_t)serverFileIdent
                               clientFileIdent:(uint_fast64_t)clientFileIdent;
-- (void)handleChangesetMessageWithServerVersion:(Replication::version_type)serverVersion
-                                  clientVersion:(Replication::version_type)clientVersion
-                                originTimestamp:(uint_fast64_t)originTimestamp
-                                originFileIdent:(uint_fast64_t)originFileIdent
-                                           data:(NSData *)data;
-- (void)handleAcceptMessageWithServerVersion:(Replication::version_type)serverVersion
-                               clientVersion:(Replication::version_type)clientVersion;
+- (void)handleDownloadMessageWithServerVersion:(Replication::version_type)serverVersion
+                                 clientVersion:(Replication::version_type)clientVersion
+                                     changeset:(NSData *)changeset
+                               originTimestamp:(uint_fast64_t)originTimestamp
+                               originFileIdent:(uint_fast64_t)originFileIdent;
+- (void)handleProgressMessageWithServerVersion:(Replication::version_type)serverVersion
+                                 clientVersion:(Replication::version_type)clientVersion;
 @end
 
 
@@ -308,7 +308,7 @@ std::atomic<bool> s_syncLogEverything(false);
     msg.head = [NSString stringWithFormat:@"ident %llu %lu %lu\n", ulonglong(protocolVersion),
                          ulong(applicationIdentSize), ulong(userIdentSize)];
     [self enqueueOutputMessage:msg];
-    NSLog(@"RealmSync: Connection[%lu]: Sending: Application and user identities", _ident);
+    NSLog(@"RealmSync: Connection[%lu]: Sending: IDENT", _ident);
 }
 
 
@@ -319,31 +319,29 @@ std::atomic<bool> s_syncLogEverything(false);
     msg.body = [serverPath dataUsingEncoding:NSUTF8StringEncoding];
     msg.head = [NSString stringWithFormat:@"alloc %@ %lu\n", sessionIdent, ulong(msg.body.length)];
     [self enqueueOutputMessage:msg];
-    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: Allocate unique identifier pair for "
-          "remote Realm '%@'", _ident, sessionIdent, serverPath);
+    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: ALLOC(server_path='%@')", _ident,
+          sessionIdent, serverPath);
 }
 
 
 - (void)sendBindMessageWithSessionIdent:(NSNumber *)sessionIdent
-                              serverFileIdent:(uint_fast64_t)serverFileIdent
-                              clientFileIdent:(uint_fast64_t)clientFileIdent
-                          serverVersion:(Replication::version_type)serverVersion
-                          clientVersion:(Replication::version_type)clientVersion
+                        serverFileIdent:(uint_fast64_t)serverFileIdent
+                        clientFileIdent:(uint_fast64_t)clientFileIdent
                              serverPath:(NSString *)serverPath
-                             clientPath:(NSString *)clientPath {
+                          serverVersion:(Replication::version_type)serverVersion
+                          clientVersion:(Replication::version_type)clientVersion {
     typedef unsigned long      ulong;
     typedef unsigned long long ulonglong;
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
     msg.body = [serverPath dataUsingEncoding:NSUTF8StringEncoding];
-    msg.head = [NSString stringWithFormat:@"bind %@ %llu %llu %llu %llu %lu\n", sessionIdent,
+    msg.head = [NSString stringWithFormat:@"bind %@ %llu %llu %lu %llu %llu\n", sessionIdent,
                          ulonglong(serverFileIdent), ulonglong(clientFileIdent),
-                         ulonglong(serverVersion), ulonglong(clientVersion),
-                         ulong(msg.body.length)];
+                         ulong(msg.body.length), ulonglong(serverVersion),
+                         ulonglong(clientVersion)];
     [self enqueueOutputMessage:msg];
-    NSLog(@"RealmSync: Connection[%lu]: Sessions[%@]: Sending: Bind local Realm '%@' (%llu) "
-          "to remote Realm '%@' (%llu) continuing synchronization from server version %llu, "
-          "whose last integrated client version is %llu", _ident, sessionIdent, clientPath,
-          ulonglong(clientFileIdent), serverPath, ulonglong(serverFileIdent),
+    NSLog(@"RealmSync: Connection[%lu]: Sessions[%@]: Sending: BIND(server_file_ident=%llu, "
+          "client_file_ident=%llu, server_path='%@', server_version=%llu, client_version=%llu)",
+          _ident, sessionIdent, ulonglong(serverFileIdent), ulonglong(clientFileIdent), serverPath,
           ulonglong(serverVersion), ulonglong(clientVersion));
 }
 
@@ -352,7 +350,7 @@ std::atomic<bool> s_syncLogEverything(false);
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
     msg.head = [NSString stringWithFormat:@"unbind %@\n", sessionIdent];
     [self enqueueOutputMessage:msg];
-    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: Unbind", _ident, sessionIdent);
+    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: UNBIND", _ident, sessionIdent);
 }
 
 
@@ -445,22 +443,23 @@ std::atomic<bool> s_syncLogEverything(false);
 
                     _messageHandler = nil;
                     __weak RLMServerConnection *weakSelf = self;
-                    if (message_type == "changeset") {
+                    if (message_type == "download") {
                         // A new foreign changeset is available for download
                         unsigned sessionIdent = 0;
                         Replication::version_type serverVersion = 0;
                         Replication::version_type clientVersion = 0;
+                        size_t changesetSize = 0;
                         uint_fast64_t originTimestamp = 0;
                         uint_fast64_t originFileIdent = 0;
-                        size_t changesetSize = 0;
-                        char sp1, sp2, sp3, sp4, sp5, sp6;
+                        bool moreIsAvailable = false;
+                        char sp1, sp2, sp3, sp4, sp5, sp6, sp7;
                         parser >> sp1 >> sessionIdent >> sp2 >> serverVersion >> sp3 >>
-                            clientVersion >> sp4 >> originTimestamp >> sp5 >>
-                            originFileIdent >> sp6 >> changesetSize;
+                            clientVersion >> sp4 >> changesetSize >> sp5 >>
+                            originTimestamp >> sp6 >> originFileIdent >> sp7 >> moreIsAvailable;
                         bool good = parser && parser.eof() && sp1 == ' ' && sp2 == ' ' &&
-                            sp3 == ' ' && sp4 == ' ' && sp5 == ' ' && sp6 == ' ';
+                            sp3 == ' ' && sp4 == ' ' && sp5 == ' ' && sp6 == ' ' && sp7 == ' ';
                         if (!good) {
-                            NSLog(@"RealmSync: Connection[%lu]: Bad 'changeset' message "
+                            NSLog(@"RealmSync: Connection[%lu]: Bad DOWNLOAD message "
                                   "from server", _ident);
                             [self closeAndTryToReconnectLater];
                             return;
@@ -468,15 +467,15 @@ std::atomic<bool> s_syncLogEverything(false);
                         _messageBodySize = changesetSize;
                         _messageHandler = ^{
                             NSNumber *sessionIdent2 = [NSNumber numberWithUnsignedInteger:sessionIdent];
-                            [weakSelf handleChangesetMessageWithSessionIdent:sessionIdent2
-                                                               serverVersion:serverVersion
-                                                               clientVersion:clientVersion
-                                                             originTimestamp:originTimestamp
-                                                             originFileIdent:originFileIdent];
+                            [weakSelf handleDownloadMessageWithSessionIdent:sessionIdent2
+                                                              serverVersion:serverVersion
+                                                              clientVersion:clientVersion
+                                                            originTimestamp:originTimestamp
+                                                            originFileIdent:originFileIdent
+                                                            moreIsAvailable:moreIsAvailable];
                         };
                     }
-                    else if (message_type == "accept") {
-                        // Server accepts a previously uploaded changeset
+                    else if (message_type == "progress") {
                         unsigned sessionIdent = 0;
                         Replication::version_type serverVersion = 0;
                         Replication::version_type clientVersion = 0;
@@ -486,15 +485,15 @@ std::atomic<bool> s_syncLogEverything(false);
                         bool good = parser && parser.eof() && sp1 == ' ' && sp2 == ' ' &&
                             sp3 == ' ';
                         if (!good) {
-                            NSLog(@"RealmSync: Connection[%lu]: Bad 'accept' message "
-                                  "from server", _ident);
+                            NSLog(@"RealmSync: Connection[%lu]: Bad PROGRESS message from server",
+                                  _ident);
                             [self closeAndTryToReconnectLater];
                             return;
                         }
                         NSNumber *sessionIdent2 = [NSNumber numberWithUnsignedInteger:sessionIdent];
-                        [self handleAcceptMessageWithSessionIdent:sessionIdent2
-                                                    serverVersion:serverVersion
-                                                    clientVersion:clientVersion];
+                        [self handleProgressMessageWithSessionIdent:sessionIdent2
+                                                      serverVersion:serverVersion
+                                                      clientVersion:clientVersion];
                     }
                     else if (message_type == "alloc") {
                         // New unique file identifier pair from server.
@@ -506,7 +505,7 @@ std::atomic<bool> s_syncLogEverything(false);
                         bool good = parser && parser.eof() && sp1 == ' ' && sp2 == ' ' &&
                             sp3 == ' ';
                         if (!good) {
-                            NSLog(@"RealmSync: Connection[%lu]: Bad 'alloc' message "
+                            NSLog(@"RealmSync: Connection[%lu]: Bad ALLOC message "
                                   "from server", _ident);
                             [self closeAndTryToReconnectLater];
                             return;
@@ -597,9 +596,8 @@ std::atomic<bool> s_syncLogEverything(false);
                            serverFileIdent:(uint_fast64_t)serverFileIdent
                            clientFileIdent:(uint_fast64_t)clientFileIdent {
     typedef unsigned long long ulonglong;
-    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: New unique Realm identifier pair "
-          "is (%llu, %llu)", _ident, sessionIdent, ulonglong(serverFileIdent),
-          ulonglong(clientFileIdent));
+    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: ALLOC(%llu, %llu)", _ident,
+          sessionIdent, ulonglong(serverFileIdent), ulonglong(clientFileIdent));
 
     RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
     if (!session)
@@ -610,62 +608,64 @@ std::atomic<bool> s_syncLogEverything(false);
 }
 
 
-- (void)handleChangesetMessageWithSessionIdent:(NSNumber *)sessionIdent
-                                 serverVersion:(Replication::version_type)serverVersion
-                                 clientVersion:(Replication::version_type)clientVersion
-                               originTimestamp:(uint_fast64_t)originTimestamp
-                               originFileIdent:(uint_fast64_t)originFileIdent {
+- (void)handleDownloadMessageWithSessionIdent:(NSNumber *)sessionIdent
+                                serverVersion:(Replication::version_type)serverVersion
+                                clientVersion:(Replication::version_type)clientVersion
+                              originTimestamp:(uint_fast64_t)originTimestamp
+                              originFileIdent:(uint_fast64_t)originFileIdent
+                              moreIsAvailable:(bool)moreIsAvailable {
     if (s_syncLogEverything) {
-        typedef unsigned long long ulonglong;
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: Changeset %llu -> %llu "
-              "of size %lu with origin timestamp %llu and origin client Realm identifier %llu "
-              "(last integrated client version is %llu)", _ident, sessionIdent,
-              ulonglong(serverVersion-1), ulonglong(serverVersion), (unsigned long)_messageBodyBuffer.length,
-              ulonglong(originTimestamp), ulonglong(originFileIdent), ulonglong(clientVersion));
+        using ulong     = unsigned long;
+        using ulonglong = unsigned long long;
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: DOWNLOAD(server_version=%llu, "
+              "client_version=%llu, changeset_size=%lu, origin_timestamp=%llu, "
+              "origin_file_ident=%llu, more_is_available=%d)", _ident, sessionIdent,
+              ulonglong(serverVersion), ulonglong(clientVersion), ulong(_messageBodyBuffer.length),
+              ulonglong(originTimestamp), ulonglong(originFileIdent), int(moreIsAvailable));
     }
 
     RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
     if (!session)
         return; // This session no longer exists
 
-    NSData *data = _messageBodyBuffer;
+    NSData *changeset = _messageBodyBuffer;
     _messageBodyBuffer = nil;
 
-    [session handleChangesetMessageWithServerVersion:serverVersion
-                                       clientVersion:clientVersion
-                                     originTimestamp:originTimestamp
-                                     originFileIdent:originFileIdent
-                                                data:data];
+    [session handleDownloadMessageWithServerVersion:serverVersion
+                                      clientVersion:clientVersion
+                                          changeset:changeset
+                                    originTimestamp:originTimestamp
+                                    originFileIdent:originFileIdent];
 }
 
 
-- (void)handleAcceptMessageWithSessionIdent:(NSNumber *)sessionIdent
-                              serverVersion:(Replication::version_type)serverVersion
-                              clientVersion:(Replication::version_type)clientVersion {
+- (void)handleProgressMessageWithSessionIdent:(NSNumber *)sessionIdent
+                                serverVersion:(Replication::version_type)serverVersion
+                                clientVersion:(Replication::version_type)clientVersion {
     if (s_syncLogEverything) {
-        typedef unsigned long long ulonglong;
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: Accept changeset %llu -> %llu, "
-              "producing server version %llu", _ident, sessionIdent,
-              ulonglong(clientVersion-1), ulonglong(clientVersion), ulonglong(serverVersion));
+        using ulonglong = unsigned long long;
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: PROGRESS(server_version=%llu, "
+              "client_version=%llu)", _ident, sessionIdent, ulonglong(serverVersion),
+              ulonglong(clientVersion));
     }
 
     RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
     if (!session)
         return; // This session no longer exists
 
-    [session handleAcceptMessageWithServerVersion:serverVersion clientVersion:clientVersion];
+    [session handleProgressMessageWithServerVersion:serverVersion clientVersion:clientVersion];
 }
 
 @end
 
 
 @implementation RLMSyncSession {
-    std::unique_ptr<SharedGroup>   _sharedGroup;
-    std::unique_ptr<ClientHistory> _history;
+    std::unique_ptr<SharedGroup>            _sharedGroup;
+    std::unique_ptr<ClientTransformHistory> _history;
 
-    std::unique_ptr<SharedGroup>   _backgroundSharedGroup; // For background thread
-    std::unique_ptr<ClientHistory> _backgroundHistory;     // For background thread
-    std::unique_ptr<Transformer>   _backgroundTransformer; // For background thread
+    std::unique_ptr<SharedGroup>            _backgroundSharedGroup; // For background thread
+    std::unique_ptr<ClientTransformHistory> _backgroundHistory;     // For background thread
+    std::unique_ptr<Transformer>            _backgroundTransformer; // For background thread
 
     Replication::version_type _latestVersionAvailable;
     Replication::version_type _latestVersionUploaded;
@@ -691,11 +691,11 @@ std::atomic<bool> s_syncLogEverything(false);
         _sessionIdent = [NSNumber numberWithUnsignedInteger:[connection newSessionIdent]];
 
         SharedGroup::DurabilityLevel durability = SharedGroup::durability_Full;
-        _history = realm::make_client_sync_history(_configuration.path.UTF8String);
+        _history = realm::make_client_transform_history(_configuration.path.UTF8String);
         _sharedGroup = std::make_unique<SharedGroup>(*_history, durability);
-        _backgroundHistory = realm::make_client_sync_history(_configuration.path.UTF8String);
+        _backgroundHistory = realm::make_client_transform_history(_configuration.path.UTF8String);
         _backgroundSharedGroup = std::make_unique<SharedGroup>(*_backgroundHistory, durability);
-        _backgroundTransformer = realm::make_sync_demo(false, *_backgroundHistory);
+        _backgroundTransformer = realm::make_transformer(false, *_backgroundHistory);
         _backgroundOperationQueue = [[NSOperationQueue alloc] init];
         _backgroundOperationQueue.name = @"io.realm.sync";
         _backgroundOperationQueue.maxConcurrentOperationCount = 1;
@@ -747,6 +747,10 @@ std::atomic<bool> s_syncLogEverything(false);
         }
     }
 
+    NSString *realmPath = _configuration.path;
+    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: New session for '%@'", _connection.ident,
+          _sessionIdent, realmPath);
+
 /*
     NSLog(@"_latestVersionAvailable = %llu", (unsigned long long)(_latestVersionAvailable));
     NSLog(@"_latestVersionUploaded = %llu", (unsigned long long)(_latestVersionUploaded));
@@ -783,12 +787,11 @@ std::atomic<bool> s_syncLogEverything(false);
     if (_latestVersionUploaded > _latestVersionAvailable) // Transiently possible (FIXME: Or is it?)
         _latestVersionUploaded = _latestVersionAvailable;
     [_connection sendBindMessageWithSessionIdent:_sessionIdent
-                                       serverFileIdent:_serverFileIdent
-                                       clientFileIdent:_clientFileIdent
-                                   serverVersion:_syncProgressServerVersion
-                                   clientVersion:_syncProgressClientVersion
+                                 serverFileIdent:_serverFileIdent
+                                 clientFileIdent:_clientFileIdent
                                       serverPath:_serverPath
-                                      clientPath:_configuration.path];
+                                   serverVersion:_syncProgressServerVersion
+                                   clientVersion:_syncProgressClientVersion];
     [self resumeUpload];
 }
 
@@ -822,22 +825,23 @@ std::atomic<bool> s_syncLogEverything(false);
             break;
         _latestVersionUploaded = uploadVersion;
     }
+    using ulong     = unsigned long;
     using ulonglong = unsigned long long;
     // `serverVersion` is the last server version that has been integrated into
     // `uploadVersion`.
-    ulonglong serverVersion = historyEntry.remote_version;
+    auto clientVersion = uploadVersion;
+    auto serverVersion = historyEntry.remote_version;
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
     msg.body = [NSData dataWithBytes:historyEntry.changeset.data()
                               length:historyEntry.changeset.size()]; // Full copy
-    msg.head = [NSString stringWithFormat:@"changeset %@ %llu %llu %llu %lu\n", _sessionIdent,
-                         ulonglong(uploadVersion), ulonglong(serverVersion),
-                         ulonglong(historyEntry.origin_timestamp), (unsigned long)msg.body.length];
+    msg.head = [NSString stringWithFormat:@"upload %@ %llu %llu %lu %llu\n", _sessionIdent,
+                         ulonglong(clientVersion), ulonglong(serverVersion),
+                         ulong(msg.body.length), ulonglong(historyEntry.origin_timestamp)];
     if (s_syncLogEverything) {
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: Changeset %llu -> %llu "
-              "of size %lu with timestamp %llu (last integrated server version is %llu)",
-              _connection.ident, _sessionIdent, ulonglong(uploadVersion-1),
-              ulonglong(uploadVersion), (unsigned long)msg.body.length, ulonglong(historyEntry.origin_timestamp),
-              serverVersion);
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: UPLOAD(client_version=%llu, "
+              "server_version=%llu, changeset_size=%lu, timestamp=%llu)", _connection.ident,
+              _sessionIdent, ulonglong(clientVersion), ulonglong(serverVersion),
+              ulong(msg.body.length), ulonglong(historyEntry.origin_timestamp));
     }
     __weak RLMSyncSession *weakSelf = self;
     [msg setCompletionHandler:^{
@@ -866,7 +870,7 @@ std::atomic<bool> s_syncLogEverything(false);
     // conclude that a race is not possible, because the background thread must
     // not attempt to transform anything before the file identifier is
     // known. Note that it cannot be assumed the there will be no spurious
-    // 'alloc' messages received.
+    // ALLOC messages received.
     _backgroundTransformer->set_local_client_file_ident(clientFileIdent);
     _serverFileIdent = serverFileIdent;
     _clientFileIdent = clientFileIdent;
@@ -875,11 +879,11 @@ std::atomic<bool> s_syncLogEverything(false);
 }
 
 
-- (void)handleChangesetMessageWithServerVersion:(Replication::version_type)serverVersion
-                                  clientVersion:(Replication::version_type)clientVersion
-                                originTimestamp:(uint_fast64_t)originTimestamp
-                                originFileIdent:(uint_fast64_t)originFileIdent
-                                           data:(NSData *)data {
+- (void)handleDownloadMessageWithServerVersion:(Replication::version_type)serverVersion
+                                 clientVersion:(Replication::version_type)clientVersion
+                                     changeset:(NSData *)changeset
+                               originTimestamp:(uint_fast64_t)originTimestamp
+                               originFileIdent:(uint_fast64_t)originFileIdent {
     // We cannot save the synchronization progress marker (`serverVersion`,
     // `clientVersion`) to persistent storage until the changeset is actually
     // integrated locally, but that means it will be delayed by two context
@@ -895,20 +899,18 @@ std::atomic<bool> s_syncLogEverything(false);
     // attempting to apply the changeset, and to do that, we must both check and
     // update `_syncProgressServerVersion` and `_syncProgressClientVersion`
     // right here in the main thread.
-    //
-    // Note: The server version must increase, since it is the number of a new
-    // server version. The client version, however, can only be increased by an
-    // 'accept' message, so it must remain unchanged here.
-    bool good_versions = serverVersion > _syncProgressServerVersion &&
-        clientVersion == _syncProgressClientVersion;
+    bool good_versions =
+        serverVersion >  _syncProgressServerVersion &&
+        clientVersion >= _syncProgressClientVersion;
     if (!good_versions) {
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: ERROR: Bad server or client version "
-              "in 'changeset' message", _connection.ident, _sessionIdent);
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: ERROR: Bad server and/or client version "
+              "in DOWNLOAD message", _connection.ident, _sessionIdent);
         [_connection closeAndTryToReconnectLater];
         return;
 
     }
     _syncProgressServerVersion = serverVersion;
+    _syncProgressClientVersion = clientVersion;
 
     // Skip changesets that were already integrated during an earlier session,
     // but still attempt to save a new synchronization progress marker to
@@ -917,14 +919,14 @@ std::atomic<bool> s_syncLogEverything(false);
         if (s_syncLogEverything) {
             using ulonglong = unsigned long long;
             NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Ignoring previously integrated "
-                  "changeset (threshold is %llu)", _connection.ident, _sessionIdent,
+                  "changeset (server version threshold is %llu)", _connection.ident, _sessionIdent,
                   ulonglong(_serverVersionThreshold));
         }
         [self addBackgroundTaskWithServerVersion:serverVersion
                                    clientVersion:clientVersion
+                                       changeset:nil
                                  originTimestamp:0
-                                 originFileIdent:0
-                                            data:nil];
+                                 originFileIdent:0];
         return;
     }
 
@@ -936,32 +938,27 @@ std::atomic<bool> s_syncLogEverything(false);
 
     [self addBackgroundTaskWithServerVersion:serverVersion
                                clientVersion:clientVersion
+                                   changeset:changeset
                              originTimestamp:originTimestamp
-                             originFileIdent:originFileIdent
-                                        data:data];
+                             originFileIdent:originFileIdent];
 }
 
 
-- (void)handleAcceptMessageWithServerVersion:(Replication::version_type)serverVersion
-                               clientVersion:(Replication::version_type)clientVersion {
-    // As with 'changeset' messages, we need to update the synchronization
-    // progress marker.
+- (void)handleProgressMessageWithServerVersion:(Replication::version_type)serverVersion
+                                 clientVersion:(Replication::version_type)clientVersion {
+    // As with DOWNLOAD messages, we need to update the synchronization progress
+    // marker.
     //
     // FIXME: Properly explain the three roles of the synchronization progress
     // marker (syncronization restart point, history upload window specifier,
     // and history merge window specifier), and the intricate interplay between
     // them.
-    //
-    // Note: The server version must increase, since it is the number of a new
-    // server version. The client version must also increase, because it
-    // specifies the last integrated client version, and an 'accept' message
-    // implies that a new client version was integrated.
-    bool good_versions = serverVersion > _syncProgressServerVersion &&
-        clientVersion > _syncProgressClientVersion &&
-        clientVersion <= _latestVersionUploaded;
+    bool good_versions =
+        serverVersion >  _syncProgressServerVersion &&
+        clientVersion >= _syncProgressClientVersion;
     if (!good_versions) {
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: ERROR: Bad server or client version "
-              "in 'accept' message", _connection.ident, _sessionIdent);
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: ERROR: Bad server and/or client version "
+              "in PROGRESS message", _connection.ident, _sessionIdent);
         [_connection closeAndTryToReconnectLater];
         return;
 
@@ -971,42 +968,42 @@ std::atomic<bool> s_syncLogEverything(false);
 
     // The order in which updated synchronization progress markers are saved to
     // persistent storage must be the same order in with the are received from
-    // the server either via a 'changeset' message or an 'accept' message.
+    // the server either via a DOWNLOAD or a PROGRESS message.
     [self addBackgroundTaskWithServerVersion:serverVersion
                                clientVersion:clientVersion
+                                   changeset:nil
                              originTimestamp:0
-                             originFileIdent:0
-                                        data:nil];
+                             originFileIdent:0];
 }
 
 
 - (void)addBackgroundTaskWithServerVersion:(Replication::version_type)serverVersion
                              clientVersion:(Replication::version_type)clientVersion
+                                 changeset:(NSData *)changeset
                            originTimestamp:(uint_fast64_t)originTimestamp
-                           originFileIdent:(uint_fast64_t)originFileIdent
-                                      data:(NSData *)data {
+                           originFileIdent:(uint_fast64_t)originFileIdent {
     __weak RLMSyncSession *weakSelf = self;
     [_backgroundOperationQueue addOperationWithBlock:^{
             [weakSelf backgroundTaskWithServerVersion:serverVersion
                                         clientVersion:clientVersion
+                                            changeset:changeset
                                       originTimestamp:originTimestamp
-                                      originFileIdent:originFileIdent
-                                                 data:data];
+                                      originFileIdent:originFileIdent];
         }];
 }
 
 
 - (void)backgroundTaskWithServerVersion:(Replication::version_type)serverVersion
                           clientVersion:(Replication::version_type)clientVersion
+                              changeset:(NSData *)changeset
                         originTimestamp:(uint_fast64_t)originTimestamp
-                        originFileIdent:(uint_fast64_t)originFileIdent
-                                   data:(NSData *)data {
-    if (data)
+                        originFileIdent:(uint_fast64_t)originFileIdent {
+    if (changeset)
         [self backgroundApplyChangesetWithServerVersion:serverVersion
                                           clientVersion:clientVersion
+                                              changeset:changeset
                                         originTimestamp:originTimestamp
-                                        originFileIdent:originFileIdent
-                                                   data:data];
+                                        originFileIdent:originFileIdent];
 
     __weak RLMSyncSession *weakSelf = self;
     NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
@@ -1019,28 +1016,23 @@ std::atomic<bool> s_syncLogEverything(false);
 
 - (void)backgroundApplyChangesetWithServerVersion:(Replication::version_type)serverVersion
                                     clientVersion:(Replication::version_type)clientVersion
+                                        changeset:(NSData *)changeset
                                   originTimestamp:(uint_fast64_t)originTimestamp
-                                  originFileIdent:(uint_fast64_t)originFileIdent
-                                             data:(NSData *)data {
+                                  originFileIdent:(uint_fast64_t)originFileIdent {
     using ulonglong = unsigned long long;
-    const char *data2 = static_cast<const char *>(data.bytes);
-    size_t size = data.length;
-    BinaryData changeset(data2, size);
+    const char *changesetData = static_cast<const char *>(changeset.bytes);
+    size_t changesetSize = changeset.length;
     HistoryEntry::version_type newVersion;
     try {
         Transformer &transformer = *_backgroundTransformer;
         HistoryEntry::version_type lastIntegratedLocalVersion = clientVersion;
-        BinaryData remoteChangeset = changeset;
-        std::ostream *applyLog = 0;
+        BinaryData remoteChangeset(changesetData, changesetSize);
+        util::Logger *replayLogger = 0;
         newVersion =
             transformer.integrate_remote_changeset(*_backgroundSharedGroup, originTimestamp,
                                                    originFileIdent, lastIntegratedLocalVersion,
-                                                   serverVersion, remoteChangeset, applyLog); // Throws
-    }
-    catch (BadInitialSchemaCreation& e) {
-        NSString *message = [NSString stringWithFormat:@"Unresolvable conflict between initial "
-                                      "schema-creating changesets: %s", e.what()];
-        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+                                                   serverVersion, remoteChangeset,
+                                                   replayLogger); // Throws
     }
     catch (TransformError& e) {
         NSString *message = [NSString stringWithFormat:@"Bad changeset received: %s", e.what()];
@@ -1050,9 +1042,8 @@ std::atomic<bool> s_syncLogEverything(false);
     [RLMRealm realmWithConfiguration:_configuration error:nullptr]->_realm->notify_others();
 
     if (s_syncLogEverything) {
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Server changeset (%llu -> %llu) "
-              "integrated, producing client version %llu", _connection.ident, _sessionIdent,
-              ulonglong(serverVersion-1), ulonglong(serverVersion), ulonglong(newVersion));
+        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Remote changeset integrated, producing "
+              "client version %llu", _connection.ident, _sessionIdent, ulonglong(newVersion));
     }
 }
 
