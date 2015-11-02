@@ -153,7 +153,7 @@
 		C0D8E1321A8196EE0077C784 /* TestUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TestUtils.mm; sourceTree = "<group>"; };
 		C0D8E1391A819B430077C784 /* RealmSwiftTests-BridgingHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "RealmSwiftTests-BridgingHeader.h"; path = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h"; sourceTree = SOURCE_ROOT; };
 		C0E04FAB1AB2366200DCC8C0 /* TestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C0F5D2941B14FC59001C4543 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "build/ios-dynamic/Realm.framework"; sourceTree = "<group>"; };
+		C0F5D2941B14FC59001C4543 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "build/ios/Realm.framework"; sourceTree = "<group>"; };
 		C0F5D2951B14FC71001C4543 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = build/osx/Realm.framework; sourceTree = "<group>"; };
 		C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectTests.swift; sourceTree = "<group>"; };
 		E8DF380F1AF7185B00BC914F /* strip-frameworks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = "strip-frameworks.sh"; path = "scripts/strip-frameworks.sh"; sourceTree = SOURCE_ROOT; };
@@ -437,7 +437,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ $PLATFORM_NAME == \"macosx\" ]]; then\n  if [[ ! -d \"build/osx/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh osx\n  fi\nelif [[ $PLATFORM_NAME == \"iphoneos\" ]] || [[ $PLATFORM_NAME == \"iphonesimulator\" ]]; then\n  if [[ ! -d \"build/ios-dynamic/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\n  fi\nelse\n  if [[ ! -d \"build/watchos/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh watchos\n  fi\nfi";
+			shellScript = "if [[ $PLATFORM_NAME == \"macosx\" ]]; then\n  if [[ ! -d \"build/osx/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh osx\n  fi\nelif [[ $PLATFORM_NAME == \"iphoneos\" ]] || [[ $PLATFORM_NAME == \"iphonesimulator\" ]]; then\n  if [[ ! -d \"build/ios/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\n  fi\nelse\n  if [[ ! -d \"build/watchos/Realm.framework\" ]]; then\n    CONFIGURATION=$CONFIGURATION sh build.sh watchos\n  fi\nfi";
 		};
 		5DA0C4D41B16A0D70077F097 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

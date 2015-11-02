@@ -11,6 +11,6 @@ end
 Motion::Project::App.setup do |app|
   # Use `rake config' to see complete project settings.
   app.name = 'RealmRubyMotionSimpleExample'
-  app.external_frameworks << '../../../../build/ios/Realm.framework'
-  app.vendor_project 'models', :static, :cflags => '-F ../../../../../build/ios/'
+  app.external_frameworks << '../../../../build/ios-static/Realm.framework'
+  app.vendor_project 'models', :static, :cflags => '-F ../../../../../build/ios-static/'
 end
