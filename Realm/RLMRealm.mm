@@ -94,7 +94,8 @@ std::atomic<bool> s_syncLogEverything(false);
                                  clientVersion:(Replication::version_type)clientVersion
                                      changeset:(NSData *)changeset
                                originTimestamp:(uint_fast64_t)originTimestamp
-                               originFileIdent:(uint_fast64_t)originFileIdent;
+                               originFileIdent:(uint_fast64_t)originFileIdent
+                               moreIsAvailable:(bool)moreIsAvailable;
 - (void)handleProgressMessageWithServerVersion:(Replication::version_type)serverVersion
                                  clientVersion:(Replication::version_type)clientVersion;
 @end
@@ -635,7 +636,8 @@ std::atomic<bool> s_syncLogEverything(false);
                                       clientVersion:clientVersion
                                           changeset:changeset
                                     originTimestamp:originTimestamp
-                                    originFileIdent:originFileIdent];
+                                    originFileIdent:originFileIdent
+                                    moreIsAvailable:moreIsAvailable];
 }
 
 
@@ -669,10 +671,15 @@ std::atomic<bool> s_syncLogEverything(false);
 
     Replication::version_type _latestVersionAvailable;
     Replication::version_type _latestVersionUploaded;
-    Replication::version_type _syncProgressServerVersion;
-    Replication::version_type _syncProgressClientVersion;
+    Replication::version_type _progressServerVersion;
+    Replication::version_type _progressClientVersion;
+    Replication::version_type _persistedProgressServerVersion;
+    Replication::version_type _persistedProgressClientVersion;
     Replication::version_type _serverVersionThreshold;
     BOOL _uploadInProgress;
+
+    std::vector<Transformer::RemoteChangeset> _pendingChangesets;
+    std::vector<NSData *> _pendingChangesetBuffers;
 
     NSOperationQueue *_backgroundOperationQueue;
 }
@@ -713,30 +720,48 @@ std::atomic<bool> s_syncLogEverything(false);
         _backgroundTransformer->set_local_client_file_ident(clientFileIdent);
     }
 
-    _history->get_sync_progress(_syncProgressServerVersion, _syncProgressClientVersion);
+    _history->get_sync_progress(_persistedProgressServerVersion, _persistedProgressClientVersion);
 
     _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
     REALM_ASSERT(_latestVersionAvailable >= 1);
-    REALM_ASSERT(_latestVersionAvailable >= _syncProgressClientVersion);
+    REALM_ASSERT(_latestVersionAvailable >= _persistedProgressClientVersion);
 
-    // Due to the nature of the protocol, it is possible that the server sends a
-    // changeset that was previously sent, and already integrated locally. To be
-    // able to detect this situation, we need to know the latest server version
-    // that is already integrated, so that we can skip those changesets. We have
-    // `_syncProgressServerVersion`, but it is not guaranteed to be completely
-    // up to date with what is actually in the history. For that reason, we have
-    // to manually search a portion of the history.
+    // It is possible to find an inconsistency between the main Realm file, and
+    // the associated history file(s). In particular, since the server-side
+    // progress, as persisted in the history file(s), is updated after
+    // successful integration of an incoming changeset, it is possible to find
+    // that a changeset has been downloaded and integrated into the Realm, but
+    // that `_persisteedProgressServerVersion` has not been updated to reflect
+    // it, presumably due to a a crash at an unfortunate point in time.
     //
-    // FIXME: Consider whether this can be done in the same way, and at the same
-    // time as latest_local_time_seen and latest_remote_time_seen are managed
-    // inside the CommitLogs class.
-    _serverVersionThreshold = _syncProgressServerVersion;
+    // FIXME: This possibility of inconsistency can be eliminated by moving the
+    // history into the main Realm file, which is already something that is
+    // likely to happen for different reasons.
+    //
+    // If a new synchronization session is started at a time where such an
+    // inconsistency exists, the server will resend the changeset that was
+    // already integrated, and it is therefore necessary for the client to be
+    // able to reliably intercept and ignore a received changeset that is
+    // already integrated. `_serverVersionThreshold` was introduced to solve
+    // this problem.
+    //
+    // During initialization of a RLMSyncSession object,
+    // `_serverVersionThreshold` is set to `HistoryEntry::remote_version` of the
+    // last history entry, that succeeds `_persistedProgressClientVersion`, and
+    // is produced by integration of a remote changeset, or if no such history
+    // entry exists, it is set to `_persistedProgressServerVersion`.
+    //
+    // Given that, any changeset, that is received in a DOWNLOAD message
+    // specifying a server version less than, or equal to
+    // `_serverVersionThreshold`, is known to already have been integrated, and
+    // can be safely ignored by the client.
+    _serverVersionThreshold = _persistedProgressServerVersion;
     {
         HistoryEntry historyEntry;
         History::version_type version = _latestVersionAvailable;
         if (version == 1)
             version = 0;
-        while (version > _syncProgressClientVersion) {
+        while (version > _persistedProgressClientVersion) {
             History::version_type prevVersion = _history->get_history_entry(version, historyEntry);
             BOOL isForeign = historyEntry.origin_client_file_ident != 0;
             if (isForeign) {
@@ -752,11 +777,12 @@ std::atomic<bool> s_syncLogEverything(false);
           _sessionIdent, realmPath);
 
 /*
-    NSLog(@"_latestVersionAvailable = %llu", (unsigned long long)(_latestVersionAvailable));
-    NSLog(@"_latestVersionUploaded = %llu", (unsigned long long)(_latestVersionUploaded));
-    NSLog(@"_syncProgressServerVersion = %llu", (unsigned long long)(_syncProgressServerVersion));
-    NSLog(@"_syncProgressClientVersion = %llu", (unsigned long long)(_syncProgressClientVersion));
-    NSLog(@"_serverVersionThreshold = %llu", (unsigned long long)(_serverVersionThreshold));
+    using ulonglong = unsigned long long;
+    NSLog(@"_latestVersionAvailable = %llu", ulongong(_latestVersionAvailable));
+    NSLog(@"_latestVersionUploaded = %llu",  ulongong(_latestVersionUploaded));
+    NSLog(@"_progressServerVersion = %llu",  ulongong(_persistedProgressServerVersion));
+    NSLog(@"_progressClientVersion = %llu",  ulongong(_persistedProgressClientVersion));
+    NSLog(@"_serverVersionThreshold = %llu", ulongong(_serverVersionThreshold));
 */
 
     [_connection mainThreadInit];
@@ -783,15 +809,19 @@ std::atomic<bool> s_syncLogEverything(false);
 
 
 - (void)connectionIsOpenAndSessionHasFileIdent {
-    _latestVersionUploaded = std::max<History::version_type>(1, _syncProgressClientVersion);
+    _pendingChangesets.clear();
+    _pendingChangesetBuffers.clear();
+    _progressServerVersion = _persistedProgressServerVersion;
+    _progressClientVersion = _persistedProgressClientVersion;
+    _latestVersionUploaded = std::max<History::version_type>(1, _progressClientVersion);
     if (_latestVersionUploaded > _latestVersionAvailable) // Transiently possible (FIXME: Or is it?)
         _latestVersionUploaded = _latestVersionAvailable;
     [_connection sendBindMessageWithSessionIdent:_sessionIdent
                                  serverFileIdent:_serverFileIdent
                                  clientFileIdent:_clientFileIdent
                                       serverPath:_serverPath
-                                   serverVersion:_syncProgressServerVersion
-                                   clientVersion:_syncProgressClientVersion];
+                                   serverVersion:_progressServerVersion
+                                   clientVersion:_progressClientVersion];
     [self resumeUpload];
 }
 
@@ -883,7 +913,8 @@ std::atomic<bool> s_syncLogEverything(false);
                                  clientVersion:(Replication::version_type)clientVersion
                                      changeset:(NSData *)changeset
                                originTimestamp:(uint_fast64_t)originTimestamp
-                               originFileIdent:(uint_fast64_t)originFileIdent {
+                               originFileIdent:(uint_fast64_t)originFileIdent
+                               moreIsAvailable:(bool)moreIsAvailable {
     // We cannot save the synchronization progress marker (`serverVersion`,
     // `clientVersion`) to persistent storage until the changeset is actually
     // integrated locally, but that means it will be delayed by two context
@@ -893,15 +924,9 @@ std::atomic<bool> s_syncLogEverything(false);
     // reference, which presumably would be due to the termination of the
     // synchronization session, but not necessarily in connection with the
     // termination of the application.
-    //
-    // Additionally, we want to be able to make a proper monotony check on
-    // `serverVersion` and `clientVersion` before having the background thread
-    // attempting to apply the changeset, and to do that, we must both check and
-    // update `_syncProgressServerVersion` and `_syncProgressClientVersion`
-    // right here in the main thread.
     bool good_versions =
-        serverVersion >  _syncProgressServerVersion &&
-        clientVersion >= _syncProgressClientVersion;
+        serverVersion >  _progressServerVersion &&
+        clientVersion >= _progressClientVersion;
     if (!good_versions) {
         NSLog(@"RealmSync: Connection[%lu]: Session[%@]: ERROR: Bad server and/or client version "
               "in DOWNLOAD message", _connection.ident, _sessionIdent);
@@ -909,38 +934,46 @@ std::atomic<bool> s_syncLogEverything(false);
         return;
 
     }
-    _syncProgressServerVersion = serverVersion;
-    _syncProgressClientVersion = clientVersion;
+    _progressServerVersion = serverVersion;
+    _progressClientVersion = clientVersion;
 
     // Skip changesets that were already integrated during an earlier session,
     // but still attempt to save a new synchronization progress marker to
     // persistent storage.
-    if (serverVersion <= _serverVersionThreshold) {
+    if (serverVersion > _serverVersionThreshold) {
+        BinaryData data(static_cast<const char *>(changeset.bytes), size_t(changeset.length));
+        Transformer::RemoteChangeset changeset_2(serverVersion, clientVersion, data,
+                                                 originTimestamp, originFileIdent);
+        REALM_ASSERT(_pendingChangesets.size() <= _pendingChangesetBuffers.size());
+        _pendingChangesetBuffers.reserve(_pendingChangesets.size()+1); // Throws
+        _pendingChangesets.push_back(changeset_2); // Throws
+        _pendingChangesetBuffers.push_back(std::move(changeset)); // Not throwing
+    }
+    else {
         if (s_syncLogEverything) {
             using ulonglong = unsigned long long;
             NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Ignoring previously integrated "
                   "changeset (server version threshold is %llu)", _connection.ident, _sessionIdent,
                   ulonglong(_serverVersionThreshold));
         }
-        [self addBackgroundTaskWithServerVersion:serverVersion
-                                   clientVersion:clientVersion
-                                       changeset:nil
-                                 originTimestamp:0
-                                 originFileIdent:0];
-        return;
     }
 
-    // FIXME: Consider whether we should attempt to apply small changsesets
-    // immediately on the main thread (right here) if auto-refresh is enabled,
-    // `_backgroundOperationQueue` is empty, and a try-lock on the
-    // write-transaction mutex succeeds. This might be an effective way of
-    // reducing latency due to context switches.
+    // FIXME: Also "flush" the "pending queue" if the accumulated size exceeds a
+    // certain limit. Additionally, when adding the first changeset to the
+    // "pending queue", start a deadline timer, and flush on timeout
+    // (cancel/restart the timer on early flush).
 
+    if (moreIsAvailable)
+        return;
+
+    std::vector<Transformer::RemoteChangeset> changesets = std::move(_pendingChangesets);
+    std::vector<NSData *> changesetBuffers               = std::move(_pendingChangesetBuffers);
+    _pendingChangesets.clear();
+    _pendingChangesetBuffers.clear();
     [self addBackgroundTaskWithServerVersion:serverVersion
                                clientVersion:clientVersion
-                                   changeset:changeset
-                             originTimestamp:originTimestamp
-                             originFileIdent:originFileIdent];
+                                  changesets:std::move(changesets)
+                            changesetBuffers:std::move(changesetBuffers)];
 }
 
 
@@ -954,8 +987,8 @@ std::atomic<bool> s_syncLogEverything(false);
     // and history merge window specifier), and the intricate interplay between
     // them.
     bool good_versions =
-        serverVersion >  _syncProgressServerVersion &&
-        clientVersion >= _syncProgressClientVersion;
+        serverVersion >  _progressServerVersion &&
+        clientVersion >= _progressClientVersion;
     if (!good_versions) {
         NSLog(@"RealmSync: Connection[%lu]: Session[%@]: ERROR: Bad server and/or client version "
               "in PROGRESS message", _connection.ident, _sessionIdent);
@@ -963,47 +996,47 @@ std::atomic<bool> s_syncLogEverything(false);
         return;
 
     }
-    _syncProgressServerVersion = serverVersion;
-    _syncProgressClientVersion = clientVersion;
 
-    // The order in which updated synchronization progress markers are saved to
-    // persistent storage must be the same order in with the are received from
-    // the server either via a DOWNLOAD or a PROGRESS message.
+    if (!_pendingChangesets.empty()) {
+        NSLog(@"RealmSync: Connection[%lu]: Session(%@): ERROR: PROGRESS message received while "
+              "changesets are pending", _connection.ident, _sessionIdent);
+        [_connection closeAndTryToReconnectLater];
+        return;
+    }
+
+    _progressServerVersion = serverVersion;
+    _progressClientVersion = clientVersion;
+
+    std::vector<Transformer::RemoteChangeset> changesets;
+    std::vector<NSData *> changesetBuffers;
     [self addBackgroundTaskWithServerVersion:serverVersion
                                clientVersion:clientVersion
-                                   changeset:nil
-                             originTimestamp:0
-                             originFileIdent:0];
+                                  changesets:std::move(changesets)
+                            changesetBuffers:std::move(changesetBuffers)];
 }
 
 
 - (void)addBackgroundTaskWithServerVersion:(Replication::version_type)serverVersion
                              clientVersion:(Replication::version_type)clientVersion
-                                 changeset:(NSData *)changeset
-                           originTimestamp:(uint_fast64_t)originTimestamp
-                           originFileIdent:(uint_fast64_t)originFileIdent {
+                                changesets:(std::vector<Transformer::RemoteChangeset>)changesets
+                          changesetBuffers:(std::vector<NSData *>)changesetBuffers {
     __weak RLMSyncSession *weakSelf = self;
     [_backgroundOperationQueue addOperationWithBlock:^{
             [weakSelf backgroundTaskWithServerVersion:serverVersion
                                         clientVersion:clientVersion
-                                            changeset:changeset
-                                      originTimestamp:originTimestamp
-                                      originFileIdent:originFileIdent];
+                                           changesets:std::move(changesets)
+                                     changesetBuffers:std::move(changesetBuffers)];
         }];
 }
 
 
 - (void)backgroundTaskWithServerVersion:(Replication::version_type)serverVersion
                           clientVersion:(Replication::version_type)clientVersion
-                              changeset:(NSData *)changeset
-                        originTimestamp:(uint_fast64_t)originTimestamp
-                        originFileIdent:(uint_fast64_t)originFileIdent {
-    if (changeset)
-        [self backgroundApplyChangesetWithServerVersion:serverVersion
-                                          clientVersion:clientVersion
-                                              changeset:changeset
-                                        originTimestamp:originTimestamp
-                                        originFileIdent:originFileIdent];
+                             changesets:(std::vector<Transformer::RemoteChangeset>)changesets
+                       changesetBuffers:(std::vector<NSData *>)changesetBuffers {
+    if (!changesets.empty())
+        [self backgroundApplyChangesets:changesets];
+    static_cast<void>(changesetBuffers); // Still the owner of the changeset buffer memory
 
     __weak RLMSyncSession *weakSelf = self;
     NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
@@ -1014,25 +1047,18 @@ std::atomic<bool> s_syncLogEverything(false);
 }
 
 
-- (void)backgroundApplyChangesetWithServerVersion:(Replication::version_type)serverVersion
-                                    clientVersion:(Replication::version_type)clientVersion
-                                        changeset:(NSData *)changeset
-                                  originTimestamp:(uint_fast64_t)originTimestamp
-                                  originFileIdent:(uint_fast64_t)originFileIdent {
-    using ulonglong = unsigned long long;
-    const char *changesetData = static_cast<const char *>(changeset.bytes);
-    size_t changesetSize = changeset.length;
-    HistoryEntry::version_type newVersion;
+- (void)backgroundApplyChangesets:(const std::vector<Transformer::RemoteChangeset> &)changesets {
+    REALM_ASSERT(!changesets.empty());
+    const Transformer::RemoteChangeset *changesets_2 = changesets.data();
+    size_t numChangesets = changesets.size();
+    Replication::version_type newClientVersion;
     try {
         Transformer &transformer = *_backgroundTransformer;
-        HistoryEntry::version_type lastIntegratedLocalVersion = clientVersion;
-        BinaryData remoteChangeset(changesetData, changesetSize);
-        util::Logger *replayLogger = 0;
-        newVersion =
-            transformer.integrate_remote_changeset(*_backgroundSharedGroup, originTimestamp,
-                                                   originFileIdent, lastIntegratedLocalVersion,
-                                                   serverVersion, remoteChangeset,
-                                                   replayLogger); // Throws
+        SharedGroup& sharedGroup = *_backgroundSharedGroup;
+        util::Logger* replayLogger = 0;
+        newClientVersion =
+            transformer.integrate_remote_changesets(sharedGroup, changesets_2, numChangesets,
+                                                    replayLogger); // Throws
     }
     catch (TransformError& e) {
         NSString *message = [NSString stringWithFormat:@"Bad changeset received: %s", e.what()];
@@ -1042,8 +1068,18 @@ std::atomic<bool> s_syncLogEverything(false);
     [RLMRealm realmWithConfiguration:_configuration error:nullptr]->_realm->notify_others();
 
     if (s_syncLogEverything) {
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Remote changeset integrated, producing "
-              "client version %llu", _connection.ident, _sessionIdent, ulonglong(newVersion));
+        using ulong     = unsigned long;
+        using ulonglong = unsigned long long;
+        if (numChangesets == 1) {
+            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: 1 remote changeset integrated, "
+                  "producing client version %llu", _connection.ident, _sessionIdent,
+                  ulonglong(newClientVersion));
+        }
+        else {
+            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: %lu remote changesets integrated, "
+                  "producing client version %llu", _connection.ident, _sessionIdent,
+                  ulong(numChangesets), ulonglong(newClientVersion));
+        }
     }
 }
 
@@ -1051,6 +1087,8 @@ std::atomic<bool> s_syncLogEverything(false);
 - (void)updateSyncProgressWithServerVersion:(Replication::version_type)serverVersion
                               clientVersion:(Replication::version_type)clientVersion {
     _history->set_sync_progress(serverVersion, clientVersion);
+    _persistedProgressServerVersion = serverVersion;
+    _persistedProgressClientVersion = clientVersion;
 }
 
 
