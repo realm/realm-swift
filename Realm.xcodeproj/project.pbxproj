@@ -105,7 +105,7 @@
 		5D659EA31BE04556006515A0 /* object_store.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FAE25521B8CEBBE00D01405 /* object_store.hpp */; };
 		5D659EA41BE04556006515A0 /* property.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FAE25571B8CEBBE00D01405 /* property.hpp */; };
 		5D659EA51BE04556006515A0 /* Realm.h in Headers */ = {isa = PBXBuildFile; fileRef = E8D89B9D1955FC6D00CF2B9A /* Realm.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5D659EA61BE04556006515A0 /* realm_binding_context.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F62BA9E1BA0AB9000A4CEB2 /* realm_binding_context.hpp */; };
+		5D659EA61BE04556006515A0 /* binding_context.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F62BA9E1BA0AB9000A4CEB2 /* binding_context.hpp */; };
 		5D659EA71BE04556006515A0 /* RLMAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F631955FC9300FDED82 /* RLMAccessor.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		5D659EA81BE04556006515A0 /* RLMAnalytics.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E83591941B3DF05C0035F2F3 /* RLMAnalytics.hpp */; };
 		5D659EA91BE04556006515A0 /* RLMArray.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F661955FC9300FDED82 /* RLMArray.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -222,7 +222,7 @@
 		5DD755A11BE056DE002800DA /* object_store.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FAE25521B8CEBBE00D01405 /* object_store.hpp */; };
 		5DD755A21BE056DE002800DA /* property.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FAE25571B8CEBBE00D01405 /* property.hpp */; };
 		5DD755A31BE056DE002800DA /* Realm.h in Headers */ = {isa = PBXBuildFile; fileRef = E8D89B9D1955FC6D00CF2B9A /* Realm.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5DD755A41BE056DE002800DA /* realm_binding_context.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F62BA9E1BA0AB9000A4CEB2 /* realm_binding_context.hpp */; };
+		5DD755A41BE056DE002800DA /* binding_context.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F62BA9E1BA0AB9000A4CEB2 /* binding_context.hpp */; };
 		5DD755A51BE056DE002800DA /* RLMAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F631955FC9300FDED82 /* RLMAccessor.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		5DD755A61BE056DE002800DA /* RLMAnalytics.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E83591941B3DF05C0035F2F3 /* RLMAnalytics.hpp */; };
 		5DD755A71BE056DE002800DA /* RLMArray.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F661955FC9300FDED82 /* RLMArray.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -426,7 +426,7 @@
 		3F44109E19953F5900223146 /* RLMTestObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMTestObjects.h; sourceTree = "<group>"; };
 		3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMSwiftSupport.m; path = Realm/RLMSwiftSupport.m; sourceTree = SOURCE_ROOT; };
 		3F4E324B1B98C6C700183A69 /* RLMSchema_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSchema_Private.hpp; sourceTree = "<group>"; };
-		3F62BA9E1BA0AB9000A4CEB2 /* realm_binding_context.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = realm_binding_context.hpp; path = ObjectStore/realm_binding_context.hpp; sourceTree = "<group>"; };
+		3F62BA9E1BA0AB9000A4CEB2 /* binding_context.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = binding_context.hpp; path = ObjectStore/binding_context.hpp; sourceTree = "<group>"; };
 		3F68BFCD1B558CA800D50FBD /* RLMPrefix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMPrefix.h; sourceTree = "<group>"; };
 		3F6B89AE19EF40BA004E8EA8 /* librealm-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "librealm-ios.a"; path = "../core/librealm-ios.a"; sourceTree = "<group>"; };
 		3FAE25511B8CEBBE00D01405 /* object_store.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = object_store.cpp; path = ObjectStore/object_store.cpp; sourceTree = "<group>"; };
@@ -620,6 +620,7 @@
 			isa = PBXGroup;
 			children = (
 				3FF0B0A31BA861F200E74157 /* impl */,
+				3F62BA9E1BA0AB9000A4CEB2 /* binding_context.hpp */,
 				3FBD05FA1B94E1C3004559CF /* index_set.cpp */,
 				3FBD05FB1B94E1C3004559CF /* index_set.hpp */,
 				3FAE25561B8CEBBE00D01405 /* object_schema.cpp */,
@@ -627,7 +628,6 @@
 				3FAE25511B8CEBBE00D01405 /* object_store.cpp */,
 				3FAE25521B8CEBBE00D01405 /* object_store.hpp */,
 				3FAE25571B8CEBBE00D01405 /* property.hpp */,
-				3F62BA9E1BA0AB9000A4CEB2 /* realm_binding_context.hpp */,
 				3FE556421B9A43E5002A1129 /* schema.cpp */,
 				3FE556431B9A43E5002A1129 /* schema.hpp */,
 				3FAE25531B8CEBBE00D01405 /* shared_realm.cpp */,
@@ -966,13 +966,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5D659EA61BE04556006515A0 /* binding_context.hpp in Headers */,
 				5D659EA01BE04556006515A0 /* external_commit_helper.hpp in Headers */,
 				5D659EA11BE04556006515A0 /* index_set.hpp in Headers */,
 				5D659EA21BE04556006515A0 /* object_schema.hpp in Headers */,
 				5D659EA31BE04556006515A0 /* object_store.hpp in Headers */,
 				5D659EA41BE04556006515A0 /* property.hpp in Headers */,
 				5D659EA51BE04556006515A0 /* Realm.h in Headers */,
-				5D659EA61BE04556006515A0 /* realm_binding_context.hpp in Headers */,
 				5D659EA71BE04556006515A0 /* RLMAccessor.h in Headers */,
 				5D659EA81BE04556006515A0 /* RLMAnalytics.hpp in Headers */,
 				5D659EA91BE04556006515A0 /* RLMArray.h in Headers */,
@@ -1025,13 +1025,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5DD755A41BE056DE002800DA /* binding_context.hpp in Headers */,
 				5DD7559E1BE056DE002800DA /* external_commit_helper.hpp in Headers */,
 				5DD7559F1BE056DE002800DA /* index_set.hpp in Headers */,
 				5DD755A01BE056DE002800DA /* object_schema.hpp in Headers */,
 				5DD755A11BE056DE002800DA /* object_store.hpp in Headers */,
 				5DD755A21BE056DE002800DA /* property.hpp in Headers */,
 				5DD755A31BE056DE002800DA /* Realm.h in Headers */,
-				5DD755A41BE056DE002800DA /* realm_binding_context.hpp in Headers */,
 				5DD755A51BE056DE002800DA /* RLMAccessor.h in Headers */,
 				5DD755A61BE056DE002800DA /* RLMAnalytics.hpp in Headers */,
 				5DD755A71BE056DE002800DA /* RLMArray.h in Headers */,

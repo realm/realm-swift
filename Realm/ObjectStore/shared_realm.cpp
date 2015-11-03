@@ -19,7 +19,7 @@
 #include "shared_realm.hpp"
 
 #include "external_commit_helper.hpp"
-#include "realm_binding_context.hpp"
+#include "binding_context.hpp"
 #include "schema.hpp"
 #include "transact_log_handler.hpp"
 

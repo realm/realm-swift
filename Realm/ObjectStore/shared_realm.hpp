@@ -30,7 +30,7 @@ namespace realm {
     class ClientHistory;
     class Realm;
     class RealmCache;
-    class RealmBindingContext;
+    class BindingContext;
     typedef std::shared_ptr<Realm> SharedRealm;
     typedef std::weak_ptr<Realm> WeakRealm;
 
@@ -120,7 +120,7 @@ namespace realm {
         std::shared_ptr<_impl::ExternalCommitHelper> m_notifier;
 
       public:
-        std::unique_ptr<RealmBindingContext> m_binding_context;
+        std::unique_ptr<BindingContext> m_binding_context;
 
         // FIXME private
         Group *read_group();

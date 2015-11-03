@@ -399,7 +399,7 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
 
 namespace {
 template<typename Func>
-void forEach(realm::RealmBindingContext::ObserverState const& state, Func&& func) {
+void forEach(realm::BindingContext::ObserverState const& state, Func&& func) {
     for (size_t i = 0, size = state.changes.size(); i < size; ++i) {
         if (state.changes[i].changed) {
             func(i, state.changes[i], static_cast<RLMObservationInfo *>(state.info));
@@ -408,8 +408,8 @@ void forEach(realm::RealmBindingContext::ObserverState const& state, Func&& func
 }
 }
 
-std::vector<realm::RealmBindingContext::ObserverState> RLMGetObservedRows(NSArray *schema) {
-    std::vector<realm::RealmBindingContext::ObserverState> observers;
+std::vector<realm::BindingContext::ObserverState> RLMGetObservedRows(NSArray *schema) {
+    std::vector<realm::BindingContext::ObserverState> observers;
     for (RLMObjectSchema *objectSchema in schema) {
         for (auto info : objectSchema->_observedObjects) {
             auto const& row = info->getRow();
@@ -425,16 +425,16 @@ std::vector<realm::RealmBindingContext::ObserverState> RLMGetObservedRows(NSArra
     return observers;
 }
 
-static NSKeyValueChange convert(realm::RealmBindingContext::ColumnInfo::Kind kind) {
+static NSKeyValueChange convert(realm::BindingContext::ColumnInfo::Kind kind) {
     switch (kind) {
-        case realm::RealmBindingContext::ColumnInfo::Kind::None:
-        case realm::RealmBindingContext::ColumnInfo::Kind::SetAll:
+        case realm::BindingContext::ColumnInfo::Kind::None:
+        case realm::BindingContext::ColumnInfo::Kind::SetAll:
             return NSKeyValueChangeSetting;
-        case realm::RealmBindingContext::ColumnInfo::Kind::Set:
+        case realm::BindingContext::ColumnInfo::Kind::Set:
             return NSKeyValueChangeReplacement;
-        case realm::RealmBindingContext::ColumnInfo::Kind::Insert:
+        case realm::BindingContext::ColumnInfo::Kind::Insert:
             return NSKeyValueChangeInsertion;
-        case realm::RealmBindingContext::ColumnInfo::Kind::Remove:
+        case realm::BindingContext::ColumnInfo::Kind::Remove:
             return NSKeyValueChangeRemoval;
     }
 }
@@ -451,7 +451,7 @@ static NSIndexSet *convert(realm::IndexSet const& in, NSMutableIndexSet *out) {
     return out;
 }
 
-void RLMWillChange(std::vector<realm::RealmBindingContext::ObserverState> const& observed,
+void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& observed,
                    std::vector<void *> const& invalidated) {
     NSMutableIndexSet *indexes = [NSMutableIndexSet new];
     for (auto info : invalidated) {
@@ -468,7 +468,7 @@ void RLMWillChange(std::vector<realm::RealmBindingContext::ObserverState> const&
     }
 }
 
-void RLMDidChange(std::vector<realm::RealmBindingContext::ObserverState> const& observed,
+void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& observed,
                   std::vector<void *> const& invalidated) {
     // Loop in reverse order to avoid O(N^2) behavior in Foundation
     NSMutableIndexSet *indexes = [NSMutableIndexSet new];

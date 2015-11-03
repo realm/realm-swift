@@ -25,7 +25,7 @@
 #import <Realm/RLMConstants.h>
 #import <Realm/RLMSchema.h>
 
-#import "realm_binding_context.hpp"
+#import "binding_context.hpp"
 
 #import <map>
 #import <mutex>
@@ -86,7 +86,7 @@ void RLMInstallUncaughtExceptionHandler() {
 }
 
 namespace {
-class RLMNotificationHelper : public realm::RealmBindingContext {
+class RLMNotificationHelper : public realm::BindingContext {
 public:
     RLMNotificationHelper(RLMRealm *realm) : _realm(realm) { }
 
@@ -116,6 +116,6 @@ private:
 } // anonymous namespace
 
 
-std::unique_ptr<realm::RealmBindingContext> RLMCreateRealmBindingContext(RLMRealm *realm) {
-    return std::unique_ptr<realm::RealmBindingContext>(new RLMNotificationHelper(realm));
+std::unique_ptr<realm::BindingContext> RLMCreateBindingContext(RLMRealm *realm) {
+    return std::unique_ptr<realm::BindingContext>(new RLMNotificationHelper(realm));
 }

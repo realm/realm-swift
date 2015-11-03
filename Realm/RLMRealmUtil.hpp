@@ -23,7 +23,7 @@
 @class RLMRealm;
 
 namespace realm {
-    class RealmBindingContext;
+    class BindingContext;
 }
 
 // Add a Realm to the weak cache
@@ -39,4 +39,4 @@ void RLMClearRealmCache();
 // for all cached realms on the current thread
 void RLMInstallUncaughtExceptionHandler();
 
-std::unique_ptr<realm::RealmBindingContext> RLMCreateRealmBindingContext(RLMRealm *realm);
+std::unique_ptr<realm::BindingContext> RLMCreateBindingContext(RLMRealm *realm);
