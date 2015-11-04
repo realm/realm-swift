@@ -176,6 +176,36 @@ build_watchos_combined() {
     xcrun lipo -create "$watchsimulator_path/$binary_path" "$watchos_path/$binary_path" -output "$out_path/$product_name/$module_name"
 }
 
+build_tvos_combined() {
+    local scheme="$1"
+    local module_name="$2"
+    local scope_suffix="$3"
+    local config="$CONFIGURATION"
+
+    # Derive build paths
+    local build_products_path="build/DerivedData/Realm/Build/Products"
+    local product_name="$module_name.framework"
+    local binary_path="$module_name"
+    local tvos_path="$build_products_path/$config-appletvos$scope_suffix/$product_name"
+    local tvsimulator_path="$build_products_path/$config-appletvsimulator$scope_suffix/$product_name"
+    local out_path="build/tvos$scope_suffix"
+
+    # Build for each platform
+    xc "-scheme '$scheme' -configuration $config -sdk appletvos"
+    xc "-scheme '$scheme' -configuration $config -sdk appletvsimulator -destination 'name=Apple TV 1080p' ONLY_ACTIVE_ARCH=NO"
+
+    # Combine .swiftmodule
+    if [ -d $tvsimulator_path/Modules/$module_name.swiftmodule ]; then
+      cp $tvsimulator_path/Modules/$module_name.swiftmodule/* $tvos_path/Modules/$module_name.swiftmodule/
+    fi
+
+    # Retrieve build products
+    clean_retrieve $tvos_path $out_path $product_name
+
+    # Combine ar archives
+    xcrun lipo -create "$tvsimulator_path/$binary_path" "$tvos_path/$binary_path" -output "$out_path/$product_name/$module_name"
+}
+
 xc_work_around_rdar_23055637() {
     # xcodebuild times out waiting for the iOS simulator to launch if it takes > 120 seconds for the tests to
     # build (<http://openradar.appspot.com/23055637>). Work around this by having the test phases intentionally
@@ -479,6 +509,16 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "tvos")
+        build_tvos_combined Realm Realm
+        exit 0
+        ;;
+
+    "tvos-swift")
+        build_tvos_combined RealmSwift RealmSwift
+        exit 0
+        ;;
+
     "osx")
         xc "-scheme Realm -configuration $CONFIGURATION"
         rm -rf build/osx
@@ -600,6 +640,7 @@ case "$COMMAND" in
         sh build.sh verify-ios-device-objc
         sh build.sh verify-ios-device-swift
         sh build.sh verify-watchos
+        sh build.sh verify-tvos
         sh build.sh verify-swiftlint
         ;;
 
@@ -670,6 +711,13 @@ case "$COMMAND" in
     "verify-watchos")
         if [ $REALM_SWIFT_VERSION != '1.2' ]; then
             sh build.sh watchos-swift
+        fi
+        exit 0
+        ;;
+
+    "verify-tvos")
+        if [ $REALM_SWIFT_VERSION != '1.2' ]; then
+            sh build.sh tvos-swift
         fi
         exit 0
         ;;
@@ -951,6 +999,22 @@ case "$COMMAND" in
         zip --symlinks -r realm-swift-framework-watchos.zip RealmSwift.framework Realm.framework
         ;;
 
+    "package-tvos")
+        cd tightdb_objc
+        REALM_SWIFT_VERSION=2.0 sh build.sh tvos
+
+        cd build/tvos
+        zip --symlinks -r realm-framework-tvos.zip Realm.framework
+        ;;
+
+    "package-tvos-swift")
+        cd tightdb_objc
+        REALM_SWIFT_VERSION=2.0 sh build.sh tvos-swift
+
+        cd build/tvos
+        zip --symlinks -r realm-swift-framework-tvos.zip RealmSwift.framework Realm.framework
+        ;;
+
     "package-release")
         LANG="$2"
         TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
@@ -961,7 +1025,7 @@ case "$COMMAND" in
 
         FOLDER=${TEMPDIR}/realm-${LANG}-${VERSION}
 
-        mkdir -p ${FOLDER}/osx ${FOLDER}/ios ${FOLDER}/watchos
+        mkdir -p ${FOLDER}/osx ${FOLDER}/ios ${FOLDER}/watchos ${FOLDER}/tvos
 
         if [[ "${LANG}" == "objc" ]]; then
             mkdir -p ${FOLDER}/ios/static
@@ -987,6 +1051,11 @@ case "$COMMAND" in
                 cd ${FOLDER}/watchos
                 unzip ${WORKSPACE}/realm-framework-watchos.zip
             )
+
+            (
+                cd ${FOLDER}/tvos
+                unzip ${WORKSPACE}/realm-framework-tvos.zip
+            )
         else
             (
                 cd ${FOLDER}/osx
@@ -1001,6 +1070,11 @@ case "$COMMAND" in
             (
                 cd ${FOLDER}/watchos
                 unzip ${WORKSPACE}/realm-swift-framework-watchos.zip
+            )
+
+            (
+                cd ${FOLDER}/tvos
+                unzip ${WORKSPACE}/realm-swift-framework-tvos.zip
             )
         fi
 
@@ -1094,6 +1168,12 @@ EOF
         sh tightdb_objc/build.sh package-watchos-swift
         cp tightdb_objc/build/watchos/realm-swift-framework-watchos.zip .
         cp tightdb_objc/build/watchos/realm-framework-watchos.zip .
+
+        echo 'Packaging tvOS'
+        sh tightdb_objc/build.sh package-tvos
+        sh tightdb_objc/build.sh package-tvos-swift
+        cp tightdb_objc/build/tvos/realm-swift-framework-tvos.zip .
+        cp tightdb_objc/build/tvos/realm-framework-tvos.zip .
 
         echo 'Building final release packages'
         sh tightdb_objc/build.sh package-release objc

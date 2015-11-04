@@ -1,5 +1,5 @@
-SUPPORTED_PLATFORMS = macosx iphoneos iphonesimulator watchos watchsimulator;
-TARGETED_DEVICE_FAMILY = 1,2,4;
+SUPPORTED_PLATFORMS = macosx iphoneos iphonesimulator watchos watchsimulator appletvos appletvsimulator;
+TARGETED_DEVICE_FAMILY = 1,2,3,4;
 
 INFOPLIST_FILE = Realm/Realm-Info.plist;
 MODULEMAP_FILE = $(SRCROOT)/Realm/module.modulemap;
@@ -29,3 +29,5 @@ OTHER_LDFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
 OTHER_LIBTOOLFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
 OTHER_LDFLAGS[sdk=watch*] = -lrealm-watchos$(REALM_LIBRARY_SUFFIX);
 OTHER_LIBTOOLFLAGS[sdk=watch*] = -lrealm-watchos$(REALM_LIBRARY_SUFFIX);
+OTHER_LDFLAGS[sdk=appletv*] = -lrealm-tvos$(REALM_LIBRARY_SUFFIX);
+OTHER_LIBTOOLFLAGS[sdk=appletv*] = -lrealm-tvos$(REALM_LIBRARY_SUFFIX);
