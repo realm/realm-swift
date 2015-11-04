@@ -151,7 +151,7 @@ namespace realm {
             /** Thrown if the user does not have permission to open or create
              the specified file in the specified access mode when the realm is opened. */
             PermissionDenied,
-            /** Thrown if no_create was specified and the file did already exist when the realm is opened. */
+            /** Thrown if create_Always was specified and the file did already exist when the realm is opened. */
             Exists,
             /** Thrown if no_create was specified and the file was not found when the realm is opened. */
             NotFound,
@@ -160,11 +160,14 @@ namespace realm {
              architecture mismatch. */
             IncompatibleLockFile,
         };
-        RealmFileException(Kind kind, std::string message) : std::runtime_error(message), m_kind(kind) {}
+        RealmFileException(Kind kind, std::string path, std::string message) :
+            std::runtime_error(std::move(message)), m_kind(kind), m_path(std::move(path)) {}
         Kind kind() const { return m_kind; }
+        const std::string& path() const { return m_path; }
         
       private:
         Kind m_kind;
+        std::string m_path;
     };
 
     class MismatchedConfigException : public std::runtime_error

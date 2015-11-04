@@ -73,18 +73,22 @@ Realm::Realm(Config config)
         }
     }
     catch (util::File::PermissionDenied const& ex) {
-        throw RealmFileException(RealmFileException::Kind::PermissionDenied, "Unable to open a realm at path '" + m_config.path +
-                             "'. Please use a path where your app has " + (m_config.read_only ? "read" : "read-write") + " permissions.");
+        throw RealmFileException(RealmFileException::Kind::PermissionDenied, ex.get_path(),
+                                 "Unable to open a realm at path '" + ex.get_path() +
+                                 "'. Please use a path where your app has " + (m_config.read_only ? "read" : "read-write") + " permissions.");
     }
     catch (util::File::Exists const& ex) {
-        throw RealmFileException(RealmFileException::Kind::Exists, "Unable to open a realm at path '" + m_config.path + "'");
+        throw RealmFileException(RealmFileException::Kind::Exists, ex.get_path(),
+                                 "File at path '" + ex.get_path() + "' already exists.");
     }
     catch (util::File::AccessError const& ex) {
-        throw RealmFileException(RealmFileException::Kind::AccessError, "Unable to open a realm at path '" + m_config.path + "'");
+        throw RealmFileException(RealmFileException::Kind::AccessError, ex.get_path(),
+                                 "Unable to open a realm at path '" + ex.get_path() + "'");
     }
-    catch (IncompatibleLockFile const&) {
-        throw RealmFileException(RealmFileException::Kind::IncompatibleLockFile, "Realm file is currently open in another process "
-        "which cannot share access with this process. All processes sharing a single file must be the same architecture.");
+    catch (IncompatibleLockFile const& ex) {
+        throw RealmFileException(RealmFileException::Kind::IncompatibleLockFile, m_config.path,
+                                 "Realm file is currently open in another process "
+                                 "which cannot share access with this process. All processes sharing a single file must be the same architecture.");
     }
 }
 

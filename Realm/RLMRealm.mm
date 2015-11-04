@@ -244,7 +244,8 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
                                  "architecture. For sharing files between the Realm "
                                  "Browser and an iOS simulator, this means that you "
                                  "must use a 64-bit simulator.";
-                RLMSetErrorOrThrow(RLMMakeError(RLMErrorIncompatibleLockFile, File::PermissionDenied(err.UTF8String, "FIXME: ex.get_path()")), outError);
+                RLMSetErrorOrThrow(RLMMakeError(RLMErrorIncompatibleLockFile,
+                                                File::PermissionDenied(err.UTF8String, ex.path())), outError);
                 break;
             }
             case RealmFileException::Kind::Exists:
