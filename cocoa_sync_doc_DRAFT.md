@@ -30,9 +30,9 @@ You can adjust the amount of information logged by the synchronization process. 
 
 The default level is `1` (normal), and `0` means 'nothing'. Note, setting the log level to `2` can have a significant negative impact on the performance of your application.
 
-Before trying this out, you need to build Realm with synchronization support (this is still a manual process). See [Building Realm for iOS] for more on this.
+Before trying this out, you need to build Realm with synchronization support (this is still a manual process). See [Building Realm for iOS](#building-realm-for-ios) for more on this.
 
-See [How it works] for more information on how synchronization works.
+See [How it works](#how-it-works) for more information on how synchronization works.
 
 See [Your own server](#your-own-server) if you want to run your own server.
 
@@ -45,7 +45,7 @@ How it works
 Building Realm for iOS
 ----------------------
 
-Be sure to have followed the instructions in "Build preperations".
+Be sure to have followed the instructions in [Build preperations](#build-preperations).
 
 In `realm-sync/`:
 
@@ -83,7 +83,7 @@ For now it is a manual process to ensure that the branches checked out in each o
 Your own server
 ---------------
 
-Be sure to have followed the instructions in "Build preperations".
+Be sure to have followed the instructions in [Build preperations](#build-preperations).
 
 Build the server from`realm-sync/` as follows:
 
