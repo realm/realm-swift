@@ -109,7 +109,7 @@ build_ios_combined() {
     local config="$CONFIGURATION"
 
     # Derive build paths
-    local build_products_path="build/DerivedData/$module_name/Build/Products"
+    local build_products_path="build/DerivedData/Realm/Build/Products"
     local product_name="$module_name.framework"
     local binary_path="$module_name"
     local iphoneos_path="$build_products_path/$config-iphoneos$scope_suffix/$product_name"
@@ -139,7 +139,7 @@ build_watchos_combined() {
     local config="$CONFIGURATION"
 
     # Derive build paths
-    local build_products_path="build/DerivedData/$module_name/Build/Products"
+    local build_products_path="build/DerivedData/Realm/Build/Products"
     local product_name="$module_name.framework"
     local binary_path="$module_name"
     local watchos_path="$build_products_path/$config-watchos$scope_suffix/$product_name"
@@ -409,6 +409,7 @@ case "$COMMAND" in
         ;;
 
     "ios-swift")
+        sh build.sh ios-dynamic
         build_ios_combined RealmSwift RealmSwift '' "/swift-$REALM_SWIFT_VERSION"
         cp -R build/ios/Realm.framework build/ios/swift-$REALM_SWIFT_VERSION
         exit 0
@@ -420,6 +421,7 @@ case "$COMMAND" in
         ;;
 
     "watchos-swift")
+        sh build.sh watchos
         build_watchos_combined RealmSwift RealmSwift
         exit 0
         ;;
@@ -433,9 +435,10 @@ case "$COMMAND" in
         ;;
 
     "osx-swift")
+        sh build.sh osx
         xc "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
         destination="build/osx/swift-$REALM_SWIFT_VERSION"
-        clean_retrieve "build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
+        clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
         cp -R build/osx/Realm.framework "$destination"
         exit 0
         ;;
