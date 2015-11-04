@@ -1173,7 +1173,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E856D1EB195614A400FB2FCF /* Build configuration list for PBXNativeTarget "iOS static tests" */;
 			buildPhases = (
-				293F98F01A76E05700C0199D /* Get Version Number */,
+				5D304A2F1BE9AF350082C1A6 /* Get Version Number */,
 				E856D1DB195614A400FB2FCF /* Sources */,
 				E856D1DC195614A400FB2FCF /* Frameworks */,
 				5D61570B1BE3250000A4BD3F /* Exit After Building Tests If Requested */,
@@ -1193,7 +1193,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E8D89BB11955FC6D00CF2B9A /* Build configuration list for PBXNativeTarget "Tests" */;
 			buildPhases = (
-				293F98F01A76E05700C0199D /* Get Version Number */,
+				5D304A2E1BE9AEFB0082C1A6 /* Get Version Number */,
 				E8D89B9F1955FC6D00CF2B9A /* Sources */,
 				E8D89BA01955FC6D00CF2B9A /* Frameworks */,
 				5D128F291BE984D4001F4FBF /* Embed Frameworks */,
@@ -1292,7 +1292,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		293F98F01A76E05700C0199D /* Get Version Number */ = {
+		5D304A2E1BE9AEFB0082C1A6 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1306,7 +1306,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"#define REALM_COCOA_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
+			shellScript = "exec \"${SRCROOT}/scripts/generate-rlmversion.sh\"\n";
+		};
+		5D304A2F1BE9AF350082C1A6 /* Get Version Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Realm/Realm-Info.plist",
+			);
+			name = "Get Version Number";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/RLMVersion.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "exec \"${SRCROOT}/scripts/generate-rlmversion.sh\"\n";
 		};
 		5D6156F41BE06FF500A4BD3F /* Generate RLMPlatform.h */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1378,7 +1394,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"#define REALM_COCOA_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
+			shellScript = "exec \"${SRCROOT}/scripts/generate-rlmversion.sh\"\n";
 		};
 		5D659E7F1BE04556006515A0 /* Download Core & Set Bitcode Symlink */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1408,7 +1424,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"#define REALM_COCOA_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
+			shellScript = "exec \"${SRCROOT}/scripts/generate-rlmversion.sh\"\n";
 		};
 		5DD7557D1BE056DE002800DA /* Download Core & Set Bitcode Symlink */ = {
 			isa = PBXShellScriptBuildPhase;
