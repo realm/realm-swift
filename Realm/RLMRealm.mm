@@ -62,6 +62,8 @@ unsigned long s_lastServerConnectionIdent = 0;
 
 std::atomic<bool> s_syncLogEverything(false);
 
+NSString* s_syncUserIdentity = nil;
+
 // Instances of RLMServerConnection and RLMSyncSession may be created by any
 // thread, but all instance methods must be called by the main thread, except
 // backgroundTask and backgroundApplyChangeset in RLMSyncSession which are
@@ -294,14 +296,19 @@ std::atomic<bool> s_syncLogEverything(false);
     // Realm and `userIdent` could for example be the concattenation of a user
     // name and a password).
     NSData *applicationIdent = [@"dummy_app"  dataUsingEncoding:NSUTF8StringEncoding];
-    NSData *userIdent        = [@"dummy_user" dataUsingEncoding:NSUTF8StringEncoding];
+    NSString* userIdent = s_syncUserIdentity;
+    if (userIdent == nil) {
+        NSLog(@"RealmSync: No user identity set (using default, which probably won't work).");
+        userIdent = @"dummy_user";
+    }
+    NSData *userIdentData    = [userIdent dataUsingEncoding:NSUTF8StringEncoding];
 
     NSMutableData *body = [applicationIdent mutableCopy];
-    [body appendData:userIdent];
+    [body appendData:userIdentData];
 
     uint_fast64_t protocolVersion = 1;
     size_t applicationIdentSize = size_t(applicationIdent.length);
-    size_t userIdentSize        = size_t(userIdent.length);
+    size_t userIdentSize        = size_t(userIdentData.length);
     typedef unsigned long      ulong;
     typedef unsigned long long ulonglong;
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
@@ -1858,6 +1865,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 + (void)setServerSyncLogLevel:(int)level {
     s_syncLogEverything = (level >= 2);
+}
+
++ (void)setSyncUserIdentity:(NSString *)identity {
+    s_syncUserIdentity = identity;
 }
 
 @end
