@@ -6,9 +6,11 @@ Overview
 
 In general, synchronization is enabled when a server URL is specified. To enable synchronization for the default Realm, you need to set the `syncServerURL` property of the default Realm configuration as follows:
 
-    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/my_app/foo"];
-    [RLMRealmConfiguration setDefaultConfiguration:configuration];
+```objc
+RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/my_app/foo"];
+[RLMRealmConfiguration setDefaultConfiguration:configuration];
+```
 
 ~(KS: Why is the `setDefaultConfiguration:` step needed? Couldn't the configuration object have been "live"?)~
 
@@ -22,11 +24,13 @@ Setting the server URL is enough to enable synchronization.
 
 You can adjust the amount of information logged by the synchronization process. For example, to get the maximum amount of information, do this:
 
-    [RLMRealm setServerSyncLogLevel:2]; // Log everything
+```objc
+[RLMRealm setServerSyncLogLevel:2]; // Log everything
+```
 
 The default level is `1` (normal), and `0` means 'nothing'. Note, setting the log level to `2` can have a significant negative impact on the performance of your application.
 
-Before trying this out, you need to build Realm with synchronization support (this is still a manual progress). See [Building Realm for iOS] for more on this.
+Before trying this out, you need to build Realm with synchronization support (this is still a manual process). See [Building Realm for iOS] for more on this.
 
 See [How it works] for more information on how synchronization works.
 
