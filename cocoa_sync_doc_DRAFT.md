@@ -69,7 +69,7 @@ For now it will be assumed that the directory names of your three local reposito
     ----------------------------------------------------
     realm-core/     git@github.com:realm/realm-core.git
     realm-sync/     git@github.com:realm/realm-sync.git
-    realm-cocoa/    git@github.com:realm/realm-cocoa.git
+    realm-cocoa/    git@github.com:realm/realm-cocoa-private.git (for now)
 
 For now it is a manual process to ensure that the branches checked out in each of these repositories are intercompatible. At the present time, there is a branch called `sync-demo-5` in each of them, and they are currently intercompatible, and represent the latest state of development.
 
