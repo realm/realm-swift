@@ -448,42 +448,42 @@
 		5D660FC01BE98BEF0021E04F /* Tests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
 		5D660FCC1BE98C560021E04F /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D660FD81BE98C7C0021E04F /* RealmSwift Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RealmSwift Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5D660FE31BE98D670021E04F /* Aliases.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Aliases.swift; path = "RealmSwift-swift2.0/Aliases.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FE41BE98D670021E04F /* List.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = List.swift; path = "RealmSwift-swift2.0/List.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FE51BE98D670021E04F /* Migration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Migration.swift; path = "RealmSwift-swift2.0/Migration.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FE61BE98D670021E04F /* Object.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Object.swift; path = "RealmSwift-swift2.0/Object.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FE71BE98D670021E04F /* ObjectSchema.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ObjectSchema.swift; path = "RealmSwift-swift2.0/ObjectSchema.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FE81BE98D670021E04F /* Optional.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Optional.swift; path = "RealmSwift-swift2.0/Optional.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FE91BE98D670021E04F /* Property.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Property.swift; path = "RealmSwift-swift2.0/Property.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FEA1BE98D670021E04F /* Realm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Realm.swift; path = "RealmSwift-swift2.0/Realm.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FEB1BE98D670021E04F /* RealmCollectionType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RealmCollectionType.swift; path = "RealmSwift-swift2.0/RealmCollectionType.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FEC1BE98D670021E04F /* RealmConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RealmConfiguration.swift; path = "RealmSwift-swift2.0/RealmConfiguration.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FED1BE98D670021E04F /* Results.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Results.swift; path = "RealmSwift-swift2.0/Results.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FEE1BE98D670021E04F /* Schema.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Schema.swift; path = "RealmSwift-swift2.0/Schema.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FEF1BE98D670021E04F /* SortDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDescriptor.swift; path = "RealmSwift-swift2.0/SortDescriptor.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FF01BE98D670021E04F /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Util.swift; path = "RealmSwift-swift2.0/Util.swift"; sourceTree = SOURCE_ROOT; };
-		5D660FFF1BE98D880021E04F /* KVOTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KVOTests.swift; path = "RealmSwift-swift2.0/Tests/KVOTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610001BE98D880021E04F /* ListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ListTests.swift; path = "RealmSwift-swift2.0/Tests/ListTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610011BE98D880021E04F /* MigrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MigrationTests.swift; path = "RealmSwift-swift2.0/Tests/MigrationTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610021BE98D880021E04F /* ObjectAccessorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ObjectAccessorTests.swift; path = "RealmSwift-swift2.0/Tests/ObjectAccessorTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610031BE98D880021E04F /* ObjectCreationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ObjectCreationTests.swift; path = "RealmSwift-swift2.0/Tests/ObjectCreationTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610041BE98D880021E04F /* ObjectSchemaInitializationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ObjectSchemaInitializationTests.swift; path = "RealmSwift-swift2.0/Tests/ObjectSchemaInitializationTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610051BE98D880021E04F /* ObjectSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ObjectSchemaTests.swift; path = "RealmSwift-swift2.0/Tests/ObjectSchemaTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610061BE98D880021E04F /* ObjectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ObjectTests.swift; path = "RealmSwift-swift2.0/Tests/ObjectTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610071BE98D880021E04F /* PerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PerformanceTests.swift; path = "RealmSwift-swift2.0/Tests/PerformanceTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610081BE98D880021E04F /* PropertyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PropertyTests.swift; path = "RealmSwift-swift2.0/Tests/PropertyTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610091BE98D880021E04F /* RealmCollectionTypeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RealmCollectionTypeTests.swift; path = "RealmSwift-swift2.0/Tests/RealmCollectionTypeTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D66100A1BE98D880021E04F /* RealmConfigurationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RealmConfigurationTests.swift; path = "RealmSwift-swift2.0/Tests/RealmConfigurationTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D66100B1BE98D880021E04F /* RealmSwiftTests-BridgingHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "RealmSwiftTests-BridgingHeader.h"; path = "RealmSwift-swift2.0/Tests/RealmSwiftTests-BridgingHeader.h"; sourceTree = SOURCE_ROOT; };
-		5D66100C1BE98D880021E04F /* RealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RealmTests.swift; path = "RealmSwift-swift2.0/Tests/RealmTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D66100D1BE98D880021E04F /* SchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SchemaTests.swift; path = "RealmSwift-swift2.0/Tests/SchemaTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D66100E1BE98D880021E04F /* SortDescriptorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDescriptorTests.swift; path = "RealmSwift-swift2.0/Tests/SortDescriptorTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D66100F1BE98D880021E04F /* SwiftLinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftLinkTests.swift; path = "RealmSwift-swift2.0/Tests/SwiftLinkTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610101BE98D880021E04F /* SwiftTestObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftTestObjects.swift; path = "RealmSwift-swift2.0/Tests/SwiftTestObjects.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610111BE98D880021E04F /* SwiftUnicodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftUnicodeTests.swift; path = "RealmSwift-swift2.0/Tests/SwiftUnicodeTests.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610121BE98D880021E04F /* TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestCase.swift; path = "RealmSwift-swift2.0/Tests/TestCase.swift"; sourceTree = SOURCE_ROOT; };
-		5D6610131BE98D880021E04F /* TestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtils.h; path = "RealmSwift-swift2.0/Tests/TestUtils.h"; sourceTree = SOURCE_ROOT; };
-		5D6610141BE98D880021E04F /* TestUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TestUtils.mm; path = "RealmSwift-swift2.0/Tests/TestUtils.mm"; sourceTree = SOURCE_ROOT; };
+		5D660FE31BE98D670021E04F /* Aliases.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Aliases.swift; sourceTree = "<group>"; };
+		5D660FE41BE98D670021E04F /* List.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = List.swift; sourceTree = "<group>"; };
+		5D660FE51BE98D670021E04F /* Migration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Migration.swift; sourceTree = "<group>"; };
+		5D660FE61BE98D670021E04F /* Object.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
+		5D660FE71BE98D670021E04F /* ObjectSchema.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectSchema.swift; sourceTree = "<group>"; };
+		5D660FE81BE98D670021E04F /* Optional.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Optional.swift; sourceTree = "<group>"; };
+		5D660FE91BE98D670021E04F /* Property.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Property.swift; sourceTree = "<group>"; };
+		5D660FEA1BE98D670021E04F /* Realm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Realm.swift; sourceTree = "<group>"; };
+		5D660FEB1BE98D670021E04F /* RealmCollectionType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmCollectionType.swift; sourceTree = "<group>"; };
+		5D660FEC1BE98D670021E04F /* RealmConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmConfiguration.swift; sourceTree = "<group>"; };
+		5D660FED1BE98D670021E04F /* Results.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Results.swift; sourceTree = "<group>"; };
+		5D660FEE1BE98D670021E04F /* Schema.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Schema.swift; sourceTree = "<group>"; };
+		5D660FEF1BE98D670021E04F /* SortDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SortDescriptor.swift; sourceTree = "<group>"; };
+		5D660FF01BE98D670021E04F /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
+		5D660FFF1BE98D880021E04F /* KVOTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KVOTests.swift; sourceTree = "<group>"; };
+		5D6610001BE98D880021E04F /* ListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListTests.swift; sourceTree = "<group>"; };
+		5D6610011BE98D880021E04F /* MigrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MigrationTests.swift; sourceTree = "<group>"; };
+		5D6610021BE98D880021E04F /* ObjectAccessorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectAccessorTests.swift; sourceTree = "<group>"; };
+		5D6610031BE98D880021E04F /* ObjectCreationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectCreationTests.swift; sourceTree = "<group>"; };
+		5D6610041BE98D880021E04F /* ObjectSchemaInitializationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectSchemaInitializationTests.swift; sourceTree = "<group>"; };
+		5D6610051BE98D880021E04F /* ObjectSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectSchemaTests.swift; sourceTree = "<group>"; };
+		5D6610061BE98D880021E04F /* ObjectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectTests.swift; sourceTree = "<group>"; };
+		5D6610071BE98D880021E04F /* PerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PerformanceTests.swift; sourceTree = "<group>"; };
+		5D6610081BE98D880021E04F /* PropertyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PropertyTests.swift; sourceTree = "<group>"; };
+		5D6610091BE98D880021E04F /* RealmCollectionTypeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmCollectionTypeTests.swift; sourceTree = "<group>"; };
+		5D66100A1BE98D880021E04F /* RealmConfigurationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmConfigurationTests.swift; sourceTree = "<group>"; };
+		5D66100B1BE98D880021E04F /* RealmSwiftTests-BridgingHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RealmSwiftTests-BridgingHeader.h"; sourceTree = "<group>"; };
+		5D66100C1BE98D880021E04F /* RealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmTests.swift; sourceTree = "<group>"; };
+		5D66100D1BE98D880021E04F /* SchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaTests.swift; sourceTree = "<group>"; };
+		5D66100E1BE98D880021E04F /* SortDescriptorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SortDescriptorTests.swift; sourceTree = "<group>"; };
+		5D66100F1BE98D880021E04F /* SwiftLinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftLinkTests.swift; sourceTree = "<group>"; };
+		5D6610101BE98D880021E04F /* SwiftTestObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTestObjects.swift; sourceTree = "<group>"; };
+		5D6610111BE98D880021E04F /* SwiftUnicodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUnicodeTests.swift; sourceTree = "<group>"; };
+		5D6610121BE98D880021E04F /* TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestCase.swift; sourceTree = "<group>"; };
+		5D6610131BE98D880021E04F /* TestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestUtils.h; sourceTree = "<group>"; };
+		5D6610141BE98D880021E04F /* TestUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TestUtils.mm; sourceTree = "<group>"; };
 		5DD755CF1BE056DE002800DA /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DD755E01BE05C19002800DA /* Tests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
 		5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Tests iOS static.xcconfig"; sourceTree = "<group>"; };
@@ -738,7 +738,8 @@
 				5D6610131BE98D880021E04F /* TestUtils.h */,
 				5D6610141BE98D880021E04F /* TestUtils.mm */,
 			);
-			path = "RealmSwift Tests";
+			name = "RealmSwift Tests";
+			path = RealmSwift/Tests;
 			sourceTree = "<group>";
 		};
 		5D6610291BE98DAA0021E04F /* Supporting Files */ = {
@@ -1856,6 +1857,7 @@
 				5D660FD31BE98C560021E04F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5D660FE01BE98C7C0021E04F /* Build configuration list for PBXNativeTarget "RealmSwift Tests" */ = {
 			isa = XCConfigurationList;
@@ -1864,6 +1866,7 @@
 				5D660FE21BE98C7C0021E04F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5DD755CC1BE056DE002800DA /* Build configuration list for PBXNativeTarget "Realm iOS static" */ = {
 			isa = XCConfigurationList;
