@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>runDestinationsByUUID</key>
+	<dict>
+		<key>6890B8D9-CE81-403E-8EF6-B95A367D65B5</key>
+		<dict>
+			<key>targetArchitecture</key>
+			<string>armv7s</string>
+			<key>targetDevice</key>
+			<dict>
+				<key>modelCode</key>
+				<string>iPhone5,1</string>
+				<key>platformIdentifier</key>
+				<string>com.apple.platform.iphoneos</string>
+			</dict>
+		</dict>
+		<key>B87A7896-8B70-4814-B20D-7CD723D62868</key>
+		<dict>
+			<key>targetArchitecture</key>
+			<string>arm64</string>
+			<key>targetDevice</key>
+			<dict>
+				<key>modelCode</key>
+				<string>iPad4,4</string>
+				<key>platformIdentifier</key>
+				<string>com.apple.platform.iphoneos</string>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>
