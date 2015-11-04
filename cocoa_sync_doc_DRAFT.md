@@ -47,7 +47,17 @@ See [Your own server](#your-own-server) if you want to run your own server.
 How it works
 ------------
 
+Realm Sync is based on a set of merge rules which ensure that all clients will eventually see the same state. Clients are allowed to make any modification they please at any point in time (except destructive schema changes, for now). In a formal sense, Realm Sync is an AP solution under the CAP theorem. Clients are generally unaware of each other, except the server, and it is up to the app to identify different users if it so pleases.
 
+When two clients make modifications to the Realm in a way that causes a conflict, Realm Sync automatically resolves the conflict in a way that emulates the behavior that would have been observed if all the operations had been performed locally. The order of operations used in this emulation is defined by the timestamp of each commit in the transaction log. Timestamps are [Lamport timestamps](https://en.wikipedia.org/wiki/Lamport_timestamps) to ensure a somewhat intuitive behavior of the merge algorithm.
+
+Objects in Realm have no inherent order, so insertion/object creation can always be merged in a way that behaves naturally. However, for ordered data structures (such as lists), the order of operations on the data structure matters. For instance, if the app developer inserts elements to a list in an sort order that the app defines, this order might be broken when receiving updates from the server, because the merge algorithm doesn't know about the order that the user is trying to enforce. Similarly, if the app developer updates a field of an object based on some condition derived from other data in the Realm, this invariant might be broken during sync if another peer came to a different conclusion and made a different update, because the merge algorithm does not know about this logic.
+
+If, however, operations on the Realm always reflect end-user intentions (i.e. a user-defined list order, or a field of an object that is updated directly by the user), things "naturally" merge correctly.
+
+NOTE: In the (near) future we will start providing ways to make this behavior much more customizable, potentially by letting the app developer express their intention to the sync merge algorithm in various ways. Some of the planned features are: Set, Dictionary, Counter, Bounded Counter.
+
+NOTE: Sync is currently only able to function in AP mode, which means that global locks are not available. This has the implication that features that depend on all clients participating on sync agreeing on a particular state are not possible to implement (for instance, a bank transfer app that needs to answer the question "do I have enough money for this transaction?" will not work properly). Each device is considered an equal source of truth in the app's decision-making, and it is currently not possible to work in a different mode. Luckily, this interacts very well with our existing APIs, in the sense that apps using Realm require zero modifications to the app code to work with sync (no calls into Realm will suddently start blocking, etc.).
 
 
 Building Realm for iOS
