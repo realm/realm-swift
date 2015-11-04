@@ -14,13 +14,20 @@ configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.re
 
 *(KS: Why is the `setDefaultConfiguration:` step needed? Couldn't the configuration object have been "live"?)*
 
-For example, you can do that from `didFinishLaunchingWithOptions:` of your implementation of `UIApplicationDelegate`.
+In addition, the sync server needs a user identification token. At present, this is a 40-byte alphanumeric string (such as a SHA1 of an e-mail address). In the future this will change to be a persisted cryptographic token. For now, set the user identity with:
 
-The server URL specifies both the server name (and port), and the server-side Realm with which to synchronize (`/my_app/foo`).
+
+```objc
+[RLMRealm setSyncUserIdentity:@"..."];
+```
+
+You can set up sync from `didFinishLaunchingWithOptions:` in your implementation of `UIApplicationDelegate`.
+
+The server URL specifies both the server name (and port), and the server-side Realm with which to synchronize (`/my_app/foo`). Different user identities will see completely independent Realms even if they ask for the same path. Sharing across user identities is currently not possible.
 
 Use `hydrogen.fr.sync.realm.io` as server name to access our shared synchronization server (recently launched).
 
-Setting the server URL is enough to enable synchronization.
+Setting the server URL is enough to enable synchronization. If the server URL is set but not the user identity token, you will see an error message in the log.
 
 You can adjust the amount of information logged by the synchronization process. For example, to get the maximum amount of information, do this:
 
@@ -39,6 +46,7 @@ See [Your own server](#your-own-server) if you want to run your own server.
 
 How it works
 ------------
+
 
 
 
