@@ -146,11 +146,7 @@
 		5D659ECD1BE04556006515A0 /* shared_realm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FAE25541B8CEBBE00D01405 /* shared_realm.hpp */; };
 		5D659ED21BE04556006515A0 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = E81A1FB31955FCE000FDED82 /* CHANGELOG.md */; };
 		5D659ED51BE04556006515A0 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E81A1FB41955FCE000FDED82 /* LICENSE */; };
-		5D660FC11BE98BEF0021E04F /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5D660FBB1BE98BEF0021E04F /* Base.xcconfig */; };
-		5D660FC21BE98BEF0021E04F /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5D660FBC1BE98BEF0021E04F /* Debug.xcconfig */; };
 		5D660FC31BE98BEF0021E04F /* RealmSwift.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */; };
-		5D660FC41BE98BEF0021E04F /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5D660FBE1BE98BEF0021E04F /* Release.xcconfig */; };
-		5D660FC51BE98BEF0021E04F /* TestHost.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5D660FBF1BE98BEF0021E04F /* TestHost.xcconfig */; };
 		5D660FC61BE98BEF0021E04F /* Tests.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5D660FC01BE98BEF0021E04F /* Tests.xcconfig */; };
 		5D660FDD1BE98C7C0021E04F /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D660FCC1BE98C560021E04F /* RealmSwift.framework */; };
 		5D660FF11BE98D670021E04F /* Aliases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FE31BE98D670021E04F /* Aliases.swift */; };
@@ -448,11 +444,7 @@
 		5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Realm iOS static.xcconfig"; sourceTree = "<group>"; };
 		5D659E761BE03E0D006515A0 /* Realm.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Realm.xcconfig; sourceTree = "<group>"; };
 		5D659ED91BE04556006515A0 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		5D660FBB1BE98BEF0021E04F /* Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
-		5D660FBC1BE98BEF0021E04F /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = RealmSwift.xcconfig; sourceTree = "<group>"; };
-		5D660FBE1BE98BEF0021E04F /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
-		5D660FBF1BE98BEF0021E04F /* TestHost.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = TestHost.xcconfig; sourceTree = "<group>"; };
 		5D660FC01BE98BEF0021E04F /* Tests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
 		5D660FCC1BE98C560021E04F /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D660FD81BE98C7C0021E04F /* RealmSwift Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RealmSwift Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -669,12 +661,8 @@
 		5D659E6C1BE03981006515A0 /* Realm */ = {
 			isa = PBXGroup;
 			children = (
-				5D659E6D1BE0398E006515A0 /* Base.xcconfig */,
-				5D659E6E1BE0398E006515A0 /* Debug.xcconfig */,
 				5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */,
 				5D659E761BE03E0D006515A0 /* Realm.xcconfig */,
-				5D659E6F1BE0398E006515A0 /* Release.xcconfig */,
-				5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */,
 				5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */,
 				5DD755E01BE05C19002800DA /* Tests.xcconfig */,
 			);
@@ -684,6 +672,10 @@
 		5D660FB71BE98B770021E04F /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
+				5D659E6D1BE0398E006515A0 /* Base.xcconfig */,
+				5D659E6E1BE0398E006515A0 /* Debug.xcconfig */,
+				5D659E6F1BE0398E006515A0 /* Release.xcconfig */,
+				5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */,
 				5D659E6C1BE03981006515A0 /* Realm */,
 				5D660FBA1BE98BD80021E04F /* RealmSwift */,
 			);
@@ -693,11 +685,7 @@
 		5D660FBA1BE98BD80021E04F /* RealmSwift */ = {
 			isa = PBXGroup;
 			children = (
-				5D660FBB1BE98BEF0021E04F /* Base.xcconfig */,
-				5D660FBC1BE98BEF0021E04F /* Debug.xcconfig */,
 				5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */,
-				5D660FBE1BE98BEF0021E04F /* Release.xcconfig */,
-				5D660FBF1BE98BEF0021E04F /* TestHost.xcconfig */,
 				5D660FC01BE98BEF0021E04F /* Tests.xcconfig */,
 			);
 			path = RealmSwift;
@@ -1281,10 +1269,6 @@
 				5D659ED21BE04556006515A0 /* CHANGELOG.md in Resources */,
 				5D659ED51BE04556006515A0 /* LICENSE in Resources */,
 				5D6157051BE13CBB00A4BD3F /* strip-frameworks.sh in Resources */,
-				5D660FC21BE98BEF0021E04F /* Debug.xcconfig in Resources */,
-				5D660FC41BE98BEF0021E04F /* Release.xcconfig in Resources */,
-				5D660FC51BE98BEF0021E04F /* TestHost.xcconfig in Resources */,
-				5D660FC11BE98BEF0021E04F /* Base.xcconfig in Resources */,
 				5D660FC61BE98BEF0021E04F /* Tests.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
