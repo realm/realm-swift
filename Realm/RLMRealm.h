@@ -485,6 +485,12 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 */
 + (void)setServerSyncLogLevel:(int)level;
 
+/**
+ Set the user identity token used for synchronization.
+ @param identity    Must be a 40-byte alphanumeric string (such as a hex SHA1 hash).
+*/
++ (void)setSyncUserIdentity:(NSString*)identity;
+
 #pragma mark -
 
 //---------------------------------------------------------------------------------------
