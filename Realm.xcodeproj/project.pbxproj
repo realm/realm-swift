@@ -317,6 +317,13 @@
 			remoteGlobalIDString = 5D659E7D1BE04556006515A0;
 			remoteInfo = Realm;
 		};
+		5D6610301BE99B770021E04F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
+			remoteInfo = "Set Swift Version";
+		};
 		5DD755D11BE05828002800DA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -1118,6 +1125,7 @@
 			);
 			dependencies = (
 				5D66102C1BE98DF60021E04F /* PBXTargetDependency */,
+				5D6610311BE99B770021E04F /* PBXTargetDependency */,
 			);
 			name = RealmSwift;
 			productName = RealmSwift;
@@ -1669,6 +1677,11 @@
 			isa = PBXTargetDependency;
 			target = 5D659E7D1BE04556006515A0 /* Realm */;
 			targetProxy = 5D66102B1BE98DF60021E04F /* PBXContainerItemProxy */;
+		};
+		5D6610311BE99B770021E04F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
+			targetProxy = 5D6610301BE99B770021E04F /* PBXContainerItemProxy */;
 		};
 		5DD755D21BE05828002800DA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
