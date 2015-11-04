@@ -1,6 +1,6 @@
 #!/bin/sh
 
-: ${SRCROOT:?"generate-rlmplatform.sh must be invoked as part of an Xcode script phase"}
+: ${SRCROOT:?"generate-rlmversion.sh must be invoked as part of an Xcode script phase"}
 
 TEMPORARY_FILE="${TARGET_TEMP_DIR}/RLMVersion.h"
 DESTINATION_FILE="${DERIVED_FILE_DIR}/RLMVersion.h"
