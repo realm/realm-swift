@@ -12,7 +12,7 @@ configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.re
 [RLMRealmConfiguration setDefaultConfiguration:configuration];
 ```
 
-~(KS: Why is the `setDefaultConfiguration:` step needed? Couldn't the configuration object have been "live"?)~
+*(KS: Why is the `setDefaultConfiguration:` step needed? Couldn't the configuration object have been "live"?)*
 
 For example, you can do that from `didFinishLaunchingWithOptions:` of your implementation of `UIApplicationDelegate`.
 
@@ -34,7 +34,7 @@ Before trying this out, you need to build Realm with synchronization support (th
 
 See [How it works] for more information on how synchronization works.
 
-See [Your own server] if you want to run your own server.
+See [Your own server](#your-own-server) if you want to run your own server.
 
 
 How it works
