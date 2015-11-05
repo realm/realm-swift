@@ -146,8 +146,6 @@
 		5D659ECD1BE04556006515A0 /* shared_realm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FAE25541B8CEBBE00D01405 /* shared_realm.hpp */; };
 		5D659ED21BE04556006515A0 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = E81A1FB31955FCE000FDED82 /* CHANGELOG.md */; };
 		5D659ED51BE04556006515A0 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E81A1FB41955FCE000FDED82 /* LICENSE */; };
-		5D660FC31BE98BEF0021E04F /* RealmSwift.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */; };
-		5D660FC61BE98BEF0021E04F /* Tests.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5D660FC01BE98BEF0021E04F /* Tests.xcconfig */; };
 		5D660FDD1BE98C7C0021E04F /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D660FCC1BE98C560021E04F /* RealmSwift.framework */; };
 		5D660FF11BE98D670021E04F /* Aliases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FE31BE98D670021E04F /* Aliases.swift */; };
 		5D660FF21BE98D670021E04F /* List.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FE41BE98D670021E04F /* List.swift */; };
@@ -1274,11 +1272,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5D660FC31BE98BEF0021E04F /* RealmSwift.xcconfig in Resources */,
 				5D659ED21BE04556006515A0 /* CHANGELOG.md in Resources */,
 				5D659ED51BE04556006515A0 /* LICENSE in Resources */,
 				5D6157051BE13CBB00A4BD3F /* strip-frameworks.sh in Resources */,
-				5D660FC61BE98BEF0021E04F /* Tests.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
