@@ -73,7 +73,7 @@ exactly when and how migrations are performed.
                            block used to perform the migration.
 
 - returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
-           that occured otherwise.
+           that occurred otherwise.
 */
 public func migrateRealm(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) -> NSError? {
     return RLMRealm.migrateRealm(configuration.rlmConfiguration)
