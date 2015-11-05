@@ -57,8 +57,7 @@ xctest() {
     elif [[ $NAME == Carthage* ]]; then
         (
             cd "$DIRECTORY";
-            : ${sha:=master}
-            echo "github \"realm/realm-cocoa\" \"$sha\"" > Cartfile
+            echo "github \"realm/realm-cocoa\" \"${sha:-master}\"" > Cartfile
             carthage update
         )
     elif [[ $LANG == swift* ]]; then
