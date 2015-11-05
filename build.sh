@@ -101,16 +101,6 @@ xc() {
     fi
 }
 
-xcrealm() {
-    PROJECT=Realm.xcodeproj
-    xc "-project $PROJECT $@"
-}
-
-xcrealmswift() {
-    PROJECT=RealmSwift.xcodeproj
-    xc "-project $PROJECT $@"
-}
-
 build_ios_combined() {
     local scheme="$1"
     local module_name="$2"
@@ -119,7 +109,7 @@ build_ios_combined() {
     local config="$CONFIGURATION"
 
     # Derive build paths
-    local build_products_path="build/DerivedData/$module_name/Build/Products"
+    local build_products_path="build/DerivedData/Realm/Build/Products"
     local product_name="$module_name.framework"
     local binary_path="$module_name"
     local iphoneos_path="$build_products_path/$config-iphoneos$scope_suffix/$product_name"
@@ -127,9 +117,8 @@ build_ios_combined() {
     local out_path="build/ios$scope_suffix$version_suffix"
 
     # Build for each platform
-    cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]') # lowercase the module name to generate command (xcrealm or xcrealmswift)
-    $cmd "-scheme '$scheme' -configuration $config -sdk iphoneos"
-    $cmd "-scheme '$scheme' -configuration $config -sdk iphonesimulator -destination 'name=iPhone 6' ONLY_ACTIVE_ARCH=NO"
+    xc "-scheme '$scheme' -configuration $config -sdk iphoneos"
+    xc "-scheme '$scheme' -configuration $config -sdk iphonesimulator -destination 'name=iPhone 6' ONLY_ACTIVE_ARCH=NO"
 
     # Combine .swiftmodule
     if [ -d $iphonesimulator_path/Modules/$module_name.swiftmodule ]; then
@@ -150,7 +139,7 @@ build_watchos_combined() {
     local config="$CONFIGURATION"
 
     # Derive build paths
-    local build_products_path="build/DerivedData/$module_name/Build/Products"
+    local build_products_path="build/DerivedData/Realm/Build/Products"
     local product_name="$module_name.framework"
     local binary_path="$module_name"
     local watchos_path="$build_products_path/$config-watchos$scope_suffix/$product_name"
@@ -158,9 +147,8 @@ build_watchos_combined() {
     local out_path="build/watchos$scope_suffix"
 
     # Build for each platform
-    cmd=$(echo "xc$module_name" | tr '[:upper:]' '[:lower:]') # lowercase the module name to generate command (xcrealm or xcrealmswift)
-    $cmd "-scheme '$scheme' -configuration $config -sdk watchos"
-    $cmd "-scheme '$scheme' -configuration $config -sdk watchsimulator -destination 'name=Apple Watch - 42mm' ONLY_ACTIVE_ARCH=NO"
+    xc "-scheme '$scheme' -configuration $config -sdk watchos"
+    xc "-scheme '$scheme' -configuration $config -sdk watchsimulator -destination 'name=Apple Watch - 42mm' ONLY_ACTIVE_ARCH=NO"
 
     # Combine .swiftmodule
     if [ -d $watchsimulator_path/Modules/$module_name.swiftmodule ]; then
@@ -174,12 +162,12 @@ build_watchos_combined() {
     xcrun lipo -create "$watchsimulator_path/$binary_path" "$watchos_path/$binary_path" -output "$out_path/$product_name/$module_name"
 }
 
-xcrealm_work_around_rdar_23055637() {
+xc_work_around_rdar_23055637() {
     # xcodebuild times out waiting for the iOS simulator to launch if it takes > 120 seconds for the tests to
     # build (<http://openradar.appspot.com/23055637>). Work around this by having the test phases intentionally
     # exit after they finish building the first time, then run the tests for real.
-    ( REALM_EXIT_AFTER_BUILDING_TESTS=YES xcrealm "$1" ) || true
-    xcrealm "$1"
+    ( REALM_EXIT_AFTER_BUILDING_TESTS=YES xc "$1" ) || true
+    xc "$1"
 }
 
 clean_retrieve() {
@@ -223,12 +211,11 @@ test_ios_devices() {
         fi
         exit 1
     fi
-    cmd="$1"
-    scheme="$2"
-    configuration="$3"
+    scheme="$1"
+    configuration="$2"
     failed=0
     for device in "${serial_numbers[@]}"; do
-        $cmd "-scheme '$2' -configuration $configuration -destination 'id=$device' test" || failed=1
+        xc "-scheme '$scheme' -configuration $configuration -destination 'id=$device' test" || failed=1
     done
     return $failed
 }
@@ -422,6 +409,7 @@ case "$COMMAND" in
         ;;
 
     "ios-swift")
+        sh build.sh ios-dynamic
         build_ios_combined RealmSwift RealmSwift '' "/swift-$REALM_SWIFT_VERSION"
         cp -R build/ios/Realm.framework build/ios/swift-$REALM_SWIFT_VERSION
         exit 0
@@ -433,12 +421,13 @@ case "$COMMAND" in
         ;;
 
     "watchos-swift")
+        sh build.sh watchos
         build_watchos_combined RealmSwift RealmSwift
         exit 0
         ;;
 
     "osx")
-        xcrealm "-scheme Realm -configuration $CONFIGURATION"
+        xc "-scheme Realm -configuration $CONFIGURATION"
         rm -rf build/osx
         mkdir build/osx
         cp -R build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework build/osx
@@ -446,9 +435,10 @@ case "$COMMAND" in
         ;;
 
     "osx-swift")
-        xcrealmswift "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
+        sh build.sh osx
+        xc "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
         destination="build/osx/swift-$REALM_SWIFT_VERSION"
-        clean_retrieve "build/DerivedData/RealmSwift/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
+        clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
         cp -R build/osx/Realm.framework "$destination"
         exit 0
         ;;
@@ -477,30 +467,30 @@ case "$COMMAND" in
         ;;
 
     "test-ios-static")
-        xcrealm_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xc_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         shutdown_simulators
-        xcrealm_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
+        xc_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
         exit 0
         ;;
 
     "test-ios7-static")
-        xcrealm_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' test"
+        xc_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' test"
         shutdown_simulators
-        xcrealm_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s,OS=7.1' test"
+        xc_work_around_rdar_23055637 "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s,OS=7.1' test"
         exit 0
         ;;
 
     "test-ios-dynamic")
-        xcrealm_work_around_rdar_23055637 "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xc_work_around_rdar_23055637 "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         shutdown_simulators
-        xcrealm_work_around_rdar_23055637 "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
+        xc_work_around_rdar_23055637 "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
         exit 0
         ;;
 
     "test-ios-swift")
-        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
         shutdown_simulators
-        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
         exit 0
         ;;
 
@@ -513,12 +503,12 @@ case "$COMMAND" in
         ;;
 
     "test-ios-devices-objc")
-        test_ios_devices xcrealm "Realm iOS static" "$CONFIGURATION"
+        test_ios_devices "Realm iOS static" "$CONFIGURATION"
         exit $?
         ;;
 
     "test-ios-devices-swift")
-        test_ios_devices xcrealmswift "RealmSwift" "$CONFIGURATION"
+        test_ios_devices "RealmSwift" "$CONFIGURATION"
         exit $?
         ;;
 
@@ -527,12 +517,12 @@ case "$COMMAND" in
         if [[ "$CONFIGURATION" == "Debug" ]]; then
             COVERAGE_PARAMS="GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
         fi
-        xcrealm "-scheme Realm -configuration $CONFIGURATION test $COVERAGE_PARAMS"
+        xc "-scheme Realm -configuration $CONFIGURATION test $COVERAGE_PARAMS"
         exit 0
         ;;
 
     "test-osx-swift")
-        xcrealmswift "-scheme RealmSwift -configuration $CONFIGURATION test"
+        xc "-scheme RealmSwift -configuration $CONFIGURATION test"
         exit 0
         ;;
 

@@ -1,6 +1,5 @@
 SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos;
 SKIP_INSTALL = YES;
-FRAMEWORK_SEARCH_PATHS = $(inherited) $(REALM_FRAMEWORK_PATH);
 INFOPLIST_FILE = RealmSwift/Tests/RealmSwiftTests-Info.plist;
 PRODUCT_NAME = $(TARGET_NAME);
 SWIFT_OBJC_BRIDGING_HEADER = RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h
