@@ -54,6 +54,8 @@ command:
   test-ios-devices:     tests ObjC & Swift iOS frameworks on all attached iOS devices
   test-ios-devices-objc:  tests ObjC iOS framework on all attached iOS devices
   test-ios-devices-swift: tests Swift iOS framework on all attached iOS devices
+  test-tvos:            tests tvOS framework
+  test-tvos-swift:      tests RealmSwift tvOS framework
   test-osx:             tests OS X framework
   test-osx-swift:       tests RealmSwift OS X framework
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device in both Debug and Release configurations, swiftlint
@@ -476,6 +478,8 @@ case "$COMMAND" in
         sh build.sh ios-swift
         sh build.sh watchos
         sh build.sh watchos-swift
+        sh build.sh tvos
+        sh build.sh tvos-swift
         sh build.sh osx
         sh build.sh osx-swift
         exit 0
@@ -602,6 +606,16 @@ case "$COMMAND" in
 
     "test-ios-devices-swift")
         test_ios_devices "RealmSwift" "$CONFIGURATION"
+        exit $?
+        ;;
+
+    "test-tvos")
+        xc_work_around_rdar_23055637 "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
+        exit $?
+        ;;
+
+    "test-tvos-swift")
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
         exit $?
         ;;
 
