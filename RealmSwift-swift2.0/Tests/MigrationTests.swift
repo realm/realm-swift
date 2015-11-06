@@ -23,7 +23,7 @@ import Realm.Private
 import Realm.Dynamic
 import Foundation
 
-private func realmWithCustomSchema(path: String, schema :RLMSchema) -> RLMRealm {
+private func realmWithCustomSchema(path: String, schema: RLMSchema) -> RLMRealm {
     return try! RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: true, schema: schema)
 }
 
@@ -56,22 +56,23 @@ class MigrationTests: TestCase {
     }
 
     // migrate realm at path and ensure migration
-    private func migrateAndTestRealm(realmPath: String, shouldRun: Bool = true, schemaVersion: UInt64 = 1, autoMigration: Bool = false, block: MigrationBlock? = nil) {
+    private func migrateAndTestRealm(realmPath: String, shouldRun: Bool = true, schemaVersion: UInt64 = 1,
+                                     autoMigration: Bool = false, block: MigrationBlock? = nil) {
         var didRun = false
-        let config = Realm.Configuration(path: realmPath, schemaVersion: schemaVersion, migrationBlock: { migration, oldSchemaVersion in
-            if let block = block {
-                block(migration: migration, oldSchemaVersion: oldSchemaVersion)
-            }
-            didRun = true
-            return
+        let config = Realm.Configuration(path: realmPath, schemaVersion: schemaVersion,
+            migrationBlock: { migration, oldSchemaVersion in
+                if let block = block {
+                    block(migration: migration, oldSchemaVersion: oldSchemaVersion)
+                }
+                didRun = true
+                return
         })
 
         if autoMigration {
             autoreleasepool {
                 _ = try! Realm(configuration: config)
             }
-        }
-        else {
+        } else {
             migrateRealm(config)
         }
 
@@ -80,7 +81,8 @@ class MigrationTests: TestCase {
 
     private func migrateAndTestDefaultRealm(schemaVersion: UInt64 = 1, block: MigrationBlock) {
         migrateAndTestRealm(defaultRealmPath(), schemaVersion: schemaVersion, block: block)
-        Realm.Configuration.defaultConfiguration = Realm.Configuration(path: defaultRealmPath(), schemaVersion: schemaVersion)
+        Realm.Configuration.defaultConfiguration = Realm.Configuration(path: defaultRealmPath(),
+            schemaVersion: schemaVersion)
     }
 
     // MARK Test cases
@@ -89,7 +91,7 @@ class MigrationTests: TestCase {
         createAndTestRealmAtPath(defaultRealmPath())
 
         var didRun = false
-        let config = Realm.Configuration(path: defaultRealmPath(), schemaVersion: 1, migrationBlock: { migration, oldSchemaVersion in
+        let config = Realm.Configuration(path: defaultRealmPath(), schemaVersion: 1, migrationBlock: { _, _ in
             didRun = true
         })
         Realm.Configuration.defaultConfiguration = config
@@ -108,7 +110,7 @@ class MigrationTests: TestCase {
     }
 
     func testSchemaVersionAtPath() {
-        var error : NSError? = nil
+        var error: NSError? = nil
         assertNil(schemaVersionAtPath(defaultRealmPath(), error: &error), "Version should be nil before Realm creation")
         XCTAssertNotNil(error, "Error should be set")
 
@@ -131,7 +133,8 @@ class MigrationTests: TestCase {
     }
 
     func testMigrationProperties() {
-        let prop = RLMProperty(name: "stringCol", type: RLMPropertyType.Int, objectClassName: nil, indexed: false, optional: false)
+        let prop = RLMProperty(name: "stringCol", type: RLMPropertyType.Int, objectClassName: nil, indexed: false,
+            optional: false)
         autoreleasepool {
             realmWithSingleClassProperties(defaultRealmPath(), className: "SwiftStringObject", properties: [prop])
         }
@@ -146,6 +149,7 @@ class MigrationTests: TestCase {
         }
     }
 
+    // swiftlint:disable function_body_length
     func testEnumerate() {
         autoreleasepool {
             _ = try! Realm()
@@ -246,6 +250,7 @@ class MigrationTests: TestCase {
             }
         }
     }
+    // swiftlint:enable function_body_length
 
     func testCreate() {
         autoreleasepool {
@@ -312,6 +317,7 @@ class MigrationTests: TestCase {
         XCTAssertEqual(0, realm.allObjects("SwiftStringObject").count)
     }
 
+    // swiftlint:disable function_body_length
     // test getting/setting all property types
     func testMigrationObject() {
         autoreleasepool {
@@ -409,5 +415,5 @@ class MigrationTests: TestCase {
         // make sure we added new bool objects as object property and in the list
         XCTAssertEqual(try! Realm().objects(SwiftBoolObject).count, 4)
     }
+    // swiftlint:enable function_body_length
 }
-

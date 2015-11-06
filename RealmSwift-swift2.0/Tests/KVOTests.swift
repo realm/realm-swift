@@ -25,7 +25,9 @@ func nextPrimaryKey() -> Int {
 }
 
 class KVOObject: Object {
+    // swiftlint:disable variable_name
     dynamic var pk = nextPrimaryKey() // primary key for equality
+    // swiftlint:enable variable_name
     dynamic var ignored: Int = 0
 
     dynamic var boolCol: Bool = false
@@ -70,11 +72,13 @@ class KVOTests: TestCase {
     }
 
     var changeDictionary: [NSObject: AnyObject]?
-    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?,
+                  change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         changeDictionary = change
     }
 
-    func observeChange(obj: NSObject, _ key: String, _ old: AnyObject, _ new: AnyObject, fileName: String = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
+    func observeChange(obj: NSObject, _ key: String, _ old: AnyObject, _ new: AnyObject,
+                       fileName: String = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [.Old, .New], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
@@ -86,13 +90,16 @@ class KVOTests: TestCase {
 
         let actualOld: AnyObject = changeDictionary![NSKeyValueChangeOldKey]!
         let actualNew: AnyObject = changeDictionary![NSKeyValueChangeNewKey]!
-        XCTAssert(actualOld.isEqual(old), "Old value: expected \(old), got \(actualOld)", file: fileName, line: lineNumber)
-        XCTAssert(actualNew.isEqual(new), "New value: expected \(new), got \(actualNew)", file: fileName, line: lineNumber)
+        XCTAssert(actualOld.isEqual(old), "Old value: expected \(old), got \(actualOld)", file: fileName,
+            line: lineNumber)
+        XCTAssert(actualNew.isEqual(new), "New value: expected \(new), got \(actualNew)", file: fileName,
+            line: lineNumber)
 
         changeDictionary = nil
     }
 
-    func observeListChange(obj: NSObject, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet, fileName: String = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
+    func observeListChange(obj: NSObject, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet,
+                           fileName: String = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [.Old, .New], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
@@ -102,10 +109,13 @@ class KVOTests: TestCase {
             return
         }
 
-        let actualKind = NSKeyValueChange(rawValue: (changeDictionary![NSKeyValueChangeKindKey] as! NSNumber).unsignedLongValue)!
+        let actualKind = NSKeyValueChange(rawValue: (changeDictionary![NSKeyValueChangeKindKey] as! NSNumber)
+            .unsignedLongValue)!
         let actualIndexes = changeDictionary![NSKeyValueChangeIndexesKey]! as! NSIndexSet
-        XCTAssert(actualKind == kind, "Change kind: expected \(kind), got \(actualKind)", file: fileName, line: lineNumber)
-        XCTAssert(actualIndexes.isEqual(indexes), "Changed indexes: expected \(indexes), got \(actualIndexes)", file: fileName, line: lineNumber)
+        XCTAssert(actualKind == kind, "Change kind: expected \(kind), got \(actualKind)", file: fileName,
+            line: lineNumber)
+        XCTAssert(actualIndexes.isEqual(indexes), "Changed indexes: expected \(indexes), got \(actualIndexes)",
+            file: fileName, line: lineNumber)
 
         changeDictionary = nil
     }
@@ -154,6 +164,7 @@ class KVOTests: TestCase {
         observeChange(obj, "optDateCol", date, NSNull()) { obj.optDateCol = nil }
     }
 
+    // swiftlint:disable function_body_length
     func testAllPropertyTypesPersisted() {
         let obj = KVOObject()
         realm.add(obj)
@@ -263,4 +274,5 @@ class KVOTests: TestCase {
             self.realm.delete(obj2)
         }
     }
+    // swiftlint:enable function_body_length
 }

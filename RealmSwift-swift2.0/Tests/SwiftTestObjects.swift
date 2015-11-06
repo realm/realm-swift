@@ -159,10 +159,10 @@ class SwiftAggregateObject: Object {
 }
 
 class SwiftAllIntSizesObject: Object {
-    dynamic var int8  : Int8  = 0
-    dynamic var int16 : Int16 = 0
-    dynamic var int32 : Int32 = 0
-    dynamic var int64 : Int64 = 0
+    dynamic var int8: Int8  = 0
+    dynamic var int16: Int16 = 0
+    dynamic var int32: Int32 = 0
+    dynamic var int64: Int64 = 0
 }
 
 class SwiftEmployeeObject: Object {
@@ -194,7 +194,9 @@ class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
 }
 
 class SwiftUTF8Object: Object {
+    // swiftlint:disable variable_name
     dynamic var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+    // swiftlint:enable variable_name
 }
 
 class SwiftIgnoredPropertiesObject: Object {
