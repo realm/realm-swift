@@ -110,7 +110,7 @@ public final class Realm {
     
     :returns: Whether the transaction succeeded.
     */
-    public func write(error: NSErrorPointer = nil, block: (() -> Void)) -> Bool {
+    public func write(error: NSErrorPointer = nil, @noescape block: (() -> Void)) -> Bool {
         return rlmRealm.transactionWithBlock(block, error: error)
     }
 
