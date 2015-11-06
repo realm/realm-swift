@@ -189,30 +189,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     return [RLMRealm realmWithConfiguration:configuration error:outError];
 }
 
-+ (instancetype)realmWithPath:(NSString *)path
-                          key:(NSData *)key
-                     readOnly:(BOOL)readonly
-                     inMemory:(BOOL)inMemory
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-         disableFormatUpgrade:(BOOL)disableFormatUpgrade
-                        error:(NSError *__autoreleasing *)outError
-{
-    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    if (inMemory) {
-        configuration.inMemoryIdentifier = path.lastPathComponent;
-    }
-    else {
-        configuration.path = path;
-    }
-    configuration.encryptionKey = key;
-    configuration.readOnly = readonly;
-    configuration.dynamic = dynamic;
-    configuration.customSchema = customSchema;
-    configuration.disableFormatUpgrade = disableFormatUpgrade;
-    return [RLMRealm realmWithConfiguration:configuration error:outError];
-}
-
 // ARC tries to eliminate calls to autorelease when the value is then immediately
 // returned, but this results in significantly different semantics between debug
 // and release builds for RLMRealm, so force it to always autorelease.
