@@ -98,3 +98,4 @@ build/
 ## Carthage
 # Cartfiles are ignored because they're generated on demand in the installation examples
 Cartfile
+Carthage
