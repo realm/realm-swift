@@ -6,6 +6,7 @@
 //___COPYRIGHT___
 //
 
+import Foundation
 import RealmSwift
 
 class ___FILEBASENAMEASIDENTIFIER___: Object {
