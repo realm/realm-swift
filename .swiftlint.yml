@@ -2,7 +2,7 @@
 # Uncomment the commented lines to avoid any violations
 
 included:
-  - RealmSwift
+  - RealmSwift-swift2.0
 disabled_rules:
   - force_cast
   - todo
