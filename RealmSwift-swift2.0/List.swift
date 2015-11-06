@@ -356,6 +356,7 @@ public final class List<T: Object>: ListBase {
         _rlmArray.replaceObjectAtIndex(UInt(index), withObject: unsafeBitCast(object, RLMObject.self))
     }
 
+    // swiftlint:disable variable_name
     /**
     Moves the object at the given source index to the given destination index.
 
@@ -367,6 +368,7 @@ public final class List<T: Object>: ListBase {
     - parameter to:    index to which the object at `from` should be moved.
     */
     public func move(from from: Int, to: Int) {
+        // swiftlint:enable variable_name
         throwForNegativeIndex(from)
         throwForNegativeIndex(to)
         _rlmArray.moveObjectAtIndex(UInt(from), toIndex: UInt(to))

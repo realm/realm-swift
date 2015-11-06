@@ -77,7 +77,7 @@ extension Realm {
 
         /// The path to the realm file.
         /// Mutually exclusive with `inMemoryIdentifier`.
-        public var path: String?  {
+        public var path: String? {
             set {
                 _inMemoryIdentifier = nil
                 _path = newValue
@@ -91,7 +91,7 @@ extension Realm {
 
         /// A string used to identify a particular in-memory Realm.
         /// Mutually exclusive with `path`.
-        public var inMemoryIdentifier: String?  {
+        public var inMemoryIdentifier: String? {
             set {
                 _path = nil
                 _inMemoryIdentifier = newValue
