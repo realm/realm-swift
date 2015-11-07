@@ -653,9 +653,9 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
 @end
 
-//
-// Notification token - holds onto the realm and the notification block
-//
+/**
+ Notification token - holds onto the realm and the notification block
+ */
 @interface RLMNotificationToken : NSObject
 @end
 
