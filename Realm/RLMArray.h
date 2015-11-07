@@ -328,6 +328,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @end
 
+/// :nodoc:
 @interface RLMArray (Swift)
 // for use only in Swift class definitions
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
