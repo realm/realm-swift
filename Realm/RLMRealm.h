@@ -47,10 +47,9 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 
 @interface RLMRealm : NSObject
-/**---------------------------------------------------------------------------------------
- *  @name Creating & Initializing a Realm
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Creating & Initializing a Realm
+
 /**
  Obtains an instance of the default Realm.
 
@@ -240,10 +239,8 @@ RLM_ASSUME_NONNULL_BEGIN
 
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
-/**---------------------------------------------------------------------------------------
- *  @name Receiving Notification when a Realm Changes
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Receiving Notification when a Realm Changes
 
 /**
  Add a notification handler for changes in this RLMRealm.
@@ -277,10 +274,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 #pragma mark - Transactions
 
-/**---------------------------------------------------------------------------------------
- *  @name Writing to a Realm
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Writing to a Realm
 
 /**
  Begins a write transaction in an `RLMRealm`.
@@ -458,10 +453,9 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 #pragma mark - Accessing Objects
 
-/**---------------------------------------------------------------------------------------
- *  @name Adding and Removing Objects from a Realm
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Adding and Removing Objects from a Realm
+
 /**
  Adds an object to be persisted it in this Realm.
 
@@ -656,35 +650,6 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
  @return            The error that occurred while applying the migration, if any.
  */
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key DEPRECATED_MSG_ATTRIBUTE("Use +[RLMRealm migrateRealm:]");
-
-#pragma mark -
-
-//---------------------------------------------------------------------------------------
-//@name Named Object Storage and Retrieval
-//---------------------------------------------------------------------------------------
-//
-// Realm provides a top level key/value store for storing and accessing objects by NSString.
-// This system can be extended with the RLMKeyValueStore interface to create nested
-// namespaces as needed.
-
-// Retrieve a persisted object with an NSString.
-//
-// @usage RLMObject *object = RLMRealm.defaultRealm[@"name"];
-// @param key The NSString used to identify an object
-//
-// @return    RLMObject or nil if no object is stored for the given key.
-//
-//-(id)objectForKeyedSubscript:(id <NSCopying>)key;
-
-
-// Store an object with an NSString key.
-//
-// @usage RLMRealm.defaultRealm[@"name"] = object;
-// @param obj     The object to be stored.
-// @param key     The key that identifies the object to be used for future lookups.
-//
-//-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
-
 
 @end
 

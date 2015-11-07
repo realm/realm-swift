@@ -27,10 +27,6 @@ RLM_ASSUME_NONNULL_BEGIN
 
 typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObject * __nullable newObject);
 
-/**---------------------------------------------------------------------------------------
- *  @name Realm Migrations
- *  ---------------------------------------------------------------------------------------
- */
 /**
  RLMMigration is the object passed into a user defined RLMMigrationBlock when updating the version
  of an RLMRealm instance.
@@ -38,6 +34,8 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
  This object provides access to the RLMSchema current to this migration.
  */
 @interface RLMMigration : NSObject
+
+#pragma mark - Properties
 
 /**
  Get the new RLMSchema for the migration. This is the schema which describes the RLMRealm before the
@@ -52,10 +50,8 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
 @property (nonatomic, readonly) RLMSchema *newSchema;
 
 
-/**---------------------------------------------------------------------------------------
- *  @name Altering Objects during a Migration
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Altering Objects during a Migration
+
 /**
  Enumerates objects of a given type in this Realm, providing both the old and new versions of each object.
  Objects properties can be accessed using keyed subscripting.
