@@ -393,7 +393,10 @@ RLM_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Dynamic Accessors
 
+/// :nodoc:
 - (nullable id)objectForKeyedSubscript:(NSString *)key;
+
+/// :nodoc:
 - (void)setObject:(nullable id)obj forKeyedSubscript:(NSString *)key;
 
 @end

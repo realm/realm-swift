@@ -164,7 +164,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return The minimum value for the property amongst objects in an RLMResults.
  */
--(nullable id)minOfProperty:(NSString *)property;
+- (nullable id)minOfProperty:(NSString *)property;
 
 /**
  Returns the maximum (highest) value of the given property of objects in an RLMResults
@@ -177,7 +177,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return The maximum value for the property amongst objects in an RLMResults
  */
--(nullable id)maxOfProperty:(NSString *)property;
+- (nullable id)maxOfProperty:(NSString *)property;
 
 /**
  Returns the sum of the given property for objects in an RLMResults.
@@ -190,7 +190,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return The sum of the given property over all objects in an RLMResults.
  */
--(NSNumber *)sumOfProperty:(NSString *)property;
+- (NSNumber *)sumOfProperty:(NSString *)property;
 
 /**
  Returns the average of a given property for objects in an RLMResults.
@@ -204,8 +204,9 @@ RLM_ASSUME_NONNULL_BEGIN
  @return    The average for the given property amongst objects in an RLMResults. This will be of type double for both
  float and double properties.
  */
--(nullable NSNumber *)averageOfProperty:(NSString *)property;
+- (nullable NSNumber *)averageOfProperty:(NSString *)property;
 
+/// :nodoc:
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 
 #pragma mark - Unavailable Methods
