@@ -611,9 +611,14 @@ case "$COMMAND" in
         ;;
 
     "verify-docs")
-        sh scripts/build-docs.sh
+        sh build.sh docs
+        if [ -s docs/objc_output/undocumented.txt ]; then
+          echo "Undocumented Realm Objective-C declarations:"
+          echo "$(cat docs/objc_output/undocumented.txt)"
+          exit 1
+        fi
         if [ -s docs/swift_output/undocumented.txt ]; then
-          echo "Undocumented RealmSwift declarations:"
+          echo "Undocumented Realm Swift declarations:"
           echo "$(cat docs/swift_output/undocumented.txt)"
           exit 1
         fi
