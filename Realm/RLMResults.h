@@ -156,7 +156,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Returns the minimum (lowest) value of the given property
 
- NSNumber *min = [results minOfProperty:@"age"];
+     NSNumber *min = [results minOfProperty:@"age"];
 
  @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
@@ -169,7 +169,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Returns the maximum (highest) value of the given property of objects in an RLMResults
 
- NSNumber *max = [results maxOfProperty:@"age"];
+     NSNumber *max = [results maxOfProperty:@"age"];
 
  @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
@@ -182,7 +182,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Returns the sum of the given property for objects in an RLMResults.
 
- NSNumber *sum = [results sumOfProperty:@"age"];
+     NSNumber *sum = [results sumOfProperty:@"age"];
 
  @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
@@ -195,7 +195,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Returns the average of a given property for objects in an RLMResults.
 
- NSNumber *average = [results averageOfProperty:@"age"];
+     NSNumber *average = [results averageOfProperty:@"age"];
 
  @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
