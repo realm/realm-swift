@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+#pragma mark - Enums
+
 /**
  Property types supported in Realm models.
 
@@ -25,9 +27,8 @@
  */
 // Make sure numbers match those in <realm/data_type.hpp>
 typedef NS_ENUM(int32_t, RLMPropertyType) {
-    ////////////////////////////////
-    // Primitive types
-    ////////////////////////////////
+
+#pragma mark - Primitive types
 
     /** Integer type: NSInteger, int, long, Int (Swift) */
     RLMPropertyTypeInt    = 0,
@@ -38,9 +39,7 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     /** Double type: double, Double (Swift) */
     RLMPropertyTypeDouble = 10,
 
-    ////////////////////////////////
-    // Object types
-    ////////////////////////////////
+#pragma mark - Object types
 
     /** String type: NSString, String (Swift) */
     RLMPropertyTypeString = 2,
@@ -51,9 +50,7 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     /** Date type: NSDate */
     RLMPropertyTypeDate   = 7,
 
-    ////////////////////////////////
-    // Array/Linked object types
-    ////////////////////////////////
+#pragma mark - Array/Linked object types
 
     /** Object type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
     RLMPropertyTypeObject = 12,

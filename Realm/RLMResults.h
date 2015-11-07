@@ -33,13 +33,9 @@ RLM_ASSUME_NONNULL_BEGIN
 
  RLMResults cannot be created directly.
  */
-
 @interface RLMResults RLM_GENERIC_COLLECTION : NSObject<RLMCollection, NSFastEnumeration>
 
-/**---------------------------------------------------------------------------------------
- *  @name RLMResults Properties
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Properties
 
 /**
  Number of objects in the results.
@@ -56,12 +52,7 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
-#pragma mark -
-
-/**---------------------------------------------------------------------------------------
- *  @name Accessing Objects from an RLMResults
- * ---------------------------------------------------------------------------------------
- */
+#pragma mark - Accessing Objects from an RLMResults
 
 /**
  Returns the object at the index specified.
@@ -92,13 +83,9 @@ RLM_ASSUME_NONNULL_BEGIN
 
 
 
-#pragma mark -
 
+#pragma mark - Querying Results
 
-/**---------------------------------------------------------------------------------------
- *  @name Querying Results
- *  ---------------------------------------------------------------------------------------
- */
 /**
  Gets the index of an object.
 
@@ -163,13 +150,8 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingDescriptors:(NSArray *)properties;
 
-#pragma mark -
 
-
-/**---------------------------------------------------------------------------------------
- *  @name Aggregating Property Values
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Aggregating Property Values
 
 /**
  Returns the minimum (lowest) value of the given property
@@ -224,16 +206,9 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 -(nullable NSNumber *)averageOfProperty:(NSString *)property;
 
-#pragma mark -
-
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 
-#pragma mark -
-
-/**---------------------------------------------------------------------------------------
- *  @name Unavailable Methods
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Unavailable Methods
 
 /**
  -[RLMResults init] is not available because RLMResults cannot be created directly.
