@@ -21,7 +21,7 @@
 /**
  Property types supported in Realm models.
 
- See [Realm Models](http://realm.io/docs/cocoa/latest/#models)
+ See [Realm Models](https://realm.io/docs/objc/latest/#models)
  */
 // Make sure numbers match those in <realm/data_type.hpp>
 typedef NS_ENUM(int32_t, RLMPropertyType) {
@@ -55,9 +55,9 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     // Array/Linked object types
     ////////////////////////////////
 
-    /** Object type. See [Realm Models](http://realm.io/docs/cocoa/latest/#models) */
+    /** Object type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
     RLMPropertyTypeObject = 12,
-    /** Array type. See [Realm Models](http://realm.io/docs/cocoa/latest/#models) */
+    /** Array type. See [Realm Models](http://realms.io/docs/objc/latest/#models) */
     RLMPropertyTypeArray  = 13,
 };
 

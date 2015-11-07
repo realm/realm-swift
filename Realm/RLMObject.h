@@ -60,7 +60,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  ### Relationships
  
- See our [Cocoa guide](http://realm.io/docs/cocoa/latest) for more details.
+ See our [Cocoa guide](https://realm.io/docs/objc/latest#relationships) for more details.
 
  ### Key-Value Observing
 
