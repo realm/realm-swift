@@ -250,6 +250,7 @@ build_docs() {
         objc=""
     fi
 
+    touch Realm/RLMPlatform.h # jazzy will fail if it can't find all public header files
     jazzy \
       ${objc} \
       --clean \

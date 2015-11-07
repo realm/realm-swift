@@ -41,6 +41,7 @@ bin
 # sh build.sh docs
 /docs/objc_output
 /docs/swift_output
+/Realm/RLMPlatform.h
 
 # XCode
 *.bak
