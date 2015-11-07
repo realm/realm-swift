@@ -19,7 +19,7 @@ set -e
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
 
-PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
+PATH=/usr/libexec:$PATH
 
 if ! [ -z "${JENKINS_HOME}" ]; then
     XCPRETTY_PARAMS="--no-utf --report junit --output build/reports/junit.xml"
@@ -225,6 +225,41 @@ test_ios_devices() {
         $cmd "-scheme '$2' -configuration $configuration -destination 'id=$device' test" || failed=1
     done
     return $failed
+}
+
+######################################
+# Docs
+######################################
+
+build_docs() {
+    local language="$1"
+    local version=$(sh build.sh get-version)
+
+    local xcodebuild_arguments="--objc,Realm/Realm.h,-x,objective-c,-isysroot,$(xcrun --show-sdk-path),-I,$(pwd)"
+    local module="Realm"
+    local objc="--objc"
+
+    if [[ "$language" == "swift" ]]; then
+        : ${REALM_SWIFT_VERSION:=2.1}
+        ./build.sh set-swift-version
+        xcodebuild_arguments="-scheme,RealmSwift"
+        module="RealmSwift"
+        objc=""
+    fi
+
+    jazzy \
+      ${objc} \
+      --clean \
+      --author Realm \
+      --author_url https://realm.io \
+      --github_url https://github.com/realm/realm-cocoa \
+      --github-file-prefix https://github.com/realm/realm-cocoa/tree/v${version} \
+      --module-version ${version} \
+      --xcodebuild-arguments ${xcodebuild_arguments} \
+      --module ${module} \
+      --root-url https://realm.io/docs/${language}/${version}/api/ \
+      --output $(pwd)/docs/${language}_output \
+      --template-directory $(pwd)/docs/templates
 }
 
 ######################################
@@ -599,7 +634,8 @@ case "$COMMAND" in
     # Docs
     ######################################
     "docs")
-        sh scripts/build-docs.sh
+        build_docs objc
+        build_docs swift
         exit 0
         ;;
 

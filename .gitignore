@@ -39,7 +39,7 @@ bin
 /include
 
 # sh build.sh docs
-/docs/output
+/docs/objc_output
 /docs/swift_output
 
 # XCode
