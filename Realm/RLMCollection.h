@@ -22,6 +22,9 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @class RLMRealm, RLMResults, RLMObject;
 
+/**
+ A homogenous collection of `RLMObject`s like `RLMArray` or `RLMResults`.
+ */
 @protocol RLMCollection <NSFastEnumeration>
 
 @required
