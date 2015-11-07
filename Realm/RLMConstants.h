@@ -79,6 +79,10 @@ typedef NS_ENUM(NSInteger, RLMError) {
     RLMErrorIncompatibleLockFile  = 8,
 };
 
+#pragma mark - Constants
+
+#pragma mark - Notification Constants
+
 /**
  Posted by RLMRealm when the data in the realm has changed.
 
@@ -102,15 +106,22 @@ extern NSString * const RLMRealmRefreshRequiredNotification;
  */
 extern NSString * const RLMRealmDidChangeNotification;
 
-// Schema version used for uninitialized Realms
+#pragma mark - Other Constants
+
+/** Schema version used for uninitialized Realms */
 extern const uint64_t RLMNotVersioned;
 
+/** Error domain used in Realm. */
 extern NSString * const RLMErrorDomain;
 
+/** Key for name of Realm exceptions. */
 extern NSString * const RLMExceptionName;
 
+/** Key for Realm file version. */
 extern NSString * const RLMRealmVersionKey;
 
+/** Key for Realm core version. */
 extern NSString * const RLMRealmCoreVersionKey;
 
+/** Key for Realm invalidated property name. */
 extern NSString * const RLMInvalidatedKey;
