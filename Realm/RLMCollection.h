@@ -141,6 +141,7 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
 
+/// :nodoc:
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 
 /**

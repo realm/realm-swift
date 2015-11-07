@@ -237,6 +237,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Notifications
 
+/// Block to run when the data in a Realm was modified.
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 

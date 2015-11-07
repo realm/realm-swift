@@ -25,6 +25,13 @@ RLM_ASSUME_NONNULL_BEGIN
 @class RLMArray;
 @class RLMObject;
 
+/**
+Provides both the old and new versions of an object in this Realm. Objects properties can only be
+accessed using keyed subscripting.
+
+@param oldObject Object in original RLMRealm (read-only).
+@param newObject Object in migrated RLMRealm (read-write).
+*/
 typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObject * __nullable newObject);
 
 /**

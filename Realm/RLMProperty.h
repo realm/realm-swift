@@ -22,15 +22,23 @@
 
 RLM_ASSUME_NONNULL_BEGIN
 
+/// :nodoc:
 @protocol RLMInt
 @end
+
+/// :nodoc:
 @protocol RLMBool
 @end
+
+/// :nodoc:
 @protocol RLMDouble
 @end
+
+/// :nodoc:
 @protocol RLMFloat
 @end
 
+/// :nodoc:
 @interface NSNumber ()<RLMInt, RLMBool, RLMDouble, RLMFloat>
 @end
 

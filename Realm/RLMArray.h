@@ -275,7 +275,10 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingDescriptors:(NSArray *)properties;
 
+/// :nodoc:
 - (RLMObjectType)objectAtIndexedSubscript:(NSUInteger)index;
+
+/// :nodoc:
 - (void)setObject:(RLMObjectType)newValue atIndexedSubscript:(NSUInteger)index;
 
 #pragma mark - Unavailable Methods
