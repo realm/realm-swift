@@ -30,7 +30,7 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
 /**
  RLMMigration is the object passed into a user defined RLMMigrationBlock when updating the version
  of an RLMRealm instance.
- 
+
  This object provides access to the RLMSchema current to this migration.
  */
 @interface RLMMigration : NSObject
@@ -38,7 +38,7 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
 #pragma mark - Properties
 
 /**
- Get the new RLMSchema for the migration. This is the schema which describes the RLMRealm before the
+ Get the old RLMSchema for the migration. This is the schema which describes the RLMRealm before the
  migration is applied.
  */
 @property (nonatomic, readonly) RLMSchema *oldSchema;
@@ -55,9 +55,9 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
 /**
  Enumerates objects of a given type in this Realm, providing both the old and new versions of each object.
  Objects properties can be accessed using keyed subscripting.
- 
+
  @param className   The name of the RLMObject class to enumerate.
- 
+
  @warning   All objects returned are of a type specific to the current migration and should not be casted
             to className. Instead you should access them as RLMObjects and use keyed subscripting to access
             properties.
@@ -90,9 +90,9 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
  Deletes the data for the class with the given name.
  This deletes all objects of the given class, and if the RLMObject subclass no longer exists in your program,
  cleans up any remaining metadata for the class in the Realm file.
- 
+
  @param  name The name of the RLMObject class to delete.
- 
+
  @return whether there was any data to delete.
  */
 - (BOOL)deleteDataForClassName:(NSString *)name;
