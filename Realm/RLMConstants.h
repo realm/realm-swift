@@ -59,6 +59,27 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
 };
 
 /**
+ Enum representing all recoverable errors in Realm.
+ */
+typedef NS_ENUM(NSInteger, RLMError) {
+    /** Returned by RLMRealm if no other specific error is returned when a realm is opened. */
+    RLMErrorFail                  = 1,
+    /** Returned by RLMRealm for any I/O related exception scenarios when a realm is opened. */
+    RLMErrorFileAccessError       = 2,
+    /** Returned by RLMRealm if the user does not have permission to open or create
+        the specified file in the specified access mode when the realm is opened. */
+    RLMErrorFilePermissionDenied  = 3,
+    /** Returned by RLMRealm if no_create was specified and the file did already exist when the realm is opened. */
+    RLMErrorFileExists            = 4,
+    /** Returned by RLMRealm if no_create was specified and the file was not found when the realm is opened. */
+    RLMErrorFileNotFound          = 5,
+    /** Returned by RLMRealm if the database file is currently open in another
+        process which cannot share with the current process due to an
+        architecture mismatch. */
+    RLMErrorIncompatibleLockFile  = 8,
+};
+
+/**
  Posted by RLMRealm when the data in the realm has changed.
 
  DidChange are posted after a realm has been refreshed to reflect a write
@@ -80,24 +101,6 @@ extern NSString * const RLMRealmRefreshRequiredNotification;
  to keep an extra copy of the data for the un-refreshed RLMRealm.
  */
 extern NSString * const RLMRealmDidChangeNotification;
-
-typedef NS_ENUM(NSInteger, RLMError) {
-    /** Returned by RLMRealm if no other specific error is returned when a realm is opened. */
-    RLMErrorFail                  = 1,
-    /** Returned by RLMRealm for any I/O related exception scenarios when a realm is opened. */
-    RLMErrorFileAccessError       = 2,
-    /** Returned by RLMRealm if the user does not have permission to open or create
-        the specified file in the specified access mode when the realm is opened. */
-    RLMErrorFilePermissionDenied  = 3,
-    /** Returned by RLMRealm if no_create was specified and the file did already exist when the realm is opened. */
-    RLMErrorFileExists            = 4,
-    /** Returned by RLMRealm if no_create was specified and the file was not found when the realm is opened. */
-    RLMErrorFileNotFound          = 5,
-    /** Returned by RLMRealm if the database file is currently open in another
-        process which cannot share with the current process due to an
-        architecture mismatch. */
-    RLMErrorIncompatibleLockFile  = 8,
-};
 
 // Schema version used for uninitialized Realms
 extern const uint64_t RLMNotVersioned;
