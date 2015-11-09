@@ -52,6 +52,8 @@ extension Realm {
         :param: schemaVersion      The current schema version.
         :param: migrationBlock     The block which migrates the Realm to the current version.
         :param: objectTypes        The subset of `Object` subclasses persisted in the Realm.
+        :param: syncServerURL      The synchronization server URL.
+        :param: syncIdentity       The user identity token used for synchronization.
 
         :returns: An initialized `Configuration`.
         */
@@ -61,7 +63,9 @@ extension Realm {
             readOnly: Bool = false,
             schemaVersion: UInt64 = 0,
             migrationBlock: MigrationBlock? = nil,
-            objectTypes: [Object.Type]? = nil) {
+            objectTypes: [Object.Type]? = nil,
+            syncServerURL: NSURL? = nil,
+            syncIdentity: String? = nil) {
                 self.path = path
                 if inMemoryIdentifier != nil {
                     self.inMemoryIdentifier = inMemoryIdentifier
@@ -71,6 +75,8 @@ extension Realm {
                 self.schemaVersion = schemaVersion
                 self.migrationBlock = migrationBlock
                 self.objectTypes = objectTypes
+                self.syncServerURL = syncServerURL
+                self.syncIdentity = syncIdentity
         }
 
         // MARK: Configuration Properties
@@ -133,6 +139,24 @@ extension Realm {
             }
         }
 
+        // MARK: Synchronization
+
+        /**
+        The synchronization server URL.
+
+        The URL must be of the form `realm://realm.foo.com:7800/my_realm`, where
+        `my_realm` is the name of the Realm as known to the server.
+
+        When `nil`, synchronization is disabled. Defaults to `nil`.
+        */
+        public var syncServerURL: NSURL? = nil
+
+        /**
+        The user identity token used for synchronization.
+        Must be a 40-byte alphanumeric string (such as a hex SHA1 hash).
+        */
+        public var syncIdentity: String? = nil
+
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema? = nil
 
@@ -150,6 +174,8 @@ extension Realm {
             configuration.schemaVersion = self.schemaVersion
             configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
             configuration.customSchema = self.customSchema
+            configuration.syncServerURL = self.syncServerURL
+            configuration.syncIdentity = self.syncIdentity
             return configuration
         }
 
@@ -166,6 +192,8 @@ extension Realm {
                 }
             )
             configuration.customSchema = rlmConfiguration.customSchema
+            configuration.syncServerURL = rlmConfiguration.syncServerURL
+            configuration.syncIdentity = rlmConfiguration.syncIdentity
             return configuration
         }
     }
