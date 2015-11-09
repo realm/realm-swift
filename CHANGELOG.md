@@ -13,7 +13,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix crashes or incorrect results when calling `-[RLMRealm refresh]` during
+  fast enumeration.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================

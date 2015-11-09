@@ -600,4 +600,34 @@ static vm_size_t get_resident_size() {
     [realm cancelWriteTransaction];
 }
 
+- (void)testManualRefreshDuringEnumeration {
+    RLMRealm *realm = self.realmWithTestPath;
+    const int count = 40;
+
+    [realm beginWriteTransaction];
+    for (int i = 0; i < count; ++i) {
+        [IntObject createInRealm:realm withValue:@[@(0)]];
+    }
+    [realm commitWriteTransaction];
+
+    realm.autorefresh = NO;
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm beginWriteTransaction];
+        // FIXME: this is roundabout because `table.clear()` does not update
+        // table views correctly
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 0"]];
+        [realm commitWriteTransaction];
+    }];
+
+    int enumeratedCount = 0;
+    for (IntObject *io in [IntObject allObjectsInRealm:realm]) {
+        [realm refresh];
+        XCTAssertTrue(io.invalidated);
+        ++enumeratedCount;
+    }
+
+    XCTAssertEqual(enumeratedCount, count);
+}
+
 @end

@@ -443,13 +443,6 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     catch (std::exception &ex) {
         @throw RLMException(ex);
     }
-
-    // notify any collections currently being enumerated that they need
-    // to switch to enumerating a copy as the data may change on them
-    for (RLMFastEnumerator *enumerator in _collectionEnumerators) {
-        [enumerator detach];
-    }
-    _collectionEnumerators = nil;
 }
 
 - (void)commitWriteTransaction {
@@ -736,6 +729,13 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator {
     [_collectionEnumerators removeObject:enumerator];
+}
+
+- (void)detachAllEnumerators {
+    for (RLMFastEnumerator *enumerator in _collectionEnumerators) {
+        [enumerator detach];
+    }
+    _collectionEnumerators = nil;
 }
 
 @end
