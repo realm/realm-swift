@@ -24,8 +24,12 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
-    [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                       serverBaseURL:@"realm://Alexanders-MacBook-Pro.local/chat"];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/chat"];
+    configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    [RLMRealmConfiguration setDefaultConfiguration:configuration];
+
+    [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelLudicrous];
     return YES;
 }
 

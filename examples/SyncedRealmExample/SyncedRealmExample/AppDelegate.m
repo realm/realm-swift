@@ -18,10 +18,12 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    NSString *path = [RLMRealm defaultRealmPath];
-    [RLMRealm enableServerSyncOnPath:path serverBaseURL:@"http://192.168.1.50:8080"]; // Kristains workstation
-//    RLMRealm *realm = [RLMRealm realmWithPath:path];
-    NSLog(@"realm: %@", path);
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/synced_realm_example"];
+    configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    [RLMRealmConfiguration setDefaultConfiguration:configuration];
+
+    [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelLudicrous];
 
     // Override point for customization after application launch.
     return YES;

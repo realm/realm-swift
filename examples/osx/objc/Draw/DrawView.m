@@ -44,9 +44,12 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
     self.vendorID = host;
     if (self) {
         [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
-        [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                           serverBaseURL:[NSString stringWithFormat:@"realm://%@/draw", host]];
-        [RLMRealm setServerSyncLogLevel:1]; // `level >= 2` means "everything"
+        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/draw"];
+        configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        [RLMRealmConfiguration setDefaultConfiguration:configuration];
+
+        [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelLudicrous];
 
         self.notificationToken = [[RLMRealm defaultRealm] addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
             self.paths = [DrawPath allObjects];

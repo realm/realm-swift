@@ -28,9 +28,12 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                       serverBaseURL:@"realm://hydrogen.fr.sync.realm.io/puzzle"];
-    [RLMRealm setServerSyncLogLevel:1]; // `level >= 2` means "everything"
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/puzzle"];
+    configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    [RLMRealmConfiguration setDefaultConfiguration:configuration];
+
+    [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelLudicrous];
 
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window.backgroundColor = [UIColor blackColor];
