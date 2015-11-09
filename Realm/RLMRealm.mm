@@ -571,10 +571,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
             // notify any collections currently being enumerated that they need
             // to switch to enumerating a copy as the data may change on them
-            for (RLMFastEnumerator *enumerator in _collectionEnumerators) {
-                [enumerator detach];
-            }
-            _collectionEnumerators = nil;
+            [self detachAllEnumerators];
 
             RLMPromoteToWrite(*_sharedGroup, *_history, _schema);
 
@@ -746,6 +743,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         if (_sharedGroup->has_changed()) { // Throws
             if (_autorefresh) {
                 if (_group) {
+                    [self detachAllEnumerators];
                     RLMAdvanceRead(*_sharedGroup, *_history, _schema);
                 }
                 [self sendNotifications:RLMRealmDidChangeNotification];
@@ -773,6 +771,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         // advance transaction if database has changed
         if (_sharedGroup->has_changed()) { // Throws
             if (_group) {
+                [self detachAllEnumerators];
                 RLMAdvanceRead(*_sharedGroup, *_history, _schema);
             }
             else {
@@ -1020,6 +1019,13 @@ void RLMRealmSetSchemaVersionForPath(uint64_t version, NSString *path, RLMMigrat
 
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator {
     [_collectionEnumerators removeObject:enumerator];
+}
+
+- (void)detachAllEnumerators {
+    for (RLMFastEnumerator *enumerator in _collectionEnumerators) {
+        [enumerator detach];
+    }
+    _collectionEnumerators = nil;
 }
 
 @end

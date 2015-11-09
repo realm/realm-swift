@@ -22,6 +22,8 @@
   `List` or `RealmOptional` properties.
 * Fix crash when trying to retrieve object instances via `dynamicObjects`.
 * Add `Int8` support for `RealmOptional`, `MinMaxType` and `AddableType`.
+* Fix crashes or incorrect results when calling `-[RLMRealm refresh]` during
+  fast enumeration.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
