@@ -71,6 +71,7 @@ FOUNDATION_EXTERN NSData *RLMRealmValidatedEncryptionKey(NSData *key);
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator;
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator;
+- (void)detachAllEnumerators;
 
 - (void)sendNotifications:(NSString *)notification;
 - (void)notify;
