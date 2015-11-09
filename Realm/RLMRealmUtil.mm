@@ -97,6 +97,7 @@ public:
     }
 
     std::vector<ObserverState> get_observed_rows() override {
+        [_realm detachAllEnumerators];
         return RLMGetObservedRows(_realm.schema.objectSchema);
     }
 
