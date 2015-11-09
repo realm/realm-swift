@@ -52,6 +52,7 @@ namespace realm {
             bool cache = true;
             std::vector<char> encryption_key;
             util::Optional<std::string> sync_server_url;
+            util::Optional<std::string> sync_identity;
 
             std::unique_ptr<Schema> schema;
             uint64_t schema_version = ObjectStore::NotVersioned;

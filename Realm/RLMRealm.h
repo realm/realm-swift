@@ -475,7 +475,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
  */
 + (NSError *)migrateRealm:(RLMRealmConfiguration *)configuration;
 
-#pragma mark - Sync demo
+#pragma mark - Synchronization
 
 /**
  Set the log level for the synchronization network protocol. A value
@@ -484,12 +484,6 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
  be changed at any time, and by any thread.
 */
 + (void)setServerSyncLogLevel:(int)level;
-
-/**
- Set the user identity token used for synchronization.
- @param identity    Must be a 40-byte alphanumeric string (such as a hex SHA1 hash).
-*/
-+ (void)setSyncUserIdentity:(NSString*)identity;
 
 #pragma mark -
 
