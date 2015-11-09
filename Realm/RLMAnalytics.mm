@@ -189,10 +189,10 @@ static NSDictionary *RLMAnalyticsPayload() {
                      @"Binding": @"cocoa",
                      @"Language": isSwift ? @"swift" : @"objc",
                      @"Realm Version": REALM_COCOA_VERSION,
-#if TARGET_OS_IOS
-                     @"Target OS Type": @"ios",
-#elif TARGET_OS_WATCH
+#if TARGET_OS_WATCH
                      @"Target OS Type": @"watchos",
+#elif TARGET_OS_IPHONE
+                     @"Target OS Type": @"ios",
 #else
                      @"Target OS Type": @"osx",
 #endif

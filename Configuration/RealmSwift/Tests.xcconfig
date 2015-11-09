@@ -1,6 +1,5 @@
 SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos;
 SKIP_INSTALL = YES;
-FRAMEWORK_SEARCH_PATHS = $(inherited) $(REALM_FRAMEWORK_PATH);
 INFOPLIST_FILE = RealmSwift/Tests/RealmSwiftTests-Info.plist;
 PRODUCT_NAME = $(TARGET_NAME);
 SWIFT_OBJC_BRIDGING_HEADER = RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h
@@ -10,6 +9,6 @@ LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks 
 LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks;
 
 EXCLUDED_SOURCE_FILE_NAMES[sdk=iphone*] = build/osx/*;
-EXCLUDED_SOURCE_FILE_NAMES[sdk=macosx*] = build/ios-dynamic/*;
+EXCLUDED_SOURCE_FILE_NAMES[sdk=macosx*] = build/ios/*;
 
 TEST_HOST = $(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestHost;
