@@ -51,3 +51,6 @@ public typealias PropertyType = RLMPropertyType
 
 /// An opaque token used to unregister notification blocks from Realms.
 public typealias NotificationToken = RLMNotificationToken
+
+/// Log level for the synchronization network protocol.
+public typealias SyncLogLevel = RLMSyncLogLevel
