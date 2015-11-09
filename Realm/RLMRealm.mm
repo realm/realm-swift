@@ -1405,9 +1405,6 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
                 objectSchema.realm = realm;
             }
 
-            // Ensured by the SharedGroup constructor.
-            REALM_ASSERT(bool(cachedRealm.configuration.syncServerURL) == bool(realm.configuration.syncServerURL));
-
             if (realm.configuration.syncServerURL) {
                 if (![realm.configuration.syncServerURL isEqual:cachedRealm.configuration.syncServerURL]) {
                     @throw [NSException exceptionWithName:@"RLMException"
