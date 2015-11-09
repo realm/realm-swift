@@ -531,7 +531,15 @@ public final class Realm {
         }
     }
 
+    // MARK: Synchronization
+
+    /// Set the log level for the synchronization network protocol for all Realms.
+    public static func setGlobalSynchronizationLoggingLevel(level: SyncLogLevel) {
+        RLMRealm.setGlobalSynchronizationLoggingLevel(level)
+    }
+
     // MARK: Internal
+    
     internal var rlmRealm: RLMRealm
 
     internal init(_ rlmRealm: RLMRealm) {
