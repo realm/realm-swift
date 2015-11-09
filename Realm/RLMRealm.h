@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMDefines.h>
+#import <Realm/RLMConstants.h>
 
 @class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
@@ -477,13 +478,8 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
 #pragma mark - Synchronization
 
-/**
- Set the log level for the synchronization network protocol. A value
- less than, or equal to 1 is understood as "normal level", and a value
- greater than, or equal to 2 means "log everything". The log level may
- be changed at any time, and by any thread.
-*/
-+ (void)setServerSyncLogLevel:(int)level;
+/// Set the log level for the synchronization network protocol for all Realms.
++ (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level;
 
 #pragma mark -
 

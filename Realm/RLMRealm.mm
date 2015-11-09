@@ -1861,8 +1861,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     [_collectionEnumerators removeObject:enumerator];
 }
 
-+ (void)setServerSyncLogLevel:(int)level {
-    s_syncLogEverything = (level >= 2);
++ (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level {
+    s_syncLogEverything = level == RLMSyncLogLevelLudicrous;
 }
 
 @end

@@ -18,6 +18,14 @@
 
 #import <Foundation/Foundation.h>
 
+/// Log level for the synchronization network protocol.
+typedef NS_ENUM(NSUInteger, RLMSyncLogLevel) {
+    /// Normal logging level.
+    RLMSyncLogLevelNormal = 1,
+    /// Ludicrous logging level. Logs ALL THE THINGS.
+    RLMSyncLogLevelLudicrous = 2,
+};
+
 /**
  Property types supported in Realm models.
 
