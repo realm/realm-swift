@@ -4,22 +4,16 @@ Cocoa sync doc DRAFT
 Overview
 --------
 
-In general, synchronization is enabled when a server URL is specified. To enable synchronization for the default Realm, you need to set the `syncServerURL` property of the default Realm configuration as follows:
+In general, synchronization is enabled when a server URL is specified. To enable synchronization for the default Realm, you need to set the `syncServerURL` and `syncIdentity` properties of your RLMRealmConfiguration as follows:
 
 ```objc
 RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
 configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/my_app/foo"];
-[RLMRealmConfiguration setDefaultConfiguration:configuration];
+configuration.syncIdentity = @"..."; // 40-byte string
+[[RLMRealm alloc] initWithConfiguration:configuration error:nil];
 ```
 
-*(KS: Why is the `setDefaultConfiguration:` step needed? Couldn't the configuration object have been "live"?)*
-
-In addition, the sync server needs a user identification token. At present, this is a 40-byte alphanumeric string (such as a SHA1 of an e-mail address). In the future this will change to be a persisted cryptographic token. For now, set the user identity with:
-
-
-```objc
-[RLMRealm setSyncUserIdentity:@"..."];
-```
+In the future the `syncIdentity` will change from a string to be a persisted cryptographic token.
 
 You can set up sync from `didFinishLaunchingWithOptions:` in your implementation of `UIApplicationDelegate`.
 
@@ -32,10 +26,10 @@ Setting the server URL is enough to enable synchronization. If the server URL is
 You can adjust the amount of information logged by the synchronization process. For example, to get the maximum amount of information, do this:
 
 ```objc
-[RLMRealm setServerSyncLogLevel:2]; // Log everything
+[RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelVerbose];
 ```
 
-The default level is `1` (normal), and `0` means 'nothing'. Note, setting the log level to `2` can have a significant negative impact on the performance of your application.
+The default level is `RLMSyncLogLevelNormal`. Note, setting the log level to `RLMSyncLogLevelVerbose` can have a significant negative impact on the performance of your application.
 
 Before trying this out, you need to build Realm with synchronization support (this is still a manual process). See [Building Realm for iOS](#building-realm-for-ios) for more on this.
 
