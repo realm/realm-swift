@@ -273,12 +273,12 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 }
 
 - (void)setSyncIdentity:(NSString *)syncIdentity {
-    if ([syncIdentity lengthOfBytesUsingEncoding:NSUTF8StringEncoding] != 40) {
-        @throw RLMException(@"Sync identity must be exactly 40 bytes");
-    }
     if (!syncIdentity) {
         _config.sync_identity = realm::util::none;
     } else {
+        if ([syncIdentity lengthOfBytesUsingEncoding:NSUTF8StringEncoding] != 40) {
+            @throw RLMException(@"Sync identity must be exactly 40 bytes");
+        }
         _config.sync_identity = std::string(syncIdentity.UTF8String);
     }
 }
