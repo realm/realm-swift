@@ -25,7 +25,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.syncServerURL = [NSURL URLWithString:@"realm://Alexanders-MacBook-Pro.local/draw"];
+    configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/draw"];
     // configuration.syncIdentityServerURL = [NSURL URLWithString:@"https://sync-auth.realm.io"];
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
 

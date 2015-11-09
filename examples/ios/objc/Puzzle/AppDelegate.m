@@ -29,14 +29,14 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                       serverBaseURL:@"realm://Alexanders-MacBook-Pro.local/puzzle"];
+                       serverBaseURL:@"realm://hydrogen.fr.sync.realm.io/puzzle"];
     [RLMRealm setServerSyncLogLevel:1]; // `level >= 2` means "everything"
-    
+
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window.backgroundColor = [UIColor blackColor];
     self.window.rootViewController = [[RLMViewController alloc] init];
     [self.window makeKeyAndVisible];
-    
+
     return YES;
 }
 
