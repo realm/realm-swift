@@ -26,11 +26,10 @@
 {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/draw"];
-    // configuration.syncIdentityServerURL = [NSURL URLWithString:@"https://sync-auth.realm.io"];
+    configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
 
-    [RLMRealm setServerSyncLogLevel:1]; // `level >= 2` means "everything"
-    [RLMRealm setSyncUserIdentity:@"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"];
+    [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelVerbose];
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] init];

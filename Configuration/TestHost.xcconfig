@@ -6,6 +6,8 @@ INFOPLIST_FILE = Realm/Tests/TestHost/Info.plist;
 PRODUCT_NAME = $(TARGET_NAME);
 CLANG_MODULES_AUTOLINK = NO;
 ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+
 PRODUCT_BUNDLE_IDENTIFIER = io.realm.TestHost;
 
 OTHER_LDFLAGS[sdk=iphone*] = -framework UIKit;
@@ -13,3 +15,5 @@ OTHER_LDFLAGS[sdk=macosx*] = -framework Cocoa;
 
 PRINCIPAL_CLASS[sdk=iphone*] = UIApplication;
 PRINCIPAL_CLASS[sdk=macosx*] = NSApplication;
+
+IPHONEOS_DEPLOYMENT_TARGET = 7.0;

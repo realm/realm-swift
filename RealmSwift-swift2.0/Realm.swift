@@ -91,7 +91,7 @@ public final class Realm {
 
     - parameter block: The block to be executed inside a write transaction.
     */
-    public func write(block: (() -> Void)) throws {
+    public func write(@noescape block: (() -> Void)) throws {
         try rlmRealm.transactionWithBlock(block)
     }
 

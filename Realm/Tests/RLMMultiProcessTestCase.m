@@ -58,8 +58,17 @@
 
 - (void)setUp {
     self.isParent = !getenv("RLMProcessIsChild");
-    self.xctestPath = NSProcessInfo.processInfo.arguments[0];
+    self.xctestPath = [self locateXCTest];
     self.testsPath = [NSBundle bundleForClass:[self class]].bundlePath;
+
+    if (!self.isParent) {
+        // For multi-process tests, the child's concept of a default path needs to match the parent.
+        // RLMRealmConfiguration isn't aware of this, but our test's RLMDefaultRealmPath helper does.
+        // Use it to reset the default configuration's path so it matches the parent.
+        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        configuration.path = RLMDefaultRealmPath();
+        [RLMRealmConfiguration setDefaultConfiguration:configuration];
+    }
 
     [super setUp];
 }
@@ -75,11 +84,23 @@
     // Do nothing so that we can test global schema init in child processes
 }
 
+- (NSString *)locateXCTest {
+    NSString *pathString = [NSProcessInfo processInfo].environment[@"PATH"];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    for (NSString *directory in [pathString componentsSeparatedByString:@":"]) {
+        NSString *candidatePath = [directory stringByAppendingPathComponent:@"xctest"];
+        if ([fileManager isExecutableFileAtPath:candidatePath])
+            return candidatePath;
+    }
+    return nil;
+}
+
 #if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
 - (NSTask *)childTask {
     NSString *testName = [NSString stringWithFormat:@"%@/%@", self.className, self.testName];
     NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];
     env[@"RLMProcessIsChild"] = @"true";
+    env[@"RLMParentProcessBundleID"] = [NSBundle mainBundle].bundleIdentifier;
 
     // Don't inherit the config file in the subprocess, as multiple XCTest
     // processes talking to a single Xcode instance doesn't work at all
@@ -108,7 +129,7 @@
     // Filter the output from the child process to reduce xctest noise
     while (true) {
         NSUInteger newline;
-        while ((newline = [buffer rangeOfData:delimiter options:0 range:NSMakeRange(0, buffer.length)].location) != NSNotFound) {
+        while ((newline = [buffer rangeOfData:delimiter options:(NSDataSearchOptions)0 range:NSMakeRange(0, buffer.length)].location) != NSNotFound) {
             // Skip lines starting with "Test Case", "Test Suite" and "     Executed"
             const void *b = buffer.bytes;
             if (newline < 17 || (memcmp(b, "Test Suite", 10) && memcmp(b, "Test Case", 9) && memcmp(b, "	 Executed 1 test", 17))) {

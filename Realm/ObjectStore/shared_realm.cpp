@@ -19,7 +19,7 @@
 #include "shared_realm.hpp"
 
 #include "external_commit_helper.hpp"
-#include "realm_delegate.hpp"
+#include "binding_context.hpp"
 #include "schema.hpp"
 #include "transact_log_handler.hpp"
 
@@ -40,6 +40,7 @@ Realm::Config::Config(const Config& c)
 , cache(c.cache)
 , encryption_key(c.encryption_key)
 , sync_server_url(c.sync_server_url)
+, sync_identity(c.sync_identity)
 , schema_version(c.schema_version)
 , migration_function(c.migration_function)
 {
@@ -258,7 +259,7 @@ void Realm::begin_transaction()
     // make sure we have a read transaction
     read_group();
 
-    transaction::begin(*m_shared_group, *m_history, m_delegate.get());
+    transaction::begin(*m_shared_group, *m_history, m_binding_context.get());
     m_in_transaction = true;
 }
 
@@ -272,7 +273,7 @@ void Realm::commit_transaction()
     }
 
     m_in_transaction = false;
-    transaction::commit(*m_shared_group, *m_history, m_delegate.get());
+    transaction::commit(*m_shared_group, *m_history, m_binding_context.get());
     m_notifier->notify_others();
 }
 
@@ -286,7 +287,7 @@ void Realm::cancel_transaction()
     }
 
     m_in_transaction = false;
-    transaction::cancel(*m_shared_group, *m_history, m_delegate.get());
+    transaction::cancel(*m_shared_group, *m_history, m_binding_context.get());
 }
 
 void Realm::invalidate()
@@ -331,15 +332,15 @@ void Realm::notify()
     verify_thread();
 
     if (m_shared_group->has_changed()) { // Throws
-        if (m_delegate) {
-            m_delegate->changes_available();
+        if (m_binding_context) {
+            m_binding_context->changes_available();
         }
         if (m_auto_refresh) {
             if (m_group) {
-                transaction::advance(*m_shared_group, *m_history, m_delegate.get());
+                transaction::advance(*m_shared_group, *m_history, m_binding_context.get());
             }
-            else if (m_delegate) {
-                m_delegate->did_change({}, {});
+            else if (m_binding_context) {
+                m_binding_context->did_change({}, {});
             }
         }
     }
@@ -362,7 +363,7 @@ bool Realm::refresh()
     }
 
     if (m_group) {
-        transaction::advance(*m_shared_group, *m_history, m_delegate.get());
+        transaction::advance(*m_shared_group, *m_history, m_binding_context.get());
     }
     else {
         // Create the read transaction

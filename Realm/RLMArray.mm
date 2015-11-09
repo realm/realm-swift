@@ -174,7 +174,7 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
     // reflect changes made during enumeration. This copy has to be autoreleased
     // (since there's nowhere for us to store a strong reference), and uses
     // RLMArrayHolder rather than an NSArray because NSArray doesn't guarantee
-    // that it'll use a single contiugous block of memory, and if it doesn't
+    // that it'll use a single contiguous block of memory, and if it doesn't
     // we'd need to forward multiple calls to this method to the same NSArray,
     // which would require holding a reference to it somewhere.
     __autoreleasing RLMArrayHolder *copy = [[RLMArrayHolder alloc] init];

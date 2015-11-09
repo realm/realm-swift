@@ -8,6 +8,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Queries are no longer limited to 16 levels of grouping.
+* The block parameter of `-[RLMRealm transactionWithBlock:]`/`Realm.write(_:)` is 
+  now marked as `__attribute__((noescape))`/`@noescape`.
 
 ### Bugfixes
 

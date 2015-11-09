@@ -63,6 +63,8 @@ RLM_ASSUME_NONNULL_BEGIN
 /// The classes persisted in the Realm.
 @property (nonatomic, copy, nullable) NSArray *objectClasses;
 
+#pragma mark - Synchronization
+
 /**
  The synchronization server URL.
 
@@ -72,6 +74,12 @@ RLM_ASSUME_NONNULL_BEGIN
  When `nil`, synchronization is disabled. Defaults to `nil`.
 */
 @property (nonatomic, copy, nullable) NSURL *syncServerURL;
+
+/**
+ The user identity token used for synchronization.
+ Must be a 40-byte alphanumeric string (such as a hex SHA1 hash).
+*/
+@property (nonatomic, copy, nullable) NSString *syncIdentity;
 
 @end
 

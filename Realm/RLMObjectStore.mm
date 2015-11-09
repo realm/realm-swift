@@ -38,7 +38,6 @@
 
 using namespace realm;
 
-
 // Schema used to created generated accessors
 static NSMutableArray * const s_accessorSchema = [NSMutableArray new];
 

@@ -35,13 +35,16 @@ static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"migrationBlock",
     @"dynamic",
     @"customSchema",
+    @"syncServerURL",
+    @"syncIdentity",
 };
 
 static NSString *const c_defaultRealmFileName = @"default.realm";
 RLMRealmConfiguration *s_defaultConfiguration;
 
-NSString *RLMRealmPathForFile(NSString *fileName) {
+NSString *RLMRealmPathForFileAndBundleIdentifier(NSString *fileName, NSString *bundleIdentifier) {
 #if TARGET_OS_IPHONE
+    (void)bundleIdentifier;
     // On iOS the Documents directory isn't user-visible, so put files there
     NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
 #else
@@ -50,11 +53,14 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     // to avoid accidentally sharing files between applications
     NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
     if (![[NSProcessInfo processInfo] environment][@"APP_SANDBOX_CONTAINER_ID"]) {
-        NSString *identifier = [[NSBundle mainBundle] bundleIdentifier];
-        if ([identifier length] == 0) {
-            identifier = [[[NSBundle mainBundle] executablePath] lastPathComponent];
+        if (!bundleIdentifier) {
+            bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
         }
-        path = [path stringByAppendingPathComponent:identifier];
+        if (!bundleIdentifier) {
+            bundleIdentifier = [NSBundle mainBundle].executablePath.lastPathComponent;
+        }
+
+        path = [path stringByAppendingPathComponent:bundleIdentifier];
 
         // create directory
         [[NSFileManager defaultManager] createDirectoryAtPath:path
@@ -64,6 +70,10 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     }
 #endif
     return [path stringByAppendingPathComponent:fileName];
+}
+
+NSString *RLMRealmPathForFile(NSString *fileName) {
+    return RLMRealmPathForFileAndBundleIdentifier(fileName, nil);
 }
 
 @implementation RLMRealmConfiguration {
@@ -236,18 +246,41 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     _config.schema = [_customSchema objectStoreCopy];
 }
 
+#pragma mark - Synchronization
+
 - (NSURL *)syncServerURL {
-    if (!_config.sync_server_url)
+    if (!_config.sync_server_url) {
         return nil;
+    }
 
     return [NSURL URLWithString:@(_config.sync_server_url->c_str())];
 }
 
 - (void)setSyncServerURL:(NSURL *)syncServerURL {
-    if (!syncServerURL)
+    if (!syncServerURL) {
         _config.sync_server_url = realm::util::none;
-    else
+    } else {
         _config.sync_server_url = std::string([[syncServerURL absoluteString] UTF8String]);
+    }
+}
+
+- (NSString *)syncIdentity {
+    if (!_config.sync_identity) {
+        return nil;
+    }
+
+    return @(_config.sync_identity->c_str());
+}
+
+- (void)setSyncIdentity:(NSString *)syncIdentity {
+    if ([syncIdentity lengthOfBytesUsingEncoding:NSUTF8StringEncoding] != 40) {
+        @throw RLMException(@"Sync identity must be exactly 40 bytes");
+    }
+    if (!syncIdentity) {
+        _config.sync_identity = realm::util::none;
+    } else {
+        _config.sync_identity = std::string(syncIdentity.UTF8String);
+    }
 }
 
 @end

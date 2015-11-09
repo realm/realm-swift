@@ -31,7 +31,7 @@ namespace realm {
     class ClientHistory;
     class Realm;
     class RealmCache;
-    class RealmDelegate;
+    class BindingContext;
     typedef std::shared_ptr<Realm> SharedRealm;
     typedef std::weak_ptr<Realm> WeakRealm;
 
@@ -52,6 +52,7 @@ namespace realm {
             bool cache = true;
             std::vector<char> encryption_key;
             util::Optional<std::string> sync_server_url;
+            util::Optional<std::string> sync_identity;
 
             std::unique_ptr<Schema> schema;
             uint64_t schema_version = ObjectStore::NotVersioned;
@@ -124,7 +125,7 @@ namespace realm {
         std::shared_ptr<_impl::ExternalCommitHelper> m_notifier;
 
       public:
-        std::unique_ptr<RealmDelegate> m_delegate;
+        std::unique_ptr<BindingContext> m_binding_context;
 
         // FIXME private
         Group *read_group();

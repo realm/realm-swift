@@ -62,8 +62,6 @@ unsigned long s_lastServerConnectionIdent = 0;
 
 std::atomic<bool> s_syncLogEverything(false);
 
-NSString* s_syncUserIdentity = nil;
-
 // Instances of RLMServerConnection and RLMSyncSession may be created by any
 // thread, but all instance methods must be called by the main thread, except
 // backgroundTask and backgroundApplyChangeset in RLMSyncSession which are
@@ -76,6 +74,7 @@ NSString* s_syncUserIdentity = nil;
 
 @interface RLMServerConnection : NSObject <NSStreamDelegate>
 @property (readonly, nonatomic) unsigned long ident; // Used only for logging
+@property (readonly, nonatomic) NSString *identity;
 @property (readonly, nonatomic) BOOL isOpen;
 @end
 
@@ -165,11 +164,14 @@ NSString* s_syncUserIdentity = nil;
 }
 
 
-- (instancetype)initWithIdent:(unsigned long)ident address:(NSString *)address
+- (instancetype)initWithIdent:(unsigned long)ident
+                     identity:(NSString *)identity
+                      address:(NSString *)address
                          port:(NSNumber *)port {
     self = [super init];
     if (self) {
         _ident = ident;
+        _identity = [identity copy];
         _isOpen = NO;
 
         _address = address;
@@ -296,12 +298,11 @@ NSString* s_syncUserIdentity = nil;
     // Realm and `userIdent` could for example be the concattenation of a user
     // name and a password).
     NSData *applicationIdent = [@"dummy_app"  dataUsingEncoding:NSUTF8StringEncoding];
-    NSString* userIdent = s_syncUserIdentity;
-    if (userIdent == nil) {
+    if (self.identity == nil) {
         NSLog(@"RealmSync: No user identity set (using default, which probably won't work).");
-        userIdent = @"dummy_user";
+        _identity = @"dummy_user";
     }
-    NSData *userIdentData    = [userIdent dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *userIdentData = [self.identity dataUsingEncoding:NSUTF8StringEncoding];
 
     NSMutableData *body = [applicationIdent mutableCopy];
     [body appendData:userIdentData];
@@ -1404,9 +1405,6 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
                 objectSchema.realm = realm;
             }
 
-            // Ensured by the SharedGroup constructor.
-            REALM_ASSERT(bool(cachedRealm.configuration.syncServerURL) == bool(realm.configuration.syncServerURL));
-
             if (realm.configuration.syncServerURL) {
                 if (![realm.configuration.syncServerURL isEqual:cachedRealm.configuration.syncServerURL]) {
                     @throw [NSException exceptionWithName:@"RLMException"
@@ -1439,6 +1437,7 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
                     if (!conn) {
                         unsigned long serverConnectionIdent = ++s_lastServerConnectionIdent;
                         conn = [[RLMServerConnection alloc] initWithIdent:serverConnectionIdent
+                                                                 identity:realm.configuration.syncIdentity
                                                                   address:serverBaseURL.host
                                                                      port:serverBaseURL.port];
                         [s_serverConnections setObject:conn forKey:hostKey];
@@ -1488,7 +1487,7 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
     if (!readOnly) {
         // initializing the schema started a read transaction, so end it
         [realm invalidate];
-        realm->_realm->m_delegate = RLMCreateRealmDelegate(realm);
+        realm->_realm->m_binding_context = RLMCreateBindingContext(realm);
     }
 
     return RLMAutorelease(realm);
@@ -1856,19 +1855,14 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         _collectionEnumerators = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
     }
     [_collectionEnumerators addObject:enumerator];
-
 }
 
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator {
     [_collectionEnumerators removeObject:enumerator];
 }
 
-+ (void)setServerSyncLogLevel:(int)level {
-    s_syncLogEverything = (level >= 2);
-}
-
-+ (void)setSyncUserIdentity:(NSString *)identity {
-    s_syncUserIdentity = identity;
++ (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level {
+    s_syncLogEverything = level == RLMSyncLogLevelVerbose;
 }
 
 @end

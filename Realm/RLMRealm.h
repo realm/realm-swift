@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMDefines.h>
+#import <Realm/RLMConstants.h>
 
 @class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
@@ -244,7 +245,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Helper to perform a block within a transaction.
  */
-- (void)transactionWithBlock:(void(^)(void))block RLM_SWIFT_UNAVAILABLE("");
+- (void)transactionWithBlock:(RLM_NOESCAPE void(^)(void))block RLM_SWIFT_UNAVAILABLE("");
 
 /**
  Helper to perform a block within a transaction.
@@ -256,7 +257,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  @return Whether the transaction succeeded.
  */
-- (BOOL)transactionWithBlock:(void(^)(void))block error:(NSError **)error;
+- (BOOL)transactionWithBlock:(RLM_NOESCAPE void(^)(void))block error:(NSError **)error;
 
 /**
  Update an `RLMRealm` and outstanding objects to point to the most recent data for this `RLMRealm`.
@@ -475,21 +476,10 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
  */
 + (NSError *)migrateRealm:(RLMRealmConfiguration *)configuration;
 
-#pragma mark - Sync demo
+#pragma mark - Synchronization
 
-/**
- Set the log level for the synchronization network protocol. A value
- less than, or equal to 1 is understood as "normal level", and a value
- greater than, or equal to 2 means "log everything". The log level may
- be changed at any time, and by any thread.
-*/
-+ (void)setServerSyncLogLevel:(int)level;
-
-/**
- Set the user identity token used for synchronization.
- @param identity    Must be a 40-byte alphanumeric string (such as a hex SHA1 hash).
-*/
-+ (void)setSyncUserIdentity:(NSString*)identity;
+/// Set the log level for the synchronization network protocol for all Realms.
++ (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level;
 
 #pragma mark -
 
