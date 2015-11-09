@@ -23,7 +23,7 @@
     configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
 
-    [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelLudicrous];
+    [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelVerbose];
 
     // Override point for customization after application launch.
     return YES;

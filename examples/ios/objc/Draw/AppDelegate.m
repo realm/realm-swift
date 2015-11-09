@@ -29,7 +29,7 @@
     configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
 
-    [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelLudicrous];
+    [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelVerbose];
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] init];

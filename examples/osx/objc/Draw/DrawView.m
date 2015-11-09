@@ -49,7 +49,7 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
         configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
         [RLMRealmConfiguration setDefaultConfiguration:configuration];
 
-        [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelLudicrous];
+        [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelVerbose];
 
         self.notificationToken = [[RLMRealm defaultRealm] addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
             self.paths = [DrawPath allObjects];

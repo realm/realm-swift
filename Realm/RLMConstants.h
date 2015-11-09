@@ -22,8 +22,8 @@
 typedef NS_ENUM(NSUInteger, RLMSyncLogLevel) {
     /// Normal logging level.
     RLMSyncLogLevelNormal = 1,
-    /// Ludicrous logging level. Logs ALL THE THINGS.
-    RLMSyncLogLevelLudicrous = 2,
+    /// Verbose logging level. Logs ALL THE THINGS.
+    RLMSyncLogLevelVerbose = 2,
 };
 
 /**

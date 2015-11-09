@@ -29,7 +29,7 @@
     configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
 
-    [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelLudicrous];
+    [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelVerbose];
     return YES;
 }
 

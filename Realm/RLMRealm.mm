@@ -1862,7 +1862,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level {
-    s_syncLogEverything = level == RLMSyncLogLevelLudicrous;
+    s_syncLogEverything = level == RLMSyncLogLevelVerbose;
 }
 
 @end
