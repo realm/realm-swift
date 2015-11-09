@@ -26,9 +26,11 @@
 {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.syncServerURL = [NSURL URLWithString:@"realm://Alexanders-MacBook-Pro.local/draw"];
+    // configuration.syncIdentityServerURL = [NSURL URLWithString:@"https://sync-auth.realm.io"];
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
 
     [RLMRealm setServerSyncLogLevel:1]; // `level >= 2` means "everything"
+    [RLMRealm setSyncUserIdentity:@"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"];
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] init];
