@@ -20,9 +20,9 @@ import Foundation
 import Realm
 
 /**
-This class represents properties persisted to Realm in an ObjectSchema.
+This class represents properties persisted to Realm in an `ObjectSchema`.
 
-When using Realm, Property objects allow performing migrations and
+When using Realm, `Property` objects allow performing migrations and
 introspecting the database's schema.
 
 These properties map to columns in the core database.
@@ -42,7 +42,7 @@ public final class Property: CustomStringConvertible {
     /// Whether this property is indexed.
     public var indexed: Bool { return rlmProperty.indexed }
 
-    ///  Whether this property is optional (can contain `nil` values).
+    /// Whether this property is optional (can contain `nil` values).
     public var optional: Bool { return rlmProperty.optional }
 
     /// Object class name - specify object types for `Object` and `List` properties.

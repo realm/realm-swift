@@ -36,6 +36,7 @@ class Dog: Object {
 
 - `String`, `NSString`
 - `Int`
+- `Int8`, `Int16`, `Int32`, `Int64`
 - `Float`
 - `Double`
 - `Bool`
@@ -46,10 +47,10 @@ class Dog: Object {
 - `List<T: Object>` for to-many relationships
 
 `String`, `NSString`, `NSDate`, `NSData` and `Object` subclass properties can be
-optional. `Int`, `Float`, `Double`, `Bool` and `List` properties cannot. To store
-an optional number, instead use `RealmOptional<Int>`, `RealmOptional<Float>`,
-`RealmOptional<Double>`, or `RealmOptional<Bool>` instead, which wraps an optional
-value of the generic type.
+optional. `Int`, `Int8`, Int16`, Int32`, `Int64`, `Float`, `Double`, `Bool` 
+and `List` properties cannot. To store an optional number, instead use 
+`RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or 
+`RealmOptional<Bool>` instead, which wraps an optional value of the generic type.
 
 All property types except for `List` and `RealmOptional` *must* be declared as
 `dynamic var`. `List` and `RealmOptional` properties must be declared as
@@ -57,8 +58,8 @@ non-dynamic `let` properties.
 
 ### Querying
 
-You can gets `Results` of an Object subclass via tha `objects(_:)` free function or
-the `objects(_:)` instance method on `Realm`.
+You can gets `Results` of an Object subclass via the `objects(_:)` instance 
+method on `Realm`.
 
 ### Relationships
 
@@ -69,7 +70,7 @@ public class Object: RLMObjectBase {
     // MARK: Initializers
 
     /**
-    Initialize a standalone (unpersisted) Object.
+    Initialize a standalone (unpersisted) `Object`.
     Call `add(_:)` on a `Realm` to add standalone objects to a realm.
 
     - see: Realm().add(_:)
@@ -158,13 +159,13 @@ public class Object: RLMObjectBase {
     // MARK: Inverse Relationships
 
     /**
-    Get an `Array` of objects of type `className` which have this object as the given property value. This can
+    Get an `Array` of objects of type `T` which have this object as the given property value. This can
     be used to get the inverse relationship value for `Object` and `List` properties.
 
-    - parameter className: The type of object on which the relationship to query is defined.
-    - parameter property:  The name of the property which defines the relationship.
+    - parameter type:          The type of object on which the relationship to query is defined.
+    - parameter propertyName:  The name of the property which defines the relationship.
 
-    - returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
+    - returns: An `Array` of objects of type `T` which have this object as their value for the `propertyName` property.
     */
     public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
         // FIXME: use T.className()

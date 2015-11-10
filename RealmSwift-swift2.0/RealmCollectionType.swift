@@ -82,7 +82,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
 
     - parameter predicate: The `NSPredicate` used to filter the objects.
 
-    - returns: The index of the given object, or `nil` if no objects match.
+    - returns: The index of the first matching object, or `nil` if no objects match.
     */
     func indexOf(predicate: NSPredicate) -> Int?
 
@@ -93,7 +93,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     - parameter predicateFormat: The predicate format string, optionally followed by a variable number
     of arguments.
 
-    - returns: The index of the given object, or `nil` if no objects match.
+    - returns: The index of the first matching object, or `nil` if no objects match.
     */
     func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int?
 
@@ -191,18 +191,18 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     // MARK: Key-Value Coding
 
     /**
-    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    Returns an Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
 
     - parameter key: The name of the property.
 
-    - returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
     func valueForKey(key: String) -> AnyObject?
 
     /**
-    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+    Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
 
-    :warning: This method can only be called during a write transaction.
+    - warning: This method can only be called during a write transaction.
 
     - parameter value: The object value.
     - parameter key:   The name of the property.
@@ -271,7 +271,7 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
 
     - parameter predicate: The `NSPredicate` used to filter the objects.
 
-    - returns: The index of the given object, or `nil` if no objects match.
+    - returns: The index of the first matching object, or `nil` if no objects match.
     */
     override func indexOf(predicate: NSPredicate) -> Int? { return base.indexOf(predicate) }
 
@@ -282,7 +282,7 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     - parameter predicateFormat: The predicate format string, optionally followed by a variable number
     of arguments.
 
-    - returns: The index of the given object, or `nil` if no objects match.
+    - returns: The index of the first matching object, or `nil` if no objects match.
     */
     override func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? { return base.indexOf(NSPredicate(format: predicateFormat, argumentArray: args)) }
 
@@ -405,18 +405,18 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     // MARK: Key-Value Coding
 
     /**
-    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    Returns an Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
 
     - parameter key: The name of the property.
 
-    - returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
     override func valueForKey(key: String) -> AnyObject? { return base.valueForKey(key) }
 
     /**
-    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+    Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
 
-    :warning: This method can only be called during a write transaction.
+    - warning: This method can only be called during a write transaction.
 
     - parameter value: The object value.
     - parameter key:   The name of the property.
@@ -472,7 +472,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
 
     - parameter predicate: The `NSPredicate` used to filter the objects.
 
-    - returns: The index of the given object, or `nil` if no objects match.
+    - returns: The index of the first matching object, or `nil` if no objects match.
     */
     public func indexOf(predicate: NSPredicate) -> Int? { return base.indexOf(predicate) }
 
@@ -483,7 +483,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     - parameter predicateFormat: The predicate format string, optionally followed by a variable number
     of arguments.
 
-    - returns: The index of the given object, or `nil` if no objects match.
+    - returns: The index of the first matching object, or `nil` if no objects match.
     */
     public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? { return base.indexOf(NSPredicate(format: predicateFormat, argumentArray: args)) }
 
@@ -606,18 +606,18 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     // MARK: Key-Value Coding
 
     /**
-    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    Returns an Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
 
     - parameter key: The name of the property.
 
-    - returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
     public func valueForKey(key: String) -> AnyObject? { return base.valueForKey(key) }
 
     /**
-    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+    Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
 
-    :warning: This method can only be called during a write transaction.
+    - warning: This method can only be called during a write transaction.
 
     - parameter value: The object value.
     - parameter key:   The name of the property.
