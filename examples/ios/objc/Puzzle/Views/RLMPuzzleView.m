@@ -141,12 +141,10 @@
         }
     }
     
+    __block NSInteger pieceIndex = RLMPuzzlePieceIdentifierA1;
     [UIView animateWithDuration:1.5f delay:1.5f usingSpringWithDamping:1.0f initialSpringVelocity:0.2f options:0 animations:^{
         for (RLMPuzzlePieceView *piece in self.puzzlePieces) {
-            CGPoint point = CGPointZero;
-            point.x = frame.origin.x + arc4random() % (NSInteger)((frame.origin.x+frame.size.width)-frame.origin.x);
-            point.y = frame.origin.y + arc4random() % (NSInteger)((frame.origin.y+frame.size.height)-frame.origin.y);
-            piece.center = point;
+            piece.center = [points[pieceIndex++] CGPointValue];
         }
     } completion:nil];
 }

@@ -54,7 +54,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
 - (instancetype)init
 {
     if (self = [super init]) {
-        [self setupNotifications];
+        
     }
     
     return self;
@@ -154,8 +154,8 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
         self.startView.alpha = 0.0f;
     } completion:^(BOOL complete) {
         [self.startView removeFromSuperview];
-        
         [self.puzzleView scramblePiecesAnimated];
+        [self setupNotifications];
     }];
 }
 
