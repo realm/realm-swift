@@ -519,7 +519,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
         return nil;
     }
 
-    return RLMCreateObjectAccessor(realm, objectSchema, (*objectSchema.table)[row]);
+    return RLMCreateObjectAccessor(realm, objectSchema, row);
 }
 
 RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm,
