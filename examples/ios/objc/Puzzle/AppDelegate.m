@@ -28,6 +28,9 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    application.applicationSupportsShakeToEdit = YES;
+    
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/puzzle"];
     configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
