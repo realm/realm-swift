@@ -336,6 +336,7 @@ public class ObjectUtil: NSObject {
             } else if mirror.valueType is Optional<Object>.Type {
                 properties[name] = Int(PropertyType.Object.rawValue)
             } else if mirror.valueType is RealmOptional<Int>.Type ||
+                      mirror.valueType is RealmOptional<Int8>.Type ||
                       mirror.valueType is RealmOptional<Int16>.Type ||
                       mirror.valueType is RealmOptional<Int32>.Type ||
                       mirror.valueType is RealmOptional<Int64>.Type {

@@ -15,6 +15,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix crashes or incorrect results when calling `-[RLMRealm refresh]` during
   fast enumeration.
+* Add `Int8` support for `RealmOptional`, `MinMaxType` and `AddableType`.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================

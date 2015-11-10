@@ -455,6 +455,7 @@ class ObjectCreationTests: TestCase {
     private func verifySwiftOptionalObjectWithDictionaryLiteral(object: SwiftOptionalDefaultValuesObject, dictionary: [String:AnyObject], boolObjectValue: Bool?) {
         XCTAssertEqual(object.optBoolCol.value, (dictionary["optBoolCol"] as! Bool?))
         XCTAssertEqual(object.optIntCol.value, (dictionary["optIntCol"] as! Int?))
+        XCTAssertEqual(object.optInt8Col.value, ((dictionary["optInt8Col"] as! NSNumber?)?.longValue).map({Int8($0)}))
         XCTAssertEqual(object.optInt16Col.value, ((dictionary["optInt16Col"] as! NSNumber?)?.longValue).map({Int16($0)}))
         XCTAssertEqual(object.optInt32Col.value, ((dictionary["optInt32Col"] as! NSNumber?)?.longValue).map({Int32($0)}))
         XCTAssertEqual(object.optInt64Col.value, (dictionary["optInt64Col"] as! NSNumber?)?.longLongValue)
