@@ -251,7 +251,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _objectSchema);
     size_t index = query.find();
     if (index == realm::not_found) {
-        return (NSUInteger)NSNotFound;
+        return NSNotFound;
     }
     return _results.index_of(index);
 }
