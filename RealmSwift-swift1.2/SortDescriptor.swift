@@ -55,7 +55,7 @@ public struct SortDescriptor {
 
     // MARK: Functions
 
-    /// Returns a copy of the receiver with the sort order reversed.
+    /// Returns a copy of the `SortDescriptor` with the sort order reversed.
     public func reversed() -> SortDescriptor {
         return SortDescriptor(property: property, ascending: !ascending)
     }

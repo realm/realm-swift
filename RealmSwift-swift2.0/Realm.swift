@@ -213,6 +213,8 @@ public final class Realm {
 
     - see: add(_:update:)
 
+    - warning: This method can only be called during a write transaction.
+
     - parameter objects: A sequence which contains objects to be added to this Realm.
     - parameter update: If true will try to update existing objects with the same primary key.
     */
@@ -231,6 +233,8 @@ public final class Realm {
     When 'update' is 'true', the object must have a primary key. If no objects exist in
     the Realm instance with the same primary key value, the object is inserted. Otherwise,
     the existing object is updated with any changed values.
+
+    - warning: This method can only be called during a write transaction.
 
     - parameter type:   The object type to create.
     - parameter value:  The value used to populate the object. This can be any key/value coding compliant
@@ -264,6 +268,8 @@ public final class Realm {
     the Realm instance with the same primary key value, the object is inserted. Otherwise,
     the existing object is updated with any changed values.
 
+    - warning: This method can only be called during a write transaction.
+
     - parameter className:  The class name of the object to create.
     - parameter value:      The value used to populate the object. This can be any key/value coding compliant
     object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
@@ -290,6 +296,8 @@ public final class Realm {
     /**
     Deletes the given object from this Realm.
 
+    - warning: This method can only be called during a write transaction.
+
     - parameter object: The object to be deleted.
     */
     public func delete(object: Object) {
@@ -298,6 +306,8 @@ public final class Realm {
 
     /**
     Deletes the given objects from this Realm.
+
+    - warning: This method can only be called during a write transaction.
 
     - parameter objects: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
                          or any other enumerable SequenceType which generates Object.
@@ -311,6 +321,8 @@ public final class Realm {
     /**
     Deletes the given objects from this Realm.
 
+    - warning: This method can only be called during a write transaction.
+
     - parameter objects: The objects to be deleted. Must be `List<Object>`.
 
     :nodoc:
@@ -322,6 +334,8 @@ public final class Realm {
     /**
     Deletes the given objects from this Realm.
 
+    - warning: This method can only be called during a write transaction.
+
     - parameter objects: The objects to be deleted. Must be `Results<Object>`.
 
     :nodoc:
@@ -332,6 +346,8 @@ public final class Realm {
 
     /**
     Deletes all objects from this Realm.
+
+    - warning: This method can only be called during a write transaction.
     */
     public func deleteAll() {
         RLMDeleteAllObjectsFromRealm(rlmRealm)
