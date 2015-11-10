@@ -174,4 +174,22 @@
     return YES;
 }
 
+- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
+{
+    if (motion == UIEventSubtypeMotionShake)
+    {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Reset Canvas?" message:@"This will clear the Realm database and reset the canvas. Are you sure you wish to proceed?" preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [[RLMRealm defaultRealm] transactionWithBlock:^{
+                [[RLMRealm defaultRealm] deleteAllObjects];
+            }];
+            
+            [self setNeedsDisplay];
+        }]];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        
+        [[[[UIApplication sharedApplication] keyWindow] rootViewController] presentViewController:alertController animated:YES completion:nil];
+    }
+}
+
 @end
