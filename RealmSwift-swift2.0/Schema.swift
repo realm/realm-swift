@@ -25,7 +25,7 @@ This class represents the collection of model object schemas persisted to Realm.
 When using Realm, `Schema` objects allow performing migrations and
 introspecting the database's schema.
 
-Schemas map to collections of tables in the core database.
+`Schema`s map to collections of tables in the core database.
 */
 public final class Schema: CustomStringConvertible {
 
