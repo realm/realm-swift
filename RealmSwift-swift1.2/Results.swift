@@ -25,10 +25,11 @@ import Realm
 public protocol MinMaxType {}
 extension Double: MinMaxType {}
 extension Float: MinMaxType {}
+extension Int: MinMaxType {}
+extension Int8: MinMaxType {}
 extension Int16: MinMaxType {}
 extension Int32: MinMaxType {}
 extension Int64: MinMaxType {}
-extension Int: MinMaxType {}
 extension NSDate: MinMaxType {}
 
 // MARK: AddableType
@@ -37,10 +38,11 @@ extension NSDate: MinMaxType {}
 public protocol AddableType {}
 extension Double: AddableType {}
 extension Float: AddableType {}
+extension Int: AddableType {}
+extension Int8: AddableType {}
 extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
-extension Int: AddableType {}
 
 /// :nodoc:
 /// Internal class. Do not use directly.

@@ -21,6 +21,7 @@
 * Fix memory leak when using Object(value:) for subclasses with
   `List` or `RealmOptional` properties.
 * Fix crash when trying to retrieve object instances via `dynamicObjects`.
+* Add `Int8` support for `RealmOptional`, `MinMaxType` and `AddableType`.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
