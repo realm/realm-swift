@@ -20,12 +20,12 @@ import Foundation
 import Realm
 
 /**
-This class represents Realm model object schemas persisted to Realm in a Schema.
+This class represents Realm model object schemas.
 
-When using Realm, ObjectSchema objects allow performing migrations and
+When using Realm, `ObjectSchema` objects allow performing migrations and
 introspecting the database's schema.
 
-Object schemas map to tables in the core database.
+`ObjectSchema`s map to tables in the core database.
 */
 public final class ObjectSchema: CustomStringConvertible {
 
