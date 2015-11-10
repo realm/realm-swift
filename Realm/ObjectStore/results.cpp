@@ -272,7 +272,7 @@ void Results::clear()
             m_table->clear();
             break;
         case Mode::Query:
-            // Not using Query:remove() because bulding the tableview and
+            // Not using Query:remove() because building the tableview and
             // clearing it is actually significantly faster
         case Mode::TableView:
             validate_write();
