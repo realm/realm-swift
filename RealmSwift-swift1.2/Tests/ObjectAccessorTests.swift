@@ -262,6 +262,15 @@ class ObjectAccessorTests: TestCase {
         object.optIntCol.value = nil
         XCTAssertNil(object.optIntCol.value)
 
+        object.optInt8Col.value = Int8.min
+        XCTAssertEqual(object.optInt8Col.value!, Int8.min)
+        object.optInt8Col.value = 0
+        XCTAssertEqual(object.optInt8Col.value!, 0)
+        object.optInt8Col.value = Int8.max
+        XCTAssertEqual(object.optInt8Col.value!, Int8.max)
+        object.optInt8Col.value = nil
+        XCTAssert(object.optInt8Col.value == nil)
+
         object.optInt16Col.value = Int16.min
         XCTAssertEqual(object.optInt16Col.value!, Int16.min)
         object.optInt16Col.value = 0

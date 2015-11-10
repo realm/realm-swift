@@ -329,6 +329,7 @@ public class ObjectUtil: NSObject {
             } else if type is Optional<Object>.Type {
                 properties[name] = Int(PropertyType.Object.rawValue)
             } else if type is RealmOptional<Int>.Type ||
+                      type is RealmOptional<Int8>.Type ||
                       type is RealmOptional<Int16>.Type ||
                       type is RealmOptional<Int32>.Type ||
                       type is RealmOptional<Int64>.Type {
