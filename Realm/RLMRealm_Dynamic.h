@@ -25,10 +25,8 @@
 
 @interface RLMRealm (Dynamic)
 
-/**---------------------------------------------------------------------------------------
- *  @name Getting Objects from a Realm
- * ---------------------------------------------------------------------------------------
- */
+#pragma mark - Getting Objects from a Realm
+
 /**
  This method is useful only in specialized circumstances, for example, when building components
  that integrate with Realm. If you are simply building an app on Realm, it is

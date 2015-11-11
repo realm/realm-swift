@@ -39,9 +39,9 @@ namespace realm {
         PropertyTypeAny    = 6,
         /** Date type: NSDate */
         PropertyTypeDate   = 7,
-        /** Object type. See [Realm Models](http://realm.io/docs/cocoa/latest/#models) */
+        /** Object type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
         PropertyTypeObject = 12,
-        /** Array type. See [Realm Models](http://realm.io/docs/cocoa/latest/#models) */
+        /** Array type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
         PropertyTypeArray  = 13,
     };
 

@@ -27,7 +27,7 @@
   </head>
   <body>
     {{#dash_type}}
-    <a name="//apple_ref/swift/{{dash_type}}/{{name}}" class="dashAnchor"></a>
+    <a name="//apple_ref/{{language_stub}}/{{dash_type}}/{{name}}" class="dashAnchor"></a>
     {{/dash_type}}
     <a title="{{name}} {{kind}} Reference"></a>
     {{> header}}
@@ -44,6 +44,13 @@
         <section>
           <section class="section">
             {{^hide_name}}<h1>{{name}}</h1>{{/hide_name}}
+            {{#declaration}}
+              <div class="declaration">
+                <div class="language">
+                  {{{declaration}}}
+                </div>
+              </div>
+            {{/declaration}}
             {{{overview}}}
           </section>
           {{> tasks}}
