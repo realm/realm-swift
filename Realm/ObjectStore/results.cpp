@@ -324,7 +324,7 @@ Results Results::sort(realm::SortOrder&& sort) const
 
 Results Results::filter(Query&& q) const
 {
-    return Results(m_realm, get_query().and_query(q), get_sort());
+    return Results(m_realm, get_query().and_query(std::move(q)), get_sort());
 }
 
 Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t column, const Table* table) {
