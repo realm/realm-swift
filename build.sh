@@ -264,6 +264,8 @@ build_docs() {
       --root-url https://realm.io/docs/${language}/${version}/api/ \
       --output $(pwd)/docs/${language}_output \
       --template-directory $(pwd)/docs/templates
+
+    rm Realm/RLMPlatform.h
 }
 
 ######################################
@@ -648,16 +650,14 @@ case "$COMMAND" in
 
     "verify-docs")
         sh build.sh docs
-        if [ -s docs/objc_output/undocumented.txt ]; then
-          echo "Undocumented Realm Objective-C declarations:"
-          echo "$(cat docs/objc_output/undocumented.txt)"
-          exit 1
-        fi
-        if [ -s docs/swift_output/undocumented.txt ]; then
-          echo "Undocumented Realm Swift declarations:"
-          echo "$(cat docs/swift_output/undocumented.txt)"
-          exit 1
-        fi
+        for lang in swift objc; do
+            undocumented="docs/${lang}_output/undocumented.txt"
+            if [ -s "$undocumented" ]; then
+              echo "Undocumented Realm $lang declarations:"
+              cat "$undocumented"
+              exit 1
+            fi
+        done
         exit 0
         ;;
 
