@@ -60,7 +60,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  ### Relationships
  
- See our [Cocoa guide](http://realm.io/docs/cocoa/latest) for more details.
+ See our [Cocoa guide](https://realm.io/docs/objc/latest#relationships) for more details.
 
  ### Key-Value Observing
 
@@ -86,10 +86,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @interface RLMObject : RLMObjectBase
 
-/**---------------------------------------------------------------------------------------
- *  @name Creating & Initializing Objects
- * ---------------------------------------------------------------------------------------
- */
+#pragma mark - Creating & Initializing Objects
 
 /**
  Initialize a standalone RLMObject
@@ -211,6 +208,8 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value;
 
+#pragma mark - Properties
+
 /**
  The Realm in which this object is persisted. Returns nil for standalone objects.
  */
@@ -230,10 +229,7 @@ RLM_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
 
-/**---------------------------------------------------------------------------------------
- *  @name Customizing your Objects
- * ---------------------------------------------------------------------------------------
- */
+#pragma mark - Customizing your Objects
 
 /**
  Return an array of property names for properties which should be indexed. Only supported
@@ -283,10 +279,7 @@ RLM_ASSUME_NONNULL_BEGIN
 + (NSArray *)requiredProperties;
 
 
-/**---------------------------------------------------------------------------------------
- *  @name Getting & Querying Objects from the Default Realm
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Getting & Querying Objects from the Default Realm
 
 /**
  Get all objects of this type from the default Realm.
@@ -329,10 +322,7 @@ RLM_ASSUME_NONNULL_BEGIN
 + (nullable instancetype)objectForPrimaryKey:(nullable id)primaryKey;
 
 
-/**---------------------------------------------------------------------------------------
- *  @name Querying Specific Realms
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Querying Specific Realms
 
 /**
  Get all objects of this type from the specified Realm.
@@ -377,6 +367,8 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (nullable instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(nullable id)primaryKey;
 
+#pragma mark - Other Instance Methods
+
 /**
  Get an `NSArray` of objects of type `className` which have this object as the given property value. This can
  be used to get the inverse relatshionship value for `RLMObject` and `RLMArray` properties.
@@ -399,28 +391,18 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)isEqualToObject:(RLMObject *)object;
 
-#pragma mark -
+#pragma mark - Dynamic Accessors
 
-//---------------------------------------------------------------------------------------
-// @name Dynamic Accessors
-//---------------------------------------------------------------------------------------
-//
-// Properties on RLMObjects can be accessed and set using keyed subscripting.
-// ie. rlmObject[@"propertyName"] = object;
-//     id object = rlmObject[@"propertyName"];
-//
-
+/// :nodoc:
 - (nullable id)objectForKeyedSubscript:(NSString *)key;
-- (void)setObject:(nullable id)obj forKeyedSubscript:(NSString *)key;
 
-#pragma mark -
+/// :nodoc:
+- (void)setObject:(nullable id)obj forKeyedSubscript:(NSString *)key;
 
 @end
 
-/**---------------------------------------------------------------------------------------
- *  @name RLMArray Property Declaration
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - RLMArray Property Declaration
+
 /**
  Properties on RLMObjects of type RLMArray must have an associated type. A type is associated
  with an RLMArray property by defining a protocol for the object type which the RLMArray will
