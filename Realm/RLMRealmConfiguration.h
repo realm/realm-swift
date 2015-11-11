@@ -27,6 +27,8 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @interface RLMRealmConfiguration : NSObject<NSCopying>
 
+#pragma mark - Default Configuration
+
 /**
  Returns the default configuration used to create Realms when no other
  configuration is explicitly specified (i.e. `+[RLMRealm defaultRealm]`).
@@ -41,6 +43,8 @@ RLM_ASSUME_NONNULL_BEGIN
  @param configuration The new default Realm configuration.
  */
 + (void)setDefaultConfiguration:(RLMRealmConfiguration *)configuration;
+
+#pragma mark - Properties
 
 /// The path to the realm file. Mutually exclusive with `inMemoryIdentifier`.
 @property (nonatomic, copy, nullable) NSString *path;

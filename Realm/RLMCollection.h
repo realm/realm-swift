@@ -22,14 +22,14 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @class RLMRealm, RLMResults, RLMObject;
 
+/**
+ A homogenous collection of `RLMObject`s like `RLMArray` or `RLMResults`.
+ */
 @protocol RLMCollection <NSFastEnumeration>
 
 @required
 
-/**---------------------------------------------------------------------------------------
- *  @name RLMCollection Properties
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Properties
 
 /**
  Number of objects in the collection.
@@ -46,12 +46,7 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
-#pragma mark -
-
-/**---------------------------------------------------------------------------------------
- *  @name Accessing Objects from a Collection
- * ---------------------------------------------------------------------------------------
- */
+#pragma mark - Accessing Objects from a Collection
 
 /**
  Returns the object at the index specified.
@@ -80,12 +75,7 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (nullable id)lastObject;
 
-#pragma mark -
-
-/**---------------------------------------------------------------------------------------
- *  @name Querying a Collection
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Querying a Collection
 
 /**
  Gets the index of an object.
@@ -151,11 +141,8 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
 
-#pragma mark -
-
+/// :nodoc:
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
-
-#pragma mark -
 
 /**
  Returns an NSArray containing the results of invoking `valueForKey:` using key on each of the collection's objects.
