@@ -524,7 +524,7 @@ DuplicatePrimaryKeyValueException::DuplicatePrimaryKeyValueException(std::string
     m_object_type(object_type), m_property(property)
 {
     m_what = "Primary key property '" + property.name + "' has duplicate values after migration.";
-};
+}
 
 
 SchemaValidationException::SchemaValidationException(std::vector<ObjectSchemaValidationException> const& errors) :
