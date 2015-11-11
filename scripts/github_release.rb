@@ -16,19 +16,9 @@ SWIFT_ZIP = BUILD + "realm-swift-#{VERSION}.zip"
 CARTHAGE_ZIP = BUILD + 'Carthage.framework.zip'
 
 puts 'Creating Carthage release zip'
-Dir.mktmpdir do |tmp|
-  Dir.chdir(tmp) do
-    FileUtils.mkdir_p %w(Carthage/Build/Mac Carthage/Build/iOS Carthage/Build/watchOS)
-    system('unzip', SWIFT_ZIP.to_path, :out=>"/dev/null")
-    FileUtils.rm_f CARTHAGE_ZIP
-
-    FileUtils.mv(%W(realm-swift-#{VERSION}/ios/swift-2.1/Realm.framework realm-swift-#{VERSION}/ios/swift-2.1/RealmSwift.framework), 'Carthage/Build/iOS')
-    FileUtils.mv(%W(realm-swift-#{VERSION}/osx/swift-2.1/Realm.framework realm-swift-#{VERSION}/osx/swift-2.1/RealmSwift.framework), 'Carthage/Build/Mac')
-    FileUtils.mv(%W(realm-swift-#{VERSION}/watchos/Realm.framework realm-swift-#{VERSION}/watchos/RealmSwift.framework), 'Carthage/Build/watchOS')
-
-    system('zip', '--symlinks', '-r', CARTHAGE_ZIP.to_path, 'Carthage', :out=>"/dev/null")
-  end
-end
+system('carthage', 'build', '--no-skip-current')
+system('carthage', 'archive', 'Realm', '--output', CARTHAGE_ZIP.to_path)
+system('carthage', 'archive', 'RealmSwift', '--output', CARTHAGE_ZIP.to_path)
 
 REPOSITORY = 'realm/realm-cocoa'
 
