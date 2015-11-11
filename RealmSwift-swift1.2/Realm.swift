@@ -168,8 +168,8 @@ public final class Realm {
     This rolls back all objects in the Realm to the state they were in at the
     beginning of the write transaction, and then ends the transaction.
 
-    This restores the data for deleted objects, but does not reinstate deleted
-    accessor objects. Any `Object`s which were added to the Realm will be
+    This restores the data for deleted objects, but does not revive invalidated
+    object instances. Any `Object`s which were added to the Realm will be
     invalidated rather than switching back to standalone objects.
     Given the following code:
 
