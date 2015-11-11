@@ -52,6 +52,11 @@ class TestCase: XCTestCase {
         }
     }
 
+    override class func tearDown() {
+        RLMRealm.resetRealmState()
+        super.tearDown()
+    }
+
     override func invokeTest() {
         testDir = RLMRealmPathForFile(realmFilePrefix())
 
@@ -72,7 +77,7 @@ class TestCase: XCTestCase {
             XCTAssertFalse(RLMHasCachedRealmForPath(testRealmPath()))
         }
 
-        RLMRealm.resetRealmState()
+        resetRealmState()
 
         do {
             try NSFileManager.defaultManager().removeItemAtPath(testDir)
@@ -86,6 +91,10 @@ class TestCase: XCTestCase {
             XCTAssertNotEqual(url.pathExtension, "realm", "Lingering realm file at \(parentDir)/\(url)")
             assert(url.pathExtension != "realm")
         }
+    }
+
+    func resetRealmState() {
+        RLMRealm.resetRealmState()
     }
 
     func dispatchSyncNewThread(block: dispatch_block_t) {
