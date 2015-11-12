@@ -895,24 +895,20 @@ extern "C" {
 - (void)testRefreshCreatesAReadTransaction
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_group_t group = dispatch_group_create();
 
-    dispatch_group_async(group, queue, ^{
+    [self dispatchAsyncAndWait:^{
         [RLMRealm.defaultRealm transactionWithBlock:^{
             [IntObject createInDefaultRealmWithValue:@[@1]];
         }];
-    });
-    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+    }];
 
     XCTAssertTrue([realm refresh]);
 
-    dispatch_group_async(group, queue, ^{
+    [self dispatchAsyncAndWait:^{
         [RLMRealm.defaultRealm transactionWithBlock:^{
             [IntObject createInDefaultRealmWithValue:@[@1]];
         }];
-    });
-    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+    }];
 
     // refresh above should have created a read transaction, so realm should
     // still only see one object
