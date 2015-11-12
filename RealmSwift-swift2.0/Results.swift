@@ -148,15 +148,15 @@ public final class Results<T: Object>: ResultsBase {
     public subscript(index: Int) -> T {
         get {
             throwForNegativeIndex(index)
-            return rlmResults[UInt(index)] as! T
+            return unsafeBitCast(rlmResults[UInt(index)], T.self)
         }
     }
 
     /// Returns the first object in the results, or `nil` if empty.
-    public var first: T? { return rlmResults.firstObject() as! T? }
+    public var first: T? { return unsafeBitCast(rlmResults.firstObject(), Optional<T>.self) }
 
     /// Returns the last object in the results, or `nil` if empty.
-    public var last: T? { return rlmResults.lastObject() as! T? }
+    public var last: T? { return unsafeBitCast(rlmResults.lastObject(), Optional<T>.self) }
 
     // MARK: KVC
 

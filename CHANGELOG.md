@@ -13,6 +13,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
+* Fix crash when trying to retrieve object instances via `dynamicObjects`.
 * Fix crashes or incorrect results when calling `-[RLMRealm refresh]` during
   fast enumeration.
 * Add `Int8` support for `RealmOptional`, `MinMaxType` and `AddableType`.
