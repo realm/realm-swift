@@ -161,7 +161,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 
                 Class cls = [RLMSchema classForString:_objectClassName];
                 if (!RLMIsObjectSubclass(cls)) {
-                    @throw RLMException(@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/objc/#to-many for more information.", self.objectClassName);
+                    @throw RLMException(@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See https://realm.io/docs/objc/latest/#to-many for more information.", self.objectClassName);
                 }
             }
             else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
@@ -185,7 +185,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
                 else {
                     @throw RLMException(@"'%@' is not supported as an NSNumber object type. "
                                         @"NSNumbers can only be RLMInt, RLMFloat, RLMDouble, and RLMBool at the moment. "
-                                        @"See http://realm.io/docs/objc/ for more information.", numberType);
+                                        @"See https://realm.io/docs/objc/latest for more information.", numberType);
                 }
             }
             else if (strcmp(code, "@\"NSNumber\"") == 0) {
@@ -201,7 +201,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
                 // verify type
                 Class cls = [RLMSchema classForString:className];
                 if (!RLMIsObjectSubclass(cls)) {
-                    @throw RLMException(@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/objc/api/Classes/RLMObject.html for more information.", className);
+                    @throw RLMException(@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See https://realm.io/docs/objc/latest/api/Classes/RLMObject.html for more information.", className);
                 }
 
                 _type = RLMPropertyTypeObject;
