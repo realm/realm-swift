@@ -27,6 +27,8 @@
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 
+#import <realm/mixed.hpp>
+
 #include <sys/sysctl.h>
 #include <sys/types.h>
 
@@ -326,4 +328,29 @@ BOOL RLMIsDebuggerAttached()
     }
 
     return (info.kp_proc.p_flag & P_TRACED) != 0;
+}
+
+id RLMMixedToObjc(realm::Mixed const& mixed) {
+    switch (mixed.get_type()) {
+        case realm::type_String:
+            return RLMStringDataToNSString(mixed.get_string());
+        case realm::type_Int: {
+            return @(mixed.get_int());
+        case realm::type_Float:
+            return @(mixed.get_float());
+        case realm::type_Double:
+            return @(mixed.get_double());
+        case realm::type_Bool:
+            return @(mixed.get_bool());
+        case realm::type_DateTime:
+            return RLMDateTimeToNSDate(mixed.get_datetime());
+        case realm::type_Binary: {
+            return RLMBinaryDataToNSData(mixed.get_binary());
+        }
+        case realm::type_Link:
+        case realm::type_LinkList:
+        default:
+            @throw RLMException(@"Invalid data type for RLMPropertyTypeAny property.");
+        }
+    }
 }

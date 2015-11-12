@@ -24,8 +24,9 @@
 
 namespace realm {
     class LinkView;
-    class Query;
+    class Results;
     class TableView;
+    struct SortOrder;
 
     namespace util {
         template<typename T> class bind_ptr;
@@ -36,15 +37,6 @@ namespace realm {
 @class RLMObjectBase;
 @class RLMObjectSchema;
 class RLMObservationInfo;
-
-struct RLMSortOrder {
-    std::vector<size_t> columnIndices;
-    std::vector<bool> ascending;
-
-    explicit operator bool() const {
-        return !columnIndices.empty();
-    }
-};
 
 @protocol RLMFastEnumerable
 @property (nonatomic, readonly) RLMRealm *realm;
@@ -92,36 +84,10 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NS
 // RLMResults private methods
 //
 @interface RLMResults () <RLMFastEnumerable>
-+ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
-                                     query:(std::unique_ptr<realm::Query>)query
-                                     realm:(RLMRealm *)realm;
-
-+ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
-                                     query:(std::unique_ptr<realm::Query>)query
-                                      view:(realm::TableView &&)view
-                                     realm:(RLMRealm *)realm;
-
-+ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
-                                     query:(std::unique_ptr<realm::Query>)query
-                                      sort:(RLMSortOrder)sorter
-                                     realm:(RLMRealm *)realm;
++ (instancetype)resultsWithObjectSchema:(RLMObjectSchema *)objectSchema
+                                   results:(realm::Results)results;
 
 - (void)deleteObjectsFromRealm;
-@end
-
-//
-// RLMResults subclass used when a TableView can't be created - this is used
-// for readonly realms where we can't create an underlying table class for a
-// type, and we need to return a functional RLMResults instance which is always empty.
-//
-@interface RLMEmptyResults : RLMResults
-+ (instancetype)emptyResultsWithObjectClassName:(NSString *)objectClassName
-                                          realm:(RLMRealm *)realm;
-@end
-
-// RLMResults backed by a realm::Table directly rather than using a TableView
-@interface RLMTableResults : RLMResults
-+ (RLMResults *)tableResultsWithObjectSchema:(RLMObjectSchema *)objectSchema realm:(RLMRealm *)realm;
 @end
 
 // An object which encapulates the shared logic for fast-enumerating RLMArray

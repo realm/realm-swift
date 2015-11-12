@@ -1226,6 +1226,20 @@ public:
     AssertIndexChange(NSKeyValueChangeRemoval, ([NSIndexSet indexSetWithIndexesInRange:{0, 3}]));
 }
 
+- (void)testDeleteObjectsInArrayViaTableViewClear {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject2 *obj2 = [self createLinkObject];
+    [obj.array addObject:obj.obj];
+    [obj.array addObject:obj.obj];
+    [obj.array addObject:obj2.obj];
+
+    KVORecorder r(self, obj, @"array");
+    RLMResults *results = [KVOLinkObject1 objectsInRealm:self.realm where:@"TRUEPREDICATE"];
+    [results lastObject];
+    [self.realm deleteObjects:results];
+    AssertIndexChange(NSKeyValueChangeRemoval, ([NSIndexSet indexSetWithIndexesInRange:{0, 3}]));
+}
+
 - (void)testDeleteObjectsInArrayViaQueryClear {
     KVOLinkObject2 *obj = [self createLinkObject];
     KVOLinkObject2 *obj2 = [self createLinkObject];

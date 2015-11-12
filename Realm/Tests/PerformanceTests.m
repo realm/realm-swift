@@ -42,7 +42,12 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
 + (void)tearDown {
     s_smallRealm = s_mediumRealm = s_largeRealm = nil;
+    [RLMRealm resetRealmState];
     [super tearDown];
+}
+
+- (void)resetRealmState {
+    // Do nothing, as we need to keep our in-memory realms around between tests
 }
 
 - (void)measureBlock:(void (^)(void))block {

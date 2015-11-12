@@ -59,23 +59,6 @@ void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *name, N
     }
 }
 
-void RLMDeallocateRealm(NSString *path) {
-    __weak RLMRealm *realm;
-
-    @autoreleasepool {
-        realm = RLMGetThreadLocalCachedRealmForPath(path.UTF8String);
-    }
-
-    while (true) {
-        @autoreleasepool {
-            if (!realm) {
-                return;
-            }
-        }
-        CFRelease((__bridge void *)realm);
-    }
-}
-
 bool RLMHasCachedRealmForPath(NSString *path) {
     return RLMGetAnyCachedRealmForPath(path.UTF8String);
 }

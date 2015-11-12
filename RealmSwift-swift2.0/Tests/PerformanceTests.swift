@@ -62,6 +62,10 @@ class SwiftPerformanceTests: TestCase {
         super.tearDown()
     }
 
+    override func resetRealmState() {
+        // Do nothing, as we need to keep our in-memory realms around between tests
+    }
+
     override func measureBlock(block: (() -> Void)) {
         super.measureBlock {
             autoreleasepool {
