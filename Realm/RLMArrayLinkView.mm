@@ -28,6 +28,8 @@
 #import "RLMSchema.h"
 #import "RLMUtil.hpp"
 
+#import "results.hpp"
+
 #import <realm/table_view.hpp>
 #import <objc/runtime.h>
 
@@ -391,12 +393,11 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties {
     RLMLinkViewArrayValidateAttached(self);
 
-    auto query = std::make_unique<realm::Query>(_backingLinkView->get_target_table().where(_backingLinkView));
-    return [RLMResults resultsWithObjectClassName:self.objectClassName
-                                            query:move(query)
-                                             sort:RLMSortOrderFromDescriptors(_realm.schema[_objectClassName], properties)
-                                            realm:_realm];
-
+    auto results = realm::Results(_realm->_realm,
+                                  _backingLinkView->get_target_table().where(_backingLinkView),
+                                  RLMSortOrderFromDescriptors(_realm.schema[_objectClassName], properties));
+    return [RLMResults resultsWithObjectSchema:_realm.schema[self.objectClassName]
+                                       results:std::move(results)];
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
@@ -404,9 +405,8 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 
     realm::Query query = _backingLinkView->get_target_table().where(_backingLinkView);
     RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
-    return [RLMResults resultsWithObjectClassName:self.objectClassName
-                                            query:std::make_unique<realm::Query>(query)
-                                            realm:_realm];
+    return [RLMResults resultsWithObjectSchema:_realm.schema[self.objectClassName]
+                                       results:realm::Results(_realm->_realm, std::move(query))];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
