@@ -169,7 +169,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     RLMObjectSchema *schema = [realm.schema schemaForClassName:objectClassName];
     if (!schema) {
         @throw RLMException(@"Object type '%@' is not persisted in the Realm. "
-                            @"If using a custom `objectClasses` / `obejctTypes` array in your configuration, "
+                            @"If using a custom `objectClasses` / `objectTypes` array in your configuration, "
                             @"add `%@` to the list of `objectClasses` / `objectTypes`.",
                             objectClassName, objectClassName);
     }
