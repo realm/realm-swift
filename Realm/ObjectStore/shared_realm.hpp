@@ -19,7 +19,6 @@
 #ifndef REALM_REALM_HPP
 #define REALM_REALM_HPP
 
-#include <map>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -56,8 +55,8 @@ namespace realm {
 
             MigrationFunction migration_function;
 
-            Config() = default;
-            Config(Config&&) = default;
+            Config();
+            Config(Config&&);
             Config(const Config& c);
             ~Config();
 
@@ -100,6 +99,11 @@ namespace realm {
 
         std::thread::id thread_id() const { return m_thread_id; }
         void verify_thread() const;
+        void verify_in_write() const;
+
+        // Close this Realm and remove it from the cache. Continuing to use a
+        // Realm after closing it will produce undefined behavior.
+        void close();
 
         ~Realm();
 
@@ -141,11 +145,9 @@ namespace realm {
         std::mutex m_mutex;
     };
 
-    class RealmFileException : public std::runtime_error
-    {
-      public:
-        enum class Kind
-        {
+    class RealmFileException : public std::runtime_error {
+    public:
+        enum class Kind {
             /** Thrown for any I/O related exception scenarios when a realm is opened. */
             AccessError,
             /** Thrown if the user does not have permission to open or create
@@ -163,31 +165,27 @@ namespace realm {
         RealmFileException(Kind kind, std::string message) : std::runtime_error(message), m_kind(kind) {}
         Kind kind() const { return m_kind; }
         
-      private:
+    private:
         Kind m_kind;
     };
 
-    class MismatchedConfigException : public std::runtime_error
-    {
-      public:
+    class MismatchedConfigException : public std::runtime_error {
+    public:
         MismatchedConfigException(std::string message) : std::runtime_error(message) {}
     };
 
-    class InvalidTransactionException : public std::runtime_error
-    {
-      public:
+    class InvalidTransactionException : public std::runtime_error {
+    public:
         InvalidTransactionException(std::string message) : std::runtime_error(message) {}
     };
 
-    class IncorrectThreadException : public std::runtime_error
-    {
-      public:
-        IncorrectThreadException(std::string message) : std::runtime_error(message) {}
+    class IncorrectThreadException : public std::runtime_error {
+    public:
+        IncorrectThreadException() : std::runtime_error("Realm accessed from incorrect thread.") {}
     };
 
-    class UnitializedRealmException : public std::runtime_error
-    {
-      public:
+    class UnitializedRealmException : public std::runtime_error {
+    public:
         UnitializedRealmException(std::string message) : std::runtime_error(message) {}
     };
 }

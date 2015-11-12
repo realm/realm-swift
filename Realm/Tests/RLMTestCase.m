@@ -129,11 +129,15 @@ static BOOL encryptTests() {
 
 - (void)deleteFiles {
     // Clear cache
-    [RLMRealm resetRealmState];
+    [self resetRealmState];
 
     // Delete Realm files
     [self deleteRealmFileAtPath:RLMDefaultRealmPath()];
     [self deleteRealmFileAtPath:RLMTestRealmPath()];
+}
+
+- (void)resetRealmState {
+    [RLMRealm resetRealmState];
 }
 
 - (void)deleteRealmFileAtPath:(NSString *)path

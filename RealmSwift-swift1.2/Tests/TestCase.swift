@@ -55,16 +55,12 @@ class TestCase: XCTestCase {
         exceptionThrown = false
         autoreleasepool { super.invokeTest() }
 
-        if exceptionThrown {
-            RLMDeallocateRealm(defaultRealmPath())
-            RLMDeallocateRealm(testRealmPath())
-        }
-        else {
+        if !exceptionThrown {
             XCTAssertFalse(RLMHasCachedRealmForPath(defaultRealmPath()))
             XCTAssertFalse(RLMHasCachedRealmForPath(testRealmPath()))
         }
-        deleteRealmFiles()
         RLMRealm.resetRealmState()
+        deleteRealmFiles()
     }
 
     func dispatchSyncNewThread(block: dispatch_block_t) {
