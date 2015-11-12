@@ -56,6 +56,9 @@ command:
   test-ios-devices-swift: tests Swift iOS framework on all attached iOS devices
   test-tvos:            tests tvOS framework
   test-tvos-swift:      tests RealmSwift tvOS framework
+  test-tvos-devices:     tests ObjC & Swift tvOS frameworks on all attached iOS devices
+  test-tvos-devices-objc:  tests ObjC tvOS framework on all attached iOS devices
+  test-tvos-devices-swift: tests Swift tvOS framework on all attached iOS devices
   test-osx:             tests OS X framework
   test-osx-swift:       tests RealmSwift OS X framework
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device in both Debug and Release configurations, swiftlint
@@ -262,6 +265,32 @@ test_ios_devices() {
     failed=0
     for device in "${serial_numbers[@]}"; do
         xc "-scheme '$scheme' -configuration $configuration -destination 'id=$device' test" || failed=1
+    done
+    return $failed
+}
+
+test_tvos_devices() {
+    serial_numbers_str=$(system_profiler SPUSBDataType | grep "Serial Number: ")
+    serial_numbers=()
+    while read -r line; do
+        number=${line:15} # Serial number starts at position 15
+        if [[ ${#number} == 40 ]]; then
+            serial_numbers+=("$number")
+        fi
+    done <<< "$serial_numbers_str"
+    if [[ ${#serial_numbers[@]} == 0 ]]; then
+        echo "At least one iOS device must be connected to this computer to run device tests"
+        if [ -z "${JENKINS_HOME}" ]; then
+            # Don't fail if running locally and there's no device
+            exit 0
+        fi
+        exit 1
+    fi
+    scheme="$1"
+    configuration="$2"
+    failed=0
+    for device in "${serial_numbers[@]}"; do
+        xc "-scheme '$scheme' -configuration $configuration -destination 'id=$device' -sdk appletvos test ONLY_ACTIVE_ARCH=NO" || failed=1
     done
     return $failed
 }
@@ -550,6 +579,7 @@ case "$COMMAND" in
         sh build.sh test-ios-dynamic || failed=1
         sh build.sh test-ios-swift || failed=1
         sh build.sh test-ios-devices || failed=1
+        sh build.sh test-tvos-devices || failed=1
         sh build.sh test-osx || failed=1
         sh build.sh test-osx-swift || failed=1
         exit $failed
@@ -616,6 +646,24 @@ case "$COMMAND" in
 
     "test-tvos-swift")
         xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
+        exit $?
+        ;;
+
+    "test-tvos-devices")
+        failed=0
+        trap "failed=1" ERR
+        sh build.sh test-tvos-devices-objc
+        sh build.sh test-tvos-devices-swift
+        exit $failed
+        ;;
+
+    "test-tvos-devices-objc")
+        test_tvos_devices "Realm" "$CONFIGURATION"
+        exit $?
+        ;;
+
+    "test-tvos-devices-swift")
+        test_tvos_devices "RealmSwift" "$CONFIGURATION"
         exit $?
         ;;
 
@@ -733,6 +781,16 @@ case "$COMMAND" in
         if [ $REALM_SWIFT_VERSION != '1.2' ]; then
             sh build.sh tvos-swift
         fi
+        exit 0
+        ;;
+
+    "verify-tvos-device-objc")
+        sh build.sh test-tvos-devices-objc
+        exit 0
+        ;;
+
+    "verify-tvos-device-swift")
+        sh build.sh test-tvos-devices-swift
         exit 0
         ;;
 
