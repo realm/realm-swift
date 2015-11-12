@@ -20,6 +20,7 @@
   `+[RLMObject allObjectsInRealm:]`.
 * Fix memory leak when using Object(value:) for subclasses with
   `List` or `RealmOptional` properties.
+* Fix crash when trying to retrieve object instances via `dynamicObjects`.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
