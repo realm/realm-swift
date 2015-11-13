@@ -193,7 +193,11 @@ void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
         return;
     }
 
-    begin_transaction();
+    read_group();
+    transaction::begin(*m_shared_group, *m_history, m_binding_context.get(),
+                       /* error on schema changes */ false);
+    m_in_transaction = true;
+
     struct WriteTransactionGuard {
         Realm& realm;
         ~WriteTransactionGuard() {
