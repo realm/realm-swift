@@ -20,7 +20,7 @@
 
 RLM_ASSUME_NONNULL_BEGIN
 
-@class RLMRealm, RLMResults, RLMObject;
+@class RLMRealm, RLMResults, RLMObject, RLMSortDescriptor;
 
 /**
  A homogenous collection of `RLMObject`s like `RLMArray` or `RLMResults`.
@@ -139,7 +139,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  @return    An RLMResults sorted by the specified properties.
  */
-- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray RLM_GENERIC(RLMSortDescriptor *) *)properties;
 
 /// :nodoc:
 - (id)objectAtIndexedSubscript:(NSUInteger)index;

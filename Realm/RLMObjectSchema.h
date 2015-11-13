@@ -40,7 +40,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  @see RLMProperty
  */
-@property (nonatomic, readonly, copy) NSArray *properties;
+@property (nonatomic, readonly, copy) NSArray RLM_GENERIC(RLMProperty *) *properties;
 
 /**
  The name of the class this schema describes.
