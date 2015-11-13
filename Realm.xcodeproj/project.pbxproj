@@ -1156,6 +1156,7 @@
 				5D660FD41BE98C7C0021E04F /* Sources */,
 				5D660FD51BE98C7C0021E04F /* Frameworks */,
 				5D66102D1BE98E360021E04F /* Embed Frameworks */,
+				E81B01FF1BF664B700A41452 /* Exit After Building Tests If Requested */,
 			);
 			buildRules = (
 			);
@@ -1472,6 +1473,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "sh build.sh set-swift-version";
+		};
+		E81B01FF1BF664B700A41452 /* Exit After Building Tests If Requested */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Exit After Building Tests If Requested";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ $REALM_EXIT_AFTER_BUILDING_TESTS == \"YES\" ]]; then\n    echo \"Exiting as requested.\"\n    exit 1\nfi\n";
 		};
 		E83EAC7D1BED3D8F0085CCD2 /* Run SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
