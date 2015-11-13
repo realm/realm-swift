@@ -27,7 +27,7 @@ RLM_ASSUME_NONNULL_BEGIN
 @interface RLMObjectSchema ()
 
 // writable redecleration
-@property (nonatomic, readwrite, copy) NSArray *properties;
+@property (nonatomic, readwrite, copy) NSArray RLM_GENERIC(RLMProperty *) *properties;
 @property (nonatomic, readwrite, assign) bool isSwiftClass;
 
 // class used for this object schema

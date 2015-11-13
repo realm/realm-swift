@@ -42,8 +42,8 @@ class SwiftDynamicTests: RLMTestCase {
         let dynSchema = dyrealm.schema[SwiftDynamicObject.className()]
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
         XCTAssertEqual(dynSchema.properties.count, Int(2))
-        XCTAssertEqual(dynSchema.properties[0].name!, "stringCol")
-        XCTAssertEqual((dynSchema.properties[1] as! RLMProperty).type, RLMPropertyType.Int)
+        XCTAssertEqual(dynSchema.properties[0].name, "stringCol")
+        XCTAssertEqual(dynSchema.properties[1].type, RLMPropertyType.Int)
 
         // verify object type
         let array = SwiftDynamicObject.allObjectsInRealm(dyrealm)
@@ -88,8 +88,8 @@ class SwiftDynamicTests: RLMTestCase {
         let dynSchema = dyrealm.schema[DynamicObject.className()]
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
         XCTAssertTrue(dynSchema.properties.count == 2)
-        XCTAssertTrue(dynSchema.properties[0].name! == "stringCol")
-        XCTAssertTrue((dynSchema.properties[1] as! RLMProperty).type == RLMPropertyType.Int)
+        XCTAssertTrue(dynSchema.properties[0].name == "stringCol")
+        XCTAssertTrue(dynSchema.properties[1].type == RLMPropertyType.Int)
 
         // verify object type
         let array = DynamicObject.allObjectsInRealm(dyrealm)
@@ -164,13 +164,13 @@ class SwiftDynamicTests: RLMTestCase {
 
         let schema = dyrealm.schema[AllTypesObject.className()]
         for idx in 0..<10 {
-            let prop = schema.properties[idx] as! RLMProperty
+            let prop = schema.properties[idx]
             XCTAssertTrue(obj1[idx].isEqual((array[0] as! RLMObject)[prop.name]))
             XCTAssertTrue(obj2[idx].isEqual((array[1] as! RLMObject)[prop.name]))
         }
 
         // check sub object type
-        XCTAssertTrue((schema.properties[10] as! RLMProperty).objectClassName! == "StringObject")
+        XCTAssertTrue(schema.properties[10].objectClassName! == "StringObject")
 
         // check object equality
         XCTAssertNil((array[0] as! RLMObject)["objectCol"], "object should be nil")

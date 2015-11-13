@@ -151,13 +151,10 @@ class ObjectSchemaInitializationTests: TestCase {
         let schema = RLMObjectSchema(forObjectClass: SwiftOptionalObject.self)
 
         for prop in schema.properties {
-            XCTAssertTrue((prop as! RLMProperty).optional)
+            XCTAssertTrue(prop.optional)
         }
 
-        let types = Set(schema.properties.map { prop in
-            (prop as! RLMProperty).type
-        })
-
+        let types = Set(schema.properties.map { $0.type })
         XCTAssertEqual(types, Set([.String, .String, .Data, .Date, .Object, .Int, .Float, .Double, .Bool]))
     }
 
