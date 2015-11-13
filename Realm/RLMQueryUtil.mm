@@ -173,36 +173,36 @@ public:
         Average,
     };
 
-    CollectionOperation(Type type, ColumnReference link_column, RLMProperty *property)
+    CollectionOperation(Type type, ColumnReference link_column, util::Optional<ColumnReference> column)
         : m_type(type)
         , m_link_column(link_column)
-        , m_property(property)
+        , m_column(column)
     {
         RLMPrecondition(link_column.type() == RLMPropertyTypeArray, @"Invalid predicate",
                         @"Collection operation can only be applied to a property of type RLMArray.");
 
         switch (m_type) {
             case Count:
-                RLMPrecondition(!m_property, @"Invalid predicate", @"Result of @count does not have any properties.");
+                RLMPrecondition(!m_column, @"Invalid predicate", @"Result of @count does not have any properties.");
                 break;
             case Minimum:
             case Maximum:
             case Sum:
             case Average:
-                RLMPrecondition(m_property && RLMPropertyTypeIsNumeric(m_property.type), @"Invalid predicate", @"%@ can only be applied to a numeric property.", name_for_type(m_type));
+                RLMPrecondition(m_column && RLMPropertyTypeIsNumeric(m_column->type()), @"Invalid predicate", @"%@ can only be applied to a numeric property.", name_for_type(m_type));
                 break;
         }
     }
 
-    CollectionOperation(NSString *operationName, ColumnReference link_column, RLMProperty *property = nil)
-        : CollectionOperation(type_for_name(operationName), std::move(link_column), property)
+    CollectionOperation(NSString *operationName, ColumnReference link_column, util::Optional<ColumnReference> column = util::none)
+        : CollectionOperation(type_for_name(operationName), std::move(link_column), column)
     {
     }
 
     Type type() const { return m_type; }
     const ColumnReference& link_column() const { return m_link_column; }
-    NSUInteger column_index() const { return m_property.column; }
-    RLMPropertyType column_type() const { return m_property.type; }
+    NSUInteger column_index() const { return m_column->index(); }
+    RLMPropertyType column_type() const { return m_column->type(); }
 
     void validate_value(id value) const {
         switch (m_type) {
@@ -213,8 +213,8 @@ public:
             case Minimum:
             case Maximum:
             case Sum:
-                RLMPrecondition(RLMIsObjectValidForProperty(value, m_property), @"Invalid operand", @"%@ on a property of type %@ cannot be compared with '%@'",
-                                name_for_type(m_type), RLMTypeToString(m_property.type), value);
+                RLMPrecondition(RLMIsObjectValidForProperty(value, m_column->property()), @"Invalid operand", @"%@ on a property of type %@ cannot be compared with '%@'",
+                                name_for_type(m_type), RLMTypeToString(m_column->type()), value);
                 break;
         }
     }
@@ -251,7 +251,7 @@ private:
 
     Type m_type;
     ColumnReference m_link_column;
-    RLMProperty *m_property;
+    util::Optional<ColumnReference> m_column;
 };
 
 // add a clause for numeric constraints based on operator type
@@ -673,9 +673,10 @@ void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
     }
 }
 
-RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc,
-                                        NSString *keyPath, std::vector<NSUInteger> &indexes, bool isAggregate)
+ColumnReference column_reference_from_key_path(RLMSchema *schema, RLMObjectSchema *desc,
+                                               NSString *keyPath, bool isAggregate)
 {
+    std::vector<NSUInteger> indexes;
     RLMProperty *prop = nil;
 
     NSString *prevPath = nil;
@@ -715,15 +716,7 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
         start = end + 1;
     } while (end != NSNotFound);
 
-    return prop;
-}
-
-ColumnReference column_reference_from_key_path(RLMSchema *schema, RLMObjectSchema *desc,
-                                               NSString *keyPath, bool isAggregate)
-{
-    std::vector<NSUInteger> links;
-    RLMProperty *property = get_property_from_key_path(schema, desc, keyPath, links, isAggregate);
-    return ColumnReference(property, links);
+    return ColumnReference(prop, indexes);
 }
 
 void validate_property_value(const ColumnReference& column,
@@ -875,15 +868,14 @@ void update_query_with_collection_operator_expression(RLMSchema *schema,
     NSString *collectionOperationName = get_collection_operation_name_from_key_path(keyPath, &leadingKeyPath, &trailingKey);
 
     ColumnReference linkColumn = column_reference_from_key_path(schema, desc, leadingKeyPath, true);
-    RLMProperty *property;
+    util::Optional<ColumnReference> column;
     if (trailingKey) {
         RLMPrecondition([trailingKey rangeOfString:@"."].location == NSNotFound, @"Invalid key path", @"Right side of collection operator may only have a single level key");
         NSString *fullKeyPath = [leadingKeyPath stringByAppendingFormat:@".%@", trailingKey];
-        std::vector<NSUInteger> ignoredIndexes;
-        property = get_property_from_key_path(schema, desc, fullKeyPath, ignoredIndexes, true);
+        column = column_reference_from_key_path(schema, desc, fullKeyPath, true);
     }
 
-    CollectionOperation operation(collectionOperationName, std::move(linkColumn), property);
+    CollectionOperation operation(collectionOperationName, std::move(linkColumn), std::move(column));
     operation.validate_value(value);
 
     if (pred.leftExpression.expressionType == NSKeyPathExpressionType) {
