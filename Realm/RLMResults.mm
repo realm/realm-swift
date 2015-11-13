@@ -23,7 +23,7 @@
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMObservation.hpp"
-#import "RLMProperty.h"
+#import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
@@ -335,7 +335,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)aggregate:(NSString *)property method:(util::Optional<Mixed> (Results::*)(size_t))method methodName:(NSString *)methodName {
-    size_t column = RLMValidatedColumnIndex(_objectSchema, property);
+    size_t column = RLMValidatedProperty(_objectSchema, property).column;
     auto value = translateErrors([&] { return (_results.*method)(column); }, methodName);
     if (!value) {
         return nil;
