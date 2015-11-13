@@ -114,101 +114,53 @@ copy_bcsymbolmap() {
     find "$1" -name '*.bcsymbolmap' -type f -exec cp {} "$2" \;
 }
 
-build_ios_combined() {
+build_combined() {
     local scheme="$1"
     local module_name="$2"
-    local scope_suffix="$3"
-    local version_suffix="$4"
+    local os="$3"
+    local simulator="$4"
+    local scope_suffix="$5"
+    local version_suffix="$6"
     local config="$CONFIGURATION"
+
+    local destination=""
+    local os_name=""
+    if [[ "$os" == "iphoneos" ]]; then
+        os_name="ios"
+        destination="iPhone 6"
+    elif [[ "$os" == "watchos"  ]]; then
+        os_name="$os"
+        destination="Apple Watch - 42mm"
+    elif [[ "$os" == "appletvos"  ]]; then
+        os_name="tvos"
+        destination="Apple TV 1080p"
+    fi
 
     # Derive build paths
     local build_products_path="build/DerivedData/Realm/Build/Products"
     local product_name="$module_name.framework"
     local binary_path="$module_name"
-    local iphoneos_path="$build_products_path/$config-iphoneos$scope_suffix/$product_name"
-    local iphonesimulator_path="$build_products_path/$config-iphonesimulator$scope_suffix/$product_name"
-    local out_path="build/ios$scope_suffix$version_suffix"
+    local os_path="$build_products_path/$config-$os$scope_suffix/$product_name"
+    local simulator_path="$build_products_path/$config-$simulator$scope_suffix/$product_name"
+    local out_path="build/$os_name$scope_suffix$version_suffix"
 
     # Build for each platform
-    xc "-scheme '$scheme' -configuration $config -sdk iphoneos"
-    xc "-scheme '$scheme' -configuration $config -sdk iphonesimulator -destination 'name=iPhone 6' ONLY_ACTIVE_ARCH=NO"
+    xc "-scheme '$scheme' -configuration $config -sdk $os"
+    xc "-scheme '$scheme' -configuration $config -sdk $simulator -destination 'name=$destination' ONLY_ACTIVE_ARCH=NO"
 
     # Combine .swiftmodule
-    if [ -d $iphonesimulator_path/Modules/$module_name.swiftmodule ]; then
-      cp $iphonesimulator_path/Modules/$module_name.swiftmodule/* $iphoneos_path/Modules/$module_name.swiftmodule/
+    if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
+      cp $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
     fi
     
     # Copy *.bcsymbolmap to .framework for submitting app with bitcode
-    copy_bcsymbolmap "$build_products_path/$config-iphoneos$scope_suffix" "$iphoneos_path"
+    copy_bcsymbolmap "$build_products_path/$config-$os$scope_suffix" "$os_path"
 
     # Retrieve build products
-    clean_retrieve $iphoneos_path $out_path $product_name
+    clean_retrieve $os_path $out_path $product_name
 
     # Combine ar archives
-    xcrun lipo -create "$iphonesimulator_path/$binary_path" "$iphoneos_path/$binary_path" -output "$out_path/$product_name/$module_name"
-}
-
-build_watchos_combined() {
-    local scheme="$1"
-    local module_name="$2"
-    local scope_suffix="$3"
-    local config="$CONFIGURATION"
-
-    # Derive build paths
-    local build_products_path="build/DerivedData/Realm/Build/Products"
-    local product_name="$module_name.framework"
-    local binary_path="$module_name"
-    local watchos_path="$build_products_path/$config-watchos$scope_suffix/$product_name"
-    local watchsimulator_path="$build_products_path/$config-watchsimulator$scope_suffix/$product_name"
-    local out_path="build/watchos$scope_suffix"
-
-    # Build for each platform
-    xc "-scheme '$scheme' -configuration $config -sdk watchos"
-    xc "-scheme '$scheme' -configuration $config -sdk watchsimulator -destination 'name=Apple Watch - 42mm' ONLY_ACTIVE_ARCH=NO"
-
-    # Combine .swiftmodule
-    if [ -d $watchsimulator_path/Modules/$module_name.swiftmodule ]; then
-      cp $watchsimulator_path/Modules/$module_name.swiftmodule/* $watchos_path/Modules/$module_name.swiftmodule/
-    fi
-    
-    # Copy *.bcsymbolmap
-    copy_bcsymbolmap "$build_products_path/$config-watchos$scope_suffix" "$watchos_path"
-
-    # Retrieve build products
-    clean_retrieve $watchos_path $out_path $product_name
-
-    # Combine ar archives
-    xcrun lipo -create "$watchsimulator_path/$binary_path" "$watchos_path/$binary_path" -output "$out_path/$product_name/$module_name"
-}
-
-build_tvos_combined() {
-    local scheme="$1"
-    local module_name="$2"
-    local scope_suffix="$3"
-    local config="$CONFIGURATION"
-
-    # Derive build paths
-    local build_products_path="build/DerivedData/Realm/Build/Products"
-    local product_name="$module_name.framework"
-    local binary_path="$module_name"
-    local tvos_path="$build_products_path/$config-appletvos$scope_suffix/$product_name"
-    local tvsimulator_path="$build_products_path/$config-appletvsimulator$scope_suffix/$product_name"
-    local out_path="build/tvos$scope_suffix"
-
-    # Build for each platform
-    xc "-scheme '$scheme' -configuration $config -sdk appletvos"
-    xc "-scheme '$scheme' -configuration $config -sdk appletvsimulator -destination 'name=Apple TV 1080p' ONLY_ACTIVE_ARCH=NO"
-
-    # Combine .swiftmodule
-    if [ -d $tvsimulator_path/Modules/$module_name.swiftmodule ]; then
-      cp $tvsimulator_path/Modules/$module_name.swiftmodule/* $tvos_path/Modules/$module_name.swiftmodule/
-    fi
-
-    # Retrieve build products
-    clean_retrieve $tvos_path $out_path $product_name
-
-    # Combine ar archives
-    xcrun lipo -create "$tvsimulator_path/$binary_path" "$tvos_path/$binary_path" -output "$out_path/$product_name/$module_name"
+    xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$out_path/$product_name/$module_name"
 }
 
 xc_work_around_rdar_23055637() {
@@ -515,40 +467,40 @@ case "$COMMAND" in
         ;;
 
     "ios-static")
-        build_ios_combined 'Realm iOS static' Realm "-static"
+        build_combined 'Realm iOS static' Realm iphoneos iphonesimulator "-static"
         exit 0
         ;;
 
     "ios-dynamic")
-        build_ios_combined "Realm" Realm
+        build_combined Realm Realm iphoneos iphonesimulator
         exit 0
         ;;
 
     "ios-swift")
         sh build.sh ios-dynamic
-        build_ios_combined RealmSwift RealmSwift '' "/swift-$REALM_SWIFT_VERSION"
+        build_combined RealmSwift RealmSwift iphoneos iphonesimulator '' "/swift-$REALM_SWIFT_VERSION"
         cp -R build/ios/Realm.framework build/ios/swift-$REALM_SWIFT_VERSION
         exit 0
         ;;
 
     "watchos")
-        build_watchos_combined Realm Realm
+        build_combined Realm Realm watchos watchsimulator
         exit 0
         ;;
 
     "watchos-swift")
         sh build.sh watchos
-        build_watchos_combined RealmSwift RealmSwift
+        build_combined RealmSwift RealmSwift watchos watchsimulator
         exit 0
         ;;
 
     "tvos")
-        build_tvos_combined Realm Realm
+        build_combined Realm Realm appletvos appletvsimulator
         exit 0
         ;;
 
     "tvos-swift")
-        build_tvos_combined RealmSwift RealmSwift
+        build_combined RealmSwift RealmSwift appletvos appletvsimulator
         exit 0
         ;;
 
