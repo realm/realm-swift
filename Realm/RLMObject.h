@@ -236,7 +236,7 @@ RLM_ASSUME_NONNULL_BEGIN
  for string and int properties.
  @return    NSArray of property names.
  */
-+ (NSArray *)indexedProperties;
++ (NSArray RLM_GENERIC(NSString *) *)indexedProperties;
 
 /**
  Implement to indicate the default values to be used for each property.
@@ -261,7 +261,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  @return    NSArray of property names to ignore.
  */
-+ (nullable NSArray *)ignoredProperties;
++ (nullable NSArray RLM_GENERIC(NSString *) *)ignoredProperties;
 
 /**
  Implement to return an array of property names that should not allow storing nil.
@@ -276,7 +276,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return    NSArray of property names that are required.
  */
-+ (NSArray *)requiredProperties;
++ (NSArray RLM_GENERIC(NSString *) *)requiredProperties;
 
 
 #pragma mark - Getting & Querying Objects from the Default Realm
