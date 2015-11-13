@@ -567,9 +567,9 @@ case "$COMMAND" in
         ;;
 
     "test-ios-swift")
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
+        xc_work_around_rdar_23055637 "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
         shutdown_simulators
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
+        xc_work_around_rdar_23055637 "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
         exit 0
         ;;
 
@@ -597,7 +597,7 @@ case "$COMMAND" in
         ;;
 
     "test-tvos-swift")
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
+        xc_work_around_rdar_23055637 "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
         exit $?
         ;;
 
