@@ -926,29 +926,28 @@ void update_query_with_value_expression(RLMSchema *schema,
     }
 }
 
-void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query,
-                                         NSString *leftColumnName, NSString *rightColumnName,
+void update_query_with_column_expression(RLMSchema *schema, RLMObjectSchema *desc, Query &query,
+                                         NSString *leftKeyPath, NSString *rightKeyPath,
                                          NSComparisonPredicate *predicate)
 {
-    // Validate object types
-    RLMProperty *left = RLMValidatedProperty(scheme, leftColumnName);
-    RLMPrecondition(left.type != RLMPropertyTypeArray, @"Invalid predicate",
-                    @"RLMArray predicates must contain the ANY modifier");
+    if (key_path_contains_collection_operator(leftKeyPath) || key_path_contains_collection_operator(rightKeyPath)) {
+        @throw RLMPredicateException(@"Unsupported predicate", @"Key paths including aggregate operations may only be compared with constants.");
+    }
 
-    RLMProperty *right = RLMValidatedProperty(scheme, rightColumnName);
-    RLMPrecondition(right.type != RLMPropertyTypeArray, @"Invalid predicate",
-                    @"RLMArray predicates must contain the ANY modifier");
+    bool isAny = false;
+    ColumnReference left = column_reference_from_key_path(schema, desc, leftKeyPath, isAny);
+    ColumnReference right = column_reference_from_key_path(schema, desc, rightKeyPath, isAny);
 
     // NOTE: It's assumed that column type must match and no automatic type conversion is supported.
-    RLMPrecondition(left.type == right.type,
+    RLMPrecondition(left.type() == right.type(),
                     RLMPropertiesComparisonTypeMismatchException,
                     RLMPropertiesComparisonTypeMismatchReason,
-                    RLMTypeToString(left.type),
-                    RLMTypeToString(right.type));
+                    RLMTypeToString(left.type()),
+                    RLMTypeToString(right.type()));
 
     // TODO: Should we handle special case where left row is the same as right row (tautology)
-    add_constraint_to_query(query, left.type, predicate.predicateOperatorType, predicate.options,
-                            ColumnReference(left), ColumnReference(right));
+    add_constraint_to_query(query, left.type(), predicate.predicateOperatorType, predicate.options,
+                            std::move(left), std::move(right));
 }
 
 void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
@@ -1022,7 +1021,7 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
 
         if (exp1Type == NSKeyPathExpressionType && exp2Type == NSKeyPathExpressionType) {
             // both expression are KeyPaths
-            update_query_with_column_expression(objectSchema, query, compp.leftExpression.keyPath,
+            update_query_with_column_expression(schema, objectSchema, query, compp.leftExpression.keyPath,
                                                 compp.rightExpression.keyPath, compp);
         }
         else if (exp1Type == NSKeyPathExpressionType && exp2Type == NSConstantValueExpressionType) {
