@@ -129,6 +129,39 @@ NSString *operatorName(NSPredicateOperatorType operatorType)
     return [NSString stringWithFormat:@"unknown operator %lu", (unsigned long)operatorType];
 }
 
+// A reference to a column within a query. Can be resolved to a Columns<T> for use in query expressions.
+class ColumnReference {
+public:
+    ColumnReference(RLMProperty* property, const std::vector<size_t>& links) :
+        m_property(property), m_links(links)
+    {
+    }
+    explicit ColumnReference(RLMProperty* property) : m_property(property) { }
+
+    template <typename T>
+    auto resolve(Query& query) const
+    {
+        return table_for_query(query)->template column<T>(index());
+    }
+
+    RLMProperty *property() const { return m_property; }
+    size_t index() const { return m_property.column; }
+    bool has_links() const { return m_links.size(); }
+
+private:
+    Table* table_for_query(Query& query) const
+    {
+        realm::TableRef& table = query.get_table();
+        for (size_t col : m_links) {
+            table->link(col); // mutates m_link_chain on table
+        }
+        return table.get();
+    }
+
+    RLMProperty *m_property;
+    std::vector<size_t> m_links;
+};
+
 class CollectionOperation {
 public:
     enum Type {
@@ -139,12 +172,13 @@ public:
         Average,
     };
 
-    CollectionOperation(Type type, RLMProperty *linkProperty, RLMProperty *property)
+    CollectionOperation(Type type, ColumnReference link_column, RLMProperty *property)
         : m_type(type)
-        , m_link_property(linkProperty)
+        , m_link_column(link_column)
         , m_property(property)
     {
-        RLMPrecondition(m_link_property.type == RLMPropertyTypeArray, @"Invalid predicate", @"Collection operation can only be applied to a property of type RLMArray.");
+        RLMPrecondition(link_column.property().type == RLMPropertyTypeArray, @"Invalid predicate",
+                        @"Collection operation can only be applied to a property of type RLMArray.");
 
         switch (m_type) {
             case Count:
@@ -159,15 +193,15 @@ public:
         }
     }
 
-    CollectionOperation(NSString *operationName, RLMProperty *linkProperty, RLMProperty *property = nil)
-        : CollectionOperation(type_for_name(operationName), linkProperty, property)
+    CollectionOperation(NSString *operationName, ColumnReference link_column, RLMProperty *property = nil)
+        : CollectionOperation(type_for_name(operationName), std::move(link_column), property)
     {
     }
 
     Type type() const { return m_type; }
-    NSUInteger linkColumnIndex() const { return m_link_property.column; }
-    NSUInteger columnIndex() const { return m_property.column; }
-    RLMPropertyType columnType() const { return m_property.type; }
+    const ColumnReference& link_column() const { return m_link_column; }
+    NSUInteger column_index() const { return m_property.column; }
+    RLMPropertyType column_type() const { return m_property.type; }
 
     void validate_value(id value) const {
         switch (m_type) {
@@ -215,7 +249,7 @@ private:
     }
 
     Type m_type;
-    RLMProperty *m_link_property;
+    ColumnReference m_link_column;
     RLMProperty *m_property;
 };
 
@@ -704,6 +738,14 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
     return prop;
 }
 
+ColumnReference column_reference_from_key_path(RLMSchema *schema, RLMObjectSchema *desc,
+                                               NSString *keyPath, bool isAggregate)
+{
+    std::vector<NSUInteger> links;
+    RLMProperty *property = get_property_from_key_path(schema, desc, keyPath, links, isAggregate);
+    return ColumnReference(property, links);
+}
+
 void validate_property_value(__unsafe_unretained RLMProperty *const prop,
                              __unsafe_unretained id const value,
                              __unsafe_unretained NSString *const err,
@@ -719,38 +761,38 @@ void validate_property_value(__unsafe_unretained RLMProperty *const prop,
     }
 }
 
-template <typename RequestedType, CollectionOperation::Type OperationType, typename TableGetter>
+template <typename RequestedType, CollectionOperation::Type OperationType>
 struct ValueOfTypeWithCollectionOperationHelper;
 
-template <typename RequestedType, typename TableGetter>
+template <typename RequestedType>
 struct ValueOfTypeWithCollectionOperationPassThrough {
     template <typename T>
-    static auto convert(TableGetter&& table, T&& value)
+    static auto convert(Query& query, T&& value)
     {
-        return value_of_type_for_query<RequestedType>(std::forward<TableGetter>(table), std::forward<T>(value));
+        return value_of_type_for_query<RequestedType>(query, std::forward<T>(value));
     }
 };
 
-template <typename TableGetter>
-struct ValueOfTypeWithCollectionOperationHelper<Int, CollectionOperation::Count, TableGetter> : ValueOfTypeWithCollectionOperationPassThrough<Int, TableGetter> {
-    using ValueOfTypeWithCollectionOperationPassThrough<Int, TableGetter>::convert;
+template <>
+struct ValueOfTypeWithCollectionOperationHelper<Int, CollectionOperation::Count> : ValueOfTypeWithCollectionOperationPassThrough<Int> {
+    using ValueOfTypeWithCollectionOperationPassThrough<Int>::convert;
 
-    static auto convert(TableGetter&& table, CollectionOperation operation)
+    static auto convert(Query& query, CollectionOperation operation)
     {
         assert(operation.type() == CollectionOperation::Count);
-        return table()->template column<Link>(operation.linkColumnIndex()).count();
+        return operation.link_column().resolve<Link>(query).count();
     }
 };
 
 #define VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER(OperationType, function) \
-template <typename T, typename TableGetter> \
-struct ValueOfTypeWithCollectionOperationHelper<T, OperationType, TableGetter> : ValueOfTypeWithCollectionOperationPassThrough<T, TableGetter> { \
-    using ValueOfTypeWithCollectionOperationPassThrough<T, TableGetter>::convert; \
+template <typename T> \
+struct ValueOfTypeWithCollectionOperationHelper<T, OperationType> : ValueOfTypeWithCollectionOperationPassThrough<T> { \
+    using ValueOfTypeWithCollectionOperationPassThrough<T>::convert; \
 \
-    static auto convert(TableGetter&& table, CollectionOperation operation) \
+    static auto convert(Query& query, CollectionOperation operation) \
     { \
         REALM_ASSERT(operation.type() == OperationType); \
-        auto targetColumn = table()->template column<Link>(operation.linkColumnIndex()).template column<T>(operation.columnIndex()); \
+        auto targetColumn = operation.link_column().resolve<Link>(query).template column<T>(operation.column_index()); \
         return targetColumn.function(); \
     } \
 } \
@@ -761,24 +803,24 @@ VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER(CollectionOperation::Sum, sum);
 VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER(CollectionOperation::Average, average);
 #undef VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER
 
-template <typename Requested, CollectionOperation::Type OperationType, typename TableGetter, typename T>
-auto value_of_type_for_query_with_collection_operation(TableGetter&& table, T&& value) {
-    using helper = ValueOfTypeWithCollectionOperationHelper<Requested, OperationType, TableGetter>;
-    return helper::convert(std::forward<TableGetter>(table), std::forward<T>(value));
+template <typename Requested, CollectionOperation::Type OperationType, typename T>
+auto value_of_type_for_query_with_collection_operation(Query& query, T&& value) {
+    using helper = ValueOfTypeWithCollectionOperationHelper<Requested, OperationType>;
+    return helper::convert(query, std::forward<T>(value));
 }
 
-template <CollectionOperation::Type Operation, typename TableGetter, typename... T>
-void add_collection_operation_constraint_to_query(realm::Query& query, RLMPropertyType propertyType, NSPredicateOperatorType operatorType, TableGetter&& table, T... values)
+template <CollectionOperation::Type Operation, typename... T>
+void add_collection_operation_constraint_to_query(realm::Query& query, RLMPropertyType propertyType, NSPredicateOperatorType operatorType, T... values)
 {
     switch (propertyType) {
         case RLMPropertyTypeInt:
-            add_numeric_constraint_to_query(query, propertyType, operatorType, value_of_type_for_query_with_collection_operation<Int, Operation>(table, values)...);
+            add_numeric_constraint_to_query(query, propertyType, operatorType, value_of_type_for_query_with_collection_operation<Int, Operation>(query, values)...);
             break;
         case RLMPropertyTypeFloat:
-            add_numeric_constraint_to_query(query, propertyType, operatorType, value_of_type_for_query_with_collection_operation<Float, Operation>(table, values)...);
+            add_numeric_constraint_to_query(query, propertyType, operatorType, value_of_type_for_query_with_collection_operation<Float, Operation>(query, values)...);
             break;
         case RLMPropertyTypeDouble:
-            add_numeric_constraint_to_query(query, propertyType, operatorType, value_of_type_for_query_with_collection_operation<Double, Operation>(table, values)...);
+            add_numeric_constraint_to_query(query, propertyType, operatorType, value_of_type_for_query_with_collection_operation<Double, Operation>(query, values)...);
             break;
         default:
             REALM_ASSERT(false && "Only numeric property types should hit this path.");
@@ -787,37 +829,29 @@ void add_collection_operation_constraint_to_query(realm::Query& query, RLMProper
 
 template <typename... T>
 void add_collection_operation_constraint_to_query(realm::Query& query, NSPredicateOperatorType operatorType,
-                                                  CollectionOperation collectionOperation, const std::vector<NSUInteger> linkColumns, T... values)
+                                                  CollectionOperation collectionOperation, T... values)
 {
     static_assert(sizeof...(T) == 2, "add_collection_operation_constraint_to_query accepts only two values as arguments");
 
-    auto table = [&] {
-        realm::TableRef& tbl = query.get_table();
-        for (NSUInteger col : linkColumns) {
-            tbl->link(col); // mutates m_link_chain on table
-        }
-        return tbl.get();
-    };
-
     switch (collectionOperation.type()) {
         case CollectionOperation::Count: {
-            add_numeric_constraint_to_query(query, RLMPropertyTypeInt, operatorType, value_of_type_for_query_with_collection_operation<Int, CollectionOperation::Count>(table, values)...);
+            add_numeric_constraint_to_query(query, RLMPropertyTypeInt, operatorType, value_of_type_for_query_with_collection_operation<Int, CollectionOperation::Count>(query, values)...);
             break;
         }
         case CollectionOperation::Minimum: {
-            add_collection_operation_constraint_to_query<CollectionOperation::Minimum>(query, collectionOperation.columnType(), operatorType, table, values...);
+            add_collection_operation_constraint_to_query<CollectionOperation::Minimum>(query, collectionOperation.column_type(), operatorType, values...);
             break;
         }
         case CollectionOperation::Maximum: {
-            add_collection_operation_constraint_to_query<CollectionOperation::Maximum>(query, collectionOperation.columnType(), operatorType, table, values...);
+            add_collection_operation_constraint_to_query<CollectionOperation::Maximum>(query, collectionOperation.column_type(), operatorType, values...);
             break;
         }
         case CollectionOperation::Sum: {
-            add_collection_operation_constraint_to_query<CollectionOperation::Sum>(query, collectionOperation.columnType(), operatorType, table, values...);
+            add_collection_operation_constraint_to_query<CollectionOperation::Sum>(query, collectionOperation.column_type(), operatorType, values...);
             break;
         }
         case CollectionOperation::Average: {
-            add_collection_operation_constraint_to_query<CollectionOperation::Average>(query, collectionOperation.columnType(), operatorType, table, values...);
+            add_collection_operation_constraint_to_query<CollectionOperation::Average>(query, collectionOperation.column_type(), operatorType, values...);
             break;
         }
     }
@@ -859,8 +893,7 @@ void update_query_with_collection_operator_expression(RLMSchema *schema,
     NSString *trailingKey;
     NSString *collectionOperationName = get_collection_operation_name_from_key_path(keyPath, &leadingKeyPath, &trailingKey);
 
-    std::vector<NSUInteger> indexes;
-    RLMProperty *linkProperty = get_property_from_key_path(schema, desc, leadingKeyPath, indexes, true);
+    ColumnReference linkColumn = column_reference_from_key_path(schema, desc, leadingKeyPath, true);
     RLMProperty *property;
     if (trailingKey) {
         RLMPrecondition([trailingKey rangeOfString:@"."].location == NSNotFound, @"Invalid key path", @"Right side of collection operator may only have a single level key");
@@ -869,13 +902,13 @@ void update_query_with_collection_operator_expression(RLMSchema *schema,
         property = get_property_from_key_path(schema, desc, fullKeyPath, ignoredIndexes, true);
     }
 
-    CollectionOperation operation(collectionOperationName, linkProperty, property);
+    CollectionOperation operation(collectionOperationName, std::move(linkColumn), property);
     operation.validate_value(value);
 
     if (pred.leftExpression.expressionType == NSKeyPathExpressionType) {
-        add_collection_operation_constraint_to_query(query, pred.predicateOperatorType, operation, indexes, operation, value);
+        add_collection_operation_constraint_to_query(query, pred.predicateOperatorType, operation, operation, value);
     } else {
-        add_collection_operation_constraint_to_query(query, pred.predicateOperatorType, operation, indexes, value, operation);
+        add_collection_operation_constraint_to_query(query, pred.predicateOperatorType, operation, value, operation);
     }
 }
 
