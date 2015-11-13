@@ -195,7 +195,7 @@ shutdown_simulators() {
 # Device Test Helper
 ######################################
 
-test_ios_devices() {
+test_devices() {
     serial_numbers_str=$(system_profiler SPUSBDataType | grep "Serial Number: ")
     serial_numbers=()
     while read -r line; do
@@ -212,37 +212,12 @@ test_ios_devices() {
         fi
         exit 1
     fi
-    scheme="$1"
-    configuration="$2"
-    failed=0
+    local sdk="$1"
+    local scheme="$2"
+    local configuration="$3"
+    local failed=0
     for device in "${serial_numbers[@]}"; do
-        xc "-scheme '$scheme' -configuration $configuration -destination 'id=$device' test" || failed=1
-    done
-    return $failed
-}
-
-test_tvos_devices() {
-    serial_numbers_str=$(system_profiler SPUSBDataType | grep "Serial Number: ")
-    serial_numbers=()
-    while read -r line; do
-        number=${line:15} # Serial number starts at position 15
-        if [[ ${#number} == 40 ]]; then
-            serial_numbers+=("$number")
-        fi
-    done <<< "$serial_numbers_str"
-    if [[ ${#serial_numbers[@]} == 0 ]]; then
-        echo "At least one iOS device must be connected to this computer to run device tests"
-        if [ -z "${JENKINS_HOME}" ]; then
-            # Don't fail if running locally and there's no device
-            exit 0
-        fi
-        exit 1
-    fi
-    scheme="$1"
-    configuration="$2"
-    failed=0
-    for device in "${serial_numbers[@]}"; do
-        xc "-scheme '$scheme' -configuration $configuration -destination 'id=$device' -sdk appletvos test ONLY_ACTIVE_ARCH=NO" || failed=1
+        xc "-scheme '$scheme' -configuration $configuration -destination 'id=$device' -sdk $sdk test" || failed=1
     done
     return $failed
 }
@@ -582,12 +557,12 @@ case "$COMMAND" in
         ;;
 
     "test-ios-devices-objc")
-        test_ios_devices "Realm iOS static" "$CONFIGURATION"
+        test_devices iphoneos "Realm iOS static" "$CONFIGURATION"
         exit $?
         ;;
 
     "test-ios-devices-swift")
-        test_ios_devices "RealmSwift" "$CONFIGURATION"
+        test_devices iphoneos "RealmSwift" "$CONFIGURATION"
         exit $?
         ;;
 
@@ -610,12 +585,12 @@ case "$COMMAND" in
         ;;
 
     "test-tvos-devices-objc")
-        test_tvos_devices "Realm" "$CONFIGURATION"
+        test_devices appletvos Realm "$CONFIGURATION"
         exit $?
         ;;
 
     "test-tvos-devices-swift")
-        test_tvos_devices "RealmSwift" "$CONFIGURATION"
+        test_devices appletvos RealmSwift "$CONFIGURATION"
         exit $?
         ;;
 
