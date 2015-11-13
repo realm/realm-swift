@@ -549,13 +549,6 @@ void process_or_group(Query &query, id array, Func&& func) {
 }
 
 template <typename RequestedType>
-struct ColumnOfTypeHelper {
-    static realm::Columns<RequestedType> convert(Query& query, const ColumnReference& column) {
-        return column.resolve<RequestedType>(query);
-    }
-};
-
-template <typename RequestedType>
 RequestedType convert(id value);
 
 template <>
@@ -588,21 +581,21 @@ String convert<String>(id value) {
     return RLMStringDataWithNSString(value);
 }
 
-template <typename RequestedType>
-struct ValueOfTypeHelper {
-    static realm::null convert(Query&, realm::null) { return realm::null(); }
-    static auto convert(Query&, id value) { return ::convert<RequestedType>(value); }
-};
-
-template <typename RequestedType, typename Value>
-auto value_of_type_for_query(Query& query, Value&& value)
-{
-    const bool isColumnReference = std::is_same<ColumnReference, typename std::remove_reference<Value>::type>::value;
-    using helper = std::conditional_t<isColumnReference,
-                                     ColumnOfTypeHelper<RequestedType>,
-                                     ValueOfTypeHelper<RequestedType>>;
-    return helper::convert(query, std::forward<Value>(value));
+template <typename>
+realm::null value_of_type_for_query(Query&, realm::null) {
+    return realm::null();
 }
+
+template <typename RequestedType>
+auto value_of_type_for_query(Query&, id value) {
+    return ::convert<RequestedType>(value);
+}
+
+template <typename RequestedType>
+auto value_of_type_for_query(Query& query, const ColumnReference& column) {
+    return column.resolve<RequestedType>(query);
+}
+
 
 template <typename... T>
 void do_add_constraint_to_query(realm::Query &query, RLMPropertyType type,
