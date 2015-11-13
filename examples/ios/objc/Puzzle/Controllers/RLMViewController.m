@@ -199,7 +199,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
     }
     
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Reset Puzzle?" message:@"Are you sure you wish to reset this puzzle?" preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Reset" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [self.puzzleView scramblePiecesAnimated];
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];

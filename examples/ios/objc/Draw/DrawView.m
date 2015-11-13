@@ -176,28 +176,30 @@
 
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
 {
-    if (motion == UIEventSubtypeMotionShake)
-    {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Reset Canvas?" message:@"This will clear the Realm database and reset the canvas. Are you sure you wish to proceed?" preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addAction:[UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-            [[RLMRealm defaultRealm] transactionWithBlock:^{
-                [[RLMRealm defaultRealm] deleteAllObjects];
-            }];
-            
-            //Clear the onscreen context
-            CGContextSetFillColorWithColor(self.onscreenContext, [UIColor whiteColor].CGColor);
-            CGContextFillRect(self.onscreenContext, self.bounds);
-            
-            //Clear the offscreen context
-            CGContextSetFillColorWithColor(self.offscreenContext, [UIColor whiteColor].CGColor);
-            CGContextFillRect(self.offscreenContext, self.bounds);
-            
-            [self setNeedsDisplay];
-        }]];
-        [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-        
-        [[[[UIApplication sharedApplication] keyWindow] rootViewController] presentViewController:alertController animated:YES completion:nil];
+    if (motion != UIEventSubtypeMotionShake) {
+        return;
     }
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Reset Canvas?" message:@"This will clear the Realm database and reset the canvas. Are you sure you wish to proceed?" preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Reset" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [[RLMRealm defaultRealm] transactionWithBlock:^{
+            [[RLMRealm defaultRealm] deleteAllObjects];
+        }];
+        
+        //Clear the onscreen context
+        CGContextSetFillColorWithColor(self.onscreenContext, [UIColor whiteColor].CGColor);
+        CGContextFillRect(self.onscreenContext, self.bounds);
+        
+        //Clear the offscreen context
+        CGContextSetFillColorWithColor(self.offscreenContext, [UIColor whiteColor].CGColor);
+        CGContextFillRect(self.offscreenContext, self.bounds);
+        
+        [self setNeedsDisplay];
+    }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    
+    [[[[UIApplication sharedApplication] keyWindow] rootViewController] presentViewController:alertController animated:YES completion:nil];
+
 }
 
 @end
