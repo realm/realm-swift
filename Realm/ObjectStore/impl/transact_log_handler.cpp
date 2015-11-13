@@ -43,6 +43,10 @@ class TransactLogHandler {
     // Change information for the currently selected LinkList, if any
     ColumnInfo* m_active_linklist = nullptr;
 
+    // Tables which were created during the transaction being processed, which
+    // can have columns inserted without a schema version bump
+    std::vector<size_t> m_new_tables;
+
     // Get the change info for the given column, creating it if needed
     static ColumnInfo& get_change(ObserverState& state, size_t i)
     {
@@ -82,6 +86,21 @@ class TransactLogHandler {
         m_observers.erase(m_observers.begin() + (o - &m_observers[0]));
     }
 
+    REALM_NORETURN
+    REALM_NOINLINE
+    void schema_error()
+    {
+        throw std::runtime_error("Schema mismatch detected: another process has modified the Realm file's schema in an incompatible way");
+    }
+
+    bool schema_error_unless_new_table()
+    {
+        if (std::find(begin(m_new_tables), end(m_new_tables), m_current_table) == end(m_new_tables)) {
+            schema_error();
+        }
+        return true;
+    }
+
 public:
     template<typename Func>
     TransactLogHandler(BindingContext* delegate, SharedGroup& sg, Func&& func)
@@ -113,21 +132,36 @@ public:
         m_delegate->will_change(m_observers, invalidated);
     }
 
-    // These would require having an observer before schema init
-    // Maybe do something here to throw an error when multiple processes have different schemas?
-    bool insert_group_level_table(size_t, size_t, StringData) { return false; }
-    bool erase_group_level_table(size_t, size_t) { return false; }
-    bool rename_group_level_table(size_t, StringData) { return false; }
-    bool insert_column(size_t, DataType, StringData, bool) { return false; }
-    bool insert_link_column(size_t, DataType, StringData, size_t, size_t) { return false; }
-    bool erase_column(size_t) { return false; }
-    bool erase_link_column(size_t, size_t, size_t) { return false; }
-    bool rename_column(size_t, StringData) { return false; }
-    bool add_search_index(size_t) { return false; }
-    bool remove_search_index(size_t) { return false; }
-    bool add_primary_key(size_t) { return false; }
-    bool remove_primary_key() { return false; }
-    bool set_link_type(size_t, LinkType) { return false; }
+    // Schema changes which don't involve a change in the schema version are
+    // allowed
+    bool add_search_index(size_t) { return true; }
+    bool remove_search_index(size_t) { return true; }
+
+    // Creating entirely new tables without a schema version bump is allowed, so
+    // we need to track if new columns are being added to a new table or an
+    // existing one
+    bool insert_group_level_table(size_t table_ndx, size_t, StringData)
+    {
+        for (auto& observer : m_observers) {
+            if (observer.table_ndx >= table_ndx)
+                ++observer.table_ndx;
+        }
+        m_new_tables.push_back(table_ndx);
+        return true;
+    }
+
+    bool insert_column(size_t, DataType, StringData, bool) { return schema_error_unless_new_table(); }
+    bool insert_link_column(size_t, DataType, StringData, size_t, size_t) { return schema_error_unless_new_table(); }
+    bool add_primary_key(size_t) { return schema_error_unless_new_table(); }
+    bool set_link_type(size_t, LinkType) { return schema_error_unless_new_table(); }
+
+    // Schema changes which are never allowed while a file is open
+    bool erase_group_level_table(size_t, size_t) { schema_error(); }
+    bool rename_group_level_table(size_t, StringData) { schema_error(); }
+    bool erase_column(size_t) { schema_error(); }
+    bool erase_link_column(size_t, size_t, size_t) { schema_error(); }
+    bool rename_column(size_t, StringData) { schema_error(); }
+    bool remove_primary_key() { schema_error(); }
 
     bool select_table(size_t group_level_ndx, int, const size_t*) noexcept
     {
@@ -306,6 +340,8 @@ public:
     bool set_link(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
     bool set_null(size_t col, size_t row) { return mark_dirty(row, col); }
     bool nullify_link(size_t col, size_t row, size_t) { return mark_dirty(row, col); }
+    bool insert_substring(size_t col, size_t row, size_t, StringData) { return mark_dirty(row, col); }
+    bool erase_substring(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
 
     // Doesn't change any data
     bool optimize_table() { return true; }
@@ -314,8 +350,6 @@ public:
     bool select_descriptor(int, const size_t*) { return false; }
 
     // Not implemented
-    bool insert_substring(size_t, size_t, size_t, StringData) { return false; }
-    bool erase_substring(size_t, size_t, size_t, size_t) { return false; }
     bool swap_rows(size_t, size_t) { return false; }
     bool move_column(size_t, size_t) { return false; }
     bool move_group_level_table(size_t, size_t) { return false; }
