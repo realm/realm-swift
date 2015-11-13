@@ -408,7 +408,7 @@ void forEach(realm::BindingContext::ObserverState const& state, Func&& func) {
 }
 }
 
-std::vector<realm::BindingContext::ObserverState> RLMGetObservedRows(NSArray *schema) {
+std::vector<realm::BindingContext::ObserverState> RLMGetObservedRows(NSArray RLM_GENERIC(RLMObjectSchema *) *schema) {
     std::vector<realm::BindingContext::ObserverState> observers;
     for (RLMObjectSchema *objectSchema in schema) {
         for (auto info : objectSchema->_observedObjects) {

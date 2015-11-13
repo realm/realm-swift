@@ -35,7 +35,7 @@ public final class ObjectSchema: CustomStringConvertible {
 
     /// Array of persisted `Property` objects for an object.
     public var properties: [Property] {
-        return (rlmObjectSchema.properties as! [RLMProperty]).map { Property($0) }
+        return rlmObjectSchema.properties.map { Property($0) }
     }
 
     /// The name of the class this schema describes.

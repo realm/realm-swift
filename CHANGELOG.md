@@ -4,6 +4,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### API breaking changes
 
 * All functionality deprecated in previous releases has been removed entirely.
+* Add generic type annotations to NSArrays and NSDictionaries in public APIs.
 
 ### Enhancements
 

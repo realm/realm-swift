@@ -114,7 +114,7 @@ class SwiftIgnoredPropertiesObject: RLMObject {
     dynamic var runtimeProperty: AnyObject?
     dynamic var readOnlyProperty: Int { return 0 }
 
-    override class func ignoredProperties() -> [AnyObject]? {
+    override class func ignoredProperties() -> [String]? {
         return ["runtimeProperty"]
     }
 }
