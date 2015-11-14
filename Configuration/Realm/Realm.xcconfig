@@ -19,9 +19,13 @@ HEADER_SEARCH_PATHS = $(inherited) $(DERIVED_FILE_DIR);
 LIBRARY_SEARCH_PATHS = core;
 
 ENABLE_BITCODE[sdk=iphone*] = YES;
+ENABLE_BITCODE[sdk=watch*] = YES;
+ENABLE_BITCODE[sdk=appletv*] = YES;
 
 LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks;
 LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
+LD_RUNPATH_SEARCH_PATHS[sdk=watch*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
+LD_RUNPATH_SEARCH_PATHS[sdk=appletv*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 
 OTHER_LDFLAGS[sdk=macosx*] = -lrealm$(REALM_LIBRARY_SUFFIX);
 OTHER_LIBTOOLFLAGS[sdk=macosx*] = -lrealm$(REALM_LIBRARY_SUFFIX);
