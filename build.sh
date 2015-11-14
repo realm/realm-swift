@@ -56,9 +56,7 @@ command:
   test-ios-devices-swift: tests Swift iOS framework on all attached iOS devices
   test-tvos:            tests tvOS framework
   test-tvos-swift:      tests RealmSwift tvOS framework
-  test-tvos-devices:     tests ObjC & Swift tvOS frameworks on all attached iOS devices
-  test-tvos-devices-objc:  tests ObjC tvOS framework on all attached iOS devices
-  test-tvos-devices-swift: tests Swift tvOS framework on all attached iOS devices
+  test-tvos-devices:    tests ObjC & Swift tvOS frameworks on all attached tvOS devices
   test-osx:             tests OS X framework
   test-osx-swift:       tests RealmSwift OS X framework
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device in both Debug and Release configurations, swiftlint
@@ -577,21 +575,7 @@ case "$COMMAND" in
         ;;
 
     "test-tvos-devices")
-        failed=0
-        trap "failed=1" ERR
-        sh build.sh test-tvos-devices-objc
-        sh build.sh test-tvos-devices-swift
-        exit $failed
-        ;;
-
-    "test-tvos-devices-objc")
-        test_devices appletvos Realm "$CONFIGURATION"
-        exit $?
-        ;;
-
-    "test-tvos-devices-swift")
-        test_devices appletvos RealmSwift "$CONFIGURATION"
-        exit $?
+        test_devices appletvos TestHost "$CONFIGURATION"
         ;;
 
     "test-osx")
@@ -711,13 +695,8 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "verify-tvos-device-objc")
-        sh build.sh test-tvos-devices-objc
-        exit 0
-        ;;
-
-    "verify-tvos-device-swift")
-        sh build.sh test-tvos-devices-swift
+    "verify-tvos-device")
+        sh build.sh test-tvos-devices
         exit 0
         ;;
 
