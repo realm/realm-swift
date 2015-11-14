@@ -205,7 +205,7 @@ test_devices() {
         fi
     done <<< "$serial_numbers_str"
     if [[ ${#serial_numbers[@]} == 0 ]]; then
-        echo "At least one iOS device must be connected to this computer to run device tests"
+        echo "At least one iOS/tvOS device must be connected to this computer to run device tests"
         if [ -z "${JENKINS_HOME}" ]; then
             # Don't fail if running locally and there's no device
             exit 0
