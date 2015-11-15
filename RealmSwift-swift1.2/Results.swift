@@ -310,12 +310,12 @@ public final class Results<T: Object>: ResultsBase {
      realm.refresh() from within the block, the query may be synchronously
      rerun the next time you access the results.
 
-     @warning This method cannot be called during a write transaction, or when
-              the containing realm is read-only.
+     :warning: This method cannot be called during a write transaction, or when
+               the containing realm is read-only.
 
-     @param queue The dispatch queue onto which the results should be delivered.
-     @param block The block to be called on the given `queue` with the queue-local copy of the results.
-     @return A token which must be held for as long as you want query results to be delivered.
+     :param: queue The dispatch queue onto which the results should be delivered.
+     :param: block The block to be called on the given `queue` with the queue-local copy of the results.
+     :returns: A token which must be held for as long as you want query results to be delivered.
      */
     public func deliverOn(queue: dispatch_queue_t, block: (Results<T>?, NSError?) -> ()) -> NotificationToken {
         weak var cachedResults: Results<T>? = nil
@@ -357,11 +357,11 @@ public final class Results<T: Object>: ResultsBase {
      realm.refresh() while on the main thread, the query may be synchronously
      rerun the next time you access the results.
 
-     @warning This method cannot be called during a write transaction, or when
-              the containing realm is read-only.
+     :warning: This method cannot be called during a write transaction, or when
+               the containing realm is read-only.
 
-     @param block The block to be called with the evaluated results
-     @return A token which must be held for as long as you want query results to be delivered.
+     :param: block The block to be called with the evaluated results
+     :returns: A token which must be held for as long as you want query results to be delivered.
      */
     public func deliverOnMainThread(block: (Results<T>?, NSError?) -> ()) -> NotificationToken {
         return deliverOn(dispatch_get_main_queue(), block: block)

@@ -512,6 +512,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
  stop, call the `-stop` method.
  */
 @interface RLMNotificationToken : NSObject
+/// Stop receiving notifications for the subcription that returned this token
 - (void)stop;
 @end
 
