@@ -180,6 +180,7 @@ bool Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
 {
     schema->validate();
 
+    // If the schema version matches, just verify that the schema itself also matches
     bool needs_update = !m_config.read_only && (m_config.schema_version != version || ObjectStore::needs_update(*m_config.schema, *schema));
     if (!needs_update) {
         ObjectStore::verify_schema(*m_config.schema, *schema, m_config.read_only);
@@ -188,39 +189,60 @@ bool Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
         return false;
     }
 
-    // Store the old config/schema for the migration function, and update
-    // our schema to the new one
-    auto old_schema = std::move(m_config.schema);
-    Config old_config(m_config);
-    old_config.read_only = true;
-    old_config.schema = std::move(old_schema);
+    begin_transaction();
+    struct WriteTransactionGuard {
+        Realm& realm;
+        ~WriteTransactionGuard() {
+            if (realm.is_in_transaction()) {
+                realm.cancel_transaction();
+            }
+        }
+    } write_transaction_guard{*this};
 
-    m_config.schema = std::move(schema);
-    m_config.schema_version = version;
+    // Recheck the schema version after beginning the write transaction
+    // If it changed then someone else initialized the schema and we need to
+    // recheck everything
+    auto current_schema_version = ObjectStore::get_schema_version(read_group());
+    if (current_schema_version != m_config.schema_version) {
+        cancel_transaction();
+
+        m_config.schema_version = current_schema_version;
+        *m_config.schema = ObjectStore::schema_from_group(read_group());
+        return update_schema(std::move(schema), version);
+    }
 
     auto migration_function = [&](Group*,  Schema&) {
-        SharedRealm old_realm(new Realm(old_config));
-        auto updated_realm = shared_from_this();
-        m_config.migration_function(old_realm, updated_realm);
+        SharedRealm old_realm(new Realm(m_config));
+        old_realm->m_config.read_only = true;
+
+        auto new_realm = shared_from_this();
+        m_config.schema = std::move(schema);
+        m_config.schema_version = version;
+
+        try {
+            m_config.migration_function(old_realm, new_realm);
+        }
+        catch (...) {
+            m_config.schema = std::move(old_realm->m_config.schema);
+            m_config.schema_version = old_realm->m_config.schema_version;
+            throw;
+        }
     };
 
-    try {
-        // update and migrate
-        begin_transaction();
-        bool changed = ObjectStore::update_realm_with_schema(read_group(), *old_config.schema,
-                                                             version, *m_config.schema,
-                                                             migration_function);
-        commit_transaction();
-        return changed;
+    bool changed = ObjectStore::update_realm_with_schema(read_group(), *m_config.schema,
+                                                         version, *schema,
+                                                         migration_function);
+    commit_transaction();
+
+    if (schema) {
+        // We update the schema after opening the "old" Realm in the migration
+        // block to reduce the amount of juggling required, but that means that
+        // the schema hasn't been updated if no migration occurred
+        m_config.schema = std::move(schema);
+        m_config.schema_version = version;
     }
-    catch (...) {
-        if (is_in_transaction()) {
-            cancel_transaction();
-        }
-        m_config.schema_version = old_config.schema_version;
-        m_config.schema = std::move(old_config.schema);
-        throw;
-    }
+
+    return changed;
 }
 
 static void check_read_write(Realm *realm)
