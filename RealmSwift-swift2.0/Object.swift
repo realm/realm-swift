@@ -333,7 +333,9 @@ public class ObjectUtil: NSObject {
     }
 
     @objc private class func initializeOptionalProperty(object: RLMObjectBase, property: RLMProperty) {
-        (object as! Object).optionalForProperty(property).object = object
+        let optional = (object as! Object).optionalForProperty(property)
+        optional.property = property
+        optional.object = object
     }
 
     @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
