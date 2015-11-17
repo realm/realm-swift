@@ -184,6 +184,8 @@ public class Object: RLMObjectBase {
             if property.type == .Array {
                 return self.listForProperty(property)
             }
+            // No special logic is needed for optional numbers here because the NSNumber returned by RLMDynamicGet
+            // is better for callers than the RealmOptional that optionalForProperty would give us.
             return RLMDynamicGet(self, property)
         }
         set(value) {
