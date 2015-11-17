@@ -570,9 +570,16 @@ public:
     }
 
     void update_ready() override {
-        auto block = _block;
+        __weak auto block = _block;
         auto config = _config;
+        void *key = this;
         dispatch_async(_queue, ^{
+            if (dispatch_get_specific(key) != key) {
+                // Query was stopped after this was dispatched, so skip opening
+                // the Realm pointlessly
+                return;
+            }
+
             @autoreleasepool {
                 NSError *error;
                 RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:&error];
