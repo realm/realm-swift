@@ -211,38 +211,31 @@ bool Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
         return update_schema(std::move(schema), version);
     }
 
+    Config old_config(m_config);
     auto migration_function = [&](Group*,  Schema&) {
-        SharedRealm old_realm(new Realm(m_config));
+        SharedRealm old_realm(new Realm(old_config));
+        // Need to open in read-write mode so that it uses a SharedGroup, but
+        // users shouldn't actually be able to write via the old realm
         old_realm->m_config.read_only = true;
 
-        auto new_realm = shared_from_this();
-        m_config.schema = std::move(schema);
-        m_config.schema_version = version;
-
-        try {
-            m_config.migration_function(old_realm, new_realm);
-        }
-        catch (...) {
-            m_config.schema = std::move(old_realm->m_config.schema);
-            m_config.schema_version = old_realm->m_config.schema_version;
-            throw;
-        }
+        m_config.migration_function(old_realm, shared_from_this());
     };
 
-    bool changed = ObjectStore::update_realm_with_schema(read_group(), *m_config.schema,
-                                                         version, *schema,
-                                                         migration_function);
-    commit_transaction();
-
-    if (schema) {
-        // We update the schema after opening the "old" Realm in the migration
-        // block to reduce the amount of juggling required, but that means that
-        // the schema hasn't been updated if no migration occurred
+    try {
         m_config.schema = std::move(schema);
         m_config.schema_version = version;
-    }
 
-    return changed;
+        bool changed = ObjectStore::update_realm_with_schema(read_group(), *old_config.schema,
+                                                             version, *m_config.schema,
+                                                             migration_function);
+        commit_transaction();
+        return changed;
+    }
+    catch (...) {
+        m_config.schema = std::move(old_config.schema);
+        m_config.schema_version = old_config.schema_version;
+        throw;
+    }
 }
 
 static void check_read_write(Realm *realm)
