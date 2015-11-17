@@ -192,7 +192,57 @@ class MigrationTests: TestCase {
                 XCTAssertTrue(oldObject! as AnyObject is MigrationObject)
                 XCTAssertTrue(newObject! as AnyObject is MigrationObject)
                 XCTAssertTrue(oldObject!["array"]! is List<MigrationObject>)
-                XCTAssertTrue(oldObject!["array"]! is List<MigrationObject>)
+                XCTAssertTrue(newObject!["array"]! is List<MigrationObject>)
+            }
+        }
+
+        autoreleasepool {
+            Realm().write {
+                let soo = SwiftOptionalObject()
+                soo.optNSStringCol = "NSString"
+                soo.optStringCol = "String"
+                soo.optBinaryCol = NSData()
+                soo.optDateCol = NSDate()
+                soo.optIntCol.value = 1
+                soo.optInt8Col.value = 2
+                soo.optInt16Col.value = 3
+                soo.optInt32Col.value = 4
+                soo.optInt64Col.value = 5
+                soo.optFloatCol.value = 6.1
+                soo.optDoubleCol.value = 7.2
+                soo.optBoolCol.value = true
+                Realm().add(soo)
+            }
+        }
+
+        migrateAndTestDefaultRealm(schemaVersion: 4) { migration, oldSchemaVersion in
+            migration.enumerate("SwiftOptionalObject") { oldObject, newObject in
+                XCTAssertTrue(oldObject! as AnyObject is MigrationObject)
+                XCTAssertTrue(newObject! as AnyObject is MigrationObject)
+                XCTAssertTrue(oldObject!["optNSStringCol"]! is NSString)
+                XCTAssertTrue(newObject!["optNSStringCol"]! is NSString)
+                XCTAssertTrue(oldObject!["optStringCol"]! is String)
+                XCTAssertTrue(newObject!["optStringCol"]! is String)
+                XCTAssertTrue(oldObject!["optBinaryCol"]! is NSData)
+                XCTAssertTrue(newObject!["optBinaryCol"]! is NSData)
+                XCTAssertTrue(oldObject!["optDateCol"]! is NSDate)
+                XCTAssertTrue(newObject!["optDateCol"]! is NSDate)
+                XCTAssertTrue(oldObject!["optIntCol"]! is Int)
+                XCTAssertTrue(newObject!["optIntCol"]! is Int)
+                XCTAssertTrue(oldObject!["optInt8Col"]! is Int)
+                XCTAssertTrue(newObject!["optInt8Col"]! is Int)
+                XCTAssertTrue(oldObject!["optInt16Col"]! is Int)
+                XCTAssertTrue(newObject!["optInt16Col"]! is Int)
+                XCTAssertTrue(oldObject!["optInt32Col"]! is Int)
+                XCTAssertTrue(newObject!["optInt32Col"]! is Int)
+                XCTAssertTrue(oldObject!["optInt64Col"]! is Int)
+                XCTAssertTrue(newObject!["optInt64Col"]! is Int)
+                XCTAssertTrue(oldObject!["optFloatCol"]! is Float)
+                XCTAssertTrue(newObject!["optFloatCol"]! is Float)
+                XCTAssertTrue(oldObject!["optDoubleCol"]! is Double)
+                XCTAssertTrue(newObject!["optDoubleCol"]! is Double)
+                XCTAssertTrue(oldObject!["optBoolCol"]! is Bool)
+                XCTAssertTrue(newObject!["optBoolCol"]! is Bool)
             }
         }
     }
