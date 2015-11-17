@@ -324,18 +324,17 @@ public final class Results<T: Object>: ResultsBase {
     public func deliverOn(queue: dispatch_queue_t, block: (Results<T>?, NSError?) -> ()) -> NotificationToken {
         weak var cachedResults: Results<T>? = nil
         return rlmResults.deliverOn(queue) { results, error in
-            if let results = results {
-                if let cachedResults = cachedResults {
-                    block(cachedResults, nil) // contained RLMResults has been updated already
-                }
-                else {
-                    let r = Results<T>(results)
-                    cachedResults = r
-                    block(r, nil)
-                }
+            guard let results = results else {
+                block(nil, error)
+                return
+            }
+            if let cachedResults = cachedResults {
+                block(cachedResults, nil) // contained RLMResults has been updated already
             }
             else {
-                block(nil, error)
+                let r = Results<T>(results)
+                cachedResults = r
+                block(r, nil)
             }
         }
     }
