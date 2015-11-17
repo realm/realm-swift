@@ -438,6 +438,9 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 + (void)initializeListProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property array:(__unused RLMArray *)array {
 }
 
++ (void)initializeOptionalProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property {
+}
+
 + (NSDictionary *)getOptionalProperties:(__unused id)obj {
     return nil;
 }
