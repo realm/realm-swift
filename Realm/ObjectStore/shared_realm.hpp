@@ -77,8 +77,7 @@ namespace realm {
         // updating indexes as necessary. Uses the existing migration function
         // on the Config, and the resulting Schema and version with updated
         // column mappings are set on the realms config upon success.
-        // returns if any changes were made
-        bool update_schema(std::unique_ptr<Schema> schema, uint64_t version);
+        void update_schema(std::unique_ptr<Schema> schema, uint64_t version);
 
         static uint64_t get_schema_version(Config const& config);
 

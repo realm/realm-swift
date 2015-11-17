@@ -176,7 +176,7 @@ SharedRealm Realm::get_shared_realm(Config config)
     return realm;
 }
 
-bool Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
+void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
 {
     schema->validate();
 
@@ -186,7 +186,7 @@ bool Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
         ObjectStore::verify_schema(*m_config.schema, *schema, m_config.read_only);
         m_config.schema = std::move(schema);
         m_config.schema_version = version;
-        return false;
+        return;
     }
 
     begin_transaction();
@@ -225,11 +225,10 @@ bool Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
         m_config.schema = std::move(schema);
         m_config.schema_version = version;
 
-        bool changed = ObjectStore::update_realm_with_schema(read_group(), *old_config.schema,
-                                                             version, *m_config.schema,
-                                                             migration_function);
+        ObjectStore::update_realm_with_schema(read_group(), *old_config.schema,
+                                              version, *m_config.schema,
+                                              migration_function);
         commit_transaction();
-        return changed;
     }
     catch (...) {
         m_config.schema = std::move(old_config.schema);

@@ -52,12 +52,11 @@ namespace realm {
         static bool needs_update(Schema const& old_schema, Schema const& schema);
         
         // updates a Realm from old_schema to the given target schema, creating and updating tables as needed
-        // returns if any changes were made
         // passed in target schema is updated with the correct column mapping
         // optionally runs migration function if schema is out of date
         // NOTE: must be performed within a write transaction
         typedef std::function<void(Group *, Schema &)> MigrationFunction;
-        static bool update_realm_with_schema(Group *group, Schema const& old_schema, uint64_t version,
+        static void update_realm_with_schema(Group *group, Schema const& old_schema, uint64_t version,
                                              Schema &schema, MigrationFunction migration);
 
         // get a table for an object type
@@ -86,11 +85,11 @@ namespace realm {
         // create any metadata tables that don't already exist
         // must be in write transaction to set
         // returns true if it actually did anything
-        static bool create_metadata_tables(Group *group);
+        static void create_metadata_tables(Group *group);
 
         // set references to tables on targetSchema and create/update any missing or out-of-date tables
         // if update existing is true, updates existing tables, otherwise only adds and initializes new tables
-        static bool create_tables(realm::Group *group, Schema &target_schema, bool update_existing);
+        static void create_tables(realm::Group *group, Schema &target_schema, bool update_existing);
 
         // verify a target schema against an expected schema, setting the table_column property on each schema object
         // updates the column mapping on the target_schema
