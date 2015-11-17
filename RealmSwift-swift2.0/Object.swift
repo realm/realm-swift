@@ -184,6 +184,8 @@ public class Object: RLMObjectBase {
             if property.type == .Array {
                 return self.listForProperty(property)
             }
+            // No special logic is needed for optional numbers here because the NSNumber returned by RLMDynamicGet
+            // is better for callers than the RealmOptional that optionalForProperty would give us.
             return RLMDynamicGet(self, property)
         }
         set(value) {
@@ -250,6 +252,11 @@ public class Object: RLMObjectBase {
     internal func listForProperty(prop: RLMProperty) -> RLMListBase {
         return object_getIvar(self, prop.swiftIvar) as! RLMListBase
     }
+
+    // Helper for getting the optional object for a property
+    internal func optionalForProperty(prop: RLMProperty) -> RLMOptionalBase {
+        return object_getIvar(self, prop.swiftIvar) as! RLMOptionalBase
+    }
 }
 
 
@@ -258,6 +265,7 @@ public class Object: RLMObjectBase {
 /// :nodoc:
 public final class DynamicObject: Object {
     private var listProperties = [String: List<DynamicObject>]()
+    private var optionalProperties = [String: RLMOptionalBase]()
 
     // Override to create List<DynamicObject> on access
     internal override func listForProperty(prop: RLMProperty) -> RLMListBase {
@@ -267,6 +275,17 @@ public final class DynamicObject: Object {
         let list = List<DynamicObject>()
         listProperties[prop.name] = list
         return list
+    }
+
+    // Override to create RealmOptional on access
+    internal override func optionalForProperty(prop: RLMProperty) -> RLMOptionalBase {
+        if let optional = optionalProperties[prop.name] {
+            return optional
+        }
+        let optional = RLMOptionalBase()
+        optional.property = prop
+        optionalProperties[prop.name] = optional
+        return optional
     }
 
     /// :nodoc:
@@ -313,6 +332,12 @@ public class ObjectUtil: NSObject {
 
     @objc private class func initializeListProperty(object: RLMObjectBase, property: RLMProperty, array: RLMArray) {
         (object as! Object).listForProperty(property)._rlmArray = array
+    }
+
+    @objc private class func initializeOptionalProperty(object: RLMObjectBase, property: RLMProperty) {
+        let optional = (object as! Object).optionalForProperty(property)
+        optional.property = property
+        optional.object = object
     }
 
     @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
