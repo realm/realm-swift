@@ -524,7 +524,8 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
     if (!self.isParent) {
         RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[IntObject.class]];
-        schema.objectSchema[0].properties[0].type = RLMPropertyTypeFloat;
+        RLMProperty *prop = ((NSArray *)[schema.objectSchema[0] properties])[0];
+        prop.type = RLMPropertyTypeFloat;
 
         RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
         config.customSchema = schema;
