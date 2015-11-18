@@ -949,7 +949,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqualObjects(@0, obj.doubleObj);
     XCTAssertEqualObjects(@0, obj.boolObj);
     XCTAssertEqualObjects(@"", obj.string);
-    XCTAssertEqualObjects(nil, obj.data);
+    XCTAssertEqualObjects(NSData.data, obj.data);
     XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:0], obj.date);
 
     obj = allObjects[1];
@@ -958,7 +958,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqualObjects(@0, obj.doubleObj);
     XCTAssertEqualObjects(@0, obj.boolObj);
     XCTAssertEqualObjects(@"", obj.string);
-    XCTAssertEqualObjects(nil, obj.data);
+    XCTAssertEqualObjects(NSData.data, obj.data);
     XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:0], obj.date);
 }
 
