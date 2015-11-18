@@ -315,12 +315,6 @@ BOOL RLMIsObjectSubclass(Class klass) {
 
 BOOL RLMIsDebuggerAttached()
 {
-    // NOTE: Debugger checks are a workaround for LLDB hangs when dealing with encrypted realms (issue #1625).
-    // Skipping the checks is necessary for encryption tests to run, but can result in hangs when debugging
-    // other tests.
-    if (getenv("REALM_SKIP_DEBUGGER_CHECKS"))
-        return NO;
-
     int name[] = {
         CTL_KERN,
         KERN_PROC,
