@@ -22,6 +22,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Set the default value for newly added non-optional NSData properties to a
   zero-byte NSData rather than nil.
 * Fix a potential crash when deleting all objects of a class.
+* Fix performance problems when creating large numbers of objects with
+  `RLMArray`/`List` properties.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
