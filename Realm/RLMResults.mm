@@ -545,7 +545,10 @@ public:
             RLMRealm *realm = [RLMRealm realmWithConfiguration:_config error:nil];
             RLMResults *results = _previousResults;
             if (results) {
-                results->_realm = realm;
+                if (results->_realm != realm) {
+                    results->_realm = realm;
+                    results.objectSchema = realm.schema[_objectClassName];
+                }
                 results->_results = std::move(r);
             }
             else {
