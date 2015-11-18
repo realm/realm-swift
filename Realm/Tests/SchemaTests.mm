@@ -621,7 +621,9 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 - (void)testAddingIndexToExistingColumnInBackgroundProcess {
     if (!self.isParent) {
         RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[IntObject.class]];
-        schema.objectSchema[0].properties[0].indexed = YES;
+        RLMObjectSchema *objectSchema = schema.objectSchema[0];
+        RLMProperty *prop = objectSchema.properties[0];
+        prop.indexed = YES;
 
         RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
         config.customSchema = schema;
@@ -650,7 +652,9 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 - (void)testRemovingIndexFromExistingColumnInBackgroundProcess {
     if (!self.isParent) {
         RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[IndexedStringObject.class]];
-        schema.objectSchema[0].properties[0].indexed = NO;
+        RLMObjectSchema *objectSchema = schema.objectSchema[0];
+        RLMProperty *prop = objectSchema.properties[0];
+        prop.indexed = NO;
 
         RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
         config.customSchema = schema;
@@ -679,7 +683,9 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 - (void)testMigratingToLaterVersionInBackgroundProcess {
     if (!self.isParent) {
         RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[IntObject.class]];
-        schema.objectSchema[0].properties[0].type = RLMPropertyTypeFloat;
+        RLMObjectSchema *objectSchema = schema.objectSchema[0];
+        RLMProperty *prop = objectSchema.properties[0];
+        prop.type = RLMPropertyTypeFloat;
 
         RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
         config.customSchema = schema;
