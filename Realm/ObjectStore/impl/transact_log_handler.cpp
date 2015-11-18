@@ -44,6 +44,8 @@ class TransactLogValidator {
         throw std::runtime_error("Schema mismatch detected: another process has modified the Realm file's schema in an incompatible way");
     }
 
+    // Throw an exception if the currently modified table already existed before
+    // the current set of modifications
     bool schema_error_unless_new_table()
     {
         if (std::find(begin(m_new_tables), end(m_new_tables), m_current_table) == end(m_new_tables)) {
@@ -185,23 +187,6 @@ class TransactLogObserver : public TransactLogValidator {
     {
         invalidated.push_back(o->info);
         m_observers.erase(m_observers.begin() + (o - &m_observers[0]));
-    }
-
-    REALM_NORETURN
-    REALM_NOINLINE
-    void schema_error()
-    {
-        throw std::runtime_error("Schema mismatch detected: another process has modified the Realm file's schema in an incompatible way");
-    }
-
-    // Throw an exception if the currently modified table already existed before
-    // the current set of modifications
-    bool schema_error_unless_new_table()
-    {
-        if (std::find(begin(m_new_tables), end(m_new_tables), current_table()) == end(m_new_tables)) {
-            schema_error();
-        }
-        return true;
     }
 
 public:
