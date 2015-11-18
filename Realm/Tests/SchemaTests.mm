@@ -23,8 +23,8 @@
 #import "RLMAccessor.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMRealm_Dynamic.h"
-#import "RLMSchema_Private.h"
 #import "RLMSchema_Private.h"
 
 #import <algorithm>
@@ -485,7 +485,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         return;
     }
 
-    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
 
     // Verify that opening with class subsets without the shared schema being
     // initialized works
@@ -517,6 +517,62 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         XCTAssertEqual(realm.schema.objectSchema.count,
                        [NSSet setWithArray:[realm.schema.objectSchema valueForKey:@"className"]].count);
     }
+}
+
+- (void)testMultipleProcessesTryingToInitializeSchema {
+    RLMRealm *syncRealm = [self realmWithTestPath];
+
+    if (!self.isParent) {
+        RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[IntObject.class]];
+        RLMProperty *prop = ((NSArray *)[schema.objectSchema[0] properties])[0];
+        prop.type = RLMPropertyTypeFloat;
+
+        RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+        config.customSchema = schema;
+        config.schemaVersion = 1;
+
+        [syncRealm transactionWithBlock:^{
+            [StringObject createInRealm:syncRealm withValue:@[@""]];
+        }];
+
+        [RLMRealm realmWithConfiguration:config error:nil];
+        return;
+    }
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[IntObject.class];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+
+    // Hold a write transaction to prevent the child processes from performing
+    // the migration immediately
+    [realm beginWriteTransaction];
+
+    // Spawn a bunch of child processes which will all try to perform the migration
+    dispatch_group_t group = dispatch_group_create();
+    for (int i = 0; i < 5; ++i) {
+        dispatch_group_async(group, dispatch_get_global_queue(0, 0), ^{
+            RLMRunChildAndWait();
+        });
+    }
+
+    // Wait for all five to be immediately before the point where they will try
+    // to perform the migration. There's inherently a race condition here in
+    // as in theory all but one process could be suspended immediately after
+    // committing the signalling commit and then not get woken up until after
+    // the migration is complete, but in practice it won't happen and we can't
+    // wait for someone to be waiting on a mutex.
+    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
+    RLMNotificationToken *token = [syncRealm addNotificationBlock:^(NSString *, RLMRealm *) {
+        if ([StringObject allObjectsInRealm:syncRealm].count == 5) {
+            [notificationFired fulfill];
+        }
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [realm removeNotification:token];
+
+    // Release the write transaction and let them run
+    [realm cancelWriteTransaction];
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 }
 #endif
 
