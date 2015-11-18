@@ -68,6 +68,11 @@ public:
     // existing one
     bool insert_group_level_table(size_t table_ndx, size_t, StringData)
     {
+        // Shift any previously added tables after the new one
+        for (auto& table : m_new_tables) {
+            if (table >= table_ndx)
+                ++table;
+        }
         m_new_tables.push_back(table_ndx);
         return true;
     }
