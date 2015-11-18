@@ -282,7 +282,7 @@ class MigrationTests: TestCase {
         }
 
         migrateAndTestDefaultRealm() { migration, oldSchemaVersion in
-            var deleted = false;
+            var deleted = false
             migration.enumerate("SwiftStringObject", { oldObj, newObj in
                 if deleted == false {
                     migration.delete(newObj!)
@@ -303,13 +303,13 @@ class MigrationTests: TestCase {
         }
 
         migrateAndTestDefaultRealm() { migration, oldSchemaVersion in
-            XCTAssertEqual(oldSchemaVersion, 0, "Initial schema version should be 0");
+            XCTAssertEqual(oldSchemaVersion, 0, "Initial schema version should be 0")
 
-            XCTAssertTrue(migration.deleteData("DeletedClass"));
-            XCTAssertFalse(migration.deleteData("NoSuchClass"));
+            XCTAssertTrue(migration.deleteData("DeletedClass"))
+            XCTAssertFalse(migration.deleteData("NoSuchClass"))
 
             migration.create(SwiftStringObject.className(), value: ["migration"])
-            XCTAssertTrue(migration.deleteData(SwiftStringObject.className()));
+            XCTAssertTrue(migration.deleteData(SwiftStringObject.className()))
         }
 
         let realm = dynamicRealm(defaultRealmPath())

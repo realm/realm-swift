@@ -88,14 +88,14 @@ public final class Realm {
 
     /**
     Performs actions contained within the given block inside a write transation.
-	
-    Write transactions cannot be nested, and trying to execute a write transaction 
-	on a `Realm` which is already in a write transaction will throw an exception. 
+
+    Write transactions cannot be nested, and trying to execute a write transaction
+	on a `Realm` which is already in a write transaction will throw an exception.
 	Calls to `write` from `Realm` instances in other threads will block
     until the current write transaction completes.
 
-    Before executing the write transaction, `write` updates the `Realm` to the 
-	latest Realm version, as if `refresh()` was called, and generates notifications 
+    Before executing the write transaction, `write` updates the `Realm` to the
+	latest Realm version, as if `refresh()` was called, and generates notifications
 	if applicable. This has no effect if the `Realm` was already up to date.
 
     - parameter block: The block to be executed inside a write transaction.
@@ -467,8 +467,8 @@ public final class Realm {
     in this Realm on the next cycle of the run loop after the changes are
     committed.  If set to `false`, you must manually call `refresh()` on the Realm to
     update it to get the latest version.
-	
-	Note that on background threads, the run loop is not run by default and you will 
+
+	Note that on background threads, the run loop is not run by default and you will
 	will need to manually call `refresh()` in order to update to the latest version,
 	even if `autorefresh` is set to `true`.
 

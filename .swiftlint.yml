@@ -5,6 +5,7 @@ included:
   - RealmSwift-swift2.0
 disabled_rules:
   - force_cast
+  - force_try
   - todo
 line_length:
   - 120

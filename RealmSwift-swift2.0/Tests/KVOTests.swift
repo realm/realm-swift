@@ -25,9 +25,9 @@ func nextPrimaryKey() -> Int {
 }
 
 class KVOObject: Object {
-    // swiftlint:disable variable_name
+    // swiftlint:disable variable_name_min_length
     dynamic var pk = nextPrimaryKey() // primary key for equality
-    // swiftlint:enable variable_name
+    // swiftlint:enable variable_name_min_length
     dynamic var ignored: Int = 0
 
     dynamic var boolCol: Bool = false

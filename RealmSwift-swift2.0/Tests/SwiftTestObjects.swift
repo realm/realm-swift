@@ -193,6 +193,18 @@ class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
     let boolArray = List<SwiftBoolObject>()
 }
 
+class SwiftLinkToPrimaryStringObject: Object {
+    // swiftlint:disable variable_name_min_length
+    dynamic var pk = ""
+    // swiftlint:enable variable_name_min_length
+    dynamic var object: SwiftPrimaryStringObject?
+    let objects = List<SwiftPrimaryStringObject>()
+
+    override class func primaryKey() -> String? {
+        return "pk"
+    }
+}
+
 class SwiftUTF8Object: Object {
     // swiftlint:disable variable_name
     dynamic var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
@@ -208,16 +220,6 @@ class SwiftIgnoredPropertiesObject: Object {
 
     override class func ignoredProperties() -> [String] {
         return ["runtimeProperty", "runtimeDefaultProperty"]
-    }
-}
-
-class SwiftLinkToPrimaryStringObject: Object {
-    dynamic var pk = ""
-    dynamic var object: SwiftPrimaryStringObject?
-    let objects = List<SwiftPrimaryStringObject>()
-
-    override class func primaryKey() -> String? {
-        return "pk"
     }
 }
 

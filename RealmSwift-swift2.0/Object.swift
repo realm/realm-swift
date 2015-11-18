@@ -47,9 +47,9 @@ class Dog: Object {
 - `List<T: Object>` for to-many relationships
 
 `String`, `NSString`, `NSDate`, `NSData` and `Object` subclass properties can be
-optional. `Int`, `Int8`, Int16`, Int32`, `Int64`, `Float`, `Double`, `Bool` 
-and `List` properties cannot. To store an optional number, instead use 
-`RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or 
+optional. `Int`, `Int8`, Int16`, Int32`, `Int64`, `Float`, `Double`, `Bool`
+and `List` properties cannot. To store an optional number, instead use
+`RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or
 `RealmOptional<Bool>` instead, which wraps an optional value of the generic type.
 
 All property types except for `List` and `RealmOptional` *must* be declared as
@@ -58,7 +58,7 @@ non-dynamic `let` properties.
 
 ### Querying
 
-You can gets `Results` of an Object subclass via the `objects(_:)` instance 
+You can gets `Results` of an Object subclass via the `objects(_:)` instance
 method on `Realm`.
 
 ### Relationships
@@ -224,7 +224,7 @@ public class Object: RLMObjectBase {
     /// Objects are considered equal when they are both from the same Realm
     /// and point to the same underlying object in the database.
     public override func isEqual(object: AnyObject?) -> Bool {
-        return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase);
+        return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
 
     // MARK: Private functions
@@ -299,7 +299,7 @@ public final class DynamicObject: Object {
 
     /// :nodoc:
     public override class func shouldIncludeInDefaultSchema() -> Bool {
-        return false;
+        return false
     }
 }
 
