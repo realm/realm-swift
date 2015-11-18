@@ -28,7 +28,7 @@ using namespace realm;
 
 namespace {
 // A transaction log handler that just validates that all operations made are
-// onces supported by the object store
+// ones supported by the object store
 class TransactLogValidator {
     // Index of currently selected table
     size_t m_current_table = 0;
