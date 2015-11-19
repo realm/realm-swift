@@ -1,16 +1,16 @@
 //
-//  ViewController.m
+//  RepositoriesViewController.m
 //  DownloadCache
 //
 //  Created by Katsumi Kishikawa on 11/19/15.
 //  Copyright © 2015 Realm. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "RepositoriesViewController.h"
 #import "RepositoryCell.h"
 #import "Repository.h"
 
-@interface ViewController () <UITextFieldDelegate>
+@interface RepositoriesViewController () <UITextFieldDelegate>
 
 @property (nonatomic, weak) IBOutlet UISegmentedControl *sortOrderControl;
 @property (nonatomic, weak) IBOutlet UITextField *searchField;

@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  RepositoriesViewController.h
 //  DownloadCache
 //
 //  Created by Katsumi Kishikawa on 11/19/15.
@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UICollectionViewController
+@interface RepositoriesViewController : UICollectionViewController
 
 @end

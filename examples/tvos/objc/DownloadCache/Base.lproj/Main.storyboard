@@ -4,10 +4,10 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Repositories View Controller-->
         <scene sceneID="TGC-cV-31p">
             <objects>
-                <collectionViewController id="5G5-gs-SCO" customClass="ViewController" sceneMemberID="viewController">
+                <collectionViewController id="5G5-gs-SCO" customClass="RepositoriesViewController" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="xAL-5D-kDM">
                         <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -34,7 +34,7 @@
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dzB-jG-rgK">
                                             <rect key="frame" x="204" y="336" width="140" height="69"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
@@ -50,7 +50,7 @@
                                     <constraint firstItem="dzB-jG-rgK" firstAttribute="top" secondItem="qi7-WI-nKv" secondAttribute="bottom" constant="36" id="qK8-LG-RcM"/>
                                 </constraints>
                                 <connections>
-                                    <outlet property="imageView" destination="qi7-WI-nKv" id="unm-i3-EtX"/>
+                                    <outlet property="avatarImageView" destination="qi7-WI-nKv" id="mpV-Bq-qu2"/>
                                     <outlet property="titleLabel" destination="dzB-jG-rgK" id="Iel-x7-kyK"/>
                                 </connections>
                             </collectionViewCell>
