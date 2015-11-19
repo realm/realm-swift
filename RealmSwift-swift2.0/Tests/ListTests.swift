@@ -185,7 +185,7 @@ class ListTests: TestCase {
         assertThrows(self.array.replace(-200, object: self.str2))
     }
 
-    func testMove()  {
+    func testMove() {
         array.appendContentsOf([str1, str2])
 
         array.move(from: 1, to: 0)

@@ -1,0 +1,10 @@
+included:
+  - RealmSwift-swift2.0
+line_length: 120
+disabled_rules:
+  - force_cast
+  - force_try
+  - todo
+  - function_body_length
+  - file_length
+  - type_body_length

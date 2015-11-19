@@ -63,8 +63,12 @@ public class ResultsBase: NSObject, NSFastEnumeration {
 
     // MARK: Fast Enumeration
 
-    public func countByEnumeratingWithState(state: UnsafeMutablePointer<NSFastEnumerationState>, objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>, count len: Int) -> Int {
-        return Int(rlmResults.countByEnumeratingWithState(state, objects: buffer, count: UInt(len)))
+    public func countByEnumeratingWithState(state: UnsafeMutablePointer<NSFastEnumerationState>,
+                                            objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>,
+                                            count len: Int) -> Int {
+        return Int(rlmResults.countByEnumeratingWithState(state,
+                   objects: buffer,
+                   count: UInt(len)))
     }
 }
 
@@ -133,7 +137,8 @@ public final class Results<T: Object>: ResultsBase {
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
     public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
-        return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))
+        return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat,
+                                                                               argumentArray: args)))
     }
 
     // MARK: Object Retrieval
@@ -302,6 +307,7 @@ extension Results: RealmCollectionType {
     public var startIndex: Int { return 0 }
 
     /// The collection's "past the end" position.
-    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
+    /// zero or more applications of successor().
     public var endIndex: Int { return count }
 }

@@ -30,7 +30,8 @@ class ObjectCreationTests: TestCase {
         XCTAssertNil(object.realm)
 
         // test defaults values
-        verifySwiftObjectWithDictionaryLiteral(object, dictionary: SwiftObject.defaultValues(), boolObjectValue: false, boolObjectListValues: [])
+        verifySwiftObjectWithDictionaryLiteral(object, dictionary: SwiftObject.defaultValues(), boolObjectValue: false,
+            boolObjectListValues: [])
 
         // test realm properties are nil for standalone
         XCTAssertNil(object.realm)
@@ -52,7 +53,8 @@ class ObjectCreationTests: TestCase {
 
     func testInitWithOptionalDefaults() {
         let object = SwiftOptionalDefaultValuesObject()
-        verifySwiftOptionalObjectWithDictionaryLiteral(object, dictionary: SwiftOptionalDefaultValuesObject.defaultValues(), boolObjectValue: true)
+        verifySwiftOptionalObjectWithDictionaryLiteral(object, dictionary:
+            SwiftOptionalDefaultValuesObject.defaultValues(), boolObjectValue: true)
     }
 
     func testInitWithDictionary() {
@@ -77,7 +79,8 @@ class ObjectCreationTests: TestCase {
                 var values = baselineValues
                 values[props[propNum].name] = validValue
                 let object = SwiftObject(value: values)
-                verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
+                verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true,
+                    boolObjectListValues: [true, false])
             }
         }
 
@@ -96,12 +99,14 @@ class ObjectCreationTests: TestCase {
         // test with dictionary with mix of default and one specified value
         let object = SwiftObject(value: ["intCol": 200])
         let valueDict = defaultSwiftObjectValuesWithReplacements(["intCol": 200])
-        verifySwiftObjectWithDictionaryLiteral(object, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
+        verifySwiftObjectWithDictionaryLiteral(object, dictionary: valueDict, boolObjectValue: false,
+            boolObjectListValues: [])
     }
 
     func testInitWithArray() {
         // array with all values specified
-        let baselineValues = [true, 1, 1.1, 11.1, "b", "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData, NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject]
+        let baselineValues = [true, 1, 1.1, 11.1, "b", "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+            NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -111,7 +116,8 @@ class ObjectCreationTests: TestCase {
                 var values = baselineValues
                 values[propNum] = validValue
                 let object = SwiftObject(value: values)
-                verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true, boolObjectListValues: [true, false])
+                verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true,
+                    boolObjectListValues: [true, false])
             }
         }
 
@@ -131,7 +137,8 @@ class ObjectCreationTests: TestCase {
         let objectWithInt = SwiftObject(value: ["intCol": 200])
         let objectWithKVCObject = SwiftObject(value: objectWithInt)
         let valueDict = defaultSwiftObjectValuesWithReplacements(["intCol": 200])
-        verifySwiftObjectWithDictionaryLiteral(objectWithKVCObject, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
+        verifySwiftObjectWithDictionaryLiteral(objectWithKVCObject, dictionary: valueDict, boolObjectValue: false,
+            boolObjectListValues: [])
     }
 
     func testGenericInit() {
@@ -140,7 +147,8 @@ class ObjectCreationTests: TestCase {
         }
         let obj1: SwiftBoolObject = createObject()
         let obj2 = SwiftBoolObject()
-        XCTAssertEqual(obj1.boolCol, obj2.boolCol, "object created via generic initializer should equal object created by calling initializer directly")
+        XCTAssertEqual(obj1.boolCol, obj2.boolCol,
+            "object created via generic initializer should equal object created by calling initializer directly")
     }
 
     // MARK: Creation tests
@@ -157,7 +165,8 @@ class ObjectCreationTests: TestCase {
             object = realm.create(SwiftObject)
             return
         }
-        verifySwiftObjectWithDictionaryLiteral(object, dictionary: SwiftObject.defaultValues(), boolObjectValue: false, boolObjectListValues: [])
+        verifySwiftObjectWithDictionaryLiteral(object, dictionary: SwiftObject.defaultValues(), boolObjectValue: false,
+            boolObjectListValues: [])
 
         // test realm properties are populated correctly
         XCTAssertEqual(object.realm!, realm)
@@ -179,7 +188,8 @@ class ObjectCreationTests: TestCase {
         let realm = try! Realm()
         try! realm.write {
             let object = realm.create(SwiftOptionalDefaultValuesObject)
-            self.verifySwiftOptionalObjectWithDictionaryLiteral(object, dictionary: SwiftOptionalDefaultValuesObject.defaultValues(), boolObjectValue: true)
+            self.verifySwiftOptionalObjectWithDictionaryLiteral(object,
+                dictionary: SwiftOptionalDefaultValuesObject.defaultValues(), boolObjectValue: true)
         }
     }
 
@@ -194,17 +204,17 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithDictionary() {
         // dictionary with all values specified
-        let baselineValues =
-            ["boolCol": true as NSNumber,
-                "intCol": 1 as NSNumber,
-                "floatCol": 1.1 as NSNumber,
-                "doubleCol": 11.1 as NSNumber,
-                "stringCol": "b" as NSString,
-                "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
-                "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
-                "objectCol": SwiftBoolObject(value: [true]) as AnyObject,
-                "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]  as AnyObject
-            ]
+        let baselineValues: [String: AnyObject] = [
+            "boolCol": true,
+            "intCol": 1,
+            "floatCol": 1.1,
+            "doubleCol": 11.1,
+            "stringCol": "b",
+            "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)!,
+            "dateCol": NSDate(timeIntervalSince1970: 2),
+            "objectCol": SwiftBoolObject(value: [true]),
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
+        ]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -215,9 +225,11 @@ class ObjectCreationTests: TestCase {
                 values[props[propNum].name] = validValue
                 try! Realm().beginWrite()
                 let object = try! Realm().create(SwiftObject.self, value: values)
-                verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
+                verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true,
+                    boolObjectListValues: [true, false])
                 try! Realm().commitWrite()
-                verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
+                verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true,
+                    boolObjectListValues: [true, false])
             }
         }
 
@@ -242,12 +254,14 @@ class ObjectCreationTests: TestCase {
         try! realm.commitWrite()
 
         let valueDict = defaultSwiftObjectValuesWithReplacements(["intCol": 200])
-        verifySwiftObjectWithDictionaryLiteral(objectWithInt, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
+        verifySwiftObjectWithDictionaryLiteral(objectWithInt, dictionary: valueDict, boolObjectValue: false,
+            boolObjectListValues: [])
     }
 
     func testCreateWithArray() {
         // array with all values specified
-        let baselineValues = [true, 1, 1.1, 11.1, "b", "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData, NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject]
+        let baselineValues = [true, 1, 1.1, 11.1, "b", "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+            NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -258,9 +272,11 @@ class ObjectCreationTests: TestCase {
                 values[propNum] = validValue
                 try! Realm().beginWrite()
                 let object = try! Realm().create(SwiftObject.self, value: values)
-                verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true, boolObjectListValues: [true, false])
+                verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true,
+                    boolObjectListValues: [true, false])
                 try! Realm().commitWrite()
-                verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true, boolObjectListValues: [true, false])
+                verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true,
+                    boolObjectListValues: [true, false])
             }
         }
 
@@ -272,7 +288,8 @@ class ObjectCreationTests: TestCase {
                 values[propNum] = invalidValue
 
                 try! Realm().beginWrite()
-                assertThrows(try! Realm().create(SwiftObject.self, value: values), "Invalid property value '\(invalidValue)' for property number \(propNum)")
+                assertThrows(try! Realm().create(SwiftObject.self, value: values),
+                    "Invalid property value '\(invalidValue)' for property number \(propNum)")
                 try! Realm().cancelWrite()
             }
         }
@@ -286,7 +303,8 @@ class ObjectCreationTests: TestCase {
         let valueDict = defaultSwiftObjectValuesWithReplacements(["intCol": 200])
         try! Realm().commitWrite()
 
-        verifySwiftObjectWithDictionaryLiteral(objectWithKVCObject, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
+        verifySwiftObjectWithDictionaryLiteral(objectWithKVCObject, dictionary: valueDict, boolObjectValue: false,
+            boolObjectListValues: [])
         XCTAssertEqual(try! Realm().objects(SwiftObject).count, 2, "Object should have been copied")
     }
 
@@ -294,27 +312,31 @@ class ObjectCreationTests: TestCase {
         let standalone = SwiftPrimaryStringObject(value: ["p0", 11])
 
         try! Realm().beginWrite()
-        let objectWithNestedObjects = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p1", ["p1", 11], [standalone]])
+        let objectWithNestedObjects = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p1", ["p1", 11],
+            [standalone]])
         try! Realm().commitWrite()
 
         let stringObjects = try! Realm().objects(SwiftPrimaryStringObject)
         XCTAssertEqual(stringObjects.count, 2)
         let persistedObject = stringObjects.first!
 
-        XCTAssertNotEqual(standalone, persistedObject) // standalone object should be copied into the realm, not added directly
+        // standalone object should be copied into the realm, not added directly
+        XCTAssertNotEqual(standalone, persistedObject)
         XCTAssertEqual(objectWithNestedObjects.object!, persistedObject)
         XCTAssertEqual(objectWithNestedObjects.objects.first!, stringObjects.last!)
 
         let standalone1 = SwiftPrimaryStringObject(value: ["p3", 11])
         try! Realm().beginWrite()
-        assertThrows(try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p3", ["p3", 11], [standalone1]]), "Should throw with duplicate primary key")
+        assertThrows(try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p3", ["p3", 11], [standalone1]]),
+            "Should throw with duplicate primary key")
         try! Realm().commitWrite()
     }
 
     func testUpdateWithNestedObjects() {
         let standalone = SwiftPrimaryStringObject(value: ["primary", 11])
         try! Realm().beginWrite()
-        let object = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["otherPrimary", ["primary", 12], [["primary", 12]]], update: true)
+        let object = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["otherPrimary", ["primary", 12],
+            [["primary", 12]]], update: true)
         try! Realm().commitWrite()
 
         let stringObjects = try! Realm().objects(SwiftPrimaryStringObject)
@@ -349,12 +371,14 @@ class ObjectCreationTests: TestCase {
         try! Realm().commitWrite()
 
         XCTAssertNotEqual(otherRealmObject, object)
-        verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
+        verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true,
+            boolObjectListValues: [true, false])
     }
 
     func testUpdateWithObjectsFromAnotherRealm() {
         realmWithTestPath().beginWrite()
-        let otherRealmObject = realmWithTestPath().create(SwiftLinkToPrimaryStringObject.self, value: ["primary", NSNull(), [["2", 2], ["4", 4]]])
+        let otherRealmObject = realmWithTestPath().create(SwiftLinkToPrimaryStringObject.self,
+            value: ["primary", NSNull(), [["2", 2], ["4", 4]]])
         try! realmWithTestPath().commitWrite()
 
         try! Realm().beginWrite()
@@ -422,7 +446,8 @@ class ObjectCreationTests: TestCase {
     }
 
     // MARK: Private utilities
-    private func verifySwiftObjectWithArrayLiteral(object: SwiftObject, array: [AnyObject], boolObjectValue: Bool, boolObjectListValues: [Bool]) {
+    private func verifySwiftObjectWithArrayLiteral(object: SwiftObject, array: [AnyObject], boolObjectValue: Bool,
+                                                   boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, (array[0] as! Bool))
         XCTAssertEqual(object.intCol, (array[1] as! Int))
         XCTAssertEqual(object.floatCol, (array[2] as! Float))
@@ -437,7 +462,8 @@ class ObjectCreationTests: TestCase {
         }
     }
 
-    private func verifySwiftObjectWithDictionaryLiteral(object: SwiftObject, dictionary: [String:AnyObject], boolObjectValue: Bool, boolObjectListValues: [Bool]) {
+    private func verifySwiftObjectWithDictionaryLiteral(object: SwiftObject, dictionary: [String:AnyObject],
+                                                        boolObjectValue: Bool, boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, (dictionary["boolCol"] as! Bool))
         XCTAssertEqual(object.intCol, (dictionary["intCol"] as! Int))
         XCTAssertEqual(object.floatCol, (dictionary["floatCol"] as! Float))
@@ -452,12 +478,17 @@ class ObjectCreationTests: TestCase {
         }
     }
 
-    private func verifySwiftOptionalObjectWithDictionaryLiteral(object: SwiftOptionalDefaultValuesObject, dictionary: [String:AnyObject], boolObjectValue: Bool?) {
+    private func verifySwiftOptionalObjectWithDictionaryLiteral(object: SwiftOptionalDefaultValuesObject,
+                                                                dictionary: [String:AnyObject],
+                                                                boolObjectValue: Bool?) {
         XCTAssertEqual(object.optBoolCol.value, (dictionary["optBoolCol"] as! Bool?))
         XCTAssertEqual(object.optIntCol.value, (dictionary["optIntCol"] as! Int?))
-        XCTAssertEqual(object.optInt8Col.value, ((dictionary["optInt8Col"] as! NSNumber?)?.longValue).map({Int8($0)}))
-        XCTAssertEqual(object.optInt16Col.value, ((dictionary["optInt16Col"] as! NSNumber?)?.longValue).map({Int16($0)}))
-        XCTAssertEqual(object.optInt32Col.value, ((dictionary["optInt32Col"] as! NSNumber?)?.longValue).map({Int32($0)}))
+        XCTAssertEqual(object.optInt8Col.value,
+                       ((dictionary["optInt8Col"] as! NSNumber?)?.longValue).map({Int8($0)}))
+        XCTAssertEqual(object.optInt16Col.value,
+                       ((dictionary["optInt16Col"] as! NSNumber?)?.longValue).map({Int16($0)}))
+        XCTAssertEqual(object.optInt32Col.value,
+            ((dictionary["optInt32Col"] as! NSNumber?)?.longValue).map({Int32($0)}))
         XCTAssertEqual(object.optInt64Col.value, (dictionary["optInt64Col"] as! NSNumber?)?.longLongValue)
         XCTAssertEqual(object.optFloatCol.value, (dictionary["optFloatCol"] as! Float?))
         XCTAssertEqual(object.optDoubleCol.value, (dictionary["optDoubleCol"] as! Double?))
@@ -490,7 +521,12 @@ class ObjectCreationTests: TestCase {
             case .Data:     return ["b".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)! as NSData]
             case .Date:     return [NSDate(timeIntervalSince1970: 2) as AnyObject]
             case .Object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
-            case .Array:    return [[[true], [false]], [["boolCol": true], ["boolCol": false]], [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])], [persistedObject, [false]]]
+            case .Array:    return [
+                [[true], [false]],
+                [["boolCol": true], ["boolCol": false]],
+                [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])],
+                [persistedObject, [false]]
+            ]
             case .Any:      XCTFail("not supported")
         }
         return []
@@ -515,4 +551,3 @@ class ObjectCreationTests: TestCase {
         return []
     }
 }
-
