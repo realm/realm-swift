@@ -18,6 +18,17 @@
 			name = "Set Swift Version";
 			productName = "Swift Version";
 		};
+		E83EAC791BED3D880085CCD2 /* SwiftLint */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = E83EAC7C1BED3D880085CCD2 /* Build configuration list for PBXAggregateTarget "SwiftLint" */;
+			buildPhases = (
+				E83EAC7D1BED3D8F0085CCD2 /* Run SwiftLint */,
+			);
+			dependencies = (
+			);
+			name = SwiftLint;
+			productName = SwiftLint;
+		};
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
@@ -1241,6 +1252,9 @@
 					C04B4BD71B55C47600FAE58E = {
 						CreatedOnToolsVersion = 6.4;
 					};
+					E83EAC791BED3D880085CCD2 = {
+						CreatedOnToolsVersion = 7.1;
+					};
 					E856D1DE195614A400FB2FCF = {
 						CreatedOnToolsVersion = 6.0;
 					};
@@ -1271,6 +1285,7 @@
 				C04B4BD71B55C47600FAE58E /* Set Swift Version */,
 				5D660FCB1BE98C560021E04F /* RealmSwift */,
 				5D660FD71BE98C7C0021E04F /* RealmSwift Tests */,
+				E83EAC791BED3D880085CCD2 /* SwiftLint */,
 			);
 		};
 /* End PBXProject section */
@@ -1282,7 +1297,6 @@
 			files = (
 				5D659ED21BE04556006515A0 /* CHANGELOG.md in Resources */,
 				5D659ED51BE04556006515A0 /* LICENSE in Resources */,
-				5D660FC31BE98BEF0021E04F /* RealmSwift.xcconfig in Resources */,
 				5D6157051BE13CBB00A4BD3F /* strip-frameworks.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1458,6 +1472,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "sh build.sh set-swift-version";
+		};
+		E83EAC7D1BED3D8F0085CCD2 /* Run SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run SwiftLint";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1817,6 +1845,20 @@
 			};
 			name = Release;
 		};
+		E83EAC7A1BED3D880085CCD2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E83EAC7B1BED3D880085CCD2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		E856D1EC195614A400FB2FCF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */;
@@ -1921,6 +1963,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		E83EAC7C1BED3D880085CCD2 /* Build configuration list for PBXAggregateTarget "SwiftLint" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E83EAC7A1BED3D880085CCD2 /* Debug */,
+				E83EAC7B1BED3D880085CCD2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		E856D1EB195614A400FB2FCF /* Build configuration list for PBXNativeTarget "iOS static tests" */ = {
 			isa = XCConfigurationList;

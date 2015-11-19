@@ -53,7 +53,9 @@ class ObjectTests: TestCase {
         XCTAssert(schema as AnyObject is ObjectSchema)
         XCTAssert(schema.properties as AnyObject is [Property])
         XCTAssertEqual(schema.className, "SwiftObject")
-        XCTAssertEqual(schema.properties.map { $0.name }, ["boolCol", "intCol", "floatCol", "doubleCol", "stringCol", "binaryCol", "dateCol", "objectCol", "arrayCol"])
+        XCTAssertEqual(schema.properties.map { $0.name },
+            ["boolCol", "intCol", "floatCol", "doubleCol", "stringCol", "binaryCol", "dateCol", "objectCol", "arrayCol"]
+        )
     }
 
     func testInvalidated() {
@@ -75,11 +77,13 @@ class ObjectTests: TestCase {
 
     func testDescription() {
         let object = SwiftObject()
+        // swiftlint:disable line_length
         XCTAssertEqual(object.description, "SwiftObject {\n\tboolCol = 0;\n\tintCol = 123;\n\tfloatCol = 1.23;\n\tdoubleCol = 12.3;\n\tstringCol = a;\n\tbinaryCol = <61 — 1 total bytes>;\n\tdateCol = 1970-01-01 00:00:01 +0000;\n\tobjectCol = SwiftBoolObject {\n\t\tboolCol = 0;\n\t};\n\tarrayCol = List<SwiftBoolObject> (\n\t\n\t);\n}")
 
         let recursiveObject = SwiftRecursiveObject()
         recursiveObject.objects.append(recursiveObject)
         XCTAssertEqual(recursiveObject.description, "SwiftRecursiveObject {\n\tobjects = List<SwiftRecursiveObject> (\n\t\t[0] SwiftRecursiveObject {\n\t\t\tobjects = List<SwiftRecursiveObject> (\n\t\t\t\t[0] SwiftRecursiveObject {\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t}\n\t\t\t);\n\t\t}\n\t);\n}")
+        // swiftlint:enable line_length
     }
 
     func testPrimaryKey() {
@@ -125,7 +129,8 @@ class ObjectTests: TestCase {
             XCTAssertEqual(object.valueForKey("floatCol") as! Float!, 1.23 as Float)
             XCTAssertEqual(object.valueForKey("doubleCol") as! Double!, 12.3)
             XCTAssertEqual(object.valueForKey("stringCol") as! String!, "a")
-            XCTAssertEqual((object.valueForKey("binaryCol") as! NSData), "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
+            XCTAssertEqual((object.valueForKey("binaryCol") as! NSData),
+                "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
             XCTAssertEqual(object.valueForKey("dateCol") as! NSDate!, NSDate(timeIntervalSince1970: 1))
             XCTAssertEqual((object.valueForKey("objectCol")! as! SwiftBoolObject).boolCol, false)
             XCTAssert(object.valueForKey("arrayCol")! is List<SwiftBoolObject>)
@@ -138,7 +143,8 @@ class ObjectTests: TestCase {
         }
     }
 
-    func setAndTestAllTypes(setter: (SwiftObject, AnyObject?, String) -> (), getter: (SwiftObject, String) -> (AnyObject?), object: SwiftObject) {
+    func setAndTestAllTypes(setter: (SwiftObject, AnyObject?, String) -> (),
+                            getter: (SwiftObject, String) -> (AnyObject?), object: SwiftObject) {
         setter(object, true, "boolCol")
         XCTAssertEqual(getter(object, "boolCol") as! Bool!, true)
 
@@ -171,7 +177,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
 
-        list.removeAll();
+        list.removeAll()
         setter(object, list, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
 
@@ -180,7 +186,9 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
     }
 
-    func dynamicSetAndTestAllTypes(setter: (DynamicObject, AnyObject?, String) -> (), getter: (DynamicObject, String) -> (AnyObject?), object: DynamicObject, boolObject: DynamicObject) {
+    func dynamicSetAndTestAllTypes(setter: (DynamicObject, AnyObject?, String) -> (),
+                                   getter: (DynamicObject, String) -> (AnyObject?), object: DynamicObject,
+                                   boolObject: DynamicObject) {
         setter(object, true, "boolCol")
         XCTAssertEqual((getter(object, "boolCol") as! Bool), true)
 
@@ -211,7 +219,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
 
         let list = getter(object, "arrayCol") as! List<DynamicObject>
-        list.removeAll();
+        list.removeAll()
         setter(object, list, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 0)
 

@@ -63,6 +63,6 @@ public final class Property: CustomStringConvertible {
 extension Property: Equatable {}
 
 /// Returns whether the two properties are equal.
-public func ==(lhs: Property, rhs: Property) -> Bool {
+public func == (lhs: Property, rhs: Property) -> Bool {
     return lhs.rlmProperty.isEqualToProperty(rhs.rlmProperty)
 }

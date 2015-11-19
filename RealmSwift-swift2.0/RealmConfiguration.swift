@@ -77,7 +77,7 @@ extension Realm {
 
         /// The path to the realm file.
         /// Mutually exclusive with `inMemoryIdentifier`.
-        public var path: String?  {
+        public var path: String? {
             set {
                 _inMemoryIdentifier = nil
                 _path = newValue
@@ -91,7 +91,7 @@ extension Realm {
 
         /// A string used to identify a particular in-memory Realm.
         /// Mutually exclusive with `path`.
-        public var inMemoryIdentifier: String?  {
+        public var inMemoryIdentifier: String? {
             set {
                 _path = nil
                 _inMemoryIdentifier = newValue
@@ -168,6 +168,8 @@ extension Realm {
 extension Realm.Configuration: CustomStringConvertible {
     /// Returns a human-readable description of the configuration.
     public var description: String {
-        return gsub("\\ARLMRealmConfiguration", template: "Realm.Configuration", string: rlmConfiguration.description) ?? ""
+        return gsub("\\ARLMRealmConfiguration",
+                    template: "Realm.Configuration",
+                    string: rlmConfiguration.description) ?? ""
     }
 }

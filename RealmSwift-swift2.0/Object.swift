@@ -47,9 +47,9 @@ class Dog: Object {
 - `List<T: Object>` for to-many relationships
 
 `String`, `NSString`, `NSDate`, `NSData` and `Object` subclass properties can be
-optional. `Int`, `Int8`, Int16`, Int32`, `Int64`, `Float`, `Double`, `Bool` 
-and `List` properties cannot. To store an optional number, instead use 
-`RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or 
+optional. `Int`, `Int8`, Int16`, Int32`, `Int64`, `Float`, `Double`, `Bool`
+and `List` properties cannot. To store an optional number, instead use
+`RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or
 `RealmOptional<Bool>` instead, which wraps an optional value of the generic type.
 
 All property types except for `List` and `RealmOptional` *must* be declared as
@@ -58,7 +58,7 @@ non-dynamic `let` properties.
 
 ### Querying
 
-You can gets `Results` of an Object subclass via the `objects(_:)` instance 
+You can gets `Results` of an Object subclass via the `objects(_:)` instance
 method on `Realm`.
 
 ### Relationships
@@ -80,7 +80,8 @@ public class Object: RLMObjectBase {
     }
 
     /**
-    Initialize a standalone (unpersisted) `Object` with values from an `Array<AnyObject>` or `Dictionary<String, AnyObject>`.
+    Initialize a standalone (unpersisted) `Object` with values from an `Array<AnyObject>` or
+    `Dictionary<String, AnyObject>`.
     Call `add(_:)` on a `Realm` to add standalone objects to a realm.
 
     - parameter value: The value used to populate the object. This can be any key/value coding compliant
@@ -168,7 +169,6 @@ public class Object: RLMObjectBase {
     - returns: An `Array` of objects of type `T` which have this object as their value for the `propertyName` property.
     */
     public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
-        // FIXME: use T.className()
         return RLMObjectBaseLinkingObjectsOfClass(self, (T.self as Object.Type).className(), propertyName) as! [T]
     }
 
@@ -178,11 +178,11 @@ public class Object: RLMObjectBase {
     public subscript(key: String) -> AnyObject? {
         get {
             if realm == nil {
-                return self.valueForKey(key)
+                return valueForKey(key)
             }
             let property = RLMValidatedGetProperty(self, key)
             if property.type == .Array {
-                return self.listForProperty(property)
+                return listForProperty(property)
             }
             // No special logic is needed for optional numbers here because the NSNumber returned by RLMDynamicGet
             // is better for callers than the RealmOptional that optionalForProperty would give us.
@@ -190,9 +190,8 @@ public class Object: RLMObjectBase {
         }
         set(value) {
             if realm == nil {
-                self.setValue(value, forKey: key)
-            }
-            else {
+                setValue(value, forKey: key)
+            } else {
                 RLMDynamicValidatedSet(self, key, value)
             }
         }
@@ -225,7 +224,7 @@ public class Object: RLMObjectBase {
     /// Objects are considered equal when they are both from the same Realm
     /// and point to the same underlying object in the database.
     public override func isEqual(object: AnyObject?) -> Bool {
-        return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase);
+        return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
 
     // MARK: Private functions
@@ -300,7 +299,7 @@ public final class DynamicObject: Object {
 
     /// :nodoc:
     public override class func shouldIncludeInDefaultSchema() -> Bool {
-        return false;
+        return false
     }
 }
 
@@ -341,7 +340,8 @@ public class ObjectUtil: NSObject {
     }
 
     @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
-        return Mirror(reflecting: object).children.reduce([String:AnyObject]()) { (var properties: [String:AnyObject], prop: Mirror.Child) in
+        let children = Mirror(reflecting: object).children
+        return children.reduce([String: AnyObject]()) { (var properties: [String:AnyObject], prop: Mirror.Child) in
             guard let name = prop.label else { return properties }
             let mirror = Mirror(reflecting: prop.value)
             let type = mirror.subjectType
