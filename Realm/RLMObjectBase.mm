@@ -35,23 +35,32 @@ using namespace realm;
 
 const NSUInteger RLMDescriptionMaxDepth = 5;
 
+static bool RLMInitializedObjectSchema(RLMObjectBase *obj) {
+    obj->_objectSchema = [obj.class sharedSchema];
+    if (!obj->_objectSchema) {
+        return false;
+    }
+
+    // set default values
+    if (!obj->_objectSchema.isSwiftClass) {
+        NSDictionary *dict = RLMDefaultValuesForObjectSchema(obj->_objectSchema);
+        for (NSString *key in dict) {
+            [obj setValue:dict[key] forKey:key];
+        }
+    }
+
+    // set standalone accessor class
+    object_setClass(obj, obj->_objectSchema.standaloneClass);
+    return true;
+}
+
 @implementation RLMObjectBase
 // standalone init
 - (instancetype)init {
     self = [super init];
-    if (self && (_objectSchema = [self.class sharedSchema])) {
-        // set default values
-        if (!_objectSchema.isSwiftClass) {
-            NSDictionary *dict = RLMDefaultValuesForObjectSchema(_objectSchema);
-            for (NSString *key in dict) {
-                [self setValue:dict[key] forKey:key];
-            }
-        }
-
-        // set standalone accessor class
-        object_setClass(self, _objectSchema.standaloneClass);
+    if (self) {
+        RLMInitializedObjectSchema(self);
     }
-
     return self;
 }
 
@@ -81,10 +90,13 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 }
 
 - (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
-    self = [self init];
-    if (!_objectSchema) {
-        // _objectSchema will not be set if we're called during schema init
-        return self;
+    self = [super init];
+    if (self) {
+        if (!RLMInitializedObjectSchema(self)) {
+            // Don't populate fields from the passed-in object if we're called
+            // during schema init
+            return self;
+        }
     }
 
     NSArray *properties = _objectSchema.properties;
