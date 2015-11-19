@@ -239,7 +239,6 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 - (void)setDisableFormatUpgrade:(bool)disableFormatUpgrade
 {
     _config.disable_format_upgrade = disableFormatUpgrade;
-    _config.cache = false;
 }
 
 - (bool)disableFormatUpgrade
