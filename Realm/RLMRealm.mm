@@ -89,7 +89,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
         if (key.length != 64) {
             @throw RLMException(@"Encryption key must be exactly 64 bytes long");
         }
-#if TARGET_OS_WATCH || TARGET_OS_TV
+#if TARGET_OS_WATCH
         @throw RLMException(@"Cannot open an encrypted Realm on watchOS and tvOS.");
 #endif
     }
