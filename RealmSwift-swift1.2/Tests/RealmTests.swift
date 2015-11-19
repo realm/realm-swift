@@ -393,7 +393,6 @@ class RealmTests: TestCase {
     func testDynamicObjects() {
         XCTAssertEqual(0, Realm().dynamicObjects("SwiftStringObject").count)
         XCTAssertEqual(3, Realm().dynamicObjects("SwiftIntObject").count)
-        XCTAssertEqual(3, Realm().dynamicObjects("SwiftIntObject").count)
         assertThrows(Realm().dynamicObjects("Object"))
     }
 
