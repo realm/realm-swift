@@ -39,7 +39,7 @@ private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
 class SwiftPerformanceTests: TestCase {
     override class func defaultTestSuite() -> XCTestSuite {
 #if !DEBUG && os(iOS)
-        if (isRunningOnDevice) {
+        if isRunningOnDevice {
             return super.defaultTestSuite()
         }
 #endif
@@ -91,11 +91,9 @@ class SwiftPerformanceTests: TestCase {
     private func copyRealmToTestPath(realm: Realm) -> Realm {
         do {
             try NSFileManager.defaultManager().removeItemAtPath(testRealmPath())
-        }
-        catch let error as NSError {
+        } catch let error as NSError {
             XCTAssertTrue(error.domain == NSCocoaErrorDomain && error.code == 4)
-        }
-        catch {
+        } catch {
             fatalError("Unexpected error: \(error)")
         }
 
@@ -199,7 +197,8 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessArrayProperty() {
         let realm = copyRealmToTestPath(mediumRealm)
         realm.beginWrite()
-        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
+        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self,
+            value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
         try! realm.commitWrite()
 
         measureBlock {
@@ -212,7 +211,8 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessArrayPropertySlow() {
         let realm = copyRealmToTestPath(mediumRealm)
         realm.beginWrite()
-        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
+        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self,
+            value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
         try! realm.commitWrite()
 
         measureBlock {
@@ -247,7 +247,8 @@ class SwiftPerformanceTests: TestCase {
 
     func testQueryConstruction() {
         let realm = realmWithTestPath()
-        let predicate = NSPredicate(format: "boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and doubleCol != 7.0 and stringCol IN {'a', 'b', 'c'}")
+        let predicate = "boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and doubleCol != 7.0 " +
+                        " and stringCol IN {'a', 'b', 'c'}"
 
         measureBlock {
             for _ in 0..<500 {

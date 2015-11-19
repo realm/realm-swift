@@ -54,7 +54,7 @@ command:
   test-ios-devices-swift: tests Swift iOS framework on all attached iOS devices
   test-osx:             tests OS X framework
   test-osx-swift:       tests RealmSwift OS X framework
-  verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device in both Debug and Release configurations
+  verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device in both Debug and Release configurations, swiftlint
   docs:                 builds docs in docs/output
   examples:             builds all examples
   examples-ios:         builds all static iOS examples
@@ -595,6 +595,7 @@ case "$COMMAND" in
         sh build.sh verify-ios-device-objc
         sh build.sh verify-ios-device-swift
         sh build.sh verify-watchos
+        sh build.sh verify-swiftlint
         ;;
 
     "verify-cocoapods")
@@ -665,6 +666,11 @@ case "$COMMAND" in
         if [ $REALM_SWIFT_VERSION != '1.2' ]; then
             sh build.sh watchos-swift
         fi
+        exit 0
+        ;;
+
+    "verify-swiftlint")
+        swiftlint lint --strict
         exit 0
         ;;
 

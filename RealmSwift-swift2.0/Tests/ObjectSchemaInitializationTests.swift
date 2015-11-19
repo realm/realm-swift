@@ -112,22 +112,30 @@ class ObjectSchemaInitializationTests: TestCase {
     }
 
     func testInvalidObjects() {
-        let schema = RLMObjectSchema(forObjectClass: SwiftFakeObjectSubclass.self) // Should be able to get a schema for a non-RLMObjectBase subclass
+        // Should be able to get a schema for a non-RLMObjectBase subclass
+        let schema = RLMObjectSchema(forObjectClass: SwiftFakeObjectSubclass.self)
         XCTAssertEqual(schema.properties.count, 1)
 
         // FIXME - disable any and make sure this fails
-        _ = RLMObjectSchema(forObjectClass: SwiftObjectWithAnyObject.self)  // Should throw when not ignoring a property of a type we can't persist
+        // Should throw when not ignoring a property of a type we can't persist
+        _ = RLMObjectSchema(forObjectClass: SwiftObjectWithAnyObject.self)
 
-        _ = RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)       // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
-        _ = RLMObjectSchema(forObjectClass: SwiftObjectWithStruct.self)     // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
+        // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
+        _ = RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)
+        // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
+        _ = RLMObjectSchema(forObjectClass: SwiftObjectWithStruct.self)
 
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDatePrimaryKey.self), "Should throw when setting a non int/string primary key")
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSURL.self), "Should throw when not ignoring a property of a type we can't persist")
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonOptionalLinkProperty.self), "Should throw when not marking a link property as optional")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDatePrimaryKey.self),
+            "Should throw when setting a non int/string primary key")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSURL.self),
+            "Should throw when not ignoring a property of a type we can't persist")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonOptionalLinkProperty.self),
+            "Should throw when not marking a link property as optional")
     }
 
     func testPrimaryKey() {
-        XCTAssertNil(SwiftObject().objectSchema.primaryKeyProperty, "Object should default to having no primary key property")
+        XCTAssertNil(SwiftObject().objectSchema.primaryKeyProperty,
+            "Object should default to having no primary key property")
         XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
     }
 
@@ -143,7 +151,8 @@ class ObjectSchemaInitializationTests: TestCase {
 
         let unindexibleSchema = RLMObjectSchema(forObjectClass: SwiftObjectWithUnindexibleProperties.self)
         for propName in SwiftObjectWithUnindexibleProperties.indexedProperties() {
-            XCTAssertFalse(unindexibleSchema[propName]!.indexed, "Shouldn't mark unindexible property '\(propName)' as indexed")
+            XCTAssertFalse(unindexibleSchema[propName]!.indexed,
+                "Shouldn't mark unindexible property '\(propName)' as indexed")
         }
     }
 
@@ -172,14 +181,14 @@ class ObjectSchemaInitializationTests: TestCase {
     }
 }
 
-class SwiftFakeObject : NSObject {
+class SwiftFakeObject: NSObject {
     dynamic class func primaryKey() -> String! { return nil }
     dynamic class func ignoredProperties() -> [String] { return [] }
     dynamic class func indexedProperties() -> [String] { return [] }
 }
 
 class SwiftObjectWithNSURL: SwiftFakeObject {
-    dynamic var URL = NSURL(string: "http://realm.io")!
+    dynamic var url = NSURL(string: "http://realm.io")!
 }
 
 class SwiftObjectWithAnyObject: SwiftFakeObject {
@@ -226,9 +235,11 @@ class SwiftObjectWithUnindexibleProperties: SwiftFakeObject {
     }
 }
 
+// swiftlint:disable type_name
 class SwiftObjectWithNonNullableOptionalProperties: SwiftFakeObject {
     dynamic var optDateCol: NSDate?
 }
+// swiftlint:enable type_name
 
 class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
     dynamic var objectCol = SwiftBoolObject()

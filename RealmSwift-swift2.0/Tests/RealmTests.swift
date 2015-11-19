@@ -60,7 +60,8 @@ class RealmTests: TestCase {
         realm.beginWrite()
         realm.create(SwiftStringObject.self, value: ["a"])
         try! realm.commitWrite()
-        XCTAssertFalse(realm.isEmpty, "Realm should not be empty after committing a write transaction that added an object.")
+        XCTAssertFalse(realm.isEmpty,
+            "Realm should not be empty after committing a write transaction that added an object.")
     }
 
     func testInit() {
@@ -107,7 +108,8 @@ class RealmTests: TestCase {
     }
 
     func testInitCustomClassList() {
-        let configuration = Realm.Configuration(path: Realm.Configuration.defaultConfiguration.path, objectTypes: [SwiftStringObject.self])
+        let configuration = Realm.Configuration(path: Realm.Configuration.defaultConfiguration.path,
+            objectTypes: [SwiftStringObject.self])
         XCTAssert(configuration.objectTypes! is [SwiftStringObject.Type])
         let realm = try! Realm(configuration: configuration)
         XCTAssertEqual(["SwiftStringObject"], realm.schema.objectSchema.map { $0.className })
@@ -122,7 +124,7 @@ class RealmTests: TestCase {
         }
         XCTAssertEqual(try! Realm().objects(SwiftStringObject).count, 1)
     }
-    
+
     func testDynamicWrite() {
         try! Realm().write {
             self.assertThrows(try! Realm().beginWrite())
@@ -132,14 +134,14 @@ class RealmTests: TestCase {
         }
         XCTAssertEqual(try! Realm().objects(SwiftStringObject).count, 1)
     }
-    
+
     func testDynamicWriteSubscripting() {
         try! Realm().beginWrite()
         let object = try! Realm().dynamicCreate("SwiftStringObject", value: ["1"])
         try! Realm().commitWrite()
-        
+
         XCTAssertNotNil(object,"Dynamic Object Creation Failed")
-        
+
         let stringVal = object["stringCol"] as! String
         XCTAssertEqual(stringVal, "1", "Object Subscripting Failed")
     }
@@ -364,7 +366,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(3, try! Realm().objects(SwiftIntObject).count)
         assertThrows(try! Realm().objects(Object))
     }
-    
+
     func testDynamicObjects() {
         try! Realm().write {
             try! Realm().create(SwiftIntObject.self, value: [100])
@@ -390,28 +392,28 @@ class RealmTests: TestCase {
         let missingObject = realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "z")
         XCTAssertNil(missingObject)
     }
-    
+
     func testDynamicObjectForPrimaryKey() {
         let realm = try! Realm()
         try! realm.write {
             realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
             realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
         }
-        
+
         XCTAssertNotNil(realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "a"))
         XCTAssertNil(realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "z"))
     }
-    
+
     func testDynamicObjectForPrimaryKeySubscripting() {
         let realm = try! Realm()
         try! realm.write {
             realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
         }
-        
+
         let object = realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "a")
-        
+
         let stringVal = object!["stringCol"] as! String
-        
+
         XCTAssertEqual(stringVal, "a", "Object Subscripting Failed!")
     }
 
@@ -527,7 +529,8 @@ class RealmTests: TestCase {
         try! realm.write {
             realm.add(SwiftObject())
         }
-        let path = ((defaultRealmPath() as NSString).stringByDeletingLastPathComponent as NSString ).stringByAppendingPathComponent("copy.realm")
+        let path = ((defaultRealmPath() as NSString).stringByDeletingLastPathComponent as NSString )
+            .stringByAppendingPathComponent("copy.realm")
         do {
             try realm.writeCopyToPath(path)
         } catch {
