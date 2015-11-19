@@ -18,6 +18,8 @@
 * Fix a potential crash when deleting all objects of a class.
 * Add error-checking for nil realm parameters in many methods such as
   `+[RLMObject allObjectsInRealm:]`.
+* Fix memory leak when using Object(value:) for subclasses with
+  `List` or `RealmOptional` properties.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
