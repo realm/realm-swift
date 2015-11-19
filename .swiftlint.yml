@@ -1,15 +1,10 @@
-# Realm Swift's SwiftLint configuration file
-# Uncomment the commented lines to avoid any violations
-
 included:
   - RealmSwift-swift2.0
+line_length: 120
 disabled_rules:
   - force_cast
   - force_try
   - todo
-line_length:
-  - 120
-file_length:
-  - 670
-type_body_length:
-  - 581
+  - function_body_length
+  - file_length
+  - type_body_length

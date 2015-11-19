@@ -442,7 +442,6 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
-    // swiftlint:disable function_body_length
     func testCrossThreadSyncLatency() {
         let stopValue = 100
         inMeasureBlock {
@@ -487,5 +486,4 @@ class SwiftPerformanceTests: TestCase {
             realm.removeNotification(token)
         }
     }
-    // swiftlint:enable function_body_length
 }

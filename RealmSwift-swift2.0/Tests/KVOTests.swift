@@ -164,7 +164,6 @@ class KVOTests: TestCase {
         observeChange(obj, "optDateCol", date, NSNull()) { obj.optDateCol = nil }
     }
 
-    // swiftlint:disable function_body_length
     func testAllPropertyTypesPersisted() {
         let obj = KVOObject()
         realm.add(obj)
@@ -274,5 +273,4 @@ class KVOTests: TestCase {
             self.realm.delete(obj2)
         }
     }
-    // swiftlint:enable function_body_length
 }

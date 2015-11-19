@@ -23,7 +23,6 @@ import Realm.Dynamic
 import Foundation
 
 class ObjectSchemaInitializationTests: TestCase {
-    // swiftlint:disable function_body_length
     func testAllValidTypes() {
         let object = SwiftObject()
         let objectSchema = object.objectSchema
@@ -111,7 +110,6 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertFalse(arrayCol!.optional)
         XCTAssertEqual(dynamicArrayCol!.objectClassName!, "SwiftEmployeeObject")
     }
-    // swiftlint:enable function_body_length
 
     func testInvalidObjects() {
         // Should be able to get a schema for a non-RLMObjectBase subclass

@@ -202,7 +202,6 @@ class ObjectCreationTests: TestCase {
         }
     }
 
-    // swiftlint:disable function_body_length
     func testCreateWithDictionary() {
         // dictionary with all values specified
         let baselineValues: [String: AnyObject] = [
@@ -246,7 +245,6 @@ class ObjectCreationTests: TestCase {
             }
         }
     }
-    // swiftlint:enable function_body_length
 
     func testCreateWithDefaultsAndDictionary() {
         // test with dictionary with mix of default and one specified value

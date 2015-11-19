@@ -21,7 +21,6 @@ import RealmSwift
 import Foundation
 
 class ObjectAccessorTests: TestCase {
-    // swiftlint:disable function_body_length
     func setAndTestAllProperties(object: SwiftObject) {
         object.boolCol = true
         XCTAssertEqual(object.boolCol, true)
@@ -66,7 +65,6 @@ class ObjectAccessorTests: TestCase {
         object.objectCol = SwiftBoolObject(value: [true])
         XCTAssertEqual(object.objectCol!.boolCol, true)
     }
-    // swiftlint:enable function_body_length
 
     func testStandaloneAccessors() {
         let object = SwiftObject()
@@ -86,7 +84,6 @@ class ObjectAccessorTests: TestCase {
         try! realm.commitWrite()
     }
 
-    // swiftlint:disable function_body_length
     func testIntSizes() {
         let realm = realmWithTestPath()
 
@@ -146,7 +143,6 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(obj.int32, v32)
         XCTAssertEqual(obj.int64, v64)
     }
-    // swiftlint:enable function_body_length
 
     func testLongType() {
         let longNumber: Int64 = 17179869184
@@ -230,7 +226,6 @@ class ObjectAccessorTests: TestCase {
         }
     }
 
-    // swiftlint:disable function_body_length
     func setAndTestAllOptionalProperties(object: SwiftOptionalObject) {
         object.optNSStringCol = ""
         XCTAssertEqual(object.optNSStringCol!, "")
@@ -334,5 +329,4 @@ class ObjectAccessorTests: TestCase {
         object.optObjectCol = nil
         XCTAssertNil(object.optObjectCol)
     }
-    // swiftlint:enable function_body_length
 }

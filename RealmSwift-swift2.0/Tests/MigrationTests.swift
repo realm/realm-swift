@@ -149,7 +149,6 @@ class MigrationTests: TestCase {
         }
     }
 
-    // swiftlint:disable function_body_length
     func testEnumerate() {
         autoreleasepool {
             _ = try! Realm()
@@ -250,7 +249,6 @@ class MigrationTests: TestCase {
             }
         }
     }
-    // swiftlint:enable function_body_length
 
     func testCreate() {
         autoreleasepool {
@@ -317,7 +315,6 @@ class MigrationTests: TestCase {
         XCTAssertEqual(0, realm.allObjects("SwiftStringObject").count)
     }
 
-    // swiftlint:disable function_body_length
     // test getting/setting all property types
     func testMigrationObject() {
         autoreleasepool {
@@ -415,5 +412,4 @@ class MigrationTests: TestCase {
         // make sure we added new bool objects as object property and in the list
         XCTAssertEqual(try! Realm().objects(SwiftBoolObject).count, 4)
     }
-    // swiftlint:enable function_body_length
 }
