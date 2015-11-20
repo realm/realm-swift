@@ -24,6 +24,13 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  An `RLMRealmConfiguration` is used to describe the different options used to
  create an `RLMRealm` instance.
+
+ `RLMRealmConfiguration` instances are just plain NSObjects, and unlike RLMRealm
+ and RLMObjects can be freely shared between threads as long as you do not
+ mutate them. Creating configuration objects for class subsets (by setting the
+ `objectClasses` property) can be expensive, and so you will normally want to
+ cache and reuse a single configuration object for each distinct configuration
+ that you are using rather than creating a new one each time you open a Realm.
  */
 @interface RLMRealmConfiguration : NSObject<NSCopying>
 
