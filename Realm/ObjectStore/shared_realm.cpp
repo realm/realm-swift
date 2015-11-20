@@ -38,6 +38,7 @@ Realm::Config::Config(const Config& c)
 , read_only(c.read_only)
 , in_memory(c.in_memory)
 , cache(c.cache)
+, disable_format_upgrade(c.disable_format_upgrade)
 , encryption_key(c.encryption_key)
 , schema_version(c.schema_version)
 , migration_function(c.migration_function)
@@ -71,7 +72,7 @@ Realm::Realm(Config config)
             m_history = realm::make_client_history(m_config.path, m_config.encryption_key.data());
             SharedGroup::DurabilityLevel durability = m_config.in_memory ? SharedGroup::durability_MemOnly :
                                                                            SharedGroup::durability_Full;
-            m_shared_group = std::make_unique<SharedGroup>(*m_history, durability, m_config.encryption_key.data());
+            m_shared_group = std::make_unique<SharedGroup>(*m_history, durability, m_config.encryption_key.data(), !m_config.disable_format_upgrade);
         }
     }
     catch (util::File::PermissionDenied const& ex) {
@@ -91,6 +92,10 @@ Realm::Realm(Config config)
         throw RealmFileException(RealmFileException::Kind::IncompatibleLockFile, m_config.path,
                                  "Realm file is currently open in another process "
                                  "which cannot share access with this process. All processes sharing a single file must be the same architecture.");
+    }
+    catch (FileFormatUpgradeRequired const& ex) {
+        throw RealmFileException(RealmFileException::Kind::FormatUpgradeRequired, "The Realm file format must be allowed to be upgraded "
+        "in order to proceed.");
     }
 }
 

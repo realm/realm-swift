@@ -244,5 +244,15 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     _config.schema = [_customSchema objectStoreCopy];
 }
 
+- (void)setDisableFormatUpgrade:(bool)disableFormatUpgrade
+{
+    _config.disable_format_upgrade = disableFormatUpgrade;
+}
+
+- (bool)disableFormatUpgrade
+{
+    return _config.disable_format_upgrade;
+}
+
 @end
 

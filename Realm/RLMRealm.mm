@@ -251,6 +251,9 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
             case RealmFileException::Kind::AccessError:
                 RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileAccessError, ex), outError);
                 break;
+            case RealmFileException::Kind::FormatUpgradeRequired:
+                RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileFormatUpgradeRequired, ex), outError);
+                break;
             default:
                 RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, ex), outError);
                 break;
