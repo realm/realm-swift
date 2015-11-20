@@ -1,6 +1,13 @@
 Cocoa sync doc DRAFT
 ====================
 
+Realm Sync allows you to transparently share Realms between multiple devices. This makes it easy for users to move seamlessly between devices, do realtime collaboration with other users and always have a live backup of all their data. 
+
+**Key features:**
+* Realtime collaboration: Multiple users can interact with the same data simultaniously.
+* Full access to the entire Realm on the device. So no latency on your own operations.
+* Works even when devices go offline. They will transparently merge changes when reconnected.
+
 Overview
 --------
 
