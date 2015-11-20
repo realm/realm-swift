@@ -801,6 +801,39 @@ case "$COMMAND" in
         ;;
 
     ######################################
+    # Continuous Integration
+    ######################################
+
+    "ci-pr")
+        mkdir -p build/reports
+
+        if [ "$target" = "docs" ]; then
+            ./build.sh set-swift-version
+            ./build.sh verify-docs
+        elif [ "$target" = "swiftlint" ]; then
+            ./build.sh verify-swiftlint
+        else
+            sha=$ghprbSourceBranch
+            REALM_SWIFT_VERSION=$swift_version
+            CONFIGURATION=$configuration
+            REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
+            NSUnbufferedIO=YES
+            ./build.sh prelaunch-simulator
+            # Verify that no Realm files still exist
+            ! find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .
+
+            ./build.sh verify-$target | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || \
+                (echo "\n\n***\nbuild/build.log\n***\n\n" && cat build/build.log && exit 1)
+        fi
+
+        if [ "$target" = "osx" ] && [ "$configuration" = "Debug" ]; then
+          gcovr -r . -f ".*Realm.*" -e ".*Tests.*" -e ".*core.*" --xml > build/reports/coverage-report.xml
+          WS=$(pwd | sed "s/\//\\\\\//g")
+          sed -i ".bak" "s/<source>\./<source>${WS}/" build/reports/coverage-report.xml
+        fi
+        ;;
+
+    ######################################
     # Release packaging
     ######################################
 
