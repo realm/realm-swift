@@ -73,6 +73,8 @@ typedef NS_ENUM(NSInteger, RLMError) {
     RLMErrorFileExists            = 4,
     /** Returned by RLMRealm if no_create was specified and the file was not found when the realm is opened. */
     RLMErrorFileNotFound          = 5,
+    /** Returned by RLMRealm if a file format upgrade is required to open the file, but upgrades were explicilty disabled. */
+    RLMErrorFileFormatUpgradeRequired = 6,
     /** Returned by RLMRealm if the database file is currently open in another
         process which cannot share with the current process due to an
         architecture mismatch. */
