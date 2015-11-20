@@ -26,7 +26,7 @@ RLM_ASSUME_NONNULL_BEGIN
 @class RLMObject;
 
 /**
-Provides both the old and new versions of an object in this Realm. Objects properties can only be
+Provides both the old and new versions of an object in this Realm. Object properties can only be
 accessed using keyed subscripting.
 
 @param oldObject Object in original RLMRealm (read-only).
