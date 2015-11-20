@@ -88,6 +88,8 @@ xcode() {
 }
 
 xc() {
+    # Logs xcodebuild output in realtime
+    : ${NSUnbufferedIO:=YES}
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcode "$@"
     elif [[ "$XCMODE" == "xcpretty" ]]; then
@@ -244,7 +246,7 @@ build_docs() {
 
     if [[ "$language" == "swift" ]]; then
         : ${REALM_SWIFT_VERSION:=2.1}
-        ./build.sh set-swift-version
+        sh build.sh set-swift-version
         xcodebuild_arguments="-scheme,RealmSwift"
         module="RealmSwift"
         objc=""
@@ -601,8 +603,8 @@ case "$COMMAND" in
     "verify-cocoapods")
         cd examples/installation
         # FIXME: tests are duplicated to work around https://github.com/realm/realm-cocoa/issues/2701
-        ./build.sh test-ios-objc-cocoapods || ./build.sh test-ios-objc-cocoapods || exit 1
-        ./build.sh test-ios-swift-cocoapods || ./build.sh test-ios-swift-cocoapods || exit 1
+        sh build.sh test-ios-objc-cocoapods || sh build.sh test-ios-objc-cocoapods || exit 1
+        sh build.sh test-ios-swift-cocoapods || sh build.sh test-ios-swift-cocoapods || exit 1
         ;;
 
     "verify-osx")
@@ -808,21 +810,20 @@ case "$COMMAND" in
         mkdir -p build/reports
 
         if [ "$target" = "docs" ]; then
-            ./build.sh set-swift-version
-            ./build.sh verify-docs
+            sh build.sh set-swift-version
+            sh build.sh verify-docs
         elif [ "$target" = "swiftlint" ]; then
-            ./build.sh verify-swiftlint
+            sh build.sh verify-swiftlint
         else
-            sha=$ghprbSourceBranch
-            REALM_SWIFT_VERSION=$swift_version
-            CONFIGURATION=$configuration
-            REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
-            NSUnbufferedIO=YES
-            ./build.sh prelaunch-simulator
+            export sha=$ghprbSourceBranch
+            export REALM_SWIFT_VERSION=$swift_version
+            export CONFIGURATION=$configuration
+            export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
+            sh build.sh prelaunch-simulator
             # Verify that no Realm files still exist
             ! find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .
 
-            ./build.sh verify-$target | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || \
+            sh build.sh verify-$target | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || \
                 (echo "\n\n***\nbuild/build.log\n***\n\n" && cat build/build.log && exit 1)
         fi
 
