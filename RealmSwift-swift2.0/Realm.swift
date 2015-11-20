@@ -138,7 +138,7 @@ public final class Realm {
     }
 
     /**
-    Revert all writes made in the current write transaction and end the transaction.
+    Reverts all writes made in the current write transaction and end the transaction.
 
     This rolls back all objects in the Realm to the state they were in at the
     beginning of the write transaction, and then ends the transaction.
@@ -468,9 +468,9 @@ public final class Realm {
     committed.  If set to `false`, you must manually call `refresh()` on the Realm to
     update it to get the latest version.
 
-	Note that on background threads, the run loop is not run by default and you will
-	will need to manually call `refresh()` in order to update to the latest version,
-	even if `autorefresh` is set to `true`.
+    Note that by default, background threads do not have an active run loop and you
+    will need to manually call `refresh()` in order to update to the latest version,
+    even if `autorefresh` is set to `true`.
 
     Even with this enabled, you can still call `refresh()` at any time to update the
     Realm before the automatic refresh would occur.

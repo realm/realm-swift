@@ -59,7 +59,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @param index   The index to look up.
 
- @return An RLMObject of the class contained by this RLMResults.
+ @return An RLMObject of the type contained in this RLMResults.
  */
 - (RLMObjectType)objectAtIndex:(NSUInteger)index;
 
@@ -68,7 +68,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty RLMResults.
 
- @return An RLMObject of the class contained by this RLMResults.
+ @return An RLMObject of the type contained in this RLMResults.
  */
 - (nullable RLMObjectType)firstObject;
 
@@ -77,7 +77,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty RLMResults.
 
- @return An RLMObject of the class contained by this RLMResults.
+ @return An RLMObject of the type contained in this RLMResults.
  */
 - (nullable RLMObjectType)lastObject;
 
