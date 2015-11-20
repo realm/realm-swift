@@ -27,6 +27,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix a potential crash when deleting all objects of a class.
 * Fix performance problems when creating large numbers of objects with
   `RLMArray`/`List` properties.
+* Fix memory leak when using Object(value:) for subclasses with
+  `List` or `RealmOptional` properties.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
