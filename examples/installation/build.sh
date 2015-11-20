@@ -56,8 +56,12 @@ xctest() {
         pod install --project-directory="$DIRECTORY"
     elif [[ $NAME == Carthage* ]]; then
         (
-            cd "$DIRECTORY";
-            echo "github \"realm/realm-cocoa\" \"${sha:-master}\"" > Cartfile
+            cd "$DIRECTORY"
+            if [ -n "$REALM_BUILD_USING_LATEST_RELEASE" ]; then
+                echo "github \"realm/realm-cocoa\"" > Cartfile
+            else
+                echo "github \"realm/realm-cocoa\" \"${sha:-master}\"" > Cartfile
+            fi
             carthage update
         )
     elif [[ $LANG == swift* ]]; then
