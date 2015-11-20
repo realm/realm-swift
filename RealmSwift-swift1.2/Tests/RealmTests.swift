@@ -376,8 +376,47 @@ class RealmTests: TestCase {
 
         XCTAssertEqual(0, Realm().dynamicObjects("SwiftStringObject").count)
         XCTAssertEqual(3, Realm().dynamicObjects("SwiftIntObject").count)
-        XCTAssertEqual(3, Realm().dynamicObjects("SwiftIntObject").count)
         assertThrows(Realm().dynamicObjects("Object"))
+    }
+
+    func testDynamicObjectProperties() {
+        Realm().write {
+            Realm().create(SwiftObject)
+        }
+
+        let object = Realm().dynamicObjects("SwiftObject")[0]
+        let dictionary = SwiftObject.defaultValues()
+
+        XCTAssertEqual(object["boolCol"] as? NSNumber, dictionary["boolCol"] as! NSNumber?)
+        XCTAssertEqual(object["intCol"] as? NSNumber, dictionary["intCol"] as! NSNumber?)
+        XCTAssertEqual(object["floatCol"] as? NSNumber, dictionary["floatCol"] as! Float?)
+        XCTAssertEqual(object["doubleCol"] as? NSNumber, dictionary["doubleCol"] as! Double?)
+        XCTAssertEqual(object["stringCol"] as! String?, dictionary["stringCol"] as! String?)
+        XCTAssertEqual(object["binaryCol"] as! NSData?, (dictionary["binaryCol"] as! NSData?))
+        XCTAssertEqual(object["dateCol"] as! NSDate?, (dictionary["dateCol"] as! NSDate?))
+        XCTAssertEqual(object["objectCol"]?.boolCol, false)
+    }
+
+    func testDynamicObjectOptionalProperties() {
+        Realm().write {
+            Realm().create(SwiftOptionalDefaultValuesObject)
+        }
+
+        let object = Realm().dynamicObjects("SwiftOptionalDefaultValuesObject")[0]
+        let dictionary = SwiftOptionalDefaultValuesObject.defaultValues()
+
+        XCTAssertEqual(object["optIntCol"] as? NSNumber, dictionary["optIntCol"] as? NSNumber)
+        XCTAssertEqual(object["optInt8Col"] as? NSNumber, dictionary["optInt8Col"] as? NSNumber)
+        XCTAssertEqual(object["optInt16Col"] as? NSNumber, dictionary["optInt16Col"] as? NSNumber)
+        XCTAssertEqual(object["optInt32Col"] as? NSNumber, dictionary["optInt32Col"] as? NSNumber)
+        XCTAssertEqual(object["optInt64Col"] as? NSNumber, dictionary["optInt64Col"] as? NSNumber)
+        XCTAssertEqual(object["optFloatCol"] as? NSNumber, dictionary["optFloatCol"] as? NSNumber)
+        XCTAssertEqual(object["optDoubleCol"] as? NSNumber, dictionary["optDoubleCol"] as? NSNumber)
+        XCTAssertEqual(object["optStringCol"] as! String?, dictionary["optStringCol"] as! String?)
+        XCTAssertEqual(object["optNSStringCol"] as! String?, (dictionary["optNSStringCol"] as! String?))
+        XCTAssertEqual(object["optBinaryCol"] as! NSData?, (dictionary["optBinaryCol"] as! NSData?))
+        XCTAssertEqual(object["optDateCol"] as! NSDate?, (dictionary["optDateCol"] as! NSDate?))
+        XCTAssertEqual(object["optObjectCol"]?.boolCol, true)
     }
 
     func testObjectForPrimaryKey() {
