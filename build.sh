@@ -88,6 +88,8 @@ xcode() {
 }
 
 xc() {
+    # Logs xcodebuild output in realtime
+    : ${NSUnbufferedIO:=YES}
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcode "$@"
     elif [[ "$XCMODE" == "xcpretty" ]]; then
@@ -524,8 +526,8 @@ case "$COMMAND" in
     "verify-cocoapods")
         cd examples/installation
         # FIXME: tests are duplicated to work around https://github.com/realm/realm-cocoa/issues/2701
-        ./build.sh test-ios-objc-cocoapods || ./build.sh test-ios-objc-cocoapods || exit 1
-        ./build.sh test-ios-swift-cocoapods || ./build.sh test-ios-swift-cocoapods || exit 1
+        sh build.sh test-ios-objc-cocoapods || sh build.sh test-ios-objc-cocoapods || exit 1
+        sh build.sh test-ios-swift-cocoapods || sh build.sh test-ios-swift-cocoapods || exit 1
         ;;
 
     "verify-osx")
@@ -709,6 +711,38 @@ case "$COMMAND" in
           cp Realm/*.{h,hpp} include/Realm
           cp Realm/ObjectStore/*.hpp include/Realm
           touch include/Realm/RLMPlatform.h
+        fi
+        ;;
+
+    ######################################
+    # Continuous Integration
+    ######################################
+
+    "ci-pr")
+        mkdir -p build/reports
+
+        if [ "$target" = "docs" ]; then
+            sh build.sh set-swift-version
+            sh build.sh verify-docs
+        elif [ "$target" = "swiftlint" ]; then
+            sh build.sh verify-swiftlint
+        else
+            export sha=$ghprbSourceBranch
+            export REALM_SWIFT_VERSION=$swift_version
+            export CONFIGURATION=$configuration
+            export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
+            sh build.sh prelaunch-simulator
+            # Verify that no Realm files still exist
+            ! find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .
+
+            sh build.sh verify-$target | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || \
+                (echo "\n\n***\nbuild/build.log\n***\n\n" && cat build/build.log && exit 1)
+        fi
+
+        if [ "$target" = "osx" ] && [ "$configuration" = "Debug" ]; then
+          gcovr -r . -f ".*Realm.*" -e ".*Tests.*" -e ".*core.*" --xml > build/reports/coverage-report.xml
+          WS=$(pwd | sed "s/\//\\\\\//g")
+          sed -i ".bak" "s/<source>\./<source>${WS}/" build/reports/coverage-report.xml
         fi
         ;;
 
