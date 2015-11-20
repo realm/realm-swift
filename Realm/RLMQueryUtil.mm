@@ -439,6 +439,16 @@ void add_link_constraint_to_query(realm::Query & query,
         query.Not();
     }
 
+    if (!obj->_row.is_attached()) {
+        query.and_query(new FalseExpression);
+        return;
+    }
+
+    // NOTE: This precondition assumes that the argument `obj` will be always originating from the
+    // queried table as verified before by `validate_property_value`
+    RLMPrecondition(query.get_table()->get_link_target(column).get() == obj->_row.get_table(),
+                    @"Invalid value origin", @"Object must be from the Realm being queried");
+
     query.links_to(column, obj->_row.get_index());
 }
 
