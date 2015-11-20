@@ -94,3 +94,8 @@ build/
 
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
+
+## Carthage
+# Cartfiles are ignored because they're generated on demand in the installation examples
+Cartfile
+Carthage
