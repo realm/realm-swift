@@ -467,8 +467,8 @@ public final class Realm {
     in this Realm on the next cycle of the run loop after the changes are
     committed.  If set to `false`, you must manually call `refresh()` on the Realm to
     update it to get the latest version.
-	
-    Note that by default, background threads do not have an active run loop and you 
+
+    Note that by default, background threads do not have an active run loop and you
     will need to manually call `refresh()` in order to update to the latest version,
     even if `autorefresh` is set to `true`.
 

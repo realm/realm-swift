@@ -102,21 +102,21 @@ public final class Realm {
 
     /**
     Performs actions contained within the given block inside a write transation.
-	
-    Write transactions cannot be nested, and trying to execute a write transaction 
-	on a `Realm` which is already in a write transaction will throw an exception. 
+
+    Write transactions cannot be nested, and trying to execute a write transaction
+	on a `Realm` which is already in a write transaction will throw an exception.
 	Calls to `write` from `Realm` instances in other threads will block
     until the current write transaction completes.
 
-    Before executing the write transaction, `write` updates the `Realm` to the 
-	latest Realm version, as if `refresh()` was called, and generates notifications 
+    Before executing the write transaction, `write` updates the `Realm` to the
+	latest Realm version, as if `refresh()` was called, and generates notifications
 	if applicable. This has no effect if the `Realm` was already up to date.
- 
+
     :param: block The block to be executed inside a write transaction.
     :param: error If an error occurs, upon return contains an `NSError` object
                   that describes the problem. If you are not interested in
                   possible errors, omit the argument, or pass in `nil`.
-    
+
     :returns: Whether the transaction succeeded.
     */
     public func write(error: NSErrorPointer = nil, @noescape block: (() -> Void)) -> Bool {
@@ -151,7 +151,7 @@ public final class Realm {
 	the transaction.
 
     Calling this when not in a write transaction will throw an exception.
-    
+
     :param: error If an error occurs, upon return contains an `NSError` object
             that describes the problem. If you are not interested in
             possible errors, omit the argument, or pass in `nil`.
@@ -279,19 +279,19 @@ public final class Realm {
         }
         return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, update), T.self)
     }
-    
+
     /**
     This method is useful only in specialized circumstances, for example, when building
     components that integrate with Realm. If you are simply building an app on Realm, it is
     recommended to use the typed method `create(type:value:update:)`.
-    
+
     Creates or updates an object with the given class name and adds it to the `Realm`, populating
     the object with the given value.
-    
+
     When 'update' is 'true', the object must have a primary key. If no objects exist in
     the Realm instance with the same primary key value, the object is inserted. Otherwise,
     the existing object is updated with any changed values.
-    
+
     :warning: This method can only be called during a write transaction.
 
     :param: className   The class name of the object to create.
@@ -299,13 +299,13 @@ public final class Realm {
     object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
     or an `Array` with one object for each persisted property. An exception will be
     thrown if any required properties are not present and no default is set.
-    
+
     When passing in an `Array`, all properties must be present,
     valid and in the same order as the properties defined in the model.
     :param: update      If true will try to update existing objects with the same primary key.
-    
+
     :returns: The created object.
-    
+
     :nodoc:
     */
     public func dynamicCreate(className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
@@ -346,7 +346,7 @@ public final class Realm {
     Deletes the given objects from this Realm.
 
     :warning: This method can only be called during a write transaction.
- 
+
     :param: objects The objects to be deleted. Must be `List<Object>`.
 
     :nodoc:
@@ -389,20 +389,20 @@ public final class Realm {
     public func objects<T: Object>(type: T.Type) -> Results<T> {
         return Results<T>(RLMGetObjects(rlmRealm, T.className(), nil))
     }
-    
+
     /**
     This method is useful only in specialized circumstances, for example, when building
     components that integrate with Realm. If you are simply building an app on Realm, it is
     recommended to use the typed method `objects(type:)`.
-    
+
     Returns all objects for a given class name in the Realm.
-    
+
     :warning: This method is useful only in specialized circumstances.
-    
+
     :param: className  The class name of the objects to be returned.
-    
+
     :returns: All objects for the given class name as dynamic objects
-    
+
     :nodoc:
     */
     public func dynamicObjects(className: String) -> Results<DynamicObject> {
@@ -426,27 +426,27 @@ public final class Realm {
     public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T? {
         return unsafeBitCast(RLMGetObject(rlmRealm, type.className(), key), Optional<T>.self)
     }
-    
+
     /**
     This method is useful only in specialized circumstances, for example, when building
     components that integrate with Realm. If you are simply building an app on Realm, it is
     recommended to use the typed method `objectForPrimaryKey(type:key:)`.
-    
+
     Get a dynamic object with the given class name and primary key.
-    
+
     Returns `nil` if no object exists with the given class name and primary key.
-    
+
     This method requires that `primaryKey()` be overridden on the given subclass.
-    
+
     :see: Object.primaryKey()
-    
+
     :warning: This method is useful only in specialized circumstances.
-    
+
     :param: className  The class name of the object to be returned.
     :param: key        The primary key of the desired object.
-    
+
     :returns: An object of type `DynamicObject` or `nil` if an object with the given primary key does not exist.
-    
+
     :nodoc:
     */
     public func dynamicObjectForPrimaryKey(className: String, key: AnyObject) -> DynamicObject? {
@@ -493,10 +493,10 @@ public final class Realm {
     committed.  If set to `false`, you must manually call `refresh()` on the Realm to
     update it to get the latest version.
 
-    Note that by default, background threads do not have an active run loop and you 
+    Note that by default, background threads do not have an active run loop and you
     will need to manually call `refresh()` in order to update to the latest version,
     even if `autorefresh` is set to `true`.
-	
+
     Even with this enabled, you can still call `refresh()` at any time to update the
     Realm before the automatic refresh would occur.
 
