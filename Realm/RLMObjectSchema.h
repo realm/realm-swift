@@ -24,7 +24,7 @@ RLM_ASSUME_NONNULL_BEGIN
 @class RLMProperty;
 
 /**
- This class represents Realm model object schemas persisted to Realm in an RLMSchema.
+ This class represents Realm model object schemas.
 
  When using Realm, RLMObjectSchema objects allow performing migrations and
  introspecting the database's schema.
