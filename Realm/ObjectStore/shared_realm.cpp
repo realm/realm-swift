@@ -94,7 +94,7 @@ Realm::Realm(Config config)
                                  "which cannot share access with this process. All processes sharing a single file must be the same architecture.");
     }
     catch (FileFormatUpgradeRequired const& ex) {
-        throw RealmFileException(RealmFileException::Kind::FormatUpgradeRequired, "The Realm file format must be allowed to be upgraded "
+        throw RealmFileException(RealmFileException::Kind::FormatUpgradeRequired, m_config.path, "The Realm file format must be allowed to be upgraded "
         "in order to proceed.");
     }
 }
