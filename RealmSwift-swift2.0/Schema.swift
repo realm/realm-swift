@@ -36,7 +36,7 @@ public final class Schema: CustomStringConvertible {
     /// `ObjectSchema`s for all object types in this Realm. Meant
     /// to be used during migrations for dynamic introspection.
     public var objectSchema: [ObjectSchema] {
-        return (rlmSchema.objectSchema as! [RLMObjectSchema]).map { ObjectSchema($0) }
+        return rlmSchema.objectSchema.map(ObjectSchema.init)
     }
 
     /// Returns a human-readable description of the object schemas contained in this schema.
