@@ -8,6 +8,10 @@ Realm Sync allows you to transparently share Realms between multiple devices. Th
 * Full access to the entire Realm on the device. No latency on your own operations.
 * Works even when devices go offline. Changes will transparently be merged when reconnected.
 
+**Limitations:**
+* You can only synchronize entire Realms. Sync of subsets (individual objects) is not supported yet.
+* Still lacks a lot of data types (primary keys, counters, sets, dictionaries...) needed to for finer control of merge behaviour.
+
 Overview
 --------
 
