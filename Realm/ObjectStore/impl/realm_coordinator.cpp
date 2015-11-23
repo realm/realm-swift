@@ -33,17 +33,14 @@ static std::unordered_map<std::string, std::weak_ptr<RealmCoordinator>> s_coordi
 std::shared_ptr<RealmCoordinator> RealmCoordinator::get_coordinator(StringData path)
 {
     std::lock_guard<std::mutex> lock(s_coordinator_mutex);
-    std::shared_ptr<RealmCoordinator> coordinator;
 
-    auto it = s_coordinators_per_path.find(path);
-    if (it != s_coordinators_per_path.end()) {
-        coordinator = it->second.lock();
+    auto& weak_coordinator = s_coordinators_per_path[path];
+    if (auto coordinator = weak_coordinator.lock()) {
+        return coordinator;
     }
 
-    if (!coordinator) {
-        s_coordinators_per_path[path] = coordinator = std::make_shared<RealmCoordinator>();
-    }
-
+    auto coordinator = std::make_shared<RealmCoordinator>();
+    weak_coordinator = coordinator;
     return coordinator;
 }
 
