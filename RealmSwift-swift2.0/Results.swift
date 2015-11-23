@@ -330,8 +330,7 @@ public final class Results<T: Object>: ResultsBase {
             }
             if let cachedResults = cachedResults {
                 block(cachedResults, nil) // contained RLMResults has been updated already
-            }
-            else {
+            } else {
                 let r = Results<T>(results)
                 cachedResults = r
                 block(r, nil)
