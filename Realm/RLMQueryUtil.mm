@@ -738,20 +738,9 @@ void validate_property_value(const ColumnReference& column,
 template <typename RequestedType, CollectionOperation::Type OperationType>
 struct ValueOfTypeWithCollectionOperationHelper;
 
-template <typename RequestedType>
-struct ValueOfTypeWithCollectionOperationPassThrough {
-    template <typename T>
-    static auto convert(Query& query, T&& value)
-    {
-        return value_of_type_for_query<RequestedType>(query, std::forward<T>(value));
-    }
-};
-
 template <>
-struct ValueOfTypeWithCollectionOperationHelper<Int, CollectionOperation::Count> : ValueOfTypeWithCollectionOperationPassThrough<Int> {
-    using ValueOfTypeWithCollectionOperationPassThrough<Int>::convert;
-
-    static auto convert(Query& query, CollectionOperation operation)
+struct ValueOfTypeWithCollectionOperationHelper<Int, CollectionOperation::Count> {
+    static auto convert(Query& query, const CollectionOperation& operation)
     {
         assert(operation.type() == CollectionOperation::Count);
         return operation.link_column().resolve<Link>(query).count();
@@ -760,10 +749,8 @@ struct ValueOfTypeWithCollectionOperationHelper<Int, CollectionOperation::Count>
 
 #define VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER(OperationType, function) \
 template <typename T> \
-struct ValueOfTypeWithCollectionOperationHelper<T, OperationType> : ValueOfTypeWithCollectionOperationPassThrough<T> { \
-    using ValueOfTypeWithCollectionOperationPassThrough<T>::convert; \
-\
-    static auto convert(Query& query, CollectionOperation operation) \
+struct ValueOfTypeWithCollectionOperationHelper<T, OperationType> { \
+    static auto convert(Query& query, const CollectionOperation& operation) \
     { \
         REALM_ASSERT(operation.type() == OperationType); \
         auto targetColumn = operation.link_column().resolve<Link>(query).template column<T>(operation.column_index()); \
@@ -779,8 +766,13 @@ VALUE_OF_TYPE_WITH_COLLECTION_OPERATOR_HELPER(CollectionOperation::Average, aver
 
 template <typename Requested, CollectionOperation::Type OperationType, typename T>
 auto value_of_type_for_query_with_collection_operation(Query& query, T&& value) {
+    return value_of_type_for_query<Requested>(query, std::forward<T>(value));
+}
+
+template <typename Requested, CollectionOperation::Type OperationType>
+auto value_of_type_for_query_with_collection_operation(Query& query, CollectionOperation operation) {
     using helper = ValueOfTypeWithCollectionOperationHelper<Requested, OperationType>;
-    return helper::convert(query, std::forward<T>(value));
+    return helper::convert(query, operation);
 }
 
 template <CollectionOperation::Type Operation, typename... T>
