@@ -31,6 +31,7 @@
 #include <realm/table_view.hpp>
 
 #include <cassert>
+#include <unordered_map>
 
 #include <unordered_map>
 
