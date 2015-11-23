@@ -395,6 +395,9 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     if (!block) {
         @throw RLMException(@"The notification block should not be nil");
     }
+    if (!RLMIsInRunLoop()) {
+        @throw RLMException(@"Can only add notification blocks from within runloops.");
+    }
 
     _realm->read_group();
 

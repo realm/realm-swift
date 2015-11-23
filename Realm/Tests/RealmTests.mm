@@ -955,15 +955,19 @@ extern "C" {
     [self dispatchAsync:^{
         RLMRealm *realm = [self realmWithTestPath];
         __block bool fulfilled = false;
-        RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
-            XCTAssertNotNil(realm, @"Realm should not be nil");
-            XCTAssertEqual(note, RLMRealmDidChangeNotification);
-            XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
-            fulfilled = true;
-        }];
 
-        // notify main thread that we're ready for it to commit
-        [bgReady fulfill];
+        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+            __block RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+                XCTAssertNotNil(realm, @"Realm should not be nil");
+                XCTAssertEqual(note, RLMRealmDidChangeNotification);
+                XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+                fulfilled = true;
+                [realm removeNotification:token];
+            }];
+
+            // notify main thread that we're ready for it to commit
+            [bgReady fulfill];
+        });
 
         // run for two seconds or until we receive notification
         NSDate *end = [NSDate dateWithTimeIntervalSinceNow:5.0];
@@ -972,7 +976,6 @@ extern "C" {
         }
         XCTAssertTrue(fulfilled, @"Notification should have been received");
 
-        [realm removeNotification:token];
         [bgDone fulfill];
     }];
 
@@ -985,6 +988,22 @@ extern "C" {
     [realm commitWriteTransaction];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+- (void)testAddingNotificationOutsideOfRunLoopIsAnError {
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        XCTAssertThrows([realm addNotificationBlock:^(NSString *, RLMRealm *) { }]);
+
+        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+            RLMNotificationToken *token;
+            XCTAssertNoThrow(token = [realm addNotificationBlock:^(NSString *, RLMRealm *) { }]);
+            [realm removeNotification:token];
+            CFRunLoopStop(CFRunLoopGetCurrent());
+        });
+
+        CFRunLoopRun();
+    }];
 }
 
 #pragma mark - In-memory Realms
