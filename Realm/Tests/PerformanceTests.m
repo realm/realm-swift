@@ -447,25 +447,24 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
 
-        dispatch_queue_t queue = dispatch_queue_create("background", 0);
         dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-        dispatch_async(queue, ^{
-            @autoreleasepool {
-                RLMRealm *realm = self.testRealm;
-                IntObject *obj = [[IntObject allObjectsInRealm:realm] firstObject];
-                __block bool stop = false;
-                RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
-                    stop = obj.intCol == stopValue;
+        [self dispatchAsync:^{
+            RLMRealm *realm = self.testRealm;
+            IntObject *obj = [[IntObject allObjectsInRealm:realm] firstObject];
+            __block RLMNotificationToken *token;
+
+            CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+                token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
+                    if (obj.intCol == stopValue) {
+                        CFRunLoopStop(CFRunLoopGetCurrent());
+                    }
                 }];
-
                 dispatch_semaphore_signal(sema);
-                while (!stop) {
-                    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-                }
+            });
+            CFRunLoopRun();
 
-                [realm removeNotification:token];
-            }
-        });
+            [realm removeNotification:token];
+        }];
 
         dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
         [self startMeasuring];
@@ -475,7 +474,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
             }];
         }
 
-        dispatch_sync(queue, ^{});
+        [self dispatchAsyncAndWait:^{}];
         [self stopMeasuring];
     }];
 }
@@ -490,14 +489,18 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
         [realm commitWriteTransaction];
 
-        dispatch_queue_t queue = dispatch_queue_create("background", 0);
         dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-        dispatch_async(queue, ^{
-            @autoreleasepool {
-                RLMRealm *realm = self.testRealm;
-                IntObject *obj = [[IntObject allObjectsInRealm:realm] firstObject];
-                RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
-                    if (obj.intCol % 2 == 0 && obj.intCol < stopValue) {
+        [self dispatchAsync:^{
+            RLMRealm *realm = self.testRealm;
+            IntObject *obj = [[IntObject allObjectsInRealm:realm] firstObject];
+            __block RLMNotificationToken *token;
+
+            CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+                token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
+                    if (obj.intCol == stopValue) {
+                        CFRunLoopStop(CFRunLoopGetCurrent());
+                    }
+                    else if (obj.intCol % 2 == 0) {
                         [realm transactionWithBlock:^{
                             obj.intCol++;
                         }];
@@ -505,13 +508,11 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
                 }];
 
                 dispatch_semaphore_signal(sema);
-                while (obj.intCol < stopValue) {
-                    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-                }
+            });
+            CFRunLoopRun();
 
-                [realm removeNotification:token];
-            }
-        });
+            [realm removeNotification:token];
+        }];
 
         RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
             if (obj.intCol % 2 == 1 && obj.intCol < stopValue) {
@@ -530,7 +531,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
             [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
         }
 
-        dispatch_sync(queue, ^{});
+        [self dispatchAsyncAndWait:^{}];
         [self stopMeasuring];
 
         [realm removeNotification:token];
@@ -657,7 +658,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     dispatch_async(_queue, ^{
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         id obj = [[realm allObjects:className] firstObject];
-        [obj addObserver:self forKeyPath:keyPath options:0 context:(__bridge void *)_sema];
+        [obj addObserver:self forKeyPath:keyPath options:(NSKeyValueObservingOptions)0 context:(__bridge void *)_sema];
 
         dispatch_semaphore_signal(_sema);
         while (!block(obj)) {

@@ -5,6 +5,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * All functionality deprecated in previous releases has been removed entirely.
 * Add generic type annotations to NSArrays and NSDictionaries in public APIs.
+* Adding a Realm notification block on a thread not currently running from
+  within a run loop throws an exception rather than silently never calling the
+  notification block.
 
 ### Enhancements
 
