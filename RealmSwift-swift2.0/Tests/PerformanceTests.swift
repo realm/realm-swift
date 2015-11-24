@@ -420,14 +420,16 @@ class SwiftPerformanceTests: TestCase {
                 autoreleasepool {
                     let realm = inMemoryRealm("test")
                     let object = realm.objects(SwiftIntObject).first!
-                    var stop = false
-                    let token = realm.addNotificationBlock { _, _ in
-                        stop = object.intCol == stopValue
+                    var token: NotificationToken! = nil
+                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) {
+                        token = realm.addNotificationBlock { _, _ in
+                            if object.intCol == stopValue {
+                                CFRunLoopStop(CFRunLoopGetCurrent())
+                            }
+                        }
+                        dispatch_semaphore_signal(semaphore)
                     }
-                    dispatch_semaphore_signal(semaphore)
-                    while !stop {
-                        NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
-                    }
+                    CFRunLoopRun()
                     realm.removeNotification(token)
                 }
             }
@@ -456,15 +458,18 @@ class SwiftPerformanceTests: TestCase {
                 autoreleasepool {
                     let realm = inMemoryRealm("test")
                     let object = realm.objects(SwiftIntObject).first!
-                    let token = realm.addNotificationBlock { _, _ in
-                        if object.intCol % 2 == 0 && object.intCol < stopValue {
-                            try! realm.write { _ = object.intCol++ }
+                    var token: NotificationToken! = nil
+                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) {
+                        token = realm.addNotificationBlock { _, _ in
+                            if object.intCol == stopValue {
+                                CFRunLoopStop(CFRunLoopGetCurrent())
+                            } else if object.intCol % 2 == 0 {
+                                try! realm.write { object.intCol++ }
+                            }
                         }
+                        dispatch_semaphore_signal(semaphore)
                     }
-                    dispatch_semaphore_signal(semaphore)
-                    while object.intCol < stopValue {
-                        NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
-                    }
+                    CFRunLoopRun()
                     realm.removeNotification(token)
                 }
             }
@@ -477,7 +482,7 @@ class SwiftPerformanceTests: TestCase {
 
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
             self.startMeasuring()
-            try! realm.write { _ = object.intCol++ }
+            try! realm.write { object.intCol++ }
             while object.intCol < stopValue {
                 NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
             }

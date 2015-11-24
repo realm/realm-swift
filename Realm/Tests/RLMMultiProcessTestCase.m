@@ -73,6 +73,14 @@
     [super setUp];
 }
 
+- (void)invokeTest {
+    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+        [super invokeTest];
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    });
+    CFRunLoopRun();
+}
+
 - (void)deleteFiles {
     // Only the parent should delete files in setUp/tearDown
     if (self.isParent) {
