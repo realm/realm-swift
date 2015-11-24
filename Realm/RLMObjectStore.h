@@ -77,14 +77,23 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 // Accessor Creation
 //
 
-// Create accessors
-RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm,
-                                       RLMObjectSchema *objectSchema,
-                                       NSUInteger index) NS_RETURNS_RETAINED;
 
 // switch List<> properties from being backed by standalone RLMArrays to RLMArrayLinkView
 void RLMInitializeSwiftAccessorGenerics(RLMObjectBase *object);
 
 #ifdef __cplusplus
 }
+
+namespace realm {
+    class Table;
+    template<typename T> class BasicRowExpr;
+    using RowExpr = BasicRowExpr<Table>;
+}
+// Create accessors
+RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm,
+                                       RLMObjectSchema *objectSchema,
+                                       NSUInteger index) NS_RETURNS_RETAINED;
+RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm,
+                                       RLMObjectSchema *objectSchema,
+                                       realm::RowExpr row) NS_RETURNS_RETAINED;
 #endif

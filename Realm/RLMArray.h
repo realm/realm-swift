@@ -61,11 +61,8 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @interface RLMArray RLM_GENERIC_COLLECTION : NSObject<RLMCollection, NSFastEnumeration>
 
-/**---------------------------------------------------------------------------------------
- *  @name RLMArray Properties
- *  ---------------------------------------------------------------------------------------
- */
-
+#pragma mark - Properties
+ 
 /**
  Number of objects in the array.
  */
@@ -86,19 +83,14 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
-#pragma mark -
-
-/**---------------------------------------------------------------------------------------
- *  @name Accessing Objects from an Array
- * ---------------------------------------------------------------------------------------
- */
+#pragma mark - Accessing Objects from an Array
 
 /**
  Returns the object at the index specified.
 
  @param index   The index to look up.
 
- @return An RLMObject of the class contained by this RLMArray.
+ @return An RLMObject of the type contained in this RLMArray.
  */
 - (RLMObjectType)objectAtIndex:(NSUInteger)index;
 
@@ -107,7 +99,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty RLMArray.
 
- @return An RLMObject of the class contained by this RLMArray.
+ @return An RLMObject of the type contained in this RLMArray.
  */
 - (nullable RLMObjectType)firstObject;
 
@@ -116,25 +108,20 @@ RLM_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty RLMArray.
 
- @return An RLMObject of the class contained by this RLMArray.
+ @return An RLMObject of the type contained in this RLMArray.
  */
 - (nullable RLMObjectType)lastObject;
 
 
-#pragma mark -
 
-
-/**---------------------------------------------------------------------------------------
- *  @name Adding, Removing, and Replacing Objects in an Array
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Adding, Removing, and Replacing Objects in an Array
 
 /**
  Adds an object to the end of the array.
 
  @warning This method can only be called during a write transaction.
 
- @param object  An RLMObject of the class contained by this RLMArray.
+ @param object  An RLMObject of the type contained in this RLMArray.
  */
 - (void)addObject:(RLMObjectArgument)object;
 
@@ -151,11 +138,11 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Inserts an object at the given index.
 
- Throws an exception when called with an index greater than the number of objects in this RLMArray.
+ Throws an exception when the index exceeds the bounds of this RLMArray.
 
  @warning This method can only be called during a write transaction.
 
- @param anObject  An object (of the same type as returned from the objectClassName selector).
+ @param anObject  An RLMObject of the type contained in this RLMArray.
  @param index   The array index at which the object is inserted.
  */
 - (void)insertObject:(RLMObjectArgument)anObject atIndex:(NSUInteger)index;
@@ -163,7 +150,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Removes an object at a given index.
 
- Throws an exception when called with an index greater than the number of objects in this RLMArray.
+ Throws an exception when the index exceeds the bounds of this RLMArray.
 
  @warning This method can only be called during a write transaction.
 
@@ -188,7 +175,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Replaces an object at the given index with a new object.
 
- Throws an exception when called with an index greater than the number of objects in this RLMArray.
+ Throws an exception when the index exceeds the bounds of this RLMArray.
 
  @warning This method can only be called during a write transaction.
 
@@ -200,8 +187,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Moves the object at the given source index to the given destination index.
 
- Throws an exception when called with an index greater than or equal to the
- number of objects in this RLMArray.
+ Throws an exception when the index exceeds the bounds of this RLMArray.
 
  @warning This method can only be called during a write transaction.
 
@@ -222,13 +208,8 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (void)exchangeObjectAtIndex:(NSUInteger)index1 withObjectAtIndex:(NSUInteger)index2;
 
-#pragma mark -
+#pragma mark - Querying an Array
 
-
-/**---------------------------------------------------------------------------------------
- *  @name Querying an Array
- *  ---------------------------------------------------------------------------------------
- */
 /**
  Gets the index of an object.
 
@@ -293,17 +274,13 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingDescriptors:(NSArray *)properties;
 
-#pragma mark -
-
+/// :nodoc:
 - (RLMObjectType)objectAtIndexedSubscript:(NSUInteger)index;
+
+/// :nodoc:
 - (void)setObject:(RLMObjectType)newValue atIndexedSubscript:(NSUInteger)index;
 
-#pragma mark -
-
-/**---------------------------------------------------------------------------------------
- *  @name Unavailable Methods
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Unavailable Methods
 
 /**
  -[RLMArray init] is not available because RLMArrays cannot be created directly.
@@ -327,6 +304,8 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @interface RLMSortDescriptor : NSObject
 
+#pragma mark - Properties
+ 
 /**
  The name of the property which this sort descriptor orders results by.
  */
@@ -336,6 +315,8 @@ RLM_ASSUME_NONNULL_BEGIN
  Whether this descriptor sorts in ascending or descending order.
  */
 @property (nonatomic, readonly) BOOL ascending;
+
+#pragma mark - Methods
 
 /**
  Returns a new sort descriptor for the given property name and order.
@@ -349,6 +330,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @end
 
+/// :nodoc:
 @interface RLMArray (Swift)
 // for use only in Swift class definitions
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;

@@ -29,7 +29,7 @@ RLM_ASSUME_NONNULL_BEGIN
  database.
 
  Realms can either be stored on disk (see +[RLMRealm realmWithPath:]) or in
- memory (see +[RLMRealm inMemoryRealmWithIdentifier:]).
+ memory (see RLMRealmConfiguration).
 
  RLMRealm instances are cached internally, and constructing equivalent RLMRealm
  objects (with the same path or identifier) multiple times on a single thread
@@ -48,10 +48,9 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 
 @interface RLMRealm : NSObject
-/**---------------------------------------------------------------------------------------
- *  @name Creating & Initializing a Realm
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Creating & Initializing a Realm
+
 /**
  Obtains an instance of the default Realm.
 
@@ -115,7 +114,7 @@ RLM_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 
 /**
- Returns an `RLMRealmConfiguration` that can be used to create this `RLMRealm` instance.
+ Returns the `RLMRealmConfiguration` that was used to create this `RLMRealm` instance.
  */
 @property (nonatomic, readonly) RLMRealmConfiguration *configuration;
 
@@ -126,15 +125,20 @@ RLM_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Notifications
 
+/// Block to run when the data in a Realm was modified.
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
-/**---------------------------------------------------------------------------------------
- *  @name Receiving Notification when a Realm Changes
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Receiving Notification when a Realm Changes
 
 /**
  Add a notification handler for changes in this RLMRealm.
+
+ Notification handlers are called after each write transaction is committed,
+ either on the current thread or other threads. The block is called on the same
+ thread as they were added on, and can only be added on threads which are
+ currently within a run loop. Unless you are specifically creating and running a
+ run loop on a background thread, this normally will only be the main thread.
 
  The block has the following definition:
 
@@ -165,17 +169,15 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 #pragma mark - Transactions
 
-/**---------------------------------------------------------------------------------------
- *  @name Writing to a Realm
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Writing to a Realm
 
 /**
  Begins a write transaction in an `RLMRealm`.
 
  Only one write transaction can be open at a time. Write transactions cannot be
  nested, and trying to begin a write transaction on a `RLMRealm` which is
- already in a write transaction with throw an exception. Calls to
+ already in a write transaction will throw an exception. Calls to
  `beginWriteTransaction` from `RLMRealm` instances in other threads will block
  until the current write transaction completes.
 
@@ -192,20 +194,18 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (void)beginWriteTransaction;
 
 /**
- Commits all writes operations in the current write transaction.
+ Commits all write operations in the current write transaction, and ends the 
+ transaction.
 
- After this is called the `RLMRealm` reverts back to being read-only.
-
- Calling this when not in a write transaction will throw an exception.
+ @warning This method can only be called during a write transaction.
  */
 - (void)commitWriteTransaction RLM_SWIFT_UNAVAILABLE("");
 
 /**
- Commits all writes operations in the current write transaction.
+ Commits all write operations in the current write transaction, and ends the
+ transaction.
 
- After this is called the `RLMRealm` reverts back to being read-only.
-
- Calling this when not in a write transaction will throw an exception.
+ @warning This method can only be called during a write transaction.
 
  @param error If an error occurs, upon return contains an `NSError` object
               that describes the problem. If you are not interested in
@@ -216,13 +216,13 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (BOOL)commitWriteTransaction:(NSError **)error;
 
 /**
- Revert all writes made in the current write transaction and end the transaction.
+ Reverts all writes made in the current write transaction and ends the transaction.
 
  This rolls back all objects in the Realm to the state they were in at the
  beginning of the write transaction, and then ends the transaction.
 
- This restores the data for deleted objects, but does not re-validated deleted
- accessor objects. Any `RLMObject`s which were added to the Realm will be
+ This restores the data for deleted objects, but does not revive invalidated
+ object instances. Any `RLMObject`s which were added to the Realm will be
  invalidated rather than switching back to standalone objects.
  Given the following code:
 
@@ -238,7 +238,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  but re-running the query which provided `oldObject` will once again return
  the valid object.
 
- Calling this when not in a write transaction will throw an exception.
+ @warning This method can only be called during a write transaction.
  */
 - (void)cancelWriteTransaction;
 
@@ -248,7 +248,17 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (void)transactionWithBlock:(RLM_NOESCAPE void(^)(void))block RLM_SWIFT_UNAVAILABLE("");
 
 /**
- Helper to perform a block within a transaction.
+ Performs actions contained within the given block inside a write transation.
+ 
+ Write transactions cannot be nested, and trying to execute a write transaction 
+ on a `RLMRealm` which is already in a write transaction will throw an 
+ exception. Calls to `transactionWithBlock:` from `RLMRealm` instances in other 
+ threads will block until the current write transaction completes.
+
+ Before beginning the write transaction, `transactionWithBlock:` updates the
+ `RLMRealm` to the latest Realm version, as if refresh was called, and
+ generates notifications if applicable. This has no effect if the `RLMRealm`
+ was already up to date.
 
  @param block The block to perform.
  @param error If an error occurs, upon return contains an `NSError` object
@@ -271,10 +281,14 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  If set to YES (the default), changes made on other threads will be reflected
  in this Realm on the next cycle of the run loop after the changes are
- committed.  If set to NO, you must manually call -refresh on the Realm to
+ committed.  If set to NO, you must manually call `-refresh` on the Realm to
  update it to get the latest version.
 
- Even with this enabled, you can still call -refresh at any time to update the
+ Note that by default, background threads do not have an active run loop and you 
+ will need to manually call `-refresh` in order to update to the latest version,
+ even if `autorefresh` is set to `true`.
+
+ Even with this enabled, you can still call `-refresh` at any time to update the
  Realm before the automatic refresh would occur.
 
  Notifications are sent when a write transaction is committed whether or not
@@ -346,17 +360,16 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 #pragma mark - Accessing Objects
 
-/**---------------------------------------------------------------------------------------
- *  @name Adding and Removing Objects from a Realm
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Adding and Removing Objects from a Realm
+
 /**
- Adds an object to be persisted it in this Realm.
+ Adds an object to be persisted in this Realm.
 
  Once added, this object can be retrieved using the `objectsWhere:` selectors
- on `RLMRealm` and on subclasses of `RLMObject`. When added, all linked (child)
- objects referenced by this object will also be added to the Realm if they are
- not already in it. If the object or any linked objects already belong to a
+ on `RLMRealm` and on subclasses of `RLMObject`. When added, all (child)
+ relationships referenced by this object will also be added to the Realm if they are
+ not already in it. If the object or any related objects already belong to a
  different Realm an exception will be thrown. Use
  `-[RLMObject createInRealm:withObject]` to insert a copy of a persisted object
  into a different Realm.
@@ -364,14 +377,18 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  The object to be added must be valid and cannot have been previously deleted
  from a Realm (i.e. `isInvalidated`) must be false.
 
+ @warning This method can only be called during a write transaction.
+
  @param object  Object to be added to this Realm.
  */
 - (void)addObject:(RLMObject *)object;
 
 /**
- Adds objects in the given array to be persisted it in this Realm.
+ Adds objects in the given array to be persisted in this Realm.
 
  This is the equivalent of `addObject:` except for an array of objects.
+
+ @warning This method can only be called during a write transaction.
 
  @param array   An enumerable object such as NSArray or RLMResults which contains objects to be added to
                 this Realm.
@@ -381,7 +398,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (void)addObjects:(id<NSFastEnumeration>)array;
 
 /**
- Adds or updates an object to be persisted it in this Realm. The object provided must have a designated
+ Adds or updates an object to be persisted in this Realm. The object provided must have a designated
  primary key. If no objects exist in the RLMRealm instance with the same primary key value, the object is
  inserted. Otherwise, the existing object is updated with any changed values.
 
@@ -389,14 +406,18 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Realm. Use `-[RLMObject createOrUpdateInRealm:withValue:]` to copy values to
  a different Realm.
 
+ @warning This method can only be called during a write transaction.
+
  @param object  Object to be added or updated.
  */
 - (void)addOrUpdateObject:(RLMObject *)object;
 
 /**
- Adds or updates objects in the given array to be persisted it in this Realm.
+ Adds or updates objects in the given array to be persisted in this Realm.
 
  This is the equivalent of `addOrUpdateObject:` except for an array of objects.
+
+ @warning This method can only be called during a write transaction.
 
  @param array  `NSArray`, `RLMArray`, or `RLMResults` of `RLMObject`s (or subclasses) to be added to this Realm.
 
@@ -407,6 +428,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Delete an object from this Realm.
 
+ @warning This method can only be called during a write transaction.
+
  @param object  Object to be deleted from this Realm.
  */
 - (void)deleteObject:(RLMObject *)object;
@@ -414,12 +437,16 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Delete an `NSArray`, `RLMArray`, or `RLMResults` of objects from this Realm.
 
+ @warning This method can only be called during a write transaction.
+
  @param array  `RLMArray`, `NSArray`, or `RLMResults` of `RLMObject`s to be deleted.
  */
 - (void)deleteObjects:(id)array;
 
 /**
  Deletes all objects in this Realm.
+
+ @warning This method can only be called during a write transaction.
  */
 - (void)deleteAllObjects;
 
@@ -481,40 +508,11 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 /// Set the log level for the synchronization network protocol for all Realms.
 + (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level;
 
-#pragma mark -
-
-//---------------------------------------------------------------------------------------
-//@name Named Object Storage and Retrieval
-//---------------------------------------------------------------------------------------
-//
-// Realm provides a top level key/value store for storing and accessing objects by NSString.
-// This system can be extended with the RLMKeyValueStore interface to create nested
-// namespaces as needed.
-
-// Retrieve a persisted object with an NSString.
-//
-// @usage RLMObject *object = RLMRealm.defaultRealm[@"name"];
-// @param key The NSString used to identify an object
-//
-// @return    RLMObject or nil if no object is stored for the given key.
-//
-//-(id)objectForKeyedSubscript:(id <NSCopying>)key;
-
-
-// Store an object with an NSString key.
-//
-// @usage RLMRealm.defaultRealm[@"name"] = object;
-// @param obj     The object to be stored.
-// @param key     The key that identifies the object to be used for future lookups.
-//
-//-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
-
-
 @end
 
-//
-// Notification token - holds onto the realm and the notification block
-//
+/**
+ Notification token - holds onto the realm and the notification block
+ */
 @interface RLMNotificationToken : NSObject
 @end
 

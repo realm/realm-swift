@@ -20,12 +20,12 @@ import Foundation
 import Realm
 
 /**
-This class represents Realm model object schemas persisted to Realm in a Schema.
+This class represents Realm model object schemas.
 
-When using Realm, ObjectSchema objects allow performing migrations and
+When using Realm, `ObjectSchema` objects allow performing migrations and
 introspecting the database's schema.
 
-Object schemas map to tables in the core database.
+`ObjectSchema`s map to tables in the core database.
 */
 public final class ObjectSchema: CustomStringConvertible {
 
@@ -35,7 +35,7 @@ public final class ObjectSchema: CustomStringConvertible {
 
     /// Array of persisted `Property` objects for an object.
     public var properties: [Property] {
-        return (rlmObjectSchema.properties as! [RLMProperty]).map { Property($0) }
+        return rlmObjectSchema.properties.map { Property($0) }
     }
 
     /// The name of the class this schema describes.
@@ -74,6 +74,6 @@ public final class ObjectSchema: CustomStringConvertible {
 extension ObjectSchema: Equatable {}
 
 /// Returns whether the two object schemas are equal.
-public func ==(lhs: ObjectSchema, rhs: ObjectSchema) -> Bool {
+public func == (lhs: ObjectSchema, rhs: ObjectSchema) -> Bool {
     return lhs.rlmObjectSchema.isEqualToObjectSchema(rhs.rlmObjectSchema)
 }

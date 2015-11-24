@@ -4,16 +4,34 @@ x.x.x Release notes (yyyy-MM-dd)
 ### API breaking changes
 
 * All functionality deprecated in previous releases has been removed entirely.
+* Add generic type annotations to NSArrays and NSDictionaries in public APIs.
+* Adding a Realm notification block on a thread not currently running from
+  within a run loop throws an exception rather than silently never calling the
+  notification block.
 
 ### Enhancements
 
 * Queries are no longer limited to 16 levels of grouping.
 * The block parameter of `-[RLMRealm transactionWithBlock:]`/`Realm.write(_:)` is 
   now marked as `__attribute__((noescape))`/`@noescape`.
+* Rework the implementation of encrypted Realms to no longer interfere with
+  debuggers.
 
 ### Bugfixes
 
-* None.
+* Fix crash when trying to retrieve object instances via `dynamicObjects`.
+* Throw an exception when querying on a link providing objects, which are from a different Realm.
+* Return empty results when querying on a link providing an unattached object.
+* Fix crashes or incorrect results when calling `-[RLMRealm refresh]` during
+  fast enumeration.
+* Add `Int8` support for `RealmOptional`, `MinMaxType` and `AddableType`.
+* Set the default value for newly added non-optional NSData properties to a
+  zero-byte NSData rather than nil.
+* Fix a potential crash when deleting all objects of a class.
+* Fix performance problems when creating large numbers of objects with
+  `RLMArray`/`List` properties.
+* Fix memory leak when using Object(value:) for subclasses with
+  `List` or `RealmOptional` properties.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================

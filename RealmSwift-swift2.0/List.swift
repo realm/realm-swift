@@ -26,7 +26,7 @@ public class ListBase: RLMListBase {
     // Printable requires a description property defined in Swift (and not obj-c),
     // and it has to be defined as @objc override, which can't be done in a
     // generic class.
-    /// Returns a human-readable description of the objects contained in the list.
+    /// Returns a human-readable description of the objects contained in the List.
     @objc public override var description: String {
         return descriptionWithMaxDepth(RLMDescriptionMaxDepth)
     }
@@ -36,14 +36,14 @@ public class ListBase: RLMListBase {
         return gsub("RLMArray <0x[a-z0-9]+>", template: type, string: _rlmArray.descriptionWithMaxDepth(depth)) ?? type
     }
 
-    /// Returns the number of objects in this list.
+    /// Returns the number of objects in this List.
     public var count: Int { return Int(_rlmArray.count) }
 }
 
 /**
 `List<T>` is the container type in Realm used to define to-many relationships.
 
-Lists hold a single `Object` subclass (`T`) which defines the "type" of the list.
+Lists hold a single `Object` subclass (`T`) which defines the "type" of the List.
 
 Lists can be filtered and sorted with the same predicates as `Results<T>`.
 
@@ -56,31 +56,30 @@ public final class List<T: Object>: ListBase {
 
     // MARK: Properties
 
-    /// The Realm the objects in this list belong to, or `nil` if the list's
-    /// owning object does not belong to a realm (the list is standalone).
+    /// The Realm the objects in this List belong to, or `nil` if the List's
+    /// owning object does not belong to a Realm (the List is standalone).
     public var realm: Realm? {
         return _rlmArray.realm.map { Realm($0) }
     }
 
-    /// Indicates if the list can no longer be accessed.
+    /// Indicates if the List can no longer be accessed.
     public var invalidated: Bool { return _rlmArray.invalidated }
 
     // MARK: Initializers
 
     /// Creates a `List` that holds objects of type `T`.
     public override init() {
-        // FIXME: use T.className()
         super.init(array: RLMArray(objectClassName: (T.self as Object.Type).className()))
     }
 
     // MARK: Index Retrieval
 
     /**
-    Returns the index of the given object, or `nil` if the object is not in the list.
+    Returns the index of the given object, or `nil` if the object is not in the List.
 
     - parameter object: The object whose index is being queried.
 
-    - returns: The index of the given object, or `nil` if the object is not in the list.
+    - returns: The index of the given object, or `nil` if the object is not in the List.
     */
     public func indexOf(object: T) -> Int? {
         return notFoundToNil(_rlmArray.indexOfObject(unsafeBitCast(object, RLMObject.self)))
@@ -92,7 +91,7 @@ public final class List<T: Object>: ListBase {
 
     - parameter predicate: The `NSPredicate` used to filter the objects.
 
-    - returns: The index of the given object, or `nil` if no objects match.
+    - returns: The index of the first matching object, or `nil` if no objects match.
     */
     public func indexOf(predicate: NSPredicate) -> Int? {
         return notFoundToNil(_rlmArray.indexOfObjectWithPredicate(predicate))
@@ -105,7 +104,7 @@ public final class List<T: Object>: ListBase {
     - parameter predicateFormat: The predicate format string, optionally
                                  followed by a variable number of arguments.
 
-    - returns: The index of the given object, or `nil` if no objects match.
+    - returns: The index of the first matching object, or `nil` if no objects match.
     */
     public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
         return indexOf(NSPredicate(format: predicateFormat, argumentArray: args))
@@ -134,27 +133,27 @@ public final class List<T: Object>: ListBase {
         }
     }
 
-    /// Returns the first object in the list, or `nil` if empty.
+    /// Returns the first object in the List, or `nil` if empty.
     public var first: T? { return _rlmArray.firstObject() as! T? }
 
-    /// Returns the last object in the list, or `nil` if empty.
+    /// Returns the last object in the List, or `nil` if empty.
     public var last: T? { return _rlmArray.lastObject() as! T? }
 
     // MARK: KVC
 
     /**
-    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    Returns an Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
 
     - parameter key: The name of the property.
 
-    - returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
     public override func valueForKey(key: String) -> AnyObject? {
         return _rlmArray.valueForKey(key)
     }
 
     /**
-    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+    Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
 
     - warning: This method can only be called during a write transaction.
 
@@ -168,22 +167,22 @@ public final class List<T: Object>: ListBase {
     // MARK: Filtering
 
     /**
-    Returns `Results` containing list elements that match the given predicate.
+    Returns `Results` containing elements that match the given predicate.
 
     - parameter predicateFormat: The predicate format string which can accept variable arguments.
 
-    - returns: `Results` containing list elements that match the given predicate.
+    - returns: `Results` containing elements that match the given predicate.
     */
     public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T> {
         return Results<T>(_rlmArray.objectsWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
     /**
-    Returns `Results` containing list elements that match the given predicate.
+    Returns `Results` containing elements that match the given predicate.
 
     - parameter predicate: The predicate to filter the objects.
 
-    - returns: `Results` containing list elements that match the given predicate.
+    - returns: `Results` containing elements that match the given predicate.
     */
     public func filter(predicate: NSPredicate) -> Results<T> {
         return Results<T>(_rlmArray.objectsWithPredicate(predicate))
@@ -192,12 +191,12 @@ public final class List<T: Object>: ListBase {
     // MARK: Sorting
 
     /**
-    Returns `Results` containing list elements sorted by the given property.
+    Returns `Results` containing elements sorted by the given property.
 
     - parameter property:  The property name to sort by.
     - parameter ascending: The direction to sort by.
 
-    - returns: `Results` containing list elements sorted by the given property.
+    - returns: `Results` containing elements sorted by the given property.
     */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
         return sorted([SortDescriptor(property: property, ascending: ascending)])
@@ -271,7 +270,7 @@ public final class List<T: Object>: ListBase {
     // MARK: Mutation
 
     /**
-    Appends the given object to the end of the list. If the object is from a
+    Appends the given object to the end of the List. If the object is from a
     different Realm it is copied to the List's Realm.
 
     - warning: This method can only be called during a write transaction.
@@ -283,7 +282,7 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
-    Appends the objects in the given sequence to the end of the list.
+    Appends the objects in the given sequence to the end of the List.
 
     - warning: This method can only be called during a write transaction.
 
@@ -300,7 +299,7 @@ public final class List<T: Object>: ListBase {
 
     - warning: This method can only be called during a write transaction.
     - warning: Throws an exception when called with an index smaller than zero
-               or greater than or equal to the number of objects in the list.
+               or greater than or equal to the number of objects in the List.
 
     - parameter object: An object.
     - parameter index:  The index at which to insert the object.
@@ -311,11 +310,11 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
-    Removes the object at the given index from the list. Does not remove the object from the Realm.
+    Removes the object at the given index from the List. Does not remove the object from the Realm.
 
     - warning: This method can only be called during a write transaction.
     - warning: Throws an exception when called with an index smaller than zero
-               or greater than or equal to the number of objects in the list.
+               or greater than or equal to the number of objects in the List.
 
     - parameter index: The index at which to remove the object.
     */
@@ -325,7 +324,7 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
-    Removes the last object in the list. Does not remove the object from the Realm.
+    Removes the last object in the List. Does not remove the object from the Realm.
 
     - warning: This method can only be called during a write transaction.
     */
@@ -347,9 +346,9 @@ public final class List<T: Object>: ListBase {
 
     - warning: This method can only be called during a write transaction.
     - warning: Throws an exception when called with an index smaller than zero
-               or greater than or equal to the number of objects in the list.
+               or greater than or equal to the number of objects in the List.
 
-    - parameter index:  The list index of the object to be replaced.
+    - parameter index:  The index of the object to be replaced.
     - parameter object: An object to replace at the specified index.
     */
     public func replace(index: Int, object: T) {
@@ -357,26 +356,28 @@ public final class List<T: Object>: ListBase {
         _rlmArray.replaceObjectAtIndex(UInt(index), withObject: unsafeBitCast(object, RLMObject.self))
     }
 
+    // swiftlint:disable variable_name_min_length
     /**
     Moves the object at the given source index to the given destination index.
 
     - warning: This method can only be called during a write transaction.
     - warning: Throws an exception when called with an index smaller than zero or greater than
-               or equal to the number of objects in the list.
+               or equal to the number of objects in the List.
 
     - parameter from:  The index of the object to be moved.
     - parameter to:    index to which the object at `from` should be moved.
     */
     public func move(from from: Int, to: Int) {
+        // swiftlint:enable variable_name_min_length
         throwForNegativeIndex(from)
         throwForNegativeIndex(to)
         _rlmArray.moveObjectAtIndex(UInt(from), toIndex: UInt(to))
     }
 
     /**
-    Exchanges the objects in the list at given indexes.
+    Exchanges the objects in the List at given indexes.
 
-    - warning: Throws an exception when either index exceeds the bounds of the list.
+    - warning: Throws an exception when either index exceeds the bounds of the List.
     - warning: This method can only be called during a write transaction.
 
     - parameter index1: The index of the object with which to replace the object at index `index2`.
@@ -392,7 +393,7 @@ public final class List<T: Object>: ListBase {
 extension List: RealmCollectionType, RangeReplaceableCollectionType {
     // MARK: Sequence Support
 
-    /// Returns a `GeneratorOf<T>` that yields successive elements in the list.
+    /// Returns a `GeneratorOf<T>` that yields successive elements in the List.
     public func generate() -> RLMGenerator<T> {
         return RLMGenerator(collection: _rlmArray)
     }
@@ -403,9 +404,10 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
     Replace the given `subRange` of elements with `newElements`.
 
     - parameter subRange:    The range of elements to be replaced.
-    - parameter newElements: The new elements to be inserted into the list.
+    - parameter newElements: The new elements to be inserted into the List.
     */
-    public func replaceRange<C: CollectionType where C.Generator.Element == T>(subRange: Range<Int>, with newElements: C) {
+    public func replaceRange<C: CollectionType where C.Generator.Element == T>(subRange: Range<Int>,
+                                                                               with newElements: C) {
         for _ in subRange {
             removeAtIndex(subRange.startIndex)
         }
@@ -419,6 +421,7 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
     public var startIndex: Int { return 0 }
 
     /// The collection's "past the end" position.
-    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
+    /// zero or more applications of successor().
     public var endIndex: Int { return count }
 }

@@ -55,7 +55,15 @@ xctest() {
     if [[ $NAME == CocoaPods* ]]; then
         pod install --project-directory="$DIRECTORY"
     elif [[ $NAME == Carthage* ]]; then
-        (cd "$DIRECTORY"; carthage update)
+        (
+            cd "$DIRECTORY"
+            if [ -n "$REALM_BUILD_USING_LATEST_RELEASE" ]; then
+                echo "github \"realm/realm-cocoa\"" > Cartfile
+            else
+                echo "github \"realm/realm-cocoa\" \"${sha:-master}\"" > Cartfile
+            fi
+            carthage update
+        )
     elif [[ $LANG == swift* ]]; then
         download_zip_if_needed swift
     else

@@ -101,7 +101,9 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testDescription() {
+        // swiftlint:disable line_length
         XCTAssertEqual(collection.description, "Results<SwiftStringObject> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
+        // swiftlint:enable line_length
     }
 
     func testCount() {
@@ -227,7 +229,8 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(1, sorted[0].intCol)
         XCTAssertEqual(2, sorted[1].intCol)
 
-        sorted = collection.sorted([SortDescriptor(property: "doubleCol", ascending: false), SortDescriptor(property: "intCol", ascending: false)])
+        sorted = collection.sorted([SortDescriptor(property: "doubleCol", ascending: false),
+            SortDescriptor(property: "intCol", ascending: false)])
         XCTAssertEqual(2.22, sorted[0].doubleCol)
         XCTAssertEqual(3, sorted[0].intCol)
         XCTAssertEqual(2.22, sorted[1].doubleCol)
@@ -359,7 +362,7 @@ class ResultsFromLinkViewTests: ResultsTests {
         let array = realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
         return array.array.filter(NSPredicate(value: true))
     }
-    
+
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
         let list = SwiftAggregateObjectList()
         realmWithTestPath().add(list)
@@ -394,7 +397,9 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
     }
 
     override func testDescription() {
+        // swiftlint:disable line_length
         XCTAssertEqual(collection.description, "List<SwiftStringObject> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
+        // swiftlint:enable line_length
     }
 }
 
@@ -423,7 +428,8 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func testSortWithDescriptor() {
         let collection = getAggregateableCollection()
         assertThrows(collection.sorted([SortDescriptor(property: "intCol", ascending: true)]))
-        assertThrows(collection.sorted([SortDescriptor(property: "doubleCol", ascending: false), SortDescriptor(property: "intCol", ascending: false)]))
+        assertThrows(collection.sorted([SortDescriptor(property: "doubleCol", ascending: false),
+            SortDescriptor(property: "intCol", ascending: false)]))
     }
 
     override func testFastEnumerationWithMutation() {

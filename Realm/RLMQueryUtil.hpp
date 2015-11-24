@@ -21,14 +21,13 @@
 
 namespace realm {
     class Query;
+    struct SortOrder;
     class Table;
     class TableView;
 }
 
 @class RLMObjectSchema;
 @class RLMSchema;
-
-struct RLMSortOrder;
 
 extern NSString * const RLMPropertiesComparisonTypeMismatchException;
 extern NSString * const RLMUnsupportedTypesFoundInPropertyComparisonException;
@@ -40,8 +39,8 @@ void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RL
 // return column index - throw for invalid column name
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *objectSchema, NSString *columnName);
 
-// validate the array of RLMSortDescriptors and convert it to an RLMSortOrder
-RLMSortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *objectSchema, NSArray *descriptors);
+// validate the array of RLMSortDescriptors and convert it to a realm::SortOrder
+realm::SortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *objectSchema, NSArray *descriptors);
 
 // This macro validates predicate format with optional arguments
 #define RLM_VARARG(PREDICATE_FORMAT, ARGS) \

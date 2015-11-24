@@ -22,15 +22,23 @@
 
 RLM_ASSUME_NONNULL_BEGIN
 
+/// :nodoc:
 @protocol RLMInt
 @end
+
+/// :nodoc:
 @protocol RLMBool
 @end
+
+/// :nodoc:
 @protocol RLMDouble
 @end
+
+/// :nodoc:
 @protocol RLMFloat
 @end
 
+/// :nodoc:
 @interface NSNumber ()<RLMInt, RLMBool, RLMDouble, RLMFloat>
 @end
 
@@ -43,6 +51,8 @@ RLM_ASSUME_NONNULL_BEGIN
  These properties map to columns in the core database.
  */
 @interface RLMProperty : NSObject
+
+#pragma mark - Properties
 
 /**
  Property name.
@@ -72,6 +82,8 @@ RLM_ASSUME_NONNULL_BEGIN
  Whether this property is optional.
  */
 @property (nonatomic, readonly) BOOL optional;
+
+#pragma mark - Methods
 
 /**
  Returns YES if property objects are equal.

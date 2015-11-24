@@ -24,6 +24,13 @@ extension Realm {
     /**
     A `Configuration` is used to describe the different options used to
     create a `Realm` instance.
+
+    `Realm.Configuration` instances are just plain Swift structs, and unlike
+    `Realm` and `Object`s can be freely shared between threads. Creating
+    configuration objects for class subsets (by setting the `objectTypes`
+    property) can be expensive, and so you will normally want to cache and reuse
+    a single configuration object for each distinct configuration that you are
+    using rather than creating a new one each time you open a `Realm`.
     */
     public struct Configuration {
 

@@ -33,7 +33,9 @@
 #import "RLMUtil.hpp"
 
 #import "object_store.hpp"
+#import "results.hpp"
 #import "shared_realm.hpp"
+
 #import <objc/message.h>
 
 using namespace realm;
@@ -100,10 +102,8 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
                                                                      key:prop.name
                                                             parentSchema:object->_objectSchema];
             [RLMObjectUtilClass(YES) initializeListProperty:object property:prop array:array];
-        } else if (auto ivar = prop.swiftIvar) {
-            auto optional = static_cast<RLMOptionalBase *>(object_getIvar(object, ivar));
-            optional.object = object;
-            optional.property = prop;
+        } else if (prop.swiftIvar) {
+            [RLMObjectUtilClass(YES) initializeOptionalProperty:object property:prop];
         }
     }
 }
@@ -167,7 +167,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     RLMObjectSchema *schema = [realm.schema schemaForClassName:objectClassName];
     if (!schema) {
         @throw RLMException(@"Object type '%@' is not persisted in the Realm. "
-                            @"If using a custom `objectClasses` / `obejctTypes` array in your configuration, "
+                            @"If using a custom `objectClasses` / `objectTypes` array in your configuration, "
                             @"add `%@` to the list of `objectClasses` / `objectTypes`.",
                             objectClassName, objectClassName);
     }
@@ -456,7 +456,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
     if (!objectSchema.table) {
         // read-only realms may be missing tables since we can't add any
         // missing ones on init
-        return [RLMEmptyResults emptyResultsWithObjectClassName:objectClassName realm:realm];
+        return [RLMResults resultsWithObjectSchema:objectSchema results:{}];
     }
 
     if (predicate) {
@@ -464,12 +464,12 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
         RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
 
         // create and populate array
-        return [RLMResults resultsWithObjectClassName:objectClassName
-                                                query:std::make_unique<Query>(query)
-                                                realm:realm];
+        return [RLMResults resultsWithObjectSchema:objectSchema
+                                           results:realm::Results(realm->_realm, std::move(query))];
     }
 
-    return [RLMTableResults tableResultsWithObjectSchema:objectSchema realm:realm];
+    return [RLMResults resultsWithObjectSchema:objectSchema
+                                       results:realm::Results(realm->_realm, *objectSchema.table)];
 }
 
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
@@ -520,12 +520,18 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     return RLMCreateObjectAccessor(realm, objectSchema, row);
 }
 
-// Create accessor and register with realm
 RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm,
                                        __unsafe_unretained RLMObjectSchema *const objectSchema,
                                        NSUInteger index) {
+    return RLMCreateObjectAccessor(realm, objectSchema, (*objectSchema.table)[index]);
+}
+
+// Create accessor and register with realm
+RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm,
+                                       __unsafe_unretained RLMObjectSchema *const objectSchema,
+                                       realm::RowExpr row) {
     RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-    accessor->_row = (*objectSchema.table)[index];
+    accessor->_row = row;
     RLMInitializeSwiftAccessorGenerics(accessor);
     return accessor;
 }

@@ -34,7 +34,7 @@ public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt6
 public typealias MigrationObject = DynamicObject
 
 /**
-Provides both the old and new versions of an object in this Realm. Objects properties can only be
+Provides both the old and new versions of an object in this Realm. Object properties can only be
 accessed using subscripting.
 
 - parameter oldObject: Object in original `Realm` (read-only).
@@ -52,7 +52,8 @@ Get the schema version for a Realm at a given path.
 
 - returns: The version of the Realm at `realmPath` or `nil` if the version cannot be read.
 */
-public func schemaVersionAtPath(realmPath: String, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) -> UInt64? {
+public func schemaVersionAtPath(realmPath: String, encryptionKey: NSData? = nil,
+                                error: NSErrorPointer = nil) -> UInt64? {
     let version = RLMRealm.schemaVersionAtPath(realmPath, encryptionKey: encryptionKey, error: error)
     if version == RLMNotVersioned {
         return nil
@@ -104,12 +105,13 @@ public final class Migration {
     Enumerates objects of a given type in this Realm, providing both the old and new versions of
     each object. Object properties can be accessed using subscripting.
 
-    - parameter className: The name of the `Object` class to enumerate.
-    - parameter block:     The block providing both the old and new versions of an object in this Realm.
+    - parameter objectClassName: The name of the `Object` class to enumerate.
+    - parameter block:           The block providing both the old and new versions of an object in this Realm.
     */
     public func enumerate(objectClassName: String, _ block: MigrationObjectEnumerateBlock) {
         rlmMigration.enumerateObjects(objectClassName) {
-            block(oldObject: unsafeBitCast($0, MigrationObject.self), newObject: unsafeBitCast($1, MigrationObject.self))
+            block(oldObject: unsafeBitCast($0, MigrationObject.self),
+                  newObject: unsafeBitCast($1, MigrationObject.self))
         }
     }
 
@@ -117,7 +119,7 @@ public final class Migration {
     Create an `Object` of type `className` in the Realm being migrated.
 
     - parameter className: The name of the `Object` class to create.
-    - parameter object:    The object used to populate the object. This can be any key/value coding
+    - parameter value:     The object used to populate the new `Object`. This can be any key/value coding
                            compliant object, or a JSON object such as those returned from the methods in
                            `NSJSONSerialization`, or an `Array` with one object for each persisted
                            property. An exception will be thrown if any required properties are not
@@ -144,9 +146,9 @@ public final class Migration {
     This deletes all objects of the given class, and if the Object subclass no longer exists in your program,
     cleans up any remaining metadata for the class in the Realm file.
 
-    - parameter name: The name of the Object class to delete.
+    - parameter objectClassName: The name of the Object class to delete.
 
-    - returns: whether there was any data to delete.
+    - returns: `true` if there was any data to delete.
     */
     public func deleteData(objectClassName: String) -> Bool {
         return rlmMigration.deleteDataForClassName(objectClassName)
@@ -164,18 +166,14 @@ internal func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigra
     return { migration, oldVersion in
         // set all accessor classes to MigrationObject
         for objectSchema in migration.oldSchema.objectSchema {
-            if let objectSchema = objectSchema as? RLMObjectSchema {
-                objectSchema.accessorClass = MigrationObject.self
-                // isSwiftClass is always `false` for object schema generated
-                // from the table, but we need to pretend it's from a swift class
-                // (even if it isn't) for the accessors to be initialized correctly.
-                objectSchema.isSwiftClass = true
-            }
+            objectSchema.accessorClass = MigrationObject.self
+            // isSwiftClass is always `false` for object schema generated
+            // from the table, but we need to pretend it's from a swift class
+            // (even if it isn't) for the accessors to be initialized correctly.
+            objectSchema.isSwiftClass = true
         }
         for objectSchema in migration.newSchema.objectSchema {
-            if let objectSchema = objectSchema as? RLMObjectSchema {
-                objectSchema.accessorClass = MigrationObject.self
-            }
+            objectSchema.accessorClass = MigrationObject.self
         }
 
         // run migration

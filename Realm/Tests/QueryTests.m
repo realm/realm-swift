@@ -1113,6 +1113,30 @@
     [realm commitWriteTransaction];
 }
 
+- (void)testLinkQueryNewObjectCausesEmptyResults
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [self makeDogWithName:@"Harvie" owner:@"Tim"];
+    DogObject *newDogObject = [[DogObject alloc] init];
+    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog = %@", newDogObject].count), 0U);
+}
+
+- (void)testLinkQueryDifferentRealmsThrows
+{
+    RLMRealm *testRealm = [self realmWithTestPath];
+    [self makeDogWithName:@"Harvie" owner:@"Tim"];
+
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    DogObject *dog = [[DogObject alloc] init];
+    dog.dogName = @"Fido";
+    [defaultRealm beginWriteTransaction];
+    [defaultRealm addObject:dog];
+    [defaultRealm commitWriteTransaction];
+
+    XCTAssertThrows(([OwnerObject objectsInRealm:testRealm where:@"dog = %@", dog]));
+}
+
 - (void)testLinkQueryString
 {
     RLMRealm *realm = [self realmWithTestPath];

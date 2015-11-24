@@ -42,7 +42,7 @@ See [Realm Models](http://realm.io/docs/swift/latest/#models).
 * Data
 * Date
 
-## Array/Linked object types
+## Relationships: List (Array) and Object types
 
 * Object
 * Array

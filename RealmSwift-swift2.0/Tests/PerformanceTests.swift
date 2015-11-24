@@ -39,7 +39,7 @@ private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
 class SwiftPerformanceTests: TestCase {
     override class func defaultTestSuite() -> XCTestSuite {
 #if !DEBUG && os(iOS)
-        if (isRunningOnDevice) {
+        if isRunningOnDevice {
             return super.defaultTestSuite()
         }
 #endif
@@ -60,6 +60,10 @@ class SwiftPerformanceTests: TestCase {
         mediumRealm = nil
         largeRealm = nil
         super.tearDown()
+    }
+
+    override func resetRealmState() {
+        // Do nothing, as we need to keep our in-memory realms around between tests
     }
 
     override func measureBlock(block: (() -> Void)) {
@@ -87,11 +91,9 @@ class SwiftPerformanceTests: TestCase {
     private func copyRealmToTestPath(realm: Realm) -> Realm {
         do {
             try NSFileManager.defaultManager().removeItemAtPath(testRealmPath())
-        }
-        catch let error as NSError {
+        } catch let error as NSError {
             XCTAssertTrue(error.domain == NSCocoaErrorDomain && error.code == 4)
-        }
-        catch {
+        } catch {
             fatalError("Unexpected error: \(error)")
         }
 
@@ -195,7 +197,8 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessArrayProperty() {
         let realm = copyRealmToTestPath(mediumRealm)
         realm.beginWrite()
-        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
+        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self,
+            value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
         try! realm.commitWrite()
 
         measureBlock {
@@ -208,7 +211,8 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessArrayPropertySlow() {
         let realm = copyRealmToTestPath(mediumRealm)
         realm.beginWrite()
-        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
+        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self,
+            value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
         try! realm.commitWrite()
 
         measureBlock {
@@ -243,7 +247,8 @@ class SwiftPerformanceTests: TestCase {
 
     func testQueryConstruction() {
         let realm = realmWithTestPath()
-        let predicate = NSPredicate(format: "boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and doubleCol != 7.0 and stringCol IN {'a', 'b', 'c'}")
+        let predicate = "boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and doubleCol != 7.0 " +
+                        " and stringCol IN {'a', 'b', 'c'}"
 
         measureBlock {
             for _ in 0..<500 {
@@ -415,14 +420,16 @@ class SwiftPerformanceTests: TestCase {
                 autoreleasepool {
                     let realm = inMemoryRealm("test")
                     let object = realm.objects(SwiftIntObject).first!
-                    var stop = false
-                    let token = realm.addNotificationBlock { _, _ in
-                        stop = object.intCol == stopValue
+                    var token: NotificationToken! = nil
+                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) {
+                        token = realm.addNotificationBlock { _, _ in
+                            if object.intCol == stopValue {
+                                CFRunLoopStop(CFRunLoopGetCurrent())
+                            }
+                        }
+                        dispatch_semaphore_signal(semaphore)
                     }
-                    dispatch_semaphore_signal(semaphore)
-                    while !stop {
-                        NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
-                    }
+                    CFRunLoopRun()
                     realm.removeNotification(token)
                 }
             }
@@ -451,15 +458,18 @@ class SwiftPerformanceTests: TestCase {
                 autoreleasepool {
                     let realm = inMemoryRealm("test")
                     let object = realm.objects(SwiftIntObject).first!
-                    let token = realm.addNotificationBlock { _, _ in
-                        if object.intCol % 2 == 0 && object.intCol < stopValue {
-                            try! realm.write { _ = object.intCol++ }
+                    var token: NotificationToken! = nil
+                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) {
+                        token = realm.addNotificationBlock { _, _ in
+                            if object.intCol == stopValue {
+                                CFRunLoopStop(CFRunLoopGetCurrent())
+                            } else if object.intCol % 2 == 0 {
+                                try! realm.write { object.intCol++ }
+                            }
                         }
+                        dispatch_semaphore_signal(semaphore)
                     }
-                    dispatch_semaphore_signal(semaphore)
-                    while object.intCol < stopValue {
-                        NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
-                    }
+                    CFRunLoopRun()
                     realm.removeNotification(token)
                 }
             }
@@ -472,7 +482,7 @@ class SwiftPerformanceTests: TestCase {
 
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
             self.startMeasuring()
-            try! realm.write { _ = object.intCol++ }
+            try! realm.write { object.intCol++ }
             while object.intCol < stopValue {
                 NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
             }
