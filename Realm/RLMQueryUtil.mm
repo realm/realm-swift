@@ -204,7 +204,7 @@ public:
     NSUInteger column_index() const { return m_column->index(); }
     RLMPropertyType column_type() const { return m_column->type(); }
 
-    void validate_value(id value) const {
+    void validate_comparison(id value) const {
         switch (m_type) {
             case Count:
             case Average:
@@ -215,6 +215,21 @@ public:
             case Sum:
                 RLMPrecondition(RLMIsObjectValidForProperty(value, m_column->property()), @"Invalid operand", @"%@ on a property of type %@ cannot be compared with '%@'",
                                 name_for_type(m_type), RLMTypeToString(m_column->type()), value);
+                break;
+        }
+    }
+
+    void validate_comparison(const ColumnReference& column) const {
+        switch (m_type) {
+            case Count:
+                RLMPrecondition(RLMPropertyTypeIsNumeric(column.type()), @"Invalid operand", @"%@ can only be compared with a numeric value.", name_for_type(m_type));
+                break;
+            case Average:
+            case Minimum:
+            case Maximum:
+            case Sum:
+                RLMPrecondition(RLMPropertyTypeIsNumeric(column.type()), @"Invalid operand", @"%@ on a property of type %@ cannot be compared with property of type '%@'",
+                                name_for_type(m_type), RLMTypeToString(m_column->type()), RLMTypeToString(column.type()));
                 break;
         }
     }
@@ -849,12 +864,9 @@ NSString *get_collection_operation_name_from_key_path(NSString *keyPath, NSStrin
     }
 }
 
-void update_query_with_collection_operator_expression(RLMSchema *schema,
-                                                      RLMObjectSchema *desc,
-                                                      realm::Query &query,
-                                                      NSString *keyPath,
-                                                      id value,
-                                                      NSComparisonPredicate *pred) {
+CollectionOperation collection_operation_from_key_path(RLMSchema *schema,
+                                                       RLMObjectSchema *desc,
+                                                       NSString *keyPath) {
     NSString *leadingKeyPath;
     NSString *trailingKey;
     NSString *collectionOperationName = get_collection_operation_name_from_key_path(keyPath, &leadingKeyPath, &trailingKey);
@@ -867,8 +879,17 @@ void update_query_with_collection_operator_expression(RLMSchema *schema,
         column = column_reference_from_key_path(schema, desc, fullKeyPath, true);
     }
 
-    CollectionOperation operation(collectionOperationName, std::move(linkColumn), std::move(column));
-    operation.validate_value(value);
+    return { collectionOperationName, std::move(linkColumn), std::move(column) };
+}
+
+void update_query_with_collection_operator_expression(RLMSchema *schema,
+                                                      RLMObjectSchema *desc,
+                                                      realm::Query &query,
+                                                      NSString *keyPath,
+                                                      id value,
+                                                      NSComparisonPredicate *pred) {
+    CollectionOperation operation = collection_operation_from_key_path(schema, desc, keyPath);
+    operation.validate_comparison(value);
 
     if (pred.leftExpression.expressionType == NSKeyPathExpressionType) {
         add_collection_operation_constraint_to_query(query, pred.predicateOperatorType, operation, operation, value);
@@ -922,8 +943,25 @@ void update_query_with_column_expression(RLMSchema *schema, RLMObjectSchema *des
                                          NSString *leftKeyPath, NSString *rightKeyPath,
                                          NSComparisonPredicate *predicate)
 {
-    if (key_path_contains_collection_operator(leftKeyPath) || key_path_contains_collection_operator(rightKeyPath)) {
-        @throw RLMPredicateException(@"Unsupported predicate", @"Key paths including aggregate operations may only be compared with constants.");
+    bool left_key_path_contains_collection_operator = key_path_contains_collection_operator(leftKeyPath);
+    bool right_key_path_contains_collection_operator = key_path_contains_collection_operator(rightKeyPath);
+    if (left_key_path_contains_collection_operator && right_key_path_contains_collection_operator) {
+        @throw RLMPredicateException(@"Unsupported predicate", @"Key paths including aggregate operations cannot be compared with other aggregate operations.");
+    }
+
+    if (left_key_path_contains_collection_operator) {
+        CollectionOperation left = collection_operation_from_key_path(schema, desc, leftKeyPath);
+        ColumnReference right = column_reference_from_key_path(schema, desc, rightKeyPath, false);
+        left.validate_comparison(right);
+        add_collection_operation_constraint_to_query(query, predicate.predicateOperatorType, left, left, right);
+        return;
+    }
+    if (right_key_path_contains_collection_operator) {
+        ColumnReference left = column_reference_from_key_path(schema, desc, leftKeyPath, false);
+        CollectionOperation right = collection_operation_from_key_path(schema, desc, rightKeyPath);
+        right.validate_comparison(left);
+        add_collection_operation_constraint_to_query(query, predicate.predicateOperatorType, right, left, right);
+        return;
     }
 
     bool isAny = false;

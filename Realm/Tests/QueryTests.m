@@ -1960,15 +1960,15 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    IntegerArrayPropertyObject *arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @1234, @[]]];
+    IntegerArrayPropertyObject *arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @1, @[]]];
     [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @456 ]]];
 
-    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @4567, @[]]];
+    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @2, @[]]];
     [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @1 ]]];
     [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @2 ]]];
     [arr.array addObject:[IntObject createInRealm:realm withValue:@[ @3 ]]];
 
-    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @4567, @[]]];
+    arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @0, @[]]];
 
     [realm commitWriteTransaction];
 
@@ -1979,8 +1979,12 @@
     XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"3 == array.@count"].count));
     XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"1 >  array.@count"].count));
 
-    // We do not yet handle collection operations with a keypath on the other side of the comparison.
-    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count != number"]), @"aggregate operations may only be compared with constants");
+    XCTAssertEqual(2U, [IntegerArrayPropertyObject objectsWhere:@"array.@count == number"].count);
+    XCTAssertEqual(1U, [IntegerArrayPropertyObject objectsWhere:@"array.@count > number"].count);
+    XCTAssertEqual(1U, [IntegerArrayPropertyObject objectsWhere:@"number < array.@count"].count);
+
+    // We do not yet handle collection operations on both sides of the comparison.
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count == array.@count"]), @"aggregate operations cannot be compared with other aggregate operations");
 
     RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.foo.bar != 0"]), @"single level key");
     RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.intCol > 0"]), @"@count does not have any properties");
@@ -2025,8 +2029,17 @@
     XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol < -50"].count));
     XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol > 50"].count));
 
-    // We do not yet handle collection operations with a keypath on the other side of the comparison.
-    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == number"]), @"aggregate operations may only be compared with constants");
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol < number"].count));
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"number > array.@min.intCol"].count));
+
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol < number"].count));
+    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"number > array.@max.intCol"].count));
+
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol < number"].count));
+    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"number > array.@avg.intCol"].count));
+
+    // We do not yet handle collection operations on both sides of the comparison.
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == array.@min.intCol"]), @"aggregate operations cannot be compared with other aggregate operations");
 
     RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol.foo.bar == 1.23"]), @"single level key");
     RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol.foo.bar == 1.23"]), @"single level key");
