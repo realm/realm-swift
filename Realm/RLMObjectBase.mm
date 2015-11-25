@@ -148,9 +148,10 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     return [super valueForKey:key];
 }
 
-// Generic Swift properties can't be dynamic, so KVO doesn't work for them by default
+// Generic Swift properties can't be dynamic, so KVC doesn't work for them by default
 - (id)valueForUndefinedKey:(NSString *)key {
     if (Ivar ivar = _objectSchema[key].swiftIvar) {
+        RLMInitializeSwiftAccessorGenericsForProperty(self,key);
         return RLMCoerceToNil(object_getIvar(self, ivar));
     }
     return [super valueForUndefinedKey:key];

@@ -80,6 +80,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 
 // switch List<> properties from being backed by standalone RLMArrays to RLMArrayLinkView
 void RLMInitializeSwiftAccessorGenerics(RLMObjectBase *object);
+void RLMInitializeSwiftAccessorGenericsForProperty(RLMObjectBase *object, NSString *propName);
 
 #ifdef __cplusplus
 }

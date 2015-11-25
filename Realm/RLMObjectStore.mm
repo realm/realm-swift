@@ -115,6 +115,35 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
     }
 }
 
+void RLMInitializeSwiftAccessorGenericsForProperty(__unsafe_unretained RLMObjectBase *const object, __unsafe_unretained NSString *const propName) {
+    if (!object || !object->_row || !object->_objectSchema.isSwiftClass) {
+        return;
+    }
+    
+    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwift.Object");
+    if (![object isKindOfClass:s_swiftObjectClass]) {
+        return; // Is a Swift class using the obj-c API
+    }
+    
+    RLMProperty *prop = object->_objectSchema[propName];
+    
+    if (prop) {
+        if (prop.type == RLMPropertyTypeArray) {
+            RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
+                                                                    view:object->_row.get_linklist(prop.column)
+                                                                   realm:object->_realm
+                                                                     key:prop.name
+                                                            parentSchema:object->_objectSchema];
+            [RLMObjectUtilClass(YES) initializeListProperty:object property:prop array:array];
+        }
+        else if (auto ivar = prop.swiftIvar) {
+            auto optional = static_cast<RLMOptionalBase *>(object_getIvar(object, ivar));
+            optional.object = object;
+            optional.property = prop;
+        }
+    }
+}
+
 template<typename F>
 static inline NSUInteger RLMCreateOrGetRowForObject(__unsafe_unretained RLMObjectSchema *const schema, F primaryValueGetter, bool createOrUpdate, bool &created) {
     // try to get existing row if updating
