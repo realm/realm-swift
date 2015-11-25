@@ -374,7 +374,7 @@ class ObjectCreationTests: TestCase {
         verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true,
             boolObjectListValues: [true, false])
     }
-    
+
     func testCreateWithDeeplyNestedObjectsFromAnotherRealm() {
         let values = [
             "boolCol": true as NSNumber,
@@ -387,17 +387,18 @@ class ObjectCreationTests: TestCase {
             "objectCol": SwiftBoolObject(value: [true]) as AnyObject,
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()] as AnyObject,
         ]
-        
+
         realmWithTestPath().beginWrite()
-        let otherRealmObject = realmWithTestPath().create(SwiftListOfSwiftObject.self, value: ["array": [SwiftObject(value: values),SwiftObject(value: values)]])
+        let otherRealmObjectValue = ["array": [SwiftObject(value: values), SwiftObject(value: values)]]
+        let otherRealmObject = realmWithTestPath().create(SwiftListOfSwiftObject.self, value: otherRealmObjectValue)
         try! realmWithTestPath().commitWrite()
-        
+
         try! Realm().beginWrite()
         let object = try! Realm().create(SwiftListOfSwiftObject.self, value: otherRealmObject)
         try! Realm().commitWrite()
-        
+
         XCTAssertNotEqual(otherRealmObject, object)
-        XCTAssertEqual(object.array.count,2)
+        XCTAssertEqual(object.array.count, 2)
         for swiftObject in object.array {
             verifySwiftObjectWithDictionaryLiteral(swiftObject, dictionary: values, boolObjectValue: true,
                 boolObjectListValues: [true, false])
