@@ -8,6 +8,7 @@ framework module Realm {
         header "RLMAccessor.h"
         header "RLMArray_Private.h"
         header "RLMListBase.h"
+        header "RLMResultsBase.h"
         header "RLMMigration_Private.h"
         header "RLMObjectSchema_Private.h"
         header "RLMObjectStore.h"
