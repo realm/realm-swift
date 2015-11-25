@@ -135,11 +135,8 @@ void RLMInitializeSwiftAccessorGenericsForProperty(__unsafe_unretained RLMObject
                                                                      key:prop.name
                                                             parentSchema:object->_objectSchema];
             [RLMObjectUtilClass(YES) initializeListProperty:object property:prop array:array];
-        }
-        else if (auto ivar = prop.swiftIvar) {
-            auto optional = static_cast<RLMOptionalBase *>(object_getIvar(object, ivar));
-            optional.object = object;
-            optional.property = prop;
+        } else if (prop.swiftIvar) {
+            [RLMObjectUtilClass(YES) initializeOptionalProperty:object property:prop];
         }
     }
 }
