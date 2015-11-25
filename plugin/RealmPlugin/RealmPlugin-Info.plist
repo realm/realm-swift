@@ -36,14 +36,18 @@
 		<string>9F75337B-21B4-4ADC-B558-F9CADF7073A7</string>
 		<string>7FDF5C7A-131F-4ABB-9EDC-8C5F8F0B8A90</string>
 		<string>0420B86A-AA43-4792-9ED0-6FE0F2B16A13</string>
+		<string>E969541F-E6F9-4D25-8158-72DC3545A6C6</string>
+		<string>8DC44374-2B35-4C57-A6FE-2AD66A36AAD9</string>
+		<string>AABB7188-E14E-4433-AD3B-5CD791EAD9A3</string>
+		<string>CC0D0F4F-05B3-431A-8F33-F84AFCB2C651</string>
+		<string>7265231C-39B4-402C-89E1-16167C4CC990</string>
+		<string>9AFF134A-08DC-4096-8CEE-62A4BB123046</string>
 	</array>
 	<key>NSPrincipalClass</key>
 	<string>RLMPRealmPlugin</string>
 	<key>XC4Compatible</key>
 	<true/>
 	<key>XC5Compatible</key>
-	<true/>
-	<key>XCGCReady</key>
 	<true/>
 	<key>XCPluginHasUI</key>
 	<false/>

@@ -33,13 +33,9 @@ RLM_ASSUME_NONNULL_BEGIN
 
  RLMResults cannot be created directly.
  */
-
 @interface RLMResults RLM_GENERIC_COLLECTION : NSObject<RLMCollection, NSFastEnumeration>
 
-/**---------------------------------------------------------------------------------------
- *  @name RLMResults Properties
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Properties
 
 /**
  Number of objects in the results.
@@ -56,19 +52,14 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
-#pragma mark -
-
-/**---------------------------------------------------------------------------------------
- *  @name Accessing Objects from an RLMResults
- * ---------------------------------------------------------------------------------------
- */
+#pragma mark - Accessing Objects from an RLMResults
 
 /**
  Returns the object at the index specified.
 
  @param index   The index to look up.
 
- @return An RLMObject of the class contained by this RLMResults.
+ @return An RLMObject of the type contained in this RLMResults.
  */
 - (RLMObjectType)objectAtIndex:(NSUInteger)index;
 
@@ -77,7 +68,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty RLMResults.
 
- @return An RLMObject of the class contained by this RLMResults.
+ @return An RLMObject of the type contained in this RLMResults.
  */
 - (nullable RLMObjectType)firstObject;
 
@@ -86,19 +77,15 @@ RLM_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty RLMResults.
 
- @return An RLMObject of the class contained by this RLMResults.
+ @return An RLMObject of the type contained in this RLMResults.
  */
 - (nullable RLMObjectType)lastObject;
 
 
 
-#pragma mark -
 
+#pragma mark - Querying Results
 
-/**---------------------------------------------------------------------------------------
- *  @name Querying Results
- *  ---------------------------------------------------------------------------------------
- */
 /**
  Gets the index of an object.
 
@@ -163,18 +150,13 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingDescriptors:(NSArray *)properties;
 
-#pragma mark -
 
-
-/**---------------------------------------------------------------------------------------
- *  @name Aggregating Property Values
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Aggregating Property Values
 
 /**
  Returns the minimum (lowest) value of the given property
 
- NSNumber *min = [results minOfProperty:@"age"];
+     NSNumber *min = [results minOfProperty:@"age"];
 
  @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
@@ -182,12 +164,12 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return The minimum value for the property amongst objects in an RLMResults.
  */
--(nullable id)minOfProperty:(NSString *)property;
+- (nullable id)minOfProperty:(NSString *)property;
 
 /**
  Returns the maximum (highest) value of the given property of objects in an RLMResults
 
- NSNumber *max = [results maxOfProperty:@"age"];
+     NSNumber *max = [results maxOfProperty:@"age"];
 
  @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
@@ -195,12 +177,12 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return The maximum value for the property amongst objects in an RLMResults
  */
--(nullable id)maxOfProperty:(NSString *)property;
+- (nullable id)maxOfProperty:(NSString *)property;
 
 /**
  Returns the sum of the given property for objects in an RLMResults.
 
- NSNumber *sum = [results sumOfProperty:@"age"];
+     NSNumber *sum = [results sumOfProperty:@"age"];
 
  @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
@@ -208,12 +190,12 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return The sum of the given property over all objects in an RLMResults.
  */
--(NSNumber *)sumOfProperty:(NSString *)property;
+- (NSNumber *)sumOfProperty:(NSString *)property;
 
 /**
  Returns the average of a given property for objects in an RLMResults.
 
- NSNumber *average = [results averageOfProperty:@"age"];
+     NSNumber *average = [results averageOfProperty:@"age"];
 
  @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
@@ -222,18 +204,12 @@ RLM_ASSUME_NONNULL_BEGIN
  @return    The average for the given property amongst objects in an RLMResults. This will be of type double for both
  float and double properties.
  */
--(nullable NSNumber *)averageOfProperty:(NSString *)property;
+- (nullable NSNumber *)averageOfProperty:(NSString *)property;
 
-#pragma mark -
-
+/// :nodoc:
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 
-#pragma mark -
-
-/**---------------------------------------------------------------------------------------
- *  @name Unavailable Methods
- *  ---------------------------------------------------------------------------------------
- */
+#pragma mark - Unavailable Methods
 
 /**
  -[RLMResults init] is not available because RLMResults cannot be created directly.

@@ -30,6 +30,7 @@
 
 using namespace realm;
 
+namespace {
 const char * const c_metadataTableName = "metadata";
 const char * const c_versionColumnName = "version";
 const size_t c_versionColumnIndex = 0;
@@ -42,8 +43,8 @@ const size_t c_primaryKeyPropertyNameColumnIndex =  1;
 
 const size_t c_zeroRowIndex = 0;
 
-const std::string c_object_table_prefix = "class_";
-const size_t c_object_table_prefix_length = c_object_table_prefix.length();
+const char c_object_table_prefix[] = "class_";
+}
 
 const uint64_t ObjectStore::NotVersioned = std::numeric_limits<uint64_t>::max();
 
@@ -51,13 +52,11 @@ bool ObjectStore::has_metadata_tables(const Group *group) {
     return group->get_table(c_primaryKeyTableName) && group->get_table(c_metadataTableName);
 }
 
-bool ObjectStore::create_metadata_tables(Group *group) {
-    bool changed = false;
+void ObjectStore::create_metadata_tables(Group *group) {
     TableRef table = group->get_or_add_table(c_primaryKeyTableName);
     if (table->get_column_count() == 0) {
         table->add_column(type_String, c_primaryKeyObjectClassColumnName);
         table->add_column(type_String, c_primaryKeyPropertyNameColumnName);
-        changed = true;
     }
 
     table = group->get_or_add_table(c_metadataTableName);
@@ -67,10 +66,7 @@ bool ObjectStore::create_metadata_tables(Group *group) {
         // set initial version
         table->add_empty_row();
         table->set_int(c_versionColumnIndex, c_zeroRowIndex, ObjectStore::NotVersioned);
-        changed = true;
     }
-
-    return changed;
 }
 
 uint64_t ObjectStore::get_schema_version(const Group *group) {
@@ -119,15 +115,15 @@ void ObjectStore::set_primary_key_for_object(Group *group, StringData object_typ
     }
 }
 
-std::string ObjectStore::object_type_for_table_name(const std::string &table_name) {
-    if (table_name.size() >= c_object_table_prefix_length && table_name.compare(0, c_object_table_prefix_length, c_object_table_prefix) == 0) {
-        return table_name.substr(c_object_table_prefix_length, table_name.length() - c_object_table_prefix_length);
+StringData ObjectStore::object_type_for_table_name(StringData table_name) {
+    if (table_name.begins_with(c_object_table_prefix)) {
+        return table_name.substr(sizeof(c_object_table_prefix) - 1);
     }
-    return std::string();
+    return StringData();
 }
 
-std::string ObjectStore::table_name_for_object_type(const std::string &object_type) {
-    return c_object_table_prefix + object_type;
+std::string ObjectStore::table_name_for_object_type(StringData object_type) {
+    return std::string(c_object_table_prefix) + object_type.data();
 }
 
 TableRef ObjectStore::table_for_object_type(Group *group, StringData object_type) {
@@ -138,7 +134,7 @@ ConstTableRef ObjectStore::table_for_object_type(const Group *group, StringData 
     return group->get_table(table_name_for_object_type(object_type));
 }
 
-TableRef ObjectStore::table_for_object_type_create_if_needed(Group *group, const StringData &object_type, bool &created) {
+TableRef ObjectStore::table_for_object_type_create_if_needed(Group *group, StringData object_type, bool &created) {
     return group->get_or_add_table(table_name_for_object_type(object_type), &created);
 }
 
@@ -254,9 +250,7 @@ static void copy_property_values(const Property& source, const Property& destina
 // set references to tables on targetSchema and create/update any missing or out-of-date tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
-bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update_existing) {
-    bool changed = false;
-
+void ObjectStore::create_tables(Group *group, Schema &target_schema, bool update_existing) {
     // first pass to create missing tables
     std::vector<ObjectSchema *> to_update;
     for (auto& object_schema : target_schema) {
@@ -266,7 +260,6 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
         // we will modify tables for any new objectSchema (table was created) or for all if update_existing is true
         if (update_existing || created) {
             to_update.push_back(&object_schema);
-            changed = true;
         }
     }
 
@@ -290,7 +283,6 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
             table->remove_column(current_prop.table_column);
 
             current_prop.table_column = target_prop->table_column;
-            changed = true;
         }
 
         bool inserted_placeholder_column = false;
@@ -313,7 +305,6 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
                 table->remove_column(current_prop.table_column);
                 ++deleted;
                 current_prop.table_column = npos;
-                changed = true;
             }
         }
 
@@ -335,8 +326,6 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
                         target_prop.table_column = table->add_column(DataType(target_prop.type), target_prop.name, target_prop.is_nullable);
                         break;
                 }
-
-                changed = true;
             }
             else {
                 target_prop.table_column = current_prop->table_column;
@@ -357,16 +346,13 @@ bool ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
             // if there is a primary key set, check if it is the same as the old key
             if (current_schema.primary_key != target_object_schema->primary_key) {
                 set_primary_key_for_object(group, target_object_schema->name, target_object_schema->primary_key);
-                changed = true;
             }
         }
         else if (current_schema.primary_key.length()) {
             // there is no primary key, so if there was one nil out
             set_primary_key_for_object(group, target_object_schema->name, "");
-            changed = true;
         }
     }
-    return changed;
 }
 
 bool ObjectStore::is_schema_at_version(const Group *group, uint64_t version) {
@@ -401,7 +387,7 @@ bool ObjectStore::needs_update(Schema const& old_schema, Schema const& schema) {
     return false;
 }
 
-bool ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schema,
+void ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schema,
                                            uint64_t version, Schema &schema,
                                            MigrationFunction migration) {
     // Recheck the schema version after beginning the write transaction as
@@ -410,8 +396,8 @@ bool ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
     bool migrating = !is_schema_at_version(group, version);
 
     // create tables
-    bool changed = create_metadata_tables(group);
-    changed = create_tables(group, schema, migrating) || changed;
+    create_metadata_tables(group);
+    create_tables(group, schema, migrating);
 
     if (!migrating) {
         // If we aren't migrating, then verify that all of the tables which
@@ -419,10 +405,10 @@ bool ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
         verify_schema(old_schema, schema, true);
     }
 
-    changed = update_indexes(group, schema) || changed;
+    update_indexes(group, schema);
 
     if (!migrating) {
-        return changed;
+        return;
     }
 
     // apply the migration block if provided and there's any old data
@@ -433,7 +419,6 @@ bool ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
     }
 
     set_schema_version(group, version);
-    return true;
 }
 
 Schema ObjectStore::schema_from_group(const Group *group) {
@@ -491,7 +476,7 @@ void ObjectStore::validate_primary_column_uniqueness(const Group *group, Schema 
     }
 }
 
-void ObjectStore::delete_data_for_object(Group *group, const StringData &object_type) {
+void ObjectStore::delete_data_for_object(Group *group, StringData object_type) {
     TableRef table = table_for_object_type(group, object_type);
     if (table) {
         group->remove_table(table->get_index_in_group());
@@ -523,7 +508,7 @@ DuplicatePrimaryKeyValueException::DuplicatePrimaryKeyValueException(std::string
     m_object_type(object_type), m_property(property)
 {
     m_what = "Primary key property '" + property.name + "' has duplicate values after migration.";
-};
+}
 
 
 SchemaValidationException::SchemaValidationException(std::vector<ObjectSchemaValidationException> const& errors) :

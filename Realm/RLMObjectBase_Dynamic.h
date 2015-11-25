@@ -51,7 +51,7 @@ FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *obje
  @param className	The type of object on which the relationship to query is defined.
  @param property	The name of the property which defines the relationship.
  
- @return An NSArray of objects of type `className` which have this object as thier value for the `property` property.
+ @return An NSArray of objects of type `className` which have this object as their value for the `property` property.
  */
 FOUNDATION_EXTERN NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property);
 

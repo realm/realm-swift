@@ -27,10 +27,12 @@
 #pragma mark - Generics
 
 #if __has_extension(objc_generics)
+#define RLM_GENERIC(...) <__VA_ARGS__>
 #define RLM_GENERIC_COLLECTION <RLMObjectType: RLMObject *>
 #define RLM_GENERIC_RETURN <RLMObjectType>
 #define RLMObjectArgument RLMObjectType
 #else
+#define RLM_GENERIC(...)
 #define RLM_GENERIC_COLLECTION
 #define RLM_GENERIC_RETURN
 typedef id RLMObjectType;

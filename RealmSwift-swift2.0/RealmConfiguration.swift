@@ -24,6 +24,13 @@ extension Realm {
     /**
     A `Realm.Configuration` is used to describe the different options used to
     create a `Realm` instance.
+
+    `Realm.Configuration` instances are just plain Swift structs, and unlike
+    `Realm` and `Object`s can be freely shared between threads. Creating
+    configuration objects for class subsets (by setting the `objectTypes`
+    property) can be expensive, and so you will normally want to cache and reuse
+    a single configuration object for each distinct configuration that you are
+    using rather than creating a new one each time you open a `Realm`.
     */
     public struct Configuration {
 
@@ -83,7 +90,7 @@ extension Realm {
 
         /// The path to the realm file.
         /// Mutually exclusive with `inMemoryIdentifier`.
-        public var path: String?  {
+        public var path: String? {
             set {
                 _inMemoryIdentifier = nil
                 _path = newValue
@@ -97,7 +104,7 @@ extension Realm {
 
         /// A string used to identify a particular in-memory Realm.
         /// Mutually exclusive with `path`.
-        public var inMemoryIdentifier: String?  {
+        public var inMemoryIdentifier: String? {
             set {
                 _path = nil
                 _inMemoryIdentifier = newValue
@@ -196,6 +203,8 @@ extension Realm {
 extension Realm.Configuration: CustomStringConvertible {
     /// Returns a human-readable description of the configuration.
     public var description: String {
-        return gsub("\\ARLMRealmConfiguration", template: "Realm.Configuration", string: rlmConfiguration.description) ?? ""
+        return gsub("\\ARLMRealmConfiguration",
+                    template: "Realm.Configuration",
+                    string: rlmConfiguration.description) ?? ""
     }
 }

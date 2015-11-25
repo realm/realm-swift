@@ -1,12 +1,12 @@
 <div class="task-group">
   {{#name}}
-    <div class="task-name-container">
-      <a name="/{{uid}}"></a>
-      <a name="//apple_ref/swift/Section/{{name}}" class="dashAnchor"></a>
-      <a href="#/{{uid}}">
-        <h3 class="section-name">{{name}}</h3>
-      </a>
-    </div>
+  <div class="task-name-container">
+    <a name="/{{uid}}"></a>
+    <a name="//apple_ref/{{language_stub}}/Section/{{name}}" class="dashAnchor"></a>
+    <a href="#/{{uid}}">
+      <h3 class="section-name">{{name}}</h3>
+    </a>
+  </div>
   {{/name}}
   <ul>
     {{#items}}
@@ -14,7 +14,7 @@
       <div>
         <code>
         <a name="/{{usr}}"></a>
-        <a name="//apple_ref/swift/{{dash_type}}/{{name}}" class="dashAnchor"></a>
+        <a name="//apple_ref/{{language_stub}}/{{dash_type}}/{{name}}" class="dashAnchor"></a>
         <a class="token" href="#/{{usr}}">{{name}}</a>
         </code>
       </div>
@@ -33,8 +33,8 @@
           {{#declaration}}
           <div class="declaration">
             <h4>Declaration</h4>
-            <div class="Swift">
-              <p class="aside-title">Swift</p>
+            <div class="language">
+              <p class="aside-title">{{language}}</p>
               {{{declaration}}}
             </div>
           </div>

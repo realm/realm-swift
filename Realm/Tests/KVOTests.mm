@@ -26,6 +26,8 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 
+#import <realm/group.hpp>
+
 #import <atomic>
 #import <memory>
 #import <vector>
@@ -1226,6 +1228,20 @@ public:
     AssertIndexChange(NSKeyValueChangeRemoval, ([NSIndexSet indexSetWithIndexesInRange:{0, 3}]));
 }
 
+- (void)testDeleteObjectsInArrayViaTableViewClear {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject2 *obj2 = [self createLinkObject];
+    [obj.array addObject:obj.obj];
+    [obj.array addObject:obj.obj];
+    [obj.array addObject:obj2.obj];
+
+    KVORecorder r(self, obj, @"array");
+    RLMResults *results = [KVOLinkObject1 objectsInRealm:self.realm where:@"TRUEPREDICATE"];
+    [results lastObject];
+    [self.realm deleteObjects:results];
+    AssertIndexChange(NSKeyValueChangeRemoval, ([NSIndexSet indexSetWithIndexesInRange:{0, 3}]));
+}
+
 - (void)testDeleteObjectsInArrayViaQueryClear {
     KVOLinkObject2 *obj = [self createLinkObject];
     KVOLinkObject2 *obj2 = [self createLinkObject];
@@ -1596,5 +1612,25 @@ public:
         AssertChanged(r, @NO, @YES);
     }
 }
+
+#if 0 // FIXME: this hits an assertion failure in core
+- (void)testInsertNewTables {
+    KVOObject *obj = [self createObject];
+
+    {
+        KVORecorder r(self, obj, @"boolCol");
+
+        // Add tables before the observed one so that the observed one's index changes
+        realm::Group *group = self.realm->_realm->read_group();
+        realm::TableRef table1 = group->insert_table(5, "new table");
+        realm::TableRef table2 = group->insert_table(0, "new table 2");
+        table1->add_column(realm::type_Int, "col");
+        table2->add_column(realm::type_Int, "col");
+
+        obj.boolCol = YES;
+        AssertChanged(r, @NO, @YES);
+    }
+}
+#endif
 @end
 

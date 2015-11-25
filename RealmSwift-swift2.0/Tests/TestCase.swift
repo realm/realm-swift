@@ -52,6 +52,11 @@ class TestCase: XCTestCase {
         }
     }
 
+    override class func tearDown() {
+        RLMRealm.resetRealmState()
+        super.tearDown()
+    }
+
     override func invokeTest() {
         testDir = RLMRealmPathForFile(realmFilePrefix())
 
@@ -60,21 +65,20 @@ class TestCase: XCTestCase {
         } catch {
             // The directory shouldn't actually already exist, so not an error
         }
-        try! NSFileManager.defaultManager().createDirectoryAtPath(testDir, withIntermediateDirectories: true, attributes: nil)
+        try! NSFileManager.defaultManager().createDirectoryAtPath(testDir, withIntermediateDirectories: true,
+            attributes: nil)
 
         Realm.Configuration.defaultConfiguration = Realm.Configuration(path: defaultRealmPath())
 
         exceptionThrown = false
         autoreleasepool { super.invokeTest() }
 
-        if exceptionThrown {
-            RLMDeallocateRealm(defaultRealmPath())
-            RLMDeallocateRealm(testRealmPath())
-        }
-        else {
+        if !exceptionThrown {
             XCTAssertFalse(RLMHasCachedRealmForPath(defaultRealmPath()))
             XCTAssertFalse(RLMHasCachedRealmForPath(testRealmPath()))
         }
+
+        resetRealmState()
 
         do {
             try NSFileManager.defaultManager().removeItemAtPath(testDir)
@@ -88,7 +92,9 @@ class TestCase: XCTestCase {
             XCTAssertNotEqual(url.pathExtension, "realm", "Lingering realm file at \(parentDir)/\(url)")
             assert(url.pathExtension != "realm")
         }
+    }
 
+    func resetRealmState() {
         RLMRealm.resetRealmState()
     }
 
@@ -102,12 +108,14 @@ class TestCase: XCTestCase {
         dispatch_sync(queue) {}
     }
 
-    func assertThrows<T>(@autoclosure(escaping) block: () -> T, _ message: String? = nil, named: String? = RLMExceptionName, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
+    func assertThrows<T>(@autoclosure(escaping) block: () -> T, _ message: String? = nil,
+                         named: String? = RLMExceptionName, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
         exceptionThrown = true
         RLMAssertThrows(self, { _ = block() } as dispatch_block_t, named, message, fileName, lineNumber)
     }
 
-    func assertNil<T>(@autoclosure block: () -> T?, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
+    func assertNil<T>(@autoclosure block: () -> T?, _ message: String? = nil, fileName: String = __FILE__,
+                      lineNumber: UInt = __LINE__) {
         XCTAssert(block() == nil, message ?? "", file: fileName, line: lineNumber)
     }
 

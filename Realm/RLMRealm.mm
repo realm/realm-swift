@@ -1155,9 +1155,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
         if (key.length != 64) {
             @throw RLMException(@"Encryption key must be exactly 64 bytes long");
         }
-        if (RLMIsDebuggerAttached()) {
-            @throw RLMException(@"Cannot open an encrypted Realm with a debugger attached to the process");
-        }
 #if TARGET_OS_WATCH
         @throw RLMException(@"Cannot open an encrypted Realm on watchOS.");
 #endif
@@ -1312,7 +1309,8 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
                                  "architecture. For sharing files between the Realm "
                                  "Browser and an iOS simulator, this means that you "
                                  "must use a 64-bit simulator.";
-                RLMSetErrorOrThrow(RLMMakeError(RLMErrorIncompatibleLockFile, File::PermissionDenied(err.UTF8String, "FIXME: ex.get_path()")), outError);
+                RLMSetErrorOrThrow(RLMMakeError(RLMErrorIncompatibleLockFile,
+                                                File::PermissionDenied(err.UTF8String, ex.path())), outError);
                 break;
             }
             case RealmFileException::Kind::Exists:
@@ -1320,6 +1318,9 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
                 break;
             case RealmFileException::Kind::AccessError:
                 RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileAccessError, ex), outError);
+                break;
+            case RealmFileException::Kind::FormatUpgradeRequired:
+                RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileFormatUpgradeRequired, ex), outError);
                 break;
             default:
                 RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, ex), outError);
@@ -1511,6 +1512,9 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     if (!block) {
         @throw RLMException(@"The notification block should not be nil");
     }
+    if (!RLMIsInRunLoop()) {
+        @throw RLMException(@"Can only add notification blocks from within runloops.");
+    }
 
     _realm->read_group();
 
@@ -1567,13 +1571,6 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     catch (std::exception &ex) {
         @throw RLMException(ex);
     }
-
-    // notify any collections currently being enumerated that they need
-    // to switch to enumerating a copy as the data may change on them
-    for (RLMFastEnumerator *enumerator in _collectionEnumerators) {
-        [enumerator detach];
-    }
-    _collectionEnumerators = nil;
 }
 
 - (void)commitWriteTransaction {
@@ -1618,6 +1615,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         NSLog(@"WARNING: An RLMRealm instance was invalidated during a write "
               "transaction and all pending changes have been rolled back.");
     }
+
+    [self detachAllEnumerators];
 
     for (RLMObjectSchema *objectSchema in _schema.objectSchema) {
         for (RLMObservationInfo *info : objectSchema->_observedObjects) {
@@ -1859,6 +1858,13 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator {
     [_collectionEnumerators removeObject:enumerator];
+}
+
+- (void)detachAllEnumerators {
+    for (RLMFastEnumerator *enumerator in _collectionEnumerators) {
+        [enumerator detach];
+    }
+    _collectionEnumerators = nil;
 }
 
 + (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level {

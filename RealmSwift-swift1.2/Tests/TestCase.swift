@@ -23,6 +23,18 @@ import Realm.Dynamic
 import RealmSwift
 import XCTest
 
+func XCTAssertEqual<T: Any where T: Equatable>(@autoclosure a: () -> T?, @autoclosure b: () -> T?, _ message: String? = nil, file: String = __FILE__, line: UInt = __LINE__) {
+    if let _a = a() {
+        if let _b = b() {
+            XCTAssertEqual(_a, _b, (message != nil ? message! : ""), file: file, line: line)
+        } else {
+            XCTFail((message != nil ? message! : "a != nil, b == nil"), file: file, line: line)
+        }
+    } else if let _ = b() {
+        XCTFail((message != nil ? message! : "a == nil, b != nil"), file: file, line: line)
+    }
+}
+
 func inMemoryRealm(inMememoryIdentifier: String) -> Realm {
     return Realm(configuration: Realm.Configuration(inMemoryIdentifier: inMememoryIdentifier))!
 }
@@ -55,16 +67,12 @@ class TestCase: XCTestCase {
         exceptionThrown = false
         autoreleasepool { super.invokeTest() }
 
-        if exceptionThrown {
-            RLMDeallocateRealm(defaultRealmPath())
-            RLMDeallocateRealm(testRealmPath())
-        }
-        else {
+        if !exceptionThrown {
             XCTAssertFalse(RLMHasCachedRealmForPath(defaultRealmPath()))
             XCTAssertFalse(RLMHasCachedRealmForPath(testRealmPath()))
         }
-        deleteRealmFiles()
         RLMRealm.resetRealmState()
+        deleteRealmFiles()
     }
 
     func dispatchSyncNewThread(block: dispatch_block_t) {

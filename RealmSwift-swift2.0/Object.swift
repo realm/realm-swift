@@ -36,6 +36,7 @@ class Dog: Object {
 
 - `String`, `NSString`
 - `Int`
+- `Int8`, `Int16`, `Int32`, `Int64`
 - `Float`
 - `Double`
 - `Bool`
@@ -46,10 +47,10 @@ class Dog: Object {
 - `List<T: Object>` for to-many relationships
 
 `String`, `NSString`, `NSDate`, `NSData` and `Object` subclass properties can be
-optional. `Int`, `Float`, `Double`, `Bool` and `List` properties cannot. To store
-an optional number, instead use `RealmOptional<Int>`, `RealmOptional<Float>`,
-`RealmOptional<Double>`, or `RealmOptional<Bool>` instead, which wraps an optional
-value of the generic type.
+optional. `Int`, `Int8`, Int16`, Int32`, `Int64`, `Float`, `Double`, `Bool`
+and `List` properties cannot. To store an optional number, instead use
+`RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or
+`RealmOptional<Bool>` instead, which wraps an optional value of the generic type.
 
 All property types except for `List` and `RealmOptional` *must* be declared as
 `dynamic var`. `List` and `RealmOptional` properties must be declared as
@@ -57,8 +58,8 @@ non-dynamic `let` properties.
 
 ### Querying
 
-You can gets `Results` of an Object subclass via tha `objects(_:)` free function or
-the `objects(_:)` instance method on `Realm`.
+You can gets `Results` of an Object subclass via the `objects(_:)` instance
+method on `Realm`.
 
 ### Relationships
 
@@ -69,7 +70,7 @@ public class Object: RLMObjectBase {
     // MARK: Initializers
 
     /**
-    Initialize a standalone (unpersisted) Object.
+    Initialize a standalone (unpersisted) `Object`.
     Call `add(_:)` on a `Realm` to add standalone objects to a realm.
 
     - see: Realm().add(_:)
@@ -79,7 +80,8 @@ public class Object: RLMObjectBase {
     }
 
     /**
-    Initialize a standalone (unpersisted) `Object` with values from an `Array<AnyObject>` or `Dictionary<String, AnyObject>`.
+    Initialize a standalone (unpersisted) `Object` with values from an `Array<AnyObject>` or
+    `Dictionary<String, AnyObject>`.
     Call `add(_:)` on a `Realm` to add standalone objects to a realm.
 
     - parameter value: The value used to populate the object. This can be any key/value coding compliant
@@ -158,16 +160,15 @@ public class Object: RLMObjectBase {
     // MARK: Inverse Relationships
 
     /**
-    Get an `Array` of objects of type `className` which have this object as the given property value. This can
+    Get an `Array` of objects of type `T` which have this object as the given property value. This can
     be used to get the inverse relationship value for `Object` and `List` properties.
 
-    - parameter className: The type of object on which the relationship to query is defined.
-    - parameter property:  The name of the property which defines the relationship.
+    - parameter type:          The type of object on which the relationship to query is defined.
+    - parameter propertyName:  The name of the property which defines the relationship.
 
-    - returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
+    - returns: An `Array` of objects of type `T` which have this object as their value for the `propertyName` property.
     */
     public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
-        // FIXME: use T.className()
         return RLMObjectBaseLinkingObjectsOfClass(self, (T.self as Object.Type).className(), propertyName) as! [T]
     }
 
@@ -177,19 +178,20 @@ public class Object: RLMObjectBase {
     public subscript(key: String) -> AnyObject? {
         get {
             if realm == nil {
-                return self.valueForKey(key)
+                return valueForKey(key)
             }
             let property = RLMValidatedGetProperty(self, key)
             if property.type == .Array {
-                return self.listForProperty(property)
+                return listForProperty(property)
             }
+            // No special logic is needed for optional numbers here because the NSNumber returned by RLMDynamicGet
+            // is better for callers than the RealmOptional that optionalForProperty would give us.
             return RLMDynamicGet(self, property)
         }
         set(value) {
             if realm == nil {
-                self.setValue(value, forKey: key)
-            }
-            else {
+                setValue(value, forKey: key)
+            } else {
                 RLMDynamicValidatedSet(self, key, value)
             }
         }
@@ -222,7 +224,7 @@ public class Object: RLMObjectBase {
     /// Objects are considered equal when they are both from the same Realm
     /// and point to the same underlying object in the database.
     public override func isEqual(object: AnyObject?) -> Bool {
-        return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase);
+        return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
 
     // MARK: Private functions
@@ -249,6 +251,11 @@ public class Object: RLMObjectBase {
     internal func listForProperty(prop: RLMProperty) -> RLMListBase {
         return object_getIvar(self, prop.swiftIvar) as! RLMListBase
     }
+
+    // Helper for getting the optional object for a property
+    internal func optionalForProperty(prop: RLMProperty) -> RLMOptionalBase {
+        return object_getIvar(self, prop.swiftIvar) as! RLMOptionalBase
+    }
 }
 
 
@@ -257,6 +264,7 @@ public class Object: RLMObjectBase {
 /// :nodoc:
 public final class DynamicObject: Object {
     private var listProperties = [String: List<DynamicObject>]()
+    private var optionalProperties = [String: RLMOptionalBase]()
 
     // Override to create List<DynamicObject> on access
     internal override func listForProperty(prop: RLMProperty) -> RLMListBase {
@@ -266,6 +274,17 @@ public final class DynamicObject: Object {
         let list = List<DynamicObject>()
         listProperties[prop.name] = list
         return list
+    }
+
+    // Override to create RealmOptional on access
+    internal override func optionalForProperty(prop: RLMProperty) -> RLMOptionalBase {
+        if let optional = optionalProperties[prop.name] {
+            return optional
+        }
+        let optional = RLMOptionalBase()
+        optional.property = prop
+        optionalProperties[prop.name] = optional
+        return optional
     }
 
     /// :nodoc:
@@ -280,7 +299,7 @@ public final class DynamicObject: Object {
 
     /// :nodoc:
     public override class func shouldIncludeInDefaultSchema() -> Bool {
-        return false;
+        return false
     }
 }
 
@@ -314,8 +333,15 @@ public class ObjectUtil: NSObject {
         (object as! Object).listForProperty(property)._rlmArray = array
     }
 
+    @objc private class func initializeOptionalProperty(object: RLMObjectBase, property: RLMProperty) {
+        let optional = (object as! Object).optionalForProperty(property)
+        optional.property = property
+        optional.object = object
+    }
+
     @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
-        return Mirror(reflecting: object).children.reduce([String:AnyObject]()) { (var properties: [String:AnyObject], prop: Mirror.Child) in
+        let children = Mirror(reflecting: object).children
+        return children.reduce([String: AnyObject]()) { (var properties: [String:AnyObject], prop: Mirror.Child) in
             guard let name = prop.label else { return properties }
             let mirror = Mirror(reflecting: prop.value)
             let type = mirror.subjectType
@@ -328,6 +354,7 @@ public class ObjectUtil: NSObject {
             } else if type is Optional<Object>.Type {
                 properties[name] = Int(PropertyType.Object.rawValue)
             } else if type is RealmOptional<Int>.Type ||
+                      type is RealmOptional<Int8>.Type ||
                       type is RealmOptional<Int16>.Type ||
                       type is RealmOptional<Int32>.Type ||
                       type is RealmOptional<Int64>.Type {

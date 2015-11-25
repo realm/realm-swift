@@ -52,11 +52,6 @@
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
     XCTAssertNoThrow(configuration.encryptionKey = nil);
 
-    if (RLMIsDebuggerAttached()) {
-        XCTAssertThrows(configuration.encryptionKey = RLMGenerateKey());
-        return;
-    }
-
     RLMAssertThrowsWithReasonMatching(configuration.encryptionKey = [NSData data], @"Encryption key must be exactly 64 bytes long");
 
     NSData *key = RLMGenerateKey();
@@ -148,24 +143,22 @@
     config.path = RLMDefaultRealmPath();
     RLMRealmConfiguration.defaultConfiguration = config;
 
-    if (!RLMIsDebuggerAttached()) {
-        config.encryptionKey = RLMGenerateKey();
-        RLMRealmConfiguration.defaultConfiguration = config;
-        @autoreleasepool {
-            // Realm with no encryption key already exists from above
-            XCTAssertThrows([RLMRealm defaultRealm]);
-        }
-
-        [self deleteRealmFileAtPath:config.path];
-        // Create and then re-open with same key
-        @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
-        @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
-
-        // Fail to re-open with a different key
-        config.encryptionKey = RLMGenerateKey();
-        RLMRealmConfiguration.defaultConfiguration = config;
-        @autoreleasepool { XCTAssertThrows([RLMRealm defaultRealm]); }
+    config.encryptionKey = RLMGenerateKey();
+    RLMRealmConfiguration.defaultConfiguration = config;
+    @autoreleasepool {
+        // Realm with no encryption key already exists from above
+        XCTAssertThrows([RLMRealm defaultRealm]);
     }
+
+    [self deleteRealmFileAtPath:config.path];
+    // Create and then re-open with same key
+    @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
+    @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
+
+    // Fail to re-open with a different key
+    config.encryptionKey = RLMGenerateKey();
+    RLMRealmConfiguration.defaultConfiguration = config;
+    @autoreleasepool { XCTAssertThrows([RLMRealm defaultRealm]); }
 
     // Verify that the default realm's migration block is used implicitly
     // when needed

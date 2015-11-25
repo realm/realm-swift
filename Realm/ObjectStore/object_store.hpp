@@ -52,12 +52,11 @@ namespace realm {
         static bool needs_update(Schema const& old_schema, Schema const& schema);
         
         // updates a Realm from old_schema to the given target schema, creating and updating tables as needed
-        // returns if any changes were made
         // passed in target schema is updated with the correct column mapping
         // optionally runs migration function if schema is out of date
         // NOTE: must be performed within a write transaction
         typedef std::function<void(Group *, Schema &)> MigrationFunction;
-        static bool update_realm_with_schema(Group *group, Schema const& old_schema, uint64_t version,
+        static void update_realm_with_schema(Group *group, Schema const& old_schema, uint64_t version,
                                              Schema &schema, MigrationFunction migration);
 
         // get a table for an object type
@@ -68,10 +67,13 @@ namespace realm {
         static Schema schema_from_group(const Group *group);
 
         // deletes the table for the given type
-        static void delete_data_for_object(Group *group, const StringData &object_type);
+        static void delete_data_for_object(Group *group, StringData object_type);
 
         // indicates if this group contains any objects
         static bool is_empty(const Group *group);
+
+        static std::string table_name_for_object_type(StringData class_name);
+        static StringData object_type_for_table_name(StringData table_name);
 
     private:
         // set a new schema version
@@ -83,11 +85,11 @@ namespace realm {
         // create any metadata tables that don't already exist
         // must be in write transaction to set
         // returns true if it actually did anything
-        static bool create_metadata_tables(Group *group);
+        static void create_metadata_tables(Group *group);
 
         // set references to tables on targetSchema and create/update any missing or out-of-date tables
         // if update existing is true, updates existing tables, otherwise only adds and initializes new tables
-        static bool create_tables(realm::Group *group, Schema &target_schema, bool update_existing);
+        static void create_tables(realm::Group *group, Schema &target_schema, bool update_existing);
 
         // verify a target schema against an expected schema, setting the table_column property on each schema object
         // updates the column mapping on the target_schema
@@ -102,9 +104,7 @@ namespace realm {
         // must be in write transaction to set
         static void set_primary_key_for_object(Group *group, StringData object_type, StringData primary_key);
 
-        static TableRef table_for_object_type_create_if_needed(Group *group, const StringData &object_type, bool &created);
-        static std::string table_name_for_object_type(const std::string &class_name);
-        static std::string object_type_for_table_name(const std::string &table_name);
+        static TableRef table_for_object_type_create_if_needed(Group *group, StringData object_type, bool &created);
 
         // returns if any indexes were changed
         static bool update_indexes(Group *group, Schema &schema);
