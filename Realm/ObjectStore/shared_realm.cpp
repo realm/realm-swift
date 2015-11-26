@@ -153,11 +153,15 @@ SharedRealm Realm::get_shared_realm(Config config)
         // FIXME - need to validate that schemas match
         realm->m_config.schema = std::make_unique<Schema>(*existing->m_config.schema);
 
-        realm->m_notifier = existing->m_notifier;
-        realm->m_notifier->add_realm(realm.get());
+        if (!realm->m_config.read_only) {
+            realm->m_notifier = existing->m_notifier;
+            realm->m_notifier->add_realm(realm.get());
+        }
     }
     else {
-        realm->m_notifier = std::make_shared<ExternalCommitHelper>(realm.get());
+        if (!realm->m_config.read_only) {
+            realm->m_notifier = std::make_shared<ExternalCommitHelper>(realm.get());
+        }
 
         // otherwise get the schema from the group
         realm->m_config.schema = std::make_unique<Schema>(ObjectStore::schema_from_group(realm->read_group()));
