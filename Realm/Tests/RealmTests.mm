@@ -91,6 +91,32 @@ extern "C" {
     [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:RLMTestRealmPath() error:nil];
 }
 
+- (void)testReadOnlyFileInImmutableDirectory {
+    @autoreleasepool {
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withValue:@[@"a"]];
+        [realm commitWriteTransaction];
+    }
+
+    // Delete `*.lock` and `.note` files to simulate opening Realm in an app bundle
+    NSString *testRealmPath = RLMTestRealmPath();
+    [[NSFileManager defaultManager] removeItemAtPath:[testRealmPath stringByAppendingString:@".lock"] error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:[testRealmPath stringByAppendingString:@".note"] error:nil];
+
+    // Make parent directory immutable to simulate opening Realm in an app bundle
+    NSString *parentDirectoryOfTestRealmPath = [RLMTestRealmPath() stringByDeletingLastPathComponent];
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:parentDirectoryOfTestRealmPath error:nil];
+
+    RLMRealm *realm;
+    // Read-only Realm should be opened even in immutable directory
+    XCTAssertNoThrow(realm = [self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
+
+    [self dispatchAsyncAndWait:^{ XCTAssertNoThrow([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]); }];
+
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:parentDirectoryOfTestRealmPath error:nil];
+}
+
 - (void)testReadOnlyRealmMustExist {
    XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
 }
