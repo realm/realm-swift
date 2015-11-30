@@ -32,6 +32,87 @@
 using namespace realm;
 using namespace realm::_impl;
 
+#if TARGET_OS_TV
+ExternalCommitHelper::ExternalCommitHelper(Realm* realm)
+{
+    add_realm(realm);
+
+    // Use the minimum allowed stack size, as we need very little in our listener
+    // https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/Multithreading/CreatingThreads/CreatingThreads.html#//apple_ref/doc/uid/10000057i-CH15-SW7
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setstacksize(&attr, 16 * 1024);
+
+    auto fn = [](void *self) -> void * {
+        static_cast<ExternalCommitHelper *>(self)->listen();
+        return nullptr;
+    };
+    int ret = pthread_create(&m_thread, &attr, fn, this);
+    pthread_attr_destroy(&attr);
+    if (ret != 0) {
+        throw std::system_error(errno, std::system_category());
+    }
+}
+
+ExternalCommitHelper::~ExternalCommitHelper()
+{
+    REALM_ASSERT_DEBUG(m_realms.empty());
+    pthread_join(m_thread, nullptr); // Wait for the thread to exit
+}
+
+void ExternalCommitHelper::add_realm(realm::Realm* realm)
+{
+    std::lock_guard<std::mutex> lock(m_realms_mutex);
+
+    // Create the runloop source
+    CFRunLoopSourceContext ctx{};
+    ctx.info = realm;
+    ctx.perform = [](void* info) {
+        static_cast<Realm*>(info)->notify();
+    };
+
+    CFRunLoopRef runloop = CFRunLoopGetCurrent();
+    CFRetain(runloop);
+    CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
+    CFRunLoopAddSource(runloop, signal, kCFRunLoopDefaultMode);
+
+    m_realms.push_back({realm, runloop, signal});
+}
+
+void ExternalCommitHelper::remove_realm(realm::Realm* realm)
+{
+    std::lock_guard<std::mutex> lock(m_realms_mutex);
+    for (auto it = m_realms.begin(); it != m_realms.end(); ++it) {
+        if (it->realm == realm) {
+            CFRunLoopSourceInvalidate(it->signal);
+            CFRelease(it->signal);
+            CFRelease(it->runloop);
+            m_realms.erase(it);
+            return;
+        }
+    }
+    REALM_TERMINATE("Realm not registered");
+}
+
+void ExternalCommitHelper::listen()
+{
+    pthread_setname_np("RLMRealm notification listener");
+}
+
+void ExternalCommitHelper::notify_others()
+{
+    std::lock_guard<std::mutex> lock(m_realms_mutex);
+    for (auto const& realm : m_realms) {
+        CFRunLoopSourceSignal(realm.signal);
+        // Signalling the source makes it run the next time the runloop gets
+        // to it, but doesn't make the runloop start if it's currently idle
+        // waiting for events
+        CFRunLoopWakeUp(realm.runloop);
+    }
+}
+
+#else
+
 namespace {
 // Write a byte to a pipe to notify anyone waiting for data on the pipe
 void notify_fd(int fd)
@@ -248,4 +329,4 @@ void ExternalCommitHelper::notify_others()
 {
     notify_fd(m_notify_fd);
 }
-
+#endif
