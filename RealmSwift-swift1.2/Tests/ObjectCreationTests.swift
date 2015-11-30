@@ -370,11 +370,11 @@ class ObjectCreationTests: TestCase {
         realmWithTestPath().beginWrite()
         let otherRealmObjectValue = ["array": [SwiftObject(value: values), SwiftObject(value: values)]]
         let otherRealmObject = realmWithTestPath().create(SwiftListOfSwiftObject.self, value: otherRealmObjectValue)
-        try! realmWithTestPath().commitWrite()
+        realmWithTestPath().commitWrite()
 
-        try! Realm().beginWrite()
-        let object = try! Realm().create(SwiftListOfSwiftObject.self, value: otherRealmObject)
-        try! Realm().commitWrite()
+        Realm().beginWrite()
+        let object = Realm().create(SwiftListOfSwiftObject.self, value: otherRealmObject)
+        Realm().commitWrite()
 
         XCTAssertNotEqual(otherRealmObject, object)
         XCTAssertEqual(object.array.count, 2)
