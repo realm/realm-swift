@@ -16,6 +16,8 @@
 * Set the default value for newly added non-optional NSData properties to a
   zero-byte NSData rather than nil.
 * Fix a potential crash when deleting all objects of a class.
+* Add error-checking for nil realm parameters in many methods such as
+  `+[RLMObject allObjectsInRealm:]`.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
