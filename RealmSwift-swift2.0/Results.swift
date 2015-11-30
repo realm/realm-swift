@@ -18,6 +18,7 @@
 
 import Foundation
 import Realm
+import Realm.Private
 
 // MARK: MinMaxType
 
@@ -46,8 +47,7 @@ extension Int64: AddableType {}
 
 /// :nodoc:
 /// Internal class. Do not use directly.
-public class ResultsBase: NSObject, NSFastEnumeration {
-    internal let rlmResults: RLMResults
+public class ResultsBase: RLMResultsBase {
 
     /// Returns a human-readable description of the objects contained in these results.
     public override var description: String {
@@ -58,17 +58,7 @@ public class ResultsBase: NSObject, NSFastEnumeration {
     // MARK: Initializers
 
     internal init(_ rlmResults: RLMResults) {
-        self.rlmResults = rlmResults
-    }
-
-    // MARK: Fast Enumeration
-
-    public func countByEnumeratingWithState(state: UnsafeMutablePointer<NSFastEnumerationState>,
-                                            objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>,
-                                            count len: Int) -> Int {
-        return Int(rlmResults.countByEnumeratingWithState(state,
-                   objects: buffer,
-                   count: UInt(len)))
+        super.init(results: rlmResults)
     }
 }
 
