@@ -32,6 +32,8 @@ x.x.x Release notes (yyyy-MM-dd)
   `RLMArray`/`List` properties.
 * Fix memory leak when using Object(value:) for subclasses with
   `List` or `RealmOptional` properties.
+* Fix a crash when computing the average of an optional integer property.
+* Fix incorrect search results for some queries on integer properties.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
