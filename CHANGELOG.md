@@ -34,6 +34,8 @@ x.x.x Release notes (yyyy-MM-dd)
   `List` or `RealmOptional` properties.
 * Fix a crash when computing the average of an optional integer property.
 * Fix incorrect search results for some queries on integer properties.
+* Add error-checking for nil realm parameters in many methods such as
+  `+[RLMObject allObjectsInRealm:]`.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
