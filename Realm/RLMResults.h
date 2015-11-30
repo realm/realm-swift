@@ -31,6 +31,22 @@ RLM_ASSUME_NONNULL_BEGIN
  RLMResults can be queried with the same predicates as RLMObject and RLMArray
  and you can chain queries to further filter query results.
 
+ RLMResults always reflect the current state of the Realm on the current thread,
+ including during write transactions on the current thread. The one exception to
+ this is when using `for...in` fast enumeration, which will always enumerate
+ over the objects which matched the query when the enumeration is begun, even if
+ some of them are deleted or modified to be excluded by the filter during the
+ enumeration.
+
+ RLMResults are initially lazily evaluated, and only run queries when the result
+ of the query is requested. This means that chaining several temporary
+ RLMResults to sort and filter your data does not perform any extra work
+ processing the intermediate state.
+
+ Once the results have been evaluated or a notification block has been added,
+ the results are eagerly kept up-to-date, with the work done to keep them
+ up-to-date done on a background thread whenever possible.
+
  RLMResults cannot be created directly.
  */
 @interface RLMResults RLM_GENERIC_COLLECTION : NSObject<RLMCollection, NSFastEnumeration>
@@ -80,9 +96,6 @@ RLM_ASSUME_NONNULL_BEGIN
  @return An RLMObject of the type contained in this RLMResults.
  */
 - (nullable RLMObjectType)lastObject;
-
-
-
 
 #pragma mark - Querying Results
 
@@ -156,28 +169,48 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingDescriptors:(NSArray *)properties;
 
-#pragma mark - Asynchronous Queries
+#pragma mark - Notifications
 
 /**
- Asynchronously run this query and then pass the result to the block on the given dispatch queue.
+ Register a block to be called each time the RLMResults changes.
 
- The block will be called again after each write transaction which changes the
- result of the query. You must retain the returned token for as long as you want
- the results to continue to be sent to the block. To stop receiving updates,
- call -stop on the token.
+ The block will be asyncronously called with the initial results, and then
+ called again after each writen transaction which causes the results to change.
+ You must retain the returned token for as long as you want the results to
+ continue to be sent to the block. To stop receiving updates, call -stop on the
+ token.
 
- The determination for if the results have changed is currently very coarse, but
- will become more precise in future versions.
+ The determination for whether or not a write transaction has changed the
+ results is currently very coarse, and the block may be called even if no
+ changes occurred. The opposite (not being called despite changes) will not
+ happen. This will become more precise in future versions.
 
  If an error occurs the block will be called with `nil` for the results
  parameter and a non-`nil` error. Currently the only errors that can occur are
  when opening the RLMRealm on the background worker thread or the destination
  queue fails.
 
- The RLMResults passed to the block is a normal auto-updating RLMResults object.
- This means that if you perform a write transaction or explicitly call
- -[RLMRealm refresh] from within the block, the query may be synchronously rerun
- the next time you access the results.
+ At the time when the block is called, the RLMResults object will be fully
+ evaluated and up-to-date, and as long as you do not perform a write transaction
+ on the same thread or explicitly call -[RLMRealm refresh], access it will never
+ perform blocking work.
+
+ @warning This method cannot be called during a write transaction, or when the
+          containing realm is read-only.
+
+ @param block The block to be called with the evaluated results
+ @return A token which must be held for as long as you want query results to be delivered.
+ */
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results, NSError *__nullable error))block;
+
+#pragma mark - Asynchronous Queries
+
+/**
+ Asynchronously run this query and then pass the result to the block on the given dispatch queue.
+
+ This is similar to `addNotificationBlock:`, but rather than delivering the
+ results on the current thread, the results are delivered to the given dispatch
+ queue.
 
  @warning This method cannot be called during a write transaction, or when the
           containing realm is read-only.
@@ -188,35 +221,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (RLMNotificationToken *)deliverOn:(dispatch_queue_t)queue
                               block:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results, NSError *__nullable error))block;
-
-/**
- Asynchronously run this query and then pass the result to the block on the main thread
-
- The block will be called again after each write transaction which changes the
- result of the query. You must retain the returned token for as long as you want
- the results to continue to be sent to the block. To stop receiving updates,
- call -stop on the token.
-
- The determination for if the results have changed is currently very coarse, but
- will become more precise in future versions.
-
- If an error occurs the block will be called with `nil` for the results
- parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the RLMRealm on the background worker thread or the destination
- queue fails.
-
- The RLMResults passed to the block is a normal auto-updating RLMResults object.
- This means that if you perform a write transaction or explicitly call
- -[RLMRealm refresh] from within the block, the query may be synchronously rerun
- the next time you access the results.
-
- @warning This method cannot be called during a write transaction, or when the
-          containing realm is read-only.
-
- @param block The block to be called with the evaluated results
- @return A token which must be held for as long as you want query results to be delivered.
- */
-- (RLMNotificationToken *)deliverOnMainThread:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results, NSError *__nullable error))block;
 
 #pragma mark - Aggregating Property Values
 

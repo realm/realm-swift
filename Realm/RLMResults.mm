@@ -528,14 +528,14 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 namespace {
-class CallbackImpl : public realm::AsyncQueryCallback {
+class QueueCallback : public realm::AsyncQueryCallback {
 public:
-    CallbackImpl(void (^block)(RLMResults *, NSError *), dispatch_queue_t queue, NSString *objectClassName, RLMRealmConfiguration *config)
+    QueueCallback(void (^block)(RLMResults *, NSError *), dispatch_queue_t queue, NSString *objectClassName, RLMRealmConfiguration *config)
     : _block(block), _queue(queue), _objectClassName(objectClassName), _config(config) {
         dispatch_queue_set_specific(queue, this, this, nullptr);
     }
 
-    ~CallbackImpl() {
+    ~QueueCallback() {
         dispatch_queue_set_specific(_queue, this, nullptr, nullptr);
     }
 
@@ -609,6 +609,40 @@ private:
 
     __weak RLMResults *_previousResults = nil;
 };
+
+class RunloopCallback : public realm::AsyncQueryCallback {
+public:
+    RunloopCallback(RLMResults *results, void (^block)(RLMResults *, NSError *))
+    : _block(block), _results(results)
+    {
+    }
+
+    void deliver(Results r) override {
+        @autoreleasepool {
+            _results->_results = std::move(r);
+            _block(_results, nil);
+        }
+    }
+
+    void error(std::exception_ptr err) override {
+        try {
+            rethrow_exception(err);
+        }
+        catch (...) {
+            NSError *error;
+            RLMRealmTranslateException(&error);
+            _block(nil, error);
+        }
+    }
+
+    bool is_for_current_thread() override {
+        return _results->_realm->_realm->thread_id() == std::this_thread::get_id();
+    }
+
+private:
+    void (^_block)(RLMResults *, NSError *);
+    RLMResults *const _results;
+};
 }
 
 // The compiler complains about the method's argument type not matching due to
@@ -616,16 +650,18 @@ private:
 // to actually include the generic type
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-- (RLMCancellationToken *)deliverOn:(dispatch_queue_t)queue
-                              block:(void (^)(RLMResults *, NSError *))block {
-    auto token = _results.async(std::make_unique<CallbackImpl>(block, queue,
-                                                               self.objectClassName,
-                                                               _realm.configuration));
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *results, NSError *error))block {
+    if (!RLMIsInRunLoop()) {
+        @throw RLMException(@"Can only add notification blocks from within runloops.");
+    }
+
+    auto token = _results.async(std::make_unique<RunloopCallback>(self, block));
     return [[RLMCancellationToken alloc] initWithToken:std::move(token)];
 }
 
-- (RLMCancellationToken *)deliverOnMainThread:(void (^)(RLMResults *, NSError *))block {
-    auto token = _results.async(std::make_unique<CallbackImpl>(block, dispatch_get_main_queue(),
+- (RLMCancellationToken *)deliverOn:(dispatch_queue_t)queue
+                              block:(void (^)(RLMResults *, NSError *))block {
+    auto token = _results.async(std::make_unique<QueueCallback>(block, queue,
                                                                self.objectClassName,
                                                                _realm.configuration));
     return [[RLMCancellationToken alloc] initWithToken:std::move(token)];

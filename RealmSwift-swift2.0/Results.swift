@@ -291,6 +291,48 @@ public final class Results<T: Object>: ResultsBase {
         return rlmResults.averageOfProperty(property) as! U?
     }
 
+    // MARK: Notifications
+
+    /**
+     Register a block to be called each time the Results changes.
+
+     The block will be asyncronously called with the initial results, and then
+     called again after each writen transaction which causes the results to change.
+     You must retain the returned token for as long as you want the results to
+     continue to be sent to the block. To stop receiving updates, call stop() on the
+     token.
+
+     The determination for whether or not a write transaction has changed the
+     results is currently very coarse, and the block may be called even if no
+     changes occurred. The opposite (not being called despite changes) will not
+     happen. This will become more precise in future versions.
+
+     If an error occurs the block will be called with `nil` for the results
+     parameter and a non-`nil` error. Currently the only errors that can occur are
+     when opening the Realm on the background worker thread or the destination
+     queue fails.
+
+     At the time when the block is called, the Results object will be fully
+     evaluated and up-to-date, and as long as you do not perform a write transaction
+     on the same thread or explicitly call realm.refresh(), accessing it will never
+     perform blocking work.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the source realm is read-only.
+
+     - parameter block: The block to be called with the evaluated results
+     - returns: A token which must be held for as long as you want query results to be delivered.
+     */
+    public func addNotificationBlock(block: (Results<T>?, NSError?) -> ()) -> NotificationToken {
+        return rlmResults.addNotificationBlock { results, error in
+            if results != nil {
+                block(self, nil)
+            } else {
+                block(nil, error)
+            }
+        }
+    }
+
     // MARK: Asynchronous Queries
 
     /**
@@ -336,37 +378,6 @@ public final class Results<T: Object>: ResultsBase {
                 block(r, nil)
             }
         }
-    }
-
-    /**
-     Asynchronously run this query and then pass the result to the block on the main thread
-
-     The block will be called again after each write transaction which changes
-     the result of the query. You must retain the returned token for as long as
-     you want the results to continue to be sent to the block. To stop
-     receiving updates, call .stop() on the token.
-
-     The determination for if the results have changed is currently very
-     coarse, but will become more precise in future versions.
-
-     If an error occurs the block will be called with `nil` for the results
-     parameter and a non-`nil` error. Currently the only errors that can occur
-     are when opening the Realm on the background worker thread or the
-     destination queue fails.
-
-     The Results passed to the block is a normal auto-updating Results object.
-     This means that if you perform a write transaction or explicitly call
-     realm.refresh() while on the main thread, the query may be synchronously
-     rerun the next time you access the results.
-
-     - warning: This method cannot be called during a write transaction, or when
-                the containing realm is read-only.
-
-     - parameter block: The block to be called with the evaluated results
-     - returns: A token which must be held for as long as you want query results to be delivered.
-     */
-    public func deliverOnMainThread(block: (Results<T>?, NSError?) -> ()) -> NotificationToken {
-        return deliverOn(dispatch_get_main_queue(), block: block)
     }
 }
 

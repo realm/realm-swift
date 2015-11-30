@@ -377,7 +377,7 @@ class ResultsTests: RealmCollectionTypeTests {
 
         var expectation = expectationWithDescription("")
         var calls = 0
-        let token = collection.deliverOnMainThread { results, error in
+        let token = collection.addNotificationBlock { results, error in
             XCTAssertNil(error)
             XCTAssertNotNil(results)
 
