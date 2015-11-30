@@ -76,12 +76,19 @@ void RLMClearAccessorCache() {
     [s_accessorSchema removeAllObjects];
 }
 
+static inline void RLMVerifyRealmRead(__unsafe_unretained RLMRealm *const realm) {
+    if (!realm) {
+        @throw RLMException(@"Realm must not be nil");
+    }
+    [realm verifyThread];
+}
+
 static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {
+    RLMVerifyRealmRead(realm);
     // if realm is not writable throw
     if (!realm.inWriteTransaction) {
         @throw RLMException(@"Can only add, remove, or create objects in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
-    [realm verifyThread];
 }
 
 void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const object) {
@@ -449,7 +456,7 @@ void RLMDeleteAllObjectsFromRealm(RLMRealm *realm) {
 }
 
 RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) {
-    [realm verifyThread];
+    RLMVerifyRealmRead(realm);
 
     // create view from table and predicate
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
@@ -473,7 +480,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
 }
 
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
-    [realm verifyThread];
+    RLMVerifyRealmRead(realm);
 
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
 

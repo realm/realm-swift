@@ -100,6 +100,10 @@
     return NO;
 }
 
+- (void)testQueryingNilRealmThrows {
+    XCTAssertThrows([PersonObject allObjectsInRealm:self.nonLiteralNil]);
+}
+
 - (void)testBasicQuery
 {
     RLMRealm *realm = [self realmWithTestPath];

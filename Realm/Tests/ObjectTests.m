@@ -454,12 +454,16 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertNil(oo.dog);
 }
 
--(void)testObjectInitWithObjectTypeOther
+- (void)testObjectInitWithObjectTypeOther
 {
     XCTAssertThrows([[EmployeeObject alloc] initWithValue:@"StringObject"], @"Not an array or dictionary");
     XCTAssertThrows([[EmployeeObject alloc] initWithValue:self.nonLiteralNil], @"Not an array or dictionary");
 }
 
+- (void)testCreateInNilRealm
+{
+    XCTAssertThrows(([EmployeeObject createInRealm:self.nonLiteralNil withValue:@[@"", @0, @NO]]));
+}
 
 - (void)testObjectSubscripting
 {
@@ -1774,6 +1778,9 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertEqualObjects(nonNullIntObj, [PrimaryNullableIntObject objectForPrimaryKey:@0]);
     XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectForPrimaryKey:NSNull.null]);
     XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectForPrimaryKey:nil]);
+
+    // nil realm throws
+    XCTAssertThrows([PrimaryIntObject objectInRealm:self.nonLiteralNil forPrimaryKey:@0]);
 }
 
 - (void)testBacklinks {
