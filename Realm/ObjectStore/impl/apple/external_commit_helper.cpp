@@ -54,7 +54,7 @@ void notify_fd(int fd)
 }
 } // anonymous namespace
 
-void InterProccessNotifier::FdHolder::close()
+void ExternalCommitHelper::FdHolder::close()
 {
         if (m_fd != -1) {
             ::close(m_fd);
@@ -86,7 +86,7 @@ void InterProccessNotifier::FdHolder::close()
 // signal the runloop source and wake up the target runloop, and when data is
 // written to the anonymous pipe the background thread removes the runloop
 // source from the runloop and and shuts down.
-InterProccessNotifier::InterProccessNotifier(Realm* realm)
+ExternalCommitHelper::ExternalCommitHelper(Realm* realm)
 {
     add_realm(realm);
 
@@ -147,7 +147,7 @@ InterProccessNotifier::InterProccessNotifier(Realm* realm)
     pthread_attr_setstacksize(&attr, 16 * 1024);
 
     auto fn = [](void *self) -> void * {
-        static_cast<InterProccessNotifier *>(self)->listen();
+        static_cast<ExternalCommitHelper *>(self)->listen();
         return nullptr;
     };
     ret = pthread_create(&m_thread, &attr, fn, this);
@@ -157,14 +157,14 @@ InterProccessNotifier::InterProccessNotifier(Realm* realm)
     }
 }
 
-InterProccessNotifier::~InterProccessNotifier()
+ExternalCommitHelper::~ExternalCommitHelper()
 {
     REALM_ASSERT_DEBUG(m_realms.empty());
     notify_fd(m_shutdown_write_fd);
     pthread_join(m_thread, nullptr); // Wait for the thread to exit
 }
 
-void InterProccessNotifier::add_realm(realm::Realm* realm)
+void ExternalCommitHelper::add_realm(realm::Realm* realm)
 {
     std::lock_guard<std::mutex> lock(m_realms_mutex);
 
@@ -183,7 +183,7 @@ void InterProccessNotifier::add_realm(realm::Realm* realm)
     m_realms.push_back({realm, runloop, signal});
 }
 
-void InterProccessNotifier::remove_realm(realm::Realm* realm)
+void ExternalCommitHelper::remove_realm(realm::Realm* realm)
 {
     std::lock_guard<std::mutex> lock(m_realms_mutex);
     for (auto it = m_realms.begin(); it != m_realms.end(); ++it) {
@@ -198,7 +198,7 @@ void InterProccessNotifier::remove_realm(realm::Realm* realm)
     REALM_TERMINATE("Realm not registered");
 }
 
-void InterProccessNotifier::listen()
+void ExternalCommitHelper::listen()
 {
     pthread_setname_np("RLMRealm notification listener");
 
@@ -244,86 +244,8 @@ void InterProccessNotifier::listen()
     }
 }
 
-void InterProccessNotifier::notify_others()
+void ExternalCommitHelper::notify_others()
 {
     notify_fd(m_notify_fd);
 }
 
-
-InterThreadNotifier::InterThreadNotifier(Realm* realm)
-{
-    add_realm(realm);
-
-    // Use the minimum allowed stack size, as we need very little in our listener
-    // https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/Multithreading/CreatingThreads/CreatingThreads.html#//apple_ref/doc/uid/10000057i-CH15-SW7
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setstacksize(&attr, 16 * 1024);
-
-    auto fn = [](void *self) -> void * {
-        static_cast<InterThreadNotifier *>(self)->listen();
-        return nullptr;
-    };
-    int ret = pthread_create(&m_thread, &attr, fn, this);
-    pthread_attr_destroy(&attr);
-    if (ret != 0) {
-        throw std::system_error(errno, std::system_category());
-    }
-}
-
-InterThreadNotifier::~InterThreadNotifier()
-{
-    REALM_ASSERT_DEBUG(m_realms.empty());
-    pthread_join(m_thread, nullptr); // Wait for the thread to exit
-}
-
-void InterThreadNotifier::add_realm(realm::Realm* realm)
-{
-    std::lock_guard<std::mutex> lock(m_realms_mutex);
-
-    // Create the runloop source
-    CFRunLoopSourceContext ctx{};
-    ctx.info = realm;
-    ctx.perform = [](void* info) {
-        static_cast<Realm*>(info)->notify();
-    };
-
-    CFRunLoopRef runloop = CFRunLoopGetCurrent();
-    CFRetain(runloop);
-    CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
-    CFRunLoopAddSource(runloop, signal, kCFRunLoopDefaultMode);
-
-    m_realms.push_back({realm, runloop, signal});
-}
-
-void InterThreadNotifier::remove_realm(realm::Realm* realm)
-{
-    std::lock_guard<std::mutex> lock(m_realms_mutex);
-    for (auto it = m_realms.begin(); it != m_realms.end(); ++it) {
-        if (it->realm == realm) {
-            CFRunLoopSourceInvalidate(it->signal);
-            CFRelease(it->signal);
-            CFRelease(it->runloop);
-            m_realms.erase(it);
-            return;
-        }
-    }
-    REALM_TERMINATE("Realm not registered");
-}
-
-void InterThreadNotifier::listen()
-{
-    pthread_setname_np("RLMRealm notification listener");
-}
-
-void InterThreadNotifier::notify_others()
-{
-    std::lock_guard<std::mutex> lock(m_realms_mutex);
-    for (auto const& realm : m_realms) {
-        CFRunLoopSourceSignal(realm.signal);
-        // Signalling the source makes it run the next time the runloop gets
-        // to it, but doesn't make the runloop start if it's currently idle
-        // waiting for events
-        CFRunLoopWakeUp(realm.runloop);
-    }
-}

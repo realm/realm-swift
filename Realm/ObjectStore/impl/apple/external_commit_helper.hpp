@@ -27,24 +27,14 @@ namespace realm {
 class Realm;
 
 namespace _impl {
-
 class ExternalCommitHelper {
 public:
-    virtual ~ExternalCommitHelper() = default;
+    ExternalCommitHelper(Realm* realm);
+    ~ExternalCommitHelper();
 
-    virtual void notify_others() = 0;
-    virtual void add_realm(Realm* realm) = 0;
-    virtual void remove_realm(Realm* realm) = 0;
-};
-
-class InterProccessNotifier: public ExternalCommitHelper {
-public:
-    InterProccessNotifier(Realm* realm);
-    ~InterProccessNotifier();
-
-    void notify_others() override;
-    void add_realm(Realm* realm) override;
-    void remove_realm(Realm* realm) override;
+    void notify_others();
+    void add_realm(Realm* realm);
+    void remove_realm(Realm* realm);
 
 private:
     // A RAII holder for a file descriptor which automatically closes the wrapped
@@ -96,36 +86,6 @@ private:
     // it should be shut down.
     FdHolder m_shutdown_read_fd;
     FdHolder m_shutdown_write_fd;
-};
-
-class InterThreadNotifier: public ExternalCommitHelper {
-public:
-    InterThreadNotifier(Realm* realm);
-    ~InterThreadNotifier();
-
-    void notify_others() override;
-    void add_realm(Realm* realm) override;
-    void remove_realm(Realm* realm) override;
-
-private:
-
-    struct PerRealmInfo {
-        Realm* realm;
-        CFRunLoopRef runloop;
-        CFRunLoopSourceRef signal;
-    };
-
-    void listen();
-
-    // Currently registered realms and the signal for delivering notifications
-    // to them
-    std::vector<PerRealmInfo> m_realms;
-
-    // Mutex which guards m_realms
-    std::mutex m_realms_mutex;
-
-    // The listener thread
-    pthread_t m_thread;
 };
 
 } // namespace _impl
