@@ -65,6 +65,23 @@ NOTE: In the (near) future we will start providing ways to make this behavior mu
 
 NOTE: Sync is currently only able to function in AP mode, which means that global locks are not available. This has the implication that features that depend on all clients participating on sync agreeing on a particular state are not possible to implement (for instance, a bank transfer app that needs to answer the question "do I have enough money for this transaction?" will not work properly). Each device is considered an equal source of truth in the app's decision-making, and it is currently not possible to work in a different mode. Luckily, this interacts very well with our existing APIs, in the sense that apps using Realm require zero modifications to the app code to work with sync (no calls into Realm will suddently start blocking, etc.).
 
+Designing the Data Model for Sync
+---------------------------------
+
+One of the primary objectives of Realm Sync is that you should be able to use your existing data models pretty much as-is. There are a few things you should be aware of though. The first one is that since multiple devices may be working on the same data, and some of them may be offline so you won't be able to see their changes until later, you should design you data model such that it does not depend on knowing in advance what changes have been done by others.
+
+An example of this would be what we encountered when building the Puzzle App. The first thing the app did was initialize the data model with a number of objects to represent the puzzle pieces. The problem here was that another device might start up and do the same thing at the same time (before the fact that pieces have been added has been synchronized), and suddenly you have double the number of pieces as you wanted.
+
+The solution for this was to add the concept of a "game", so that you as a user start a new game, and the puzzle pieces are added as members of that specific game. This means that multiple devices (and users) can start games at the same time without conflicts, and then  later choose if they want to join into an existing game.
+
+Another way to solve this problem would have been to assign each puzzle pieze a hardcoded ObjectId (like "puzzle_piece_1"), which would make the adding the object an idempotent operation (no matter how many time it is done, you still get only one object). But that is still waiting for support for explicit ObjectsId's in core.
+
+Another thing to be aware of is that you should avoid storing values that depends on a consistent view of the data within the Realm. An example of this would be aggregates like counts or sums. Since the data could be changed on other devices while you are calculating the aggregate, you can't trust that the value you save will stay valid. So the right solution here is to always calculate any aggregates at runtime.
+
+You have the same issue with sorted lists of objects. While you could manually sort the list, so that the order was persisted, other devices doing inserts at the same time could mess up the order. So the right solution if you want to display a sorted list is to just create a sorted view at runtime (via a query) and display that instead. In that way you are always assured that it will be in the correct sorted order, no matter what happens to the list from other devices.
+
+In general it is a good idea to keep anything that can be expressed as a query or some other kind of runtime transformation of the data, out of the data model and instead just do it on demand as needed.
+
 
 Building Realm for iOS
 ----------------------
