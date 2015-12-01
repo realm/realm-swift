@@ -245,8 +245,8 @@ static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) 
                                                 File::PermissionDenied(err.UTF8String, ex.path())), outError);
                 break;
             }
-            case RealmFileException::Kind::Exists:
-                RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileExists, ex), outError);
+            case RealmFileException::Kind::NotFound:
+                RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileNotFound, ex), outError);
                 break;
             case RealmFileException::Kind::AccessError:
                 RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileAccess, ex), outError);
