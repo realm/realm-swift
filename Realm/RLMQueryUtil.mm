@@ -691,7 +691,7 @@ void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
 ColumnReference column_reference_from_key_path(RLMSchema *schema, RLMObjectSchema *desc,
                                                NSString *keyPath, bool isAggregate)
 {
-    std::vector<NSUInteger> indexes;
+    std::vector<size_t> indexes;
     RLMProperty *prop = nil;
 
     NSString *prevPath = nil;
