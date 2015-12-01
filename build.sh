@@ -1058,6 +1058,7 @@ EOF
         export WORKSPACE
         cd $WORKSPACE
         git clone $REALM_SOURCE tightdb_objc
+        cp -R $REALM_SOURCE/core tightdb_objc/core
 
         echo 'Packaging iOS static'
         sh tightdb_objc/build.sh package-ios-static
