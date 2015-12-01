@@ -854,4 +854,108 @@
     [realm commitWriteTransaction];
 }
 
+- (void)testNotificationSentInitially {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+    [realm commitWriteTransaction];
+
+    id expectation = [self expectationWithDescription:@""];
+    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+        XCTAssertNotNil(array);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [token stop];
+}
+
+- (void)testNotificationSentAfterCommit {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+    [realm commitWriteTransaction];
+
+    __block id expectation = [self expectationWithDescription:@""];
+    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+        XCTAssertNotNil(array);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    expectation = [self expectationWithDescription:@""];
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm transactionWithBlock:^{
+            [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+        }];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+- (void)testNotificationNotSentForUnrelatedChange {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+    [realm commitWriteTransaction];
+
+    id expectation = [self expectationWithDescription:@""];
+    id token = [array.array addNotificationBlock:^(__unused RLMArray *array, __unused NSError *error) {
+        // will throw if it's incorrectly called a second time due to the
+        // unrelated write transaction
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // All notification blocks are called as part of a single runloop event, so
+    // waiting for this one also waits for the above one to get a chance to run
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        [self dispatchAsyncAndWait:^{
+            [self.realmWithTestPath transactionWithBlock:^{ }];
+        }];
+    }];
+    [token stop];
+}
+
+- (void)testNotificationSentOnlyForActualRefresh {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+    [realm commitWriteTransaction];
+
+    __block id expectation = [self expectationWithDescription:@""];
+    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+        XCTAssertNotNil(array);
+        XCTAssertNil(error);
+        // will throw if it's called a second time before we create the new
+        // expectation object immediately before manually refreshing
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Turn off autorefresh, so the background commit should not result in a notification
+    realm.autorefresh = NO;
+
+    // All notification blocks are called as part of a single runloop event, so
+    // waiting for this one also waits for the above one to get a chance to run
+    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
+        [self dispatchAsyncAndWait:^{
+            RLMRealm *realm = self.realmWithTestPath;
+            [realm transactionWithBlock:^{
+                [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+            }];
+        }];
+    }];
+
+    expectation = [self expectationWithDescription:@""];
+    [realm refresh];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
 @end
