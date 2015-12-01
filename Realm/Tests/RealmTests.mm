@@ -18,6 +18,7 @@
 
 #import "RLMTestCase.h"
 
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Dynamic.h"
 
@@ -160,6 +161,13 @@ extern "C" {
 
     [NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: permissions} ofItemAtPath:RLMTestRealmPath() error:&error];
     assert(!error);
+}
+
+- (void)testFileFormatUpgradeRequiredButDisabled {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.disableFormatUpgrade = true;
+    config.path = [[NSBundle bundleForClass:RealmTests.class] pathForResource:@"fileformat-pre-null.realm" ofType:nil];
+    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileFormatUpgradeRequired);
 }
 
 #pragma mark - Adding and Removing Objects
