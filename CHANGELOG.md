@@ -16,6 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
   now marked as `__attribute__((noescape))`/`@noescape`.
 * Rework the implementation of encrypted Realms to no longer interfere with
   debuggers.
+* Many forms of queries with key paths on both sides of the comparison operator
+  are now supported.
 
 ### Bugfixes
 
