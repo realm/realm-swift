@@ -243,13 +243,22 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
 }
 
 
+static NSException *RLMException(NSString *reason, NSDictionary *additionalUserInfo) {
+    NSMutableDictionary *userInfo = @{RLMRealmVersionKey: REALM_COCOA_VERSION,
+                                      RLMRealmCoreVersionKey: @REALM_VERSION}.mutableCopy;
+    if (additionalUserInfo != nil) {
+        [userInfo addEntriesFromDictionary:additionalUserInfo];
+    }
+    NSException *e = [NSException exceptionWithName:RLMExceptionName
+                                             reason:reason
+                                           userInfo:userInfo];
+    return e;
+}
+
 NSException *RLMException(NSString *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    NSException *e = [NSException exceptionWithName:RLMExceptionName
-                                             reason:[[NSString alloc] initWithFormat:fmt arguments:args]
-                                           userInfo:@{RLMRealmVersionKey: REALM_COCOA_VERSION,
-                                                      RLMRealmCoreVersionKey: @REALM_VERSION}];
+    NSException *e = RLMException([[NSString alloc] initWithFormat:fmt arguments:args], @{});
     va_end(args);
     return e;
 }
@@ -299,7 +308,7 @@ void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
         *outError = error;
     }
     else {
-        @throw RLMException(@"%@", error.localizedDescription);
+        @throw RLMException(error.localizedDescription, @{ NSUnderlyingErrorKey: error });
     }
 }
 
