@@ -175,10 +175,10 @@ public:
 
     CollectionOperation(Type type, ColumnReference link_column, util::Optional<ColumnReference> column)
         : m_type(type)
-        , m_link_column(link_column)
-        , m_column(column)
+        , m_link_column(std::move(link_column))
+        , m_column(std::move(column))
     {
-        RLMPrecondition(link_column.type() == RLMPropertyTypeArray, @"Invalid predicate",
+        RLMPrecondition(m_link_column.type() == RLMPropertyTypeArray, @"Invalid predicate",
                         @"Collection operation can only be applied to a property of type RLMArray.");
 
         switch (m_type) {
@@ -195,7 +195,7 @@ public:
     }
 
     CollectionOperation(NSString *operationName, ColumnReference link_column, util::Optional<ColumnReference> column = util::none)
-        : CollectionOperation(type_for_name(operationName), std::move(link_column), column)
+        : CollectionOperation(type_for_name(operationName), std::move(link_column), std::move(column))
     {
     }
 
@@ -395,7 +395,7 @@ void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
                              NSComparisonPredicateOptions predicateOptions,
                              L lhs, R rhs);
 
-void add_between_constraint_to_query(realm::Query &query, ColumnReference column, id value) {
+void add_between_constraint_to_query(realm::Query &query, const ColumnReference& column, id value) {
     id from, to;
     validate_and_extract_between_range(value, column.property(), &from, &to);
 
@@ -953,14 +953,14 @@ void update_query_with_column_expression(RLMSchema *schema, RLMObjectSchema *des
         CollectionOperation left = collection_operation_from_key_path(schema, desc, leftKeyPath);
         ColumnReference right = column_reference_from_key_path(schema, desc, rightKeyPath, false);
         left.validate_comparison(right);
-        add_collection_operation_constraint_to_query(query, predicate.predicateOperatorType, left, left, right);
+        add_collection_operation_constraint_to_query(query, predicate.predicateOperatorType, left, left, std::move(right));
         return;
     }
     if (right_key_path_contains_collection_operator) {
         ColumnReference left = column_reference_from_key_path(schema, desc, leftKeyPath, false);
         CollectionOperation right = collection_operation_from_key_path(schema, desc, rightKeyPath);
         right.validate_comparison(left);
-        add_collection_operation_constraint_to_query(query, predicate.predicateOperatorType, right, left, right);
+        add_collection_operation_constraint_to_query(query, predicate.predicateOperatorType, right, std::move(left), right);
         return;
     }
 
