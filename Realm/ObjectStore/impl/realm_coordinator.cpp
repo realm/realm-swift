@@ -221,7 +221,7 @@ void RealmCoordinator::pin_version(uint_fast64_t version, uint_fast32_t index)
             m_advancer_history = nullptr;
         }
     }
-    else if (m_queries.empty() && m_new_queries.empty()) {
+    else if (m_new_queries.empty()) {
         // If this is the first query then we don't already have a read transaction
         m_advancer_sg->begin_read(versionid);
     }
@@ -284,17 +284,17 @@ void RealmCoordinator::do_unregister_query(AsyncQuery& registration)
     };
 
     std::lock_guard<std::mutex> lock(m_query_mutex);
-    swap_remove(m_queries) || swap_remove(m_new_queries);
-
-    if (m_queries.empty() && m_new_queries.empty()) {
+    if (swap_remove(m_queries)) {
         // Make sure we aren't holding on to read versions needlessly if there
         // are no queries left, but don't close them entirely as opening shared
         // groups is expensive
-        if (m_advancer_sg) {
-            m_advancer_sg->end_read();
-        }
-        if (m_query_sg) {
+        if (m_queries.empty() && m_query_sg) {
             m_query_sg->end_read();
+        }
+    }
+    else if (swap_remove(m_new_queries)) {
+        if (m_new_queries.empty() && m_advancer_sg) {
+            m_advancer_sg->end_read();
         }
     }
 }
@@ -378,6 +378,11 @@ void RealmCoordinator::move_new_queries_to_main()
 
 void RealmCoordinator::advance_helper_shared_group_to_latest()
 {
+    if (m_new_queries.empty()) {
+        LangBindHelper::advance_read(*m_query_sg, *m_query_history);
+        return;
+    }
+
     // Sort newly added queries by their source version so that we can pull them
     // all forward to the latest version in a single pass over the transaction log
     std::sort(m_new_queries.begin(), m_new_queries.end(), [](auto const& lft, auto const& rgt) {
@@ -401,10 +406,10 @@ void RealmCoordinator::advance_helper_shared_group_to_latest()
         query->attach_to(*m_query_sg);
     }
 
-    move_new_queries_to_main();
-
-    m_advancer_sg->end_read();
-    m_advancer_sg->begin_read(m_query_sg->get_version_of_current_transaction());
+    if (!m_new_queries.empty()) {
+        move_new_queries_to_main();
+        m_advancer_sg->end_read();
+    }
 }
 
 void RealmCoordinator::advance_to_ready(Realm& realm)
