@@ -36,7 +36,7 @@ public:
     CachedRealm(const CachedRealm&) = delete;
     CachedRealm& operator=(const CachedRealm&) = delete;
 
-    // Asyncronously call notify() on the Realm on the appropriate thread
+    // Asynchronously call notify() on the Realm on the appropriate thread
     void notify();
 
 private:

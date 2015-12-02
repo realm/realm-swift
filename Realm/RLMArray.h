@@ -291,7 +291,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Register a block to be called each time the RLMArray changes.
 
- The block will be asyncronously called with the initial array, and then
+ The block will be asynchronously called with the initial array, and then
  called again after each writen transaction which changes the array or any
  items contained in the array. You must retain the returned token for as long as
  you want the block to continue to be called. To stop receiving updates, call

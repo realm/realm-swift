@@ -56,7 +56,7 @@ public:
     const std::vector<char>& get_encryption_key() const noexcept { return m_config.encryption_key; }
     bool is_in_memory() const noexcept { return m_config.in_memory; }
 
-    // Asyncronously call notify() on every Realm instance for this coordinator's
+    // Asynchronously call notify() on every Realm instance for this coordinator's
     // path, including those in other processes
     void send_commit_notifications();
 

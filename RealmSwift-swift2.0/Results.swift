@@ -296,7 +296,7 @@ public final class Results<T: Object>: ResultsBase {
     /**
      Register a block to be called each time the Results changes.
 
-     The block will be asyncronously called with the initial results, and then
+     The block will be asynchronously called with the initial results, and then
      called again after each writen transaction which causes the results to change.
      You must retain the returned token for as long as you want the results to
      continue to be sent to the block. To stop receiving updates, call stop() on the
