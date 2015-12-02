@@ -460,6 +460,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     if (!RLMIsInRunLoop()) {
         @throw RLMException(@"Can only add notification blocks from within runloops.");
     }
+    [_realm verifyThread];
 
     __block uint_fast64_t prevVersion = -1;
     auto noteBlock = ^(NSString *notification, RLMRealm *) {
