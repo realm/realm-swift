@@ -66,32 +66,42 @@ void AsyncQuery::get_results(const SharedRealm& realm, SharedGroup& sg, std::vec
     });
 }
 
-void AsyncQuery::update()
+void AsyncQuery::prepare_update()
 {
+    // This function must not touch m_tv_handover as it is called without the
+    // relevant lock held (so that another thread can consume m_tv_handover
+    // while this is running)
+
     REALM_ASSERT(m_sg);
 
     if (m_tv.is_attached()) {
-        // No need to notify if the tv hasn't changed and our last notification
-        // was already consumed, but if it hasn't been consumed yet we need to
-        // re-export it at the new version
-        if (!m_tv_handover && m_tv.is_in_sync()) {
-            return;
-        }
-        m_tv.sync_if_needed();
+        m_did_update = m_tv.sync_if_needed();
     }
     else {
         m_tv = m_query->find_all();
         if (m_sort) {
             m_tv.sort(m_sort.columnIndices, m_sort.ascending);
         }
+        m_did_update = true;
     }
-
-    m_tv_handover = m_sg->export_for_handover(m_tv, ConstSourcePayload::Copy);
-
-    m_callback->update_ready();
 }
 
-void AsyncQuery::set_error(std::exception_ptr err) {
+void AsyncQuery::prepare_handover()
+{
+    // Even if the TV didn't change, we need to re-export it if the previous
+    // export has not been consumed yet, as the old handover object is no longer
+    // usable due to the version not matching
+    if (m_did_update || (m_tv_handover && m_tv_handover->version != m_sg->get_version_of_current_transaction())) {
+        m_tv_handover = m_sg->export_for_handover(m_tv, ConstSourcePayload::Copy);
+    }
+
+    if (m_did_update) {
+        m_callback->update_ready();
+    }
+}
+
+void AsyncQuery::set_error(std::exception_ptr err)
+{
     if (!m_error) {
         m_error = err;
         m_callback->update_ready();

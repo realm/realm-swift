@@ -111,9 +111,11 @@ private:
 
     // must be called with m_query_mutex locked
     void pin_version(uint_fast64_t version, uint_fast32_t index);
-    void update_async_queries();
 
     void run_async_queries();
+    void open_helper_shared_group();
+    void move_new_queries_to_main();
+    void advance_helper_shared_group_to_latest();
 };
 
 } // namespace _impl

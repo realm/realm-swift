@@ -311,13 +311,46 @@ void RealmCoordinator::on_change()
 
 void RealmCoordinator::run_async_queries()
 {
-    std::lock_guard<std::mutex> lock(m_query_mutex);
+    std::unique_lock<std::mutex> lock(m_query_mutex);
 
     if (m_queries.empty() && m_new_queries.empty()) {
         return;
     }
 
-    if (!m_query_sg && !m_async_error) {
+    if (!m_async_error) {
+        open_helper_shared_group();
+    }
+
+    if (m_async_error) {
+        move_new_queries_to_main();
+        for (auto& query : m_queries) {
+            query->set_error(m_async_error);
+        }
+        return;
+    }
+
+    advance_helper_shared_group_to_latest();
+
+    // Make a copy of the queries vector so that we can release the lock while
+    // we run the queries
+    auto queries_to_run = m_queries;
+    lock.unlock();
+
+    for (auto& query : queries_to_run) {
+        query->prepare_update();
+    }
+
+    // Reacquire the lock while updating the fields that are actually read on
+    // other threads
+    lock.lock();
+    for (auto& query : queries_to_run) {
+        query->prepare_handover();
+    }
+}
+
+void RealmCoordinator::open_helper_shared_group()
+{
+    if (!m_query_sg) {
         try {
             Realm tmp(m_config);
             m_query_history = std::move(tmp.m_history);
@@ -331,15 +364,20 @@ void RealmCoordinator::run_async_queries()
             m_query_history = nullptr;
         }
     }
-    else if (!m_async_error && m_queries.empty()) {
+    else if (m_queries.empty()) {
         m_query_sg->begin_read();
     }
+}
 
-    if (m_async_error) {
-        update_async_queries();
-        return;
-    }
+void RealmCoordinator::move_new_queries_to_main()
+{
+    m_queries.reserve(m_queries.size() + m_new_queries.size());
+    std::move(m_new_queries.begin(), m_new_queries.end(), std::back_inserter(m_queries));
+    m_new_queries.clear();
+}
 
+void RealmCoordinator::advance_helper_shared_group_to_latest()
+{
     // Sort newly added queries by their source version so that we can pull them
     // all forward to the latest version in a single pass over the transaction log
     std::sort(m_new_queries.begin(), m_new_queries.end(), [](auto const& lft, auto const& rgt) {
@@ -363,28 +401,10 @@ void RealmCoordinator::run_async_queries()
         query->attach_to(*m_query_sg);
     }
 
-    update_async_queries();
+    move_new_queries_to_main();
 
     m_advancer_sg->end_read();
     m_advancer_sg->begin_read(m_query_sg->get_version_of_current_transaction());
-}
-
-void RealmCoordinator::update_async_queries()
-{
-    // Move "new queries" to the main query list
-    m_queries.reserve(m_queries.size() + m_new_queries.size());
-    std::move(m_new_queries.begin(), m_new_queries.end(), std::back_inserter(m_queries));
-    m_new_queries.clear();
-
-    // Run each of the queries and send the updated results
-    for (auto& query : m_queries) {
-        if (m_async_error) {
-            query->set_error(m_async_error);
-        }
-        else {
-            query->update();
-        }
-    }
 }
 
 void RealmCoordinator::advance_to_ready(Realm& realm)

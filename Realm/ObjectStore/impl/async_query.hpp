@@ -36,9 +36,14 @@ public:
 
     void get_results(const SharedRealm& realm, SharedGroup& sg, std::vector<std::function<void()>>& ret);
 
-    void update();
     void set_error(std::exception_ptr err);
 
+    // Run/rerun the query if needed
+    void prepare_update();
+    // Update the handover object with the new data produced in prepare_update()
+    void prepare_handover();
+
+    // Get the version of the current handover object
     SharedGroup::VersionID version() const noexcept;
 
     void attach_to(SharedGroup& sg);
@@ -60,6 +65,8 @@ private:
     SharedGroup* m_sg = nullptr;
 
     std::exception_ptr m_error;
+
+    bool m_did_update = false;
 };
 
 } // namespace _impl
