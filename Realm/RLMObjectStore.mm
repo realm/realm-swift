@@ -362,7 +362,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:className];
     if (!objectSchema) {
         @throw RLMException(@"Object type '%@' is not persisted in the Realm. "
-                             @"If using a custom `objectClasses` / `obejctTypes` array in your configuration, "
+                             @"If using a custom `objectClasses` / `objectTypes` array in your configuration, "
                              @"add `%@` to the list of `objectClasses` / `objectTypes`.",
                              className, className);
     }
