@@ -307,6 +307,23 @@ class RealmCollectionTypeTests: TestCase {
         // Should not throw a type error.
         collection.filter("ANY stringListCol == %@", SwiftStringObject())
     }
+
+    func testAddNotificationBlock() {
+        let realm = realmWithTestPath()
+        try! realm.commitWrite()
+
+        let expectation = expectationWithDescription("")
+        let token = collection.addNotificationBlock { c, error in
+            XCTAssertNil(error)
+            XCTAssertNotNil(c)
+            XCTAssertEqual(c!.count, 2)
+            expectation.fulfill()
+        }
+        waitForExpectationsWithTimeout(1, handler: nil)
+
+        token.stop()
+        realm.beginWrite()
+    }
 }
 
 // MARK: Results
@@ -500,6 +517,23 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         XCTAssertEqual(collection.description, "List<SwiftStringObject> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
         // swiftlint:enable line_length
     }
+
+    func testAddNotificationBlockDirect() {
+        let collection = collectionBase()
+
+        let realm = realmWithTestPath()
+        try! realm.commitWrite()
+
+        let expectation = expectationWithDescription("")
+        let token = collection.addNotificationBlock { list in
+            XCTAssertEqual(list.count, 2)
+            expectation.fulfill()
+        }
+        waitForExpectationsWithTimeout(1, handler: nil)
+
+        token.stop()
+        realm.beginWrite()
+    }
 }
 
 class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
@@ -591,6 +625,22 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(self.collection.average("intCol") as Int!)
         assertThrows(self.collection.average("floatCol") as Float!)
         assertThrows(self.collection.average("doubleCol") as Double!)
+    }
+
+    override func testAddNotificationBlock() {
+        let realm = realmWithTestPath()
+        try! realm.commitWrite()
+        assertThrows(self.collection.addNotificationBlock { _, _ in })
+        realm.beginWrite()
+    }
+
+    override func testAddNotificationBlockDirect() {
+        let collection = collectionBase()
+        let realm = realmWithTestPath()
+        try! realm.commitWrite()
+
+        assertThrows(collection.addNotificationBlock { _ in })
+        realm.beginWrite()
     }
 }
 
