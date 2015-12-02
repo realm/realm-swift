@@ -48,16 +48,14 @@ void AsyncQuery::get_results(const SharedRealm& realm, SharedGroup& sg, std::vec
         return;
     }
 
-    if (!m_query_handover) {
+    if (!m_tv_handover) {
         return;
     }
-    REALM_ASSERT(m_tv_handover);
-    if (m_query_handover->version < sg.get_version_of_current_transaction()) {
+    if (m_tv_handover->version < sg.get_version_of_current_transaction()) {
         // async results are stale; ignore
         return;
     }
     auto r = Results(realm,
-                     std::move(*sg.import_from_handover(std::move(m_query_handover))),
                      m_sort,
                      std::move(*sg.import_from_handover(std::move(m_tv_handover))));
     auto version = sg.get_version_of_current_transaction();
@@ -89,7 +87,6 @@ void AsyncQuery::update()
     }
 
     m_tv_handover = m_sg->export_for_handover(m_tv, ConstSourcePayload::Copy);
-    m_query_handover = m_sg->export_for_handover(*m_query, ConstSourcePayload::Copy);
 
     m_callback->update_ready();
 }
@@ -103,7 +100,11 @@ void AsyncQuery::set_error(std::exception_ptr err) {
 
 SharedGroup::VersionID AsyncQuery::version() const noexcept
 {
-    return m_query_handover ? m_query_handover->version : SharedGroup::VersionID{};
+    if (m_tv_handover)
+        return m_tv_handover->version;
+    if (m_query_handover)
+        return m_query_handover->version;
+    return SharedGroup::VersionID{};
 }
 
 void AsyncQuery::attach_to(realm::SharedGroup& sg)

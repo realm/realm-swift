@@ -53,9 +53,8 @@ Results::Results(SharedRealm r, Table& table)
 {
 }
 
-Results::Results(SharedRealm r, Query q, SortOrder s, TableView tv)
+Results::Results(SharedRealm r, SortOrder s, TableView tv)
 : m_realm(std::move(r))
-, m_query(std::move(q))
 , m_table_view(std::move(tv))
 , m_table(&m_table_view.get_parent())
 , m_sort(std::move(s))
@@ -301,8 +300,9 @@ Query Results::get_query() const
     switch (m_mode) {
         case Mode::Empty:
         case Mode::Query:
-        case Mode::TableView:
             return m_query;
+        case Mode::TableView:
+            return m_table_view.get_query();
         case Mode::Table:
             return m_table->where();
     }

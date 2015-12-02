@@ -799,7 +799,7 @@
 
     // asyncify them in reverse order so that the version pin has to go backwards
     for (int i = 9; i >= 0; --i) {
-        XCTestExpectation *exp = [self expectationWithDescription:@""];
+        XCTestExpectation *exp = [self expectationWithDescription:@(i).stringValue];
         tokens[i] = [[IntObject allObjectsInRealm:realms[i]] addNotificationBlock:^(RLMResults *results, NSError *error) {
             XCTAssertEqual(10U, results.count);
             XCTAssertNil(error);

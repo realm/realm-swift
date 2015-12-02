@@ -89,7 +89,7 @@ public:
     // or a wrapper around a query and a sort order which creates and updates
     // the tableview as needed
     Results() = default;
-    Results(SharedRealm r, Query q, SortOrder s, TableView tv);
+    Results(SharedRealm r, SortOrder s, TableView tv);
     Results(SharedRealm r, Table& table);
     Results(SharedRealm r, Query q, SortOrder s = {});
 
