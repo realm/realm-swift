@@ -19,21 +19,16 @@
 #ifndef REALM_CACHED_REALM_HPP
 #define REALM_CACHED_REALM_HPP
 
+#include "../cached_realm_base.hpp"
+
 #include <CoreFoundation/CFRunLoop.h>
-#include <memory>
-#include <thread>
 
 namespace realm {
 class Realm;
 
 namespace _impl {
 
-// CachedRealm stores a weak reference to a Realm instance, along with all of
-// the information about a Realm that needs to be accessed from other threads.
-// This is needed to avoid forming strong references to the Realm instances on
-// other threads, which can produce deadlocks when the last strong reference to
-// a Realm instance is released from within a function holding the cache lock.
-class CachedRealm {
+class CachedRealm : public CachedRealmBase {
 public:
     CachedRealm(const std::shared_ptr<Realm>& realm, bool cache);
     ~CachedRealm();
@@ -44,27 +39,10 @@ public:
     CachedRealm(const CachedRealm&) = delete;
     CachedRealm& operator=(const CachedRealm&) = delete;
 
-    // Get a strong reference to the cached realm
-    std::shared_ptr<Realm> realm() const { return m_realm.lock(); }
-
-    // Does this CachedRealm store a Realm instance that should be used on the current thread?
-    bool is_cached_for_current_thread() const { return m_cache && m_thread_id == std::this_thread::get_id(); }
-
-    // Has the Realm instance been destroyed?
-    bool expired() const { return m_realm.expired(); }
-
     // Asyncronously call notify() on the Realm on the appropriate thread
     void notify();
 
-    // Is this a CachedRealm for the given Realm instance?
-    bool is_for_realm(Realm* realm) const { return realm == m_realm_key; }
-
 private:
-    std::weak_ptr<Realm> m_realm;
-    std::thread::id m_thread_id = std::this_thread::get_id();
-    void* m_realm_key;
-    bool m_cache = false;
-
     CFRunLoopRef m_runloop;
     CFRunLoopSourceRef m_signal;
 };

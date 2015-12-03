@@ -24,9 +24,7 @@ using namespace realm;
 using namespace realm::_impl;
 
 CachedRealm::CachedRealm(const std::shared_ptr<Realm>& realm, bool cache)
-: m_realm(realm)
-, m_realm_key(realm.get())
-, m_cache(cache)
+: CachedRealmBase(realm, cache)
 {
     struct RefCountedWeakPointer {
         std::weak_ptr<Realm> realm;
@@ -58,15 +56,17 @@ CachedRealm::CachedRealm(const std::shared_ptr<Realm>& realm, bool cache)
 }
 
 CachedRealm::CachedRealm(CachedRealm&& rgt)
+: CachedRealmBase(std::move(rgt))
+, m_runloop(rgt.m_runloop)
+, m_signal(rgt.m_signal)
 {
-    *this = std::move(rgt);
+    rgt.m_runloop = nullptr;
+    rgt.m_signal = nullptr;
 }
 
 CachedRealm& CachedRealm::operator=(CachedRealm&& rgt)
 {
-    m_realm = std::move(rgt.m_realm);
-    m_thread_id = rgt.m_thread_id;
-    m_cache = rgt.m_cache;
+    CachedRealmBase::operator=(std::move(rgt));
     m_runloop = rgt.m_runloop;
     m_signal = rgt.m_signal;
     rgt.m_runloop = nullptr;
