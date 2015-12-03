@@ -45,6 +45,8 @@ public:
     const Schema* get_schema() const noexcept;
     uint64_t get_schema_version() const noexcept { return m_config.schema_version; }
     const std::string& get_path() const noexcept { return m_config.path; }
+    const std::vector<char>& get_encryption_key() const noexcept { return m_config.encryption_key; }
+    bool is_in_memory() const noexcept { return m_config.in_memory; }
 
     // Asyncronously call notify() on every Realm instance for this coordinator's
     // path, including those in other processes
