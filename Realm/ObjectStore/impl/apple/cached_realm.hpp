@@ -28,6 +28,11 @@ class Realm;
 
 namespace _impl {
 
+// CachedRealm stores a weak reference to a Realm instance, along with all of
+// the information about a Realm that needs to be accessed from other threads.
+// This is needed to avoid forming strong references to the Realm instances on
+// other threads, which can produce deadlocks when the last strong reference to
+// a Realm instance is released from within a function holding the cache lock.
 class CachedRealm {
 public:
     CachedRealm(const std::shared_ptr<Realm>& realm, bool cache);
@@ -52,9 +57,6 @@ public:
     void notify();
 
     // Is this a CachedRealm for the given Realm instance?
-    // This should be used rather than lock() to avoid deadlocks when the
-    // reference from lock() is the last remaining one (due to another thread
-    // releasing them at the same time)
     bool is_for_realm(Realm* realm) const { return realm == m_realm_key; }
 
 private:
