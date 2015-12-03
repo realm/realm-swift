@@ -45,14 +45,22 @@ public:
     // Does this CachedRealm store a Realm instance that should be used on the current thread?
     bool is_cached_for_current_thread() const { return m_cache && m_thread_id == std::this_thread::get_id(); }
 
+    // Has the Realm instance been destroyed?
     bool expired() const { return m_realm.expired(); }
 
     // Asyncronously call notify() on the Realm on the appropriate thread
     void notify();
 
+    // Is this a CachedRealm for the given Realm instance?
+    // This should be used rather than lock() to avoid deadlocks when the
+    // reference from lock() is the last remaining one (due to another thread
+    // releasing them at the same time)
+    bool is_for_realm(Realm* realm) const { return realm == m_realm_key; }
+
 private:
     std::weak_ptr<Realm> m_realm;
     std::thread::id m_thread_id = std::this_thread::get_id();
+    void* m_realm_key;
     bool m_cache = false;
 
     CFRunLoopRef m_runloop;

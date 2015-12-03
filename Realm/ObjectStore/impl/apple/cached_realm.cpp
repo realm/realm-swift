@@ -25,6 +25,7 @@ using namespace realm::_impl;
 
 CachedRealm::CachedRealm(const std::shared_ptr<Realm>& realm, bool cache)
 : m_realm(realm)
+, m_realm_key(realm.get())
 , m_cache(cache)
 {
     struct RefCountedWeakPointer {

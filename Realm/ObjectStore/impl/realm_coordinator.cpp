@@ -122,16 +122,19 @@ RealmCoordinator::~RealmCoordinator()
     }
 }
 
-void RealmCoordinator::unregister_realm(Realm*)
+void RealmCoordinator::unregister_realm(Realm* realm)
 {
     std::lock_guard<std::mutex> lock(m_realm_mutex);
     for (size_t i = 0; i < m_cached_realms.size(); ++i) {
-        if (m_cached_realms[i].expired()) {
-            if (i + 1 < m_cached_realms.size()) {
-                m_cached_realms[i] = std::move(m_cached_realms.back());
-            }
-            m_cached_realms.pop_back();
+        auto& cached_realm = m_cached_realms[i];
+        if (!cached_realm.expired() && !cached_realm.is_for_realm(realm)) {
+            continue;
         }
+
+        if (i + 1 < m_cached_realms.size()) {
+            cached_realm = std::move(m_cached_realms.back());
+        }
+        m_cached_realms.pop_back();
     }
 }
 
