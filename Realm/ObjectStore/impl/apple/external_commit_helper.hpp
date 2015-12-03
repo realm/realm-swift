@@ -19,9 +19,7 @@
 #ifndef REALM_EXTERNAL_COMMIT_HELPER_HPP
 #define REALM_EXTERNAL_COMMIT_HELPER_HPP
 
-#include <CoreFoundation/CFRunLoop.h>
 #include <future>
-#include <vector>
 
 namespace realm {
 class Realm;
@@ -57,12 +55,6 @@ private:
 
         FdHolder& operator=(FdHolder const&) = delete;
         FdHolder(FdHolder const&) = delete;
-    };
-
-    struct PerRealmInfo {
-        Realm* realm;
-        CFRunLoopRef runloop;
-        CFRunLoopSourceRef signal;
     };
 
     void listen();
