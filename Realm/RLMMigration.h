@@ -84,6 +84,7 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
  */
 -(RLMObject *)createObject:(NSString *)className withValue:(id)value;
 
+/// :nodoc:
 -(RLMObject *)createObject:(NSString *)className withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createObject:withValue:");
 
 /**

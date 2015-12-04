@@ -109,6 +109,7 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithValue:(id)value NS_DESIGNATED_INITIALIZER;
 
+/// :nodoc:
 - (instancetype)initWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use initWithValue:");
 
 
@@ -142,6 +143,7 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)createInDefaultRealmWithValue:(id)value;
 
+/// :nodoc:
 + (instancetype)createInDefaultRealmWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createInDefaultRealmWithValue:");
 
 /**
@@ -165,6 +167,7 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value;
 
+/// :nodoc:
 + (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createInRealm:withValue:");
 
 /**
@@ -190,6 +193,7 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)createOrUpdateInDefaultRealmWithValue:(id)value;
 
+/// :nodoc:
 + (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createOrUpdateInDefaultRealmWithValue:");
 
 /**
@@ -216,6 +220,7 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value;
 
+/// :nodoc:
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createOrUpdateInRealm:withValue:");
 
 #pragma mark - Properties
@@ -238,6 +243,7 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
+/// :nodoc:
 @property (nonatomic, readonly, getter = isDeletedFromRealm) BOOL deletedFromRealm __attribute__((deprecated("Use `invalidated` instead.")));
 
 #pragma mark - Customizing your Objects
