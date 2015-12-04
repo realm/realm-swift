@@ -3,27 +3,27 @@
 
 ### Enhancements
 
+* Queries are no longer limited to 16 levels of grouping.
 * Rework the implementation of encrypted Realms to no longer interfere with
   debuggers.
-* Queries are no longer limited to 16 levels of grouping.
 
 ### Bugfixes
 
-* Fix a crash when computing the average of an optional integer property.
-* Fix incorrect search results for some queries on integer properties.
-* Fix performance problems when creating large numbers of objects with
-  `RLMArray`/`List` properties.
+* Fix crash when trying to retrieve object instances via `dynamicObjects`.
+* Fix crashes or incorrect results when calling `-[RLMRealm refresh]` during
+  fast enumeration.
+* Add `Int8` support for `RealmOptional`, `MinMaxType` and `AddableType`.
 * Set the default value for newly added non-optional NSData properties to a
   zero-byte NSData rather than nil.
 * Fix a potential crash when deleting all objects of a class.
-* Add error-checking for nil realm parameters in many methods such as
-  `+[RLMObject allObjectsInRealm:]`.
+* Fix performance problems when creating large numbers of objects with
+  `RLMArray`/`List` properties.
 * Fix memory leak when using Object(value:) for subclasses with
   `List` or `RealmOptional` properties.
-* Fix crash when trying to retrieve object instances via `dynamicObjects`.
-* Add `Int8` support for `RealmOptional`, `MinMaxType` and `AddableType`.
-* Fix crashes or incorrect results when calling `-[RLMRealm refresh]` during
-  fast enumeration.
+* Fix a crash when computing the average of an optional integer property.
+* Fix incorrect search results for some queries on integer properties.
+* Add error-checking for nil realm parameters in many methods such as
+  `+[RLMObject allObjectsInRealm:]`.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
