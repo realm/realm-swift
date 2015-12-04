@@ -242,7 +242,7 @@ build_docs() {
     if [[ "$language" == "swift" ]]; then
         : ${REALM_SWIFT_VERSION:=2.1}
         ./build.sh set-swift-version
-        xcodebuild_arguments="-scheme,RealmSwift"
+        xcodebuild_arguments="-project,RealmSwift.xcodeproj,-scheme,RealmSwift"
         module="RealmSwift"
         objc=""
     fi
