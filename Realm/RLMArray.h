@@ -228,6 +228,9 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
 
+/// :nodoc:
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
+
 /**
  Gets the index of the first object matching the predicate.
 
@@ -245,6 +248,9 @@ RLM_ASSUME_NONNULL_BEGIN
  @return                An RLMResults of objects that match the given predicate
  */
 - (RLMResults RLM_GENERIC_RETURN*)objectsWhere:(NSString *)predicateFormat, ...;
+
+/// :nodoc:
+- (RLMResults RLM_GENERIC_RETURN*)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
 /**
  Get objects matching the given predicate in the RLMArray.
