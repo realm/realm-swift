@@ -435,7 +435,10 @@ RLM_ARRAY_TYPE(MigrationObject);
 
     RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
     [realm beginWriteTransaction];
-    [realm createObject:CircleObject.className withValue:@[NSNull.null, @"data"]];
+    [realm createObject:CircleObject.className withValue:@[@"data", NSNull.null]];
+
+    // -createObject:withValue: takes values in the order the properties were declared.
+    RLMAssertThrowsWithReasonMatching(([realm createObject:CircleObject.className withValue:@[NSNull.null, @"data"]]), @"object of type 'CircleObject'");
     [realm commitWriteTransaction];
 
     // accessors should work
@@ -464,6 +467,13 @@ RLM_ARRAY_TYPE(MigrationObject);
     for (NSUInteger i = 0; i < properties.count; i++) {
         XCTAssertEqual([properties[i] column], i);
     }
+
+    [realm beginWriteTransaction];
+    [realm createObject:CircleObject.className withValue:@[@"data", NSNull.null]];
+
+    // -createObject:withValue: takes values in the order the properties were declared.
+    RLMAssertThrowsWithReasonMatching(([realm createObject:CircleObject.className withValue:@[NSNull.null, @"data"]]), @"object of type 'CircleObject'");
+    [realm commitWriteTransaction];
 }
 
 - (void)testAccessorCreationForReadOnlyRealms {
