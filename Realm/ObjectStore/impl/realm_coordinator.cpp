@@ -288,7 +288,7 @@ void RealmCoordinator::do_unregister_query(AsyncQuery& registration)
         // Make sure we aren't holding on to read versions needlessly if there
         // are no queries left, but don't close them entirely as opening shared
         // groups is expensive
-        if (m_queries.empty() && m_query_sg) {
+        if (!m_running_queries && m_queries.empty() && m_query_sg) {
             m_query_sg->end_read();
         }
     }
@@ -331,6 +331,10 @@ void RealmCoordinator::run_async_queries()
 
     advance_helper_shared_group_to_latest();
 
+    // Tell other threads not to close the shared group as we need it even
+    // though we aren't holding the lock
+    m_running_queries = true;
+
     // Make a copy of the queries vector so that we can release the lock while
     // we run the queries
     auto queries_to_run = m_queries;
@@ -345,6 +349,13 @@ void RealmCoordinator::run_async_queries()
     lock.lock();
     for (auto& query : queries_to_run) {
         query->prepare_handover();
+    }
+
+    // Check if all queries were removed while we were running them, as if so
+    // the shared group didn't get closed by do_unregister_query()
+    m_running_queries = false;
+    if (m_queries.empty()) {
+        m_query_sg->end_read();
     }
 }
 

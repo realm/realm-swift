@@ -91,6 +91,7 @@ private:
     std::vector<CachedRealm> m_cached_realms;
 
     std::mutex m_query_mutex;
+    bool m_running_queries = false;
     std::vector<std::shared_ptr<_impl::AsyncQuery>> m_new_queries;
     std::vector<std::shared_ptr<_impl::AsyncQuery>> m_queries;
 
