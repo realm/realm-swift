@@ -38,6 +38,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix incorrect search results for some queries on integer properties.
 * Add error-checking for nil realm parameters in many methods such as
   `+[RLMObject allObjectsInRealm:]`.
+* Fix a race condition between commits and opening Realm files on new threads
+  that could lead to a crash.
+* Fix several crashes when opening Realm files.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
