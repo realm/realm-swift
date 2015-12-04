@@ -532,10 +532,12 @@ public:
     bool insert_group_level_table(size_t, size_t, StringData) noexcept { return false; }
     bool erase_group_level_table(size_t, size_t) noexcept { return false; }
     bool rename_group_level_table(size_t, StringData) noexcept { return false; }
+    bool move_group_level_table(size_t, size_t) noexcept { return false; }
     bool insert_column(size_t, DataType, StringData, bool) { return false; }
     bool insert_link_column(size_t, DataType, StringData, size_t, size_t) { return false; }
     bool erase_column(size_t) { return false; }
     bool erase_link_column(size_t, size_t, size_t) { return false; }
+    bool move_column(size_t, size_t) { return false; }
     bool rename_column(size_t, StringData) { return false; }
     bool add_search_index(size_t) { return false; }
     bool remove_search_index(size_t) { return false; }
@@ -585,7 +587,7 @@ public:
         return true;
     }
 
-    bool select_link_list(size_t col, size_t row) {
+    bool select_link_list(size_t col, size_t row, size_t) {
         activeLinkList = nullptr;
         for (auto& o : observers) {
             if (o.table == currentTable && o.row == row) {
@@ -708,36 +710,28 @@ public:
 
     // Things that just mark the field as modified
     bool set_int(size_t col, size_t row, int_fast64_t) { return markDirty(row, col); }
+    bool set_int_unique(size_t col, size_t row, int_fast64_t) { return markDirty(row, col); }
     bool set_bool(size_t col, size_t row, bool) { return markDirty(row, col); }
     bool set_float(size_t col, size_t row, float) { return markDirty(row, col); }
     bool set_double(size_t col, size_t row, double) { return markDirty(row, col); }
     bool set_string(size_t col, size_t row, StringData) { return markDirty(row, col); }
+    bool set_string_unique(size_t col, size_t row, StringData) { return markDirty(row, col); }
     bool set_binary(size_t col, size_t row, BinaryData) { return markDirty(row, col); }
     bool set_date_time(size_t col, size_t row, DateTime) { return markDirty(row, col); }
     bool set_table(size_t col, size_t row) { return markDirty(row, col); }
     bool set_mixed(size_t col, size_t row, const Mixed&) { return markDirty(row, col); }
-    bool set_link(size_t col, size_t row, size_t) { return markDirty(row, col); }
+    bool set_link(size_t col, size_t row, size_t, size_t) { return markDirty(row, col); }
     bool set_null(size_t col, size_t row) { return markDirty(row, col); }
-    bool nullify_link(size_t col, size_t row) { return markDirty(row, col); }
+    bool nullify_link(size_t col, size_t row, size_t) { return markDirty(row, col); }
+    bool insert_substring(size_t col, size_t row, size_t, StringData) { return markDirty(row, col); }
+    bool erase_substring(size_t col, size_t row, size_t, size_t) { return markDirty(row, col); }
 
     // Things we don't need to do anything for
     bool optimize_table() { return false; }
 
     // Things that we don't do in the binding
     bool select_descriptor(int, const size_t*) { return true; }
-    bool row_insert_complete() { return false; }
-    bool add_int_to_column(size_t, int_fast64_t) { return false; }
-    bool insert_int(size_t, size_t, size_t, int_fast64_t) { return false; }
-    bool insert_bool(size_t, size_t, size_t, bool) { return false; }
-    bool insert_float(size_t, size_t, size_t, float) { return false; }
-    bool insert_double(size_t, size_t, size_t, double) { return false; }
-    bool insert_string(size_t, size_t, size_t, StringData) { return false; }
-    bool insert_binary(size_t, size_t, size_t, BinaryData) { return false; }
-    bool insert_date_time(size_t, size_t, size_t, DateTime) { return false; }
-    bool insert_table(size_t, size_t, size_t) { return false; }
-    bool insert_mixed(size_t, size_t, size_t, const Mixed&) { return false; }
-    bool insert_link(size_t, size_t, size_t, size_t) { return false; }
-    bool insert_link_list(size_t, size_t, size_t) { return false; }
+    bool swap_rows(size_t, size_t) { return true; }
 };
 }
 

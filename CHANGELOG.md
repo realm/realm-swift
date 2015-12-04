@@ -1,3 +1,22 @@
+0.96.3 Release notes (2015-12-04)
+=============================================================
+
+### Enhancements
+
+* Rework the implementation of encrypted Realms to no longer interfere with
+  debuggers.
+* Queries are no longer limited to 16 levels of grouping.
+
+### Bugfixes
+
+* Fix a crash when computing the average of an optional integer property.
+* Fix incorrect search results for some queries on integer properties.
+* Fix performance problems when creating large numbers of objects with
+  `RLMArray`/`List` properties.
+* Set the default value for newly added non-optional NSData properties to a
+  zero-byte NSData rather than nil.
+* Fix a potential crash when deleting all objects of a class.
+
 0.96.2 Release notes (2015-10-26)
 =============================================================
 
