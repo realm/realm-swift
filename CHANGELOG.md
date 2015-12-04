@@ -41,6 +41,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix a race condition between commits and opening Realm files on new threads
   that could lead to a crash.
 * Fix several crashes when opening Realm files.
+* `-[RLMObject createInRealm:withValue:]`, `-[RLMObject createOrUpdateInRealm:withValue:]`, and
+  their variants for the default Realm now always match the contents of an `NSArray` against properties
+  in the same order as they are defined in the model,.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================
