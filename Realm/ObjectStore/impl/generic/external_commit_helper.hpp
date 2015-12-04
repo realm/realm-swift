@@ -40,12 +40,12 @@ public:
 private:
     RealmCoordinator& m_parent;
 
-    // The listener thread
-    std::future<void> m_thread;
-
     // A shared group used to listen for changes
     std::unique_ptr<ClientHistory> m_history;
     SharedGroup m_sg;
+
+    // The listener thread
+    std::future<void> m_thread;
 };
 
 } // namespace _impl
