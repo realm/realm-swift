@@ -16,9 +16,9 @@ SWIFT_ZIP = BUILD + "realm-swift-#{VERSION}.zip"
 CARTHAGE_ZIP = BUILD + 'Carthage.framework.zip'
 
 puts 'Creating Carthage release zip'
-system('carthage', 'build', '--no-skip-current')
-system('carthage', 'archive', 'Realm', '--output', CARTHAGE_ZIP.to_path)
-system('carthage', 'archive', 'RealmSwift', '--output', CARTHAGE_ZIP.to_path)
+system('carthage', 'build', '--no-skip-current', '-v') || exit(1)
+system('carthage', 'archive', 'Realm', '--output', CARTHAGE_ZIP.to_path) || exit(1)
+system('carthage', 'archive', 'RealmSwift', '--output', CARTHAGE_ZIP.to_path) || exit(1)
 
 REPOSITORY = 'realm/realm-cocoa'
 
