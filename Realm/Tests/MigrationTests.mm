@@ -973,4 +973,32 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:0], obj.date);
 }
 
+- (void)testMigrationAfterReorderingProperties {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:RequiredPropertiesObject.class];
+    // Create a table where the order of columns does not match the order the properties are declared in the class.
+    objectSchema.properties = @[ objectSchema.properties[2], objectSchema.properties[0], objectSchema.properties[1] ];
+
+    [self createTestRealmWithSchema:@[objectSchema] block:^(RLMRealm *realm) {
+        // We use a dictionary here to ensure that the test reaches the migration case below, even if the non-migration
+        // case doesn't handle the ordering correctly. The non-migration case is tested in testRearrangeProperties.
+        [RequiredPropertiesObject createInRealm:realm withValue:@{ @"stringCol": @"Hello", @"dateCol": [NSDate date], @"binaryCol": [NSData data] }];
+    }];
+
+    objectSchema = [RLMObjectSchema schemaForObjectClass:RequiredPropertiesObject.class];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.path = RLMTestRealmPath();
+    config.customSchema = [self schemaWithObjects:@[objectSchema]];
+    config.schemaVersion = 1;
+    config.migrationBlock = ^(RLMMigration *migration, uint64_t) {
+        [migration createObject:RequiredPropertiesObject.className withValue:@[@"World", [NSData data], [NSDate date]]];
+    };
+
+    XCTAssertNil([RLMRealm migrateRealm:config]);
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+
+    RLMResults *allObjects = [RequiredPropertiesObject allObjectsInRealm:realm];
+    XCTAssertEqualObjects(@"Hello", [allObjects[0] stringCol]);
+    XCTAssertEqualObjects(@"World", [allObjects[1] stringCol]);
+}
+
 @end
