@@ -11,13 +11,23 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* Queries are no longer limited to 16 levels of grouping.
 * The block parameter of `-[RLMRealm transactionWithBlock:]`/`Realm.write(_:)` is 
   now marked as `__attribute__((noescape))`/`@noescape`.
-* Rework the implementation of encrypted Realms to no longer interfere with
-  debuggers.
 * Many forms of queries with key paths on both sides of the comparison operator
   are now supported.
+
+### Bugfixes
+
+* None.
+
+0.96.3 Release notes (2015-12-04)
+=============================================================
+
+### Enhancements
+
+* Queries are no longer limited to 16 levels of grouping.
+* Rework the implementation of encrypted Realms to no longer interfere with
+  debuggers.
 
 ### Bugfixes
 
