@@ -528,88 +528,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 namespace {
-class QueueCallback : public realm::AsyncQueryCallback {
-public:
-    QueueCallback(void (^block)(RLMResults *, NSError *), dispatch_queue_t queue, NSString *objectClassName, RLMRealmConfiguration *config)
-    : _block(block), _queue(queue), _objectClassName(objectClassName), _config(config) {
-        dispatch_queue_set_specific(queue, this, this, nullptr);
-    }
-
-    ~QueueCallback() {
-        dispatch_queue_set_specific(_queue, this, nullptr, nullptr);
-    }
-
-    void deliver(Results r) override {
-        @autoreleasepool {
-            // This call can't fail because the SharedRealm is already open
-            RLMRealm *realm = [RLMRealm realmWithConfiguration:_config error:nil];
-            RLMResults *results = _previousResults;
-            if (results) {
-                if (results->_realm != realm) {
-                    results->_realm = realm;
-                    results.objectSchema = realm.schema[_objectClassName];
-                }
-                results->_results = std::move(r);
-            }
-            else {
-                results = [RLMResults resultsWithObjectSchema:realm.schema[_objectClassName]
-                                                      results:std::move(r)];
-                _previousResults = results;
-            }
-
-            _block(results, nil);
-        }
-    }
-
-    void error(std::exception_ptr err) override {
-        try {
-            rethrow_exception(err);
-        }
-        catch (...) {
-            NSError *error;
-            RLMRealmTranslateException(&error);
-            _block(nil, error);
-        }
-    }
-
-    void update_ready() override {
-        __weak auto block = _block;
-        auto config = _config;
-        void *key = this;
-        dispatch_async(_queue, ^{
-            if (dispatch_get_specific(key) != key) {
-                // Query was stopped after this was dispatched, so skip opening
-                // the Realm pointlessly
-                return;
-            }
-
-            @autoreleasepool {
-                NSError *error;
-                RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:&error];
-                if (realm) {
-                    realm->_realm->read_group();
-                    realm->_realm->notify();
-                }
-                else {
-                    block(nil, error);
-                }
-            }
-        });
-    }
-
-    bool is_for_current_thread() override {
-        return dispatch_get_specific(this) == this;
-    }
-
-private:
-    void (^_block)(RLMResults *, NSError *);
-    const dispatch_queue_t _queue;
-    NSString *const _objectClassName;
-    RLMRealmConfiguration *const _config;
-
-    __weak RLMResults *_previousResults = nil;
-};
-
 class RunloopCallback : public realm::AsyncQueryCallback {
 public:
     RunloopCallback(RLMResults *results, void (^block)(RLMResults *, NSError *))
@@ -658,15 +576,6 @@ private:
     [_realm verifyThread];
 
     auto token = _results.async(std::make_unique<RunloopCallback>(self, block));
-    return [[RLMCancellationToken alloc] initWithToken:std::move(token)];
-}
-
-- (RLMCancellationToken *)deliverOn:(dispatch_queue_t)queue
-                              block:(void (^)(RLMResults *, NSError *))block {
-    [_realm verifyThread];
-    auto token = _results.async(std::make_unique<QueueCallback>(block, queue,
-                                                               self.objectClassName,
-                                                               _realm.configuration));
     return [[RLMCancellationToken alloc] initWithToken:std::move(token)];
 }
 #pragma clang diagnostic pop

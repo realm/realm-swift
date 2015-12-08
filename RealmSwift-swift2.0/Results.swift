@@ -332,53 +332,6 @@ public final class Results<T: Object>: ResultsBase {
             }
         }
     }
-
-    // MARK: Asynchronous Queries
-
-    /**
-     Asynchronously run this query and then pass the result to the block on the given dispatch queue.
-
-     The block will be called again after each write transaction which changes
-     the result of the query. You must retain the returned token for as long as
-     you want the results to continue to be sent to the block. To stop
-     receiving updates, call .stop() on the token.
-
-     The determination for if the results have changed is currently very
-     coarse, but will become more precise in future versions.
-
-     If an error occurs the block will be called with `nil` for the results
-     parameter and a non-`nil` error. Currently the only errors that can occur
-     are when opening the Realm on the background worker thread or the
-     destination queue fails.
-
-     The Results passed to the block is a normal auto-updating Results object.
-     This means that if you perform a write transaction or explicitly call
-     realm.refresh() from within the block, the query may be synchronously
-     rerun the next time you access the results.
-
-     - warning: This method cannot be called during a write transaction, or when
-                the containing realm is read-only.
-
-     - parameter queue: The dispatch queue onto which the results should be delivered.
-     - parameter block: The block to be called on the given `queue` with the queue-local copy of the results.
-     - returns: A token which must be held for as long as you want query results to be delivered.
-     */
-    public func deliverOn(queue: dispatch_queue_t, block: (Results<T>?, NSError?) -> ()) -> NotificationToken {
-        weak var cachedResults: Results<T>? = nil
-        return rlmResults.deliverOn(queue) { results, error in
-            guard let results = results else {
-                block(nil, error)
-                return
-            }
-            if let cachedResults = cachedResults {
-                block(cachedResults, nil) // contained RLMResults has been updated already
-            } else {
-                let r = Results<T>(results)
-                cachedResults = r
-                block(r, nil)
-            }
-        }
-    }
 }
 
 extension Results: RealmCollectionType {

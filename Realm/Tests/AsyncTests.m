@@ -214,10 +214,9 @@
     ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
     [realm commitWriteTransaction];
 
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    dispatch_queue_t queue = dispatch_queue_create("queue", 0);
+    __block XCTestExpectation *expectation = [self expectationWithDescription:@""];
     __block int expected = 0;
-    id token = [[array.intArray objectsWhere:@"intCol > 0"] deliverOn:queue block:^(RLMResults *results, NSError *e) {
+    id token = [[array.intArray objectsWhere:@"intCol > 0"] addNotificationBlock:^(RLMResults *results, NSError *e) {
         XCTAssertNil(e);
         XCTAssertNotNil(results);
         XCTAssertEqual((int)results.count, expected);
@@ -225,20 +224,26 @@
             XCTAssertEqual([results[i] intCol], i + 1);
         }
         ++expected;
-        dispatch_semaphore_signal(sema);
+        [expectation fulfill];
     }];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     for (int i = 0; i < 3; ++i) {
-        // Create two objects, one in the list and one not, to verify that the
-        // LinkList is actually be used
-        [realm beginWriteTransaction];
-        [IntObject createInRealm:realm withValue:@[@(i + 1)]];
-        [array.intArray addObject:[IntObject createInRealm:realm withValue:@[@(i + 1)]]];
-        [realm commitWriteTransaction];
-        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+        expectation = [self expectationWithDescription:@""];
+        [self dispatchAsyncAndWait:^{
+            RLMRealm *realm = [RLMRealm defaultRealm];
+            ArrayPropertyObject *array = [[ArrayPropertyObject allObjectsInRealm:realm] firstObject];
+
+            // Create two objects, one in the list and one not, to verify that the
+            // LinkList is actually be used
+            [realm beginWriteTransaction];
+            [IntObject createInRealm:realm withValue:@[@(i + 1)]];
+            [array.intArray addObject:[IntObject createInRealm:realm withValue:@[@(i + 1)]]];
+            [realm commitWriteTransaction];
+        }];
+        [self waitForExpectationsWithTimeout:2.0 handler:nil];
     }
-    dispatch_sync(queue, ^{});
+
     [token stop];
 }
 
@@ -300,45 +305,53 @@
     [token stop];
 }
 
-- (void)testStaleResultsAreDiscardedWhenTargetQueueIsBlocked {
-    dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_SERIAL);
+- (void)testStaleResultsAreDiscardedWhenThreadIsBlocked {
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    id token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, NSError *e) {
+        // Will fail if this is called with the initial results
+        XCTAssertEqual(1U, results.count);
+        // Will fail if it's called twice
+        [expectation fulfill];
+    }];
+
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
-    // Block the target queue so that it can't receive the initial results until
-    // after we've made another commit
-    dispatch_semaphore_t results_ready_sema = dispatch_semaphore_create(0);
-    dispatch_async(queue , ^{
-        dispatch_semaphore_signal(sema);
-        dispatch_semaphore_wait(results_ready_sema, DISPATCH_TIME_FOREVER);
+    // Add a notification block on a background thread and wait for it to have been added
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        @autoreleasepool {
+            __block RLMNotificationToken *token;
+            CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+                token = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+                    CFRunLoopStop(CFRunLoopGetCurrent());
+                    dispatch_semaphore_signal(sema);
+                    [realm removeNotification:token];
+                    token = nil;
+                }];
+                dispatch_semaphore_signal(sema);
+            });
 
+            CFRunLoopRun();
+        }
+        dispatch_semaphore_signal(sema);
     });
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 
-    // Set up the async query
-    __block int calls = 0;
-    id token = [IntObject.allObjects deliverOn:queue block:^(RLMResults *results, NSError *e) {
-        ++calls;
-        XCTAssertEqual(1U, results.count);
-        dispatch_semaphore_signal(sema);
-    }];
-
-    [self waitForNotification:RLMRealmDidChangeNotification realm:RLMRealm.defaultRealm block:^{
-        [RLMRealm.defaultRealm transactionWithBlock:^{
-            [IntObject createInDefaultRealmWithValue:@[@0]];
-        } error:nil];
-    }];
-
-    dispatch_semaphore_signal(results_ready_sema);
+    // Make a commit on a background thread, and wait for the notification for
+    // it to have been sent to the other background thread (which happens only
+    // after all queries have run)
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        @autoreleasepool {
+            [RLMRealm.defaultRealm transactionWithBlock:^{
+                [IntObject createInDefaultRealmWithValue:@[@0]];
+            } error:nil];
+        }
+    });
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 
-    dispatch_sync(queue, ^{});
-
-    // Should only have been called for the update and not the initial results
-    XCTAssertEqual(1, calls);
+    // Only now let the main thread pick up the notifications
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
     [token stop];
-}
-
-- (void)testStaleResultsAreDiscardedWhenManuallyRefreshing {
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 }
 
 - (void)testStaleResultsAreDiscardedEvenAfterBeingQueuedForDelivery {
@@ -388,90 +401,6 @@
     [token2 stop];
 }
 
-- (void)testDeliverToQueueVersionHandling {
-    // This is the same as the above test, except delivering to a background queue
-
-    dispatch_queue_t queue = dispatch_queue_create("queue", 0);
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    __block int firstBlockCalls = 0;
-    __block int secondBlockCalls = 0;
-
-    id token = [IntObject.allObjects deliverOn:queue block:^(RLMResults *results, NSError *e) {
-        ++firstBlockCalls;
-        if (firstBlockCalls == 1 || firstBlockCalls == 3) {
-            dispatch_semaphore_signal(sema);
-        }
-        else {
-            [results.realm beginWriteTransaction];
-            [IntObject createInDefaultRealmWithValue:@[@1]];
-            [results.realm commitWriteTransaction];
-        }
-    }];
-
-    id token2 = [IntObject.allObjects deliverOn:queue block:^(RLMResults *results, NSError *e) {
-        ++secondBlockCalls;
-        dispatch_semaphore_signal(sema);
-    }];
-
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-
-    [RLMRealm.defaultRealm transactionWithBlock:^{
-        [IntObject createInDefaultRealmWithValue:@[@0]];
-    } error:nil];
-
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-
-    XCTAssertEqual(3, firstBlockCalls);
-    XCTAssertEqual(2, secondBlockCalls);
-
-    dispatch_sync(queue, ^{});
-    [token stop];
-    [token2 stop];
-}
-
-- (void)testCancelSubscriptionWithPendingReadyResults {
-    // This test relies on the specific order in which things are called after
-    // a commit, which is an implementation detail that could change
-
-    dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_SERIAL);
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-
-    // Create the async query and wait for the first run of it to complete
-    __block int calls = 0;
-    RLMNotificationToken *queryToken = [IntObject.allObjects deliverOn:queue block:^(RLMResults *results, NSError *e) {
-        ++calls;
-        dispatch_semaphore_signal(sema);
-    }];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-
-    // Block the queue which we've asked for results to be delivered on until
-    // the main thread gets a commit notification, which happens only after
-    // all async queries are ready
-    dispatch_semaphore_t results_ready_sema = dispatch_semaphore_create(0);
-    dispatch_async(queue , ^{
-        dispatch_semaphore_signal(sema);
-        dispatch_semaphore_wait(results_ready_sema, DISPATCH_TIME_FOREVER);
-
-    });
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-
-    [self waitForNotification:RLMRealmDidChangeNotification realm:RLMRealm.defaultRealm block:^{
-        [RLMRealm.defaultRealm transactionWithBlock:^{
-            [IntObject createInDefaultRealmWithValue:@[@0]];
-        } error:nil];
-    }];
-
-    [queryToken stop];
-    dispatch_semaphore_signal(results_ready_sema);
-
-    dispatch_sync(queue, ^{});
-
-    // Should have been called for the first run, but not after the commit
-    XCTAssertEqual(1, calls);
-}
-
 - (void)testErrorHandling {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
@@ -511,136 +440,7 @@
     [token2 stop];
 }
 
-- (void)testQueueErrorHandling {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-
-    // Force an error when opening the helper SharedGroups by deleting the file
-    // after opening the Realm
-    [NSFileManager.defaultManager removeItemAtPath:realm.path error:nil];
-
-    dispatch_queue_t queue = dispatch_queue_create("queue", 0);
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    __block bool called = false;
-    id token = [IntObject.allObjects deliverOn:queue block:^(RLMResults *results, NSError *error) {
-        XCTAssertNil(results);
-        XCTAssertNotNil(error);
-        XCTAssertFalse(called);
-        called = true;
-        dispatch_semaphore_signal(sema);
-    }];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-
-    // Neither adding a new async query nor commiting a write transaction should
-    // cause it to resend the error
-    id token2 = [IntObject.allObjects deliverOn:queue block:^(RLMResults *results, NSError *error) {
-        XCTAssertNil(results);
-        XCTAssertNotNil(error);
-        dispatch_semaphore_signal(sema);
-    }];
-    [realm beginWriteTransaction];
-    [IntObject createInDefaultRealmWithValue:@[@0]];
-    [realm commitWriteTransaction];
-
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-    dispatch_sync(queue, ^{});
-    [token stop];
-    [token2 stop];
-}
-
-- (void)testErrorWhenDelivering {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-
-    dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_SERIAL);
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-
-    // Create the async query and wait for the first run of it to complete
-    __block bool first = true;
-    id token = [IntObject.allObjects deliverOn:queue block:^(RLMResults *results, NSError *e) {
-        if (first) {
-            XCTAssertNil(e);
-            XCTAssertNotNil(results);
-            first = false;
-        }
-        else {
-            XCTAssertNil(results);
-            XCTAssertNotNil(e);
-        }
-        dispatch_semaphore_signal(sema);
-    }];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-
-    // Block the queue which we've asked for results to be delivered on until
-    // the main thread gets a commit notification, which happens only after
-    // all async queries are ready
-    dispatch_semaphore_t results_ready_sema = dispatch_semaphore_create(0);
-    dispatch_async(queue , ^{
-        dispatch_semaphore_signal(sema);
-        dispatch_semaphore_wait(results_ready_sema, DISPATCH_TIME_FOREVER);
-
-        // Once results are ready, delete the Realm file so that delivering them
-        // to the queue will fail
-        [NSFileManager.defaultManager removeItemAtPath:realm.path error:nil];
-    });
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-
-    [self waitForNotification:RLMRealmDidChangeNotification realm:RLMRealm.defaultRealm block:^{
-        [RLMRealm.defaultRealm transactionWithBlock:^{
-            [IntObject createInDefaultRealmWithValue:@[@0]];
-        } error:nil];
-    }];
-
-    dispatch_semaphore_signal(results_ready_sema);
-
-    dispatch_sync(queue, ^{});
-    [token stop];
-}
-
-- (void)testRLMResultsInstanceIsReusedWhenRetainedExternally {
-    dispatch_queue_t queue = dispatch_queue_create("queue", 0);
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    __block RLMResults *prev;
-    __block bool first = true;
-    id token = [IntObject.allObjects deliverOn:queue block:^(RLMResults *results, NSError *e) {
-        if (first) {
-            prev = results;
-            first = false;
-        }
-        else {
-            XCTAssertEqual(prev, results); // deliberately not EqualObjects
-        }
-        dispatch_semaphore_signal(sema);
-    }];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-
-    [self createObject:1];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-    [token stop];
-
-    dispatch_sync(queue, ^{});
-}
-
-- (void)testRLMResultsInstanceIsHeldWeaklyForDeliverOn {
-    dispatch_queue_t queue = dispatch_queue_create("queue", 0);
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-   __weak __block RLMResults *prev;
-    id token = [IntObject.allObjects deliverOn:queue block:^(RLMResults *results, NSError *e) {
-        XCTAssertNotNil(results);
-        XCTAssertNil(e);
-        XCTAssertNil(prev);
-        prev = results;
-        dispatch_semaphore_signal(sema);
-    }];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-
-    [self createObject:1];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-    dispatch_sync(queue, ^{});
-
-    XCTAssertNil(prev);
-    [token stop];
-}
-
-- (void)testRLMResultsInstanceIsHeldStronglyForThreadLocalNotifications {
+- (void)testRLMResultsInstanceIsRedused {
    __weak __block RLMResults *prev;
     __block bool first = true;
 
@@ -706,57 +506,6 @@
 
     [token stop];
     XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
-}
-
-- (void)testResultsAreDeliveredToTheCorrectQueue {
-    dispatch_queue_t queues[6];
-    for (int i = 0; i < 5; ++i) {
-        queues[i] = dispatch_queue_create("background queue", 0);
-    }
-    queues[5] = dispatch_get_main_queue();
-
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    id tokens[6];
-    for (int i = 0; i < 6; ++i) {
-        dispatch_queue_t queue = queues[i];
-        tokens[i] = [IntObject.allObjects deliverOn:queue block:^(RLMResults *results, NSError *error) {
-            XCTAssertNotNil(results);
-            XCTAssertNil(error);
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-            XCTAssertEqual(dispatch_get_current_queue(), queue);
-#pragma clang diagnostic pop
-
-            dispatch_semaphore_signal(sema);
-        }];
-    }
-
-    dispatch_block_t waitForAll = ^{
-        XCTestExpectation *expectation = [self expectationWithDescription:@"background wait"];
-        dispatch_async(dispatch_get_global_queue(0, 0), ^{
-            for (int i = 0; i < 6; ++i) {
-                dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-            }
-            [expectation fulfill];
-        });
-        [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    };
-
-    waitForAll();
-
-    [self dispatchAsyncAndWait:^{
-        [RLMRealm.defaultRealm transactionWithBlock:^{
-            [IntObject createInDefaultRealmWithValue:@[@0]];
-        }];
-    }];
-
-    waitForAll();
-
-    for (int i = 0; i < 5; ++i) {
-        dispatch_sync(queues[i], ^{});
-        [tokens[i] stop];
-    }
 }
 
 - (void)testAddAndRemoveQueries {

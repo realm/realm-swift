@@ -203,25 +203,6 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results, NSError *__nullable error))block;
 
-#pragma mark - Asynchronous Queries
-
-/**
- Asynchronously run this query and then pass the result to the block on the given dispatch queue.
-
- This is similar to `addNotificationBlock:`, but rather than delivering the
- results on the current thread, the results are delivered to the given dispatch
- queue.
-
- @warning This method cannot be called during a write transaction, or when the
-          containing realm is read-only.
-
- @param queue The dispatch queue onto which the results should be delivered.
- @param block The block to be called on the given `queue` with the queue-local copy of the results.
- @return A token which must be held for as long as you want query results to be delivered.
- */
-- (RLMNotificationToken *)deliverOn:(dispatch_queue_t)queue
-                              block:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results, NSError *__nullable error))block;
-
 #pragma mark - Aggregating Property Values
 
 /**

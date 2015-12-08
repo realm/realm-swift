@@ -94,17 +94,12 @@ void AsyncQuery::prepare_handover()
     if (m_did_update || (m_tv_handover && m_tv_handover->version != m_sg->get_version_of_current_transaction())) {
         m_tv_handover = m_sg->export_for_handover(m_tv, ConstSourcePayload::Copy);
     }
-
-    if (m_did_update) {
-        m_callback->update_ready();
-    }
 }
 
 void AsyncQuery::set_error(std::exception_ptr err)
 {
     if (!m_error) {
         m_error = err;
-        m_callback->update_ready();
     }
 }
 

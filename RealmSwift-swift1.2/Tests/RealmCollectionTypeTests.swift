@@ -337,61 +337,6 @@ class ResultsTests: RealmCollectionTypeTests {
             realm.create(SwiftStringObject.self, value: ["a"])
         }
     }
-
-    func testDeliverToQueue() {
-        let collection = collectionBase()
-
-        let realm = realmWithTestPath()
-        realm.commitWrite()
-
-        let queue = dispatch_queue_create("queue", nil)
-        let sema = dispatch_semaphore_create(0)
-        var calls = 0
-        let token = collection.deliverOn(queue) { results, error in
-            XCTAssertNil(error)
-            XCTAssertNotNil(results)
-
-            XCTAssertEqual(results!.count, calls + 2)
-            ++calls
-
-            dispatch_semaphore_signal(sema)
-        }
-        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER)
-
-        addObjectToResults()
-        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER)
-
-        dispatch_sync(queue) { }
-        token.stop()
-        realm.beginWrite()
-    }
-
-    func testDeliverToMainThread() {
-        let collection = collectionBase()
-
-        let realm = realmWithTestPath()
-        realm.commitWrite()
-
-        var expectation = expectationWithDescription("")
-        var calls = 0
-        let token = collection.deliverOnMainThread { results, error in
-            XCTAssertNil(error)
-            XCTAssertNotNil(results)
-
-            XCTAssertEqual(results!.count, calls + 2)
-            ++calls
-
-            expectation.fulfill()
-        }
-        waitForExpectationsWithTimeout(1, handler: nil)
-
-        expectation = expectationWithDescription("")
-        addObjectToResults()
-        waitForExpectationsWithTimeout(1, handler: nil)
-
-        token.stop()
-        realm.beginWrite()
-    }
 }
 
 class ResultsFromTableTests: ResultsTests {
@@ -421,7 +366,7 @@ class ResultsFromLinkViewTests: ResultsTests {
         let array = realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
         return array.array.filter(NSPredicate(value: true))
     }
-    
+
     override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
         let list = SwiftAggregateObjectList()
         realmWithTestPath().add(list)

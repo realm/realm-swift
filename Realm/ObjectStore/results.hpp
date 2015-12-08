@@ -65,10 +65,6 @@ public:
     // returned true
     virtual void error(std::exception_ptr) = 0;
 
-    // Called from the worker thread when the query is done running
-    // Can be used to notify other threads that they should wake up
-    virtual void update_ready() {}
-
     // Return whether or not this query is associated with the current thread
     virtual bool is_for_current_thread() { return true; }
 };
