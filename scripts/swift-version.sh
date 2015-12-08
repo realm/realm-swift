@@ -30,6 +30,9 @@ find_xcode_for_swift() {
     return 1
 }
 
+# If version is not set, try to initialize it from the current branch for names like 'swift-1.2'
+: ${REALM_SWIFT_VERSION:=$(git symbolic-ref --short HEAD 2>/dev/null | sed -E 's/(swift-([0-9]+\.[0-9]+))|.*/\2/g')}
+
 if [[ "$REALM_SWIFT_VERSION" ]]; then
     find_xcode_for_swift $REALM_SWIFT_VERSION
 else
