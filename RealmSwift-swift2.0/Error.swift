@@ -84,11 +84,22 @@ public enum Error: ErrorType {
     case IncompatibleLockFile
 }
 
+// MARK: Equatable
+
+extension Error: Equatable {}
+
+/// Returns whether the two errors are identical
+public func == (lhs: ErrorType, rhs: ErrorType) -> Bool {
+    return lhs._code == rhs._code
+        && lhs._domain == rhs._domain
+}
+
+// MARK: Pattern Matching
+
 /**
 Explicitly implement pattern matching for `Realm.Error`, so that the instances can be used in the
 `do … syntax`.
 */
 public func ~= (lhs: Error, rhs: ErrorType) -> Bool {
-    return lhs._code == rhs._code
-        && lhs._domain == rhs._domain
+    return lhs == rhs
 }
