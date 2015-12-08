@@ -509,18 +509,31 @@
 }
 
 - (void)testAddAndRemoveQueries {
+    RLMResults *results = IntObject.allObjects;
+    [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
+        XCTFail(@"results delivered after removal");
+    }] stop];
+
+    // Readd same results at same version
+    [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
+        XCTFail(@"results delivered after removal");
+    }] stop];
+
+    // Add different results at same version
     [[self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *r) {
         XCTFail(@"results delivered after removal");
     }] stop];
 
-    // Readd at same version
-    [[self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *r) {
-        XCTFail(@"results delivered after removal");
-    }] stop];
-
-    [RLMRealm.defaultRealm transactionWithBlock:^{ }];
+    [self waitForNotification:RLMRealmDidChangeNotification realm:RLMRealm.defaultRealm block:^{
+        [RLMRealm.defaultRealm transactionWithBlock:^{ }];
+    }];
 
     // Readd at later version
+    [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
+        XCTFail(@"results delivered after removal");
+    }] stop];
+
+    // Add different results at later version
     [[self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *r) {
         XCTFail(@"results delivered after removal");
     }] stop];

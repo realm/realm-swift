@@ -39,7 +39,7 @@ namespace realm {
     typedef std::weak_ptr<Realm> WeakRealm;
 
     namespace _impl {
-        class ExternalCommitHelper;
+        class AsyncQuery;
         class RealmCoordinator;
     }
 
@@ -136,6 +136,7 @@ namespace realm {
         // FIXME private
         Group *read_group();
 
+        friend class _impl::AsyncQuery;
         friend class _impl::RealmCoordinator;
     };
 

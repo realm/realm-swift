@@ -527,42 +527,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return translateErrors([&] { return _results.get_tableview(); });
 }
 
-namespace {
-class RunloopCallback : public realm::AsyncQueryCallback {
-public:
-    RunloopCallback(RLMResults *results, void (^block)(RLMResults *, NSError *))
-    : _block(block), _results(results)
-    {
-    }
-
-    void deliver(Results r) override {
-        @autoreleasepool {
-            _results->_results = std::move(r);
-            _block(_results, nil);
-        }
-    }
-
-    void error(std::exception_ptr err) override {
-        try {
-            rethrow_exception(err);
-        }
-        catch (...) {
-            NSError *error;
-            RLMRealmTranslateException(&error);
-            _block(nil, error);
-        }
-    }
-
-    bool is_for_current_thread() override {
-        return _results->_realm->_realm->thread_id() == std::this_thread::get_id();
-    }
-
-private:
-    void (^_block)(RLMResults *, NSError *);
-    RLMResults *const _results;
-};
-}
-
 // The compiler complains about the method's argument type not matching due to
 // it not having the generic type attached, but it doesn't seem to be possible
 // to actually include the generic type
@@ -574,8 +538,22 @@ private:
         @throw RLMException(@"Can only add notification blocks from within runloops.");
     }
     [_realm verifyThread];
+    auto token = _results.async([self, block](std::exception_ptr err) {
+        if (err) {
+            try {
+                rethrow_exception(err);
+            }
+            catch (...) {
+                NSError *error;
+                RLMRealmTranslateException(&error);
+                block(nil, error);
+            }
+        }
+        else {
+            block(self, nil);
+        }
+    });
 
-    auto token = _results.async(std::make_unique<RunloopCallback>(self, block));
     return [[RLMCancellationToken alloc] initWithToken:std::move(token)];
 }
 #pragma clang diagnostic pop

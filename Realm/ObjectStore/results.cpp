@@ -18,6 +18,7 @@
 
 #include "results.hpp"
 
+#include "async_query.hpp"
 #include "object_store.hpp"
 #include "realm_coordinator.hpp"
 
@@ -60,6 +61,13 @@ Results::Results(SharedRealm r, SortOrder s, TableView tv)
 , m_sort(std::move(s))
 , m_mode(Mode::TableView)
 {
+}
+
+Results::~Results()
+{
+    if (m_background_query) {
+        m_background_query->unregister();
+    }
 }
 
 void Results::validate_read() const
@@ -340,36 +348,59 @@ Results Results::filter(Query&& q) const
     return Results(m_realm, get_query().and_query(std::move(q)), get_sort());
 }
 
-Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t column, const Table* table) {
+AsyncQueryCancelationToken Results::async(std::function<void (std::exception_ptr)> target)
+{
+    if (m_realm->config().read_only) {
+        throw InvalidTransactionException("Cannot create asynchronous query for read-only Realms");
+    }
+    if (m_realm->is_in_transaction()) {
+        throw InvalidTransactionException("Cannot create asynchronous query while in a write transaction");
+    }
+
+    if (!m_background_query) {
+        m_background_query = std::make_shared<_impl::AsyncQuery>(*this);
+        _impl::RealmCoordinator::register_query(m_background_query);
+    }
+    return m_background_query->add_callback(std::move(target));
+}
+
+void Results::AsyncFriend::set_table_view(Results& results, realm::TableView &&tv)
+{
+    results.m_table_view = std::move(tv);
+    results.m_mode = Mode::TableView;
+    // needs https://github.com/realm/realm-core/pull/1392
+//    REALM_ASSERT(results.m_table_view.is_in_sync());
+}
+
+Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t column, const Table* table)
+{
     column_index = column;
     column_name = table->get_column_name(column);
     column_type = table->get_column_type(column);
 }
 
-AsyncQueryCancelationToken Results::async(std::unique_ptr<AsyncQueryCallback> target)
-{
-    return _impl::RealmCoordinator::register_query(*this, std::move(target));
-}
-
 AsyncQueryCancelationToken::~AsyncQueryCancelationToken()
 {
-    if (m_registration) {
-        _impl::RealmCoordinator::unregister_query(*m_registration);
+    if (m_query) {
+        m_query->remove_callback(m_token);
     }
 }
 
 AsyncQueryCancelationToken::AsyncQueryCancelationToken(AsyncQueryCancelationToken&& rgt)
-: m_registration(std::move(rgt.m_registration))
+: m_query(rgt.m_query), m_token(rgt.m_token)
 {
+    rgt.m_query = nullptr;
 }
 
 AsyncQueryCancelationToken& AsyncQueryCancelationToken::operator=(realm::AsyncQueryCancelationToken&& rgt)
 {
     if (this != &rgt) {
-        if (m_registration) {
-            _impl::RealmCoordinator::unregister_query(*m_registration);
+        if (m_query) {
+            m_query->remove_callback(m_token);
         }
-        m_registration = std::move(rgt.m_registration);
+        m_query = std::move(rgt.m_query);
+        m_token = rgt.m_token;
+        rgt.m_query = nullptr;
     }
     return *this;
 }
