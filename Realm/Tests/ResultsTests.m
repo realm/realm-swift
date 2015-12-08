@@ -541,6 +541,32 @@
     XCTAssertEqual(30, [(EmployeeObject *)filtered[1] age]);
 }
 
+- (void)testLiveUpdateFirst {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    [IntObject createInRealm:realm withValue:@[@0]];
+
+    RLMResults *objects = [IntObject objectsInRealm:realm where:@"intCol = 0"];
+    XCTAssertNotNil([objects firstObject]);
+    [objects.firstObject setIntCol:1];
+    XCTAssertNil([objects firstObject]);
+
+    [realm cancelWriteTransaction];
+}
+
+- (void)testLiveUpdateLast {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    [IntObject createInRealm:realm withValue:@[@0]];
+
+    RLMResults *objects = [IntObject objectsInRealm:realm where:@"intCol = 0"];
+    XCTAssertNotNil([objects lastObject]);
+    [objects.lastObject setIntCol:1];
+    XCTAssertNil([objects lastObject]);
+
+    [realm cancelWriteTransaction];
+}
+
 static vm_size_t get_resident_size() {
     struct task_basic_info info;
     mach_msg_type_number_t size = sizeof(info);
