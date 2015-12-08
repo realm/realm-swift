@@ -1184,7 +1184,20 @@ extern "C" {
 
     NSError *writeError;
     XCTAssertFalse([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
-    XCTAssertNotNil(writeError);
+    XCTAssertEqual(writeError.code, RLMErrorFileExists);
+}
+
+- (void)testCannotWriteInNotExistingDir
+{
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withValue:@[@0]];
+    }];
+
+
+    NSError *writeError;
+    XCTAssertFalse([realm writeCopyToPath:@"/tmp/RLMTestDirMayNotExist/foo" error:&writeError]);
+    XCTAssertEqual(writeError.code, RLMErrorFileNotFound);
 }
 
 - (void)testWritingCopyUsesWriteTransactionInProgress

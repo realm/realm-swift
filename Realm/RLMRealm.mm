@@ -701,6 +701,11 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             *error = RLMMakeError(RLMErrorFileExists, ex);
         }
     }
+    catch (File::NotFound &ex) {
+        if (error) {
+            *error = RLMMakeError(RLMErrorFileNotFound, ex);
+        }
+    }
     catch (File::AccessError &ex) {
         if (error) {
             *error = RLMMakeError(RLMErrorFileAccess, ex);
