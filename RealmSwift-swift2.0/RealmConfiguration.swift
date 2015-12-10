@@ -141,8 +141,10 @@ extension Realm {
             let configuration = RLMRealmConfiguration()
             if path != nil {
                 configuration.path = self.path
-            } else {
+            } else if inMemoryIdentifier != nil {
                 configuration.inMemoryIdentifier = self.inMemoryIdentifier
+            } else {
+                fatalError("A Realm Configuration must specify a path or an in-memory identifier.")
             }
             configuration.encryptionKey = self.encryptionKey
             configuration.readOnly = self.readOnly
