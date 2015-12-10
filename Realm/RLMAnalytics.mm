@@ -169,7 +169,7 @@ static NSDictionary *RLMAnalyticsPayload() {
     }
 
     NSString *osVersionString = [[NSProcessInfo processInfo] operatingSystemVersionString];
-    BOOL isSwift = NSClassFromString(@"RealmSwift.ObjectUtil") != nil;
+    BOOL isSwift = NSClassFromString(@"RealmSwiftObjectUtil") != nil;
 
     static NSString *kUnknownString = @"unknown";
     NSString *hashedMACAddress = RLMMACAddress() ?: kUnknownString;
