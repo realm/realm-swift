@@ -51,10 +51,9 @@ static NSString * const kTableName = @"table";
 
     // Set realm notification block
     __weak typeof(self) weakSelf = self;
-    self.notification = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+    self.notification = [self.array addNotificationBlock:^(RLMResults *data, NSError *error) {
         [weakSelf.tableView reloadData];
     }];
-    [self.tableView reloadData];
 }
 
 #pragma mark - UI
