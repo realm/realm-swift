@@ -63,22 +63,33 @@ Realm::Config& Realm::Config::operator=(realm::Realm::Config const& c)
 Realm::Realm(Config config)
 : m_config(std::move(config))
 {
+    open_with_config(m_config, m_history, m_shared_group, m_read_only_group);
+
+    if (m_read_only_group) {
+        m_group = m_read_only_group.get();
+    }
+}
+
+void Realm::open_with_config(const Config& config,
+                             std::unique_ptr<ClientHistory>& history,
+                             std::unique_ptr<SharedGroup>& shared_group,
+                             std::unique_ptr<Group>& read_only_group)
+{
     try {
-        if (m_config.read_only) {
-            m_read_only_group = std::make_unique<Group>(m_config.path, m_config.encryption_key.data(), Group::mode_ReadOnly);
-            m_group = m_read_only_group.get();
+        if (config.read_only) {
+            read_only_group = std::make_unique<Group>(config.path, config.encryption_key.data(), Group::mode_ReadOnly);
         }
         else {
-            m_history = realm::make_client_history(m_config.path, m_config.encryption_key.data());
-            SharedGroup::DurabilityLevel durability = m_config.in_memory ? SharedGroup::durability_MemOnly :
+            history = realm::make_client_history(config.path, config.encryption_key.data());
+            SharedGroup::DurabilityLevel durability = config.in_memory ? SharedGroup::durability_MemOnly :
                                                                            SharedGroup::durability_Full;
-            m_shared_group = std::make_unique<SharedGroup>(*m_history, durability, m_config.encryption_key.data(), !m_config.disable_format_upgrade);
+            shared_group = std::make_unique<SharedGroup>(*history, durability, config.encryption_key.data(), !config.disable_format_upgrade);
         }
     }
     catch (util::File::PermissionDenied const& ex) {
         throw RealmFileException(RealmFileException::Kind::PermissionDenied, ex.get_path(),
                                  "Unable to open a realm at path '" + ex.get_path() +
-                                 "'. Please use a path where your app has " + (m_config.read_only ? "read" : "read-write") + " permissions.");
+                                 "'. Please use a path where your app has " + (config.read_only ? "read" : "read-write") + " permissions.");
     }
     catch (util::File::Exists const& ex) {
         throw RealmFileException(RealmFileException::Kind::Exists, ex.get_path(),
@@ -93,12 +104,12 @@ Realm::Realm(Config config)
                                  "Unable to open a realm at path '" + ex.get_path() + "'");
     }
     catch (IncompatibleLockFile const& ex) {
-        throw RealmFileException(RealmFileException::Kind::IncompatibleLockFile, m_config.path,
+        throw RealmFileException(RealmFileException::Kind::IncompatibleLockFile, config.path,
                                  "Realm file is currently open in another process "
                                  "which cannot share access with this process. All processes sharing a single file must be the same architecture.");
     }
     catch (FileFormatUpgradeRequired const& ex) {
-        throw RealmFileException(RealmFileException::Kind::FormatUpgradeRequired, m_config.path,
+        throw RealmFileException(RealmFileException::Kind::FormatUpgradeRequired, config.path,
                                  "The Realm file format must be allowed to be upgraded "
                                  "in order to proceed.");
     }

@@ -28,10 +28,10 @@ AsyncQuery::AsyncQuery(Results& target)
 : m_target_results(&target)
 , m_realm(target.get_realm().shared_from_this())
 , m_sort(target.get_sort())
-, m_version(m_realm->m_shared_group->get_version_of_current_transaction())
+, m_version(Realm::Internal::get_shared_group(*m_realm).get_version_of_current_transaction())
 {
     Query q = target.get_query();
-    m_query_handover = m_realm->m_shared_group->export_for_handover(q, MutableSourcePayload::Move);
+    m_query_handover = Realm::Internal::get_shared_group(*m_realm).export_for_handover(q, MutableSourcePayload::Move);
 }
 
 AsyncQueryCancelationToken AsyncQuery::add_callback(std::function<void (std::exception_ptr)> callback)
@@ -46,7 +46,7 @@ AsyncQueryCancelationToken AsyncQuery::add_callback(std::function<void (std::exc
     }
 
     m_callbacks.push_back({std::move(callback), nullptr, token, true});
-    m_realm->m_coordinator->send_commit_notifications();
+    Realm::Internal::get_coordinator(*m_realm).send_commit_notifications();
     return {*this, token};
 }
 
@@ -179,7 +179,7 @@ void AsyncQuery::deliver(SharedGroup& sg, std::exception_ptr err)
 
     REALM_ASSERT(!m_query_handover);
 
-    auto realm_version = m_realm->m_shared_group->get_version_of_current_transaction();
+    auto realm_version = Realm::Internal::get_shared_group(*m_realm).get_version_of_current_transaction();
     if (m_version != realm_version) {
         // Realm version can be newer if a commit was made on our thread or the
         // user manually called refresh(), or older if a commit was made on a

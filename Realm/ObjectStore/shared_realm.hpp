@@ -116,6 +116,21 @@ namespace realm {
         void init(std::shared_ptr<_impl::RealmCoordinator> coordinator);
         Realm(Config config);
 
+        // Give AsyncQuery direct access to the shared group as it needs it to
+        // call the handover functions
+        class Internal {
+            friend class _impl::AsyncQuery;
+            friend class _impl::RealmCoordinator;
+            static SharedGroup& get_shared_group(Realm& realm) { return *realm.m_shared_group; }
+            static ClientHistory& get_history(Realm& realm) { return *realm.m_history; }
+            static _impl::RealmCoordinator& get_coordinator(Realm& realm) { return *realm.m_coordinator; }
+        };
+
+        static void open_with_config(const Config& config,
+                                     std::unique_ptr<ClientHistory>& history,
+                                     std::unique_ptr<SharedGroup>& shared_group,
+                                     std::unique_ptr<Group>& read_only_group);
+
       private:
         Config m_config;
         std::thread::id m_thread_id = std::this_thread::get_id();
@@ -135,9 +150,6 @@ namespace realm {
 
         // FIXME private
         Group *read_group();
-
-        friend class _impl::AsyncQuery;
-        friend class _impl::RealmCoordinator;
     };
 
     class RealmFileException : public std::runtime_error {

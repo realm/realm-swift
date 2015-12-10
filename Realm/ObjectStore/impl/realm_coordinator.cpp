@@ -208,11 +208,9 @@ void RealmCoordinator::pin_version(uint_fast64_t version, uint_fast32_t index)
     SharedGroup::VersionID versionid(version, index);
     if (!m_advancer_sg) {
         try {
-            // Use a temporary Realm instance to open the shared group to reuse
-            // the error handling there
-            Realm tmp(m_config);
-            m_advancer_history = std::move(tmp.m_history);
-            m_advancer_sg = std::move(tmp.m_shared_group);
+            std::unique_ptr<Group> read_only_group;
+            Realm::open_with_config(m_config, m_advancer_history, m_advancer_sg, read_only_group);
+            REALM_ASSERT(!read_only_group);
             m_advancer_sg->begin_read(versionid);
         }
         catch (...) {
@@ -236,7 +234,7 @@ void RealmCoordinator::pin_version(uint_fast64_t version, uint_fast32_t index)
 void RealmCoordinator::register_query(std::shared_ptr<AsyncQuery> query)
 {
     auto version = query->version();
-    auto& self = *query->get_realm().m_coordinator;
+    auto& self = Realm::Internal::get_coordinator(query->get_realm());
     {
         std::lock_guard<std::mutex> lock(self.m_query_mutex);
         self.pin_version(version.version, version.index);
@@ -260,7 +258,7 @@ void RealmCoordinator::unregister_query(AsyncQuery& query)
         return false;
     };
 
-    auto& self = *query.get_realm().m_coordinator;
+    auto& self = Realm::Internal::get_coordinator(query.get_realm());
     std::lock_guard<std::mutex> lock(self.m_query_mutex);
     if (swap_remove(self.m_queries)) {
         // Make sure we aren't holding on to read versions needlessly if there
@@ -342,9 +340,9 @@ void RealmCoordinator::open_helper_shared_group()
 {
     if (!m_query_sg) {
         try {
-            Realm tmp(m_config);
-            m_query_history = std::move(tmp.m_history);
-            m_query_sg = std::move(tmp.m_shared_group);
+            std::unique_ptr<Group> read_only_group;
+            Realm::open_with_config(m_config, m_query_history, m_query_sg, read_only_group);
+            REALM_ASSERT(!read_only_group);
             m_query_sg->begin_read();
         }
         catch (...) {
@@ -406,6 +404,9 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
 {
     decltype(m_queries) queries;
 
+    auto& sg = Realm::Internal::get_shared_group(realm);
+    auto& history = Realm::Internal::get_history(realm);
+
     std::lock_guard<std::mutex> lock(m_query_version_mutex);
     {
         std::lock_guard<std::mutex> lock(m_query_mutex);
@@ -420,20 +421,20 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
 
         // no untargeted async queries; just advance to latest
         if (version.version == 0) {
-            transaction::advance(*realm.m_shared_group, *realm.m_history, realm.m_binding_context.get());
+            transaction::advance(sg, history, realm.m_binding_context.get());
             return;
         }
         // async results are out of date; ignore
-        else if (version < realm.m_shared_group->get_version_of_current_transaction()) {
+        else if (version < sg.get_version_of_current_transaction()) {
             return;
         }
 
-        transaction::advance(*realm.m_shared_group, *realm.m_history, realm.m_binding_context.get(), version);
+        transaction::advance(sg, history, realm.m_binding_context.get(), version);
         queries = m_queries;
     }
 
     for (auto& query : queries) {
-        query->deliver(*realm.m_shared_group, m_async_error);
+        query->deliver(sg, m_async_error);
     }
 }
 
@@ -445,8 +446,9 @@ void RealmCoordinator::process_available_async(Realm& realm)
         queries = m_queries;
     }
 
+    auto& sg = Realm::Internal::get_shared_group(realm);
     std::lock_guard<std::mutex> lock(m_query_version_mutex);
     for (auto& query : queries) {
-        query->deliver(*realm.m_shared_group, m_async_error);
+        query->deliver(sg, m_async_error);
     }
 }
