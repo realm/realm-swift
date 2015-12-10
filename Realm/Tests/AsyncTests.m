@@ -509,32 +509,41 @@
 }
 
 - (void)testAddAndRemoveQueries {
-    RLMResults *results = IntObject.allObjects;
-    [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
-        XCTFail(@"results delivered after removal");
-    }] stop];
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    @autoreleasepool {
+        RLMResults *results = IntObject.allObjects;
+        [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
+            XCTFail(@"results delivered after removal");
+        }] stop];
 
-    // Readd same results at same version
-    [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
-        XCTFail(@"results delivered after removal");
-    }] stop];
+        // Readd same results at same version
+        [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
+            XCTFail(@"results delivered after removal");
+        }] stop];
 
-    // Add different results at same version
-    [[self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *r) {
-        XCTFail(@"results delivered after removal");
-    }] stop];
+        // Add different results at same version
+        [[self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *r) {
+            XCTFail(@"results delivered after removal");
+        }] stop];
 
-    [self waitForNotification:RLMRealmDidChangeNotification realm:RLMRealm.defaultRealm block:^{
-        [RLMRealm.defaultRealm transactionWithBlock:^{ }];
-    }];
+        [self waitForNotification:RLMRealmDidChangeNotification realm:RLMRealm.defaultRealm block:^{
+            [RLMRealm.defaultRealm transactionWithBlock:^{ }];
+        }];
 
-    // Readd at later version
-    [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
-        XCTFail(@"results delivered after removal");
-    }] stop];
+        // Readd at later version
+        [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
+            XCTFail(@"results delivered after removal");
+        }] stop];
 
-    // Add different results at later version
-    [[self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *r) {
+        // Add different results at later version
+        [[self subscribeAndWaitForInitial:[IntObject allObjectsInRealm:realm] block:^(RLMResults *r) {
+            XCTFail(@"results delivered after removal");
+        }] stop];
+    }
+
+    // Add different results after all of the previous async queries have been
+    // removed entirely
+    [[self subscribeAndWaitForInitial:[IntObject allObjectsInRealm:realm] block:^(RLMResults *r) {
         XCTFail(@"results delivered after removal");
     }] stop];
 }
@@ -574,6 +583,132 @@
     for (int i = 0; i < 10; ++i) {
         [tokens[i] stop];
     }
+}
+
+- (void)testMultipleCallbacksForOneQuery {
+    RLMResults *results = IntObject.allObjects;
+
+    __block int calls1 = 0;
+    id token1 = [self subscribeAndWaitForInitial:results block:^(RLMResults *results) {
+        ++calls1;
+    }];
+    XCTAssertEqual(calls1, 0);
+
+    __block int calls2 = 0;
+    id token2 = [self subscribeAndWaitForInitial:results block:^(RLMResults *results) {
+        ++calls2;
+    }];
+    XCTAssertEqual(calls1, 0);
+    XCTAssertEqual(calls2, 0);
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:results.realm block:^{
+        [self createObject:0];
+    }];
+
+    XCTAssertEqual(calls1, 1);
+    XCTAssertEqual(calls2, 1);
+
+    [token1 stop];
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:results.realm block:^{
+        [self createObject:0];
+    }];
+
+    XCTAssertEqual(calls1, 1);
+    XCTAssertEqual(calls2, 2);
+
+    [token2 stop];
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:results.realm block:^{
+        [self createObject:0];
+    }];
+
+    XCTAssertEqual(calls1, 1);
+    XCTAssertEqual(calls2, 2);
+}
+
+- (void)testRemovingBlockFromWithinNotificationBlock {
+    RLMResults *results = IntObject.allObjects;
+
+    __block int calls = 0;
+    __block id token1, token2;
+    token1 = [self subscribeAndWaitForInitial:results block:^(RLMResults *results) {
+        [token1 stop];
+        ++calls;
+    }];
+    token2 = [self subscribeAndWaitForInitial:results block:^(RLMResults *results) {
+        [token2 stop];
+        ++calls;
+    }];
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:results.realm block:^{
+        [self createObject:0];
+    }];
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:results.realm block:^{
+        [self createObject:0];
+    }];
+    XCTAssertEqual(calls, 2);
+}
+
+- (void)testAddingBlockFromWithinNotificationBlock {
+    RLMResults *results = IntObject.allObjects;
+
+    __block int calls = 0;
+    __block id token1, token2;
+    token1 = [self subscribeAndWaitForInitial:results block:^(RLMResults *results) {
+        if (++calls == 1) {
+            token2 = [results addNotificationBlock:^(RLMResults *results, NSError *error) {
+                ++calls;
+            }];
+        }
+    }];
+
+    // Triggers one call on each block
+    [self waitForNotification:RLMRealmDidChangeNotification realm:results.realm block:^{
+        [self createObject:0];
+    }];
+    XCTAssertEqual(calls, 2);
+
+    // Triggers one call on each block
+    [self waitForNotification:RLMRealmDidChangeNotification realm:results.realm block:^{
+        [self createObject:0];
+    }];
+    XCTAssertEqual(calls, 4);
+
+    [token1 stop];
+    [token2 stop];
+}
+
+- (void)testAddingNewQueryWithinNotificationBlock {
+    RLMResults *results1 = IntObject.allObjects;
+    RLMResults *results2 = IntObject.allObjects;
+
+    __block int calls = 0;
+    __block id token1, token2;
+    token1 = [self subscribeAndWaitForInitial:results1 block:^(RLMResults *results) {
+        ++calls;
+        if (calls == 1) {
+            token2 = [results2 addNotificationBlock:^(RLMResults *results, NSError *error) {
+                ++calls;
+            }];
+        }
+    }];
+
+    // Triggers one call on outer block, zero on inner
+    [self waitForNotification:RLMRealmDidChangeNotification realm:results1.realm block:^{
+        [self createObject:0];
+    }];
+    XCTAssertEqual(calls, 1);
+
+    // Picks up initial from inner, and triggers one more on each
+    [self waitForNotification:RLMRealmDidChangeNotification realm:results1.realm block:^{
+        [self createObject:0];
+    }];
+    XCTAssertEqual(calls, 4);
+
+    [token1 stop];
+    [token2 stop];
 }
 
 - (void)testAsyncNotSupportedForReadOnlyRealms {

@@ -36,28 +36,42 @@ AsyncQuery::AsyncQuery(Results& target)
 
 AsyncQueryCancelationToken AsyncQuery::add_callback(std::function<void (std::exception_ptr)> callback)
 {
-    std::lock_guard<std::mutex> lock(m_callback_mutex);
-
-    size_t token = 0;
-    for (auto& callback : m_callbacks) {
-        if (token <= callback.token) {
-            token = callback.token + 1;
+    auto next_token = [=] {
+        size_t token = 0;
+        for (auto& callback : m_callbacks) {
+            if (token <= callback.token) {
+                token = callback.token + 1;
+            }
         }
+        return token;
+    };
+
+    if (is_for_current_thread() &&  m_calling_callbacks) {
+        // We're being called from within a callback block, so add without
+        // locking or faking a commit
+        auto token = next_token();
+        m_callbacks.push_back({std::move(callback), nullptr, token, -1ULL});
+        return {*this, token};
     }
 
-    m_callbacks.push_back({std::move(callback), nullptr, token, true});
+    std::lock_guard<std::mutex> lock(m_callback_mutex);
+    auto token = next_token();
+    m_callbacks.push_back({std::move(callback), nullptr, token, -1ULL});
     Realm::Internal::get_coordinator(*m_realm).send_commit_notifications();
     return {*this, token};
 }
 
 void AsyncQuery::remove_callback(size_t token)
 {
-    std::lock_guard<std::mutex> lock(m_callback_mutex);
     if (is_for_current_thread() &&  m_calling_callbacks) {
         // Schedule the removal for after we're done calling callbacks
+        // No need for a lock here because we're on the same thread as the one
+        // holding the lock
         m_callbacks_to_remove.push_back(token);
         return;
     }
+
+    std::lock_guard<std::mutex> lock(m_callback_mutex);
     do_remove_callback(token);
 }
 
@@ -92,8 +106,10 @@ void AsyncQuery::run()
     {
         std::lock_guard<std::mutex> callback_lock(m_callback_mutex);
         std::lock_guard<std::mutex> target_lock(m_target_mutex);
+        // Don't run the query if the results aren't actually going to be used
         if (!m_target_results || (m_callbacks.empty() && !m_target_results->wants_background_updates())) {
             m_skipped_running = true;
+            m_version = SharedGroup::VersionID{};
             return;
         }
     }
@@ -103,7 +119,7 @@ void AsyncQuery::run()
     // may be called concurrently (as it'd be pretty bad for a running query to
     // block the main thread trying to pick up the previous results)
     if (m_tv.is_attached()) {
-        m_did_update = m_tv.sync_if_needed();
+        m_next_tv_version = m_tv.sync_if_needed();
     }
     else {
         m_tv = m_query->find_all();
@@ -111,7 +127,7 @@ void AsyncQuery::run()
         if (m_sort) {
             m_tv.sort(m_sort.columnIndices, m_sort.ascending);
         }
-        m_did_update = true;
+        m_next_tv_version = m_tv.outside_version();
     }
 }
 
@@ -131,8 +147,9 @@ void AsyncQuery::prepare_handover()
     // Even if the TV didn't change, we need to re-export it if the previous
     // export has not been consumed yet, as the old handover object is no longer
     // usable due to the version not matching
-    if (m_did_update || (m_tv_handover && m_tv_handover->version != m_version)) {
+    if (m_next_tv_version != m_tv_version || (m_tv_handover && m_tv_handover->version != m_version)) {
         m_tv_handover = m_sg->export_for_handover(m_tv, ConstSourcePayload::Copy);
+        m_tv_version = m_next_tv_version;
     }
 }
 
@@ -188,20 +205,23 @@ void AsyncQuery::deliver(SharedGroup& sg, std::exception_ptr err)
         return;
     }
 
-    // Cannot use m_did_update here as it is used unlocked in run()
-    bool did_update = false;
     if (m_tv_handover) {
         Results::AsyncFriend::set_table_view(*m_target_results,
                                              std::move(*sg.import_from_handover(std::move(m_tv_handover))));
 
-        did_update = true;
     }
     REALM_ASSERT(!m_tv_handover);
 
-    for (auto& callback : m_callbacks) {
-        if (did_update || callback.first_run) {
+    // Iterate by index to handle users adding callbacks during iteration
+    for (size_t i = 0; i < m_callbacks.size(); ++i) {
+        auto& callback = m_callbacks[i];
+        // Skip callbacks stopped from within previous callback blocks
+        if (find(begin(m_callbacks_to_remove), end(m_callbacks_to_remove), callback.token) != end(m_callbacks_to_remove)) {
+            continue;
+        }
+        if (callback.delivered_version != m_tv_version) {
             callback.fn(nullptr);
-            callback.first_run = false;
+            callback.delivered_version = m_tv_version;
         }
     }
 

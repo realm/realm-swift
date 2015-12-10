@@ -83,7 +83,7 @@ private:
         std::function<void (std::exception_ptr)> fn;
         std::unique_ptr<SharedGroup::Handover<TableView>> handover;
         size_t token;
-        bool first_run;
+        uint_fast64_t delivered_version;
     };
 
     // Currently registered callbacks and a mutex which must always be held
@@ -97,7 +97,9 @@ private:
 
     SharedGroup* m_sg = nullptr;
 
-    bool m_did_update = false;
+    uint_fast64_t m_tv_version = -1;
+    uint_fast64_t m_next_tv_version = -1;
+
     bool m_skipped_running = false;
     bool m_initial_run_complete = false;
     bool m_calling_callbacks = false;
