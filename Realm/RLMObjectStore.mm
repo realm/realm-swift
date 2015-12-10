@@ -96,7 +96,7 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
         return;
     }
 
-    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwift.Object");
+    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwiftObject");
     if (![object isKindOfClass:s_swiftObjectClass]) {
         return; // Is a Swift class using the obj-c API
     }

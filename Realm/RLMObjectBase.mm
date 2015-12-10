@@ -429,7 +429,7 @@ id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
 
 Class RLMObjectUtilClass(BOOL isSwift) {
     static Class objectUtilObjc = [RLMObjectUtil class];
-    static Class objectUtilSwift = NSClassFromString(@"RealmSwift.ObjectUtil");
+    static Class objectUtilSwift = NSClassFromString(@"RealmSwiftObjectUtil");
     return isSwift && objectUtilSwift ? objectUtilSwift : objectUtilObjc;
 }
 
