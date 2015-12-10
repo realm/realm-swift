@@ -275,7 +275,7 @@ void Results::clear()
         case Mode::TableView:
             validate_write();
             update_tableview();
-            m_table_view.clear();
+            m_table_view.clear(RemoveMode::unordered);
             break;
     }
 }
