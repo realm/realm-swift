@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTestObjects.h"
-#import "RLMMultiProcessTestCase.h"
-#import "TestUtils.h"
+#import <Foundation/Foundation.h>
+#import <XCTest/XCTestCase.h>
 
-@interface RLMSchema (Private)
-+ (void)registerClasses:(const Class[])classes count:(NSUInteger)count;
-@end
+FOUNDATION_EXTERN void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
+                                                              __attribute__((noescape)) dispatch_block_t block,
+                                                              NSString *regexString,
+                                                              NSString *message,
+                                                              NSString *fileName,
+                                                              NSUInteger lineNumber);
