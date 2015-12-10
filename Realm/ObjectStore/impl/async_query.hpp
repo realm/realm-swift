@@ -98,6 +98,7 @@ private:
     SharedGroup* m_sg = nullptr;
 
     bool m_did_update = false;
+    bool m_skipped_running = false;
     bool m_initial_run_complete = false;
     bool m_calling_callbacks = false;
     bool m_error = false;

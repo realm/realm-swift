@@ -172,6 +172,7 @@ void Results::update_tableview()
                 m_background_query = std::make_shared<_impl::AsyncQuery>(*this);
                 _impl::RealmCoordinator::register_query(m_background_query);
             }
+            m_has_used_table_view = true;
             m_table_view.sync_if_needed();
             break;
     }
@@ -370,8 +371,15 @@ AsyncQueryCancelationToken Results::async(std::function<void (std::exception_ptr
 
 void Results::AsyncFriend::set_table_view(Results& results, realm::TableView &&tv)
 {
+    // If the previous TableView was never actually used, then generating new
+    // ones until the user actually uses the Results object again
+    if (results.m_mode == Mode::TableView) {
+        results.m_wants_background_updates = results.m_has_used_table_view;
+    }
+
     results.m_table_view = std::move(tv);
     results.m_mode = Mode::TableView;
+    results.m_has_used_table_view = false;
     // needs https://github.com/realm/realm-core/pull/1392
 //    REALM_ASSERT(results.m_table_view.is_in_sync());
 }

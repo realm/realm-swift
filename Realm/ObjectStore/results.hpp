@@ -177,6 +177,8 @@ public:
     // and then rerun after each commit (if needed) and redelivered if it changed
     AsyncQueryCancelationToken async(std::function<void (std::exception_ptr)> target);
 
+    bool wants_background_updates() const { return m_wants_background_updates; }
+
     // Helper type to let AsyncQuery update the tableview without giving access
     // to any other privates or letting anyone else do so
     class AsyncFriend {
@@ -194,6 +196,8 @@ private:
     std::shared_ptr<_impl::AsyncQuery> m_background_query;
 
     Mode m_mode = Mode::Empty;
+    bool m_has_used_table_view = false;
+    bool m_wants_background_updates = true;
 
     void validate_read() const;
     void validate_write() const;

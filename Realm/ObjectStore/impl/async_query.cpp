@@ -87,12 +87,21 @@ void AsyncQuery::unregister() noexcept
 
 void AsyncQuery::run()
 {
+    REALM_ASSERT(m_sg);
+
+    {
+        std::lock_guard<std::mutex> callback_lock(m_callback_mutex);
+        std::lock_guard<std::mutex> target_lock(m_target_mutex);
+        if (!m_target_results || (m_callbacks.empty() && !m_target_results->wants_background_updates())) {
+            m_skipped_running = true;
+            return;
+        }
+    }
+    m_skipped_running = false;
+
     // This function must not touch any members touched in deliver(), as they
     // may be called concurrently (as it'd be pretty bad for a running query to
     // block the main thread trying to pick up the previous results)
-
-    REALM_ASSERT(m_sg);
-
     if (m_tv.is_attached()) {
         m_did_update = m_tv.sync_if_needed();
     }
@@ -108,10 +117,14 @@ void AsyncQuery::run()
 
 void AsyncQuery::prepare_handover()
 {
-    std::lock_guard<std::mutex> lock(m_callback_mutex);
+    if (m_skipped_running) {
+        return;
+    }
 
+    REALM_ASSERT(m_tv.is_attached());
     REALM_ASSERT(m_tv.is_in_sync());
 
+    std::lock_guard<std::mutex> lock(m_callback_mutex);
     m_version = m_sg->get_version_of_current_transaction();
     m_initial_run_complete = true;
 
