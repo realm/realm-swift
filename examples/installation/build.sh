@@ -71,9 +71,9 @@ xctest() {
     fi
     DESTINATION=""
     if [[ $PLATFORM == ios ]]; then
-        DESTINATION="-destination 'id=$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')'"
+        DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
     fi
-    eval "xcodebuild $CMD -scheme $NAME clean build test $DESTINATION"
+    xcodebuild $CMD -scheme $NAME clean build test $DESTINATION
 }
 
 source "$(dirname "$0")/../../scripts/swift-version.sh"
