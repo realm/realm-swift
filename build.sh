@@ -265,7 +265,8 @@ build_docs() {
       --module ${module} \
       --root-url https://realm.io/docs/${language}/${version}/api/ \
       --output $(pwd)/docs/${language}_output \
-      --template-directory $(pwd)/docs/templates
+      --template-directory $(pwd)/docs/templates \
+      --swift-version 2.1.1
 
     rm Realm/RLMPlatform.h
 }
