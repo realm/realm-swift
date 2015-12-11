@@ -245,7 +245,7 @@ build_docs() {
     local objc="--objc"
 
     if [[ "$language" == "swift" ]]; then
-        : ${REALM_SWIFT_VERSION:=2.1}
+        : ${REALM_SWIFT_VERSION:=2.1.1}
         sh build.sh set-swift-version
         xcodebuild_arguments="-scheme,RealmSwift"
         module="RealmSwift"
@@ -913,14 +913,14 @@ case "$COMMAND" in
 
     "package-ios-swift")
         cd tightdb_objc
-        for version in 1.2 2.1; do
+        for version in 1.2 2.1.1; do
             rm -rf build/ios/Realm.framework
             REALM_SWIFT_VERSION=$version sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION=$version sh build.sh ios-swift
         done
 
         cd build/ios
-        zip --symlinks -r realm-swift-framework-ios.zip swift-1.2 swift-2.1
+        zip --symlinks -r realm-swift-framework-ios.zip swift-1.2 swift-2.1.1
         ;;
 
     "package-osx-swift")
@@ -929,7 +929,7 @@ case "$COMMAND" in
         REALM_SWIFT_VERSION=2.1.1 sh build.sh osx-swift
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip swift-1.2 swift-2.1
+        zip --symlinks -r realm-swift-framework-osx.zip swift-1.2 swift-2.1.1
         ;;
 
     "package-watchos")
@@ -1015,7 +1015,7 @@ case "$COMMAND" in
             unzip ${WORKSPACE}/realm-examples.zip
             cd examples
             if [[ "${LANG}" == "objc" ]]; then
-                rm -rf ios/swift-1.2 ios/swift-2.1
+                rm -rf ios/swift-1.2 ios/swift-2.1.1
             else
                 rm -rf ios/objc ios/rubymotion osx
             fi
