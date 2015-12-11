@@ -33,6 +33,7 @@ happening when initializing a Realm instance.
 
 */
 public enum Error: ErrorType {
+    // swiftlint:disable variable_name
     /// :nodoc:
     public var _code: Int {
         return rlmError.rawValue
@@ -42,6 +43,7 @@ public enum Error: ErrorType {
     public var _domain: String {
         return RLMErrorDomain
     }
+    // swiftlint:enable variable_name
 
     /// The RLMError value, which can be used to derive the error's code.
     private var rlmError: RLMError {
