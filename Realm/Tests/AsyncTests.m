@@ -20,6 +20,7 @@
 
 #import "RLMRealmConfiguration_Private.h"
 
+// A whole bunch of blocks don't use their RLMResults parameter
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
 @interface AsyncTests : RLMTestCase
@@ -702,6 +703,101 @@
 
     [token1 stop];
     [token2 stop];
+}
+
+- (void)testBlockedThreadWithNotificationsDoesNotPreventDeliveryOnOtherThreads {
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    dispatch_semaphore_t sema2 = dispatch_semaphore_create(0);
+    [self dispatchAsync:^{
+        // Add a notification block on a background thread, run the runloop
+        // until the initial results are ready, and then block the thread without
+        // running the runloop until the main thread is done testing things
+        __block id token;
+        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+            token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, NSError *error) {
+                dispatch_semaphore_signal(sema);
+                CFRunLoopStop(CFRunLoopGetCurrent());
+                dispatch_semaphore_wait(sema2, DISPATCH_TIME_FOREVER);
+            }];
+        });
+        CFRunLoopRun();
+        [token stop];
+    }];
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+
+    __block int calls = 0;
+    id token = [self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *results) {
+        ++calls;
+    }];
+    XCTAssertEqual(calls, 0);
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:RLMRealm.defaultRealm block:^{
+        [self createObject:0];
+    }];
+    XCTAssertEqual(calls, 1);
+
+    [token stop];
+    dispatch_semaphore_signal(sema2);
+}
+
+- (void)testAddNotificationBlockFromWrongThread {
+    RLMResults *results = [IntObject allObjects];
+    [self dispatchAsyncAndWait:^{
+        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+            XCTAssertThrows([results addNotificationBlock:^(RLMResults *results, NSError *error) {
+                XCTFail(@"should not be called");
+            }]);
+            CFRunLoopStop(CFRunLoopGetCurrent());
+        });
+        CFRunLoopRun();
+    }];
+}
+
+- (void)testRemoveNotificationBlockFromWrongThread {
+    // Unlike adding this is allowed, because it can happen due to capturing
+    // tokens in blocks and users are very confused by errors from deallocation
+    // on the wrong thread
+    RLMResults *results = [IntObject allObjects];
+    id token = [results addNotificationBlock:^(RLMResults *results, NSError *error) {
+        XCTFail(@"should not be called");
+    }];
+    [self dispatchAsyncAndWait:^{
+        [token stop];
+    }];
+}
+
+- (void)testSimultaneouslyRemoveCallbacksFromCallbacksForOtherResults {
+    dispatch_semaphore_t sema1 = dispatch_semaphore_create(0);
+    dispatch_semaphore_t sema2 = dispatch_semaphore_create(0);
+    __block id token1, token2;
+
+    [self dispatchAsync:^{
+        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+            __block bool first = true;
+            token1 = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, NSError *error) {
+                XCTAssertTrue(first);
+                first = false;
+                dispatch_semaphore_signal(sema1);
+                dispatch_semaphore_wait(sema2, DISPATCH_TIME_FOREVER);
+                [token2 stop];
+                CFRunLoopStop(CFRunLoopGetCurrent());
+            }];
+        });
+        CFRunLoopRun();
+    }];
+
+    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+        __block bool first = true;
+        token2 = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, NSError *error) {
+            XCTAssertTrue(first);
+            first = false;
+            dispatch_semaphore_signal(sema2);
+            dispatch_semaphore_wait(sema1, DISPATCH_TIME_FOREVER);
+            [token1 stop];
+            CFRunLoopStop(CFRunLoopGetCurrent());
+        }];
+    });
+    CFRunLoopRun();
 }
 
 - (void)testAsyncNotSupportedForReadOnlyRealms {
