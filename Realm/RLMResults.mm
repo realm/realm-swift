@@ -302,7 +302,9 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         }
         NSString *operatorName = [keyPath substringWithRange:NSMakeRange(1, operatorRange.location - 1)];
         NSString *operatorKeyPath = [keyPath substringFromIndex:operatorRange.location + 1];
-        NSAssert(operatorKeyPath.length > 0, @"Missing key path for KVC collection operator %@ in key path '%@'", operatorName, keyPath);
+        if (operatorKeyPath.length == 0) {
+            @throw RLMException(@"Missing key path for KVC collection operator %@ in key path '%@'", operatorName, keyPath);
+        }
         SEL opSelector = NSSelectorFromString([NSString stringWithFormat:@"_%@ForKeyPath:", operatorName]);
         if ([self respondsToSelector:opSelector]) {
             return ((id(*)(id, SEL, id))objc_msgSend)(self, opSelector, operatorKeyPath);
@@ -341,6 +343,38 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 - (NSNumber *)_avgForKeyPath:(NSString *)keyPath {
     return [self _aggregateForKeyPath:keyPath method:&Results::average methodName:@"@avg"];
+}
+
+- (NSArray *)_unionOfObjectsForKeyPath:(NSString *)keyPath {
+    assertKeyPathIsNotNested(keyPath);
+    return translateErrors([&] {
+        return RLMCollectionValueForKey(self, keyPath);
+    });
+}
+
+- (NSArray *)_distinctUnionOfObjectsForKeyPath:(NSString *)keyPath {
+    return [NSSet setWithArray:[self _unionOfObjectsForKeyPath:keyPath]].allObjects;
+}
+
+- (NSArray *)_unionOfArraysForKeyPath:(NSString *)keyPath {
+    assertKeyPathIsNotNested(keyPath);
+    if ([keyPath isEqualToString:@"self"]) {
+        @throw RLMException(@"self is not a valid key-path for a KVC array collection operator as 'unionOfArrays'.");
+    }
+
+    return translateErrors([&] {
+        NSArray *nestedResults = RLMCollectionValueForKey(self, keyPath);
+        NSMutableArray *flatArray = [NSMutableArray arrayWithCapacity:nestedResults.count];
+        for (id<RLMFastEnumerable> array in nestedResults) {
+            NSArray *nsArray = RLMCollectionValueForKey(array, @"self");
+            [flatArray addObjectsFromArray:nsArray];
+        }
+        return flatArray;
+    });
+}
+
+- (NSArray *)_distinctUnionOfArraysForKeyPath:(__unused NSString *)keyPath {
+    return [NSSet setWithArray:[self _unionOfArraysForKeyPath:keyPath]].allObjects;
 }
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
