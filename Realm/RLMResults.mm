@@ -282,6 +282,21 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     });
 }
 
+- (id)valueForKeyPath:(NSString *)keyPath {
+    if ([keyPath characterAtIndex:0] == '@') {
+        NSRange operatorRange = [keyPath rangeOfString:@"." options:NSLiteralSearch];
+        if (operatorRange.location == NSNotFound) {
+            if ([keyPath isEqualToString:@"@count"]) {
+                return @(self.count);
+            }
+            else {
+                @throw RLMException(@"Unsupported KVC collection operator found in key path '%@'", keyPath);
+            }
+        }
+    }
+    return [super valueForKeyPath:keyPath];
+}
+
 - (id)valueForKey:(NSString *)key {
     return translateErrors([&] {
         return RLMCollectionValueForKey(self, key);

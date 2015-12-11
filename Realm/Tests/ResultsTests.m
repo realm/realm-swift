@@ -349,6 +349,24 @@
     RLMAssertThrowsWithReasonMatching([allArray maxOfProperty:@"boolCol"], @"max.*bool");
 }
 
+- (void)testValueForCollectionOperationKeyPath
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [CompanyObject createInRealm:realm withValue:@{@"name": @"InspiringNames LLC"}];
+    [CompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG"}];
+    [realm commitWriteTransaction];
+
+    RLMResults *allCompanies = [CompanyObject allObjects];
+
+    // count operator
+    XCTAssertEqual([[allCompanies valueForKeyPath:@"@count"] integerValue], 2);
+
+    // invalid key paths
+    RLMAssertThrowsWithReasonMatching([allCompanies valueForKeyPath:@"@invalid"], @"Unsupported KVC collection operator found in key path '@invalid'");
+}
+
 - (void)testArrayDescription
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
