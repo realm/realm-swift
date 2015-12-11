@@ -140,18 +140,19 @@ void RealmCoordinator::unregister_realm(Realm* realm)
 
 void RealmCoordinator::clear_cache()
 {
-    std::vector<SharedRealm> realms_to_close;
-
+    std::vector<WeakRealm> realms_to_close;
     {
         std::lock_guard<std::mutex> lock(s_coordinator_mutex);
 
-        // Gather a list of all of the realms which will be removed
         for (auto& weak_coordinator : s_coordinators_per_path) {
             auto coordinator = weak_coordinator.second.lock();
             if (!coordinator) {
                 continue;
             }
 
+            coordinator->m_notifier = nullptr;
+
+            // Gather a list of all of the realms which will be removed
             for (auto& cached_realm : coordinator->m_cached_realms) {
                 if (auto realm = cached_realm.realm()) {
                     realms_to_close.push_back(realm);
@@ -164,8 +165,10 @@ void RealmCoordinator::clear_cache()
 
     // Close all of the previously cached Realms. This can't be done while
     // s_coordinator_mutex is held as it may try to re-lock it.
-    for (auto& realm : realms_to_close) {
-        realm->close();
+    for (auto& weak_realm : realms_to_close) {
+        if (auto realm = weak_realm.lock()) {
+            realm->close();
+        }
     }
 }
 
