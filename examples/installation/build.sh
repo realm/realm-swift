@@ -69,11 +69,11 @@ xctest() {
     else
         download_zip_if_needed $LANG
     fi
-    SDK="macosx"
+    DESTINATION=""
     if [[ $PLATFORM == ios ]]; then
-        SDK="iphonesimulator"
+        DESTINATION="-destination 'id=$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')'"
     fi
-    xcodebuild $CMD -scheme $NAME clean build test -sdk $SDK
+    xcodebuild $CMD -scheme $NAME clean build test "$DESTINATION"
 }
 
 source "$(dirname "$0")/../../scripts/swift-version.sh"
