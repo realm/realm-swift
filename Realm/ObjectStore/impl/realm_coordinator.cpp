@@ -247,6 +247,9 @@ void RealmCoordinator::register_query(std::shared_ptr<AsyncQuery> query)
 
 void RealmCoordinator::unregister_query(AsyncQuery& query)
 {
+    REALM_ASSERT(&query.get_realm());
+    REALM_ASSERT(&Realm::Internal::get_coordinator(query.get_realm()));
+
     auto swap_remove = [&](auto& container) {
         auto it = std::find_if(container.begin(), container.end(),
                                [&](auto const& ptr) { return ptr.get() == &query; });
@@ -320,8 +323,6 @@ void RealmCoordinator::run_async_queries()
     // Reacquire the lock while updating the fields that are actually read on
     // other threads
     {
-        // Make sure we don't change the version while another thread is delivering
-        std::lock_guard<std::mutex> version_lock(m_query_version_mutex);
         lock.lock();
         for (auto& query : queries_to_run) {
             query->prepare_handover();
@@ -407,7 +408,6 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
     auto& sg = Realm::Internal::get_shared_group(realm);
     auto& history = Realm::Internal::get_history(realm);
 
-    std::lock_guard<std::mutex> lock(m_query_version_mutex);
     {
         std::lock_guard<std::mutex> lock(m_query_mutex);
 
@@ -430,25 +430,33 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
         }
 
         transaction::advance(sg, history, realm.m_binding_context.get(), version);
-        queries = m_queries;
+
+        for (auto& query : m_queries) {
+            if (query->deliver(sg, m_async_error)) {
+                queries.push_back(query);
+            }
+        }
     }
 
     for (auto& query : queries) {
-        query->deliver(sg, m_async_error);
+        query->call_callbacks();
     }
 }
 
 void RealmCoordinator::process_available_async(Realm& realm)
 {
+    auto& sg = Realm::Internal::get_shared_group(realm);
     decltype(m_queries) queries;
     {
         std::lock_guard<std::mutex> lock(m_query_mutex);
-        queries = m_queries;
+        for (auto& query : m_queries) {
+            if (query->deliver(sg, m_async_error)) {
+                queries.push_back(query);
+            }
+        }
     }
 
-    auto& sg = Realm::Internal::get_shared_group(realm);
-    std::lock_guard<std::mutex> lock(m_query_version_mutex);
     for (auto& query : queries) {
-        query->deliver(sg, m_async_error);
+        query->call_callbacks();
     }
 }

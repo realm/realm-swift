@@ -44,8 +44,10 @@ public:
     void run();
     // Prepare the handover object if run() did update the TableView
     void prepare_handover();
-    // Update the target results from the handover and call callbacks
-    void deliver(SharedGroup& sg, std::exception_ptr err);
+    // Update the target results from the handover
+    // Returns if any callbacks need to be invoked
+    bool deliver(SharedGroup& sg, std::exception_ptr err);
+    void call_callbacks();
 
     // Attach the handed-over query to `sg`
     void attach_to(SharedGroup& sg);
@@ -78,6 +80,7 @@ private:
     TableView m_tv;
     std::unique_ptr<SharedGroup::Handover<TableView>> m_tv_handover;
     SharedGroup::VersionID m_version;
+    std::exception_ptr m_error;
 
     struct Callback {
         std::function<void (std::exception_ptr)> fn;
@@ -103,7 +106,7 @@ private:
     bool m_skipped_running = false;
     bool m_initial_run_complete = false;
     bool m_calling_callbacks = false;
-    bool m_error = false;
+    std::atomic<bool> m_have_callbacks = {false};
 
     void do_remove_callback(size_t token) noexcept;
 

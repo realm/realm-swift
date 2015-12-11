@@ -354,16 +354,7 @@
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 }
 
-- (void)testStaleResultsAreDiscardedEvenAfterBeingQueuedForDelivery {
-    // This test relies on blocks being called in the order in which they are
-    // added, which is an implementation detail that could change
-
-    // This test sets up two async queries, waits for the initial results for
-    // each to be ready, and then makes a commit to trigger both at the same
-    // time. From the handler for the first, it then makes another commit, so
-    // that the results for the second one are for an out-of-date transaction
-    // version, and are not delivered.
-
+- (void)testCommitInOneNotificationDoesNotCancelOtherNotifications {
     __block XCTestExpectation *exp1 = nil;
     __block XCTestExpectation *exp2 = nil;
     __block int firstBlockCalls = 0;
@@ -382,7 +373,9 @@
     }];
     id token2 = [self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *results) {
         ++secondBlockCalls;
-        [exp2 fulfill];
+        if (secondBlockCalls == 2) {
+            [exp2 fulfill];
+        }
     }];
 
     exp1 = [self expectationWithDescription:@""];
@@ -395,7 +388,7 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     XCTAssertEqual(2, firstBlockCalls);
-    XCTAssertEqual(1, secondBlockCalls);
+    XCTAssertEqual(2, secondBlockCalls);
 
     [token stop];
     [token2 stop];
