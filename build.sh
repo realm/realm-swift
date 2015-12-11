@@ -320,6 +320,7 @@ case "$COMMAND" in
 esac
 export CONFIGURATION
 
+: ${REALM_SWIFT_VERSION:=1.2}
 source "$(dirname "$0")/scripts/swift-version.sh"
 
 case "$COMMAND" in
