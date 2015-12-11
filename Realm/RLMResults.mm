@@ -32,6 +32,7 @@
 #import "results.hpp"
 
 #import <objc/runtime.h>
+#import <objc/message.h>
 #import <realm/table_view.hpp>
 
 using namespace realm;
@@ -147,6 +148,12 @@ static const int RLMEnumerationBufferSize = 16;
 - (instancetype)initPrivate {
     self = [super init];
     return self;
+}
+
+static void assertKeyPathIsNotNested(NSString *keyPath) {
+    if ([keyPath rangeOfString:@"."].location != NSNotFound) {
+        @throw RLMException(@"Nested key paths are not supported yet for KVC collection operators.");
+    }
 }
 
 [[gnu::noinline]]
@@ -293,6 +300,13 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
                 @throw RLMException(@"Unsupported KVC collection operator found in key path '%@'", keyPath);
             }
         }
+        NSString *operatorName = [keyPath substringWithRange:NSMakeRange(1, operatorRange.location - 1)];
+        NSString *operatorKeyPath = [keyPath substringFromIndex:operatorRange.location + 1];
+        NSAssert(operatorKeyPath.length > 0, @"Missing key path for KVC collection operator %@ in key path '%@'", operatorName, keyPath);
+        SEL opSelector = NSSelectorFromString([NSString stringWithFormat:@"_%@ForKeyPath:", operatorName]);
+        if ([self respondsToSelector:opSelector]) {
+            return ((id(*)(id, SEL, id))objc_msgSend)(self, opSelector, operatorKeyPath);
+        }
     }
     return [super valueForKeyPath:keyPath];
 }
@@ -306,6 +320,27 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 - (void)setValue:(id)value forKey:(NSString *)key {
     translateErrors([&] { RLMResultsValidateInWriteTransaction(self); });
     RLMCollectionSetValueForKey(self, key, value);
+}
+
+- (NSNumber *)_aggregateForKeyPath:(NSString *)keyPath method:(util::Optional<Mixed> (Results::*)(size_t))method methodName:(NSString *)methodName {
+    assertKeyPathIsNotNested(keyPath);
+    return [self aggregate:keyPath method:method methodName:methodName];
+}
+
+- (NSNumber *)_minForKeyPath:(NSString *)keyPath {
+    return [self _aggregateForKeyPath:keyPath method:&Results::min methodName:@"@min"];
+}
+
+- (NSNumber *)_maxForKeyPath:(NSString *)keyPath {
+    return [self _aggregateForKeyPath:keyPath method:&Results::max methodName:@"@max"];
+}
+
+- (NSNumber *)_sumForKeyPath:(NSString *)keyPath {
+    return [self _aggregateForKeyPath:keyPath method:&Results::sum methodName:@"@sum"];
+}
+
+- (NSNumber *)_avgForKeyPath:(NSString *)keyPath {
+    return [self _aggregateForKeyPath:keyPath method:&Results::average methodName:@"@avg"];
 }
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
