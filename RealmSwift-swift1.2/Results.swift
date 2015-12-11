@@ -286,6 +286,48 @@ public final class Results<T: Object>: ResultsBase {
     public func average<U: AddableType>(property: String) -> U? {
         return rlmResults.averageOfProperty(property) as! U?
     }
+
+    // MARK: Notifications
+
+    /**
+     Register a block to be called each time the Results changes.
+
+     The block will be asynchronously called with the initial results, and then
+     called again after each writen transaction which causes the results to change.
+     You must retain the returned token for as long as you want the results to
+     continue to be sent to the block. To stop receiving updates, call stop() on the
+     token.
+
+     The determination for whether or not a write transaction has changed the
+     results is currently very coarse, and the block may be called even if no
+     changes occurred. The opposite (not being called despite changes) will not
+     happen. This will become more precise in future versions.
+
+     If an error occurs the block will be called with `nil` for the results
+     parameter and a non-`nil` error. Currently the only errors that can occur are
+     when opening the Realm on the background worker thread or the destination
+     queue fails.
+
+     At the time when the block is called, the Results object will be fully
+     evaluated and up-to-date, and as long as you do not perform a write transaction
+     on the same thread or explicitly call realm.refresh(), accessing it will never
+     perform blocking work.
+
+     :warning: This method cannot be called during a write transaction, or when
+               the source realm is read-only.
+
+     :param: block The block to be called with the evaluated results
+     :returns: A token which must be held for as long as you want query results to be delivered.
+     */
+    public func addNotificationBlock(block: (Results<T>?, NSError?) -> ()) -> NotificationToken {
+        return rlmResults.addNotificationBlock { results, error in
+            if results != nil {
+                block(self, nil)
+            } else {
+                block(nil, error)
+            }
+        }
+    }
 }
 
 extension Results: RealmCollectionType {
@@ -305,4 +347,16 @@ extension Results: RealmCollectionType {
     /// The collection's "past the end" position.
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
     public var endIndex: Int { return count }
+
+    /// :nodoc:
+    public func _addNotificationBlock(block: (AnyRealmCollection<T>?, NSError?) -> ()) -> NotificationToken {
+        let anyCollection = AnyRealmCollection(self)
+        return rlmResults.addNotificationBlock { results, error in
+            if results != nil {
+                block(anyCollection, nil)
+            } else {
+                block(nil, error)
+            }
+        }
+    }
 }

@@ -386,6 +386,24 @@ public final class List<T: Object>: ListBase {
         throwForNegativeIndex(index2, parameterName: "index2")
         _rlmArray.exchangeObjectAtIndex(UInt(index1), withObjectAtIndex: UInt(index2))
     }
+
+    // MARK: Notifications
+
+    /**
+    Register a block to be called each time the List changes.
+
+    The block will be asynchronously called with the initial list, and then
+    called again after each write transaction which changes the list or any of
+    the items in the list. You must retain the returned token for as long as
+    you want the results to continue to be sent to the block. To stop receiving
+    updates, call stop() on the token.
+
+    :param: The block to be called each time the list changes
+    :returns: A token which must be held for as long as you want notifications to be delivered.
+    */
+    public func addNotificationBlock(block: (List<T>) -> ()) -> NotificationToken {
+        return _rlmArray.addNotificationBlock { _, _ in block(self) }
+    }
 }
 
 extension List: RealmCollectionType, ExtensibleCollectionType {
@@ -394,6 +412,12 @@ extension List: RealmCollectionType, ExtensibleCollectionType {
     /// Returns a `GeneratorOf<T>` that yields successive elements in the List.
     public func generate() -> RLMGenerator<T> {
         return RLMGenerator(collection: _rlmArray)
+    }
+
+    /// :nodoc:
+    public func _addNotificationBlock(block: (AnyRealmCollection<T>?, NSError?) -> ()) -> NotificationToken {
+        let anyCollection = AnyRealmCollection(self)
+        return _rlmArray.addNotificationBlock { _, _ in block(anyCollection, nil) }
     }
 
     // MARK: ExtensibleCollection Support
