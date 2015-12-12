@@ -247,8 +247,8 @@ class SwiftPerformanceTests: TestCase {
 
     func testQueryConstruction() {
         let realm = realmWithTestPath()
-        let predicate = "boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and doubleCol != 7.0 " +
-                        " and stringCol IN {'a', 'b', 'c'}"
+        let predicate = NSPredicate(format: "boolCol = false and (intCol = 5 or floatCol = 1.0) and " +
+                                    "objectCol = nil and doubleCol != 7.0 and stringCol IN {'a', 'b', 'c'}")
 
         measureBlock {
             for _ in 0..<500 {
