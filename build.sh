@@ -245,7 +245,7 @@ build_docs() {
     local objc="--objc"
 
     if [[ "$language" == "swift" ]]; then
-        : ${REALM_SWIFT_VERSION:=2.1}
+        : ${REALM_SWIFT_VERSION:=2.1.1}
         sh build.sh set-swift-version
         xcodebuild_arguments="-scheme,RealmSwift"
         module="RealmSwift"
@@ -265,7 +265,8 @@ build_docs() {
       --module ${module} \
       --root-url https://realm.io/docs/${language}/${version}/api/ \
       --output $(pwd)/docs/${language}_output \
-      --template-directory $(pwd)/docs/templates
+      --template-directory $(pwd)/docs/templates \
+      --swift-version 2.1.1
 
     rm Realm/RLMPlatform.h
 }
@@ -856,7 +857,7 @@ case "$COMMAND" in
         cp -r $(dirname $0)/scripts ${OBJC}
         cd ${OBJC}
         REALM_SWIFT_VERSION=1.2 sh build.sh examples-ios
-        REALM_SWIFT_VERSION=2.1 sh build.sh examples-ios
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh examples-ios
         sh build.sh examples-osx
         cd ..
         rm -rf ${OBJC}
@@ -867,7 +868,7 @@ case "$COMMAND" in
         cp -r $(dirname $0)/scripts ${SWIFT}
         cd ${SWIFT}
         REALM_SWIFT_VERSION=1.2 sh build.sh examples-ios-swift
-        REALM_SWIFT_VERSION=2.1 sh build.sh examples-ios-swift
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh examples-ios-swift
         cd ..
         rm -rf ${SWIFT}
         ;;
@@ -881,9 +882,9 @@ case "$COMMAND" in
         move_to_clean_dir build/ios-static/Realm.framework xcode-6
         rm -rf build
 
-        REALM_SWIFT_VERSION=2.1 sh build.sh prelaunch-simulator
-        REALM_SWIFT_VERSION=2.1 sh build.sh test-ios-static
-        REALM_SWIFT_VERSION=2.1 sh build.sh ios-static
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh prelaunch-simulator
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh test-ios-static
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh ios-static
         move_to_clean_dir build/ios-static/Realm.framework xcode-7
 
         zip --symlinks -r build/ios-static/realm-framework-ios.zip xcode-6 xcode-7
@@ -896,8 +897,8 @@ case "$COMMAND" in
         move_to_clean_dir build/ios/Realm.framework xcode-6
         rm -rf build
 
-        REALM_SWIFT_VERSION=2.1 sh build.sh prelaunch-simulator
-        REALM_SWIFT_VERSION=2.1 sh build.sh ios-dynamic
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh prelaunch-simulator
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh ios-dynamic
         move_to_clean_dir build/ios/Realm.framework xcode-7
 
         zip --symlinks -r build/ios/realm-dynamic-framework-ios.zip xcode-6 xcode-7
@@ -905,7 +906,7 @@ case "$COMMAND" in
 
     "package-osx")
         cd tightdb_objc
-        REALM_SWIFT_VERSION=2.1 sh build.sh test-osx
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh test-osx
 
         cd build/DerivedData/Realm/Build/Products/Release
         zip --symlinks -r realm-framework-osx.zip Realm.framework
@@ -913,28 +914,28 @@ case "$COMMAND" in
 
     "package-ios-swift")
         cd tightdb_objc
-        for version in 1.2 2.1; do
+        for version in 1.2 2.1.1; do
             rm -rf build/ios/Realm.framework
             REALM_SWIFT_VERSION=$version sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION=$version sh build.sh ios-swift
         done
 
         cd build/ios
-        zip --symlinks -r realm-swift-framework-ios.zip swift-1.2 swift-2.1
+        zip --symlinks -r realm-swift-framework-ios.zip swift-1.2 swift-2.1.1
         ;;
 
     "package-osx-swift")
         cd tightdb_objc
         REALM_SWIFT_VERSION=1.2 sh build.sh osx-swift
-        REALM_SWIFT_VERSION=2.1 sh build.sh osx-swift
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh osx-swift
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip swift-1.2 swift-2.1
+        zip --symlinks -r realm-swift-framework-osx.zip swift-1.2 swift-2.1.1
         ;;
 
     "package-watchos")
         cd tightdb_objc
-        REALM_SWIFT_VERSION=2.1 sh build.sh watchos
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh watchos
 
         cd build/watchos
         zip --symlinks -r realm-framework-watchos.zip Realm.framework
@@ -942,7 +943,7 @@ case "$COMMAND" in
 
     "package-watchos-swift")
         cd tightdb_objc
-        REALM_SWIFT_VERSION=2.1 sh build.sh watchos-swift
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh watchos-swift
 
         cd build/watchos
         zip --symlinks -r realm-swift-framework-watchos.zip RealmSwift.framework Realm.framework
@@ -1015,7 +1016,7 @@ case "$COMMAND" in
             unzip ${WORKSPACE}/realm-examples.zip
             cd examples
             if [[ "${LANG}" == "objc" ]]; then
-                rm -rf ios/swift-1.2 ios/swift-2.1
+                rm -rf ios/swift-1.2 ios/swift-2.1.1
             else
                 rm -rf ios/objc ios/rubymotion osx
             fi
