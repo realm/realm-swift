@@ -113,7 +113,6 @@ void AsyncQuery::run()
         // Don't run the query if the results aren't actually going to be used
         if (!m_target_results || (!m_have_callbacks && !m_target_results->wants_background_updates())) {
             m_skipped_running = true;
-            m_version = SharedGroup::VersionID{};
             return;
         }
     }
@@ -138,6 +137,7 @@ void AsyncQuery::run()
 void AsyncQuery::prepare_handover()
 {
     if (m_skipped_running) {
+        m_version = SharedGroup::VersionID{};
         return;
     }
 
