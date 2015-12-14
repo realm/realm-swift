@@ -361,6 +361,17 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     return RLMConvertNotFound(_backingLinkView->find(object_ndx));
 }
 
+- (id)valueForKeyPath:(NSString *)keyPath {
+    if ([keyPath hasPrefix:@"@"]) {
+        // Delegate KVC collection operators to RLMResults
+        realm::Query query = _backingLinkView->get_target_table().where(_backingLinkView);
+        RLMResults *results = [RLMResults resultsWithObjectSchema:_realm.schema[self.objectClassName]
+                                                          results:realm::Results(_realm->_realm, std::move(query))];
+        return [results valueForKeyPath:keyPath];
+    }
+    return [super valueForKeyPath:keyPath];
+}
+
 - (id)valueForKey:(NSString *)key {
     // Ideally we'd use "@invalidated" for this so that "invalidated" would use
     // normal array KVC semantics, but observing @things works very oddly (when

@@ -299,6 +299,13 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
     return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
+- (id)valueForKeyPath:(NSString *)keyPath {
+    if (_backingArray) {
+        return [_backingArray valueForKeyPath:keyPath];
+    }
+    return [super valueForKeyPath:keyPath];
+}
+
 - (id)valueForKey:(NSString *)key {
     if ([key isEqualToString:RLMInvalidatedKey]) {
         return @NO; // Standalone arrays are never invalidated
