@@ -97,8 +97,9 @@ void AsyncQuery::do_remove_callback(size_t token) noexcept
 
 void AsyncQuery::unregister() noexcept
 {
-    std::lock_guard<std::mutex> lock(m_target_mutex);
     RealmCoordinator::unregister_query(*this);
+
+    std::lock_guard<std::mutex> lock(m_target_mutex);
     m_target_results = nullptr;
     m_realm = nullptr;
 }
