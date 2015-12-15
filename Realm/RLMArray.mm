@@ -300,10 +300,22 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (id)valueForKeyPath:(NSString *)keyPath {
-    if (_backingArray) {
-        return [_backingArray valueForKeyPath:keyPath];
+    if (!_backingArray) {
+        return [super valueForKeyPath:keyPath];
     }
-    return [super valueForKeyPath:keyPath];
+    // Although delegating to valueForKeyPath: here would allow to support
+    // nested key paths as well, limiting functionality gives consistency
+    // between standalone and persisted arrays.
+    if ([keyPath characterAtIndex:0] == '@') {
+        NSRange operatorRange = [keyPath rangeOfString:@"." options:NSLiteralSearch];
+        if (operatorRange.location != NSNotFound) {
+            NSString *operatorKeyPath = [keyPath substringFromIndex:operatorRange.location + 1];
+            if ([operatorKeyPath rangeOfString:@"."].location != NSNotFound) {
+                @throw RLMException(@"Nested key paths are not supported yet for KVC collection operators.");
+            }
+        }
+    }
+    return [_backingArray valueForKeyPath:keyPath];
 }
 
 - (id)valueForKey:(NSString *)key {
