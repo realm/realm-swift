@@ -93,23 +93,22 @@ private:
     std::mutex m_callback_mutex;
     std::vector<Callback> m_callbacks;
 
-    // Callbacks which the user has asked to have removed whose removal has been
-    // deferred until after we're done looping over m_callbacks
-    std::vector<size_t> m_callbacks_to_remove;
-
     SharedGroup* m_sg = nullptr;
 
     uint_fast64_t m_handed_over_table_version = -1;
     uint_fast64_t m_delievered_table_version = -1;
 
+    // Iteration variable for looping over callbacks
+    // remove_callback() updates this when needed
+    size_t m_callback_index = npos;
+
     bool m_skipped_running = false;
     bool m_initial_run_complete = false;
-    bool m_calling_callbacks = false;
     std::atomic<bool> m_have_callbacks = {false};
 
-    void do_remove_callback(size_t token) noexcept;
-
     bool is_for_current_thread() const { return m_thread_id == std::this_thread::get_id(); }
+
+    std::function<void (std::exception_ptr)> next_callback();
 };
 
 } // namespace _impl

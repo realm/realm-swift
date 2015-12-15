@@ -48,51 +48,51 @@ AsyncQueryCancelationToken AsyncQuery::add_callback(std::function<void (std::exc
         return token;
     };
 
-    if (m_calling_callbacks) {
-        // We're being called from within a callback block, so add without
-        // locking or faking a commit
-        auto token = next_token();
-        m_callbacks.push_back({std::move(callback), token, -1ULL});
-        return {*this, token};
-    }
-
     std::lock_guard<std::mutex> lock(m_callback_mutex);
     auto token = next_token();
     m_callbacks.push_back({std::move(callback), token, -1ULL});
-    Realm::Internal::get_coordinator(*m_realm).send_commit_notifications();
-    m_have_callbacks = true;
+    if (m_callback_index == npos) { // Don't need to wake up if we're already sending notifications
+        Realm::Internal::get_coordinator(*m_realm).send_commit_notifications();
+        m_have_callbacks = true;
+    }
     return {*this, token};
 }
 
 void AsyncQuery::remove_callback(size_t token)
 {
-    if (is_for_current_thread() &&  m_calling_callbacks) {
-        // Schedule the removal for after we're done calling callbacks
-        // No need for a lock here because we're on the same thread as the one
-        // holding the lock
-        m_callbacks_to_remove.push_back(token);
-        return;
-    }
-
     std::lock_guard<std::mutex> lock(m_callback_mutex);
-    do_remove_callback(token);
-}
-
-void AsyncQuery::do_remove_callback(size_t token) noexcept
-{
     REALM_ASSERT(m_error || m_callbacks.size() > 0);
+
     auto it = find_if(begin(m_callbacks), end(m_callbacks),
                       [=](const auto& c) { return c.token == token; });
     // We should only fail to find the callback if it was removed due to an error
     REALM_ASSERT(m_error || it != end(m_callbacks));
-
-    if (it != end(m_callbacks)) {
-        if (it != prev(end(m_callbacks))) {
-            *it = std::move(m_callbacks.back());
-        }
-        m_callbacks.pop_back();
+    if (it == end(m_callbacks)) {
+        return;
     }
-    m_have_callbacks = !m_callbacks.empty();
+
+    size_t idx = distance(begin(m_callbacks), it);
+    if (m_callback_index != npos && m_callback_index > idx) {
+        // If we're currently looping over callbacks and are on an index after
+        // the one being removed, then the move-last-over logic will result in
+        // the previously-last callback being skipped, so shift the one being
+        // removed to the current iteration position
+        REALM_ASSERT(m_callback_index < m_callbacks.size());
+        REALM_ASSERT(idx + 1 < m_callbacks.size());
+        auto begin = m_callbacks.begin();
+        std::move(begin + idx + 1, begin + m_callback_index + 1, begin + idx);
+        it = begin + m_callback_index;
+        idx = m_callback_index;
+    }
+
+    if (m_callback_index == idx) {
+        --m_callback_index;
+    }
+
+    if (it != prev(end(m_callbacks))) {
+        *it = std::move(m_callbacks.back());
+    }
+    m_callbacks.pop_back();
 }
 
 void AsyncQuery::unregister() noexcept
@@ -208,47 +208,32 @@ bool AsyncQuery::deliver(SharedGroup& sg, std::exception_ptr err)
 void AsyncQuery::call_callbacks()
 {
     REALM_ASSERT(is_for_current_thread());
-    std::lock_guard<std::mutex> callback_lock(m_callback_mutex);
 
-    // Tell remove_callback() to defer actually removing them, so that calling it
-    // in the callback block works
-    m_calling_callbacks = true;
+    while (auto fn = next_callback()) {
+        fn(m_error);
+    }
 
     if (m_error) {
-        for (auto& callback : m_callbacks) {
-            callback.fn(m_error);
-        }
-
         // Remove all the callbacks as we never need to call anything ever again
         // after delivering an error
+        std::lock_guard<std::mutex> callback_lock(m_callback_mutex);
         m_callbacks.clear();
-        m_callbacks_to_remove.clear();
-        m_calling_callbacks = false;
-        return;
     }
+}
 
-    // Iterate by index to handle users adding callbacks during iteration
-    for (size_t i = 0; i < m_callbacks.size(); ++i) {
-        auto& callback = m_callbacks[i];
-        // Skip callbacks stopped from within previous callback blocks
-        if (find(begin(m_callbacks_to_remove), end(m_callbacks_to_remove), callback.token) != end(m_callbacks_to_remove)) {
-            continue;
-        }
-        if (callback.delivered_version != m_delievered_table_version) {
+std::function<void (std::exception_ptr)> AsyncQuery::next_callback()
+{
+    std::lock_guard<std::mutex> callback_lock(m_callback_mutex);
+    for (++m_callback_index; m_callback_index < m_callbacks.size(); ++m_callback_index) {
+        auto& callback = m_callbacks[m_callback_index];
+        if (m_error || callback.delivered_version != m_delievered_table_version) {
             callback.delivered_version = m_delievered_table_version;
-            // warning: `callback` is invalidated after this call, as the
-            /// referenced object could move if the user adds a new callback
-            callback.fn(nullptr);
+            return callback.fn;
         }
     }
 
-    m_calling_callbacks = false;
-
-    // Actually remove any callbacks whose removal was requested during iteration
-    for (auto token : m_callbacks_to_remove) {
-        do_remove_callback(token);
-    }
-    m_callbacks_to_remove.clear();
+    m_callback_index = npos;
+    return nullptr;
 }
 
 void AsyncQuery::attach_to(realm::SharedGroup& sg)
