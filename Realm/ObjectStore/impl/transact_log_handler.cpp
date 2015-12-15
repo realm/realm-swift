@@ -135,8 +135,6 @@ public:
     bool set_int_unique(size_t, size_t, int_fast64_t) { return true; }
     bool set_string_unique(size_t, size_t, StringData) { return true; }
     bool optimize_table() { return true; }
-    bool set_int_unique(size_t, size_t, int_fast64_t) { return true; }
-    bool set_string_unique(size_t, size_t, StringData) { return true; }
 };
 
 // Extends TransactLogValidator to also track changes and report it to the
