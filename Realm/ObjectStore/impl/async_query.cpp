@@ -235,8 +235,10 @@ void AsyncQuery::call_callbacks()
             continue;
         }
         if (callback.delivered_version != m_delievered_table_version) {
-            callback.fn(nullptr);
             callback.delivered_version = m_delievered_table_version;
+            // warning: `callback` is invalidated after this call, as the
+            /// referenced object could move if the user adds a new callback
+            callback.fn(nullptr);
         }
     }
 
