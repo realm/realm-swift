@@ -57,7 +57,7 @@ public:
 
     Realm& get_realm() { return m_target_results->get_realm(); }
     // Get the version of the current handover object
-    SharedGroup::VersionID version() const noexcept { return m_version; }
+    SharedGroup::VersionID version() const noexcept { return m_sg_version; }
 
 private:
     // Target Results to update and a mutex which guards it
@@ -79,7 +79,7 @@ private:
     // be non-null
     TableView m_tv;
     std::unique_ptr<SharedGroup::Handover<TableView>> m_tv_handover;
-    SharedGroup::VersionID m_version;
+    SharedGroup::VersionID m_sg_version;
     std::exception_ptr m_error;
 
     struct Callback {
@@ -99,8 +99,8 @@ private:
 
     SharedGroup* m_sg = nullptr;
 
-    uint_fast64_t m_tv_version = -1;
-    uint_fast64_t m_next_tv_version = -1;
+    uint_fast64_t m_handed_over_table_version = -1;
+    uint_fast64_t m_delievered_table_version = -1;
 
     bool m_skipped_running = false;
     bool m_initial_run_complete = false;

@@ -28,7 +28,7 @@ AsyncQuery::AsyncQuery(Results& target)
 : m_target_results(&target)
 , m_realm(target.get_realm().shared_from_this())
 , m_sort(target.get_sort())
-, m_version(Realm::Internal::get_shared_group(*m_realm).get_version_of_current_transaction())
+, m_sg_version(Realm::Internal::get_shared_group(*m_realm).get_version_of_current_transaction())
 {
     Query q = target.get_query();
     m_query_handover = Realm::Internal::get_shared_group(*m_realm).export_for_handover(q, MutableSourcePayload::Move);
@@ -122,7 +122,7 @@ void AsyncQuery::run()
     // may be called concurrently (as it'd be pretty bad for a running query to
     // block the main thread trying to pick up the previous results)
     if (m_tv.is_attached()) {
-        m_next_tv_version = m_tv.sync_if_needed();
+        m_tv.sync_if_needed();
     }
     else {
         m_tv = m_query->find_all();
@@ -130,30 +130,31 @@ void AsyncQuery::run()
         if (m_sort) {
             m_tv.sort(m_sort.columnIndices, m_sort.ascending);
         }
-        m_next_tv_version = m_tv.outside_version();
     }
 }
 
 void AsyncQuery::prepare_handover()
 {
     if (m_skipped_running) {
-        m_version = SharedGroup::VersionID{};
+        m_sg_version = SharedGroup::VersionID{};
         return;
     }
 
     REALM_ASSERT(m_tv.is_attached());
     REALM_ASSERT(m_tv.is_in_sync());
 
-    m_version = m_sg->get_version_of_current_transaction();
+    m_sg_version = m_sg->get_version_of_current_transaction();
     m_initial_run_complete = true;
 
-    // Even if the TV didn't change, we need to re-export it if the previous
-    // export has not been consumed yet, as the old handover object is no longer
-    // usable due to the version not matching
-    if (m_next_tv_version != m_tv_version || (m_tv_handover && m_tv_handover->version != m_version)) {
-        m_tv_handover = m_sg->export_for_handover(m_tv, ConstSourcePayload::Copy);
-        m_tv_version = m_next_tv_version;
+    auto table_version = m_tv.outside_version();
+    if (!m_tv_handover && table_version == m_handed_over_table_version) {
+        // We've already delivered the query results since the last time the
+        // table changed, so no need to do anything
+        return;
     }
+
+    m_tv_handover = m_sg->export_for_handover(m_tv, ConstSourcePayload::Copy);
+    m_handed_over_table_version = table_version;
 }
 
 bool AsyncQuery::deliver(SharedGroup& sg, std::exception_ptr err)
@@ -185,8 +186,8 @@ bool AsyncQuery::deliver(SharedGroup& sg, std::exception_ptr err)
 
     REALM_ASSERT(!m_query_handover);
 
-    auto realm_version = Realm::Internal::get_shared_group(*m_realm).get_version_of_current_transaction();
-    if (m_version != realm_version) {
+    auto realm_sg_version = Realm::Internal::get_shared_group(*m_realm).get_version_of_current_transaction();
+    if (m_sg_version != realm_sg_version) {
         // Realm version can be newer if a commit was made on our thread or the
         // user manually called refresh(), or older if a commit was made on a
         // different thread and we ran *really* fast in between the check for
@@ -197,6 +198,7 @@ bool AsyncQuery::deliver(SharedGroup& sg, std::exception_ptr err)
     if (m_tv_handover) {
         Results::AsyncFriend::set_table_view(*m_target_results,
                                              std::move(*sg.import_from_handover(std::move(m_tv_handover))));
+        m_delievered_table_version = m_handed_over_table_version;
 
     }
     REALM_ASSERT(!m_tv_handover);
@@ -232,9 +234,9 @@ void AsyncQuery::call_callbacks()
         if (find(begin(m_callbacks_to_remove), end(m_callbacks_to_remove), callback.token) != end(m_callbacks_to_remove)) {
             continue;
         }
-        if (callback.delivered_version != m_tv_version) {
+        if (callback.delivered_version != m_delievered_table_version) {
             callback.fn(nullptr);
-            callback.delivered_version = m_tv_version;
+            callback.delivered_version = m_delievered_table_version;
         }
     }
 
