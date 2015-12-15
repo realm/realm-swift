@@ -52,13 +52,13 @@ AsyncQueryCancelationToken AsyncQuery::add_callback(std::function<void (std::exc
         // We're being called from within a callback block, so add without
         // locking or faking a commit
         auto token = next_token();
-        m_callbacks.push_back({std::move(callback), nullptr, token, -1ULL});
+        m_callbacks.push_back({std::move(callback), token, -1ULL});
         return {*this, token};
     }
 
     std::lock_guard<std::mutex> lock(m_callback_mutex);
     auto token = next_token();
-    m_callbacks.push_back({std::move(callback), nullptr, token, -1ULL});
+    m_callbacks.push_back({std::move(callback), token, -1ULL});
     Realm::Internal::get_coordinator(*m_realm).send_commit_notifications();
     m_have_callbacks = true;
     return {*this, token};

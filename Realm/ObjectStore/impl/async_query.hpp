@@ -84,7 +84,6 @@ private:
 
     struct Callback {
         std::function<void (std::exception_ptr)> fn;
-        std::unique_ptr<SharedGroup::Handover<TableView>> handover;
         size_t token;
         uint_fast64_t delivered_version;
     };
