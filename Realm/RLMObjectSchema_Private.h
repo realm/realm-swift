@@ -37,6 +37,8 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readwrite) RLMProperty *primaryKeyProperty;
 
+@property (nonatomic, readonly) NSArray RLM_GENERIC(RLMProperty *) *propertiesInDeclaredOrder;
+
 // The Realm retains its object schemas, so they need to not retain the Realm
 @property (nonatomic, unsafe_unretained, nullable) RLMRealm *realm;
 // returns a cached or new schema for a given object class
