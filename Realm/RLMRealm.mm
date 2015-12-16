@@ -633,7 +633,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (RLMResults *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat args:(va_list)args {
-    return [self objects:objectClassName withPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
+    return [self objects:objectClassName withPredicate:RLMValidatedPredicate(predicateFormat, args)];
 }
 
 - (RLMResults *)objects:(NSString *)objectClassName withPredicate:(NSPredicate *)predicate {

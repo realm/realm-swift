@@ -245,8 +245,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args {
-    return [self indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:predicateFormat
-                                                                   arguments:args]];
+    return [self indexOfObjectWithPredicate:RLMValidatedPredicate(predicateFormat, args)];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
@@ -385,7 +384,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args {
-    return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
+    return [self objectsWithPredicate:RLMValidatedPredicate(predicateFormat, args)];
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {

@@ -71,6 +71,14 @@ RLMProperty *RLMValidatedProperty(RLMObjectSchema *desc, NSString *columnName) {
     return prop;
 }
 
+NSPredicate *RLMValidatedPredicate(id predicateFormat, va_list args) {
+    if (predicateFormat && ![predicateFormat isKindOfClass:[NSString class]]) {
+        NSString *reason = @"predicate must be an NSString with optional format va_list";
+        @throw [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:nil];
+    }
+    return [NSPredicate predicateWithFormat:predicateFormat arguments:args];
+}
+
 namespace {
 
 // FIXME: TrueExpression and FalseExpression should be supported by core in some way
