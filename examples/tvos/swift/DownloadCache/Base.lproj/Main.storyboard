@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" initialViewController="SGO-h1-0KE">
+<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" initialViewController="SGO-h1-0KE">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
     </dependencies>
@@ -74,7 +74,7 @@
                                 <action selector="valueChanged:" destination="Lzj-QC-eFp" eventType="valueChanged" id="bxz-KG-3GC"/>
                             </connections>
                         </segmentedControl>
-                        <barButtonItem key="rightBarButtonItem" style="plain" id="Etp-QS-ce2">
+                        <barButtonItem key="rightBarButtonItem" id="Etp-QS-ce2">
                             <view key="customView" contentMode="scaleToFill" id="CQd-xG-tmf">
                                 <rect key="frame" x="1494" y="44" width="426" height="108"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
