@@ -21,7 +21,7 @@
 @implementation RepositoryCell
 
 - (void)prepareForReuse {
-    self.imageView.image = nil;
+    self.avatarImageView.image = nil;
     self.titleLabel.text = nil;
 }
 

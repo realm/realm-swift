@@ -29,7 +29,7 @@
 
 @end
 
-@implementation ViewController
+@implementation RepositoriesViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -83,7 +83,7 @@
         if (!error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIImage *image = [UIImage imageWithData:data];
-                cell.imageView.image = image;
+                cell.avatarImageView.image = image;
             });
         } else {
             NSLog(@"%@", error);
@@ -94,14 +94,11 @@
 }
 
 - (void)reloadData {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    RLMResults *results;
+    self.results = [Repository allObjects];
     if (self.searchField.text.length > 0) {
-        results = [Repository objectsInRealm:realm where:@"name contains[c] %@", self.searchField.text];
-    } else {
-        results = [Repository allObjectsInRealm:realm];
+        self.results = [self.results objectsWhere:@"name contains[c] %@", self.searchField.text];
     }
-    self.results = [results sortedResultsUsingProperty:@"name" ascending:self.sortOrderControl.selectedSegmentIndex == 0];
+    self.results = [self.results sortedResultsUsingProperty:@"name" ascending:self.sortOrderControl.selectedSegmentIndex == 0];
 
     [self.collectionView reloadData];
 }
