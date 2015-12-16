@@ -107,6 +107,8 @@ namespace realm {
         void verify_thread() const;
         void verify_in_write() const;
 
+        bool can_deliver_notifications() const noexcept;
+
         // Close this Realm and remove it from the cache. Continuing to use a
         // Realm after closing it will produce undefined behavior.
         void close();

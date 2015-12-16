@@ -80,6 +80,7 @@ void RLMRealmTranslateException(NSError **error);
 - (void)sendNotifications:(NSString *)notification;
 - (void)notify;
 - (void)verifyThread;
+- (void)verifyNotificationsAreSupported;
 
 + (NSString *)writeableTemporaryPathForFile:(NSString *)fileName;
 

@@ -408,6 +408,19 @@ bool Realm::refresh()
     return true;
 }
 
+bool Realm::can_deliver_notifications() const noexcept
+{
+    if (m_config.read_only) {
+        return false;
+    }
+
+    if (m_binding_context && !m_binding_context->can_deliver_notifications()) {
+        return false;
+    }
+
+    return true;
+}
+
 uint64_t Realm::get_schema_version(const realm::Realm::Config &config)
 {
     auto coordinator = RealmCoordinator::get_existing_coordinator(config.path);

@@ -414,15 +414,19 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
-- (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
+- (void)verifyNotificationsAreSupported {
     [self verifyThread];
     CheckReadWrite(self, @"Read-only Realms do not change and do not have change notifications");
+    if (!_realm->can_deliver_notifications()) {
+        @throw RLMException(@"Can only add notification blocks from within runloops.");
+    }
+}
+
+- (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
     if (!block) {
         @throw RLMException(@"The notification block should not be nil");
     }
-    if (!RLMIsInRunLoop()) {
-        @throw RLMException(@"Can only add notification blocks from within runloops.");
-    }
+    [self verifyNotificationsAreSupported];
 
     _realm->read_group();
 

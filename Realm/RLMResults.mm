@@ -534,10 +534,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *results, NSError *error))block {
-    if (!RLMIsInRunLoop()) {
-        @throw RLMException(@"Can only add notification blocks from within runloops.");
-    }
-    [_realm verifyThread];
+    [_realm verifyNotificationsAreSupported];
     auto token = _results.async([self, block](std::exception_ptr err) {
         if (err) {
             try {

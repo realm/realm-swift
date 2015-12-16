@@ -457,10 +457,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, NSError *))block {
-    if (!RLMIsInRunLoop()) {
-        @throw RLMException(@"Can only add notification blocks from within runloops.");
-    }
-    [_realm verifyThread];
+    [_realm verifyNotificationsAreSupported];
 
     __block uint_fast64_t prevVersion = -1;
     auto noteBlock = ^(NSString *notification, RLMRealm *) {

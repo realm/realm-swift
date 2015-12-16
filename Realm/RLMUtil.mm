@@ -344,22 +344,6 @@ BOOL RLMIsDebuggerAttached()
     return (info.kp_proc.p_flag & P_TRACED) != 0;
 }
 
-BOOL RLMIsInRunLoop() {
-    // The main thread may not be in a run loop yet if we're called from
-    // something like `applicationDidFinishLaunching:`, but it presumably will
-    // be in the future
-    if ([NSThread isMainThread]) {
-        return true;
-    }
-    // Current mode indicates why the current callout from the runloop was made,
-    // and is null if a runloop callout isn't currently being processed
-    if (auto mode = CFRunLoopCopyCurrentMode(CFRunLoopGetCurrent())) {
-        CFRelease(mode);
-        return true;
-    }
-    return false;
-}
-
 id RLMMixedToObjc(realm::Mixed const& mixed) {
     switch (mixed.get_type()) {
         case realm::type_String:

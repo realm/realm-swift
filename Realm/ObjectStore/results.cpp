@@ -168,7 +168,7 @@ void Results::update_tableview()
             m_mode = Mode::TableView;
             break;
         case Mode::TableView:
-            if (!m_realm->config().read_only && !m_realm->is_in_transaction() && !m_background_query) {
+            if (!m_background_query && m_realm->can_deliver_notifications() &&  !m_realm->is_in_transaction()) {
                 m_background_query = std::make_shared<_impl::AsyncQuery>(*this);
                 _impl::RealmCoordinator::register_query(m_background_query);
             }
