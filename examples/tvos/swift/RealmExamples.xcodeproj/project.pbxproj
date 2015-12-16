@@ -51,6 +51,13 @@
 			remoteGlobalIDString = 14835E3A1BFE5E8400B9A267;
 			remoteInfo = RealmSwift;
 		};
+		E83178551C222E78002F9738 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 14835DFA1BFE5E0B00B9A267 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 14835E3A1BFE5E8400B9A267;
+			remoteInfo = RealmSwift;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -98,7 +105,7 @@
 		14AACA8F1BFE7B740046BD85 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		14AACA911BFE7B740046BD85 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		14AACA951BFE7C260046BD85 /* Place.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
-		14AACA971BFE7C420046BD85 /* Places.realm */ = {isa = PBXFileReference; lastKnownFileType = file; name = Places.realm; path = "Seed Data/Places.realm"; sourceTree = "<group>"; };
+		14AACA971BFE7C420046BD85 /* Places.realm */ = {isa = PBXFileReference; lastKnownFileType = file; name = Places.realm; path = "../../objc/PreloadedData/Seed Data/Places.realm"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -222,6 +229,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				E83178561C222E78002F9738 /* PBXTargetDependency */,
 			);
 			name = PreloadedData;
 			productName = PreloadedData;
@@ -351,6 +359,11 @@
 			isa = PBXTargetDependency;
 			target = 14835E3A1BFE5E8400B9A267 /* RealmSwift */;
 			targetProxy = 14835E3F1BFE5ED700B9A267 /* PBXContainerItemProxy */;
+		};
+		E83178561C222E78002F9738 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 14835E3A1BFE5E8400B9A267 /* RealmSwift */;
+			targetProxy = E83178551C222E78002F9738 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -556,6 +569,7 @@
 				14AACA941BFE7B740046BD85 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

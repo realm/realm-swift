@@ -49,6 +49,13 @@
 			remoteGlobalIDString = 1403AF621BFDC71100C1FBB4;
 			remoteInfo = Realm;
 		};
+		E83178571C222EFC002F9738 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1403AF401BFDC60A00C1FBB4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1403AF621BFDC71100C1FBB4;
+			remoteInfo = Realm;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -250,6 +257,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				E83178581C222EFC002F9738 /* PBXTargetDependency */,
 			);
 			name = PreloadedData;
 			productName = PreloadedData;
@@ -328,7 +336,6 @@
 			);
 			name = "Build Realm";
 			outputPaths = (
-				"$(SRCROOT)/../../../build/ios-static/Realm.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -395,6 +402,11 @@
 			isa = PBXTargetDependency;
 			target = 1403AF621BFDC71100C1FBB4 /* Realm */;
 			targetProxy = 1403AF7F1BFDC91100C1FBB4 /* PBXContainerItemProxy */;
+		};
+		E83178581C222EFC002F9738 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1403AF621BFDC71100C1FBB4 /* Realm */;
+			targetProxy = E83178571C222EFC002F9738 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
