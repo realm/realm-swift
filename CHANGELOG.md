@@ -16,6 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Many forms of queries with key paths on both sides of the comparison operator
   are now supported.
 * Add support for KVC collection operators in `RLMResults` and `RLMArray`.
+* Fail instead of deadlocking in `+[RLMRealm sharedSchema]`, if a Swift property is initialized
+  to a computed value, which attempts to open a Realm on its own.
 
 ### Bugfixes
 
