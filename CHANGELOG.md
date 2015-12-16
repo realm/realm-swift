@@ -15,6 +15,7 @@ x.x.x Release notes (yyyy-MM-dd)
   now marked as `__attribute__((noescape))`/`@noescape`.
 * Many forms of queries with key paths on both sides of the comparison operator
   are now supported.
+* Add support for KVC collection operators in `RLMResults` and `RLMArray`.
 
 ### Bugfixes
 

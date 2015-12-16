@@ -349,6 +349,50 @@
     RLMAssertThrowsWithReasonMatching([allArray maxOfProperty:@"boolCol"], @"max.*bool");
 }
 
+- (void)testValueForCollectionOperationKeyPath
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    EmployeeObject *c1e1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    EmployeeObject *c1e2 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    EmployeeObject *c1e3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    [CompanyObject createInRealm:realm withValue:@{@"name": @"InspiringNames LLC", @"employees": @[c1e1, c1e2, c1e3]}];
+
+    EmployeeObject *c2e1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"A", @"age": @20, @"hired": @YES}];
+    EmployeeObject *c2e2 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    EmployeeObject *c2e3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [CompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[c2e1, c2e2, c2e3]}];
+
+    EmployeeObject *c3e1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"A", @"age": @21, @"hired": @YES}];
+    [CompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[c3e1]}];
+    [realm commitWriteTransaction];
+
+    RLMResults *allCompanies = [CompanyObject allObjects];
+    RLMResults *allEmployees = [EmployeeObject allObjects];
+
+    // count operator
+    XCTAssertEqual([[allCompanies valueForKeyPath:@"@count"] integerValue], 3);
+
+    // numeric operators
+    XCTAssertEqual([[allEmployees valueForKeyPath:@"@min.age"] intValue], 20);
+    XCTAssertEqual([[allEmployees valueForKeyPath:@"@max.age"] intValue], 40);
+    XCTAssertEqual([[allEmployees valueForKeyPath:@"@sum.age"] integerValue], 206);
+    XCTAssertEqualWithAccuracy([[allEmployees valueForKeyPath:@"@avg.age"] doubleValue], 29.43, 0.1f);
+
+    // collection
+    XCTAssertEqualObjects([allCompanies valueForKeyPath:@"@unionOfObjects.name"], (@[@"InspiringNames LLC", @"ABC AG", @"ABC AG"]));
+    XCTAssertEqualObjects([allCompanies valueForKeyPath:@"@distinctUnionOfObjects.name"], (@[@"ABC AG", @"InspiringNames LLC"]));
+    XCTAssertEqualObjects([allCompanies valueForKeyPath:@"employees.@unionOfArrays.name"], (@[@"Joe", @"John", @"Jill", @"A", @"B", @"C", @"A"]));
+    XCTAssertEqualObjects([NSSet setWithArray:[allCompanies valueForKeyPath:@"employees.@distinctUnionOfArrays.name"]], ([NSSet setWithArray:@[@"Joe", @"John", @"Jill", @"A", @"B", @"C"]]));
+
+    // invalid key paths
+    RLMAssertThrowsWithReasonMatching([allCompanies valueForKeyPath:@"@invalid"], @"Unsupported KVC collection operator found in key path '@invalid'");
+    RLMAssertThrowsWithReasonMatching([allCompanies valueForKeyPath:@"@sum"], @"Missing key path for KVC collection operator sum in key path '@sum'");
+    RLMAssertThrowsWithReasonMatching([allCompanies valueForKeyPath:@"@sum."], @"Missing key path for KVC collection operator sum in key path '@sum.'");
+    RLMAssertThrowsWithReasonMatching([allCompanies valueForKeyPath:@"@sum.employees.@sum.age"], @"Nested key paths.*not supported");
+}
+
 - (void)testArrayDescription
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
