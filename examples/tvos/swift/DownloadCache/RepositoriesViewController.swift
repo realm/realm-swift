@@ -94,11 +94,11 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
 
     func reloadData() {
         let realm = try! Realm()
-        var results = realm.objects(Repository)
+        results = realm.objects(Repository)
         if let text = searchField.text where !text.isEmpty {
-            results = results.filter("name contains[c] %@", text)
+            results = results?.filter("name contains[c] %@", text)
         }
-        self.results = results.sorted("name", ascending: sortOrderControl!.selectedSegmentIndex == 0)
+        results = results?.sorted("name", ascending: sortOrderControl!.selectedSegmentIndex == 0)
 
         collectionView?.reloadData()
     }

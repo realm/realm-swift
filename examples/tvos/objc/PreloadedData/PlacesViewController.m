@@ -63,14 +63,11 @@
 }
 
 - (void)reloadData {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    RLMResults *results;
+    self.results = [Place allObjects];
     if (self.searchField.text.length > 0) {
-        results = [Place objectsInRealm:realm where:@"postalCode beginswith %@", self.searchField.text];
-    } else {
-        results = [Place allObjectsInRealm:realm];
+        self.results = [self.results objectsWhere:@"postalCode beginswith %@", self.searchField.text];
     }
-    self.results = [results sortedResultsUsingProperty:@"postalCode" ascending:YES];
+    self.results = [self.results sortedResultsUsingProperty:@"postalCode" ascending:YES];
 
     [self.tableView reloadData];
 }
