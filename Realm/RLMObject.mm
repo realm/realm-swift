@@ -105,22 +105,24 @@
 
 + (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     va_list args;
-    RLM_VARARG(predicateFormat, args);
+    va_start(args, predicateFormat);
+    va_end(args);
     return [self objectsWhere:predicateFormat args:args];
 }
 
 + (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args {
-    return [self objectsWithPredicate:RLMValidatedPredicate(predicateFormat, args)];
+    return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
 + (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat, ... {
     va_list args;
-    RLM_VARARG(predicateFormat, args);
+    va_start(args, predicateFormat);
+    va_end(args);
     return [self objectsInRealm:realm where:predicateFormat args:args];
 }
 
 + (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args {
-    return [self objectsInRealm:realm withPredicate:RLMValidatedPredicate(predicateFormat, args)];
+    return [self objectsInRealm:realm withPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
 + (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {

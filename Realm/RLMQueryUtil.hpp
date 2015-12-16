@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMConstants.h"
 #import <vector>
 
 namespace realm {
@@ -43,11 +42,3 @@ RLMProperty *RLMValidatedProperty(RLMObjectSchema *objectSchema, NSString *colum
 
 // validate the array of RLMSortDescriptors and convert it to a realm::SortOrder
 realm::SortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *objectSchema, NSArray *descriptors);
-
-// This macro validates predicate format with optional arguments
-#define RLM_VARARG(PREDICATE_FORMAT, ARGS) \
-va_start(ARGS, PREDICATE_FORMAT);          \
-va_end(ARGS);
-
-// return predicate - throw for invalid format
-NSPredicate *RLMValidatedPredicate(id predicateFormat, va_list args);

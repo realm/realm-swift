@@ -290,13 +290,14 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...
 {
     va_list args;
-    RLM_VARARG(predicateFormat, args);
+    va_start(args, predicateFormat);
+    va_end(args);
     return [self objectsWhere:predicateFormat args:args];
 }
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
 {
-    return [self objectsWithPredicate:RLMValidatedPredicate(predicateFormat, args)];
+    return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
 - (id)valueForKeyPath:(NSString *)keyPath {
@@ -380,13 +381,15 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...
 {
     va_list args;
-    RLM_VARARG(predicateFormat, args);
+    va_start(args, predicateFormat);
+    va_end(args);
     return [self indexOfObjectWhere:predicateFormat args:args];
 }
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args
 {
-    return [self indexOfObjectWithPredicate:RLMValidatedPredicate(predicateFormat, args)];
+    return [self indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:predicateFormat
+                                                                   arguments:args]];
 }
 
 #pragma mark - Superclass Overrides

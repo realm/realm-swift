@@ -240,12 +240,14 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ... {
     va_list args;
-    RLM_VARARG(predicateFormat, args);
+    va_start(args, predicateFormat);
+    va_end(args);
     return [self indexOfObjectWhere:predicateFormat args:args];
 }
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args {
-    return [self indexOfObjectWithPredicate:RLMValidatedPredicate(predicateFormat, args)];
+    return [self indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:predicateFormat
+                                                                   arguments:args]];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
@@ -379,12 +381,13 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     va_list args;
-    RLM_VARARG(predicateFormat, args);
+    va_start(args, predicateFormat);
+    va_end(args);
     return [self objectsWhere:predicateFormat args:args];
 }
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args {
-    return [self objectsWithPredicate:RLMValidatedPredicate(predicateFormat, args)];
+    return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
