@@ -724,6 +724,8 @@ case "$COMMAND" in
         sh build.sh examples-ios
         sh build.sh examples-ios-swift
         sh build.sh examples-osx
+        sh build.sh examples-tvos
+        sh build.sh examples-tvos-swift
         exit 0
         ;;
 
@@ -763,6 +765,18 @@ case "$COMMAND" in
 
     "examples-osx")
         xc "-project examples/osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration ${CONFIGURATION} build ${CODESIGN_PARAMS}"
+        ;;
+
+    "examples-tvos")
+        xc "-project examples/tvos/objc/RealmExamples.xcodeproj -scheme DownloadCache -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/tvos/objc/RealmExamples.xcodeproj -scheme PreloadedData -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        exit 0
+        ;;
+
+    "examples-tvos-swift")
+        xc "-project examples/tvos/swift/RealmExamples.xcodeproj -scheme DownloadCache -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/tvos/swift/RealmExamples.xcodeproj -scheme PreloadedData -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        exit 0
         ;;
 
     ######################################
