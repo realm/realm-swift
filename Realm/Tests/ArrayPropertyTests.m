@@ -615,6 +615,16 @@
     XCTAssertTrue([[[company.employees valueForKey:@"self"] firstObject] isEqualToObject:company.employees.firstObject]);
     XCTAssertTrue([[[company.employees valueForKey:@"self"] lastObject] isEqualToObject:company.employees.lastObject]);
 
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@count"] integerValue], 30);
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@min.age"] integerValue], 0);
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@max.age"] integerValue], 29);
+    XCTAssertEqualWithAccuracy([[company.employees valueForKeyPath:@"@avg.age"] doubleValue], 14.5, 0.1f);
+
+    XCTAssertEqualObjects([company.employees valueForKeyPath:@"@unionOfObjects.age"], (@[@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17, @18, @19, @20, @21, @22, @23, @24, @25, @26, @27, @28, @29]));
+    XCTAssertEqualObjects([company.employees valueForKeyPath:@"@distinctUnionOfObjects.name"], (@[@"Joe"]));
+
+    RLMAssertThrowsWithReasonMatching([company.employees valueForKeyPath:@"@sum.dogs.@sum.age"], @"Nested key paths.*not supported");
+    
     // standalone
     company = [[CompanyObject alloc] init];
     ages = [NSMutableArray array];
@@ -627,6 +637,16 @@
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
     XCTAssertTrue([[[company.employees valueForKey:@"self"] firstObject] isEqualToObject:company.employees.firstObject]);
     XCTAssertTrue([[[company.employees valueForKey:@"self"] lastObject] isEqualToObject:company.employees.lastObject]);
+
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@count"] integerValue], 30);
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@min.age"] integerValue], 0);
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@max.age"] integerValue], 29);
+    XCTAssertEqualWithAccuracy([[company.employees valueForKeyPath:@"@avg.age"] doubleValue], 14.5, 0.1f);
+
+    XCTAssertEqualObjects([company.employees valueForKeyPath:@"@unionOfObjects.age"], (@[@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17, @18, @19, @20, @21, @22, @23, @24, @25, @26, @27, @28, @29]));
+    XCTAssertEqualObjects([company.employees valueForKeyPath:@"@distinctUnionOfObjects.name"], (@[@"Joe"]));
+
+    RLMAssertThrowsWithReasonMatching([company.employees valueForKeyPath:@"@sum.dogs.@sum.age"], @"Nested key paths.*not supported");
 }
 
 - (void)testSetValueForKey {
