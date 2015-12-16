@@ -10,7 +10,7 @@
 
 #if TARGET_OS_WATCH
 
-// watchOS don't support testing at this time.
+// watchOS doesn't support testing at this time.
 int main(int argc, const char *argv[]) {
 }
 

@@ -43,7 +43,7 @@ RLMRealmConfiguration *s_defaultConfiguration;
 NSString *RLMRealmPathForFileAndBundleIdentifier(NSString *fileName, NSString *bundleIdentifier) {
 #if TARGET_OS_TV
     (void)bundleIdentifier;
-    // On tvOS prohibited to write any files in the Documents directory. So use Library/Caches directory.
+    // tvOS prohibits writing to the Documents directory, so we use the Library/Caches directory instead.
     NSString *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0];
 #elif TARGET_OS_IPHONE
     (void)bundleIdentifier;
