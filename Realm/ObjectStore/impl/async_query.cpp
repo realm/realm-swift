@@ -72,27 +72,10 @@ void AsyncQuery::remove_callback(size_t token)
     }
 
     size_t idx = distance(begin(m_callbacks), it);
-    if (m_callback_index != npos && m_callback_index > idx) {
-        // If we're currently looping over callbacks and are on an index after
-        // the one being removed, then the move-last-over logic will result in
-        // the previously-last callback being skipped, so shift the one being
-        // removed to the current iteration position
-        REALM_ASSERT(m_callback_index < m_callbacks.size());
-        REALM_ASSERT(idx + 1 < m_callbacks.size());
-        auto begin = m_callbacks.begin();
-        std::move(begin + idx + 1, begin + m_callback_index + 1, begin + idx);
-        it = begin + m_callback_index;
-        idx = m_callback_index;
-    }
-
-    if (m_callback_index == idx) {
+    if (m_callback_index != npos && m_callback_index >= idx) {
         --m_callback_index;
     }
-
-    if (it != prev(end(m_callbacks))) {
-        *it = std::move(m_callbacks.back());
-    }
-    m_callbacks.pop_back();
+    m_callbacks.erase(it);
 }
 
 void AsyncQuery::unregister() noexcept
