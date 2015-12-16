@@ -998,7 +998,7 @@ case "$COMMAND" in
 
     "package-tvos")
         cd tightdb_objc
-        REALM_SWIFT_VERSION=2.0 sh build.sh tvos
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh tvos
 
         cd build/tvos
         zip --symlinks -r realm-framework-tvos.zip Realm.framework
@@ -1006,7 +1006,7 @@ case "$COMMAND" in
 
     "package-tvos-swift")
         cd tightdb_objc
-        REALM_SWIFT_VERSION=2.0 sh build.sh tvos-swift
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh tvos-swift
 
         cd build/tvos
         zip --symlinks -r realm-swift-framework-tvos.zip RealmSwift.framework Realm.framework
