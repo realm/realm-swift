@@ -692,7 +692,10 @@ case "$COMMAND" in
 
     "verify-tvos")
         if [ $REALM_SWIFT_VERSION != '1.2' ]; then
-            sh build.sh tvos-swift
+            sh build.sh test-tvos
+            sh build.sh test-tvos-swift
+            sh build.sh examples-tvos
+            sh build.sh examples-tvos-swift
         fi
         exit 0
         ;;
