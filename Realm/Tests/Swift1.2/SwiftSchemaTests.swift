@@ -18,10 +18,25 @@
 
 import XCTest
 import Realm
+import Realm.Private
 
 class InitLinkedToClass: RLMObject {
     dynamic var value = SwiftIntObject(value: [0])
 }
+
+class SwiftRecursingSchemaTestObject : RLMObject {
+    dynamic var propertyWithIllegalDefaultValue: SwiftIntObject? = {
+        if mayAccessSchema {
+            let realm = RLMRealm.defaultRealm()
+            return SwiftIntObject.allObjects().firstObject() as! SwiftIntObject?
+        } else {
+            return nil
+        }
+    }()
+
+    static var mayAccessSchema = false
+}
+
 
 class SwiftSchemaTests: RLMMultiProcessTestCase {
     func testWorksAtAll() {
@@ -41,5 +56,15 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         // schema for `InitLinkedToClass` before `IntObject` to verify that
         // `initWithValue:` does not throw in that scenario
         RLMSchema.registerClasses([InitLinkedToClass.self, SwiftIntObject.self], count: 2)
+    }
+
+    func testPreventsDeadLocks() {
+        if isParent {
+            XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
+            return
+        }
+
+        SwiftRecursingSchemaTestObject.mayAccessSchema = true
+        assertThrowsWithReasonMatching(RLMSchema.sharedSchema(), ".*recursive.*")
     }
 }
