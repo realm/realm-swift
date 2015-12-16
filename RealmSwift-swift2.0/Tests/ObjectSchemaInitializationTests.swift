@@ -116,9 +116,12 @@ class ObjectSchemaInitializationTests: TestCase {
         let schema = RLMObjectSchema(forObjectClass: SwiftFakeObjectSubclass.self)
         XCTAssertEqual(schema.properties.count, 1)
 
-        // FIXME - disable any and make sure this fails
-        // Should throw when not ignoring a property of a type we can't persist
-        _ = RLMObjectSchema(forObjectClass: SwiftObjectWithAnyObject.self)
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithAnyObject.self),
+                     "Should throw when not ignoring a property of a type we can't persist")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithStringArray.self),
+                     "Should throw when not ignoring a property of a type we can't persist")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithOptionalStringArray.self),
+                     "Should throw when not ignoring a property of a type we can't persist")
 
         // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
         _ = RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)
@@ -192,7 +195,15 @@ class SwiftObjectWithNSURL: SwiftFakeObject {
 }
 
 class SwiftObjectWithAnyObject: SwiftFakeObject {
-    dynamic var anyObject: AnyObject = NSString(string: "")
+    dynamic var anyObject: AnyObject = NSObject()
+}
+
+class SwiftObjectWithStringArray: SwiftFakeObject {
+    dynamic var stringArray = [String]()
+}
+
+class SwiftObjectWithOptionalStringArray: SwiftFakeObject {
+    dynamic var stringArray: [String]?
 }
 
 enum SwiftEnum {

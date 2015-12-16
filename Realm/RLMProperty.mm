@@ -19,9 +19,11 @@
 #import "RLMProperty_Private.h"
 
 #import "RLMArray.h"
+#import "RLMListBase.h"
 #import "RLMObject.h"
-#import "RLMSchema_Private.h"
 #import "RLMObject_Private.h"
+#import "RLMOptionalBase.h"
+#import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
@@ -292,18 +294,23 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
         }
     }
 
-    if (![self setTypeFromRawType]) {
+    void (^throwForPropertyName)(NSString *) = ^(NSString *propertyName){
         @throw RLMException(@"Can't persist property '%@' with incompatible type. "
-                            "Add to ignoredPropertyNames: method to ignore.", self.name);
+                            "Add to Object.ignoredProperties() class method to ignore.", propertyName);
+    };
+
+    if (![self setTypeFromRawType]) {
+        throwForPropertyName(self.name);
     }
 
-    // convert type for any swift property types (which are parsed as Any)
-    if (_type == RLMPropertyTypeAny) {
+    if (_type == RLMPropertyTypeAny && [obj valueForKey:_name] != nil) {
         if ([[obj valueForKey:_name] isKindOfClass:[NSString class]]) {
+            // convert type for any swift property types (which are parsed as Any)
             _type = RLMPropertyTypeString;
+        } else if (![[obj valueForKey:_name] isKindOfClass:[RLMListBase class]] && ![[obj valueForKey:_name] isKindOfClass:[RLMOptionalBase class]]) {
+            throwForPropertyName(self.name);
         }
-    }
-    if (_objcType == 'c') {
+    } else if (_objcType == 'c') {
         // Check if it's a BOOL or Int8 by trying to set it to 2 and seeing if
         // it actually sets it to 1.
         [obj setValue:@2 forKey:name];
