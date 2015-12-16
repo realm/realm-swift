@@ -267,12 +267,14 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
         return nil;
     }
 
+    id propertyValue = [obj valueForKey:_name];
+
     // convert array types to objc variant
     if ([_objcRawType isEqualToString:@"@\"RLMArray\""]) {
-        _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [[obj valueForKey:_name] objectClassName]];
+        _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [propertyValue objectClassName]];
     }
     else if ([_objcRawType isEqualToString:@"@\"NSNumber\""]) {
-        const char *numberType = [[obj valueForKey:_name] objCType];
+        const char *numberType = [propertyValue objCType];
         switch (*numberType) {
             case 'i':
             case 'l':
@@ -303,11 +305,13 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
         throwForPropertyName(self.name);
     }
 
-    if (_type == RLMPropertyTypeAny && [obj valueForKey:_name] != nil) {
-        if ([[obj valueForKey:_name] isKindOfClass:[NSString class]]) {
-            // convert type for any swift property types (which are parsed as Any)
+    if (_type == RLMPropertyTypeAny && propertyValue != nil) {
+        if ([propertyValue isKindOfClass:[NSString class]]) {
+            // NSStrings are parsed as Any.
             _type = RLMPropertyTypeString;
-        } else if (![[obj valueForKey:_name] isKindOfClass:[RLMListBase class]] && ![[obj valueForKey:_name] isKindOfClass:[RLMOptionalBase class]]) {
+        } else if (![propertyValue isKindOfClass:[RLMListBase class]] && ![propertyValue isKindOfClass:[RLMOptionalBase class]]) {
+            // Don't throw if the property is a List/RealmOptional property because those types only
+            // get reported to ObjC with Swift 1.2 and not 2+.
             throwForPropertyName(self.name);
         }
     } else if (_objcType == 'c') {
