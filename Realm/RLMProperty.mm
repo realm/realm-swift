@@ -19,9 +19,11 @@
 #import "RLMProperty_Private.h"
 
 #import "RLMArray.h"
+#import "RLMListBase.h"
 #import "RLMObject.h"
-#import "RLMSchema_Private.h"
 #import "RLMObject_Private.h"
+#import "RLMOptionalBase.h"
+#import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
@@ -265,12 +267,14 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
         return nil;
     }
 
+    id propertyValue = [obj valueForKey:_name];
+
     // convert array types to objc variant
     if ([_objcRawType isEqualToString:@"@\"RLMArray\""]) {
-        _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [[obj valueForKey:_name] objectClassName]];
+        _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [propertyValue objectClassName]];
     }
     else if ([_objcRawType isEqualToString:@"@\"NSNumber\""]) {
-        const char *numberType = [[obj valueForKey:_name] objCType];
+        const char *numberType = [propertyValue objCType];
         switch (*numberType) {
             case 'i':
             case 'l':
@@ -292,18 +296,25 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
         }
     }
 
-    if (![self setTypeFromRawType]) {
+    void (^throwForPropertyName)(NSString *) = ^(NSString *propertyName){
         @throw RLMException(@"Can't persist property '%@' with incompatible type. "
-                            "Add to ignoredPropertyNames: method to ignore.", self.name);
+                            "Add to Object.ignoredProperties() class method to ignore.", propertyName);
+    };
+
+    if (![self setTypeFromRawType]) {
+        throwForPropertyName(self.name);
     }
 
-    // convert type for any swift property types (which are parsed as Any)
-    if (_type == RLMPropertyTypeAny) {
-        if ([[obj valueForKey:_name] isKindOfClass:[NSString class]]) {
+    if (_type == RLMPropertyTypeAny && propertyValue != nil) {
+        if ([propertyValue isKindOfClass:[NSString class]]) {
+            // NSStrings are parsed as Any.
             _type = RLMPropertyTypeString;
+        } else if (![propertyValue isKindOfClass:[RLMListBase class]] && ![propertyValue isKindOfClass:[RLMOptionalBase class]]) {
+            // Don't throw if the property is a List/RealmOptional property because those types only
+            // get reported to ObjC with Swift 1.2 and not 2+.
+            throwForPropertyName(self.name);
         }
-    }
-    if (_objcType == 'c') {
+    } else if (_objcType == 'c') {
         // Check if it's a BOOL or Int8 by trying to set it to 2 and seeing if
         // it actually sets it to 1.
         [obj setValue:@2 forKey:name];

@@ -22,6 +22,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix poor performance when calling `-[RLMRealm deleteObjects:]` on an
   `RLMResults` which filtered the objects when there are other classes linking
   to the type of the deleted objects.
+* An exception is now thrown when defining `Object` properties of an unsupported
+  type.
 
 0.96.3 Release notes (2015-12-04)
 =============================================================
