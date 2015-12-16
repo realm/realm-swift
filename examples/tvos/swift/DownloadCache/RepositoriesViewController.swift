@@ -92,13 +92,6 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
         return cell
     }
 
-    func clearData() {
-        let realm = try! Realm()
-        try! realm.write {
-            realm.deleteAll()
-        }
-    }
-
     func reloadData() {
         let realm = try! Realm()
         var results = realm.objects(Repository)

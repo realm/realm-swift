@@ -93,13 +93,6 @@
     return cell;
 }
 
-- (void)clearData {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    [realm transactionWithBlock:^{
-        [realm deleteAllObjects];
-    }];
-}
-
 - (void)reloadData {
     RLMRealm *realm = [RLMRealm defaultRealm];
     RLMResults *results;
