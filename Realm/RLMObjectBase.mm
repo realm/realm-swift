@@ -90,13 +90,14 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 }
 
 - (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
-    self = [super init];
-    if (self) {
-        if (!RLMInitializedObjectSchema(self)) {
-            // Don't populate fields from the passed-in object if we're called
-            // during schema init
-            return self;
-        }
+    if (!(self = [super init])) {
+        return self;
+    }
+
+    if (!RLMInitializedObjectSchema(self)) {
+        // Don't populate fields from the passed-in object if we're called
+        // during schema init
+        return self;
     }
 
     NSArray *properties = _objectSchema.properties;
