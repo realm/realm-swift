@@ -27,6 +27,7 @@ namespace realm {
 }
 
 @class RLMObjectSchema;
+@class RLMProperty;
 @class RLMSchema;
 
 extern NSString * const RLMPropertiesComparisonTypeMismatchException;
@@ -36,8 +37,8 @@ extern NSString * const RLMUnsupportedTypesFoundInPropertyComparisonException;
 void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RLMSchema *schema,
                                  RLMObjectSchema *objectSchema);
 
-// return column index - throw for invalid column name
-NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *objectSchema, NSString *columnName);
+// return property - throw for invalid column name
+RLMProperty *RLMValidatedProperty(RLMObjectSchema *objectSchema, NSString *columnName);
 
 // validate the array of RLMSortDescriptors and convert it to a realm::SortOrder
 realm::SortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *objectSchema, NSArray *descriptors);

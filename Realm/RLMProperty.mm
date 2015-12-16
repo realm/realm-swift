@@ -396,6 +396,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     prop->_isPrimary = _isPrimary;
     prop->_swiftIvar = _swiftIvar;
     prop->_optional = _optional;
+    prop->_declarationIndex = _declarationIndex;
 
     return prop;
 }

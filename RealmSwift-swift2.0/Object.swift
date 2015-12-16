@@ -65,6 +65,7 @@ method on `Realm`.
 
 See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
 */
+@objc(RealmSwiftObject)
 public class Object: RLMObjectBase {
 
     // MARK: Initializers
@@ -305,6 +306,7 @@ public final class DynamicObject: Object {
 
 /// :nodoc:
 /// Internal class. Do not use directly.
+@objc(RealmSwiftObjectUtil)
 public class ObjectUtil: NSObject {
     @objc private class func ignoredPropertiesForClass(type: AnyClass) -> NSArray? {
         if let type = type as? Object.Type {

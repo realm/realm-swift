@@ -108,9 +108,8 @@ util::Optional<RowExpr> Results::first()
         case Mode::Table:
             return m_table->size() == 0 ? util::none : util::make_optional(m_table->front());
         case Mode::Query:
-            update_tableview();
-            REALM_FALLTHROUGH;
         case Mode::TableView:
+            update_tableview();
             return m_table_view.size() == 0 ? util::none : util::make_optional(m_table_view.front());
     }
     REALM_UNREACHABLE();
@@ -125,9 +124,8 @@ util::Optional<RowExpr> Results::last()
         case Mode::Table:
             return m_table->size() == 0 ? util::none : util::make_optional(m_table->back());
         case Mode::Query:
-            update_tableview();
-            REALM_FALLTHROUGH;
         case Mode::TableView:
+            update_tableview();
             return m_table_view.size() == 0 ? util::none : util::make_optional(m_table_view.back());
     }
     REALM_UNREACHABLE();
@@ -277,7 +275,7 @@ void Results::clear()
         case Mode::TableView:
             validate_write();
             update_tableview();
-            m_table_view.clear();
+            m_table_view.clear(RemoveMode::unordered);
             break;
     }
 }

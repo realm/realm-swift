@@ -1613,7 +1613,6 @@ public:
     }
 }
 
-#if 0 // FIXME: this hits an assertion failure in core
 - (void)testInsertNewTables {
     KVOObject *obj = [self createObject];
 
@@ -1631,6 +1630,5 @@ public:
         AssertChanged(r, @NO, @YES);
     }
 }
-#endif
 @end
 

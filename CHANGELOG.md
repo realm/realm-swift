@@ -11,9 +11,23 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* Queries are no longer limited to 16 levels of grouping.
 * The block parameter of `-[RLMRealm transactionWithBlock:]`/`Realm.write(_:)` is 
   now marked as `__attribute__((noescape))`/`@noescape`.
+* Many forms of queries with key paths on both sides of the comparison operator
+  are now supported.
+
+### Bugfixes
+
+* Fix poor performance when calling `-[RLMRealm deleteObjects:]` on an
+  `RLMResults` which filtered the objects when there are other classes linking
+  to the type of the deleted objects.
+
+0.96.3 Release notes (2015-12-04)
+=============================================================
+
+### Enhancements
+
+* Queries are no longer limited to 16 levels of grouping.
 * Rework the implementation of encrypted Realms to no longer interfere with
   debuggers.
 
@@ -32,6 +46,16 @@ x.x.x Release notes (yyyy-MM-dd)
   `RLMArray`/`List` properties.
 * Fix memory leak when using Object(value:) for subclasses with
   `List` or `RealmOptional` properties.
+* Fix a crash when computing the average of an optional integer property.
+* Fix incorrect search results for some queries on integer properties.
+* Add error-checking for nil realm parameters in many methods such as
+  `+[RLMObject allObjectsInRealm:]`.
+* Fix a race condition between commits and opening Realm files on new threads
+  that could lead to a crash.
+* Fix several crashes when opening Realm files.
+* `-[RLMObject createInRealm:withValue:]`, `-[RLMObject createOrUpdateInRealm:withValue:]`, and
+  their variants for the default Realm now always match the contents of an `NSArray` against properties
+  in the same order as they are defined in the model.
 
 0.96.2 Release notes (2015-10-26)
 =============================================================

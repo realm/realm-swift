@@ -69,11 +69,11 @@ xctest() {
     else
         download_zip_if_needed $LANG
     fi
-    SDK="macosx"
+    DESTINATION=""
     if [[ $PLATFORM == ios ]]; then
-        SDK="iphonesimulator"
+        DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
     fi
-    xcodebuild $CMD -scheme $NAME clean build test -sdk $SDK
+    xcodebuild $CMD -scheme $NAME clean build test $DESTINATION
 }
 
 source "$(dirname "$0")/../../scripts/swift-version.sh"
@@ -97,7 +97,7 @@ case "$COMMAND" in
 
     "test-xcode7")
         for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage; do
-            REALM_SWIFT_VERSION=2.1 ./build.sh test-$target || exit 1
+            REALM_SWIFT_VERSION=2.1.1 ./build.sh test-$target || exit 1
         done
         ;;
 

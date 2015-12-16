@@ -39,6 +39,7 @@ using namespace realm;
 @implementation RLMObjectSchema {
     // table accessor optimization
     realm::TableRef _table;
+    NSArray *_propertiesInDeclaredOrder;
 }
 
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
@@ -67,6 +68,7 @@ using namespace realm;
         }
     }
     _propertiesByName = map;
+    _propertiesInDeclaredOrder = nil;
 }
 
 - (void)setPrimaryKeyProperty:(RLMProperty *)primaryKeyProperty {
@@ -98,6 +100,10 @@ using namespace realm;
         props = [[RLMObjectSchema propertiesForClass:cls isSwift:isSwift] arrayByAddingObjectsFromArray:props];
         cls = superClass;
         superClass = class_getSuperclass(superClass);
+    }
+    NSUInteger index = 0;
+    for (RLMProperty *prop in props) {
+        prop.declarationIndex = index++;
     }
     schema.properties = props;
 
@@ -379,6 +385,17 @@ using namespace realm;
         return NSOrderedSame;
     }];
     // No need to update the dictionary
+}
+
+- (NSArray *)propertiesInDeclaredOrder {
+    if (!_propertiesInDeclaredOrder) {
+        _propertiesInDeclaredOrder = [_properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
+            if (p1.declarationIndex < p2.declarationIndex) return NSOrderedAscending;
+            if (p1.declarationIndex > p2.declarationIndex) return NSOrderedDescending;
+            return NSOrderedSame;
+        }];
+    }
+    return _propertiesInDeclaredOrder;
 }
 
 @end
