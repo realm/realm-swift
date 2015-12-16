@@ -799,6 +799,10 @@ case "$COMMAND" in
           cp Realm/ObjectStore/*.hpp include/Realm
           cp Realm/ObjectStore/impl/*.hpp include/Realm
           cp Realm/ObjectStore/impl/apple/*.hpp include/Realm
+          # Create lowercase `realm` header directory for a case-sensitive filesystem.
+          if [ ! -e include/realm ]; then
+            cp -R include/Realm include/realm
+          fi
           touch include/Realm/RLMPlatform.h
         fi
         ;;
