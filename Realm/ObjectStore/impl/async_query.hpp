@@ -34,6 +34,7 @@ namespace _impl {
 class AsyncQuery {
 public:
     AsyncQuery(Results& target);
+    ~AsyncQuery();
 
     AsyncQueryCancelationToken add_callback(std::function<void (std::exception_ptr)>);
     void remove_callback(size_t token);

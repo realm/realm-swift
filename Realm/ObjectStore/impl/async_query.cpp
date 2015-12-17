@@ -34,6 +34,12 @@ AsyncQuery::AsyncQuery(Results& target)
     m_query_handover = Realm::Internal::get_shared_group(*m_realm).export_for_handover(q, MutableSourcePayload::Move);
 }
 
+AsyncQuery::~AsyncQuery()
+{
+    std::lock_guard<std::mutex> lock(m_target_mutex);
+    m_realm = nullptr;
+}
+
 AsyncQueryCancelationToken AsyncQuery::add_callback(std::function<void (std::exception_ptr)> callback)
 {
     m_realm->verify_thread();
