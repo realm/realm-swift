@@ -108,7 +108,12 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
 #pragma mark - Puzzle State Management -
 - (void)startNewPuzzle
 {
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Puzzle Name" message:@"Please enter a name for this new puzzle" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK",nil];
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Puzzle Name"
+                                                        message:@"Please enter a name for this new puzzle"
+                                                       delegate:self
+                                              cancelButtonTitle:@"Cancel"
+                                              otherButtonTitles:@"OK",nil];
+    
     alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
     [alertView textFieldAtIndex:0].text = @"My Puzzle";
     [alertView show];
@@ -150,13 +155,9 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
         [defaultRealm addObject:newPuzzle];
     }];
 
-    [UIView animateWithDuration:0.5f animations:^{
-        self.startView.alpha = 0.0f;
-    } completion:^(BOOL complete) {
-        [self.startView removeFromSuperview];
-        
-        [self.puzzleView scramblePiecesAnimated];
-    }];
+    [self.startView removeFromSuperview];
+    
+    [self.puzzleView scramblePiecesAnimated];
 }
 
 - (void)joinExistingPuzzle
@@ -171,13 +172,10 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
         weakSelf.currentPuzzleID = puzzle.uuid;
         [weakSelf updatePuzzleState];
         
-        [self dismissViewControllerAnimated:YES completion:nil];
+        [weakSelf dismissViewControllerAnimated:YES
+                                     completion:nil];
         
-        [UIView animateWithDuration:0.5f animations:^{
-            weakSelf.startView.alpha = 0.0f;
-        } completion:^(BOOL complete) {
-            [weakSelf.startView removeFromSuperview];
-        }];
+        [weakSelf.startView removeFromSuperview];
     };
 }
 
@@ -192,8 +190,36 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
     }
 }
 
+- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
+{
+    if (motion != UIEventSubtypeMotionShake) {
+        return;
+    }
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Reset Puzzle?"
+                                                                             message:@"Are you sure you wish to reset this puzzle?"
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    
+    __weak typeof(self) weakSelf = self;
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Reset"
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction *action) {
+        [weakSelf.puzzleView scramblePiecesAnimated];
+    }]];
+    
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                                        style:UIAlertActionStyleCancel
+                                                      handler:nil]];
+    
+    [self presentViewController:alertController
+                       animated:YES
+                     completion:nil];
+}
+
 #pragma mark - Puzzle View Delegate -
-- (void)puzzleView:(RLMPuzzleView *)puzzleView pieceMoved:(RLMPuzzlePieceIdentifier)pieceIdentifier toPoint:(CGPoint)point
+- (void)puzzleView:(RLMPuzzleView *)puzzleView
+        pieceMoved:(RLMPuzzlePieceIdentifier)pieceIdentifier
+           toPoint:(CGPoint)point
 {
     RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:self.currentPuzzleID];
     if (puzzle == nil || pieceIdentifier >= puzzle.pieces.count)
@@ -211,7 +237,6 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
 {
     __weak typeof(self) weakSelf = self;
     RLMNotificationBlock block = ^(NSString *notification, RLMRealm *realm) {
-        weakSelf.puzzles = [RLMPuzzle allObjects];
         [weakSelf updatePuzzleState];
     };
     
