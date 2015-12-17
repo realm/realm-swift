@@ -97,53 +97,51 @@ void AsyncQuery::run()
 {
     REALM_ASSERT(m_sg);
 
+    // This function must not touch any members touched in deliver(), as they
+    // may be called concurrently (as it'd be pretty bad for a running query to
+    // block the main thread trying to pick up the previous results)
     {
         std::lock_guard<std::mutex> target_lock(m_target_mutex);
         // Don't run the query if the results aren't actually going to be used
         if (!m_target_results || (!m_have_callbacks && !m_target_results->wants_background_updates())) {
-            m_skipped_running = true;
             return;
         }
     }
-    m_skipped_running = false;
 
-    // This function must not touch any members touched in deliver(), as they
-    // may be called concurrently (as it'd be pretty bad for a running query to
-    // block the main thread trying to pick up the previous results)
-    if (m_tv.is_attached()) {
-        m_tv.sync_if_needed();
-    }
-    else {
-        m_tv = m_query->find_all();
-        m_query = nullptr;
-        if (m_sort) {
-            m_tv.sort(m_sort.columnIndices, m_sort.ascending);
+    REALM_ASSERT(!m_tv.is_attached());
+
+    // If we've run previously, check if we need to rerun
+    if (m_initial_run_complete) {
+        // Make an empty tableview from the query to get the table version, since
+        // Query doesn't expose it
+        m_tv = m_query->find_all(0, 0, 0);
+        auto table_version = m_tv.outside_version();
+        if (table_version == m_handed_over_table_version) {
+            m_tv = TableView();
+            return;
         }
+    }
+
+    m_tv = m_query->find_all();
+    if (m_sort) {
+        m_tv.sort(m_sort.columnIndices, m_sort.ascending);
     }
 }
 
 void AsyncQuery::prepare_handover()
 {
-    if (m_skipped_running) {
-        m_sg_version = SharedGroup::VersionID{};
+    m_sg_version = m_sg->get_version_of_current_transaction();
+
+    if (!m_tv.is_attached()) {
         return;
     }
 
-    REALM_ASSERT(m_tv.is_attached());
     REALM_ASSERT(m_tv.is_in_sync());
 
-    m_sg_version = m_sg->get_version_of_current_transaction();
     m_initial_run_complete = true;
-
-    auto table_version = m_tv.outside_version();
-    if (!m_tv_handover && table_version == m_handed_over_table_version) {
-        // We've already delivered the query results since the last time the
-        // table changed, so no need to do anything
-        return;
-    }
-
-    m_tv_handover = m_sg->export_for_handover(m_tv, ConstSourcePayload::Copy);
-    m_handed_over_table_version = table_version;
+    m_handed_over_table_version = m_tv.outside_version();
+    m_tv_handover = m_sg->export_for_handover(m_tv, MutableSourcePayload::Move);
+    m_tv = TableView();
 }
 
 bool AsyncQuery::deliver(SharedGroup& sg, std::exception_ptr err)
