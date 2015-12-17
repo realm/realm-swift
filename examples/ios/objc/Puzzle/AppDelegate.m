@@ -32,7 +32,7 @@
     application.applicationSupportsShakeToEdit = YES;
     
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/puzzle"];
+    configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/puzzle/demo/v2"];
     configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
 

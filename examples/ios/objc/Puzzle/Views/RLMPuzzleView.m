@@ -39,7 +39,7 @@
 {
     if (self = [super initWithFrame:frame])
     {
-        self.backgroundColor = [UIColor colorWithWhite:0.15f alpha:1.0f];
+        self.backgroundColor = [UIColor colorWithWhite:0.10f alpha:1.0f];
     }
         
     return self;
@@ -142,6 +142,7 @@
     }
     
     __block NSInteger pieceIndex = RLMPuzzlePieceIdentifierA1;
+
     [UIView animateWithDuration:1.5f delay:1.5f usingSpringWithDamping:1.0f initialSpringVelocity:0.2f options:0 animations:^{
         for (RLMPuzzlePieceView *piece in self.puzzlePieces) {
             piece.center = [points[pieceIndex++] CGPointValue];
@@ -184,8 +185,9 @@
     piecePoint.y = self.gesturePieceOrigin.y + point.y;
     pieceView.center = piecePoint;
     
-    if (self.delegate)
+    if (self.delegate) {
         [self.delegate puzzleView:self pieceMoved:pieceView.tag toPoint:piecePoint];
+    }
 }
 
 //allowing interactions with puzzle pieces outside the bounds
