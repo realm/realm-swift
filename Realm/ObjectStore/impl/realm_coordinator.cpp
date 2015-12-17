@@ -240,9 +240,6 @@ void RealmCoordinator::register_query(std::shared_ptr<AsyncQuery> query)
         self.pin_version(version.version, version.index);
         self.m_new_queries.push_back(std::move(query));
     }
-
-    // Wake up the background worker threads by pretending we made a commit
-    self.m_notifier->notify_others();
 }
 
 void RealmCoordinator::unregister_query(AsyncQuery& query)
