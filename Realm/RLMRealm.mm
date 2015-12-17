@@ -629,8 +629,9 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 - (RLMResults *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);
+    RLMResults *results = [self objects:objectClassName where:predicateFormat args:args];
     va_end(args);
-    return [self objects:objectClassName where:predicateFormat args:args];
+    return results;
 }
 
 - (RLMResults *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat args:(va_list)args {

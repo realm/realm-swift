@@ -291,8 +291,9 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 {
     va_list args;
     va_start(args, predicateFormat);
+    RLMResults *results = [self objectsWhere:predicateFormat args:args];
     va_end(args);
-    return [self objectsWhere:predicateFormat args:args];
+    return results;
 }
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
@@ -382,8 +383,9 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 {
     va_list args;
     va_start(args, predicateFormat);
+    NSUInteger index = [self indexOfObjectWhere:predicateFormat args:args];
     va_end(args);
-    return [self indexOfObjectWhere:predicateFormat args:args];
+    return index;
 }
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args
