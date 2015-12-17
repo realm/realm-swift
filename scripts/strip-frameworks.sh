@@ -35,6 +35,14 @@ code_sign() {
   /usr/bin/codesign --force --sign ${EXPANDED_CODE_SIGN_IDENTITY} --preserve-metadata=identifier,entitlements "$1"
 }
 
+if [ "$ACTION" = "install" ]; then
+  echo "Copy .bcsymbolmap files to .xcarchive"
+  find . -name '*.bcsymbolmap' -type f -exec mv {} "${CONFIGURATION_BUILD_DIR}" \;
+else
+  # Delete *.bcsymbolmap files from framework bundle unless archiving
+  find . -name '*.bcsymbolmap' -type f -exec rm -rf "{}" +\;
+fi
+
 echo "Stripping frameworks"
 cd "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}"
 
@@ -60,11 +68,3 @@ for file in $(find . -type f -perm +111); do
     fi
   fi
 done
-
-if [ "$ACTION" = "install" ]; then
-  echo "Copy .bcsymbolmap files to .xcarchive"
-  find . -name '*.bcsymbolmap' -type f -exec mv {} "${CONFIGURATION_BUILD_DIR}" \;
-else
-  # Delete *.bcsymbolmap files from framework bundle unless archiving
-  find . -name '*.bcsymbolmap' -type f -exec rm -rf "{}" +\;
-fi
