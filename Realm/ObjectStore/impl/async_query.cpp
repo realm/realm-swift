@@ -66,31 +66,56 @@ AsyncQueryCancelationToken AsyncQuery::add_callback(std::function<void (std::exc
 
 void AsyncQuery::remove_callback(size_t token)
 {
-    std::lock_guard<std::mutex> lock(m_callback_mutex);
-    REALM_ASSERT(m_error || m_callbacks.size() > 0);
+    Callback old;
+    {
+        std::lock_guard<std::mutex> lock(m_callback_mutex);
+        REALM_ASSERT(m_error || m_callbacks.size() > 0);
 
-    auto it = find_if(begin(m_callbacks), end(m_callbacks),
-                      [=](const auto& c) { return c.token == token; });
-    // We should only fail to find the callback if it was removed due to an error
-    REALM_ASSERT(m_error || it != end(m_callbacks));
-    if (it == end(m_callbacks)) {
-        return;
-    }
+        auto it = find_if(begin(m_callbacks), end(m_callbacks),
+                          [=](const auto& c) { return c.token == token; });
+        // We should only fail to find the callback if it was removed due to an error
+        REALM_ASSERT(m_error || it != end(m_callbacks));
+        if (it == end(m_callbacks)) {
+            return;
+        }
 
-    size_t idx = distance(begin(m_callbacks), it);
-    if (m_callback_index != npos && m_callback_index >= idx) {
-        --m_callback_index;
+        size_t idx = distance(begin(m_callbacks), it);
+        if (m_callback_index != npos && m_callback_index >= idx) {
+            --m_callback_index;
+        }
+
+        old = std::move(*it);
+        m_callbacks.erase(it);
     }
-    m_callbacks.erase(it);
 }
 
 void AsyncQuery::unregister() noexcept
 {
-    RealmCoordinator::unregister_query(*this);
+    {
+        std::lock_guard<std::mutex> lock(m_callback_mutex);
+        REALM_ASSERT(m_callbacks.empty());
+    }
 
     std::lock_guard<std::mutex> lock(m_target_mutex);
     m_target_results = nullptr;
     m_realm = nullptr;
+    m_unregistered = true;
+}
+
+void AsyncQuery::release_query() noexcept
+{
+    {
+        std::lock_guard<std::mutex> lock(m_target_mutex);
+        REALM_ASSERT(m_unregistered);
+    }
+
+    m_query = nullptr;
+}
+
+bool AsyncQuery::is_alive() const noexcept
+{
+    std::lock_guard<std::mutex> lock(m_target_mutex);
+    return !m_unregistered;
 }
 
 void AsyncQuery::run()

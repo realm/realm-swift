@@ -77,7 +77,6 @@ public:
     void on_change();
 
     static void register_query(std::shared_ptr<AsyncQuery> query);
-    static void unregister_query(AsyncQuery& query);
 
     // Advance the Realm to the most recent transaction version which all async
     // work is complete for
@@ -116,6 +115,7 @@ private:
     void open_helper_shared_group();
     void move_new_queries_to_main();
     void advance_helper_shared_group_to_latest();
+    void clean_up_dead_queries();
 };
 
 } // namespace _impl

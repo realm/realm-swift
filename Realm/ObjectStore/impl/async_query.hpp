@@ -40,6 +40,7 @@ public:
     void remove_callback(size_t token);
 
     void unregister() noexcept;
+    void release_query() noexcept;
 
     // Run/rerun the query if needed
     void run();
@@ -60,9 +61,11 @@ public:
     // Get the version of the current handover object
     SharedGroup::VersionID version() const noexcept { return m_sg_version; }
 
+    bool is_alive() const noexcept;
+
 private:
     // Target Results to update and a mutex which guards it
-    std::mutex m_target_mutex;
+    mutable std::mutex m_target_mutex;
     Results* m_target_results;
 
     std::shared_ptr<Realm> m_realm;
@@ -105,6 +108,7 @@ private:
 
     bool m_skipped_running = false;
     bool m_initial_run_complete = false;
+    bool m_unregistered = false;
     std::atomic<bool> m_have_callbacks = {false};
 
     bool is_for_current_thread() const { return m_thread_id == std::this_thread::get_id(); }
