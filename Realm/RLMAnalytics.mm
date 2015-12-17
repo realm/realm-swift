@@ -55,7 +55,7 @@
 
 #import <Foundation/Foundation.h>
 
-#if TARGET_IPHONE_SIMULATOR || TARGET_OS_MAC || (TARGET_OS_WATCH && TARGET_OS_SIMULATOR)
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_MAC || (TARGET_OS_WATCH && TARGET_OS_SIMULATOR) || (TARGET_OS_TV && TARGET_OS_SIMULATOR)
 #import "RLMRealm.h"
 #import "RLMUtil.hpp"
 
@@ -191,6 +191,8 @@ static NSDictionary *RLMAnalyticsPayload() {
                      @"Realm Version": REALM_COCOA_VERSION,
 #if TARGET_OS_WATCH
                      @"Target OS Type": @"watchos",
+#elif TARGET_OS_TV
+                     @"Target OS Type": @"tvos",
 #elif TARGET_OS_IPHONE
                      @"Target OS Type": @"ios",
 #else

@@ -41,7 +41,11 @@ static NSString *const c_defaultRealmFileName = @"default.realm";
 RLMRealmConfiguration *s_defaultConfiguration;
 
 NSString *RLMRealmPathForFileAndBundleIdentifier(NSString *fileName, NSString *bundleIdentifier) {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_TV
+    (void)bundleIdentifier;
+    // tvOS prohibits writing to the Documents directory, so we use the Library/Caches directory instead.
+    NSString *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0];
+#elif TARGET_OS_IPHONE
     (void)bundleIdentifier;
     // On iOS the Documents directory isn't user-visible, so put files there
     NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];

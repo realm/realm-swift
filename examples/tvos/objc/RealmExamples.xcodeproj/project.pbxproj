@@ -1,0 +1,619 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		1403AF621BFDC71100C1FBB4 /* Realm */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 1403AF631BFDC71100C1FBB4 /* Build configuration list for PBXAggregateTarget "Realm" */;
+			buildPhases = (
+				1403AF661BFDC73200C1FBB4 /* Build Realm */,
+			);
+			dependencies = (
+			);
+			name = Realm;
+			productName = Realm;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		1403AF6F1BFDC8D300C1FBB4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1403AF6E1BFDC8D300C1FBB4 /* main.m */; };
+		1403AF721BFDC8D300C1FBB4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1403AF711BFDC8D300C1FBB4 /* AppDelegate.m */; };
+		1403AF751BFDC8D300C1FBB4 /* RepositoriesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1403AF741BFDC8D300C1FBB4 /* RepositoriesViewController.m */; };
+		1403AF781BFDC8D300C1FBB4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1403AF761BFDC8D300C1FBB4 /* Main.storyboard */; };
+		1403AF7A1BFDC8D300C1FBB4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1403AF791BFDC8D300C1FBB4 /* Assets.xcassets */; };
+		1403AF831BFDCA8200C1FBB4 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1403AF811BFDCA8200C1FBB4 /* Realm.framework */; };
+		1403AF841BFDCA8200C1FBB4 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1403AF811BFDCA8200C1FBB4 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1403AF8E1BFDDDCF00C1FBB4 /* Repository.m in Sources */ = {isa = PBXBuildFile; fileRef = 1403AF8D1BFDDDCE00C1FBB4 /* Repository.m */; };
+		1403AF911BFDDE0B00C1FBB4 /* RepositoryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1403AF901BFDDE0B00C1FBB4 /* RepositoryCell.m */; };
+		14835DF51BFE5AAB00B9A267 /* Places.realm in Resources */ = {isa = PBXBuildFile; fileRef = 14835DF41BFE5AAB00B9A267 /* Places.realm */; };
+		14835DF81BFE5D4100B9A267 /* Place.m in Sources */ = {isa = PBXBuildFile; fileRef = 14835DF71BFE5D4100B9A267 /* Place.m */; };
+		1493911B1BFE50940036B420 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1493911A1BFE50940036B420 /* main.m */; };
+		1493911E1BFE50940036B420 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1493911D1BFE50940036B420 /* AppDelegate.m */; };
+		149391211BFE50940036B420 /* PlacesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 149391201BFE50940036B420 /* PlacesViewController.m */; };
+		149391241BFE50940036B420 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 149391221BFE50940036B420 /* Main.storyboard */; };
+		149391261BFE50940036B420 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 149391251BFE50940036B420 /* Assets.xcassets */; };
+		1493912B1BFE52880036B420 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1403AF811BFDCA8200C1FBB4 /* Realm.framework */; };
+		1493912C1BFE52880036B420 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1403AF811BFDCA8200C1FBB4 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1403AF7F1BFDC91100C1FBB4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1403AF401BFDC60A00C1FBB4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1403AF621BFDC71100C1FBB4;
+			remoteInfo = Realm;
+		};
+		E83178571C222EFC002F9738 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1403AF401BFDC60A00C1FBB4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1403AF621BFDC71100C1FBB4;
+			remoteInfo = Realm;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1403AF871BFDCA8200C1FBB4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				1403AF841BFDCA8200C1FBB4 /* Realm.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1493912F1BFE52880036B420 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				1493912C1BFE52880036B420 /* Realm.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1403AF6B1BFDC8D300C1FBB4 /* DownloadCache.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DownloadCache.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1403AF6E1BFDC8D300C1FBB4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		1403AF701BFDC8D300C1FBB4 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		1403AF711BFDC8D300C1FBB4 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		1403AF731BFDC8D300C1FBB4 /* RepositoriesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RepositoriesViewController.h; sourceTree = "<group>"; };
+		1403AF741BFDC8D300C1FBB4 /* RepositoriesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RepositoriesViewController.m; sourceTree = "<group>"; };
+		1403AF771BFDC8D300C1FBB4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		1403AF791BFDC8D300C1FBB4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1403AF7B1BFDC8D300C1FBB4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1403AF811BFDCA8200C1FBB4 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../../build/tvos/Realm.framework; sourceTree = "<group>"; };
+		1403AF8C1BFDDDCE00C1FBB4 /* Repository.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Repository.h; sourceTree = "<group>"; };
+		1403AF8D1BFDDDCE00C1FBB4 /* Repository.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Repository.m; sourceTree = "<group>"; };
+		1403AF8F1BFDDE0B00C1FBB4 /* RepositoryCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RepositoryCell.h; sourceTree = "<group>"; };
+		1403AF901BFDDE0B00C1FBB4 /* RepositoryCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RepositoryCell.m; sourceTree = "<group>"; };
+		14835DF41BFE5AAB00B9A267 /* Places.realm */ = {isa = PBXFileReference; lastKnownFileType = file; name = Places.realm; path = "Seed Data/Places.realm"; sourceTree = "<group>"; };
+		14835DF61BFE5D4100B9A267 /* Place.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Place.h; sourceTree = "<group>"; };
+		14835DF71BFE5D4100B9A267 /* Place.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Place.m; sourceTree = "<group>"; };
+		149391171BFE50930036B420 /* PreloadedData.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PreloadedData.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1493911A1BFE50940036B420 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		1493911C1BFE50940036B420 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		1493911D1BFE50940036B420 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		1493911F1BFE50940036B420 /* PlacesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlacesViewController.h; sourceTree = "<group>"; };
+		149391201BFE50940036B420 /* PlacesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlacesViewController.m; sourceTree = "<group>"; };
+		149391231BFE50940036B420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		149391251BFE50940036B420 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		149391271BFE50940036B420 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1403AF681BFDC8D300C1FBB4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1403AF831BFDCA8200C1FBB4 /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		149391141BFE50930036B420 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1493912B1BFE52880036B420 /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1403AF3F1BFDC60A00C1FBB4 = {
+			isa = PBXGroup;
+			children = (
+				1403AF6C1BFDC8D300C1FBB4 /* DownloadCache */,
+				149391181BFE50930036B420 /* PreloadedData */,
+				1403AF881BFDCAC800C1FBB4 /* Realm */,
+				1403AF491BFDC60A00C1FBB4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1403AF491BFDC60A00C1FBB4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1403AF6B1BFDC8D300C1FBB4 /* DownloadCache.app */,
+				149391171BFE50930036B420 /* PreloadedData.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1403AF6C1BFDC8D300C1FBB4 /* DownloadCache */ = {
+			isa = PBXGroup;
+			children = (
+				1403AF701BFDC8D300C1FBB4 /* AppDelegate.h */,
+				1403AF711BFDC8D300C1FBB4 /* AppDelegate.m */,
+				1403AF731BFDC8D300C1FBB4 /* RepositoriesViewController.h */,
+				1403AF741BFDC8D300C1FBB4 /* RepositoriesViewController.m */,
+				1403AF8F1BFDDE0B00C1FBB4 /* RepositoryCell.h */,
+				1403AF901BFDDE0B00C1FBB4 /* RepositoryCell.m */,
+				1403AF8C1BFDDDCE00C1FBB4 /* Repository.h */,
+				1403AF8D1BFDDDCE00C1FBB4 /* Repository.m */,
+				1403AF761BFDC8D300C1FBB4 /* Main.storyboard */,
+				1403AF791BFDC8D300C1FBB4 /* Assets.xcassets */,
+				1403AF7B1BFDC8D300C1FBB4 /* Info.plist */,
+				1403AF6D1BFDC8D300C1FBB4 /* Supporting Files */,
+			);
+			path = DownloadCache;
+			sourceTree = "<group>";
+		};
+		1403AF6D1BFDC8D300C1FBB4 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1403AF6E1BFDC8D300C1FBB4 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		1403AF881BFDCAC800C1FBB4 /* Realm */ = {
+			isa = PBXGroup;
+			children = (
+				1403AF811BFDCA8200C1FBB4 /* Realm.framework */,
+			);
+			name = Realm;
+			path = DownloadCache;
+			sourceTree = "<group>";
+		};
+		14835DF11BFE582C00B9A267 /* Seed Data */ = {
+			isa = PBXGroup;
+			children = (
+				14835DF41BFE5AAB00B9A267 /* Places.realm */,
+			);
+			name = "Seed Data";
+			sourceTree = "<group>";
+		};
+		149391181BFE50930036B420 /* PreloadedData */ = {
+			isa = PBXGroup;
+			children = (
+				1493911C1BFE50940036B420 /* AppDelegate.h */,
+				1493911D1BFE50940036B420 /* AppDelegate.m */,
+				1493911F1BFE50940036B420 /* PlacesViewController.h */,
+				149391201BFE50940036B420 /* PlacesViewController.m */,
+				14835DF61BFE5D4100B9A267 /* Place.h */,
+				14835DF71BFE5D4100B9A267 /* Place.m */,
+				149391221BFE50940036B420 /* Main.storyboard */,
+				149391251BFE50940036B420 /* Assets.xcassets */,
+				149391271BFE50940036B420 /* Info.plist */,
+				14835DF11BFE582C00B9A267 /* Seed Data */,
+				149391191BFE50940036B420 /* Supporting Files */,
+			);
+			path = PreloadedData;
+			sourceTree = "<group>";
+		};
+		149391191BFE50940036B420 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1493911A1BFE50940036B420 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1403AF6A1BFDC8D300C1FBB4 /* DownloadCache */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1403AF7E1BFDC8D300C1FBB4 /* Build configuration list for PBXNativeTarget "DownloadCache" */;
+			buildPhases = (
+				1403AF671BFDC8D300C1FBB4 /* Sources */,
+				1403AF681BFDC8D300C1FBB4 /* Frameworks */,
+				1403AF691BFDC8D300C1FBB4 /* Resources */,
+				1403AF871BFDCA8200C1FBB4 /* Embed Frameworks */,
+				1403AF891BFDCAFD00C1FBB4 /* Strip Framework Architectures */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1403AF801BFDC91100C1FBB4 /* PBXTargetDependency */,
+			);
+			name = DownloadCache;
+			productName = DownloadCache;
+			productReference = 1403AF6B1BFDC8D300C1FBB4 /* DownloadCache.app */;
+			productType = "com.apple.product-type.application";
+		};
+		149391161BFE50930036B420 /* PreloadedData */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1493912A1BFE50940036B420 /* Build configuration list for PBXNativeTarget "PreloadedData" */;
+			buildPhases = (
+				149391131BFE50930036B420 /* Sources */,
+				149391141BFE50930036B420 /* Frameworks */,
+				149391151BFE50930036B420 /* Resources */,
+				1493912F1BFE52880036B420 /* Embed Frameworks */,
+				149391301BFE529A0036B420 /* Strip Framework Architectures */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E83178581C222EFC002F9738 /* PBXTargetDependency */,
+			);
+			name = PreloadedData;
+			productName = PreloadedData;
+			productReference = 149391171BFE50930036B420 /* PreloadedData.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1403AF401BFDC60A00C1FBB4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = Realm;
+				TargetAttributes = {
+					1403AF621BFDC71100C1FBB4 = {
+						CreatedOnToolsVersion = 7.2;
+					};
+					1403AF6A1BFDC8D300C1FBB4 = {
+						CreatedOnToolsVersion = 7.2;
+					};
+					149391161BFE50930036B420 = {
+						CreatedOnToolsVersion = 7.2;
+					};
+				};
+			};
+			buildConfigurationList = 1403AF431BFDC60A00C1FBB4 /* Build configuration list for PBXProject "RealmExamples" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1403AF3F1BFDC60A00C1FBB4;
+			productRefGroup = 1403AF491BFDC60A00C1FBB4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1403AF6A1BFDC8D300C1FBB4 /* DownloadCache */,
+				149391161BFE50930036B420 /* PreloadedData */,
+				1403AF621BFDC71100C1FBB4 /* Realm */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1403AF691BFDC8D300C1FBB4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1403AF7A1BFDC8D300C1FBB4 /* Assets.xcassets in Resources */,
+				1403AF781BFDC8D300C1FBB4 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		149391151BFE50930036B420 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				149391261BFE50940036B420 /* Assets.xcassets in Resources */,
+				149391241BFE50940036B420 /* Main.storyboard in Resources */,
+				14835DF51BFE5AAB00B9A267 /* Places.realm in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1403AF661BFDC73200C1FBB4 /* Build Realm */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Build Realm";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ../../../\nif [[ ! -d \"tvos/Realm.framework\" && ! -d \"build/tvos/Realm.framework\" ]]; then\n    sh build.sh tvos\nfi\n";
+		};
+		1403AF891BFDCAFD00C1FBB4 /* Strip Framework Architectures */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Strip Framework Architectures";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
+		};
+		149391301BFE529A0036B420 /* Strip Framework Architectures */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Strip Framework Architectures";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1403AF671BFDC8D300C1FBB4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1403AF751BFDC8D300C1FBB4 /* RepositoriesViewController.m in Sources */,
+				1403AF721BFDC8D300C1FBB4 /* AppDelegate.m in Sources */,
+				1403AF911BFDDE0B00C1FBB4 /* RepositoryCell.m in Sources */,
+				1403AF6F1BFDC8D300C1FBB4 /* main.m in Sources */,
+				1403AF8E1BFDDDCF00C1FBB4 /* Repository.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		149391131BFE50930036B420 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				149391211BFE50940036B420 /* PlacesViewController.m in Sources */,
+				1493911E1BFE50940036B420 /* AppDelegate.m in Sources */,
+				1493911B1BFE50940036B420 /* main.m in Sources */,
+				14835DF81BFE5D4100B9A267 /* Place.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1403AF801BFDC91100C1FBB4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1403AF621BFDC71100C1FBB4 /* Realm */;
+			targetProxy = 1403AF7F1BFDC91100C1FBB4 /* PBXContainerItemProxy */;
+		};
+		E83178581C222EFC002F9738 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1403AF621BFDC71100C1FBB4 /* Realm */;
+			targetProxy = E83178571C222EFC002F9738 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		1403AF761BFDC8D300C1FBB4 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1403AF771BFDC8D300C1FBB4 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		149391221BFE50940036B420 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				149391231BFE50940036B420 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1403AF5D1BFDC60B00C1FBB4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = ../../../build/tvos/;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.1;
+			};
+			name = Debug;
+		};
+		1403AF5E1BFDC60B00C1FBB4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = ../../../build/tvos/;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1403AF641BFDC71100C1FBB4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1403AF651BFDC71100C1FBB4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		1403AF7C1BFDC8D300C1FBB4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				INFOPLIST_FILE = DownloadCache/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.DownloadCache;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1403AF7D1BFDC8D300C1FBB4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				INFOPLIST_FILE = DownloadCache/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.DownloadCache;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		149391281BFE50940036B420 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				INFOPLIST_FILE = PreloadedData/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.PreloadedData;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		149391291BFE50940036B420 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				INFOPLIST_FILE = PreloadedData/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.PreloadedData;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1403AF431BFDC60A00C1FBB4 /* Build configuration list for PBXProject "RealmExamples" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1403AF5D1BFDC60B00C1FBB4 /* Debug */,
+				1403AF5E1BFDC60B00C1FBB4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1403AF631BFDC71100C1FBB4 /* Build configuration list for PBXAggregateTarget "Realm" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1403AF641BFDC71100C1FBB4 /* Debug */,
+				1403AF651BFDC71100C1FBB4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1403AF7E1BFDC8D300C1FBB4 /* Build configuration list for PBXNativeTarget "DownloadCache" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1403AF7C1BFDC8D300C1FBB4 /* Debug */,
+				1403AF7D1BFDC8D300C1FBB4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1493912A1BFE50940036B420 /* Build configuration list for PBXNativeTarget "PreloadedData" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				149391281BFE50940036B420 /* Debug */,
+				149391291BFE50940036B420 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1403AF401BFDC60A00C1FBB4 /* Project object */;
+}
