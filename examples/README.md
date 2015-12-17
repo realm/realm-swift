@@ -99,3 +99,23 @@ The `installation/` directory contains example Xcode projects demonstrating how
 to install Realm Objective-C and Realm Swift from all available methods defined
 in <https://realm.io/docs/objc/latest/#installation> and
 <https://realm.io/docs/swift/latest/#installation>.
+
+## tvOS (Objective-C)
+
+### DownloadCache
+
+A tvOS app that demonstrates how to use Realm to store data and display data from a REST API.
+
+### PreloadedData
+
+A tvOS app that demonstrates how to use a Realm file included in your app bundle.
+
+## tvOS (Swift)
+
+### DownloadCache
+
+A tvOS app that demonstrates how to use Realm to store data and display data from a REST API.
+
+### PreloadedData
+
+A tvOS app that demonstrates how to use a Realm file included in your app bundle.

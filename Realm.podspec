@@ -57,7 +57,12 @@ Pod::Spec.new do |s|
 
   if s.respond_to?(:watchos)
     s.watchos.deployment_target = '2.0'
-    s.watchos.vendored_library = 'core/librealm-watchos.a'
+    s.watchos.vendored_library  = 'core/librealm-watchos.a'
+  end
+
+  if s.respond_to?(:tvos)
+    s.tvos.deployment_target = '9.0'
+    s.tvos.vendored_library  = 'core/librealm-tvos.a'
   end
 
   s.subspec 'Headers' do |s|

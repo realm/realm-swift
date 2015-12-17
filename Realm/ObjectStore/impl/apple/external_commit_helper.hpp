@@ -27,6 +27,36 @@ namespace realm {
 class Realm;
 
 namespace _impl {
+#if TARGET_OS_TV
+class ExternalCommitHelper {
+public:
+    ExternalCommitHelper(Realm* realm);
+    ~ExternalCommitHelper();
+
+    void notify_others();
+    void add_realm(Realm* realm);
+    void remove_realm(Realm* realm);
+
+private:
+    struct PerRealmInfo {
+        Realm* realm;
+        CFRunLoopRef runloop;
+        CFRunLoopSourceRef signal;
+    };
+
+    void listen();
+
+    // Currently registered realms and the signal for delivering notifications
+    // to them
+    std::vector<PerRealmInfo> m_realms;
+
+    // Mutex which guards m_realms
+    std::mutex m_realms_mutex;
+
+    // The listener thread
+    pthread_t m_thread;
+};
+#else
 class ExternalCommitHelper {
 public:
     ExternalCommitHelper(Realm* realm);
@@ -87,7 +117,7 @@ private:
     FdHolder m_shutdown_read_fd;
     FdHolder m_shutdown_write_fd;
 };
-
+#endif
 } // namespace _impl
 } // namespace realm
 

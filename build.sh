@@ -42,6 +42,8 @@ command:
   ios-swift:            builds RealmSwift frameworks for iOS
   watchos:              builds watchOS framwork
   watchos-swift:        builds RealmSwift framework for watchOS
+  tvos:                 builds tvOS framework
+  tvos-swift:           builds RealmSwift framework for tvOS
   osx:                  builds OS X framework
   osx-swift:            builds RealmSwift framework for OS X
   test:                 tests all iOS and OS X frameworks
@@ -52,6 +54,9 @@ command:
   test-ios-devices:     tests ObjC & Swift iOS frameworks on all attached iOS devices
   test-ios-devices-objc:  tests ObjC iOS framework on all attached iOS devices
   test-ios-devices-swift: tests Swift iOS framework on all attached iOS devices
+  test-tvos:            tests tvOS framework
+  test-tvos-swift:      tests RealmSwift tvOS framework
+  test-tvos-devices:    tests ObjC & Swift tvOS frameworks on all attached tvOS devices
   test-osx:             tests OS X framework
   test-osx-swift:       tests RealmSwift OS X framework
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device in both Debug and Release configurations, swiftlint
@@ -107,71 +112,53 @@ copy_bcsymbolmap() {
     find "$1" -name '*.bcsymbolmap' -type f -exec cp {} "$2" \;
 }
 
-build_ios_combined() {
+build_combined() {
     local scheme="$1"
     local module_name="$2"
-    local scope_suffix="$3"
-    local version_suffix="$4"
+    local os="$3"
+    local simulator="$4"
+    local scope_suffix="$5"
+    local version_suffix="$6"
     local config="$CONFIGURATION"
+
+    local destination=""
+    local os_name=""
+    if [[ "$os" == "iphoneos" ]]; then
+        os_name="ios"
+        destination="iPhone 6"
+    elif [[ "$os" == "watchos"  ]]; then
+        os_name="$os"
+        destination="Apple Watch - 42mm"
+    elif [[ "$os" == "appletvos"  ]]; then
+        os_name="tvos"
+        destination="Apple TV 1080p"
+    fi
 
     # Derive build paths
     local build_products_path="build/DerivedData/Realm/Build/Products"
     local product_name="$module_name.framework"
     local binary_path="$module_name"
-    local iphoneos_path="$build_products_path/$config-iphoneos$scope_suffix/$product_name"
-    local iphonesimulator_path="$build_products_path/$config-iphonesimulator$scope_suffix/$product_name"
-    local out_path="build/ios$scope_suffix$version_suffix"
+    local os_path="$build_products_path/$config-$os$scope_suffix/$product_name"
+    local simulator_path="$build_products_path/$config-$simulator$scope_suffix/$product_name"
+    local out_path="build/$os_name$scope_suffix$version_suffix"
 
     # Build for each platform
-    xc "-scheme '$scheme' -configuration $config -sdk iphoneos"
-    xc "-scheme '$scheme' -configuration $config -sdk iphonesimulator -destination 'name=iPhone 6' ONLY_ACTIVE_ARCH=NO"
+    xc "-scheme '$scheme' -configuration $config -sdk $os"
+    xc "-scheme '$scheme' -configuration $config -sdk $simulator -destination 'name=$destination' ONLY_ACTIVE_ARCH=NO"
 
     # Combine .swiftmodule
-    if [ -d $iphonesimulator_path/Modules/$module_name.swiftmodule ]; then
-      cp $iphonesimulator_path/Modules/$module_name.swiftmodule/* $iphoneos_path/Modules/$module_name.swiftmodule/
+    if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
+      cp $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
     fi
     
     # Copy *.bcsymbolmap to .framework for submitting app with bitcode
-    copy_bcsymbolmap "$build_products_path/$config-iphoneos$scope_suffix" "$iphoneos_path"
+    copy_bcsymbolmap "$build_products_path/$config-$os$scope_suffix" "$os_path"
 
     # Retrieve build products
-    clean_retrieve $iphoneos_path $out_path $product_name
+    clean_retrieve $os_path $out_path $product_name
 
     # Combine ar archives
-    xcrun lipo -create "$iphonesimulator_path/$binary_path" "$iphoneos_path/$binary_path" -output "$out_path/$product_name/$module_name"
-}
-
-build_watchos_combined() {
-    local scheme="$1"
-    local module_name="$2"
-    local scope_suffix="$3"
-    local config="$CONFIGURATION"
-
-    # Derive build paths
-    local build_products_path="build/DerivedData/Realm/Build/Products"
-    local product_name="$module_name.framework"
-    local binary_path="$module_name"
-    local watchos_path="$build_products_path/$config-watchos$scope_suffix/$product_name"
-    local watchsimulator_path="$build_products_path/$config-watchsimulator$scope_suffix/$product_name"
-    local out_path="build/watchos$scope_suffix"
-
-    # Build for each platform
-    xc "-scheme '$scheme' -configuration $config -sdk watchos"
-    xc "-scheme '$scheme' -configuration $config -sdk watchsimulator -destination 'name=Apple Watch - 42mm' ONLY_ACTIVE_ARCH=NO"
-
-    # Combine .swiftmodule
-    if [ -d $watchsimulator_path/Modules/$module_name.swiftmodule ]; then
-      cp $watchsimulator_path/Modules/$module_name.swiftmodule/* $watchos_path/Modules/$module_name.swiftmodule/
-    fi
-    
-    # Copy *.bcsymbolmap
-    copy_bcsymbolmap "$build_products_path/$config-watchos$scope_suffix" "$watchos_path"
-
-    # Retrieve build products
-    clean_retrieve $watchos_path $out_path $product_name
-
-    # Combine ar archives
-    xcrun lipo -create "$watchsimulator_path/$binary_path" "$watchos_path/$binary_path" -output "$out_path/$product_name/$module_name"
+    xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$out_path/$product_name/$module_name"
 }
 
 xc_work_around_rdar_23055637() {
@@ -206,7 +193,7 @@ shutdown_simulators() {
 # Device Test Helper
 ######################################
 
-test_ios_devices() {
+test_devices() {
     serial_numbers_str=$(system_profiler SPUSBDataType | grep "Serial Number: ")
     serial_numbers=()
     while read -r line; do
@@ -216,18 +203,19 @@ test_ios_devices() {
         fi
     done <<< "$serial_numbers_str"
     if [[ ${#serial_numbers[@]} == 0 ]]; then
-        echo "At least one iOS device must be connected to this computer to run device tests"
+        echo "At least one iOS/tvOS device must be connected to this computer to run device tests"
         if [ -z "${JENKINS_HOME}" ]; then
             # Don't fail if running locally and there's no device
             exit 0
         fi
         exit 1
     fi
-    scheme="$1"
-    configuration="$2"
-    failed=0
+    local sdk="$1"
+    local scheme="$2"
+    local configuration="$3"
+    local failed=0
     for device in "${serial_numbers[@]}"; do
-        xc "-scheme '$scheme' -configuration $configuration -destination 'id=$device' test" || failed=1
+        xc "-scheme '$scheme' -configuration $configuration -destination 'id=$device' -sdk $sdk test" || failed=1
     done
     return $failed
 }
@@ -444,36 +432,48 @@ case "$COMMAND" in
         sh build.sh ios-swift
         sh build.sh watchos
         sh build.sh watchos-swift
+        sh build.sh tvos
+        sh build.sh tvos-swift
         sh build.sh osx
         sh build.sh osx-swift
         exit 0
         ;;
 
     "ios-static")
-        build_ios_combined 'Realm iOS static' Realm "-static"
+        build_combined 'Realm iOS static' Realm iphoneos iphonesimulator "-static"
         exit 0
         ;;
 
     "ios-dynamic")
-        build_ios_combined "Realm" Realm
+        build_combined Realm Realm iphoneos iphonesimulator
         exit 0
         ;;
 
     "ios-swift")
         sh build.sh ios-dynamic
-        build_ios_combined RealmSwift RealmSwift '' "/swift-$REALM_SWIFT_VERSION"
+        build_combined RealmSwift RealmSwift iphoneos iphonesimulator '' "/swift-$REALM_SWIFT_VERSION"
         cp -R build/ios/Realm.framework build/ios/swift-$REALM_SWIFT_VERSION
         exit 0
         ;;
 
     "watchos")
-        build_watchos_combined Realm Realm
+        build_combined Realm Realm watchos watchsimulator
         exit 0
         ;;
 
     "watchos-swift")
         sh build.sh watchos
-        build_watchos_combined RealmSwift RealmSwift
+        build_combined RealmSwift RealmSwift watchos watchsimulator
+        exit 0
+        ;;
+
+    "tvos")
+        build_combined Realm Realm appletvos appletvsimulator
+        exit 0
+        ;;
+
+    "tvos-swift")
+        build_combined RealmSwift RealmSwift appletvos appletvsimulator
         exit 0
         ;;
 
@@ -504,6 +504,7 @@ case "$COMMAND" in
         sh build.sh test-ios-dynamic || failed=1
         sh build.sh test-ios-swift || failed=1
         sh build.sh test-ios-devices || failed=1
+        sh build.sh test-tvos-devices || failed=1
         sh build.sh test-osx || failed=1
         sh build.sh test-osx-swift || failed=1
         exit $failed
@@ -539,9 +540,9 @@ case "$COMMAND" in
         ;;
 
     "test-ios-swift")
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
+        xc_work_around_rdar_23055637 "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
         shutdown_simulators
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
+        xc_work_around_rdar_23055637 "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
         exit 0
         ;;
 
@@ -554,13 +555,27 @@ case "$COMMAND" in
         ;;
 
     "test-ios-devices-objc")
-        test_ios_devices "Realm iOS static" "$CONFIGURATION"
+        test_devices iphoneos "Realm iOS static" "$CONFIGURATION"
         exit $?
         ;;
 
     "test-ios-devices-swift")
-        test_ios_devices "RealmSwift" "$CONFIGURATION"
+        test_devices iphoneos "RealmSwift" "$CONFIGURATION"
         exit $?
+        ;;
+
+    "test-tvos")
+        xc_work_around_rdar_23055637 "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
+        exit $?
+        ;;
+
+    "test-tvos-swift")
+        xc_work_around_rdar_23055637 "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
+        exit $?
+        ;;
+
+    "test-tvos-devices")
+        test_devices appletvos TestHost "$CONFIGURATION"
         ;;
 
     "test-osx")
@@ -598,6 +613,9 @@ case "$COMMAND" in
         sh build.sh verify-ios-device-objc
         sh build.sh verify-ios-device-swift
         sh build.sh verify-watchos
+        sh build.sh verify-tvos
+        sh build.sh verify-tvos-debug
+        sh build.sh verify-tvos-device
         sh build.sh verify-swiftlint
         ;;
 
@@ -672,6 +690,21 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "verify-tvos")
+        if [ $REALM_SWIFT_VERSION != '1.2' ]; then
+            sh build.sh test-tvos
+            sh build.sh test-tvos-swift
+            sh build.sh examples-tvos
+            sh build.sh examples-tvos-swift
+        fi
+        exit 0
+        ;;
+
+    "verify-tvos-device")
+        sh build.sh test-tvos-devices
+        exit 0
+        ;;
+
     "verify-swiftlint")
         swiftlint lint --strict
         exit 0
@@ -694,6 +727,8 @@ case "$COMMAND" in
         sh build.sh examples-ios
         sh build.sh examples-ios-swift
         sh build.sh examples-osx
+        sh build.sh examples-tvos
+        sh build.sh examples-tvos-swift
         exit 0
         ;;
 
@@ -733,6 +768,18 @@ case "$COMMAND" in
 
     "examples-osx")
         xc "-project examples/osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration ${CONFIGURATION} build ${CODESIGN_PARAMS}"
+        ;;
+
+    "examples-tvos")
+        xc "-project examples/tvos/objc/RealmExamples.xcodeproj -scheme DownloadCache -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/tvos/objc/RealmExamples.xcodeproj -scheme PreloadedData -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        exit 0
+        ;;
+
+    "examples-tvos-swift")
+        xc "-project examples/tvos/swift/RealmExamples.xcodeproj -scheme DownloadCache -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/tvos/swift/RealmExamples.xcodeproj -scheme PreloadedData -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        exit 0
         ;;
 
     ######################################
@@ -953,6 +1000,22 @@ case "$COMMAND" in
         zip --symlinks -r realm-swift-framework-watchos.zip RealmSwift.framework Realm.framework
         ;;
 
+    "package-tvos")
+        cd tightdb_objc
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh tvos
+
+        cd build/tvos
+        zip --symlinks -r realm-framework-tvos.zip Realm.framework
+        ;;
+
+    "package-tvos-swift")
+        cd tightdb_objc
+        REALM_SWIFT_VERSION=2.1.1 sh build.sh tvos-swift
+
+        cd build/tvos
+        zip --symlinks -r realm-swift-framework-tvos.zip RealmSwift.framework Realm.framework
+        ;;
+
     "package-release")
         LANG="$2"
         TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
@@ -963,7 +1026,7 @@ case "$COMMAND" in
 
         FOLDER=${TEMPDIR}/realm-${LANG}-${VERSION}
 
-        mkdir -p ${FOLDER}/osx ${FOLDER}/ios ${FOLDER}/watchos
+        mkdir -p ${FOLDER}/osx ${FOLDER}/ios ${FOLDER}/watchos ${FOLDER}/tvos
 
         if [[ "${LANG}" == "objc" ]]; then
             mkdir -p ${FOLDER}/ios/static
@@ -989,6 +1052,11 @@ case "$COMMAND" in
                 cd ${FOLDER}/watchos
                 unzip ${WORKSPACE}/realm-framework-watchos.zip
             )
+
+            (
+                cd ${FOLDER}/tvos
+                unzip ${WORKSPACE}/realm-framework-tvos.zip
+            )
         else
             (
                 cd ${FOLDER}/osx
@@ -1003,6 +1071,11 @@ case "$COMMAND" in
             (
                 cd ${FOLDER}/watchos
                 unzip ${WORKSPACE}/realm-swift-framework-watchos.zip
+            )
+
+            (
+                cd ${FOLDER}/tvos
+                unzip ${WORKSPACE}/realm-swift-framework-tvos.zip
             )
         fi
 
@@ -1096,6 +1169,12 @@ EOF
         sh tightdb_objc/build.sh package-watchos-swift
         cp tightdb_objc/build/watchos/realm-swift-framework-watchos.zip .
         cp tightdb_objc/build/watchos/realm-framework-watchos.zip .
+
+        echo 'Packaging tvOS'
+        sh tightdb_objc/build.sh package-tvos
+        sh tightdb_objc/build.sh package-tvos-swift
+        cp tightdb_objc/build/tvos/realm-swift-framework-tvos.zip .
+        cp tightdb_objc/build/tvos/realm-framework-tvos.zip .
 
         echo 'Building final release packages'
         sh tightdb_objc/build.sh package-release objc

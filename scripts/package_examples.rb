@@ -53,6 +53,7 @@ FileUtils.cp_r 'examples/ios/xcode-6', 'examples/ios/xcode-7'
 replace_in_file('examples/ios/xcode-6/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/ios-static', '/../ios/static/xcode-6')
 replace_in_file('examples/ios/xcode-7/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/ios-static', '/../ios/static/xcode-7')
 replace_in_file('examples/osx/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/osx', '/osx')
+replace_in_file('examples/tvos/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/tvos', '/tvos')
 
 # Remove Realm target and dependencies from all example objc projects
 objc_examples = [
@@ -70,7 +71,8 @@ end
 
 swift_examples = [
   "examples/ios/swift-1.2/RealmExamples.xcodeproj",
-  "examples/ios/swift-2.1.1/RealmExamples.xcodeproj"
+  "examples/ios/swift-2.1.1/RealmExamples.xcodeproj",
+  "examples/tvos/swift/RealmExamples.xcodeproj"
 ]
 
 swift_examples.each do |example|
@@ -78,6 +80,7 @@ swift_examples.each do |example|
   remove_target(example, "RealmSwift")
   filepath = File.join(example, "project.pbxproj")
   replace_in_file(filepath, "/build/ios", "/ios")
+  replace_in_file(filepath, "/build/tvos", "/tvos")
 end
 
 # Update RubyMotion sample

@@ -11,6 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
+* Support for tvOS.
+* Support for building Realm Swift from source when using Carthage.
 * The block parameter of `-[RLMRealm transactionWithBlock:]`/`Realm.write(_:)` is 
   now marked as `__attribute__((noescape))`/`@noescape`.
 * Many forms of queries with key paths on both sides of the comparison operator
