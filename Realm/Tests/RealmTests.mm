@@ -26,6 +26,8 @@ extern "C" {
 #import "RLMSchema_Private.h"
 }
 
+#import <thread>
+
 @interface RLMRealm ()
 + (BOOL)isCoreDebug;
 - (BOOL)compact;
@@ -996,15 +998,11 @@ extern "C" {
 }
 
 - (void)testHoldRealmAfterSourceThreadIsDestroyed {
-    __block RLMRealm *realm;
+    RLMRealm *realm;
 
-    // Using an NSThread to ensure the thread (and thus runloop) is actually destroyed
-    NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(runBlock:) object:^{
-        realm = [RLMRealm defaultRealm];
-    }];
-    [thread start];
-    while (!thread.isFinished)
-        usleep(100);
+    // Explicitly create a thread so that we can ensure the thread (and thus
+    // runloop) is actually destroyed
+    std::thread([&] { realm = [RLMRealm defaultRealm]; }).join();
 
     [realm path]; // ensure ARC releases the object after the thread has finished
 }
