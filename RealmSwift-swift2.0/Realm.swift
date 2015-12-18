@@ -80,8 +80,9 @@ public final class Realm {
     - parameter path: Path to the realm file.
     */
     public convenience init(path: String) throws {
-        let rlmRealm = try RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: false, schema: nil)
-        self.init(rlmRealm)
+        var configuration = Configuration.defaultConfiguration
+        configuration.path = path
+        try self.init(configuration: configuration)
     }
 
     // MARK: Transactions
