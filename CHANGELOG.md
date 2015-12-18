@@ -3,7 +3,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* `+[RLMRealm realmWithPath:]` now inherits from the default configuration.
+* `+[RLMRealm realmWithPath:]`/`Realm.init(path:)` now inherits from the default
+  configuration.
 
 ### Enhancements
 
