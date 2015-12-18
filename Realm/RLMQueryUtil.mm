@@ -83,13 +83,13 @@ struct TrueExpression : realm::Expression {
 
         return realm::not_found;
     }
-    void set_table() override {}
+    void set_table(const Table*) override {}
     const Table* get_table() const override { return nullptr; }
 };
 
 struct FalseExpression : realm::Expression {
     size_t find_first(size_t, size_t) const override { return realm::not_found; }
-    void set_table() override {}
+    void set_table(const Table*) override {}
     const Table* get_table() const override { return nullptr; }
 };
 
@@ -503,7 +503,7 @@ void add_link_constraint_to_query(realm::Query & query,
     RLMPrecondition(query.get_table()->get_link_target(column.index()).get() == obj->_row.get_table(),
                     @"Invalid value origin", @"Object must be from the Realm being queried");
 
-    query.links_to(column.index(), obj->_row.get_index());
+    query.links_to(column.index(), obj->_row);
 }
 
 void add_link_constraint_to_query(realm::Query & query,
