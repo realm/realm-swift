@@ -95,7 +95,7 @@ public final class Realm {
     :param: path Path to the realm file.
     */
     public convenience init(path: String) {
-        self.init(RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: false, schema: nil, error: nil)!)
+        self.init(RLMRealm(path: path))
     }
 
     // MARK: Transactions

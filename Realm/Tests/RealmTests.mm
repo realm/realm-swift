@@ -71,6 +71,15 @@ extern "C" {
     XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
 }
 
+- (void)testRealmWithPathUsesDefaultConfiguration {
+    RLMRealmConfiguration *originalDefaultConfiguration = [RLMRealmConfiguration defaultConfiguration];
+    RLMRealmConfiguration *newDefaultConfiguration = [originalDefaultConfiguration copy];
+    newDefaultConfiguration.objectClasses = @[];
+    [RLMRealmConfiguration setDefaultConfiguration:newDefaultConfiguration];
+    XCTAssertEqual([[[[RLMRealm realmWithPath:RLMTestRealmPath()] configuration] objectClasses] count], 0U);
+    [RLMRealmConfiguration setDefaultConfiguration:originalDefaultConfiguration];
+}
+
 - (void)testReadOnlyFile {
     @autoreleasepool {
         RLMRealm *realm = self.realmWithTestPath;
