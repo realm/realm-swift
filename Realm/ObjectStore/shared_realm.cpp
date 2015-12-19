@@ -86,7 +86,7 @@ Realm::Realm(Config config)
     }
     catch (util::File::NotFound const& ex) {
         throw RealmFileException(RealmFileException::Kind::NotFound, ex.get_path(),
-                                 "File at path '" + ex.get_path() + "' does not exists.");
+                                 "File at path '" + ex.get_path() + "' does not exist.");
     }
     catch (util::File::AccessError const& ex) {
         throw RealmFileException(RealmFileException::Kind::AccessError, ex.get_path(),
