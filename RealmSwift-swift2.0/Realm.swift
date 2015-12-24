@@ -68,6 +68,8 @@ public final class Realm {
     which can be changed by setting `Realm.Configuration.defaultConfiguration`.
 
     - parameter configuration: The configuration to use when creating the Realm instance.
+
+    - throws: An NSError if the Realm could not be initialized.
     */
     public convenience init(configuration: Configuration = Configuration.defaultConfiguration) throws {
         let rlmRealm = try RLMRealm(configuration: configuration.rlmConfiguration)
@@ -78,6 +80,8 @@ public final class Realm {
     Obtains a Realm instance persisted at the specified file path.
 
     - parameter path: Path to the realm file.
+
+    - throws: An NSError if the Realm could not be initialized.
     */
     public convenience init(path: String) throws {
         var configuration = Configuration.defaultConfiguration
@@ -100,6 +104,8 @@ public final class Realm {
 	if applicable. This has no effect if the `Realm` was already up to date.
 
     - parameter block: The block to be executed inside a write transaction.
+
+    - throws: An NSError if the transaction could not be written.
     */
     public func write(@noescape block: (() -> Void)) throws {
         try rlmRealm.transactionWithBlock(block)
@@ -133,6 +139,8 @@ public final class Realm {
 	the transaction.
 
     Calling this when not in a write transaction will throw an exception.
+
+    - throws: An NSError if the transaction could not be written.
     */
     public func commitWrite() throws {
         try rlmRealm.commitWriteTransaction()
@@ -555,6 +563,8 @@ public final class Realm {
 
     - parameter path:          Path to save the Realm to.
     - parameter encryptionKey: Optional 64-byte encryption key to encrypt the new file with.
+
+    - throws: An NSError if the copy could not be written.
     */
     public func writeCopyToPath(path: String, encryptionKey: NSData? = nil) throws {
         if let encryptionKey = encryptionKey {
@@ -576,10 +586,14 @@ public final class Realm {
 
 extension Realm: Equatable { }
 
+// swiftlint:disable valid_docs
+
 /// Returns whether the two realms are equal.
 public func == (lhs: Realm, rhs: Realm) -> Bool {
     return lhs.rlmRealm == rhs.rlmRealm
 }
+
+// swiftlint:enable valid_docs
 
 // MARK: Notifications
 
