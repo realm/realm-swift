@@ -60,6 +60,9 @@ public final class Realm {
 
     /// Indicates if this Realm contains any objects.
     public var isEmpty: Bool { return rlmRealm.isEmpty }
+    
+    /// Indicates is this Realm may not contain the most recent changes from other Realms
+    public var isDirty: Bool { return rlmRealm.isDirty }
 
     // MARK: Initializers
 

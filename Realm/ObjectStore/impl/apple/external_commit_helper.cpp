@@ -327,6 +327,11 @@ void ExternalCommitHelper::listen()
 
 void ExternalCommitHelper::notify_others()
 {
+    std::lock_guard<std::mutex> lock(m_realms_mutex);
+    for (auto const& realm : m_realms) {
+        realm.realm->set_is_dirty(true);
+    }
+    
     notify_fd(m_notify_fd);
 }
 #endif
