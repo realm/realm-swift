@@ -307,6 +307,16 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 @property (nonatomic) BOOL autorefresh;
 
 /**
+ After changes from writable Realm are saved, and notifications were sent to other Realms,
+ there is a hole between sending the notifications and their processing. So, if any user's block
+ would be executed in this hole, the Realm might not contain the newest changes.
+ 
+ To prevent this, isDirty is set to YES after sending notifications and
+ then is reverted to NO after its processing.
+ */
+@property (nonatomic, readonly) BOOL isDirty;
+
+/**
  Write a compacted copy of the RLMRealm to the given path.
 
  The destination file cannot already exist.
