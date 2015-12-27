@@ -97,6 +97,8 @@ Realm::Realm(Config config)
         throw RealmFileException(RealmFileException::Kind::FormatUpgradeRequired, m_config.path, "The Realm file format must be allowed to be upgraded "
         "in order to proceed.");
     }
+    
+    set_is_dirty(false);
 }
 
 Realm::~Realm() {
@@ -372,6 +374,8 @@ void Realm::notify()
             }
         }
     }
+    
+    set_is_dirty(false);
 }
 
 
@@ -398,6 +402,8 @@ bool Realm::refresh()
         read_group();
     }
 
+    set_is_dirty(false);
+    
     return true;
 }
 

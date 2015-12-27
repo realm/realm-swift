@@ -129,6 +129,13 @@ namespace realm {
         // FIXME private
         Group *read_group();
         static RealmCache s_global_cache;
+        
+    private:
+        bool m_is_dirty;
+        
+    public:
+        void set_is_dirty(bool is_dirty) { m_is_dirty = is_dirty; }
+        bool is_dirty() const { return m_is_dirty; }
     };
 
     class RealmCache
