@@ -251,7 +251,7 @@ public final class Realm {
     public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
         let className = (type as Object.Type).className()
         if update && schema[className]?.primaryKeyProperty == nil {
-          throwRealmException("'\(className)' does not have a primary key and can not be updated")
+            throwRealmException("'\(className)' does not have a primary key and can not be updated")
         }
         return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), T.self)
     }

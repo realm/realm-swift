@@ -135,6 +135,9 @@ extension Realm {
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema? = nil
 
+        /// Allows to disable automatic format upgrades when accessing the Realm.
+        internal var disableFormatUpgrade: Bool = false
+
         // MARK: Private Methods
 
         internal var rlmConfiguration: RLMRealmConfiguration {
@@ -151,6 +154,7 @@ extension Realm {
             configuration.schemaVersion = self.schemaVersion
             configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
             configuration.customSchema = self.customSchema
+            configuration.disableFormatUpgrade = self.disableFormatUpgrade
             return configuration
         }
 
@@ -167,6 +171,7 @@ extension Realm {
                 }
             }
             configuration.customSchema = rlmConfiguration.customSchema
+            configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
             return configuration
         }
     }

@@ -55,3 +55,9 @@
         RLMAssertMatches(exception.reason, regex, __VA_ARGS__); \
     } \
 })
+
+#define RLMAssertThrowsWithCodeMatching(expression, expectedCode, ...) \
+({ \
+    NSException *exception = RLMAssertThrows(expression, __VA_ARGS__); \
+    XCTAssertEqual([exception.userInfo[NSUnderlyingErrorKey] code], expectedCode, __VA_ARGS__); \
+})
