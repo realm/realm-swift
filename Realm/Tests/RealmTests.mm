@@ -18,6 +18,7 @@
 
 #import "RLMTestCase.h"
 
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Dynamic.h"
 
@@ -58,7 +59,7 @@ extern "C" {
 - (void)testOpeningInvalidPathThrows {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.path = @"/dev/null/foo";
-    XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
+    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileAccess);
 }
 
 - (void)testPathCannotBeBothInMemoryAndRegularDurability {
@@ -68,7 +69,8 @@ extern "C" {
 
     // make sure we can't open disk-realm at same path
     config.path = inMemoryRealm.path;
-    XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
+    NSError *error; // passing in a reference to assert that this error can't be catched!
+    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:&error], @"Realm at path '.*' already opened with different inMemory settings");
 }
 
 - (void)testRealmWithPathUsesDefaultConfiguration {
@@ -91,7 +93,7 @@ extern "C" {
     [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:RLMTestRealmPath() error:nil];
 
     // Should not be able to open read-write
-    XCTAssertThrows([self realmWithTestPath]);
+    RLMAssertThrowsWithCodeMatching([self realmWithTestPath], RLMErrorFail);
 
     RLMRealm *realm;
     XCTAssertNoThrow(realm = [self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
@@ -127,19 +129,45 @@ extern "C" {
 }
 
 - (void)testReadOnlyRealmMustExist {
-   XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
+   RLMAssertThrowsWithCodeMatching([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil], RLMErrorFileNotFound);
 }
 
 - (void)testCannotHaveReadOnlyAndReadWriteRealmsAtSamePathAtSameTime {
+    NSString *exceptionReason = @"Realm at path '.*' already opened with different read permissions";
     @autoreleasepool {
         XCTAssertNoThrow([self realmWithTestPath]);
-        XCTAssertThrows([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
+        RLMAssertThrowsWithReasonMatching([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil], exceptionReason);
     }
 
     @autoreleasepool {
         XCTAssertNoThrow([self readOnlyRealmWithPath:RLMTestRealmPath() error:nil]);
-        XCTAssertThrows([self realmWithTestPath]);
+        RLMAssertThrowsWithReasonMatching([self realmWithTestPath], exceptionReason);
     }
+}
+
+- (void)testFilePermissionDenied {
+    @autoreleasepool {
+        XCTAssertNoThrow([self realmWithTestPath]);
+    }
+    
+    // Make Realm at test path temporarily unreadable
+    NSError *error;
+    NSNumber *permissions = [NSFileManager.defaultManager attributesOfItemAtPath:RLMTestRealmPath() error:&error][NSFilePosixPermissions];
+    assert(!error);
+    [NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: @(0000)} ofItemAtPath:RLMTestRealmPath() error:&error];
+    assert(!error);
+    
+    RLMAssertThrowsWithCodeMatching([self realmWithTestPath], RLMErrorFilePermissionDenied);
+
+    [NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: permissions} ofItemAtPath:RLMTestRealmPath() error:&error];
+    assert(!error);
+}
+
+- (void)testFileFormatUpgradeRequiredButDisabled {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.disableFormatUpgrade = true;
+    config.path = [[NSBundle bundleForClass:RealmTests.class] pathForResource:@"fileformat-pre-null.realm" ofType:nil];
+    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileFormatUpgradeRequired);
 }
 
 #pragma mark - Adding and Removing Objects
@@ -1156,7 +1184,20 @@ extern "C" {
 
     NSError *writeError;
     XCTAssertFalse([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
-    XCTAssertNotNil(writeError);
+    XCTAssertEqual(writeError.code, RLMErrorFileExists);
+}
+
+- (void)testCannotWriteInNotExistingDir
+{
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withValue:@[@0]];
+    }];
+
+
+    NSError *writeError;
+    XCTAssertFalse([realm writeCopyToPath:@"/tmp/RLMTestDirMayNotExist/foo" error:&writeError]);
+    XCTAssertEqual(writeError.code, RLMErrorFileNotFound);
 }
 
 - (void)testWritingCopyUsesWriteTransactionInProgress

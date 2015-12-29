@@ -84,6 +84,10 @@ Realm::Realm(Config config)
         throw RealmFileException(RealmFileException::Kind::Exists, ex.get_path(),
                                  "File at path '" + ex.get_path() + "' already exists.");
     }
+    catch (util::File::NotFound const& ex) {
+        throw RealmFileException(RealmFileException::Kind::NotFound, ex.get_path(),
+                                 "File at path '" + ex.get_path() + "' does not exists.");
+    }
     catch (util::File::AccessError const& ex) {
         throw RealmFileException(RealmFileException::Kind::AccessError, ex.get_path(),
                                  "Unable to open a realm at path '" + ex.get_path() + "'");

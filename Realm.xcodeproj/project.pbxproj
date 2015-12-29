@@ -49,8 +49,12 @@
 		02AFB4671A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02AFB4681A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
+		2973CCF91C175AB400FEA0FA /* fileformat-pre-null.realm in Resources */ = {isa = PBXBuildFile; fileRef = 29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */; };
 		297FBEFB1C19F696009D1118 /* RLMTestCaseUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297FBEFA1C19F696009D1118 /* RLMTestCaseUtils.swift */; };
 		297FBEFF1C19F844009D1118 /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 297FBEFE1C19F844009D1118 /* TestUtils.mm */; };
+		29B7FDF61C0DA6560023224E /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B7FDF51C0DA6560023224E /* Error.swift */; };
+		29B7FDFB1C0DE8100023224E /* fileformat-pre-null.realm in Resources */ = {isa = PBXBuildFile; fileRef = 29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */; };
+		29B7FDFC1C0DE8110023224E /* fileformat-pre-null.realm in Resources */ = {isa = PBXBuildFile; fileRef = 29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */; };
 		29EDB8E41A7708E700458D80 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8839B2D19E31FD90047B1A8 /* main.m */; };
 		3F1F47821B9612B300CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F1F47831B9656B900CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
@@ -425,6 +429,8 @@
 		297FBEFA1C19F696009D1118 /* RLMTestCaseUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RLMTestCaseUtils.swift; sourceTree = "<group>"; };
 		297FBEFD1C19F844009D1118 /* TestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtils.h; path = Realm/Tests/TestUtils.h; sourceTree = SOURCE_ROOT; };
 		297FBEFE1C19F844009D1118 /* TestUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TestUtils.mm; path = Realm/Tests/TestUtils.mm; sourceTree = SOURCE_ROOT; };
+		29B7FDF51C0DA6560023224E /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
+		29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fileformat-pre-null.realm"; sourceTree = "<group>"; };
 		29EDB8D71A7703C500458D80 /* RLMObjectStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectStore.h; sourceTree = "<group>"; };
 		29EDB8E01A77070200458D80 /* RLMRealm_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealm_Private.h; sourceTree = "<group>"; };
 		29EDB8E51A7710B700458D80 /* RLMResults_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults_Private.h; sourceTree = "<group>"; };
@@ -723,6 +729,7 @@
 			isa = PBXGroup;
 			children = (
 				5D660FE31BE98D670021E04F /* Aliases.swift */,
+				29B7FDF51C0DA6560023224E /* Error.swift */,
 				5D660FE41BE98D670021E04F /* List.swift */,
 				5D660FE51BE98D670021E04F /* Migration.swift */,
 				5D660FE61BE98D670021E04F /* Object.swift */,
@@ -979,6 +986,7 @@
 			isa = PBXGroup;
 			children = (
 				E81A1FC21955FE0100FDED82 /* RealmTests-Info.plist */,
+				29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -1164,6 +1172,7 @@
 				5D660FD41BE98C7C0021E04F /* Sources */,
 				5D660FD51BE98C7C0021E04F /* Frameworks */,
 				5D66102D1BE98E360021E04F /* Embed Frameworks */,
+				2973CCF81C175AAA00FEA0FA /* Resources */,
 				E81B01FF1BF664B700A41452 /* Exit After Building Tests If Requested */,
 			);
 			buildRules = (
@@ -1202,6 +1211,7 @@
 				5D304A2F1BE9AF350082C1A6 /* Get Version Number */,
 				E856D1DB195614A400FB2FCF /* Sources */,
 				E856D1DC195614A400FB2FCF /* Frameworks */,
+				29B7FDF91C0DE7FC0023224E /* Resources */,
 				5D61570B1BE3250000A4BD3F /* Exit After Building Tests If Requested */,
 			);
 			buildRules = (
@@ -1223,6 +1233,7 @@
 				E8D89B9F1955FC6D00CF2B9A /* Sources */,
 				E8D89BA01955FC6D00CF2B9A /* Frameworks */,
 				5D128F291BE984D4001F4FBF /* Embed Frameworks */,
+				29B7FDFA1C0DE80A0023224E /* Resources */,
 				5D61570A1BE324A300A4BD3F /* Exit After Building Tests If Requested */,
 			);
 			buildRules = (
@@ -1300,6 +1311,30 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2973CCF81C175AAA00FEA0FA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2973CCF91C175AB400FEA0FA /* fileformat-pre-null.realm in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		29B7FDF91C0DE7FC0023224E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				29B7FDFC1C0DE8110023224E /* fileformat-pre-null.realm in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		29B7FDFA1C0DE80A0023224E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				29B7FDFB1C0DE8100023224E /* fileformat-pre-null.realm in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5D659ECE1BE04556006515A0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1576,6 +1611,7 @@
 				5D660FFB1BE98D670021E04F /* Results.swift in Sources */,
 				5D660FFC1BE98D670021E04F /* Schema.swift in Sources */,
 				5D660FFD1BE98D670021E04F /* SortDescriptor.swift in Sources */,
+				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
 				5D660FFE1BE98D670021E04F /* Util.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
