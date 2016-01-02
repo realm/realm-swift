@@ -59,8 +59,6 @@ extension Realm {
         - parameter schemaVersion:      The current schema version.
         - parameter migrationBlock:     The block which migrates the Realm to the current version.
         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
-
-        - returns: An initialized `Realm.Configuration`.
         */
         public init(path: String? = RLMRealmPathForFile("default.realm"),
             inMemoryIdentifier: String? = nil,
