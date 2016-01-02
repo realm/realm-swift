@@ -228,7 +228,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
     }
 
-    /// Yields a read-write migration `SwiftObject` to the given block
+    // Yields a read-write migration `SwiftObject` to the given block
     private func withMigrationObject(block: ((MigrationObject, Migration) -> ())) {
         autoreleasepool {
             let realm = self.realmWithTestPath()
@@ -252,11 +252,11 @@ class ObjectTests: TestCase {
     }
 
     func testSetValueForKey() {
-        let setter : (Object, AnyObject?, String) -> () = { object, value, key in
+        let setter: (Object, AnyObject?, String) -> () = { object, value, key in
             object.setValue(value, forKey: key)
             return
         }
-        let getter : (Object, String) -> (AnyObject?) = { object, key in
+        let getter: (Object, String) -> (AnyObject?) = { object, key in
             object.valueForKey(key)
         }
 
@@ -273,11 +273,11 @@ class ObjectTests: TestCase {
     }
 
     func testSubscript() {
-        let setter : (Object, AnyObject?, String) -> () = { object, value, key in
+        let setter: (Object, AnyObject?, String) -> () = { object, value, key in
             object[key] = value
             return
         }
-        let getter : (Object, String) -> (AnyObject?) = { object, key in
+        let getter: (Object, String) -> (AnyObject?) = { object, key in
             object[key]
         }
 

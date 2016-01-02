@@ -221,9 +221,14 @@ public class Object: RLMObjectBase {
 
     // MARK: Equatable
 
-    /// Returns whether both objects are equal.
-    /// Objects are considered equal when they are both from the same Realm
-    /// and point to the same underlying object in the database.
+    /**
+    Returns whether both objects are equal.
+
+    Objects are considered equal when they are both from the same Realm and point to the same
+    underlying object in the database.
+
+    - parameter object: Object to compare for equality.
+    */
     public override func isEqual(object: AnyObject?) -> Bool {
         return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
