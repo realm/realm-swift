@@ -51,7 +51,7 @@ public enum Error: ErrorType {
         case .Fail:
             return RLMError.Fail
         case .FileAccess:
-            return RLMError.FileAccess
+            return RLMError.FileAccessError
         case .FilePermissionDenied:
             return RLMError.FilePermissionDenied
         case .FileExists:
