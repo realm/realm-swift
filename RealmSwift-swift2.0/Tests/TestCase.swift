@@ -119,7 +119,8 @@ class TestCase: XCTestCase {
         do {
             try block()
         } catch {
-            XCTFail("Expected no error, but instead caught <\(error)>.")
+            XCTFail("Expected no error, but instead caught <\(error)>.",
+                file: fileName, line: lineNumber)
         }
     }
 
@@ -128,11 +129,13 @@ class TestCase: XCTestCase {
                         @noescape block: () throws -> T) {
         do {
             try block()
-            XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.")
+            XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
+                file: fileName, line: lineNumber)
         } catch expectedError {
             // Success!
         } catch {
-            XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.")
+            XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.",
+                file: fileName, line: lineNumber)
         }
     }
 
