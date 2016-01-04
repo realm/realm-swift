@@ -196,6 +196,10 @@
 
     XCTAssertThrows([[AggregateObject allObjectsInRealm:realm] valueForKey:@"invalid"]);
 
+    [[AggregateObject objectsInRealm:realm where:@"intCol != 5"] setValue:@5 forKey:@"intCol"];
+    XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"],
+                          (@[@5, @5, @5, @5, @5, @5, @5, @5, @5, @5]));
+
     [realm commitWriteTransaction];
 
     RLMAssertThrowsWithReasonMatching([[AggregateObject allObjectsInRealm:realm] setValue:@25 forKey:@"intCol"],
