@@ -16,7 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix incorrect results or crashes when using `-[RLMResults setValue:forKey:]`
+  on an RLMResults which was filtered on the key being set.
 
 0.97.0 Release notes (2015-12-17)
 =============================================================

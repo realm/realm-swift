@@ -28,6 +28,7 @@
 #import "RLMSwiftSupport.h"
 
 #import <realm/mixed.hpp>
+#import <realm/table_view.hpp>
 
 #include <sys/sysctl.h>
 #include <sys/types.h>
@@ -225,18 +226,16 @@ NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *ke
 }
 
 void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value) {
-    size_t count = collection.count;
-    if (count == 0) {
+    realm::TableView tv = [collection tableView];
+    if (tv.size() == 0) {
         return;
     }
 
     RLMRealm *realm = collection.realm;
     RLMObjectSchema *objectSchema = collection.objectSchema;
     RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-    realm::Table *table = objectSchema.table;
-    for (size_t i = 0; i < count; i++) {
-        size_t rowIndex = [collection indexInSource:i];
-        accessor->_row = (*table)[rowIndex];
+    for (size_t i = 0; i < tv.size(); i++) {
+        accessor->_row = tv[i];
         RLMInitializeSwiftAccessorGenerics(accessor);
         [accessor setValue:value forKey:key];
     }
