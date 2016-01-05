@@ -858,6 +858,8 @@ case "$COMMAND" in
             cp -R include/Realm include/realm
           fi
           touch include/Realm/RLMPlatform.h
+        else
+          echo "let swiftLanguageVersion = \"$(get_swift_version)\"" > RealmSwift/SwiftVersion.swift
         fi
         ;;
 
