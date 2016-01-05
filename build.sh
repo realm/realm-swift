@@ -817,7 +817,7 @@ case "$COMMAND" in
     # CocoaPods
     ######################################
     "cocoapods-setup")
-        if [[ "$2" != "without-core" ]]; then
+        if [[ "$2" != "swift" ]]; then
             sh build.sh download-core
             mv core/librealm.a core/librealm-osx.a
             if [[ "$REALM_SWIFT_VERSION" = "1.2" ]]; then
@@ -838,7 +838,7 @@ case "$COMMAND" in
           fi
         done
 
-        if [[ "$2" != "without-core" ]]; then
+        if [[ "$2" != "swift" ]]; then
           # CocoaPods doesn't support multiple header_mappings_dir, so combine
           # both sets of headers into a single directory
           rm -rf include
