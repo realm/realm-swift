@@ -302,6 +302,10 @@ public final class DynamicObject: Object {
 /// Internal class. Do not use directly.
 @objc(RealmSwiftObjectUtil)
 public class ObjectUtil: NSObject {
+    @objc private class func swiftVersion() -> NSString {
+        return "1.2"
+    }
+
     @objc private class func ignoredPropertiesForClass(type: AnyClass) -> NSArray? {
         if let type = type as? Object.Type {
             return type.ignoredProperties() as NSArray?

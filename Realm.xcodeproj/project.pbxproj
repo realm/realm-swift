@@ -311,6 +311,7 @@
 		E8917599197A1B350068ACC6 /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8917597197A1B350068ACC6 /* UnicodeTests.m */; };
 		E8A5DEED1968E520006A50F6 /* RLMPredicateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */; };
 		E8A5DEEE1968E521006A50F6 /* RLMPredicateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */; };
+		E8BF67FC1C24D07100E591CD /* SwiftVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -593,6 +594,7 @@
 		E8951F01196C96DE00D6461C /* RLMRealm_Dynamic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealm_Dynamic.h; sourceTree = "<group>"; };
 		E8A543AD195C9C9E00990A20 /* RLMPredicateUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPredicateUtil.h; sourceTree = "<group>"; };
 		E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPredicateUtil.m; sourceTree = "<group>"; };
+		E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftVersion.swift; sourceTree = "<group>"; };
 		E8D89B9D1955FC6D00CF2B9A /* Realm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Realm.h; sourceTree = "<group>"; };
 		E8D89BA31955FC6D00CF2B9A /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTestObjects.swift; sourceTree = "<group>"; };
@@ -742,6 +744,7 @@
 				5D660FED1BE98D670021E04F /* Results.swift */,
 				5D660FEE1BE98D670021E04F /* Schema.swift */,
 				5D660FEF1BE98D670021E04F /* SortDescriptor.swift */,
+				E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */,
 				5D660FF01BE98D670021E04F /* Util.swift */,
 			);
 			path = RealmSwift;
@@ -1612,6 +1615,7 @@
 				5D660FFC1BE98D670021E04F /* Schema.swift in Sources */,
 				5D660FFD1BE98D670021E04F /* SortDescriptor.swift in Sources */,
 				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
+				E8BF67FC1C24D07100E591CD /* SwiftVersion.swift in Sources */,
 				5D660FFE1BE98D670021E04F /* Util.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -50,6 +50,7 @@
 // - The minimum iOS/OS X version that the application is targeting (again, to
 //   help us decide what versions we need to support). 
 // - An anonymous MAC address and bundle ID to aggregate the other information on.
+// - What version of Swift is being used (if applicable).
 
 #import "RLMAnalytics.hpp"
 
@@ -70,6 +71,11 @@
 #ifndef REALM_COCOA_VERSION
 #import "RLMVersion.h"
 #endif
+
+// Declared for RealmSwiftObjectUtil
+@interface NSObject (SwiftVersion)
++ (NSString *)swiftVersion;
+@end
 
 // Wrapper for sysctl() that handles the memory management stuff
 static auto RLMSysCtl(int *mib, u_int mibSize, size_t *bufferSize) {
@@ -169,7 +175,9 @@ static NSDictionary *RLMAnalyticsPayload() {
     }
 
     NSString *osVersionString = [[NSProcessInfo processInfo] operatingSystemVersionString];
-    BOOL isSwift = NSClassFromString(@"RealmSwiftObjectUtil") != nil;
+    Class swiftObjectUtilClass = NSClassFromString(@"RealmSwiftObjectUtil");
+    BOOL isSwift = swiftObjectUtilClass != nil;
+    NSString *swiftVersion = isSwift ? [swiftObjectUtilClass swiftVersion] : @"N/A";
 
     static NSString *kUnknownString = @"unknown";
     NSString *hashedMACAddress = RLMMACAddress() ?: kUnknownString;
@@ -198,6 +206,7 @@ static NSDictionary *RLMAnalyticsPayload() {
 #else
                      @"Target OS Type": @"osx",
 #endif
+                     @"Swift Version": swiftVersion,
                      // Current OS version the app is targetting
                      @"Target OS Version": osVersionString,
                      // Minimum OS version the app is targetting
