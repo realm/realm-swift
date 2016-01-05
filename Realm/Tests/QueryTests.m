@@ -550,6 +550,9 @@
     XCTAssertThrows([realm objects:className where:@","], @"comma");
     XCTAssertThrows([realm objects:className where:@"()"], @"parens");
 
+    // Misspelled keypath (should be %K)
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"@K == YES"], @"'@K' is not a valid key path'");
+
     // not a link column
     RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age.age == 25"], @"'age' is not a link .* 'PersonObject'");
     XCTAssertThrows([realm objects:className where:@"age.age.age == 25"]);
