@@ -415,7 +415,7 @@ case "$COMMAND" in
         SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
         CONTENTS="let swiftLanguageVersion = \"$version\""
         if ! grep "$CONTENTS" "$SWIFT_VERSION_FILE"; then
-          echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
+            echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
         fi
 
         cd Realm/Tests
