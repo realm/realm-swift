@@ -252,9 +252,8 @@ build_docs() {
       --xcodebuild-arguments ${xcodebuild_arguments} \
       --module ${module} \
       --root-url https://realm.io/docs/${language}/${version}/api/ \
-      --output $(pwd)/docs/${language}_output \
-      --template-directory $(pwd)/docs/templates \
-      --swift-version 2.1.1
+      --output docs/${language}_output \
+      --head "$(cat docs/custom_head.html)"
 
     rm Realm/RLMPlatform.h
 }
