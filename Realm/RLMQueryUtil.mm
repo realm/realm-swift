@@ -848,7 +848,7 @@ NSString *get_collection_operation_name_from_key_path(NSString *keyPath, NSStrin
         @throw RLMPredicateException(@"Invalid key path", @"'%@' is not a valid key path'", keyPath);
     }
 
-    if ([keyPath characterAtIndex:at.location - 1] != '.') {
+    if (at.location == 0 || [keyPath characterAtIndex:at.location - 1] != '.') {
         @throw RLMPredicateException(@"Invalid key path", @"'%@' is not a valid key path'", keyPath);
     }
 
