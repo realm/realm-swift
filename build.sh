@@ -411,6 +411,12 @@ case "$COMMAND" in
         ln -s "RealmSwift-swift$version" RealmSwift
         git update-index --assume-unchanged RealmSwift || true
 
+        SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
+        CONTENTS="let swiftLanguageVersion = \"$version\""
+        if ! grep -q "$CONTENTS" "$SWIFT_VERSION_FILE"; then
+            echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
+        fi
+
         cd Realm/Tests
         rm -rf Swift
         ln -s "Swift$version" Swift
@@ -810,7 +816,7 @@ case "$COMMAND" in
     # CocoaPods
     ######################################
     "cocoapods-setup")
-        if [[ "$2" != "without-core" ]]; then
+        if [[ "$2" != "swift" ]]; then
             sh build.sh download-core
             mv core/librealm.a core/librealm-osx.a
             if [[ "$REALM_SWIFT_VERSION" = "1.2" ]]; then
@@ -831,7 +837,7 @@ case "$COMMAND" in
           fi
         done
 
-        if [[ "$2" != "without-core" ]]; then
+        if [[ "$2" != "swift" ]]; then
           # CocoaPods doesn't support multiple header_mappings_dir, so combine
           # both sets of headers into a single directory
           rm -rf include
@@ -851,6 +857,8 @@ case "$COMMAND" in
             cp -R include/Realm include/realm
           fi
           touch include/Realm/RLMPlatform.h
+        else
+          echo "let swiftLanguageVersion = \"$(get_swift_version)\"" > RealmSwift/SwiftVersion.swift
         fi
         ;;
 
