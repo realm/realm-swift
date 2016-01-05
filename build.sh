@@ -413,7 +413,7 @@ case "$COMMAND" in
         git update-index --assume-unchanged RealmSwift || true
 
         SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
-        CONTENTS="public let swiftLanguageVersion = \"$version\""
+        CONTENTS="let swiftLanguageVersion = \"$version\""
         if ! grep "$CONTENTS" "$SWIFT_VERSION_FILE"; then
           echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
         fi
