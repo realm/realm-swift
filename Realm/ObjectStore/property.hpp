@@ -53,7 +53,7 @@ namespace realm {
         bool is_indexed = false;
         bool is_nullable = false;
 
-        size_t table_column;
+        size_t table_column = -1;
         bool requires_index() const { return is_primary || is_indexed; }
     };
 
