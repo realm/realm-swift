@@ -268,7 +268,7 @@ void ExternalCommitHelper::add_realm(realm::Realm* realm)
     };
     ctx.release = [](const void* info) {
         auto ptr = static_cast<RefCountedWeakPointer*>(const_cast<void*>(info));
-        if (ptr->ref_count.fetch_add(-1, std::memory_order_relaxed) == 1) {
+        if (ptr->ref_count.fetch_add(-1, std::memory_order_acq_rel) == 1) {
             delete ptr;
         }
     };
