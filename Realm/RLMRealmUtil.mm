@@ -91,28 +91,38 @@ public:
     RLMNotificationHelper(RLMRealm *realm) : _realm(realm) { }
 
     void changes_available() override {
-        if (!_realm.autorefresh) {
-            [_realm sendNotifications:RLMRealmRefreshRequiredNotification];
+        @autoreleasepool {
+            auto realm = _realm;
+            if (realm && !realm.autorefresh) {
+                [realm sendNotifications:RLMRealmRefreshRequiredNotification];
+            }
         }
     }
 
     std::vector<ObserverState> get_observed_rows() override {
-        [_realm detachAllEnumerators];
-        return RLMGetObservedRows(_realm.schema.objectSchema);
+        @autoreleasepool {
+            auto realm = _realm;
+            [realm detachAllEnumerators];
+            return RLMGetObservedRows(realm.schema.objectSchema);
+        }
     }
 
     void will_change(std::vector<ObserverState> const& observed, std::vector<void*> const& invalidated) override {
-        RLMWillChange(observed, invalidated);
+        @autoreleasepool {
+            RLMWillChange(observed, invalidated);
+        }
     }
 
     void did_change(std::vector<ObserverState> const& observed, std::vector<void*> const& invalidated) override {
-        RLMDidChange(observed, invalidated);
-        [_realm sendNotifications:RLMRealmDidChangeNotification];
+        @autoreleasepool {
+            RLMDidChange(observed, invalidated);
+            [_realm sendNotifications:RLMRealmDidChangeNotification];
+        }
     }
 
 private:
     // This is owned by the realm, so it needs to not retain the realm
-    __unsafe_unretained RLMRealm *const _realm;
+    __weak RLMRealm *const _realm;
 };
 } // anonymous namespace
 
