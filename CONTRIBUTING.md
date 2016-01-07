@@ -51,7 +51,6 @@ Below are some guidelines about the format of the commit message itself:
 
 * Separate the commit message into a single-line title and a separate body that describes the change.
 * Make the title concise to be easily read within a commit log.
-* In changes that are restricted to a specific part of the code, include a [tag] at the start of the line in square brackets — for example, `[RLMArray] …`, `[scripts] …` or  `[Podspec] …`. This tag helps email filters and searches for post-commit reviews.
 * Make the body concise, while including the complete reasoning. Unless required to understand the change, additional code examples or other details should be left to the pull request.
 * If the commit fixes a bug, include the number of the issue in the message.
 * Use the first person present tense - for example "Fix …" instead of "Fixes …" or "Fixed …".
