@@ -18,6 +18,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix incorrect results or crashes when using `-[RLMResults setValue:forKey:]`
   on an RLMResults which was filtered on the key being set.
+* Fix crashes when an RLMRealm is deallocated from the wrong thread.
 
 0.97.0 Release notes (2015-12-17)
 =============================================================

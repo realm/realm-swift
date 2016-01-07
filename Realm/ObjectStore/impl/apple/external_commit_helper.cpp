@@ -249,11 +249,28 @@ void ExternalCommitHelper::add_realm(realm::Realm* realm)
 {
     std::lock_guard<std::mutex> lock(m_realms_mutex);
 
+    struct RefCountedWeakPointer {
+        std::weak_ptr<Realm> realm;
+        std::atomic<size_t> ref_count = {1};
+    };
+
     // Create the runloop source
     CFRunLoopSourceContext ctx{};
-    ctx.info = realm;
+    ctx.info = new RefCountedWeakPointer{realm->shared_from_this()};
     ctx.perform = [](void* info) {
-        static_cast<Realm*>(info)->notify();
+        if (auto realm = static_cast<RefCountedWeakPointer*>(info)->realm.lock()) {
+            realm->notify();
+        }
+    };
+    ctx.retain = [](const void* info) {
+        static_cast<RefCountedWeakPointer*>(const_cast<void*>(info))->ref_count.fetch_add(1, std::memory_order_relaxed);
+        return info;
+    };
+    ctx.release = [](const void* info) {
+        auto ptr = static_cast<RefCountedWeakPointer*>(const_cast<void*>(info));
+        if (ptr->ref_count.fetch_add(-1, std::memory_order_acq_rel) == 1) {
+            delete ptr;
+        }
     };
 
     CFRunLoopRef runloop = CFRunLoopGetCurrent();
