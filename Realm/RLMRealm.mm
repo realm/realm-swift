@@ -150,6 +150,11 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     _realm->set_auto_refresh(autorefresh);
 }
 
+- (BOOL)isDirty {
+    // YES & NO are not exactly the same as true & false
+    return _realm->is_dirty() ? YES : NO;
+}
+
 + (NSString *)writeableTemporaryPathForFile:(NSString *)fileName {
     return [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
 }
