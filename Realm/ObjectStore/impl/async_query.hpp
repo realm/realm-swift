@@ -19,6 +19,7 @@
 #ifndef REALM_ASYNC_QUERY_HPP
 #define REALM_ASYNC_QUERY_HPP
 
+#include "background_collection.hpp"
 #include "results.hpp"
 
 #include <realm/group_shared.hpp>
@@ -26,51 +27,38 @@
 #include <exception>
 #include <mutex>
 #include <functional>
+#include <set>
 #include <thread>
 #include <vector>
 
 namespace realm {
 namespace _impl {
-class AsyncQuery {
+struct TransactionChangeInfo;
+
+class AsyncQuery : public BackgroundCollection {
 public:
     AsyncQuery(Results& target);
-    ~AsyncQuery();
-
-    size_t add_callback(std::function<void (std::exception_ptr)>);
-    void remove_callback(size_t token);
-
-    void unregister() noexcept;
-    void release_query() noexcept;
-
-    // Run/rerun the query if needed
-    void run();
-    // Prepare the handover object if run() did update the TableView
-    void prepare_handover();
-    // Update the target results from the handover
-    // Returns if any callbacks need to be invoked
-    bool deliver(SharedGroup& sg, std::exception_ptr err);
-    void call_callbacks();
-
-    // Attach the handed-over query to `sg`
-    void attach_to(SharedGroup& sg);
-    // Create a new query handover object and stop using the previously attached
-    // SharedGroup
-    void detatch();
-
-    Realm& get_realm() { return m_target_results->get_realm(); }
-    // Get the version of the current handover object
-    SharedGroup::VersionID version() const noexcept { return m_sg_version; }
-
-    bool is_alive() const noexcept;
 
 private:
+    // Run/rerun the query if needed
+    void run() override;
+    // Prepare the handover object if run() did update the TableView
+    bool do_prepare_handover(SharedGroup&) override;
+    // Update the target results from the handover
+    // Returns if any callbacks need to be invoked
+    bool do_deliver(SharedGroup& sg) override;
+
+    void do_add_required_change_info(TransactionChangeInfo& info) override;
+
+    void release_data() noexcept override;
+    void do_attach_to(SharedGroup& sg) override;
+    void do_detach_from(SharedGroup& sg) override;
+
     // Target Results to update and a mutex which guards it
     mutable std::mutex m_target_mutex;
     Results* m_target_results;
 
-    std::shared_ptr<Realm> m_realm;
     const SortOrder m_sort;
-    const std::thread::id m_thread_id = std::this_thread::get_id();
 
     // The source Query, in handover form iff m_sg is null
     std::unique_ptr<SharedGroup::Handover<Query>> m_query_handover;
@@ -80,40 +68,16 @@ private:
     // the query was (re)run since the last time the handover object was created
     TableView m_tv;
     std::unique_ptr<SharedGroup::Handover<TableView>> m_tv_handover;
-    SharedGroup::VersionID m_sg_version;
-    std::exception_ptr m_error;
 
-    struct Callback {
-        std::function<void (std::exception_ptr)> fn;
-        size_t token;
-        uint_fast64_t delivered_version;
-    };
-
-    // Currently registered callbacks and a mutex which must always be held
-    // while doing anything with them or m_callback_index
-    std::mutex m_callback_mutex;
-    std::vector<Callback> m_callbacks;
-
-    SharedGroup* m_sg = nullptr;
+    CollectionChangeIndices m_changes;
+    TransactionChangeInfo* m_info = nullptr;
 
     uint_fast64_t m_handed_over_table_version = -1;
-    uint_fast64_t m_delivered_table_version = -1;
+    bool m_did_change = false;
 
-    // Iteration variable for looping over callbacks
-    // remove_callback() updates this when needed
-    size_t m_callback_index = npos;
+    std::vector<size_t> m_previous_rows;
 
     bool m_initial_run_complete = false;
-
-    // Cached value for if m_callbacks is empty, needed to avoid deadlocks in
-    // run() due to lock-order inversion between m_callback_mutex and m_target_mutex
-    // It's okay if this value is stale as at worst it'll result in us doing
-    // some extra work.
-    std::atomic<bool> m_have_callbacks = {false};
-
-    bool is_for_current_thread() const { return m_thread_id == std::this_thread::get_id(); }
-
-    std::function<void (std::exception_ptr)> next_callback();
 };
 
 } // namespace _impl

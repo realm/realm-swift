@@ -214,4 +214,9 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface RLMObjectChange : NSObject
+@property (nonatomic) NSUInteger oldIndex;
+@property (nonatomic) NSUInteger newIndex;
+@end
+
 RLM_ASSUME_NONNULL_END

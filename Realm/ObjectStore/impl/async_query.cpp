@@ -25,96 +25,18 @@ using namespace realm;
 using namespace realm::_impl;
 
 AsyncQuery::AsyncQuery(Results& target)
-: m_target_results(&target)
-, m_realm(target.get_realm().shared_from_this())
+: BackgroundCollection(target.get_realm())
+, m_target_results(&target)
 , m_sort(target.get_sort())
-, m_sg_version(Realm::Internal::get_shared_group(*m_realm).get_version_of_current_transaction())
 {
     Query q = target.get_query();
-    m_query_handover = Realm::Internal::get_shared_group(*m_realm).export_for_handover(q, MutableSourcePayload::Move);
+    set_table(*q.get_table());
+    m_query_handover = Realm::Internal::get_shared_group(get_realm()).export_for_handover(q, MutableSourcePayload::Move);
 }
 
-AsyncQuery::~AsyncQuery()
+void AsyncQuery::release_data() noexcept
 {
-    // unregister() may have been called from a different thread than we're being
-    // destroyed on, so we need to synchronize access to the interesting fields
-    // modified there
-    std::lock_guard<std::mutex> lock(m_target_mutex);
-    m_realm = nullptr;
-}
-
-size_t AsyncQuery::add_callback(std::function<void (std::exception_ptr)> callback)
-{
-    m_realm->verify_thread();
-
-    auto next_token = [=] {
-        size_t token = 0;
-        for (auto& callback : m_callbacks) {
-            if (token <= callback.token) {
-                token = callback.token + 1;
-            }
-        }
-        return token;
-    };
-
-    std::lock_guard<std::mutex> lock(m_callback_mutex);
-    auto token = next_token();
-    m_callbacks.push_back({std::move(callback), token, -1ULL});
-    if (m_callback_index == npos) { // Don't need to wake up if we're already sending notifications
-        Realm::Internal::get_coordinator(*m_realm).send_commit_notifications();
-        m_have_callbacks = true;
-    }
-    return token;
-}
-
-void AsyncQuery::remove_callback(size_t token)
-{
-    Callback old;
-    {
-        std::lock_guard<std::mutex> lock(m_callback_mutex);
-        REALM_ASSERT(m_error || m_callbacks.size() > 0);
-
-        auto it = find_if(begin(m_callbacks), end(m_callbacks),
-                          [=](const auto& c) { return c.token == token; });
-        // We should only fail to find the callback if it was removed due to an error
-        REALM_ASSERT(m_error || it != end(m_callbacks));
-        if (it == end(m_callbacks)) {
-            return;
-        }
-
-        size_t idx = distance(begin(m_callbacks), it);
-        if (m_callback_index != npos && m_callback_index >= idx) {
-            --m_callback_index;
-        }
-
-        old = std::move(*it);
-        m_callbacks.erase(it);
-
-        m_have_callbacks = !m_callbacks.empty();
-    }
-}
-
-void AsyncQuery::unregister() noexcept
-{
-    std::lock_guard<std::mutex> lock(m_target_mutex);
-    m_target_results = nullptr;
-    m_realm = nullptr;
-}
-
-void AsyncQuery::release_query() noexcept
-{
-    {
-        std::lock_guard<std::mutex> lock(m_target_mutex);
-        REALM_ASSERT(!m_realm && !m_target_results);
-    }
-
     m_query = nullptr;
-}
-
-bool AsyncQuery::is_alive() const noexcept
-{
-    std::lock_guard<std::mutex> lock(m_target_mutex);
-    return m_target_results != nullptr;
 }
 
 // Most of the inter-thread synchronization for run(), prepare_handover(),
@@ -141,19 +63,39 @@ bool AsyncQuery::is_alive() const noexcept
 // destroyed while the background work is running, and to allow removing
 // callbacks from any thread.
 
+static bool map_moves(size_t& idx, CollectionChangeIndices const& changes)
+{
+    for (auto&& move : changes.moves) {
+        if (move.from == idx) {
+            idx = move.to;
+            return true;
+        }
+    }
+    return false;
+}
+
+void AsyncQuery::do_add_required_change_info(TransactionChangeInfo& info)
+{
+    REALM_ASSERT(m_query);
+    m_info = &info;
+}
+
 void AsyncQuery::run()
 {
-    REALM_ASSERT(m_sg);
+    REALM_ASSERT(m_info);
+    m_did_change = false;
 
     {
         std::lock_guard<std::mutex> target_lock(m_target_mutex);
         // Don't run the query if the results aren't actually going to be used
-        if (!m_target_results || (!m_have_callbacks && !m_target_results->wants_background_updates())) {
+        if (!m_target_results || (!have_callbacks() && !m_target_results->wants_background_updates())) {
             return;
         }
     }
 
     REALM_ASSERT(!m_tv.is_attached());
+
+    size_t table_ndx = m_query->get_table()->get_index_in_group();
 
     // If we've run previously, check if we need to rerun
     if (m_initial_run_complete) {
@@ -166,35 +108,69 @@ void AsyncQuery::run()
 
     m_tv = m_query->find_all();
     if (m_sort) {
-        m_tv.sort(m_sort.columnIndices, m_sort.ascending);
+        m_tv.sort(m_sort.column_indices, m_sort.ascending);
     }
+
+    if (m_initial_run_complete) {
+        auto changes = table_ndx < m_info->tables.size() ? &m_info->tables[table_ndx] : nullptr;
+
+        std::vector<size_t> next_rows;
+        next_rows.reserve(m_tv.size());
+        for (size_t i = 0; i < m_tv.size(); ++i)
+            next_rows.push_back(m_tv[i].get_index());
+
+        if (changes) {
+            for (auto& idx : m_previous_rows) {
+                if (changes->deletions.contains(idx))
+                    idx = npos;
+                else
+                    map_moves(idx, *changes);
+                REALM_ASSERT_DEBUG(!changes->insertions.contains(idx));
+            }
+        }
+
+        m_changes = CollectionChangeIndices::calculate(m_previous_rows, next_rows,
+                                                       [&](size_t row) { return m_info->row_did_change(*m_query->get_table(), row); },
+                                                       !!m_sort);
+        m_previous_rows = std::move(next_rows);
+        if (m_changes.empty()) {
+            m_tv = {};
+            return;
+        }
+    }
+    else {
+        m_previous_rows.resize(m_tv.size());
+        for (size_t i = 0; i < m_tv.size(); ++i)
+            m_previous_rows[i] = m_tv[i].get_index();
+    }
+
+    m_did_change = true;
 }
 
-void AsyncQuery::prepare_handover()
+bool AsyncQuery::do_prepare_handover(SharedGroup& sg)
 {
-    m_sg_version = m_sg->get_version_of_current_transaction();
-
     if (!m_tv.is_attached()) {
-        return;
+        return false;
     }
 
     REALM_ASSERT(m_tv.is_in_sync());
 
     m_initial_run_complete = true;
     m_handed_over_table_version = m_tv.sync_if_needed();
-    m_tv_handover = m_sg->export_for_handover(m_tv, MutableSourcePayload::Move);
+    m_tv_handover = sg.export_for_handover(m_tv, MutableSourcePayload::Move);
+
+    add_changes(std::move(m_changes));
+    REALM_ASSERT(m_changes.empty());
 
     // detach the TableView as we won't need it again and keeping it around
     // makes advance_read() much more expensive
-    m_tv = TableView();
+    m_tv = {};
+
+    return m_did_change;
 }
 
-bool AsyncQuery::deliver(SharedGroup& sg, std::exception_ptr err)
+bool AsyncQuery::do_deliver(SharedGroup& sg)
 {
-    if (!is_for_current_thread()) {
-        return false;
-    }
-
     std::lock_guard<std::mutex> target_lock(m_target_mutex);
 
     // Target results being null here indicates that it was destroyed while we
@@ -207,84 +183,32 @@ bool AsyncQuery::deliver(SharedGroup& sg, std::exception_ptr err)
     // We can get called before the query has actually had the chance to run if
     // we're added immediately before a different set of async results are
     // delivered
-    if (!m_initial_run_complete && !err) {
+    if (!m_initial_run_complete) {
         return false;
-    }
-
-    if (err) {
-        m_error = err;
-        return m_have_callbacks;
     }
 
     REALM_ASSERT(!m_query_handover);
 
-    auto realm_sg_version = Realm::Internal::get_shared_group(*m_realm).get_version_of_current_transaction();
-    if (m_sg_version != realm_sg_version) {
-        // Realm version can be newer if a commit was made on our thread or the
-        // user manually called refresh(), or older if a commit was made on a
-        // different thread and we ran *really* fast in between the check for
-        // if the shared group has changed and when we pick up async results
-        return false;
-    }
-
     if (m_tv_handover) {
-        m_tv_handover->version = m_sg_version;
+        m_tv_handover->version = version();
         Results::Internal::set_table_view(*m_target_results,
                                           std::move(*sg.import_from_handover(std::move(m_tv_handover))));
-        m_delivered_table_version = m_handed_over_table_version;
-
     }
     REALM_ASSERT(!m_tv_handover);
-    return m_have_callbacks;
+    return have_callbacks();
 }
 
-void AsyncQuery::call_callbacks()
+void AsyncQuery::do_attach_to(SharedGroup& sg)
 {
-    REALM_ASSERT(is_for_current_thread());
-
-    while (auto fn = next_callback()) {
-        fn(m_error);
-    }
-
-    if (m_error) {
-        // Remove all the callbacks as we never need to call anything ever again
-        // after delivering an error
-        std::lock_guard<std::mutex> callback_lock(m_callback_mutex);
-        m_callbacks.clear();
-    }
-}
-
-std::function<void (std::exception_ptr)> AsyncQuery::next_callback()
-{
-    std::lock_guard<std::mutex> callback_lock(m_callback_mutex);
-    for (++m_callback_index; m_callback_index < m_callbacks.size(); ++m_callback_index) {
-        auto& callback = m_callbacks[m_callback_index];
-        if (m_error || callback.delivered_version != m_delivered_table_version) {
-            callback.delivered_version = m_delivered_table_version;
-            return callback.fn;
-        }
-    }
-
-    m_callback_index = npos;
-    return nullptr;
-}
-
-void AsyncQuery::attach_to(realm::SharedGroup& sg)
-{
-    REALM_ASSERT(!m_sg);
     REALM_ASSERT(m_query_handover);
-
     m_query = sg.import_from_handover(std::move(m_query_handover));
-    m_sg = &sg;
 }
 
-void AsyncQuery::detatch()
+void AsyncQuery::do_detach_from(SharedGroup& sg)
 {
-    REALM_ASSERT(m_sg);
     REALM_ASSERT(m_query);
     REALM_ASSERT(!m_tv.is_attached());
 
-    m_query_handover = m_sg->export_for_handover(*m_query, MutableSourcePayload::Move);
-    m_sg = nullptr;
+    m_query_handover = sg.export_for_handover(*m_query, MutableSourcePayload::Move);
     m_query = nullptr;
 }

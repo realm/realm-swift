@@ -360,8 +360,8 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 // Methods unsupported on standalone RLMArray instances
 //
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate
 {
@@ -382,14 +382,14 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 // it not having the generic type attached, but it doesn't seem to be possible
 // to actually include the generic type
 // http://www.openradar.me/radar?id=6135653276319744
-#pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, NSError *))block {
     @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
 }
+- (RLMNotificationToken *)addNotificationBlockWithChanges:(void (^)(RLMArray *, NSArray<RLMObjectChange *> *, NSError *))block {
+    @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
+}
 #pragma clang diagnostic pop
-
-#pragma GCC diagnostic pop
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...
 {

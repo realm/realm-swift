@@ -19,6 +19,8 @@
 #ifndef REALM_LIST_HPP
 #define REALM_LIST_HPP
 
+#include "collection_notifications.hpp"
+
 #include <realm/link_view.hpp>
 
 #include <memory>
@@ -65,6 +67,8 @@ public:
 
     bool operator==(List const& rgt) const noexcept;
 
+    NotificationToken add_notification_callback(CollectionChangeCallback cb);
+
     // This should go away once we have real List notifications
     uint_fast64_t get_version_counter() const noexcept;
 
@@ -95,6 +99,7 @@ public:
 private:
     std::shared_ptr<Realm> m_realm;
     LinkViewRef m_link_view;
+    std::shared_ptr<_impl::BackgroundCollection> m_notifier;
 
     void verify_valid_row(size_t row_ndx, bool insertion = false) const;
 

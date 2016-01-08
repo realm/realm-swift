@@ -16,15 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALM_CACHED_REALM_HPP
-#define REALM_CACHED_REALM_HPP
+#ifndef REALM_WEAK_REALM_NOTIFIER_HPP
+#define REALM_WEAK_REALM_NOTIFIER_HPP
 
 #include <realm/util/features.h>
 
 #if REALM_PLATFORM_APPLE
-#include "impl/apple/cached_realm.hpp"
+#include "impl/apple/weak_realm_notifier.hpp"
 #else
-#include "impl/generic/cached_realm.hpp"
+#include "impl/generic/weak_realm_notifier.hpp"
 #endif
 
-#endif // REALM_CACHED_REALM_HPP
+#endif // REALM_WEAK_REALM_NOTIFIER_HPP

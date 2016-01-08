@@ -1225,11 +1225,11 @@ void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RL
 
 realm::SortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *objectSchema, NSArray *descriptors) {
     realm::SortOrder sort;
-    sort.columnIndices.reserve(descriptors.count);
+    sort.column_indices.reserve(descriptors.count);
     sort.ascending.reserve(descriptors.count);
 
     for (RLMSortDescriptor *descriptor in descriptors) {
-        sort.columnIndices.push_back(RLMValidatedPropertyForSort(objectSchema, descriptor.property).column);
+        sort.column_indices.push_back(RLMValidatedPropertyForSort(objectSchema, descriptor.property).column);
         sort.ascending.push_back(descriptor.ascending);
     }
 

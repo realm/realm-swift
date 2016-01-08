@@ -19,6 +19,8 @@
 #include "impl/transact_log_handler.hpp"
 
 #include "binding_context.hpp"
+#include "collection_notifications.hpp"
+#include "impl/realm_coordinator.hpp"
 
 #include <realm/commit_log.hpp>
 #include <realm/group_shared.hpp>
@@ -427,6 +429,157 @@ public:
     bool insert_substring(size_t col, size_t row, size_t, StringData) { return mark_dirty(row, col); }
     bool erase_substring(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
 };
+
+// Extends TransactLogValidator to track changes made to LinkViews
+class LinkViewObserver : public TransactLogValidator {
+    _impl::TransactionChangeInfo& m_info;
+    CollectionChangeIndices* m_active = nullptr;
+
+    CollectionChangeIndices* get_change()
+    {
+        auto tbl_ndx = current_table();
+        if (tbl_ndx >= m_info.tables_needed.size() || !m_info.tables_needed[tbl_ndx])
+            return nullptr;
+        if (m_info.tables.size() <= tbl_ndx) {
+            m_info.tables.resize(std::max(m_info.tables.size() * 2, tbl_ndx + 1));
+        }
+        return &m_info.tables[tbl_ndx];
+    }
+
+    bool mark_dirty(size_t row, __unused size_t col)
+    {
+        if (auto change = get_change())
+            change->modify(row);
+        return true;
+    }
+
+public:
+    LinkViewObserver(_impl::TransactionChangeInfo& info)
+    : m_info(info) { }
+
+    bool select_link_list(size_t col, size_t row, size_t)
+    {
+        mark_dirty(row, col);
+
+        m_active = nullptr;
+        for (auto& o : m_info.lists) {
+            if (o.table_ndx == current_table() && o.row_ndx == row && o.col_ndx == col) {
+                m_active = o.changes;
+                // need to use last match for multiple source version logic
+//                break;
+            }
+        }
+        return true;
+    }
+
+    bool link_list_set(size_t index, size_t)
+    {
+        if (m_active)
+            m_active->modify(index);
+        return true;
+    }
+
+    bool link_list_insert(size_t index, size_t)
+    {
+        if (m_active)
+            m_active->insert(index);
+        return true;
+    }
+
+    bool link_list_erase(size_t index)
+    {
+        if (m_active)
+            m_active->erase(index);
+        return true;
+    }
+
+    bool link_list_nullify(size_t index)
+    {
+        return link_list_erase(index);
+    }
+
+    bool link_list_swap(size_t index1, size_t index2)
+    {
+        link_list_set(index1, 0);
+        link_list_set(index2, 0);
+        return true;
+    }
+
+    bool link_list_clear(size_t old_size)
+    {
+        if (m_active)
+            m_active->clear(old_size);
+        return true;
+    }
+
+    bool link_list_move(size_t from, size_t to)
+    {
+        if (m_active)
+            m_active->move(from, to);
+        return true;
+    }
+
+    bool insert_empty_rows(size_t row_ndx, size_t num_rows_to_insert, size_t, bool unordered)
+    {
+        REALM_ASSERT(!unordered);
+        if (auto change = get_change())
+            change->insert(row_ndx, num_rows_to_insert);
+
+        return true;
+    }
+
+    bool erase_rows(size_t row_ndx, size_t, size_t prior_num_rows, bool unordered)
+    {
+        REALM_ASSERT(unordered);
+        size_t last_row = prior_num_rows - 1;
+
+        for (auto it = begin(m_info.lists); it != end(m_info.lists); ) {
+            if (it->table_ndx == current_table()) {
+                if (it->row_ndx == row_ndx) {
+                    *it = std::move(m_info.lists.back());
+                    m_info.lists.pop_back();
+                    continue;
+                }
+                if (it->row_ndx == last_row - 1)
+                    it->row_ndx = row_ndx;
+            }
+            ++it;
+        }
+
+        if (auto change = get_change())
+            change->move_over(row_ndx, last_row);
+        return true;
+    }
+
+    bool clear_table()
+    {
+        auto tbl_ndx = current_table();
+        auto it = remove_if(begin(m_info.lists), end(m_info.lists),
+                            [&](auto const& lv) { return lv.table_ndx == tbl_ndx; });
+        m_info.lists.erase(it, end(m_info.lists));
+        if (auto change = get_change())
+            change->clear(0); // FIXME
+        return true;
+    }
+
+    // Things that just mark the field as modified
+    bool set_int(size_t col, size_t row, int_fast64_t) { return mark_dirty(row, col); }
+    bool set_bool(size_t col, size_t row, bool) { return mark_dirty(row, col); }
+    bool set_float(size_t col, size_t row, float) { return mark_dirty(row, col); }
+    bool set_double(size_t col, size_t row, double) { return mark_dirty(row, col); }
+    bool set_string(size_t col, size_t row, StringData) { return mark_dirty(row, col); }
+    bool set_binary(size_t col, size_t row, BinaryData) { return mark_dirty(row, col); }
+    bool set_date_time(size_t col, size_t row, DateTime) { return mark_dirty(row, col); }
+    bool set_table(size_t col, size_t row) { return mark_dirty(row, col); }
+    bool set_mixed(size_t col, size_t row, const Mixed&) { return mark_dirty(row, col); }
+    bool set_link(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
+    bool set_null(size_t col, size_t row) { return mark_dirty(row, col); }
+    bool nullify_link(size_t col, size_t row, size_t) { return mark_dirty(row, col); }
+    bool insert_substring(size_t col, size_t row, size_t, StringData) { return mark_dirty(row, col); }
+    bool erase_substring(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
+    bool set_int_unique(size_t col, size_t row, size_t, int_fast64_t) { return mark_dirty(row, col); }
+    bool set_string_unique(size_t col, size_t row, size_t, StringData) { return mark_dirty(row, col); }
+};
 } // anonymous namespace
 
 namespace realm {
@@ -460,6 +613,13 @@ void cancel(SharedGroup& sg, BindingContext* context)
     TransactLogObserver(context, sg, [&](auto&&... args) {
         LangBindHelper::rollback_and_continue_as_read(sg, std::move(args)...);
     }, false);
+}
+
+void advance_and_observe_linkviews(SharedGroup& sg,
+                                   TransactionChangeInfo& info,
+                                   SharedGroup::VersionID version)
+{
+    LangBindHelper::advance_read(sg, LinkViewObserver(info), version);
 }
 
 } // namespace transaction

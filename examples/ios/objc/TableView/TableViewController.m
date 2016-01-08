@@ -51,8 +51,31 @@ static NSString * const kTableName = @"table";
 
     // Set realm notification block
     __weak typeof(self) weakSelf = self;
-    self.notification = [self.array addNotificationBlock:^(RLMResults *data, NSError *error) {
-        [weakSelf.tableView reloadData];
+    self.notification = [self.array addNotificationBlockWatchingKeypaths:@[] changes:^(RLMResults *data, NSArray<RLMObjectChange *> *changes, NSError *error) {
+        UITableView *tv = weakSelf.tableView;
+        if (!changes) {
+            [tv reloadData];
+            return;
+        }
+
+        [tv beginUpdates];
+        for (RLMObjectChange *change in changes) {
+            if (change.oldIndex == change.newIndex) {
+                [tv reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:change.oldIndex inSection:0]]
+                          withRowAnimation:UITableViewRowAnimationAutomatic];
+            }
+            else {
+                if (change.oldIndex != NSNotFound) {
+                    [tv deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:change.oldIndex inSection:0]]
+                              withRowAnimation:UITableViewRowAnimationAutomatic];
+                }
+                if (change.newIndex != NSNotFound) {
+                    [tv insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:change.newIndex inSection:0]]
+                              withRowAnimation:UITableViewRowAnimationAutomatic];
+                }
+            }
+        }
+        [tv endUpdates];
     }];
 }
 

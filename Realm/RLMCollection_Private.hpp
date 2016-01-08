@@ -18,6 +18,8 @@
 
 #import <Realm/RLMCollection.h>
 
+#import <Realm/RLMRealm.h>
+
 namespace realm {
     struct NotificationToken;
     class TableView;
@@ -46,6 +48,14 @@ namespace realm {
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                     count:(NSUInteger)len;
+@end
+
+@interface RLMCancellationToken : RLMNotificationToken
+- (instancetype)initWithToken:(realm::NotificationToken)token;
+@end
+
+@interface RLMObjectChange ()
+- (instancetype)initWithOld:(NSUInteger)oldIndex new:(NSUInteger)newIndex;
 @end
 
 NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *key);

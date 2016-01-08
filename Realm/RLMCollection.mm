@@ -23,6 +23,8 @@
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.h"
 
+#import "collection_notifications.hpp"
+
 #import <realm/table_view.hpp>
 
 static const int RLMEnumerationBufferSize = 16;
@@ -212,3 +214,30 @@ NSString *RLMDescriptionWithMaxDepth(NSString *name,
     [str appendFormat:@"\n)"];
     return str;
 }
+
+@implementation RLMCancellationToken {
+    realm::NotificationToken _token;
+}
+- (instancetype)initWithToken:(realm::NotificationToken)token {
+    self = [super init];
+    if (self) {
+        _token = std::move(token);
+    }
+    return self;
+}
+
+- (void)stop {
+    _token = {};
+}
+
+@end
+
+@implementation RLMObjectChange
+- (instancetype)initWithOld:(NSUInteger)oldIndex new:(NSUInteger)newIndex {
+    if ((self = [super init])) {
+        _oldIndex = oldIndex;
+        _newIndex = newIndex;
+    }
+    return self;
+}
+@end

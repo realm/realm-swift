@@ -304,6 +304,7 @@ RLM_ASSUME_NONNULL_BEGIN
  @return A token which must be held for as long as you want notifications to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray RLM_GENERIC_RETURN *array, NSError *))block RLM_WARN_UNUSED_RESULT;
+- (RLMNotificationToken *)addNotificationBlockWithChanges:(void (^)(RLMArray RLM_GENERIC_RETURN *, NSArray<RLMObjectChange *> *, NSError *))block RLM_WARN_UNUSED_RESULT;
 
 #pragma mark - Unavailable Methods
 

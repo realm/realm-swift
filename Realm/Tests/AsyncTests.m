@@ -99,11 +99,10 @@
 
     expectation = [self expectationWithDescription:@""];
     ++expected;
-    [self dispatchAsyncAndWait:^{ [self createObject:1]; }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    expectation = [self expectationWithDescription:@""];
-    [self dispatchAsyncAndWait:^{ [self createObject:-1]; }];
+    [self dispatchAsyncAndWait:^{
+        [self createObject:1];
+        [self createObject:-11];
+    }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
     [token stop];
 }

@@ -19,22 +19,41 @@
 #ifndef REALM_COORDINATOR_HPP
 #define REALM_COORDINATOR_HPP
 
+#include "index_set.hpp"
 #include "shared_realm.hpp"
 
 #include <realm/string_data.hpp>
 
+#include <map>
+
 namespace realm {
-class AsyncQueryCallback;
-class ClientHistory;
+class Replication;
 class Results;
-class SharedGroup;
 class Schema;
-struct AsyncQueryCancelationToken;
+class SharedGroup;
+class Table;
+struct CollectionChangeIndices;
 
 namespace _impl {
-class AsyncQuery;
-class CachedRealm;
+class BackgroundCollection;
 class ExternalCommitHelper;
+class ListNotifier;
+class WeakRealmNotifier;
+
+struct ListChangeInfo {
+    size_t table_ndx;
+    size_t row_ndx;
+    size_t col_ndx;
+    CollectionChangeIndices *changes;
+};
+
+struct TransactionChangeInfo {
+    std::vector<bool> tables_needed;
+    std::vector<ListChangeInfo> lists;
+    std::vector<CollectionChangeIndices> tables;
+
+    bool row_did_change(Table const& table, size_t row_ndx, int depth = 0) const;
+};
 
 // RealmCoordinator manages the weak cache of Realm instances and communication
 // between per-thread Realm instances for a given file
@@ -66,6 +85,9 @@ public:
     // cached instances will have odd results
     static void clear_cache();
 
+    // Clears all caches on existing coordinators
+    static void clear_all_caches();
+
     // Explicit constructor/destructor needed for the unique_ptrs to forward-declared types
     RealmCoordinator();
     ~RealmCoordinator();
@@ -80,7 +102,7 @@ public:
     // Update the schema in the cached config
     void update_schema(Schema const& new_schema);
 
-    static void register_query(std::shared_ptr<AsyncQuery> query);
+    static void register_query(std::shared_ptr<BackgroundCollection> query);
 
     // Advance the Realm to the most recent transaction version which all async
     // work is complete for
@@ -91,11 +113,11 @@ private:
     Realm::Config m_config;
 
     std::mutex m_realm_mutex;
-    std::vector<CachedRealm> m_cached_realms;
+    std::vector<WeakRealmNotifier> m_weak_realm_notifiers;
 
     std::mutex m_query_mutex;
-    std::vector<std::shared_ptr<_impl::AsyncQuery>> m_new_queries;
-    std::vector<std::shared_ptr<_impl::AsyncQuery>> m_queries;
+    std::vector<std::shared_ptr<_impl::BackgroundCollection>> m_new_queries;
+    std::vector<std::shared_ptr<_impl::BackgroundCollection>> m_queries;
 
     // SharedGroup used for actually running async queries
     // Will have a read transaction iff m_queries is non-empty

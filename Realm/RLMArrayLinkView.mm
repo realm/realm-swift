@@ -432,6 +432,45 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 
     return [_realm addNotificationBlock:noteBlock];
 }
+
+- (RLMNotificationToken *)addNotificationBlockWithChanges:(void (^)(RLMArray *, NSArray<RLMObjectChange *> *, NSError *))block {
+    [_realm verifyNotificationsAreSupported];
+
+    auto token = _backingList.add_notification_callback([self, block](realm::CollectionChangeIndices const& changes,
+                                                                  std::exception_ptr err) {
+        if (err) {
+            try {
+                rethrow_exception(err);
+            }
+            catch (...) {
+                NSError *error;
+                RLMRealmTranslateException(&error);
+                block(nil, nil, error);
+            }
+        }
+        else if (changes.empty()) {
+            block(self, nil, nil);
+        }
+        else {
+            NSMutableArray *objcChanges = [NSMutableArray new];
+            for (auto ndx : changes.deletions.as_indexes()) {
+                [objcChanges addObject:[[RLMObjectChange alloc] initWithOld:ndx new:NSNotFound]];
+            }
+            for (auto ndx : changes.insertions.as_indexes()) {
+                [objcChanges addObject:[[RLMObjectChange alloc] initWithOld:NSNotFound new:ndx]];
+            }
+            for (auto ndx : changes.modifications.as_indexes()) {
+                [objcChanges addObject:[[RLMObjectChange alloc] initWithOld:ndx new:ndx]];
+            }
+            for (auto move : changes.moves) {
+                [objcChanges addObject:[[RLMObjectChange alloc] initWithOld:move.from new:move.to]];
+            }
+            block(self, objcChanges, nil);
+        }
+    });
+
+    return [[RLMCancellationToken alloc] initWithToken:std::move(token)];
+}
 #pragma clang diagnostic pop
 
 @end
