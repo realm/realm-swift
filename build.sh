@@ -632,6 +632,11 @@ case "$COMMAND" in
         sh build.sh test-ios-swift-cocoapods || sh build.sh test-ios-swift-cocoapods || exit 1
         ;;
 
+    "verify-osx-encryption")
+        REALM_ENCRYPT_ALL=YES sh build.sh test-osx || exit 1
+        exit 0
+        ;;
+
     "verify-osx")
         sh build.sh test-osx
         sh build.sh examples-osx

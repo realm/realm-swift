@@ -29,6 +29,8 @@ matrix:
 
     # - script: ./build.sh verify-ios-dynamic
     #   env: JOB=verify-ios-dynamic
+    # - script: ./build.sh verify-osx-encryption
+    #   env: JOB=verify-osx-encryption
   exclude:
     - script: placeholder # workaround for https://github.com/travis-ci/travis-ci/issues/4681
 notifications:
