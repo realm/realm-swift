@@ -158,7 +158,11 @@ build_combined() {
     clean_retrieve $os_path $out_path $product_name
 
     # Combine ar archives
-    xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$out_path/$product_name/$module_name"
+    LIPO_OUTPUT="$out_path/$product_name/$module_name"
+    xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
+    if [[ "$destination" != "" ]] && [[ "$config" == "Release" ]]; then
+        sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
+    fi
 }
 
 xc_work_around_rdar_23055637() {
@@ -810,6 +814,36 @@ case "$COMMAND" in
             PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
         done
         exit 0
+        ;;
+
+    ######################################
+    # Bitcode Detection
+    ######################################
+
+    "binary-has-bitcode")
+        BINARY="$2"
+        if otool -l "$BINARY" | grep -q "segname __LLVM"; then
+            exit 0
+        fi
+        # Work around rdar://21826157 by checking for bitcode in thin binaries
+        
+        # Get architectures for binary
+        archs="$(lipo -info "$BINARY" | rev | cut -d ':' -f1 | rev)"
+
+        archs_array=( $archs )
+        if [[ ${#archs_array[@]} < 2 ]]; then
+            exit 1 # Early exit if not a fat binary
+        fi
+
+        TEMPDIR=$(mktemp -d $TMPDIR/realm-bitcode-check.XXXX)
+
+        for arch in $archs; do
+            lipo -thin "$arch" "$BINARY" -output "$TEMPDIR/$arch"
+            if otool -l "$TEMPDIR/$arch" | grep -q "segname __LLVM"; then
+                exit 0
+            fi
+        done
+        exit 1
         ;;
 
     ######################################
