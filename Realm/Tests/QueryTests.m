@@ -894,19 +894,19 @@
     [FloatObject createInRealm:realm withValue:@[@1.7f]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > 1"] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > %d", 1] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = 1.7"] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = %f", 1.7f] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > 1.0"] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol >= 1.0"] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol < 1.0"] count]), 0U, @"0 objects expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol <= 1.0"] count]), 0U, @"0 objects expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol BETWEEN %@", @[@1.0, @2.0]] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = %e", 1.7] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol == %f", FLT_MAX] count]), 0U, @"0 objects expected");
-    XCTAssertThrows(([[realm objects:[FloatObject className] where:@"floatCol = 3.5e+38"] count]), @"Too large to be a float");
-    XCTAssertThrows(([[realm objects:[FloatObject className] where:@"floatCol = -3.5e+38"] count]), @"Too small to be a float");
+    XCTAssertEqual(([[FloatObject objectsInRealm:realm where:@"floatCol > 1"] count]), 1U, @"1 object expected");
+    XCTAssertEqual(([[FloatObject objectsInRealm:realm where:@"floatCol > %d", 1] count]), 1U, @"1 object expected");
+    XCTAssertEqual(([[FloatObject objectsInRealm:realm where:@"floatCol = 1.7"] count]), 1U, @"1 object expected");
+    XCTAssertEqual(([[FloatObject objectsInRealm:realm where:@"floatCol = %f", 1.7f] count]), 1U, @"1 object expected");
+    XCTAssertEqual(([[FloatObject objectsInRealm:realm where:@"floatCol > 1.0"] count]), 1U, @"1 object expected");
+    XCTAssertEqual(([[FloatObject objectsInRealm:realm where:@"floatCol >= 1.0"] count]), 1U, @"1 object expected");
+    XCTAssertEqual(([[FloatObject objectsInRealm:realm where:@"floatCol < 1.0"] count]), 0U, @"0 objects expected");
+    XCTAssertEqual(([[FloatObject objectsInRealm:realm where:@"floatCol <= 1.0"] count]), 0U, @"0 objects expected");
+    XCTAssertEqual(([[FloatObject objectsInRealm:realm where:@"floatCol BETWEEN %@", @[@1.0, @2.0]] count]), 1U, @"1 object expected");
+    XCTAssertEqual(([[FloatObject objectsInRealm:realm where:@"floatCol = %e", 1.7] count]), 1U, @"1 object expected");
+    XCTAssertEqual(([[FloatObject objectsInRealm:realm where:@"floatCol == %f", FLT_MAX] count]), 0U, @"0 objects expected");
+    XCTAssertThrows(([[FloatObject objectsInRealm:realm where:@"floatCol = 3.5e+38"] count]), @"Too large to be a float");
+    XCTAssertThrows(([[FloatObject objectsInRealm:realm where:@"floatCol = -3.5e+38"] count]), @"Too small to be a float");
 }
 
 - (void)testLiveQueriesInsideTransaction
@@ -1094,7 +1094,7 @@
     XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName != dog.dogName"].count), 0U);
 
     // test invalid operators
-    XCTAssertThrows([realm objects:[OwnerObject className] where:@"dog.dogName > 'Harvie'"], @"Invalid operator should throw");
+    XCTAssertThrows([OwnerObject objectsInRealm:realm where:@"dog.dogName > 'Harvie'"], @"Invalid operator should throw");
 }
 
 - (void)testLinkQueryInt
@@ -1157,13 +1157,13 @@
     [realm addObject:linkToAllTypes];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.boolCol = YES"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.boolCol = NO"] count], 0U);
+    XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.boolCol = YES"] count], 1U);
+    XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.boolCol = NO"] count], 0U);
 
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol = 1"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol != 1"] count], 0U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol > 0"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol > 1"] count], 0U);
+    XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.intCol = 1"] count], 1U);
+    XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.intCol != 1"] count], 0U);
+    XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.intCol > 0"] count], 1U);
+    XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.intCol > 1"] count], 0U);
 
     NSPredicate *predEq = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol = %f", 1.1];
     XCTAssertEqual([LinkToAllTypesObject objectsInRealm:realm withPredicate:predEq].count, 1U);
@@ -1172,15 +1172,15 @@
     NSPredicate *predLess = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol < %f", 1.1];
     XCTAssertEqual([LinkToAllTypesObject objectsInRealm:realm withPredicate:predLess].count, 0U);
 
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol = 1.11"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol >= 1.11"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol > 1.11"] count], 0U);
+    XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.doubleCol = 1.11"] count], 1U);
+    XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.doubleCol >= 1.11"] count], 1U);
+    XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.doubleCol > 1.11"] count], 0U);
 
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.longCol = 11"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.longCol != 11"] count], 0U);
+    XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.longCol = 11"] count], 1U);
+    XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.longCol != 11"] count], 0U);
 
-    XCTAssertEqual(([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.dateCol = %@", now] count]), 1U);
-    XCTAssertEqual(([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.dateCol != %@", now] count]), 0U);
+    XCTAssertEqual(([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.dateCol = %@", now] count]), 1U);
+    XCTAssertEqual(([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.dateCol != %@", now] count]), 0U);
 }
 
 - (void)testLinkQueryInvalid {
@@ -1214,11 +1214,12 @@
     [realm addObject:arrPropObj1];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 10"] count], 0U);
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 5"] count], 1U);
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY array.stringCol = '1'"] count], 1U);
-    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol == 5"].count, 0U);
-    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol > 10"].count, 1U);
+    XCTAssertEqual([[ArrayPropertyObject objectsInRealm:realm where:@"ANY intArray.intCol > 10"] count], 0U);
+    XCTAssertEqual([[ArrayPropertyObject objectsInRealm:realm where:@"ANY intArray.intCol > 10"] count], 0U);
+    XCTAssertEqual([[ArrayPropertyObject objectsInRealm:realm where:@"ANY intArray.intCol > 5"] count], 1U);
+    XCTAssertEqual([[ArrayPropertyObject objectsInRealm:realm where:@"ANY array.stringCol = '1'"] count], 1U);
+    XCTAssertEqual([ArrayPropertyObject objectsInRealm:realm where:@"NONE intArray.intCol == 5"].count, 0U);
+    XCTAssertEqual([ArrayPropertyObject objectsInRealm:realm where:@"NONE intArray.intCol > 10"].count, 1U);
 
     ArrayPropertyObject *arrPropObj2 = [[ArrayPropertyObject alloc] init];
     arrPropObj2.name = @"Test";
@@ -1233,11 +1234,11 @@
     [realm beginWriteTransaction];
     [realm addObject:arrPropObj2];
     [realm commitWriteTransaction];
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 10"] count], 0U);
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 5"] count], 1U);
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 2"] count], 2U);
-    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol == 5"].count, 1U);
-    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol > 10"].count, 2U);
+    XCTAssertEqual([[ArrayPropertyObject objectsInRealm:realm where:@"ANY intArray.intCol > 10"] count], 0U);
+    XCTAssertEqual([[ArrayPropertyObject objectsInRealm:realm where:@"ANY intArray.intCol > 5"] count], 1U);
+    XCTAssertEqual([[ArrayPropertyObject objectsInRealm:realm where:@"ANY intArray.intCol > 2"] count], 2U);
+    XCTAssertEqual([ArrayPropertyObject objectsInRealm:realm where:@"NONE intArray.intCol == 5"].count, 1U);
+    XCTAssertEqual([ArrayPropertyObject objectsInRealm:realm where:@"NONE intArray.intCol > 10"].count, 2U);
 }
 
 - (void)testMultiLevelLinkQuery
