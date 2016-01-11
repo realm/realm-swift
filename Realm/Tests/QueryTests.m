@@ -144,13 +144,13 @@
     [AllTypesObject createInRealm:realm withValue:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]];
     [realm commitWriteTransaction];
 
-    RLMResults *betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol BETWEEN %@", @[@2, @3]]];
+    RLMResults *betweenResults = [AllTypesObject objectsWhere:@"intCol BETWEEN %@", @[@2, @3]];
     XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
-    betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"floatCol BETWEEN %@", @[@1.0f, @4.0f]]];
+    betweenResults = [AllTypesObject objectsWhere:@"floatCol BETWEEN %@", @[@1.0f, @4.0f]];
     XCTAssertEqual(betweenResults.count, 4U, @"Should equal 4");
-    betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"doubleCol BETWEEN %@", @[@3.0, @7.0f]]];
+    betweenResults = [AllTypesObject objectsWhere:@"doubleCol BETWEEN %@", @[@3.0, @7.0f]];
     XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
-    betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol BETWEEN %@", @[date2,date3]]];
+    betweenResults = [AllTypesObject objectsWhere:@"dateCol BETWEEN %@", @[date2,date3]];
     XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
 
     betweenResults = [AllTypesObject objectsWhere:@"intCol BETWEEN {2, 3}"];
@@ -181,17 +181,17 @@
     [AllTypesObject createInRealm:realm withValue:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]];
     [realm commitWriteTransaction];
 
-    RLMResults *dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol < %@", date3]];
+    RLMResults *dateResults = [AllTypesObject objectsWhere:@"dateCol < %@", date3];
     XCTAssertEqual(dateResults.count, 2U, @"2 dates smaller");
-    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol =< %@", date3]];
+    dateResults = [AllTypesObject objectsWhere:@"dateCol =< %@", date3];
     XCTAssertEqual(dateResults.count, 3U, @"3 dates smaller or equal");
-    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol > %@", date1]];
+    dateResults = [AllTypesObject objectsWhere:@"dateCol > %@", date1];
     XCTAssertEqual(dateResults.count, 2U, @"2 dates greater");
-    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol => %@", date1]];
+    dateResults = [AllTypesObject objectsWhere:@"dateCol => %@", date1];
     XCTAssertEqual(dateResults.count, 3U, @"3 dates greater or equal");
-    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol == %@", date1]];
+    dateResults = [AllTypesObject objectsWhere:@"dateCol == %@", date1];
     XCTAssertEqual(dateResults.count, 1U, @"1 date equal to");
-    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol != %@", date1]];
+    dateResults = [AllTypesObject objectsWhere:@"dateCol != %@", date1];
     XCTAssertEqual(dateResults.count, 2U, @"2 dates not equal to");
 }
 
@@ -1165,12 +1165,9 @@
     XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.intCol > 0"] count], 1U);
     XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.intCol > 1"] count], 0U);
 
-    NSPredicate *predEq = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol = %f", 1.1];
-    XCTAssertEqual([LinkToAllTypesObject objectsInRealm:realm withPredicate:predEq].count, 1U);
-    NSPredicate *predLessEq = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol <= %f", 1.1];
-    XCTAssertEqual([LinkToAllTypesObject objectsInRealm:realm withPredicate:predLessEq].count, 1U);
-    NSPredicate *predLess = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol < %f", 1.1];
-    XCTAssertEqual([LinkToAllTypesObject objectsInRealm:realm withPredicate:predLess].count, 0U);
+    XCTAssertEqual(([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.floatCol = %f", 1.11] count]), 1U);
+    XCTAssertEqual(([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.floatCol <= %f", 1.11] count]), 1U);
+    XCTAssertEqual(([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.floatCol < %f", 1.11] count]), 0U);
 
     XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.doubleCol = 1.11"] count], 1U);
     XCTAssertEqual([[LinkToAllTypesObject objectsInRealm:realm where:@"allTypesCol.doubleCol >= 1.11"] count], 1U);
@@ -1332,11 +1329,9 @@
     XCTAssertEqual(4U, ([AllTypesObject objectsWhere:@"objectCol != nil"].count));
     XCTAssertEqual(3U, ([AllTypesObject objectsWhere:@"objectCol != %@", stringObj0].count));
 
-    NSPredicate *longPred = [NSPredicate predicateWithFormat:@"longCol = %lli", 34359738368];
-    XCTAssertEqual([AllTypesObject objectsWithPredicate:longPred].count, 1U, @"Count should be 1");
+    XCTAssertEqual(1U, ([AllTypesObject objectsWhere:@"longCol = %lli", 34359738368]).count);
 
-    NSPredicate *longBetweenPred = [NSPredicate predicateWithFormat:@"longCol BETWEEN %@", @[@34359738367LL, @34359738369LL]];
-    XCTAssertEqual([AllTypesObject objectsWithPredicate:longBetweenPred].count, 1U, @"Count should be 1");
+    XCTAssertEqual(1U, ([AllTypesObject objectsWhere:@"longCol BETWEEN %@", @[@34359738367LL, @34359738369LL]]).count);
 
     // check for ANY object in array
     XCTAssertEqual(2U, ([ArrayOfAllTypesObject objectsWhere:@"ANY array = %@", obj0].count));
@@ -1378,12 +1373,13 @@
 {
     va_list args;
     va_start(args, predicateFormat);
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateFormat arguments:args];
     va_end(args);
-    XCTAssertEqual(normalCount, [[class objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]] count]);
-    predicateFormat = [NSString stringWithFormat:@"NOT(%@)", predicateFormat];
-    va_start(args, predicateFormat);
-    va_end(args);
-    XCTAssertEqual(notCount, [[class objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]] count]);
+
+    XCTAssertEqual(normalCount, [[class objectsWithPredicate:predicate] count]);
+
+    predicate = [NSCompoundPredicate notPredicateWithSubpredicate:predicate];
+    XCTAssertEqual(notCount, [[class objectsWithPredicate:predicate] count]);
 }
 
 - (void)testINPredicate
