@@ -388,10 +388,8 @@ void RealmCoordinator::advance_helper_shared_group_to_latest()
         query->attach_to(*m_query_sg);
     }
 
-    if (!m_new_queries.empty()) {
-        move_new_queries_to_main();
-        m_advancer_sg->end_read();
-    }
+    move_new_queries_to_main();
+    m_advancer_sg->end_read();
 }
 
 void RealmCoordinator::advance_to_ready(Realm& realm)
