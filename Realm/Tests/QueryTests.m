@@ -89,6 +89,9 @@
 - (BOOL)isNull;
 @end
 
+#define RLMAssertCount(cls, expectedCount, ...) \
+    XCTAssertEqual(expectedCount, ([cls objectsWhere:__VA_ARGS__].count))
+
 @implementation QueryTests
 
 - (Class)queryObjectClass {
@@ -105,7 +108,7 @@
 
 - (void)testBasicQuery
 {
-    RLMRealm *realm = [self realmWithTestPath];
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
     [PersonObject createInRealm:realm withValue:@[@"Fiel", @27]];
@@ -114,7 +117,7 @@
     [realm commitWriteTransaction];
 
     // query on realm
-    XCTAssertEqual([PersonObject objectsInRealm:realm where:@"age > 28"].count, 2U, @"Expecting 2 results");
+    RLMAssertCount(PersonObject, 2U, @"age > 28");
 
     // query on realm with order
     RLMResults *results = [[PersonObject objectsInRealm:realm where:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
@@ -144,24 +147,16 @@
     [AllTypesObject createInRealm:realm withValue:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]];
     [realm commitWriteTransaction];
 
-    RLMResults *betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol BETWEEN %@", @[@2, @3]]];
-    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
-    betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"floatCol BETWEEN %@", @[@1.0f, @4.0f]]];
-    XCTAssertEqual(betweenResults.count, 4U, @"Should equal 4");
-    betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"doubleCol BETWEEN %@", @[@3.0, @7.0f]]];
-    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
-    betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol BETWEEN %@", @[date2,date3]]];
-    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
+    RLMAssertCount(AllTypesObject, 2U, @"intCol BETWEEN %@", @[@2, @3]);
+    RLMAssertCount(AllTypesObject, 4U, @"floatCol BETWEEN %@", @[@1.0f, @4.0f]);
+    RLMAssertCount(AllTypesObject, 2U, @"doubleCol BETWEEN %@", @[@3.0, @7.0]);
+    RLMAssertCount(AllTypesObject, 2U, @"dateCol BETWEEN %@", @[date2, date3]);
 
-    betweenResults = [AllTypesObject objectsWhere:@"intCol BETWEEN {2, 3}"];
-    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
-    betweenResults = [AllTypesObject objectsWhere:@"doubleCol BETWEEN {3.0, 7.0}"];
-    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
+    RLMAssertCount(AllTypesObject, 2U, @"intCol BETWEEN {2, 3}");
+    RLMAssertCount(AllTypesObject, 2U, @"doubleCol BETWEEN {3.0, 7.0}");
 
-    betweenResults = [AllTypesObject.allObjects objectsWhere:@"intCol BETWEEN {2, 3}"];
-    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
-    betweenResults = [AllTypesObject.allObjects objectsWhere:@"doubleCol BETWEEN {3.0, 7.0}"];
-    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
+    RLMAssertCount(AllTypesObject.allObjects, 2U, @"intCol BETWEEN {2, 3}");
+    RLMAssertCount(AllTypesObject.allObjects, 2U, @"doubleCol BETWEEN {3.0, 7.0}");
 }
 
 - (void)testQueryWithDates
@@ -181,18 +176,12 @@
     [AllTypesObject createInRealm:realm withValue:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]];
     [realm commitWriteTransaction];
 
-    RLMResults *dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol < %@", date3]];
-    XCTAssertEqual(dateResults.count, 2U, @"2 dates smaller");
-    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol =< %@", date3]];
-    XCTAssertEqual(dateResults.count, 3U, @"3 dates smaller or equal");
-    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol > %@", date1]];
-    XCTAssertEqual(dateResults.count, 2U, @"2 dates greater");
-    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol => %@", date1]];
-    XCTAssertEqual(dateResults.count, 3U, @"3 dates greater or equal");
-    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol == %@", date1]];
-    XCTAssertEqual(dateResults.count, 1U, @"1 date equal to");
-    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol != %@", date1]];
-    XCTAssertEqual(dateResults.count, 2U, @"2 dates not equal to");
+    RLMAssertCount(AllTypesObject, 2U, @"dateCol < %@", date3);
+    RLMAssertCount(AllTypesObject, 3U, @"dateCol <= %@", date3);
+    RLMAssertCount(AllTypesObject, 2U, @"dateCol > %@", date1);
+    RLMAssertCount(AllTypesObject, 3U, @"dateCol >= %@", date1);
+    RLMAssertCount(AllTypesObject, 1U, @"dateCol == %@", date1);
+    RLMAssertCount(AllTypesObject, 2U, @"dateCol != %@", date1);
 }
 
 - (void)testDefaultRealmQuery
@@ -206,14 +195,11 @@
     [realm commitWriteTransaction];
 
     // query on class
-    RLMResults *all = [PersonObject allObjects];
-    XCTAssertEqual(all.count, 3U, @"Expecting 3 results");
-
-    RLMResults *results = [PersonObject objectsWhere:@"age == 27"];
-    XCTAssertEqual(results.count, 1U, @"Expecting 1 results");
+    XCTAssertEqual([PersonObject allObjects].count, 3U);
+    RLMAssertCount(PersonObject, 1U, @"age == 27");
 
     // with order
-    results = [[PersonObject objectsWhere:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *results = [[PersonObject objectsWhere:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
     PersonObject *tim = results[0];
     XCTAssertEqualObjects(tim.name, @"Tim", @"Tim should be first results");
 }
@@ -235,8 +221,8 @@
     RLMResults *some = [[PersonObject objectsWhere:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
 
     // query/order on array
-    XCTAssertEqual([all objectsWhere:@"age == 27"].count, 1U, @"Expecting 1 result");
-    XCTAssertEqual([all objectsWhere:@"age == 28"].count, 0U, @"Expecting 0 results");
+    RLMAssertCount(all, 1U, @"age == 27");
+    RLMAssertCount(all, 0U, @"age == 28");
     some = [some sortedResultsUsingProperty:@"age" ascending:NO];
     XCTAssertEqualObjects([some[0] name], @"Ari", @"Ari should be first results");
 }
@@ -245,7 +231,7 @@
     RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingProperty:column ascending:ascending];
     AllTypesObject *obj = results[0];
     XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
-    
+
     RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
     results = [ar sortedResultsUsingProperty:column ascending:ascending];
     obj = results[0];
@@ -256,7 +242,7 @@
     // test TableView query
     RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingProperty:column ascending:ascending];
     XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
-    
+
     // test LinkView query
     RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
     results = [ar sortedResultsUsingProperty:column ascending:ascending];
@@ -277,12 +263,12 @@
 
     StringObject *stringObj = [StringObject new];
     stringObj.stringCol = @"string";
-    
+
     [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @1, @1, stringObj]]];
     [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @2, @"mixed", stringObj]]];
     [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @3, @"mixed", stringObj]]];
     [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @3, @"mixed", stringObj]]];
-    
+
     [realm commitWriteTransaction];
 
 
@@ -293,12 +279,12 @@
     //////////// sort by intCol
     [self verifySort:realm column:@"intCol" ascending:YES expected:@1];
     [self verifySort:realm column:@"intCol" ascending:NO expected:@33];
-    
+
     //////////// sort by dateCol
     double (^dateGetter)(id) = ^(NSDate *d) { return d.timeIntervalSince1970; };
     [self verifySortWithAccuracy:realm column:@"dateCol" ascending:YES getter:dateGetter expected:date1.timeIntervalSince1970 accuracy:1];
     [self verifySortWithAccuracy:realm column:@"dateCol" ascending:NO getter:dateGetter expected:date33.timeIntervalSince1970 accuracy:1];
-    
+
     //////////// sort by doubleCol
     double (^doubleGetter)(id) = ^(NSNumber *n) { return n.doubleValue; };
     [self verifySortWithAccuracy:realm column:@"doubleCol" ascending:YES getter:doubleGetter expected:1.0 accuracy:0.0000001];
@@ -307,15 +293,15 @@
     //////////// sort by floatCol
     [self verifySortWithAccuracy:realm column:@"floatCol" ascending:YES getter:doubleGetter expected:1.0 accuracy:0.0000001];
     [self verifySortWithAccuracy:realm column:@"floatCol" ascending:NO getter:doubleGetter expected:3.3 accuracy:0.0000001];
-    
+
     //////////// sort by stringCol
     [self verifySort:realm column:@"stringCol" ascending:YES expected:@"a"];
     [self verifySort:realm column:@"stringCol" ascending:NO expected:@"cc"];
-    
+
     // sort by mixed column
     RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingProperty:@"mixedCol" ascending:YES], @"'mixedCol' .* 'AllTypesObject': sorting is only supported .* type any");
     XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"mixedCol" ascending:NO]);
-    
+
     // sort invalid name
     RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingProperty:@"invalidCol" ascending:YES], @"'invalidCol'.* 'AllTypesObject'.* not found");
     XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"invalidCol" ascending:NO]);
@@ -382,7 +368,7 @@
     // delete cc, add d results should update
     [realm transactionWithBlock:^{
         [arrayOfAll.array removeObjectAtIndex:3];
-        
+
         // create extra alltypesobject
         [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"d", [@"d" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]]];
     }];
@@ -611,59 +597,59 @@
 
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"bool1 == bool1"].count);
-    XCTAssertEqual(3U, [self.queryObjectClass objectsWhere:@"bool1 == bool2"].count);
-    XCTAssertEqual(4U, [self.queryObjectClass objectsWhere:@"bool1 != bool2"].count);
+    RLMAssertCount(self.queryObjectClass, 7U, @"bool1 == bool1");
+    RLMAssertCount(self.queryObjectClass, 3U, @"bool1 == bool2");
+    RLMAssertCount(self.queryObjectClass, 4U, @"bool1 != bool2");
 
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"int1 == int1"].count);
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"int1 == int2"].count);
-    XCTAssertEqual(5U, [self.queryObjectClass objectsWhere:@"int1 != int2"].count);
-    XCTAssertEqual(1U, [self.queryObjectClass objectsWhere:@"int1 > int2"].count);
-    XCTAssertEqual(4U, [self.queryObjectClass objectsWhere:@"int1 < int2"].count);
-    XCTAssertEqual(3U, [self.queryObjectClass objectsWhere:@"int1 >= int2"].count);
-    XCTAssertEqual(6U, [self.queryObjectClass objectsWhere:@"int1 <= int2"].count);
+    RLMAssertCount(self.queryObjectClass, 7U, @"int1 == int1");
+    RLMAssertCount(self.queryObjectClass, 2U, @"int1 == int2");
+    RLMAssertCount(self.queryObjectClass, 5U, @"int1 != int2");
+    RLMAssertCount(self.queryObjectClass, 1U, @"int1 > int2");
+    RLMAssertCount(self.queryObjectClass, 4U, @"int1 < int2");
+    RLMAssertCount(self.queryObjectClass, 3U, @"int1 >= int2");
+    RLMAssertCount(self.queryObjectClass, 6U, @"int1 <= int2");
 
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"float1 == float1"].count);
-    XCTAssertEqual(1U, [self.queryObjectClass objectsWhere:@"float1 == float2"].count);
-    XCTAssertEqual(6U, [self.queryObjectClass objectsWhere:@"float1 != float2"].count);
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"float1 > float2"].count);
-    XCTAssertEqual(4U, [self.queryObjectClass objectsWhere:@"float1 < float2"].count);
-    XCTAssertEqual(3U, [self.queryObjectClass objectsWhere:@"float1 >= float2"].count);
-    XCTAssertEqual(5U, [self.queryObjectClass objectsWhere:@"float1 <= float2"].count);
+    RLMAssertCount(self.queryObjectClass, 7U, @"float1 == float1");
+    RLMAssertCount(self.queryObjectClass, 1U, @"float1 == float2");
+    RLMAssertCount(self.queryObjectClass, 6U, @"float1 != float2");
+    RLMAssertCount(self.queryObjectClass, 2U, @"float1 > float2");
+    RLMAssertCount(self.queryObjectClass, 4U, @"float1 < float2");
+    RLMAssertCount(self.queryObjectClass, 3U, @"float1 >= float2");
+    RLMAssertCount(self.queryObjectClass, 5U, @"float1 <= float2");
 
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"double1 == double1"].count);
-    XCTAssertEqual(0U, [self.queryObjectClass objectsWhere:@"double1 == double2"].count);
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"double1 != double2"].count);
-    XCTAssertEqual(1U, [self.queryObjectClass objectsWhere:@"double1 > double2"].count);
-    XCTAssertEqual(6U, [self.queryObjectClass objectsWhere:@"double1 < double2"].count);
-    XCTAssertEqual(1U, [self.queryObjectClass objectsWhere:@"double1 >= double2"].count);
-    XCTAssertEqual(6U, [self.queryObjectClass objectsWhere:@"double1 <= double2"].count);
+    RLMAssertCount(self.queryObjectClass, 7U, @"double1 == double1");
+    RLMAssertCount(self.queryObjectClass, 0U, @"double1 == double2");
+    RLMAssertCount(self.queryObjectClass, 7U, @"double1 != double2");
+    RLMAssertCount(self.queryObjectClass, 1U, @"double1 > double2");
+    RLMAssertCount(self.queryObjectClass, 6U, @"double1 < double2");
+    RLMAssertCount(self.queryObjectClass, 1U, @"double1 >= double2");
+    RLMAssertCount(self.queryObjectClass, 6U, @"double1 <= double2");
 
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"string1 == string1"].count);
-    XCTAssertEqual(1U, [self.queryObjectClass objectsWhere:@"string1 == string2"].count);
-    XCTAssertEqual(6U, [self.queryObjectClass objectsWhere:@"string1 != string2"].count);
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"string1 CONTAINS string1"].count);
-    XCTAssertEqual(1U, [self.queryObjectClass objectsWhere:@"string1 CONTAINS string2"].count);
-    XCTAssertEqual(3U, [self.queryObjectClass objectsWhere:@"string2 CONTAINS string1"].count);
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"string1 BEGINSWITH string1"].count);
-    XCTAssertEqual(1U, [self.queryObjectClass objectsWhere:@"string1 BEGINSWITH string2"].count);
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"string2 BEGINSWITH string1"].count);
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"string1 ENDSWITH string1"].count);
-    XCTAssertEqual(1U, [self.queryObjectClass objectsWhere:@"string1 ENDSWITH string2"].count);
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"string2 ENDSWITH string1"].count);
+    RLMAssertCount(self.queryObjectClass, 7U, @"string1 == string1");
+    RLMAssertCount(self.queryObjectClass, 1U, @"string1 == string2");
+    RLMAssertCount(self.queryObjectClass, 6U, @"string1 != string2");
+    RLMAssertCount(self.queryObjectClass, 7U, @"string1 CONTAINS string1");
+    RLMAssertCount(self.queryObjectClass, 1U, @"string1 CONTAINS string2");
+    RLMAssertCount(self.queryObjectClass, 3U, @"string2 CONTAINS string1");
+    RLMAssertCount(self.queryObjectClass, 7U, @"string1 BEGINSWITH string1");
+    RLMAssertCount(self.queryObjectClass, 1U, @"string1 BEGINSWITH string2");
+    RLMAssertCount(self.queryObjectClass, 2U, @"string2 BEGINSWITH string1");
+    RLMAssertCount(self.queryObjectClass, 7U, @"string1 ENDSWITH string1");
+    RLMAssertCount(self.queryObjectClass, 1U, @"string1 ENDSWITH string2");
+    RLMAssertCount(self.queryObjectClass, 2U, @"string2 ENDSWITH string1");
 
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"string1 ==[c] string1"].count);
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"string1 ==[c] string2"].count);
-    XCTAssertEqual(5U, [self.queryObjectClass objectsWhere:@"string1 !=[c] string2"].count);
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"string1 CONTAINS[c] string1"].count);
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"string1 CONTAINS[c] string2"].count);
-    XCTAssertEqual(6U, [self.queryObjectClass objectsWhere:@"string2 CONTAINS[c] string1"].count);
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"string1 BEGINSWITH[c] string1"].count);
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"string1 BEGINSWITH[c] string2"].count);
-    XCTAssertEqual(4U, [self.queryObjectClass objectsWhere:@"string2 BEGINSWITH[c] string1"].count);
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"string1 ENDSWITH[c] string1"].count);
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"string1 ENDSWITH[c] string2"].count);
-    XCTAssertEqual(4U, [self.queryObjectClass objectsWhere:@"string2 ENDSWITH[c] string1"].count);
+    RLMAssertCount(self.queryObjectClass, 7U, @"string1 ==[c] string1");
+    RLMAssertCount(self.queryObjectClass, 2U, @"string1 ==[c] string2");
+    RLMAssertCount(self.queryObjectClass, 5U, @"string1 !=[c] string2");
+    RLMAssertCount(self.queryObjectClass, 7U, @"string1 CONTAINS[c] string1");
+    RLMAssertCount(self.queryObjectClass, 2U, @"string1 CONTAINS[c] string2");
+    RLMAssertCount(self.queryObjectClass, 6U, @"string2 CONTAINS[c] string1");
+    RLMAssertCount(self.queryObjectClass, 7U, @"string1 BEGINSWITH[c] string1");
+    RLMAssertCount(self.queryObjectClass, 2U, @"string1 BEGINSWITH[c] string2");
+    RLMAssertCount(self.queryObjectClass, 4U, @"string2 BEGINSWITH[c] string1");
+    RLMAssertCount(self.queryObjectClass, 7U, @"string1 ENDSWITH[c] string1");
+    RLMAssertCount(self.queryObjectClass, 2U, @"string1 ENDSWITH[c] string2");
+    RLMAssertCount(self.queryObjectClass, 4U, @"string2 ENDSWITH[c] string1");
 
     RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"int1 == float1"],
                                       @"Property type mismatch between int and float");
@@ -683,7 +669,7 @@
     NSArray *operators = @[@"<", @"<=", @">", @">=", @"==", @"!="];
     for (NSString *operator in operators) {
         NSString *fmt = [@[property, operator, @"%@"] componentsJoinedByString:@" "];
-        XCTAssertEqual(0U, ([class objectsWhere:fmt, value]).count);
+        RLMAssertCount(class, 0U, fmt, value);
     }
 }
 
@@ -712,15 +698,12 @@
 
 - (void)testBooleanPredicate
 {
-    XCTAssertEqual([BoolObject objectsWhere:@"boolCol == TRUE"].count,
-                   0U, @"== operator in bool predicate.");
-    XCTAssertEqual([BoolObject objectsWhere:@"boolCol != TRUE"].count,
-                   0U, @"== operator in bool predicate.");
+    RLMAssertCount(BoolObject, 0U, @"boolCol == TRUE");
+    RLMAssertCount(BoolObject, 0U, @"boolCol != TRUE");
+
     if (self.isNull) {
-        XCTAssertEqual([BoolObject objectsWhere:@"boolCol == NULL"].count,
-                       0U, @"== operator in bool predicate.");
-        XCTAssertEqual([BoolObject objectsWhere:@"boolCol != NULL"].count,
-                       0U, @"== operator in bool predicate.");
+        RLMAssertCount(BoolObject, 0U, @"boolCol == NULL");
+        RLMAssertCount(BoolObject, 0U, @"boolCol != NULL");
     }
     else {
         XCTAssertThrows([BoolObject objectsWhere:@"boolCol == NULL"]);
@@ -746,21 +729,21 @@
     }
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'a'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'ab'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'abc'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'abcd'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'abd'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'c'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'A'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol BEGINSWITH[c] 'a'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol BEGINSWITH[c] 'A'"].count);
+    RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH 'a'");
+    RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH 'ab'");
+    RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH 'abc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol BEGINSWITH 'abcd'");
+    RLMAssertCount(StringObject, 0U, @"stringCol BEGINSWITH 'abd'");
+    RLMAssertCount(StringObject, 0U, @"stringCol BEGINSWITH 'c'");
+    RLMAssertCount(StringObject, 0U, @"stringCol BEGINSWITH 'A'");
+    RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH[c] 'a'");
+    RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH[c] 'A'");
 
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol BEGINSWITH 'a'"].count);
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol BEGINSWITH 'c'"].count);
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol BEGINSWITH 'A'"].count);
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol BEGINSWITH[c] 'a'"].count);
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol BEGINSWITH[c] 'A'"].count);
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol BEGINSWITH 'a'");
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol BEGINSWITH 'c'");
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol BEGINSWITH 'A'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol BEGINSWITH[c] 'a'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol BEGINSWITH[c] 'A'");
 }
 
 - (void)testStringEndsWith
@@ -776,21 +759,21 @@
     }
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ENDSWITH 'c'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ENDSWITH 'bc'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ENDSWITH 'abc'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol ENDSWITH 'aabc'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol ENDSWITH 'bbc'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol ENDSWITH 'a'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol ENDSWITH 'C'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ENDSWITH[c] 'c'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ENDSWITH[c] 'C'"].count);
+    RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH 'c'");
+    RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH 'bc'");
+    RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH 'abc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol ENDSWITH 'aabc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol ENDSWITH 'bbc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol ENDSWITH 'a'");
+    RLMAssertCount(StringObject, 0U, @"stringCol ENDSWITH 'C'");
+    RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH[c] 'c'");
+    RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH[c] 'C'");
 
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH 'c'"].count);
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH 'a'"].count);
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH 'C'"].count);
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH[c] 'c'"].count);
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH[c] 'C'"].count);
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol ENDSWITH 'c'");
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol ENDSWITH 'a'");
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol ENDSWITH 'C'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol ENDSWITH[c] 'c'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol ENDSWITH[c] 'C'");
 }
 
 - (void)testStringContains
@@ -806,25 +789,25 @@
     }
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'a'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'b'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'c'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'ab'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'bc'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'abc'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol CONTAINS 'd'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol CONTAINS 'aabc'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol CONTAINS 'bbc'"].count);
+    RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS 'a'");
+    RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS 'b'");
+    RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS 'c'");
+    RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS 'ab'");
+    RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS 'bc'");
+    RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS 'abc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol CONTAINS 'd'");
+    RLMAssertCount(StringObject, 0U, @"stringCol CONTAINS 'aabc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol CONTAINS 'bbc'");
 
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol CONTAINS 'C'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS[c] 'c'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS[c] 'C'"].count);
+    RLMAssertCount(StringObject, 0U, @"stringCol CONTAINS 'C'");
+    RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS[c] 'c'");
+    RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS[c] 'C'");
 
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol CONTAINS 'd'"].count);
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol CONTAINS 'c'"].count);
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol CONTAINS 'C'"].count);
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol CONTAINS[c] 'c'"].count);
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol CONTAINS[c] 'C'"].count);
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol CONTAINS 'd'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol CONTAINS 'c'");
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol CONTAINS 'C'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol CONTAINS[c] 'c'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol CONTAINS[c] 'C'");
 }
 
 - (void)testStringEquality
@@ -836,24 +819,24 @@
     [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol == 'abc'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol != 'def'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ==[c] 'abc'"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ==[c] 'ABC'"].count);
+    RLMAssertCount(StringObject, 1U, @"stringCol == 'abc'");
+    RLMAssertCount(StringObject, 1U, @"stringCol != 'def'");
+    RLMAssertCount(StringObject, 1U, @"stringCol ==[c] 'abc'");
+    RLMAssertCount(StringObject, 1U, @"stringCol ==[c] 'ABC'");
 
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol != 'abc'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol == 'def'"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol == 'ABC'"].count);
+    RLMAssertCount(StringObject, 0U, @"stringCol != 'abc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol == 'def'");
+    RLMAssertCount(StringObject, 0U, @"stringCol == 'ABC'");
 
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol == 'abc'"].count);
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol != 'def'"].count);
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol == 'abc'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol != 'def'");
 
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ==[c] 'abc'"].count);
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ==[c] 'ABC'"].count);
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol ==[c] 'abc'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol ==[c] 'ABC'");
 
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol != 'abc'"].count);
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol == 'def'"].count);
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol == 'ABC'"].count);
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol != 'abc'");
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol == 'def'");
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol == 'ABC'");
 }
 
 - (void)testStringUnsupportedOperations
@@ -871,11 +854,11 @@
 
 - (void)testBinaryComparisonInPredicate {
     NSData *data = [NSData data];
-    XCTAssertEqual(0U, ([BinaryObject objectsWhere:@"binaryCol BEGINSWITH %@", data]).count);
-    XCTAssertEqual(0U, ([BinaryObject objectsWhere:@"binaryCol ENDSWITH %@", data]).count);
-    XCTAssertEqual(0U, ([BinaryObject objectsWhere:@"binaryCol CONTAINS %@", data]).count);
-    XCTAssertEqual(0U, ([BinaryObject objectsWhere:@"binaryCol = %@", data]).count);
-    XCTAssertEqual(0U, ([BinaryObject objectsWhere:@"binaryCol != %@", data]).count);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol BEGINSWITH %@", data);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol ENDSWITH %@", data);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol CONTAINS %@", data);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol = %@", data);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol != %@", data);
 
     XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol < %@", data]));
     XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol <= %@", data]));
@@ -888,25 +871,25 @@
 
 - (void)testFloatQuery
 {
-    RLMRealm *realm = [self realmWithTestPath];
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
     [FloatObject createInRealm:realm withValue:@[@1.7f]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > 1"] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > %d", 1] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = 1.7"] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = %f", 1.7f] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > 1.0"] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol >= 1.0"] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol < 1.0"] count]), 0U, @"0 objects expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol <= 1.0"] count]), 0U, @"0 objects expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol BETWEEN %@", @[@1.0, @2.0]] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = %e", 1.7] count]), 1U, @"1 object expected");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol == %f", FLT_MAX] count]), 0U, @"0 objects expected");
-    XCTAssertThrows(([[realm objects:[FloatObject className] where:@"floatCol = 3.5e+38"] count]), @"Too large to be a float");
-    XCTAssertThrows(([[realm objects:[FloatObject className] where:@"floatCol = -3.5e+38"] count]), @"Too small to be a float");
+    RLMAssertCount(FloatObject, 1U, @"floatCol > 1");
+    RLMAssertCount(FloatObject, 1U, @"floatCol > %d", 1);
+    RLMAssertCount(FloatObject, 1U, @"floatCol = 1.7");
+    RLMAssertCount(FloatObject, 1U, @"floatCol = %f", 1.7f);
+    RLMAssertCount(FloatObject, 1U, @"floatCol > 1.0");
+    RLMAssertCount(FloatObject, 1U, @"floatCol >= 1.0");
+    RLMAssertCount(FloatObject, 0U, @"floatCol < 1.0");
+    RLMAssertCount(FloatObject, 0U, @"floatCol <= 1.0");
+    RLMAssertCount(FloatObject, 1U, @"floatCol BETWEEN %@", @[@1.0, @2.0]);
+    RLMAssertCount(FloatObject, 1U, @"floatCol = %e", 1.7);
+    RLMAssertCount(FloatObject, 0U, @"floatCol == %f", FLT_MAX);
+    XCTAssertThrows([FloatObject objectsInRealm:realm where:@"floatCol = 3.5e+38"], @"Too large to be a float");
+    XCTAssertThrows([FloatObject objectsInRealm:realm where:@"floatCol = -3.5e+38"], @"Too small to be a float");
 }
 
 - (void)testLiveQueriesInsideTransaction
@@ -1004,7 +987,7 @@
 }
 
 - (void)makeDogWithName:(NSString *)name owner:(NSString *)ownerName {
-    RLMRealm *realm = [self realmWithTestPath];
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
     OwnerObject *owner = [[OwnerObject alloc] init];
     owner.name = ownerName;
@@ -1017,7 +1000,7 @@
 }
 
 - (void)makeDogWithAge:(int)age owner:(NSString *)ownerName {
-    RLMRealm *realm = [self realmWithTestPath];
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
     OwnerObject *owner = [[OwnerObject alloc] init];
     owner.name = ownerName;
@@ -1032,11 +1015,9 @@
 
 - (void)testLinkQueryNewObjectCausesEmptyResults
 {
-    RLMRealm *realm = [self realmWithTestPath];
-
     [self makeDogWithName:@"Harvie" owner:@"Tim"];
     DogObject *newDogObject = [[DogObject alloc] init];
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog = %@", newDogObject].count), 0U);
+    RLMAssertCount(OwnerObject, 0U, @"dog = %@", newDogObject);
 }
 
 - (void)testLinkQueryDifferentRealmsThrows
@@ -1056,85 +1037,83 @@
 
 - (void)testLinkQueryString
 {
-    RLMRealm *realm = [self realmWithTestPath];
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
     [self makeDogWithName:@"Harvie" owner:@"Tim"];
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName  = 'Harvie'"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName != 'Harvie'"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName  = 'eivraH'"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName  = 'Fido'"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName IN {'Fido', 'Harvie'}"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName IN {'Fido', 'eivraH'}"].count), 0U);
+    RLMAssertCount(OwnerObject, 1U, @"dog.dogName  = 'Harvie'");
+    RLMAssertCount(OwnerObject, 0U, @"dog.dogName != 'Harvie'");
+    RLMAssertCount(OwnerObject, 0U, @"dog.dogName  = 'eivraH'");
+    RLMAssertCount(OwnerObject, 0U, @"dog.dogName  = 'Fido'");
+    RLMAssertCount(OwnerObject, 1U, @"dog.dogName IN {'Fido', 'Harvie'}");
+    RLMAssertCount(OwnerObject, 0U, @"dog.dogName IN {'Fido', 'eivraH'}");
 
     [self makeDogWithName:@"Harvie" owner:@"Joe"];
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName  = 'Harvie'"].count), 2U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName != 'Harvie'"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName  = 'eivraH'"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName  = 'Fido'"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName IN {'Fido', 'Harvie'}"].count), 2U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName IN {'Fido', 'eivraH'}"].count), 0U);
+    RLMAssertCount(OwnerObject, 2U, @"dog.dogName  = 'Harvie'");
+    RLMAssertCount(OwnerObject, 0U, @"dog.dogName != 'Harvie'");
+    RLMAssertCount(OwnerObject, 0U, @"dog.dogName  = 'eivraH'");
+    RLMAssertCount(OwnerObject, 0U, @"dog.dogName  = 'Fido'");
+    RLMAssertCount(OwnerObject, 2U, @"dog.dogName IN {'Fido', 'Harvie'}");
+    RLMAssertCount(OwnerObject, 0U, @"dog.dogName IN {'Fido', 'eivraH'}");
 
     [self makeDogWithName:@"Fido" owner:@"Jim"];
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName  = 'Harvie'"].count), 2U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName != 'Harvie'"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName  = 'eivraH'"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName  = 'Fido'"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName IN {'Fido', 'Harvie'}"].count), 3U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName IN {'Fido', 'eivraH'}"].count), 1U);
+    RLMAssertCount(OwnerObject, 2U, @"dog.dogName  = 'Harvie'");
+    RLMAssertCount(OwnerObject, 1U, @"dog.dogName != 'Harvie'");
+    RLMAssertCount(OwnerObject, 0U, @"dog.dogName  = 'eivraH'");
+    RLMAssertCount(OwnerObject, 1U, @"dog.dogName  = 'Fido'");
+    RLMAssertCount(OwnerObject, 3U, @"dog.dogName IN {'Fido', 'Harvie'}");
+    RLMAssertCount(OwnerObject, 1U, @"dog.dogName IN {'Fido', 'eivraH'}");
 
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName = 'Harvie' and name = 'Tim'"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName = 'Harvie' and name = 'Jim'"].count), 0U);
+    RLMAssertCount(OwnerObject, 1U, @"dog.dogName = 'Harvie' and name = 'Tim'");
+    RLMAssertCount(OwnerObject, 0U, @"dog.dogName = 'Harvie' and name = 'Jim'");
 
     [self makeDogWithName:@"Rex" owner:@"Rex"];
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName = name"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"name = dog.dogName"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName != name"].count), 3U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"name != dog.dogName"].count), 3U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName == dog.dogName"].count), 4U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.dogName != dog.dogName"].count), 0U);
+    RLMAssertCount(OwnerObject, 1U, @"dog.dogName = name");
+    RLMAssertCount(OwnerObject, 1U, @"name = dog.dogName");
+    RLMAssertCount(OwnerObject, 3U, @"dog.dogName != name");
+    RLMAssertCount(OwnerObject, 3U, @"name != dog.dogName");
+    RLMAssertCount(OwnerObject, 4U, @"dog.dogName == dog.dogName");
+    RLMAssertCount(OwnerObject, 0U, @"dog.dogName != dog.dogName");
 
     // test invalid operators
-    XCTAssertThrows([realm objects:[OwnerObject className] where:@"dog.dogName > 'Harvie'"], @"Invalid operator should throw");
+    XCTAssertThrows([OwnerObject objectsInRealm:realm where:@"dog.dogName > 'Harvie'"], @"Invalid operator should throw");
 }
 
 - (void)testLinkQueryInt
 {
-    RLMRealm *realm = [self realmWithTestPath];
-
     [self makeDogWithAge:5 owner:@"Tim"];
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age  = 5"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age != 5"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age  = 10"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age  = 8"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age IN {5, 8}"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age IN {8, 10}"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age BETWEEN {0, 10}"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age BETWEEN {0, 7}"].count), 1U);
+    RLMAssertCount(OwnerObject, 1U, @"dog.age  = 5");
+    RLMAssertCount(OwnerObject, 0U, @"dog.age != 5");
+    RLMAssertCount(OwnerObject, 0U, @"dog.age  = 10");
+    RLMAssertCount(OwnerObject, 0U, @"dog.age  = 8");
+    RLMAssertCount(OwnerObject, 1U, @"dog.age IN {5, 8}");
+    RLMAssertCount(OwnerObject, 0U, @"dog.age IN {8, 10}");
+    RLMAssertCount(OwnerObject, 1U, @"dog.age BETWEEN {0, 10}");
+    RLMAssertCount(OwnerObject, 1U, @"dog.age BETWEEN {0, 7}");
 
     [self makeDogWithAge:5 owner:@"Joe"];
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age  = 5"].count), 2U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age != 5"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age  = 10"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age  = 8"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age IN {5, 8}"].count), 2U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age IN {8, 10}"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age BETWEEN {0, 10}"].count), 2U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age BETWEEN {0, 7}"].count), 2U);
+    RLMAssertCount(OwnerObject, 2U, @"dog.age  = 5");
+    RLMAssertCount(OwnerObject, 0U, @"dog.age != 5");
+    RLMAssertCount(OwnerObject, 0U, @"dog.age  = 10");
+    RLMAssertCount(OwnerObject, 0U, @"dog.age  = 8");
+    RLMAssertCount(OwnerObject, 2U, @"dog.age IN {5, 8}");
+    RLMAssertCount(OwnerObject, 0U, @"dog.age IN {8, 10}");
+    RLMAssertCount(OwnerObject, 2U, @"dog.age BETWEEN {0, 10}");
+    RLMAssertCount(OwnerObject, 2U, @"dog.age BETWEEN {0, 7}");
 
     [self makeDogWithAge:8 owner:@"Jim"];
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age  = 5"].count), 2U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age != 5"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age  = 10"].count), 0U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age  = 8"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age IN {5, 8}"].count), 3U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age IN {8, 10}"].count), 1U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age BETWEEN {0, 10}"].count), 3U);
-    XCTAssertEqual(([OwnerObject objectsInRealm:realm where:@"dog.age BETWEEN {0, 7}"].count), 2U);
+    RLMAssertCount(OwnerObject, 2U, @"dog.age  = 5");
+    RLMAssertCount(OwnerObject, 1U, @"dog.age != 5");
+    RLMAssertCount(OwnerObject, 0U, @"dog.age  = 10");
+    RLMAssertCount(OwnerObject, 1U, @"dog.age  = 8");
+    RLMAssertCount(OwnerObject, 3U, @"dog.age IN {5, 8}");
+    RLMAssertCount(OwnerObject, 1U, @"dog.age IN {8, 10}");
+    RLMAssertCount(OwnerObject, 3U, @"dog.age BETWEEN {0, 10}");
+    RLMAssertCount(OwnerObject, 2U, @"dog.age BETWEEN {0, 7}");
 }
 
 - (void)testLinkQueryAllTypes
 {
-    RLMRealm *realm = [self realmWithTestPath];
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
     NSDate *now = [NSDate dateWithTimeIntervalSince1970:100000];
 
@@ -1157,30 +1136,27 @@
     [realm addObject:linkToAllTypes];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.boolCol = YES"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.boolCol = NO"] count], 0U);
+    RLMAssertCount(LinkToAllTypesObject, 1U, @"allTypesCol.boolCol = YES");
+    RLMAssertCount(LinkToAllTypesObject, 0U, @"allTypesCol.boolCol = NO");
 
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol = 1"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol != 1"] count], 0U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol > 0"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol > 1"] count], 0U);
+    RLMAssertCount(LinkToAllTypesObject, 1U, @"allTypesCol.intCol = 1");
+    RLMAssertCount(LinkToAllTypesObject, 0U, @"allTypesCol.intCol != 1");
+    RLMAssertCount(LinkToAllTypesObject, 1U, @"allTypesCol.intCol > 0");
+    RLMAssertCount(LinkToAllTypesObject, 0U, @"allTypesCol.intCol > 1");
 
-    NSPredicate *predEq = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol = %f", 1.1];
-    XCTAssertEqual([LinkToAllTypesObject objectsInRealm:realm withPredicate:predEq].count, 1U);
-    NSPredicate *predLessEq = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol <= %f", 1.1];
-    XCTAssertEqual([LinkToAllTypesObject objectsInRealm:realm withPredicate:predLessEq].count, 1U);
-    NSPredicate *predLess = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol < %f", 1.1];
-    XCTAssertEqual([LinkToAllTypesObject objectsInRealm:realm withPredicate:predLess].count, 0U);
+    RLMAssertCount(LinkToAllTypesObject, 1U, @"allTypesCol.floatCol = %f", 1.1);
+    RLMAssertCount(LinkToAllTypesObject, 1U, @"allTypesCol.floatCol <= %f", 1.1);
+    RLMAssertCount(LinkToAllTypesObject, 0U, @"allTypesCol.floatCol < %f", 1.1);
 
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol = 1.11"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol >= 1.11"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol > 1.11"] count], 0U);
+    RLMAssertCount(LinkToAllTypesObject, 1U, @"allTypesCol.doubleCol = 1.11");
+    RLMAssertCount(LinkToAllTypesObject, 1U, @"allTypesCol.doubleCol >= 1.11");
+    RLMAssertCount(LinkToAllTypesObject, 0U, @"allTypesCol.doubleCol > 1.11");
 
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.longCol = 11"] count], 1U);
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.longCol != 11"] count], 0U);
+    RLMAssertCount(LinkToAllTypesObject, 1U, @"allTypesCol.longCol = 11");
+    RLMAssertCount(LinkToAllTypesObject, 0U, @"allTypesCol.longCol != 11");
 
-    XCTAssertEqual(([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.dateCol = %@", now] count]), 1U);
-    XCTAssertEqual(([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.dateCol != %@", now] count]), 0U);
+    RLMAssertCount(LinkToAllTypesObject, 1U, @"allTypesCol.dateCol = %@", now);
+    RLMAssertCount(LinkToAllTypesObject, 0U, @"allTypesCol.dateCol != %@", now);
 }
 
 - (void)testLinkQueryInvalid {
@@ -1198,7 +1174,7 @@
 
 - (void)testLinkQueryMany
 {
-    RLMRealm *realm = [self realmWithTestPath];
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
     ArrayPropertyObject *arrPropObj1 = [[ArrayPropertyObject alloc] init];
     arrPropObj1.name = @"Test";
@@ -1214,11 +1190,12 @@
     [realm addObject:arrPropObj1];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 10"] count], 0U);
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 5"] count], 1U);
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY array.stringCol = '1'"] count], 1U);
-    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol == 5"].count, 0U);
-    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol > 10"].count, 1U);
+    RLMAssertCount(ArrayPropertyObject, 0U, @"ANY intArray.intCol > 10");
+    RLMAssertCount(ArrayPropertyObject, 0U, @"ANY intArray.intCol > 10");
+    RLMAssertCount(ArrayPropertyObject, 1U, @"ANY intArray.intCol > 5");
+    RLMAssertCount(ArrayPropertyObject, 1U, @"ANY array.stringCol = '1'");
+    RLMAssertCount(ArrayPropertyObject, 0U, @"NONE intArray.intCol == 5");
+    RLMAssertCount(ArrayPropertyObject, 1U, @"NONE intArray.intCol > 10");
 
     ArrayPropertyObject *arrPropObj2 = [[ArrayPropertyObject alloc] init];
     arrPropObj2.name = @"Test";
@@ -1233,16 +1210,16 @@
     [realm beginWriteTransaction];
     [realm addObject:arrPropObj2];
     [realm commitWriteTransaction];
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 10"] count], 0U);
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 5"] count], 1U);
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 2"] count], 2U);
-    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol == 5"].count, 1U);
-    XCTAssertEqual([realm objects:[ArrayPropertyObject className] where:@"NONE intArray.intCol > 10"].count, 2U);
+    RLMAssertCount(ArrayPropertyObject, 0U, @"ANY intArray.intCol > 10");
+    RLMAssertCount(ArrayPropertyObject, 1U, @"ANY intArray.intCol > 5");
+    RLMAssertCount(ArrayPropertyObject, 2U, @"ANY intArray.intCol > 2");
+    RLMAssertCount(ArrayPropertyObject, 1U, @"NONE intArray.intCol == 5");
+    RLMAssertCount(ArrayPropertyObject, 2U, @"NONE intArray.intCol > 10");
 }
 
 - (void)testMultiLevelLinkQuery
 {
-    RLMRealm *realm = [self realmWithTestPath];
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
     CircleObject *circle = nil;
@@ -1267,7 +1244,7 @@
 
 - (void)testArrayMultiLevelLinkQuery
 {
-    RLMRealm *realm = [self realmWithTestPath];
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
     CircleObject *circle = nil;
@@ -1278,17 +1255,17 @@
     [CircleArrayObject createInRealm:realm withValue:@[[CircleObject allObjectsInRealm:realm]]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '4'"].count);
-    XCTAssertEqual(0U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '4'"].count);
-    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '3'"].count);
-    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '3'"].count);
-    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"NONE circles.next.data = '4'"].count);
+    RLMAssertCount(CircleArrayObject, 1U, @"ANY circles.data = '4'");
+    RLMAssertCount(CircleArrayObject, 0U, @"ANY circles.next.data = '4'");
+    RLMAssertCount(CircleArrayObject, 1U, @"ANY circles.next.data = '3'");
+    RLMAssertCount(CircleArrayObject, 1U, @"ANY circles.data = '3'");
+    RLMAssertCount(CircleArrayObject, 1U, @"NONE circles.next.data = '4'");
 
-    XCTAssertEqual(0U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.next.data = '3'"].count);
-    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.next.data = '2'"].count);
-    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '2'"].count);
-    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '2'"].count);
-    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"NONE circles.next.next.data = '3'"].count);
+    RLMAssertCount(CircleArrayObject, 0U, @"ANY circles.next.next.data = '3'");
+    RLMAssertCount(CircleArrayObject, 1U, @"ANY circles.next.next.data = '2'");
+    RLMAssertCount(CircleArrayObject, 1U, @"ANY circles.next.data = '2'");
+    RLMAssertCount(CircleArrayObject, 1U, @"ANY circles.data = '2'");
+    RLMAssertCount(CircleArrayObject, 1U, @"NONE circles.next.next.data = '3'");
 
     XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY data = '2'"]);
     XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY circles.next = '2'"]);
@@ -1325,23 +1302,21 @@
     [realm commitWriteTransaction];
 
     // simple queries
-    XCTAssertEqual(2U, ([AllTypesObject objectsWhere:@"objectCol = %@", stringObj0].count));
-    XCTAssertEqual(1U, ([AllTypesObject objectsWhere:@"objectCol = %@", stringObj1].count));
-    XCTAssertEqual(1U, ([AllTypesObject objectsWhere:@"objectCol = nil"].count));
-    XCTAssertEqual(4U, ([AllTypesObject objectsWhere:@"objectCol != nil"].count));
-    XCTAssertEqual(3U, ([AllTypesObject objectsWhere:@"objectCol != %@", stringObj0].count));
+    RLMAssertCount(AllTypesObject, 2U, @"objectCol = %@", stringObj0);
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol = %@", stringObj1);
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol = nil");
+    RLMAssertCount(AllTypesObject, 4U, @"objectCol != nil");
+    RLMAssertCount(AllTypesObject, 3U, @"objectCol != %@", stringObj0);
 
-    NSPredicate *longPred = [NSPredicate predicateWithFormat:@"longCol = %lli", 34359738368];
-    XCTAssertEqual([AllTypesObject objectsWithPredicate:longPred].count, 1U, @"Count should be 1");
+    RLMAssertCount(AllTypesObject, 1U, @"longCol = %lli", 34359738368);
 
-    NSPredicate *longBetweenPred = [NSPredicate predicateWithFormat:@"longCol BETWEEN %@", @[@34359738367LL, @34359738369LL]];
-    XCTAssertEqual([AllTypesObject objectsWithPredicate:longBetweenPred].count, 1U, @"Count should be 1");
+    RLMAssertCount(AllTypesObject, 1U, @"longCol BETWEEN %@", @[@34359738367LL, @34359738369LL]);
 
     // check for ANY object in array
-    XCTAssertEqual(2U, ([ArrayOfAllTypesObject objectsWhere:@"ANY array = %@", obj0].count));
-    XCTAssertEqual(2U, ([ArrayOfAllTypesObject objectsWhere:@"ANY array != %@", obj1].count));
-    XCTAssertEqual(2U, ([ArrayOfAllTypesObject objectsWhere:@"NONE array = %@", obj0].count));
-    XCTAssertEqual(2U, ([ArrayOfAllTypesObject objectsWhere:@"NONE array != %@", obj1].count));
+    RLMAssertCount(ArrayOfAllTypesObject, 2U, @"ANY array = %@", obj0);
+    RLMAssertCount(ArrayOfAllTypesObject, 2U, @"ANY array != %@", obj1);
+    RLMAssertCount(ArrayOfAllTypesObject, 2U, @"NONE array = %@", obj0);
+    RLMAssertCount(ArrayOfAllTypesObject, 2U, @"NONE array != %@", obj1);
     XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array = %@", obj0].count));
     XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array != %@", obj0].count));
 }
@@ -1354,8 +1329,8 @@
     [PersonObject createInRealm:realm withValue:@[@"Ari", @33]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(2U, [[PersonObject objectsWhere:@"name == 'Ari' or age < 30"] count]);
-    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name == 'Ari' or age > 40"] count]);
+    RLMAssertCount(PersonObject, 2U, @"name == 'Ari' or age < 30");
+    RLMAssertCount(PersonObject, 1U, @"name == 'Ari' or age > 40");
 }
 
 - (void)testCompoundAndQuery {
@@ -1366,8 +1341,8 @@
     [PersonObject createInRealm:realm withValue:@[@"Ari", @33]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name == 'Ari' and age > 30"] count]);
-    XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name == 'Ari' and age > 40"] count]);
+    RLMAssertCount(PersonObject, 1U, @"name == 'Ari' and age > 30");
+    RLMAssertCount(PersonObject, 0U, @"name == 'Ari' and age > 40");
 }
 
 - (void)testClass:(Class)class
@@ -1377,12 +1352,13 @@
 {
     va_list args;
     va_start(args, predicateFormat);
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateFormat arguments:args];
     va_end(args);
-    XCTAssertEqual(normalCount, [[class objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]] count]);
-    predicateFormat = [NSString stringWithFormat:@"NOT(%@)", predicateFormat];
-    va_start(args, predicateFormat);
-    va_end(args);
-    XCTAssertEqual(notCount, [[class objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]] count]);
+
+    XCTAssertEqual(normalCount, [[class objectsWithPredicate:predicate] count]);
+
+    predicate = [NSCompoundPredicate notPredicateWithSubpredicate:predicate];
+    XCTAssertEqual(notCount, [[class objectsWithPredicate:predicate] count]);
 }
 
 - (void)testINPredicate
@@ -1508,8 +1484,8 @@
 
     // mixed
     // FIXME: Support IN predicates with mixed properties
-    XCTAssertThrows(([[AllTypesObject objectsWhere:@"mixedCol IN %@", @[@0, @2, @3]] count]));
-    XCTAssertThrows(([[AllTypesObject objectsWhere:@"NOT(mixedCol IN %@)", @[@0, @2, @3]] count]));
+    XCTAssertThrows(([AllTypesObject objectsWhere:@"mixedCol IN %@", @[@0, @2, @3]]));
+    XCTAssertThrows(([AllTypesObject objectsWhere:@"NOT(mixedCol IN %@)", @[@0, @2, @3]]));
 
     // string subobject
     [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"objectCol.stringCol IN %@", @[@"abc"]];
@@ -1529,15 +1505,15 @@
     [realm commitWriteTransaction];
 
 
-    XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"ANY array.stringCol IN %@", @[@"missing"]] count]));
-    XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"ANY array.stringCol IN %@", @[@"value"]] count]));
-    XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"NONE array.stringCol IN %@", @[@"missing"]] count]));
-    XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"NONE array.stringCol IN %@", @[@"value"]] count]));
+    RLMAssertCount(ArrayPropertyObject, 0U, @"ANY array.stringCol IN %@", @[@"missing"]);
+    RLMAssertCount(ArrayPropertyObject, 1U, @"ANY array.stringCol IN %@", @[@"value"]);
+    RLMAssertCount(ArrayPropertyObject, 1U, @"NONE array.stringCol IN %@", @[@"missing"]);
+    RLMAssertCount(ArrayPropertyObject, 0U, @"NONE array.stringCol IN %@", @[@"value"]);
 
-    XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]] count]));
-    XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]] count]));
-    XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"NONE array IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]] count]));
-    XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"NONE array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]] count]));
+    RLMAssertCount(ArrayPropertyObject, 0U, @"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]);
+    RLMAssertCount(ArrayPropertyObject, 1U, @"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]);
+    RLMAssertCount(ArrayPropertyObject, 1U, @"NONE array IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]);
+    RLMAssertCount(ArrayPropertyObject, 0U, @"NONE array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]);
 }
 
 - (void)testQueryChaining {
@@ -1548,8 +1524,8 @@
     [PersonObject createInRealm:realm withValue:@[@"Ari", @33]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name == 'Ari'"] count]);
-    XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name == 'Ari' and age == 29"] count]);
+    RLMAssertCount(PersonObject, 1U, @"name == 'Ari'");
+    RLMAssertCount(PersonObject, 0U, @"name == 'Ari' and age == 29");
     XCTAssertEqual(0U, [[[PersonObject objectsWhere:@"name == 'Ari'"] objectsWhere:@"age == 29"] count]);
 }
 
@@ -1564,12 +1540,12 @@
     [realm commitWriteTransaction];
 
     CompanyObject *co = [CompanyObject allObjects][0];
-    XCTAssertEqual(1U, [co.employees objectsWhere:@"hired = NO"].count);
-    XCTAssertEqual(2U, [co.employees objectsWhere:@"hired = YES"].count);
-    XCTAssertEqual(1U, [co.employees objectsWhere:@"hired = YES AND age = 40"].count);
-    XCTAssertEqual(0U, [co.employees objectsWhere:@"hired = YES AND age = 30"].count);
-    XCTAssertEqual(3U, [co.employees objectsWhere:@"hired = YES OR age = 30"].count);
-    XCTAssertEqual(1U, [[co.employees objectsWhere:@"hired = YES"] objectsWhere:@"name = 'Joe'"].count);
+    RLMAssertCount(co.employees, 1U, @"hired = NO");
+    RLMAssertCount(co.employees, 2U, @"hired = YES");
+    RLMAssertCount(co.employees, 1U, @"hired = YES AND age = 40");
+    RLMAssertCount(co.employees, 0U, @"hired = YES AND age = 30");
+    RLMAssertCount(co.employees, 3U, @"hired = YES OR age = 30");
+    RLMAssertCount([co.employees, 1U, @"hired = YES"] objectsWhere:@"name = 'Joe'");
 }
 
 - (void)testLinkViewQueryLifetime {
@@ -1689,32 +1665,32 @@
 
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(4U, [self.queryObjectClass objectsWhere:@"TRUE == bool1"].count);
-    XCTAssertEqual(3U, [self.queryObjectClass objectsWhere:@"TRUE != bool2"].count);
+    RLMAssertCount(self.queryObjectClass, 4U, @"TRUE == bool1");
+    RLMAssertCount(self.queryObjectClass, 3U, @"TRUE != bool2");
 
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"1 == int1"].count);
-    XCTAssertEqual(5U, [self.queryObjectClass objectsWhere:@"2 != int2"].count);
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"2 > int1"].count);
-    XCTAssertEqual(4U, [self.queryObjectClass objectsWhere:@"2 < int1"].count);
-    XCTAssertEqual(3U, [self.queryObjectClass objectsWhere:@"2 >= int1"].count);
-    XCTAssertEqual(5U, [self.queryObjectClass objectsWhere:@"2 <= int1"].count);
+    RLMAssertCount(self.queryObjectClass, 2U, @"1 == int1");
+    RLMAssertCount(self.queryObjectClass, 5U, @"2 != int2");
+    RLMAssertCount(self.queryObjectClass, 2U, @"2 > int1");
+    RLMAssertCount(self.queryObjectClass, 4U, @"2 < int1");
+    RLMAssertCount(self.queryObjectClass, 3U, @"2 >= int1");
+    RLMAssertCount(self.queryObjectClass, 5U, @"2 <= int1");
 
-    XCTAssertEqual(3U, [self.queryObjectClass objectsWhere:@"1.0 == float1"].count);
-    XCTAssertEqual(6U, [self.queryObjectClass objectsWhere:@"1.0 != float2"].count);
-    XCTAssertEqual(1U, [self.queryObjectClass objectsWhere:@"1.0 > float1"].count);
-    XCTAssertEqual(6U, [self.queryObjectClass objectsWhere:@"1.0 < float2"].count);
-    XCTAssertEqual(4U, [self.queryObjectClass objectsWhere:@"1.0 >= float1"].count);
-    XCTAssertEqual(7U, [self.queryObjectClass objectsWhere:@"1.0 <= float2"].count);
+    RLMAssertCount(self.queryObjectClass, 3U, @"1.0 == float1");
+    RLMAssertCount(self.queryObjectClass, 6U, @"1.0 != float2");
+    RLMAssertCount(self.queryObjectClass, 1U, @"1.0 > float1");
+    RLMAssertCount(self.queryObjectClass, 6U, @"1.0 < float2");
+    RLMAssertCount(self.queryObjectClass, 4U, @"1.0 >= float1");
+    RLMAssertCount(self.queryObjectClass, 7U, @"1.0 <= float2");
 
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"1.0 == double1"].count);
-    XCTAssertEqual(5U, [self.queryObjectClass objectsWhere:@"1.0 != double1"].count);
-    XCTAssertEqual(1U, [self.queryObjectClass objectsWhere:@"5.0 > double2"].count);
-    XCTAssertEqual(6U, [self.queryObjectClass objectsWhere:@"5.0 < double2"].count);
-    XCTAssertEqual(2U, [self.queryObjectClass objectsWhere:@"5.55 >= double2"].count);
-    XCTAssertEqual(6U, [self.queryObjectClass objectsWhere:@"5.55 <= double2"].count);
+    RLMAssertCount(self.queryObjectClass, 2U, @"1.0 == double1");
+    RLMAssertCount(self.queryObjectClass, 5U, @"1.0 != double1");
+    RLMAssertCount(self.queryObjectClass, 1U, @"5.0 > double2");
+    RLMAssertCount(self.queryObjectClass, 6U, @"5.0 < double2");
+    RLMAssertCount(self.queryObjectClass, 2U, @"5.55 >= double2");
+    RLMAssertCount(self.queryObjectClass, 6U, @"5.55 <= double2");
 
-    XCTAssertEqual(1U, [self.queryObjectClass objectsWhere:@"'a' == string2"].count);
-    XCTAssertEqual(6U, [self.queryObjectClass objectsWhere:@"'a' != string2"].count);
+    RLMAssertCount(self.queryObjectClass, 1U, @"'a' == string2");
+    RLMAssertCount(self.queryObjectClass, 6U, @"'a' != string2");
 
     RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"'Realm' CONTAINS string1"].count,
                                       @"Operator 'CONTAINS' is not supported .* right side");
@@ -1756,15 +1732,15 @@
         XCTAssertEqual(3U, nonNilStrings.count);
         XCTAssertEqualObjects((@[@"a", @"b", @""]), [nonNilStrings valueForKey:@"stringCol"]);
 
-        XCTAssertEqual(3U, [stringObjectClass objectsInRealm:realm where:@"stringCol IN {NULL, 'a'}"].count);
+        RLMAssertCount(stringObjectClass, 3U, @"stringCol IN {NULL, 'a'}");
 
-        XCTAssertEqual(1U, [stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS 'a'"].count);
-        XCTAssertEqual(1U, [stringObjectClass objectsInRealm:realm where:@"stringCol BEGINSWITH 'a'"].count);
-        XCTAssertEqual(1U, [stringObjectClass objectsInRealm:realm where:@"stringCol ENDSWITH 'a'"].count);
+        RLMAssertCount(stringObjectClass, 1U, @"stringCol CONTAINS 'a'");
+        RLMAssertCount(stringObjectClass, 1U, @"stringCol BEGINSWITH 'a'");
+        RLMAssertCount(stringObjectClass, 1U, @"stringCol ENDSWITH 'a'");
 
-        XCTAssertEqual(0U, [stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS 'z'"].count);
+        RLMAssertCount(stringObjectClass, 0U, @"stringCol CONTAINS 'z'");
 
-        XCTAssertEqual(1U, [stringObjectClass objectsInRealm:realm where:@"stringCol = ''"].count);
+        RLMAssertCount(stringObjectClass, 1U, @"stringCol = ''");
 
         RLMResults *sorted = [[stringObjectClass allObjectsInRealm:realm] sortedResultsUsingProperty:@"stringCol" ascending:YES];
         XCTAssertEqualObjects((@[NSNull.null, NSNull.null, @"", @"a", @"b"]), [sorted valueForKey:@"stringCol"]);
@@ -1810,15 +1786,15 @@
         XCTAssertEqual(3U, nonNilStrings.count);
         XCTAssertEqualObjects((@[@"a", @"b", @""]), [nonNilStrings valueForKeyPath:@"objectCol.stringCol"]);
 
-        XCTAssertEqual(3U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol IN {NULL, 'a'}"].count);
+        RLMAssertCount(stringLinkClass, 3U, @"objectCol.stringCol IN {NULL, 'a'}");
 
-        XCTAssertEqual(1U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol CONTAINS 'a'"].count);
-        XCTAssertEqual(1U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol BEGINSWITH 'a'"].count);
-        XCTAssertEqual(1U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol ENDSWITH 'a'"].count);
+        RLMAssertCount(stringLinkClass, 1U, @"objectCol.stringCol CONTAINS 'a'");
+        RLMAssertCount(stringLinkClass, 1U, @"objectCol.stringCol BEGINSWITH 'a'");
+        RLMAssertCount(stringLinkClass, 1U, @"objectCol.stringCol ENDSWITH 'a'");
 
-        XCTAssertEqual(0U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol CONTAINS 'z'"].count);
+        RLMAssertCount(stringLinkClass, 0U, @"objectCol.stringCol CONTAINS 'z'");
 
-        XCTAssertEqual(1U, [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol = ''"].count);
+        RLMAssertCount(stringLinkClass, 1U, @"objectCol.stringCol = ''");
     };
 
     testWithStringClass([LinkStringObject class], [StringObject class]);
@@ -1889,23 +1865,27 @@
 
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@count > 0"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@count == 3"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@count < 1"].count));
-    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"0 < array.@count"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"3 == array.@count"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"1 >  array.@count"].count));
+    RLMAssertCount(IntegerArrayPropertyObject, 2U, @"array.@count > 0");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@count == 3");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@count < 1");
+    RLMAssertCount(IntegerArrayPropertyObject, 2U, @"0 < array.@count");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"3 == array.@count");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"1 >  array.@count");
 
-    XCTAssertEqual(2U, [IntegerArrayPropertyObject objectsWhere:@"array.@count == number"].count);
-    XCTAssertEqual(1U, [IntegerArrayPropertyObject objectsWhere:@"array.@count > number"].count);
-    XCTAssertEqual(1U, [IntegerArrayPropertyObject objectsWhere:@"number < array.@count"].count);
+    RLMAssertCount(IntegerArrayPropertyObject, 2U, @"array.@count == number");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@count > number");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"number < array.@count");
 
     // We do not yet handle collection operations on both sides of the comparison.
-    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count == array.@count"]), @"aggregate operations cannot be compared with other aggregate operations");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count == array.@count"]),
+                                      @"aggregate operations cannot be compared with other aggregate operations");
 
-    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.foo.bar != 0"]), @"single level key");
-    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.intCol > 0"]), @"@count does not have any properties");
-    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count != 'Hello'"]), @"@count can only be compared with a numeric value");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.foo.bar != 0"]),
+                                      @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count.intCol > 0"]),
+                                      @"@count does not have any properties");
+    RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@count != 'Hello'"]),
+                                      @"@count can only be compared with a numeric value");
 }
 
 - (void)testAggregateCollectionOperators {
@@ -1924,36 +1904,36 @@
 
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == -12345"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == 100"].count));
-    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol < 1000"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol > -1000"].count));
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@min.intCol == -12345");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@min.intCol == 100");
+    RLMAssertCount(IntegerArrayPropertyObject, 2U, @"array.@min.intCol < 1000");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@min.intCol > -1000");
 
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol == 1234"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol == 100"].count));
-    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol > -1000"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol > 1000"].count));
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@max.intCol == 1234");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@max.intCol == 100");
+    RLMAssertCount(IntegerArrayPropertyObject, 2U, @"array.@max.intCol > -1000");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@max.intCol > 1000");
 
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol == 100"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol == -11109"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol == 0"].count));
-    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol > -50"].count));
-    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol < 50"].count));
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@sum.intCol == 100");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@sum.intCol == -11109");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@sum.intCol == 0");
+    RLMAssertCount(IntegerArrayPropertyObject, 2U, @"array.@sum.intCol > -50");
+    RLMAssertCount(IntegerArrayPropertyObject, 2U, @"array.@sum.intCol < 50");
 
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol == 100"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol == -3703.0"].count));
-    XCTAssertEqual(0U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol == 0"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol < -50"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol > 50"].count));
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@avg.intCol == 100");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@avg.intCol == -3703.0");
+    RLMAssertCount(IntegerArrayPropertyObject, 0U, @"array.@avg.intCol == 0");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@avg.intCol < -50");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@avg.intCol > 50");
 
-    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol < number"].count));
-    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"number > array.@min.intCol"].count));
+    RLMAssertCount(IntegerArrayPropertyObject, 2U, @"array.@min.intCol < number");
+    RLMAssertCount(IntegerArrayPropertyObject, 2U, @"number > array.@min.intCol");
 
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol < number"].count));
-    XCTAssertEqual(1U, ([IntegerArrayPropertyObject objectsWhere:@"number > array.@max.intCol"].count));
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"array.@max.intCol < number");
+    RLMAssertCount(IntegerArrayPropertyObject, 1U, @"number > array.@max.intCol");
 
-    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"array.@avg.intCol < number"].count));
-    XCTAssertEqual(2U, ([IntegerArrayPropertyObject objectsWhere:@"number > array.@avg.intCol"].count));
+    RLMAssertCount(IntegerArrayPropertyObject, 2U, @"array.@avg.intCol < number");
+    RLMAssertCount(IntegerArrayPropertyObject, 2U, @"number > array.@avg.intCol");
 
     // We do not yet handle collection operations on both sides of the comparison.
     RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == array.@min.intCol"]), @"aggregate operations cannot be compared with other aggregate operations");
