@@ -21,7 +21,6 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
-#import "RLMPredicateUtil.h"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"

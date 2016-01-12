@@ -309,8 +309,6 @@
 		E856D21F195615B100FB2FCF /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC51955FE0100FDED82 /* RLMTestCase.m */; };
 		E8917598197A1B350068ACC6 /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8917597197A1B350068ACC6 /* UnicodeTests.m */; };
 		E8917599197A1B350068ACC6 /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8917597197A1B350068ACC6 /* UnicodeTests.m */; };
-		E8A5DEED1968E520006A50F6 /* RLMPredicateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */; };
-		E8A5DEEE1968E521006A50F6 /* RLMPredicateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */; };
 		E8BF67FC1C24D07100E591CD /* SwiftVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */; };
 /* End PBXBuildFile section */
 
@@ -592,8 +590,6 @@
 		E8917597197A1B350068ACC6 /* UnicodeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnicodeTests.m; sourceTree = "<group>"; };
 		E891759A197A1B600068ACC6 /* SwiftUnicodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUnicodeTests.swift; sourceTree = "<group>"; };
 		E8951F01196C96DE00D6461C /* RLMRealm_Dynamic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealm_Dynamic.h; sourceTree = "<group>"; };
-		E8A543AD195C9C9E00990A20 /* RLMPredicateUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPredicateUtil.h; sourceTree = "<group>"; };
-		E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPredicateUtil.m; sourceTree = "<group>"; };
 		E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftVersion.swift; sourceTree = "<group>"; };
 		E8D89B9D1955FC6D00CF2B9A /* Realm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Realm.h; sourceTree = "<group>"; };
 		E8D89BA31955FC6D00CF2B9A /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -835,8 +831,6 @@
 				C0D6E4101AFBFAF7001F3027 /* RLMAssertions.h */,
 				027A4D2A1AB1012500AA46F9 /* RLMMultiProcessTestCase.h */,
 				027A4D2B1AB1012500AA46F9 /* RLMMultiProcessTestCase.m */,
-				E8A543AD195C9C9E00990A20 /* RLMPredicateUtil.h */,
-				E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */,
 				E81A1FC41955FE0100FDED82 /* RLMTestCase.h */,
 				E81A1FC51955FE0100FDED82 /* RLMTestCase.m */,
 				3F44109E19953F5900223146 /* RLMTestObjects.h */,
@@ -988,8 +982,8 @@
 		E8D89BA81955FC6D00CF2B9A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				E81A1FC21955FE0100FDED82 /* RealmTests-Info.plist */,
 				29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */,
+				E81A1FC21955FE0100FDED82 /* RealmTests-Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -1602,6 +1596,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5D660FF11BE98D670021E04F /* Aliases.swift in Sources */,
+				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
 				5D660FF31BE98D670021E04F /* Migration.swift in Sources */,
 				5D660FF41BE98D670021E04F /* Object.swift in Sources */,
@@ -1614,7 +1609,6 @@
 				5D660FFB1BE98D670021E04F /* Results.swift in Sources */,
 				5D660FFC1BE98D670021E04F /* Schema.swift in Sources */,
 				5D660FFD1BE98D670021E04F /* SortDescriptor.swift in Sources */,
-				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
 				E8BF67FC1C24D07100E591CD /* SwiftVersion.swift in Sources */,
 				5D660FFE1BE98D670021E04F /* Util.swift in Sources */,
 			);
@@ -1708,7 +1702,6 @@
 				E856D21E195615A900FB2FCF /* RealmTests.mm in Sources */,
 				02AFB4681A80343600E11938 /* ResultsTests.m in Sources */,
 				3FC767071BB9FE7500FE0AFC /* RLMMultiProcessTestCase.m in Sources */,
-				E8A5DEEE1968E521006A50F6 /* RLMPredicateUtil.m in Sources */,
 				3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */,
 				E856D21F195615B100FB2FCF /* RLMTestCase.m in Sources */,
 				028481CB19CCFC9C0097A416 /* RLMTestObjects.m in Sources */,
@@ -1752,24 +1745,23 @@
 				E81A1FEB1955FE0100FDED82 /* RealmTests.mm in Sources */,
 				02AFB4671A80343600E11938 /* ResultsTests.m in Sources */,
 				027A4D2D1AB1012500AA46F9 /* RLMMultiProcessTestCase.m in Sources */,
-				E8A5DEED1968E520006A50F6 /* RLMPredicateUtil.m in Sources */,
 				3FDCFEB619F6A8D3005E414A /* RLMSupport.swift in Sources */,
 				E81A1FEE1955FE0100FDED82 /* RLMTestCase.m in Sources */,
+				297FBEFB1C19F696009D1118 /* RLMTestCaseUtils.swift in Sources */,
 				028481EF19CD032C0097A416 /* RLMTestObjects.m in Sources */,
 				0207AB89195DFA15007EFB12 /* SchemaTests.mm in Sources */,
-				297FBEFB1C19F696009D1118 /* RLMTestCaseUtils.swift in Sources */,
 				3FB4FA1819F5D2740020D53B /* SwiftArrayPropertyTests.swift in Sources */,
 				3FB4FA1919F5D2740020D53B /* SwiftArrayTests.swift in Sources */,
 				3FB4FA1A19F5D2740020D53B /* SwiftDynamicTests.swift in Sources */,
 				3FB4FA1B19F5D2740020D53B /* SwiftLinkTests.swift in Sources */,
 				3FB4FA1C19F5D2740020D53B /* SwiftMixedTests.swift in Sources */,
 				3FB4FA1D19F5D2740020D53B /* SwiftObjectInterfaceTests.swift in Sources */,
-				297FBEFF1C19F844009D1118 /* TestUtils.mm in Sources */,
 				3FB4FA1E19F5D2740020D53B /* SwiftPropertyTypeTest.swift in Sources */,
 				3FB4FA1F19F5D2740020D53B /* SwiftRealmTests.swift in Sources */,
 				3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */,
 				3FB4FA1719F5D2740020D53B /* SwiftTestObjects.swift in Sources */,
 				3FB4FA2019F5D2740020D53B /* SwiftUnicodeTests.swift in Sources */,
+				297FBEFF1C19F844009D1118 /* TestUtils.mm in Sources */,
 				E81A20021955FE0100FDED82 /* TransactionTests.m in Sources */,
 				E8917598197A1B350068ACC6 /* UnicodeTests.m in Sources */,
 				C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */,
