@@ -84,13 +84,264 @@
 
 #pragma mark - Tests
 
+#define RLMAssertCount(cls, expectedCount, ...) \
+    XCTAssertEqual(expectedCount, ([cls objectsWhere:__VA_ARGS__].count))
+
+@interface QueryConstructionTests : RLMTestCase
+@end
+
+@implementation QueryConstructionTests
+- (void)testQueryingNilRealmThrows {
+    XCTAssertThrows([PersonObject allObjectsInRealm:self.nonLiteralNil]);
+}
+
+- (void)testDynamicQueryInvalidClass
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    // class not derived from RLMObject
+    XCTAssertThrows([realm objects:@"NonRealmPersonObject" where:@"age > 25"], @"invalid object type");
+    XCTAssertThrows([[realm objects:@"NonRealmPersonObject" where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"invalid object type");
+
+    // empty string for class name
+    XCTAssertThrows([realm objects:@"" where:@"age > 25"], @"missing class name");
+    XCTAssertThrows([[realm objects:@"" where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"missing class name");
+
+    // nil class name
+    XCTAssertThrows([realm objects:nil where:@"age > 25"], @"nil class name");
+    XCTAssertThrows([[realm objects:nil where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"nil class name");
+}
+
+- (void)testPredicateValidUse
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    // boolean false
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == no"], @"== no");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == No"], @"== No");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == NO"], @"== NO");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == false"], @"== false");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == False"], @"== False");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == FALSE"], @"== FALSE");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == 0"], @"== 0");
+
+    // boolean true
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == yes"], @"== yes");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == Yes"], @"== Yes");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == YES"], @"== YES");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == true"], @"== true");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == True"], @"== True");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == TRUE"], @"== TRUE");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == 1"], @"== 1");
+
+    // inequality
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol != YES"], @"!= YES");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol <> YES"], @"<> YES");
+}
+
+- (void)testPredicateNotSupported
+{
+    // These are things which are valid predicates, but which we do not support
+
+    // Aggregate operators on non-arrays
+    XCTAssertThrows([PersonObject objectsWhere:@"ANY age > 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"ALL age > 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"SOME age > 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"NONE age > 5"]);
+
+    // nil on LHS of comparison with nullable property
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = boolObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = intObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = floatObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = doubleObj"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = string"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = data"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = date"]);
+
+    // comparing two constants
+    XCTAssertThrows([PersonObject objectsWhere:@"5 = 5"]);
+    XCTAssertThrows([PersonObject objectsWhere:@"nil = nil"]);
+
+    // substring operations with constant on LHS
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' CONTAINS string"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' BEGINSWITH string"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' ENDSWITH string"]);
+    XCTAssertThrows(([AllOptionalTypes objectsWhere:@"%@ CONTAINS data", [NSData data]]));
+
+    // data is missing stuff
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"data = data"]);
+    XCTAssertThrows(([LinkToAllTypesObject objectsWhere:@"%@ = allTypesCol.binaryCol", [NSData data]]));
+    XCTAssertThrows(([LinkToAllTypesObject objectsWhere:@"allTypesCol.binaryCol CONTAINS %@", [NSData data]]));
+
+    // LinkList equality is unsupport since the semantics are unclear
+    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"ANY array = array"]));
+
+    // subquery
+    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"SUBQUERY(array, $obj, $obj.intCol = 5).@count > 1"]));
+
+    // block-based predicate
+    NSPredicate *pred = [NSPredicate predicateWithBlock:^BOOL (__unused id obj, __unused NSDictionary *bindings) {
+        return true;
+    }];
+    XCTAssertThrows([IntObject objectsWithPredicate:pred]);
+}
+
+- (void)testPredicateMisuse
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    NSString *className = PersonObject.className;
+
+    // invalid column/property name
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"height > 72"], @"'height' not found in .* 'PersonObject'");
+
+    // wrong/invalid data types
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age != xyz"], @"'xyz' not found in .* 'PersonObject'");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"name == 3"], @"type string .* property 'name' .* 'PersonObject'.*: 3");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age IN {'xyz'}"], @"type int .* property 'age' .* 'PersonObject'.*: xyz");
+    XCTAssertThrows([realm objects:className where:@"name IN {3}"], @"invalid type");
+
+    className = AllTypesObject.className;
+
+    XCTAssertThrows([realm objects:className where:@"boolCol == Foo"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"boolCol == 2"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"dateCol == 7"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"doubleCol == The"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"floatCol == Bar"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"intCol == Baz"], @"invalid type");
+
+    className = PersonObject.className;
+
+    // compare two constants
+    XCTAssertThrows([realm objects:className where:@"3 == 3"], @"comparing 2 constants");
+
+    // invalid strings
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@""], @"Unable to parse");
+    XCTAssertThrows([realm objects:className where:@"age"], @"column name only");
+    XCTAssertThrows([realm objects:className where:@"sdlfjasdflj"], @"gibberish");
+    XCTAssertThrows([realm objects:className where:@"age * 25"], @"invalid operator");
+    XCTAssertThrows([realm objects:className where:@"age === 25"], @"invalid operator");
+    XCTAssertThrows([realm objects:className where:@","], @"comma");
+    XCTAssertThrows([realm objects:className where:@"()"], @"parens");
+
+    // Misspelled keypath (should be %K)
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"@K == YES"], @"'@K' is not a valid key path'");
+
+    // not a link column
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age.age == 25"], @"'age' is not a link .* 'PersonObject'");
+    XCTAssertThrows([realm objects:className where:@"age.age.age == 25"]);
+
+    // abuse of BETWEEN
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN 25"], @"type NSArray for BETWEEN");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN Foo"], @"BETWEEN operator must compare a KeyPath with an aggregate");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {age, age}"], @"must be constant values");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {age, 0}"], @"must be constant values");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {0, age}"], @"must be constant values");
+    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {0, {1, 10}}"], @"must be constant values");
+
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1]];
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"exactly two objects");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1, @2, @3]];
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"exactly two objects");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@"Foo", @"Bar"]];
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type int for BETWEEN");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1.5, @2.5]];
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type int for BETWEEN");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1, @[@2, @3]]];
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type int for BETWEEN");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @{@25 : @35}];
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type NSArray for BETWEEN");
+
+    pred = [NSPredicate predicateWithFormat:@"height BETWEEN %@", @[@25, @35]];
+    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"'height' not found .* 'PersonObject'");
+
+    // bad type in link IN
+    XCTAssertThrows([PersonLinkObject objectsInRealm:realm where:@"person.age IN {'Tim'}"]);
+}
+
+- (void)testStringUnsupportedOperations
+{
+    XCTAssertThrows([StringObject objectsWhere:@"stringCol LIKE 'abc'"]);
+    XCTAssertThrows([StringObject objectsWhere:@"stringCol MATCHES 'abc'"]);
+    XCTAssertThrows([StringObject objectsWhere:@"stringCol BETWEEN {'a', 'b'}"]);
+    XCTAssertThrows([StringObject objectsWhere:@"stringCol < 'abc'"]);
+
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol LIKE 'abc'"]);
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol MATCHES 'abc'"]);
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol BETWEEN {'a', 'b'}"]);
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol < 'abc'"]);
+}
+
+- (void)testBinaryComparisonInPredicate {
+    NSData *data = [NSData data];
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol BEGINSWITH %@", data);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol ENDSWITH %@", data);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol CONTAINS %@", data);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol = %@", data);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol != %@", data);
+
+    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol < %@", data]));
+    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol <= %@", data]));
+    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol > %@", data]));
+    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol >= %@", data]));
+
+    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol LIKE %@", data]));
+    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol MATCHES %@", data]));
+}
+
+- (void)testLinkQueryInvalid {
+    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.binaryCol = 'a'"], @"Binary data not supported");
+    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.mixedCol = 'a'"], @"Mixed data not supported");
+    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.invalidCol = 'a'"], @"Invalid column name should throw");
+
+    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.longCol = 'a'"], @"Wrong data type should throw");
+
+    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"intArray.intCol > 5"], @"RLMArray query without ANY modifier should throw");
+
+    RLMAssertThrowsWithReasonMatching([LinkToAllTypesObject objectsWhere:@"allTypesCol.intCol = allTypesCol.doubleCol"], @"Property type mismatch");
+}
+
+- (void)testNumericOperatorsOnClass:(Class)class property:(NSString *)property value:(id)value {
+    NSArray *operators = @[@"<", @"<=", @">", @">=", @"==", @"!="];
+    for (NSString *operator in operators) {
+        NSString *fmt = [@[property, operator, @"%@"] componentsJoinedByString:@" "];
+        RLMAssertCount(class, 0U, fmt, value);
+    }
+}
+
+- (void)testValidOperatorsInNumericComparison {
+    [self testNumericOperatorsOnClass:[IntObject class] property:@"intCol" value:@0];
+    [self testNumericOperatorsOnClass:[FloatObject class] property:@"floatCol" value:@0];
+    [self testNumericOperatorsOnClass:[DoubleObject class] property:@"doubleCol" value:@0];
+    [self testNumericOperatorsOnClass:[DateObject class] property:@"dateCol" value:NSDate.date];
+}
+
+- (void)testStringOperatorsOnClass:(Class)class property:(NSString *)property value:(id)value {
+    NSArray *operators = @[@"BEGINSWITH", @"ENDSWITH", @"CONTAINS", @"LIKE", @"MATCHES"];
+    for (NSString *operator in operators) {
+        NSString *fmt = [@[property, operator, @"%@"] componentsJoinedByString:@" "];
+        RLMAssertThrowsWithReasonMatching(([class objectsWhere:fmt, value]),
+                                          @"not supported for type");
+    }
+}
+
+- (void)testInvalidOperatorsInNumericComparison {
+    [self testStringOperatorsOnClass:[IntObject class] property:@"intCol" value:@0];
+    [self testStringOperatorsOnClass:[FloatObject class] property:@"floatCol" value:@0];
+    [self testStringOperatorsOnClass:[DoubleObject class] property:@"doubleCol" value:@0];
+    [self testStringOperatorsOnClass:[DateObject class] property:@"dateCol" value:NSDate.date];
+}
+@end
+
 @interface QueryTests : RLMTestCase
 - (Class)queryObjectClass;
 - (BOOL)isNull;
 @end
-
-#define RLMAssertCount(cls, expectedCount, ...) \
-    XCTAssertEqual(expectedCount, ([cls objectsWhere:__VA_ARGS__].count))
 
 @implementation QueryTests
 
@@ -100,10 +351,6 @@
 
 - (BOOL)isNull {
     return NO;
-}
-
-- (void)testQueryingNilRealmThrows {
-    XCTAssertThrows([PersonObject allObjectsInRealm:self.nonLiteralNil]);
 }
 
 - (void)testBasicQuery
@@ -412,175 +659,6 @@
     XCTAssertEqual(3, [[[[desc objectsWhere:@"intCol >= 2"] objectsWhere:@"intCol < 4"] firstObject] intCol]);
 }
 
-- (void)testDynamicQueryInvalidClass
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-
-    // class not derived from RLMObject
-    XCTAssertThrows([realm objects:@"NonRealmPersonObject" where:@"age > 25"], @"invalid object type");
-    XCTAssertThrows([[realm objects:@"NonRealmPersonObject" where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"invalid object type");
-
-    // empty string for class name
-    XCTAssertThrows([realm objects:@"" where:@"age > 25"], @"missing class name");
-    XCTAssertThrows([[realm objects:@"" where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"missing class name");
-
-    // nil class name
-    XCTAssertThrows([realm objects:nil where:@"age > 25"], @"nil class name");
-    XCTAssertThrows([[realm objects:nil where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"nil class name");
-}
-
-- (void)testPredicateValidUse
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-
-    // boolean false
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == no"], @"== no");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == No"], @"== No");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == NO"], @"== NO");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == false"], @"== false");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == False"], @"== False");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == FALSE"], @"== FALSE");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == 0"], @"== 0");
-
-    // boolean true
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == yes"], @"== yes");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == Yes"], @"== Yes");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == YES"], @"== YES");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == true"], @"== true");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == True"], @"== True");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == TRUE"], @"== TRUE");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == 1"], @"== 1");
-
-    // inequality
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol != YES"], @"!= YES");
-    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol <> YES"], @"<> YES");
-}
-
-- (void)testPredicateNotSupported
-{
-    // These are things which are valid predicates, but which we do not support
-
-    // Aggregate operators on non-arrays
-    XCTAssertThrows([PersonObject objectsWhere:@"ANY age > 5"]);
-    XCTAssertThrows([PersonObject objectsWhere:@"ALL age > 5"]);
-    XCTAssertThrows([PersonObject objectsWhere:@"SOME age > 5"]);
-    XCTAssertThrows([PersonObject objectsWhere:@"NONE age > 5"]);
-
-    // nil on LHS of comparison with nullable property
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = boolObj"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = intObj"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = floatObj"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = doubleObj"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = string"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = data"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = date"]);
-
-    // comparing two constants
-    XCTAssertThrows([PersonObject objectsWhere:@"5 = 5"]);
-    XCTAssertThrows([PersonObject objectsWhere:@"nil = nil"]);
-
-    // substring operations with constant on LHS
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' CONTAINS string"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' BEGINSWITH string"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' ENDSWITH string"]);
-    XCTAssertThrows(([AllOptionalTypes objectsWhere:@"%@ CONTAINS data", [NSData data]]));
-
-    // data is missing stuff
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"data = data"]);
-    XCTAssertThrows(([LinkToAllTypesObject objectsWhere:@"%@ = allTypesCol.binaryCol", [NSData data]]));
-    XCTAssertThrows(([LinkToAllTypesObject objectsWhere:@"allTypesCol.binaryCol CONTAINS %@", [NSData data]]));
-
-    // LinkList equality is unsupport since the semantics are unclear
-    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"ANY array = array"]));
-
-    // subquery
-    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"SUBQUERY(array, $obj, $obj.intCol = 5).@count > 1"]));
-
-    // block-based predicate
-    NSPredicate *pred = [NSPredicate predicateWithBlock:^BOOL (__unused id obj, __unused NSDictionary *bindings) {
-        return true;
-    }];
-    XCTAssertThrows([IntObject objectsWithPredicate:pred]);
-}
-
-- (void)testPredicateMisuse
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-
-    NSString *className = PersonObject.className;
-
-    // invalid column/property name
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"height > 72"], @"'height' not found in .* 'PersonObject'");
-
-    // wrong/invalid data types
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age != xyz"], @"'xyz' not found in .* 'PersonObject'");
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"name == 3"], @"type string .* property 'name' .* 'PersonObject'.*: 3");
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age IN {'xyz'}"], @"type int .* property 'age' .* 'PersonObject'.*: xyz");
-    XCTAssertThrows([realm objects:className where:@"name IN {3}"], @"invalid type");
-
-    className = AllTypesObject.className;
-
-    XCTAssertThrows([realm objects:className where:@"boolCol == Foo"], @"invalid type");
-    XCTAssertThrows([realm objects:className where:@"boolCol == 2"], @"invalid type");
-    XCTAssertThrows([realm objects:className where:@"dateCol == 7"], @"invalid type");
-    XCTAssertThrows([realm objects:className where:@"doubleCol == The"], @"invalid type");
-    XCTAssertThrows([realm objects:className where:@"floatCol == Bar"], @"invalid type");
-    XCTAssertThrows([realm objects:className where:@"intCol == Baz"], @"invalid type");
-
-    className = PersonObject.className;
-
-    // compare two constants
-    XCTAssertThrows([realm objects:className where:@"3 == 3"], @"comparing 2 constants");
-
-    // invalid strings
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@""], @"Unable to parse");
-    XCTAssertThrows([realm objects:className where:@"age"], @"column name only");
-    XCTAssertThrows([realm objects:className where:@"sdlfjasdflj"], @"gibberish");
-    XCTAssertThrows([realm objects:className where:@"age * 25"], @"invalid operator");
-    XCTAssertThrows([realm objects:className where:@"age === 25"], @"invalid operator");
-    XCTAssertThrows([realm objects:className where:@","], @"comma");
-    XCTAssertThrows([realm objects:className where:@"()"], @"parens");
-
-    // Misspelled keypath (should be %K)
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"@K == YES"], @"'@K' is not a valid key path'");
-
-    // not a link column
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age.age == 25"], @"'age' is not a link .* 'PersonObject'");
-    XCTAssertThrows([realm objects:className where:@"age.age.age == 25"]);
-
-    // abuse of BETWEEN
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN 25"], @"type NSArray for BETWEEN");
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN Foo"], @"BETWEEN operator must compare a KeyPath with an aggregate");
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {age, age}"], @"must be constant values");
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {age, 0}"], @"must be constant values");
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {0, age}"], @"must be constant values");
-    RLMAssertThrowsWithReasonMatching([realm objects:className where:@"age BETWEEN {0, {1, 10}}"], @"must be constant values");
-
-    NSPredicate *pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1]];
-    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"exactly two objects");
-
-    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1, @2, @3]];
-    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"exactly two objects");
-
-    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@"Foo", @"Bar"]];
-    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type int for BETWEEN");
-
-    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1.5, @2.5]];
-    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type int for BETWEEN");
-
-    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1, @[@2, @3]]];
-    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type int for BETWEEN");
-
-    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @{@25 : @35}];
-    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"type NSArray for BETWEEN");
-
-    pred = [NSPredicate predicateWithFormat:@"height BETWEEN %@", @[@25, @35]];
-    RLMAssertThrowsWithReasonMatching([realm objects:className withPredicate:pred], @"'height' not found .* 'PersonObject'");
-
-    // bad type in link IN
-    XCTAssertThrows([PersonLinkObject objectsInRealm:realm where:@"person.age IN {'Tim'}"]);
-}
-
 - (void)testTwoColumnComparison
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -663,37 +741,6 @@
                                       @"Property type mismatch between float and string");
     RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"double1 < string1"],
                                       @"Property type mismatch between double and string");
-}
-
-- (void)testNumericOperatorsOnClass:(Class)class property:(NSString *)property value:(id)value {
-    NSArray *operators = @[@"<", @"<=", @">", @">=", @"==", @"!="];
-    for (NSString *operator in operators) {
-        NSString *fmt = [@[property, operator, @"%@"] componentsJoinedByString:@" "];
-        RLMAssertCount(class, 0U, fmt, value);
-    }
-}
-
-- (void)testValidOperatorsInNumericComparison {
-    [self testNumericOperatorsOnClass:[IntObject class] property:@"intCol" value:@0];
-    [self testNumericOperatorsOnClass:[FloatObject class] property:@"floatCol" value:@0];
-    [self testNumericOperatorsOnClass:[DoubleObject class] property:@"doubleCol" value:@0];
-    [self testNumericOperatorsOnClass:[DateObject class] property:@"dateCol" value:NSDate.date];
-}
-
-- (void)testStringOperatorsOnClass:(Class)class property:(NSString *)property value:(id)value {
-    NSArray *operators = @[@"BEGINSWITH", @"ENDSWITH", @"CONTAINS", @"LIKE", @"MATCHES"];
-    for (NSString *operator in operators) {
-        NSString *fmt = [@[property, operator, @"%@"] componentsJoinedByString:@" "];
-        RLMAssertThrowsWithReasonMatching(([class objectsWhere:fmt, value]),
-                                          @"not supported for type");
-    }
-}
-
-- (void)testInvalidOperatorsInNumericComparison {
-    [self testStringOperatorsOnClass:[IntObject class] property:@"intCol" value:@0];
-    [self testStringOperatorsOnClass:[FloatObject class] property:@"floatCol" value:@0];
-    [self testStringOperatorsOnClass:[DoubleObject class] property:@"doubleCol" value:@0];
-    [self testStringOperatorsOnClass:[DateObject class] property:@"dateCol" value:NSDate.date];
 }
 
 - (void)testBooleanPredicate
@@ -837,36 +884,6 @@
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol != 'abc'");
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol == 'def'");
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol == 'ABC'");
-}
-
-- (void)testStringUnsupportedOperations
-{
-    XCTAssertThrows([StringObject objectsWhere:@"stringCol LIKE 'abc'"]);
-    XCTAssertThrows([StringObject objectsWhere:@"stringCol MATCHES 'abc'"]);
-    XCTAssertThrows([StringObject objectsWhere:@"stringCol BETWEEN {'a', 'b'}"]);
-    XCTAssertThrows([StringObject objectsWhere:@"stringCol < 'abc'"]);
-
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol LIKE 'abc'"]);
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol MATCHES 'abc'"]);
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol BETWEEN {'a', 'b'}"]);
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol < 'abc'"]);
-}
-
-- (void)testBinaryComparisonInPredicate {
-    NSData *data = [NSData data];
-    RLMAssertCount(BinaryObject, 0U, @"binaryCol BEGINSWITH %@", data);
-    RLMAssertCount(BinaryObject, 0U, @"binaryCol ENDSWITH %@", data);
-    RLMAssertCount(BinaryObject, 0U, @"binaryCol CONTAINS %@", data);
-    RLMAssertCount(BinaryObject, 0U, @"binaryCol = %@", data);
-    RLMAssertCount(BinaryObject, 0U, @"binaryCol != %@", data);
-
-    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol < %@", data]));
-    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol <= %@", data]));
-    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol > %@", data]));
-    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol >= %@", data]));
-
-    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol LIKE %@", data]));
-    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol MATCHES %@", data]));
 }
 
 - (void)testFloatQuery
@@ -1158,19 +1175,6 @@
     RLMAssertCount(LinkToAllTypesObject, 1U, @"allTypesCol.dateCol = %@", now);
     RLMAssertCount(LinkToAllTypesObject, 0U, @"allTypesCol.dateCol != %@", now);
 }
-
-- (void)testLinkQueryInvalid {
-    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.binaryCol = 'a'"], @"Binary data not supported");
-    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.mixedCol = 'a'"], @"Mixed data not supported");
-    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.invalidCol = 'a'"], @"Invalid column name should throw");
-
-    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.longCol = 'a'"], @"Wrong data type should throw");
-
-    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"intArray.intCol > 5"], @"RLMArray query without ANY modifier should throw");
-
-    RLMAssertThrowsWithReasonMatching([LinkToAllTypesObject objectsWhere:@"allTypesCol.intCol = allTypesCol.doubleCol"], @"Property type mismatch");
-}
-
 
 - (void)testLinkQueryMany
 {
