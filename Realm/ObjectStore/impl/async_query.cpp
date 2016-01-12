@@ -97,14 +97,13 @@ void AsyncQuery::unregister() noexcept
     std::lock_guard<std::mutex> lock(m_target_mutex);
     m_target_results = nullptr;
     m_realm = nullptr;
-    m_unregistered = true;
 }
 
 void AsyncQuery::release_query() noexcept
 {
     {
         std::lock_guard<std::mutex> lock(m_target_mutex);
-        REALM_ASSERT(m_unregistered);
+        REALM_ASSERT(!m_realm && !m_target_results);
     }
 
     m_query = nullptr;
@@ -113,7 +112,7 @@ void AsyncQuery::release_query() noexcept
 bool AsyncQuery::is_alive() const noexcept
 {
     std::lock_guard<std::mutex> lock(m_target_mutex);
-    return !m_unregistered;
+    return m_target_results != nullptr;
 }
 
 // Most of the inter-thread synchronization for run(), prepare_handover(),
