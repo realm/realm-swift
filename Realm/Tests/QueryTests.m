@@ -85,12 +85,16 @@
 #pragma mark - Tests
 
 #define RLMAssertCount(cls, expectedCount, ...) \
-    XCTAssertEqual(expectedCount, ([cls objectsWhere:__VA_ARGS__].count))
+    XCTAssertEqual(expectedCount, ([self evaluate:[cls objectsWhere:__VA_ARGS__]].count))
 
 @interface QueryConstructionTests : RLMTestCase
 @end
 
 @implementation QueryConstructionTests
+- (RLMResults *)evaluate:(RLMResults *)results {
+    return results;
+}
+
 - (void)testQueryingNilRealmThrows {
     XCTAssertThrows([PersonObject allObjectsInRealm:self.nonLiteralNil]);
 }
@@ -351,6 +355,10 @@
 
 - (BOOL)isNull {
     return NO;
+}
+
+- (RLMResults *)evaluate:(RLMResults *)results {
+    return results;
 }
 
 - (void)testBasicQuery
@@ -1359,10 +1367,10 @@
     NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateFormat arguments:args];
     va_end(args);
 
-    XCTAssertEqual(normalCount, [[class objectsWithPredicate:predicate] count]);
+    XCTAssertEqual(normalCount, [[self evaluate:[class objectsWithPredicate:predicate]] count]);
 
     predicate = [NSCompoundPredicate notPredicateWithSubpredicate:predicate];
-    XCTAssertEqual(notCount, [[class objectsWithPredicate:predicate] count]);
+    XCTAssertEqual(notCount, [[self evaluate:[class objectsWithPredicate:predicate]] count]);
 }
 
 - (void)testINPredicate
@@ -2254,4 +2262,20 @@ struct NullTestData {
     [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"date IN %@", @[[NSDate dateWithTimeIntervalSince1970:1]]];
 }
 
+@end
+
+@interface AsyncQueryTests : QueryTests
+@end
+
+@implementation AsyncQueryTests
+- (RLMResults *)evaluate:(RLMResults *)results {
+    id token = [results addNotificationBlock:^(RLMResults *r, NSError *e) {
+        XCTAssertNil(e);
+        XCTAssertNotNil(r);
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    }];
+    CFRunLoopRun();
+    [token stop];
+    return results;
+}
 @end
