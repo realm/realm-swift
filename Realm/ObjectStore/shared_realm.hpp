@@ -19,11 +19,12 @@
 #ifndef REALM_REALM_HPP
 #define REALM_REALM_HPP
 
+#include "object_store.hpp"
+
 #include <memory>
+#include <mutex>
 #include <thread>
 #include <vector>
-
-#include "object_store.hpp"
 
 namespace realm {
     class ClientHistory;
@@ -168,7 +169,7 @@ namespace realm {
             std::runtime_error(std::move(message)), m_kind(kind), m_path(std::move(path)) {}
         Kind kind() const { return m_kind; }
         const std::string& path() const { return m_path; }
-        
+
     private:
         Kind m_kind;
         std::string m_path;
