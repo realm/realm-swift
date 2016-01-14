@@ -89,6 +89,8 @@ void AsyncQuery::remove_callback(size_t token)
 
         old = std::move(*it);
         m_callbacks.erase(it);
+
+        m_have_callbacks = !m_callbacks.empty();
     }
 }
 
