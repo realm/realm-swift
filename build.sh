@@ -285,7 +285,7 @@ download_core() {
         local CORE_URL="https://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.bz2"
         set +e # temporarily disable immediate exit
         local ERROR # sweeps the exit code unless declared separately
-        ERROR=$(curl -fsSL "$CORE_URL" -o "${CORE_TMP_TAR}" 2>&1 >/dev/null)
+        ERROR=$(curl --fail --silent --show-error --location "$CORE_URL" --output "${CORE_TMP_TAR}" 2>&1 >/dev/null)
         if [[ $? -ne 0 ]]; then
             echo "Downloading core failed:\n${ERROR}"
             exit 1
