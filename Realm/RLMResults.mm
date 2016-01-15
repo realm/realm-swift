@@ -58,8 +58,16 @@ using namespace realm;
     return self;
 }
 
+- (void)dealloc {
+    // Ensure we see an up-to-date value for _token in case it was stopped on a
+    // different thread. No further synchronization is needed as dealloc cannot
+    // be called concurrently with another method
+    std::atomic_thread_fence(std::memory_order_acquire);
+}
+
 - (void)stop {
     _token = {};
+    std::atomic_thread_fence(std::memory_order_release);
 }
 
 @end
