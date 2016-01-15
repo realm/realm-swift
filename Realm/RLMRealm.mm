@@ -670,11 +670,11 @@ std::atomic<bool> s_syncLogEverything(false);
 
 
 @implementation RLMSyncSession {
-    std::unique_ptr<SharedGroup>            _sharedGroup;
     std::unique_ptr<ClientTransformHistory> _history;
+    std::unique_ptr<SharedGroup>            _sharedGroup;
 
-    std::unique_ptr<SharedGroup>            _backgroundSharedGroup; // For background thread
     std::unique_ptr<ClientTransformHistory> _backgroundHistory;     // For background thread
+    std::unique_ptr<SharedGroup>            _backgroundSharedGroup; // For background thread
     std::unique_ptr<Transformer>            _backgroundTransformer; // For background thread
 
     Replication::version_type _latestVersionAvailable;
