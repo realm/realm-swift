@@ -181,8 +181,8 @@ std::atomic<bool> s_syncLogEverything(false);
     // been sent.
     //
     // The set is cleared whenever the connection is reestablished to
-    // reflect the fact that all session bindings are void upon
-    // loosing a connection.
+    // reflect the fact that all session bindings are void upon losing
+    // a connection.
     std::set<unsigned> _boundSessions;
 }
 
@@ -320,7 +320,7 @@ std::atomic<bool> s_syncLogEverything(false);
 
 
 - (void)unbindSession:(NSNumber *)sessionIdent {
-    auto i = _boundSessions.find([sessionIdent unsignedIntValue]);
+    auto i = _boundSessions.find(sessionIdent.unsignedIntValue);
     if (i != _boundSessions.end())
         [self sendUnbindMessageWithSessionIdent:sessionIdent];
 }
@@ -382,7 +382,7 @@ std::atomic<bool> s_syncLogEverything(false);
                          ulong(msg.body.length), ulonglong(serverVersion),
                          ulonglong(clientVersion)];
     [self enqueueOutputMessage:msg];
-    _boundSessions.insert([sessionIdent unsignedIntValue]);
+    _boundSessions.insert(sessionIdent.unsignedIntValue);
     NSLog(@"RealmSync: Connection[%lu]: Sessions[%@]: Sending: BIND(server_file_ident=%llu, "
           "client_file_ident=%llu, server_path='%@', server_version=%llu, client_version=%llu)",
           _ident, sessionIdent, ulonglong(serverFileIdent), ulonglong(clientFileIdent), serverPath,
