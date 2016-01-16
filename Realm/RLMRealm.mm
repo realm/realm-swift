@@ -253,6 +253,11 @@ std::atomic<bool> s_syncLogEverything(false);
     NSInputStream  *inputStream  = (__bridge_transfer NSInputStream  *)readStream;
     NSOutputStream *outputStream = (__bridge_transfer NSOutputStream *)writeStream;
 
+    // Ensure that the delegate object outlives the stream objects
+    static char key;
+    objc_setAssociatedObject(inputStream,  &key, _streamDelegate, OBJC_ASSOCIATION_RETAIN);
+    objc_setAssociatedObject(outputStream, &key, _streamDelegate, OBJC_ASSOCIATION_RETAIN);
+
     [inputStream setDelegate:_streamDelegate];
     [outputStream setDelegate:_streamDelegate];
 
@@ -703,18 +708,15 @@ std::atomic<bool> s_syncLogEverything(false);
 
 
 - (void)dealloc {
-    if (!_inputStream && !_outputStream)
-        return;
-    NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
-    RLMServerStreamDelegate *delegate = _streamDelegate;
-    NSInputStream  *inputStream  = _inputStream;
-    NSOutputStream *outputStream = _outputStream;
-    [mainQueue addOperationWithBlock:^{
-            __attribute__((objc_precise_lifetime)) RLMServerStreamDelegate *delegate2 = delegate;
-            [inputStream  close];
-            [outputStream close];
-            delegate2 = nil;
-        }];
+    if (_inputStream || _outputStream) {
+        NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
+        NSInputStream  *inputStream  = _inputStream;
+        NSOutputStream *outputStream = _outputStream;
+        [mainQueue addOperationWithBlock:^{
+                [inputStream  close];
+                [outputStream close];
+            }];
+    }
 }
 
 @end
