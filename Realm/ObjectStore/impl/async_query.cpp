@@ -91,11 +91,6 @@ void AsyncQuery::remove_callback(size_t token)
 
 void AsyncQuery::unregister() noexcept
 {
-    {
-        std::lock_guard<std::mutex> lock(m_callback_mutex);
-        REALM_ASSERT(m_callbacks.empty());
-    }
-
     std::lock_guard<std::mutex> lock(m_target_mutex);
     m_target_results = nullptr;
     m_realm = nullptr;
