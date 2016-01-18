@@ -36,7 +36,7 @@ public:
     AsyncQuery(Results& target);
     ~AsyncQuery();
 
-    AsyncQueryCancelationToken add_callback(std::function<void (std::exception_ptr)>);
+    size_t add_callback(std::function<void (std::exception_ptr)>);
     void remove_callback(size_t token);
 
     void unregister() noexcept;

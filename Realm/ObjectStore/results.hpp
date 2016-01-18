@@ -38,7 +38,7 @@ namespace _impl {
 // A token which keeps an asynchronous query alive
 struct AsyncQueryCancelationToken {
     AsyncQueryCancelationToken() = default;
-    AsyncQueryCancelationToken(_impl::AsyncQuery& query, size_t token) : m_query(&query), m_token(token) { }
+    AsyncQueryCancelationToken(std::shared_ptr<_impl::AsyncQuery> query, size_t token);
     ~AsyncQueryCancelationToken();
 
     AsyncQueryCancelationToken(AsyncQueryCancelationToken&&);
@@ -48,7 +48,7 @@ struct AsyncQueryCancelationToken {
     AsyncQueryCancelationToken& operator=(AsyncQueryCancelationToken const&) = delete;
 
 private:
-    _impl::AsyncQuery* m_query = nullptr;
+    std::shared_ptr<_impl::AsyncQuery> m_query;
     size_t m_token;
 };
 

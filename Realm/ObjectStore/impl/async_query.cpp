@@ -40,7 +40,7 @@ AsyncQuery::~AsyncQuery()
     m_realm = nullptr;
 }
 
-AsyncQueryCancelationToken AsyncQuery::add_callback(std::function<void (std::exception_ptr)> callback)
+size_t AsyncQuery::add_callback(std::function<void (std::exception_ptr)> callback)
 {
     m_realm->verify_thread();
 
@@ -61,7 +61,7 @@ AsyncQueryCancelationToken AsyncQuery::add_callback(std::function<void (std::exc
         Realm::Internal::get_coordinator(*m_realm).send_commit_notifications();
         m_have_callbacks = true;
     }
-    return {*this, token};
+    return token;
 }
 
 void AsyncQuery::remove_callback(size_t token)

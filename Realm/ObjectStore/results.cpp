@@ -366,7 +366,7 @@ AsyncQueryCancelationToken Results::async(std::function<void (std::exception_ptr
         m_background_query = std::make_shared<_impl::AsyncQuery>(*this);
         _impl::RealmCoordinator::register_query(m_background_query);
     }
-    return m_background_query->add_callback(std::move(target));
+    return {m_background_query, m_background_query->add_callback(std::move(target))};
 }
 
 void Results::AsyncFriend::set_table_view(Results& results, realm::TableView &&tv)
@@ -391,28 +391,31 @@ Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t c
     column_type = table->get_column_type(column);
 }
 
+AsyncQueryCancelationToken::AsyncQueryCancelationToken(std::shared_ptr<_impl::AsyncQuery> query, size_t token)
+: m_query(std::move(query)), m_token(token)
+{
+}
+
 AsyncQueryCancelationToken::~AsyncQueryCancelationToken()
 {
-    if (m_query) {
-        m_query->remove_callback(m_token);
+    if (auto query = std::atomic_load(&m_query)) {
+        query->remove_callback(m_token);
     }
 }
 
 AsyncQueryCancelationToken::AsyncQueryCancelationToken(AsyncQueryCancelationToken&& rgt)
-: m_query(rgt.m_query), m_token(rgt.m_token)
+: m_query(std::atomic_exchange(&rgt.m_query, {})), m_token(rgt.m_token)
 {
-    rgt.m_query = nullptr;
 }
 
 AsyncQueryCancelationToken& AsyncQueryCancelationToken::operator=(realm::AsyncQueryCancelationToken&& rgt)
 {
     if (this != &rgt) {
-        if (m_query) {
-            m_query->remove_callback(m_token);
+        if (auto query = std::atomic_load(&m_query)) {
+            query->remove_callback(m_token);
         }
-        m_query = std::move(rgt.m_query);
+        std::atomic_store(&m_query, std::atomic_exchange(&rgt.m_query, {}));
         m_token = rgt.m_token;
-        rgt.m_query = nullptr;
     }
     return *this;
 }
