@@ -35,6 +35,8 @@
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
+#include <set>
+
 #include "object_store.hpp"
 #include "schema.hpp"
 #include "shared_realm.hpp"
@@ -72,7 +74,7 @@ std::atomic<bool> s_syncLogEverything(false);
 @property (nonatomic) NSData *body; // May be nil
 @end
 
-@interface RLMServerConnection : NSObject <NSStreamDelegate>
+@interface RLMServerConnection : NSObject
 @property (readonly, nonatomic) unsigned long ident; // Used only for logging
 @property (readonly, nonatomic) NSString *identity;
 @property (readonly, nonatomic) BOOL isOpen;
@@ -99,6 +101,10 @@ std::atomic<bool> s_syncLogEverything(false);
                                moreIsAvailable:(bool)moreIsAvailable;
 - (void)handleProgressMessageWithServerVersion:(Replication::version_type)serverVersion
                                  clientVersion:(Replication::version_type)clientVersion;
+@end
+
+@interface RLMServerStreamDelegate : NSObject <NSStreamDelegate>
+- (instancetype)initWithConnection:(RLMServerConnection *)connection;
 @end
 
 
@@ -134,6 +140,7 @@ std::atomic<bool> s_syncLogEverything(false);
 
     NSInputStream  *_inputStream;
     NSOutputStream *_outputStream;
+    RLMServerStreamDelegate *_streamDelegate;
 
     BOOL _inputIsHead;
     size_t _inputBufferSize;
@@ -161,6 +168,22 @@ std::atomic<bool> s_syncLogEverything(false);
     // identifier is a locally assigned integer that uniquely identifies the
     // RLMSyncSession instance within a particular server connection.
     NSMapTable *_sessions;
+
+    // Set of identifiers of bound sessions. More specifically, if T
+    // is the point in time of the last reestablishment of the
+    // connection (when `_isOpen` last became true), then
+    // `_boundSessions` is the set of session identifiers of the
+    // `RLMSyncSession` objects for which a BIND message has been
+    // enqueued since T. An enqueued message is one that is added to
+    // `_outputQueue`.
+    //
+    // A session remains in this set even after an UNBIND message has
+    // been sent.
+    //
+    // The set is cleared whenever the connection is reestablished to
+    // reflect the fact that all session bindings are void upon losing
+    // a connection.
+    std::set<unsigned> _boundSessions;
 }
 
 
@@ -178,6 +201,8 @@ std::atomic<bool> s_syncLogEverything(false);
         _port = port ? port : [NSNumber numberWithInt:7800];
 
         _runLoop = nil;
+
+        _streamDelegate = [[RLMServerStreamDelegate alloc] initWithConnection:self];
 
         _inputBufferSize = 1024;
         _inputBuffer = std::make_unique<char[]>(_inputBufferSize);
@@ -228,8 +253,13 @@ std::atomic<bool> s_syncLogEverything(false);
     NSInputStream  *inputStream  = (__bridge_transfer NSInputStream  *)readStream;
     NSOutputStream *outputStream = (__bridge_transfer NSOutputStream *)writeStream;
 
-    [inputStream setDelegate:self];
-    [outputStream setDelegate:self];
+    // Ensure that the delegate object outlives the stream objects
+    static char key;
+    objc_setAssociatedObject(inputStream,  &key, _streamDelegate, OBJC_ASSOCIATION_RETAIN);
+    objc_setAssociatedObject(outputStream, &key, _streamDelegate, OBJC_ASSOCIATION_RETAIN);
+
+    [inputStream setDelegate:_streamDelegate];
+    [outputStream setDelegate:_streamDelegate];
 
     [inputStream scheduleInRunLoop:_runLoop forMode:NSDefaultRunLoopMode];
     [inputStream open];
@@ -242,6 +272,8 @@ std::atomic<bool> s_syncLogEverything(false);
     _headBufferCurr = _headBuffer.get();
 
     _outputQueue = [NSMutableArray array];
+
+    _boundSessions.clear();
 
     _isOpen = YES;
 
@@ -289,6 +321,13 @@ std::atomic<bool> s_syncLogEverything(false);
     [_sessions setObject:session forKey:session.sessionIdent];
     if (_isOpen)
         [session connectionIsOpen];
+}
+
+
+- (void)unbindSession:(NSNumber *)sessionIdent {
+    auto i = _boundSessions.find(sessionIdent.unsignedIntValue);
+    if (i != _boundSessions.end())
+        [self sendUnbindMessageWithSessionIdent:sessionIdent];
 }
 
 
@@ -348,6 +387,7 @@ std::atomic<bool> s_syncLogEverything(false);
                          ulong(msg.body.length), ulonglong(serverVersion),
                          ulonglong(clientVersion)];
     [self enqueueOutputMessage:msg];
+    _boundSessions.insert(sessionIdent.unsignedIntValue);
     NSLog(@"RealmSync: Connection[%lu]: Sessions[%@]: Sending: BIND(server_file_ident=%llu, "
           "client_file_ident=%llu, server_path='%@', server_version=%llu, client_version=%llu)",
           _ident, sessionIdent, ulonglong(serverFileIdent), ulonglong(clientFileIdent), serverPath,
@@ -664,6 +704,19 @@ std::atomic<bool> s_syncLogEverything(false);
         return; // This session no longer exists
 
     [session handleProgressMessageWithServerVersion:serverVersion clientVersion:clientVersion];
+}
+
+
+- (void)dealloc {
+    if (_inputStream || _outputStream) {
+        NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
+        NSInputStream  *inputStream  = _inputStream;
+        NSOutputStream *outputStream = _outputStream;
+        [mainQueue addOperationWithBlock:^{
+                [inputStream  close];
+                [outputStream close];
+            }];
+    }
 }
 
 @end
@@ -1105,8 +1158,27 @@ std::atomic<bool> s_syncLogEverything(false);
     __weak RLMServerConnection *weakConnection = _connection;
     NSNumber *sessionIdent = _sessionIdent;
     [mainQueue addOperationWithBlock:^{
-            [weakConnection sendUnbindMessageWithSessionIdent:sessionIdent];
+            [weakConnection unbindSession:sessionIdent];
         }];
+}
+
+@end
+
+
+@implementation RLMServerStreamDelegate {
+    __weak RLMServerConnection *_weakConnection;
+}
+
+- (instancetype)initWithConnection:(RLMServerConnection *)connection {
+    self = [super init];
+    if (self) {
+        _weakConnection = connection;
+    }
+    return self;
+}
+
+- (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode {
+    [_weakConnection stream:stream handleEvent:eventCode];
 }
 
 @end
