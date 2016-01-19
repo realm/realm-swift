@@ -683,22 +683,27 @@
     token1 = [self subscribeAndWaitForInitial:results1 block:^(RLMResults *results) {
         ++calls;
         if (calls == 1) {
+            CFRunLoopStop(CFRunLoopGetCurrent());
             token2 = [results2 addNotificationBlock:^(RLMResults *results, NSError *error) {
+                CFRunLoopStop(CFRunLoopGetCurrent());
                 ++calls;
             }];
         }
     }];
 
-    // Triggers one call on outer block, zero on inner
-    [self waitForNotification:RLMRealmDidChangeNotification realm:results1.realm block:^{
-        [self createObject:0];
-    }];
+    // Triggers one call on outer block, but inner does not get a chance to deliver
+    [self dispatchAsync:^{ [self createObject:0]; }];
+    CFRunLoopRun();
     XCTAssertEqual(calls, 1);
 
-    // Picks up initial from inner, and triggers one more on each
-    [self waitForNotification:RLMRealmDidChangeNotification realm:results1.realm block:^{
-        [self createObject:0];
-    }];
+    // Pick up the initial run of the inner block
+    CFRunLoopRun();
+    assert(calls == 2);
+    XCTAssertEqual(calls, 2);
+
+    // Triggers a call on each block
+    [self dispatchAsync:^{ [self createObject:0]; }];
+    CFRunLoopRun();
     XCTAssertEqual(calls, 4);
 
     [token1 stop];
