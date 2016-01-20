@@ -226,6 +226,15 @@ RLM_ARRAY_TYPE(DogObject)
 
 @end
 
+#pragma mark ArrayOfSelfObject
+
+RLM_ARRAY_TYPE(ArrayOfSelfObject);
+
+@interface ArrayOfSelfObject : RLMObject
+@property NSString *name;
+@property RLM_GENERIC_ARRAY(ArrayOfSelfObject) *arrayProp;
+@end
+
 #pragma mark CircleObject
 
 @interface CircleObject : RLMObject

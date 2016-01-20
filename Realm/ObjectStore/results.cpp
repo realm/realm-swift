@@ -146,7 +146,13 @@ void Results::update_tableview()
             m_mode = Mode::TableView;
             break;
         case Mode::TableView:
-            m_table_view.sync_if_needed();
+            try {
+                m_table_view.sync_if_needed();
+            }
+            catch (DeletedLinkView const& ex) {
+                m_mode = Mode::Empty;
+                m_table_view = TableView();
+            }
             break;
     }
 }
