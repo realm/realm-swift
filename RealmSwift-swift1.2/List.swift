@@ -396,9 +396,9 @@ public final class List<T: Object>: ListBase {
     called again after each write transaction which changes the list or any of
     the items in the list. You must retain the returned token for as long as
     you want the results to continue to be sent to the block. To stop receiving
-    updates, call stop() on the token.
+    updates, call `stop()` on the token.
 
-    :param: The block to be called each time the list changes
+    :param: The block to be called each time the list changes.
     :returns: A token which must be held for as long as you want notifications to be delivered.
     */
     public func addNotificationBlock(block: (List<T>) -> ()) -> NotificationToken {

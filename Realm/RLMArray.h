@@ -292,15 +292,15 @@ RLM_ASSUME_NONNULL_BEGIN
  Register a block to be called each time the RLMArray changes.
 
  The block will be asynchronously called with the initial array, and then
- called again after each writen transaction which changes the array or any
+ called again after each write transaction which changes the array or any
  items contained in the array. You must retain the returned token for as long as
  you want the block to continue to be called. To stop receiving updates, call
- -stop on the token.
+ `-stop` on the token.
 
  The error parameter will always be `nil`, and is present only for compatiblity
  with the RLMResults version of this method, which can potentially fail.
 
- @param block The block to be called each time the array changes
+ @param block The block to be called each time the array changes.
  @return A token which must be held for as long as you want notifications to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray RLM_GENERIC_RETURN *array, NSError *))block;

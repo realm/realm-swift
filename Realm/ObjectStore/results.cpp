@@ -371,8 +371,8 @@ AsyncQueryCancelationToken Results::async(std::function<void (std::exception_ptr
 
 void Results::AsyncFriend::set_table_view(Results& results, realm::TableView &&tv)
 {
-    // If the previous TableView was never actually used, then generating new
-    // ones until the user actually uses the Results object again
+    // If the previous TableView was never actually used, then stop generating
+    // new ones until the user actually uses the Results object again
     if (results.m_mode == Mode::TableView) {
         results.m_wants_background_updates = results.m_has_used_table_view;
     }

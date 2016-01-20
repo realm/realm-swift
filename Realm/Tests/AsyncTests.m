@@ -411,7 +411,7 @@
         [exp fulfill];
     }];
 
-    // Block should still be called asyncronously
+    // Block should still be called asynchronously
     XCTAssertFalse(called);
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];

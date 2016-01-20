@@ -293,10 +293,10 @@ public final class Results<T: Object>: ResultsBase {
      Register a block to be called each time the Results changes.
 
      The block will be asynchronously called with the initial results, and then
-     called again after each writen transaction which causes the results to change.
+     called again after each write transaction which causes the results to change.
      You must retain the returned token for as long as you want the results to
-     continue to be sent to the block. To stop receiving updates, call stop() on the
-     token.
+     continue to be sent to the block. To stop receiving updates, call `stop()`
+     on the token.
 
      The determination for whether or not a write transaction has changed the
      results is currently very coarse, and the block may be called even if no
@@ -316,7 +316,7 @@ public final class Results<T: Object>: ResultsBase {
      :warning: This method cannot be called during a write transaction, or when
                the source realm is read-only.
 
-     :param: block The block to be called with the evaluated results
+     :param: block The block to be called with the evaluated results.
      :returns: A token which must be held for as long as you want query results to be delivered.
      */
     public func addNotificationBlock(block: (Results<T>?, NSError?) -> ()) -> NotificationToken {

@@ -27,7 +27,7 @@ class Realm;
 
 namespace _impl {
 
-// CachedRealm stores a weak reference to a Realm instance, along with all of
+// CachedRealmBase stores a weak reference to a Realm instance, along with all of
 // the information about a Realm that needs to be accessed from other threads.
 // This is needed to avoid forming strong references to the Realm instances on
 // other threads, which can produce deadlocks when the last strong reference to

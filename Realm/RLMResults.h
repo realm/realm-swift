@@ -175,7 +175,7 @@ RLM_ASSUME_NONNULL_BEGIN
  Register a block to be called each time the RLMResults changes.
 
  The block will be asynchronously called with the initial results, and then
- called again after each writen transaction which causes the results to change.
+ called again after each write transaction which causes the results to change.
  You must retain the returned token for as long as you want the results to
  continue to be sent to the block. To stop receiving updates, call -stop on the
  token.
@@ -192,13 +192,13 @@ RLM_ASSUME_NONNULL_BEGIN
 
  At the time when the block is called, the RLMResults object will be fully
  evaluated and up-to-date, and as long as you do not perform a write transaction
- on the same thread or explicitly call -[RLMRealm refresh], access it will never
- perform blocking work.
+ on the same thread or explicitly call `-[RLMRealm refresh]`, accessing it will
+ never perform blocking work.
 
  @warning This method cannot be called during a write transaction, or when the
           containing realm is read-only.
 
- @param block The block to be called with the evaluated results
+ @param block The block to be called with the evaluated results.
  @return A token which must be held for as long as you want query results to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results, NSError *__nullable error))block;

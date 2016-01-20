@@ -677,9 +677,9 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     then called again after each write transaction which changes the collection
     or any of the items in the collection. You must retain the returned token for
     as long as you want updates to continue to be sent to the block. To stop
-    receiving updates, call stop() on the token.
+    receiving updates, call `stop()` on the token.
 
-    :param: block The block to be called each time the collection changes
+    :param: block The block to be called each time the collection changes.
     :returns: A token which must be held for as long as you want notifications to be delivered.
     */
     public func addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken {

@@ -174,7 +174,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Register a block to be called each time the collection changes.
 
- @param block The block to be called each time the collection changes
+ @param block The block to be called each time the collection changes.
  @return A token which must be held for as long as you want notifications to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMCollection> collection))block;

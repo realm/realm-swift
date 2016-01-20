@@ -400,7 +400,7 @@ public final class List<T: Object>: ListBase {
     you want the results to continue to be sent to the block. To stop receiving
     updates, call stop() on the token.
 
-    - parameter block: The block to be called each time the list changes
+    - parameter block: The block to be called each time the list changes.
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
     public func addNotificationBlock(block: (List<T>) -> ()) -> NotificationToken {
