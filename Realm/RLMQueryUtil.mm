@@ -503,7 +503,7 @@ void add_link_constraint_to_query(realm::Query & query,
     RLMPrecondition(query.get_table()->get_link_target(column.index()).get() == obj->_row.get_table(),
                     @"Invalid value origin", @"Object must be from the Realm being queried");
 
-    query.links_to(column.index(), obj->_row.get_index());
+    query.links_to(column, obj->_row);
 }
 
 void add_link_constraint_to_query(realm::Query & query,
