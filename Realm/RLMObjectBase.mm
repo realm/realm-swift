@@ -304,7 +304,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 
 + (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
 {
-    const char* className = class_getName(self);
+    const char *className = class_getName(self);
     const char accessorClassPrefix[] = "RLMAccessor_";
     if (!strncmp(className, accessorClassPrefix, sizeof(accessorClassPrefix) - 1)) {
         if (self.sharedSchema[key]) {
