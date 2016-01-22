@@ -434,8 +434,8 @@
     [token2 stop];
 }
 
-- (void)testRLMResultsInstanceIsRedused {
-   __weak __block RLMResults *prev;
+- (void)testRLMResultsInstanceIsReused {
+    __weak __block RLMResults *prev;
     __block bool first = true;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
