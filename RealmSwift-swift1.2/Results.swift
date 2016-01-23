@@ -70,11 +70,26 @@ public class ResultsBase: NSObject, NSFastEnumeration {
 }
 
 /**
-`Results` is an auto-updating container type in Realm returned from object
-queries.
+Results is an auto-updating container type in Realm returned from object queries.
 
-Results can be queried with the same predicates as `List<T>` and you can chain queries to further
-filter query results.
+Results can be queried with the same predicates as `List<T>` and you can chain
+queries to further filter query results.
+
+Results always reflect the current state of the Realm on the current thread,
+including during write transactions on the current thread. The one exception to
+this is when using `for...in` enumeration, which will always enumerate over the
+ objects which matched the query when the enumeration is begun, even if
+some of them are deleted or modified to be excluded by the filter during the
+enumeration.
+
+Results are initially lazily evaluated, and only run queries when the result
+of the query is requested. This means that chaining several temporary
+Results to sort and filter your data does not perform any extra work
+processing the intermediate state.
+
+Once the results have been evaluated or a notification block has been added,
+the results are eagerly kept up-to-date, with the work done to keep them
+up-to-date done on a background thread whenever possible.
 
 Results cannot be created directly.
 */
