@@ -67,14 +67,23 @@
 
 
 @interface IndexedObject : RLMObject
-@property NSString *name;
-@property NSInteger age;
+@property NSString *stringCol;
+@property NSInteger integerCol;
+@property int intCol;
+@property long longCol;
+@property long long longlongCol;
+@property BOOL boolCol;
+@property NSDate *dateCol;
+
+@property float floatCol;
+@property double doubleCol;
+@property NSData *dataCol;
 @end
 
 @implementation IndexedObject
 + (NSArray *)indexedProperties
 {
-    return @[@"name"];
+    return @[@"stringCol", @"integerCol", @"intCol", @"longCol", @"longlongCol", @"boolCol", @"dateCol"];
 }
 @end
 
@@ -1492,11 +1501,37 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
 - (void)testIndex
 {
-    RLMProperty *nameProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"name"];
-    XCTAssertTrue(nameProperty.indexed, @"indexed property should have an index");
+    RLMSchema *schema = [RLMRealm defaultRealm].schema;
+
+    RLMProperty *stringProperty = schema[IndexedObject.className][@"stringCol"];
+    XCTAssertTrue(stringProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *integerProperty = schema[IndexedObject.className][@"integerCol"];
+    XCTAssertTrue(integerProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *intProperty = schema[IndexedObject.className][@"intCol"];
+    XCTAssertTrue(intProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *longProperty = schema[IndexedObject.className][@"longCol"];
+    XCTAssertTrue(longProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *longlongProperty = schema[IndexedObject.className][@"longlongCol"];
+    XCTAssertTrue(longlongProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *boolProperty = schema[IndexedObject.className][@"boolCol"];
+    XCTAssertTrue(boolProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *dateProperty = schema[IndexedObject.className][@"dateCol"];
+    XCTAssertTrue(dateProperty.indexed, @"indexed property should have an index");
     
-    RLMProperty *ageProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"age"];
-    XCTAssertFalse(ageProperty.indexed, @"non-indexed property shouldn't have an index");
+    RLMProperty *floatProperty = schema[IndexedObject.className][@"floatCol"];
+    XCTAssertFalse(floatProperty.indexed, @"non-indexed property shouldn't have an index");
+
+    RLMProperty *doubleProperty = schema[IndexedObject.className][@"doubleCol"];
+    XCTAssertFalse(doubleProperty.indexed, @"non-indexed property shouldn't have an index");
+
+    RLMProperty *dataProperty = schema[IndexedObject.className][@"dataCol"];
+    XCTAssertFalse(dataProperty.indexed, @"non-indexed property shouldn't have an index");
 }
 
 - (void)testRetainedRealmObjectUnknownKey
