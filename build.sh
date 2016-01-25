@@ -385,7 +385,7 @@ case "$COMMAND" in
         # objectstore repo
         git rev-list --reverse $commit..HEAD -- Realm/ObjectStore \
             | xargs -I@ git format-patch --stdout @^! Realm/ObjectStore \
-            | git -C $path am -p 3
+            | git -C $path am -p 3 --directory src
         ;;
 
     "pull-object-store-changes")
@@ -396,7 +396,7 @@ case "$COMMAND" in
             exit 1
         fi
 
-        git -C $path format-patch --stdout $commit..HEAD | git am --directory Realm/ObjectStore
+        git -C $path format-patch --stdout $commit..HEAD | git am -p 2 --directory Realm/ObjectStore
         ;;
 
     ######################################

@@ -31,6 +31,7 @@ namespace realm {
     class ObjectSchema {
     public:
         ObjectSchema() = default;
+        ObjectSchema(std::string name, std::string primary_key, std::initializer_list<Property> properties);
         ~ObjectSchema();
 
         // create object schema from existing table
@@ -49,6 +50,9 @@ namespace realm {
         const Property *primary_key_property() const {
             return property_for_name(primary_key);
         }
+
+    private:
+        void set_primary_key_property();
     };
 }
 
