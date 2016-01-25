@@ -19,6 +19,7 @@
 #ifndef REALM_INDEX_SET_HPP
 #define REALM_INDEX_SET_HPP
 
+#include <cstdlib>
 #include <vector>
 
 namespace realm {

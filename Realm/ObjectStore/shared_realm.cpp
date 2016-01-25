@@ -86,7 +86,7 @@ Realm::Realm(Config config)
     }
     catch (util::File::NotFound const& ex) {
         throw RealmFileException(RealmFileException::Kind::NotFound, ex.get_path(),
-                                 "File at path '" + ex.get_path() + "' does not exists.");
+                                 "File at path '" + ex.get_path() + "' does not exist.");
     }
     catch (util::File::AccessError const& ex) {
         throw RealmFileException(RealmFileException::Kind::AccessError, ex.get_path(),
@@ -98,8 +98,9 @@ Realm::Realm(Config config)
                                  "which cannot share access with this process. All processes sharing a single file must be the same architecture.");
     }
     catch (FileFormatUpgradeRequired const& ex) {
-        throw RealmFileException(RealmFileException::Kind::FormatUpgradeRequired, m_config.path, "The Realm file format must be allowed to be upgraded "
-        "in order to proceed.");
+        throw RealmFileException(RealmFileException::Kind::FormatUpgradeRequired, m_config.path,
+                                 "The Realm file format must be allowed to be upgraded "
+                                 "in order to proceed.");
     }
 }
 
@@ -197,12 +198,20 @@ void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
 {
     schema->validate();
 
-    // If the schema version matches, just verify that the schema itself also matches
-    bool needs_update = !m_config.read_only && (m_config.schema_version != version || ObjectStore::needs_update(*m_config.schema, *schema));
-    if (!needs_update) {
+    auto needs_update = [&] {
+        // If the schema version matches, just verify that the schema itself also matches
+        bool needs_write = !m_config.read_only && (m_config.schema_version != version || ObjectStore::needs_update(*m_config.schema, *schema));
+        if (needs_write) {
+            return true;
+        }
+
         ObjectStore::verify_schema(*m_config.schema, *schema, m_config.read_only);
         m_config.schema = std::move(schema);
         m_config.schema_version = version;
+        return false;
+    };
+
+    if (!needs_update()) {
         return;
     }
 
@@ -225,11 +234,13 @@ void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
     // recheck everything
     auto current_schema_version = ObjectStore::get_schema_version(read_group());
     if (current_schema_version != m_config.schema_version) {
-        cancel_transaction();
-
         m_config.schema_version = current_schema_version;
         *m_config.schema = ObjectStore::schema_from_group(read_group());
-        return update_schema(std::move(schema), version);
+
+        if (!needs_update()) {
+            cancel_transaction();
+            return;
+        }
     }
 
     Config old_config(m_config);
