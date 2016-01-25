@@ -375,6 +375,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 }
 
 - (instancetype)initSwiftOptionalPropertyWithName:(NSString *)name
+                                          indexed:(BOOL)indexed
                                              ivar:(Ivar)ivar
                                      propertyType:(RLMPropertyType)propertyType {
     self = [super init];
@@ -384,6 +385,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 
     _name = name;
     _type = propertyType;
+    _indexed = indexed;
     _objcType = '@';
     _swiftIvar = ivar;
     _optional = true;
