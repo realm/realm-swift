@@ -74,16 +74,20 @@
 @property long long longlongCol;
 @property BOOL boolCol;
 @property NSDate *dateCol;
+@property NSNumber<RLMInt> *optionalIntCol;
+@property NSNumber<RLMBool> *optionalBoolCol;
 
 @property float floatCol;
 @property double doubleCol;
 @property NSData *dataCol;
+@property NSNumber<RLMFloat> *optionalFloatCol;
+@property NSNumber<RLMDouble> *optionalDoubleCol;
 @end
 
 @implementation IndexedObject
 + (NSArray *)indexedProperties
 {
-    return @[@"stringCol", @"integerCol", @"intCol", @"longCol", @"longlongCol", @"boolCol", @"dateCol"];
+    return @[@"stringCol", @"integerCol", @"intCol", @"longCol", @"longlongCol", @"boolCol", @"dateCol", @"optionalIntCol", @"optionalBoolCol"];
 }
 @end
 
@@ -1523,6 +1527,12 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
     RLMProperty *dateProperty = schema[IndexedObject.className][@"dateCol"];
     XCTAssertTrue(dateProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *optionalIntProperty = schema[IndexedObject.className][@"optionalIntCol"];
+    XCTAssertTrue(optionalIntProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *optionalBoolProperty = schema[IndexedObject.className][@"optionalBoolCol"];
+    XCTAssertTrue(optionalBoolProperty.indexed, @"indexed property should have an index");
     
     RLMProperty *floatProperty = schema[IndexedObject.className][@"floatCol"];
     XCTAssertFalse(floatProperty.indexed, @"non-indexed property shouldn't have an index");
@@ -1532,6 +1542,12 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
     RLMProperty *dataProperty = schema[IndexedObject.className][@"dataCol"];
     XCTAssertFalse(dataProperty.indexed, @"non-indexed property shouldn't have an index");
+
+    RLMProperty *optionalFloatProperty = schema[IndexedObject.className][@"optionalFloatCol"];
+    XCTAssertFalse(optionalFloatProperty.indexed, @"non-indexed property shouldn't have an index");
+
+    RLMProperty *optionalDoubleProperty = schema[IndexedObject.className][@"optionalDoubleCol"];
+    XCTAssertFalse(optionalDoubleProperty.indexed, @"non-indexed property shouldn't have an index");
 }
 
 - (void)testRetainedRealmObjectUnknownKey
