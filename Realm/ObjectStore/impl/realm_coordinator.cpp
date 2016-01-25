@@ -16,10 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "realm_coordinator.hpp"
+#include "impl/realm_coordinator.hpp"
 
-#include "cached_realm.hpp"
-#include "external_commit_helper.hpp"
+#include "impl/cached_realm.hpp"
+#include "impl/external_commit_helper.hpp"
 #include "object_store.hpp"
 
 #include <unordered_map>

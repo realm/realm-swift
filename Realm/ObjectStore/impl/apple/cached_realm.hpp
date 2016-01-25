@@ -16,10 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALM_CACHED_REALM_HPP
-#define REALM_CACHED_REALM_HPP
-
-#include "../cached_realm_base.hpp"
+#include "impl/cached_realm_base.hpp"
 
 #include <CoreFoundation/CFRunLoop.h>
 
@@ -49,5 +46,3 @@ private:
 
 } // namespace _impl
 } // namespace realm
-
-#endif // REALM_CACHED_REALM_HPP

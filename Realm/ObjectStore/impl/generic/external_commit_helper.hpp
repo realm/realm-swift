@@ -16,9 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALM_EXTERNAL_COMMIT_HELPER_HPP
-#define REALM_EXTERNAL_COMMIT_HELPER_HPP
-
 #include <realm/group_shared.hpp>
 
 #include <future>
@@ -51,4 +48,3 @@ private:
 } // namespace _impl
 } // namespace realm
 
-#endif /* REALM_EXTERNAL_COMMIT_HELPER_HPP */

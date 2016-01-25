@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2015 Realm Inc.
+// Copyright 2016 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,21 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "impl/cached_realm_base.hpp"
+#ifndef REALM_CACHED_REALM_HPP
+#define REALM_CACHED_REALM_HPP
 
-namespace realm {
-class Realm;
+#include <realm/util/features.h>
 
-namespace _impl {
+#if REALM_PLATFORM_APPLE
+#include "impl/apple/cached_realm.hpp"
+#else
+#include "impl/generic/cached_realm.hpp"
+#endif
 
-class CachedRealm : public CachedRealmBase {
-public:
-    using CachedRealmBase::CachedRealmBase;
-
-    // Do nothing, as this can't be implemented portably
-    void notify() { }
-};
-
-} // namespace _impl
-} // namespace realm
-
+#endif // REALM_CACHED_REALM_HPP
