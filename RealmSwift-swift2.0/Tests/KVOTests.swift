@@ -21,7 +21,8 @@ import RealmSwift
 
 var pkCounter = 0
 func nextPrimaryKey() -> Int {
-    return ++pkCounter
+    pkCounter += 1
+    return pkCounter
 }
 
 class KVOObject: Object {

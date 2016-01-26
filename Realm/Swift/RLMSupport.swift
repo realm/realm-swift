@@ -29,20 +29,15 @@ extension RLMObject {
     }
 }
 
-public class RLMGenerator: GeneratorType {
-    private var i: UInt = 0
-    private let collection: RLMCollection
+public final class RLMGenerator: GeneratorType {
+    private let generatorBase: NSFastGenerator
 
-    init(collection: RLMCollection) {
-        self.collection = collection
+    internal init(collection: RLMCollection) {
+        generatorBase = NSFastGenerator(collection)
     }
 
     public func next() -> RLMObject? {
-        if i >= collection.count {
-            return .None
-        } else {
-            return collection[i++] as? RLMObject
-        }
+        return generatorBase.next() as! RLMObject?
     }
 }
 
