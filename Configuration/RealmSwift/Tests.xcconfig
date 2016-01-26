@@ -4,6 +4,7 @@ INFOPLIST_FILE = RealmSwift/Tests/RealmSwiftTests-Info.plist;
 PRODUCT_NAME = $(TARGET_NAME);
 SWIFT_OBJC_BRIDGING_HEADER = RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h
 SWIFT_OPTIMIZATION_LEVEL = -Onone;
+OTHER_SWIFT_FLAGS = -DREALM_XCODE_VERSION_$(XCODE_VERSION_MINOR);
 
 LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 LD_RUNPATH_SEARCH_PATHS[sdk=appletv*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;

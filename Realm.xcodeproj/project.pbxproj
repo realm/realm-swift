@@ -1254,7 +1254,7 @@
 				CLASSPREFIX = RLM;
 				LastSwiftUpdateCheck = 0710;
 				LastTestingUpgradeCheck = 0510;
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					3F1A5E711992EB7400F45F4C = {
