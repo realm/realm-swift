@@ -89,7 +89,7 @@ void Schema::validate() const
 
             // check indexable
             if (prop.is_indexed) {
-                if (prop.type != PropertyTypeString && prop.type != PropertyTypeInt) {
+                if (!prop.is_indexable()) {
                     exceptions.emplace_back(PropertyTypeNotIndexableException(object.name, prop));
                 }
             }

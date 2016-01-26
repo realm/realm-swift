@@ -102,8 +102,21 @@ class ObjectTests: TestCase {
 
     func testIndexedProperties() {
         XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
-        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 1)
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["stringCol"]!.indexed)
+        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 8)
+
+        let objectSchema = SwiftIndexedPropertiesObject().objectSchema
+        XCTAssertTrue(objectSchema["stringCol"]!.indexed)
+        XCTAssertTrue(objectSchema["intCol"]!.indexed)
+        XCTAssertTrue(objectSchema["int8Col"]!.indexed)
+        XCTAssertTrue(objectSchema["int16Col"]!.indexed)
+        XCTAssertTrue(objectSchema["int32Col"]!.indexed)
+        XCTAssertTrue(objectSchema["int64Col"]!.indexed)
+        XCTAssertTrue(objectSchema["boolCol"]!.indexed)
+        XCTAssertTrue(objectSchema["dateCol"]!.indexed)
+
+        XCTAssertFalse(objectSchema["floatCol"]!.indexed)
+        XCTAssertFalse(objectSchema["doubleCol"]!.indexed)
+        XCTAssertFalse(objectSchema["dataCol"]!.indexed)
     }
 
     func testLinkingObjects() {
