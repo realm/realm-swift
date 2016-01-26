@@ -27,8 +27,8 @@ x.x.x Release notes (yyyy-MM-dd)
   million objects in the Realm.
 * Fix errors when opening encrypted Realm files created with writeCopyToPath.
 * Fix crashes or incorrect results for queries that use relationship equality
-  in cases where the `RLMResults` is kept alive and the target table of the
-  relationship has rows reordered or deleted.
+  in cases where the `RLMResults` is kept alive and instances of the target class
+  of the relationship are deleted.
 
 0.97.0 Release notes (2015-12-17)
 =============================================================
