@@ -26,6 +26,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix a crash when adding a new property to an existing class with over a
   million objects in the Realm.
 * Fix errors when opening encrypted Realm files created with writeCopyToPath.
+* Fix crashes or incorrect results for queries that use relationship equality
+  in cases where the `RLMResults` is kept alive and instances of the target class
+  of the relationship are deleted.
 
 0.97.0 Release notes (2015-12-17)
 =============================================================
