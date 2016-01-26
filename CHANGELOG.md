@@ -13,12 +13,19 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fail with `RLMErrorFileNotFound` instead of the more generic `RLMErrorFileAccess`,
   if no file was found when a realm was opened as read-only or if the directory part
   of the specified path was not found when a copy should be written. 
+* Greatly improve performance when deleting objects with one or more indexed
+  properties.
 
 ### Bugfixes
 
 * Fix incorrect results or crashes when using `-[RLMResults setValue:forKey:]`
   on an RLMResults which was filtered on the key being set.
 * Fix crashes when an RLMRealm is deallocated from the wrong thread.
+* Fix incorrect results from aggregate methods on `Results`/`RLMResults` after
+  objects which were previously in the results are deleted.
+* Fix a crash when adding a new property to an existing class with over a
+  million objects in the Realm.
+* Fix errors when opening encrypted Realm files created with writeCopyToPath.
 
 0.97.0 Release notes (2015-12-17)
 =============================================================
