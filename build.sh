@@ -397,7 +397,7 @@ case "$COMMAND" in
             exit 1
         fi
 
-        git -C $path format-patch --stdout $commit..HEAD | git am -p 2 --directory Realm/ObjectStore
+        git -C $path format-patch --stdout $commit..HEAD | git am -p 2 --directory Realm/ObjectStore --exclude='*CMake*'
         ;;
 
     ######################################
