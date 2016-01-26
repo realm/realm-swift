@@ -16,6 +16,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Greatly improve performance when deleting objects with one or more indexed
   properties.
 * Indexing `BOOL`/`Bool` and `NSDate` properties are now supported.
+* Swift: Add support for indexing optional properties.
 
 ### Bugfixes
 
