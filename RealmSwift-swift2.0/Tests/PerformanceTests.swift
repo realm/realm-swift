@@ -383,7 +383,7 @@ class SwiftPerformanceTests: TestCase {
 
             self.startMeasuring()
             while object.intCol < 100 {
-                try! realm.write { _ = object.intCol += 1 }
+                try! realm.write { object.intCol += 1 }
             }
             self.stopMeasuring()
         }
