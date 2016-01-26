@@ -631,9 +631,8 @@ case "$COMMAND" in
 
     "verify-cocoapods")
         cd examples/installation
-        # FIXME: tests are duplicated to work around https://github.com/realm/realm-cocoa/issues/2701
-        sh build.sh test-ios-objc-cocoapods || sh build.sh test-ios-objc-cocoapods || exit 1
-        sh build.sh test-ios-swift-cocoapods || sh build.sh test-ios-swift-cocoapods || exit 1
+        sh build.sh test-ios-objc-cocoapods || exit 1
+        sh build.sh test-ios-swift-cocoapods || exit 1
         ;;
 
     "verify-osx-encryption")
