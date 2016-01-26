@@ -114,34 +114,28 @@ class TestCase: XCTestCase {
         RLMAssertThrows(self, { _ = block() } as dispatch_block_t, named, message, fileName, lineNumber)
     }
 
-    func assertSucceeds(message: String? = nil, fileName: StaticString = __FILE__, lineNumber: UInt = __LINE__,
-                        @noescape block: () throws -> ()) {
+    func assertSucceeds(message: String? = nil, @noescape block: () throws -> ()) {
         do {
             try block()
         } catch {
-            XCTFail("Expected no error, but instead caught <\(error)>.",
-                file: fileName, line: lineNumber)
+            XCTFail("Expected no error, but instead caught <\(error)>.")
         }
     }
 
     func assertFails<T>(expectedError: Error,  _ message: String? = nil,
-                        fileName: StaticString = __FILE__, lineNumber: UInt = __LINE__,
                         @noescape block: () throws -> T) {
         do {
             try block()
-            XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
-                file: fileName, line: lineNumber)
+            XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.")
         } catch expectedError {
             // Success!
         } catch {
-            XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.",
-                file: fileName, line: lineNumber)
+            XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.")
         }
     }
 
-    func assertNil<T>(@autoclosure block: () -> T?, _ message: String? = nil, fileName: StaticString = __FILE__,
-                      lineNumber: UInt = __LINE__) {
-        XCTAssert(block() == nil, message ?? "", file: fileName, line: lineNumber)
+    func assertNil<T>(@autoclosure block: () -> T?, _ message: String? = nil) {
+        XCTAssert(block() == nil, message ?? "")
     }
 
     private func realmFilePrefix() -> String {
