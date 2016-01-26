@@ -79,31 +79,33 @@ class KVOTests: TestCase {
     }
 
     func observeChange(obj: NSObject, _ key: String, _ old: AnyObject, _ new: AnyObject,
-                       _ block: () -> Void) {
+                       fileName: TestLocationString = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [.Old, .New], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
 
-        XCTAssert(changeDictionary != nil, "Did not get a notification")
+        XCTAssert(changeDictionary != nil, "Did not get a notification", file: fileName, line: lineNumber)
         if changeDictionary == nil {
             return
         }
 
         let actualOld: AnyObject = changeDictionary![NSKeyValueChangeOldKey]!
         let actualNew: AnyObject = changeDictionary![NSKeyValueChangeNewKey]!
-        XCTAssert(actualOld.isEqual(old), "Old value: expected \(old), got \(actualOld)")
-        XCTAssert(actualNew.isEqual(new), "New value: expected \(new), got \(actualNew)")
+        XCTAssert(actualOld.isEqual(old), "Old value: expected \(old), got \(actualOld)", file: fileName,
+            line: lineNumber)
+        XCTAssert(actualNew.isEqual(new), "New value: expected \(new), got \(actualNew)", file: fileName,
+            line: lineNumber)
 
         changeDictionary = nil
     }
 
     func observeListChange(obj: NSObject, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet,
-                           _ block: () -> Void) {
+                           fileName: TestLocationString = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [.Old, .New], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
 
-        XCTAssert(changeDictionary != nil, "Did not get a notification")
+        XCTAssert(changeDictionary != nil, "Did not get a notification", file: fileName, line: lineNumber)
         if changeDictionary == nil {
             return
         }
@@ -111,8 +113,10 @@ class KVOTests: TestCase {
         let actualKind = NSKeyValueChange(rawValue: (changeDictionary![NSKeyValueChangeKindKey] as! NSNumber)
             .unsignedLongValue)!
         let actualIndexes = changeDictionary![NSKeyValueChangeIndexesKey]! as! NSIndexSet
-        XCTAssert(actualKind == kind, "Change kind: expected \(kind), got \(actualKind)")
-        XCTAssert(actualIndexes.isEqual(indexes), "Changed indexes: expected \(indexes), got \(actualIndexes)")
+        XCTAssert(actualKind == kind, "Change kind: expected \(kind), got \(actualKind)", file: fileName,
+            line: lineNumber)
+        XCTAssert(actualIndexes.isEqual(indexes), "Changed indexes: expected \(indexes), got \(actualIndexes)",
+            file: fileName, line: lineNumber)
 
         changeDictionary = nil
     }
