@@ -1700,6 +1700,42 @@
                                       @"Operator 'ENDSWITH' is not supported .* right side");
 }
 
+- (void)testLinksToDeletedOrMovedObject
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    DogObject *fido = [DogObject createInRealm:realm withValue:@[ @"Fido", @3 ]];
+    [OwnerObject createInRealm:realm withValue:@[ @"Fido's owner", fido ]];
+
+    DogObject *rex = [DogObject createInRealm:realm withValue:@[ @"Rex", @2 ]];
+    [OwnerObject createInRealm:realm withValue:@[ @"Rex's owner", rex ]];
+
+    DogObject *spot = [DogObject createInRealm:realm withValue:@[ @"Spot", @2 ]];
+    [OwnerObject createInRealm:realm withValue:@[ @"Spot's owner", spot ]];
+
+    [realm commitWriteTransaction];
+
+    RLMResults *fidoQuery = [OwnerObject objectsInRealm:realm where:@"dog == %@", fido];
+    RLMResults *rexQuery = [OwnerObject objectsInRealm:realm where:@"dog == %@", rex];
+    RLMResults *spotQuery = [OwnerObject objectsInRealm:realm where:@"dog == %@", spot];
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:fido];
+    [realm commitWriteTransaction];
+
+    // Fido was removed, so we should not find his owner.
+    XCTAssertEqual(0u, fidoQuery.count);
+
+    // Rex's owner should be found as the row was not touched.
+    XCTAssertEqual(1u, rexQuery.count);
+    XCTAssertEqualObjects(@"Rex's owner", [rexQuery.firstObject name]);
+
+    // Spot's owner should be found, despite Spot's row having moved.
+    XCTAssertEqual(1u, spotQuery.count);
+    XCTAssertEqualObjects(@"Spot's owner", [spotQuery.firstObject name]);
+}
+
 @end
 
 @interface NullQueryTests : QueryTests
