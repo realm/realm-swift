@@ -15,6 +15,7 @@ x.x.x Release notes (yyyy-MM-dd)
   of the specified path was not found when a copy should be written. 
 * Greatly improve performance when deleting objects with one or more indexed
   properties.
+* Indexing `BOOL`/`Bool` and `NSDate` properties are now supported.
 
 ### Bugfixes
 
