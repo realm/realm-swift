@@ -119,6 +119,23 @@ class ObjectTests: TestCase {
         XCTAssertFalse(objectSchema["dataCol"]!.indexed)
     }
 
+    func testIndexedOptionalProperties() {
+        XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
+        XCTAssertEqual(SwiftIndexedOptinalPropertiesObject.indexedProperties().count, 8)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalStringCol"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalDateCol"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalBoolCol"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalIntCol"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalInt8Col"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalInt16Col"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalInt32Col"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalInt64Col"]!.indexed)
+
+        XCTAssertFalse(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalDataCol"]!.indexed)
+        XCTAssertFalse(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalFloatCol"]!.indexed)
+        XCTAssertFalse(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalDoubleCol"]!.indexed)
+    }
+
     func testLinkingObjects() {
         let realm = try! Realm()
         let object = SwiftEmployeeObject()
