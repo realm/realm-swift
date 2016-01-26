@@ -45,10 +45,6 @@ xctest() {
     DIRECTORY="$PLATFORM/$LANG/$NAME"
     PROJECT="$DIRECTORY/$NAME.xcodeproj"
     WORKSPACE="$DIRECTORY/$NAME.xcworkspace"
-    CMD="-project $PROJECT"
-    if [ -d $WORKSPACE ]; then
-        CMD="-workspace $WORKSPACE"
-    fi
     if [[ $PLATFORM == ios ]]; then
         sh "$(dirname "$0")/../../scripts/reset-simulators.sh"
     fi
@@ -72,6 +68,10 @@ xctest() {
     DESTINATION=""
     if [[ $PLATFORM == ios ]]; then
         DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
+    fi
+    CMD="-project $PROJECT"
+    if [ -d $WORKSPACE ]; then
+        CMD="-workspace $WORKSPACE"
     fi
     xcodebuild $CMD -scheme $NAME clean build test $DESTINATION
 }
