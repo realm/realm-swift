@@ -33,7 +33,7 @@ using namespace realm;
 // private properties
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite) NSDictionary RLM_GENERIC(id, RLMProperty *) *propertiesByName;
-@property (nonatomic, readwrite, assign) NSString *className;
+@property (nonatomic, readwrite) NSString *className;
 @end
 
 @implementation RLMObjectSchema {
