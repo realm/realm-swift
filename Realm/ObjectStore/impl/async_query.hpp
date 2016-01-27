@@ -103,7 +103,6 @@ private:
     // remove_callback() updates this when needed
     size_t m_callback_index = npos;
 
-    bool m_skipped_running = false;
     bool m_initial_run_complete = false;
 
     // Cached value for if m_callbacks is empty, needed to avoid deadlocks in
