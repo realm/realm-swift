@@ -31,6 +31,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix crashes or incorrect results for queries that use relationship equality
   in cases where the `RLMResults` is kept alive and instances of the target class
   of the relationship are deleted.
+* Fix crash when accessing Results dependent on a deleted relationship.
 
 0.97.0 Release notes (2015-12-17)
 =============================================================

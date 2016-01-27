@@ -124,6 +124,11 @@
 @implementation BaseClassStringObject
 @end
 
+#pragma mark ArrayOfSelfObject
+
+@implementation ArrayOfSelfObject
+@end
+
 #pragma mark CircleObject
 
 @implementation CircleObject

@@ -1736,6 +1736,21 @@
     XCTAssertEqualObjects(@"Spot's owner", [spotQuery.firstObject name]);
 }
 
+- (void)testQueryDeleteRelationshipDependency
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [ArrayOfSelfObject createInDefaultRealmWithValue:@{@"name": @"B", @"arrayProp": @[@{@"name": @"A"}]}];
+    // Make queries that depend on the relationship.
+    RLMResults *arrayProp = [[[[ArrayOfSelfObject allObjects] firstObject] arrayProp] objectsWhere:@"name = name"];
+    [[[arrayProp firstObject] arrayProp] objectsWhere:@"name = name"];
+    // Delete the object in the relationship being queried.
+    [realm deleteObject:[[ArrayOfSelfObject allObjects] firstObject]];
+    XCTAssertNil(arrayProp.firstObject, @"Should be nil and not throw");
+    XCTAssertEqual(arrayProp.count, 0U, @"Result should be empty");
+    [realm cancelWriteTransaction];
+}
+
 @end
 
 @interface NullQueryTests : QueryTests
