@@ -181,7 +181,7 @@ public:
 
     // Helper type to let AsyncQuery update the tableview without giving access
     // to any other privates or letting anyone else do so
-    class AsyncFriend {
+    class Internal {
         friend class _impl::AsyncQuery;
         static void set_table_view(Results& results, TableView&& tv);
     };

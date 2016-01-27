@@ -204,8 +204,8 @@ bool AsyncQuery::deliver(SharedGroup& sg, std::exception_ptr err)
 
     if (m_tv_handover) {
         m_tv_handover->version = m_sg_version;
-        Results::AsyncFriend::set_table_view(*m_target_results,
-                                             std::move(*sg.import_from_handover(std::move(m_tv_handover))));
+        Results::Internal::set_table_view(*m_target_results,
+                                          std::move(*sg.import_from_handover(std::move(m_tv_handover))));
         m_delievered_table_version = m_handed_over_table_version;
 
     }
