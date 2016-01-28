@@ -1001,7 +1001,7 @@ NSExpression *simplify_self_value_for_key_path_function_expression(NSExpression 
     if (expression.expressionType == NSFunctionExpressionType
         && expression.operand.expressionType == NSEvaluatedObjectExpressionType
         && [expression.function isEqualToString:@"valueForKeyPath:"]) {
-        if (NSString *keyPath = expression.arguments.firstObject.keyPath) {
+        if (NSString *keyPath = [expression.arguments.firstObject keyPath]) {
             return [NSExpression expressionForKeyPath:keyPath];
         }
     }
