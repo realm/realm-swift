@@ -38,7 +38,18 @@
 
 #endif
 
-NSExpression *RLMPredicateExpressionTransformer::visit(NSExpression *expression) const {
+namespace {
+
+struct PredicateExpressionTransformer {
+    PredicateExpressionTransformer(ExpressionVisitor visitor) : m_visitor(visitor) { }
+
+    NSExpression *visit(NSExpression *expression) const;
+    NSPredicate *visit(NSPredicate *predicate) const;
+
+    ExpressionVisitor m_visitor;
+};
+
+NSExpression *PredicateExpressionTransformer::visit(NSExpression *expression) const {
     expression = m_visitor(expression);
 
     switch (expression.expressionType) {
@@ -81,7 +92,7 @@ NSExpression *RLMPredicateExpressionTransformer::visit(NSExpression *expression)
     }
 }
 
-NSPredicate *RLMPredicateExpressionTransformer::visit(NSPredicate *predicate) const {
+NSPredicate *PredicateExpressionTransformer::visit(NSPredicate *predicate) const {
     if ([predicate isKindOfClass:[NSCompoundPredicate class]]) {
         NSCompoundPredicate *compoundPredicate = (NSCompoundPredicate *)predicate;
         NSMutableArray *subpredicates = [NSMutableArray array];
@@ -97,4 +108,11 @@ NSPredicate *RLMPredicateExpressionTransformer::visit(NSPredicate *predicate) co
         return [NSComparisonPredicate predicateWithLeftExpression:leftExpression rightExpression:rightExpression modifier:comparisonPredicate.comparisonPredicateModifier type:comparisonPredicate.predicateOperatorType options:comparisonPredicate.options];
     }
     return predicate;
+}
+
+} // anonymous namespace
+
+NSPredicate *transformPredicate(NSPredicate *predicate, ExpressionVisitor visitor) {
+    PredicateExpressionTransformer transformer(visitor);
+    return transformer.visit(predicate);
 }

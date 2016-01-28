@@ -17,20 +17,5 @@
 
 #import <Foundation/Foundation.h>
 
-class RLMPredicateExpressionTransformer {
-    using ExpressionVisitor = NSExpression *(*)(NSExpression *);
-
-public:
-    static NSPredicate *transform(NSPredicate *predicate, ExpressionVisitor visitor) {
-        RLMPredicateExpressionTransformer self(visitor);
-        return self.visit(predicate);
-    }
-
-private:
-    RLMPredicateExpressionTransformer(ExpressionVisitor visitor) : m_visitor(visitor) { }
-
-    NSExpression *visit(NSExpression *expression) const;
-    NSPredicate *visit(NSPredicate *predicate) const;
-
-    ExpressionVisitor m_visitor;
-};
+using ExpressionVisitor = NSExpression *(*)(NSExpression *);
+NSPredicate *transformPredicate(NSPredicate *, ExpressionVisitor);

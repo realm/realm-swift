@@ -1015,7 +1015,7 @@ void update_query_with_subquery_expression(RLMSchema *schema, RLMObjectSchema *o
 
     // Eliminate references to the iteration variable in the subquery.
     NSPredicate *subqueryPredicate = [subqueryExpression.predicate predicateWithSubstitutionVariables:@{ subqueryExpression.variable : [NSExpression expressionForEvaluatedObject] }];
-    subqueryPredicate = RLMPredicateExpressionTransformer::transform(subqueryPredicate, simplify_self_value_for_key_path_function_expression);
+    subqueryPredicate = transformPredicate(subqueryPredicate, simplify_self_value_for_key_path_function_expression);
 
     Query subquery = collectionMemberObjectSchema.table->where();
     RLMUpdateQueryWithPredicate(&subquery, subqueryPredicate, schema, collectionMemberObjectSchema);
