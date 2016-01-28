@@ -995,12 +995,22 @@ void update_query_with_column_expression(RLMSchema *schema, RLMObjectSchema *des
                             std::move(left), std::move(right));
 }
 
+// Identify expressions of the form [SELF valueForKeyPath:]
+bool is_self_value_for_key_path_function_expression(NSExpression *expression)
+{
+    if (expression.expressionType != NSFunctionExpressionType)
+        return false;
+
+    if (expression.operand.expressionType != NSEvaluatedObjectExpressionType)
+        return false;
+
+    return [expression.function isEqualToString:@"valueForKeyPath:"];
+}
+
+// -[NSPredicate predicateWithSubtitutionVariables:] results in function expressions of the form [SELF valueForKeyPath:]
+// that update_query_with_predicate cannot handle. Replace such expressions with equivalent NSKeyPathExpressionType expressions.
 NSExpression *simplify_self_value_for_key_path_function_expression(NSExpression *expression) {
-    // -[NSPredicate predicateWithSubtitutionVariables:] results in function expressions of the form [SELF valueForKeyPath:]
-    // that update_query_with_predicate cannot handle. Replace such expressions with equivalent NSKeyPathExpressionType expressions.
-    if (expression.expressionType == NSFunctionExpressionType
-        && expression.operand.expressionType == NSEvaluatedObjectExpressionType
-        && [expression.function isEqualToString:@"valueForKeyPath:"]) {
+    if (is_self_value_for_key_path_function_expression(expression)) {
         if (NSString *keyPath = [expression.arguments.firstObject keyPath]) {
             return [NSExpression expressionForKeyPath:keyPath];
         }
@@ -1008,8 +1018,13 @@ NSExpression *simplify_self_value_for_key_path_function_expression(NSExpression 
     return expression;
 }
 
-void update_query_with_subquery_expression(RLMSchema *schema, RLMObjectSchema *objectSchema, realm::Query& query,
-                                           NSExpression *subqueryExpression, NSPredicateOperatorType operatorType, NSUInteger value) {
+void update_query_with_subquery_count_expression(RLMSchema *schema, RLMObjectSchema *objectSchema, realm::Query& query,
+                                           NSExpression *subqueryExpression, NSPredicateOperatorType operatorType, NSExpression *right) {
+    if (right.expressionType != NSConstantValueExpressionType || ![right.constantValue isKindOfClass:[NSNumber class]]) {
+        @throw RLMPredicateException(@"Invalid predicate expression", @"SUBQUERY(…).@count is only supported when compared with a constant number.");
+    }
+    int64_t value = [right.constantValue integerValue];
+
     ColumnReference collectionColumn = column_reference_from_key_path(schema, objectSchema, [subqueryExpression.collection keyPath], true);
     RLMObjectSchema *collectionMemberObjectSchema = schema[collectionColumn.property().objectClassName];
 
@@ -1020,8 +1035,32 @@ void update_query_with_subquery_expression(RLMSchema *schema, RLMObjectSchema *o
     Query subquery = collectionMemberObjectSchema.table->where();
     RLMUpdateQueryWithPredicate(&subquery, subqueryPredicate, schema, collectionMemberObjectSchema);
 
-    add_numeric_constraint_to_query(query, RLMPropertyTypeInt, operatorType, collectionColumn.resolveWithSubquery<LinkList>(query, std::move(subquery)).count(), static_cast<int64_t>(value));
+    add_numeric_constraint_to_query(query, RLMPropertyTypeInt, operatorType, collectionColumn.resolveWithSubquery<LinkList>(query, std::move(subquery)).count(), value);
 }
+
+void update_query_with_function_subquery_expression(RLMSchema *schema, RLMObjectSchema *objectSchema, realm::Query& query,
+                                                    NSExpression *functionExpression, NSPredicateOperatorType operatorType, NSExpression *right) {
+    if (![functionExpression.function isEqualToString:@"valueForKeyPath:"] || functionExpression.arguments.count != 1) {
+        @throw RLMPredicateException(@"Invalid predicate", @"The '%@' function is not supported on the result of a SUBQUERY.", functionExpression.function);
+    }
+
+    NSExpression *keyPathExpression = functionExpression.arguments.firstObject;
+    if ([keyPathExpression.keyPath isEqualToString:@"@count"]) {
+        update_query_with_subquery_count_expression(schema, objectSchema, query, functionExpression.operand,  operatorType, right);
+    } else {
+        @throw RLMPredicateException(@"Invalid predicate", @"SUBQUERY is only supported when immediately followed by .@count that is compared with a constant number.");
+    }
+}
+
+void update_query_with_function_expression(RLMSchema *schema, RLMObjectSchema *objectSchema, realm::Query& query,
+                                           NSExpression *functionExpression, NSPredicateOperatorType operatorType, NSExpression *right) {
+    if (functionExpression.operand.expressionType == NSSubqueryExpressionType) {
+        update_query_with_function_subquery_expression(schema, objectSchema, query, functionExpression, operatorType, right);
+    } else {
+        @throw RLMPredicateException(@"Invalid predicate", @"The '%@' function is not supported.", functionExpression.function);
+    }
+}
+
 
 void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                                  RLMObjectSchema *objectSchema, realm::Query &query)
@@ -1108,19 +1147,7 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                                                compp.leftExpression.constantValue, compp);
         }
         else if (exp1Type == NSFunctionExpressionType) {
-            NSExpression *functionExpression = compp.leftExpression;
-            if (functionExpression.operand.expressionType == NSSubqueryExpressionType && [functionExpression.function isEqualToString:@"valueForKeyPath:"] && functionExpression.arguments.count == 1) {
-                NSExpression *keyPathExpression = functionExpression.arguments.firstObject;
-                if ([keyPathExpression.keyPath isEqualToString:@"@count"]
-                    && compp.rightExpression.expressionType == NSConstantValueExpressionType
-                    && [compp.rightExpression.constantValue isKindOfClass:[NSNumber class]]) {
-                    update_query_with_subquery_expression(schema, objectSchema, query, functionExpression.operand,  compp.predicateOperatorType, [compp.rightExpression.constantValue integerValue]);
-                } else {
-                    @throw RLMPredicateException(@"Invalid predicate expression", @"SUBQUERY is only supported when immediately followed by .@count that is compared with a constant number.");
-                }
-            } else {
-                @throw RLMPredicateException(@"Invalid predicate", @"The '%@' function is not supported.", functionExpression.function);
-            }
+            update_query_with_function_expression(schema, objectSchema, query, compp.leftExpression, compp.predicateOperatorType, compp.rightExpression);
         }
         else if (exp1Type == NSSubqueryExpressionType) {
             // The subquery expressions that we support are handled by the NSFunctionExpressionType case above.
