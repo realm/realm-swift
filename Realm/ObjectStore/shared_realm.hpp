@@ -118,13 +118,20 @@ namespace realm {
         void init(std::shared_ptr<_impl::RealmCoordinator> coordinator);
         Realm(Config config);
 
-        // Give AsyncQuery direct access to the shared group as it needs it to
-        // call the handover functions
+        // Expose some internal functionality to other parts of the ObjectStore
+        // without making it public to everyone
         class Internal {
             friend class _impl::AsyncQuery;
             friend class _impl::RealmCoordinator;
+
+            // AsyncQuery needs access to the SharedGroup to be able to call the
+            // handover functions, which are not very wrappable
             static SharedGroup& get_shared_group(Realm& realm) { return *realm.m_shared_group; }
             static ClientHistory& get_history(Realm& realm) { return *realm.m_history; }
+
+            // AsyncQuery needs to be able to access the owning coordinator to
+            // wake up the worker thread when a callback is added, and
+            // coordinators need to be able to get themselves from a Realm
             static _impl::RealmCoordinator& get_coordinator(Realm& realm) { return *realm.m_coordinator; }
         };
 
