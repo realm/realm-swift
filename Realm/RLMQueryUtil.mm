@@ -86,12 +86,14 @@ struct TrueExpression : realm::Expression {
     }
     void set_table(const Table*) override {}
     const Table* get_table() const override { return nullptr; }
+    std::unique_ptr<Expression> clone(QueryNodeHandoverPatches*) const override { return nullptr; }
 };
 
 struct FalseExpression : realm::Expression {
     size_t find_first(size_t, size_t) const override { return realm::not_found; }
     void set_table(const Table*) override {}
     const Table* get_table() const override { return nullptr; }
+    std::unique_ptr<Expression> clone(QueryNodeHandoverPatches*) const override { return nullptr; }
 };
 
 NSString *operatorName(NSPredicateOperatorType operatorType)
@@ -501,7 +503,7 @@ void add_link_constraint_to_query(realm::Query & query,
     }
 
     if (!obj->_row.is_attached()) {
-        query.and_query(new FalseExpression);
+        query.and_query(std::unique_ptr<Expression>(new FalseExpression));
         return;
     }
 
@@ -564,7 +566,7 @@ void process_or_group(Query &query, id array, Func&& func) {
         // Queries can't be empty, so if there's zero things in the OR group
         // validation will fail. Work around this by adding an expression which
         // will never find any rows in a table.
-        query.and_query(new FalseExpression);
+        query.and_query(std::unique_ptr<Expression>(new FalseExpression));
     }
 
     query.end_group();
@@ -1033,7 +1035,7 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                     query.end_group();
                 } else {
                     // NSCompoundPredicate's documentation states that an AND predicate with no subpredicates evaluates to TRUE.
-                    query.and_query(new TrueExpression);
+                    query.and_query(std::unique_ptr<Expression>(new TrueExpression));
                 }
                 break;
 
@@ -1124,9 +1126,9 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
         }
     }
     else if ([predicate isEqual:[NSPredicate predicateWithValue:YES]]) {
-        query.and_query(new TrueExpression);
+        query.and_query(std::unique_ptr<Expression>(new TrueExpression));
     } else if ([predicate isEqual:[NSPredicate predicateWithValue:NO]]) {
-        query.and_query(new FalseExpression);
+        query.and_query(std::unique_ptr<Expression>(new FalseExpression));
     }
     else {
         // invalid predicate type
