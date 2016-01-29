@@ -161,13 +161,9 @@ build_combined() {
     LIPO_OUTPUT="$out_path/$product_name/$module_name"
     xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
 
-    if [[ $(xcode_major_version) != "6" && "$destination" != "" && "$config" == "Release" ]]; then
+    if [[ $REALM_SWIFT_VERSION != '1.2' && "$destination" != "" && "$config" == "Release" ]]; then
         sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
     fi
-}
-
-xcode_major_version() {
-    xcodebuild -version | awk '/Xcode / { print $2 }' | cut -d '.' -f 1
 }
 
 xc_work_around_rdar_23055637() {
