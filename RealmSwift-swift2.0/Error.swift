@@ -97,7 +97,7 @@ public enum Error: ErrorType {
 extension Error: Equatable {}
 
 /// Returns whether the two errors are identical
-public func == (lhs: ErrorType, rhs: ErrorType) -> Bool {
+public func == (lhs: ErrorType, rhs: ErrorType) -> Bool { // swiftlint:disable:this valid_docs
     return lhs._code == rhs._code
         && lhs._domain == rhs._domain
 }
@@ -108,6 +108,6 @@ public func == (lhs: ErrorType, rhs: ErrorType) -> Bool {
 Explicitly implement pattern matching for `Realm.Error`, so that the instances can be used in the
 `do … syntax`.
 */
-public func ~= (lhs: Error, rhs: ErrorType) -> Bool {
+public func ~= (lhs: Error, rhs: ErrorType) -> Bool { // swiftlint:disable:this valid_docs
     return lhs == rhs
 }

@@ -101,9 +101,8 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testDescription() {
-        // swiftlint:disable line_length
+        // swiftlint:disable:next line_length
         XCTAssertEqual(collection.description, "Results<SwiftStringObject> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
-        // swiftlint:enable line_length
     }
 
     func testCount() {
@@ -457,9 +456,8 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
     }
 
     override func testDescription() {
-        // swiftlint:disable line_length
+        // swiftlint:disable:next line_length
         XCTAssertEqual(collection.description, "List<SwiftStringObject> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
-        // swiftlint:enable line_length
     }
 
     func testAddNotificationBlockDirect() {
