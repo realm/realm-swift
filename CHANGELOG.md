@@ -8,6 +8,21 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
+* None.
+
+### Bugfixes
+
+* None.
+
+0.97.1 Release notes (2016-01-29)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
 * Swift: Added `Error` enum allowing to catch errors e.g. thrown on initializing
   `RLMRealm`/`Realm` instances.
 * Fail with `RLMErrorFileNotFound` instead of the more generic `RLMErrorFileAccess`,
