@@ -827,7 +827,9 @@ case "$COMMAND" in
 
     "binary-has-bitcode")
         BINARY="$2"
-        if otool -l "$BINARY" | grep -q "segname __LLVM"; then
+        # Although grep has a '-q' flag to prevent logging to stdout, grep
+        # behaves differently when used, so redirect stdout to /dev/null.
+        if otool -l "$BINARY" | grep "segname __LLVM" > /dev/null 2>&1; then
             exit 0
         fi
         # Work around rdar://21826157 by checking for bitcode in thin binaries
