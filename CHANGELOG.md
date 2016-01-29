@@ -1,10 +1,9 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.97.1 Release notes (2016-01-29)
 =============================================================
 
 ### API breaking changes
 
-* `+[RLMRealm realmWithPath:]`/`Realm.init(path:)` now inherits from the default
-  configuration.
+* None.
 
 ### Enhancements
 
