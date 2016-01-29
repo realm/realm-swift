@@ -398,6 +398,12 @@ AsyncQueryCancelationToken::AsyncQueryCancelationToken(std::shared_ptr<_impl::As
 
 AsyncQueryCancelationToken::~AsyncQueryCancelationToken()
 {
+    // m_query itself (and not just the pointed-to thing) needs to be accessed
+    // atomically to ensure that there are no data races when the token is
+    // destroyed after being modified on a different thread.
+    // This is needed despite the token not being thread-safe in general as
+    // users find it very surpringing for obj-c objects to care about what
+    // thread they are deallocated on.
     if (auto query = std::atomic_load(&m_query)) {
         query->remove_callback(m_token);
     }
