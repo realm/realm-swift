@@ -84,9 +84,8 @@ public final class Realm {
     - throws: An NSError if the Realm could not be initialized.
     */
     public convenience init(path: String) throws {
-        var configuration = Configuration.defaultConfiguration
-        configuration.path = path
-        try self.init(configuration: configuration)
+        let rlmRealm = try RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: false, schema: nil)
+        self.init(rlmRealm)
     }
 
     // MARK: Transactions
