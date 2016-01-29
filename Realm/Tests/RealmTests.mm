@@ -73,15 +73,6 @@ extern "C" {
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:&error], @"Realm at path '.*' already opened with different inMemory settings");
 }
 
-- (void)testRealmWithPathUsesDefaultConfiguration {
-    RLMRealmConfiguration *originalDefaultConfiguration = [RLMRealmConfiguration defaultConfiguration];
-    RLMRealmConfiguration *newDefaultConfiguration = [originalDefaultConfiguration copy];
-    newDefaultConfiguration.objectClasses = @[];
-    [RLMRealmConfiguration setDefaultConfiguration:newDefaultConfiguration];
-    XCTAssertEqual([[[[RLMRealm realmWithPath:RLMTestRealmPath()] configuration] objectClasses] count], 0U);
-    [RLMRealmConfiguration setDefaultConfiguration:originalDefaultConfiguration];
-}
-
 - (void)testReadOnlyFile {
     @autoreleasepool {
         RLMRealm *realm = self.realmWithTestPath;

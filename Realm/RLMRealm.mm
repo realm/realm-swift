@@ -159,7 +159,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 }
 
 + (instancetype)realmWithPath:(NSString *)path {
-    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
     configuration.path = path;
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
