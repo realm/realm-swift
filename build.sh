@@ -160,7 +160,8 @@ build_combined() {
     # Combine ar archives
     LIPO_OUTPUT="$out_path/$product_name/$module_name"
     xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
-    if [[ "$destination" != "" ]] && [[ "$config" == "Release" ]]; then
+
+    if [[ $REALM_SWIFT_VERSION != '1.2' && "$destination" != "" && "$config" == "Release" ]]; then
         sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
     fi
 }
@@ -830,7 +831,7 @@ case "$COMMAND" in
             exit 0
         fi
         # Work around rdar://21826157 by checking for bitcode in thin binaries
-        
+
         # Get architectures for binary
         archs="$(lipo -info "$BINARY" | rev | cut -d ':' -f1 | rev)"
 
