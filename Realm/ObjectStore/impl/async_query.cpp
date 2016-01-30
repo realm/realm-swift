@@ -134,10 +134,7 @@ void AsyncQuery::run()
     if (m_initial_run_complete) {
         // Make an empty tableview from the query to get the table version, since
         // Query doesn't expose it
-        m_tv = m_query->find_all(0, 0, 0);
-        auto table_version = m_tv.outside_version();
-        if (table_version == m_handed_over_table_version) {
-            m_tv = TableView();
+        if (m_query->find_all(0, 0, 0).outside_version() == m_handed_over_table_version) {
             return;
         }
     }
