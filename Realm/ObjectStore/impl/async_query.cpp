@@ -36,6 +36,9 @@ AsyncQuery::AsyncQuery(Results& target)
 
 AsyncQuery::~AsyncQuery()
 {
+    // unregister() may have been called from a different thread than we're being
+    // destroyed on, so we need to synchronize access to the interesting fields
+    // modified there
     std::lock_guard<std::mutex> lock(m_target_mutex);
     m_realm = nullptr;
 }
@@ -113,13 +116,34 @@ bool AsyncQuery::is_alive() const noexcept
     return !m_unregistered;
 }
 
+// Most of the inter-thread synchronization for run(), prepare_handover(),
+// attach_to(), detach(), release_query() and deliver() is done by
+// RealmCoordinator external to this code, which has some potentially
+// non-obvious results on which members are and are not safe to use without
+// holding a lock.
+//
+// attach_to(), detach(), run(), prepare_handover(), and release_query() are
+// all only ever called on a single thread. call_callbacks() and deliver() are
+// called on the same thread. Calls to prepare_handover() and deliver() are
+// guarded by a lock.
+//
+// In total, this means that the safe data flow is as follows:
+//  - prepare_handover(), attach_to(), detach() and release_query() can read
+//    members written by each other
+//  - deliver() can read members written to in prepare_handover(), deliver(),
+//    and call_callbacks()
+//  - call_callbacks() and read members written to in deliver()
+//
+// Separately from this data flow for the query results, all uses of
+// m_target_results, m_callbacks, and m_callback_index must be done with the
+// appropriate mutex held to avoid race conditions when the Results object is
+// destroyed while the background work is running, and to allow removing
+// callbacks from any thread.
+
 void AsyncQuery::run()
 {
     REALM_ASSERT(m_sg);
 
-    // This function must not touch any members touched in deliver(), as they
-    // may be called concurrently (as it'd be pretty bad for a running query to
-    // block the main thread trying to pick up the previous results)
     {
         std::lock_guard<std::mutex> target_lock(m_target_mutex);
         // Don't run the query if the results aren't actually going to be used
