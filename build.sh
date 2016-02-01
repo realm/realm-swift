@@ -283,8 +283,15 @@ download_core() {
     CORE_TMP_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2.tmp"
     CORE_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2"
     if [ ! -f "${CORE_TAR}" ]; then
-        curl -f -L -s "https://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.bz2" -o "${CORE_TMP_TAR}" ||
-          (echo "Downloading core failed. Please try again once you have an Internet connection." && exit 1)
+        local CORE_URL="https://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.bz2"
+        set +e # temporarily disable immediate exit
+        local ERROR # sweeps the exit code unless declared separately
+        ERROR=$(curl --fail --silent --show-error --location "$CORE_URL" --output "${CORE_TMP_TAR}" 2>&1 >/dev/null)
+        if [[ $? -ne 0 ]]; then
+            echo "Downloading core failed:\n${ERROR}"
+            exit 1
+        fi
+        set -e # re-enable flag
         mv "${CORE_TMP_TAR}" "${CORE_TAR}"
     fi
 
