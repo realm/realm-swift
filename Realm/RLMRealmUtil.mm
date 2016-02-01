@@ -90,6 +90,22 @@ class RLMNotificationHelper : public realm::BindingContext {
 public:
     RLMNotificationHelper(RLMRealm *realm) : _realm(realm) { }
 
+    bool can_deliver_notifications() const noexcept override {
+        // The main thread may not be in a run loop yet if we're called from
+        // something like `applicationDidFinishLaunching:`, but it presumably will
+        // be in the future
+        if ([NSThread isMainThread]) {
+            return true;
+        }
+        // Current mode indicates why the current callout from the runloop was made,
+        // and is null if a runloop callout isn't currently being processed
+        if (auto mode = CFRunLoopCopyCurrentMode(CFRunLoopGetCurrent())) {
+            CFRelease(mode);
+            return true;
+        }
+        return false;
+    }
+
     void changes_available() override {
         @autoreleasepool {
             auto realm = _realm;

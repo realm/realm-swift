@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,34 +16,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectSchema_Private.h"
-
-#import "object_schema.hpp"
-#import "RLMObject_Private.hpp"
-
-#import <realm/row.hpp>
-#import <vector>
+#include "impl/cached_realm_base.hpp"
 
 namespace realm {
-    class Table;
-}
+class Realm;
 
-class RLMObservationInfo;
+namespace _impl {
 
-// RLMObjectSchema private
-@interface RLMObjectSchema () {
-    @public
-    std::vector<RLMObservationInfo *> _observedObjects;
-}
-@property (nonatomic) realm::Table *table;
+class CachedRealm : public CachedRealmBase {
+public:
+    using CachedRealmBase::CachedRealmBase;
 
-// shallow copy reusing properties and property map
-- (instancetype)shallowCopy;
+    // Do nothing, as this can't be implemented portably
+    void notify() { }
+};
 
-// create realm::ObjectSchema copy
-- (realm::ObjectSchema)objectStoreCopy;
+} // namespace _impl
+} // namespace realm
 
-// initialize with realm::ObjectSchema
-+ (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema &)objectSchema;
-
-@end

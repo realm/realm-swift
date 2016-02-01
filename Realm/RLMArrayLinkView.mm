@@ -450,4 +450,34 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     return _backingLinkView->get_target_table().where(_backingLinkView).find_all();
 }
 
+// The compiler complains about the method's argument type not matching due to
+// it not having the generic type attached, but it doesn't seem to be possible
+// to actually include the generic type
+// http://www.openradar.me/radar?id=6135653276319744
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, NSError *))block {
+    [_realm verifyNotificationsAreSupported];
+
+    __block uint_fast64_t prevVersion = -1;
+    auto noteBlock = ^(NSString *notification, RLMRealm *) {
+        if (notification != RLMRealmDidChangeNotification) {
+            return;
+        }
+
+        auto version = _backingLinkView->get_origin_table().get_version_counter();
+        if (version != prevVersion) {
+            block(self, nil);
+            prevVersion = version;
+        }
+    };
+
+    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+        noteBlock(RLMRealmDidChangeNotification, nil);
+    });
+
+    return [_realm addNotificationBlock:noteBlock];
+}
+#pragma clang diagnostic pop
+
 @end

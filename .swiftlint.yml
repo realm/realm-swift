@@ -8,3 +8,4 @@ disabled_rules:
   - function_body_length
   - file_length
   - type_body_length
+  - variable_name_min_length

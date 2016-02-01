@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,34 +16,33 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectSchema_Private.h"
+#include "impl/cached_realm_base.hpp"
 
-#import "object_schema.hpp"
-#import "RLMObject_Private.hpp"
-
-#import <realm/row.hpp>
-#import <vector>
+#include <CoreFoundation/CFRunLoop.h>
 
 namespace realm {
-    class Table;
-}
+class Realm;
 
-class RLMObservationInfo;
+namespace _impl {
 
-// RLMObjectSchema private
-@interface RLMObjectSchema () {
-    @public
-    std::vector<RLMObservationInfo *> _observedObjects;
-}
-@property (nonatomic) realm::Table *table;
+class CachedRealm : public CachedRealmBase {
+public:
+    CachedRealm(const std::shared_ptr<Realm>& realm, bool cache);
+    ~CachedRealm();
 
-// shallow copy reusing properties and property map
-- (instancetype)shallowCopy;
+    CachedRealm(CachedRealm&&);
+    CachedRealm& operator=(CachedRealm&&);
 
-// create realm::ObjectSchema copy
-- (realm::ObjectSchema)objectStoreCopy;
+    CachedRealm(const CachedRealm&) = delete;
+    CachedRealm& operator=(const CachedRealm&) = delete;
 
-// initialize with realm::ObjectSchema
-+ (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema &)objectSchema;
+    // Asynchronously call notify() on the Realm on the appropriate thread
+    void notify();
 
-@end
+private:
+    CFRunLoopRef m_runloop;
+    CFRunLoopSourceRef m_signal;
+};
+
+} // namespace _impl
+} // namespace realm

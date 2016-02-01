@@ -20,7 +20,7 @@
 
 RLM_ASSUME_NONNULL_BEGIN
 
-@class RLMRealm, RLMResults, RLMObject, RLMSortDescriptor;
+@class RLMRealm, RLMResults, RLMObject, RLMSortDescriptor, RLMNotificationToken;
 
 /**
  A homogenous collection of `RLMObject`s like `RLMArray` or `RLMResults`.
@@ -168,6 +168,16 @@ RLM_ASSUME_NONNULL_BEGIN
  @param key   The name of the property.
  */
 - (void)setValue:(nullable id)value forKey:(NSString *)key;
+
+#pragma mark - Notifications
+
+/**
+ Register a block to be called each time the collection changes.
+
+ @param block The block to be called each time the collection changes.
+ @return A token which must be held for as long as you want notifications to be delivered.
+ */
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMCollection> collection))block;
 
 @end
 
