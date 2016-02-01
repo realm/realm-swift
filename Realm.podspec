@@ -36,17 +36,29 @@ Pod::Spec.new do |s|
                               'include/Realm/RLMRealm_Dynamic.h',
                               'include/Realm/RLMObjectBase_Dynamic.h'
 
-  s.module_map              = 'Realm/module.modulemap'
-  s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__"
-  s.prepare_command         = 'sh build.sh cocoapods-setup'
-  s.source_files            = 'Realm/*.{m,mm}',
+  private_header_files      = 'include/Realm/*{Accessor,RealmUtil,ListBase,ObjectStore,Private,SwiftSupport}.h',
+                              'include/realm.hpp',
+                              'include/realm/realm_nmmintrin.h',
+                              'include/realm/util/*.h',
+                              'include/realm/**/*.hpp',
+                              'include/Realm/**/*.hpp'
+
+  source_files              = 'Realm/*.{m,mm}',
                               'Realm/ObjectStore/*.cpp',
                               'Realm/ObjectStore/impl/*.cpp',
                               'Realm/ObjectStore/impl/apple/*.cpp'
+
+
+  s.module_map              = 'Realm/module.modulemap'
+  s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__"
+  s.prepare_command         = 'sh build.sh cocoapods-setup'
+  s.source_files            = source_files + private_header_files
+  s.private_header_files    = private_header_files
   s.header_mappings_dir     = 'include'
   s.pod_target_xcconfig     = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)',
-                                'APPLICATION_EXTENSION_API_ONLY' => 'YES' }
+                                'APPLICATION_EXTENSION_API_ONLY' => 'YES',
+                                'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include/Realm/"' }
   s.preserve_paths          = %w(build.sh)
 
   s.ios.deployment_target   = '7.0'
@@ -66,11 +78,7 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'Headers' do |s|
-    s.source_files          = 'include/**/*.{h,hpp}'
+    s.source_files          = public_header_files
     s.public_header_files   = public_header_files
-    s.private_header_files  = 'include/Realm/*{Accessor,RealmUtil,ListBase,ObjectStore,Private}.h',
-                              'include/Realm/ObjectStore/*.hpp',
-                              'include/Realm/ObjectStore/impl/*.hpp',
-                              'include/Realm/ObjectStore/impl/apple/*.hpp'
   end
 end
