@@ -30,19 +30,14 @@ public final class RLMGenerator<T: Object>: GeneratorType {
         generatorBase = NSFastGenerator(collection)
     }
 
-    // swiftlint:disable valid_docs
-
-    /// Advance to the next element and return it, or `nil` if no next element
-    /// exists.
-    public func next() -> T? {
+    /// Advance to the next element and return it, or `nil` if no next element exists.
+    public func next() -> T? { // swiftlint:disable:this valid_docs
         let accessor = generatorBase.next() as! T?
         if let accessor = accessor {
             RLMInitializeSwiftAccessorGenerics(accessor)
         }
         return accessor
     }
-
-    // swiftlint:enable valid_docs
 }
 
 /**

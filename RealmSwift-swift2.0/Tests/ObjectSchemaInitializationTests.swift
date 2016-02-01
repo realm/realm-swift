@@ -257,11 +257,10 @@ class SwiftObjectWithUnindexibleProperties: SwiftFakeObject {
     }
 }
 
-// swiftlint:disable type_name
+// swiftlint:disable:next type_name
 class SwiftObjectWithNonNullableOptionalProperties: SwiftFakeObject {
     dynamic var optDateCol: NSDate?
 }
-// swiftlint:enable type_name
 
 class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
     dynamic var objectCol = SwiftBoolObject()

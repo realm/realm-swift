@@ -508,6 +508,7 @@ class ObjectCreationTests: TestCase {
     }
 
     // return an array of valid values that can be used to initialize each type
+    // swiftlint:disable:next cyclomatic_complexity
     private func validValuesForSwiftObjectType(type: PropertyType) -> [AnyObject] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().create(SwiftBoolObject.self, value: [true])
@@ -532,6 +533,7 @@ class ObjectCreationTests: TestCase {
         return []
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func invalidValuesForSwiftObjectType(type: PropertyType) -> [AnyObject] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().create(SwiftIntObject)

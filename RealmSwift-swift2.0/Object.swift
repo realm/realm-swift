@@ -350,6 +350,7 @@ public class ObjectUtil: NSObject {
         optional.object = object
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
         let children = Mirror(reflecting: object).children
         return children.reduce([String: AnyObject]()) { (var properties: [String:AnyObject], prop: Mirror.Child) in
