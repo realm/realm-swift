@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,34 +16,35 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectSchema_Private.h"
+#include <realm/group_shared.hpp>
 
-#import "object_schema.hpp"
-#import "RLMObject_Private.hpp"
-
-#import <realm/row.hpp>
-#import <vector>
+#include <future>
 
 namespace realm {
-    class Table;
-}
+class ClientHistory;
 
-class RLMObservationInfo;
+namespace _impl {
+class RealmCoordinator;
 
-// RLMObjectSchema private
-@interface RLMObjectSchema () {
-    @public
-    std::vector<RLMObservationInfo *> _observedObjects;
-}
-@property (nonatomic) realm::Table *table;
+class ExternalCommitHelper {
+public:
+    ExternalCommitHelper(RealmCoordinator& parent);
+    ~ExternalCommitHelper();
 
-// shallow copy reusing properties and property map
-- (instancetype)shallowCopy;
+    // A no-op in this version, but needed for the Apple version
+    void notify_others() { }
 
-// create realm::ObjectSchema copy
-- (realm::ObjectSchema)objectStoreCopy;
+private:
+    RealmCoordinator& m_parent;
 
-// initialize with realm::ObjectSchema
-+ (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema &)objectSchema;
+    // A shared group used to listen for changes
+    std::unique_ptr<ClientHistory> m_history;
+    SharedGroup m_sg;
 
-@end
+    // The listener thread
+    std::future<void> m_thread;
+};
+
+} // namespace _impl
+} // namespace realm
+

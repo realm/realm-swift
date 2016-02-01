@@ -397,7 +397,7 @@ case "$COMMAND" in
             exit 1
         fi
 
-        git -C $path format-patch --stdout $commit..HEAD | git am -p 2 --directory Realm/ObjectStore
+        git -C $path format-patch --stdout $commit..HEAD | git am -p 2 --directory Realm/ObjectStore --exclude='*CMake*'
         ;;
 
     ######################################
@@ -888,11 +888,11 @@ case "$COMMAND" in
             cp -R core/include/realm core/include/Realm
           fi
           cp -R core/include include
-          mkdir -p include/Realm
+          mkdir -p include/Realm/impl/apple
           cp Realm/*.{h,hpp} include/Realm
           cp Realm/ObjectStore/*.hpp include/Realm
-          cp Realm/ObjectStore/impl/*.hpp include/Realm
-          cp Realm/ObjectStore/impl/apple/*.hpp include/Realm
+          cp Realm/ObjectStore/impl/*.hpp include/Realm/impl
+          cp Realm/ObjectStore/impl/apple/*.hpp include/Realm/impl/apple
           # Create lowercase `realm` header directory for a case-sensitive filesystem.
           if [ ! -e include/realm ]; then
             cp -R include/Realm include/realm

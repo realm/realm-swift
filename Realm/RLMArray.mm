@@ -377,6 +377,17 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
     @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
 }
 
+// The compiler complains about the method's argument type not matching due to
+// it not having the generic type attached, but it doesn't seem to be possible
+// to actually include the generic type
+// http://www.openradar.me/radar?id=6135653276319744
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, NSError *))block {
+    @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
+}
+#pragma clang diagnostic pop
+
 #pragma GCC diagnostic pop
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...

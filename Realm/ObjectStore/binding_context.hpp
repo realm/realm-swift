@@ -70,6 +70,10 @@ class BindingContext {
 public:
     virtual ~BindingContext() = default;
 
+    // If the user adds a notification handler to the Realm, will it ever
+    // actually be called?
+    virtual bool can_deliver_notifications() const noexcept { return true; }
+
     // Called by the Realm when a write transaction is committed to the file by
     // a different Realm instance (possibly in a different process)
     virtual void changes_available() { }

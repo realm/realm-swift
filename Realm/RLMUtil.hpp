@@ -63,8 +63,6 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
 
 BOOL RLMIsDebuggerAttached();
 
-BOOL RLMIsInRunLoop();
-
 // C version of isKindOfClass
 static inline BOOL RLMIsKindOfClass(Class class1, Class class2) {
     while (class1) {
