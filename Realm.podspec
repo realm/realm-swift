@@ -58,6 +58,7 @@ Pod::Spec.new do |s|
   s.pod_target_xcconfig     = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)',
                                 'APPLICATION_EXTENSION_API_ONLY' => 'YES',
+                                'HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include"',
                                 'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include/Realm/"' }
   s.preserve_paths          = %w(build.sh)
 
