@@ -586,14 +586,10 @@ public final class Realm {
 
 extension Realm: Equatable { }
 
-// swiftlint:disable valid_docs
-
 /// Returns whether the two realms are equal.
-public func == (lhs: Realm, rhs: Realm) -> Bool {
+public func == (lhs: Realm, rhs: Realm) -> Bool { // swiftlint:disable:this valid_docs
     return lhs.rlmRealm == rhs.rlmRealm
 }
-
-// swiftlint:enable valid_docs
 
 // MARK: Notifications
 

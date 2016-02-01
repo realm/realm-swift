@@ -75,15 +75,12 @@ extension SortDescriptor: CustomStringConvertible {
 
 extension SortDescriptor: Equatable {}
 
-// swiftlint:disable valid_docs
-
 /// Returns whether the two sort descriptors are equal.
 public func == (lhs: SortDescriptor, rhs: SortDescriptor) -> Bool {
+    // swiftlint:disable:previous valid_docs
     return lhs.property == rhs.property &&
         lhs.ascending == lhs.ascending
 }
-
-// swiftlint:enable valid_docs
 
 // MARK: StringLiteralConvertible
 

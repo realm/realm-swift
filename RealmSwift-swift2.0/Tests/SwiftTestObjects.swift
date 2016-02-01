@@ -194,9 +194,8 @@ class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
 }
 
 class SwiftLinkToPrimaryStringObject: Object {
-    // swiftlint:disable variable_name_min_length
+    // swiftlint:disable:next variable_name
     dynamic var pk = ""
-    // swiftlint:enable variable_name_min_length
     dynamic var object: SwiftPrimaryStringObject?
     let objects = List<SwiftPrimaryStringObject>()
 
@@ -206,9 +205,8 @@ class SwiftLinkToPrimaryStringObject: Object {
 }
 
 class SwiftUTF8Object: Object {
-    // swiftlint:disable variable_name
+    // swiftlint:disable:next variable_name
     dynamic var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
-    // swiftlint:enable variable_name
 }
 
 class SwiftIgnoredPropertiesObject: Object {
