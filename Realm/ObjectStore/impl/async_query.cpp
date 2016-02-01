@@ -182,6 +182,9 @@ void AsyncQuery::prepare_handover()
     m_initial_run_complete = true;
     m_handed_over_table_version = m_tv.outside_version();
     m_tv_handover = m_sg->export_for_handover(m_tv, MutableSourcePayload::Move);
+
+    // detach the TableView as we won't need it again and keeping it around
+    // makes advance_read() much more expensive
     m_tv = TableView();
 }
 

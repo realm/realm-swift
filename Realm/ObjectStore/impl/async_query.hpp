@@ -72,15 +72,12 @@ private:
     const SortOrder m_sort;
     const std::thread::id m_thread_id = std::this_thread::get_id();
 
-    // The source Query, in handover from iff m_sg is null
-    // Only used until the first time the query is actually run, after which
-    // both will be null
+    // The source Query, in handover form iff m_sg is null
     std::unique_ptr<SharedGroup::Handover<Query>> m_query_handover;
     std::unique_ptr<Query> m_query;
 
-    // The TableView resulting from running the query. Will be detached if the
-    // Query has not yet been run, in which case m_query or m_query_handover will
-    // be non-null
+    // The TableView resulting from running the query. Will be detached unless
+    // the query was (re)run since the last time the handover object was created
     TableView m_tv;
     std::unique_ptr<SharedGroup::Handover<TableView>> m_tv_handover;
     SharedGroup::VersionID m_sg_version;
@@ -93,7 +90,7 @@ private:
     };
 
     // Currently registered callbacks and a mutex which must always be held
-    // while doing anything with them
+    // while doing anything with them or m_callback_index
     std::mutex m_callback_mutex;
     std::vector<Callback> m_callbacks;
 
@@ -109,6 +106,11 @@ private:
     bool m_skipped_running = false;
     bool m_initial_run_complete = false;
     bool m_unregistered = false;
+
+    // Cached value for if m_callbacks is empty, needed to avoid deadlocks in
+    // run() due to lock-order inversion between m_callback_mutex and m_target_mutex
+    // It's okay if this value is stale as at worst it'll result in us doing
+    // some extra work.
     std::atomic<bool> m_have_callbacks = {false};
 
     bool is_for_current_thread() const { return m_thread_id == std::this_thread::get_id(); }
