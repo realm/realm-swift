@@ -197,6 +197,7 @@ void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
         ObjectStore::verify_schema(*m_config.schema, *schema, m_config.read_only);
         m_config.schema = std::move(schema);
         m_config.schema_version = version;
+        m_coordinator->update_schema(*m_config.schema);
         return false;
     };
 
@@ -256,6 +257,8 @@ void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
         m_config.schema_version = old_config.schema_version;
         throw;
     }
+
+    m_coordinator->update_schema(*m_config.schema);
 }
 
 static void check_read_write(Realm *realm)

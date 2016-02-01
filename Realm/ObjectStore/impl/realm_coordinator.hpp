@@ -28,6 +28,7 @@ class AsyncQueryCallback;
 class ClientHistory;
 class Results;
 class SharedGroup;
+class Schema;
 struct AsyncQueryCancelationToken;
 
 namespace _impl {
@@ -75,6 +76,9 @@ public:
 
     // Called by m_notifier when there's a new commit to send notifications for
     void on_change();
+
+    // Update the schema in the cached config
+    void update_schema(Schema const& new_schema);
 
     static void register_query(std::shared_ptr<AsyncQuery> query);
 
