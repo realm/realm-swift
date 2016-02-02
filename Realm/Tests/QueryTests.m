@@ -1765,8 +1765,8 @@
                                                         @{@"name": @"Tim",  @"age": @60, @"hired": @NO}]]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(1U, [CompanyObject objectsWhere:@"SUBQUERY(employees, $employee, $employee.age > 30 AND $employee.hired = FALSE).@count > 0"].count);
-    XCTAssertEqual(2U, [CompanyObject objectsWhere:@"SUBQUERY(employees, $employee, $employee.age < 30 AND $employee.hired = TRUE).@count == 0"].count);
+    RLMAssertCount(CompanyObject, 1U, @"SUBQUERY(employees, $employee, $employee.age > 30 AND $employee.hired = FALSE).@count > 0");
+    RLMAssertCount(CompanyObject, 2U, @"SUBQUERY(employees, $employee, $employee.age < 30 AND $employee.hired = TRUE).@count == 0");
 }
 
 @end
