@@ -183,6 +183,7 @@
     // Unsupported variants of subqueries.
     RLMAssertThrowsWithReasonMatching(([ArrayOfAllTypesObject objectsWhere:@"SUBQUERY(array, $obj, $obj.intCol = 5).@count == array.@count"]), @"SUBQUERY.*compared with a constant number");
     RLMAssertThrowsWithReasonMatching(([ArrayOfAllTypesObject objectsWhere:@"SUBQUERY(array, $obj, $obj.intCol = 5) == 0"]), @"SUBQUERY.*immediately followed by .@count");
+    RLMAssertThrowsWithReasonMatching(([ArrayOfAllTypesObject objectsWhere:@"SELF IN SUBQUERY(array, $obj, $obj.intCol = 5)"]), @"Predicate with IN operator must compare.*aggregate$");
 
     // block-based predicate
     NSPredicate *pred = [NSPredicate predicateWithBlock:^BOOL (__unused id obj, __unused NSDictionary *bindings) {

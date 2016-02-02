@@ -1124,9 +1124,14 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
             // Inserting an array via %@ gives NSConstantValueExpressionType, but
             // including it directly gives NSAggregateExpressionType
             if (exp1Type != NSKeyPathExpressionType || (exp2Type != NSAggregateExpressionType && exp2Type != NSConstantValueExpressionType)) {
-                @throw RLMPredicateException(@"Invalid predicate",
-                                             @"Predicate with %s operator must compare a KeyPath with an aggregate with two values",
-                                             compp.predicateOperatorType == NSBetweenPredicateOperatorType ? "BETWEEN" : "IN");
+                if (compp.predicateOperatorType == NSBetweenPredicateOperatorType) {
+                    @throw RLMPredicateException(@"Invalid predicate",
+                                                 @"Predicate with BETWEEN operator must compare a KeyPath with an aggregate with two values");
+                }
+                else if (compp.predicateOperatorType == NSInPredicateOperatorType) {
+                    @throw RLMPredicateException(@"Invalid predicate",
+                                                 @"Predicate with IN operator must compare a KeyPath with an aggregate");
+                }
             }
             exp2Type = NSConstantValueExpressionType;
         }
