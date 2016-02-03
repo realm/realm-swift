@@ -423,10 +423,13 @@ case "$COMMAND" in
         ln -s "RealmSwift-swift$version" RealmSwift
         git update-index --assume-unchanged RealmSwift || true
 
-        SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
-        CONTENTS="let swiftLanguageVersion = \"$version\""
-        if [ ! -f "$SWIFT_VERSION_FILE" ] || ! grep -q "$CONTENTS" "$SWIFT_VERSION_FILE"; then
-            echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
+        # Only write SwiftVersion.swift if RealmSwift supports the given version of Swift.
+        if [[ -e "RealmSwift-swift$version" ]]; then
+            SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
+            CONTENTS="let swiftLanguageVersion = \"$version\""
+            if [ ! -f "$SWIFT_VERSION_FILE" ] || ! grep -q "$CONTENTS" "$SWIFT_VERSION_FILE"; then
+                echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
+            fi
         fi
 
         cd Realm/Tests
