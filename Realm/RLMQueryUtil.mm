@@ -21,6 +21,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMPredicateUtil.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
@@ -85,12 +86,20 @@ struct TrueExpression : realm::Expression {
     }
     void set_table(const Table*) override {}
     const Table* get_table() const override { return nullptr; }
+    std::unique_ptr<Expression> clone(QueryNodeHandoverPatches*) const override
+    {
+        return std::unique_ptr<Expression>(new TrueExpression(*this));
+    }
 };
 
 struct FalseExpression : realm::Expression {
     size_t find_first(size_t, size_t) const override { return realm::not_found; }
     void set_table(const Table*) override {}
     const Table* get_table() const override { return nullptr; }
+    std::unique_ptr<Expression> clone(QueryNodeHandoverPatches*) const override
+    {
+        return std::unique_ptr<Expression>(new FalseExpression(*this));
+    }
 };
 
 NSString *operatorName(NSPredicateOperatorType operatorType)
@@ -142,6 +151,12 @@ public:
     auto resolve(Query& query) const
     {
         return table_for_query(query)->template column<T>(index());
+    }
+
+    template <typename T>
+    auto resolveWithSubquery(Query& query, Query subquery) const
+    {
+        return table_for_query(query)->template column<T>(index(), std::move(subquery));
     }
 
     RLMProperty *property() const { return m_property; }
@@ -494,7 +509,7 @@ void add_link_constraint_to_query(realm::Query & query,
     }
 
     if (!obj->_row.is_attached()) {
-        query.and_query(new FalseExpression);
+        query.and_query(std::unique_ptr<Expression>(new FalseExpression));
         return;
     }
 
@@ -557,7 +572,7 @@ void process_or_group(Query &query, id array, Func&& func) {
         // Queries can't be empty, so if there's zero things in the OR group
         // validation will fail. Work around this by adding an expression which
         // will never find any rows in a table.
-        query.and_query(new FalseExpression);
+        query.and_query(std::unique_ptr<Expression>(new FalseExpression));
     }
 
     query.end_group();
@@ -980,6 +995,73 @@ void update_query_with_column_expression(RLMSchema *schema, RLMObjectSchema *des
                             std::move(left), std::move(right));
 }
 
+// Identify expressions of the form [SELF valueForKeyPath:]
+bool is_self_value_for_key_path_function_expression(NSExpression *expression)
+{
+    if (expression.expressionType != NSFunctionExpressionType)
+        return false;
+
+    if (expression.operand.expressionType != NSEvaluatedObjectExpressionType)
+        return false;
+
+    return [expression.function isEqualToString:@"valueForKeyPath:"];
+}
+
+// -[NSPredicate predicateWithSubtitutionVariables:] results in function expressions of the form [SELF valueForKeyPath:]
+// that update_query_with_predicate cannot handle. Replace such expressions with equivalent NSKeyPathExpressionType expressions.
+NSExpression *simplify_self_value_for_key_path_function_expression(NSExpression *expression) {
+    if (is_self_value_for_key_path_function_expression(expression)) {
+        if (NSString *keyPath = [expression.arguments.firstObject keyPath]) {
+            return [NSExpression expressionForKeyPath:keyPath];
+        }
+    }
+    return expression;
+}
+
+void update_query_with_subquery_count_expression(RLMSchema *schema, RLMObjectSchema *objectSchema, realm::Query& query,
+                                           NSExpression *subqueryExpression, NSPredicateOperatorType operatorType, NSExpression *right) {
+    if (right.expressionType != NSConstantValueExpressionType || ![right.constantValue isKindOfClass:[NSNumber class]]) {
+        @throw RLMPredicateException(@"Invalid predicate expression", @"SUBQUERY(…).@count is only supported when compared with a constant number.");
+    }
+    int64_t value = [right.constantValue integerValue];
+
+    ColumnReference collectionColumn = column_reference_from_key_path(schema, objectSchema, [subqueryExpression.collection keyPath], true);
+    RLMObjectSchema *collectionMemberObjectSchema = schema[collectionColumn.property().objectClassName];
+
+    // Eliminate references to the iteration variable in the subquery.
+    NSPredicate *subqueryPredicate = [subqueryExpression.predicate predicateWithSubstitutionVariables:@{ subqueryExpression.variable : [NSExpression expressionForEvaluatedObject] }];
+    subqueryPredicate = transformPredicate(subqueryPredicate, simplify_self_value_for_key_path_function_expression);
+
+    Query subquery = collectionMemberObjectSchema.table->where();
+    RLMUpdateQueryWithPredicate(&subquery, subqueryPredicate, schema, collectionMemberObjectSchema);
+
+    add_numeric_constraint_to_query(query, RLMPropertyTypeInt, operatorType, collectionColumn.resolveWithSubquery<LinkList>(query, std::move(subquery)).count(), value);
+}
+
+void update_query_with_function_subquery_expression(RLMSchema *schema, RLMObjectSchema *objectSchema, realm::Query& query,
+                                                    NSExpression *functionExpression, NSPredicateOperatorType operatorType, NSExpression *right) {
+    if (![functionExpression.function isEqualToString:@"valueForKeyPath:"] || functionExpression.arguments.count != 1) {
+        @throw RLMPredicateException(@"Invalid predicate", @"The '%@' function is not supported on the result of a SUBQUERY.", functionExpression.function);
+    }
+
+    NSExpression *keyPathExpression = functionExpression.arguments.firstObject;
+    if ([keyPathExpression.keyPath isEqualToString:@"@count"]) {
+        update_query_with_subquery_count_expression(schema, objectSchema, query, functionExpression.operand,  operatorType, right);
+    } else {
+        @throw RLMPredicateException(@"Invalid predicate", @"SUBQUERY is only supported when immediately followed by .@count that is compared with a constant number.");
+    }
+}
+
+void update_query_with_function_expression(RLMSchema *schema, RLMObjectSchema *objectSchema, realm::Query& query,
+                                           NSExpression *functionExpression, NSPredicateOperatorType operatorType, NSExpression *right) {
+    if (functionExpression.operand.expressionType == NSSubqueryExpressionType) {
+        update_query_with_function_subquery_expression(schema, objectSchema, query, functionExpression, operatorType, right);
+    } else {
+        @throw RLMPredicateException(@"Invalid predicate", @"The '%@' function is not supported.", functionExpression.function);
+    }
+}
+
+
 void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                                  RLMObjectSchema *objectSchema, realm::Query &query)
 {
@@ -998,7 +1080,7 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                     query.end_group();
                 } else {
                     // NSCompoundPredicate's documentation states that an AND predicate with no subpredicates evaluates to TRUE.
-                    query.and_query(new TrueExpression);
+                    query.and_query(std::unique_ptr<Expression>(new TrueExpression));
                 }
                 break;
 
@@ -1042,9 +1124,14 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
             // Inserting an array via %@ gives NSConstantValueExpressionType, but
             // including it directly gives NSAggregateExpressionType
             if (exp1Type != NSKeyPathExpressionType || (exp2Type != NSAggregateExpressionType && exp2Type != NSConstantValueExpressionType)) {
-                @throw RLMPredicateException(@"Invalid predicate",
-                                             @"Predicate with %s operator must compare a KeyPath with an aggregate with two values",
-                                             compp.predicateOperatorType == NSBetweenPredicateOperatorType ? "BETWEEN" : "IN");
+                if (compp.predicateOperatorType == NSBetweenPredicateOperatorType) {
+                    @throw RLMPredicateException(@"Invalid predicate",
+                                                 @"Predicate with BETWEEN operator must compare a KeyPath with an aggregate with two values");
+                }
+                else if (compp.predicateOperatorType == NSInPredicateOperatorType) {
+                    @throw RLMPredicateException(@"Invalid predicate",
+                                                 @"Predicate with IN operator must compare a KeyPath with an aggregate");
+                }
             }
             exp2Type = NSConstantValueExpressionType;
         }
@@ -1064,15 +1151,22 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
             update_query_with_value_expression(schema, objectSchema, query, compp.rightExpression.keyPath,
                                                compp.leftExpression.constantValue, compp);
         }
+        else if (exp1Type == NSFunctionExpressionType) {
+            update_query_with_function_expression(schema, objectSchema, query, compp.leftExpression, compp.predicateOperatorType, compp.rightExpression);
+        }
+        else if (exp1Type == NSSubqueryExpressionType) {
+            // The subquery expressions that we support are handled by the NSFunctionExpressionType case above.
+            @throw RLMPredicateException(@"Invalid predicate expression", @"SUBQUERY is only supported when immediately followed by .@count.");
+        }
         else {
             @throw RLMPredicateException(@"Invalid predicate expressions",
                                          @"Predicate expressions must compare a keypath and another keypath or a constant value");
         }
     }
     else if ([predicate isEqual:[NSPredicate predicateWithValue:YES]]) {
-        query.and_query(new TrueExpression);
+        query.and_query(std::unique_ptr<Expression>(new TrueExpression));
     } else if ([predicate isEqual:[NSPredicate predicateWithValue:NO]]) {
-        query.and_query(new FalseExpression);
+        query.and_query(std::unique_ptr<Expression>(new FalseExpression));
     }
     else {
         // invalid predicate type
