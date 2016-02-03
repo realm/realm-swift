@@ -150,7 +150,7 @@ build_combined() {
     if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
       cp $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
     fi
-    
+
     # Copy *.bcsymbolmap to .framework for submitting app with bitcode
     copy_bcsymbolmap "$build_products_path/$config-$os$scope_suffix" "$os_path"
 
@@ -974,7 +974,6 @@ case "$COMMAND" in
         cp $0 ${SWIFT}
         cp -r $(dirname $0)/scripts ${SWIFT}
         cd ${SWIFT}
-        REALM_SWIFT_VERSION=1.2 sh build.sh examples-ios-swift
         REALM_SWIFT_VERSION=2.1.1 sh build.sh examples-ios-swift
         cd ..
         rm -rf ${SWIFT}
@@ -1021,23 +1020,22 @@ case "$COMMAND" in
 
     "package-ios-swift")
         cd tightdb_objc
-        for version in 1.2 2.1.1; do
+        for version in 2.1.1; do
             rm -rf build/ios/Realm.framework
             REALM_SWIFT_VERSION=$version sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION=$version sh build.sh ios-swift
         done
 
         cd build/ios
-        zip --symlinks -r realm-swift-framework-ios.zip swift-1.2 swift-2.1.1
+        zip --symlinks -r realm-swift-framework-ios.zip swift-2.1.1
         ;;
 
     "package-osx-swift")
         cd tightdb_objc
-        REALM_SWIFT_VERSION=1.2 sh build.sh osx-swift
         REALM_SWIFT_VERSION=2.1.1 sh build.sh osx-swift
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip swift-1.2 swift-2.1.1
+        zip --symlinks -r realm-swift-framework-osx.zip swift-2.1.1
         ;;
 
     "package-watchos")
@@ -1149,7 +1147,7 @@ case "$COMMAND" in
             unzip ${WORKSPACE}/realm-examples.zip
             cd examples
             if [[ "${LANG}" == "objc" ]]; then
-                rm -rf ios/swift-1.2 ios/swift-2.1.1
+                rm -rf ios/swift-2.1.1
             else
                 rm -rf ios/objc ios/rubymotion osx
             fi
