@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
+		5D0A40841C62ACCC00BBB612 /* Check For Supported Swift Version */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 5D0A40851C62ACCC00BBB612 /* Build configuration list for PBXAggregateTarget "Check For Supported Swift Version" */;
+			buildPhases = (
+				5D0A40881C62ACD500BBB612 /* ShellScript */,
+			);
+			dependencies = (
+				5D0A408A1C62ACE100BBB612 /* PBXTargetDependency */,
+			);
+			name = "Check For Supported Swift Version";
+			productName = "Check For Supported Swift Version";
+		};
 		C04B4BD71B55C47600FAE58E /* Set Swift Version */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Set Swift Version" */;
@@ -331,6 +343,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		5D0A40891C62ACE100BBB612 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
+			remoteInfo = "Set Swift Version";
+		};
+		5D0A408B1C62ACE800BBB612 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5D0A40841C62ACCC00BBB612;
+			remoteInfo = "Check For Supported Swift Version";
+		};
 		5D6157011BE0A3A100A4BD3F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -1206,6 +1232,7 @@
 			dependencies = (
 				5D66102C1BE98DF60021E04F /* PBXTargetDependency */,
 				5D6610311BE99B770021E04F /* PBXTargetDependency */,
+				5D0A408C1C62ACE800BBB612 /* PBXTargetDependency */,
 			);
 			name = RealmSwift;
 			productName = RealmSwift;
@@ -1310,6 +1337,9 @@
 					3F1A5E711992EB7400F45F4C = {
 						CreatedOnToolsVersion = 6.0;
 					};
+					5D0A40841C62ACCC00BBB612 = {
+						CreatedOnToolsVersion = 7.2;
+					};
 					5D660FCB1BE98C560021E04F = {
 						CreatedOnToolsVersion = 7.1;
 					};
@@ -1350,6 +1380,7 @@
 				E856D1DE195614A400FB2FCF /* iOS static tests */,
 				3F1A5E711992EB7400F45F4C /* TestHost */,
 				C04B4BD71B55C47600FAE58E /* Set Swift Version */,
+				5D0A40841C62ACCC00BBB612 /* Check For Supported Swift Version */,
 				5D660FCB1BE98C560021E04F /* RealmSwift */,
 				5D660FD71BE98C7C0021E04F /* RealmSwift Tests */,
 				E83EAC791BED3D880085CCD2 /* SwiftLint */,
@@ -1402,6 +1433,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5D0A40881C62ACD500BBB612 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ ! -e RealmSwift ]]; then\n    version=$(readlink RealmSwift | sed 's/RealmSwift-swift//')\n    echo >&2 \"error: Swift $version is not supported.\"\n    exit 1\nfi\n";
+		};
 		5D304A2E1BE9AEFB0082C1A6 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1831,6 +1875,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5D0A408A1C62ACE100BBB612 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
+			targetProxy = 5D0A40891C62ACE100BBB612 /* PBXContainerItemProxy */;
+		};
+		5D0A408C1C62ACE800BBB612 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5D0A40841C62ACCC00BBB612 /* Check For Supported Swift Version */;
+			targetProxy = 5D0A408B1C62ACE800BBB612 /* PBXContainerItemProxy */;
+		};
 		5D6157021BE0A3A100A4BD3F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
@@ -1885,6 +1939,20 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */;
 			buildSettings = {
+			};
+			name = Release;
+		};
+		5D0A40861C62ACCC00BBB612 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		5D0A40871C62ACCC00BBB612 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -2035,6 +2103,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		5D0A40851C62ACCC00BBB612 /* Build configuration list for PBXAggregateTarget "Check For Supported Swift Version" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5D0A40861C62ACCC00BBB612 /* Debug */,
+				5D0A40871C62ACCC00BBB612 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		5D659ED61BE04556006515A0 /* Build configuration list for PBXNativeTarget "Realm" */ = {
 			isa = XCConfigurationList;
