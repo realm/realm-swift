@@ -195,53 +195,6 @@ NSDictionary *RLMDefaultValuesForObjectSchema(__unsafe_unretained RLMObjectSchem
     return defaults;
 }
 
-NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *key) {
-    size_t count = collection.count;
-    if (count == 0) {
-        return @[];
-    }
-
-    RLMRealm *realm = collection.realm;
-    RLMObjectSchema *objectSchema = collection.objectSchema;
-
-    NSMutableArray *results = [NSMutableArray arrayWithCapacity:count];
-    if ([key isEqualToString:@"self"]) {
-        for (size_t i = 0; i < count; i++) {
-            size_t rowIndex = [collection indexInSource:i];
-            [results addObject:RLMCreateObjectAccessor(realm, objectSchema, rowIndex) ?: NSNull.null];
-        }
-        return results;
-    }
-
-    RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-    realm::Table *table = objectSchema.table;
-    for (size_t i = 0; i < count; i++) {
-        size_t rowIndex = [collection indexInSource:i];
-        accessor->_row = (*table)[rowIndex];
-        RLMInitializeSwiftAccessorGenerics(accessor);
-        [results addObject:[accessor valueForKey:key] ?: NSNull.null];
-    }
-
-    return results;
-}
-
-void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value) {
-    realm::TableView tv = [collection tableView];
-    if (tv.size() == 0) {
-        return;
-    }
-
-    RLMRealm *realm = collection.realm;
-    RLMObjectSchema *objectSchema = collection.objectSchema;
-    RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-    for (size_t i = 0; i < tv.size(); i++) {
-        accessor->_row = tv[i];
-        RLMInitializeSwiftAccessorGenerics(accessor);
-        [accessor setValue:value forKey:key];
-    }
-}
-
-
 static NSException *RLMException(NSString *reason, NSDictionary *additionalUserInfo) {
     NSMutableDictionary *userInfo = @{RLMRealmVersionKey: REALM_COCOA_VERSION,
                                       RLMRealmCoreVersionKey: @REALM_VERSION}.mutableCopy;

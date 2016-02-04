@@ -32,7 +32,6 @@ namespace realm {
 
 @class RLMObjectSchema;
 @class RLMProperty;
-@protocol RLMFastEnumerable;
 
 namespace realm {
     class RealmFileException;
@@ -56,10 +55,6 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 // gets default values for the given schema (+defaultPropertyValues)
 // merges with native property defaults if Swift class
 NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema);
-
-NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *key);
-
-void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value);
 
 BOOL RLMIsDebuggerAttached();
 BOOL RLMIsRunningInPlayground();

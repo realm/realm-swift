@@ -321,40 +321,6 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @end
 
-/**
- An RLMSortDescriptor stores a property name and a sort order for use with
- `sortedResultsUsingDescriptors:`. It is similar to NSSortDescriptor, but supports
- only the subset of functionality which can be efficiently run by the query
- engine. RLMSortDescriptor instances are immutable.
- */
-@interface RLMSortDescriptor : NSObject
-
-#pragma mark - Properties
- 
-/**
- The name of the property which this sort descriptor orders results by.
- */
-@property (nonatomic, readonly) NSString *property;
-
-/**
- Whether this descriptor sorts in ascending or descending order.
- */
-@property (nonatomic, readonly) BOOL ascending;
-
-#pragma mark - Methods
-
-/**
- Returns a new sort descriptor for the given property name and order.
- */
-+ (instancetype)sortDescriptorWithProperty:(NSString *)propertyName ascending:(BOOL)ascending;
-
-/**
- Returns a copy of the receiver with the sort order reversed.
- */
-- (instancetype)reversedSortDescriptor;
-
-@end
-
 /// :nodoc:
 @interface RLMArray (Swift)
 // for use only in Swift class definitions

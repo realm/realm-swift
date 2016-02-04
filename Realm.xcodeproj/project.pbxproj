@@ -110,6 +110,9 @@
 		3FB4FA1E19F5D2740020D53B /* SwiftPropertyTypeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F3CA681986CC86004623E1 /* SwiftPropertyTypeTest.swift */; };
 		3FB4FA1F19F5D2740020D53B /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD01955FE0100FDED82 /* SwiftRealmTests.swift */; };
 		3FB4FA2019F5D2740020D53B /* SwiftUnicodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E891759A197A1B600068ACC6 /* SwiftUnicodeTests.swift */; };
+		3FBEF67A1C63D66100F6935B /* RLMCollection_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3FBEF6781C63D66100F6935B /* RLMCollection_Private.hpp */; };
+		3FBEF67B1C63D66100F6935B /* RLMCollection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FBEF6791C63D66100F6935B /* RLMCollection.mm */; };
+		3FBEF67C1C63D66400F6935B /* RLMCollection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FBEF6791C63D66100F6935B /* RLMCollection.mm */; };
 		3FC767071BB9FE7500FE0AFC /* RLMMultiProcessTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 027A4D2B1AB1012500AA46F9 /* RLMMultiProcessTestCase.m */; };
 		3FDCFEB619F6A8D3005E414A /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
@@ -523,6 +526,8 @@
 		3FAE25581B8CEBBE00D01405 /* object_schema.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = object_schema.hpp; path = ObjectStore/object_schema.hpp; sourceTree = "<group>"; };
 		3FBD05FA1B94E1C3004559CF /* index_set.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = index_set.cpp; path = ObjectStore/index_set.cpp; sourceTree = "<group>"; };
 		3FBD05FB1B94E1C3004559CF /* index_set.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = index_set.hpp; path = ObjectStore/index_set.hpp; sourceTree = "<group>"; };
+		3FBEF6781C63D66100F6935B /* RLMCollection_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMCollection_Private.hpp; sourceTree = "<group>"; };
+		3FBEF6791C63D66100F6935B /* RLMCollection.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMCollection.mm; sourceTree = "<group>"; };
 		3FE556421B9A43E5002A1129 /* schema.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = schema.cpp; path = ObjectStore/schema.cpp; sourceTree = "<group>"; };
 		3FE556431B9A43E5002A1129 /* schema.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = schema.hpp; path = ObjectStore/schema.hpp; sourceTree = "<group>"; };
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
@@ -972,6 +977,8 @@
 				E81A1F651955FC9300FDED82 /* RLMArray_Private.hpp */,
 				E81A1F691955FC9300FDED82 /* RLMArrayLinkView.mm */,
 				02B8EF5B19E7048D0045A93D /* RLMCollection.h */,
+				3FBEF6791C63D66100F6935B /* RLMCollection.mm */,
+				3FBEF6781C63D66100F6935B /* RLMCollection_Private.hpp */,
 				E81A1F6B1955FC9300FDED82 /* RLMConstants.h */,
 				E81A1F6C1955FC9300FDED82 /* RLMConstants.m */,
 				5D30B74A1B42039F00D90C5A /* RLMDefines.h */,
@@ -1094,6 +1101,7 @@
 				5D659EA91BE04556006515A0 /* RLMArray.h in Headers */,
 				5D659EAA1BE04556006515A0 /* RLMArray_Private.h in Headers */,
 				5D659EAB1BE04556006515A0 /* RLMCollection.h in Headers */,
+				3FBEF67A1C63D66100F6935B /* RLMCollection_Private.hpp in Headers */,
 				5D659EAC1BE04556006515A0 /* RLMConstants.h in Headers */,
 				5D659EAD1BE04556006515A0 /* RLMDefines.h in Headers */,
 				5D659EAE1BE04556006515A0 /* RLMListBase.h in Headers */,
@@ -1678,6 +1686,7 @@
 				5D659E861BE04556006515A0 /* RLMAnalytics.mm in Sources */,
 				5D659E871BE04556006515A0 /* RLMArray.mm in Sources */,
 				5D659E881BE04556006515A0 /* RLMArrayLinkView.mm in Sources */,
+				3FBEF67B1C63D66100F6935B /* RLMCollection.mm in Sources */,
 				5D659E891BE04556006515A0 /* RLMConstants.m in Sources */,
 				5D659E8A1BE04556006515A0 /* RLMListBase.mm in Sources */,
 				5D659E8B1BE04556006515A0 /* RLMMigration.mm in Sources */,
@@ -1771,6 +1780,7 @@
 				5DD755841BE056DE002800DA /* RLMAnalytics.mm in Sources */,
 				5DD755851BE056DE002800DA /* RLMArray.mm in Sources */,
 				5DD755861BE056DE002800DA /* RLMArrayLinkView.mm in Sources */,
+				3FBEF67C1C63D66400F6935B /* RLMCollection.mm in Sources */,
 				5DD755871BE056DE002800DA /* RLMConstants.m in Sources */,
 				5DD755881BE056DE002800DA /* RLMListBase.mm in Sources */,
 				5DD755891BE056DE002800DA /* RLMMigration.mm in Sources */,

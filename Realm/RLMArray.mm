@@ -408,47 +408,13 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 #pragma mark - Superclass Overrides
 
-- (NSString *)description
-{
+- (NSString *)description {
     return [self descriptionWithMaxDepth:RLMDescriptionMaxDepth];
 }
 
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
-    if (depth == 0) {
-        return @"<Maximum depth exceeded>";
-    }
-
-    const NSUInteger maxObjects = 100;
-    NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <%p> (\n", self];
-    unsigned long index = 0, skipped = 0;
-    for (id obj in self) {
-        NSString *sub;
-        if ([obj respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
-            sub = [obj descriptionWithMaxDepth:depth - 1];
-        }
-        else {
-            sub = [obj description];
-        }
-
-        // Indent child objects
-        NSString *objDescription = [sub stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"];
-        [mString appendFormat:@"\t[%lu] %@,\n", index++, objDescription];
-        if (index >= maxObjects) {
-            skipped = self.count - maxObjects;
-            break;
-        }
-    }
-    
-    // Remove last comma and newline characters
-    if(self.count > 0)
-        [mString deleteCharactersInRange:NSMakeRange(mString.length-2, 2)];
-    if (skipped) {
-        [mString appendFormat:@"\n\t... %lu objects skipped.", skipped];
-    }
-    [mString appendFormat:@"\n)"];
-    return [NSString stringWithString:mString];
+    return RLMDescriptionWithMaxDepth(@"RLMArray", self, depth);
 }
-
 @end
 
 @interface RLMSortDescriptor ()
