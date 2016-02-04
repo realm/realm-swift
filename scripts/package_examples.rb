@@ -70,7 +70,6 @@ end
 # Remove RealmSwift target and dependencies from all example swift projects
 
 swift_examples = [
-  "examples/ios/swift-1.2/RealmExamples.xcodeproj",
   "examples/ios/swift-2.1.1/RealmExamples.xcodeproj",
   "examples/tvos/swift/RealmExamples.xcodeproj"
 ]
