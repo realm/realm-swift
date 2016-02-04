@@ -14,6 +14,10 @@ x.x.x Release notes (yyyy-MM-dd)
 * Do a lot of the work for keeping `RLMResults`/`Results` up-to-date after
   write transactions on a background thread to help avoid blocking the main
   thread.
+* `NSPredicate`'s `SUBQUERY` operator is now supported. It has the following limitations:
+  * `@count` is the only operator that may be applied to the `SUBQUERY` expression.
+  * The `SUBQUERY(…).@count` expression must be compared with a constant.
+  * Correlated subqueries are not yet supported.
 
 ### Bugfixes
 
@@ -37,10 +41,6 @@ x.x.x Release notes (yyyy-MM-dd)
   properties.
 * Indexing `BOOL`/`Bool` and `NSDate` properties are now supported.
 * Swift: Add support for indexing optional properties.
-* `NSPredicate`'s `SUBQUERY` operator is now supported. It has the following limitations:
-  * `@count` is the only operator that may be applied to the `SUBQUERY` expression.
-  * The `SUBQUERY(…).@count` expression must be compared with a constant.
-  * Correlated subqueries are not yet supported.
 
 ### Bugfixes
 
