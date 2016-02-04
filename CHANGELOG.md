@@ -5,6 +5,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * `+[RLMRealm realmWithPath:]`/`Realm.init(path:)` now inherits from the default
   configuration.
+* Swift 1.2 is no longer supported.
 
 ### Enhancements
 
