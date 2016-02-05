@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix an occasional crash when a `RLMArray`/`List` which has previously been
+  filtered is deleted.
+
 0.98.0 Release notes (2016-02-04)
 =============================================================
 

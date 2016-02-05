@@ -145,6 +145,12 @@ void AsyncQuery::run()
 {
     REALM_ASSERT(m_sg);
 
+    // We should only not have a query if it was based on a LinkView that was deleted
+    if (!m_query) {
+        REALM_ASSERT(!m_query_handover);
+        return;
+    }
+
     {
         std::lock_guard<std::mutex> target_lock(m_target_mutex);
         // Don't run the query if the results aren't actually going to be used
@@ -272,17 +278,31 @@ std::function<void (std::exception_ptr)> AsyncQuery::next_callback()
 void AsyncQuery::attach_to(realm::SharedGroup& sg)
 {
     REALM_ASSERT(!m_sg);
-    REALM_ASSERT(m_query_handover);
+    REALM_ASSERT(!m_query);
 
-    m_query = sg.import_from_handover(std::move(m_query_handover));
+    if (m_query_handover) {
+        m_query = sg.import_from_handover(std::move(m_query_handover));
+    }
     m_sg = &sg;
 }
 
 void AsyncQuery::detatch()
 {
     REALM_ASSERT(m_sg);
-    REALM_ASSERT(m_query);
     REALM_ASSERT(!m_tv.is_attached());
+
+    if (!m_query) {
+        return;
+    }
+
+    try {
+        static_cast<void>(m_query->find_all(0, 0, 0));
+    }
+    catch (realm::DeletedLinkView) {
+        m_sg = nullptr;
+        m_query = nullptr;
+        return;
+    }
 
     m_query_handover = m_sg->export_for_handover(*m_query, MutableSourcePayload::Move);
     m_sg = nullptr;
