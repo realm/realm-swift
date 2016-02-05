@@ -323,6 +323,17 @@ class RealmCollectionTypeTests: TestCase {
         token.stop()
         realm.beginWrite()
     }
+
+    func testValueForKeyPath() {
+        XCTAssertEqual(["1", "2"], self.collection.valueForKeyPath("@unionOfObjects.stringCol") as! NSArray?)
+
+        let collection = getAggregateableCollection()
+        XCTAssertEqual(3, collection.valueForKeyPath("@count")?.longValue)
+        XCTAssertEqual(3, collection.valueForKeyPath("@max.intCol")?.longValue)
+        XCTAssertEqual(1, collection.valueForKeyPath("@min.intCol")?.longValue)
+        XCTAssertEqual(6, collection.valueForKeyPath("@sum.intCol")?.longValue)
+        XCTAssertEqual(2.0, collection.valueForKeyPath("@avg.intCol")?.doubleValue)
+    }
 }
 
 // MARK: Results

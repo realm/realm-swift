@@ -202,6 +202,15 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     func valueForKey(key: String) -> AnyObject?
 
     /**
+     Returns an Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the collection's objects.
+
+     - parameter keyPath: The key path to the property.
+
+     - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the collection's objects.
+     */
+    func valueForKeyPath(keyPath: String) -> AnyObject?
+
+    /**
     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
 
     - warning: This method can only be called during a write transaction.
@@ -240,6 +249,7 @@ private class _AnyRealmCollectionBase<T: Object>: RealmCollectionType {
     var startIndex: Int { fatalError() }
     var endIndex: Int { fatalError() }
     func valueForKey(key: String) -> AnyObject? { fatalError() }
+    func valueForKeyPath(keyPath: String) -> AnyObject? { fatalError() }
     func setValue(value: AnyObject?, forKey key: String) { fatalError() }
     func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken {
         fatalError()
@@ -449,6 +459,7 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
     override func valueForKey(key: String) -> AnyObject? { return base.valueForKey(key) }
+    override func valueForKeyPath(keyPath: String) -> AnyObject? { return base.valueForKeyPath(keyPath) }
 
     /**
     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
@@ -670,6 +681,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
     public func valueForKey(key: String) -> AnyObject? { return base.valueForKey(key) }
+    public func valueForKeyPath(keyPath: String) -> AnyObject? { return base.valueForKeyPath(keyPath) }
 
     /**
     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
