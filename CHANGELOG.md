@@ -5,6 +5,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix crashes when deleting an object containing an `RLMArray`/`List` which had
   previously been queried.
+* Fix a crash when deleting an object containing an `RLMArray`/`List` with
+  active notification blocks.
 
 0.98.0 Release notes (2016-02-04)
 =============================================================

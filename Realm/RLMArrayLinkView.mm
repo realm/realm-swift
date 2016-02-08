@@ -465,6 +465,10 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
             return;
         }
 
+        if (!_backingLinkView->is_attached()) {
+            return;
+        }
+
         auto version = _backingLinkView->get_origin_table().get_version_counter();
         if (version != prevVersion) {
             block(self, nil);
