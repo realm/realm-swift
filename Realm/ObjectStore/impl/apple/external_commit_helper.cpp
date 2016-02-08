@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "external_commit_helper.hpp"
+#include "impl/external_commit_helper.hpp"
 
 #include "impl/realm_coordinator.hpp"
 

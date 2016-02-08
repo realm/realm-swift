@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "async_query.hpp"
+#include "impl/async_query.hpp"
 
-#include "realm_coordinator.hpp"
+#include "impl/realm_coordinator.hpp"
 #include "results.hpp"
 
 using namespace realm;

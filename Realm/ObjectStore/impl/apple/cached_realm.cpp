@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "cached_realm.hpp"
+#include "impl/cached_realm.hpp"
 
 #include "shared_realm.hpp"
 

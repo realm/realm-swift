@@ -889,25 +889,19 @@ case "$COMMAND" in
         done
 
         if [[ "$2" != "swift" ]]; then
-          # CocoaPods doesn't support multiple header_mappings_dir, so combine
-          # both sets of headers into a single directory
           rm -rf include
-          # Create uppercase `Realm` header directory for a case-sensitive filesystem.
-          # Both `Realm` and `realm` directories are required.
-          if [ ! -e core/include/Realm ]; then
-            cp -R core/include/realm core/include/Realm
-          fi
-          cp -R core/include include
-          mkdir -p include/Realm/impl/apple
-          cp Realm/*.{h,hpp} include/Realm
-          cp Realm/ObjectStore/*.hpp include/Realm
-          cp Realm/ObjectStore/impl/*.hpp include/Realm/impl
-          cp Realm/ObjectStore/impl/apple/*.hpp include/Realm/impl/apple
-          # Create lowercase `realm` header directory for a case-sensitive filesystem.
-          if [ ! -e include/realm ]; then
-            cp -R include/Realm include/realm
-          fi
-          touch include/Realm/RLMPlatform.h
+          mkdir -p include
+          mv core/include include/core
+
+          mkdir -p include/impl/apple
+          cp Realm/*.hpp include
+          cp Realm/ObjectStore/*.hpp include
+          cp Realm/ObjectStore/impl/*.hpp include/impl
+          cp Realm/ObjectStore/impl/apple/*.hpp include/impl/apple
+
+          mkdir -p include/Realm
+          touch Realm/RLMPlatform.h
+          cp Realm/*.h include/Realm
         else
           echo "let swiftLanguageVersion = \"$(get_swift_version)\"" > RealmSwift/SwiftVersion.swift
         fi

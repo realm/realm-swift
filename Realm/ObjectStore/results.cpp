@@ -18,9 +18,9 @@
 
 #include "results.hpp"
 
-#include "async_query.hpp"
+#include "impl/async_query.hpp"
+#include "impl/realm_coordinator.hpp"
 #include "object_store.hpp"
-#include "realm_coordinator.hpp"
 
 #include <stdexcept>
 
