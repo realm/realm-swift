@@ -446,6 +446,10 @@
 
     // invalid object
     XCTAssertThrows([company.employees indexOfObject:(EmployeeObject *)company]);
+
+    RLMResults *employees = [company.employees objectsWhere:@"age = %@", @40];
+    XCTAssertEqual(0U, [employees indexOfObject:po1]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [employees indexOfObject:po3]);
 }
 
 - (void)testIndexOfObjectWhere
