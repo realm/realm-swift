@@ -1750,6 +1750,25 @@
     XCTAssertEqualObjects(@"Spot's owner", [spotQuery.firstObject name]);
 }
 
+- (void)testQueryOnDeletedArrayProperty
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    IntObject *io = [IntObject createInRealm:realm withValue:@[@0]];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[io]]];
+    [realm commitWriteTransaction];
+
+    RLMResults *results = [array.intArray objectsWhere:@"TRUEPREDICATE"];
+    XCTAssertEqual(1U, results.count);
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:array];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(0U, results.count);
+    XCTAssertNil(results.firstObject);
+}
+
 - (void)testSubqueries
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
