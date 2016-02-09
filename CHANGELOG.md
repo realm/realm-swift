@@ -1,3 +1,11 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Bugfixes
+
+* Fix crashes when deleting an object containing an `RLMArray`/`List` which had
+  previously been queried.
+
 0.98.0 Release notes (2016-02-04)
 =============================================================
 

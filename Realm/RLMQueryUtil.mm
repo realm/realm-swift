@@ -84,8 +84,8 @@ struct TrueExpression : realm::Expression {
 
         return realm::not_found;
     }
-    void set_table(const Table*) override {}
-    const Table* get_table() const override { return nullptr; }
+    void set_base_table(const Table*) override {}
+    const Table* get_base_table() const override { return nullptr; }
     std::unique_ptr<Expression> clone(QueryNodeHandoverPatches*) const override
     {
         return std::unique_ptr<Expression>(new TrueExpression(*this));
@@ -94,8 +94,8 @@ struct TrueExpression : realm::Expression {
 
 struct FalseExpression : realm::Expression {
     size_t find_first(size_t, size_t) const override { return realm::not_found; }
-    void set_table(const Table*) override {}
-    const Table* get_table() const override { return nullptr; }
+    void set_base_table(const Table*) override {}
+    const Table* get_base_table() const override { return nullptr; }
     std::unique_ptr<Expression> clone(QueryNodeHandoverPatches*) const override
     {
         return std::unique_ptr<Expression>(new FalseExpression(*this));
