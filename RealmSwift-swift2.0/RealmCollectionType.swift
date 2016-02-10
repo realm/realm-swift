@@ -202,11 +202,13 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     func valueForKey(key: String) -> AnyObject?
 
     /**
-     Returns an Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the collection's objects.
+     Returns an Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
+     collection's objects.
 
      - parameter keyPath: The key path to the property.
 
-     - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the collection's objects.
+     - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
+     collection's objects.
      */
     func valueForKeyPath(keyPath: String) -> AnyObject?
 
@@ -459,6 +461,16 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
     override func valueForKey(key: String) -> AnyObject? { return base.valueForKey(key) }
+
+    /**
+     Returns an Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
+     collection's objects.
+
+     - parameter keyPath: The key path to the property.
+
+     - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
+       collection's objects.
+     */
     override func valueForKeyPath(keyPath: String) -> AnyObject? { return base.valueForKeyPath(keyPath) }
 
     /**
@@ -681,6 +693,16 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
     public func valueForKey(key: String) -> AnyObject? { return base.valueForKey(key) }
+
+    /**
+     Returns an Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
+     collection's objects.
+
+     - parameter keyPath: The key path to the property.
+
+     - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
+     collection's objects.
+     */
     public func valueForKeyPath(keyPath: String) -> AnyObject? { return base.valueForKeyPath(keyPath) }
 
     /**
