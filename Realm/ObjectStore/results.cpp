@@ -201,9 +201,6 @@ size_t Results::index_of(size_t row_ndx)
         case Mode::Table:
             return row_ndx;
         case Mode::Query:
-            if (!m_sort)
-                return m_query.count(row_ndx, row_ndx + 1) ? m_query.count(0, row_ndx) : not_found;
-            REALM_FALLTHROUGH;
         case Mode::TableView:
             update_tableview();
             return m_table_view.find_by_source_ndx(row_ndx);
