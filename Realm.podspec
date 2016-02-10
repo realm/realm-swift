@@ -39,19 +39,11 @@ Pod::Spec.new do |s|
                               'include/Realm/RLMObjectBase_Dynamic.h'
 
                               # Realm.Private module
-  private_header_files      = 'include/Realm/RLMAccessor.h',
-                              'include/Realm/RLMArray_Private.h',
+  private_header_files      = 'include/Realm/*_Private.h',
+                              'include/Realm/RLMAccessor.h',
                               'include/Realm/RLMListBase.h',
-                              'include/Realm/RLMMigration_Private.h',
-                              'include/Realm/RLMObjectSchema_Private.h',
                               'include/Realm/RLMObjectStore.h',
-                              'include/Realm/RLMObject_Private.h',
-                              'include/Realm/RLMOptionalBase.h',
-                              'include/Realm/RLMProperty_Private.h',
-                              'include/Realm/RLMRealmConfiguration_Private.h',
-                              'include/Realm/RLMRealm_Private.h',
-                              'include/Realm/RLMResults_Private.h',
-                              'include/Realm/RLMSchema_Private.h'
+                              'include/Realm/RLMOptionalBase.h'
 
   source_files              = 'Realm/*.{m,mm}',
                               'Realm/ObjectStore/*.cpp',
