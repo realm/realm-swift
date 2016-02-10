@@ -30,7 +30,7 @@
 #import "RLMUtil.hpp"
 
 #import "results.hpp"
-#import "external_commit_helper.hpp"
+#import "impl/external_commit_helper.hpp"
 
 #import <objc/runtime.h>
 #import <objc/message.h>

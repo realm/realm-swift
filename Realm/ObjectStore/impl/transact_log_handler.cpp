@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "transact_log_handler.hpp"
+#include "impl/transact_log_handler.hpp"
 
 #include "binding_context.hpp"
 

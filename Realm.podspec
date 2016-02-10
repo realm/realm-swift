@@ -33,21 +33,22 @@ Pod::Spec.new do |s|
                               'include/Realm/RLMResults.h',
                               'include/Realm/RLMSchema.h',
                               'include/Realm/Realm.h',
+
+                              # Realm.Dynamic module
                               'include/Realm/RLMRealm_Dynamic.h',
                               'include/Realm/RLMObjectBase_Dynamic.h'
 
-  private_header_files      = 'include/Realm/*{Accessor,RealmUtil,ListBase,ObjectStore,Private,SwiftSupport}.h',
-                              'include/realm.hpp',
-                              'include/realm/realm_nmmintrin.h',
-                              'include/realm/util/*.h',
-                              'include/realm/**/*.hpp',
-                              'include/Realm/**/*.hpp'
+                              # Realm.Private module
+  private_header_files      = 'include/Realm/*_Private.h',
+                              'include/Realm/RLMAccessor.h',
+                              'include/Realm/RLMListBase.h',
+                              'include/Realm/RLMObjectStore.h',
+                              'include/Realm/RLMOptionalBase.h'
 
   source_files              = 'Realm/*.{m,mm}',
                               'Realm/ObjectStore/*.cpp',
                               'Realm/ObjectStore/impl/*.cpp',
                               'Realm/ObjectStore/impl/apple/*.cpp'
-
 
   s.module_map              = 'Realm/module.modulemap'
   s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__"
@@ -58,9 +59,9 @@ Pod::Spec.new do |s|
   s.pod_target_xcconfig     = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)',
                                 'APPLICATION_EXTENSION_API_ONLY' => 'YES',
-                                'HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include"',
-                                'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include/Realm/"' }
-  s.preserve_paths          = %w(build.sh)
+                                'HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include/core"',
+                                'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"' }
+  s.preserve_paths          = %w(build.sh include)
 
   s.ios.deployment_target   = '7.0'
   s.ios.vendored_library    = 'core/librealm-ios.a'
