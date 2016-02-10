@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Use of KVC collection operators on Swift collection types no longer throws an exception.
+
 0.98.1 Release notes (2016-02-10)
 =============================================================
 
@@ -10,7 +25,6 @@
 * Fix duplicate file warnings when building via CocoaPods.
 * Fix crash or incorrect results when calling `indexOfObject:` on an
   `RLMResults` derived from an `RLMArray`.
-* Use of KVC collection operators on Swift collection types no longer throws an exception.
 
 0.98.0 Release notes (2016-02-04)
 =============================================================
