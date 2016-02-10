@@ -21,9 +21,9 @@
 #include "impl/async_query.hpp"
 #include "impl/cached_realm.hpp"
 #include "impl/external_commit_helper.hpp"
+#include "impl/transact_log_handler.hpp"
 #include "object_store.hpp"
 #include "schema.hpp"
-#include "transact_log_handler.hpp"
 
 #include <realm/commit_log.hpp>
 #include <realm/group_shared.hpp>
