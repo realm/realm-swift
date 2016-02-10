@@ -958,4 +958,25 @@
     [token stop];
 }
 
+- (void)testDeletingObjectWithNotificationsRegistered {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+    [realm commitWriteTransaction];
+
+    __block id expectation = [self expectationWithDescription:@""];
+    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+        XCTAssertNotNil(array);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:array];
+    [realm commitWriteTransaction];
+
+    [token stop];
+}
+
 @end
