@@ -7,6 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
   previously been queried.
 * Fix a crash when deleting an object containing an `RLMArray`/`List` with
   active notification blocks.
+* Fix duplicate file warnings when building via CocoaPods.
 
 0.98.0 Release notes (2016-02-04)
 =============================================================
