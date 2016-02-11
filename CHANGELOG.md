@@ -14,6 +14,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Use of KVC collection operators on Swift collection types no longer throws an exception.
 * Fix reporting of inWriteTransaction in notifications triggered by
   `beginWriteTransaction`.
+* The contents of `List` and `Optional` properties are now correctly preserved when copying
+  a Swift object from one Realm to another.
 
 0.98.1 Release notes (2016-02-10)
 =============================================================
