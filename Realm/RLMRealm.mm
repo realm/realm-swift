@@ -1207,8 +1207,6 @@ void RLMDisableSyncToDisk() {
 - (void)stop {
     [_realm removeNotification:self];
 }
-
-@implementation RLMNotificationToken
 - (void)dealloc {
     if (_realm || _block) {
         NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "

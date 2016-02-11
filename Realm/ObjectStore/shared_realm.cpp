@@ -33,8 +33,6 @@
 using namespace realm;
 using namespace realm::_impl;
 
-RealmCache Realm::s_global_cache;
-
 Realm::Config::Config(const Config& c)
 : path(c.path)
 , read_only(c.read_only)
@@ -90,10 +88,10 @@ void Realm::open_with_config(const Config& config,
             // probably has to be transmuted to an NSError.
             bool server_synchronization_mode = bool(config.sync_server_url);
             if (server_synchronization_mode) {
-                m_history = realm::make_client_transform_history(m_config.path, m_config.encryption_key.data());
+                history = realm::make_client_transform_history(config.path, config.encryption_key.data());
             }
             else {
-                m_history = realm::make_client_history(m_config.path, m_config.encryption_key.data());
+                history = realm::make_client_history(config.path, config.encryption_key.data());
             }
             SharedGroup::DurabilityLevel durability = config.in_memory ? SharedGroup::durability_MemOnly :
                                                                            SharedGroup::durability_Full;
@@ -126,10 +124,10 @@ void Realm::open_with_config(const Config& config,
         throw RealmFileException(RealmFileException::Kind::FormatUpgradeRequired, config.path,
                                  "The Realm file format must be allowed to be upgraded "
                                  "in order to proceed.");
-void Realm::init(std::shared_ptr<RealmCoordinator> coordinator)
     }
 }
 
+void Realm::init(std::shared_ptr<RealmCoordinator> coordinator)
 {
     m_coordinator = std::move(coordinator);
 
@@ -392,8 +390,8 @@ void Realm::notify()
                 m_binding_context->did_change({}, {});
             }
         }
-    else {
     }
+    else {
         m_coordinator->process_available_async(*this);
     }
 }
@@ -440,7 +438,12 @@ bool Realm::can_deliver_notifications() const noexcept
 
 void Realm::notify_others() const
 {
-    m_notifier->notify_others();
+    m_coordinator->notify_others();
+}
+
+uint64_t Realm::get_schema_version(const realm::Realm::Config &config)
+{
+    auto coordinator = RealmCoordinator::get_existing_coordinator(config.path);
     if (coordinator) {
         return coordinator->get_schema_version();
     }

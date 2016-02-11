@@ -87,6 +87,8 @@ public:
     void advance_to_ready(Realm& realm);
     void process_available_async(Realm& realm);
 
+    void notify_others();
+
 private:
     Realm::Config m_config;
 

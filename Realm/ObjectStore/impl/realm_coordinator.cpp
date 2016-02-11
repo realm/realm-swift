@@ -459,3 +459,8 @@ void RealmCoordinator::process_available_async(Realm& realm)
         query->call_callbacks();
     }
 }
+
+void RealmCoordinator::notify_others()
+{
+    m_notifier->notify_others();
+}
