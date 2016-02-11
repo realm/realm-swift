@@ -15,7 +15,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix reporting of inWriteTransaction in notifications triggered by
   `beginWriteTransaction`.
 * The contents of `List` and `Optional` properties are now correctly preserved when copying
-  a Swift object from one Realm to another.
+  a Swift object from one Realm to another, and performing other operations that result in a
+  Swift object graph being recursively traversed from Objective-C.
 
 0.98.1 Release notes (2016-02-10)
 =============================================================
