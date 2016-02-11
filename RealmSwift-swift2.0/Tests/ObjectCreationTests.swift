@@ -388,17 +388,23 @@ class ObjectCreationTests: TestCase {
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()] as AnyObject,
         ]
 
-        realmWithTestPath().beginWrite()
-        let otherRealmObject = realmWithTestPath().create(SwiftListOfSwiftObject.self, value: ["array": [SwiftObject(value: values), SwiftObject(value: values)]])
-        try! realmWithTestPath().commitWrite()
+        let realmA = realmWithTestPath()
+        let realmB = try! Realm()
 
-        try! Realm().beginWrite()
-        let object = try! Realm().create(SwiftListOfSwiftObject.self, value: otherRealmObject)
-        try! Realm().commitWrite()
+        var realmAObject: SwiftListOfSwiftObject!
+        try! realmA.write {
+            let array = [SwiftObject(value: values), SwiftObject(value: values)]
+            realmAObject = realmA.create(SwiftListOfSwiftObject.self, value: ["array": array])
+        }
 
-        XCTAssertNotEqual(otherRealmObject, object)
-        XCTAssertEqual(object.array.count,2)
-        for swiftObject in object.array {
+        var realmBObject: SwiftListOfSwiftObject!
+        try! realmB.write {
+            realmBObject = realmB.create(SwiftListOfSwiftObject.self, value: realmAObject)
+        }
+
+        XCTAssertNotEqual(realmAObject, realmBObject)
+        XCTAssertEqual(realmBObject.array.count, 2)
+        for swiftObject in realmBObject.array {
             verifySwiftObjectWithDictionaryLiteral(swiftObject, dictionary: values, boolObjectValue: true,
                 boolObjectListValues: [true, false])
         }
