@@ -153,6 +153,19 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
+     Returns an Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
+     collection's objects.
+
+     - parameter keyPath: The key path to the property.
+
+     - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
+     collection's objects.
+     */
+    public override func valueForKeyPath(keyPath: String) -> AnyObject? {
+        return _rlmArray.valueForKeyPath(keyPath)
+    }
+
+    /**
     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
 
     - warning: This method can only be called during a write transaction.
