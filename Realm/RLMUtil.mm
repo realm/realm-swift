@@ -28,6 +28,7 @@
 #import "RLMSwiftSupport.h"
 
 #import <realm/mixed.hpp>
+#import <realm/table_view.hpp>
 
 #include <sys/sysctl.h>
 #include <sys/types.h>
@@ -225,31 +226,38 @@ NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *ke
 }
 
 void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value) {
-    size_t count = collection.count;
-    if (count == 0) {
+    realm::TableView tv = [collection tableView];
+    if (tv.size() == 0) {
         return;
     }
 
     RLMRealm *realm = collection.realm;
     RLMObjectSchema *objectSchema = collection.objectSchema;
     RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-    realm::Table *table = objectSchema.table;
-    for (size_t i = 0; i < count; i++) {
-        size_t rowIndex = [collection indexInSource:i];
-        accessor->_row = (*table)[rowIndex];
+    for (size_t i = 0; i < tv.size(); i++) {
+        accessor->_row = tv[i];
         RLMInitializeSwiftAccessorGenerics(accessor);
         [accessor setValue:value forKey:key];
     }
 }
 
 
+static NSException *RLMException(NSString *reason, NSDictionary *additionalUserInfo) {
+    NSMutableDictionary *userInfo = @{RLMRealmVersionKey: REALM_COCOA_VERSION,
+                                      RLMRealmCoreVersionKey: @REALM_VERSION}.mutableCopy;
+    if (additionalUserInfo != nil) {
+        [userInfo addEntriesFromDictionary:additionalUserInfo];
+    }
+    NSException *e = [NSException exceptionWithName:RLMExceptionName
+                                             reason:reason
+                                           userInfo:userInfo];
+    return e;
+}
+
 NSException *RLMException(NSString *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    NSException *e = [NSException exceptionWithName:RLMExceptionName
-                                             reason:[[NSString alloc] initWithFormat:fmt arguments:args]
-                                           userInfo:@{RLMRealmVersionKey: REALM_COCOA_VERSION,
-                                                      RLMRealmCoreVersionKey: @REALM_VERSION}];
+    NSException *e = RLMException([[NSString alloc] initWithFormat:fmt arguments:args], @{});
     va_end(args);
     return e;
 }
@@ -299,7 +307,11 @@ void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
         *outError = error;
     }
     else {
-        @throw RLMException(@"%@", error.localizedDescription);
+        NSString *msg = error.localizedDescription;
+        if (error.userInfo[NSFilePathErrorKey]) {
+            msg = [NSString stringWithFormat:@"%@: %@", error.userInfo[NSFilePathErrorKey], error.localizedDescription];
+        }
+        @throw RLMException(msg, @{NSUnderlyingErrorKey: error});
     }
 }
 
@@ -330,14 +342,6 @@ BOOL RLMIsDebuggerAttached()
     }
 
     return (info.kp_proc.p_flag & P_TRACED) != 0;
-}
-
-BOOL RLMIsInRunLoop() {
-    if (auto mode = CFRunLoopCopyCurrentMode(CFRunLoopGetCurrent())) {
-        CFRelease(mode);
-        return true;
-    }
-    return false;
 }
 
 id RLMMixedToObjc(realm::Mixed const& mixed) {

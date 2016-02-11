@@ -16,18 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "external_commit_helper.hpp"
+#include "impl/external_commit_helper.hpp"
 
-#include "shared_realm.hpp"
+#include "impl/realm_coordinator.hpp"
 
+#include <asl.h>
 #include <assert.h>
+#include <fcntl.h>
+#include <sstream>
 #include <sys/event.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <system_error>
-#include <fcntl.h>
 #include <unistd.h>
-#include <sstream>
 
 using namespace realm;
 using namespace realm::_impl;
@@ -56,11 +57,10 @@ void notify_fd(int fd)
 
 void ExternalCommitHelper::FdHolder::close()
 {
-        if (m_fd != -1) {
-            ::close(m_fd);
-        }
-        m_fd = -1;
-
+    if (m_fd != -1) {
+        ::close(m_fd);
+    }
+    m_fd = -1;
 }
 
 // Inter-thread and inter-process notifications of changes are done using a
@@ -86,16 +86,16 @@ void ExternalCommitHelper::FdHolder::close()
 // signal the runloop source and wake up the target runloop, and when data is
 // written to the anonymous pipe the background thread removes the runloop
 // source from the runloop and and shuts down.
-ExternalCommitHelper::ExternalCommitHelper(Realm* realm)
+ExternalCommitHelper::ExternalCommitHelper(RealmCoordinator& parent)
+: m_parent(parent)
 {
-    add_realm(realm);
-
     m_kq = kqueue();
     if (m_kq == -1) {
         throw std::system_error(errno, std::system_category());
     }
 
-    auto path = realm->config().path + ".note";
+#if !TARGET_OS_TV
+    auto path = parent.get_path() + ".note";
 
     // Create and open the named pipe
     int ret = mkfifo(path.c_str(), 0600);
@@ -130,78 +130,56 @@ ExternalCommitHelper::ExternalCommitHelper(Realm* realm)
         throw std::system_error(errno, std::system_category());
     }
 
-    // Create the anonymous pipe
-    int pipeFd[2];
-    ret = pipe(pipeFd);
+#else // !TARGET_OS_TV
+
+    // tvOS does not support named pipes, so use an anonymous pipe instead
+    int notification_pipe[2];
+    int ret = pipe(notification_pipe);
     if (ret == -1) {
         throw std::system_error(errno, std::system_category());
     }
 
-    m_shutdown_read_fd = pipeFd[0];
-    m_shutdown_write_fd = pipeFd[1];
+    m_notify_fd = notification_pipe[0];
+    m_notify_fd_write = notification_pipe[1];
 
-    // Use the minimum allowed stack size, as we need very little in our listener
-    // https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/Multithreading/CreatingThreads/CreatingThreads.html#//apple_ref/doc/uid/10000057i-CH15-SW7
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setstacksize(&attr, 16 * 1024);
+#endif // TARGET_OS_TV
 
-    auto fn = [](void *self) -> void * {
-        static_cast<ExternalCommitHelper *>(self)->listen();
-        return nullptr;
-    };
-    ret = pthread_create(&m_thread, &attr, fn, this);
-    pthread_attr_destroy(&attr);
-    if (ret != 0) {
+    // Create the anonymous pipe for shutdown notifications
+    int shutdown_pipe[2];
+    ret = pipe(shutdown_pipe);
+    if (ret == -1) {
         throw std::system_error(errno, std::system_category());
     }
+
+    m_shutdown_read_fd = shutdown_pipe[0];
+    m_shutdown_write_fd = shutdown_pipe[1];
+
+    m_thread = std::async(std::launch::async, [=] {
+        try {
+            listen();
+        }
+        catch (std::exception const& e) {
+            fprintf(stderr, "uncaught exception in notifier thread: %s: %s\n", typeid(e).name(), e.what());
+            asl_log(nullptr, nullptr, ASL_LEVEL_ERR, "uncaught exception in notifier thread: %s: %s", typeid(e).name(), e.what());
+            throw;
+        }
+        catch (...) {
+            fprintf(stderr,  "uncaught exception in notifier thread\n");
+            asl_log(nullptr, nullptr, ASL_LEVEL_ERR, "uncaught exception in notifier thread");
+            throw;
+        }
+    });
 }
 
 ExternalCommitHelper::~ExternalCommitHelper()
 {
-    REALM_ASSERT_DEBUG(m_realms.empty());
     notify_fd(m_shutdown_write_fd);
-    pthread_join(m_thread, nullptr); // Wait for the thread to exit
-}
-
-void ExternalCommitHelper::add_realm(realm::Realm* realm)
-{
-    std::lock_guard<std::mutex> lock(m_realms_mutex);
-
-    // Create the runloop source
-    CFRunLoopSourceContext ctx{};
-    ctx.info = realm;
-    ctx.perform = [](void* info) {
-        static_cast<Realm*>(info)->notify();
-    };
-
-    CFRunLoopRef runloop = CFRunLoopGetCurrent();
-    CFRetain(runloop);
-    CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
-    CFRunLoopAddSource(runloop, signal, kCFRunLoopDefaultMode);
-
-    m_realms.push_back({realm, runloop, signal});
-}
-
-void ExternalCommitHelper::remove_realm(realm::Realm* realm)
-{
-    std::lock_guard<std::mutex> lock(m_realms_mutex);
-    for (auto it = m_realms.begin(); it != m_realms.end(); ++it) {
-        if (it->realm == realm) {
-            CFRunLoopSourceInvalidate(it->signal);
-            CFRelease(it->signal);
-            CFRelease(it->runloop);
-            m_realms.erase(it);
-            return;
-        }
-    }
-    REALM_TERMINATE("Realm not registered");
+    m_thread.wait(); // Wait for the thread to exit
 }
 
 void ExternalCommitHelper::listen()
 {
     pthread_setname_np("RLMRealm notification listener");
-
 
     // Set up the kqueue
     // EVFILT_READ indicates that we care about data being available to read
@@ -233,19 +211,16 @@ void ExternalCommitHelper::listen()
         }
         assert(event.ident == (uint32_t)m_notify_fd);
 
-        std::lock_guard<std::mutex> lock(m_realms_mutex);
-        for (auto const& realm : m_realms) {
-            CFRunLoopSourceSignal(realm.signal);
-            // Signalling the source makes it run the next time the runloop gets
-            // to it, but doesn't make the runloop start if it's currently idle
-            // waiting for events
-            CFRunLoopWakeUp(realm.runloop);
-        }
+        m_parent.on_change();
     }
 }
 
 void ExternalCommitHelper::notify_others()
 {
-    notify_fd(m_notify_fd);
+    if (m_notify_fd_write != -1) {
+        notify_fd(m_notify_fd_write);
+    }
+    else {
+        notify_fd(m_notify_fd);
+    }
 }
-

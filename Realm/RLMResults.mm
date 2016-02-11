@@ -30,11 +30,39 @@
 #import "RLMUtil.hpp"
 
 #import "results.hpp"
+#import "impl/external_commit_helper.hpp"
 
 #import <objc/runtime.h>
+#import <objc/message.h>
 #import <realm/table_view.hpp>
 
 using namespace realm;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wincomplete-implementation"
+@implementation RLMNotificationToken
+@end
+#pragma clang diagnostic pop
+
+@interface RLMCancellationToken : RLMNotificationToken
+@end
+
+@implementation RLMCancellationToken {
+    realm::AsyncQueryCancelationToken _token;
+}
+- (instancetype)initWithToken:(realm::AsyncQueryCancelationToken)token {
+    self = [super init];
+    if (self) {
+        _token = std::move(token);
+    }
+    return self;
+}
+
+- (void)stop {
+    _token = {};
+}
+
+@end
 
 static const int RLMEnumerationBufferSize = 16;
 
@@ -149,6 +177,12 @@ static const int RLMEnumerationBufferSize = 16;
     return self;
 }
 
+static void assertKeyPathIsNotNested(NSString *keyPath) {
+    if ([keyPath rangeOfString:@"."].location != NSNotFound) {
+        @throw RLMException(@"Nested key paths are not supported yet for KVC collection operators.");
+    }
+}
+
 [[gnu::noinline]]
 [[noreturn]]
 static void throwError(NSString *aggregateMethod) {
@@ -233,8 +267,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ... {
     va_list args;
-    RLM_VARARG(predicateFormat, args);
-    return [self indexOfObjectWhere:predicateFormat args:args];
+    va_start(args, predicateFormat);
+    NSUInteger index = [self indexOfObjectWhere:predicateFormat args:args];
+    va_end(args);
+    return index;
 }
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args {
@@ -282,6 +318,31 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     });
 }
 
+- (id)valueForKeyPath:(NSString *)keyPath {
+    if ([keyPath characterAtIndex:0] == '@') {
+        if ([keyPath isEqualToString:@"@count"]) {
+            return @(self.count);
+        }
+        NSRange operatorRange = [keyPath rangeOfString:@"." options:NSLiteralSearch];
+        NSUInteger keyPathLength = keyPath.length;
+        NSUInteger separatorIndex = operatorRange.location != NSNotFound ? operatorRange.location : keyPathLength;
+        NSString *operatorName = [keyPath substringWithRange:NSMakeRange(1, separatorIndex - 1)];
+        SEL opSelector = NSSelectorFromString([NSString stringWithFormat:@"_%@ForKeyPath:", operatorName]);
+        BOOL isValidOperator = [self respondsToSelector:opSelector];
+        if (!isValidOperator) {
+            @throw RLMException(@"Unsupported KVC collection operator found in key path '%@'", keyPath);
+        }
+        else if (separatorIndex >= keyPathLength - 1) {
+            @throw RLMException(@"Missing key path for KVC collection operator %@ in key path '%@'", operatorName, keyPath);
+        }
+        NSString *operatorKeyPath = [keyPath substringFromIndex:separatorIndex + 1];
+        if (isValidOperator) {
+            return ((id(*)(id, SEL, id))objc_msgSend)(self, opSelector, operatorKeyPath);
+        }
+    }
+    return [super valueForKeyPath:keyPath];
+}
+
 - (id)valueForKey:(NSString *)key {
     return translateErrors([&] {
         return RLMCollectionValueForKey(self, key);
@@ -293,10 +354,65 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMCollectionSetValueForKey(self, key, value);
 }
 
+- (NSNumber *)_aggregateForKeyPath:(NSString *)keyPath method:(util::Optional<Mixed> (Results::*)(size_t))method methodName:(NSString *)methodName {
+    assertKeyPathIsNotNested(keyPath);
+    return [self aggregate:keyPath method:method methodName:methodName];
+}
+
+- (NSNumber *)_minForKeyPath:(NSString *)keyPath {
+    return [self _aggregateForKeyPath:keyPath method:&Results::min methodName:@"@min"];
+}
+
+- (NSNumber *)_maxForKeyPath:(NSString *)keyPath {
+    return [self _aggregateForKeyPath:keyPath method:&Results::max methodName:@"@max"];
+}
+
+- (NSNumber *)_sumForKeyPath:(NSString *)keyPath {
+    return [self _aggregateForKeyPath:keyPath method:&Results::sum methodName:@"@sum"];
+}
+
+- (NSNumber *)_avgForKeyPath:(NSString *)keyPath {
+    return [self _aggregateForKeyPath:keyPath method:&Results::average methodName:@"@avg"];
+}
+
+- (NSArray *)_unionOfObjectsForKeyPath:(NSString *)keyPath {
+    assertKeyPathIsNotNested(keyPath);
+    return translateErrors([&] {
+        return RLMCollectionValueForKey(self, keyPath);
+    });
+}
+
+- (NSArray *)_distinctUnionOfObjectsForKeyPath:(NSString *)keyPath {
+    return [NSSet setWithArray:[self _unionOfObjectsForKeyPath:keyPath]].allObjects;
+}
+
+- (NSArray *)_unionOfArraysForKeyPath:(NSString *)keyPath {
+    assertKeyPathIsNotNested(keyPath);
+    if ([keyPath isEqualToString:@"self"]) {
+        @throw RLMException(@"self is not a valid key-path for a KVC array collection operator as 'unionOfArrays'.");
+    }
+
+    return translateErrors([&] {
+        NSArray *nestedResults = RLMCollectionValueForKey(self, keyPath);
+        NSMutableArray *flatArray = [NSMutableArray arrayWithCapacity:nestedResults.count];
+        for (id<RLMFastEnumerable> array in nestedResults) {
+            NSArray *nsArray = RLMCollectionValueForKey(array, @"self");
+            [flatArray addObjectsFromArray:nsArray];
+        }
+        return flatArray;
+    });
+}
+
+- (NSArray *)_distinctUnionOfArraysForKeyPath:(__unused NSString *)keyPath {
+    return [NSSet setWithArray:[self _unionOfArraysForKeyPath:keyPath]].allObjects;
+}
+
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     va_list args;
-    RLM_VARARG(predicateFormat, args);
-    return [self objectsWhere:predicateFormat args:args];
+    va_start(args, predicateFormat);
+    RLMResults *results = [self objectsWhere:predicateFormat args:args];
+    va_end(args);
+    return results;
 }
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args {
@@ -411,4 +527,31 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return translateErrors([&] { return _results.get_tableview(); });
 }
 
+// The compiler complains about the method's argument type not matching due to
+// it not having the generic type attached, but it doesn't seem to be possible
+// to actually include the generic type
+// http://www.openradar.me/radar?id=6135653276319744
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *results, NSError *error))block {
+    [_realm verifyNotificationsAreSupported];
+    auto token = _results.async([self, block](std::exception_ptr err) {
+        if (err) {
+            try {
+                rethrow_exception(err);
+            }
+            catch (...) {
+                NSError *error;
+                RLMRealmTranslateException(&error);
+                block(nil, error);
+            }
+        }
+        else {
+            block(self, nil);
+        }
+    });
+
+    return [[RLMCancellationToken alloc] initWithToken:std::move(token)];
+}
+#pragma clang diagnostic pop
 @end

@@ -17,7 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-import RealmSwift
+#if DEBUG
+    @testable import RealmSwift
+#else
+    import RealmSwift
+#endif
 import Foundation
 
 class RealmTests: TestCase {
@@ -39,6 +43,70 @@ class RealmTests: TestCase {
 
         assertThrows(try! Realm(), "Realm has different readOnly settings")
     }
+
+    func testOpeningInvalidPathThrows() {
+        assertFails(Error.FileAccess) {
+            try Realm(configuration: Realm.Configuration(path: "/dev/null/foo"))
+        }
+    }
+
+    func testReadOnlyFile() {
+        autoreleasepool {
+            let realm = try! Realm(path: testRealmPath())
+            try! realm.write {
+                realm.create(SwiftStringObject.self, value: ["a"])
+            }
+        }
+
+        let fileManager = NSFileManager.defaultManager()
+        try! fileManager.setAttributes([ NSFileImmutable: NSNumber(bool: true) ], ofItemAtPath: testRealmPath())
+
+        // Should not be able to open read-write
+        assertFails(Error.Fail) {
+            try Realm(path: testRealmPath())
+        }
+
+        assertSucceeds {
+            let realm = try Realm(configuration: Realm.Configuration(path: self.testRealmPath(), readOnly: true))
+            XCTAssertEqual(1, realm.objects(SwiftStringObject).count)
+        }
+
+        try! fileManager.setAttributes([ NSFileImmutable: NSNumber(bool: false) ], ofItemAtPath: testRealmPath())
+    }
+
+    func testReadOnlyRealmMustExist() {
+        assertFails(Error.FileNotFound) {
+            try Realm(configuration: Realm.Configuration(path: defaultRealmPath(), readOnly: true))
+        }
+    }
+
+    func testFilePermissionDenied() {
+        autoreleasepool {
+            let _ = try! Realm(path: testRealmPath())
+        }
+
+        // Make Realm at test path temporarily unreadable
+        let fileManager = NSFileManager.defaultManager()
+        let permissions = try! fileManager.attributesOfItemAtPath(testRealmPath())[NSFilePosixPermissions] as! NSNumber
+        try! fileManager.setAttributes([ NSFilePosixPermissions: NSNumber(int: 0000) ], ofItemAtPath: testRealmPath())
+
+        assertFails(Error.FilePermissionDenied) {
+            try Realm(path: testRealmPath())
+        }
+
+        try! fileManager.setAttributes([ NSFilePosixPermissions: permissions ], ofItemAtPath: testRealmPath())
+    }
+
+    #if DEBUG
+    func testFileFormatUpgradeRequiredButDisabled() {
+        var config = Realm.Configuration()
+        config.path = NSBundle(forClass: RealmTests.self).pathForResource("fileformat-pre-null.realm", ofType: nil)!
+        config.disableFormatUpgrade = true
+        assertFails(Error.FileFormatUpgradeRequired) {
+            try Realm(configuration: config)
+        }
+    }
+    #endif
 
     func testSchema() {
         let schema = try! Realm().schema
@@ -77,10 +145,10 @@ class RealmTests: TestCase {
         NSFileManager.defaultManager().createFileAtPath(defaultRealmPath(),
             contents:"a".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false),
             attributes: nil)
-        do {
+
+        assertFails(Error.FileAccess) {
             _ = try Realm()
             XCTFail("Realm creation should have failed")
-        } catch {
         }
     }
 

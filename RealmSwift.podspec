@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.dependency 'Realm', "= #{s.version}"
   s.source_files = 'RealmSwift/*.swift'
 
-  s.prepare_command           = 'sh build.sh cocoapods-setup without-core'
+  s.prepare_command           = 'sh build.sh cocoapods-setup swift'
   s.preserve_paths            = %w(build.sh)
   
   s.pod_target_xcconfig = { 'SWIFT_WHOLE_MODULE_OPTIMIZATION' => 'YES',
@@ -27,4 +27,5 @@ Pod::Spec.new do |s|
   s.ios.deployment_target     = '8.0'
   s.osx.deployment_target     = '10.9'
   s.watchos.deployment_target = '2.0' if s.respond_to?(:watchos)
+  s.tvos.deployment_target    = '9.0' if s.respond_to?(:tvos)
 end

@@ -383,7 +383,7 @@ class SwiftPerformanceTests: TestCase {
 
             self.startMeasuring()
             while object.intCol < 100 {
-                try! realm.write { _ = object.intCol++ }
+                try! realm.write { object.intCol += 1 }
             }
             self.stopMeasuring()
         }
@@ -399,7 +399,7 @@ class SwiftPerformanceTests: TestCase {
             let token = realm.addNotificationBlock { _, _ in }
             self.startMeasuring()
             while object.intCol < 100 {
-                try! realm.write { _ = object.intCol++ }
+                try! realm.write { object.intCol += 1 }
             }
             self.stopMeasuring()
             realm.removeNotification(token)
@@ -437,7 +437,7 @@ class SwiftPerformanceTests: TestCase {
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
             self.startMeasuring()
             while object.intCol < stopValue {
-                try! realm.write { _ = object.intCol++ }
+                try! realm.write { object.intCol += 1 }
             }
             dispatch_sync(queue) {}
             self.stopMeasuring()
@@ -464,7 +464,7 @@ class SwiftPerformanceTests: TestCase {
                             if object.intCol == stopValue {
                                 CFRunLoopStop(CFRunLoopGetCurrent())
                             } else if object.intCol % 2 == 0 {
-                                try! realm.write { object.intCol++ }
+                                try! realm.write { object.intCol += 1 }
                             }
                         }
                         dispatch_semaphore_signal(semaphore)
@@ -476,13 +476,13 @@ class SwiftPerformanceTests: TestCase {
 
             let token = realm.addNotificationBlock { _, _ in
                 if object.intCol % 2 == 1 && object.intCol < stopValue {
-                    try! realm.write { _ = object.intCol++ }
+                    try! realm.write { object.intCol += 1 }
                 }
             }
 
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
             self.startMeasuring()
-            try! realm.write { object.intCol++ }
+            try! realm.write { object.intCol += 1 }
             while object.intCol < stopValue {
                 NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
             }

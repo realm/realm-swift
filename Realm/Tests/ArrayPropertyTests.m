@@ -446,6 +446,10 @@
 
     // invalid object
     XCTAssertThrows([company.employees indexOfObject:(EmployeeObject *)company]);
+
+    RLMResults *employees = [company.employees objectsWhere:@"age = %@", @40];
+    XCTAssertEqual(0U, [employees indexOfObject:po1]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [employees indexOfObject:po3]);
 }
 
 - (void)testIndexOfObjectWhere
@@ -615,6 +619,16 @@
     XCTAssertTrue([[[company.employees valueForKey:@"self"] firstObject] isEqualToObject:company.employees.firstObject]);
     XCTAssertTrue([[[company.employees valueForKey:@"self"] lastObject] isEqualToObject:company.employees.lastObject]);
 
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@count"] integerValue], 30);
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@min.age"] integerValue], 0);
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@max.age"] integerValue], 29);
+    XCTAssertEqualWithAccuracy([[company.employees valueForKeyPath:@"@avg.age"] doubleValue], 14.5, 0.1f);
+
+    XCTAssertEqualObjects([company.employees valueForKeyPath:@"@unionOfObjects.age"], (@[@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17, @18, @19, @20, @21, @22, @23, @24, @25, @26, @27, @28, @29]));
+    XCTAssertEqualObjects([company.employees valueForKeyPath:@"@distinctUnionOfObjects.name"], (@[@"Joe"]));
+
+    RLMAssertThrowsWithReasonMatching([company.employees valueForKeyPath:@"@sum.dogs.@sum.age"], @"Nested key paths.*not supported");
+    
     // standalone
     company = [[CompanyObject alloc] init];
     ages = [NSMutableArray array];
@@ -627,6 +641,16 @@
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
     XCTAssertTrue([[[company.employees valueForKey:@"self"] firstObject] isEqualToObject:company.employees.firstObject]);
     XCTAssertTrue([[[company.employees valueForKey:@"self"] lastObject] isEqualToObject:company.employees.lastObject]);
+
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@count"] integerValue], 30);
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@min.age"] integerValue], 0);
+    XCTAssertEqual([[company.employees valueForKeyPath:@"@max.age"] integerValue], 29);
+    XCTAssertEqualWithAccuracy([[company.employees valueForKeyPath:@"@avg.age"] doubleValue], 14.5, 0.1f);
+
+    XCTAssertEqualObjects([company.employees valueForKeyPath:@"@unionOfObjects.age"], (@[@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17, @18, @19, @20, @21, @22, @23, @24, @25, @26, @27, @28, @29]));
+    XCTAssertEqualObjects([company.employees valueForKeyPath:@"@distinctUnionOfObjects.name"], (@[@"Joe"]));
+
+    RLMAssertThrowsWithReasonMatching([company.employees valueForKeyPath:@"@sum.dogs.@sum.age"], @"Nested key paths.*not supported");
 }
 
 - (void)testSetValueForKey {
@@ -832,6 +856,131 @@
     [array setValue:[stringSet allObjects] forKey:@"array"];
     XCTAssertEqualObjects([[array valueForKey:@"array"] valueForKey:@"stringCol"], [[stringSet allObjects] valueForKey:@"stringCol"]);
     [realm commitWriteTransaction];
+}
+
+- (void)testNotificationSentInitially {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+    [realm commitWriteTransaction];
+
+    id expectation = [self expectationWithDescription:@""];
+    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+        XCTAssertNotNil(array);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [token stop];
+}
+
+- (void)testNotificationSentAfterCommit {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+    [realm commitWriteTransaction];
+
+    __block id expectation = [self expectationWithDescription:@""];
+    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+        XCTAssertNotNil(array);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    expectation = [self expectationWithDescription:@""];
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm transactionWithBlock:^{
+            [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+        }];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+- (void)testNotificationNotSentForUnrelatedChange {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+    [realm commitWriteTransaction];
+
+    id expectation = [self expectationWithDescription:@""];
+    id token = [array.array addNotificationBlock:^(__unused RLMArray *array, __unused NSError *error) {
+        // will throw if it's incorrectly called a second time due to the
+        // unrelated write transaction
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // All notification blocks are called as part of a single runloop event, so
+    // waiting for this one also waits for the above one to get a chance to run
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        [self dispatchAsyncAndWait:^{
+            [self.realmWithTestPath transactionWithBlock:^{ }];
+        }];
+    }];
+    [token stop];
+}
+
+- (void)testNotificationSentOnlyForActualRefresh {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+    [realm commitWriteTransaction];
+
+    __block id expectation = [self expectationWithDescription:@""];
+    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+        XCTAssertNotNil(array);
+        XCTAssertNil(error);
+        // will throw if it's called a second time before we create the new
+        // expectation object immediately before manually refreshing
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Turn off autorefresh, so the background commit should not result in a notification
+    realm.autorefresh = NO;
+
+    // All notification blocks are called as part of a single runloop event, so
+    // waiting for this one also waits for the above one to get a chance to run
+    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
+        [self dispatchAsyncAndWait:^{
+            RLMRealm *realm = self.realmWithTestPath;
+            [realm transactionWithBlock:^{
+                [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+            }];
+        }];
+    }];
+
+    expectation = [self expectationWithDescription:@""];
+    [realm refresh];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+- (void)testDeletingObjectWithNotificationsRegistered {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+    [realm commitWriteTransaction];
+
+    __block id expectation = [self expectationWithDescription:@""];
+    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+        XCTAssertNotNil(array);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:array];
+    [realm commitWriteTransaction];
+
+    [token stop];
 }
 
 @end

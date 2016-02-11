@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMPredicateUtil.h"
 
 #import <libkern/OSAtomic.h>
 #import <objc/runtime.h>
@@ -68,14 +67,27 @@
 
 
 @interface IndexedObject : RLMObject
-@property NSString *name;
-@property NSInteger age;
+@property NSString *stringCol;
+@property NSInteger integerCol;
+@property int intCol;
+@property long longCol;
+@property long long longlongCol;
+@property BOOL boolCol;
+@property NSDate *dateCol;
+@property NSNumber<RLMInt> *optionalIntCol;
+@property NSNumber<RLMBool> *optionalBoolCol;
+
+@property float floatCol;
+@property double doubleCol;
+@property NSData *dataCol;
+@property NSNumber<RLMFloat> *optionalFloatCol;
+@property NSNumber<RLMDouble> *optionalDoubleCol;
 @end
 
 @implementation IndexedObject
 + (NSArray *)indexedProperties
 {
-    return @[@"name"];
+    return @[@"stringCol", @"integerCol", @"intCol", @"longCol", @"longlongCol", @"boolCol", @"dateCol", @"optionalIntCol", @"optionalBoolCol"];
 }
 @end
 
@@ -1493,11 +1505,49 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
 - (void)testIndex
 {
-    RLMProperty *nameProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"name"];
-    XCTAssertTrue(nameProperty.indexed, @"indexed property should have an index");
+    RLMSchema *schema = [RLMRealm defaultRealm].schema;
+
+    RLMProperty *stringProperty = schema[IndexedObject.className][@"stringCol"];
+    XCTAssertTrue(stringProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *integerProperty = schema[IndexedObject.className][@"integerCol"];
+    XCTAssertTrue(integerProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *intProperty = schema[IndexedObject.className][@"intCol"];
+    XCTAssertTrue(intProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *longProperty = schema[IndexedObject.className][@"longCol"];
+    XCTAssertTrue(longProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *longlongProperty = schema[IndexedObject.className][@"longlongCol"];
+    XCTAssertTrue(longlongProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *boolProperty = schema[IndexedObject.className][@"boolCol"];
+    XCTAssertTrue(boolProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *dateProperty = schema[IndexedObject.className][@"dateCol"];
+    XCTAssertTrue(dateProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *optionalIntProperty = schema[IndexedObject.className][@"optionalIntCol"];
+    XCTAssertTrue(optionalIntProperty.indexed, @"indexed property should have an index");
+
+    RLMProperty *optionalBoolProperty = schema[IndexedObject.className][@"optionalBoolCol"];
+    XCTAssertTrue(optionalBoolProperty.indexed, @"indexed property should have an index");
     
-    RLMProperty *ageProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"age"];
-    XCTAssertFalse(ageProperty.indexed, @"non-indexed property shouldn't have an index");
+    RLMProperty *floatProperty = schema[IndexedObject.className][@"floatCol"];
+    XCTAssertFalse(floatProperty.indexed, @"non-indexed property shouldn't have an index");
+
+    RLMProperty *doubleProperty = schema[IndexedObject.className][@"doubleCol"];
+    XCTAssertFalse(doubleProperty.indexed, @"non-indexed property shouldn't have an index");
+
+    RLMProperty *dataProperty = schema[IndexedObject.className][@"dataCol"];
+    XCTAssertFalse(dataProperty.indexed, @"non-indexed property shouldn't have an index");
+
+    RLMProperty *optionalFloatProperty = schema[IndexedObject.className][@"optionalFloatCol"];
+    XCTAssertFalse(optionalFloatProperty.indexed, @"non-indexed property shouldn't have an index");
+
+    RLMProperty *optionalDoubleProperty = schema[IndexedObject.className][@"optionalDoubleCol"];
+    XCTAssertFalse(optionalDoubleProperty.indexed, @"non-indexed property shouldn't have an index");
 }
 
 - (void)testRetainedRealmObjectUnknownKey

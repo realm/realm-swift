@@ -179,7 +179,7 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((oldObj!["stringCol"] as! String), "string")
                 self.assertThrows(oldObj!["noSuchCol"] as! String)
                 self.assertThrows(newObj!["noSuchCol"] as! String)
-                count++
+                count += 1
             })
             XCTAssertEqual(count, 1)
         }

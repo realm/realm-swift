@@ -26,8 +26,10 @@
 
 @end
 
-static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) { \
-    return [actual.name isEqualToString:expected.name] && [actual.reason isEqualToString:expected.reason] && [actual.userInfo isEqual:expected.userInfo];
+static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) {
+    return [actual.name isEqualToString:expected.name]
+        && [actual.reason isEqualToString:expected.reason]
+        && [actual.userInfo isEqual:expected.userInfo];
 }
 
 @implementation UtilTests

@@ -42,12 +42,3 @@ RLMProperty *RLMValidatedProperty(RLMObjectSchema *objectSchema, NSString *colum
 
 // validate the array of RLMSortDescriptors and convert it to a realm::SortOrder
 realm::SortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *objectSchema, NSArray *descriptors);
-
-// This macro validates predicate format with optional arguments
-#define RLM_VARARG(PREDICATE_FORMAT, ARGS) \
-va_start(ARGS, PREDICATE_FORMAT);          \
-va_end(ARGS);                              \
-if (PREDICATE_FORMAT && ![PREDICATE_FORMAT isKindOfClass:[NSString class]]) {         \
-    NSString *reason = @"predicate must be an NSString with optional format va_list"; \
-    [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:nil];       \
-}

@@ -50,5 +50,6 @@
 // - The minimum iOS/OS X version that the application is targeting (again, to
 //   help us decide what versions we need to support). 
 // - An anonymous MAC address and bundle ID to aggregate the other information on.
+// - What version of Swift is being used (if applicable).
 
 void RLMSendAnalytics();

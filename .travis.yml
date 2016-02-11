@@ -1,0 +1,37 @@
+language: objective-c
+osx_image: xcode7.2
+branches:
+  only: master
+script: placeholder # workaround for https://github.com/travis-ci/travis-ci/issues/4681
+matrix:
+  include:
+    - script: ./build.sh verify-swiftlint
+      env: JOB=verify-swiftlint
+      before_install: brew update; brew install swiftlint
+    - script: ./build.sh verify-docs
+      env: JOB=verify-docs
+      before_install: gem install jazzy
+    - script: ./build.sh verify-osx-swift
+      env: JOB=verify-osx-swift
+    - script: ./build.sh test-tvos
+      env: JOB=test-tvos
+    - script: ./build.sh verify-osx
+      env: JOB=verify-osx
+    - script: ./build.sh test-ios-swift
+      env: JOB=test-ios-swift
+    - script: ./build.sh test-ios-static
+      env: JOB=test-ios-static
+
+    ############################################################################
+    # These jobs pass but are disabled because they occasionally make Travis
+    # exceed its maximum of 50 minutes in aggregate for matrix builds.
+    ############################################################################
+
+    # - script: ./build.sh verify-ios-dynamic
+    #   env: JOB=verify-ios-dynamic
+    # - script: ./build.sh verify-osx-encryption
+    #   env: JOB=verify-osx-encryption
+  exclude:
+    - script: placeholder # workaround for https://github.com/travis-ci/travis-ci/issues/4681
+notifications:
+  email: false

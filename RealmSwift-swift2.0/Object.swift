@@ -221,9 +221,14 @@ public class Object: RLMObjectBase {
 
     // MARK: Equatable
 
-    /// Returns whether both objects are equal.
-    /// Objects are considered equal when they are both from the same Realm
-    /// and point to the same underlying object in the database.
+    /**
+    Returns whether both objects are equal.
+
+    Objects are considered equal when they are both from the same Realm and point to the same
+    underlying object in the database.
+
+    - parameter object: Object to compare for equality.
+    */
     public override func isEqual(object: AnyObject?) -> Bool {
         return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
@@ -308,6 +313,10 @@ public final class DynamicObject: Object {
 /// Internal class. Do not use directly.
 @objc(RealmSwiftObjectUtil)
 public class ObjectUtil: NSObject {
+    @objc private class func swiftVersion() -> NSString {
+        return swiftLanguageVersion
+    }
+
     @objc private class func ignoredPropertiesForClass(type: AnyClass) -> NSArray? {
         if let type = type as? Object.Type {
             return type.ignoredProperties() as NSArray?
@@ -341,6 +350,7 @@ public class ObjectUtil: NSObject {
         optional.object = object
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
         let children = Mirror(reflecting: object).children
         return children.reduce([String: AnyObject]()) { (var properties: [String:AnyObject], prop: Mirror.Child) in

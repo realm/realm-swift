@@ -99,3 +99,6 @@ build/
 # Cartfiles are ignored because they're generated on demand in the installation examples
 Cartfile
 Carthage
+
+## Swift Version
+SwiftVersion.swift

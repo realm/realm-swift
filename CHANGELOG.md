@@ -1,4 +1,75 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.98.1 Release notes (2016-02-10)
+=============================================================
+
+### Bugfixes
+
+* Fix crashes when deleting an object containing an `RLMArray`/`List` which had
+  previously been queried.
+* Fix a crash when deleting an object containing an `RLMArray`/`List` with
+  active notification blocks.
+* Fix duplicate file warnings when building via CocoaPods.
+* Fix crash or incorrect results when calling `indexOfObject:` on an
+  `RLMResults` derived from an `RLMArray`.
+
+0.98.0 Release notes (2016-02-04)
+=============================================================
+
+### API breaking changes
+
+* `+[RLMRealm realmWithPath:]`/`Realm.init(path:)` now inherits from the default
+  configuration.
+* Swift 1.2 is no longer supported.
+
+### Enhancements
+
+* Add `addNotificationBlock` to `RLMResults`, `Results`, `RLMArray`, and
+  `List`, which calls the given block whenever the collection changes.
+* Do a lot of the work for keeping `RLMResults`/`Results` up-to-date after
+  write transactions on a background thread to help avoid blocking the main
+  thread.
+* `NSPredicate`'s `SUBQUERY` operator is now supported. It has the following limitations:
+  * `@count` is the only operator that may be applied to the `SUBQUERY` expression.
+  * The `SUBQUERY(…).@count` expression must be compared with a constant.
+  * Correlated subqueries are not yet supported.
+
+### Bugfixes
+
+* None.
+
+0.97.1 Release notes (2016-01-29)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Swift: Added `Error` enum allowing to catch errors e.g. thrown on initializing
+  `RLMRealm`/`Realm` instances.
+* Fail with `RLMErrorFileNotFound` instead of the more generic `RLMErrorFileAccess`,
+  if no file was found when a realm was opened as read-only or if the directory part
+  of the specified path was not found when a copy should be written. 
+* Greatly improve performance when deleting objects with one or more indexed
+  properties.
+* Indexing `BOOL`/`Bool` and `NSDate` properties are now supported.
+* Swift: Add support for indexing optional properties.
+
+### Bugfixes
+
+* Fix incorrect results or crashes when using `-[RLMResults setValue:forKey:]`
+  on an RLMResults which was filtered on the key being set.
+* Fix crashes when an RLMRealm is deallocated from the wrong thread.
+* Fix incorrect results from aggregate methods on `Results`/`RLMResults` after
+  objects which were previously in the results are deleted.
+* Fix a crash when adding a new property to an existing class with over a
+  million objects in the Realm.
+* Fix errors when opening encrypted Realm files created with writeCopyToPath.
+* Fix crashes or incorrect results for queries that use relationship equality
+  in cases where the `RLMResults` is kept alive and instances of the target class
+  of the relationship are deleted.
+
+0.97.0 Release notes (2015-12-17)
 =============================================================
 
 ### API breaking changes
@@ -11,16 +82,23 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
+* Support for tvOS.
+* Support for building Realm Swift from source when using Carthage.
 * The block parameter of `-[RLMRealm transactionWithBlock:]`/`Realm.write(_:)` is 
   now marked as `__attribute__((noescape))`/`@noescape`.
 * Many forms of queries with key paths on both sides of the comparison operator
   are now supported.
+* Add support for KVC collection operators in `RLMResults` and `RLMArray`.
+* Fail instead of deadlocking in `+[RLMRealm sharedSchema]`, if a Swift property is initialized
+  to a computed value, which attempts to open a Realm on its own.
 
 ### Bugfixes
 
 * Fix poor performance when calling `-[RLMRealm deleteObjects:]` on an
   `RLMResults` which filtered the objects when there are other classes linking
   to the type of the deleted objects.
+* An exception is now thrown when defining `Object` properties of an unsupported
+  type.
 
 0.96.3 Release notes (2015-12-04)
 =============================================================

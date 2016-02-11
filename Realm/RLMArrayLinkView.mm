@@ -361,6 +361,17 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     return RLMConvertNotFound(_backingLinkView->find(object_ndx));
 }
 
+- (id)valueForKeyPath:(NSString *)keyPath {
+    if ([keyPath hasPrefix:@"@"]) {
+        // Delegate KVC collection operators to RLMResults
+        realm::Query query = _backingLinkView->get_target_table().where(_backingLinkView);
+        RLMResults *results = [RLMResults resultsWithObjectSchema:_realm.schema[self.objectClassName]
+                                                          results:realm::Results(_realm->_realm, std::move(query))];
+        return [results valueForKeyPath:keyPath];
+    }
+    return [super valueForKeyPath:keyPath];
+}
+
 - (id)valueForKey:(NSString *)key {
     // Ideally we'd use "@invalidated" for this so that "invalidated" would use
     // normal array KVC semantics, but observing @things works very oddly (when
@@ -438,5 +449,39 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 - (realm::TableView)tableView {
     return _backingLinkView->get_target_table().where(_backingLinkView).find_all();
 }
+
+// The compiler complains about the method's argument type not matching due to
+// it not having the generic type attached, but it doesn't seem to be possible
+// to actually include the generic type
+// http://www.openradar.me/radar?id=6135653276319744
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, NSError *))block {
+    [_realm verifyNotificationsAreSupported];
+
+    __block uint_fast64_t prevVersion = -1;
+    auto noteBlock = ^(NSString *notification, RLMRealm *) {
+        if (notification != RLMRealmDidChangeNotification) {
+            return;
+        }
+
+        if (!_backingLinkView->is_attached()) {
+            return;
+        }
+
+        auto version = _backingLinkView->get_origin_table().get_version_counter();
+        if (version != prevVersion) {
+            block(self, nil);
+            prevVersion = version;
+        }
+    };
+
+    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+        noteBlock(RLMRealmDidChangeNotification, nil);
+    });
+
+    return [_realm addNotificationBlock:noteBlock];
+}
+#pragma clang diagnostic pop
 
 @end

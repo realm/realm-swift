@@ -96,29 +96,6 @@ static BOOL encryptTests() {
                             withIntermediateDirectories:YES attributes:nil error:nil];
 }
 
-- (void)setUp {
-    @autoreleasepool {
-        [super setUp];
-        [self deleteFiles];
-
-        if (encryptTests()) {
-            RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-            configuration.encryptionKey = RLMGenerateKey();
-        }
-    }
-}
-
-- (void)tearDown {
-    @autoreleasepool {
-        [super tearDown];
-        if (_bgQueue) {
-            dispatch_sync(_bgQueue, ^{});
-            _bgQueue = nil;
-        }
-        [self deleteFiles];
-    }
-}
-
 // This ensures the shared schema is initialized outside of of a test case,
 // so if an exception is thrown, it will kill the test process rather than
 // allowing hundreds of test cases to fail in strange ways
@@ -149,7 +126,22 @@ static BOOL encryptTests() {
 
 - (void)invokeTest {
     @autoreleasepool {
+        [self deleteFiles];
+
+        if (encryptTests()) {
+            RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+            configuration.encryptionKey = RLMGenerateKey();
+        }
+    }
+    @autoreleasepool {
         [super invokeTest];
+    }
+    @autoreleasepool {
+        if (_bgQueue) {
+            dispatch_sync(_bgQueue, ^{});
+            _bgQueue = nil;
+        }
+        [self deleteFiles];
     }
 }
 

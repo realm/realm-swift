@@ -194,9 +194,8 @@ class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
 }
 
 class SwiftLinkToPrimaryStringObject: Object {
-    // swiftlint:disable variable_name_min_length
+    // swiftlint:disable:next variable_name
     dynamic var pk = ""
-    // swiftlint:enable variable_name_min_length
     dynamic var object: SwiftPrimaryStringObject?
     let objects = List<SwiftPrimaryStringObject>()
 
@@ -206,9 +205,8 @@ class SwiftLinkToPrimaryStringObject: Object {
 }
 
 class SwiftUTF8Object: Object {
-    // swiftlint:disable variable_name
+    // swiftlint:disable:next variable_name
     dynamic var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
-    // swiftlint:enable variable_name
 }
 
 class SwiftIgnoredPropertiesObject: Object {
@@ -239,8 +237,38 @@ class SwiftPrimaryStringObject: Object {
 class SwiftIndexedPropertiesObject: Object {
     dynamic var stringCol = ""
     dynamic var intCol = 0
+    dynamic var int8Col: Int8 = 0
+    dynamic var int16Col: Int16 = 0
+    dynamic var int32Col: Int32 = 0
+    dynamic var int64Col: Int64 = 0
+    dynamic var boolCol = false
+    dynamic var dateCol = NSDate()
+
+    dynamic var floatCol: Float = 0.0
+    dynamic var doubleCol: Double = 0.0
+    dynamic var dataCol = NSData()
 
     override class func indexedProperties() -> [String] {
-        return ["stringCol"] // Add "intCol" when integer indexing is supported
+        return ["stringCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "boolCol", "dateCol"]
+    }
+}
+
+class SwiftIndexedOptinalPropertiesObject: Object {
+    dynamic var optionalStringCol: String? = ""
+    let optionalIntCol = RealmOptional<Int>()
+    let optionalInt8Col = RealmOptional<Int8>()
+    let optionalInt16Col = RealmOptional<Int16>()
+    let optionalInt32Col = RealmOptional<Int32>()
+    let optionalInt64Col = RealmOptional<Int64>()
+    let optionalBoolCol = RealmOptional<Bool>()
+    dynamic var optionalDateCol: NSDate? = NSDate()
+
+    let optionalFloatCol = RealmOptional<Float>()
+    let optionalDoubleCol = RealmOptional<Double>()
+    dynamic var optionalDataCol: NSData? = NSData()
+
+    override class func indexedProperties() -> [String] {
+        return ["optionalStringCol", "optionalIntCol", "optionalInt8Col", "optionalInt16Col",
+            "optionalInt32Col", "optionalInt64Col", "optionalBoolCol", "optionalDateCol"]
     }
 }

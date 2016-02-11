@@ -19,6 +19,9 @@
 #ifndef REALM_SCHEMA_HPP
 #define REALM_SCHEMA_HPP
 
+#include "property.hpp"
+
+#include <string>
 #include <vector>
 
 namespace realm {
@@ -30,6 +33,7 @@ private:
 public:
     // Create a schema from a vector of ObjectSchema
     Schema(base types);
+    Schema(std::initializer_list<ObjectSchema> types) : Schema(base(types)) { }
 
     // find an ObjectSchema by name
     iterator find(std::string const& name);

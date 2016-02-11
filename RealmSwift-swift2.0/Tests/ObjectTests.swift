@@ -102,8 +102,38 @@ class ObjectTests: TestCase {
 
     func testIndexedProperties() {
         XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
-        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 1)
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["stringCol"]!.indexed)
+        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 8)
+
+        let objectSchema = SwiftIndexedPropertiesObject().objectSchema
+        XCTAssertTrue(objectSchema["stringCol"]!.indexed)
+        XCTAssertTrue(objectSchema["intCol"]!.indexed)
+        XCTAssertTrue(objectSchema["int8Col"]!.indexed)
+        XCTAssertTrue(objectSchema["int16Col"]!.indexed)
+        XCTAssertTrue(objectSchema["int32Col"]!.indexed)
+        XCTAssertTrue(objectSchema["int64Col"]!.indexed)
+        XCTAssertTrue(objectSchema["boolCol"]!.indexed)
+        XCTAssertTrue(objectSchema["dateCol"]!.indexed)
+
+        XCTAssertFalse(objectSchema["floatCol"]!.indexed)
+        XCTAssertFalse(objectSchema["doubleCol"]!.indexed)
+        XCTAssertFalse(objectSchema["dataCol"]!.indexed)
+    }
+
+    func testIndexedOptionalProperties() {
+        XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
+        XCTAssertEqual(SwiftIndexedOptinalPropertiesObject.indexedProperties().count, 8)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalStringCol"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalDateCol"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalBoolCol"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalIntCol"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalInt8Col"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalInt16Col"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalInt32Col"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalInt64Col"]!.indexed)
+
+        XCTAssertFalse(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalDataCol"]!.indexed)
+        XCTAssertFalse(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalFloatCol"]!.indexed)
+        XCTAssertFalse(SwiftIndexedOptinalPropertiesObject().objectSchema["optionalDoubleCol"]!.indexed)
     }
 
     func testLinkingObjects() {
@@ -228,7 +258,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
     }
 
-    /// Yields a read-write migration `SwiftObject` to the given block
+    // Yields a read-write migration `SwiftObject` to the given block
     private func withMigrationObject(block: ((MigrationObject, Migration) -> ())) {
         autoreleasepool {
             let realm = self.realmWithTestPath()
@@ -252,11 +282,11 @@ class ObjectTests: TestCase {
     }
 
     func testSetValueForKey() {
-        let setter : (Object, AnyObject?, String) -> () = { object, value, key in
+        let setter: (Object, AnyObject?, String) -> () = { object, value, key in
             object.setValue(value, forKey: key)
             return
         }
-        let getter : (Object, String) -> (AnyObject?) = { object, key in
+        let getter: (Object, String) -> (AnyObject?) = { object, key in
             object.valueForKey(key)
         }
 
@@ -273,11 +303,11 @@ class ObjectTests: TestCase {
     }
 
     func testSubscript() {
-        let setter : (Object, AnyObject?, String) -> () = { object, value, key in
+        let setter: (Object, AnyObject?, String) -> () = { object, value, key in
             object[key] = value
             return
         }
-        let getter : (Object, String) -> (AnyObject?) = { object, key in
+        let getter: (Object, String) -> (AnyObject?) = { object, key in
             object[key]
         }
 

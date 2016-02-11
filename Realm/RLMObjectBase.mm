@@ -90,13 +90,14 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 }
 
 - (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
-    self = [super init];
-    if (self) {
-        if (!RLMInitializedObjectSchema(self)) {
-            // Don't populate fields from the passed-in object if we're called
-            // during schema init
-            return self;
-        }
+    if (!(self = [super init])) {
+        return self;
+    }
+
+    if (!RLMInitializedObjectSchema(self)) {
+        // Don't populate fields from the passed-in object if we're called
+        // during schema init
+        return self;
     }
 
     NSArray *properties = _objectSchema.properties;
@@ -299,6 +300,19 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 
 - (void)setObservationInfo:(void *)observationInfo {
     _observationInfo->kvoInfo = observationInfo;
+}
+
++ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
+{
+    const char *className = class_getName(self);
+    const char accessorClassPrefix[] = "RLMAccessor_";
+    if (!strncmp(className, accessorClassPrefix, sizeof(accessorClassPrefix) - 1)) {
+        if (self.sharedSchema[key]) {
+            return NO;
+        }
+    }
+
+    return [super automaticallyNotifiesObserversForKey:key];
 }
 
 @end

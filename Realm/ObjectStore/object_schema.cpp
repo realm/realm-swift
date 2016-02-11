@@ -28,6 +28,14 @@ using namespace realm;
 
 ObjectSchema::~ObjectSchema() = default;
 
+ObjectSchema::ObjectSchema(std::string name, std::string primary_key, std::initializer_list<Property> properties)
+: name(std::move(name))
+, properties(properties)
+, primary_key(std::move(primary_key))
+{
+    set_primary_key_property();
+}
+
 ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(name) {
     ConstTableRef table = ObjectStore::table_for_object_type(group, name);
 
@@ -50,13 +58,7 @@ ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(n
     }
 
     primary_key = realm::ObjectStore::get_primary_key_for_object(group, name);
-    if (primary_key.length()) {
-        auto primary_key_prop = primary_key_property();
-        if (!primary_key_prop) {
-            throw InvalidPrimaryKeyException(name, primary_key);
-        }
-        primary_key_prop->is_primary = true;
-    }
+    set_primary_key_property();
 }
 
 Property *ObjectSchema::property_for_name(StringData name) {
@@ -70,4 +72,15 @@ Property *ObjectSchema::property_for_name(StringData name) {
 
 const Property *ObjectSchema::property_for_name(StringData name) const {
     return const_cast<ObjectSchema *>(this)->property_for_name(name);
+}
+
+void ObjectSchema::set_primary_key_property()
+{
+    if (primary_key.length()) {
+        auto primary_key_prop = primary_key_property();
+        if (!primary_key_prop) {
+            throw InvalidPrimaryKeyException(name, primary_key);
+        }
+        primary_key_prop->is_primary = true;
+    }
 }

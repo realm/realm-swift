@@ -18,6 +18,10 @@
 
 #include "results.hpp"
 
+#include "impl/async_query.hpp"
+#include "impl/realm_coordinator.hpp"
+#include "object_store.hpp"
+
 #include <stdexcept>
 
 using namespace realm;
@@ -50,11 +54,29 @@ Results::Results(SharedRealm r, Table& table)
 {
 }
 
+Results::Results(SharedRealm r, SortOrder s, TableView tv)
+: m_realm(std::move(r))
+, m_table_view(std::move(tv))
+, m_table(&m_table_view.get_parent())
+, m_sort(std::move(s))
+, m_mode(Mode::TableView)
+{
+}
+
+Results::~Results()
+{
+    if (m_background_query) {
+        m_background_query->unregister();
+    }
+}
+
 void Results::validate_read() const
 {
     if (m_realm)
         m_realm->verify_thread();
     if (m_table && !m_table->is_attached())
+        throw InvalidatedException();
+    if (m_mode == Mode::TableView && !m_table_view.is_attached())
         throw InvalidatedException();
 }
 
@@ -146,6 +168,11 @@ void Results::update_tableview()
             m_mode = Mode::TableView;
             break;
         case Mode::TableView:
+            if (!m_background_query && !m_realm->is_in_transaction() && m_realm->can_deliver_notifications()) {
+                m_background_query = std::make_shared<_impl::AsyncQuery>(*this);
+                _impl::RealmCoordinator::register_query(m_background_query);
+            }
+            m_has_used_table_view = true;
             m_table_view.sync_if_needed();
             break;
     }
@@ -174,9 +201,6 @@ size_t Results::index_of(size_t row_ndx)
         case Mode::Table:
             return row_ndx;
         case Mode::Query:
-            if (!m_sort)
-                return m_query.count(row_ndx, row_ndx + 1) ? m_query.count(0, row_ndx) : not_found;
-            REALM_FALLTHROUGH;
         case Mode::TableView:
             update_tableview();
             return m_table_view.find_by_source_ndx(row_ndx);
@@ -286,8 +310,9 @@ Query Results::get_query() const
     switch (m_mode) {
         case Mode::Empty:
         case Mode::Query:
-        case Mode::TableView:
             return m_query;
+        case Mode::TableView:
+            return m_table_view.get_query();
         case Mode::Table:
             return m_table->where();
     }
@@ -325,8 +350,75 @@ Results Results::filter(Query&& q) const
     return Results(m_realm, get_query().and_query(std::move(q)), get_sort());
 }
 
-Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t column, const Table* table) {
+AsyncQueryCancelationToken Results::async(std::function<void (std::exception_ptr)> target)
+{
+    if (m_realm->config().read_only) {
+        throw InvalidTransactionException("Cannot create asynchronous query for read-only Realms");
+    }
+    if (m_realm->is_in_transaction()) {
+        throw InvalidTransactionException("Cannot create asynchronous query while in a write transaction");
+    }
+
+    if (!m_background_query) {
+        m_background_query = std::make_shared<_impl::AsyncQuery>(*this);
+        _impl::RealmCoordinator::register_query(m_background_query);
+    }
+    return {m_background_query, m_background_query->add_callback(std::move(target))};
+}
+
+void Results::Internal::set_table_view(Results& results, realm::TableView &&tv)
+{
+    // If the previous TableView was never actually used, then stop generating
+    // new ones until the user actually uses the Results object again
+    if (results.m_mode == Mode::TableView) {
+        results.m_wants_background_updates = results.m_has_used_table_view;
+    }
+
+    results.m_table_view = std::move(tv);
+    results.m_mode = Mode::TableView;
+    results.m_has_used_table_view = false;
+    // needs https://github.com/realm/realm-core/pull/1392
+//    REALM_ASSERT(results.m_table_view.is_in_sync());
+}
+
+Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t column, const Table* table)
+{
     column_index = column;
     column_name = table->get_column_name(column);
     column_type = table->get_column_type(column);
+}
+
+AsyncQueryCancelationToken::AsyncQueryCancelationToken(std::shared_ptr<_impl::AsyncQuery> query, size_t token)
+: m_query(std::move(query)), m_token(token)
+{
+}
+
+AsyncQueryCancelationToken::~AsyncQueryCancelationToken()
+{
+    // m_query itself (and not just the pointed-to thing) needs to be accessed
+    // atomically to ensure that there are no data races when the token is
+    // destroyed after being modified on a different thread.
+    // This is needed despite the token not being thread-safe in general as
+    // users find it very surpringing for obj-c objects to care about what
+    // thread they are deallocated on.
+    if (auto query = std::atomic_load(&m_query)) {
+        query->remove_callback(m_token);
+    }
+}
+
+AsyncQueryCancelationToken::AsyncQueryCancelationToken(AsyncQueryCancelationToken&& rgt)
+: m_query(std::atomic_exchange(&rgt.m_query, {})), m_token(rgt.m_token)
+{
+}
+
+AsyncQueryCancelationToken& AsyncQueryCancelationToken::operator=(realm::AsyncQueryCancelationToken&& rgt)
+{
+    if (this != &rgt) {
+        if (auto query = std::atomic_load(&m_query)) {
+            query->remove_callback(m_token);
+        }
+        std::atomic_store(&m_query, std::atomic_exchange(&rgt.m_query, {}));
+        m_token = rgt.m_token;
+    }
+    return *this;
 }

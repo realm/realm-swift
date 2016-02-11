@@ -61,8 +61,6 @@ extension Realm {
         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
         - parameter syncServerURL:      The synchronization server URL.
         - parameter syncIdentity:       The user identity token used for synchronization.
-
-        - returns: An initialized `Realm.Configuration`.
         */
         public init(path: String? = RLMRealmPathForFile("default.realm"),
             inMemoryIdentifier: String? = nil,
@@ -158,6 +156,9 @@ extension Realm {
 
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema? = nil
+        /// Allows to disable automatic format upgrades when accessing the Realm.
+
+        internal var disableFormatUpgrade: Bool = false
 
         // MARK: Private Methods
 
@@ -175,6 +176,7 @@ extension Realm {
             configuration.schemaVersion = self.schemaVersion
             configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
             configuration.customSchema = self.customSchema
+            configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.syncServerURL = self.syncServerURL
             configuration.syncIdentity = self.syncIdentity
             return configuration
@@ -193,6 +195,7 @@ extension Realm {
                 }
             }
             configuration.customSchema = rlmConfiguration.customSchema
+            configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
             configuration.syncServerURL = rlmConfiguration.syncServerURL
             configuration.syncIdentity = rlmConfiguration.syncIdentity
             return configuration

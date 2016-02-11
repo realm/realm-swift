@@ -21,13 +21,13 @@ import RealmSwift
 
 var pkCounter = 0
 func nextPrimaryKey() -> Int {
-    return ++pkCounter
+    pkCounter += 1
+    return pkCounter
 }
 
 class KVOObject: Object {
-    // swiftlint:disable variable_name_min_length
+    // swiftlint:disable:next variable_name
     dynamic var pk = nextPrimaryKey() // primary key for equality
-    // swiftlint:enable variable_name_min_length
     dynamic var ignored: Int = 0
 
     dynamic var boolCol: Bool = false
@@ -78,7 +78,7 @@ class KVOTests: TestCase {
     }
 
     func observeChange(obj: NSObject, _ key: String, _ old: AnyObject, _ new: AnyObject,
-                       fileName: String = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
+                       fileName: TestLocationString = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [.Old, .New], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
@@ -99,7 +99,7 @@ class KVOTests: TestCase {
     }
 
     func observeListChange(obj: NSObject, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet,
-                           fileName: String = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
+                           fileName: TestLocationString = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [.Old, .New], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)

@@ -73,11 +73,26 @@ public class ResultsBase: NSObject, NSFastEnumeration {
 }
 
 /**
-`Results` is an auto-updating container type in Realm returned from object
-queries.
+Results is an auto-updating container type in Realm returned from object queries.
 
-Results can be queried with the same predicates as `List<T>` and you can chain queries to further
-filter query results.
+Results can be queried with the same predicates as `List<T>` and you can chain
+queries to further filter query results.
+
+Results always reflect the current state of the Realm on the current thread,
+including during write transactions on the current thread. The one exception to
+this is when using `for...in` enumeration, which will always enumerate over the
+ objects which matched the query when the enumeration is begun, even if
+some of them are deleted or modified to be excluded by the filter during the
+enumeration.
+
+Results are initially lazily evaluated, and only run queries when the result
+of the query is requested. This means that chaining several temporary
+Results to sort and filter your data does not perform any extra work
+processing the intermediate state.
+
+Once the results have been evaluated or a notification block has been added,
+the results are eagerly kept up-to-date, with the work done to keep them
+up-to-date done on a background thread whenever possible.
 
 Results cannot be created directly.
 */
@@ -290,6 +305,48 @@ public final class Results<T: Object>: ResultsBase {
     public func average<U: AddableType>(property: String) -> U? {
         return rlmResults.averageOfProperty(property) as! U?
     }
+
+    // MARK: Notifications
+
+    /**
+     Register a block to be called each time the Results changes.
+
+     The block will be asynchronously called with the initial results, and then
+     called again after each write transaction which causes the results to change.
+     You must retain the returned token for as long as you want the results to
+     continue to be sent to the block. To stop receiving updates, call stop() on the
+     token.
+
+     The determination for whether or not a write transaction has changed the
+     results is currently very coarse, and the block may be called even if no
+     changes occurred. The opposite (not being called despite changes) will not
+     happen. This will become more precise in future versions.
+
+     If an error occurs the block will be called with `nil` for the results
+     parameter and a non-`nil` error. Currently the only errors that can occur are
+     when opening the Realm on the background worker thread or the destination
+     queue fails.
+
+     At the time when the block is called, the Results object will be fully
+     evaluated and up-to-date, and as long as you do not perform a write transaction
+     on the same thread or explicitly call realm.refresh(), accessing it will never
+     perform blocking work.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the source realm is read-only.
+
+     - parameter block: The block to be called with the evaluated results.
+     - returns: A token which must be held for as long as you want query results to be delivered.
+     */
+    public func addNotificationBlock(block: (Results<T>?, NSError?) -> ()) -> NotificationToken {
+        return rlmResults.addNotificationBlock { results, error in
+            if results != nil {
+                block(self, nil)
+            } else {
+                block(nil, error)
+            }
+        }
+    }
 }
 
 extension Results: RealmCollectionType {
@@ -310,4 +367,16 @@ extension Results: RealmCollectionType {
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
     /// zero or more applications of successor().
     public var endIndex: Int { return count }
+
+    /// :nodoc:
+    public func _addNotificationBlock(block: (AnyRealmCollection<T>?, NSError?) -> ()) -> NotificationToken {
+        let anyCollection = AnyRealmCollection(self)
+        return rlmResults.addNotificationBlock { results, error in
+            if results != nil {
+                block(anyCollection, nil)
+            } else {
+                block(nil, error)
+            }
+        }
+    }
 }

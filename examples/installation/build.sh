@@ -45,10 +45,6 @@ xctest() {
     DIRECTORY="$PLATFORM/$LANG/$NAME"
     PROJECT="$DIRECTORY/$NAME.xcodeproj"
     WORKSPACE="$DIRECTORY/$NAME.xcworkspace"
-    CMD="-project $PROJECT"
-    if [ -d $WORKSPACE ]; then
-        CMD="-workspace $WORKSPACE"
-    fi
     if [[ $PLATFORM == ios ]]; then
         sh "$(dirname "$0")/../../scripts/reset-simulators.sh"
     fi
@@ -73,6 +69,10 @@ xctest() {
     if [[ $PLATFORM == ios ]]; then
         DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
     fi
+    CMD="-project $PROJECT"
+    if [ -d $WORKSPACE ]; then
+        CMD="-workspace $WORKSPACE"
+    fi
     xcodebuild $CMD -scheme $NAME clean build test $DESTINATION
 }
 
@@ -85,14 +85,9 @@ case "$COMMAND" in
         ;;
 
     "test-xcode6")
-        for target in ios-objc-static ios-objc-dynamic ios-objc-cocoapods ios-objc-cocoapods-dynamic ios-objc-carthage osx-objc-dynamic osx-objc-cocoapods osx-objc-carthage ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic; do
+        for target in ios-objc-static ios-objc-dynamic ios-objc-cocoapods ios-objc-cocoapods-dynamic ios-objc-carthage osx-objc-dynamic osx-objc-cocoapods osx-objc-carthage; do
             REALM_SWIFT_VERSION=1.2 ./build.sh test-$target || exit 1
         done
-
-        # FIXME: Re-enable once Carthage supports multiple build folders.
-        # export REALM_SWIFT_VERSION=1.2
-        # ./build.sh test-ios-swift-carthage || exit 1
-        # ./build.sh test-osx-swift-carthage || exit 1
         ;;
 
     "test-xcode7")
