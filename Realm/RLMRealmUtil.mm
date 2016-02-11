@@ -130,9 +130,21 @@ public:
     }
 
     void did_change(std::vector<ObserverState> const& observed, std::vector<void*> const& invalidated) override {
-        @autoreleasepool {
-            RLMDidChange(observed, invalidated);
-            [_realm sendNotifications:RLMRealmDidChangeNotification];
+        try {
+            @autoreleasepool {
+                RLMDidChange(observed, invalidated);
+                [_realm sendNotifications:RLMRealmDidChangeNotification];
+            }
+        }
+        catch (...) {
+            // This can only be called during a write transaction if it was
+            // called due to the transaction beginning, so cancel it to ensure
+            // exceptions thrown here behave the same as exceptions thrown when
+            // actually beginning the write
+            if (_realm.inWriteTransaction) {
+                [_realm cancelWriteTransaction];
+            }
+            throw;
         }
     }
 
