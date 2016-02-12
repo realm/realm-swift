@@ -12,6 +12,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Use of KVC collection operators on Swift collection types no longer throws an exception.
+* Fix reporting of inWriteTransaction in notifications triggered by
+  `beginWriteTransaction`.
 
 0.98.1 Release notes (2016-02-10)
 =============================================================
