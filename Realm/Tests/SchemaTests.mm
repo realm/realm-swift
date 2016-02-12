@@ -151,7 +151,8 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 - (void)testSchemaWithObjectClasses {
     RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[RLMDynamicObject.class, StringObject.class]];
-    XCTAssertEqualObjects((@[@"RLMDynamicObject", @"StringObject"]), [schema.objectSchema valueForKey:@"className"]);
+    XCTAssertEqualObjects((@[@"RLMDynamicObject", @"StringObject"]),
+                          [[schema.objectSchema valueForKey:@"className"] sortedArrayUsingSelector:@selector(compare:)]);
     XCTAssertNil([RLMSchema.sharedSchema schemaForClassName:@"RLMDynamicObject"]);
 }
 
@@ -493,12 +494,15 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     @autoreleasepool {
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         XCTAssertEqual(1U, realm.schema.objectSchema.count);
+        XCTAssertNoThrow(realm.schema[@"IntObject"]);
     }
 
     config.objectClasses = @[IntObject.class, StringObject.class];
     @autoreleasepool {
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         XCTAssertEqual(2U, realm.schema.objectSchema.count);
+        XCTAssertNoThrow(realm.schema[@"IntObject"]);
+        XCTAssertNoThrow(realm.schema[@"StringObject"]);
     }
 
     // Verify that the shared schema generated afterwards is valid
@@ -516,7 +520,27 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         // Shared schema shouldn't have duplicate entries
         XCTAssertEqual(realm.schema.objectSchema.count,
                        [NSSet setWithArray:[realm.schema.objectSchema valueForKey:@"className"]].count);
+
+        // Shared schema should have the ones that were used in the subsets
+        XCTAssertNoThrow(realm.schema[@"IntObject"]);
+        XCTAssertNoThrow(realm.schema[@"StringObject"]);
     }
+}
+
+- (void)testPartialSharedSchemaInitInheritance {
+    if (self.isParent) {
+        RLMRunChildAndWait();
+        return;
+    }
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[NumberObject.class];
+
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    XCTAssertEqual(1U, realm.schema.objectSchema.count);
+    XCTAssertEqualObjects(@"NumberObject", [[[[NumberObject alloc] init] objectSchema] className]);
+    // Verify that child class doesn't use the parent class's schema
+    XCTAssertEqualObjects(@"NumberDefaultsObject", [[[[NumberDefaultsObject alloc] init] objectSchema] className]);
 }
 
 - (void)testMultipleProcessesTryingToInitializeSchema {

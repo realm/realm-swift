@@ -703,8 +703,15 @@ void RLMReplaceClassNameMethod(Class accessorClass, NSString *className) {
 // implement the shared schema method
 void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema) {
     Class metaClass = objc_getMetaClass(class_getName(accessorClass));
-    IMP imp = imp_implementationWithBlock(^(Class){ return schema; });
-    class_replaceMethod(metaClass, @selector(sharedSchema), imp, "@@:");
+    IMP imp = imp_implementationWithBlock(^(Class cls) {
+        // This can be called on a subclass of the class that we overrode it on
+        // if that class hasn't been initialized yet
+        if (cls == accessorClass) {
+            return schema;
+        }
+        return [RLMSchema sharedSchemaForClass:cls];
+    });
+    class_addMethod(metaClass, @selector(sharedSchema), imp, "@@:");
 }
 
 static NSMutableSet *s_generatedClasses = [NSMutableSet new];
@@ -718,12 +725,6 @@ bool RLMIsGeneratedClass(Class cls) {
     @synchronized (s_generatedClasses) {
         return [s_generatedClasses containsObject:cls];
     }
-}
-
-void RLMReplaceSharedSchemaMethodWithBlock(Class accessorClass, RLMObjectSchema *(^method)(Class)) {
-    Class metaClass = objc_getMetaClass(class_getName(accessorClass));
-    IMP imp = imp_implementationWithBlock(method);
-    class_replaceMethod(metaClass, @selector(sharedSchema), imp, "@@:");
 }
 
 static Class RLMCreateAccessorClass(Class objectClass,

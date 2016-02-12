@@ -24,6 +24,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * The `ANY` / `SOME` / `NONE` qualifiers are now required in comparisons involving a key path that
   traverse a `RLMArray`/`List` property. Previously they were only required if the first key in the
   key path was an `RLMArray`/`List` property.
+* Fix several scenarios where the default schema would be initialized
+  incorrectly if the first Realm opened used a restricted class subset (via
+  `objectClasses`/`objectTypes`).
 
 0.98.1 Release notes (2016-02-10)
 =============================================================
