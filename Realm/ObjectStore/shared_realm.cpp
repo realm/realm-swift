@@ -294,8 +294,14 @@ void Realm::begin_transaction()
     // make sure we have a read transaction
     read_group();
 
-    transaction::begin(*m_shared_group, *m_history, m_binding_context.get());
     m_in_transaction = true;
+    try {
+        transaction::begin(*m_shared_group, *m_history, m_binding_context.get());
+    }
+    catch (...) {
+        m_in_transaction = false;
+        throw;
+    }
 }
 
 void Realm::commit_transaction()

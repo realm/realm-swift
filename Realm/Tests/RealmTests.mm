@@ -984,6 +984,89 @@ extern "C" {
     XCTAssertEqual(2U, [IntObject allObjects].count);
 }
 
+- (void)testInWriteTransactionInNotificationFromBeginWrite {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    realm.autorefresh = NO;
+
+    __block bool called = false;
+    RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+        if (note == RLMRealmDidChangeNotification) {
+            called = true;
+            XCTAssertTrue(realm.inWriteTransaction);
+        }
+    }];
+
+    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
+        [RLMRealm.defaultRealm transactionWithBlock:^{ }];
+    }];
+
+    [realm beginWriteTransaction];
+    XCTAssertTrue(called);
+    [realm cancelWriteTransaction];
+    [token stop];
+}
+
+- (void)testThrowingFromDidChangeNotificationCancelsTransaction {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    realm.autorefresh = NO;
+
+    RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *) {
+        if (note == RLMRealmDidChangeNotification) {
+            throw 0;
+        }
+    }];
+
+    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
+        [RLMRealm.defaultRealm transactionWithBlock:^{ }];
+    }];
+
+    try {
+        [realm beginWriteTransaction];
+        XCTFail(@"should have thrown");
+    }
+    catch (int) { }
+    [token stop];
+
+    XCTAssertFalse(realm.inWriteTransaction);
+    XCTAssertNoThrow([realm beginWriteTransaction]);
+    [realm cancelWriteTransaction];
+}
+
+- (void)testNotificationsFireEvenWithoutReadTransaction {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+
+    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
+    RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *) {
+        if (note == RLMRealmDidChangeNotification) {
+            [notificationFired fulfill];
+        }
+    }];
+
+    [realm invalidate];
+    [self dispatchAsync:^{
+        [RLMRealm.defaultRealm transactionWithBlock:^{ }];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [token stop];
+}
+
+- (void)testNotificationBlockMustNotBeNil {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    XCTAssertThrows([realm addNotificationBlock:self.nonLiteralNil]);
+}
+
+- (void)testRefreshInWriteTransactionReturnsFalse {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    [IntObject createInRealm:realm withValue:@[@0]];
+    XCTAssertFalse([realm refresh]);
+    [realm cancelWriteTransaction];
+}
+
+- (void)testCancelWriteWhenNotInWrite {
+    XCTAssertThrows([RLMRealm.defaultRealm cancelWriteTransaction]);
+}
+
 #pragma mark - Threads
 
 - (void)testCrossThreadAccess
