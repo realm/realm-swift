@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Use of KVC collection operators on Swift collection types no longer throws an exception.
+
 0.98.1 Release notes (2016-02-10)
 =============================================================
 
