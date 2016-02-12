@@ -1784,10 +1784,6 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
-- (void)notify {
-    _realm->notify();
-}
-
 - (BOOL)refresh {
     return _realm->refresh();
 }

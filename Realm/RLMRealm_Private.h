@@ -78,7 +78,6 @@ void RLMRealmTranslateException(NSError **error);
 - (void)detachAllEnumerators;
 
 - (void)sendNotifications:(NSString *)notification;
-- (void)notify;
 - (void)verifyThread;
 - (void)verifyNotificationsAreSupported;
 
