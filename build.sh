@@ -1217,18 +1217,6 @@ EOF
         sh tightdb_objc/build.sh package-osx-swift
         cp tightdb_objc/build/osx/realm-swift-framework-osx.zip .
 
-        echo 'Packaging watchOS'
-        sh tightdb_objc/build.sh package-watchos
-        sh tightdb_objc/build.sh package-watchos-swift
-        cp tightdb_objc/build/watchos/realm-swift-framework-watchos.zip .
-        cp tightdb_objc/build/watchos/realm-framework-watchos.zip .
-
-        echo 'Packaging tvOS'
-        sh tightdb_objc/build.sh package-tvos
-        sh tightdb_objc/build.sh package-tvos-swift
-        cp tightdb_objc/build/tvos/realm-swift-framework-tvos.zip .
-        cp tightdb_objc/build/tvos/realm-framework-tvos.zip .
-
         echo 'Building final release packages'
         sh tightdb_objc/build.sh package-release objc
         sh tightdb_objc/build.sh package-release swift
