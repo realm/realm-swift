@@ -58,7 +58,11 @@ xctest() {
             else
                 echo "github \"realm/realm-cocoa\" \"${sha:-master}\"" > Cartfile
             fi
-            carthage update
+            if [[ $PLATFORM == ios ]]; then
+                carthage update --platform iOS
+            elif [[ $PLATFORM == osx ]]; then
+                carthage update --platform Mac
+            fi
         )
     elif [[ $LANG == swift* ]]; then
         download_zip_if_needed swift
