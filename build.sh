@@ -1099,16 +1099,6 @@ case "$COMMAND" in
                 cd ${FOLDER}/ios/dynamic
                 unzip ${WORKSPACE}/realm-dynamic-framework-ios.zip
             )
-
-            (
-                cd ${FOLDER}/watchos
-                unzip ${WORKSPACE}/realm-framework-watchos.zip
-            )
-
-            (
-                cd ${FOLDER}/tvos
-                unzip ${WORKSPACE}/realm-framework-tvos.zip
-            )
         else
             (
                 cd ${FOLDER}/osx
@@ -1118,16 +1108,6 @@ case "$COMMAND" in
             (
                 cd ${FOLDER}/ios
                 unzip ${WORKSPACE}/realm-swift-framework-ios.zip
-            )
-
-            (
-                cd ${FOLDER}/watchos
-                unzip ${WORKSPACE}/realm-swift-framework-watchos.zip
-            )
-
-            (
-                cd ${FOLDER}/tvos
-                unzip ${WORKSPACE}/realm-swift-framework-tvos.zip
             )
         fi
 
@@ -1220,9 +1200,6 @@ EOF
         echo 'Building final release packages'
         sh tightdb_objc/build.sh package-release objc
         sh tightdb_objc/build.sh package-release swift
-
-        echo 'Testing packaged examples'
-        sh tightdb_objc/build.sh package-test-examples
 
         ;;
 
