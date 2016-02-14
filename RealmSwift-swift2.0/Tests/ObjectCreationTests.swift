@@ -375,6 +375,41 @@ class ObjectCreationTests: TestCase {
             boolObjectListValues: [true, false])
     }
 
+    func testCreateWithDeeplyNestedObjectsFromAnotherRealm() {
+        let values = [
+            "boolCol": true as NSNumber,
+            "intCol": 1 as NSNumber,
+            "floatCol": 1.1 as NSNumber,
+            "doubleCol": 11.1 as NSNumber,
+            "stringCol": "b" as NSString,
+            "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+            "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
+            "objectCol": SwiftBoolObject(value: [true]) as AnyObject,
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()] as AnyObject,
+        ]
+
+        let realmA = realmWithTestPath()
+        let realmB = try! Realm()
+
+        var realmAObject: SwiftListOfSwiftObject!
+        try! realmA.write {
+            let array = [SwiftObject(value: values), SwiftObject(value: values)]
+            realmAObject = realmA.create(SwiftListOfSwiftObject.self, value: ["array": array])
+        }
+
+        var realmBObject: SwiftListOfSwiftObject!
+        try! realmB.write {
+            realmBObject = realmB.create(SwiftListOfSwiftObject.self, value: realmAObject)
+        }
+
+        XCTAssertNotEqual(realmAObject, realmBObject)
+        XCTAssertEqual(realmBObject.array.count, 2)
+        for swiftObject in realmBObject.array {
+            verifySwiftObjectWithDictionaryLiteral(swiftObject, dictionary: values, boolObjectValue: true,
+                boolObjectListValues: [true, false])
+        }
+    }
+
     func testUpdateWithObjectsFromAnotherRealm() {
         realmWithTestPath().beginWrite()
         let otherRealmObject = realmWithTestPath().create(SwiftLinkToPrimaryStringObject.self,
