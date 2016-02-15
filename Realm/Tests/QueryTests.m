@@ -148,10 +148,14 @@
     // These are things which are valid predicates, but which we do not support
 
     // Aggregate operators on non-arrays
-    XCTAssertThrows([PersonObject objectsWhere:@"ANY age > 5"]);
-    XCTAssertThrows([PersonObject objectsWhere:@"ALL age > 5"]);
-    XCTAssertThrows([PersonObject objectsWhere:@"SOME age > 5"]);
-    XCTAssertThrows([PersonObject objectsWhere:@"NONE age > 5"]);
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"ANY age > 5"], @"Aggregate operations can only.*array property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"ALL age > 5"], @"ALL modifier not supported");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"SOME age > 5"], @"Aggregate operations can only.*array property");
+    RLMAssertThrowsWithReasonMatching([PersonObject objectsWhere:@"NONE age > 5"], @"Aggregate operations can only.*array property");
+    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"ANY person.age > 5"], @"Aggregate operations can only.*array property");
+    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"ALL person.age > 5"], @"ALL modifier not supported");
+    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"SOME person.age > 5"], @"Aggregate operations can only.*array property");
+    RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"NONE person.age > 5"], @"Aggregate operations can only.*array property");
 
     // nil on LHS of comparison with nullable property
     XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = boolObj"]);
@@ -307,7 +311,8 @@
 
     XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.longCol = 'a'"], @"Wrong data type should throw");
 
-    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"intArray.intCol > 5"], @"RLMArray query without ANY modifier should throw");
+    RLMAssertThrowsWithReasonMatching([ArrayPropertyObject objectsWhere:@"intArray.intCol > 5"], @"Key paths.*array property.*aggregate operations");
+    RLMAssertThrowsWithReasonMatching([LinkToCompanyObject objectsWhere:@"company.employees.age > 5"], @"Key paths.*array property.*aggregate operations");
 
     RLMAssertThrowsWithReasonMatching([LinkToAllTypesObject objectsWhere:@"allTypesCol.intCol = allTypesCol.doubleCol"], @"Property type mismatch");
 }
@@ -1774,18 +1779,24 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [CompanyObject createInRealm:realm
-                       withValue:@[@"first company", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
-                                                       @{@"name": @"Jill",  @"age": @40, @"hired": @YES},
-                                                       @{@"name": @"Joe",  @"age": @40, @"hired": @YES}]]];
-    [CompanyObject createInRealm:realm
-                       withValue:@[@"second company", @[@{@"name": @"Bill", @"age": @35, @"hired": @YES},
-                                                        @{@"name": @"Don",  @"age": @45, @"hired": @NO},
-                                                        @{@"name": @"Tim",  @"age": @60, @"hired": @NO}]]];
+    CompanyObject *first = [CompanyObject createInRealm:realm
+                                              withValue:@[@"first company", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
+                                                                              @{@"name": @"Jill",  @"age": @40, @"hired": @YES},
+                                                                              @{@"name": @"Joe",  @"age": @40, @"hired": @YES}]]];
+    CompanyObject *second = [CompanyObject createInRealm:realm
+                                               withValue:@[@"second company", @[@{@"name": @"Bill", @"age": @35, @"hired": @YES},
+                                                                                @{@"name": @"Don",  @"age": @45, @"hired": @NO},
+                                                                                @{@"name": @"Tim",  @"age": @60, @"hired": @NO}]]];
+
+    [LinkToCompanyObject createInRealm:realm withValue:@[ first ]];
+    [LinkToCompanyObject createInRealm:realm withValue:@[ second ]];
     [realm commitWriteTransaction];
 
     RLMAssertCount(CompanyObject, 1U, @"SUBQUERY(employees, $employee, $employee.age > 30 AND $employee.hired = FALSE).@count > 0");
     RLMAssertCount(CompanyObject, 2U, @"SUBQUERY(employees, $employee, $employee.age < 30 AND $employee.hired = TRUE).@count == 0");
+
+    RLMAssertCount(LinkToCompanyObject, 1U, @"SUBQUERY(company.employees, $employee, $employee.age > 30 AND $employee.hired = FALSE).@count > 0");
+    RLMAssertCount(LinkToCompanyObject, 2U, @"SUBQUERY(company.employees, $employee, $employee.age < 30 AND $employee.hired = TRUE).@count == 0");
 }
 
 @end
