@@ -710,6 +710,29 @@
     [token2 stop];
 }
 
+- (void)testAddingNewQueryWithinRealmNotificationBlock {
+    __block id queryToken;
+    __block XCTestExpectation *exp;
+    id realmToken = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+        CFRunLoopStop(CFRunLoopGetCurrent());
+        exp = [self expectationWithDescription:@"query notification"];
+        queryToken = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, NSError *e) {
+            [exp fulfill];
+        }];
+    }];
+
+    // Make a background commit to trigger a Realm notification
+    [self dispatchAsync:^{ [RLMRealm.defaultRealm transactionWithBlock:^{}]; }];
+
+    // Wait for the notification
+    CFRunLoopRun();
+    [realmToken stop];
+
+    // Wait for the initial async query results created within the notification
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [queryToken stop];
+}
+
 - (void)testBlockedThreadWithNotificationsDoesNotPreventDeliveryOnOtherThreads {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     dispatch_semaphore_t sema2 = dispatch_semaphore_create(0);

@@ -17,6 +17,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * The contents of `List` and `Optional` properties are now correctly preserved when copying
   a Swift object from one Realm to another, and performing other operations that result in a
   Swift object graph being recursively traversed from Objective-C.
+* Fix a deadlock when queries are performed within a Realm notification block.
 
 0.98.1 Release notes (2016-02-10)
 =============================================================
