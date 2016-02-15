@@ -337,8 +337,6 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = objectSchema;
 
-#   define OptionalString @"\t\t\toptional = YES;\n"
-
     XCTAssertEqualObjects(schema.description, @"Schema {\n"
                                               @"\tAllTypesObject {\n"
                                               @"\t\tboolCol {\n"
@@ -374,21 +372,21 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              OptionalString
+                                              @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t\tbinaryCol {\n"
                                               @"\t\t\ttype = data;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              OptionalString
+                                              @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t\tdateCol {\n"
                                               @"\t\t\ttype = date;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              OptionalString
+                                              @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t\tcBoolCol {\n"
                                               @"\t\t\ttype = bool;\n"
@@ -419,15 +417,6 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
-                                              @"\tStringObject {\n"
-                                              @"\t\tstringCol {\n"
-                                              @"\t\t\ttype = string;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
-                                              OptionalString
-                                              @"\t\t}\n"
-                                              @"\t}\n"
                                               @"\tIntObject {\n"
                                               @"\t\tintCol {\n"
                                               @"\t\t\ttype = int;\n"
@@ -437,9 +426,17 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
+                                              @"\tStringObject {\n"
+                                              @"\t\tstringCol {\n"
+                                              @"\t\t\ttype = string;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\toptional = YES;\n"
+                                              @"\t\t}\n"
+                                              @"\t}\n"
                                               @"}");
 
-#undef OptionalString
 }
 
 - (void)testClassWithDuplicateProperties

@@ -313,8 +313,10 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 
 - (NSString *)description {
     NSMutableString *objectSchemaString = [NSMutableString string];
-    for (RLMObjectSchema *objectSchema in self.objectSchema) {
-        [objectSchemaString appendFormat:@"\t%@\n", [objectSchema.description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"]];
+    NSArray *sort = @[[NSSortDescriptor sortDescriptorWithKey:@"className" ascending:YES]];
+    for (RLMObjectSchema *objectSchema in [self.objectSchema sortedArrayUsingDescriptors:sort]) {
+        [objectSchemaString appendFormat:@"\t%@\n",
+         [objectSchema.description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"]];
     }
     return [NSString stringWithFormat:@"Schema {\n%@}", objectSchemaString];
 }
