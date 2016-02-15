@@ -7,7 +7,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Aggregate operations (`ANY`, `NONE`, `@count`, `SUBQUERY`, etc.) are now supported for key paths
+  that begin with an object relationship so long as there is a `RLMArray`/`List` property at some
+  point in a key path.
 
 ### Bugfixes
 
@@ -18,6 +20,9 @@ x.x.x Release notes (yyyy-MM-dd)
   a Swift object from one Realm to another, and performing other operations that result in a
   Swift object graph being recursively traversed from Objective-C.
 * Fix a deadlock when queries are performed within a Realm notification block.
+* The `ANY` / `SOME` / `NONE` qualifiers are now required in comparisons involving a key path that
+  traverse a `RLMArray`/`List` property. Previously they were only required if the first key in the
+  key path was an `RLMArray`/`List` property.
 
 0.98.1 Release notes (2016-02-10)
 =============================================================
