@@ -67,7 +67,7 @@ static RLMObjectSchema *RLMRegisterClass(Class cls) {
     // set standalone class on shared shema for standalone object creation
     schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(schema.objectClass, schema);
 
-    // override sharedSchema classs methods for performance
+    // override sharedSchema class methods for performance
     RLMReplaceSharedSchemaMethod(cls, schema);
 
     s_privateObjectSubclasses[schema.className] = schema;
@@ -189,7 +189,7 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 
 + (RLMObjectSchema *)sharedSchemaForClass:(Class)cls {
     @synchronized(s_localNameToClass) {
-        // We create instancse of Swift objects during schema init, and they
+        // We create instances of Swift objects during schema init, and they
         // obviously need to not also try to initialize the schema
         if (s_sharedSchemaState == SharedSchemaState::Initializing) {
             return nil;
@@ -207,9 +207,11 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 // schema based on runtime objects
 + (instancetype)sharedSchema {
     @synchronized(s_localNameToClass) {
+        // We replace this method with one which just returns s_sharedSchema
+        // once initialization is complete, but we still need to check if it's
+        // already complete because it may have been done by another thread
+        // while we were waiting for the lock
         if (s_sharedSchemaState == SharedSchemaState::Initialized) {
-            // Init was done on a different thread while we were waiting for
-            // the @synchronized
             return s_sharedSchema;
         }
 
@@ -222,7 +224,8 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
             // Make sure we've discovered all classes
             {
                 unsigned int numClasses;
-                std::unique_ptr<__unsafe_unretained Class[], decltype(&free)> classes(objc_copyClassList(&numClasses), &free);
+                using malloc_ptr = std::unique_ptr<__unsafe_unretained Class[], decltype(&free)>;
+                malloc_ptr classes(objc_copyClassList(&numClasses), &free);
                 RLMRegisterClassLocalNames(classes.get(), numClasses);
             }
 
