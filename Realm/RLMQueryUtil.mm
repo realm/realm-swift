@@ -703,50 +703,46 @@ void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
     }
 }
 
-ColumnReference column_reference_from_key_path(RLMSchema *schema, RLMObjectSchema *desc,
+ColumnReference column_reference_from_key_path(RLMSchema *schema, RLMObjectSchema *objectSchema,
                                                NSString *keyPath, bool isAggregate)
 {
+    RLMProperty *property;
     std::vector<size_t> indexes;
-    RLMProperty *prop = nil;
 
-    NSString *prevPath = nil;
+    bool keyPathContainsToManyRelationship = false;
+
     NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
     do {
         end = [keyPath rangeOfString:@"." options:0 range:{start, length - start}].location;
-        NSString *path = [keyPath substringWithRange:{start, end == NSNotFound ? length - start : end - start}];
-        if (prop) {
-            RLMPrecondition(prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray,
-                            @"Invalid value", @"Property '%@' is not a link in object of type '%@'", prevPath, desc.className);
-            indexes.push_back(prop.column);
-            prop = desc[path];
-            RLMPrecondition(prop, @"Invalid property name",
-                            @"Property '%@' not found in object of type '%@'", path, desc.className);
-        }
-        else {
-            prop = desc[path];
-            RLMPrecondition(prop, @"Invalid property name",
-                            @"Property '%@' not found in object of type '%@'", path, desc.className);
+        NSString *propertyName = [keyPath substringWithRange:{start, end == NSNotFound ? length - start : end - start}];
+        property = objectSchema[propertyName];
+        RLMPrecondition(property, @"Invalid property name",
+                        @"Property '%@' not found in object of type '%@'", propertyName, objectSchema.className);
 
-            if (isAggregate) {
-                RLMPrecondition(prop.type == RLMPropertyTypeArray,
-                                @"Invalid predicate",
-                                @"Aggregate operations can only be used on RLMArray properties");
-            }
-            else {
-                RLMPrecondition(prop.type != RLMPropertyTypeArray,
-                                @"Invalid predicate",
-                                @"RLMArray predicates must use aggregate operations");
-            }
+        if (property.type == RLMPropertyTypeArray)
+            keyPathContainsToManyRelationship = true;
+
+        if (end != NSNotFound) {
+            RLMPrecondition(property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeArray,
+                            @"Invalid value", @"Property '%@' is not a link in object of type '%@'", propertyName, objectSchema.className);
+
+            indexes.push_back(property.column);
+            REALM_ASSERT(property.objectClassName);
+            objectSchema = schema[property.objectClassName];
         }
 
-        if (prop.objectClassName) {
-            desc = schema[prop.objectClassName];
-        }
-        prevPath = path;
         start = end + 1;
     } while (end != NSNotFound);
 
-    return ColumnReference(prop, indexes);
+    if (isAggregate && !keyPathContainsToManyRelationship) {
+        @throw RLMPredicateException(@"Invalid predicate",
+                                     @"Aggregate operations can only be used on key paths that include an array property");
+    } else if (!isAggregate && keyPathContainsToManyRelationship) {
+        @throw RLMPredicateException(@"Invalid predicate",
+                                     @"Aggregate operations must be used on key paths that include an array property");
+    }
+
+    return ColumnReference(property, indexes);
 }
 
 void validate_property_value(const ColumnReference& column,
