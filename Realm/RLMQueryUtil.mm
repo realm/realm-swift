@@ -739,7 +739,7 @@ ColumnReference column_reference_from_key_path(RLMSchema *schema, RLMObjectSchem
                                      @"Aggregate operations can only be used on key paths that include an array property");
     } else if (!isAggregate && keyPathContainsToManyRelationship) {
         @throw RLMPredicateException(@"Invalid predicate",
-                                     @"Aggregate operations must be used on key paths that include an array property");
+                                     @"Key paths that include an array property must use aggregate operations");
     }
 
     return ColumnReference(property, indexes);
