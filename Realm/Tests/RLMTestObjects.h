@@ -167,6 +167,14 @@ RLM_ARRAY_TYPE(EmployeeObject)
 
 @end
 
+#pragma mark LinkToCompanyObject
+
+@interface LinkToCompanyObject : RLMObject
+
+@property CompanyObject *company;
+
+@end
+
 #pragma mark DogObject
 
 @interface DogObject : RLMObject
