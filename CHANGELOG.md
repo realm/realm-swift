@@ -10,6 +10,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Aggregate operations (`ANY`, `NONE`, `@count`, `SUBQUERY`, etc.) are now supported for key paths
   that begin with an object relationship so long as there is a `RLMArray`/`List` property at some
   point in a key path.
+* Predicates of the form `%@ IN arrayProperty` are now supported.
 
 ### Bugfixes
 
