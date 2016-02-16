@@ -96,6 +96,11 @@
 @implementation CompanyObject
 @end
 
+#pragma mark LinkToCompanyObject
+
+@implementation LinkToCompanyObject
+@end
+
 #pragma mark DogObject
 
 @implementation DogObject
