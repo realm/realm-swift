@@ -162,7 +162,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
                                                           encoding:NSUTF8StringEncoding];
 
                 Class cls = [RLMSchema classForString:_objectClassName];
-                if (!RLMIsObjectSubclass(cls)) {
+                if (!cls) {
                     @throw RLMException(@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See https://realm.io/docs/objc/latest/#to-many for more information.", self.objectClassName);
                 }
             }
@@ -202,7 +202,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 
                 // verify type
                 Class cls = [RLMSchema classForString:className];
-                if (!RLMIsObjectSubclass(cls)) {
+                if (!cls) {
                     @throw RLMException(@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See https://realm.io/docs/objc/latest/api/Classes/RLMObject.html for more information.", className);
                 }
 

@@ -20,6 +20,3 @@
 #import "RLMMultiProcessTestCase.h"
 #import "TestUtils.h"
 
-@interface RLMSchema (Private)
-+ (void)registerClasses:(const Class[])classes count:(NSUInteger)count;
-@end
