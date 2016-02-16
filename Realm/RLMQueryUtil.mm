@@ -930,7 +930,7 @@ void update_query_with_value_expression(RLMSchema *schema,
         return;
     }
 
-    // turn IN into ored together ==
+    // turn "key.path IN collection" into ored together ==. "collection IN key.path" is handled elsewhere.
     if (pred.predicateOperatorType == NSInPredicateOperatorType) {
         process_or_group(query, value, [&](id item) {
             id normalized = value_from_constant_expression_or_value(item);
@@ -1117,9 +1117,19 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
         }
 
         if (compp.predicateOperatorType == NSBetweenPredicateOperatorType || compp.predicateOperatorType == NSInPredicateOperatorType) {
-            // Inserting an array via %@ gives NSConstantValueExpressionType, but
-            // including it directly gives NSAggregateExpressionType
-            if (exp1Type != NSKeyPathExpressionType || (exp2Type != NSAggregateExpressionType && exp2Type != NSConstantValueExpressionType)) {
+            // Inserting an array via %@ gives NSConstantValueExpressionType, but including it directly gives NSAggregateExpressionType
+            if (exp1Type == NSKeyPathExpressionType && (exp2Type == NSAggregateExpressionType || exp2Type == NSConstantValueExpressionType)) {
+                // "key.path IN %@", "key.path IN {…}", "key.path BETWEEN %@", or "key.path BETWEEN {…}".
+                exp2Type = NSConstantValueExpressionType;
+            }
+            else if (compp.predicateOperatorType == NSInPredicateOperatorType && exp1Type == NSConstantValueExpressionType && exp2Type == NSKeyPathExpressionType) {
+                // "%@ IN key.path" is equivalent to "ANY key.path IN %@". Rewrite the former into the latter.
+                compp = [NSComparisonPredicate predicateWithLeftExpression:compp.rightExpression rightExpression:compp.leftExpression
+                                                                  modifier:NSAnyPredicateModifier type:NSEqualToPredicateOperatorType options:0];
+                exp1Type = NSKeyPathExpressionType;
+                exp2Type = NSConstantValueExpressionType;
+            }
+            else {
                 if (compp.predicateOperatorType == NSBetweenPredicateOperatorType) {
                     @throw RLMPredicateException(@"Invalid predicate",
                                                  @"Predicate with BETWEEN operator must compare a KeyPath with an aggregate with two values");
@@ -1129,7 +1139,6 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                                                  @"Predicate with IN operator must compare a KeyPath with an aggregate");
                 }
             }
-            exp2Type = NSConstantValueExpressionType;
         }
 
         if (exp1Type == NSKeyPathExpressionType && exp2Type == NSKeyPathExpressionType) {
