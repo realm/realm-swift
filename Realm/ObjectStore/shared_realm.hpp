@@ -57,6 +57,7 @@ namespace realm {
             uint64_t schema_version;
 
             MigrationFunction migration_function;
+            bool delete_realm_if_migration_needed = false;
 
             bool read_only = false;
             bool in_memory = false;
