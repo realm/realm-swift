@@ -894,14 +894,12 @@ case "$COMMAND" in
           mv core/include include/core
 
           mkdir -p include/impl/apple
+          touch Realm/RLMPlatform.h
+          cp Realm/*.h include
           cp Realm/*.hpp include
           cp Realm/ObjectStore/*.hpp include
           cp Realm/ObjectStore/impl/*.hpp include/impl
           cp Realm/ObjectStore/impl/apple/*.hpp include/impl/apple
-
-          mkdir -p include/Realm
-          touch Realm/RLMPlatform.h
-          cp Realm/*.h include/Realm
         else
           echo "let swiftLanguageVersion = \"$(get_swift_version)\"" > RealmSwift/SwiftVersion.swift
         fi
