@@ -171,6 +171,9 @@ xc_work_around_rdar_23055637() {
     # build (<http://openradar.appspot.com/23055637>). Work around this by having the test phases intentionally
     # exit after they finish building the first time, then run the tests for real.
     ( REALM_EXIT_AFTER_BUILDING_TESTS=YES xc "$1" ) || true
+    # Xcode 7.2.1 fails to run tests in the iOS simulator for unknown reasons. Resetting the simulator here works
+    # around this issue.
+    sh build.sh prelaunch-simulator
     xc "$1"
 }
 

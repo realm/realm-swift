@@ -27,6 +27,13 @@ done
             continue
         fi
 
+        if [[ $LINE =~ "--" ]]; then
+            # Reset the last seen device so we won't consider devices with the same name to be duplicates
+            # if they appear in different sections.
+            previous_device=""
+            continue
+        fi
+
         regex='^(.*) [(]([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})[)]'
         if [[ $LINE =~ $regex ]]; then
             device="${BASH_REMATCH[1]}"
