@@ -24,6 +24,15 @@ class InitLinkedToClass: RLMObject {
     dynamic var value = SwiftIntObject(value: [0])
 }
 
+class IgnoredLinkPropertyObject : RLMObject {
+    dynamic var value = 0
+    var obj = SwiftIntObject()
+
+    override class func ignoredProperties() -> [AnyObject]? {
+        return ["obj"]
+    }
+}
+
 class SwiftRecursingSchemaTestObject : RLMObject {
     dynamic var propertyWithIllegalDefaultValue: SwiftIntObject? = {
         if mayAccessSchema {
@@ -51,11 +60,51 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
             return
         }
 
-        // registerClasses:count: happens to initialize the schemas in the same
-        // order as the classes appear in the array, so this initializes the
-        // schema for `InitLinkedToClass` before `IntObject` to verify that
-        // `initWithValue:` does not throw in that scenario
-        RLMSchema.registerClasses([InitLinkedToClass.self, SwiftIntObject.self], count: 2)
+        let config = RLMRealmConfiguration.defaultConfiguration()
+        config.objectClasses = [IgnoredLinkPropertyObject.self]
+        config.inMemoryIdentifier = __FUNCTION__
+        let r = RLMRealm(configuration: config, error: nil)!
+        r.transactionWithBlock {
+            IgnoredLinkPropertyObject.createInRealm(r, withValue: [1])
+        }
+    }
+
+    func testCreateStandaloneObjectWhichCreatesAnotherClassDuringSchemaInit() {
+        if isParent {
+            XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
+            return
+        }
+
+        // Should not throw (or crash) despite creating an object with an
+        // unintialized schema during schema init
+        let _ = InitLinkedToClass()
+    }
+
+    func testCreateStandaloneObjectWithLinkPropertyWithoutSharedSchemaInitialized() {
+        if isParent {
+            XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
+            return
+        }
+
+        // This is different from the above test in that it links to an
+        // unintialized type rather than creating one
+        let _ = SwiftCompanyObject()
+    }
+
+    func testInitStandaloneObjectNotInClassSubsetDuringSchemaInit() {
+        if isParent {
+            XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
+            return
+        }
+
+        let config = RLMRealmConfiguration.defaultConfiguration()
+        config.objectClasses = [IgnoredLinkPropertyObject.self]
+        config.inMemoryIdentifier = __FUNCTION__
+        let _ = RLMRealm(configuration: config, error: nil)!
+        let r = RLMRealm(configuration: RLMRealmConfiguration.defaultConfiguration(), error: nil)!
+        r.transactionWithBlock {
+            IgnoredLinkPropertyObject.createInRealm(r, withValue: [1])
+        }
     }
 
     func testPreventsDeadLocks() {
