@@ -407,6 +407,27 @@ RLM_ARRAY_TYPE(MigrationObject);
     [self assertNoMigrationRequiredForChangeFrom:@[from] to:@[to]];
 }
 
+- (void)testDeleteRealmIfMigrationNeeded {
+    RLMObjectSchema *from = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
+    from.properties = [from.properties subarrayWithRange:{0, 1}];
+
+    RLMObjectSchema *to = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.customSchema = [self schemaWithObjects:@[from]];
+    @autoreleasepool { [RLMRealm realmWithConfiguration:config error:nil]; }
+
+    config.customSchema = [self schemaWithObjects:@[to]];
+    config.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+        XCTFail(@"Migration block should not have been called");
+    };
+
+    config.deleteRealmIfMigrationNeeded = YES;
+
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
+    RLMAssertRealmSchemaMatchesTable(self, [RLMRealm realmWithConfiguration:config error:nil]);
+}
+
 #pragma mark - Allowed schema mismatches
 
 - (void)testMismatchedIndexAllowedForReadOnly {
