@@ -1124,9 +1124,7 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
             }
             else if (compp.predicateOperatorType == NSInPredicateOperatorType && exp1Type == NSConstantValueExpressionType && exp2Type == NSKeyPathExpressionType) {
                 // "%@ IN key.path" is equivalent to "ANY key.path IN %@". Rewrite the former into the latter.
-                NSExpression *keyPath = [NSExpression expressionForKeyPath:compp.rightExpression.keyPath];
-                NSExpression *constantValue = [NSExpression expressionForConstantValue:compp.leftExpression.constantValue];
-                compp = [NSComparisonPredicate predicateWithLeftExpression:keyPath rightExpression:constantValue
+                compp = [NSComparisonPredicate predicateWithLeftExpression:compp.rightExpression rightExpression:compp.leftExpression
                                                                   modifier:NSAnyPredicateModifier type:NSEqualToPredicateOperatorType options:0];
                 exp1Type = NSKeyPathExpressionType;
                 exp2Type = NSConstantValueExpressionType;
