@@ -228,7 +228,8 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqual(10U, [RLMRealm schemaVersionAtPath:config.path encryptionKey:nil error:nil]);
 
     config.schemaVersion = 5;
-    XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
+    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
+                                      @"Provided schema version 5 is less than last set version 10.");
 }
 
 - (void)testDifferentSchemaVersionsAtDifferentPaths {
