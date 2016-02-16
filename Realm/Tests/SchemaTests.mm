@@ -151,7 +151,8 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 - (void)testSchemaWithObjectClasses {
     RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[RLMDynamicObject.class, StringObject.class]];
-    XCTAssertEqualObjects((@[@"RLMDynamicObject", @"StringObject"]), [schema.objectSchema valueForKey:@"className"]);
+    XCTAssertEqualObjects((@[@"RLMDynamicObject", @"StringObject"]),
+                          [[schema.objectSchema valueForKey:@"className"] sortedArrayUsingSelector:@selector(compare:)]);
     XCTAssertNil([RLMSchema.sharedSchema schemaForClassName:@"RLMDynamicObject"]);
 }
 
@@ -336,8 +337,6 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = objectSchema;
 
-#   define OptionalString @"\t\t\toptional = YES;\n"
-
     XCTAssertEqualObjects(schema.description, @"Schema {\n"
                                               @"\tAllTypesObject {\n"
                                               @"\t\tboolCol {\n"
@@ -373,21 +372,21 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              OptionalString
+                                              @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t\tbinaryCol {\n"
                                               @"\t\t\ttype = data;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              OptionalString
+                                              @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t\tdateCol {\n"
                                               @"\t\t\ttype = date;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              OptionalString
+                                              @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t\tcBoolCol {\n"
                                               @"\t\t\ttype = bool;\n"
@@ -418,15 +417,6 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
-                                              @"\tStringObject {\n"
-                                              @"\t\tstringCol {\n"
-                                              @"\t\t\ttype = string;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
-                                              OptionalString
-                                              @"\t\t}\n"
-                                              @"\t}\n"
                                               @"\tIntObject {\n"
                                               @"\t\tintCol {\n"
                                               @"\t\t\ttype = int;\n"
@@ -436,9 +426,17 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
+                                              @"\tStringObject {\n"
+                                              @"\t\tstringCol {\n"
+                                              @"\t\t\ttype = string;\n"
+                                              @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\toptional = YES;\n"
+                                              @"\t\t}\n"
+                                              @"\t}\n"
                                               @"}");
 
-#undef OptionalString
 }
 
 - (void)testClassWithDuplicateProperties
@@ -493,12 +491,15 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     @autoreleasepool {
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         XCTAssertEqual(1U, realm.schema.objectSchema.count);
+        XCTAssertNoThrow(realm.schema[@"IntObject"]);
     }
 
     config.objectClasses = @[IntObject.class, StringObject.class];
     @autoreleasepool {
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         XCTAssertEqual(2U, realm.schema.objectSchema.count);
+        XCTAssertNoThrow(realm.schema[@"IntObject"]);
+        XCTAssertNoThrow(realm.schema[@"StringObject"]);
     }
 
     // Verify that the shared schema generated afterwards is valid
@@ -516,7 +517,27 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         // Shared schema shouldn't have duplicate entries
         XCTAssertEqual(realm.schema.objectSchema.count,
                        [NSSet setWithArray:[realm.schema.objectSchema valueForKey:@"className"]].count);
+
+        // Shared schema should have the ones that were used in the subsets
+        XCTAssertNoThrow(realm.schema[@"IntObject"]);
+        XCTAssertNoThrow(realm.schema[@"StringObject"]);
     }
+}
+
+- (void)testPartialSharedSchemaInitInheritance {
+    if (self.isParent) {
+        RLMRunChildAndWait();
+        return;
+    }
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[NumberObject.class];
+
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    XCTAssertEqual(1U, realm.schema.objectSchema.count);
+    XCTAssertEqualObjects(@"NumberObject", [[[[NumberObject alloc] init] objectSchema] className]);
+    // Verify that child class doesn't use the parent class's schema
+    XCTAssertEqualObjects(@"NumberDefaultsObject", [[[[NumberDefaultsObject alloc] init] objectSchema] className]);
 }
 
 - (void)testMultipleProcessesTryingToInitializeSchema {
