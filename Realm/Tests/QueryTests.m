@@ -1521,6 +1521,7 @@
 
     ArrayPropertyObject *arr = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[], @[]]];
     [arr.array addObject:[StringObject createInRealm:realm withValue:@[@"value"]]];
+    StringObject *otherStringObject = [StringObject createInRealm:realm withValue:@[@"some other value"]];
     [realm commitWriteTransaction];
 
 
@@ -1533,6 +1534,10 @@
     RLMAssertCount(ArrayPropertyObject, 1U, @"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]);
     RLMAssertCount(ArrayPropertyObject, 1U, @"NONE array IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]);
     RLMAssertCount(ArrayPropertyObject, 0U, @"NONE array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]);
+
+    StringObject *stringObject = [[StringObject allObjectsInRealm:realm] firstObject];
+    RLMAssertCount(ArrayPropertyObject, 1U, @"%@ IN array", stringObject);
+    RLMAssertCount(ArrayPropertyObject, 0U, @"%@ IN array", otherStringObject);
 }
 
 - (void)testQueryChaining {
