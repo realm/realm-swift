@@ -190,8 +190,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         for (Class cls : testClasses) {
             // Ensure that the className method isn't used during schema init
             // as it may not be overriden yet
-            NSString *className = NSStringFromClass(cls);
-            Class metaClass = objc_getMetaClass(className.UTF8String);
+            Class metaClass = object_getClass(cls);
             IMP imp = imp_implementationWithBlock(^{ return nil; });
             class_replaceMethod(metaClass, @selector(className), imp, "@:");
         }
@@ -227,7 +226,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
             NSString *className = NSStringFromClass(cls);
 
             // Restore the className method
-            Class metaClass = objc_getMetaClass(className.UTF8String);
+            Class metaClass = object_getClass(cls);
             IMP imp = imp_implementationWithBlock(^{ return className; });
             class_replaceMethod(metaClass, @selector(className), imp, "@:");
         }
