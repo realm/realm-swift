@@ -29,9 +29,29 @@
 using namespace realm;
 
 namespace {
-// A transaction log handler that just validates that all operations made are
-// ones supported by the object store
-class TransactLogValidator {
+template<typename Derived>
+struct MarkDirtyMixin  {
+    bool mark_dirty(size_t row, size_t col) { static_cast<Derived *>(this)->mark_dirty(row, col); return true; }
+
+    bool set_int(size_t col, size_t row, int_fast64_t) { return mark_dirty(row, col); }
+    bool set_bool(size_t col, size_t row, bool) { return mark_dirty(row, col); }
+    bool set_float(size_t col, size_t row, float) { return mark_dirty(row, col); }
+    bool set_double(size_t col, size_t row, double) { return mark_dirty(row, col); }
+    bool set_string(size_t col, size_t row, StringData) { return mark_dirty(row, col); }
+    bool set_binary(size_t col, size_t row, BinaryData) { return mark_dirty(row, col); }
+    bool set_date_time(size_t col, size_t row, DateTime) { return mark_dirty(row, col); }
+    bool set_table(size_t col, size_t row) { return mark_dirty(row, col); }
+    bool set_mixed(size_t col, size_t row, const Mixed&) { return mark_dirty(row, col); }
+    bool set_link(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
+    bool set_null(size_t col, size_t row) { return mark_dirty(row, col); }
+    bool nullify_link(size_t col, size_t row, size_t) { return mark_dirty(row, col); }
+    bool set_int_unique(size_t col, size_t row, size_t, int_fast64_t) { return mark_dirty(row, col); }
+    bool set_string_unique(size_t col, size_t row, size_t, StringData) { return mark_dirty(row, col); }
+    bool insert_substring(size_t col, size_t row, size_t, StringData) { return mark_dirty(row, col); }
+    bool erase_substring(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
+};
+
+class TransactLogValidationMixin {
     // Index of currently selected table
     size_t m_current_table = 0;
 
@@ -120,29 +140,20 @@ public:
     bool link_list_clear(size_t) { return true; }
     bool link_list_move(size_t, size_t) { return true; }
     bool link_list_swap(size_t, size_t) { return true; }
-    bool set_int(size_t, size_t, int_fast64_t) { return true; }
-    bool set_bool(size_t, size_t, bool) { return true; }
-    bool set_float(size_t, size_t, float) { return true; }
-    bool set_double(size_t, size_t, double) { return true; }
-    bool set_string(size_t, size_t, StringData) { return true; }
-    bool set_binary(size_t, size_t, BinaryData) { return true; }
-    bool set_date_time(size_t, size_t, DateTime) { return true; }
-    bool set_table(size_t, size_t) { return true; }
-    bool set_mixed(size_t, size_t, const Mixed&) { return true; }
-    bool set_link(size_t, size_t, size_t, size_t) { return true; }
-    bool set_null(size_t, size_t) { return true; }
-    bool nullify_link(size_t, size_t, size_t) { return true; }
-    bool insert_substring(size_t, size_t, size_t, StringData) { return true; }
-    bool erase_substring(size_t, size_t, size_t, size_t) { return true; }
-    bool optimize_table() { return true; }
-    bool set_int_unique(size_t, size_t, size_t, int_fast64_t) { return true; }
-    bool set_string_unique(size_t, size_t, size_t, StringData) { return true; }
     bool change_link_targets(size_t, size_t) { return true; }
+    bool optimize_table() { return true; }
+};
+
+
+// A transaction log handler that just validates that all operations made are
+// ones supported by the object store
+struct TransactLogValidator : public TransactLogValidationMixin, public MarkDirtyMixin<TransactLogValidator> {
+    void mark_dirty(size_t, size_t) { }
 };
 
 // Extends TransactLogValidator to also track changes and report it to the
 // binding context if any properties are being observed
-class TransactLogObserver : public TransactLogValidator {
+class TransactLogObserver : public TransactLogValidationMixin, public MarkDirtyMixin<TransactLogObserver> {
     using ColumnInfo = BindingContext::ColumnInfo;
     using ObserverState = BindingContext::ObserverState;
 
@@ -181,16 +192,6 @@ class TransactLogObserver : public TransactLogValidator {
         }
     }
 
-    // Mark the given row/col as needing notifications sent
-    bool mark_dirty(size_t row_ndx, size_t col_ndx)
-    {
-        auto it = lower_bound(begin(m_observers), end(m_observers), ObserverState{current_table(), row_ndx, nullptr});
-        if (it != end(m_observers) && it->table_ndx == current_table() && it->row_ndx == row_ndx) {
-            get_change(*it, col_ndx).changed = true;
-        }
-        return true;
-    }
-
     // Remove the given observer from the list of observed objects and add it
     // to the listed of invalidated objects
     void invalidate(ObserverState *o)
@@ -206,10 +207,7 @@ public:
     {
         if (!context) {
             if (validate_schema_changes) {
-                // The handler functions are non-virtual, so the parent class's
-                // versions are called if we don't need to track changes to observed
-                // objects
-                func(static_cast<TransactLogValidator&>(*this));
+                func(TransactLogValidator());
             }
             else {
                 func();
@@ -221,7 +219,7 @@ public:
         if (m_observers.empty()) {
             auto old_version = sg.get_version_of_current_transaction();
             if (validate_schema_changes) {
-                func(static_cast<TransactLogValidator&>(*this));
+                func(TransactLogValidator());
             }
             else {
                 func();
@@ -234,6 +232,15 @@ public:
 
         func(*this);
         context->did_change(m_observers, invalidated);
+    }
+
+    // Mark the given row/col as needing notifications sent
+    void mark_dirty(size_t row_ndx, size_t col_ndx)
+    {
+        auto it = lower_bound(begin(m_observers), end(m_observers), ObserverState{current_table(), row_ndx, nullptr});
+        if (it != end(m_observers) && it->table_ndx == current_table() && it->row_ndx == row_ndx) {
+            get_change(*it, col_ndx).changed = true;
+        }
     }
 
     // Called at the end of the transaction log immediately before the version
@@ -249,7 +256,7 @@ public:
             if (observer.table_ndx >= table_ndx)
                 ++observer.table_ndx;
         }
-        TransactLogValidator::insert_group_level_table(table_ndx, prior_size, name);
+        TransactLogValidationMixin::insert_group_level_table(table_ndx, prior_size, name);
         return true;
     }
 
@@ -410,28 +417,10 @@ public:
         }
         return true;
     }
-
-    // Things that just mark the field as modified
-    bool set_int(size_t col, size_t row, int_fast64_t) { return mark_dirty(row, col); }
-    bool set_bool(size_t col, size_t row, bool) { return mark_dirty(row, col); }
-    bool set_float(size_t col, size_t row, float) { return mark_dirty(row, col); }
-    bool set_double(size_t col, size_t row, double) { return mark_dirty(row, col); }
-    bool set_string(size_t col, size_t row, StringData) { return mark_dirty(row, col); }
-    bool set_binary(size_t col, size_t row, BinaryData) { return mark_dirty(row, col); }
-    bool set_date_time(size_t col, size_t row, DateTime) { return mark_dirty(row, col); }
-    bool set_table(size_t col, size_t row) { return mark_dirty(row, col); }
-    bool set_mixed(size_t col, size_t row, const Mixed&) { return mark_dirty(row, col); }
-    bool set_link(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
-    bool set_null(size_t col, size_t row) { return mark_dirty(row, col); }
-    bool nullify_link(size_t col, size_t row, size_t) { return mark_dirty(row, col); }
-    bool set_int_unique(size_t col, size_t row, size_t, int_fast64_t) { return mark_dirty(row, col); }
-    bool set_string_unique(size_t col, size_t row, size_t, StringData) { return mark_dirty(row, col); }
-    bool insert_substring(size_t col, size_t row, size_t, StringData) { return mark_dirty(row, col); }
-    bool erase_substring(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
 };
 
 // Extends TransactLogValidator to track changes made to LinkViews
-class LinkViewObserver : public TransactLogValidator {
+class LinkViewObserver : public TransactLogValidationMixin, public MarkDirtyMixin<LinkViewObserver> {
     _impl::TransactionChangeInfo& m_info;
     CollectionChangeIndices* m_active = nullptr;
 
@@ -446,16 +435,15 @@ class LinkViewObserver : public TransactLogValidator {
         return &m_info.tables[tbl_ndx];
     }
 
-    bool mark_dirty(size_t row, __unused size_t col)
-    {
-        if (auto change = get_change())
-            change->modify(row);
-        return true;
-    }
-
 public:
     LinkViewObserver(_impl::TransactionChangeInfo& info)
     : m_info(info) { }
+
+    void mark_dirty(size_t row, __unused size_t col)
+    {
+        if (auto change = get_change())
+            change->modify(row);
+    }
 
     bool select_link_list(size_t col, size_t row, size_t)
     {
@@ -561,24 +549,6 @@ public:
             change->clear(0); // FIXME
         return true;
     }
-
-    // Things that just mark the field as modified
-    bool set_int(size_t col, size_t row, int_fast64_t) { return mark_dirty(row, col); }
-    bool set_bool(size_t col, size_t row, bool) { return mark_dirty(row, col); }
-    bool set_float(size_t col, size_t row, float) { return mark_dirty(row, col); }
-    bool set_double(size_t col, size_t row, double) { return mark_dirty(row, col); }
-    bool set_string(size_t col, size_t row, StringData) { return mark_dirty(row, col); }
-    bool set_binary(size_t col, size_t row, BinaryData) { return mark_dirty(row, col); }
-    bool set_date_time(size_t col, size_t row, DateTime) { return mark_dirty(row, col); }
-    bool set_table(size_t col, size_t row) { return mark_dirty(row, col); }
-    bool set_mixed(size_t col, size_t row, const Mixed&) { return mark_dirty(row, col); }
-    bool set_link(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
-    bool set_null(size_t col, size_t row) { return mark_dirty(row, col); }
-    bool nullify_link(size_t col, size_t row, size_t) { return mark_dirty(row, col); }
-    bool insert_substring(size_t col, size_t row, size_t, StringData) { return mark_dirty(row, col); }
-    bool erase_substring(size_t col, size_t row, size_t, size_t) { return mark_dirty(row, col); }
-    bool set_int_unique(size_t col, size_t row, size_t, int_fast64_t) { return mark_dirty(row, col); }
-    bool set_string_unique(size_t col, size_t row, size_t, StringData) { return mark_dirty(row, col); }
 };
 } // anonymous namespace
 
