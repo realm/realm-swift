@@ -686,12 +686,6 @@ static RLMAccessorCode accessorCodeForType(char objcTypeCode, RLMPropertyType rl
     }
 }
 
-static void RLMReplaceShouldIncludeInDefaultSchemaMethod(Class cls, bool shouldInclude) {
-    Class metaClass = objc_getMetaClass(class_getName(cls));
-    IMP imp = imp_implementationWithBlock(^(Class){ return shouldInclude; });
-    class_addMethod(metaClass, @selector(shouldIncludeInDefaultSchema), imp, "b@:");
-}
-
 // implement the class method className on accessors to return the className of the
 // base object
 void RLMReplaceClassNameMethod(Class accessorClass, NSString *className) {
@@ -768,7 +762,6 @@ static Class RLMCreateAccessorClass(Class objectClass,
 
     // implement className for accessor to return base className
     RLMReplaceClassNameMethod(accClass, schema.className);
-    RLMReplaceShouldIncludeInDefaultSchemaMethod(accClass, false);
     RLMMarkClassAsGenerated(accClass);
 
     return accClass;
