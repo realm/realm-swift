@@ -760,8 +760,6 @@ static Class RLMCreateAccessorClass(Class objectClass,
         }
     }
 
-    // implement className for accessor to return base className
-    RLMReplaceClassNameMethod(accClass, schema.className);
     RLMMarkClassAsGenerated(accClass);
 
     return accClass;
