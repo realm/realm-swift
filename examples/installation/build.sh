@@ -23,6 +23,8 @@ command:
   test-osx-objc-carthage:          tests OS X Objective-C Carthage example.
   test-osx-swift-dynamic:          tests OS X Swift dynamic example.
   test-osx-swift-carthage:         tests OS X Swift Carthage example.
+
+  test-watchos-objc-dynamic:       tests watchOS Objective-C dynamic example.
 EOF
 }
 
@@ -77,7 +79,13 @@ xctest() {
     if [ -d $WORKSPACE ]; then
         CMD="-workspace $WORKSPACE"
     fi
-    xcodebuild $CMD -scheme $NAME clean build test $DESTINATION
+    ACTION=""
+    if [[ $PLATFORM == watchos ]]; then
+        ACTION="build"
+    else
+        ACTION="build test"
+    fi
+    xcodebuild $CMD -scheme $NAME clean $ACTION $DESTINATION
 }
 
 source "$(dirname "$0")/../../scripts/swift-version.sh"
@@ -95,7 +103,7 @@ case "$COMMAND" in
         ;;
 
     "test-xcode7")
-        for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage; do
+        for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage watchos-objc-dynamic; do
             REALM_SWIFT_VERSION=2.1.1 ./build.sh test-$target || exit 1
         done
         ;;
@@ -150,6 +158,10 @@ case "$COMMAND" in
 
     "test-osx-swift-carthage")
         xctest osx swift-$REALM_SWIFT_VERSION CarthageExample
+        ;;
+
+    "test-watchos-objc-dynamic")
+        xctest watchos objc DynamicExample
         ;;
 
     *)
