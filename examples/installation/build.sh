@@ -25,6 +25,7 @@ command:
   test-osx-swift-carthage:         tests OS X Swift Carthage example.
 
   test-watchos-objc-dynamic:       tests watchOS Objective-C dynamic example.
+  test-watchos-objc-cocoapods:     tests watchOS Objective-C CocoaPods example.
   test-watchos-objc-carthage:      tests watchOS Objective-C Carthage example.
   test-watchos-swift-dynamic:      tests watchOS Swift dynamic example.
   test-watchos-swift-carthage:     tests watchOS Swift Carthage example.
@@ -108,7 +109,7 @@ case "$COMMAND" in
         ;;
 
     "test-xcode7")
-        for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage watchos-objc-dynamic test-watchos-objc-carthage watchos-swift-dynamic test-watchos-swift-carthage; do
+        for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage watchos-objc-dynamic test-watchos-objc-cocoapods test-watchos-objc-carthage watchos-swift-dynamic test-watchos-swift-carthage; do
             REALM_SWIFT_VERSION=2.1.1 ./build.sh test-$target || exit 1
         done
         ;;
@@ -167,6 +168,10 @@ case "$COMMAND" in
 
     "test-watchos-objc-dynamic")
         xctest watchos objc DynamicExample
+        ;;
+
+    "test-watchos-objc-cocoapods")
+        xctest watchos objc CocoaPodsExample
         ;;
 
     "test-watchos-objc-carthage")
