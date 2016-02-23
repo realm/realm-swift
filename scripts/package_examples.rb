@@ -6,29 +6,20 @@ require 'xcodeproj'
 # Helpers
 ##########################
 
-def remove_target(project_path, target_name)
-  project = Xcodeproj::Project.open(project_path)
-
-  project.targets.each do |target|
-    if target.name == target_name
-      target.remove_from_project
-    end
+def remove_reference_to_realm_xcode_project(workspace_path)
+  old_workspace = Xcodeproj::Workspace.new_from_xcworkspace(workspace_path)
+  file_references = old_workspace.file_references.reject do |file_reference|
+    file_reference.path  == "../../../Realm.xcodeproj"
   end
 
-  project.save
-
-  FileUtils.rm("#{project_path}/xcshareddata/xcschemes/#{target_name}.xcscheme", :force => true)
+  File.open("#{workspace_path}/contents.xcworkspacedata", "w") do |file|
+    file.puts Xcodeproj::Workspace.new(file_references).to_s
+  end
 end
 
-def remove_all_dependencies(project_path)
+def set_framework_search_path(project_path, search_path)
   project = Xcodeproj::Project.open(project_path)
-
-  project.targets.each do |target|
-    target.dependencies.each do |dependency|
-      dependency.remove_from_project
-    end
-  end
-
+  project.build_configuration_list.set_setting("FRAMEWORK_SEARCH_PATHS", search_path)
   project.save
 end
 
@@ -49,37 +40,36 @@ FileUtils.move 'examples/ios/objc', 'examples/ios/xcode-6'
 FileUtils.move 'examples/ios/rubymotion', 'examples/ios/xcode-6'
 FileUtils.cp_r 'examples/ios/xcode-6', 'examples/ios/xcode-7'
 
-# Update the paths to the prebuilt frameworks
-replace_in_file('examples/ios/xcode-6/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/ios-static', '/../ios/static/xcode-6')
-replace_in_file('examples/ios/xcode-7/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/ios-static', '/../ios/static/xcode-7')
-replace_in_file('examples/osx/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/osx', '/osx')
-replace_in_file('examples/tvos/objc/RealmExamples.xcodeproj/project.pbxproj', '/build/tvos', '/tvos')
-
-# Remove Realm target and dependencies from all example objc projects
-objc_examples = [
-  "examples/ios/xcode-6/objc/RealmExamples.xcodeproj",
-  "examples/ios/xcode-7/objc/RealmExamples.xcodeproj",
-  "examples/osx/objc/RealmExamples.xcodeproj"
+examples = [
+  "examples/ios/xcode-6/objc",
+  "examples/ios/xcode-7/objc",
+  "examples/osx/objc",
+  "examples/tvos/objc",
+  "examples/ios/swift-2.1.1",
+  "examples/tvos/swift",
 ]
 
-objc_examples.each do |example|
-  remove_all_dependencies(example)
-  remove_target(example, "Realm")
+# Remove reference to Realm.xcodeproj from all example workspaces.
+examples.each do |example|
+  remove_reference_to_realm_xcode_project("#{example}/RealmExamples.xcworkspace")
 end
 
-# Remove RealmSwift target and dependencies from all example swift projects
+framework_directory_for_example = {
+  'examples/ios/xcode-6/objc' => '../../../ios/static/xcode-6',
+  'examples/ios/xcode-7/objc' => '../../../ios/static/xcode-7',
+  'examples/osx/objc' => '../../../osx',
+  'examples/tvos/objc' => '../../../tvos',
+  'examples/ios/swift-2.1.1' => '../../../ios/swift-2.1.1',
+  'examples/tvos/swift' => '../../../tvos',
+}
 
-swift_examples = [
-  "examples/ios/swift-2.1.1/RealmExamples.xcodeproj",
-  "examples/tvos/swift/RealmExamples.xcodeproj"
-]
+# Update the paths to the prebuilt frameworks
+examples.each do |example|
+  project_path = "#{example}/RealmExamples.xcodeproj"
+  framework_directory = framework_directory_for_example[example]
 
-swift_examples.each do |example|
-  remove_all_dependencies(example)
-  remove_target(example, "RealmSwift")
-  filepath = File.join(example, "project.pbxproj")
-  replace_in_file(filepath, "/build/ios", "/ios")
-  replace_in_file(filepath, "/build/tvos", "/tvos")
+  replace_in_file("#{project_path}/project.pbxproj", /path = (Realm|RealmSwift).framework; sourceTree = BUILT_PRODUCTS_DIR;/, "path = \"#{framework_directory}/\\1.framework\"; sourceTree = SOURCE_ROOT;")
+  set_framework_search_path(project_path, framework_directory)
 end
 
 # Update RubyMotion sample
