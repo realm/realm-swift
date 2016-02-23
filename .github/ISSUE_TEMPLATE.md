@@ -1,6 +1,6 @@
 > Please fill out this template when filing an issue.
-> All lines beginning with a quotation mark (`>`),
-> instruct you with what info we expect.  
+> All lines marked as quotes (`>`) instruct you with
+> what info we expect.
 > Please remove this opening paragraph.
 
 ### Goals
@@ -18,19 +18,19 @@
 
 ### Steps to Reproduce
 
-> Please provide steps necessary to take to reproduce this issue.
+> Please provide steps we can follow to reproduce this issue.
 
 ### Code Sample
 
 > Please provide a code sample that highlights the issue.
-> If necessary, please don't forget to provide at least an
-> excerpt from your model classes.
+> If relevant, please include your model definitions.
+> For larger code samples, links to external gists or repositories are preferred.
 > Full Xcode projects that we can compile ourselves are ideal.
 
 ### Version of Realm and Tooling
 
-> Please share the versions of the used Realm frameworks, the Xcode
+> Please share which versions of Realm are affected, the Xcode
 > and OS X version on which you compile, as well as the version of the
-> involved dependency manager. (CocoaPods / Cartage)  
+> dependency manager involved (CocoaPods / Carthage).
 > [In the CONTRIBUTING guidelines](https://git.io/vgxJO), you will find
 > a script, which will help with that.
