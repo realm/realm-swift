@@ -6,20 +6,6 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		E8F70EC719BA51B1006F60D5 /* Realm */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = E8F70EC819BA51B1006F60D5 /* Build configuration list for PBXAggregateTarget "Realm" */;
-			buildPhases = (
-				E8F70ECB19BA51C4006F60D5 /* Build Realm */,
-			);
-			dependencies = (
-			);
-			name = Realm;
-			productName = "Build Realm";
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		0295B8FF19D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90019D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
@@ -119,27 +105,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3F6474991A79A07A008D5795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
-			remoteInfo = Realm;
-		};
-		3F64749B1A79A07F008D5795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
-			remoteInfo = Realm;
-		};
-		3F78C9B71B431CF300A0988E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
-			remoteInfo = Realm;
-		};
 		C06134E01A718BB800D22D12 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
@@ -161,62 +126,6 @@
 			remoteGlobalIDString = C0658DB31A76CBD8002F7A84;
 			remoteInfo = "extension WatchKit Extension";
 		};
-		C0DC41F21A70728B0067156A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
-			remoteInfo = Realm;
-		};
-		E879D9C81A12AA120035E2EB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
-			remoteInfo = Realm;
-		};
-		E8BDBFCF1A11727800450CFF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
-			remoteInfo = Realm;
-		};
-		E8F70ECC19BA5262006F60D5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
-			remoteInfo = Realm;
-		};
-		E8F70ED219BA52FE006F60D5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
-			remoteInfo = Realm;
-		};
-		E8F70ED619BA5341006F60D5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
-			remoteInfo = Realm;
-		};
-		E8F70EDA19BA5379006F60D5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
-			remoteInfo = Realm;
-		};
-		E8F70EDE19BA539C006F60D5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
-			remoteInfo = Realm;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -235,7 +144,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/ios-static/Realm.framework; sourceTree = "<group>"; };
+		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
 		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
 		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
@@ -723,7 +632,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				3F78C9B61B431CF300A0988E /* PBXTargetDependency */,
 			);
 			name = RACTableView;
 			productName = TableView;
@@ -741,7 +649,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				3F64749C1A79A07F008D5795 /* PBXTargetDependency */,
 				C0658DC21A76CBD8002F7A84 /* PBXTargetDependency */,
 			);
 			name = "extension WatchKit Extension";
@@ -775,7 +682,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				C0DC41F31A70728B0067156A /* PBXTargetDependency */,
 				C06134E11A718BB800D22D12 /* PBXTargetDependency */,
 				C0658DCB1A76CBD8002F7A84 /* PBXTargetDependency */,
 			);
@@ -795,7 +701,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				3F64749A1A79A07A008D5795 /* PBXTargetDependency */,
 			);
 			name = TodayExtension;
 			productName = TodayExtension;
@@ -813,7 +718,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E879D9C71A12AA120035E2EB /* PBXTargetDependency */,
 			);
 			name = GroupedTableView;
 			productName = TableView;
@@ -830,7 +734,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8F70ECD19BA5262006F60D5 /* PBXTargetDependency */,
 			);
 			name = Simple;
 			productName = Simple;
@@ -848,7 +751,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8F70ED319BA52FE006F60D5 /* PBXTargetDependency */,
 			);
 			name = Migration;
 			productName = Migration;
@@ -865,7 +767,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8F70ED719BA5341006F60D5 /* PBXTargetDependency */,
 			);
 			name = Encryption;
 			productName = Encryption;
@@ -883,7 +784,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8F70EDB19BA5379006F60D5 /* PBXTargetDependency */,
 			);
 			name = TableView;
 			productName = TableView;
@@ -900,7 +800,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8F70EDF19BA539C006F60D5 /* PBXTargetDependency */,
 			);
 			name = REST;
 			productName = REST;
@@ -917,7 +816,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8BDBFD01A11727800450CFF /* PBXTargetDependency */,
 			);
 			name = Backlink;
 			productName = Backlink;
@@ -992,7 +890,6 @@
 				E8AB729319BA504900F3EDB4 /* REST */,
 				E8AB71DB19BA503500F3EDB4 /* Simple */,
 				E8AB726519BA504500F3EDB4 /* TableView */,
-				E8F70EC719BA51B1006F60D5 /* Realm */,
 				C0658DB31A76CBD8002F7A84 /* extension WatchKit Extension */,
 				C0658DBE1A76CBD8002F7A84 /* extension WatchKit App */,
 			);
@@ -1092,21 +989,6 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView-resources.sh\"\n";
 			showEnvVarsInLog = 0;
-		};
-		E8F70ECB19BA51C4006F60D5 /* Build Realm */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Build Realm";
-			outputPaths = (
-				"$(SRCROOT)/../../../build/ios-static/Realm.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"ios/Realm.framework\" && ! -d \"build/ios-static/Realm.framework\" ]]; then\n    sh build.sh ios-static\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1220,21 +1102,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3F64749A1A79A07A008D5795 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8F70EC719BA51B1006F60D5 /* Realm */;
-			targetProxy = 3F6474991A79A07A008D5795 /* PBXContainerItemProxy */;
-		};
-		3F64749C1A79A07F008D5795 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8F70EC719BA51B1006F60D5 /* Realm */;
-			targetProxy = 3F64749B1A79A07F008D5795 /* PBXContainerItemProxy */;
-		};
-		3F78C9B61B431CF300A0988E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8F70EC719BA51B1006F60D5 /* Realm */;
-			targetProxy = 3F78C9B71B431CF300A0988E /* PBXContainerItemProxy */;
-		};
 		C06134E11A718BB800D22D12 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C0DC42051A7079D00067156A /* TodayExtension */;
@@ -1250,46 +1117,6 @@
 			target = C0658DB31A76CBD8002F7A84 /* extension WatchKit Extension */;
 			targetProxy = C0658DCA1A76CBD8002F7A84 /* PBXContainerItemProxy */;
 		};
-		C0DC41F31A70728B0067156A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8F70EC719BA51B1006F60D5 /* Realm */;
-			targetProxy = C0DC41F21A70728B0067156A /* PBXContainerItemProxy */;
-		};
-		E879D9C71A12AA120035E2EB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8F70EC719BA51B1006F60D5 /* Realm */;
-			targetProxy = E879D9C81A12AA120035E2EB /* PBXContainerItemProxy */;
-		};
-		E8BDBFD01A11727800450CFF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8F70EC719BA51B1006F60D5 /* Realm */;
-			targetProxy = E8BDBFCF1A11727800450CFF /* PBXContainerItemProxy */;
-		};
-		E8F70ECD19BA5262006F60D5 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8F70EC719BA51B1006F60D5 /* Realm */;
-			targetProxy = E8F70ECC19BA5262006F60D5 /* PBXContainerItemProxy */;
-		};
-		E8F70ED319BA52FE006F60D5 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8F70EC719BA51B1006F60D5 /* Realm */;
-			targetProxy = E8F70ED219BA52FE006F60D5 /* PBXContainerItemProxy */;
-		};
-		E8F70ED719BA5341006F60D5 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8F70EC719BA51B1006F60D5 /* Realm */;
-			targetProxy = E8F70ED619BA5341006F60D5 /* PBXContainerItemProxy */;
-		};
-		E8F70EDB19BA5379006F60D5 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8F70EC719BA51B1006F60D5 /* Realm */;
-			targetProxy = E8F70EDA19BA5379006F60D5 /* PBXContainerItemProxy */;
-		};
-		E8F70EDF19BA539C006F60D5 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8F70EC719BA51B1006F60D5 /* Realm */;
-			targetProxy = E8F70EDE19BA539C006F60D5 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -1299,7 +1126,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1318,7 +1144,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "$(SRCROOT)/RACTableView/Info.plist";
@@ -1492,7 +1317,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1510,7 +1334,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
@@ -1536,8 +1359,9 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
+				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios-static";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1576,9 +1400,10 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
+				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios-static";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1598,7 +1423,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1616,7 +1440,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Simple/Simple-Info.plist";
@@ -1630,7 +1453,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1648,7 +1470,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Migration/Migration-Info.plist";
@@ -1662,7 +1483,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1680,7 +1500,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Encryption/Encryption-Info.plist";
@@ -1694,7 +1513,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1712,7 +1530,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "TableView/TableView-Info.plist";
@@ -1726,7 +1543,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1744,7 +1560,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "REST/REST-Info.plist";
@@ -1759,7 +1574,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios-static";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1777,24 +1591,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios-static";
 				INFOPLIST_FILE = "$(SRCROOT)/Backlink/Backlink-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		E8F70EC919BA51B1006F60D5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		E8F70ECA19BA51B1006F60D5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -1915,15 +1714,6 @@
 			buildConfigurations = (
 				E8BDBFC11A116FAC00450CFF /* Debug */,
 				E8BDBFC21A116FAC00450CFF /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E8F70EC819BA51B1006F60D5 /* Build configuration list for PBXAggregateTarget "Realm" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E8F70EC919BA51B1006F60D5 /* Debug */,
-				E8F70ECA19BA51B1006F60D5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

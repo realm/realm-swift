@@ -6,20 +6,6 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		14835E3A1BFE5E8400B9A267 /* RealmSwift */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 14835E3B1BFE5E8400B9A267 /* Build configuration list for PBXAggregateTarget "RealmSwift" */;
-			buildPhases = (
-				14835E3E1BFE5E9A00B9A267 /* Build RealmSwift */,
-			);
-			dependencies = (
-			);
-			name = RealmSwift;
-			productName = RealmSwift;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		14835E1B1BFE5E4000B9A267 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14835E1A1BFE5E4000B9A267 /* AppDelegate.swift */; };
 		14835E1D1BFE5E4000B9A267 /* RepositoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14835E1C1BFE5E4000B9A267 /* RepositoriesViewController.swift */; };
@@ -42,23 +28,6 @@
 		14AACA9C1BFE7D0A0046BD85 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14835E441BFE5F5900B9A267 /* RealmSwift.framework */; };
 		14AACA9D1BFE7D0A0046BD85 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 14835E441BFE5F5900B9A267 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		14835E3F1BFE5ED700B9A267 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 14835DFA1BFE5E0B00B9A267 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 14835E3A1BFE5E8400B9A267;
-			remoteInfo = RealmSwift;
-		};
-		E83178551C222E78002F9738 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 14835DFA1BFE5E0B00B9A267 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 14835E3A1BFE5E8400B9A267;
-			remoteInfo = RealmSwift;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		14835E491BFE5F5A00B9A267 /* Embed Frameworks */ = {
@@ -94,8 +63,8 @@
 		14835E1F1BFE5E4000B9A267 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		14835E211BFE5E4100B9A267 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		14835E231BFE5E4100B9A267 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		14835E431BFE5F5900B9A267 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/tvos/Realm.framework; sourceTree = "<group>"; };
-		14835E441BFE5F5900B9A267 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = ../../../build/tvos/RealmSwift.framework; sourceTree = "<group>"; };
+		14835E431BFE5F5900B9A267 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		14835E441BFE5F5900B9A267 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		14835E521BFE603300B9A267 /* RepositoryCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepositoryCell.swift; sourceTree = "<group>"; };
 		14835E541BFE605000B9A267 /* Repository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Repository.swift; sourceTree = "<group>"; };
 		14AACA861BFE7B740046BD85 /* PreloadedData.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PreloadedData.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -210,7 +179,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				14835E401BFE5ED700B9A267 /* PBXTargetDependency */,
 			);
 			name = DownloadCache;
 			productName = DownloadCache;
@@ -229,7 +197,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E83178561C222E78002F9738 /* PBXTargetDependency */,
 			);
 			name = PreloadedData;
 			productName = PreloadedData;
@@ -247,9 +214,6 @@
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					14835E171BFE5E4000B9A267 = {
-						CreatedOnToolsVersion = 7.2;
-					};
-					14835E3A1BFE5E8400B9A267 = {
 						CreatedOnToolsVersion = 7.2;
 					};
 					14AACA851BFE7B740046BD85 = {
@@ -272,7 +236,6 @@
 			targets = (
 				14835E171BFE5E4000B9A267 /* DownloadCache */,
 				14AACA851BFE7B740046BD85 /* PreloadedData */,
-				14835E3A1BFE5E8400B9A267 /* RealmSwift */,
 			);
 		};
 /* End PBXProject section */
@@ -300,20 +263,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		14835E3E1BFE5E9A00B9A267 /* Build RealmSwift */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Build RealmSwift";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"tvos/RealmSwift.framework\" && ! -d \"build/tvos/RealmSwift.framework\" ]]; then\n    sh build.sh tvos-swift\nfi";
-		};
 		14835E501BFE5F9200B9A267 /* Strip Framework Architectures */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -353,19 +302,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		14835E401BFE5ED700B9A267 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 14835E3A1BFE5E8400B9A267 /* RealmSwift */;
-			targetProxy = 14835E3F1BFE5ED700B9A267 /* PBXContainerItemProxy */;
-		};
-		E83178561C222E78002F9738 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 14835E3A1BFE5E8400B9A267 /* RealmSwift */;
-			targetProxy = E83178551C222E78002F9738 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		14835E1E1BFE5E4000B9A267 /* Main.storyboard */ = {
@@ -408,7 +344,6 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = ../../../build/tvos/;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -453,7 +388,6 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = ../../../build/tvos/;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -490,20 +424,6 @@
 				INFOPLIST_FILE = DownloadCache/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.DownloadCache;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		14835E3C1BFE5E8400B9A267 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		14835E3D1BFE5E8400B9A267 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -549,15 +469,6 @@
 			buildConfigurations = (
 				14835E251BFE5E4100B9A267 /* Debug */,
 				14835E261BFE5E4100B9A267 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		14835E3B1BFE5E8400B9A267 /* Build configuration list for PBXAggregateTarget "RealmSwift" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				14835E3C1BFE5E8400B9A267 /* Debug */,
-				14835E3D1BFE5E8400B9A267 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

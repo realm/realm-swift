@@ -6,20 +6,6 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		E8D212EC1AF6A96500DAB243 /* RealmSwift */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = E8D212ED1AF6A96500DAB243 /* Build configuration list for PBXAggregateTarget "RealmSwift" */;
-			buildPhases = (
-				E8D212F01AF6A96A00DAB243 /* ShellScript */,
-			);
-			dependencies = (
-			);
-			name = RealmSwift;
-			productName = RealmSwift;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		0295B91619D103A70036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91719D103BE0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
@@ -75,58 +61,6 @@
 		E8D3F2781A11766A00620884 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D3F2761A11766A00620884 /* AppDelegate.swift */; };
 		E8D3F27D1A1177D900620884 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		5D8DD5601C62C81C005077F2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E805758D19BA55E600376620 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8D212EC1AF6A96500DAB243;
-			remoteInfo = RealmSwift;
-		};
-		E8D212FD1AF6AAA000DAB243 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E805758D19BA55E600376620 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8D212EC1AF6A96500DAB243;
-			remoteInfo = RealmSwift;
-		};
-		E8D212FF1AF6AAA400DAB243 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E805758D19BA55E600376620 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8D212EC1AF6A96500DAB243;
-			remoteInfo = RealmSwift;
-		};
-		E8D213011AF6AAA900DAB243 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E805758D19BA55E600376620 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8D212EC1AF6A96500DAB243;
-			remoteInfo = RealmSwift;
-		};
-		E8D213031AF6AAAD00DAB243 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E805758D19BA55E600376620 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8D212EC1AF6A96500DAB243;
-			remoteInfo = RealmSwift;
-		};
-		E8D213051AF6AAB000DAB243 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E805758D19BA55E600376620 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8D212EC1AF6A96500DAB243;
-			remoteInfo = RealmSwift;
-		};
-		E8D213071AF6AAB400DAB243 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E805758D19BA55E600376620 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E8D212EC1AF6A96500DAB243;
-			remoteInfo = RealmSwift;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		5D8DD55D1C62C655005077F2 /* Embed Frameworks */ = {
@@ -219,8 +153,8 @@
 		5D8DD54B1C62C5A4005077F2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5D8DD54C1C62C5A4005077F2 /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		5FC3B714C9E93753A534F397 /* Pods-ReactKitTableView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactKitTableView.release.xcconfig"; path = "Pods/Target Support Files/Pods-ReactKitTableView/Pods-ReactKitTableView.release.xcconfig"; sourceTree = "<group>"; };
-		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../build/ios/swift-2.1.1/Realm.framework"; sourceTree = SOURCE_ROOT; };
-		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../../../build/ios/swift-2.1.1/RealmSwift.framework"; sourceTree = SOURCE_ROOT; };
+		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBC0988E1843A2BB42BC405F /* Pods-ReactKitTableView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactKitTableView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ReactKitTableView/Pods-ReactKitTableView.debug.xcconfig"; sourceTree = "<group>"; };
 		D00630224166C0631FC7AD2B /* Pods_ReactKitTableView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ReactKitTableView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -476,7 +410,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				5D8DD5611C62C81C005077F2 /* PBXTargetDependency */,
 			);
 			name = ReactKitTableView;
 			productName = ReactKitTableView;
@@ -496,7 +429,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8D213021AF6AAA900DAB243 /* PBXTargetDependency */,
 			);
 			name = GroupedTableView;
 			productName = TableView;
@@ -515,7 +447,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8D213001AF6AAA400DAB243 /* PBXTargetDependency */,
 			);
 			name = Encryption;
 			productName = Encryption;
@@ -535,7 +466,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8D213041AF6AAAD00DAB243 /* PBXTargetDependency */,
 			);
 			name = Migration;
 			productName = Migration;
@@ -555,7 +485,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8D213081AF6AAB400DAB243 /* PBXTargetDependency */,
 			);
 			name = TableView;
 			productName = TableView;
@@ -574,7 +503,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8D213061AF6AAB000DAB243 /* PBXTargetDependency */,
 			);
 			name = Simple;
 			productName = Simple;
@@ -593,7 +521,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8D212FE1AF6AAA000DAB243 /* PBXTargetDependency */,
 			);
 			name = Backlink;
 			productName = Backlink;
@@ -625,9 +552,6 @@
 					E8CB085D19BA6ACA0018434A = {
 						CreatedOnToolsVersion = 6.0;
 					};
-					E8D212EC1AF6A96500DAB243 = {
-						CreatedOnToolsVersion = 6.3.1;
-					};
 					E8D3F2521A11765200620884 = {
 						CreatedOnToolsVersion = 6.1;
 					};
@@ -652,7 +576,6 @@
 				E8CB081319BA6ABD0018434A /* Migration */,
 				E8CB085D19BA6ACA0018434A /* Simple */,
 				E8CB083819BA6AC60018434A /* TableView */,
-				E8D212EC1AF6A96500DAB243 /* RealmSwift */,
 				5D8DD5351C62C572005077F2 /* ReactKitTableView */,
 			);
 		};
@@ -771,19 +694,6 @@
 			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
 			showEnvVarsInLog = 0;
 		};
-		E8D212F01AF6A96A00DAB243 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"ios/swift-2.1.1/RealmSwift.framework\" && ! -d \"build/ios/swift-2.1.1/RealmSwift.framework\" ]]; then\n  sh build.sh ios-swift\nfi";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -849,44 +759,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		5D8DD5611C62C81C005077F2 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8D212EC1AF6A96500DAB243 /* RealmSwift */;
-			targetProxy = 5D8DD5601C62C81C005077F2 /* PBXContainerItemProxy */;
-		};
-		E8D212FE1AF6AAA000DAB243 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8D212EC1AF6A96500DAB243 /* RealmSwift */;
-			targetProxy = E8D212FD1AF6AAA000DAB243 /* PBXContainerItemProxy */;
-		};
-		E8D213001AF6AAA400DAB243 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8D212EC1AF6A96500DAB243 /* RealmSwift */;
-			targetProxy = E8D212FF1AF6AAA400DAB243 /* PBXContainerItemProxy */;
-		};
-		E8D213021AF6AAA900DAB243 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8D212EC1AF6A96500DAB243 /* RealmSwift */;
-			targetProxy = E8D213011AF6AAA900DAB243 /* PBXContainerItemProxy */;
-		};
-		E8D213041AF6AAAD00DAB243 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8D212EC1AF6A96500DAB243 /* RealmSwift */;
-			targetProxy = E8D213031AF6AAAD00DAB243 /* PBXContainerItemProxy */;
-		};
-		E8D213061AF6AAB000DAB243 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8D212EC1AF6A96500DAB243 /* RealmSwift */;
-			targetProxy = E8D213051AF6AAB000DAB243 /* PBXContainerItemProxy */;
-		};
-		E8D213081AF6AAB400DAB243 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E8D212EC1AF6A96500DAB243 /* RealmSwift */;
-			targetProxy = E8D213071AF6AAB400DAB243 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin XCBuildConfiguration section */
 		5D8DD5451C62C572005077F2 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -940,7 +812,6 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = "../../../build/ios/swift-2.1.1";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -985,7 +856,6 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = "../../../build/ios/swift-2.1.1";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1006,7 +876,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1023,7 +892,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
@@ -1036,7 +904,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1053,7 +920,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Encryption/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
@@ -1066,7 +932,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1083,7 +948,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Migration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
@@ -1096,7 +960,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1113,7 +976,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = TableView/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
@@ -1126,7 +988,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1143,24 +1004,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Simple/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		E8D212EE1AF6A96500DAB243 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		E8D212EF1AF6A96500DAB243 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -1169,7 +1015,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1186,7 +1031,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Backlink/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1257,15 +1101,6 @@
 			buildConfigurations = (
 				E8CB087A19BA6ACB0018434A /* Debug */,
 				E8CB087B19BA6ACB0018434A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E8D212ED1AF6A96500DAB243 /* Build configuration list for PBXAggregateTarget "RealmSwift" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E8D212EE1AF6A96500DAB243 /* Debug */,
-				E8D212EF1AF6A96500DAB243 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
