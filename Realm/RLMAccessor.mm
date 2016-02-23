@@ -686,23 +686,17 @@ static RLMAccessorCode accessorCodeForType(char objcTypeCode, RLMPropertyType rl
     }
 }
 
-static void RLMReplaceShouldIncludeInDefaultSchemaMethod(Class cls, bool shouldInclude) {
-    Class metaClass = objc_getMetaClass(class_getName(cls));
-    IMP imp = imp_implementationWithBlock(^(Class){ return shouldInclude; });
-    class_addMethod(metaClass, @selector(shouldIncludeInDefaultSchema), imp, "b@:");
-}
-
 // implement the class method className on accessors to return the className of the
 // base object
 void RLMReplaceClassNameMethod(Class accessorClass, NSString *className) {
-    Class metaClass = objc_getMetaClass(class_getName(accessorClass));
+    Class metaClass = object_getClass(accessorClass);
     IMP imp = imp_implementationWithBlock(^(Class){ return className; });
     class_addMethod(metaClass, @selector(className), imp, "@@:");
 }
 
 // implement the shared schema method
 void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema) {
-    Class metaClass = objc_getMetaClass(class_getName(accessorClass));
+    Class metaClass = object_getClass(accessorClass);
     IMP imp = imp_implementationWithBlock(^(Class cls) {
         // This can be called on a subclass of the class that we overrode it on
         // if that class hasn't been initialized yet
@@ -766,9 +760,6 @@ static Class RLMCreateAccessorClass(Class objectClass,
         }
     }
 
-    // implement className for accessor to return base className
-    RLMReplaceClassNameMethod(accClass, schema.className);
-    RLMReplaceShouldIncludeInDefaultSchemaMethod(accClass, false);
     RLMMarkClassAsGenerated(accClass);
 
     return accClass;
