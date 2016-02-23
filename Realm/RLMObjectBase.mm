@@ -188,6 +188,10 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     return [RLMSchema sharedSchemaForClass:self.class];
 }
 
++ (Class)objectUtilClass:(BOOL)isSwift {
+    return RLMObjectUtilClass(isSwift);
+}
+
 - (NSString *)description
 {
     if (self.isInvalidated) {

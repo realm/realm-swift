@@ -190,8 +190,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         for (Class cls : testClasses) {
             // Ensure that the className method isn't used during schema init
             // as it may not be overriden yet
-            NSString *className = NSStringFromClass(cls);
-            Class metaClass = objc_getMetaClass(className.UTF8String);
+            Class metaClass = object_getClass(cls);
             IMP imp = imp_implementationWithBlock(^{ return nil; });
             class_replaceMethod(metaClass, @selector(className), imp, "@:");
         }
@@ -209,6 +208,15 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
             objectSchema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
         }
 
+        for (Class cls : testClasses) {
+            NSString *className = NSStringFromClass(cls);
+
+            // Restore the className method
+            Class metaClass = object_getClass(cls);
+            IMP imp = imp_implementationWithBlock(^{ return className; });
+            class_replaceMethod(metaClass, @selector(className), imp, "@:");
+        }
+
         // Verify that each class has the correct properties and className
         // for generated subclasses
         checkSchema(schema, @"SchemaTestClassBase", @{@"baseCol": @"IntObject"});
@@ -223,14 +231,6 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                                       @"secondChild": @"SchemaTestClassSecondChild",
                                                       @"secondChildArray": @"SchemaTestClassSecondChild"});
 
-        for (Class cls : testClasses) {
-            NSString *className = NSStringFromClass(cls);
-
-            // Restore the className method
-            Class metaClass = objc_getMetaClass(className.UTF8String);
-            IMP imp = imp_implementationWithBlock(^{ return className; });
-            class_replaceMethod(metaClass, @selector(className), imp, "@:");
-        }
 
         // Test creating objects of each class
         [self deleteFiles];

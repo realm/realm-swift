@@ -414,6 +414,7 @@ public final class List<T: Object>: ListBase {
     - parameter block: The block to be called each time the list changes.
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
+    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (List<T>) -> ()) -> NotificationToken {
         return _rlmArray.addNotificationBlock { _, _ in block(self) }
     }

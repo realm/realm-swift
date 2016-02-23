@@ -7,11 +7,12 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Initializing the shared schema is 3x faster.
 
 ### Bugfixes
 
-* None.
+* Using Realm Objective-C from Swift while having Realm Swift linked no longer causes that the
+  declared `ignoredProperties` are not taken into account.
 
 0.98.2 Release notes (2016-02-18)
 =============================================================
