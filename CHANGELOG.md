@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Initializing the shared schema is 3x faster.
 
 ### Bugfixes
 
