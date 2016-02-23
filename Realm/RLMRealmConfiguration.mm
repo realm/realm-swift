@@ -37,6 +37,7 @@ static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"customSchema",
     @"syncServerURL",
     @"syncIdentity",
+    @"syncSignature",
 };
 
 static NSString *const c_defaultRealmFileName = @"default.realm";
@@ -290,10 +291,23 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     if (!syncIdentity) {
         _config.sync_identity = realm::util::none;
     } else {
-        if ([syncIdentity lengthOfBytesUsingEncoding:NSUTF8StringEncoding] != 40) {
-            @throw RLMException(@"Sync identity must be exactly 40 bytes");
-        }
         _config.sync_identity = std::string(syncIdentity.UTF8String);
+    }
+}
+
+- (NSString *)syncSignature {
+    if (!_config.sync_signature) {
+        return nil;
+    }
+
+    return @(_config.sync_signature->c_str());
+}
+
+- (void)setSyncSignature:(NSString *)syncSignature {
+    if (!syncSignature) {
+        _config.sync_signature = realm::util::none;
+    } else {
+        _config.sync_signature = std::string(syncSignature.UTF8String);
     }
 }
 

@@ -78,6 +78,7 @@ std::atomic<bool> s_syncLogEverything(false);
 @interface RLMServerConnection : NSObject
 @property (readonly, nonatomic) unsigned long ident; // Used only for logging
 @property (readonly, nonatomic) NSString *identity;
+@property (readonly, nonatomic) NSString *signature;
 @property (readonly, nonatomic) BOOL isOpen;
 @end
 
@@ -191,12 +192,14 @@ std::atomic<bool> s_syncLogEverything(false);
 
 - (instancetype)initWithIdent:(unsigned long)ident
                      identity:(NSString *)identity
+                     signature:(NSString *)signature
                       address:(NSString *)address
                          port:(NSNumber *)port {
     self = [super init];
     if (self) {
         _ident = ident;
         _identity = [identity copy];
+        _signature = [signature copy];
         _isOpen = NO;
 
         _address = address;
@@ -344,25 +347,19 @@ std::atomic<bool> s_syncLogEverything(false);
     // `applicationIdent` is a unique application identifier registered with
     // Realm and `userIdent` could for example be the concattenation of a user
     // name and a password).
-    NSData *applicationIdent = [@"dummy_app"  dataUsingEncoding:NSUTF8StringEncoding];
-    if (self.identity == nil) {
-        NSLog(@"RealmSync: No user identity set (using default, which probably won't work).");
-        _identity = @"dummy_user";
-    }
-    NSData *userIdentData = [self.identity dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *userIdentData = [self.identity dataUsingEncoding:NSASCIIStringEncoding];
+    NSData *signatureData = [self.signature dataUsingEncoding:NSASCIIStringEncoding];
 
-    NSMutableData *body = [applicationIdent mutableCopy];
-    [body appendData:userIdentData];
+    NSMutableData *body = [userIdentData mutableCopy];
+    [body appendData:signatureData];
 
-    uint_fast64_t protocolVersion = 1;
-    size_t applicationIdentSize = size_t(applicationIdent.length);
-    size_t userIdentSize        = size_t(userIdentData.length);
-    typedef unsigned long      ulong;
-    typedef unsigned long long ulonglong;
+    unsigned long long protocolVersion = 1;
+    size_t userIdentSize = size_t(userIdentData.length);
+    size_t signatureSize = size_t(signatureData.length);
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
     msg.body = body;
-    msg.head = [NSString stringWithFormat:@"ident %llu %lu %lu\n", ulonglong(protocolVersion),
-                         ulong(applicationIdentSize), ulong(userIdentSize)];
+    msg.head = [NSString stringWithFormat:@"ident %llu %zu %zu\n", protocolVersion,
+                         userIdentSize, signatureSize];
     [self enqueueOutputMessage:msg];
     NSLog(@"RealmSync: Connection[%lu]: Sending: IDENT", _ident);
 }
@@ -1538,6 +1535,7 @@ void RLMRealmTranslateException(NSError **error) {
                         unsigned long serverConnectionIdent = ++s_lastServerConnectionIdent;
                         conn = [[RLMServerConnection alloc] initWithIdent:serverConnectionIdent
                                                                  identity:realm.configuration.syncIdentity
+                                                                signature:realm.configuration.syncSignature
                                                                   address:serverBaseURL.host
                                                                      port:serverBaseURL.port];
                         [s_serverConnections setObject:conn forKey:hostKey];

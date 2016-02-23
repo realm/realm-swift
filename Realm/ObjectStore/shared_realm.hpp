@@ -58,6 +58,7 @@ namespace realm {
             std::vector<char> encryption_key;
             util::Optional<std::string> sync_server_url;
             util::Optional<std::string> sync_identity;
+            util::Optional<std::string> sync_signature;
 
             std::unique_ptr<Schema> schema;
             uint64_t schema_version;
