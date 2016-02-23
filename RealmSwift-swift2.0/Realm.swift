@@ -458,6 +458,7 @@ public final class Realm {
     - returns: A notification token which can later be passed to `removeNotification(_:)`
                to remove this notification.
     */
+    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock(rlmNotificationBlockFromNotificationBlock(block))
     }

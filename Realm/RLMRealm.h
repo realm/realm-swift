@@ -154,7 +154,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @return A token object which must be stored as long as you wish to continue
          receiving change notifications.
  */
-- (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block;
+- (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block RLM_WARN_UNUSED_RESULT;
 
 /**
  Remove a previously registered notification handler using the token returned
