@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestObjects.h"
+#import <Realm/RLMObject_Private.h>
 
 #pragma mark - Abstract Objects
 #pragma mark -
@@ -196,6 +197,7 @@
 #pragma mark FakeObject
 
 @implementation FakeObject
++ (Class)objectUtilClass:(BOOL)isSwift { return RLMObjectUtilClass(isSwift); }
 + (NSArray *)ignoredProperties { return nil; }
 + (NSArray *)indexedProperties { return nil; }
 + (NSString *)primaryKey { return nil; }

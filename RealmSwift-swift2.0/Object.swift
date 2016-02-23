@@ -129,6 +129,15 @@ public class Object: RLMObjectBase {
     public final var className: String { return "" }
     #endif
 
+    /**
+    WARNING: This is an internal helper method not intended for public use.
+    :nodoc:
+    */
+    public override class func objectUtilClass(isSwift: Bool) -> AnyClass {
+        return ObjectUtil.self
+    }
+
+
     // MARK: Object Customization
 
     /**
