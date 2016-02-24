@@ -17,6 +17,8 @@ x.x.x Release notes (yyyy-MM-dd)
   properties to a class.
 * Fix potential errors when cancelling a write transaction which modified
   multiple `RLMArray`/`List` properties.
+* Report the correct value for inWriteTransaction after attempting to commit a
+  write transaction fails.
 
 0.98.2 Release notes (2016-02-18)
 =============================================================

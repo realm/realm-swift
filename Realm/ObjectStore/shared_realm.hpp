@@ -92,7 +92,7 @@ namespace realm {
         void begin_transaction();
         void commit_transaction();
         void cancel_transaction();
-        bool is_in_transaction() const { return m_in_transaction; }
+        bool is_in_transaction() const noexcept;
         bool is_in_read_transaction() const { return !!m_group; }
 
         bool refresh();
@@ -143,7 +143,6 @@ namespace realm {
       private:
         Config m_config;
         std::thread::id m_thread_id = std::this_thread::get_id();
-        bool m_in_transaction = false;
         bool m_auto_refresh = true;
 
         std::unique_ptr<ClientHistory> m_history;
