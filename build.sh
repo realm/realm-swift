@@ -761,6 +761,7 @@ case "$COMMAND" in
         ;;
 
     "examples-ios")
+        sh build.sh prelaunch-simulator
         if [[ -d "examples/ios/objc" ]]; then
             workspace="examples/ios/objc/RealmExamples.xcworkspace"
         elif [[ "$REALM_SWIFT_VERSION" = 1.2 ]]; then
@@ -783,6 +784,7 @@ case "$COMMAND" in
         ;;
 
     "examples-ios-swift")
+        sh build.sh prelaunch-simulator
         workspace="examples/ios/swift-$REALM_SWIFT_VERSION/RealmExamples.xcworkspace"
         xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
