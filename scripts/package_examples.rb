@@ -55,8 +55,8 @@ examples.each do |example|
 end
 
 framework_directory_for_example = {
-  'examples/ios/xcode-6/objc' => '../../../ios/static/xcode-6',
-  'examples/ios/xcode-7/objc' => '../../../ios/static/xcode-7',
+  'examples/ios/xcode-6/objc' => '../../../../ios/static/xcode-6',
+  'examples/ios/xcode-7/objc' => '../../../../ios/static/xcode-7',
   'examples/osx/objc' => '../../../osx',
   'examples/tvos/objc' => '../../../tvos',
   'examples/ios/swift-2.1.1' => '../../../ios/swift-2.1.1',
