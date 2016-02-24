@@ -872,7 +872,6 @@ case "$COMMAND" in
     "cocoapods-setup")
         if [[ "$2" != "swift" ]]; then
             sh build.sh download-core
-            mv core/librealm.a core/librealm-osx.a
             if [[ "$REALM_SWIFT_VERSION" = "1.2" ]]; then
                 echo 'Installing for Xcode 6.'
                 mv core/librealm-ios-no-bitcode.a core/librealm-ios.a
