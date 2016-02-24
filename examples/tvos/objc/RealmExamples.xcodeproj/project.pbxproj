@@ -6,20 +6,6 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		1403AF621BFDC71100C1FBB4 /* Realm */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 1403AF631BFDC71100C1FBB4 /* Build configuration list for PBXAggregateTarget "Realm" */;
-			buildPhases = (
-				1403AF661BFDC73200C1FBB4 /* Build Realm */,
-			);
-			dependencies = (
-			);
-			name = Realm;
-			productName = Realm;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		1403AF6F1BFDC8D300C1FBB4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1403AF6E1BFDC8D300C1FBB4 /* main.m */; };
 		1403AF721BFDC8D300C1FBB4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1403AF711BFDC8D300C1FBB4 /* AppDelegate.m */; };
@@ -40,23 +26,6 @@
 		1493912B1BFE52880036B420 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1403AF811BFDCA8200C1FBB4 /* Realm.framework */; };
 		1493912C1BFE52880036B420 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1403AF811BFDCA8200C1FBB4 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		1403AF7F1BFDC91100C1FBB4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 1403AF401BFDC60A00C1FBB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 1403AF621BFDC71100C1FBB4;
-			remoteInfo = Realm;
-		};
-		E83178571C222EFC002F9738 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 1403AF401BFDC60A00C1FBB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 1403AF621BFDC71100C1FBB4;
-			remoteInfo = Realm;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		1403AF871BFDCA8200C1FBB4 /* Embed Frameworks */ = {
@@ -93,7 +62,7 @@
 		1403AF771BFDC8D300C1FBB4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		1403AF791BFDC8D300C1FBB4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1403AF7B1BFDC8D300C1FBB4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1403AF811BFDCA8200C1FBB4 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../../build/tvos/Realm.framework; sourceTree = "<group>"; };
+		1403AF811BFDCA8200C1FBB4 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1403AF8C1BFDDDCE00C1FBB4 /* Repository.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Repository.h; sourceTree = "<group>"; };
 		1403AF8D1BFDDDCE00C1FBB4 /* Repository.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Repository.m; sourceTree = "<group>"; };
 		1403AF8F1BFDDE0B00C1FBB4 /* RepositoryCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RepositoryCell.h; sourceTree = "<group>"; };
@@ -237,7 +206,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				1403AF801BFDC91100C1FBB4 /* PBXTargetDependency */,
 			);
 			name = DownloadCache;
 			productName = DownloadCache;
@@ -257,7 +225,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E83178581C222EFC002F9738 /* PBXTargetDependency */,
 			);
 			name = PreloadedData;
 			productName = PreloadedData;
@@ -273,9 +240,6 @@
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
-					1403AF621BFDC71100C1FBB4 = {
-						CreatedOnToolsVersion = 7.2;
-					};
 					1403AF6A1BFDC8D300C1FBB4 = {
 						CreatedOnToolsVersion = 7.2;
 					};
@@ -299,7 +263,6 @@
 			targets = (
 				1403AF6A1BFDC8D300C1FBB4 /* DownloadCache */,
 				149391161BFE50930036B420 /* PreloadedData */,
-				1403AF621BFDC71100C1FBB4 /* Realm */,
 			);
 		};
 /* End PBXProject section */
@@ -327,20 +290,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1403AF661BFDC73200C1FBB4 /* Build Realm */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Build Realm";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"tvos/Realm.framework\" && ! -d \"build/tvos/Realm.framework\" ]]; then\n    sh build.sh tvos\nfi\n";
-		};
 		1403AF891BFDCAFD00C1FBB4 /* Strip Framework Architectures */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -397,19 +346,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		1403AF801BFDC91100C1FBB4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 1403AF621BFDC71100C1FBB4 /* Realm */;
-			targetProxy = 1403AF7F1BFDC91100C1FBB4 /* PBXContainerItemProxy */;
-		};
-		E83178581C222EFC002F9738 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 1403AF621BFDC71100C1FBB4 /* Realm */;
-			targetProxy = E83178571C222EFC002F9738 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXVariantGroup section */
 		1403AF761BFDC8D300C1FBB4 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -451,7 +387,6 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = ../../../build/tvos/;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -495,7 +430,6 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = ../../../build/tvos/;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -509,20 +443,6 @@
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.1;
 				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		1403AF641BFDC71100C1FBB4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		1403AF651BFDC71100C1FBB4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -582,15 +502,6 @@
 			buildConfigurations = (
 				1403AF5D1BFDC60B00C1FBB4 /* Debug */,
 				1403AF5E1BFDC60B00C1FBB4 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		1403AF631BFDC71100C1FBB4 /* Build configuration list for PBXAggregateTarget "Realm" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				1403AF641BFDC71100C1FBB4 /* Debug */,
-				1403AF651BFDC71100C1FBB4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

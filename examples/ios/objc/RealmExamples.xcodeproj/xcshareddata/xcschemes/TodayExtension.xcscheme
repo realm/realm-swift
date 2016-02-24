@@ -4,15 +4,31 @@
    wasCreatedForAppExtension = "YES"
    version = "2.0">
    <BuildAction
-      parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      parallelizeBuildables = "NO"
+      buildImplicitDependencies = "NO">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
             buildForProfiling = "YES"
             buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
+            buildForAnalyzing = "YES"
+            hideIssues = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5DD7557B1BE056DE002800DA"
+               BuildableName = "Realm.framework"
+               BlueprintName = "Realm iOS static"
+               ReferencedContainer = "container:../../../Realm.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES"
+            hideIssues = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C0DC42051A7079D00067156A"
@@ -26,7 +42,8 @@
             buildForRunning = "YES"
             buildForProfiling = "YES"
             buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
+            buildForAnalyzing = "YES"
+            hideIssues = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C0DC41CB1A7072670067156A"
@@ -47,9 +64,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C0DC42051A7079D00067156A"
-            BuildableName = "TodayExtension.appex"
-            BlueprintName = "TodayExtension"
+            BlueprintIdentifier = "C0DC41CB1A7072670067156A"
+            BuildableName = "extension.app"
+            BlueprintName = "extension"
             ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

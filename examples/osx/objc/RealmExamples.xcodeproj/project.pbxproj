@@ -6,20 +6,6 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		E85A516B19BA7643006C63CB /* Realm */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = E85A516C19BA7643006C63CB /* Build configuration list for PBXAggregateTarget "Realm" */;
-			buildPhases = (
-				E85A516F19BA7649006C63CB /* Build Realm */,
-			);
-			dependencies = (
-			);
-			name = Realm;
-			productName = Realm;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		E823C33D19BA4A5F00D2FF5F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F1E82019BA4A3800FAD64E /* Foundation.framework */; };
 		E823C34D19BA4A7600D2FF5F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E823C34919BA4A7600D2FF5F /* main.m */; };
@@ -27,18 +13,7 @@
 		E823C35119BA4B7500D2FF5F /* persons.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = E823C34C19BA4A7600D2FF5F /* persons.json */; };
 		E823C35319BA4B8600D2FF5F /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E823C35219BA4B8600D2FF5F /* libc++.dylib */; };
 		E85A517119BA76B7006C63CB /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E85A517019BA76B7006C63CB /* Realm.framework */; };
-		E85A517319BA770B006C63CB /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E85A517019BA76B7006C63CB /* Realm.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		E8FD2E6819BA81D100AAE423 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8F1E81519BA4A3800FAD64E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E85A516B19BA7643006C63CB;
-			remoteInfo = Realm;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		E823C33A19BA4A5F00D2FF5F /* CopyFiles */ = {
@@ -47,7 +22,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				E85A517319BA770B006C63CB /* Realm.framework in CopyFiles */,
 				E823C35119BA4B7500D2FF5F /* persons.json in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,7 +36,7 @@
 		E823C34B19BA4A7600D2FF5F /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		E823C34C19BA4A7600D2FF5F /* persons.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = persons.json; sourceTree = "<group>"; };
 		E823C35219BA4B8600D2FF5F /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		E85A517019BA76B7006C63CB /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/osx/Realm.framework; sourceTree = "<group>"; };
+		E85A517019BA76B7006C63CB /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8F1E82019BA4A3800FAD64E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -133,7 +107,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8FD2E6919BA81D100AAE423 /* PBXTargetDependency */,
 			);
 			name = JSONImport;
 			productName = JSONImport;
@@ -162,27 +135,9 @@
 			projectRoot = "";
 			targets = (
 				E823C33B19BA4A5F00D2FF5F /* JSONImport */,
-				E85A516B19BA7643006C63CB /* Realm */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		E85A516F19BA7649006C63CB /* Build Realm */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Build Realm";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"osx/Realm.framework\" ]]; then\n    sh build.sh osx\nfi\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E823C33819BA4A5F00D2FF5F /* Sources */ = {
@@ -195,14 +150,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		E8FD2E6919BA81D100AAE423 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E85A516B19BA7643006C63CB /* Realm */;
-			targetProxy = E8FD2E6819BA81D100AAE423 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E823C34519BA4A5F00D2FF5F /* Debug */ = {
@@ -231,20 +178,6 @@
 			};
 			name = Release;
 		};
-		E85A516D19BA7643006C63CB /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		E85A516E19BA7643006C63CB /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		E8F1E82919BA4A3900FAD64E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -262,7 +195,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = ../../../build/osx;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -303,7 +235,6 @@
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
-				FRAMEWORK_SEARCH_PATHS = ../../../build/osx;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -325,15 +256,6 @@
 			buildConfigurations = (
 				E823C34519BA4A5F00D2FF5F /* Debug */,
 				E823C34619BA4A5F00D2FF5F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E85A516C19BA7643006C63CB /* Build configuration list for PBXAggregateTarget "Realm" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E85A516D19BA7643006C63CB /* Debug */,
-				E85A516E19BA7643006C63CB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
