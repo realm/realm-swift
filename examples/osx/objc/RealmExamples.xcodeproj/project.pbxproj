@@ -6,20 +6,6 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		E85A516B19BA7643006C63CB /* Realm */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = E85A516C19BA7643006C63CB /* Build configuration list for PBXAggregateTarget "Realm" */;
-			buildPhases = (
-				E85A516F19BA7649006C63CB /* Build Realm */,
-			);
-			dependencies = (
-			);
-			name = Realm;
-			productName = Realm;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		027838DD1A7AE77A00553A86 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838DC1A7AE77A00553A86 /* AppDelegate.m */; };
 		027838DF1A7AE77A00553A86 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838DE1A7AE77A00553A86 /* main.m */; };
@@ -37,25 +23,7 @@
 		E823C35119BA4B7500D2FF5F /* persons.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = E823C34C19BA4A7600D2FF5F /* persons.json */; };
 		E823C35319BA4B8600D2FF5F /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E823C35219BA4B8600D2FF5F /* libc++.dylib */; };
 		E85A517119BA76B7006C63CB /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E85A517019BA76B7006C63CB /* Realm.framework */; };
-		E85A517319BA770B006C63CB /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E85A517019BA76B7006C63CB /* Realm.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		027839001A7AE94800553A86 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8F1E81519BA4A3800FAD64E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E85A516B19BA7643006C63CB;
-			remoteInfo = Realm;
-		};
-		E8FD2E6819BA81D100AAE423 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8F1E81519BA4A3800FAD64E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E85A516B19BA7643006C63CB;
-			remoteInfo = Realm;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		027839021A7C153D00553A86 /* CopyFiles */ = {
@@ -74,7 +42,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				E85A517319BA770B006C63CB /* Realm.framework in CopyFiles */,
 				E823C35119BA4B7500D2FF5F /* persons.json in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -95,18 +62,18 @@
 		027838FA1A7AE8CC00553A86 /* DrawPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawPoint.m; sourceTree = "<group>"; };
 		027838FB1A7AE8CC00553A86 /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
 		027838FC1A7AE8CC00553A86 /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
+		0ADF47111B1578CF00F67B16 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
 		22CFE27D1B0A330200D5EC93 /* SwatchColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchColor.h; sourceTree = "<group>"; };
 		22CFE27E1B0A330200D5EC93 /* SwatchColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchColor.m; sourceTree = "<group>"; };
 		22CFE27F1B0A330200D5EC93 /* SwatchesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchesView.h; sourceTree = "<group>"; };
 		22CFE2801B0A330200D5EC93 /* SwatchesView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchesView.m; sourceTree = "<group>"; };
-		0ADF47111B1578CF00F67B16 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
 		E823C33C19BA4A5F00D2FF5F /* JSONImport */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = JSONImport; sourceTree = BUILT_PRODUCTS_DIR; };
 		E823C34919BA4A7600D2FF5F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E823C34A19BA4A7600D2FF5F /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 		E823C34B19BA4A7600D2FF5F /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		E823C34C19BA4A7600D2FF5F /* persons.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = persons.json; sourceTree = "<group>"; };
 		E823C35219BA4B8600D2FF5F /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		E85A517019BA76B7006C63CB /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/osx/Realm.framework; sourceTree = "<group>"; };
+		E85A517019BA76B7006C63CB /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8F1E82019BA4A3800FAD64E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -218,7 +185,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				027839011A7AE94800553A86 /* PBXTargetDependency */,
 			);
 			name = Draw;
 			productName = Draw;
@@ -236,7 +202,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E8FD2E6919BA81D100AAE423 /* PBXTargetDependency */,
 			);
 			name = JSONImport;
 			productName = JSONImport;
@@ -271,7 +236,6 @@
 			projectRoot = "";
 			targets = (
 				E823C33B19BA4A5F00D2FF5F /* JSONImport */,
-				E85A516B19BA7643006C63CB /* Realm */,
 				027838D61A7AE77A00553A86 /* Draw */,
 			);
 		};
@@ -288,23 +252,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		E85A516F19BA7649006C63CB /* Build Realm */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Build Realm";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"build/osx/Realm.framework\" ]]; then\n    sh build.sh osx\nfi\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		027838D31A7AE77A00553A86 /* Sources */ = {
@@ -331,19 +278,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		027839011A7AE94800553A86 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E85A516B19BA7643006C63CB /* Realm */;
-			targetProxy = 027839001A7AE94800553A86 /* PBXContainerItemProxy */;
-		};
-		E8FD2E6919BA81D100AAE423 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E85A516B19BA7643006C63CB /* Realm */;
-			targetProxy = E8FD2E6819BA81D100AAE423 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		027838E21A7AE77A00553A86 /* MainMenu.xib */ = {
@@ -417,20 +351,6 @@
 			};
 			name = Release;
 		};
-		E85A516D19BA7643006C63CB /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		E85A516E19BA7643006C63CB /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		E8F1E82919BA4A3900FAD64E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -448,7 +368,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = ../../../build/osx;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -489,7 +408,6 @@
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
-				FRAMEWORK_SEARCH_PATHS = ../../../build/osx;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -520,15 +438,6 @@
 			buildConfigurations = (
 				E823C34519BA4A5F00D2FF5F /* Debug */,
 				E823C34619BA4A5F00D2FF5F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E85A516C19BA7643006C63CB /* Build configuration list for PBXAggregateTarget "Realm" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E85A516D19BA7643006C63CB /* Debug */,
-				E85A516E19BA7643006C63CB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

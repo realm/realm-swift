@@ -43,8 +43,8 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
     self = [super initWithCoder:coder];
     self.vendorID = host;
     if (self) {
-        [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
         RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        [[NSFileManager defaultManager] removeItemAtPath:configuration.path error:nil];
         configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/draw"];
         configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
         [RLMRealmConfiguration setDefaultConfiguration:configuration];
