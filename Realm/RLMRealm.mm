@@ -257,8 +257,8 @@ std::atomic<bool> s_syncLogEverything(false);
     NSOutputStream *outputStream = (__bridge_transfer NSOutputStream *)writeStream;
 
     if (_useSSL) {
-        [inputStream  setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
-        [outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
+        [inputStream  setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
+        [outputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
     }
 
     // Ensure that the delegate object outlives the stream objects
