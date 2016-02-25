@@ -11,6 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
   that begin with an object relationship so long as there is a `RLMArray`/`List` property at some
   point in a key path.
 * Predicates of the form `%@ IN arrayProperty` are now supported.
+* Support CocoaPods 1.0 beginning from prerelease 1.0.0.beta.4 while retaining
+  backwards-compatibility to 0.39.
 
 ### Bugfixes
 
