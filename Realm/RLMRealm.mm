@@ -136,6 +136,7 @@ std::atomic<bool> s_syncLogEverything(false);
 
     NSString *_address;
     NSNumber *_port;
+    BOOL _useSSL;
 
     NSRunLoop *_runLoop;
 
@@ -200,6 +201,7 @@ std::atomic<bool> s_syncLogEverything(false);
 
         _address = address;
         _port = port ? port : [NSNumber numberWithInt:7800];
+        _useSSL = [port isEqualToNumber:@443];
 
         _runLoop = nil;
 
@@ -253,6 +255,11 @@ std::atomic<bool> s_syncLogEverything(false);
                                        &readStream, &writeStream);
     NSInputStream  *inputStream  = (__bridge_transfer NSInputStream  *)readStream;
     NSOutputStream *outputStream = (__bridge_transfer NSOutputStream *)writeStream;
+
+    if (_useSSL) {
+        [inputStream  setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
+        [outputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
+    }
 
     // Ensure that the delegate object outlives the stream objects
     static char key;
