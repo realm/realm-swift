@@ -906,14 +906,14 @@ case "$COMMAND" in
 
           touch Realm/RLMPlatform.h
           if [ -n "$COCOAPODS_VERSION" ]; then
-            # This variable is set for the prepare_command beginning
+            # This variable is set for the prepare_command available
             # from the 1.0 prereleases, which requires a different
             # header layout within the header_mappings_dir.
             cp Realm/*.h include
           else
             # For CocoaPods < 1.0, we need to scope the headers within
             # the header_mappings_dir by another subdirectory to avoid
-            # that Clang complains about non-modular headers.
+            # Clang from complaining about non-modular headers.
             mkdir -p include/Realm
             cp Realm/*.h include/Realm
           fi
