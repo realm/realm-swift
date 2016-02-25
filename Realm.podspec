@@ -16,34 +16,34 @@ Pod::Spec.new do |s|
   s.documentation_url       = "https://realm.io/docs/objc/#{s.version}"
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
-  public_header_files       = 'include/RLMArray.h',
-                              'include/RLMCollection.h',
-                              'include/RLMConstants.h',
-                              'include/RLMDefines.h',
-                              'include/RLMListBase.h',
-                              'include/RLMMigration.h',
-                              'include/RLMObject.h',
-                              'include/RLMObjectBase.h',
-                              'include/RLMObjectSchema.h',
-                              'include/RLMOptionalBase.h',
-                              'include/RLMPlatform.h',
-                              'include/RLMProperty.h',
-                              'include/RLMRealm.h',
-                              'include/RLMRealmConfiguration.h',
-                              'include/RLMResults.h',
-                              'include/RLMSchema.h',
-                              'include/Realm.h',
+  public_header_files       = 'include/**/RLMArray.h',
+                              'include/**/RLMCollection.h',
+                              'include/**/RLMConstants.h',
+                              'include/**/RLMDefines.h',
+                              'include/**/RLMListBase.h',
+                              'include/**/RLMMigration.h',
+                              'include/**/RLMObject.h',
+                              'include/**/RLMObjectBase.h',
+                              'include/**/RLMObjectSchema.h',
+                              'include/**/RLMOptionalBase.h',
+                              'include/**/RLMPlatform.h',
+                              'include/**/RLMProperty.h',
+                              'include/**/RLMRealm.h',
+                              'include/**/RLMRealmConfiguration.h',
+                              'include/**/RLMResults.h',
+                              'include/**/RLMSchema.h',
+                              'include/**/Realm.h',
 
                               # Realm.Dynamic module
-                              'include/RLMRealm_Dynamic.h',
-                              'include/RLMObjectBase_Dynamic.h'
+                              'include/**/RLMRealm_Dynamic.h',
+                              'include/**/RLMObjectBase_Dynamic.h'
 
                               # Realm.Private module
-  private_header_files      = 'include/*_Private.h',
-                              'include/RLMAccessor.h',
-                              'include/RLMListBase.h',
-                              'include/RLMObjectStore.h',
-                              'include/RLMOptionalBase.h'
+  private_header_files      = 'include/**/*_Private.h',
+                              'include/**/RLMAccessor.h',
+                              'include/**/RLMListBase.h',
+                              'include/**/RLMObjectStore.h',
+                              'include/**/RLMOptionalBase.h'
 
   source_files              = 'Realm/*.{m,mm}',
                               'Realm/ObjectStore/*.cpp',
