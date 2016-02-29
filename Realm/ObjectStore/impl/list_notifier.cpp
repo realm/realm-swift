@@ -97,6 +97,11 @@ void ListNotifier::run()
         return;
     }
 
+    m_change.moves.erase(remove_if(begin(m_change.moves), end(m_change.moves),
+                                   [&](auto move) { return m_change.modifications.contains(move.to); }),
+                         end(m_change.moves));
+    m_change.modifications.remove(m_change.insertions);
+
     for (size_t i = 0; i < m_lv->size(); ++i) {
         if (m_change.insertions.contains(i) || m_change.modifications.contains(i))
             continue;

@@ -150,14 +150,7 @@ void CollectionChangeIndices::merge(realm::CollectionChangeIndices&& c)
 
 void CollectionChangeIndices::modify(size_t ndx)
 {
-    if (!insertions.contains(ndx))
-        modifications.add(ndx);
-    // FIXME: this breaks mapping old row indices to new
-    // FIXME: is that a problem?
-    // If this row was previously moved, unmark it as a move
-    moves.erase(remove_if(begin(moves), end(moves),
-                          [&](auto move) { return move.to == ndx; }),
-                end(moves));
+    modifications.add(ndx);
 }
 
 void CollectionChangeIndices::insert(size_t index, size_t count)
@@ -221,31 +214,30 @@ void CollectionChangeIndices::move(size_t from, size_t to)
 
         // Collapse A -> B, B -> C into a single A -> C move
         move.to = to;
-        modifications.erase_at(from);
-        insertions.erase_at(from);
-
-        modifications.shift_for_insert_at(to);
-        insertions.insert_at(to);
         updated_existing_move = true;
+
+        insertions.erase_at(from);
+        insertions.insert_at(to);
     }
-    if (updated_existing_move)
-        return;
 
-    if (!insertions.contains(from)) {
-        auto shifted_from = insertions.unshift(from);
-        shifted_from = deletions.add_shifted(shifted_from);
+    if (!updated_existing_move) {
+        auto shifted_from = insertions.erase_and_unshift(from);
+        insertions.insert_at(to);
 
-        // Don't record it as a move if the source row was newly inserted or
-        // was previously changed
-        if (!modifications.contains(from))
+        // Don't report deletions/moves for newly inserted rows
+        if (shifted_from != npos) {
+            shifted_from = deletions.add_shifted(shifted_from);
             moves.push_back({shifted_from, to});
+        }
     }
 
+    bool modified = modifications.contains(from);
     modifications.erase_at(from);
-    insertions.erase_at(from);
 
-    modifications.shift_for_insert_at(to);
-    insertions.insert_at(to);
+    if (modified)
+        modifications.insert_at(to);
+    else
+        modifications.shift_for_insert_at(to);
 }
 
 void CollectionChangeIndices::move_over(size_t row_ndx, size_t last_row)
@@ -255,6 +247,9 @@ void CollectionChangeIndices::move_over(size_t row_ndx, size_t last_row)
         erase(row_ndx);
         return;
     }
+    move(last_row, row_ndx);
+    erase(row_ndx + 1);
+    return;
 
     bool updated_existing_move = false;
     for (size_t i = 0; i < moves.size(); ++i) {
@@ -278,24 +273,19 @@ void CollectionChangeIndices::move_over(size_t row_ndx, size_t last_row)
         moves.push_back({last_row, row_ndx});
     }
 
-    if (insertions.contains(row_ndx)) {
-        insertions.remove(row_ndx);
-    }
-    else {
-        if (modifications.contains(row_ndx)) {
-            modifications.remove(row_ndx);
-        }
-        deletions.add(row_ndx);
-    }
+    insertions.remove(row_ndx);
+    modifications.remove(row_ndx);
 
-    if (insertions.contains(last_row)) {
-        insertions.remove(last_row);
-        insertions.add(row_ndx);
-    }
-    else if (modifications.contains(last_row)) {
+    // not add_shifted() because unordered removal does not shift
+    // mixed ordered/unordered removal currently not supported
+    deletions.add(row_ndx);
+
+    if (modifications.contains(last_row)) {
         modifications.remove(last_row);
         modifications.add(row_ndx);
     }
+
+    insertions.add(row_ndx);
 }
 
 void CollectionChangeIndices::verify()
@@ -305,10 +295,10 @@ void CollectionChangeIndices::verify()
         REALM_ASSERT(deletions.contains(move.from));
         REALM_ASSERT(insertions.contains(move.to));
     }
-    for (auto index : modifications.as_indexes())
-        REALM_ASSERT(!insertions.contains(index));
-    for (auto index : insertions.as_indexes())
-        REALM_ASSERT(!modifications.contains(index));
+//    for (auto index : modifications.as_indexes())
+//        REALM_ASSERT(!insertions.contains(index));
+//    for (auto index : insertions.as_indexes())
+//        REALM_ASSERT(!modifications.contains(index));
 #endif
 }
 

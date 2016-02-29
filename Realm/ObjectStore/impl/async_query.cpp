@@ -121,11 +121,13 @@ void AsyncQuery::run()
 
         if (changes) {
             for (auto& idx : m_previous_rows) {
-                if (changes->deletions.contains(idx))
-                    idx = npos;
-                else
-                    map_moves(idx, *changes);
-                REALM_ASSERT_DEBUG(!changes->insertions.contains(idx));
+                if (!map_moves(idx, *changes)) {
+                    if (changes->deletions.contains(idx))
+                        idx = npos;
+                    else {
+                        REALM_ASSERT_DEBUG(!changes->insertions.contains(idx));
+                    }
+                }
             }
         }
 
