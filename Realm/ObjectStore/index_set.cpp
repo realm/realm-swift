@@ -210,56 +210,42 @@ void IndexSet::do_erase(iterator it, size_t index)
     }
 }
 
-void IndexSet::remove(size_t index)
+IndexSet::iterator IndexSet::do_remove(iterator it, size_t begin, size_t end)
 {
-    auto it = find(index);
-    if (it == m_ranges.end() || it->first > index)
-        return;
+    for (it = find(begin, it); it != m_ranges.end() && it->first < end; it = find(begin, it)) {
+        // Trim off any part of the range to remove that's before the matching range
+        begin = std::max(it->first, begin);
 
-    if (it->first == index) {
-        ++it->first;
-        if (it->first == it->second) {
-            it = m_ranges.erase(it);
+        // If the matching range extends to both sides of the range to remove,
+        // split it on the range to remove
+        if (it->first < begin && it->second > end) {
+            it = m_ranges.insert(it + 1, {end, it->second}) - 1;
+            it->second = begin;
         }
-        return;
-    }
 
-    if (it->second == index + 1) {
-        --it->second;
-        return;
+        // Range to delete now coverages (at least) one end of the matching range
+        if (begin == it->first && end >= it->second)
+            it = m_ranges.erase(it);
+        else if (begin == it->first)
+            it->first = end;
+        else
+            it->second = begin;
     }
+    return it;
+}
 
-    auto end = it->second;
-    it->second = index;
-    m_ranges.insert(it + 1, {index + 1, end});
+void IndexSet::remove(size_t index, size_t count)
+{
+    do_remove(find(index), index, index + count);
 }
 
 void IndexSet::remove(realm::IndexSet const& values)
 {
     auto it = m_ranges.begin();
-    for (auto index : values.as_indexes()) {
-        it = find(index, it);
+    for (auto range : values) {
+        it = do_remove(it, range.first, range.second);
         if (it == m_ranges.end())
             return;
-        if (it->first > index)
-            continue;
-
-        if (it->first == index) {
-            ++it->first;
-            if (it->first == it->second) {
-                it = m_ranges.erase(it);
-            }
-            continue;
-        }
-
-        if (it->second == index + 1) {
-            --it->second;
-            continue;
-        }
-
-        auto end = it->second;
-        it->second = index;
-        it = m_ranges.insert(it + 1, {index + 1, end});
     }
 }
 

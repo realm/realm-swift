@@ -184,10 +184,12 @@ void CollectionChangeIndices::erase(size_t index)
 
 void CollectionChangeIndices::clear(size_t old_size)
 {
-    for (auto range : deletions)
-        old_size += range.second - range.first;
-    for (auto range : insertions)
-        old_size -= range.second - range.first;
+    if (old_size != std::numeric_limits<size_t>::max()) {
+        for (auto range : deletions)
+            old_size += range.second - range.first;
+        for (auto range : insertions)
+            old_size -= range.second - range.first;
+    }
 
     modifications.clear();
     insertions.clear();
@@ -249,43 +251,6 @@ void CollectionChangeIndices::move_over(size_t row_ndx, size_t last_row)
     }
     move(last_row, row_ndx);
     erase(row_ndx + 1);
-    return;
-
-    bool updated_existing_move = false;
-    for (size_t i = 0; i < moves.size(); ++i) {
-        auto& move = moves[i];
-        REALM_ASSERT(move.to <= last_row);
-
-        if (move.to == row_ndx) {
-            REALM_ASSERT(!updated_existing_move);
-            moves[i] = moves.back();
-            moves.pop_back();
-            --i;
-            updated_existing_move = true;
-        }
-        else if (move.to == last_row) {
-            REALM_ASSERT(!updated_existing_move);
-            move.to = row_ndx;
-            updated_existing_move = true;
-        }
-    }
-    if (!updated_existing_move) {
-        moves.push_back({last_row, row_ndx});
-    }
-
-    insertions.remove(row_ndx);
-    modifications.remove(row_ndx);
-
-    // not add_shifted() because unordered removal does not shift
-    // mixed ordered/unordered removal currently not supported
-    deletions.add(row_ndx);
-
-    if (modifications.contains(last_row)) {
-        modifications.remove(last_row);
-        modifications.add(row_ndx);
-    }
-
-    insertions.add(row_ndx);
 }
 
 void CollectionChangeIndices::verify()
@@ -295,10 +260,6 @@ void CollectionChangeIndices::verify()
         REALM_ASSERT(deletions.contains(move.from));
         REALM_ASSERT(insertions.contains(move.to));
     }
-//    for (auto index : modifications.as_indexes())
-//        REALM_ASSERT(!insertions.contains(index));
-//    for (auto index : insertions.as_indexes())
-//        REALM_ASSERT(!modifications.contains(index));
 #endif
 }
 

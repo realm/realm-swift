@@ -546,7 +546,7 @@ public:
                             [&](auto const& lv) { return lv.table_ndx == tbl_ndx; });
         m_info.lists.erase(it, end(m_info.lists));
         if (auto change = get_change())
-            change->clear(0); // FIXME
+            change->clear(std::numeric_limits<size_t>::max());
         return true;
     }
 };

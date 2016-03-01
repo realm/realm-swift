@@ -76,7 +76,7 @@ public:
     size_t erase_and_unshift(size_t index);
 
     // Remove the indexes at the given index from the set, without shifting
-    void remove(size_t index);
+    void remove(size_t index, size_t count=1);
     void remove(IndexSet const&);
 
     // Shift an index by inserting each of the indexes in this set
@@ -146,6 +146,7 @@ private:
     // returns inserted position
     iterator do_add(iterator pos, size_t index);
     void do_erase(iterator it, size_t index);
+    iterator do_remove(iterator it, size_t index, size_t count);
 };
 } // namespace realm
 
