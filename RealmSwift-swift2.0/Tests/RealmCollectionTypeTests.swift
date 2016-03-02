@@ -494,7 +494,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         try! realm.commitWrite()
 
         let expectation = expectationWithDescription("")
-        let token = collection.addNotificationBlock { list in
+        let token = collection.addNotificationBlock { (list: List<SwiftStringObject>) in
             XCTAssertEqual(list.count, 2)
             expectation.fulfill()
         }
@@ -608,7 +608,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         let realm = realmWithTestPath()
         try! realm.commitWrite()
 
-        assertThrows(collection.addNotificationBlock { _ in })
+        assertThrows(collection.addNotificationBlock { (list: List<SwiftStringObject>) in })
         realm.beginWrite()
     }
 }

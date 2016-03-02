@@ -37,7 +37,7 @@ class Cell: UITableViewCell {
 class TableViewController: UITableViewController {
 
     let realm = try! Realm()
-    let array = try! Realm().objects(DemoObject).sorted("date")
+    let results = try! Realm().objects(DemoObject).sorted("date")
     var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
@@ -46,8 +46,21 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set results notification block
-        notificationToken = array.addNotificationBlock { [unowned self] results, error in
-            self.tableView.reloadData()
+        self.notificationToken = results.addNotificationBlock { results, changes, error in
+            if let error = error {
+                fatalError("\(error)")
+            }
+            // Changes is nil if this is the first run of the query
+            guard let changes = changes else {
+                self.tableView.reloadData()
+                return
+            }
+
+            self.tableView.beginUpdates()
+            self.tableView.insertRowsAtIndexPaths(changes.insertions, withRowAnimation: .Automatic)
+            self.tableView.deleteRowsAtIndexPaths(changes.deletions, withRowAnimation: .Automatic)
+            self.tableView.reloadRowsAtIndexPaths(changes.modifications, withRowAnimation: .Automatic)
+            self.tableView.endUpdates()
         }
     }
 
@@ -64,13 +77,13 @@ class TableViewController: UITableViewController {
     // Table view data source
 
     override func tableView(tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
-        return array.count
+        return results.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! Cell
 
-        let object = array[indexPath.row]
+        let object = results[indexPath.row]
         cell.textLabel?.text = object.title
         cell.detailTextLabel?.text = object.date.description
 
@@ -80,7 +93,7 @@ class TableViewController: UITableViewController {
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             realm.beginWrite()
-            realm.delete(array[indexPath.row])
+            realm.delete(results[indexPath.row])
             try! realm.commitWrite()
         }
     }

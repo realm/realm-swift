@@ -21,8 +21,9 @@
 #import <Realm/RLMRealm.h>
 
 namespace realm {
-    struct NotificationToken;
     class TableView;
+    struct CollectionChangeIndices;
+    struct NotificationToken;
 }
 @class RLMObjectSchema;
 
@@ -54,8 +55,8 @@ namespace realm {
 - (instancetype)initWithToken:(realm::NotificationToken)token;
 @end
 
-@interface RLMObjectChange ()
-- (instancetype)initWithOld:(NSUInteger)oldIndex new:(NSUInteger)newIndex;
+@interface RLMCollectionChange ()
+- (instancetype)initWithChanges:(realm::CollectionChangeIndices)indices;
 @end
 
 NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *key);

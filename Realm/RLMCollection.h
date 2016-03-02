@@ -214,9 +214,10 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface RLMObjectChange : NSObject
-@property (nonatomic) NSUInteger oldIndex;
-@property (nonatomic) NSUInteger newIndex;
+@interface RLMCollectionChange : NSObject
+@property (nonatomic, readonly) NSArray RLM_GENERIC(NSIndexPath *) *deletions;
+@property (nonatomic, readonly) NSArray RLM_GENERIC(NSIndexPath *) *insertions;
+@property (nonatomic, readonly) NSArray RLM_GENERIC(NSIndexPath *) *modifications;
 @end
 
 RLM_ASSUME_NONNULL_END

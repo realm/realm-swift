@@ -386,7 +386,7 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, NSError *))block {
     @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
 }
-- (RLMNotificationToken *)addNotificationBlockWithChanges:(void (^)(RLMArray *, NSArray<RLMObjectChange *> *, NSError *))block {
+- (RLMNotificationToken *)addNotificationBlockWithChanges:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
     @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
 }
 #pragma clang diagnostic pop

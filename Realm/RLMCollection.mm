@@ -232,12 +232,37 @@ NSString *RLMDescriptionWithMaxDepth(NSString *name,
 
 @end
 
-@implementation RLMObjectChange
-- (instancetype)initWithOld:(NSUInteger)oldIndex new:(NSUInteger)newIndex {
-    if ((self = [super init])) {
-        _oldIndex = oldIndex;
-        _newIndex = newIndex;
+@implementation RLMCollectionChange {
+    realm::CollectionChangeIndices _indices;
+}
+
+- (instancetype)initWithChanges:(realm::CollectionChangeIndices)indices {
+    self = [super init];
+    if (self) {
+        _indices = std::move(indices);
     }
     return self;
+}
+
+static NSArray *toArray(realm::IndexSet const& set) {
+    NSMutableArray *ret = [NSMutableArray new];
+    NSUInteger path[2] = {0, 0};
+    for (auto index : set.as_indexes()) {
+        path[1] = index;
+        [ret addObject:[NSIndexPath indexPathWithIndexes:path length:2]];
+    }
+    return ret;
+}
+
+- (NSArray *)insertions {
+    return toArray(_indices.insertions);
+}
+
+- (NSArray *)deletions {
+    return toArray(_indices.deletions);
+}
+
+- (NSArray *)modifications {
+    return toArray(_indices.modifications);
 }
 @end

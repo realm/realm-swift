@@ -361,6 +361,17 @@ public final class Results<T: Object>: ResultsBase {
             }
         }
     }
+
+    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
+    public func addNotificationBlock(block: (Results<T>?, RealmCollectionChange?, NSError?) -> ()) -> NotificationToken {
+        return rlmResults.addNotificationBlockWithChanges { results, change, error in
+            if results != nil {
+                block(self, change, nil)
+            } else {
+                block(nil, nil, error)
+            }
+        }
+    }
 }
 
 extension Results: RealmCollectionType {

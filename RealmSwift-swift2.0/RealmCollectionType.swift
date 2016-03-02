@@ -41,6 +41,11 @@ public final class RLMGenerator<T: Object>: GeneratorType {
 }
 
 /**
+ Changes made to a collection
+ */
+public typealias RealmCollectionChange = RLMCollectionChange
+
+/**
 A homogenous collection of `Object`s which can be retrieved, filtered, sorted,
 and operated upon.
 */
