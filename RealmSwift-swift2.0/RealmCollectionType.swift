@@ -234,11 +234,7 @@ A type-erased `RealmCollectionType`.
 Forwards operations to an arbitrary underlying collection having the same
 Element type, hiding the specifics of the underlying `RealmCollectionType`.
 */
-public final class AnyRealmCollection<T: Object>: RealmCollectionType {
-
-    /// Element type contained in this collection.
-    public typealias Element = T
-
+public final class AnyRealmCollection<Element: Object>: RealmCollectionType {
     // getters
     private let getRealm: (Void -> Realm?)
     private let getCount: (Void -> Int)
@@ -273,7 +269,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     private var averageFunctions = [ObjectIdentifier: AverageFunc]()
 
     /// Creates an AnyRealmCollection wrapping `base`.
-    public init<C: RealmCollectionType where C.Element == T, C.Index == Int>(_ base: C) {
+    public init<C: RealmCollectionType where C.Element == Element, C.Index == Int>(_ base: C) {
         // getters
         getRealm = { base.realm }
         getCount = { base.count }
@@ -498,10 +494,10 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
 
     - returns: The object at the given `index`.
     */
-    public subscript(index: Int) -> T { return getSubscript(index) as! T }
+    public subscript(index: Int) -> Element { return getSubscript(index) as! Element }
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the collection.
-    public func generate() -> RLMGenerator<T> { return getGenerator() }
+    public func generate() -> RLMGenerator<Element> { return getGenerator() }
 
 
     // MARK: Collection Support
