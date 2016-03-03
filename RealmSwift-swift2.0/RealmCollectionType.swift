@@ -224,8 +224,19 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
 
     // MARK: Notifications
 
-    /// :nodoc:
-    func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken
+    /**
+    Register a block to be called each time the collection changes.
+
+    The block will be asynchronously called with the initial collection, and
+    then called again after each write transaction which changes the collection
+    or any of the items in the collection. You must retain the returned token for
+    as long as you want updates to continue to be sent to the block. To stop
+    receiving updates, call stop() on the token.
+
+    - parameter block: The block to be called each time the collection changes.
+    - returns: A token which must be held for as long as you want notifications to be delivered.
+    */
+    func addNotificationBlock(block: (Self?, NSError?) -> ()) -> NotificationToken
 }
 
 /**
@@ -288,7 +299,9 @@ public final class AnyRealmCollection<Element: Object>: RealmCollectionType {
         valueForKey = base.valueForKey
         valueForKeyPath = base.valueForKeyPath
         setValue = base.setValue
-        addNotificationBlock = base._addNotificationBlock
+        addNotificationBlock = { block in
+            return base.addNotificationBlock({ block($0.flatMap(AnyRealmCollection.init), $1) })
+        }
 
         // min
         minFunctions[ObjectIdentifier(Double.self)] = { base.min($0) as Double? }
@@ -560,11 +573,6 @@ public final class AnyRealmCollection<Element: Object>: RealmCollectionType {
     */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken {
-        return addNotificationBlock(block)
-    }
-
-    /// :nodoc:
-    public func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken {
         return addNotificationBlock(block)
     }
 }

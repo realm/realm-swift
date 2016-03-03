@@ -381,16 +381,4 @@ extension Results: RealmCollectionType {
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
     /// zero or more applications of successor().
     public var endIndex: Int { return count }
-
-    /// :nodoc:
-    public func _addNotificationBlock(block: (AnyRealmCollection<T>?, NSError?) -> ()) -> NotificationToken {
-        let anyCollection = AnyRealmCollection(self)
-        return rlmResults.addNotificationBlock { results, error in
-            if results != nil {
-                block(anyCollection, nil)
-            } else {
-                block(nil, error)
-            }
-        }
-    }
 }
