@@ -415,8 +415,8 @@ public final class List<T: Object>: ListBase {
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (List<T>) -> ()) -> NotificationToken {
-        return _rlmArray.addNotificationBlock { _, _ in block(self) }
+    public func addNotificationBlock(block: (List<T>?, NSError?) -> ()) -> NotificationToken {
+        return _rlmArray.addNotificationBlock { _, _ in block(self, nil) }
     }
 }
 
@@ -454,10 +454,4 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
     /// zero or more applications of successor().
     public var endIndex: Int { return count }
-
-    /// :nodoc:
-    public func _addNotificationBlock(block: (AnyRealmCollection<T>?, NSError?) -> ()) -> NotificationToken {
-        let anyCollection = AnyRealmCollection(self)
-        return _rlmArray.addNotificationBlock { _, _ in block(anyCollection, nil) }
-    }
 }
