@@ -112,13 +112,13 @@ For now it will be assumed that the directory names of your three local reposito
     realm-sync/     git@github.com:realm/realm-sync.git
     realm-cocoa/    git@github.com:realm/realm-cocoa-private.git (make sure to adjust the cloned folder to just realm-cocoa)
 
-For now it is a manual process to ensure that the branches checked out in each of these repositories are intercompatible. At the present time, there is a branch called `sync-demo-5` in each of them, and they are currently intercompatible, and represent the latest state of development.
+For now it is a manual process to ensure that the branches checked out in each of these repositories are intercompatible. Both `realm-core` and `realm-cocoa-private` have `sync` branches that represent master for the sync enabled versions, whereas `realm-sync` simply tracks `master`:
 
-    Repository       Recommended branch
+    Repository       Required branch
     -----------------------------------
-    realm-core/      sync-demo-5
-    realm-sync/      sync-demo-5
-    realm-cocoa/     sync-demo-5
+    realm-core/      sync
+    realm-sync/      master
+    realm-cocoa/     sync
 
 
 Your own server
