@@ -478,7 +478,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         try! realm.commitWrite()
 
         let expectation = expectationWithDescription("")
-        let token = collection.addNotificationBlock { list, _error in
+        let token = collection.addNotificationBlock { list, _ in
             XCTAssertEqual(list!.count, 2)
             expectation.fulfill()
         }
