@@ -7,6 +7,17 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
+* None.
+
+### Bugfixes
+
+* None.
+
+0.98.3 Release notes (2016-02-26)
+=============================================================
+
+### Enhancements
+
 * Initializing the shared schema is 3x faster.
 
 ### Bugfixes
@@ -19,6 +30,8 @@ x.x.x Release notes (yyyy-MM-dd)
   multiple `RLMArray`/`List` properties.
 * Report the correct value for inWriteTransaction after attempting to commit a
   write transaction fails.
+* Support CocoaPods 1.0 beginning from prerelease 1.0.0.beta.4 while retaining
+  backwards compatibility with 0.39.
 
 0.98.2 Release notes (2016-02-18)
 =============================================================
