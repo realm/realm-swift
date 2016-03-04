@@ -45,15 +45,15 @@
 }
 
 - (void)setUnderlyingValue:(id)underlyingValue {
-    NSString *propertyName = _property.name;
-    [_object willChangeValueForKey:propertyName];
     if ((_object && _object->_realm) || _object.isInvalidated) {
         RLMDynamicSet(_object, _property, underlyingValue, RLMCreationOptionsNone);
     }
     else {
+        NSString *propertyName = _property.name;
+        [_object willChangeValueForKey:propertyName];
         _standaloneValue = underlyingValue;
+        [_object didChangeValueForKey:propertyName];
     }
-    [_object didChangeValueForKey:propertyName];
 }
 
 - (BOOL)isKindOfClass:(Class)aClass {
