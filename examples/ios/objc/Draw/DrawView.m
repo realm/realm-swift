@@ -108,6 +108,12 @@
 - (void)addPoint:(CGPoint)point
 {
     [[RLMRealm defaultRealm] transactionWithBlock:^{
+        if (self.drawPath.isInvalidated) {
+            self.drawPath = [[DrawPath alloc] init];
+            self.drawPath.color = self.currentColor ? self.currentColor.name : @"Black";
+            [[RLMRealm defaultRealm] addObject:self.drawPath];
+        }
+
         DrawPoint *newPoint = [DrawPoint createInDefaultRealmWithValue:@[@(point.x), @(point.y)]];
         [self.drawPath.points addObject:newPoint];
     }];
