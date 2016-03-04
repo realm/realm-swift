@@ -37,7 +37,8 @@ class TestCase: XCTestCase {
     var exceptionThrown = false
     var testDir: String! = nil
 
-    func realmWithTestPath(var configuration: Realm.Configuration = Realm.Configuration()) -> Realm {
+    func realmWithTestPath(configuration: Realm.Configuration = Realm.Configuration()) -> Realm {
+        var configuration = configuration
         configuration.path = testRealmPath()
         return try! Realm(configuration: configuration)
     }
@@ -152,7 +153,11 @@ class TestCase: XCTestCase {
 
     private func realmFilePrefix() -> String {
         let remove = NSCharacterSet(charactersInString: "-[]")
+#if REALM_XCODE_VERSION_0730
+        return self.name!.stringByTrimmingCharactersInSet(remove)
+#else
         return self.name.stringByTrimmingCharactersInSet(remove)
+#endif
     }
 
     internal func testRealmPath() -> String {
