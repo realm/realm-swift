@@ -26,10 +26,11 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <mutex>
 
 namespace realm {
     class BindingContext;
-    class ClientHistory;
+    class Replication;
     class Group;
     class Realm;
     class RealmDelegate;
@@ -127,7 +128,6 @@ namespace realm {
             // AsyncQuery needs access to the SharedGroup to be able to call the
             // handover functions, which are not very wrappable
             static SharedGroup& get_shared_group(Realm& realm) { return *realm.m_shared_group; }
-            static ClientHistory& get_history(Realm& realm) { return *realm.m_history; }
 
             // AsyncQuery needs to be able to access the owning coordinator to
             // wake up the worker thread when a callback is added, and
@@ -136,7 +136,7 @@ namespace realm {
         };
 
         static void open_with_config(const Config& config,
-                                     std::unique_ptr<ClientHistory>& history,
+                                     std::unique_ptr<Replication>& history,
                                      std::unique_ptr<SharedGroup>& shared_group,
                                      std::unique_ptr<Group>& read_only_group);
 
@@ -145,7 +145,7 @@ namespace realm {
         std::thread::id m_thread_id = std::this_thread::get_id();
         bool m_auto_refresh = true;
 
-        std::unique_ptr<ClientHistory> m_history;
+        std::unique_ptr<Replication> m_history;
         std::unique_ptr<SharedGroup> m_shared_group;
         std::unique_ptr<Group> m_read_only_group;
 

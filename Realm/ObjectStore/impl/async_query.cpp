@@ -159,7 +159,7 @@ void AsyncQuery::run()
     if (m_initial_run_complete) {
         // Make an empty tableview from the query to get the table version, since
         // Query doesn't expose it
-        if (m_query->find_all(0, 0, 0).outside_version() == m_handed_over_table_version) {
+        if (m_query->find_all(0, 0, 0).sync_if_needed() == m_handed_over_table_version) {
             return;
         }
     }
@@ -181,7 +181,7 @@ void AsyncQuery::prepare_handover()
     REALM_ASSERT(m_tv.is_in_sync());
 
     m_initial_run_complete = true;
-    m_handed_over_table_version = m_tv.outside_version();
+    m_handed_over_table_version = m_tv.sync_if_needed();
     m_tv_handover = m_sg->export_for_handover(m_tv, MutableSourcePayload::Move);
 
     // detach the TableView as we won't need it again and keeping it around
@@ -231,7 +231,7 @@ bool AsyncQuery::deliver(SharedGroup& sg, std::exception_ptr err)
         m_tv_handover->version = m_sg_version;
         Results::Internal::set_table_view(*m_target_results,
                                           std::move(*sg.import_from_handover(std::move(m_tv_handover))));
-        m_delievered_table_version = m_handed_over_table_version;
+        m_delivered_table_version = m_handed_over_table_version;
 
     }
     REALM_ASSERT(!m_tv_handover);
@@ -259,8 +259,8 @@ std::function<void (std::exception_ptr)> AsyncQuery::next_callback()
     std::lock_guard<std::mutex> callback_lock(m_callback_mutex);
     for (++m_callback_index; m_callback_index < m_callbacks.size(); ++m_callback_index) {
         auto& callback = m_callbacks[m_callback_index];
-        if (m_error || callback.delivered_version != m_delievered_table_version) {
-            callback.delivered_version = m_delievered_table_version;
+        if (m_error || callback.delivered_version != m_delivered_table_version) {
+            callback.delivered_version = m_delivered_table_version;
             return callback.fn;
         }
     }

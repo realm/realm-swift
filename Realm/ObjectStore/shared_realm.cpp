@@ -71,7 +71,7 @@ Realm::Realm(Config config)
 }
 
 void Realm::open_with_config(const Config& config,
-                             std::unique_ptr<ClientHistory>& history,
+                             std::unique_ptr<Replication>& history,
                              std::unique_ptr<SharedGroup>& shared_group,
                              std::unique_ptr<Group>& read_only_group)
 {
@@ -206,7 +206,7 @@ void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
     }
 
     read_group();
-    transaction::begin(*m_shared_group, *m_history, m_binding_context.get(),
+    transaction::begin(*m_shared_group, m_binding_context.get(),
                        /* error on schema changes */ false);
 
     struct WriteTransactionGuard {
@@ -239,7 +239,9 @@ void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
         // users shouldn't actually be able to write via the old realm
         old_realm->m_config.read_only = true;
 
-        m_config.migration_function(old_realm, shared_from_this());
+        if (m_config.migration_function) {
+            m_config.migration_function(old_realm, shared_from_this());
+        }
     };
 
     try {
@@ -301,7 +303,7 @@ void Realm::begin_transaction()
     // make sure we have a read transaction
     read_group();
 
-    transaction::begin(*m_shared_group, *m_history, m_binding_context.get());
+    transaction::begin(*m_shared_group, m_binding_context.get());
 }
 
 void Realm::commit_transaction()
@@ -313,7 +315,7 @@ void Realm::commit_transaction()
         throw InvalidTransactionException("Can't commit a non-existing write transaction");
     }
 
-    transaction::commit(*m_shared_group, *m_history, m_binding_context.get());
+    transaction::commit(*m_shared_group, m_binding_context.get());
     m_coordinator->send_commit_notifications();
 }
 
@@ -326,7 +328,7 @@ void Realm::cancel_transaction()
         throw InvalidTransactionException("Can't cancel a non-existing write transaction");
     }
 
-    transaction::cancel(*m_shared_group, *m_history, m_binding_context.get());
+    transaction::cancel(*m_shared_group, m_binding_context.get());
 }
 
 void Realm::invalidate()
@@ -404,7 +406,7 @@ bool Realm::refresh()
     }
 
     if (m_group) {
-        transaction::advance(*m_shared_group, *m_history, m_binding_context.get());
+        transaction::advance(*m_shared_group, m_binding_context.get());
         m_coordinator->process_available_async(*this);
     }
     else {
