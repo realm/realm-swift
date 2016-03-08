@@ -43,7 +43,7 @@ private:
     // Run/rerun the query if needed
     void run() override;
     // Prepare the handover object if run() did update the TableView
-    bool do_prepare_handover(SharedGroup&) override;
+    void do_prepare_handover(SharedGroup&) override;
     // Update the target results from the handover
     // Returns if any callbacks need to be invoked
     bool do_deliver(SharedGroup& sg) override;
@@ -53,6 +53,8 @@ private:
     void release_data() noexcept override;
     void do_attach_to(SharedGroup& sg) override;
     void do_detach_from(SharedGroup& sg) override;
+
+    bool should_deliver_initial() const noexcept override { return true; }
 
     // Target Results to update and a mutex which guards it
     mutable std::mutex m_target_mutex;
@@ -73,7 +75,6 @@ private:
     TransactionChangeInfo* m_info = nullptr;
 
     uint_fast64_t m_handed_over_table_version = -1;
-    bool m_did_change = false;
 
     std::vector<size_t> m_previous_rows;
 

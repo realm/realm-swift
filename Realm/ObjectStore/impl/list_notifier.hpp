@@ -40,8 +40,7 @@ private:
 
     void run() override;
 
-    bool do_deliver(SharedGroup& sg) override;
-    bool do_prepare_handover(SharedGroup&) override;
+    void do_prepare_handover(SharedGroup&) override;
 
     void do_attach_to(SharedGroup& sg) override;
     void do_detach_from(SharedGroup& sg) override;

@@ -55,7 +55,7 @@ size_t BackgroundCollection::add_callback(CollectionChangeCallback callback)
 
     std::lock_guard<std::mutex> lock(m_callback_mutex);
     auto token = next_token();
-    m_callbacks.push_back({std::move(callback), token, -1ULL});
+    m_callbacks.push_back({std::move(callback), token, false});
     if (m_callback_index == npos) { // Don't need to wake up if we're already sending notifications
         Realm::Internal::get_coordinator(*m_realm).send_commit_notifications();
         m_have_callbacks = true;
@@ -138,8 +138,7 @@ void BackgroundCollection::prepare_handover()
 {
     REALM_ASSERT(m_sg);
     m_sg_version = m_sg->get_version_of_current_transaction();
-    if (do_prepare_handover(*m_sg))
-        ++m_results_version;
+    do_prepare_handover(*m_sg);
 }
 
 bool BackgroundCollection::deliver(SharedGroup& sg, std::exception_ptr err)
@@ -162,9 +161,9 @@ bool BackgroundCollection::deliver(SharedGroup& sg, std::exception_ptr err)
         return false;
     }
 
-    bool ret = do_deliver(sg);
+    bool should_call_callbacks = do_deliver(sg);
     m_changes_to_deliver = std::move(m_accumulated_changes);
-    return ret;
+    return should_call_callbacks && have_callbacks();
 }
 
 void BackgroundCollection::call_callbacks()
@@ -184,12 +183,16 @@ void BackgroundCollection::call_callbacks()
 CollectionChangeCallback BackgroundCollection::next_callback()
 {
     std::lock_guard<std::mutex> callback_lock(m_callback_mutex);
+
     for (++m_callback_index; m_callback_index < m_callbacks.size(); ++m_callback_index) {
         auto& callback = m_callbacks[m_callback_index];
-        if (m_error || callback.delivered_version != m_results_version) {
-            callback.delivered_version = m_results_version;
-            return callback.fn;
+        bool deliver_initial = !callback.initial_delivered && should_deliver_initial();
+        if (!m_error && !deliver_initial && m_changes_to_deliver.empty()) {
+            continue;
         }
+
+        callback.initial_delivered = true;
+        return callback.fn;
     }
 
     m_callback_index = npos;

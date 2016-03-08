@@ -112,13 +112,7 @@ void ListNotifier::run()
     m_prev_size = m_lv->size();
 }
 
-bool ListNotifier::do_prepare_handover(SharedGroup&)
+void ListNotifier::do_prepare_handover(SharedGroup&)
 {
     add_changes(std::move(m_change));
-    return true;
-}
-
-bool ListNotifier::do_deliver(SharedGroup&)
-{
-    return have_callbacks() && have_changes();
 }

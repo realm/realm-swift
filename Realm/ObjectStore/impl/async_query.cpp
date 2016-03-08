@@ -83,7 +83,6 @@ void AsyncQuery::do_add_required_change_info(TransactionChangeInfo& info)
 void AsyncQuery::run()
 {
     REALM_ASSERT(m_info);
-    m_did_change = false;
 
     {
         std::lock_guard<std::mutex> target_lock(m_target_mutex);
@@ -145,14 +144,12 @@ void AsyncQuery::run()
         for (size_t i = 0; i < m_tv.size(); ++i)
             m_previous_rows[i] = m_tv[i].get_index();
     }
-
-    m_did_change = true;
 }
 
-bool AsyncQuery::do_prepare_handover(SharedGroup& sg)
+void AsyncQuery::do_prepare_handover(SharedGroup& sg)
 {
     if (!m_tv.is_attached()) {
-        return false;
+        return;
     }
 
     REALM_ASSERT(m_tv.is_in_sync());
@@ -167,8 +164,6 @@ bool AsyncQuery::do_prepare_handover(SharedGroup& sg)
     // detach the TableView as we won't need it again and keeping it around
     // makes advance_read() much more expensive
     m_tv = {};
-
-    return m_did_change;
 }
 
 bool AsyncQuery::do_deliver(SharedGroup& sg)
@@ -197,7 +192,7 @@ bool AsyncQuery::do_deliver(SharedGroup& sg)
                                           std::move(*sg.import_from_handover(std::move(m_tv_handover))));
     }
     REALM_ASSERT(!m_tv_handover);
-    return have_callbacks();
+    return true;
 }
 
 void AsyncQuery::do_attach_to(SharedGroup& sg)
