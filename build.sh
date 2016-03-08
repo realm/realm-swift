@@ -19,6 +19,9 @@ set -e
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
 
+# Provide a fallback value for TMPDIR, relevant for Xcode Bots
+: ${TMPDIR:=getconf DARWIN_USER_TEMP_DIR}
+
 PATH=/usr/libexec:$PATH
 
 if ! [ -z "${JENKINS_HOME}" ]; then
@@ -281,7 +284,7 @@ fi
 
 download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
-    TMP_DIR="$(getconf DARWIN_USER_TEMP_DIR)/core_bin"
+    TMP_DIR="$TMPDIR/core_bin"
     mkdir -p "${TMP_DIR}"
     CORE_TMP_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2.tmp"
     CORE_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2"
@@ -858,7 +861,7 @@ case "$COMMAND" in
             exit 1 # Early exit if not a fat binary
         fi
 
-        TEMPDIR=$(mktemp -d $(getconf DARWIN_USER_TEMP_DIR)/realm-bitcode-check.XXXX)
+        TEMPDIR=$(mktemp -d $TMPDIR/realm-bitcode-check.XXXX)
 
         for arch in $archs; do
             lipo -thin "$arch" "$BINARY" -output "$TEMPDIR/$arch"
@@ -1084,7 +1087,7 @@ case "$COMMAND" in
 
     "package-release")
         LANG="$2"
-        TEMPDIR=$(mktemp -d $(getconf DARWIN_USER_TEMP_DIR)/realm-release-package-${LANG}.XXXX)
+        TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
 
         cd tightdb_objc
         VERSION=$(sh build.sh get-version)
