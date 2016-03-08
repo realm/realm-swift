@@ -42,6 +42,7 @@ Realm::Config::Config(const Config& c)
 , encryption_key(c.encryption_key)
 , sync_server_url(c.sync_server_url)
 , sync_identity(c.sync_identity)
+, sync_signature(c.sync_signature)
 , schema_version(c.schema_version)
 , migration_function(c.migration_function)
 {

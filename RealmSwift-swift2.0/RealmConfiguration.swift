@@ -61,6 +61,7 @@ extension Realm {
         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
         - parameter syncServerURL:      The synchronization server URL.
         - parameter syncIdentity:       The user identity token used for synchronization.
+        - parameter syncSignature:      The signature matching the identity token.
         */
         public init(path: String? = RLMRealmPathForFile("default.realm"),
             inMemoryIdentifier: String? = nil,
@@ -70,7 +71,8 @@ extension Realm {
             migrationBlock: MigrationBlock? = nil,
             objectTypes: [Object.Type]? = nil,
             syncServerURL: NSURL? = nil,
-            syncIdentity: String? = nil) {
+            syncIdentity: String? = nil,
+            syncSignature: String? = nil) {
                 self.path = path
                 if inMemoryIdentifier != nil {
                     self.inMemoryIdentifier = inMemoryIdentifier
@@ -82,6 +84,7 @@ extension Realm {
                 self.objectTypes = objectTypes
                 self.syncServerURL = syncServerURL
                 self.syncIdentity = syncIdentity
+                self.syncSignature = syncSignature
         }
 
         // MARK: Configuration Properties
@@ -150,9 +153,18 @@ extension Realm {
 
         /**
         The user identity token used for synchronization.
-        Must be a 40-byte alphanumeric string (such as a hex SHA1 hash).
+        Must be a base64-encoded JSON document.
         */
-        public var syncIdentity: String? = nil
+        public var syncIdentity: String? = nil;
+
+        /**
+        A base64-encoded cryptographic signature.
+        Must match the value of syncIdentity.
+        */
+        public var syncSignature: String? = nil;
+
+        /**
+
 
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema? = nil
@@ -198,6 +210,7 @@ extension Realm {
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
             configuration.syncServerURL = rlmConfiguration.syncServerURL
             configuration.syncIdentity = rlmConfiguration.syncIdentity
+            configuration.syncSignature = rlmConfiguration.syncSignature
             return configuration
         }
     }
