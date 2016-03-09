@@ -313,6 +313,12 @@ RLM_ARRAY_TYPE(CircleObject);
 @interface NumberDefaultsObject : NumberObject
 @end
 
+#pragma mark CustomInitializerObject
+
+@interface CustomInitializerObject : RLMObject
+@property NSString *stringCol;
+@end
+
 #pragma mark FakeObject
 
 @interface FakeObject : NSObject

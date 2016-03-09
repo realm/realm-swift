@@ -286,4 +286,14 @@ class SwiftCustomInitializerObject: Object {
         stringCol = ""
         super.init()
     }
+
+    required init(realm: RLMRealm, schema: RLMObjectSchema) {
+        stringCol = ""
+        super.init(realm: realm, schema: schema)
+    }
+
+    required init(value: AnyObject, schema: RLMSchema) {
+        stringCol = ""
+        super.init(value: value, schema: schema)
+    }
 }

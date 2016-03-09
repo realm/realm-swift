@@ -41,6 +41,14 @@
     return [super init];
 }
 
+- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
+    return [super initWithValue:value schema:schema];
+}
+
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
+                       schema:(__unsafe_unretained RLMObjectSchema *const)schema {
+    return [super initWithRealm:realm schema:schema];
+}
 
 #pragma mark - Convenience Initializers
 
