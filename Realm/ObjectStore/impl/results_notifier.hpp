@@ -24,12 +24,8 @@
 
 #include <realm/group_shared.hpp>
 
-#include <exception>
 #include <mutex>
 #include <functional>
-#include <set>
-#include <thread>
-#include <vector>
 
 namespace realm {
 namespace _impl {
@@ -40,24 +36,8 @@ public:
     ResultsNotifier(Results& target);
 
 private:
-    // Run/rerun the query if needed
-    void run() override;
-    // Prepare the handover object if run() did update the TableView
-    void do_prepare_handover(SharedGroup&) override;
-    // Update the target results from the handover
-    // Returns if any callbacks need to be invoked
-    bool do_deliver(SharedGroup& sg) override;
-
-    void do_add_required_change_info(TransactionChangeInfo& info) override;
-
-    void release_data() noexcept override;
-    void do_attach_to(SharedGroup& sg) override;
-    void do_detach_from(SharedGroup& sg) override;
-
-    bool should_deliver_initial() const noexcept override { return true; }
-
-    // Target Results to update and a mutex which guards it
-    mutable std::mutex m_target_mutex;
+    // Target Results to update
+    // Can only be used with lock_target() held
     Results* m_target_results;
 
     const SortOrder m_sort;
@@ -71,14 +51,31 @@ private:
     TableView m_tv;
     std::unique_ptr<SharedGroup::Handover<TableView>> m_tv_handover;
 
+    // The table version from the last time the query was run. Used to avoid
+    // rerunning the query when there's no chance of it changing.
+    uint_fast64_t m_last_seen_version = -1;
+
+    // The rows from the previous run of the query, for calculating diffs
+    std::vector<size_t> m_previous_rows;
+
+    // The changeset calculated during run() and delivered in do_prepare_handover()
     CollectionChangeIndices m_changes;
     TransactionChangeInfo* m_info = nullptr;
 
-    uint_fast64_t m_handed_over_table_version = -1;
-
-    std::vector<size_t> m_previous_rows;
-
+    // Flag for whether or not the query has been run at all, as goofy timing
+    // can lead to deliver() being called before that
     bool m_initial_run_complete = false;
+
+    void run() override;
+    void do_prepare_handover(SharedGroup&) override;
+    bool do_deliver(SharedGroup& sg) override;
+    void do_add_required_change_info(TransactionChangeInfo& info) override;
+
+    void release_data() noexcept override;
+    void do_attach_to(SharedGroup& sg) override;
+    void do_detach_from(SharedGroup& sg) override;
+
+    bool should_deliver_initial() const noexcept override { return true; }
 };
 
 } // namespace _impl

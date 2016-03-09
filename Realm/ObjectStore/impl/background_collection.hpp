@@ -25,7 +25,6 @@
 
 #include <mutex>
 #include <functional>
-#include <set>
 #include <thread>
 
 namespace realm {
@@ -34,42 +33,72 @@ class Realm;
 namespace _impl {
 struct TransactionChangeInfo;
 
+// A base class for a notifier that keeps a collection up to date and/or
+// generates detailed change notifications on a background thread. This manages
+// most of the lifetime-management issues related to sharing an object between
+// the worker thread and the collection on the target thread, along with the
+// thread-safe callback collection.
 class BackgroundCollection {
 public:
     BackgroundCollection(std::shared_ptr<Realm>);
     virtual ~BackgroundCollection();
+
+    // ------------------------------------------------------------------------
+    // Public API for the collections using this to get notifications:
+
+    // Stop receiving notifications from this background worker
+    // This must be called in the destructor of the collection
     void unregister() noexcept;
 
-    virtual void release_data() noexcept = 0;
-
+    // Add a callback to be called each time the collection changes
+    // This can only be called from the target collection's thread
+    // Returns a token which can be passed to remove_callback()
     size_t add_callback(CollectionChangeCallback callback);
+    // Remove a previously added token. The token is no longer valid after
+    // calling this function and must not be used again. This function can be
+    // called from any thread.
     void remove_callback(size_t token);
 
+    // ------------------------------------------------------------------------
+    // API for RealmCoordinator to manage running things and calling callbacks
+
+    Realm* get_realm() const noexcept { return m_realm.get(); }
+
+    // Get the SharedGroup version which this collection can attach to (if it's
+    // in handover mode), or can deliver to (if it's been handed over to the BG worker alredad)
+    SharedGroup::VersionID version() const noexcept { return m_sg_version; }
+
+    // Release references to all core types
+    // This is called on the worker thread to ensure that non-thread-safe things
+    // can be destroyed on the correct thread, even if the last reference to the
+    // BackgroundCollection is released on a different thread
+    virtual void release_data() noexcept = 0;
+
+    // Call each of the currently registered callbacks, if there have been any
+    // changes since the last time each of those callbacks was called
     void call_callbacks();
 
     bool is_alive() const noexcept;
 
-    Realm& get_realm() const noexcept { return *m_realm; }
-
-    // Attach the handed-over query to `sg`
+    // Attach the handed-over query to `sg`. Must not be already attaged to a SharedGroup.
     void attach_to(SharedGroup& sg);
     // Create a new query handover object and stop using the previously attached
     // SharedGroup
     void detach();
 
-    void add_required_change_info(TransactionChangeInfo&);
+    // Set `info` as the new ChangeInfo that will be populated by the next
+    // transaction advance, and register all required information in it
+    void add_required_change_info(TransactionChangeInfo& info);
 
     virtual void run() { }
     void prepare_handover();
     bool deliver(SharedGroup&, std::exception_ptr);
 
-    // Get the version of the current handover object
-    SharedGroup::VersionID version() const noexcept { return m_sg_version; }
-
 protected:
     bool have_callbacks() const noexcept { return m_have_callbacks; }
     void add_changes(CollectionChangeIndices change) { m_accumulated_changes.merge(std::move(change)); }
     void set_table(Table const& table);
+    std::unique_lock<std::mutex> lock_target();
 
 private:
     virtual void do_attach_to(SharedGroup&) = 0;

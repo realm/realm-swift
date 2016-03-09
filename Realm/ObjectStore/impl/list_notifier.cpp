@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2015 Realm Inc.
+// Copyright 2016 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 using namespace realm;
 using namespace realm::_impl;
 
-
 ListNotifier::ListNotifier(LinkViewRef lv, std::shared_ptr<Realm> realm)
 : BackgroundCollection(std::move(realm))
 , m_prev_size(lv->size())
@@ -45,13 +44,12 @@ ListNotifier::ListNotifier(LinkViewRef lv, std::shared_ptr<Realm> realm)
 
     set_table(lv->get_target_table());
 
-    auto& sg = Realm::Internal::get_shared_group(get_realm());
+    auto& sg = Realm::Internal::get_shared_group(*get_realm());
     m_lv_handover = sg.export_linkview_for_handover(lv);
 }
 
 void ListNotifier::release_data() noexcept
 {
-    // FIXME: does this need a lock?
     m_lv.reset();
 }
 

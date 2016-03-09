@@ -32,11 +32,9 @@ BackgroundCollection::BackgroundCollection(std::shared_ptr<Realm> realm)
 
 BackgroundCollection::~BackgroundCollection()
 {
-    // unregister() may have been called from a different thread than we're being
-    // destroyed on, so we need to synchronize access to the interesting fields
-    // modified there
-    std::lock_guard<std::mutex> lock(m_realm_mutex);
-    m_realm = nullptr;
+    // Need to do this explicitly to ensure m_realm is destroyed with the mutex
+    // held to avoid potential double-deletion
+    unregister();
 }
 
 size_t BackgroundCollection::add_callback(CollectionChangeCallback callback)
@@ -100,6 +98,11 @@ bool BackgroundCollection::is_alive() const noexcept
 {
     std::lock_guard<std::mutex> lock(m_realm_mutex);
     return m_realm != nullptr;
+}
+
+std::unique_lock<std::mutex> BackgroundCollection::lock_target()
+{
+    return std::unique_lock<std::mutex>{m_realm_mutex};
 }
 
 // Recursively add `table` and all tables it links to to `out`

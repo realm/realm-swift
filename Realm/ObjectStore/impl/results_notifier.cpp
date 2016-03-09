@@ -31,37 +31,13 @@ ResultsNotifier::ResultsNotifier(Results& target)
 {
     Query q = target.get_query();
     set_table(*q.get_table());
-    m_query_handover = Realm::Internal::get_shared_group(get_realm()).export_for_handover(q, MutableSourcePayload::Move);
+    m_query_handover = Realm::Internal::get_shared_group(*get_realm()).export_for_handover(q, MutableSourcePayload::Move);
 }
 
 void ResultsNotifier::release_data() noexcept
 {
     m_query = nullptr;
 }
-
-// Most of the inter-thread synchronization for run(), prepare_handover(),
-// attach_to(), detach(), release_query() and deliver() is done by
-// RealmCoordinator external to this code, which has some potentially
-// non-obvious results on which members are and are not safe to use without
-// holding a lock.
-//
-// attach_to(), detach(), run(), prepare_handover(), and release_query() are
-// all only ever called on a single thread. call_callbacks() and deliver() are
-// called on the same thread. Calls to prepare_handover() and deliver() are
-// guarded by a lock.
-//
-// In total, this means that the safe data flow is as follows:
-//  - prepare_handover(), attach_to(), detach() and release_query() can read
-//    members written by each other
-//  - deliver() can read members written to in prepare_handover(), deliver(),
-//    and call_callbacks()
-//  - call_callbacks() and read members written to in deliver()
-//
-// Separately from this data flow for the query results, all uses of
-// m_target_results, m_callbacks, and m_callback_index must be done with the
-// appropriate mutex held to avoid race conditions when the Results object is
-// destroyed while the background work is running, and to allow removing
-// callbacks from any thread.
 
 static bool map_moves(size_t& idx, CollectionChangeIndices const& changes)
 {
@@ -74,6 +50,27 @@ static bool map_moves(size_t& idx, CollectionChangeIndices const& changes)
     return false;
 }
 
+// Most of the inter-thread synchronization for run(), prepare_handover(),
+// attach_to(), detach(), release_data() and deliver() is done by
+// RealmCoordinator external to this code, which has some potentially
+// non-obvious results on which members are and are not safe to use without
+// holding a lock.
+//
+// add_required_change_info(), attach_to(), detach(), run(),
+// prepare_handover(), and release_data() are all only ever called on a single
+// background worker thread. call_callbacks() and deliver() are called on the
+// target thread. Calls to prepare_handover() and deliver() are guarded by a
+// lock.
+//
+// In total, this means that the safe data flow is as follows:
+//  - add_Required_change_info(), prepare_handover(), attach_to(), detach() and
+//    release_data() can read members written by each other
+//  - deliver() can read members written to in prepare_handover(), deliver(),
+//    and call_callbacks()
+//  - call_callbacks() and read members written to in deliver()
+//
+// Separately from the handover data flow, m_target_results is guarded by the target lock
+
 void ResultsNotifier::do_add_required_change_info(TransactionChangeInfo& info)
 {
     REALM_ASSERT(m_query);
@@ -83,24 +80,21 @@ void ResultsNotifier::do_add_required_change_info(TransactionChangeInfo& info)
 void ResultsNotifier::run()
 {
     REALM_ASSERT(m_info);
+    REALM_ASSERT(!m_tv.is_attached());
 
     {
-        std::lock_guard<std::mutex> target_lock(m_target_mutex);
+        auto lock = lock_target();
         // Don't run the query if the results aren't actually going to be used
-        if (!m_target_results || (!have_callbacks() && !m_target_results->wants_background_updates())) {
+        if (!get_realm() || (!have_callbacks() && !m_target_results->wants_background_updates())) {
             return;
         }
     }
-
-    REALM_ASSERT(!m_tv.is_attached());
-
-    size_t table_ndx = m_query->get_table()->get_index_in_group();
 
     // If we've run previously, check if we need to rerun
     if (m_initial_run_complete) {
         // Make an empty tableview from the query to get the table version, since
         // Query doesn't expose it
-        if (m_query->find_all(0, 0, 0).sync_if_needed() == m_handed_over_table_version) {
+        if (m_query->find_all(0, 0, 0).sync_if_needed() == m_last_seen_version) {
             return;
         }
     }
@@ -109,7 +103,9 @@ void ResultsNotifier::run()
     if (m_sort) {
         m_tv.sort(m_sort.column_indices, m_sort.ascending);
     }
+    m_last_seen_version = m_tv.sync_if_needed();
 
+    size_t table_ndx = m_query->get_table()->get_index_in_group();
     if (m_initial_run_complete) {
         auto changes = table_ndx < m_info->tables.size() ? &m_info->tables[table_ndx] : nullptr;
 
@@ -156,7 +152,6 @@ void ResultsNotifier::do_prepare_handover(SharedGroup& sg)
     REALM_ASSERT(m_tv.is_in_sync());
 
     m_initial_run_complete = true;
-    m_handed_over_table_version = m_tv.sync_if_needed();
     m_tv_handover = sg.export_for_handover(m_tv, MutableSourcePayload::Move);
 
     add_changes(std::move(m_changes));
@@ -169,7 +164,7 @@ void ResultsNotifier::do_prepare_handover(SharedGroup& sg)
 
 bool ResultsNotifier::do_deliver(SharedGroup& sg)
 {
-    std::lock_guard<std::mutex> target_lock(m_target_mutex);
+    auto lock = lock_target();
 
     // Target results being null here indicates that it was destroyed while we
     // were in the process of advancing the Realm version and preparing for

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2015 Realm Inc.
+// Copyright 2016 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,12 +30,20 @@ public:
     ListNotifier(LinkViewRef lv, std::shared_ptr<Realm> realm);
 
 private:
+    // The linkview, in handover form if this has not been attached to the main
+    // SharedGroup yet
     LinkViewRef m_lv;
     std::unique_ptr<SharedGroup::Handover<LinkView>> m_lv_handover;
-    CollectionChangeIndices m_change;
+
+    // The last-seen size of the LinkView so that we can report row deletions
+    // when the LinkView itself is deleted
     size_t m_prev_size;
+
+    // The column index of the LinkView
     size_t m_col_ndx;
-    std::vector<size_t> m_relevant_tables;
+
+    // The actual change, calculated in run() and delivered in prepare_handover()
+    CollectionChangeIndices m_change;
     TransactionChangeInfo* m_info;
 
     void run() override;

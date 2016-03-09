@@ -277,8 +277,8 @@ void RealmCoordinator::pin_version(uint_fast64_t version, uint_fast32_t index)
             m_advancer_history = nullptr;
         }
     }
-    else if (m_new_queries.empty()) {
-        // If this is the first query then we don't already have a read transaction
+    else if (m_new_notifiers.empty()) {
+        // If this is the first notifier then we don't already have a read transaction
         m_advancer_sg->begin_read(versionid);
     }
     else if (versionid < m_advancer_sg->get_version_of_current_transaction()) {
@@ -289,18 +289,18 @@ void RealmCoordinator::pin_version(uint_fast64_t version, uint_fast32_t index)
     }
 }
 
-void RealmCoordinator::register_query(std::shared_ptr<BackgroundCollection> query)
+void RealmCoordinator::register_notifier(std::shared_ptr<BackgroundCollection> notifier)
 {
-    auto version = query->version();
-    auto& self = Realm::Internal::get_coordinator(query->get_realm());
+    auto version = notifier->version();
+    auto& self = Realm::Internal::get_coordinator(*notifier->get_realm());
     {
-        std::lock_guard<std::mutex> lock(self.m_query_mutex);
+        std::lock_guard<std::mutex> lock(self.m_notifier_mutex);
         self.pin_version(version.version, version.index);
-        self.m_new_queries.push_back(std::move(query));
+        self.m_new_notifiers.push_back(std::move(notifier));
     }
 }
 
-void RealmCoordinator::clean_up_dead_queries()
+void RealmCoordinator::clean_up_dead_notifiers()
 {
     auto swap_remove = [&](auto& container) {
         bool did_remove = false;
@@ -308,8 +308,8 @@ void RealmCoordinator::clean_up_dead_queries()
             if (container[i]->is_alive())
                 continue;
 
-            // Ensure the query is destroyed here even if there's lingering refs
-            // to the async query elsewhere
+            // Ensure the notifier is destroyed here even if there's lingering refs
+            // to the async notifier elsewhere
             container[i]->release_data();
 
             if (container.size() > i + 1)
@@ -321,16 +321,16 @@ void RealmCoordinator::clean_up_dead_queries()
         return did_remove;
     };
 
-    if (swap_remove(m_queries)) {
+    if (swap_remove(m_notifiers)) {
         // Make sure we aren't holding on to read versions needlessly if there
-        // are no queries left, but don't close them entirely as opening shared
+        // are no notifiers left, but don't close them entirely as opening shared
         // groups is expensive
-        if (m_queries.empty() && m_query_sg) {
-            m_query_sg->end_read();
+        if (m_notifiers.empty() && m_notifier_sg) {
+            m_notifier_sg->end_read();
         }
     }
-    if (swap_remove(m_new_queries)) {
-        if (m_new_queries.empty() && m_advancer_sg) {
+    if (swap_remove(m_new_notifiers)) {
+        if (m_new_notifiers.empty() && m_advancer_sg) {
             m_advancer_sg->end_read();
         }
     }
@@ -338,7 +338,7 @@ void RealmCoordinator::clean_up_dead_queries()
 
 void RealmCoordinator::on_change()
 {
-    run_async_queries();
+    run_async_notifiers();
 
     std::lock_guard<std::mutex> lock(m_realm_mutex);
     for (auto& realm : m_weak_realm_notifiers) {
@@ -346,13 +346,13 @@ void RealmCoordinator::on_change()
     }
 }
 
-void RealmCoordinator::run_async_queries()
+void RealmCoordinator::run_async_notifiers()
 {
-    std::unique_lock<std::mutex> lock(m_query_mutex);
+    std::unique_lock<std::mutex> lock(m_notifier_mutex);
 
-    clean_up_dead_queries();
+    clean_up_dead_notifiers();
 
-    if (m_queries.empty() && m_new_queries.empty()) {
+    if (m_notifiers.empty() && m_new_notifiers.empty()) {
         return;
     }
 
@@ -361,73 +361,73 @@ void RealmCoordinator::run_async_queries()
     }
 
     if (m_async_error) {
-        std::move(m_new_queries.begin(), m_new_queries.end(), std::back_inserter(m_queries));
-        m_new_queries.clear();
+        std::move(m_new_notifiers.begin(), m_new_notifiers.end(), std::back_inserter(m_notifiers));
+        m_new_notifiers.clear();
         return;
     }
 
     std::vector<TransactionChangeInfo> change_info;
     SharedGroup::VersionID version;
 
-    auto new_queries = std::move(m_new_queries);
-    if (new_queries.empty()) {
+    auto new_notifiers = std::move(m_new_notifiers);
+    if (new_notifiers.empty()) {
         change_info.resize(1);
     }
     else {
         change_info.resize(2);
 
-        // Sort newly added queries by their source version so that we can pull them
+        // Sort newly added notifiers by their source version so that we can pull them
         // all forward to the latest version in a single pass over the transaction log
-        std::sort(new_queries.begin(), new_queries.end(),
+        std::sort(new_notifiers.begin(), new_notifiers.end(),
                   [](auto&& lft, auto&& rgt) { return lft->version() < rgt->version(); });
         version = m_advancer_sg->get_version_of_current_transaction();
-        REALM_ASSERT(version == new_queries.front()->version());
+        REALM_ASSERT(version == new_notifiers.front()->version());
 
         TransactionChangeInfo* info = &change_info.back();
 
-        // Advance each of the new queries to the latest version, attaching them
+        // Advance each of the new notifiers to the latest version, attaching them
         // to the SG at their handover version. This requires a unique
         // TransactionChangeInfo for each source version, so that things don't
         // see changes from before the version they were handed over from.
         // Each Info has all of the changes between that source version and the
         // next source version, and they'll be merged together later after
         // releasing the lock
-        for (auto& query : new_queries) {
-            if (version != query->version()) {
-                transaction::advance_and_observe_linkviews(*m_advancer_sg, *info, query->version());
+        for (auto& notifier : new_notifiers) {
+            if (version != notifier->version()) {
+                transaction::advance_and_observe_linkviews(*m_advancer_sg, *info, notifier->version());
                 change_info.push_back({{}, std::move(info->lists)});
                 info = &change_info.back();
-                version = query->version();
+                version = notifier->version();
             }
-            query->attach_to(*m_advancer_sg);
-            query->add_required_change_info(*info);
+            notifier->attach_to(*m_advancer_sg);
+            notifier->add_required_change_info(*info);
         }
 
         transaction::advance_and_observe_linkviews(*m_advancer_sg, *info);
 
-        for (auto& query : new_queries) {
-            query->detach();
+        for (auto& notifier : new_notifiers) {
+            notifier->detach();
         }
         version = m_advancer_sg->get_version_of_current_transaction();
         m_advancer_sg->end_read();
     }
 
-    // Make a copy of the queries vector and then release the lock to avoid
-    // blocking other threads trying to register or unregister queries while we run them
-    auto queries = m_queries;
+    // Make a copy of the notifiers vector and then release the lock to avoid
+    // blocking other threads trying to register or unregister notifiers while we run them
+    auto notifiers = m_notifiers;
     lock.unlock();
 
-    for (auto& query : queries) {
-        query->add_required_change_info(change_info[0]);
+    for (auto& notifier : notifiers) {
+        notifier->add_required_change_info(change_info[0]);
     }
 
-    transaction::advance_and_observe_linkviews(*m_query_sg, change_info[0], version);
+    transaction::advance_and_observe_linkviews(*m_notifier_sg, change_info[0], version);
 
-    // Attach the new queries to the main SG and move them to the main list
-    for (auto& query : new_queries) {
-        query->attach_to(*m_query_sg);
+    // Attach the new notifiers to the main SG and move them to the main list
+    for (auto& notifier : new_notifiers) {
+        notifier->attach_to(*m_notifier_sg);
     }
-    std::move(new_queries.begin(), new_queries.end(), std::back_inserter(queries));
+    std::move(new_notifiers.begin(), new_notifiers.end(), std::back_inserter(notifiers));
 
     for (size_t i = change_info.size() - 1; i > 1; --i) {
         auto& cur = change_info[i];
@@ -460,57 +460,57 @@ void RealmCoordinator::run_async_queries()
         }
     }
 
-    for (auto& query : queries) {
-        query->run();
+    for (auto& notifier : notifiers) {
+        notifier->run();
     }
 
     // Reacquire the lock while updating the fields that are actually read on
     // other threads
     lock.lock();
-    for (auto& query : queries) {
-        query->prepare_handover();
+    for (auto& notifier : notifiers) {
+        notifier->prepare_handover();
     }
-    m_queries = std::move(queries);
-    clean_up_dead_queries();
+    m_notifiers = std::move(notifiers);
+    clean_up_dead_notifiers();
 }
 
 void RealmCoordinator::open_helper_shared_group()
 {
-    if (!m_query_sg) {
+    if (!m_notifier_sg) {
         try {
             std::unique_ptr<Group> read_only_group;
-            Realm::open_with_config(m_config, m_query_history, m_query_sg, read_only_group);
+            Realm::open_with_config(m_config, m_notifier_history, m_notifier_sg, read_only_group);
             REALM_ASSERT(!read_only_group);
-            m_query_sg->begin_read();
+            m_notifier_sg->begin_read();
         }
         catch (...) {
-            // Store the error to be passed to the async queries
+            // Store the error to be passed to the async notifiers
             m_async_error = std::current_exception();
-            m_query_sg = nullptr;
-            m_query_history = nullptr;
+            m_notifier_sg = nullptr;
+            m_notifier_history = nullptr;
         }
     }
-    else if (m_queries.empty()) {
-        m_query_sg->begin_read();
+    else if (m_notifiers.empty()) {
+        m_notifier_sg->begin_read();
     }
 }
 
-void RealmCoordinator::move_new_queries_to_main()
+void RealmCoordinator::move_new_notifiers_to_main()
 {
-    m_queries.reserve(m_queries.size() + m_new_queries.size());
-    std::move(m_new_queries.begin(), m_new_queries.end(), std::back_inserter(m_queries));
-    m_new_queries.clear();
+    m_notifiers.reserve(m_notifiers.size() + m_new_notifiers.size());
+    std::move(m_new_notifiers.begin(), m_new_notifiers.end(), std::back_inserter(m_notifiers));
+    m_new_notifiers.clear();
 }
 
 void RealmCoordinator::advance_to_ready(Realm& realm)
 {
-    decltype(m_queries) queries;
+    decltype(m_notifiers) notifiers;
 
     auto& sg = Realm::Internal::get_shared_group(realm);
 
-    auto get_query_version = [&] {
-        for (auto& query : m_queries) {
-            auto version = query->version();
+    auto get_notifier_version = [&] {
+        for (auto& notifier : m_notifiers) {
+            auto version = notifier->version();
             if (version != SharedGroup::VersionID{}) {
                 return version;
             }
@@ -520,11 +520,11 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
 
     SharedGroup::VersionID version;
     {
-        std::lock_guard<std::mutex> lock(m_query_mutex);
-        version = get_query_version();
+        std::lock_guard<std::mutex> lock(m_notifier_mutex);
+        version = get_notifier_version();
     }
 
-    // no async queries; just advance to latest
+    // no async notifiers; just advance to latest
     if (version.version == std::numeric_limits<uint_fast64_t>::max()) {
         transaction::advance(sg, realm.m_binding_context.get());
         return;
@@ -540,44 +540,44 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
         // may end up calling user code (in did_change() notifications)
         transaction::advance(sg, realm.m_binding_context.get(), version);
 
-        // Reacquire the lock and recheck the query version, as the queries may
+        // Reacquire the lock and recheck the notifier version, as the notifiers may
         // have advanced to a later version while we didn't hold the lock. If
         // so, we need to release the lock and re-advance
-        std::lock_guard<std::mutex> lock(m_query_mutex);
-        version = get_query_version();
+        std::lock_guard<std::mutex> lock(m_notifier_mutex);
+        version = get_notifier_version();
         if (version.version == std::numeric_limits<uint_fast64_t>::max())
             return;
         if (version != sg.get_version_of_current_transaction())
             continue;
 
         // Query version now matches the SG version, so we can deliver them
-        for (auto& query : m_queries) {
-            if (query->deliver(sg, m_async_error)) {
-                queries.push_back(query);
+        for (auto& notifier : m_notifiers) {
+            if (notifier->deliver(sg, m_async_error)) {
+                notifiers.push_back(notifier);
             }
         }
         break;
     }
 
-    for (auto& query : queries) {
-        query->call_callbacks();
+    for (auto& notifier : notifiers) {
+        notifier->call_callbacks();
     }
 }
 
 void RealmCoordinator::process_available_async(Realm& realm)
 {
     auto& sg = Realm::Internal::get_shared_group(realm);
-    decltype(m_queries) queries;
+    decltype(m_notifiers) notifiers;
     {
-        std::lock_guard<std::mutex> lock(m_query_mutex);
-        for (auto& query : m_queries) {
-            if (query->deliver(sg, m_async_error)) {
-                queries.push_back(query);
+        std::lock_guard<std::mutex> lock(m_notifier_mutex);
+        for (auto& notifier : m_notifiers) {
+            if (notifier->deliver(sg, m_async_error)) {
+                notifiers.push_back(notifier);
             }
         }
     }
 
-    for (auto& query : queries) {
-        query->call_callbacks();
+    for (auto& notifier : notifiers) {
+        notifier->call_callbacks();
     }
 }

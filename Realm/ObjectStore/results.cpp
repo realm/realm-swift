@@ -56,8 +56,8 @@ Results::Results(SharedRealm r, Table& table)
 
 Results::~Results()
 {
-    if (m_background_query) {
-        m_background_query->unregister();
+    if (m_notifier) {
+        m_notifier->unregister();
     }
 }
 
@@ -159,9 +159,9 @@ void Results::update_tableview()
             m_mode = Mode::TableView;
             break;
         case Mode::TableView:
-            if (!m_background_query && !m_realm->is_in_transaction() && m_realm->can_deliver_notifications()) {
-                m_background_query = std::make_shared<_impl::ResultsNotifier>(*this);
-                _impl::RealmCoordinator::register_query(m_background_query);
+            if (!m_notifier && !m_realm->is_in_transaction() && m_realm->can_deliver_notifications()) {
+                m_notifier = std::make_shared<_impl::ResultsNotifier>(*this);
+                _impl::RealmCoordinator::register_notifier(m_notifier);
             }
             m_has_used_table_view = true;
             m_table_view.sync_if_needed();
@@ -350,9 +350,9 @@ void Results::prepare_async()
         throw InvalidTransactionException("Cannot create asynchronous query while in a write transaction");
     }
 
-    if (!m_background_query) {
-        m_background_query = std::make_shared<_impl::ResultsNotifier>(*this);
-        _impl::RealmCoordinator::register_query(m_background_query);
+    if (!m_notifier) {
+        m_notifier = std::make_shared<_impl::ResultsNotifier>(*this);
+        _impl::RealmCoordinator::register_notifier(m_notifier);
     }
 }
 
@@ -360,13 +360,13 @@ NotificationToken Results::async(std::function<void (std::exception_ptr)> target
 {
     prepare_async();
     auto wrap = [=](CollectionChangeIndices, std::exception_ptr e) { target(e); };
-    return {m_background_query, m_background_query->add_callback(wrap)};
+    return {m_notifier, m_notifier->add_callback(wrap)};
 }
 
 NotificationToken Results::add_notification_callback(CollectionChangeCallback cb)
 {
     prepare_async();
-    return {m_background_query, m_background_query->add_callback(std::move(cb))};
+    return {m_notifier, m_notifier->add_callback(std::move(cb))};
 }
 
 void Results::Internal::set_table_view(Results& results, realm::TableView &&tv)
