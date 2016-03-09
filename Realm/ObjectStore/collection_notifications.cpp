@@ -316,10 +316,11 @@ void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, CollectionChangeIn
 using items = std::vector<std::pair<size_t, size_t>>;
 
 struct Match {
-    size_t i, j, size;
+    size_t i, j, size, modified;
 };
 
 Match find_longest_match(items const& a, items const& b,
+                         IndexSet const& modified,
                          size_t begin1, size_t end1, size_t begin2, size_t end2)
 {
     Match best = {begin1, begin2, 0};
@@ -343,11 +344,18 @@ Match find_longest_match(items const& a, items const& b,
             size_t off = j - begin2;
             size_t size = off == 0 ? 1 : len_from_j_prev[off - 1] + 1;
             len_from_j[off] = size;
-            if (size > best.size) {
-                best.i = i - size + 1;
-                best.j = j - size + 1;
-                best.size = size;
+            if (size > best.size)
+                best = {i - size + 1, j - size + 1, size, npos};
+            // Given two equal-length matches, prefer the one with fewer modified rows
+            else if (size == best.size) {
+                if (best.modified == npos)
+                    best.modified = modified.count(best.j - size + 1, best.j + 1);
+                auto count = modified.count(j - size + 1, j + 1);
+                if (count < best.modified)
+                    best = {i - size + 1, j - size + 1, size, count};
             }
+            REALM_ASSERT(best.i >= begin1 && best.i + best.size <= end1);
+            REALM_ASSERT(best.j >= begin2 && best.j + best.size <= end2);
         }
         len_from_j.swap(len_from_j_prev);
     }
@@ -355,51 +363,40 @@ Match find_longest_match(items const& a, items const& b,
 }
 
 void find_longest_matches(items const& a, items const& b_ndx,
-                          size_t begin1, size_t end1, size_t begin2, size_t end2, std::vector<Match>& ret)
+                          size_t begin1, size_t end1, size_t begin2, size_t end2,
+                          IndexSet const& modified, std::vector<Match>& ret)
 {
     // FIXME: recursion could get too deep here
-    Match m = find_longest_match(a, b_ndx, begin1, end1, begin2, end2);
+    auto m = find_longest_match(a, b_ndx, modified, begin1, end1, begin2, end2);
     if (!m.size)
         return;
     if (m.i > begin1 && m.j > begin2)
-        find_longest_matches(a, b_ndx, begin1, m.i, begin2, m.j, ret);
+        find_longest_matches(a, b_ndx, begin1, m.i, begin2, m.j, modified, ret);
     ret.push_back(m);
     if (m.i + m.size < end2 && m.j + m.size < end2)
-        find_longest_matches(a, b_ndx, m.i + m.size, end1, m.j + m.size, end2, ret);
+        find_longest_matches(a, b_ndx, m.i + m.size, end1, m.j + m.size, end2, modified, ret);
 }
 
 void calculate_moves_sorted(std::vector<RowInfo>& new_rows, CollectionChangeIndices& changeset,
                             std::function<bool (size_t)> row_did_change)
 {
+    // Remove new insertions, as they're already reported in changeset
+    new_rows.erase(std::remove_if(begin(new_rows), end(new_rows),
+                                  [](auto& row) { return row.prev_tv_index == npos; }),
+                   end(new_rows));
+
+    std::sort(begin(new_rows), end(new_rows),
+              [](auto& lft, auto& rgt) { return lft.tv_index < rgt.tv_index; });
+
     std::vector<std::pair<size_t, size_t>> old_candidates;
     std::vector<std::pair<size_t, size_t>> new_candidates;
-
-    std::sort(begin(new_rows), end(new_rows), [](auto& lft, auto& rgt) {
-        return lft.tv_index < rgt.tv_index;
-    });
-
-    IndexSet::IndexInterator ins = changeset.insertions.begin(), del = changeset.deletions.begin();
-    int shift = 0;
     for (auto& row : new_rows) {
-        while (del != changeset.deletions.end() && *del <= row.tv_index) {
-            ++del;
-            ++shift;
-        }
-        while (ins != changeset.insertions.end() && *ins <= row.tv_index) {
-            ++ins;
-            --shift;
-        }
-        if (row.prev_tv_index == npos)
-            continue;
-
         if (row_did_change(row.shifted_row_index)) {
-            // FIXME: needlessly quadratic
-            if (!changeset.insertions.contains(row.tv_index))
-                changeset.modifications.add(row.tv_index);
+            changeset.modifications.add(row.tv_index);
         }
-            old_candidates.push_back({row.shifted_row_index, row.prev_tv_index});
-            new_candidates.push_back({row.shifted_row_index, row.tv_index});
-//        }
+
+        old_candidates.push_back({row.shifted_row_index, row.prev_tv_index});
+        new_candidates.push_back({row.shifted_row_index, row.tv_index});
     }
 
     std::sort(begin(old_candidates), end(old_candidates), [](auto a, auto b) {
@@ -436,7 +433,7 @@ void calculate_moves_sorted(std::vector<RowInfo>& new_rows, CollectionChangeIndi
     find_longest_matches(old_candidates, b_ndx,
                          first_difference, old_candidates.size(),
                          first_difference, new_candidates.size(),
-                         longest_matches);
+                         changeset.modifications, longest_matches);
     longest_matches.push_back({old_candidates.size(), new_candidates.size(), 0});
 
     size_t i = first_difference, j = first_difference;
@@ -511,6 +508,23 @@ CollectionChangeIndices CollectionChangeIndices::calculate(std::vector<size_t> c
         calculate_moves_unsorted(new_rows, ret, row_did_change);
     }
     ret.verify();
+
+#ifdef REALM_DEBUG
+    { // Verify that applying the calculated change to prev_rows actually produces next_rows
+        auto rows = prev_rows;
+        auto it = std::make_reverse_iterator(ret.deletions.end());
+        auto end = std::make_reverse_iterator(ret.deletions.begin());
+        for (; it != end; ++it) {
+            rows.erase(rows.begin() + it->first, rows.begin() + it->second);
+        }
+
+        for (auto i : ret.insertions.as_indexes()) {
+            rows.insert(rows.begin() + i, next_rows[i]);
+        }
+
+        REALM_ASSERT(rows == next_rows);
+    }
+#endif
 
     return ret;
 }

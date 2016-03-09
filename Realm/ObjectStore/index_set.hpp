@@ -44,6 +44,9 @@ public:
     // Check if the index set contains the given index
     bool contains(size_t index) const;
 
+    // Counts the number of indices in the set in the given range
+    size_t count(size_t start_index, size_t end_index) const;
+
     // Add an index to the set, doing nothing if it's already present
     void add(size_t index);
     void add(IndexSet const& is);

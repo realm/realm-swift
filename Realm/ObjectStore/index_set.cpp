@@ -36,6 +36,17 @@ bool IndexSet::contains(size_t index) const
     return it != m_ranges.end() && it->first <= index;
 }
 
+size_t IndexSet::count(size_t start_index, size_t end_index) const
+{
+    auto it = const_cast<IndexSet*>(this)->find(start_index);
+    size_t ret = 0;
+    for (; end_index > start_index && it != m_ranges.end() && it->first < end_index; ++it) {
+        ret += std::min(it->second, end_index) - std::max(it->first, start_index);
+        start_index = it->second;
+    }
+    return ret;
+}
+
 IndexSet::iterator IndexSet::find(size_t index)
 {
     return find(index, m_ranges.begin());
