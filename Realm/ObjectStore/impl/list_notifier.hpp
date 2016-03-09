@@ -43,7 +43,7 @@ private:
     size_t m_col_ndx;
 
     // The actual change, calculated in run() and delivered in prepare_handover()
-    CollectionChangeIndices m_change;
+    CollectionChangeBuilder m_change;
     TransactionChangeInfo* m_info;
 
     void run() override;

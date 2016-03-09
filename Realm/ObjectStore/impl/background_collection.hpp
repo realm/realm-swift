@@ -31,7 +31,20 @@ namespace realm {
 class Realm;
 
 namespace _impl {
-struct TransactionChangeInfo;
+struct ListChangeInfo {
+    size_t table_ndx;
+    size_t row_ndx;
+    size_t col_ndx;
+    CollectionChangeBuilder* changes;
+};
+
+struct TransactionChangeInfo {
+    std::vector<bool> tables_needed;
+    std::vector<ListChangeInfo> lists;
+    std::vector<CollectionChangeBuilder> tables;
+
+    bool row_did_change(Table const& table, size_t row_ndx, int depth = 0) const;
+};
 
 // A base class for a notifier that keeps a collection up to date and/or
 // generates detailed change notifications on a background thread. This manages
@@ -96,7 +109,7 @@ public:
 
 protected:
     bool have_callbacks() const noexcept { return m_have_callbacks; }
-    void add_changes(CollectionChangeIndices change) { m_accumulated_changes.merge(std::move(change)); }
+    void add_changes(CollectionChangeBuilder change) { m_accumulated_changes.merge(std::move(change)); }
     void set_table(Table const& table);
     std::unique_lock<std::mutex> lock_target();
 
@@ -118,7 +131,7 @@ private:
     SharedGroup* m_sg = nullptr;
 
     std::exception_ptr m_error;
-    CollectionChangeIndices m_accumulated_changes;
+    CollectionChangeBuilder m_accumulated_changes;
     CollectionChangeIndices m_changes_to_deliver;
 
     // Tables which this collection needs change information for

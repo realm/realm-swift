@@ -40,21 +40,6 @@ class ExternalCommitHelper;
 class ListNotifier;
 class WeakRealmNotifier;
 
-struct ListChangeInfo {
-    size_t table_ndx;
-    size_t row_ndx;
-    size_t col_ndx;
-    CollectionChangeIndices *changes;
-};
-
-struct TransactionChangeInfo {
-    std::vector<bool> tables_needed;
-    std::vector<ListChangeInfo> lists;
-    std::vector<CollectionChangeIndices> tables;
-
-    bool row_did_change(Table const& table, size_t row_ndx, int depth = 0) const;
-};
-
 // RealmCoordinator manages the weak cache of Realm instances and communication
 // between per-thread Realm instances for a given file
 class RealmCoordinator : public std::enable_shared_from_this<RealmCoordinator> {

@@ -25,6 +25,7 @@
 #include <realm/util/assert.hpp>
 
 using namespace realm;
+using namespace realm::_impl;
 
 NotificationToken::NotificationToken(std::shared_ptr<_impl::BackgroundCollection> query, size_t token)
 : m_query(std::move(query)), m_token(token)
@@ -71,10 +72,9 @@ CollectionChangeIndices::CollectionChangeIndices(IndexSet deletions,
         this->deletions.add(move.from);
         this->insertions.add(move.to);
     }
-    verify();
 }
 
-void CollectionChangeIndices::merge(realm::CollectionChangeIndices&& c)
+void CollectionChangeBuilder::merge(CollectionChangeBuilder&& c)
 {
     if (c.empty())
         return;
@@ -148,12 +148,12 @@ void CollectionChangeIndices::merge(realm::CollectionChangeIndices&& c)
     verify();
 }
 
-void CollectionChangeIndices::modify(size_t ndx)
+void CollectionChangeBuilder::modify(size_t ndx)
 {
     modifications.add(ndx);
 }
 
-void CollectionChangeIndices::insert(size_t index, size_t count)
+void CollectionChangeBuilder::insert(size_t index, size_t count)
 {
     modifications.shift_for_insert_at(index, count);
     insertions.insert_at(index, count);
@@ -164,7 +164,7 @@ void CollectionChangeIndices::insert(size_t index, size_t count)
     }
 }
 
-void CollectionChangeIndices::erase(size_t index)
+void CollectionChangeBuilder::erase(size_t index)
 {
     modifications.erase_at(index);
     size_t unshifted = insertions.erase_and_unshift(index);
@@ -182,7 +182,7 @@ void CollectionChangeIndices::erase(size_t index)
     }
 }
 
-void CollectionChangeIndices::clear(size_t old_size)
+void CollectionChangeBuilder::clear(size_t old_size)
 {
     if (old_size != std::numeric_limits<size_t>::max()) {
         for (auto range : deletions)
@@ -197,7 +197,7 @@ void CollectionChangeIndices::clear(size_t old_size)
     deletions.set(old_size);
 }
 
-void CollectionChangeIndices::move(size_t from, size_t to)
+void CollectionChangeBuilder::move(size_t from, size_t to)
 {
     REALM_ASSERT(from != to);
 
@@ -242,7 +242,7 @@ void CollectionChangeIndices::move(size_t from, size_t to)
         modifications.shift_for_insert_at(to);
 }
 
-void CollectionChangeIndices::move_over(size_t row_ndx, size_t last_row)
+void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
 {
     REALM_ASSERT(row_ndx <= last_row);
     if (row_ndx == last_row) {
@@ -253,7 +253,7 @@ void CollectionChangeIndices::move_over(size_t row_ndx, size_t last_row)
     erase(row_ndx + 1);
 }
 
-void CollectionChangeIndices::verify()
+void CollectionChangeBuilder::verify()
 {
 #ifdef REALM_DEBUG
     for (auto&& move : moves) {
@@ -451,12 +451,12 @@ void calculate_moves_sorted(std::vector<RowInfo>& new_rows, CollectionChangeIndi
 }
 } // Anonymous namespace
 
-CollectionChangeIndices CollectionChangeIndices::calculate(std::vector<size_t> const& prev_rows,
+CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> const& prev_rows,
                                                            std::vector<size_t> const& next_rows,
                                                            std::function<bool (size_t)> row_did_change,
                                                            bool sort)
 {
-    CollectionChangeIndices ret;
+    CollectionChangeBuilder ret;
 
     std::vector<RowInfo> old_rows;
     for (size_t i = 0; i < prev_rows.size(); ++i) {

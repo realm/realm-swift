@@ -60,6 +60,8 @@ struct CollectionChangeIndices {
     IndexSet modifications;
     std::vector<Move> moves;
 
+    bool empty() const { return deletions.empty() && insertions.empty() && modifications.empty() && moves.empty(); }
+
     CollectionChangeIndices(CollectionChangeIndices const&) = default;
     CollectionChangeIndices(CollectionChangeIndices&&) = default;
     CollectionChangeIndices& operator=(CollectionChangeIndices const&) = default;
@@ -69,15 +71,21 @@ struct CollectionChangeIndices {
                             IndexSet insertions = {},
                             IndexSet modification = {},
                             std::vector<Move> moves = {});
+};
 
-    static CollectionChangeIndices calculate(std::vector<size_t> const& old_rows,
+using CollectionChangeCallback = std::function<void (CollectionChangeIndices, std::exception_ptr)>;
+
+namespace _impl {
+class CollectionChangeBuilder : public CollectionChangeIndices {
+public:
+    using CollectionChangeIndices::CollectionChangeIndices;
+
+    static CollectionChangeBuilder calculate(std::vector<size_t> const& old_rows,
                                              std::vector<size_t> const& new_rows,
                                              std::function<bool (size_t)> row_did_change,
                                              bool sort);
 
-    bool empty() const { return deletions.empty() && insertions.empty() && modifications.empty() && moves.empty(); }
-
-    void merge(CollectionChangeIndices&&);
+    void merge(CollectionChangeBuilder&&);
 
     void insert(size_t ndx, size_t count=1);
     void modify(size_t ndx);
@@ -89,8 +97,7 @@ struct CollectionChangeIndices {
 private:
     void verify();
 };
-
-using CollectionChangeCallback = std::function<void (CollectionChangeIndices, std::exception_ptr)>;
-}
+} // namespace _impl
+} // namespace realm
 
 #endif // REALM_COLLECTION_NOTIFICATIONS_HPP

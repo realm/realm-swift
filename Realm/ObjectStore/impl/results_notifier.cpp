@@ -126,7 +126,7 @@ void ResultsNotifier::run()
             }
         }
 
-        m_changes = CollectionChangeIndices::calculate(m_previous_rows, next_rows,
+        m_changes = CollectionChangeBuilder::calculate(m_previous_rows, next_rows,
                                                        [&](size_t row) { return m_info->row_did_change(*m_query->get_table(), row); },
                                                        !!m_sort);
 

@@ -19,8 +19,7 @@
 #include "impl/transact_log_handler.hpp"
 
 #include "binding_context.hpp"
-#include "collection_notifications.hpp"
-#include "impl/realm_coordinator.hpp"
+#include "impl/background_collection.hpp"
 
 #include <realm/commit_log.hpp>
 #include <realm/group_shared.hpp>
@@ -422,9 +421,9 @@ public:
 // Extends TransactLogValidator to track changes made to LinkViews
 class LinkViewObserver : public TransactLogValidationMixin, public MarkDirtyMixin<LinkViewObserver> {
     _impl::TransactionChangeInfo& m_info;
-    CollectionChangeIndices* m_active = nullptr;
+    _impl::CollectionChangeBuilder* m_active = nullptr;
 
-    CollectionChangeIndices* get_change()
+    _impl::CollectionChangeBuilder* get_change()
     {
         auto tbl_ndx = current_table();
         if (tbl_ndx >= m_info.tables_needed.size() || !m_info.tables_needed[tbl_ndx])

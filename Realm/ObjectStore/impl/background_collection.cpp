@@ -21,8 +21,42 @@
 #include "impl/realm_coordinator.hpp"
 #include "shared_realm.hpp"
 
+#include <realm/link_view.hpp>
+
 using namespace realm;
 using namespace realm::_impl;
+
+bool TransactionChangeInfo::row_did_change(Table const& table, size_t idx, int depth) const
+{
+    if (depth > 16)  // arbitrary limit
+        return false;
+
+    size_t table_ndx = table.get_index_in_group();
+    if (table_ndx < tables.size() && tables[table_ndx].modifications.contains(idx))
+        return true;
+
+    for (size_t i = 0, count = table.get_column_count(); i < count; ++i) {
+        auto type = table.get_column_type(i);
+        if (type == type_Link) {
+            if (table.is_null_link(i, idx))
+                continue;
+            auto dst = table.get_link(i, idx);
+            return row_did_change(*table.get_link_target(i), dst, depth + 1);
+        }
+        if (type != type_LinkList)
+            continue;
+
+        auto& target = *table.get_link_target(i);
+        auto lvr = table.get_linklist(i, idx);
+        for (size_t j = 0; j < lvr->size(); ++j) {
+            size_t dst = lvr->get(j).get_index();
+            if (row_did_change(target, dst, depth + 1))
+                return true;
+        }
+    }
+
+    return false;
+}
 
 BackgroundCollection::BackgroundCollection(std::shared_ptr<Realm> realm)
 : m_realm(std::move(realm))

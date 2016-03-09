@@ -18,9 +18,8 @@
 
 #include "impl/realm_coordinator.hpp"
 
+#include "impl/background_collection.hpp"
 #include "impl/external_commit_helper.hpp"
-#include "impl/list_notifier.hpp"
-#include "impl/results_notifier.hpp"
 #include "impl/transact_log_handler.hpp"
 #include "impl/weak_realm_notifier.hpp"
 #include "object_store.hpp"
@@ -29,8 +28,6 @@
 #include <realm/commit_log.hpp>
 #include <realm/group_shared.hpp>
 #include <realm/lang_bind_helper.hpp>
-#include <realm/query.hpp>
-#include <realm/table_view.hpp>
 
 #include <cassert>
 #include <set>
@@ -38,38 +35,6 @@
 
 using namespace realm;
 using namespace realm::_impl;
-
-bool TransactionChangeInfo::row_did_change(Table const& table, size_t idx, int depth) const
-{
-    if (depth > 16)  // arbitrary limit
-        return false;
-
-    size_t table_ndx = table.get_index_in_group();
-    if (table_ndx < tables.size() && tables[table_ndx].modifications.contains(idx))
-        return true;
-
-    for (size_t i = 0, count = table.get_column_count(); i < count; ++i) {
-        auto type = table.get_column_type(i);
-        if (type == type_Link) {
-            if (table.is_null_link(i, idx))
-                continue;
-            auto dst = table.get_link(i, idx);
-            return row_did_change(*table.get_link_target(i), dst, depth + 1);
-        }
-        if (type != type_LinkList)
-            continue;
-
-        auto& target = *table.get_link_target(i);
-        auto lvr = table.get_linklist(i, idx);
-        for (size_t j = 0; j < lvr->size(); ++j) {
-            size_t dst = lvr->get(j).get_index();
-            if (row_did_change(target, dst, depth + 1))
-                return true;
-        }
-    }
-
-    return false;
-}
 
 static std::mutex s_coordinator_mutex;
 static std::unordered_map<std::string, std::weak_ptr<RealmCoordinator>> s_coordinators_per_path;
@@ -440,7 +405,7 @@ void RealmCoordinator::run_async_notifiers()
         }
 
         for (size_t j = 0; j < prev.tables.size() && j < cur.tables.size(); ++j) {
-            prev.tables[j].merge(CollectionChangeIndices{cur.tables[j]});
+            prev.tables[j].merge(CollectionChangeBuilder{cur.tables[j]});
         }
         prev.tables.reserve(cur.tables.size());
         while (prev.tables.size() < cur.tables.size()) {
@@ -454,7 +419,7 @@ void RealmCoordinator::run_async_notifiers()
         for (size_t i = 1; i < info.lists.size(); ++i) {
             for (size_t j = i; j > 0; --j) {
                 if (id(info.lists[i]) == id(info.lists[j - 1])) {
-                    info.lists[j - 1].changes->merge(CollectionChangeIndices{*info.lists[i].changes});
+                    info.lists[j - 1].changes->merge(CollectionChangeBuilder{*info.lists[i].changes});
                 }
             }
         }

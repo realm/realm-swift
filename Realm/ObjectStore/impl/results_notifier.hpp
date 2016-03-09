@@ -59,7 +59,7 @@ private:
     std::vector<size_t> m_previous_rows;
 
     // The changeset calculated during run() and delivered in do_prepare_handover()
-    CollectionChangeIndices m_changes;
+    CollectionChangeBuilder m_changes;
     TransactionChangeInfo* m_info = nullptr;
 
     // Flag for whether or not the query has been run at all, as goofy timing
