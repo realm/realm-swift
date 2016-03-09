@@ -397,6 +397,22 @@ class ResultsTests: RealmCollectionTypeTests {
     }
 }
 
+class ResultsWithCustomInitializerTest: TestCase {
+    func testValueForKey() {
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.add(SwiftCustomInitializerObject(stringVal: "A"))
+        }
+
+        let collection = realm.objects(SwiftCustomInitializerObject)
+        let expected = collection.map { $0.stringCol }
+        let actual = collection.valueForKey("stringCol") as! [String]!
+        XCTAssertEqual(expected, actual)
+
+        XCTAssertEqual(collection.map { $0 }, collection.valueForKey("self") as! [SwiftStringObject])
+    }
+}
+
 class ResultsFromTableTests: ResultsTests {
     override func collectionBase() -> Results<SwiftStringObject> {
         return realmWithTestPath().objects(SwiftStringObject)
