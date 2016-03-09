@@ -33,7 +33,7 @@ class Mixed;
 class Results;
 
 namespace _impl {
-    class AsyncQuery;
+    class ResultsNotifier;
 }
 
 struct SortOrder {
@@ -161,10 +161,10 @@ public:
 
     bool wants_background_updates() const { return m_wants_background_updates; }
 
-    // Helper type to let AsyncQuery update the tableview without giving access
+    // Helper type to let ResultsNotifier update the tableview without giving access
     // to any other privates or letting anyone else do so
     class Internal {
-        friend class _impl::AsyncQuery;
+        friend class _impl::ResultsNotifier;
         static void set_table_view(Results& results, TableView&& tv);
     };
 
@@ -175,7 +175,7 @@ private:
     Table* m_table = nullptr;
     SortOrder m_sort;
 
-    std::shared_ptr<_impl::AsyncQuery> m_background_query;
+    std::shared_ptr<_impl::ResultsNotifier> m_background_query;
 
     Mode m_mode = Mode::Empty;
     bool m_has_used_table_view = false;

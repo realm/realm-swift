@@ -16,8 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALM_ASYNC_QUERY_HPP
-#define REALM_ASYNC_QUERY_HPP
+#ifndef REALM_RESULTS_NOTIFIER_HPP
+#define REALM_RESULTS_NOTIFIER_HPP
 
 #include "background_collection.hpp"
 #include "results.hpp"
@@ -35,9 +35,9 @@ namespace realm {
 namespace _impl {
 struct TransactionChangeInfo;
 
-class AsyncQuery : public BackgroundCollection {
+class ResultsNotifier : public BackgroundCollection {
 public:
-    AsyncQuery(Results& target);
+    ResultsNotifier(Results& target);
 
 private:
     // Run/rerun the query if needed
@@ -84,4 +84,4 @@ private:
 } // namespace _impl
 } // namespace realm
 
-#endif /* REALM_ASYNC_QUERY_HPP */
+#endif /* REALM_RESULTS_NOTIFIER_HPP */

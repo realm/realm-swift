@@ -18,11 +18,11 @@
 
 #include "impl/realm_coordinator.hpp"
 
-#include "impl/async_query.hpp"
-#include "impl/weak_realm_notifier.hpp"
 #include "impl/external_commit_helper.hpp"
 #include "impl/list_notifier.hpp"
+#include "impl/results_notifier.hpp"
 #include "impl/transact_log_handler.hpp"
+#include "impl/weak_realm_notifier.hpp"
 #include "object_store.hpp"
 #include "schema.hpp"
 

@@ -18,8 +18,8 @@
 
 #include "results.hpp"
 
-#include "impl/async_query.hpp"
 #include "impl/realm_coordinator.hpp"
+#include "impl/results_notifier.hpp"
 #include "object_store.hpp"
 
 #include <stdexcept>
@@ -160,7 +160,7 @@ void Results::update_tableview()
             break;
         case Mode::TableView:
             if (!m_background_query && !m_realm->is_in_transaction() && m_realm->can_deliver_notifications()) {
-                m_background_query = std::make_shared<_impl::AsyncQuery>(*this);
+                m_background_query = std::make_shared<_impl::ResultsNotifier>(*this);
                 _impl::RealmCoordinator::register_query(m_background_query);
             }
             m_has_used_table_view = true;
@@ -351,7 +351,7 @@ void Results::prepare_async()
     }
 
     if (!m_background_query) {
-        m_background_query = std::make_shared<_impl::AsyncQuery>(*this);
+        m_background_query = std::make_shared<_impl::ResultsNotifier>(*this);
         _impl::RealmCoordinator::register_query(m_background_query);
     }
 }

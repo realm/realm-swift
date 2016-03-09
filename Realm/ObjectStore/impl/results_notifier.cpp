@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "impl/async_query.hpp"
+#include "impl/results_notifier.hpp"
 
 #include "impl/realm_coordinator.hpp"
 #include "results.hpp"
@@ -24,7 +24,7 @@
 using namespace realm;
 using namespace realm::_impl;
 
-AsyncQuery::AsyncQuery(Results& target)
+ResultsNotifier::ResultsNotifier(Results& target)
 : BackgroundCollection(target.get_realm())
 , m_target_results(&target)
 , m_sort(target.get_sort())
@@ -34,7 +34,7 @@ AsyncQuery::AsyncQuery(Results& target)
     m_query_handover = Realm::Internal::get_shared_group(get_realm()).export_for_handover(q, MutableSourcePayload::Move);
 }
 
-void AsyncQuery::release_data() noexcept
+void ResultsNotifier::release_data() noexcept
 {
     m_query = nullptr;
 }
@@ -74,13 +74,13 @@ static bool map_moves(size_t& idx, CollectionChangeIndices const& changes)
     return false;
 }
 
-void AsyncQuery::do_add_required_change_info(TransactionChangeInfo& info)
+void ResultsNotifier::do_add_required_change_info(TransactionChangeInfo& info)
 {
     REALM_ASSERT(m_query);
     m_info = &info;
 }
 
-void AsyncQuery::run()
+void ResultsNotifier::run()
 {
     REALM_ASSERT(m_info);
 
@@ -147,7 +147,7 @@ void AsyncQuery::run()
     }
 }
 
-void AsyncQuery::do_prepare_handover(SharedGroup& sg)
+void ResultsNotifier::do_prepare_handover(SharedGroup& sg)
 {
     if (!m_tv.is_attached()) {
         return;
@@ -167,7 +167,7 @@ void AsyncQuery::do_prepare_handover(SharedGroup& sg)
     m_tv = {};
 }
 
-bool AsyncQuery::do_deliver(SharedGroup& sg)
+bool ResultsNotifier::do_deliver(SharedGroup& sg)
 {
     std::lock_guard<std::mutex> target_lock(m_target_mutex);
 
@@ -196,13 +196,13 @@ bool AsyncQuery::do_deliver(SharedGroup& sg)
     return true;
 }
 
-void AsyncQuery::do_attach_to(SharedGroup& sg)
+void ResultsNotifier::do_attach_to(SharedGroup& sg)
 {
     REALM_ASSERT(m_query_handover);
     m_query = sg.import_from_handover(std::move(m_query_handover));
 }
 
-void AsyncQuery::do_detach_from(SharedGroup& sg)
+void ResultsNotifier::do_detach_from(SharedGroup& sg)
 {
     REALM_ASSERT(m_query);
     REALM_ASSERT(!m_tv.is_attached());

@@ -40,10 +40,10 @@ namespace realm {
     typedef std::weak_ptr<Realm> WeakRealm;
 
     namespace _impl {
-        class AsyncQuery;
         class BackgroundCollection;
         class ListNotifier;
         class RealmCoordinator;
+        class ResultsNotifier;
     }
 
     class Realm : public std::enable_shared_from_this<Realm> {
@@ -144,13 +144,13 @@ namespace realm {
         // Expose some internal functionality to other parts of the ObjectStore
         // without making it public to everyone
         class Internal {
-            friend class _impl::AsyncQuery;
-            friend class _impl::ListNotifier;
             friend class _impl::BackgroundCollection;
+            friend class _impl::ListNotifier;
             friend class _impl::RealmCoordinator;
+            friend class _impl::ResultsNotifier;
 
-            // AsyncQuery needs access to the SharedGroup to be able to call the
-            // handover functions, which are not very wrappable
+            // ResultsNotifier and ListNotifier need access to the SharedGroup
+            // to be able to call the handover functions, which are not very wrappable
             static SharedGroup& get_shared_group(Realm& realm) { return *realm.m_shared_group; }
 
             // BackgroundCollection needs to be able to access the owning
