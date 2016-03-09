@@ -11,7 +11,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Properly report changes made by adding an object to a Realm with
+  addOrUpdate:/createOrUpdate: to KVO observers for existing objects with that
+  primary key.
 
 0.98.3 Release notes (2016-02-26)
 =============================================================
