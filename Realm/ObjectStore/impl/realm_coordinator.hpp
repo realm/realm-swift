@@ -138,7 +138,6 @@ private:
 
     void run_async_notifiers();
     void open_helper_shared_group();
-    void move_new_notifiers_to_main();
     void advance_helper_shared_group_to_latest();
     void clean_up_dead_notifiers();
 };

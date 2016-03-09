@@ -495,13 +495,6 @@ void RealmCoordinator::open_helper_shared_group()
     }
 }
 
-void RealmCoordinator::move_new_notifiers_to_main()
-{
-    m_notifiers.reserve(m_notifiers.size() + m_new_notifiers.size());
-    std::move(m_new_notifiers.begin(), m_new_notifiers.end(), std::back_inserter(m_notifiers));
-    m_new_notifiers.clear();
-}
-
 void RealmCoordinator::advance_to_ready(Realm& realm)
 {
     decltype(m_notifiers) notifiers;
