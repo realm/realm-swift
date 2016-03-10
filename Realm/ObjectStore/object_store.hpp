@@ -156,6 +156,14 @@ namespace realm {
         std::vector<ObjectSchemaValidationException> m_validation_errors;
     };
 
+    class SchemaMismatchException : public ObjectStoreException {
+    public:
+        SchemaMismatchException(std::vector<ObjectSchemaValidationException> const& errors);
+        std::vector<ObjectSchemaValidationException> const& validation_errors() const { return m_validation_errors; }
+    private:
+        std::vector<ObjectSchemaValidationException> m_validation_errors;
+    };
+
     class ObjectSchemaValidationException : public ObjectStoreException {
       public:
         ObjectSchemaValidationException(std::string const& object_type) : m_object_type(object_type) {}
