@@ -99,13 +99,13 @@ private:
 
     // SharedGroup used for actually running async queries
     // Will have a read transaction iff m_queries is non-empty
-    std::unique_ptr<ClientHistory> m_query_history;
+    std::unique_ptr<Replication> m_query_history;
     std::unique_ptr<SharedGroup> m_query_sg;
 
     // SharedGroup used to advance queries in m_new_queries to the main shared
     // group's transaction version
     // Will have a read transaction iff m_new_queries is non-empty
-    std::unique_ptr<ClientHistory> m_advancer_history;
+    std::unique_ptr<Replication> m_advancer_history;
     std::unique_ptr<SharedGroup> m_advancer_sg;
     std::exception_ptr m_async_error;
 

@@ -369,7 +369,7 @@ void RealmCoordinator::move_new_queries_to_main()
 void RealmCoordinator::advance_helper_shared_group_to_latest()
 {
     if (m_new_queries.empty()) {
-        LangBindHelper::advance_read(*m_query_sg, *m_query_history);
+        LangBindHelper::advance_read(*m_query_sg);
         return;
     }
 
@@ -381,14 +381,13 @@ void RealmCoordinator::advance_helper_shared_group_to_latest()
 
     // Import all newly added queries to our helper SG
     for (auto& query : m_new_queries) {
-        LangBindHelper::advance_read(*m_advancer_sg, *m_advancer_history, query->version());
+        LangBindHelper::advance_read(*m_advancer_sg, query->version());
         query->attach_to(*m_advancer_sg);
     }
 
     // Advance both SGs to the newest version
-    LangBindHelper::advance_read(*m_advancer_sg, *m_advancer_history);
-    LangBindHelper::advance_read(*m_query_sg, *m_query_history,
-                                 m_advancer_sg->get_version_of_current_transaction());
+    LangBindHelper::advance_read(*m_advancer_sg);
+    LangBindHelper::advance_read(*m_query_sg, m_advancer_sg->get_version_of_current_transaction());
 
     // Transfer all new queries over to the main SG
     for (auto& query : m_new_queries) {
@@ -405,7 +404,6 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
     decltype(m_queries) queries;
 
     auto& sg = Realm::Internal::get_shared_group(realm);
-    auto& history = Realm::Internal::get_history(realm);
 
     auto get_query_version = [&] {
         for (auto& query : m_queries) {
@@ -424,8 +422,8 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
     }
 
     // no async queries; just advance to latest
-    if (version.version == 0) {
-        transaction::advance(sg, history, realm.m_binding_context.get());
+    if (version.version == std::numeric_limits<uint_fast64_t>::max()) {
+        transaction::advance(sg, realm.m_binding_context.get());
         return;
     }
 
@@ -437,14 +435,14 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
     while (true) {
         // Advance to the ready version without holding any locks because it
         // may end up calling user code (in did_change() notifications)
-        transaction::advance(sg, history, realm.m_binding_context.get(), version);
+        transaction::advance(sg, realm.m_binding_context.get(), version);
 
         // Reacquire the lock and recheck the query version, as the queries may
         // have advanced to a later version while we didn't hold the lock. If
         // so, we need to release the lock and re-advance
         std::lock_guard<std::mutex> lock(m_query_mutex);
         version = get_query_version();
-        if (version.version == 0)
+        if (version.version == std::numeric_limits<uint_fast64_t>::max())
             return;
         if (version != sg.get_version_of_current_transaction())
             continue;

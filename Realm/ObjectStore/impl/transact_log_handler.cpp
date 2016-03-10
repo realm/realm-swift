@@ -432,21 +432,21 @@ public:
 namespace realm {
 namespace _impl {
 namespace transaction {
-void advance(SharedGroup& sg, ClientHistory& history, BindingContext* delegate, SharedGroup::VersionID version) {
-    TransactLogObserver(delegate, sg, [&](auto&&... args) {
-        LangBindHelper::advance_read(sg, history, std::move(args)..., version);
+void advance(SharedGroup& sg, BindingContext* context, SharedGroup::VersionID version)
+{
+    TransactLogObserver(context, sg, [&](auto&&... args) {
+        LangBindHelper::advance_read(sg, std::move(args)..., version);
     }, true);
 }
 
-void begin(SharedGroup& sg, ClientHistory& history, BindingContext* context,
-           bool validate_schema_changes)
+void begin(SharedGroup& sg, BindingContext* context, bool validate_schema_changes)
 {
     TransactLogObserver(context, sg, [&](auto&&... args) {
-        LangBindHelper::promote_to_write(sg, history, std::move(args)...);
+        LangBindHelper::promote_to_write(sg, std::move(args)...);
     }, validate_schema_changes);
 }
 
-void commit(SharedGroup& sg, ClientHistory&, BindingContext* context)
+void commit(SharedGroup& sg, BindingContext* context)
 {
     LangBindHelper::commit_and_continue_as_read(sg);
 
@@ -455,10 +455,10 @@ void commit(SharedGroup& sg, ClientHistory&, BindingContext* context)
     }
 }
 
-void cancel(SharedGroup& sg, ClientHistory& history, BindingContext* context)
+void cancel(SharedGroup& sg, BindingContext* context)
 {
     TransactLogObserver(context, sg, [&](auto&&... args) {
-        LangBindHelper::rollback_and_continue_as_read(sg, history, std::move(args)...);
+        LangBindHelper::rollback_and_continue_as_read(sg, std::move(args)...);
     }, false);
 }
 
