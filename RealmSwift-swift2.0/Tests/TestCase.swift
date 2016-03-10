@@ -131,7 +131,7 @@ class TestCase: XCTestCase {
         }
     }
 
-    func assertFails<T>(expectedError: Error,  _ message: String? = nil,
+    func assertFails<T>(expectedError: Error, _ message: String? = nil,
                         fileName: TestLocationString = __FILE__, lineNumber: UInt = __LINE__,
                         @noescape block: () throws -> T) {
         do {
