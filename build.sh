@@ -19,6 +19,9 @@ set -e
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
 
+# Provide a fallback value for TMPDIR, relevant for Xcode Bots
+: ${TMPDIR:=getconf DARWIN_USER_TEMP_DIR}
+
 PATH=/usr/libexec:$PATH
 
 if ! [ -z "${JENKINS_HOME}" ]; then
