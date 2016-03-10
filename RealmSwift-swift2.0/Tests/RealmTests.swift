@@ -208,7 +208,7 @@ class RealmTests: TestCase {
         let object = try! Realm().dynamicCreate("SwiftStringObject", value: ["1"])
         try! Realm().commitWrite()
 
-        XCTAssertNotNil(object,"Dynamic Object Creation Failed")
+        XCTAssertNotNil(object, "Dynamic Object Creation Failed")
 
         let stringVal = object["stringCol"] as! String
         XCTAssertEqual(stringVal, "1", "Object Subscripting Failed")

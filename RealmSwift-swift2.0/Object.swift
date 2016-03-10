@@ -362,10 +362,11 @@ public class ObjectUtil: NSObject {
     // swiftlint:disable:next cyclomatic_complexity
     @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
         let children = Mirror(reflecting: object).children
-        return children.reduce([String: AnyObject]()) { (var properties: [String:AnyObject], prop: Mirror.Child) in
+        return children.reduce([String: AnyObject]()) { ( properties: [String:AnyObject], prop: Mirror.Child) in
             guard let name = prop.label else { return properties }
             let mirror = Mirror(reflecting: prop.value)
             let type = mirror.subjectType
+            var properties = properties
             if type is Optional<String>.Type || type is Optional<NSString>.Type {
                 properties[name] = Int(PropertyType.String.rawValue)
             } else if type is Optional<NSDate>.Type {

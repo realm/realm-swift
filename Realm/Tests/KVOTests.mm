@@ -1285,6 +1285,28 @@ public:
     // ignored properties do not notify other accessors for the same row
 }
 
+- (void)testAddOrUpdate {
+    KVOObject *obj = [self createObject];
+    KVOObject *obj2 = [[KVOObject alloc] initWithValue:obj];
+
+    KVORecorder r(self, obj, @"boolCol");
+    obj2.boolCol = true;
+    XCTAssertTrue(r.empty());
+    [self.realm addOrUpdateObject:obj2];
+    AssertChanged(r, @NO, @YES);
+}
+
+- (void)testCreateOrUpdate {
+    KVOObject *obj = [self createObject];
+    KVOObject *obj2 = [[KVOObject alloc] initWithValue:obj];
+
+    KVORecorder r(self, obj, @"boolCol");
+    obj2.boolCol = true;
+    XCTAssertTrue(r.empty());
+    [KVOObject createOrUpdateInRealm:self.realm withValue:obj2];
+    AssertChanged(r, @NO, @YES);
+}
+
 // The following tests aren't really multiple-accessor-specific, but they're
 // conceptually similar and don't make sense in the multiple realm instances case
 - (void)testCancelWriteTransactionWhileObservingNewObject {

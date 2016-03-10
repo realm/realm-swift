@@ -382,7 +382,7 @@ class ResultsTests: RealmCollectionTypeTests {
 
             XCTAssertEqual(results!.count, calls + 2)
             XCTAssertEqual(results, collection)
-            ++calls
+            calls += 1
 
             expectation.fulfill()
         }

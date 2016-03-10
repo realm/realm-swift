@@ -50,7 +50,7 @@ namespace realm {
         // determines if a realm with the given old schema needs non-migration
         // changes to make it compatible with the given target schema
         static bool needs_update(Schema const& old_schema, Schema const& schema);
-        
+
         // updates a Realm from old_schema to the given target schema, creating and updating tables as needed
         // passed in target schema is updated with the correct column mapping
         // optionally runs migration function if schema is out of date
@@ -153,6 +153,14 @@ namespace realm {
         SchemaValidationException(std::vector<ObjectSchemaValidationException> const& errors);
         std::vector<ObjectSchemaValidationException> const& validation_errors() const { return m_validation_errors; }
       private:
+        std::vector<ObjectSchemaValidationException> m_validation_errors;
+    };
+
+    class SchemaMismatchException : public ObjectStoreException {
+    public:
+        SchemaMismatchException(std::vector<ObjectSchemaValidationException> const& errors);
+        std::vector<ObjectSchemaValidationException> const& validation_errors() const { return m_validation_errors; }
+    private:
         std::vector<ObjectSchemaValidationException> m_validation_errors;
     };
 
