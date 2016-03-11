@@ -161,14 +161,16 @@ void BackgroundCollection::set_table(Table const& table)
 
 void BackgroundCollection::add_required_change_info(TransactionChangeInfo& info)
 {
+    if (!do_add_required_change_info(info)) {
+        return;
+    }
+
     auto max = *max_element(begin(m_relevant_tables), end(m_relevant_tables)) + 1;
     if (max > info.tables_needed.size())
         info.tables_needed.resize(max, false);
     for (auto table_ndx : m_relevant_tables) {
         info.tables_needed[table_ndx] = true;
     }
-
-    do_add_required_change_info(info);
 }
 
 void BackgroundCollection::prepare_handover()

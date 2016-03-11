@@ -69,7 +69,7 @@ private:
     void run() override;
     void do_prepare_handover(SharedGroup&) override;
     bool do_deliver(SharedGroup& sg) override;
-    void do_add_required_change_info(TransactionChangeInfo& info) override;
+    bool do_add_required_change_info(TransactionChangeInfo& info) override;
 
     void release_data() noexcept override;
     void do_attach_to(SharedGroup& sg) override;

@@ -69,11 +69,11 @@ void ListNotifier::do_detach_from(SharedGroup& sg)
     }
 }
 
-void ListNotifier::do_add_required_change_info(TransactionChangeInfo& info)
+bool ListNotifier::do_add_required_change_info(TransactionChangeInfo& info)
 {
     REALM_ASSERT(!m_lv_handover);
     if (!m_lv) {
-        return; // origin row was deleted after the notification was added
+        return false; // origin row was deleted after the notification was added
     }
 
     size_t row_ndx = m_lv->get_origin_row_index();
@@ -81,6 +81,7 @@ void ListNotifier::do_add_required_change_info(TransactionChangeInfo& info)
     info.lists.push_back({table.get_index_in_group(), row_ndx, m_col_ndx, &m_change});
 
     m_info = &info;
+    return true;
 }
 
 void ListNotifier::run()

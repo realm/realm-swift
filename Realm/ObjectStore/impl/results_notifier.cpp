@@ -71,10 +71,11 @@ static bool map_moves(size_t& idx, CollectionChangeIndices const& changes)
 //
 // Separately from the handover data flow, m_target_results is guarded by the target lock
 
-void ResultsNotifier::do_add_required_change_info(TransactionChangeInfo& info)
+bool ResultsNotifier::do_add_required_change_info(TransactionChangeInfo& info)
 {
     REALM_ASSERT(m_query);
     m_info = &info;
+    return m_initial_run_complete && have_callbacks();
 }
 
 void ResultsNotifier::run()
