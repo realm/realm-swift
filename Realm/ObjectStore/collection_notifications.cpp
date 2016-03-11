@@ -273,43 +273,21 @@ struct RowInfo {
 void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, CollectionChangeIndices& changeset,
                               std::function<bool (size_t)> row_did_change)
 {
-    std::sort(begin(new_rows), end(new_rows), [](auto& lft, auto& rgt) {
-        return lft.tv_index < rgt.tv_index;
-    });
-
-    IndexSet::IndexInterator ins = changeset.insertions.begin(), del = changeset.deletions.begin();
-    int shift = 0;
     for (auto& row : new_rows) {
-        while (del != changeset.deletions.end() && *del <= row.tv_index) {
-            ++del;
-            ++shift;
-        }
-        while (ins != changeset.insertions.end() && *ins <= row.tv_index) {
-            ++ins;
-            --shift;
-        }
-        if (row.prev_tv_index == npos)
-            continue;
-
-        // For unsorted, non-LV queries a row can only move to an index before
-        // its original position due to a move_last_over
-        if (row.tv_index + shift != row.prev_tv_index) {
-            --shift;
+        // Calculate where this row would be with only previous insertions
+        // and deletions. We can ignore future insertions/deletions from moves
+        // because move_last_over() can only move rows to lower indices
+        size_t expected = row.prev_tv_index
+                        - changeset.deletions.count(0, row.prev_tv_index)
+                        + changeset.insertions.count(0, row.tv_index);
+        if (row.tv_index != expected) {
             changeset.moves.push_back({row.prev_tv_index, row.tv_index});
+            changeset.insertions.add(row.tv_index);
+            changeset.deletions.add(row.prev_tv_index);
         }
-        // FIXME: currently move implies modification, and so they're mutally exclusive
-        // this is correct for sorted, but for unsorted a row can move without actually changing
-        else if (row_did_change(row.shifted_row_index)) {
-            // FIXME: needlessly quadratic
-            if (!changeset.insertions.contains(row.tv_index))
-                changeset.modifications.add(row.tv_index);
+        else if (!changeset.insertions.contains(row.tv_index) && row_did_change(row.shifted_row_index)) {
+            changeset.modifications.add(row.tv_index);
         }
-    }
-
-    // FIXME: this is required for merge(), but it would be nice if it wasn't
-    for (auto&& move : changeset.moves) {
-        changeset.insertions.add(move.to);
-        changeset.deletions.add(move.from);
     }
 }
 
@@ -380,14 +358,6 @@ void find_longest_matches(items const& a, items const& b_ndx,
 void calculate_moves_sorted(std::vector<RowInfo>& new_rows, CollectionChangeIndices& changeset,
                             std::function<bool (size_t)> row_did_change)
 {
-    // Remove new insertions, as they're already reported in changeset
-    new_rows.erase(std::remove_if(begin(new_rows), end(new_rows),
-                                  [](auto& row) { return row.prev_tv_index == npos; }),
-                   end(new_rows));
-
-    std::sort(begin(new_rows), end(new_rows),
-              [](auto& lft, auto& rgt) { return lft.tv_index < rgt.tv_index; });
-
     std::vector<std::pair<size_t, size_t>> old_candidates;
     std::vector<std::pair<size_t, size_t>> new_candidates;
     for (auto& row : new_rows) {
@@ -500,6 +470,12 @@ CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> c
         ret.deletions.add(old_rows[i].tv_index);
     for (; j < new_rows.size(); ++j)
         ret.insertions.add(new_rows[j].tv_index);
+
+    new_rows.erase(std::remove_if(begin(new_rows), end(new_rows),
+                                  [](auto& row) { return row.prev_tv_index == npos; }),
+                   end(new_rows));
+    std::sort(begin(new_rows), end(new_rows),
+              [](auto& lft, auto& rgt) { return lft.tv_index < rgt.tv_index; });
 
     if (sort) {
         calculate_moves_sorted(new_rows, ret, row_did_change);
