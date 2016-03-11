@@ -102,6 +102,7 @@ void CollectionChangeBuilder::merge(CollectionChangeBuilder&& c)
             }
 
             // Check if the destination was deleted
+            // Removing the insert for this move will happen later
             if (c.deletions.contains(old.to))
                 return true;
 
@@ -114,10 +115,18 @@ void CollectionChangeBuilder::merge(CollectionChangeBuilder&& c)
 
     // Ignore new moves of rows which were previously inserted (the implicit
     // delete from the move will remove the insert)
-    if (!insertions.empty()) {
+    if (!insertions.empty() && !c.moves.empty()) {
         c.moves.erase(remove_if(begin(c.moves), end(c.moves),
                               [&](auto const& m) { return insertions.contains(m.from); }),
                     end(c.moves));
+    }
+
+    // Ensure that any previously modified rows which were moved are still modified
+    if (!modifications.empty() && !c.moves.empty()) {
+        for (auto const& move : c.moves) {
+            if (modifications.contains(move.from))
+                c.modifications.add(move.to);
+        }
     }
 
     // Update the source position of new moves to compensate for the changes made
@@ -137,8 +146,17 @@ void CollectionChangeBuilder::merge(CollectionChangeBuilder&& c)
     insertions.erase_at(c.deletions);
     insertions.insert_at(c.insertions);
 
-    // Ignore new mmodifications to previously inserted rows
-    c.modifications.remove(insertions);
+    // Look for moves which are now no-ops, and remove them plus the associated
+    // insert+delete. Note that this isn't just checking for from == to due to
+    // that rows can also be shifted by other inserts and deletes
+    IndexSet to_remove;
+    moves.erase(remove_if(begin(moves), end(moves), [&](auto const& move) {
+        if (move.from - deletions.count(0, move.from) != move.to - insertions.count(0, move.to))
+            return false;
+        deletions.remove(move.from);
+        insertions.remove(move.to);
+        return true;
+    }), end(moves));
 
     modifications.erase_at(c.deletions);
     modifications.shift_for_insert_at(c.insertions);
@@ -270,8 +288,7 @@ struct RowInfo {
     size_t tv_index;
 };
 
-void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, CollectionChangeIndices& changeset,
-                              std::function<bool (size_t)> row_did_change)
+void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, CollectionChangeIndices& changeset)
 {
     for (auto& row : new_rows) {
         // Calculate where this row would be with only previous insertions
@@ -284,9 +301,6 @@ void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, CollectionChangeIn
             changeset.moves.push_back({row.prev_tv_index, row.tv_index});
             changeset.insertions.add(row.tv_index);
             changeset.deletions.add(row.prev_tv_index);
-        }
-        else if (!changeset.insertions.contains(row.tv_index) && row_did_change(row.shifted_row_index)) {
-            changeset.modifications.add(row.tv_index);
         }
     }
 }
@@ -355,16 +369,11 @@ void find_longest_matches(items const& a, items const& b_ndx,
         find_longest_matches(a, b_ndx, m.i + m.size, end1, m.j + m.size, end2, modified, ret);
 }
 
-void calculate_moves_sorted(std::vector<RowInfo>& new_rows, CollectionChangeIndices& changeset,
-                            std::function<bool (size_t)> row_did_change)
+void calculate_moves_sorted(std::vector<RowInfo>& new_rows, CollectionChangeIndices& changeset)
 {
     std::vector<std::pair<size_t, size_t>> old_candidates;
     std::vector<std::pair<size_t, size_t>> new_candidates;
     for (auto& row : new_rows) {
-        if (row_did_change(row.shifted_row_index)) {
-            changeset.modifications.add(row.tv_index);
-        }
-
         old_candidates.push_back({row.shifted_row_index, row.prev_tv_index});
         new_candidates.push_back({row.shifted_row_index, row.tv_index});
     }
@@ -415,9 +424,6 @@ void calculate_moves_sorted(std::vector<RowInfo>& new_rows, CollectionChangeIndi
         i += match.size;
         j += match.size;
     }
-
-    // FIXME: needlessly suboptimal
-    changeset.modifications.remove(changeset.insertions);
 }
 } // Anonymous namespace
 
@@ -471,17 +477,25 @@ CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> c
     for (; j < new_rows.size(); ++j)
         ret.insertions.add(new_rows[j].tv_index);
 
+    // Filter out the new insertions since we don't need them for any of the
+    // further calculations
     new_rows.erase(std::remove_if(begin(new_rows), end(new_rows),
                                   [](auto& row) { return row.prev_tv_index == npos; }),
                    end(new_rows));
     std::sort(begin(new_rows), end(new_rows),
               [](auto& lft, auto& rgt) { return lft.tv_index < rgt.tv_index; });
 
+    for (auto& row : new_rows) {
+        if (row_did_change(row.shifted_row_index)) {
+            ret.modifications.add(row.tv_index);
+        }
+    }
+
     if (sort) {
-        calculate_moves_sorted(new_rows, ret, row_did_change);
+        calculate_moves_sorted(new_rows, ret);
     }
     else {
-        calculate_moves_unsorted(new_rows, ret, row_did_change);
+        calculate_moves_unsorted(new_rows, ret);
     }
     ret.verify();
 

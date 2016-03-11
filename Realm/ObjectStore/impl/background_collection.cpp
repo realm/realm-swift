@@ -200,6 +200,7 @@ bool BackgroundCollection::deliver(SharedGroup& sg, std::exception_ptr err)
 
     bool should_call_callbacks = do_deliver(sg);
     m_changes_to_deliver = std::move(m_accumulated_changes);
+    m_changes_to_deliver.modifications.remove(m_changes_to_deliver.insertions);
     return should_call_callbacks && have_callbacks();
 }
 

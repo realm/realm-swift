@@ -98,9 +98,9 @@ void ListNotifier::run()
     m_change.moves.erase(remove_if(begin(m_change.moves), end(m_change.moves),
                                    [&](auto move) { return m_change.modifications.contains(move.to); }),
                          end(m_change.moves));
-    m_change.modifications.remove(m_change.insertions);
 
     for (size_t i = 0; i < m_lv->size(); ++i) {
+        // FIXME: may need to mark modifications even for inserts (for moves?)
         if (m_change.insertions.contains(i) || m_change.modifications.contains(i))
             continue;
         if (m_info->row_did_change(m_lv->get_target_table(), m_lv->get(i).get_index()))

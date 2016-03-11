@@ -86,6 +86,14 @@ size_t IndexSet::add_shifted(size_t index)
 
 void IndexSet::add_shifted_by(IndexSet const& shifted_by, IndexSet const& values)
 {
+#ifdef REALM_DEBUG
+    ptrdiff_t expected = std::distance(as_indexes().begin(), as_indexes().end());
+    for (auto index : values.as_indexes()) {
+        if (!shifted_by.contains(index))
+            ++expected;
+    }
+#endif
+
     auto it = shifted_by.begin(), end = shifted_by.end();
     size_t shift = 0;
     size_t skip_until = 0;
@@ -100,6 +108,8 @@ void IndexSet::add_shifted_by(IndexSet const& shifted_by, IndexSet const& values
             ++shift;
         }
     }
+
+    REALM_ASSERT_DEBUG(std::distance(as_indexes().begin(), as_indexes().end()) == expected);
 }
 
 void IndexSet::set(size_t len)
