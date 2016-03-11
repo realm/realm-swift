@@ -359,7 +359,7 @@ void RealmCoordinator::run_async_notifiers()
         // releasing the lock
         for (auto& notifier : new_notifiers) {
             if (version != notifier->version()) {
-                transaction::advance_and_observe_linkviews(*m_advancer_sg, *info, notifier->version());
+                transaction::advance(*m_advancer_sg, *info, notifier->version());
                 change_info.push_back({{}, std::move(info->lists)});
                 info = &change_info.back();
                 version = notifier->version();
@@ -368,7 +368,7 @@ void RealmCoordinator::run_async_notifiers()
             notifier->add_required_change_info(*info);
         }
 
-        transaction::advance_and_observe_linkviews(*m_advancer_sg, *info);
+        transaction::advance(*m_advancer_sg, *info);
 
         for (auto& notifier : new_notifiers) {
             notifier->detach();
@@ -386,7 +386,7 @@ void RealmCoordinator::run_async_notifiers()
         notifier->add_required_change_info(change_info[0]);
     }
 
-    transaction::advance_and_observe_linkviews(*m_notifier_sg, change_info[0], version);
+    transaction::advance(*m_notifier_sg, change_info[0], version);
 
     // Attach the new notifiers to the main SG and move them to the main list
     for (auto& notifier : new_notifiers) {

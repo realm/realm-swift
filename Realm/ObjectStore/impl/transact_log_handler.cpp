@@ -584,11 +584,17 @@ void cancel(SharedGroup& sg, BindingContext* context)
     }, false);
 }
 
-void advance_and_observe_linkviews(SharedGroup& sg,
-                                   TransactionChangeInfo& info,
-                                   SharedGroup::VersionID version)
+void advance(SharedGroup& sg,
+             TransactionChangeInfo& info,
+             SharedGroup::VersionID version)
 {
-    LangBindHelper::advance_read(sg, LinkViewObserver(info), version);
+    if (info.tables_needed.empty() && info.lists.empty()) {
+        LangBindHelper::advance_read(sg, version);
+    }
+    else {
+        LangBindHelper::advance_read(sg, LinkViewObserver(info), version);
+    }
+
 }
 
 } // namespace transaction

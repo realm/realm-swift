@@ -49,9 +49,10 @@ void commit(SharedGroup& sg, BindingContext* binding_context);
 // for reverting to the old values sent to delegate
 void cancel(SharedGroup& sg, BindingContext* binding_context);
 
-void advance_and_observe_linkviews(SharedGroup& sg,
-                                   TransactionChangeInfo& info,
-                                   SharedGroup::VersionID version=SharedGroup::VersionID{});
+// Advance the read transaction version, with change information gathered in info
+void advance(SharedGroup& sg,
+             TransactionChangeInfo& info,
+             SharedGroup::VersionID version=SharedGroup::VersionID{});
 } // namespace transaction
 } // namespace _impl
 } // namespace realm
