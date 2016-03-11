@@ -107,7 +107,6 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
         }
 
         s_localNameToClass[className] = cls;
-        RLMReplaceClassNameMethod(cls, className);
     }
 }
 
