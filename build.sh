@@ -647,6 +647,7 @@ case "$COMMAND" in
         ;;
 
     "verify-cocoapods")
+        pod spec lint
         cd examples/installation
         sh build.sh test-ios-objc-cocoapods || exit 1
         sh build.sh test-ios-swift-cocoapods || exit 1
