@@ -25,8 +25,9 @@
 #include "object_store.hpp"
 #include "schema.hpp"
 
-#include <realm/sync/commit_log.hpp>
 #include <realm/group_shared.hpp>
+#include <realm/commit_log.hpp>
+#include <realm/sync/history.hpp>
 
 #include <mutex>
 
@@ -89,7 +90,7 @@ void Realm::open_with_config(const Config& config,
             // probably has to be transmuted to an NSError.
             bool server_synchronization_mode = bool(config.sync_server_url);
             if (server_synchronization_mode) {
-                history = realm::make_client_transform_history(config.path, config.encryption_key.data());
+                history = realm::sync::make_sync_history(config.path);
             }
             else {
                 history = realm::make_client_history(config.path, config.encryption_key.data());
@@ -189,6 +190,11 @@ Group *Realm::read_group()
         m_group = &const_cast<Group&>(m_shared_group->begin_read());
     }
     return m_group;
+}
+
+SharedGroup& Realm::get_shared_group()
+{
+    return *m_shared_group;
 }
 
 SharedRealm Realm::get_shared_realm(Config config)

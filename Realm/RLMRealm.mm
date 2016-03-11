@@ -35,1155 +35,130 @@
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
+#include <memory>
 #include <set>
+#include <thread>
+
 #include "impl/realm_coordinator.hpp"
 
 #include "object_store.hpp"
 #include "schema.hpp"
 #include "shared_realm.hpp"
 
-#include <realm/sync/commit_log.hpp>
+#include <realm/util/memory_stream.hpp>
+#include <realm/util/logger.hpp>
 #include <realm/disable_sync_to_disk.hpp>
 #include <realm/lang_bind_helper.hpp>
-#include <realm/util/memory_stream.hpp>
 #include <realm/version.hpp>
+#include <realm/sync/history.hpp>
+#include <realm/sync/client.hpp>
 
 using namespace realm;
 using util::File;
 
-// Access to s_syncSessions (referenced NSMapTable object), s_serverConnections
-// (referenced NSMapTable object), and s_lastServerConnectionIdent, must be
-// synchronized with respect to s_realmsPerPath.
+namespace {
+
+class SyncLogger: public util::Logger {
+public:
+    void do_log(const std::string& message) override
+    {
+        NSString *message2 = [[NSString alloc] initWithBytes:message.data()
+                                                     length:message.size()
+                                                   encoding:NSUTF8StringEncoding];
+        NSLog(@"RealmSync: %@", message2);
+    }
+};
+
+// Key is "<user token>:<user token signature>"
+NSMapTable *g_syncClients = [NSMapTable strongToWeakObjectsMapTable];
 
 // Maps local path to RLMSyncSession instance
-NSMapTable *s_syncSessions = [NSMapTable strongToWeakObjectsMapTable];
+NSMapTable *g_syncSessions = [NSMapTable strongToWeakObjectsMapTable];
 
-// Maps "server:port" to RLMServerConnection instance
-NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
+std::atomic<bool> g_syncLogEverything{false};
 
-unsigned long s_lastServerConnectionIdent = 0;
+} // unnamed namespace
 
-std::atomic<bool> s_syncLogEverything(false);
 
-// Instances of RLMServerConnection and RLMSyncSession may be created by any
-// thread, but all instance methods must be called by the main thread, except
-// backgroundTask and backgroundApplyChangeset in RLMSyncSession which are
-// called internally from a background thread.
-
-@interface RLMOutputMessage : NSObject
-@property (nonatomic) NSString *head;
-@property (nonatomic) NSData *body; // May be nil
+@interface RLMSyncClient : NSObject
 @end
 
-@interface RLMServerConnection : NSObject
-@property (readonly, nonatomic) unsigned long ident; // Used only for logging
-@property (readonly, nonatomic) NSString *identity;
-@property (readonly, nonatomic) NSString *signature;
-@property (readonly, nonatomic) BOOL isOpen;
-@end
 
 @interface RLMSyncSession : NSObject
-@property (readonly, nonatomic) RLMServerConnection *connection;
-@property (readonly, nonatomic) NSNumber *sessionIdent;
-@property (nonatomic) uint_fast64_t serverFileIdent;
-@property (nonatomic) uint_fast64_t clientFileIdent;
-@property (readonly, nonatomic) NSString *serverPath;
-@property (readonly, nonatomic) RLMRealmConfiguration *configuration;
-
-- (void)connectionIsOpen;
-- (void)connectionIsOpenAndSessionHasFileIdent;
-- (void)connectionIsClosed;
-- (void)handleAllocMessageWithServerFileIdent:(uint_fast64_t)serverFileIdent
-                              clientFileIdent:(uint_fast64_t)clientFileIdent;
-- (void)handleDownloadMessageWithServerVersion:(Replication::version_type)serverVersion
-                                 clientVersion:(Replication::version_type)clientVersion
-                                     changeset:(NSData *)changeset
-                               originTimestamp:(uint_fast64_t)originTimestamp
-                               originFileIdent:(uint_fast64_t)originFileIdent
-                               moreIsAvailable:(bool)moreIsAvailable;
-- (void)handleProgressMessageWithServerVersion:(Replication::version_type)serverVersion
-                                 clientVersion:(Replication::version_type)clientVersion;
-@end
-
-@interface RLMServerStreamDelegate : NSObject <NSStreamDelegate>
-- (instancetype)initWithConnection:(RLMServerConnection *)connection;
 @end
 
 
-@implementation RLMOutputMessage {
-    void (^_completionHandler)();
+@implementation RLMSyncClient {
+    SyncLogger _logger;
+    std::unique_ptr<sync::Client> _client;
+    std::thread _runLoopThread;
 }
 
-- (instancetype)init {
-    self = [super init];
-    if (self)
-        _completionHandler = nil;
-    return self;
-}
-
-- (void (^)())completionHandler {
-    return _completionHandler;
-}
-
-- (void)setCompletionHandler:(void (^)())block {
-    _completionHandler = block;
-}
-
-@end
-
-
-@implementation RLMServerConnection {
-    BOOL _isOpen;
-
-    NSString *_address;
-    NSNumber *_port;
-    BOOL _useSSL;
-
-    NSRunLoop *_runLoop;
-
-    NSInputStream  *_inputStream;
-    NSOutputStream *_outputStream;
-    RLMServerStreamDelegate *_streamDelegate;
-
-    BOOL _inputIsHead;
-    size_t _inputBufferSize;
-    std::unique_ptr<char[]> _inputBuffer;
-
-    size_t _headBufferSize;
-    std::unique_ptr<char[]> _headBuffer;
-    char *_headBufferCurr;
-
-    size_t _messageBodySize;
-    NSMutableData *_messageBodyBuffer;
-    char *_messageBodyCurr;
-    void (^_messageHandler)();
-
-    NSMutableArray *_outputQueue; // Of RLMOutputMessage instances
-    NSData *_currentOutputChunk;
-    NSData *_nextOutputChunk;
-    void (^_outputCompletionHandler)();
-    const char *_currentOutputBegin;
-    const char *_currentOutputEnd;
-
-    unsigned _lastSessionIdent;
-
-    // Maps session identifiers to an RLMSyncSession instances. A session
-    // identifier is a locally assigned integer that uniquely identifies the
-    // RLMSyncSession instance within a particular server connection.
-    NSMapTable *_sessions;
-
-    // Set of identifiers of bound sessions. More specifically, if T
-    // is the point in time of the last reestablishment of the
-    // connection (when `_isOpen` last became true), then
-    // `_boundSessions` is the set of session identifiers of the
-    // `RLMSyncSession` objects for which a BIND message has been
-    // enqueued since T. An enqueued message is one that is added to
-    // `_outputQueue`.
-    //
-    // A session remains in this set even after an UNBIND message has
-    // been sent.
-    //
-    // The set is cleared whenever the connection is reestablished to
-    // reflect the fact that all session bindings are void upon losing
-    // a connection.
-    std::set<unsigned> _boundSessions;
-}
-
-
-- (instancetype)initWithIdent:(unsigned long)ident
-                     identity:(NSString *)identity
-                     signature:(NSString *)signature
-                      address:(NSString *)address
-                         port:(NSNumber *)port {
+- (instancetype)initWithUserToken:(NSString *)userToken
+               userTokenSignature:(NSString *)userTokenSignature {
     self = [super init];
     if (self) {
-        _ident = ident;
-        _identity = [identity copy];
-        _signature = [signature copy];
-        _isOpen = NO;
-
-        _address = address;
-        _port = port ? port : [NSNumber numberWithInt:7800];
-        _useSSL = [port isEqualToNumber:@443];
-
-        _runLoop = nil;
-
-        _streamDelegate = [[RLMServerStreamDelegate alloc] initWithConnection:self];
-
-        _inputBufferSize = 1024;
-        _inputBuffer = std::make_unique<char[]>(_inputBufferSize);
-
-        _headBufferSize = 256;
-        _headBuffer = std::make_unique<char[]>(_headBufferSize);
-
-        _currentOutputChunk = nil;
-        _nextOutputChunk = nil;
-        _outputCompletionHandler = nil;
-
-        _lastSessionIdent = 0;
-        _sessions = [NSMapTable strongToWeakObjectsMapTable];
+        sync::Client::LogLevel logLevel = sync::Client::LogLevel::normal;
+        if (g_syncLogEverything)
+            logLevel = sync::Client::LogLevel::everything;
+        _client.reset(new sync::Client(userToken.UTF8String, userTokenSignature.UTF8String,
+                                       &_logger, logLevel)); // Throws
+        sync::Client& client = *_client;
+        auto runLoopThread = [&client] {
+            client.run(); // Throws
+        };
+        _runLoopThread = std::thread(runLoopThread); // Throws
     }
     return self;
 }
 
-
-- (unsigned)newSessionIdent
-{
-    return ++_lastSessionIdent;
-}
-
-
-- (void)mainThreadInit {
-    // Called by main thread
-    if (_runLoop)
-        return;
-    _runLoop = [NSRunLoop currentRunLoop];
-
-    [self open];
-}
-
-
-- (void)open {
-    if (_isOpen)
-        return;
-
-    NSLog(@"RealmSync: Connection[%lu]: Opening connection to %@:%@", _ident, _address, _port);
-
-    CFAllocatorRef defaultAllocator = 0;
-    CFStringRef address2 = (__bridge CFStringRef)_address;
-    UInt32 port2 = UInt32(_port.unsignedLongValue);
-    CFReadStreamRef  readStream  = 0;
-    CFWriteStreamRef writeStream = 0;
-    CFStreamCreatePairWithSocketToHost(defaultAllocator, address2, port2,
-                                       &readStream, &writeStream);
-    NSInputStream  *inputStream  = (__bridge_transfer NSInputStream  *)readStream;
-    NSOutputStream *outputStream = (__bridge_transfer NSOutputStream *)writeStream;
-
-    if (_useSSL) {
-        [inputStream  setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
-        [outputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
-    }
-
-    // Ensure that the delegate object outlives the stream objects
-    static char key;
-    objc_setAssociatedObject(inputStream,  &key, _streamDelegate, OBJC_ASSOCIATION_RETAIN);
-    objc_setAssociatedObject(outputStream, &key, _streamDelegate, OBJC_ASSOCIATION_RETAIN);
-
-    [inputStream setDelegate:_streamDelegate];
-    [outputStream setDelegate:_streamDelegate];
-
-    [inputStream scheduleInRunLoop:_runLoop forMode:NSDefaultRunLoopMode];
-    [inputStream open];
-    [outputStream open];
-
-    _inputStream  = inputStream;
-    _outputStream = outputStream;
-
-    _inputIsHead = YES;
-    _headBufferCurr = _headBuffer.get();
-
-    _outputQueue = [NSMutableArray array];
-
-    _boundSessions.clear();
-
-    _isOpen = YES;
-
-    [self sendIdentMessage];
-
-    for (NSNumber *sessionIdent in _sessions) {
-        RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
-        [session connectionIsOpen];
-    }
-}
-
-
-- (void)closeAndTryToReconnectLater {
-    if (!_isOpen)
-        return;
-
-    [_inputStream close];
-    [_outputStream close];
-
-    _inputStream  = nil;
-    _outputStream = nil;
-
-    _outputQueue = nil;
-    _currentOutputChunk = nil;
-    _nextOutputChunk = nil;
-    _outputCompletionHandler = nil;
-
-    _isOpen = NO;
-
-    for (NSNumber *sessionIdent in _sessions) {
-        RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
-        [session connectionIsClosed];
-    }
-
-    NSTimeInterval reconnectDelay = 5;
-
-    NSLog(@"RealmSync: Connection[%lu]: Closed (will try to reconnect in %g seconds)",
-          _ident, double(reconnectDelay));
-
-    [self performSelector:@selector(open) withObject:nil afterDelay:reconnectDelay];
-}
-
-
-- (void)addSession:(RLMSyncSession *)session {
-    [_sessions setObject:session forKey:session.sessionIdent];
-    if (_isOpen)
-        [session connectionIsOpen];
-}
-
-
-- (void)unbindSession:(NSNumber *)sessionIdent {
-    auto i = _boundSessions.find(sessionIdent.unsignedIntValue);
-    if (i != _boundSessions.end())
-        [self sendUnbindMessageWithSessionIdent:sessionIdent];
-}
-
-
-- (void)sendIdentMessage {
-    // FIXME: These need to be set correctly (tentative:
-    // `applicationIdent` is a unique application identifier registered with
-    // Realm and `userIdent` could for example be the concattenation of a user
-    // name and a password).
-    NSData *userIdentData = [self.identity dataUsingEncoding:NSASCIIStringEncoding];
-    NSData *signatureData = [self.signature dataUsingEncoding:NSASCIIStringEncoding];
-
-    NSMutableData *body = [userIdentData mutableCopy];
-    [body appendData:signatureData];
-
-    unsigned long long protocolVersion = 1;
-    size_t userIdentSize = size_t(userIdentData.length);
-    size_t signatureSize = size_t(signatureData.length);
-    RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
-    msg.body = body;
-    msg.head = [NSString stringWithFormat:@"ident %llu %zu %zu\n", protocolVersion,
-                         userIdentSize, signatureSize];
-    [self enqueueOutputMessage:msg];
-    NSLog(@"RealmSync: Connection[%lu]: Sending: IDENT", _ident);
-}
-
-
-- (void)sendAllocMessageWithSessionIdent:(NSNumber *)sessionIdent
-                              serverPath:(NSString *)serverPath {
-    RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
-    typedef unsigned long ulong;
-    msg.body = [serverPath dataUsingEncoding:NSUTF8StringEncoding];
-    msg.head = [NSString stringWithFormat:@"alloc %@ %lu\n", sessionIdent, ulong(msg.body.length)];
-    [self enqueueOutputMessage:msg];
-    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: ALLOC(server_path='%@')", _ident,
-          sessionIdent, serverPath);
-}
-
-
-- (void)sendBindMessageWithSessionIdent:(NSNumber *)sessionIdent
-                        serverFileIdent:(uint_fast64_t)serverFileIdent
-                        clientFileIdent:(uint_fast64_t)clientFileIdent
-                             serverPath:(NSString *)serverPath
-                          serverVersion:(Replication::version_type)serverVersion
-                          clientVersion:(Replication::version_type)clientVersion {
-    typedef unsigned long      ulong;
-    typedef unsigned long long ulonglong;
-    RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
-    msg.body = [serverPath dataUsingEncoding:NSUTF8StringEncoding];
-    msg.head = [NSString stringWithFormat:@"bind %@ %llu %llu %lu %llu %llu\n", sessionIdent,
-                         ulonglong(serverFileIdent), ulonglong(clientFileIdent),
-                         ulong(msg.body.length), ulonglong(serverVersion),
-                         ulonglong(clientVersion)];
-    [self enqueueOutputMessage:msg];
-    _boundSessions.insert(sessionIdent.unsignedIntValue);
-    NSLog(@"RealmSync: Connection[%lu]: Sessions[%@]: Sending: BIND(server_file_ident=%llu, "
-          "client_file_ident=%llu, server_path='%@', server_version=%llu, client_version=%llu)",
-          _ident, sessionIdent, ulonglong(serverFileIdent), ulonglong(clientFileIdent), serverPath,
-          ulonglong(serverVersion), ulonglong(clientVersion));
-}
-
-
-- (void)sendUnbindMessageWithSessionIdent:(NSNumber *)sessionIdent {
-    RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
-    msg.head = [NSString stringWithFormat:@"unbind %@\n", sessionIdent];
-    [self enqueueOutputMessage:msg];
-    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: UNBIND", _ident, sessionIdent);
-}
-
-
-- (void)enqueueOutputMessage:(RLMOutputMessage *)msg {
-    [_outputQueue addObject:msg];
-    if (_isOpen && !_currentOutputChunk) {
-        [self resumeOutput];
-        [_outputStream scheduleInRunLoop:_runLoop forMode:NSDefaultRunLoopMode];
-    }
-}
-
-
-- (BOOL)resumeOutput {
-    if (_nextOutputChunk) {
-        _currentOutputChunk = _nextOutputChunk;
-        _nextOutputChunk = nil;
-    }
-    else {
-        if (_outputCompletionHandler) {
-            void (^completionHandler)();
-            completionHandler = _outputCompletionHandler;
-            _outputCompletionHandler = nil;
-            // This handler is allowed to enqueue new output messages
-            completionHandler();
-        }
-        RLMOutputMessage *msg = _outputQueue.firstObject;
-        if (!msg)
-            return NO;
-        _currentOutputChunk = [msg.head dataUsingEncoding:NSUTF8StringEncoding];
-        _nextOutputChunk = msg.body;
-        if (_nextOutputChunk.length == 0)
-            _nextOutputChunk = nil;
-        _outputCompletionHandler = msg.completionHandler;
-        [_outputQueue removeObjectAtIndex:0];
-    }
-    _currentOutputBegin = static_cast<const char*>(_currentOutputChunk.bytes);
-    _currentOutputEnd   = _currentOutputBegin + _currentOutputChunk.length;
-    return YES;
-}
-
-
-- (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode {
-    switch (eventCode) {
-        case NSStreamEventHasBytesAvailable: {
-            if (stream != _inputStream)
-                return;
-            uint8_t *buffer = reinterpret_cast<uint8_t *>(_inputBuffer.get());
-            NSUInteger length = _inputBufferSize;
-            NSInteger n = [_inputStream read:buffer maxLength:length];
-            if (n < 0) {
-                NSLog(@"RealmSync: Connection[%lu]: Error reading from socket: %@",
-                      _ident, _inputStream.streamError);
-                [self closeAndTryToReconnectLater];
-                return;
-            }
-            if (n == 0)
-                goto end_of_input;
-            char *headBufferBegin = _headBuffer.get();
-            char *headBufferEnd = headBufferBegin + _headBufferSize;
-            const char *inputBegin = _inputBuffer.get();
-            const char *inputEnd = inputBegin + n;
-            if (!_inputIsHead)
-                goto body;
-            for (;;) {
-                // Message head
-                {
-                    size_t sourceAvail = inputEnd - inputBegin;
-                    size_t destAvail = headBufferEnd - _headBufferCurr;
-                    size_t avail = std::min(sourceAvail, destAvail);
-                    const char *i = std::find(inputBegin, inputBegin + avail, '\n');
-                    _headBufferCurr = std::copy(inputBegin, i, _headBufferCurr);
-                    if (_headBufferCurr == headBufferEnd) {
-                        NSLog(@"RealmSync: Connection[%lu]: Message head too big", _ident);
-                        [self closeAndTryToReconnectLater];
-                        return;
-                    }
-                    inputBegin = i;
-                    if (inputBegin == inputEnd)
-                        break;
-                    ++inputBegin; // Discard newline from input
-                    _inputIsHead = NO;
-
-                    util::MemoryInputStream parser;
-                    parser.set_buffer(headBufferBegin, _headBufferCurr);
-                    _headBufferCurr = headBufferBegin;
-                    parser.unsetf(std::ios_base::skipws);
-
-                    std::string message_type;
-                    parser >> message_type;
-
-                    _messageHandler = nil;
-                    __weak RLMServerConnection *weakSelf = self;
-                    if (message_type == "download") {
-                        // A new foreign changeset is available for download
-                        unsigned sessionIdent = 0;
-                        Replication::version_type serverVersion = 0;
-                        Replication::version_type clientVersion = 0;
-                        size_t changesetSize = 0;
-                        uint_fast64_t originTimestamp = 0;
-                        uint_fast64_t originFileIdent = 0;
-                        bool moreIsAvailable = false;
-                        char sp1, sp2, sp3, sp4, sp5, sp6, sp7;
-                        parser >> sp1 >> sessionIdent >> sp2 >> serverVersion >> sp3 >>
-                            clientVersion >> sp4 >> changesetSize >> sp5 >>
-                            originTimestamp >> sp6 >> originFileIdent >> sp7 >> moreIsAvailable;
-                        bool good = parser && parser.eof() && sp1 == ' ' && sp2 == ' ' &&
-                            sp3 == ' ' && sp4 == ' ' && sp5 == ' ' && sp6 == ' ' && sp7 == ' ';
-                        if (!good) {
-                            NSLog(@"RealmSync: Connection[%lu]: Bad DOWNLOAD message "
-                                  "from server", _ident);
-                            [self closeAndTryToReconnectLater];
-                            return;
-                        }
-                        _messageBodySize = changesetSize;
-                        _messageHandler = ^{
-                            NSNumber *sessionIdent2 = [NSNumber numberWithUnsignedInteger:sessionIdent];
-                            [weakSelf handleDownloadMessageWithSessionIdent:sessionIdent2
-                                                              serverVersion:serverVersion
-                                                              clientVersion:clientVersion
-                                                            originTimestamp:originTimestamp
-                                                            originFileIdent:originFileIdent
-                                                            moreIsAvailable:moreIsAvailable];
-                        };
-                    }
-                    else if (message_type == "progress") {
-                        unsigned sessionIdent = 0;
-                        Replication::version_type serverVersion = 0;
-                        Replication::version_type clientVersion = 0;
-                        char sp1, sp2, sp3;
-                        parser >> sp1 >> sessionIdent >> sp2 >> serverVersion >> sp3 >>
-                            clientVersion;
-                        bool good = parser && parser.eof() && sp1 == ' ' && sp2 == ' ' &&
-                            sp3 == ' ';
-                        if (!good) {
-                            NSLog(@"RealmSync: Connection[%lu]: Bad PROGRESS message from server",
-                                  _ident);
-                            [self closeAndTryToReconnectLater];
-                            return;
-                        }
-                        NSNumber *sessionIdent2 = [NSNumber numberWithUnsignedInteger:sessionIdent];
-                        [self handleProgressMessageWithSessionIdent:sessionIdent2
-                                                      serverVersion:serverVersion
-                                                      clientVersion:clientVersion];
-                    }
-                    else if (message_type == "alloc") {
-                        // New unique file identifier pair from server.
-                        unsigned sessionIdent = 0;
-                        uint_fast64_t serverFileIdent = 0, clientFileIdent = 0;
-                        char sp1, sp2, sp3;
-                        parser >> sp1 >> sessionIdent >> sp2 >> serverFileIdent >> sp3 >>
-                            clientFileIdent;
-                        bool good = parser && parser.eof() && sp1 == ' ' && sp2 == ' ' &&
-                            sp3 == ' ';
-                        if (!good) {
-                            NSLog(@"RealmSync: Connection[%lu]: Bad ALLOC message "
-                                  "from server", _ident);
-                            [self closeAndTryToReconnectLater];
-                            return;
-                        }
-                        NSNumber *sessionIdent2 = [NSNumber numberWithUnsignedInteger:sessionIdent];
-                        [self handleAllocMessageWithSessionIdent:sessionIdent2
-                                                 serverFileIdent:serverFileIdent
-                                                 clientFileIdent:clientFileIdent];
-                    }
-                    else {
-                        NSLog(@"RealmSync: Connection[%lu]: Bad message from server", _ident);
-                        [self closeAndTryToReconnectLater];
-                        return;
-                    }
-                }
-
-                // Message body
-                if (_messageHandler) {
-                    _messageBodyBuffer = [NSMutableData dataWithLength:_messageBodySize];
-                    _messageBodyCurr = static_cast<char*>(_messageBodyBuffer.mutableBytes);
-                  body:
-                    char *messageBodyBegin = static_cast<char*>(_messageBodyBuffer.mutableBytes);
-                    char *messageBodyEnd = messageBodyBegin + _messageBodySize;
-                    size_t sourceAvail = inputEnd - inputBegin;
-                    size_t destAvail = messageBodyEnd - _messageBodyCurr;
-                    size_t avail = std::min(sourceAvail, destAvail);
-                    const char *i = inputBegin + avail;
-                    _messageBodyCurr = std::copy(inputBegin, i, _messageBodyCurr);
-                    inputBegin = i;
-                    if (_messageBodyCurr != messageBodyEnd) {
-                        REALM_ASSERT(inputBegin == inputEnd);
-                        break;
-                    }
-                    void (^messageHandler)();
-                    messageHandler = _messageHandler;
-                    _messageHandler = nil;
-                    messageHandler();
-                    if (!_isOpen)
-                        return;
-                }
-                _inputIsHead = YES;
-            }
-            break;
-        }
-        case NSStreamEventHasSpaceAvailable: {
-            if (stream != _outputStream)
-                return;
-            REALM_ASSERT(_currentOutputChunk);
-            const uint8_t *buffer = reinterpret_cast<const uint8_t *>(_currentOutputBegin);
-            NSUInteger length = _currentOutputEnd - _currentOutputBegin;
-            NSInteger n = [_outputStream write:buffer maxLength:length];
-            if (n < 0) {
-                NSLog(@"RealmSync: Connection[%lu]: Error writing to socket: %@",
-                      _ident, _outputStream.streamError);
-                [self closeAndTryToReconnectLater];
-                return;
-            }
-            _currentOutputBegin += n;
-            if (_currentOutputBegin == _currentOutputEnd) {
-                BOOL more = [self resumeOutput];
-                if (!more) {
-                    _currentOutputChunk = 0;
-                    [_outputStream removeFromRunLoop:_runLoop forMode:NSDefaultRunLoopMode];
-                }
-            }
-            break;
-        }
-        case NSStreamEventEndEncountered: {
-            if (stream != _inputStream && stream != _outputStream)
-                return;
-          end_of_input:
-            NSLog(@"RealmSync: Connection[%lu]: Server closed connection", _ident);
-            [self closeAndTryToReconnectLater];
-            return;
-        }
-        case NSStreamEventErrorOccurred: {
-            if (stream != _inputStream && stream != _outputStream)
-                return;
-            NSLog(@"RealmSync: Connection[%lu]: Socket error: %@", _ident, stream.streamError);
-            [self closeAndTryToReconnectLater];
-            return;
-        }
-    }
-}
-
-
-- (void)handleAllocMessageWithSessionIdent:(NSNumber *)sessionIdent
-                           serverFileIdent:(uint_fast64_t)serverFileIdent
-                           clientFileIdent:(uint_fast64_t)clientFileIdent {
-    typedef unsigned long long ulonglong;
-    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: ALLOC(%llu, %llu)", _ident,
-          sessionIdent, ulonglong(serverFileIdent), ulonglong(clientFileIdent));
-
-    RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
-    if (!session)
-        return; // This session no longer exists
-
-    [session handleAllocMessageWithServerFileIdent:serverFileIdent
-                                   clientFileIdent:clientFileIdent];
-}
-
-
-- (void)handleDownloadMessageWithSessionIdent:(NSNumber *)sessionIdent
-                                serverVersion:(Replication::version_type)serverVersion
-                                clientVersion:(Replication::version_type)clientVersion
-                              originTimestamp:(uint_fast64_t)originTimestamp
-                              originFileIdent:(uint_fast64_t)originFileIdent
-                              moreIsAvailable:(bool)moreIsAvailable {
-    if (s_syncLogEverything) {
-        using ulong     = unsigned long;
-        using ulonglong = unsigned long long;
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: DOWNLOAD(server_version=%llu, "
-              "client_version=%llu, changeset_size=%lu, origin_timestamp=%llu, "
-              "origin_file_ident=%llu, more_is_available=%d)", _ident, sessionIdent,
-              ulonglong(serverVersion), ulonglong(clientVersion), ulong(_messageBodyBuffer.length),
-              ulonglong(originTimestamp), ulonglong(originFileIdent), int(moreIsAvailable));
-    }
-
-    RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
-    if (!session)
-        return; // This session no longer exists
-
-    NSData *changeset = _messageBodyBuffer;
-    _messageBodyBuffer = nil;
-
-    [session handleDownloadMessageWithServerVersion:serverVersion
-                                      clientVersion:clientVersion
-                                          changeset:changeset
-                                    originTimestamp:originTimestamp
-                                    originFileIdent:originFileIdent
-                                    moreIsAvailable:moreIsAvailable];
-}
-
-
-- (void)handleProgressMessageWithSessionIdent:(NSNumber *)sessionIdent
-                                serverVersion:(Replication::version_type)serverVersion
-                                clientVersion:(Replication::version_type)clientVersion {
-    if (s_syncLogEverything) {
-        using ulonglong = unsigned long long;
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Received: PROGRESS(server_version=%llu, "
-              "client_version=%llu)", _ident, sessionIdent, ulonglong(serverVersion),
-              ulonglong(clientVersion));
-    }
-
-    RLMSyncSession *session = [_sessions objectForKey:sessionIdent];
-    if (!session)
-        return; // This session no longer exists
-
-    [session handleProgressMessageWithServerVersion:serverVersion clientVersion:clientVersion];
-}
-
-
 - (void)dealloc {
-    if (_inputStream || _outputStream) {
-        NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
-        NSInputStream  *inputStream  = _inputStream;
-        NSOutputStream *outputStream = _outputStream;
-        [mainQueue addOperationWithBlock:^{
-                [inputStream  close];
-                [outputStream close];
-            }];
+    if (_client) {
+        _client->stop();
+        if (_runLoopThread.joinable())
+            _runLoopThread.join();
     }
+}
+
+- (sync::Client&)getClient {
+    return *_client;
 }
 
 @end
 
 
 @implementation RLMSyncSession {
-    std::unique_ptr<ClientTransformHistory> _history;
-    std::unique_ptr<SharedGroup>            _sharedGroup;
-
-    std::unique_ptr<ClientTransformHistory> _backgroundHistory;     // For background thread
-    std::unique_ptr<SharedGroup>            _backgroundSharedGroup; // For background thread
-    std::unique_ptr<Transformer>            _backgroundTransformer; // For background thread
-
-    Replication::version_type _latestVersionAvailable;
-    Replication::version_type _latestVersionUploaded;
-    Replication::version_type _progressServerVersion;
-    Replication::version_type _progressClientVersion;
-    Replication::version_type _persistedProgressServerVersion;
-    Replication::version_type _persistedProgressClientVersion;
-    Replication::version_type _serverVersionThreshold;
-    BOOL _uploadInProgress;
-
-    std::vector<Transformer::RemoteChangeset> _pendingChangesets;
-    std::vector<NSData *> _pendingChangesetBuffers;
-
-    NSOperationQueue *_backgroundOperationQueue;
+    RLMSyncClient *_client;
+    NSString* _path;
+    std::unique_ptr<sync::Session> _session;
 }
 
 
-- (instancetype)initWithConnection:(RLMServerConnection *)connection
-                        serverPath:(NSString *)serverPath
-                     configuration:(RLMRealmConfiguration *)configuration {
+- (instancetype)initWithClient:(RLMSyncClient *)client
+                        path:(NSString *)path
+                     serverURL:(NSURL *)serverURL {
     self = [super init];
     if (self) {
-        _connection = connection;
-        _serverFileIdent = 0; // Assigned when `_clientFileIdent` is assigned
-        _clientFileIdent = 0; // Zero means unassigned
-        _serverPath = serverPath;
-        _configuration = [configuration copy];
-        _sessionIdent = [NSNumber numberWithUnsignedInteger:[connection newSessionIdent]];
-
-        SharedGroup::DurabilityLevel durability = SharedGroup::durability_Full;
-        _history = realm::make_client_transform_history(_configuration.path.UTF8String);
-        _sharedGroup = std::make_unique<SharedGroup>(*_history, durability);
-        _backgroundHistory = realm::make_client_transform_history(_configuration.path.UTF8String);
-        _backgroundSharedGroup = std::make_unique<SharedGroup>(*_backgroundHistory, durability);
-        _backgroundTransformer = realm::make_transformer(false, *_backgroundHistory);
-        _backgroundOperationQueue = [[NSOperationQueue alloc] init];
-        _backgroundOperationQueue.name = @"io.realm.sync";
-        _backgroundOperationQueue.maxConcurrentOperationCount = 1;
+        _client = client;
+        _path = path;
+        NSString *serverURL2 = [serverURL absoluteString];
+        auto syncTransactCallback = [path](sync::Session::version_type) {
+            // NOTE: This lambda is not allowed to refer to any part
+            // of the RLMSyncSession object, as it may execute after
+            // the deallocation of that object.
+            //
+            // FIXME: What to do if an error occurs in [RLMRealm
+            // realmWithPath:]?
+            [RLMRealm realmWithPath:path]->_realm->notify_others();
+        };
+        _session.reset(new sync::Session([client getClient], path.UTF8String, serverURL2.UTF8String,
+                                         syncTransactCallback)); // Throws
     }
     return self;
 }
 
-
-- (void)mainThreadInit {
-    // Called by main thread
-    uint_fast64_t serverFileIdent, clientFileIdent;
-    if (_history->get_file_ident_pair(serverFileIdent, clientFileIdent)) {
-        _serverFileIdent = serverFileIdent;
-        _clientFileIdent = clientFileIdent;
-        _backgroundTransformer->set_local_client_file_ident(clientFileIdent);
-    }
-
-    _history->get_sync_progress(_persistedProgressServerVersion, _persistedProgressClientVersion);
-
-    _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
-    REALM_ASSERT(_latestVersionAvailable >= 1);
-    REALM_ASSERT(_latestVersionAvailable >= _persistedProgressClientVersion);
-
-    // It is possible to find an inconsistency between the main Realm file, and
-    // the associated history file(s). In particular, since the server-side
-    // progress, as persisted in the history file(s), is updated after
-    // successful integration of an incoming changeset, it is possible to find
-    // that a changeset has been downloaded and integrated into the Realm, but
-    // that `_persisteedProgressServerVersion` has not been updated to reflect
-    // it, presumably due to a a crash at an unfortunate point in time.
-    //
-    // FIXME: This possibility of inconsistency can be eliminated by moving the
-    // history into the main Realm file, which is already something that is
-    // likely to happen for different reasons.
-    //
-    // If a new synchronization session is started at a time where such an
-    // inconsistency exists, the server will resend the changeset that was
-    // already integrated, and it is therefore necessary for the client to be
-    // able to reliably intercept and ignore a received changeset that is
-    // already integrated. `_serverVersionThreshold` was introduced to solve
-    // this problem.
-    //
-    // During initialization of a RLMSyncSession object,
-    // `_serverVersionThreshold` is set to `HistoryEntry::remote_version` of the
-    // last history entry, that succeeds `_persistedProgressClientVersion`, and
-    // is produced by integration of a remote changeset, or if no such history
-    // entry exists, it is set to `_persistedProgressServerVersion`.
-    //
-    // Given that, any changeset, that is received in a DOWNLOAD message
-    // specifying a server version less than, or equal to
-    // `_serverVersionThreshold`, is known to already have been integrated, and
-    // can be safely ignored by the client.
-    _serverVersionThreshold = _persistedProgressServerVersion;
-    {
-        HistoryEntry historyEntry;
-        History::version_type version = _latestVersionAvailable;
-        if (version == 1)
-            version = 0;
-        while (version > _persistedProgressClientVersion) {
-            History::version_type prevVersion = _history->get_history_entry(version, historyEntry);
-            BOOL isForeign = historyEntry.origin_client_file_ident != 0;
-            if (isForeign) {
-                _serverVersionThreshold = historyEntry.remote_version;
-                break;
-            }
-            version = prevVersion;
-        }
-    }
-
-    NSString *realmPath = _configuration.path;
-    NSLog(@"RealmSync: Connection[%lu]: Session[%@]: New session for '%@'", _connection.ident,
-          _sessionIdent, realmPath);
-
-/*
-    using ulonglong = unsigned long long;
-    NSLog(@"_latestVersionAvailable = %llu", ulongong(_latestVersionAvailable));
-    NSLog(@"_latestVersionUploaded = %llu",  ulongong(_latestVersionUploaded));
-    NSLog(@"_progressServerVersion = %llu",  ulongong(_persistedProgressServerVersion));
-    NSLog(@"_progressClientVersion = %llu",  ulongong(_persistedProgressClientVersion));
-    NSLog(@"_serverVersionThreshold = %llu", ulongong(_serverVersionThreshold));
-*/
-
-    [_connection mainThreadInit];
-    [_connection addSession:self];
-}
-
-
-- (void)refreshLatestVersionAvailable {
-    _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
-    if (_connection.isOpen && _clientFileIdent != 0)
-        [self resumeUpload];
-}
-
-
-- (void)connectionIsOpen {
-    if (_clientFileIdent != 0) {
-        [self connectionIsOpenAndSessionHasFileIdent];
-    }
-    else {
-        [_connection sendAllocMessageWithSessionIdent:_sessionIdent
-                                           serverPath:_serverPath];
-    }
-}
-
-
-- (void)connectionIsOpenAndSessionHasFileIdent {
-    _pendingChangesets.clear();
-    _pendingChangesetBuffers.clear();
-    _progressServerVersion = _persistedProgressServerVersion;
-    _progressClientVersion = _persistedProgressClientVersion;
-    _latestVersionUploaded = std::max<History::version_type>(1, _progressClientVersion);
-    if (_latestVersionUploaded > _latestVersionAvailable) // Transiently possible (FIXME: Or is it?)
-        _latestVersionUploaded = _latestVersionAvailable;
-    [_connection sendBindMessageWithSessionIdent:_sessionIdent
-                                 serverFileIdent:_serverFileIdent
-                                 clientFileIdent:_clientFileIdent
-                                      serverPath:_serverPath
-                                   serverVersion:_progressServerVersion
-                                   clientVersion:_progressClientVersion];
-    [self resumeUpload];
-}
-
-
-- (void)connectionIsClosed {
-    _uploadInProgress = NO;
-}
-
-
-- (void)resumeUpload {
-    REALM_ASSERT(_connection.isOpen && _clientFileIdent != 0);
-    if (_uploadInProgress)
-        return;
-    _uploadInProgress = YES;
-
-    // Fetch and copy the next changeset, and produce an output message from it.
-    // Set the completionHandler to a block that calls resumeUpload.
-    HistoryEntry::version_type uploadVersion;
-    HistoryEntry historyEntry;
-    for (;;) {
-        REALM_ASSERT(_latestVersionUploaded <= _latestVersionAvailable);
-        if (_latestVersionUploaded == _latestVersionAvailable) {
-            _uploadInProgress = NO;
-            return;
-        }
-        uploadVersion = _latestVersionUploaded + 1;
-        _history->get_history_entry(uploadVersion, historyEntry);
-        // Skip changesets that were downloaded from the server
-        BOOL isForeign = historyEntry.origin_client_file_ident != 0;
-        if (!isForeign)
-            break;
-        _latestVersionUploaded = uploadVersion;
-    }
-    using ulong     = unsigned long;
-    using ulonglong = unsigned long long;
-    // `serverVersion` is the last server version that has been integrated into
-    // `uploadVersion`.
-    auto clientVersion = uploadVersion;
-    auto serverVersion = historyEntry.remote_version;
-    RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
-    msg.body = [NSData dataWithBytes:historyEntry.changeset.data()
-                              length:historyEntry.changeset.size()]; // Full copy
-    msg.head = [NSString stringWithFormat:@"upload %@ %llu %llu %lu %llu\n", _sessionIdent,
-                         ulonglong(clientVersion), ulonglong(serverVersion),
-                         ulong(msg.body.length), ulonglong(historyEntry.origin_timestamp)];
-    if (s_syncLogEverything) {
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Sending: UPLOAD(client_version=%llu, "
-              "server_version=%llu, changeset_size=%lu, timestamp=%llu)", _connection.ident,
-              _sessionIdent, ulonglong(clientVersion), ulonglong(serverVersion),
-              ulong(msg.body.length), ulonglong(historyEntry.origin_timestamp));
-    }
-    __weak RLMSyncSession *weakSelf = self;
-    [msg setCompletionHandler:^{
-            [weakSelf uploadCompletedWithVersion:uploadVersion];
-        }];
-    [_connection enqueueOutputMessage:msg];
-}
-
-
-- (void)uploadCompletedWithVersion:(Replication::version_type)version {
-    REALM_ASSERT(version <= _latestVersionUploaded+1);
-    _uploadInProgress = NO;
-    if (_latestVersionUploaded < version)
-        _latestVersionUploaded = version;
-    if (_connection.isOpen)
-        [self resumeUpload];
-}
-
-
-- (void)handleAllocMessageWithServerFileIdent:(uint_fast64_t)serverFileIdent
-                              clientFileIdent:(uint_fast64_t)clientFileIdent {
-    _history->set_file_ident_pair(serverFileIdent, clientFileIdent); // Save in persistent storage
-    // FIXME: Describe what (if anything) prevents a race condition here, as a
-    // naive analysis would suggest that the background thread could be
-    // accessing _backgroundHistory concurrently. It would be tempting to
-    // conclude that a race is not possible, because the background thread must
-    // not attempt to transform anything before the file identifier is
-    // known. Note that it cannot be assumed the there will be no spurious
-    // ALLOC messages received.
-    _backgroundTransformer->set_local_client_file_ident(clientFileIdent);
-    _serverFileIdent = serverFileIdent;
-    _clientFileIdent = clientFileIdent;
-    if (_connection.isOpen)
-        [self connectionIsOpenAndSessionHasFileIdent];
-}
-
-
-- (void)handleDownloadMessageWithServerVersion:(Replication::version_type)serverVersion
-                                 clientVersion:(Replication::version_type)clientVersion
-                                     changeset:(NSData *)changeset
-                               originTimestamp:(uint_fast64_t)originTimestamp
-                               originFileIdent:(uint_fast64_t)originFileIdent
-                               moreIsAvailable:(bool)moreIsAvailable {
-    // We cannot save the synchronization progress marker (`serverVersion`,
-    // `clientVersion`) to persistent storage until the changeset is actually
-    // integrated locally, but that means it will be delayed by two context
-    // switches, i.e., first by a switch to the background thread, and then by a
-    // switch back to the main thread, and in each of these switches there is a
-    // risk of termination of the flow of this information due to a severed weak
-    // reference, which presumably would be due to the termination of the
-    // synchronization session, but not necessarily in connection with the
-    // termination of the application.
-    bool good_versions =
-        serverVersion >  _progressServerVersion &&
-        clientVersion >= _progressClientVersion;
-    if (!good_versions) {
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: ERROR: Bad server and/or client version "
-              "in DOWNLOAD message", _connection.ident, _sessionIdent);
-        [_connection closeAndTryToReconnectLater];
-        return;
-
-    }
-    _progressServerVersion = serverVersion;
-    _progressClientVersion = clientVersion;
-
-    // Skip changesets that were already integrated during an earlier session,
-    // but still attempt to save a new synchronization progress marker to
-    // persistent storage.
-    if (serverVersion > _serverVersionThreshold) {
-        BinaryData data(static_cast<const char *>(changeset.bytes), size_t(changeset.length));
-        Transformer::RemoteChangeset changeset_2(serverVersion, clientVersion, data,
-                                                 originTimestamp, originFileIdent);
-        REALM_ASSERT(_pendingChangesets.size() <= _pendingChangesetBuffers.size());
-        _pendingChangesetBuffers.reserve(_pendingChangesets.size()+1); // Throws
-        _pendingChangesets.push_back(changeset_2); // Throws
-        _pendingChangesetBuffers.push_back(std::move(changeset)); // Not throwing
-    }
-    else {
-        if (s_syncLogEverything) {
-            using ulonglong = unsigned long long;
-            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: Ignoring previously integrated "
-                  "changeset (server version threshold is %llu)", _connection.ident, _sessionIdent,
-                  ulonglong(_serverVersionThreshold));
-        }
-    }
-
-    // FIXME: Also "flush" the "pending queue" if the accumulated size exceeds a
-    // certain limit. Additionally, when adding the first changeset to the
-    // "pending queue", start a deadline timer, and flush on timeout
-    // (cancel/restart the timer on early flush).
-
-    if (moreIsAvailable)
-        return;
-
-    std::vector<Transformer::RemoteChangeset> changesets = std::move(_pendingChangesets);
-    std::vector<NSData *> changesetBuffers               = std::move(_pendingChangesetBuffers);
-    _pendingChangesets.clear();
-    _pendingChangesetBuffers.clear();
-    [self addBackgroundTaskWithServerVersion:serverVersion
-                               clientVersion:clientVersion
-                                  changesets:std::move(changesets)
-                            changesetBuffers:std::move(changesetBuffers)];
-}
-
-
-- (void)handleProgressMessageWithServerVersion:(Replication::version_type)serverVersion
-                                 clientVersion:(Replication::version_type)clientVersion {
-    // As with DOWNLOAD messages, we need to update the synchronization progress
-    // marker.
-    //
-    // FIXME: Properly explain the three roles of the synchronization progress
-    // marker (syncronization restart point, history upload window specifier,
-    // and history merge window specifier), and the intricate interplay between
-    // them.
-    bool good_versions =
-        serverVersion >  _progressServerVersion &&
-        clientVersion >= _progressClientVersion;
-    if (!good_versions) {
-        NSLog(@"RealmSync: Connection[%lu]: Session[%@]: ERROR: Bad server and/or client version "
-              "in PROGRESS message", _connection.ident, _sessionIdent);
-        [_connection closeAndTryToReconnectLater];
-        return;
-
-    }
-
-    if (!_pendingChangesets.empty()) {
-        NSLog(@"RealmSync: Connection[%lu]: Session(%@): ERROR: PROGRESS message received while "
-              "changesets are pending", _connection.ident, _sessionIdent);
-        [_connection closeAndTryToReconnectLater];
-        return;
-    }
-
-    _progressServerVersion = serverVersion;
-    _progressClientVersion = clientVersion;
-
-    std::vector<Transformer::RemoteChangeset> changesets;
-    std::vector<NSData *> changesetBuffers;
-    [self addBackgroundTaskWithServerVersion:serverVersion
-                               clientVersion:clientVersion
-                                  changesets:std::move(changesets)
-                            changesetBuffers:std::move(changesetBuffers)];
-}
-
-
-- (void)addBackgroundTaskWithServerVersion:(Replication::version_type)serverVersion
-                             clientVersion:(Replication::version_type)clientVersion
-                                changesets:(std::vector<Transformer::RemoteChangeset>)changesets
-                          changesetBuffers:(std::vector<NSData *>)changesetBuffers {
-    __weak RLMSyncSession *weakSelf = self;
-    [_backgroundOperationQueue addOperationWithBlock:^{
-            [weakSelf backgroundTaskWithServerVersion:serverVersion
-                                        clientVersion:clientVersion
-                                           changesets:std::move(changesets)
-                                     changesetBuffers:std::move(changesetBuffers)];
-        }];
-}
-
-
-- (void)backgroundTaskWithServerVersion:(Replication::version_type)serverVersion
-                          clientVersion:(Replication::version_type)clientVersion
-                             changesets:(std::vector<Transformer::RemoteChangeset>)changesets
-                       changesetBuffers:(std::vector<NSData *>)changesetBuffers {
-    if (!changesets.empty())
-        [self backgroundApplyChangesets:changesets];
-    static_cast<void>(changesetBuffers); // Still the owner of the changeset buffer memory
-
-    __weak RLMSyncSession *weakSelf = self;
-    NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
-    [mainQueue addOperationWithBlock:^{
-            [weakSelf updateSyncProgressWithServerVersion:serverVersion
-                                            clientVersion:clientVersion];
-        }];
-}
-
-
-- (void)backgroundApplyChangesets:(const std::vector<Transformer::RemoteChangeset> &)changesets {
-    REALM_ASSERT(!changesets.empty());
-    const Transformer::RemoteChangeset *changesets_2 = changesets.data();
-    size_t numChangesets = changesets.size();
-    Replication::version_type newClientVersion;
-    try {
-        Transformer &transformer = *_backgroundTransformer;
-        SharedGroup& sharedGroup = *_backgroundSharedGroup;
-        util::Logger* replayLogger = 0;
-        newClientVersion =
-            transformer.integrate_remote_changesets(sharedGroup, changesets_2, numChangesets,
-                                                    replayLogger); // Throws
-    }
-    catch (TransformError& e) {
-        NSString *message = [NSString stringWithFormat:@"Bad changeset received: %s", e.what()];
-        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
-    }
-
-    [RLMRealm realmWithConfiguration:_configuration error:nullptr]->_realm->notify_others();
-
-    if (s_syncLogEverything) {
-        using ulong     = unsigned long;
-        using ulonglong = unsigned long long;
-        if (numChangesets == 1) {
-            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: 1 remote changeset integrated, "
-                  "producing client version %llu", _connection.ident, _sessionIdent,
-                  ulonglong(newClientVersion));
-        }
-        else {
-            NSLog(@"RealmSync: Connection[%lu]: Session[%@]: %lu remote changesets integrated, "
-                  "producing client version %llu", _connection.ident, _sessionIdent,
-                  ulong(numChangesets), ulonglong(newClientVersion));
-        }
-    }
-}
-
-
-- (void)updateSyncProgressWithServerVersion:(Replication::version_type)serverVersion
-                              clientVersion:(Replication::version_type)clientVersion {
-    _history->set_sync_progress(serverVersion, clientVersion);
-    _persistedProgressServerVersion = serverVersion;
-    _persistedProgressClientVersion = clientVersion;
-}
-
-
-- (void)dealloc {
-    NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
-    __weak RLMServerConnection *weakConnection = _connection;
-    NSNumber *sessionIdent = _sessionIdent;
-    [mainQueue addOperationWithBlock:^{
-            [weakConnection unbindSession:sessionIdent];
-        }];
-}
-
-@end
-
-
-@implementation RLMServerStreamDelegate {
-    __weak RLMServerConnection *_weakConnection;
-}
-
-- (instancetype)initWithConnection:(RLMServerConnection *)connection {
-    self = [super init];
-    if (self) {
-        _weakConnection = connection;
-    }
-    return self;
-}
-
-- (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode {
-    [_weakConnection stream:stream handleEvent:eventCode];
+- (void)nonsyncTransactNotifyWithVersion:(sync::Session::version_type)version {
+    _session->nonsync_transact_notify(version);
 }
 
 @end
@@ -1508,6 +483,16 @@ void RLMRealmTranslateException(NSError **error) {
                                                    reason:@"Server synchronization URL mismatch"
                                                  userInfo:nil];
                 }
+                if (![realm.configuration.syncIdentity isEqual:cachedRealm.configuration.syncIdentity]) {
+                    @throw [NSException exceptionWithName:@"RLMException"
+                                                   reason:@"Server synchronization user token mismatch"
+                                                 userInfo:nil];
+                }
+                if (![realm.configuration.syncSignature isEqual:cachedRealm.configuration.syncSignature]) {
+                    @throw [NSException exceptionWithName:@"RLMException"
+                                                   reason:@"Server synchronization user token signature mismatch"
+                                                 userInfo:nil];
+                }
                 realm->_syncSession = cachedRealm->_syncSession;
             }
         }
@@ -1522,33 +507,25 @@ void RLMRealmTranslateException(NSError **error) {
             // a proc filesystem, on can use the path to the file descriptor
             // as a basis for constructing the new RLMInstance. Note that
             // the inode number is only guaranteed to stay valid for as long
-            // as you hold on the the handle of the open file.
-            RLMSyncSession *session = [s_syncSessions objectForKey:realm.path];
+            // as you hold on to the the handle of the open file.
+            RLMSyncSession *session = [g_syncSessions objectForKey:realm.path];
             if (!session) {
-                if (NSURL *serverBaseURL = realm.configuration.syncServerURL) {
-                    NSString *hostKey = serverBaseURL.host;
-                    if (serverBaseURL.port) {
-                        hostKey = [NSString stringWithFormat:@"%@:%@", serverBaseURL.host, serverBaseURL.port];
+                if (NSURL *serverURL = realm.configuration.syncServerURL) {
+                    NSString *clientKey = [NSString stringWithFormat:@"%@:%@",
+                                                    realm.configuration.syncIdentity,
+                                                    realm.configuration.syncSignature];
+                    RLMSyncClient *client = [g_syncClients objectForKey:clientKey];
+                    if (!client) {
+                        NSString *userToken          = realm.configuration.syncIdentity;
+                        NSString *userTokenSignature = realm.configuration.syncSignature;
+                        client = [[RLMSyncClient alloc] initWithUserToken:userToken
+                                                       userTokenSignature:userTokenSignature];
+                        [g_syncClients setObject:client forKey:clientKey];
                     }
-                    RLMServerConnection *conn = [s_serverConnections objectForKey:hostKey];
-                    if (!conn) {
-                        unsigned long serverConnectionIdent = ++s_lastServerConnectionIdent;
-                        conn = [[RLMServerConnection alloc] initWithIdent:serverConnectionIdent
-                                                                 identity:realm.configuration.syncIdentity
-                                                                signature:realm.configuration.syncSignature
-                                                                  address:serverBaseURL.host
-                                                                     port:serverBaseURL.port];
-                        [s_serverConnections setObject:conn forKey:hostKey];
-                    }
-                    session = [[RLMSyncSession alloc] initWithConnection:conn
-                                                              serverPath:serverBaseURL.path
-                                                           configuration:realm.configuration];
-                    [s_syncSessions setObject:session forKey:realm.path];
-                    NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
-                    __weak RLMSyncSession *weakSession = session;
-                    [mainQueue addOperationWithBlock:^{
-                        [weakSession mainThreadInit];
-                    }];
+                    session = [[RLMSyncSession alloc] initWithClient:client
+                                                                path:realm.path
+                                                           serverURL:serverURL];
+                    [g_syncSessions setObject:session forKey:realm.path];
                 }
             }
             realm->_syncSession = session;
@@ -1645,10 +622,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     NSAssert(!self.readOnly, @"Read-only realms do not have notifications");
 
     if ([notification isEqualToString:RLMRealmDidChangeNotification]) {
-        __weak RLMSyncSession *weakSession = _syncSession;
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [weakSession refreshLatestVersionAvailable];
-        }];
+        if (_syncSession) {
+            auto version = LangBindHelper::get_version_of_latest_snapshot(_realm->get_shared_group());
+            [_syncSession nonsyncTransactNotifyWithVersion:version];
+        }
     }
 
     // call this realms notification blocks
@@ -1978,7 +955,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level {
-    s_syncLogEverything = level == RLMSyncLogLevelVerbose;
+    g_syncLogEverything = level == RLMSyncLogLevelVerbose;
 }
 
 @end
