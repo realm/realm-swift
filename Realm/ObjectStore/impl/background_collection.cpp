@@ -208,8 +208,15 @@ bool BackgroundCollection::deliver(SharedGroup& sg, std::exception_ptr err)
 
 void BackgroundCollection::call_callbacks()
 {
-    while (auto fn = next_callback()) {
-        fn(m_changes_to_deliver, m_error);
+    while (auto cb = next_callback()) {
+        auto fn = cb->fn;
+        if (!cb->initial_delivered && should_deliver_initial()) {
+            cb->initial_delivered = true;
+            fn({}, m_error); // note: may invalidate `cb`
+        }
+        else {
+            fn(m_changes_to_deliver, m_error);
+        }
     }
 
     if (m_error) {
@@ -220,7 +227,7 @@ void BackgroundCollection::call_callbacks()
     }
 }
 
-CollectionChangeCallback BackgroundCollection::next_callback()
+BackgroundCollection::Callback* BackgroundCollection::next_callback()
 {
     std::lock_guard<std::mutex> callback_lock(m_callback_mutex);
 
@@ -230,9 +237,7 @@ CollectionChangeCallback BackgroundCollection::next_callback()
         if (!m_error && !deliver_initial && m_changes_to_deliver.empty()) {
             continue;
         }
-
-        callback.initial_delivered = true;
-        return callback.fn;
+        return &callback;
     }
 
     m_callback_index = npos;

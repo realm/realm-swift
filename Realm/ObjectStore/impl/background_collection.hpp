@@ -158,7 +158,7 @@ private:
     // remove_callback() updates this when needed
     size_t m_callback_index = npos;
 
-    CollectionChangeCallback next_callback();
+    Callback* next_callback();
 };
 
 } // namespace _impl
