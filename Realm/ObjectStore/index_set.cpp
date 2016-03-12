@@ -39,11 +39,20 @@ bool IndexSet::contains(size_t index) const
 size_t IndexSet::count(size_t start_index, size_t end_index) const
 {
     auto it = const_cast<IndexSet*>(this)->find(start_index);
-    size_t ret = 0;
-    for (; end_index > start_index && it != m_ranges.end() && it->first < end_index; ++it) {
-        ret += std::min(it->second, end_index) - std::max(it->first, start_index);
-        start_index = it->second;
+    const auto end = m_ranges.end();
+    if (it == end || it->first >= end_index) {
+        return 0;
     }
+    if (it->second >= end_index)
+        return std::min(it->second, end_index) - std::max(it->first, start_index);
+
+    // These checks are somewhat redundant, but this loop is hot so pulling instructions out of it helps
+    size_t ret = it->second - std::max(it->first, start_index);
+    for (++it; it != end && it->second < end_index; ++it) {
+        ret += it->second - it->first;
+    }
+    if (it != end && it->first < end_index)
+        ret += end_index - it->first;
     return ret;
 }
 
