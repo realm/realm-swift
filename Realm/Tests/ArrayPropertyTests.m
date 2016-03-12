@@ -47,7 +47,7 @@
     XCTAssertEqualObjects([array.array[2] stringCol], @"a", @"Third element should have property value 'a'");
 
     RLMArray *arrayProp = array.array;
-    XCTAssertThrows([arrayProp addObject:obj], @"Adding array object outside a transaction should throw");
+    RLMAssertThrowsWithReasonMatching([arrayProp addObject:obj], @"write transaction");
 
     // make sure we can fast enumerate
     for (RLMObject *obj in array.array) {
@@ -74,7 +74,7 @@
     XCTAssertEqualObjects([array[0] stringCol], @"a", @"First element should have property value 'a'");
     XCTAssertEqualObjects([arObj.array[1] stringCol], @"b", @"Second element should have property value 'b'");
 
-    XCTAssertThrows([array addObject:obj], @"Adding array object outside a transaction should throw");
+    RLMAssertThrowsWithReasonMatching([array addObject:obj], @"write transaction");
 }
 
 - (void)testDeleteStandaloneObjectWithArrayProperty {
@@ -136,7 +136,7 @@
     StringObject *child2 = [[StringObject alloc] init];
     child2.stringCol = @"b";
     [obj.array addObject:child2];
-    XCTAssertThrows([obj.array insertObject:child1 atIndex:2]);
+    RLMAssertThrowsWithReasonMatching([obj.array insertObject:child1 atIndex:2], @"must be less than 2");
     [realm commitWriteTransaction];
 
     RLMArray *children = obj.array;
@@ -165,8 +165,8 @@
     XCTAssertEqualObjects([children[0] stringCol], @"a");
     XCTAssertEqualObjects([children[1] stringCol], @"b");
 
-    XCTAssertThrows([children moveObjectAtIndex:0 toIndex:2]);
-    XCTAssertThrows([children moveObjectAtIndex:2 toIndex:0]);
+    RLMAssertThrowsWithReasonMatching([children moveObjectAtIndex:0 toIndex:2], @"must be less than 2");
+    RLMAssertThrowsWithReasonMatching([children moveObjectAtIndex:2 toIndex:0], @"must be less than 2");
 
     [realm beginWriteTransaction];
 
@@ -188,12 +188,12 @@
     XCTAssertEqualObjects([children[0] stringCol], @"a");
     XCTAssertEqualObjects([children[1] stringCol], @"b");
 
-    XCTAssertThrows([children moveObjectAtIndex:0 toIndex:2]);
-    XCTAssertThrows([children moveObjectAtIndex:2 toIndex:0]);
+    RLMAssertThrowsWithReasonMatching([children moveObjectAtIndex:0 toIndex:2], @"must be less than 2");
+    RLMAssertThrowsWithReasonMatching([children moveObjectAtIndex:2 toIndex:0], @"must be less than 2");
 
     [realm commitWriteTransaction];
 
-    XCTAssertThrows([children moveObjectAtIndex:1 toIndex:0]);
+    RLMAssertThrowsWithReasonMatching([children moveObjectAtIndex:1 toIndex:0], @"write transaction");
 }
 
 - (void)testAddInvalidated {
@@ -207,8 +207,16 @@
     [realm addObject:person];
     [realm deleteObjects:[EmployeeObject allObjects]];
 
-    XCTAssertThrowsSpecificNamed([company.employees addObject:person], NSException, @"RLMException");
-    XCTAssertThrowsSpecificNamed([company.employees insertObject:person atIndex:0], NSException, @"RLMException");
+    RLMAssertThrowsWithReasonMatching([company.employees addObject:person], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([company.employees insertObject:person atIndex:0], @"invalidated");
+}
+
+- (void)testAddNil {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    CompanyObject *company = [CompanyObject createInDefaultRealmWithValue:@[@"company", @[]]];
+
+    RLMAssertThrowsWithReasonMatching([company.employees addObject:self.nonLiteralNil], @"nil");
 }
 
 -(void)testStandalone {
@@ -258,7 +266,7 @@
     ArrayPropertyObject *intArray = [[ArrayPropertyObject alloc] init];
     IntObject *intObj = [[IntObject alloc] init];
     intObj.intCol = 1;
-    XCTAssertThrows([intArray.array addObject:(StringObject *)intObj], @"Addint to string array should throw");
+    RLMAssertThrowsWithReasonMatching([intArray.array addObject:(id)intObj], @"IntObject.*StringObject");
     [intArray.intArray addObject:intObj];
 
     XCTAssertThrows([intArray.intArray objectsWhere:@"intCol == 1"], @"Should throw on standalone RLMArray");
@@ -323,8 +331,10 @@
     XCTAssertTrue([[array.intArray objectAtIndex:1] isEqualToObject:intObj4], @"Objects should be replaced");
     XCTAssertEqual(array.intArray.count, 3U, @"Should have 3 elements in int array");
 
-    XCTAssertThrows([array.array replaceObjectAtIndex:0 withObject:(StringObject *)intObj4], @"Throws exception throws when type mismatched");
-    XCTAssertThrows([array.intArray replaceObjectAtIndex:1 withObject:(IntObject *)stringObj4], @"Throws exception when type mismatched");
+    RLMAssertThrowsWithReasonMatching([array.array replaceObjectAtIndex:0 withObject:(id)intObj4],
+                                      @"IntObject.*StringObject");
+    RLMAssertThrowsWithReasonMatching([array.intArray replaceObjectAtIndex:1 withObject:(id)stringObj4],
+                                      @"StringObject.*IntObject");
 }
 
 - (void)testDeleteObjectInStandaloneArray {
@@ -398,7 +408,7 @@
         XCTAssertEqualObjects(@"a", [array[0] stringCol]);
         XCTAssertEqualObjects(@"b", [array[1] stringCol]);
 
-        XCTAssertThrows([array exchangeObjectAtIndex:1 withObjectAtIndex:20]);
+        RLMAssertThrowsWithReasonMatching([array exchangeObjectAtIndex:1 withObjectAtIndex:20], @"less than 2");
     };
 
     ArrayPropertyObject *array = [[ArrayPropertyObject alloc] initWithValue:@[@"foo", @[@[@"a"], @[@"b"]], @[]]];
@@ -419,6 +429,9 @@
     EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     EmployeeObject *po2 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
     EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    EmployeeObject *deleted = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    EmployeeObject *indirectlyDeleted = [EmployeeObject allObjectsInRealm:realm].lastObject;
+    [realm deleteObject:deleted];
 
     // create company
     CompanyObject *company = [[CompanyObject alloc] init];
@@ -446,6 +459,8 @@
 
     // invalid object
     XCTAssertThrows([company.employees indexOfObject:(EmployeeObject *)company]);
+    RLMAssertThrowsWithReasonMatching([company.employees indexOfObject:deleted], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([company.employees indexOfObject:indirectlyDeleted], @"invalidated");
 
     RLMResults *employees = [company.employees objectsWhere:@"age = %@", @40];
     XCTAssertEqual(0U, [employees indexOfObject:po1]);
@@ -983,4 +998,174 @@
     [token stop];
 }
 
+- (void)testAllMethodsCheckThread {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block IntObject *io;
+    __block RLMArray *array;
+    [realm transactionWithBlock:^{
+        io = [IntObject createInDefaultRealmWithValue:@[@0]];
+        ArrayPropertyObject *obj = [ArrayPropertyObject createInDefaultRealmWithValue:@[@"", @[], @[io]]];
+        array = obj.intArray;
+    }];
+    [realm beginWriteTransaction];
+
+    [self dispatchAsyncAndWait:^{
+        RLMAssertThrowsWithReasonMatching([array count], @"thread");
+        RLMAssertThrowsWithReasonMatching([array objectAtIndex:0], @"thread");
+        RLMAssertThrowsWithReasonMatching([array firstObject], @"thread");
+        RLMAssertThrowsWithReasonMatching([array lastObject], @"thread");
+
+        RLMAssertThrowsWithReasonMatching([array addObject:io], @"thread");
+        RLMAssertThrowsWithReasonMatching([array addObjects:@[io]], @"thread");
+        RLMAssertThrowsWithReasonMatching([array insertObject:io atIndex:0], @"thread");
+        RLMAssertThrowsWithReasonMatching([array removeObjectAtIndex:0], @"thread");
+        RLMAssertThrowsWithReasonMatching([array removeLastObject], @"thread");
+        RLMAssertThrowsWithReasonMatching([array removeAllObjects], @"thread");
+        RLMAssertThrowsWithReasonMatching([array replaceObjectAtIndex:0 withObject:io], @"thread");
+        RLMAssertThrowsWithReasonMatching([array moveObjectAtIndex:0 toIndex:1], @"thread");
+        RLMAssertThrowsWithReasonMatching([array exchangeObjectAtIndex:0 withObjectAtIndex:1], @"thread");
+
+        RLMAssertThrowsWithReasonMatching([array indexOfObject:[IntObject allObjects].firstObject], @"thread");
+        RLMAssertThrowsWithReasonMatching([array indexOfObjectWhere:@"intCol = 0"], @"thread");
+        RLMAssertThrowsWithReasonMatching([array indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
+        RLMAssertThrowsWithReasonMatching([array objectsWhere:@"intCol = 0"], @"thread");
+        RLMAssertThrowsWithReasonMatching([array objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
+        RLMAssertThrowsWithReasonMatching([array sortedResultsUsingProperty:@"intCol" ascending:YES], @"thread");
+        RLMAssertThrowsWithReasonMatching([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]], @"thread");
+        RLMAssertThrowsWithReasonMatching(array[0], @"thread");
+        RLMAssertThrowsWithReasonMatching(array[0] = io, @"thread");
+        RLMAssertThrowsWithReasonMatching([array valueForKey:@"intCol"], @"thread");
+        RLMAssertThrowsWithReasonMatching([array setValue:@1 forKey:@"intCol"], @"thread");
+        RLMAssertThrowsWithReasonMatching({for (__unused id obj in array);}, @"thread");
+    }];
+    [realm cancelWriteTransaction];
+}
+
+- (void)testAllMethodsCheckForInvalidation {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block IntObject *io;
+    __block RLMArray *array;
+    [realm transactionWithBlock:^{
+        io = [IntObject createInDefaultRealmWithValue:@[@0]];
+        ArrayPropertyObject *obj = [ArrayPropertyObject createInDefaultRealmWithValue:@[@"", @[], @[io]]];
+        array = obj.intArray;
+    }];
+
+    [realm beginWriteTransaction];
+
+    XCTAssertNoThrow([array objectClassName]);
+    XCTAssertNoThrow([array realm]);
+    XCTAssertNoThrow([array isInvalidated]);
+
+    XCTAssertNoThrow([array count]);
+    XCTAssertNoThrow([array objectAtIndex:0]);
+    XCTAssertNoThrow([array firstObject]);
+    XCTAssertNoThrow([array lastObject]);
+
+    XCTAssertNoThrow([array addObject:io]);
+    XCTAssertNoThrow([array addObjects:@[io]]);
+    XCTAssertNoThrow([array insertObject:io atIndex:0]);
+    XCTAssertNoThrow([array removeObjectAtIndex:0]);
+    XCTAssertNoThrow([array removeLastObject]);
+    XCTAssertNoThrow([array removeAllObjects]);
+    [array addObjects:@[io, io, io]];
+    XCTAssertNoThrow([array replaceObjectAtIndex:0 withObject:io]);
+    XCTAssertNoThrow([array moveObjectAtIndex:0 toIndex:1]);
+    XCTAssertNoThrow([array exchangeObjectAtIndex:0 withObjectAtIndex:1]);
+
+    XCTAssertNoThrow([array indexOfObject:[IntObject allObjects].firstObject]);
+    XCTAssertNoThrow([array indexOfObjectWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([array indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([array objectsWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([array objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([array sortedResultsUsingProperty:@"intCol" ascending:YES]);
+    XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+    XCTAssertNoThrow(array[0]);
+    XCTAssertNoThrow(array[0] = io);
+    XCTAssertNoThrow([array valueForKey:@"intCol"]);
+    XCTAssertNoThrow([array setValue:@1 forKey:@"intCol"]);
+    XCTAssertNoThrow({for (__unused id obj in array);});
+
+    [realm cancelWriteTransaction];
+    [realm invalidate];
+    [realm beginWriteTransaction];
+    io = [IntObject createInDefaultRealmWithValue:@[@0]];
+
+    XCTAssertNoThrow([array objectClassName]);
+    XCTAssertNoThrow([array realm]);
+    XCTAssertNoThrow([array isInvalidated]);
+
+    RLMAssertThrowsWithReasonMatching([array count], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array objectAtIndex:0], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array firstObject], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array lastObject], @"invalidated");
+
+    RLMAssertThrowsWithReasonMatching([array addObject:io], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array addObjects:@[io]], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array insertObject:io atIndex:0], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array removeObjectAtIndex:0], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array removeLastObject], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array removeAllObjects], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array replaceObjectAtIndex:0 withObject:io], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array moveObjectAtIndex:0 toIndex:1], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array exchangeObjectAtIndex:0 withObjectAtIndex:1], @"invalidated");
+
+    RLMAssertThrowsWithReasonMatching([array indexOfObject:[IntObject allObjects].firstObject], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array indexOfObjectWhere:@"intCol = 0"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array objectsWhere:@"intCol = 0"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array sortedResultsUsingProperty:@"intCol" ascending:YES], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]], @"invalidated");
+    RLMAssertThrowsWithReasonMatching(array[0], @"invalidated");
+    RLMAssertThrowsWithReasonMatching(array[0] = io, @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array valueForKey:@"intCol"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array setValue:@1 forKey:@"intCol"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching({for (__unused id obj in array);}, @"invalidated");
+}
+
+- (void)testMutatingMethodsCheckForWriteTransaction {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block IntObject *io;
+    __block RLMArray *array;
+    [realm transactionWithBlock:^{
+        io = [IntObject createInDefaultRealmWithValue:@[@0]];
+        ArrayPropertyObject *obj = [ArrayPropertyObject createInDefaultRealmWithValue:@[@"", @[], @[io]]];
+        array = obj.intArray;
+    }];
+
+    XCTAssertNoThrow([array objectClassName]);
+    XCTAssertNoThrow([array realm]);
+    XCTAssertNoThrow([array isInvalidated]);
+
+    XCTAssertNoThrow([array count]);
+    XCTAssertNoThrow([array objectAtIndex:0]);
+    XCTAssertNoThrow([array firstObject]);
+    XCTAssertNoThrow([array lastObject]);
+
+    XCTAssertNoThrow([array indexOfObject:[IntObject allObjects].firstObject]);
+    XCTAssertNoThrow([array indexOfObjectWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([array indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([array objectsWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([array objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([array sortedResultsUsingProperty:@"intCol" ascending:YES]);
+    XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+    XCTAssertNoThrow(array[0]);
+    XCTAssertNoThrow([array valueForKey:@"intCol"]);
+    XCTAssertNoThrow({for (__unused id obj in array);});
+
+
+    RLMAssertThrowsWithReasonMatching([array addObject:io], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([array addObjects:@[io]], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([array insertObject:io atIndex:0], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([array removeObjectAtIndex:0], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([array removeLastObject], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([array removeAllObjects], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([array replaceObjectAtIndex:0 withObject:io], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([array moveObjectAtIndex:0 toIndex:1], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([array exchangeObjectAtIndex:0 withObjectAtIndex:1], @"write transaction");
+
+    RLMAssertThrowsWithReasonMatching(array[0] = io, @"write transaction");
+    RLMAssertThrowsWithReasonMatching([array setValue:@1 forKey:@"intCol"], @"write transaction");
+}
 @end
