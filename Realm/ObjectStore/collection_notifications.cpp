@@ -283,7 +283,7 @@ void CollectionChangeBuilder::verify()
 
 namespace {
 struct RowInfo {
-    size_t shifted_row_index;
+    size_t row_index;
     size_t prev_tv_index;
     size_t tv_index;
     size_t shifted_tv_index;
@@ -317,126 +317,125 @@ void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, IndexSet const& re
     }
 }
 
-using items = std::vector<std::pair<size_t, size_t>>;
+class SortedMoveCalculator {
+public:
+    SortedMoveCalculator(std::vector<RowInfo>& new_rows, CollectionChangeIndices& changeset)
+    : m_modified(changeset.modifications)
+    {
+        std::vector<Row> old_candidates;
+        old_candidates.reserve(new_rows.size());
+        for (auto& row : new_rows) {
+            old_candidates.push_back({row.row_index, row.prev_tv_index});
+        }
+        std::sort(begin(old_candidates), end(old_candidates), [](auto a, auto b) {
+            return std::tie(a.tv_index, a.row_index) < std::tie(b.tv_index, b.row_index);
+        });
 
-struct Match {
-    size_t i, j, size, modified;
+        // First check if the order of any of the rows actually changed
+        size_t first_difference = npos;
+        for (size_t i = 0; i < old_candidates.size(); ++i) {
+            if (old_candidates[i].row_index != new_rows[i].row_index) {
+                first_difference = i;
+                break;
+            }
+        }
+        if (first_difference == npos)
+            return;
+
+        // A map from row index -> tv index in new results
+        b.reserve(new_rows.size());
+        for (size_t i = 0; i < new_rows.size(); ++i)
+            b.push_back({new_rows[i].row_index, i});
+        std::sort(begin(b), end(b), [](auto a, auto b) {
+            return std::tie(a.row_index, a.tv_index) < std::tie(b.row_index, b.tv_index);
+        });
+
+        a = std::move(old_candidates);
+
+        find_longest_matches(first_difference, a.size(),
+                             first_difference, new_rows.size());
+        m_longest_matches.push_back({a.size(), new_rows.size(), 0});
+
+        size_t i = first_difference, j = first_difference;
+        for (auto match : m_longest_matches) {
+            for (; i < match.i; ++i)
+                changeset.deletions.add(a[i].tv_index);
+            for (; j < match.j; ++j)
+                changeset.insertions.add(new_rows[j].tv_index);
+            i += match.size;
+            j += match.size;
+        }
+    }
+
+private:
+    struct Match {
+        size_t i, j, size, modified;
+    };
+    struct Row {
+        size_t row_index;
+        size_t tv_index;
+    };
+
+    IndexSet const& m_modified;
+    std::vector<Match> m_longest_matches;
+
+    std::vector<Row> a, b;
+
+    Match find_longest_match(size_t begin1, size_t end1, size_t begin2, size_t end2)
+    {
+        Match best = {begin1, begin2, 0, 0};
+        std::vector<size_t> len_from_j;
+        len_from_j.resize(end2 - begin2, 0);
+        std::vector<size_t> len_from_j_prev = len_from_j;
+
+        for (size_t i = begin1; i < end1; ++i) {
+            std::fill(begin(len_from_j), end(len_from_j), 0);
+
+            size_t ai = a[i].row_index;
+            auto it = lower_bound(begin(b), end(b), Row{ai, 0},
+                                  [](auto a, auto b) { return a.row_index < b.row_index; });
+            for (; it != end(b) && it->row_index == ai; ++it) {
+                size_t j = it->tv_index;
+                if (j < begin2)
+                    continue;
+                if (j >= end2)
+                    break;
+
+                size_t off = j - begin2;
+                size_t size = off == 0 ? 1 : len_from_j_prev[off - 1] + 1;
+                len_from_j[off] = size;
+                if (size > best.size)
+                    best = {i - size + 1, j - size + 1, size, npos};
+                // Given two equal-length matches, prefer the one with fewer modified rows
+                else if (size == best.size) {
+                    if (best.modified == npos)
+                        best.modified = m_modified.count(best.j - size + 1, best.j + 1);
+                    auto count = m_modified.count(j - size + 1, j + 1);
+                    if (count < best.modified)
+                        best = {i - size + 1, j - size + 1, size, count};
+                }
+                REALM_ASSERT(best.i >= begin1 && best.i + best.size <= end1);
+                REALM_ASSERT(best.j >= begin2 && best.j + best.size <= end2);
+            }
+            len_from_j.swap(len_from_j_prev);
+        }
+        return best;
+    }
+
+    void find_longest_matches(size_t begin1, size_t end1, size_t begin2, size_t end2)
+    {
+        // FIXME: recursion could get too deep here
+        auto m = find_longest_match(begin1, end1, begin2, end2);
+        if (!m.size)
+            return;
+        if (m.i > begin1 && m.j > begin2)
+            find_longest_matches(begin1, m.i, begin2, m.j);
+        m_longest_matches.push_back(m);
+        if (m.i + m.size < end2 && m.j + m.size < end2)
+            find_longest_matches(m.i + m.size, end1, m.j + m.size, end2);
+    }
 };
 
-Match find_longest_match(items const& a, items const& b,
-                         IndexSet const& modified,
-                         size_t begin1, size_t end1, size_t begin2, size_t end2)
-{
-    Match best = {begin1, begin2, 0};
-    std::vector<size_t> len_from_j;
-    len_from_j.resize(end2 - begin2, 0);
-    std::vector<size_t> len_from_j_prev = len_from_j;
-
-    for (size_t i = begin1; i < end1; ++i) {
-        std::fill(begin(len_from_j), end(len_from_j), 0);
-
-        size_t ai = a[i].first;
-        auto it = lower_bound(begin(b), end(b), std::make_pair(size_t(0), ai),
-                              [](auto a, auto b) { return a.second < b.second; });
-        for (; it != end(b) && it->second == ai; ++it) {
-            size_t j = it->first;
-            if (j < begin2)
-                continue;
-            if (j >= end2)
-                break;
-
-            size_t off = j - begin2;
-            size_t size = off == 0 ? 1 : len_from_j_prev[off - 1] + 1;
-            len_from_j[off] = size;
-            if (size > best.size)
-                best = {i - size + 1, j - size + 1, size, npos};
-            // Given two equal-length matches, prefer the one with fewer modified rows
-            else if (size == best.size) {
-                if (best.modified == npos)
-                    best.modified = modified.count(best.j - size + 1, best.j + 1);
-                auto count = modified.count(j - size + 1, j + 1);
-                if (count < best.modified)
-                    best = {i - size + 1, j - size + 1, size, count};
-            }
-            REALM_ASSERT(best.i >= begin1 && best.i + best.size <= end1);
-            REALM_ASSERT(best.j >= begin2 && best.j + best.size <= end2);
-        }
-        len_from_j.swap(len_from_j_prev);
-    }
-    return best;
-}
-
-void find_longest_matches(items const& a, items const& b_ndx,
-                          size_t begin1, size_t end1, size_t begin2, size_t end2,
-                          IndexSet const& modified, std::vector<Match>& ret)
-{
-    // FIXME: recursion could get too deep here
-    auto m = find_longest_match(a, b_ndx, modified, begin1, end1, begin2, end2);
-    if (!m.size)
-        return;
-    if (m.i > begin1 && m.j > begin2)
-        find_longest_matches(a, b_ndx, begin1, m.i, begin2, m.j, modified, ret);
-    ret.push_back(m);
-    if (m.i + m.size < end2 && m.j + m.size < end2)
-        find_longest_matches(a, b_ndx, m.i + m.size, end1, m.j + m.size, end2, modified, ret);
-}
-
-void calculate_moves_sorted(std::vector<RowInfo>& new_rows, CollectionChangeIndices& changeset)
-{
-    std::vector<std::pair<size_t, size_t>> old_candidates;
-    std::vector<std::pair<size_t, size_t>> new_candidates;
-    for (auto& row : new_rows) {
-        old_candidates.push_back({row.shifted_row_index, row.prev_tv_index});
-        new_candidates.push_back({row.shifted_row_index, row.tv_index});
-    }
-
-    std::sort(begin(old_candidates), end(old_candidates), [](auto a, auto b) {
-        if (a.second != b.second)
-            return a.second < b.second;
-        return a.first < b.first;
-    });
-
-    // First check if the order of any of the rows actually changed
-    size_t first_difference = npos;
-    for (size_t i = 0; i < old_candidates.size(); ++i) {
-        if (old_candidates[i].first != new_candidates[i].first) {
-            first_difference = i;
-            break;
-        }
-    }
-    if (first_difference == npos)
-        return;
-
-    const auto b_ndx = [&]{
-        std::vector<std::pair<size_t, size_t>> ret;
-        ret.reserve(new_candidates.size());
-        for (size_t i = 0; i < new_candidates.size(); ++i)
-            ret.push_back(std::make_pair(i, new_candidates[i].first));
-        std::sort(begin(ret), end(ret), [](auto a, auto b) {
-            if (a.second != b.second)
-                return a.second < b.second;
-            return a.first < b.first;
-        });
-        return ret;
-    }();
-
-    std::vector<Match> longest_matches;
-    find_longest_matches(old_candidates, b_ndx,
-                         first_difference, old_candidates.size(),
-                         first_difference, new_candidates.size(),
-                         changeset.modifications, longest_matches);
-    longest_matches.push_back({old_candidates.size(), new_candidates.size(), 0});
-
-    size_t i = first_difference, j = first_difference;
-    for (auto match : longest_matches) {
-        for (; i < match.i; ++i)
-            changeset.deletions.add(old_candidates[i].second);
-        for (; j < match.j; ++j)
-            changeset.insertions.add(new_candidates[j].second);
-        i += match.size;
-        j += match.size;
-    }
-}
 } // Anonymous namespace
 
 CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> const& prev_rows,
@@ -448,6 +447,7 @@ CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> c
 
     size_t deleted = 0;
     std::vector<RowInfo> old_rows;
+    old_rows.reserve(prev_rows.size());
     for (size_t i = 0; i < prev_rows.size(); ++i) {
         if (prev_rows[i] == npos) {
             ++deleted;
@@ -456,16 +456,17 @@ CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> c
         else
             old_rows.push_back({prev_rows[i], npos, i, i - deleted});
     }
-    std::stable_sort(begin(old_rows), end(old_rows), [](auto& lft, auto& rgt) {
-        return lft.shifted_row_index < rgt.shifted_row_index;
+    std::sort(begin(old_rows), end(old_rows), [](auto& lft, auto& rgt) {
+        return lft.row_index < rgt.row_index;
     });
 
     std::vector<RowInfo> new_rows;
+    new_rows.reserve(next_rows.size());
     for (size_t i = 0; i < next_rows.size(); ++i) {
         new_rows.push_back({next_rows[i], npos, i, 0});
     }
-    std::stable_sort(begin(new_rows), end(new_rows), [](auto& lft, auto& rgt) {
-        return lft.shifted_row_index < rgt.shifted_row_index;
+    std::sort(begin(new_rows), end(new_rows), [](auto& lft, auto& rgt) {
+        return lft.row_index < rgt.row_index;
     });
 
     IndexSet removed;
@@ -474,13 +475,13 @@ CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> c
     while (i < old_rows.size() && j < new_rows.size()) {
         auto old_index = old_rows[i];
         auto new_index = new_rows[j];
-        if (old_index.shifted_row_index == new_index.shifted_row_index) {
+        if (old_index.row_index == new_index.row_index) {
             new_rows[j].prev_tv_index = old_rows[i].tv_index;
             new_rows[j].shifted_tv_index = old_rows[i].shifted_tv_index;
             ++i;
             ++j;
         }
-        else if (old_index.shifted_row_index < new_index.shifted_row_index) {
+        else if (old_index.row_index < new_index.row_index) {
             removed.add(old_index.tv_index);
             ++i;
         }
@@ -504,13 +505,13 @@ CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> c
               [](auto& lft, auto& rgt) { return lft.tv_index < rgt.tv_index; });
 
     for (auto& row : new_rows) {
-        if (row_did_change(row.shifted_row_index)) {
+        if (row_did_change(row.row_index)) {
             ret.modifications.add(row.tv_index);
         }
     }
 
     if (sort) {
-        calculate_moves_sorted(new_rows, ret);
+        SortedMoveCalculator(new_rows, ret);
     }
     else {
         calculate_moves_unsorted(new_rows, removed, ret);
