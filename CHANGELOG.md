@@ -1,3 +1,18 @@
+0.98.5 Release notes (2016-03-14)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix a crash when opening a Realm on 32-bit iOS devices.
+
 0.98.4 Release notes (2016-03-10)
 =============================================================
 
