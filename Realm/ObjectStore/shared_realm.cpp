@@ -204,7 +204,8 @@ Group *Realm::read_group()
 
 SharedRealm Realm::get_shared_realm(Config config)
 {
-    return RealmCoordinator::get_coordinator(config.path)->get_realm(std::move(config));
+    auto coordinator = RealmCoordinator::get_coordinator(config.path);
+    return coordinator->get_realm(std::move(config));
 }
 
 void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
