@@ -164,6 +164,8 @@ namespace realm {
 
         // FIXME private
         Group *read_group();
+
+        SharedGroup& get_shared_group();
     };
 
     class RealmFileException : public std::runtime_error {
