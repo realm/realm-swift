@@ -54,11 +54,8 @@ IndexSet::iterator IndexSet::find(size_t index)
 
 IndexSet::iterator IndexSet::find(size_t index, iterator it)
 {
-    for (auto end = m_ranges.end(); it != end; ++it) {
-        if (it->second > index)
-            return it;
-    }
-    return m_ranges.end();
+    return std::lower_bound(it, m_ranges.end(), std::make_pair(size_t(0), index + 1),
+                            [&](auto const& a, auto const& b) { return a.second < b.second; });
 }
 
 void IndexSet::add(size_t index)
