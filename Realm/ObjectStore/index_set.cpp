@@ -92,6 +92,9 @@ size_t IndexSet::add_shifted(size_t index)
 
 void IndexSet::add_shifted_by(IndexSet const& shifted_by, IndexSet const& values)
 {
+    if (values.empty())
+        return;
+
 #ifdef REALM_DEBUG
     ptrdiff_t expected = std::distance(as_indexes().begin(), as_indexes().end());
     for (auto index : values.as_indexes()) {
@@ -100,19 +103,39 @@ void IndexSet::add_shifted_by(IndexSet const& shifted_by, IndexSet const& values
     }
 #endif
 
-    auto it = shifted_by.begin(), end = shifted_by.end();
-    size_t shift = 0;
+    auto old_ranges = move(m_ranges);
+    m_ranges.reserve(std::max(old_ranges.size(), values.size()));
+
+    auto old_it = old_ranges.cbegin(), old_end = old_ranges.cend();
+    auto shift_it = shifted_by.m_ranges.cbegin(), shift_end = shifted_by.m_ranges.cend();
+
     size_t skip_until = 0;
+    size_t old_shift = 0;
+    size_t new_shift = 0;
     for (size_t index : values.as_indexes()) {
-        for (; it != end && it->first <= index; ++it) {
-            shift += it->second - it->first;
-            skip_until = it->second;
+        for (; shift_it != shift_end && shift_it->first <= index; ++shift_it) {
+            new_shift += shift_it->second - shift_it->first;
+            skip_until = shift_it->second;
         }
-        if (index >= skip_until) {
-            REALM_ASSERT(index >= shift);
-            add_shifted(index - shift);
-            ++shift;
+        if (index < skip_until)
+            continue;
+
+        for (; old_it != old_end && old_it->first <= index - new_shift + old_shift; ++old_it) {
+            for (size_t i = old_it->first; i < old_it->second; ++i)
+                add_back(i);
+            old_shift += old_it->second - old_it->first;
         }
+
+        REALM_ASSERT(index >= new_shift);
+        add_back(index - new_shift + old_shift);
+    }
+
+    if (old_it != old_end) {
+        if (!empty() && old_it->first == m_ranges.back().second) {
+            m_ranges.back().second = old_it->second;
+            ++old_it;
+        }
+        copy(old_it, old_end, back_inserter(m_ranges));
     }
 
     REALM_ASSERT_DEBUG(std::distance(as_indexes().begin(), as_indexes().end()) == expected);
@@ -151,9 +174,33 @@ void IndexSet::insert_at(size_t index, size_t count)
 
 void IndexSet::insert_at(IndexSet const& positions)
 {
-    for (auto range : positions) {
-        insert_at(range.first, range.second - range.first);
+    if (positions.empty())
+        return;
+    if (empty()) {
+        m_ranges = positions.m_ranges;
+        return;
     }
+
+    auto old_ranges = move(m_ranges);
+    m_ranges.reserve(std::max(m_ranges.size(), positions.m_ranges.size()));
+
+    IndexIterator begin1 = old_ranges.cbegin(), begin2 = positions.m_ranges.cbegin();
+    IndexIterator end1 = old_ranges.cend(), end2 = positions.m_ranges.cend();
+
+    size_t shift = 0;
+    while (begin1 != end1 && begin2 != end2) {
+        if (*begin1 + shift < *begin2) {
+            add_back(*begin1++ + shift);
+        }
+        else {
+            ++shift;
+            add_back(*begin2++);
+        }
+    }
+    for (; begin1 != end1; ++begin1)
+        add_back(*begin1 + shift);
+    for (; begin2 != end2; ++begin2)
+        add_back(*begin2);
 }
 
 void IndexSet::shift_for_insert_at(size_t index, size_t count)
@@ -179,8 +226,34 @@ void IndexSet::shift_for_insert_at(size_t index, size_t count)
 
 void IndexSet::shift_for_insert_at(realm::IndexSet const& values)
 {
-    for (auto range : values)
-        shift_for_insert_at(range.first, range.second - range.first);
+    if (values.empty())
+        return;
+
+    size_t shift = 0;
+    auto it = find(values.begin()->first);
+    for (auto range : values) {
+        for (; it != m_ranges.end() && it->second + shift <= range.first; ++it) {
+            it->first += shift;
+            it->second += shift;
+        }
+        if (it == m_ranges.end())
+            return;
+
+        if (it->first + shift < range.first) {
+            // split the range so that we can exclude `index`
+            auto old_second = it->second;
+            it->first += shift;
+            it->second = range.first;
+            it = m_ranges.insert(it + 1, {range.first - shift, old_second});
+        }
+
+        shift += range.second - range.first;
+    }
+
+    for (; it != m_ranges.end(); ++it) {
+        it->first += shift;
+        it->second += shift;
+    }
 }
 
 void IndexSet::erase_at(size_t index)
@@ -190,11 +263,34 @@ void IndexSet::erase_at(size_t index)
         do_erase(it, index);
 }
 
-void IndexSet::erase_at(realm::IndexSet const& values)
+void IndexSet::erase_at(IndexSet const& positions)
 {
+    if (empty() || positions.empty())
+        return;
+
+    auto old_ranges = move(m_ranges);
+    m_ranges.reserve(std::max(m_ranges.size(), positions.m_ranges.size()));
+
+    IndexIterator begin1 = old_ranges.cbegin(), begin2 = positions.m_ranges.cbegin();
+    IndexIterator end1 = old_ranges.cend(), end2 = positions.m_ranges.cend();
+
     size_t shift = 0;
-    for (auto index : values.as_indexes())
-        erase_at(index - shift++);
+    while (begin1 != end1 && begin2 != end2) {
+        if (*begin1 < *begin2) {
+            add_back(*begin1++ - shift);
+        }
+        else if (*begin1 == *begin2) {
+            ++shift;
+            ++begin1;
+            ++begin2;
+        }
+        else {
+            ++shift;
+            ++begin2;
+        }
+    }
+    for (; begin1 != end1; ++begin1)
+        add_back(*begin1 - shift);
 }
 
 size_t IndexSet::erase_and_unshift(size_t index)
@@ -301,6 +397,18 @@ size_t IndexSet::unshift(size_t index) const
 void IndexSet::clear()
 {
     m_ranges.clear();
+}
+
+void IndexSet::add_back(size_t index)
+{
+    if (m_ranges.empty())
+        m_ranges.push_back({index, index + 1});
+    else if (m_ranges.back().second == index)
+        ++m_ranges.back().second;
+    else {
+        REALM_ASSERT_DEBUG(m_ranges.back().second < index);
+        m_ranges.push_back({index, index + 1});
+    }
 }
 
 IndexSet::iterator IndexSet::do_add(iterator it, size_t index)

@@ -93,13 +93,14 @@ public:
     void verify() const noexcept;
 
     // An iterator over the indivual indices in the set rather than the ranges
-    class IndexInterator : public std::iterator<std::forward_iterator_tag, size_t> {
+    class IndexIterator : public std::iterator<std::forward_iterator_tag, size_t> {
     public:
-        IndexInterator(IndexSet::const_iterator it) : m_iterator(it) { }
+        IndexIterator(IndexSet::const_iterator it) : m_iterator(it) { }
         size_t operator*() const { return m_iterator->first + m_offset; }
-        bool operator!=(IndexInterator const& it) const { return m_iterator != it.m_iterator; }
+        bool operator==(IndexIterator const& it) const { return m_iterator == it.m_iterator; }
+        bool operator!=(IndexIterator const& it) const { return m_iterator != it.m_iterator; }
 
-        IndexInterator& operator++()
+        IndexIterator& operator++()
         {
             ++m_offset;
             if (m_iterator->first + m_offset == m_iterator->second) {
@@ -109,7 +110,7 @@ public:
             return *this;
         }
 
-        IndexInterator operator++(int)
+        IndexIterator operator++(int)
         {
             auto value = *this;
             ++*this;
@@ -124,7 +125,7 @@ public:
     class IndexIteratableAdaptor {
     public:
         using value_type = size_t;
-        using iterator = IndexInterator;
+        using iterator = IndexIterator;
         using const_iterator = iterator;
 
         const_iterator begin() const { return m_index_set.begin(); }
@@ -150,6 +151,9 @@ private:
     iterator do_add(iterator pos, size_t index);
     void do_erase(iterator it, size_t index);
     iterator do_remove(iterator it, size_t index, size_t count);
+
+    // Add an index which must be greater than the largest index in the set
+    void add_back(size_t index);
 };
 } // namespace realm
 
