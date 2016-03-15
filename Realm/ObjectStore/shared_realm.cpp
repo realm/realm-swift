@@ -193,11 +193,43 @@ void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
             return true;
         }
 
-        ObjectStore::verify_schema(*m_config.schema, *schema, m_config.read_only);
-        m_config.schema = std::move(schema);
-        m_config.schema_version = version;
-        m_coordinator->update_schema(*m_config.schema);
-        return false;
+        try {
+            ObjectStore::verify_schema(*m_config.schema, *schema, m_config.read_only);
+            m_config.schema = std::move(schema);
+            m_config.schema_version = version;
+            m_coordinator->update_schema(*m_config.schema);
+            return false;
+        }
+        catch (SchemaMismatchException const& ex) {
+            if (m_config.delete_realm_if_migration_needed && !m_config.read_only) {
+                invalidate();
+
+                if (m_coordinator) {
+                    m_coordinator->clear_cache();
+                }
+                m_group = nullptr;
+                m_shared_group = nullptr;
+                m_history = nullptr;
+                m_read_only_group = nullptr;
+                m_binding_context = nullptr;
+                m_coordinator = nullptr;
+
+                if (remove(m_config.path.c_str()) == 0) {
+                    auto schema = std::move(m_config.schema);
+                    m_config.schema_version = 0;
+
+                    auto coordinator = RealmCoordinator::get_coordinator(m_config.path);
+                    coordinator->get_realm(m_config);
+                    m_coordinator = std::move(coordinator);
+
+                    open_with_config(m_config, m_history, m_shared_group, m_read_only_group);
+                    m_config.schema = std::move(schema);
+
+                    return true;
+                }
+            }
+            throw;
+        }
     };
 
     if (!needs_update()) {
