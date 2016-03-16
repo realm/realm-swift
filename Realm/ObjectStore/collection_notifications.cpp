@@ -383,13 +383,24 @@ private:
 
     Match find_longest_match(size_t begin1, size_t end1, size_t begin2, size_t end2)
     {
+        struct Length {
+            size_t j, len;
+        };
+        std::vector<Length> cur;
+        std::vector<Length> prev;
+
+        auto length = [&](size_t j) -> size_t {
+            for (auto const& pair : prev) {
+                if (pair.j + 1 == j)
+                    return pair.len + 1;
+            }
+            return 1;
+        };
+
         Match best = {begin1, begin2, 0, 0};
-        std::vector<size_t> len_from_j;
-        len_from_j.resize(end2 - begin2, 0);
-        std::vector<size_t> len_from_j_prev = len_from_j;
 
         for (size_t i = begin1; i < end1; ++i) {
-            std::fill(begin(len_from_j), end(len_from_j), 0);
+            cur.clear();
 
             size_t ai = a[i].row_index;
             auto it = lower_bound(begin(b), end(b), Row{ai, 0},
@@ -401,9 +412,8 @@ private:
                 if (j >= end2)
                     break;
 
-                size_t off = j - begin2;
-                size_t size = off == 0 ? 1 : len_from_j_prev[off - 1] + 1;
-                len_from_j[off] = size;
+                size_t size = length(j);
+                cur.push_back({j, size});
                 if (size > best.size)
                     best = {i - size + 1, j - size + 1, size, npos};
                 // Given two equal-length matches, prefer the one with fewer modified rows
@@ -417,7 +427,7 @@ private:
                 REALM_ASSERT(best.i >= begin1 && best.i + best.size <= end1);
                 REALM_ASSERT(best.j >= begin2 && best.j + best.size <= end2);
             }
-            len_from_j.swap(len_from_j_prev);
+            cur.swap(prev);
         }
         return best;
     }
