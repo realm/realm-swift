@@ -163,9 +163,6 @@ extension Realm {
         */
         public var syncSignature: String? = nil;
 
-        /**
-
-
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema? = nil
         /// Allows to disable automatic format upgrades when accessing the Realm.
@@ -191,6 +188,7 @@ extension Realm {
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.syncServerURL = self.syncServerURL
             configuration.syncIdentity = self.syncIdentity
+            configuration.syncSignature = self.syncSignature
             return configuration
         }
 
