@@ -188,6 +188,7 @@ extension Realm {
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.syncServerURL = self.syncServerURL
             configuration.syncIdentity = self.syncIdentity
+            configuration.syncSignature = self.syncSignature
             return configuration
         }
 
