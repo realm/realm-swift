@@ -730,7 +730,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken {
+    public func addNotificationBlock(block: (collection: AnyRealmCollection<Element>?,
+                                             error: NSError?) -> ()) -> NotificationToken {
         return base._addNotificationBlock(block)
     }
 
