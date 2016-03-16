@@ -385,13 +385,7 @@ size_t IndexSet::shift(size_t index) const
 size_t IndexSet::unshift(size_t index) const
 {
     REALM_ASSERT_DEBUG(!contains(index));
-    auto shifted = index;
-    for (auto range : m_ranges) {
-        if (range.first >= index)
-            break;
-        shifted -= std::min(range.second, index) - range.first;
-    }
-    return shifted;
+    return index - count(0, index);
 }
 
 void IndexSet::clear()
