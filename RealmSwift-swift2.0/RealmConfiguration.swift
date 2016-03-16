@@ -163,9 +163,6 @@ extension Realm {
         */
         public var syncSignature: String? = nil;
 
-        /**
-
-
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema? = nil
         /// Allows to disable automatic format upgrades when accessing the Realm.
