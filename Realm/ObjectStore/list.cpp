@@ -162,7 +162,14 @@ void List::delete_all()
 
 Results List::sort(SortOrder order)
 {
-    return Results(m_realm, get_query(), std::move(order));
+    verify_attached();
+    return Results(m_realm, m_link_view, util::none, std::move(order));
+}
+
+Results List::filter(Query q)
+{
+    verify_attached();
+    return Results(m_realm, m_link_view, get_query().and_query(std::move(q)));
 }
 
 // These definitions rely on that LinkViews are interned by core

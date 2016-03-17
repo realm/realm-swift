@@ -41,6 +41,7 @@ private:
     Results* m_target_results;
 
     const SortOrder m_sort;
+    bool m_from_linkview;
 
     // The source Query, in handover form iff m_sg is null
     std::unique_ptr<SharedGroup::Handover<Query>> m_query_handover;

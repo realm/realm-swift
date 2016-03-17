@@ -369,7 +369,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     auto query = translateErrors([&] { return _backingList.get_query(); });
     RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _objectSchema);
     return [RLMResults resultsWithObjectSchema:_objectSchema
-                                       results:realm::Results(_realm->_realm, std::move(query))];
+                                       results:_backingList.filter(std::move(query))];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {

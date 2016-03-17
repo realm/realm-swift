@@ -28,6 +28,7 @@ ResultsNotifier::ResultsNotifier(Results& target)
 : BackgroundCollection(target.get_realm())
 , m_target_results(&target)
 , m_sort(target.get_sort())
+, m_from_linkview(target.get_linkview().get() != nullptr)
 {
     Query q = target.get_query();
     set_table(*q.get_table());

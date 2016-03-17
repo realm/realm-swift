@@ -316,10 +316,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         if (_results.get_mode() == Results::Mode::Empty) {
             return self;
         }
-        auto query = _results.get_query();
+        auto query = _objectSchema.table->where();
         RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _objectSchema);
         return [RLMResults resultsWithObjectSchema:_objectSchema
-                                           results:realm::Results(_realm->_realm, std::move(query), _results.get_sort())];
+                                           results:_results.filter(std::move(query))];
     });
 }
 
