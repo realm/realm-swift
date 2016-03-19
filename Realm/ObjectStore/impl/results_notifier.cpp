@@ -130,7 +130,7 @@ void ResultsNotifier::run()
 
         m_changes = CollectionChangeBuilder::calculate(m_previous_rows, next_rows,
                                                        [&](size_t row) { return m_info->row_did_change(*m_query->get_table(), row); },
-                                                       !!m_sort);
+                                                       m_sort || m_from_linkview);
 
         m_previous_rows = std::move(next_rows);
         if (m_changes.empty()) {
