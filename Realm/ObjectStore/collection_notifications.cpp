@@ -332,7 +332,7 @@ struct RowInfo {
     size_t shifted_tv_index;
 };
 
-void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, IndexSet const& removed, CollectionChangeIndices& changeset)
+void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, IndexSet& removed, CollectionChangeIndices& changeset)
 {
     size_t expected = 0;
     for (auto& row : new_rows) {
@@ -356,7 +356,7 @@ void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, IndexSet const& re
         // The row still isn't the expected one, so it's a move
         changeset.moves.push_back({row.prev_tv_index, row.tv_index});
         changeset.insertions.add(row.tv_index);
-        changeset.deletions.add(row.prev_tv_index);
+        removed.add(row.prev_tv_index);
     }
 }
 
@@ -446,14 +446,18 @@ private:
             cur.clear();
 
             size_t ai = a[i].row_index;
+            // Find the TV indicies at which this row appears in the new results
+            // There should always be at least one (or it would have been filtered out earlier),
+            // but can be multiple if there are dupes
             auto it = lower_bound(begin(b), end(b), Row{ai, 0},
                                   [](auto a, auto b) { return a.row_index < b.row_index; });
+            REALM_ASSERT(it != end(b) && it->row_index == ai);
             for (; it != end(b) && it->row_index == ai; ++it) {
                 size_t j = it->tv_index;
                 if (j < begin2)
                     continue;
                 if (j >= end2)
-                    break;
+                    break; // b is sorted by tv_index so this can't transition from false to true
 
                 size_t size = length(j);
                 cur.push_back({j, size});
@@ -478,6 +482,10 @@ private:
     void find_longest_matches(size_t begin1, size_t end1, size_t begin2, size_t end2)
     {
         // FIXME: recursion could get too deep here
+        // recursion depth worst case is currently O(N) and each recursion uses 320 bytes of stack
+        // could reduce worst case to O(sqrt(N)) (and typical case to O(log N))
+        // biasing equal selections towards the middle, but that's still
+        // insufficient for Android's 8 KB stacks
         auto m = find_longest_match(begin1, end1, begin2, end2);
         if (!m.size)
             return;
@@ -496,6 +504,8 @@ CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> c
                                                            std::function<bool (size_t)> row_did_change,
                                                            bool sort)
 {
+    REALM_ASSERT_DEBUG(sort || std::is_sorted(begin(next_rows), end(next_rows)));
+
     CollectionChangeBuilder ret;
 
     size_t deleted = 0;
