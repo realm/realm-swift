@@ -35,7 +35,7 @@
         }];
     }
 
-    _token = [self.query addNotificationBlock:^(RLMResults *results, NSError *error) {
+    _token = [self.query addNotificationBlock:^(RLMResults *results, __unused RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(results);
         XCTAssertNil(error);
         self.called = true;
@@ -138,7 +138,8 @@
 @end
 @implementation SortedNotificationTests
 - (RLMResults *)query {
-    return [[IntObject objectsWhere:@"intCol > 0 AND intCol < 5"] sortedResultsUsingProperty:@"intCol" ascending:NO];
+    return [[IntObject objectsWhere:@"intCol > 0 AND intCol < 5"]
+            sortedResultsUsingProperty:@"intCol" ascending:NO];
 }
 
 - (void)testMoveMatchingObjectDueToDeletionOfNonMatchingObject {
@@ -189,9 +190,7 @@ static RLMCollectionChange *getChange(RLMTestCase<ChangesetTestCase> *self, void
     __block bool first = true;
     RLMResults *query = [self query];
     __block RLMCollectionChange *changes;
-    id token = [query addNotificationBlockWithChanges:^(RLMResults *results,
-                                                        RLMCollectionChange *c,
-                                                        NSError *error) {
+    id token = [query addNotificationBlock:^(RLMResults *results, RLMCollectionChange *c, NSError *error) {
         XCTAssertNotNil(results);
         XCTAssertNil(error);
         changes = c;
@@ -221,9 +220,12 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
         return;
     }
 
-    XCTAssertEqualObjects(deletions, [changes.deletions valueForKey:@"row"]);
-    XCTAssertEqualObjects(insertions, [changes.insertions valueForKey:@"row"]);
-    XCTAssertEqualObjects(modifications, [changes.modifications valueForKey:@"row"]);
+    XCTAssertEqualObjects(deletions, changes.deletions);
+    XCTAssertEqualObjects(insertions, changes.insertions);
+    XCTAssertEqualObjects(modifications, changes.modifications);
+    XCTAssertEqualObjects(deletions, [changes.deletionPaths valueForKey:@"row"]);
+    XCTAssertEqualObjects(insertions, [changes.insertionPaths valueForKey:@"row"]);
+    XCTAssertEqualObjects(modifications, [changes.modificationPaths valueForKey:@"row"]);
 }
 
 #define ExpectNoChange(self, block) XCTAssertNil(getChange((self), (block)))

@@ -43,7 +43,43 @@ public final class RLMGenerator<T: Object>: GeneratorType {
 /**
  Changes made to a collection
  */
-public typealias RealmCollectionChange = RLMCollectionChange
+public enum RealmCollectionChange<T> {
+    case Initial(T)
+    case Update(T, deletions: [Int], insertions: [Int], modifications: [Int])
+    case Error(NSError)
+
+    static func fromObjc(value: T, change: RLMCollectionChange?, error: NSError?) -> RealmCollectionChange {
+        if let error = error {
+            return .Error(error)
+        }
+        if let change = change {
+            return .Update(value,
+                deletions: change.deletions as! [Int],
+                insertions: change.insertions as! [Int],
+                modifications: change.modifications as! [Int])
+        }
+        return .Initial(value)
+    }
+}
+
+public enum RealmCollectionChangePaths<T> {
+    case Initial(T)
+    case Update(T, deletions: [NSIndexPath], insertions: [NSIndexPath], modifications: [NSIndexPath])
+    case Error(NSError)
+
+    static func fromObjc(value: T, change: RLMCollectionChange?, error: NSError?) -> RealmCollectionChangePaths {
+        if let error = error {
+            return .Error(error)
+        }
+        if let change = change {
+            return .Update(value,
+                deletions: change.deletionPaths,
+                insertions: change.insertionPaths,
+                modifications: change.modificationPaths)
+        }
+        return .Initial(value)
+    }
+}
 
 /**
 A homogenous collection of `Object`s which can be retrieved, filtered, sorted,
@@ -231,9 +267,13 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
 
     /// :nodoc:
     func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken
+
+    func addNotificationBlock(block: (RealmCollectionChange<Self>) -> ()) -> NotificationToken
+    func addNotificationBlock(block: (RealmCollectionChangePaths<Self>) -> ()) -> NotificationToken
 }
 
-private class _AnyRealmCollectionBase<T: Object>: RealmCollectionType {
+private class _AnyRealmCollectionBase<T: Object> {
+    typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
     var realm: Realm? { fatalError() }
     var count: Int { fatalError() }
@@ -258,9 +298,13 @@ private class _AnyRealmCollectionBase<T: Object>: RealmCollectionType {
     func valueForKey(key: String) -> AnyObject? { fatalError() }
     func valueForKeyPath(keyPath: String) -> AnyObject? { fatalError() }
     func setValue(value: AnyObject?, forKey key: String) { fatalError() }
-    func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken {
+    func _addNotificationBlock(block: (Wrapper?, NSError?) -> ()) -> NotificationToken {
         fatalError()
     }
+    func addNotificationBlock(collection: Wrapper, block: (RealmCollectionChange<Wrapper>) -> ())
+        -> NotificationToken { fatalError() }
+    func addNotificationBlock(collection: Wrapper, block: (RealmCollectionChangePaths<Wrapper>) -> ())
+        -> NotificationToken { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBase<C.Element> {
@@ -491,8 +535,48 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     // MARK: Notifications
 
     /// :nodoc:
-    override func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken {
+    override func _addNotificationBlock(block: (Wrapper?, NSError?) -> ()) -> NotificationToken {
         return base._addNotificationBlock(block)
+    }
+
+    override func addNotificationBlock(wrapper: Wrapper, block: (RealmCollectionChange<Wrapper>) -> ())
+            -> NotificationToken {
+        return base.addNotificationBlock { (change: RealmCollectionChange<C>) in
+            switch change {
+            case .Initial:
+                block(.Initial(wrapper))
+                break
+            case .Update(_, let deletions, let insertions, let modifications):
+                block(.Update(wrapper,
+                    deletions: deletions,
+                    insertions: insertions,
+                    modifications: modifications))
+                break
+            case .Error(let err):
+                block(.Error(err))
+                break
+            }
+        }
+    }
+
+    override func addNotificationBlock(wrapper: Wrapper, block: (RealmCollectionChangePaths<Wrapper>) -> ())
+            -> NotificationToken {
+        return base.addNotificationBlock { (change: RealmCollectionChangePaths<C>) in
+            switch change {
+            case .Initial:
+                block(.Initial(wrapper))
+                break
+            case .Update(_, let deletions, let insertions, let modifications):
+                block(.Update(wrapper,
+                    deletions: deletions,
+                    insertions: insertions,
+                    modifications: modifications))
+                break
+            case .Error(let err):
+                block(.Error(err))
+                break
+            }
+        }
     }
 }
 
@@ -741,7 +825,10 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken {
-        return base._addNotificationBlock(block)
-    }
+    public func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ())
+        -> NotificationToken { return base._addNotificationBlock(block) }
+    public func addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
+        -> NotificationToken { return base.addNotificationBlock(self, block: block) }
+    public func addNotificationBlock(block: (RealmCollectionChangePaths<AnyRealmCollection>) -> ())
+        -> NotificationToken { return base.addNotificationBlock(self, block: block) }
 }

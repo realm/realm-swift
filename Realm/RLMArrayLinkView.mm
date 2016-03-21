@@ -406,35 +406,15 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 // http://www.openradar.me/radar?id=6135653276319744
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, NSError *))block {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
     [_realm verifyNotificationsAreSupported];
 
-    __block uint_fast64_t prevVersion = -1;
-    auto noteBlock = ^(NSString *notification, RLMRealm *) {
-        if (notification != RLMRealmDidChangeNotification) {
-            return;
-        }
-
-        if (!_backingList.is_valid()) {
-            return;
-        }
-
-        auto version = _backingList.get_version_counter();
-        if (version != prevVersion) {
-            block(self, nil);
-            prevVersion = version;
-        }
-    };
-
+    // FIXME: List should do this automatically
     CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
-        noteBlock(RLMRealmDidChangeNotification, nil);
+        if (_backingList.is_valid()) {
+            block(self, nil, nil);
+        }
     });
-
-    return [_realm addNotificationBlock:noteBlock];
-}
-
-- (RLMNotificationToken *)addNotificationBlockWithChanges:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
-    [_realm verifyNotificationsAreSupported];
 
     auto token = _backingList.add_notification_callback([self, block](realm::CollectionChangeIndices const& changes,
                                                                   std::exception_ptr err) {
@@ -446,9 +426,15 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
                 NSError *error;
                 RLMRealmTranslateException(&error);
                 block(nil, nil, error);
+                return;
             }
         }
-        else if (changes.empty()) {
+
+        if (!_backingList.is_valid()) {
+            return;
+        }
+
+        if (changes.empty()) {
             block(self, nil, nil);
         }
         else {

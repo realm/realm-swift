@@ -383,10 +383,7 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 // to actually include the generic type
 // http://www.openradar.me/radar?id=6135653276319744
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, NSError *))block {
-    @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
-}
-- (RLMNotificationToken *)addNotificationBlockWithChanges:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
     @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
 }
 #pragma clang diagnostic pop

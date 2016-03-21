@@ -51,17 +51,24 @@ static NSString * const kTableName = @"table";
 
     // Set realm notification block
     __weak typeof(self) weakSelf = self;
-    self.notification = [self.array addNotificationBlockWithChanges:^(RLMResults *data, RLMCollectionChange *changes, NSError *error) {
+    self.notification = [self.array addNotificationBlock:^(RLMResults *data, RLMCollectionChange *changes, NSError *error) {
+        if (error) {
+            NSLog(@"Failed to open Realm on background worker: %@", error);
+            return;
+        }
+
         UITableView *tv = weakSelf.tableView;
+        // Initial run of the query will pass nil for the change information
         if (!changes) {
             [tv reloadData];
             return;
         }
 
+        // changes is non-nil, so we just need to update the tableview
         [tv beginUpdates];
-        [tv deleteRowsAtIndexPaths:changes.deletions withRowAnimation:UITableViewRowAnimationAutomatic];
-        [tv insertRowsAtIndexPaths:changes.insertions withRowAnimation:UITableViewRowAnimationAutomatic];
-        [tv reloadRowsAtIndexPaths:changes.modifications withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tv deleteRowsAtIndexPaths:changes.deletionPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tv insertRowsAtIndexPaths:changes.insertionPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tv reloadRowsAtIndexPaths:changes.modificationPaths withRowAnimation:UITableViewRowAnimationAutomatic];
         [tv endUpdates];
     }];
 }

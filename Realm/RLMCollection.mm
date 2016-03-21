@@ -246,10 +246,8 @@ NSString *RLMDescriptionWithMaxDepth(NSString *name,
 
 static NSArray *toArray(realm::IndexSet const& set) {
     NSMutableArray *ret = [NSMutableArray new];
-    NSUInteger path[2] = {0, 0};
     for (auto index : set.as_indexes()) {
-        path[1] = index;
-        [ret addObject:[NSIndexPath indexPathWithIndexes:path length:2]];
+        [ret addObject:@(index)];
     }
     return ret;
 }
@@ -264,5 +262,27 @@ static NSArray *toArray(realm::IndexSet const& set) {
 
 - (NSArray *)modifications {
     return toArray(_indices.modifications);
+}
+
+static NSArray *toIndexPathArray(realm::IndexSet const& set) {
+    NSMutableArray *ret = [NSMutableArray new];
+    NSUInteger path[2] = {0, 0};
+    for (auto index : set.as_indexes()) {
+        path[1] = index;
+        [ret addObject:[NSIndexPath indexPathWithIndexes:path length:2]];
+    }
+    return ret;
+}
+
+- (NSArray *)insertionPaths {
+    return toIndexPathArray(_indices.insertions);
+}
+
+- (NSArray *)deletionPaths {
+    return toIndexPathArray(_indices.deletions);
+}
+
+- (NSArray *)modificationPaths {
+    return toIndexPathArray(_indices.modifications);
 }
 @end

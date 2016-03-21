@@ -46,21 +46,25 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set results notification block
-        self.notificationToken = results.addNotificationBlock { results, changes, error in
-            if let error = error {
-                fatalError("\(error)")
-            }
-            // Changes is nil if this is the first run of the query
-            guard let changes = changes else {
+        self.notificationToken = results.addNotificationBlock { (change: RealmCollectionChangePaths) in
+            switch change {
+            case .Initial:
+                // Results are now populated and can be accessed without blocking the UI
                 self.tableView.reloadData()
-                return
+                break
+            case .Update(_, let deletions, let insertions, let modifications):
+                // Query results have changed, so apply them to the TableView
+                self.tableView.beginUpdates()
+                self.tableView.insertRowsAtIndexPaths(insertions, withRowAnimation: .Automatic)
+                self.tableView.deleteRowsAtIndexPaths(deletions, withRowAnimation: .Automatic)
+                self.tableView.reloadRowsAtIndexPaths(modifications, withRowAnimation: .Automatic)
+                self.tableView.endUpdates()
+                break
+            case .Error(let err):
+                // An error occured while opening the Realm file on the background worker thread
+                fatalError("\(err)")
+                break
             }
-
-            self.tableView.beginUpdates()
-            self.tableView.insertRowsAtIndexPaths(changes.insertions, withRowAnimation: .Automatic)
-            self.tableView.deleteRowsAtIndexPaths(changes.deletions, withRowAnimation: .Automatic)
-            self.tableView.reloadRowsAtIndexPaths(changes.modifications, withRowAnimation: .Automatic)
-            self.tableView.endUpdates()
         }
     }
 

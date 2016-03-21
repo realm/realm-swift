@@ -201,12 +201,9 @@ RLM_ASSUME_NONNULL_BEGIN
  @param block The block to be called with the evaluated results.
  @return A token which must be held for as long as you want query results to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results, NSError *__nullable error))block RLM_WARN_UNUSED_RESULT;
-
-
-- (RLMNotificationToken *)addNotificationBlockWithChanges:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results,
-                                                                    RLMCollectionChange *__nullable change,
-                                                                    NSError *__nullable error))block RLM_WARN_UNUSED_RESULT;
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results,
+                                                         RLMCollectionChange *__nullable change,
+                                                         NSError *__nullable error))block RLM_WARN_UNUSED_RESULT;
 
 #pragma mark - Aggregating Property Values
 

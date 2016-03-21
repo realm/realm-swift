@@ -416,17 +416,19 @@ public final class List<T: Object>: ListBase {
     */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (list: List<T>) -> ()) -> NotificationToken {
-        return _rlmArray.addNotificationBlock { _, _ in block(list: self) }
+        return _rlmArray.addNotificationBlock { _, _, _ in block(list: self) }
     }
 
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (List<T>?, RealmCollectionChange?, NSError?) -> ()) -> NotificationToken {
-        return _rlmArray.addNotificationBlockWithChanges { list, change, error in
-            if list != nil {
-                block(self, change, nil)
-            } else {
-                block(nil, nil, error)
-            }
+    public func addNotificationBlock(block: (RealmCollectionChange<List>) -> ()) -> NotificationToken {
+        return _rlmArray.addNotificationBlock { list, change, error in
+            block(RealmCollectionChange<List>.fromObjc(self, change: change, error: error))
+        }
+    }
+    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
+    public func addNotificationBlock(block: (RealmCollectionChangePaths<List>) -> ()) -> NotificationToken {
+        return _rlmArray.addNotificationBlock { list, change, error in
+            block(RealmCollectionChangePaths<List>.fromObjc(self, change: change, error: error))
         }
     }
 }
@@ -469,6 +471,6 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
     /// :nodoc:
     public func _addNotificationBlock(block: (AnyRealmCollection<T>?, NSError?) -> ()) -> NotificationToken {
         let anyCollection = AnyRealmCollection(self)
-        return _rlmArray.addNotificationBlock { _, _ in block(anyCollection, nil) }
+        return _rlmArray.addNotificationBlock { _, _, _ in block(anyCollection, nil) }
     }
 }

@@ -353,7 +353,7 @@ public final class Results<T: Object>: ResultsBase {
      */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (results: Results<T>?, error: NSError?) -> ()) -> NotificationToken {
-        return rlmResults.addNotificationBlock { results, error in
+        return rlmResults.addNotificationBlock { results, changes, error in
             if results != nil {
                 block(results: self, error: nil)
             } else {
@@ -363,13 +363,16 @@ public final class Results<T: Object>: ResultsBase {
     }
 
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (Results<T>?, RealmCollectionChange?, NSError?) -> ()) -> NotificationToken {
-        return rlmResults.addNotificationBlockWithChanges { results, change, error in
-            if results != nil {
-                block(self, change, nil)
-            } else {
-                block(nil, nil, error)
-            }
+    public func addNotificationBlock(block: (RealmCollectionChange<Results> -> Void)) -> NotificationToken {
+        return rlmResults.addNotificationBlock { results, change, error in
+            block(RealmCollectionChange<Results>.fromObjc(self, change: change, error: error))
+        }
+    }
+
+    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
+    public func addNotificationBlock(block: (RealmCollectionChangePaths<Results> -> Void)) -> NotificationToken {
+        return rlmResults.addNotificationBlock { results, change, error in
+            block(RealmCollectionChangePaths<Results>.fromObjc(self, change: change, error: error))
         }
     }
 }
@@ -396,7 +399,7 @@ extension Results: RealmCollectionType {
     /// :nodoc:
     public func _addNotificationBlock(block: (AnyRealmCollection<T>?, NSError?) -> ()) -> NotificationToken {
         let anyCollection = AnyRealmCollection(self)
-        return rlmResults.addNotificationBlock { results, error in
+        return rlmResults.addNotificationBlock { results, change, error in
             if results != nil {
                 block(anyCollection, nil)
             } else {
