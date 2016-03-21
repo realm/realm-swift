@@ -94,6 +94,8 @@ void CollectionChangeBuilder::merge(CollectionChangeBuilder&& c)
                 return old.to == m.from;
             });
             if (it != c.moves.end()) {
+                if (modifications.contains(it->from))
+                    c.modifications.add(it->to);
                 old.to = it->to;
                 *it = c.moves.back();
                 c.moves.pop_back();
