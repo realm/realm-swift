@@ -263,7 +263,7 @@ void CollectionChangeBuilder::move(size_t from, size_t to)
 void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
 {
     REALM_ASSERT(row_ndx <= last_row);
-    if (row_ndx == last_row) {
+    if (row_ndx == last_row || row_ndx + 1 == last_row) {
         erase(row_ndx);
         return;
     }
