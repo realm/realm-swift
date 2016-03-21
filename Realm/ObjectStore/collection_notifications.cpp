@@ -292,8 +292,17 @@ void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
         move.to = row_ndx;
         updated_existing_move = true;
 
-        insertions.erase_at(last_row);
-        insertions.insert_at(row_ndx);
+        if (!insertions.empty()) {
+            REALM_ASSERT(std::prev(insertions.end())->second - 1 <= last_row);
+            insertions.remove(last_row);
+        }
+
+        // Don't mark the moved-over row as deleted if it was a new insertion
+        if (!insertions.contains(row_ndx)) {
+            deletions.add_shifted(insertions.unshift(row_ndx));
+            insertions.add(row_ndx);
+        }
+
         // Because this is a move, the unshifted source row has already been marked as deleted
     }
 
@@ -312,6 +321,7 @@ void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
         deletions.add_shifted(insertions.unshift(row_ndx));
         insertions.add(row_ndx);
     }
+    verify();
 }
 
 void CollectionChangeBuilder::verify()
