@@ -145,7 +145,11 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 - (RLMObjectSchema *)objectForKeyedSubscript:(__unsafe_unretained id<NSCopying> const)className {
     RLMObjectSchema *schema = _objectSchemaByName[className];
     if (!schema) {
-        @throw RLMException(@"Object type '%@' not persisted in Realm", className);
+        RLMObject *object = [((RLMObject *)[NSClassFromString(className) alloc]) init];
+        schema = object.objectSchema;
+        if (!schema) {
+            @throw RLMException(@"Object type '%@' not persisted in Realm", className);
+        }
     }
     return schema;
 }
