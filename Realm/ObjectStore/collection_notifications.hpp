@@ -86,6 +86,7 @@ public:
                                              bool sort);
 
     void merge(CollectionChangeBuilder&&);
+    void clean_up_stale_moves();
 
     void insert(size_t ndx, size_t count=1);
     void modify(size_t ndx);

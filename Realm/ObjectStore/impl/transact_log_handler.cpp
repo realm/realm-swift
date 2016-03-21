@@ -444,6 +444,14 @@ public:
             change->modify(row);
     }
 
+    void parse_complete()
+    {
+        for (auto& list : m_info.lists)
+        {
+            list.changes->clean_up_stale_moves();
+        }
+    }
+
     bool select_link_list(size_t col, size_t row, size_t)
     {
         mark_dirty(row, col);

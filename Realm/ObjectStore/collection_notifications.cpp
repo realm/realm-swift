@@ -146,17 +146,7 @@ void CollectionChangeBuilder::merge(CollectionChangeBuilder&& c)
     insertions.erase_at(c.deletions);
     insertions.insert_at(c.insertions);
 
-    // Look for moves which are now no-ops, and remove them plus the associated
-    // insert+delete. Note that this isn't just checking for from == to due to
-    // that rows can also be shifted by other inserts and deletes
-    IndexSet to_remove;
-    moves.erase(remove_if(begin(moves), end(moves), [&](auto const& move) {
-        if (move.from - deletions.count(0, move.from) != move.to - insertions.count(0, move.to))
-            return false;
-        deletions.remove(move.from);
-        insertions.remove(move.to);
-        return true;
-    }), end(moves));
+    clean_up_stale_moves();
 
     modifications.erase_at(c.deletions);
     modifications.shift_for_insert_at(c.insertions);
@@ -164,6 +154,20 @@ void CollectionChangeBuilder::merge(CollectionChangeBuilder&& c)
 
     c = {};
     verify();
+}
+
+void CollectionChangeBuilder::clean_up_stale_moves()
+{
+    // Look for moves which are now no-ops, and remove them plus the associated
+    // insert+delete. Note that this isn't just checking for from == to due to
+    // that rows can also be shifted by other inserts and deletes
+    moves.erase(remove_if(begin(moves), end(moves), [&](auto const& move) {
+        if (move.from - deletions.count(0, move.from) != move.to - insertions.count(0, move.to))
+            return false;
+        deletions.remove(move.from);
+        insertions.remove(move.to);
+        return true;
+    }), end(moves));
 }
 
 void CollectionChangeBuilder::modify(size_t ndx)
