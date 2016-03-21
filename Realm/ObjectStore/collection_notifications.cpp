@@ -226,7 +226,7 @@ void CollectionChangeBuilder::move(size_t from, size_t to)
             // to the other
             if (move.to >= to && move.to < from)
                 ++move.to;
-            else if (move.to < to && move.to > from)
+            else if (move.to <= to && move.to > from)
                 --move.to;
             continue;
         }
