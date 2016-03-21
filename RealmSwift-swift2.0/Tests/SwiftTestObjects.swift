@@ -297,3 +297,12 @@ class SwiftCustomInitializerObject: Object {
         super.init(value: value, schema: schema)
     }
 }
+
+class SwiftConvenienceInitializerObject: Object {
+    dynamic var stringCol = ""
+
+    convenience init(stringCol: String) {
+        self.init()
+        self.stringCol = stringCol
+    }
+}
