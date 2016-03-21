@@ -339,14 +339,24 @@ void RealmCoordinator::run_async_notifiers()
         change_info.resize(1);
     }
     else {
-        change_info.resize(2);
-
         // Sort newly added notifiers by their source version so that we can pull them
         // all forward to the latest version in a single pass over the transaction log
         std::sort(new_notifiers.begin(), new_notifiers.end(),
                   [](auto&& lft, auto&& rgt) { return lft->version() < rgt->version(); });
         version = m_advancer_sg->get_version_of_current_transaction();
         REALM_ASSERT(version == new_notifiers.front()->version());
+
+        // Preallocate the required amount of space in the vector so that we can
+        // safely give out pointers to within the vector
+        {
+            size_t count = 2;
+            for (auto it = new_notifiers.begin(), next = it + 1; next != new_notifiers.end(); ++it, ++next) {
+                if ((*it)->version() != (*next)->version())
+                    ++count;
+            }
+            change_info.reserve(count);
+            change_info.resize(2);
+        }
 
         TransactionChangeInfo* info = &change_info.back();
 
