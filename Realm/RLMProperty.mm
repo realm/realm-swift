@@ -515,6 +515,22 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     return prop;
 }
 
+- (RLMProperty *)copyWithNewName:(NSString *)name {
+    RLMProperty *prop = [self copy];
+    prop->_name = name;
+    prop->_type = _type;
+    prop->_objcType = _objcType;
+    prop->_objectClassName = _objectClassName;
+    prop->_indexed = _indexed;
+    prop->_isPrimary = _isPrimary;
+    prop->_swiftIvar = _swiftIvar;
+    prop->_optional = _optional;
+    prop->_declarationIndex = _declarationIndex;
+
+    [prop updateAccessors];
+    return prop;
+}
+
 - (BOOL)isEqual:(id)object {
     if (![object isKindOfClass:[RLMProperty class]]) {
         return NO;

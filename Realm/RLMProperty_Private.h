@@ -73,6 +73,8 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType);
 @property (nonatomic) SEL getterSel;
 @property (nonatomic) SEL setterSel;
 
+- (RLMProperty *)copyWithNewName:(NSString *)name;
+
 @end
 
 @interface RLMProperty (Dynamic)
