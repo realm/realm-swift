@@ -130,6 +130,8 @@ class ObjectSchemaInitializationTests: TestCase {
 
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDatePrimaryKey.self),
             "Should throw when setting a non int/string primary key")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithPrimaryKeyMethodButWithoutProtocol.self),
+            "Should throw when declaring primaryKey method but not implementing PrimaryKeyObject protocol")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSURL.self),
             "Should throw when not ignoring a property of a type we can't persist")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonOptionalLinkProperty.self),
@@ -235,6 +237,14 @@ class SwiftObjectWithDatePrimaryKey: SwiftFakeObject, PrimaryKeyObject {
 
     class func primaryKey() -> String {
         return "date"
+    }
+}
+
+class SwiftObjectWithPrimaryKeyMethodButWithoutProtocol: SwiftFakeObject {
+    dynamic var stringCol = ""
+
+    dynamic class func primaryKey() -> String {
+        return "stringCol"
     }
 }
 

@@ -342,6 +342,21 @@ public class ObjectUtil: NSObject {
         return nil
     }
 
+    @objc private class func primaryKeyPropertyForClass(type: AnyClass) -> String? {
+        if let type = type as? PrimaryKeyObject.Type {
+            return type.primaryKey()
+        }
+        // Note: This shoud prevent that a schema definition error is mystified by the requirement
+        // of a schema version bump, if previously a property was designated as primary key by
+        // overriding the inherited method but the later introduced protocol `PrimaryKeyObject` was
+        // not adopted yet.
+        if type.respondsToSelector("primaryKey") {
+            throwRealmException("WARNING: '\(type)' declares a static method 'primaryKey' but"
+                + "doesn't implement the protocol 'PrimaryKeyObject'.")
+        }
+        return nil
+    }
+
     // Get the names of all properties in the object which are of type List<>.
     @objc private class func getGenericListPropertyNames(object: AnyObject) -> NSArray {
         return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
