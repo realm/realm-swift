@@ -35,6 +35,7 @@ What are steps we can follow to reproduce this issue?
 Provide a code sample or test case that highlights the issue.
 If relevant, include your model definitions.
 For larger code samples, links to external gists/repositories are preferred.
+Alternatively share confidentially via mail to help@realm.io.
 Full Xcode projects that we can compile ourselves are ideal!
 
 ## Version of Realm and Tooling
