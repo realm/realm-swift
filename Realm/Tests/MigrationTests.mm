@@ -1270,4 +1270,75 @@ RLM_ARRAY_TYPE(MigrationObject);
     } secondSchemaTransform:nil];
 }
 
+// Unsuccessful Property Rename Tests
+
+- (void)testMigrationRenamePropertySetRequired {
+    [self assertPropertyRenameError:@"Migration is required due to the following errors: \n- Nullability for property 'stringCol' has changed from '1' to  '0'."
+               firstSchemaTransform:^(__unused RLMObjectSchema *schema, __unused RLMProperty *beforeProperty, RLMProperty *afterProperty) {
+        afterProperty.optional = NO;
+    } secondSchemaTransform:nil];
+}
+
+- (void)testMigrationRenamePropertyTypeMismatch {
+    [self assertPropertyRenameError:@"Old property 'before_stringCol' of type 'int' cannot be renamed to property 'stringCol' of type 'string'."
+               firstSchemaTransform:^(__unused RLMObjectSchema *schema, RLMProperty *beforeProperty, __unused RLMProperty *afterProperty) {
+        beforeProperty.type = RLMPropertyTypeInt;
+    } secondSchemaTransform:nil];
+}
+
+- (void)testMigrationRenamePropertyObjectTypeMismatch {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationLinkObject.class];
+    RLMObjectSchema *migrationObjectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
+    NSArray<RLMProperty *> *afterProperties = objectSchema.properties;
+    NSMutableArray<RLMProperty *> *beforeProperties = [NSMutableArray arrayWithCapacity:2];
+    for (RLMProperty *property in afterProperties) {
+        RLMProperty *beforeProperty = [property copyWithNewName:[NSString stringWithFormat:@"before_%@", property.name]];
+        beforeProperty.objectClassName = MigrationLinkObject.className;
+        [beforeProperties addObject:beforeProperty];
+    }
+    objectSchema.properties = beforeProperties;
+
+    [self createTestRealmWithSchema:@[objectSchema] block:^(__unused RLMRealm *realm) {
+        // No need to create an object
+    }];
+
+    objectSchema.properties = afterProperties;
+
+    [self assertPropertyRenameError:@"Old property 'before_object' of type '<MigrationLinkObject>' cannot be renamed to property 'object' of type '<MigrationObject>'."
+                      objectSchemas:@[objectSchema, migrationObjectSchema] className:MigrationLinkObject.className oldName:beforeProperties[0].name newName:afterProperties[0].name];
+
+    [self assertPropertyRenameError:@"Old property 'before_array' of type 'array<MigrationLinkObject>' cannot be renamed to property 'array' of type 'array<MigrationObject>'."
+                      objectSchemas:@[objectSchema, migrationObjectSchema] className:MigrationLinkObject.className oldName:beforeProperties[1].name newName:afterProperties[1].name];
+}
+
+- (void)testMigrationRenameMissingPropertiesAndClasses {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+
+    [self createTestRealmWithSchema:@[objectSchema] block:^(__unused RLMRealm *realm) {
+        // No need to create an object
+    }];
+
+    // Missing Old Property
+    [self assertPropertyRenameError:@"Old property 'nonExistentProperty1' is missing from the Realm file so it cannot be renamed to 'nonExistentProperty2'."
+                      objectSchemas:@[objectSchema] className:StringObject.className oldName:@"nonExistentProperty1" newName:@"nonExistentProperty2"];
+
+    // Missing New Property
+    [self assertPropertyRenameError:@"Old property 'stringCol' cannot be renamed to 'nonExistentProperty' because the new property is not present in the specified schema."
+                      objectSchemas:@[objectSchema] className:StringObject.className oldName:@"stringCol" newName:@"nonExistentProperty"];
+
+    // Non Existent Class
+    [self assertPropertyRenameError:@"Cannot rename properties on type 'MigrationObject' because it is missing from the Realm file."
+                      objectSchemas:@[[RLMObjectSchema schemaForObjectClass:IntObject.class]] className:MigrationObject.className oldName:@"" newName:@""];
+
+    // Removed Class
+    [self assertPropertyRenameError:@"Cannot rename properties on type 'StringObject' because it is missing from the specified schema."
+                      objectSchemas:@[[RLMObjectSchema schemaForObjectClass:IntObject.class]] className:StringObject.className oldName:@"stringCol" newName:@"stringCol2"];
+
+    // Without Removing Old Property
+    RLMProperty *secondProperty = [objectSchema.properties.firstObject copyWithNewName:@"stringCol2"];
+    objectSchema.properties = [objectSchema.properties arrayByAddingObject:secondProperty];
+    [self assertPropertyRenameError:@"Old property 'stringCol' cannot be renamed to 'stringCol2' because the old property is still present in the specified schema."
+                      objectSchemas:@[objectSchema] className:StringObject.className oldName:@"stringCol" newName:@"stringCol2"];
+}
+
 @end
