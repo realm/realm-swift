@@ -39,8 +39,13 @@
 
 ## Version of Realm and Tooling
 
-> Share which versions of Realm are affected, the Xcode and OS X version
-> on which you compile, as well as the version of the
-> dependency manager involved (CocoaPods / Carthage).
-> [In the CONTRIBUTING guidelines](https://git.io/vgxJO), you will find
-> a script, which will help with that.
+[In the CONTRIBUTING guidelines](https://git.io/vgxJO), you will find a script,
+which will help determining these versions.
+
+Realm version: ?
+
+Xcode version: ?
+
+iOS/OSX version: ?
+
+Dependency manager + version: ?
