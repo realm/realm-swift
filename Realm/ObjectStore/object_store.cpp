@@ -448,7 +448,7 @@ void ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
     if (get_schema_version(group) != ObjectStore::NotVersioned) {
         migration(group, schema);
         remove_properties(group, schema, to_delete);
-
+        verify_schema(schema_from_group(group), schema);
         validate_primary_column_uniqueness(group, schema);
     }
 
@@ -515,6 +515,57 @@ void ObjectStore::delete_data_for_object(Group *group, StringData object_type) {
     if (table) {
         group->remove_table(table->get_index_in_group());
         set_primary_key_for_object(group, object_type, "");
+    }
+}
+
+void ObjectStore::rename_column(Group *group, Schema& passed_schema, StringData object_type, StringData old_name, StringData new_name) {
+    Schema schema = schema_from_group(group);
+    auto matching_schema = schema.find(object_type);
+    if (matching_schema == schema.end()) {
+        // FIXME: throw
+    }
+    Property *old_property = matching_schema->property_for_name(old_name);
+    if (old_property == nullptr) {
+        // FIXME: throw
+    }
+    TableRef table = table_for_object_type(group, object_type);
+    if (!table) {
+        // FIXME: throw
+    }
+    auto passed_object_schema = passed_schema.find(object_type);
+    if (passed_object_schema == passed_schema.end()) {
+        // FIXME: throw
+    }
+    Property *new_property = matching_schema->property_for_name(new_name);
+    if (new_property == nullptr) {
+        // FIXME: throw
+    }
+    if (old_property->type != new_property->type ||
+        old_property->object_type != new_property->object_type) {
+        // FIXME: throw
+    }
+    if (passed_object_schema->property_for_name(old_name) != nullptr) {
+        // FIXME: throw
+    }
+    size_t column_to_remove = new_property->table_column;
+    table->rename_column(old_property->table_column, new_name);
+    table->remove_column(column_to_remove);
+    if (new_property->is_primary && !old_property->is_primary) {
+        set_primary_key_for_object(group, object_type, new_name);
+    }
+    if (new_property->requires_index() && !old_property->requires_index()) {
+        table->add_search_index(old_property->table_column);
+    }
+    old_property->name = new_name;
+    if (property_can_be_migrated_to_nullable(*old_property, *new_property)) {
+        new_property->table_column = old_property->table_column;
+        old_property->table_column = old_property->table_column + 1;
+
+        table->insert_column(new_property->table_column, DataType(new_property->type), new_property->name, new_property->is_nullable);
+        copy_property_values(*old_property, *new_property, *table);
+        table->remove_column(old_property->table_column);
+
+        old_property->table_column = new_property->table_column;
     }
 }
 
