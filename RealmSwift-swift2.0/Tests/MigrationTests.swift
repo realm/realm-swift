@@ -314,9 +314,11 @@ class MigrationTests: TestCase {
 
     func testRenameProperty() {
         autoreleasepool {
-            let prop = RLMProperty(name: "before_stringCol", type: .String, objectClassName: nil, indexed: false, optional: false)
+            let prop = RLMProperty(name: "before_stringCol", type: .String, objectClassName: nil, indexed: false,
+                optional: false)
             autoreleasepool {
-                let realm = realmWithSingleClassProperties(defaultRealmPath(), className: "SwiftStringObject", properties: [prop])
+                let realm = realmWithSingleClassProperties(defaultRealmPath(), className: "SwiftStringObject",
+                    properties: [prop])
                 try! realm.transactionWithBlock {
                     realm.createObject("SwiftStringObject", withValue: ["a"])
                 }
@@ -324,7 +326,8 @@ class MigrationTests: TestCase {
 
             migrateAndTestDefaultRealm() { migration, _ in
                 XCTAssertEqual(migration.oldSchema.objectSchema[0].properties.count, 1)
-                 migration.renamePropertyForClass("SwiftStringObject", oldName: "before_stringCol", newName: "stringCol")
+                 migration.renamePropertyForClass("SwiftStringObject", oldName: "before_stringCol",
+                    newName: "stringCol")
             }
 
             let realm = dynamicRealm(defaultRealmPath())
