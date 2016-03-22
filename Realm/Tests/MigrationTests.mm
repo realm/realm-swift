@@ -231,6 +231,49 @@ RLM_ARRAY_TYPE(MigrationObject);
     return configuration;
 }
 
+- (RLMRealmConfiguration *)renameConfigurationWithObjectSchemas:(NSArray *)objectSchemas className:(NSString *)className
+                                                        oldName:(NSString *)oldName newName:(NSString *)newName {
+    return [self renameConfigurationWithObjectSchemas:objectSchemas migrationBlock:^(RLMMigration *migration, uint64_t) {
+        [migration renamePropertyForClass:className oldName:oldName newName:newName];
+    }];
+}
+
+- (void)assertPropertyRenameError:(NSString *)errorMessage objectSchemas:(NSArray *)objectSchemas
+                        className:(NSString *)className oldName:(NSString *)oldName newName:(NSString *)newName {
+    RLMRealmConfiguration *config = [self renameConfigurationWithObjectSchemas:objectSchemas className:className
+                                                                       oldName:oldName newName:newName];
+    XCTAssertEqualObjects([[RLMRealm migrateRealm:config] localizedDescription], errorMessage);
+}
+
+- (void)assertPropertyRenameError:(NSString *)errorMessage
+             firstSchemaTransform:(void (^)(RLMObjectSchema *, RLMProperty *, RLMProperty *))transform1
+            secondSchemaTransform:(void (^)(RLMObjectSchema *, RLMProperty *, RLMProperty *))transform2 {
+    RLMObjectSchema *schema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+    RLMProperty *afterProperty = schema.properties.firstObject;
+    RLMProperty *beforeProperty = [afterProperty copyWithNewName:@"before_stringCol"];
+    schema.properties = @[beforeProperty];
+    if (transform1) { transform1(schema, beforeProperty, afterProperty); }
+
+    [self createTestRealmWithSchema:@[schema] block:^(RLMRealm *realm) {
+        if (errorMessage == nil) {
+            [StringObject createInRealm:realm withValue:@[@"0"]];
+        }
+    }];
+
+    schema.properties = @[afterProperty];
+    if (transform2) { transform2(schema, beforeProperty, afterProperty); }
+
+    RLMRealmConfiguration *config = [self renameConfigurationWithObjectSchemas:@[schema] className:StringObject.className
+                                                                       oldName:beforeProperty.name newName:afterProperty.name];
+
+    if (errorMessage) {
+        XCTAssertEqualObjects([[RLMRealm migrateRealm:config] localizedDescription], errorMessage);
+    } else {
+        XCTAssertNil([RLMRealm migrateRealm:config]);
+        XCTAssertEqualObjects(@"0", [[[StringObject allObjectsInRealm:[RLMRealm realmWithConfiguration:config error:nil]] firstObject] stringCol]);
+    }
+}
+
 #pragma mark - Schema versions
 
 - (void)testGetSchemaVersion {
