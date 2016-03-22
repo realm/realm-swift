@@ -45,7 +45,7 @@ examples = [
   "examples/ios/xcode-7/objc",
   "examples/osx/objc",
   "examples/tvos/objc",
-  "examples/ios/swift-2.1.1",
+  "examples/ios/swift-2.2",
   "examples/tvos/swift",
 ]
 
@@ -59,7 +59,7 @@ framework_directory_for_example = {
   'examples/ios/xcode-7/objc' => '../../../../ios/static/xcode-7',
   'examples/osx/objc' => '../../../osx',
   'examples/tvos/objc' => '../../../tvos',
-  'examples/ios/swift-2.1.1' => '../../../ios/swift-2.1.1',
+  'examples/ios/swift-2.2' => '../../../ios/swift-2.2',
   'examples/tvos/swift' => '../../../tvos',
 }
 
