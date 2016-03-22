@@ -222,6 +222,15 @@ RLM_ARRAY_TYPE(MigrationObject);
     RLMAssertRealmSchemaMatchesTable(self, [RLMRealm realmWithConfiguration:config error:nil]);
 }
 
+- (RLMRealmConfiguration *)renameConfigurationWithObjectSchemas:(NSArray *)objectSchemas migrationBlock:(RLMMigrationBlock)block {
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration new];
+    configuration.path = RLMTestRealmPath();
+    configuration.schemaVersion = 1;
+    configuration.customSchema = [self schemaWithObjects:objectSchemas];
+    configuration.migrationBlock = block;
+    return configuration;
+}
+
 #pragma mark - Schema versions
 
 - (void)testGetSchemaVersion {
@@ -1116,6 +1125,58 @@ RLM_ARRAY_TYPE(MigrationObject);
             XCTAssertEqual(obj.cookie, cookieValue);
         }
     }
+}
+
+#pragma mark - Property Rename
+
+// Successful Property Rename Tests
+
+- (void)testMigrationRenameProperty {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:AllTypesObject.class];
+    RLMObjectSchema *stringObjectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+    NSMutableArray *beforeProperties = [NSMutableArray arrayWithCapacity:objectSchema.properties.count];
+    for (RLMProperty *property in objectSchema.properties) {
+        [beforeProperties addObject:[property copyWithNewName:[NSString stringWithFormat:@"before_%@", property.name]]];
+    }
+    NSArray *afterProperties = objectSchema.properties;
+    objectSchema.properties = beforeProperties;
+
+    NSDate *now = [NSDate dateWithTimeIntervalSince1970:100000];
+    id inputValue = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, @0, @[@"a"]];
+
+    [self createTestRealmWithSchema:@[objectSchema, stringObjectSchema] block:^(RLMRealm *realm) {
+        [AllTypesObject createInRealm:realm withValue:inputValue];
+    }];
+
+    objectSchema.properties = afterProperties;
+
+    RLMRealmConfiguration *config = [self renameConfigurationWithObjectSchemas:@[objectSchema, stringObjectSchema]
+                                                                migrationBlock:^(RLMMigration * _Nonnull migration, __unused uint64_t oldSchemaVersion) {
+        [afterProperties enumerateObjectsUsingBlock:^(RLMProperty * _Nonnull property, NSUInteger idx, __unused BOOL * _Nonnull stop) {
+            [migration renamePropertyForClass:AllTypesObject.className oldName:[beforeProperties[idx] name] newName:property.name];
+        }];
+    }];
+    XCTAssertNil([RLMRealm migrateRealm:config]);
+
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    RLMAssertRealmSchemaMatchesTable(self, realm);
+
+    RLMResults<AllTypesObject *> *allObjects = [AllTypesObject allObjectsInRealm:realm];
+    XCTAssertEqual(1U, allObjects.count);
+    XCTAssertEqual(1U, [[StringObject allObjectsInRealm:realm] count]);
+
+    AllTypesObject *obj = allObjects.firstObject;
+    XCTAssertEqualObjects(inputValue[0], @(obj.boolCol));
+    XCTAssertEqualObjects(inputValue[1], @(obj.intCol));
+    XCTAssertEqualObjects(inputValue[2], @(obj.floatCol));
+    XCTAssertEqualObjects(inputValue[3], @(obj.doubleCol));
+    XCTAssertEqualObjects(inputValue[4], obj.stringCol);
+    XCTAssertEqualObjects(inputValue[5], obj.binaryCol);
+    XCTAssertEqualObjects(inputValue[6], obj.dateCol);
+    XCTAssertEqualObjects(inputValue[7], @(obj.cBoolCol));
+    XCTAssertEqualObjects(inputValue[8], @(obj.longCol));
+    XCTAssertEqualObjects(inputValue[9], obj.mixedCol);
+    XCTAssertEqualObjects(inputValue[10], @[obj.objectCol.stringCol]);
 }
 
 @end
