@@ -1222,4 +1222,52 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqualObjects(inputValue[10], @[obj.objectCol.stringCol]);
 }
 
+- (void)testMigrationRenamePropertyPrimaryKeyBoth {
+    [self assertPropertyRenameError:nil firstSchemaTransform:^(RLMObjectSchema *schema, RLMProperty *beforeProperty, __unused RLMProperty *afterProperty) {
+        schema.primaryKeyProperty = beforeProperty;
+    } secondSchemaTransform:^(RLMObjectSchema *schema, __unused RLMProperty *beforeProperty, RLMProperty *afterProperty) {
+        schema.primaryKeyProperty = afterProperty;
+    }];
+}
+
+- (void)testMigrationRenamePropertyUnsetPrimaryKey {
+    [self assertPropertyRenameError:nil firstSchemaTransform:^(RLMObjectSchema *schema, RLMProperty *beforeProperty, __unused RLMProperty *afterProperty) {
+        schema.primaryKeyProperty = beforeProperty;
+    } secondSchemaTransform:^(RLMObjectSchema *schema, __unused RLMProperty *beforeProperty, __unused RLMProperty *afterProperty) {
+        schema.primaryKeyProperty = nil;
+    }];
+}
+
+- (void)testMigrationRenamePropertySetPrimaryKey {
+    [self assertPropertyRenameError:nil firstSchemaTransform:nil
+                     secondSchemaTransform:^(RLMObjectSchema *schema, __unused RLMProperty *beforeProperty, RLMProperty *afterProperty) {
+        schema.primaryKeyProperty = afterProperty;
+    }];
+}
+
+- (void)testMigrationRenamePropertyIndexBoth {
+    [self assertPropertyRenameError:nil firstSchemaTransform:^(__unused RLMObjectSchema *schema, RLMProperty *beforeProperty, __unused RLMProperty *afterProperty) {
+        afterProperty.indexed = YES;
+        beforeProperty.indexed = YES;
+    } secondSchemaTransform:nil];
+}
+
+- (void)testMigrationRenamePropertyUnsetIndex {
+    [self assertPropertyRenameError:nil firstSchemaTransform:^(__unused RLMObjectSchema *schema, RLMProperty *beforeProperty, __unused RLMProperty *afterProperty) {
+        beforeProperty.indexed = YES;
+    } secondSchemaTransform:nil];
+}
+
+- (void)testMigrationRenamePropertySetIndex {
+    [self assertPropertyRenameError:nil firstSchemaTransform:^(__unused RLMObjectSchema *schema, __unused RLMProperty *beforeProperty, RLMProperty *afterProperty) {
+        afterProperty.indexed = YES;
+    } secondSchemaTransform:nil];
+}
+
+- (void)testMigrationRenamePropertySetOptional {
+    [self assertPropertyRenameError:nil firstSchemaTransform:^(__unused RLMObjectSchema *schema, RLMProperty *beforeProperty, __unused RLMProperty *afterProperty) {
+        beforeProperty.optional = NO;
+    } secondSchemaTransform:nil];
+}
+
 @end
