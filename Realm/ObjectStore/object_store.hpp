@@ -135,6 +135,57 @@ namespace realm {
     // Migration exceptions
     class MigrationException : public ObjectStoreException {};
 
+    class PropertyRenameMissingObjectTypeException : public MigrationException {
+      public:
+        PropertyRenameMissingObjectTypeException(std::string object_type);
+        std::string object_type() const { return m_object_type; }
+      private:
+        std::string m_object_type;
+    };
+
+    class PropertyRenameMissingOldObjectTypeException : public PropertyRenameMissingObjectTypeException {
+      public:
+        PropertyRenameMissingOldObjectTypeException(std::string object_type);
+    };
+
+    class PropertyRenameMissingNewObjectTypeException : public PropertyRenameMissingObjectTypeException {
+      public:
+        PropertyRenameMissingNewObjectTypeException(std::string object_type);
+    };
+
+    class PropertyRenameException : public MigrationException {
+      public:
+        PropertyRenameException(std::string old_property_name, std::string new_property_name);
+        std::string old_property_name() const { return m_old_property_name; }
+        std::string new_property_name() const { return m_new_property_name; }
+      private:
+        std::string m_old_property_name, m_new_property_name;
+    };
+
+    class PropertyRenameMissingOldPropertyException : public PropertyRenameException {
+      public:
+        PropertyRenameMissingOldPropertyException(std::string old_property_name, std::string new_property_name);
+    };
+
+    class PropertyRenameMissingNewPropertyException : public PropertyRenameException {
+      public:
+        PropertyRenameMissingNewPropertyException(std::string old_property_name, std::string new_property_name);
+    };
+
+    class PropertyRenameOldStillExistsException : public PropertyRenameException {
+      public:
+        PropertyRenameOldStillExistsException(std::string old_property_name, std::string new_property_name);
+    };
+
+    class PropertyRenameTypeMismatchException : public MigrationException {
+      public:
+        PropertyRenameTypeMismatchException(Property const& old_property, Property const& new_property);
+        Property const& old_property() const { return m_old_property; }
+        Property const& new_property() const { return m_new_property; }
+      private:
+        Property m_old_property, m_new_property;
+    };
+
     class InvalidSchemaVersionException : public MigrationException {
       public:
         InvalidSchemaVersionException(uint64_t old_version, uint64_t new_version);

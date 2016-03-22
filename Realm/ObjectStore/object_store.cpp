@@ -522,30 +522,30 @@ void ObjectStore::rename_column(Group *group, Schema& passed_schema, StringData 
     Schema schema = schema_from_group(group);
     auto matching_schema = schema.find(object_type);
     if (matching_schema == schema.end()) {
-        // FIXME: throw
+        throw PropertyRenameMissingOldObjectTypeException(object_type);
     }
     Property *old_property = matching_schema->property_for_name(old_name);
     if (old_property == nullptr) {
-        // FIXME: throw
+        throw PropertyRenameMissingOldPropertyException(old_name, new_name);
     }
     TableRef table = table_for_object_type(group, object_type);
     if (!table) {
-        // FIXME: throw
+        throw PropertyRenameMissingNewObjectTypeException(object_type);
     }
     auto passed_object_schema = passed_schema.find(object_type);
     if (passed_object_schema == passed_schema.end()) {
-        // FIXME: throw
+        throw PropertyRenameMissingNewObjectTypeException(object_type);
     }
     Property *new_property = matching_schema->property_for_name(new_name);
     if (new_property == nullptr) {
-        // FIXME: throw
+        throw PropertyRenameMissingNewPropertyException(old_name, new_name);
     }
     if (old_property->type != new_property->type ||
         old_property->object_type != new_property->object_type) {
-        // FIXME: throw
+        throw PropertyRenameTypeMismatchException(*old_property, *new_property);
     }
     if (passed_object_schema->property_for_name(old_name) != nullptr) {
-        // FIXME: throw
+        throw PropertyRenameOldStillExistsException(old_name, new_name);
     }
     size_t column_to_remove = new_property->table_column;
     table->rename_column(old_property->table_column, new_name);
@@ -581,6 +581,54 @@ bool ObjectStore::is_empty(const Group *group) {
         }
     }
     return true;
+}
+
+PropertyRenameException::PropertyRenameException(std::string old_property_name, std::string new_property_name) :
+    m_old_property_name(old_property_name), m_new_property_name(new_property_name)
+{
+    m_what = "Old property '" + old_property_name + "' cannot be renamed to property '" + new_property_name + "'.";
+}
+
+PropertyRenameMissingObjectTypeException::PropertyRenameMissingObjectTypeException(std::string object_type) :
+    m_object_type(object_type)
+{
+    m_what = "Cannot rename properties on type '" + object_type + "'.";
+}
+
+PropertyRenameMissingOldObjectTypeException::PropertyRenameMissingOldObjectTypeException(std::string object_type) :
+    PropertyRenameMissingObjectTypeException(object_type)
+{
+    m_what = "Cannot rename properties on type '" + object_type + "' because it is missing from the Realm file.";
+}
+
+PropertyRenameMissingNewObjectTypeException::PropertyRenameMissingNewObjectTypeException(std::string object_type) :
+    PropertyRenameMissingObjectTypeException(object_type)
+{
+    m_what = "Cannot rename properties on type '" + object_type + "' because it is missing from the specified schema.";
+}
+
+PropertyRenameMissingOldPropertyException::PropertyRenameMissingOldPropertyException(std::string old_property_name, std::string new_property_name) :
+    PropertyRenameException(old_property_name, new_property_name)
+{
+    m_what = "Old property '" + old_property_name + "' is missing from the Realm file so it cannot be renamed to '" + new_property_name + "'.";
+}
+
+PropertyRenameMissingNewPropertyException::PropertyRenameMissingNewPropertyException(std::string old_property_name, std::string new_property_name) :
+    PropertyRenameException(old_property_name, new_property_name)
+{
+    m_what = "Old property '" + old_property_name + "' cannot be renamed to '" + new_property_name + "' because the new property is not present in the specified schema.";
+}
+
+PropertyRenameOldStillExistsException::PropertyRenameOldStillExistsException(std::string old_property_name, std::string new_property_name) :
+    PropertyRenameException(old_property_name, new_property_name)
+{
+    m_what = "Old property '" + old_property_name + "' cannot be renamed to '" + new_property_name + "' because the old property is still present in the specified schema.";
+}
+
+PropertyRenameTypeMismatchException::PropertyRenameTypeMismatchException(Property const& old_property, Property const& new_property) :
+    m_old_property(old_property), m_new_property(new_property)
+{
+    m_what = "Old property '" + old_property.name + "' of type '" + old_property.type_string() + "' cannot be renamed to property '" + new_property.name + "' of type '" + new_property.type_string() + "'.";
 }
 
 InvalidSchemaVersionException::InvalidSchemaVersionException(uint64_t old_version, uint64_t new_version) :
