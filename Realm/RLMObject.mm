@@ -35,9 +35,22 @@
 // synthesized in RLMObjectBase
 @dynamic invalidated, realm, objectSchema;
 
+#pragma mark - Designated Initializers
+
 - (instancetype)init {
     return [super init];
 }
+
+- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
+    return [super initWithValue:value schema:schema];
+}
+
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
+                       schema:(__unsafe_unretained RLMObjectSchema *const)schema {
+    return [super initWithRealm:realm schema:schema];
+}
+
+#pragma mark - Convenience Initializers
 
 - (instancetype)initWithValue:(id)value {
     [self.class sharedSchema]; // ensure this class' objectSchema is loaded in the partialSharedSchema
@@ -48,6 +61,8 @@
 - (instancetype)initWithObject:(id)object {
     return [self initWithValue:object];
 }
+
+#pragma mark - Class-based Object Creation
 
 + (instancetype)createInDefaultRealmWithValue:(id)value {
     return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], value, false);
@@ -87,6 +102,8 @@
     return [self createOrUpdateInRealm:realm withValue:object];
 }
 
+#pragma mark - Subscripting
+
 - (id)objectForKeyedSubscript:(NSString *)key {
     return RLMObjectBaseObjectForKeyedSubscript(self, key);
 }
@@ -94,6 +111,8 @@
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
     RLMObjectBaseSetObjectForKeyedSubscript(self, key, obj);
 }
+
+#pragma mark - Getting & Querying
 
 + (RLMResults *)allObjects {
     return RLMGetObjects(RLMRealm.defaultRealm, self.className, nil);
@@ -143,6 +162,8 @@
     return RLMGetObject(realm, self.className, primaryKey);
 }
 
+#pragma mark - Other Instance Methods
+
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
     return RLMObjectBaseLinkingObjectsOfClass(self, className, property);
 }
@@ -154,6 +175,8 @@
 + (NSString *)className {
     return [super className];
 }
+
+#pragma mark - Default values for schema definition
 
 + (NSArray *)indexedProperties {
     return @[];

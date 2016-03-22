@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Mark further initializers in Objective-C as NS_DESIGNATED_INITIALIZER to prevent that these aren't
+  correctly defined in Swift Object subclasses, which don't qualify for auto-inheriting the required initializers.
 
 0.98.5 Release notes (2016-03-14)
 =============================================================

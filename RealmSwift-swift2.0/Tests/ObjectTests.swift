@@ -58,6 +58,15 @@ class ObjectTests: TestCase {
         )
     }
 
+    func testObjectSchemaForObjectWithConvenienceInitializer() {
+        let object = SwiftConvenienceInitializerObject(stringCol: "abc")
+        let schema = object.objectSchema
+        XCTAssert(schema as AnyObject is ObjectSchema)
+        XCTAssert(schema.properties as AnyObject is [Property])
+        XCTAssertEqual(schema.className, "SwiftConvenienceInitializerObject")
+        XCTAssertEqual(schema.properties.map { $0.name }, ["stringCol"])
+    }
+
     func testInvalidated() {
         let object = SwiftObject()
         XCTAssertFalse(object.invalidated)

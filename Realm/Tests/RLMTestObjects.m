@@ -194,6 +194,20 @@
 }
 @end
 
+#pragma mark CustomInitializerObject
+
+@implementation CustomInitializerObject
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.stringCol = @"test";
+    }
+    return self;
+}
+
+@end
+
 #pragma mark FakeObject
 
 @implementation FakeObject

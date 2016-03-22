@@ -76,7 +76,7 @@ public class Object: RLMObjectBase {
 
     - see: Realm().add(_:)
     */
-    public required override init() {
+    public override required init() {
         super.init()
     }
 
@@ -250,7 +250,7 @@ public class Object: RLMObjectBase {
     WARNING: This is an internal initializer not intended for public use.
     :nodoc:
     */
-    public override init(realm: RLMRealm, schema: RLMObjectSchema) {
+    public override required init(realm: RLMRealm, schema: RLMObjectSchema) {
         super.init(realm: realm, schema: schema)
     }
 
@@ -258,7 +258,7 @@ public class Object: RLMObjectBase {
     WARNING: This is an internal initializer not intended for public use.
     :nodoc:
     */
-    public override init(value: AnyObject, schema: RLMSchema) {
+    public override required init(value: AnyObject, schema: RLMSchema) {
         super.init(value: value, schema: schema)
     }
 

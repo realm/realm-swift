@@ -29,17 +29,28 @@
 }
 
 // standalone initializer
-- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema;
+- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema NS_DESIGNATED_INITIALIZER;
 
 // live accessor initializer
 - (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
-                       schema:(__unsafe_unretained RLMObjectSchema *const)schema;
+                       schema:(__unsafe_unretained RLMObjectSchema *const)schema NS_DESIGNATED_INITIALIZER;
 
 // shared schema for this class
 + (RLMObjectSchema *)sharedSchema;
 
 // provide injection point for alternative Swift object util class
 + (Class)objectUtilClass:(BOOL)isSwift;
+
+@end
+
+@interface RLMObject ()
+
+// standalone initializer
+- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema NS_DESIGNATED_INITIALIZER;
+
+// live accessor initializer
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
+                       schema:(__unsafe_unretained RLMObjectSchema *const)schema NS_DESIGNATED_INITIALIZER;
 
 @end
 
