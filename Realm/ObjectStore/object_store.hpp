@@ -89,7 +89,11 @@ namespace realm {
 
         // set references to tables on targetSchema and create/update any missing or out-of-date tables
         // if update existing is true, updates existing tables, otherwise only adds and initializes new tables
-        static void create_tables(realm::Group *group, Schema &target_schema, bool update_existing);
+        // returns properties that should be deleted after the migration process
+        static std::vector<Property> create_tables(realm::Group *group, Schema &target_schema, bool update_existing);
+
+        // remove properties marked for deletion by create_tables
+        static void remove_properties(Group *group, Schema &target_schema, std::vector<Property> to_delete);
 
         // verify a target schema against an expected schema, setting the table_column property on each schema object
         // updates the column mapping on the target_schema
