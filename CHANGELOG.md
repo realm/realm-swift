@@ -7,7 +7,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add a method to rename properties during migrations:
+  * Swift: `Migration.renamePropertyForClass(_:oldName:newName:)`
+  * Objective-C: `-[RLMMigration renamePropertyForClass:oldName:newName:]`
 
 ### Bugfixes
 
