@@ -15,27 +15,27 @@
 
 ## Goals
 
-> Replace this with what you tried to achieve.
+What do you want to achieve?
 
 ## Expected Results
 
-> Replace this with what you expected to happen.
+What did you expected to happen?
 
 ## Actual Results
 
-> Replace this with what actually happened.  
-> e.g. the stack trace of a crash
+What did happened instead?  
+e.g. the stack trace of a crash
 
 ## Steps to Reproduce
 
-> Provide steps we can follow to reproduce this issue.
+What are steps we can follow to reproduce this issue?
 
 ## Code Sample
 
-> Provide a code sample that highlights the issue.
-> If relevant, include your model definitions.
-> For larger code samples, links to external gists or repositories are preferred.
-> Full Xcode projects that we can compile ourselves are ideal.
+Provide a code sample or test case that highlights the issue.
+If relevant, include your model definitions.
+For larger code samples, links to external gists/repositories are preferred.
+Full Xcode projects that we can compile ourselves are ideal!
 
 ## Version of Realm and Tooling
 
