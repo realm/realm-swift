@@ -1273,7 +1273,7 @@ RLM_ARRAY_TYPE(MigrationObject);
 // Unsuccessful Property Rename Tests
 
 - (void)testMigrationRenamePropertySetRequired {
-    [self assertPropertyRenameError:@"Migration is required due to the following errors: \n- Nullability for property 'stringCol' has changed from '1' to  '0'."
+    [self assertPropertyRenameError:@"Migration is required due to the following errors:\n- Nullability for property 'stringCol' has changed from '1' to '0'."
                firstSchemaTransform:^(__unused RLMObjectSchema *schema, __unused RLMProperty *beforeProperty, RLMProperty *afterProperty) {
         afterProperty.optional = NO;
     } secondSchemaTransform:nil];

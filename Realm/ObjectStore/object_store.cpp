@@ -646,16 +646,16 @@ DuplicatePrimaryKeyValueException::DuplicatePrimaryKeyValueException(std::string
 SchemaValidationException::SchemaValidationException(std::vector<ObjectSchemaValidationException> const& errors) :
     m_validation_errors(errors)
 {
-    m_what = "Schema validation failed due to the following errors: ";
+    m_what = "Schema validation failed due to the following errors:";
     for (auto const& error : errors) {
         m_what += std::string("\n- ") + error.what();
     }
 }
 
 SchemaMismatchException::SchemaMismatchException(std::vector<ObjectSchemaValidationException> const& errors) :
-m_validation_errors(errors)
+    m_validation_errors(errors)
 {
-    m_what ="Migration is required due to the following errors: ";
+    m_what ="Migration is required due to the following errors:";
     for (auto const& error : errors) {
         m_what += std::string("\n- ") + error.what();
     }
@@ -719,7 +719,7 @@ MismatchedPropertiesException::MismatchedPropertiesException(std::string const& 
         m_what = "Target object type for property '" + old_property.name + "' do not match. Old type '" + old_property.object_type + "', new type '" + new_property.object_type + "'";
     }
     else if (new_property.is_nullable != old_property.is_nullable) {
-        m_what = "Nullability for property '" + old_property.name + "' has changed from '" + std::to_string(old_property.is_nullable) + "' to  '" + std::to_string(new_property.is_nullable) + "'.";
+        m_what = "Nullability for property '" + old_property.name + "' has changed from '" + std::to_string(old_property.is_nullable) + "' to '" + std::to_string(new_property.is_nullable) + "'.";
     }
 }
 
