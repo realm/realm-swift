@@ -94,7 +94,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     }
 }
 
--(void)updateAccessors {
+- (void)updateAccessors {
     // populate getter/setter names if generic
     if (!_getterName) {
         _getterName = _name;

@@ -124,7 +124,9 @@ RLM_ARRAY_TYPE(MigrationObject);
 @end
 
 @implementation MigrationTests
+
 #pragma mark - Helper methods
+
 - (RLMSchema *)schemaWithObjects:(NSArray *)objects {
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = objects;
@@ -208,6 +210,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertTrue(migrationCalled);
     RLMAssertRealmSchemaMatchesTable(self, [RLMRealm realmWithConfiguration:config error:nil]);
 }
+
 - (void)assertNoMigrationRequiredForChangeFrom:(NSArray *)from to:(NSArray *)to {
     RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     config.customSchema = [self schemaWithObjects:from];

@@ -114,7 +114,7 @@ using namespace realm;
     }
 }
 
--(RLMObject *)createObject:(NSString *)className withValue:(id)value {
+- (RLMObject *)createObject:(NSString *)className withValue:(id)value {
     return [_realm createObject:className withValue:value];
 }
 
