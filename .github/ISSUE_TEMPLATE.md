@@ -1,7 +1,17 @@
-> Please fill out this template when filing an issue.
-> All lines marked as quotes (`>`) instruct you with
-> what info we expect.
-> Remove this opening paragraph.
+> We LOVE to help with any issues or bugs you have!
+>
+> **Questions**: If you have questions about how to use Realm, ask on 
+> [StackOverflow](http://stackoverflow.com/questions/ask?tags=realm).
+> We monitor the `realm` tag.
+>
+> **Feature Request**: Just fill in the first two sections below.
+>
+> **Bugs**: To help you as fast as possible with an issue please describe your issue
+> and the steps you have taken to reproduce it in as many details as possible.
+>
+> Thanks for helping us help you! :-)
+>
+> Please remove this line and all above before submitting.
 
 ## Goals
 
