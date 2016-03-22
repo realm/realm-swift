@@ -254,6 +254,7 @@ build_docs() {
     touch Realm/RLMPlatform.h # jazzy will fail if it can't find all public header files
     jazzy \
       ${objc} \
+      --swift-version 2.2 \
       --clean \
       --author Realm \
       --author_url https://realm.io \
