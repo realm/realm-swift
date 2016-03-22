@@ -86,7 +86,7 @@ bool ListNotifier::do_add_required_change_info(TransactionChangeInfo& info)
 
 void ListNotifier::run()
 {
-    if (!m_lv) {
+    if (!m_lv || !m_lv->is_attached()) {
         // LV was deleted, so report all of the rows being removed if this is
         // the first run after that
         if (m_prev_size) {

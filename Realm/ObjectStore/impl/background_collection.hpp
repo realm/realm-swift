@@ -119,7 +119,6 @@ private:
     virtual void do_prepare_handover(SharedGroup&) = 0;
     virtual bool do_deliver(SharedGroup&) { return true; }
     virtual bool do_add_required_change_info(TransactionChangeInfo&) { return true; }
-    virtual bool should_deliver_initial() const noexcept { return false; }
 
     const std::thread::id m_thread_id = std::this_thread::get_id();
     bool is_for_current_thread() const { return m_thread_id == std::this_thread::get_id(); }
@@ -158,7 +157,7 @@ private:
     // remove_callback() updates this when needed
     size_t m_callback_index = npos;
 
-    Callback* next_callback();
+    CollectionChangeCallback next_callback();
 };
 
 } // namespace _impl

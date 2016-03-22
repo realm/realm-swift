@@ -24,6 +24,8 @@
 #import "RLMObject_Private.h"
 
 #import "collection_notifications.hpp"
+#import "list.hpp"
+#import "results.hpp"
 
 #import <realm/table_view.hpp>
 
@@ -286,3 +288,50 @@ static NSArray *toIndexPathArray(realm::IndexSet const& set) {
     return toIndexPathArray(_indices.modifications);
 }
 @end
+
+template<typename Collection>
+RLMNotificationToken *RLMAddNotificationBlock(id objcCollection,
+                                              Collection& collection,
+                                              void (^block)(id, RLMCollectionChange *, NSError *),
+                                              bool suppressInitialChange) {
+    struct IsValid {
+        static bool call(realm::List const& list) {
+            return list.is_valid();
+        }
+        static bool call(realm::Results const&) {
+            return true;
+        }
+    };
+    auto cb = [=, &collection](realm::CollectionChangeIndices const& changes,
+                               std::exception_ptr err) mutable {
+        if (err) {
+            try {
+                rethrow_exception(err);
+            }
+            catch (...) {
+                NSError *error;
+                RLMRealmTranslateException(&error);
+                block(nil, nil, error);
+                return;
+            }
+        }
+
+        if (!IsValid::call(collection)) {
+            return;
+        }
+
+        if (changes.empty() || suppressInitialChange) {
+            block(objcCollection, nil, nil);
+            suppressInitialChange = false;
+        }
+        else {
+            block(objcCollection, [[RLMCollectionChange alloc] initWithChanges:changes], nil);
+        }
+    };
+
+    return [[RLMCancellationToken alloc] initWithToken:collection.add_notification_callback(cb)];
+}
+
+// Explicitly instantiate the templated function for the two types we'll use it on
+template RLMNotificationToken *RLMAddNotificationBlock<realm::List>(id, realm::List&, void (^)(id, RLMCollectionChange *, NSError *), bool);
+template RLMNotificationToken *RLMAddNotificationBlock<realm::Results>(id, realm::Results&, void (^)(id, RLMCollectionChange *, NSError *), bool);

@@ -399,28 +399,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMCollectionChange *, NSError *))block {
     [_realm verifyNotificationsAreSupported];
-
-    auto token = _results.add_notification_callback([self, block](CollectionChangeIndices const& changes,
-                                                                  std::exception_ptr err) {
-        if (err) {
-            try {
-                rethrow_exception(err);
-            }
-            catch (...) {
-                NSError *error;
-                RLMRealmTranslateException(&error);
-                block(nil, nil, error);
-            }
-        }
-        else if (changes.empty()) {
-            block(self, nil, nil);
-        }
-        else {
-            block(self, [[RLMCollectionChange alloc] initWithChanges:changes], nil);
-        }
-    });
-
-    return [[RLMCancellationToken alloc] initWithToken:std::move(token)];
+    return RLMAddNotificationBlock(self, _results, block, false);
 }
 
 #pragma clang diagnostic pop

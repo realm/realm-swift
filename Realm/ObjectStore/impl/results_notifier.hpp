@@ -75,8 +75,6 @@ private:
     void release_data() noexcept override;
     void do_attach_to(SharedGroup& sg) override;
     void do_detach_from(SharedGroup& sg) override;
-
-    bool should_deliver_initial() const noexcept override { return true; }
 };
 
 } // namespace _impl

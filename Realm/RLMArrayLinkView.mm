@@ -408,41 +408,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
     [_realm verifyNotificationsAreSupported];
-
-    // FIXME: List should do this automatically
-    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
-        if (_backingList.is_valid()) {
-            block(self, nil, nil);
-        }
-    });
-
-    auto token = _backingList.add_notification_callback([self, block](realm::CollectionChangeIndices const& changes,
-                                                                  std::exception_ptr err) {
-        if (err) {
-            try {
-                rethrow_exception(err);
-            }
-            catch (...) {
-                NSError *error;
-                RLMRealmTranslateException(&error);
-                block(nil, nil, error);
-                return;
-            }
-        }
-
-        if (!_backingList.is_valid()) {
-            return;
-        }
-
-        if (changes.empty()) {
-            block(self, nil, nil);
-        }
-        else {
-            block(self, [[RLMCollectionChange alloc] initWithChanges:changes], nil);
-        }
-    });
-
-    return [[RLMCancellationToken alloc] initWithToken:std::move(token)];
+    return RLMAddNotificationBlock(self, _backingList, block);
 }
 #pragma clang diagnostic pop
 
