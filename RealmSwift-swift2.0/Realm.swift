@@ -194,9 +194,27 @@ public final class Realm {
     /**
     Adds or updates an object to be persisted it in this Realm.
 
-    When 'update' is 'true', the object must have a primary key. If no objects exist in
-    the Realm instance with the same primary key value, the object is inserted. Otherwise,
-    the existing object is updated with any changed values.
+    When added, all (child) relationships referenced by this object will also be
+    added to the Realm if they are not already in it. If the object or any related
+    objects already belong to a different Realm an exception will be thrown. Use one
+    of the `create` functions to insert a copy of a persisted object into a different
+    Realm.
+
+    The object to be added must be valid and cannot have been previously deleted
+    from a Realm (i.e. `invalidated` must be false).
+
+    - parameter update: If true will try to update existing objects with the same primary key.
+    */
+    public func add(object: Object) {
+        RLMAddObjectToRealm(object, rlmRealm, false)
+    }
+
+    /**
+    Adds or updates an object to be persisted it in this Realm.
+
+    If 'update' is 'true' and no objects exist in the Realm instance with the same primary key
+    value, the object is inserted. Otherwise, the existing object is updated with any changed
+    values.
 
     When added, all (child) relationships referenced by this object will also be
     added to the Realm if they are not already in it. If the object or any related
@@ -210,15 +228,31 @@ public final class Realm {
     - parameter object: Object to be added to this Realm.
     - parameter update: If true will try to update existing objects with the same primary key.
     */
-    public func add(object: Object, update: Bool = false) {
-        if update && object.objectSchema.primaryKeyProperty == nil {
-            throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
-        }
+    public func add<T: Object where T: PrimaryKeyObject>(object: T, update: Bool = false) {
         RLMAddObjectToRealm(object, rlmRealm, update)
     }
 
     /**
     Adds or updates objects in the given sequence to be persisted it in this Realm.
+
+    - see: add(_:)
+
+    - warning: This method can only be called during a write transaction.
+
+    - parameter objects: A sequence which contains objects to be added to this Realm.
+    */
+    public func add<S: SequenceType where S.Generator.Element: Object>(objects: S) {
+        for obj in objects {
+            add(obj)
+        }
+    }
+
+    /**
+    Adds or updates objects in the given sequence to be persisted it in this Realm.
+     
+    If 'update' is 'true' and no objects exist in the Realm instance with the same primary key
+    value, the object is inserted. Otherwise, the existing object is updated with any changed
+    values.
 
     - see: add(_:update:)
 
@@ -227,7 +261,7 @@ public final class Realm {
     - parameter objects: A sequence which contains objects to be added to this Realm.
     - parameter update: If true will try to update existing objects with the same primary key.
     */
-    public func add<S: SequenceType where S.Generator.Element: Object>(objects: S, update: Bool = false) {
+    public func add<S: SequenceType where S.Generator.Element: Object, S.Generator.Element: PrimaryKeyObject>(objects: S, update: Bool = false) {
         for obj in objects {
             add(obj, update: update)
         }
@@ -239,9 +273,32 @@ public final class Realm {
     Creates or updates an instance of this object and adds it to the `Realm` populating
     the object with the given value.
 
-    When 'update' is 'true', the object must have a primary key. If no objects exist in
-    the Realm instance with the same primary key value, the object is inserted. Otherwise,
-    the existing object is updated with any changed values.
+    - warning: This method can only be called during a write transaction.
+
+    - parameter type:   The object type to create.
+    - parameter value:  The value used to populate the object. This can be any key/value coding compliant
+                        object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
+                        or an `Array` with one object for each persisted property. An exception will be
+                        thrown if any required properties are not present and no default is set.
+                        When passing in an `Array`, all properties must be present,
+                        valid and in the same order as the properties defined in the model.
+
+    - returns: The created object.
+    */
+    public func create<T: Object>(type: T.Type, value: AnyObject = [:]) -> T {
+        let className = (type as Object.Type).className()
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, false), T.self)
+    }
+
+    /**
+    Create an `Object` with the given value.
+
+    Creates or updates an instance of this object and adds it to the `Realm` populating
+    the object with the given value.
+
+    If 'update' is 'true' and no objects exist in the Realm instance with the same primary key
+    value, the object is inserted. Otherwise, the existing object is updated with any changed
+    values.
 
     - warning: This method can only be called during a write transaction.
 
@@ -256,11 +313,8 @@ public final class Realm {
 
     - returns: The created object.
     */
-    public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
+    public func create<T: Object where T: PrimaryKeyObject>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
         let className = (type as Object.Type).className()
-        if update && schema[className]?.primaryKeyProperty == nil {
-            throwRealmException("'\(className)' does not have a primary key and can not be updated")
-        }
         return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), T.self)
     }
 
@@ -398,16 +452,16 @@ public final class Realm {
 
     Returns `nil` if no object exists with the given primary key.
 
-    This method requires that `primaryKey()` be overridden on the given subclass.
+    This method requires that `PrimaryKeyObject` is implemented on the given `Object` subclass.
 
-    - see: Object.primaryKey()
+    - see: PrimaryKeyObject.primaryKey()
 
     - parameter type: The type of the objects to be returned.
     - parameter key:  The primary key of the desired object.
 
     - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
-    public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T? {
+    public func objectForPrimaryKey<T: Object where T: PrimaryKeyObject>(type: T.Type, key: AnyObject) -> T? {
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), Optional<T>.self)
     }
 
@@ -420,9 +474,9 @@ public final class Realm {
 
     Returns `nil` if no object exists with the given class name and primary key.
 
-    This method requires that `primaryKey()` be overridden on the given subclass.
+    This method requires that the given class designates a property as primary key in its schema.
 
-    - see: Object.primaryKey()
+    - see: PrimaryKeyObject.primaryKey()
 
     - warning: This method is useful only in specialized circumstances.
 
