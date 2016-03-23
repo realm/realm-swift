@@ -67,7 +67,6 @@
 		29B7FDF61C0DA6560023224E /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B7FDF51C0DA6560023224E /* Error.swift */; };
 		29B7FDFB1C0DE8100023224E /* fileformat-pre-null.realm in Resources */ = {isa = PBXBuildFile; fileRef = 29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */; };
 		29B7FDFC1C0DE8110023224E /* fileformat-pre-null.realm in Resources */ = {isa = PBXBuildFile; fileRef = 29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */; };
-		29EDB8E41A7708E700458D80 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8839B2D19E31FD90047B1A8 /* main.m */; };
 		3F0543EB1C56F71500AA5322 /* realm_coordinator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0543E91C56F71500AA5322 /* realm_coordinator.hpp */; };
 		3F0543EC1C56F71500AA5322 /* realm_coordinator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */; };
 		3F0543ED1C56F71900AA5322 /* realm_coordinator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */; };
@@ -357,13 +356,6 @@
 			remoteGlobalIDString = 5D0A40841C62ACCC00BBB612;
 			remoteInfo = "Check For Supported Swift Version";
 		};
-		5D6157011BE0A3A100A4BD3F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3F1A5E711992EB7400F45F4C;
-			remoteInfo = TestHost;
-		};
 		5D660FDE1BE98C7C0021E04F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -491,7 +483,6 @@
 		3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = KVOTests.mm; sourceTree = "<group>"; };
 		3F0F02AC1B6FFF3D0046A4D5 /* RLMObservation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMObservation.hpp; sourceTree = "<group>"; };
 		3F0F02AD1B6FFF3D0046A4D5 /* RLMObservation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObservation.mm; sourceTree = "<group>"; };
-		3F1A5E721992EB7400F45F4C /* TestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F1F47881B97AB8B00CD99A3 /* transact_log_handler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = transact_log_handler.hpp; path = ObjectStore/impl/transact_log_handler.hpp; sourceTree = "<group>"; };
 		3F1F47891B97ABA300CD99A3 /* transact_log_handler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = transact_log_handler.cpp; path = ObjectStore/impl/transact_log_handler.cpp; sourceTree = "<group>"; };
 		3F20DA2019BE1EA6007DE308 /* RLMUpdateChecker.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUpdateChecker.hpp; sourceTree = "<group>"; };
@@ -653,13 +644,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		3F1A5E6F1992EB7400F45F4C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		5D660FC81BE98C560021E04F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -939,7 +923,6 @@
 				5DD755CF1BE056DE002800DA /* Realm.framework */,
 				5D660FD81BE98C7C0021E04F /* RealmSwift Tests.xctest */,
 				5D660FCC1BE98C560021E04F /* RealmSwift.framework */,
-				3F1A5E721992EB7400F45F4C /* TestHost.app */,
 				E8D89BA31955FC6D00CF2B9A /* Tests.xctest */,
 			);
 			name = Products;
@@ -1182,22 +1165,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		3F1A5E711992EB7400F45F4C /* TestHost */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 3F1A5E931992EB7400F45F4C /* Build configuration list for PBXNativeTarget "TestHost" */;
-			buildPhases = (
-				3F1A5E6E1992EB7400F45F4C /* Sources */,
-				3F1A5E6F1992EB7400F45F4C /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = TestHost;
-			productName = TestHost;
-			productReference = 3F1A5E721992EB7400F45F4C /* TestHost.app */;
-			productType = "com.apple.product-type.application";
-		};
 		5D659E7D1BE04556006515A0 /* Realm */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5D659ED61BE04556006515A0 /* Build configuration list for PBXNativeTarget "Realm" */;
@@ -1315,7 +1282,6 @@
 			dependencies = (
 				5DD755DF1BE05B26002800DA /* PBXTargetDependency */,
 				5DD755D21BE05828002800DA /* PBXTargetDependency */,
-				5D6157021BE0A3A100A4BD3F /* PBXTargetDependency */,
 			);
 			name = Tests;
 			productName = RealmTests;
@@ -1334,9 +1300,6 @@
 				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
-					3F1A5E711992EB7400F45F4C = {
-						CreatedOnToolsVersion = 6.0;
-					};
 					5D0A40841C62ACCC00BBB612 = {
 						CreatedOnToolsVersion = 7.2;
 					};
@@ -1378,7 +1341,6 @@
 				5DD7557B1BE056DE002800DA /* Realm iOS static */,
 				E8D89BA21955FC6D00CF2B9A /* Tests */,
 				E856D1DE195614A400FB2FCF /* iOS static tests */,
-				3F1A5E711992EB7400F45F4C /* TestHost */,
 				C04B4BD71B55C47600FAE58E /* Set Swift Version */,
 				5D0A40841C62ACCC00BBB612 /* Check For Supported Swift Version */,
 				5D660FCB1BE98C560021E04F /* RealmSwift */,
@@ -1639,14 +1601,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		3F1A5E6E1992EB7400F45F4C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				29EDB8E41A7708E700458D80 /* main.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		5D659E801BE04556006515A0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1885,11 +1839,6 @@
 			target = 5D0A40841C62ACCC00BBB612 /* Check For Supported Swift Version */;
 			targetProxy = 5D0A408B1C62ACE800BBB612 /* PBXContainerItemProxy */;
 		};
-		5D6157021BE0A3A100A4BD3F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
-			targetProxy = 5D6157011BE0A3A100A4BD3F /* PBXContainerItemProxy */;
-		};
 		5D660FDF1BE98C7C0021E04F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5D660FCB1BE98C560021E04F /* RealmSwift */;
@@ -1928,20 +1877,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		3F1A5E8F1992EB7400F45F4C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */;
-			buildSettings = {
-			};
-			name = Debug;
-		};
-		3F1A5E901992EB7400F45F4C /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */;
-			buildSettings = {
-			};
-			name = Release;
-		};
 		5D0A40861C62ACCC00BBB612 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2095,15 +2030,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3F1A5E931992EB7400F45F4C /* Build configuration list for PBXNativeTarget "TestHost" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3F1A5E8F1992EB7400F45F4C /* Debug */,
-				3F1A5E901992EB7400F45F4C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		5D0A40851C62ACCC00BBB612 /* Build configuration list for PBXAggregateTarget "Check For Supported Swift Version" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -2111,6 +2037,7 @@
 				5D0A40871C62ACCC00BBB612 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5D659ED61BE04556006515A0 /* Build configuration list for PBXNativeTarget "Realm" */ = {
 			isa = XCConfigurationList;
