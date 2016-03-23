@@ -649,6 +649,9 @@ case "$COMMAND" in
 
     "verify-cocoapods")
         pod spec lint Realm.podspec
+        # allow warnings in the Swift podspec because there's no way to
+        # prevent the typealias->associatedtype deprecation warning without
+        # also breaking backwards compatibility with previous Swift 2.x versions
         pod spec lint RealmSwift.podspec --allow-warnings
         cd examples/installation
         sh build.sh test-ios-objc-cocoapods || exit 1
