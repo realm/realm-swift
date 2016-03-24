@@ -557,6 +557,93 @@
     XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
 }
 
+- (void)testAsyncWriteOnQuery {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    NSString *path = realm.path;
+    
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+    
+    RLMResults *employees = [EmployeeObject allObjects];
+    
+    XCTestExpectation *expectation =
+    [self expectationWithDescription:@""];
+    
+    [realm writeCollectionAsync:employees withBlock:^(RLMRealm * _Nonnull realm, RLMResults * _Nonnull employees) {
+        XCTAssert([path isEqualToString:realm.path], @"Both Realms should have same path");
+        XCTAssertEqual(employees.count, 2U, @"Should be 2 employees");
+        [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    } completion:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+        [realm refresh];
+        XCTAssertEqual(employees.count, 3U, @"Should be 3 employees");
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+}
+
+- (void)testAsyncWriteOnSortedQuery {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    NSString *path = realm.path;
+    
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+    
+    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+    
+    XCTestExpectation *expectation =
+    [self expectationWithDescription:@""];
+    
+    [realm writeCollectionAsync:sortedAge withBlock:^(RLMRealm * _Nonnull realm, RLMResults * _Nonnull sortedAge) {
+        XCTAssert([path isEqualToString:realm.path], @"Both Realms should have same path");
+        XCTAssertEqual(sortedAge.count, 2U, @"Should be 2 employees");
+        [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    } completion:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+        [realm refresh];
+        XCTAssertEqual(30, [(EmployeeObject *)sortedAge[1] age]);
+        XCTAssertEqual(sortedAge.count, 3U, @"Should be 3 employees");
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+}
+
+- (void)testAsyncWriteOnSortedFilteredQuery {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    NSString *path = realm.path;
+    
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"D", @"age": @50, @"hired": @NO}];
+    [realm commitWriteTransaction];
+    
+    RLMResults *sortedAge = [[EmployeeObject objectsWhere:@"hired = YES"] sortedResultsUsingProperty:@"age" ascending:YES];
+    
+    XCTestExpectation *expectation =
+    [self expectationWithDescription:@""];
+    
+    [realm writeCollectionAsync:sortedAge withBlock:^(RLMRealm * _Nonnull realm, RLMResults * _Nonnull sortedAge) {
+        XCTAssert([path isEqualToString:realm.path], @"Both Realms should have same path");
+        XCTAssertEqual(sortedAge.count, 2U, @"Should be 2 employees");
+        [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @YES}];
+    } completion:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+        [realm refresh];
+        XCTAssertEqual(30, [(EmployeeObject *)sortedAge[1] age]);
+        XCTAssertEqual(sortedAge.count, 3U, @"Should be 3 employees");
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+}
+
 - (void)testRerunningSortedQuery {
     RLMRealm *realm = [RLMRealm defaultRealm];
 

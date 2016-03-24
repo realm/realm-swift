@@ -24,6 +24,11 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMQueryUtil.hpp"
 
+#include <future>
+#include <realm/group_shared.hpp>
+#import <realm/link_view.hpp>
+#import <realm/row.hpp>
+
 // We declare things in RLMObject which are actually implemented in RLMObjectBase
 // for documentation's sake, which leads to -Wunimplemented-method warnings.
 // Other alternatives to this would be to disable -Wunimplemented-method for this

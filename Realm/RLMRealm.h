@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMDefines.h>
+#import <Realm/RLMCollection.h>
+
 
 @class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
@@ -500,6 +502,22 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
  @see                 RLMMigration
  */
 + (NSError *)migrateRealm:(RLMRealmConfiguration *)configuration;
+
+#pragma mark - Async Writes
+
+typedef void (^RLMAsyncWriteBlock)(RLMRealm *realm);
+
+typedef void (^RLMAsyncWriteObjectBlock)(RLMRealm *realm, id object);
+
+typedef void (^RLMAsyncWriteCollectionBlock)(RLMRealm *realm, id<RLMCollection> collection);
+
+typedef void (^RLMCompletionBlock)(NSError *error);
+
+- (void)writeAsyncWithBlock:(RLMAsyncWriteBlock)block completion:(RLMCompletionBlock)completion;
+
+- (void)writeObjectAsync:(RLMObject *)object withBlock:(RLMAsyncWriteObjectBlock)block completion:(RLMCompletionBlock)completion;
+
+- (void)writeCollectionAsync:(id<RLMCollection>)collection withBlock:(RLMAsyncWriteCollectionBlock)block completion:(RLMCompletionBlock)completion;
 
 @end
 

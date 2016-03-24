@@ -91,6 +91,8 @@ public:
 
     // The input Row object is not attached
     struct DetatchedAccessorException { };
+    
+    LinkViewRef link_view();
 
 private:
     std::shared_ptr<Realm> m_realm;

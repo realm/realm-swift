@@ -163,6 +163,11 @@ Results List::sort(SortOrder order)
     return Results(m_realm, get_query(), std::move(order));
 }
 
+LinkViewRef List::link_view()
+{
+    return m_link_view;
+}
+
 // These definitions rely on that LinkViews are interned by core
 bool List::operator==(List const& rgt) const noexcept
 {
