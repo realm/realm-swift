@@ -1521,7 +1521,6 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
         dog.age = 6;
     } completion:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
-        [dog.realm refresh];
         XCTAssertEqual(dog.age, 6, @"Dog should be 6 years old");
         [expectation fulfill];
     }];

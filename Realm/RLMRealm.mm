@@ -790,25 +790,28 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (void)writeAsyncWithBlock:(RLMAsyncWriteBlock)block completion:(RLMCompletionBlock)completion {
     RLMRealmConfiguration *config = self.configuration;
+    
+    __block NSError *error;
+    __block BOOL didComplete;
+    
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+    __block RLMNotificationToken *token = [self addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+        if (didComplete) {
+            completion(error);
+            [token stop];
+        }
+    }];
+#pragma GCC diagnostic pop
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         NSError *error = nil;
-        RLMRealm *bgRealm = [RLMRealm realmWithConfiguration:config error:&error];
+        RLMRealm *newRealm = [RLMRealm realmWithConfiguration:config error:nil];
         
-        if (error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion(error);
-            });
-            return;
-        }
-        
-        [bgRealm transactionWithBlock:^{
-            block(bgRealm);
+        [newRealm transactionWithBlock:^{
+            block(newRealm);
+            didComplete = YES;
         } error:&error];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            // Should refresh be called before completion?
-            completion(error);
-        });
     });
 }
 
@@ -824,16 +827,22 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     Class accessorClass = object.objectSchema.accessorClass;
     RLMObjectSchema *objectSchema = object.objectSchema;
     
+    __block NSError *error;
+    __block BOOL didComplete;
+    
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+    __block RLMNotificationToken *token = [self addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+        if (didComplete) {
+            completion(error);
+            [token stop];
+        }
+    }];
+#pragma GCC diagnostic pop
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         NSError *error = nil;
-        RLMRealm *newRealm = [RLMRealm realmWithConfiguration:config error:&error];
-        
-        if (error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion(error);
-            });
-            return;
-        }
+        RLMRealm *newRealm = [RLMRealm realmWithConfiguration:config error:nil];
         
         newRealm->_realm->read_group();
         auto& new_sg = newRealm->_realm->shared_group();
@@ -845,12 +854,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         
         [newRealm transactionWithBlock:^{
             block(newRealm, handoverObject);
+            didComplete = YES;
         } error:&error];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            // Should refresh be called before completion?
-            completion(error);
-        });
     });
 }
 
@@ -871,16 +876,21 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         
         __block std::unique_ptr<SharedGroup::Handover<LinkView> > handover_link_view = sg.export_linkview_for_handover(lv);
         
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-            NSError *error = nil;
-            RLMRealm *newRealm = [RLMRealm realmWithConfiguration:config error:&error];
-            
-            if (error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(error);
-                });
-                return;
+        __block NSError *error;
+        __block BOOL didComplete;
+        
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+        __block RLMNotificationToken *token = [self addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+            if (didComplete) {
+                completion(error);
+                [token stop];
             }
+        }];
+#pragma GCC diagnostic pop
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            RLMRealm *newRealm = [RLMRealm realmWithConfiguration:config error:nil];
             
             newRealm->_realm->read_group();
             auto& new_sg = newRealm->_realm->shared_group();
@@ -894,12 +904,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             
             [newRealm transactionWithBlock:^{
                 block(newRealm, handoverArray);
+                didComplete = YES;
             } error:&error];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                // Should refresh be called before completion?
-                completion(error);
-            });
         });
     }
     else {
@@ -910,16 +916,21 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         TableView tv = pvResults.get_tableview();
         __block std::unique_ptr<SharedGroup::Handover<TableView>> handover_table_view = sg.export_for_handover(tv, ConstSourcePayload::Copy);
         
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-            NSError *error = nil;
-            RLMRealm *newRealm = [RLMRealm realmWithConfiguration:config error:&error];
-            
-            if (error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(error);
-                });
-                return;
+        __block NSError *error;
+        __block BOOL didComplete;
+        
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+        __block RLMNotificationToken *token = [self addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+            if (didComplete) {
+                completion(error);
+                [token stop];
             }
+        }];
+#pragma GCC diagnostic pop
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            RLMRealm *newRealm = [RLMRealm realmWithConfiguration:config error:nil];
             
             newRealm->_realm->read_group();
             auto& new_sg = newRealm->_realm->shared_group();
@@ -930,12 +941,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             
             [newRealm transactionWithBlock:^{
                 block(newRealm, handoverResults);
+                didComplete = YES;
             } error:&error];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                // Should refresh be called before completion?
-                completion(error);
-            });
         });
     }
 }

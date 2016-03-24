@@ -148,7 +148,6 @@
         [array addObject:child2];
     } completion:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
-        [realm refresh];
         RLMResults *children = [StringObject allObjectsInRealm:realm];
         XCTAssertEqualObjects([children[0] stringCol], @"a", @"First child should be 'a'");
         XCTAssertEqualObjects([children[1] stringCol], @"b", @"Second child should be 'b'");

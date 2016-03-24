@@ -577,7 +577,6 @@
         [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
     } completion:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
-        [realm refresh];
         XCTAssertEqual(employees.count, 3U, @"Should be 3 employees");
         [expectation fulfill];
     }];
@@ -605,7 +604,6 @@
         [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
     } completion:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
-        [realm refresh];
         XCTAssertEqual(30, [(EmployeeObject *)sortedAge[1] age]);
         XCTAssertEqual(sortedAge.count, 3U, @"Should be 3 employees");
         [expectation fulfill];
@@ -635,7 +633,6 @@
         [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @YES}];
     } completion:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
-        [realm refresh];
         XCTAssertEqual(30, [(EmployeeObject *)sortedAge[1] age]);
         XCTAssertEqual(sortedAge.count, 3U, @"Should be 3 employees");
         [expectation fulfill];
