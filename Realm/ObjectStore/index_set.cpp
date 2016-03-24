@@ -293,7 +293,7 @@ void IndexSet::erase_at(IndexSet const& positions)
         add_back(*begin1 - shift);
 }
 
-size_t IndexSet::erase_and_unshift(size_t index)
+size_t IndexSet::erase_or_unshift(size_t index)
 {
     auto shifted = index;
     auto it = m_ranges.begin(), end = m_ranges.end();

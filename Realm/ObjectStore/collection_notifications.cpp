@@ -191,7 +191,7 @@ void CollectionChangeBuilder::insert(size_t index, size_t count)
 void CollectionChangeBuilder::erase(size_t index)
 {
     modifications.erase_at(index);
-    size_t unshifted = insertions.erase_and_unshift(index);
+    size_t unshifted = insertions.erase_or_unshift(index);
     if (unshifted != npos)
         deletions.add_shifted(unshifted);
 
@@ -247,7 +247,7 @@ void CollectionChangeBuilder::move(size_t from, size_t to)
     }
 
     if (!updated_existing_move) {
-        auto shifted_from = insertions.erase_and_unshift(from);
+        auto shifted_from = insertions.erase_or_unshift(from);
         insertions.insert_at(to);
 
         // Don't report deletions/moves for newly inserted rows
@@ -316,7 +316,7 @@ void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
         return;
 
     // Don't report deletions/moves if last_row is newly inserted
-    auto shifted_last_row = insertions.erase_and_unshift(last_row);
+    auto shifted_last_row = insertions.erase_or_unshift(last_row);
     if (shifted_last_row != npos) {
         shifted_last_row = deletions.add_shifted(shifted_last_row);
         moves.push_back({shifted_last_row, row_ndx});

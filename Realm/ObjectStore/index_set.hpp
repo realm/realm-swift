@@ -76,7 +76,8 @@ public:
     void erase_at(size_t index);
     void erase_at(IndexSet const&);
 
-    size_t erase_and_unshift(size_t index);
+    // If the given index is in the set remove it and return npos; otherwise unshift() it
+    size_t erase_or_unshift(size_t index);
 
     // Remove the indexes at the given index from the set, without shifting
     void remove(size_t index, size_t count=1);
