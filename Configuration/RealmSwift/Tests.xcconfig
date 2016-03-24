@@ -14,4 +14,6 @@ EXCLUDED_SOURCE_FILE_NAMES[sdk=iphone*] = build/osx/*;
 EXCLUDED_SOURCE_FILE_NAMES[sdk=appletv*] = build/osx/*;
 EXCLUDED_SOURCE_FILE_NAMES[sdk=macosx*] = build/ios/*;
 
-TEST_HOST = $(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestHost;
+TEST_HOST[sdk=iphone*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost;
+TEST_HOST[sdk=appletv*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost;
+TEST_HOST[sdk=macosx*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestHost;
