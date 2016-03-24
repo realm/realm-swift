@@ -18,10 +18,10 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMDefines.h>
-#import <Realm/RLMCollection.h>
-
 
 @class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
+
+@protocol RLMCollection;
 
 RLM_ASSUME_NONNULL_BEGIN
 

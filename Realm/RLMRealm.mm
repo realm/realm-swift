@@ -45,8 +45,7 @@
 #include <realm/disable_sync_to_disk.hpp>
 #include <realm/version.hpp>
 
-#include <future>
-#include <realm/group_shared.hpp>
+#import <realm/group_shared.hpp>
 #import <realm/link_view.hpp>
 #import <realm/row.hpp>
 #import <realm/results.hpp>
