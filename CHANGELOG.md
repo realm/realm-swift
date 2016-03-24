@@ -11,7 +11,46 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
+* Mark further initializers in Objective-C as NS_DESIGNATED_INITIALIZER to prevent that these aren't
+  correctly defined in Swift Object subclasses, which don't qualify for auto-inheriting the required initializers.
+
+0.98.5 Release notes (2016-03-14)
+=============================================================
+
+### API breaking changes
+
 * None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix a crash when opening a Realm on 32-bit iOS devices.
+
+0.98.4 Release notes (2016-03-10)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Properly report changes made by adding an object to a Realm with
+  addOrUpdate:/createOrUpdate: to KVO observers for existing objects with that
+  primary key.
+* Fix crashes and assorted issues when a migration which added object link
+  properties is rolled back due to an error in the migration block.
+* Fix assertion failures when deleting objects within a migration block of a
+  type which had an object link property added in that migration.
+* Fix an assertion failure in `Query::apply_patch` when updating certain kinds
+  of queries after a write transaction is committed.
 
 0.98.3 Release notes (2016-02-26)
 =============================================================

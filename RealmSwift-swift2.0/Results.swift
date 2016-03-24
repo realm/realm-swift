@@ -352,12 +352,12 @@ public final class Results<T: Object>: ResultsBase {
      - returns: A token which must be held for as long as you want query results to be delivered.
      */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (Results<T>?, NSError?) -> ()) -> NotificationToken {
+    public func addNotificationBlock(block: (results: Results<T>?, error: NSError?) -> ()) -> NotificationToken {
         return rlmResults.addNotificationBlock { results, error in
             if results != nil {
-                block(self, nil)
+                block(results: self, error: nil)
             } else {
-                block(nil, error)
+                block(results: nil, error: error)
             }
         }
     }

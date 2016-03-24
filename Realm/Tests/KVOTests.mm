@@ -1260,6 +1260,19 @@ public:
     XCTAssertNoThrow([array addObserver:self forKeyPath:RLMInvalidatedKey options:0 context:0]);
     XCTAssertNoThrow([array removeObserver:self forKeyPath:RLMInvalidatedKey context:0]);
 }
+
+- (void)testInvalidOperationOnObservedArray {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject1 *linked = obj.obj;
+    [obj.array addObject:linked];
+    KVORecorder r(self, obj, @"array");
+    XCTAssertThrows([obj.array exchangeObjectAtIndex:2 withObjectAtIndex:3]);
+    // A KVO notification is still sent to observers on the same thread since we
+    // can't cancel willChange, but the data is not very meaningful so don't check it
+    if (!self.collapsesNotifications) {
+        AssertNotification(r);
+    }
+}
 @end
 
 // Mutate a different accessor backed by the same row as the accessor being observed
@@ -1283,6 +1296,28 @@ public:
 
 - (void)testIgnoredProperty {
     // ignored properties do not notify other accessors for the same row
+}
+
+- (void)testAddOrUpdate {
+    KVOObject *obj = [self createObject];
+    KVOObject *obj2 = [[KVOObject alloc] initWithValue:obj];
+
+    KVORecorder r(self, obj, @"boolCol");
+    obj2.boolCol = true;
+    XCTAssertTrue(r.empty());
+    [self.realm addOrUpdateObject:obj2];
+    AssertChanged(r, @NO, @YES);
+}
+
+- (void)testCreateOrUpdate {
+    KVOObject *obj = [self createObject];
+    KVOObject *obj2 = [[KVOObject alloc] initWithValue:obj];
+
+    KVORecorder r(self, obj, @"boolCol");
+    obj2.boolCol = true;
+    XCTAssertTrue(r.empty());
+    [KVOObject createOrUpdateInRealm:self.realm withValue:obj2];
+    AssertChanged(r, @NO, @YES);
 }
 
 // The following tests aren't really multiple-accessor-specific, but they're

@@ -97,7 +97,7 @@ private:
     SharedGroup* m_sg = nullptr;
 
     uint_fast64_t m_handed_over_table_version = -1;
-    uint_fast64_t m_delievered_table_version = -1;
+    uint_fast64_t m_delivered_table_version = -1;
 
     // Iteration variable for looping over callbacks
     // remove_callback() updates this when needed

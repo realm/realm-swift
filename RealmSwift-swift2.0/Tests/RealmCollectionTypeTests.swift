@@ -382,7 +382,7 @@ class ResultsTests: RealmCollectionTypeTests {
 
             XCTAssertEqual(results!.count, calls + 2)
             XCTAssertEqual(results, collection)
-            ++calls
+            calls += 1
 
             expectation.fulfill()
         }
@@ -394,6 +394,22 @@ class ResultsTests: RealmCollectionTypeTests {
 
         token.stop()
         realm.beginWrite()
+    }
+}
+
+class ResultsWithCustomInitializerTest: TestCase {
+    func testValueForKey() {
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.add(SwiftCustomInitializerObject(stringVal: "A"))
+        }
+
+        let collection = realm.objects(SwiftCustomInitializerObject)
+        let expected = collection.map { $0.stringCol }
+        let actual = collection.valueForKey("stringCol") as! [String]!
+        XCTAssertEqual(expected, actual)
+
+        XCTAssertEqual(collection.map { $0 }, collection.valueForKey("self") as! [SwiftStringObject])
     }
 }
 

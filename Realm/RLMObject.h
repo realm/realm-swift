@@ -233,7 +233,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  Return an array of property names for properties which should be indexed. Only supported
- for string and int properties.
+ for strings, integers, booleans and NSDate properties.
  @return    NSArray of property names.
  */
 + (NSArray RLM_GENERIC(NSString *) *)indexedProperties;
