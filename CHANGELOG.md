@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix running unit tests on iOS simulators and devices with Xcode 7.3.
+
 0.98.5 Release notes (2016-03-14)
 =============================================================
 
