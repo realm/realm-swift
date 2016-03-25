@@ -269,15 +269,18 @@ void CollectionChangeBuilder::move(size_t from, size_t to)
 void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
 {
     REALM_ASSERT(row_ndx <= last_row);
+    REALM_ASSERT(insertions.empty() || prev(insertions.end())->second - 1 <= last_row);
+    REALM_ASSERT(modifications.empty() || prev(modifications.end())->second - 1 <= last_row);
     if (row_ndx == last_row) {
         erase(row_ndx);
         return;
     }
 
     bool modified = modifications.contains(last_row);
-    modifications.erase_at(last_row);
-    if (modified)
+    if (modified) {
+        modifications.remove(last_row);
         modifications.add(row_ndx);
+    }
     else
         modifications.remove(row_ndx);
 
@@ -316,8 +319,11 @@ void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
         return;
 
     // Don't report deletions/moves if last_row is newly inserted
-    auto shifted_last_row = insertions.erase_or_unshift(last_row);
-    if (shifted_last_row != npos) {
+    if (!insertions.empty() && prev(insertions.end())->second == last_row + 1) {
+        insertions.remove(last_row);
+    }
+    else {
+        auto shifted_last_row = insertions.unshift(last_row);
         shifted_last_row = deletions.add_shifted(shifted_last_row);
         moves.push_back({shifted_last_row, row_ndx});
     }
