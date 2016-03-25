@@ -100,7 +100,9 @@ class RealmTests: TestCase {
     #if DEBUG
     func testFileFormatUpgradeRequiredButDisabled() {
         var config = Realm.Configuration()
-        config.path = NSBundle(forClass: RealmTests.self).pathForResource("fileformat-pre-null.realm", ofType: nil)!
+        var bundledRealmPath = NSBundle(forClass: RealmTests.self).pathForResource("fileformat-pre-null.realm",
+                                                                                   ofType: nil)!
+        try! NSFileManager.defaultManager.copyItemAtPath(bundledRealmPath, toPath: config.path)
         config.disableFormatUpgrade = true
         assertFails(Error.FileFormatUpgradeRequired) {
             try Realm(configuration: config)

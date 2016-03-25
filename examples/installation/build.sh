@@ -111,7 +111,7 @@ case "$COMMAND" in
 
     "test-xcode7")
         for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage watchos-objc-dynamic test-watchos-objc-cocoapods test-watchos-objc-carthage watchos-swift-dynamic test-watchos-swift-cocoapods test-watchos-swift-carthage; do
-            REALM_SWIFT_VERSION=2.1.1 ./build.sh test-$target || exit 1
+            REALM_SWIFT_VERSION=2.2 ./build.sh test-$target || exit 1
         done
         ;;
 
