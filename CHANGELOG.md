@@ -1,5 +1,7 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.98.6 Release notes (2016-03-24)
 =============================================================
+
+Prebuilt frameworks are now built with Xcode 7.3.
 
 ### API breaking changes
 
