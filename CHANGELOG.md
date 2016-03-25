@@ -13,6 +13,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Mark further initializers in Objective-C as NS_DESIGNATED_INITIALIZER to prevent that these aren't
   correctly defined in Swift Object subclasses, which don't qualify for auto-inheriting the required initializers.
+* Fix running unit tests on iOS simulators and devices with Xcode 7.3.
 
 0.98.5 Release notes (2016-03-14)
 =============================================================
