@@ -475,11 +475,12 @@
     EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
     EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    EmployeeObject *po4 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Bill", @"age": @55, @"hired": @YES}];
 
     // create company
     CompanyObject *company = [[CompanyObject alloc] init];
     company.name = @"name";
-    [company.employees addObjects:@[po3, po1]];
+    [company.employees addObjects:@[po3, po1, po4]];
 
     // test standalone
     XCTAssertEqual(0U, [company.employees indexOfObjectWhere:@"name = 'Jill'"]);
@@ -494,6 +495,12 @@
     XCTAssertEqual(0U, [company.employees indexOfObjectWhere:@"name = 'Jill'"]);
     XCTAssertEqual(1U, [company.employees indexOfObjectWhere:@"name = 'Joe'"]);
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObjectWhere:@"name = 'John'"]);
+
+    RLMResults *results = [company.employees objectsWhere:@"age > 30"];
+    XCTAssertEqual(0U, [results indexOfObjectWhere:@"name = 'Joe'"]);
+    XCTAssertEqual(1U, [results indexOfObjectWhere:@"name = 'Bill'"]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObjectWhere:@"name = 'John'"]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObjectWhere:@"name = 'Jill'"]);
 }
 
 - (void)testFastEnumeration
