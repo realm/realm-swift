@@ -20,7 +20,7 @@ set -e
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
 
 # Provide a fallback value for TMPDIR, relevant for Xcode Bots
-: ${TMPDIR:=getconf DARWIN_USER_TEMP_DIR}
+: ${TMPDIR:=$(getconf DARWIN_USER_TEMP_DIR)}
 
 PATH=/usr/libexec:$PATH
 
