@@ -180,10 +180,10 @@ RLM_ASSUME_NONNULL_BEGIN
  continue to be sent to the block. To stop receiving updates, call -stop on the
  token.
 
- The determination for whether or not a write transaction has changed the
- results is currently very coarse, and the block may be called even if no
- changes occurred. The opposite (not being called despite changes) will not
- happen. This will become more precise in future versions.
+ The change parameter will be `nil` the first time the block is called with the
+ initial results. For each call after that, it will contain information about
+ which rows in the results were added, removed or modified. If a write transaction
+ did not modify any objects in this results, the block is not called at all.
 
  If an error occurs the block will be called with `nil` for the results
  parameter and a non-`nil` error. Currently the only errors that can occur are

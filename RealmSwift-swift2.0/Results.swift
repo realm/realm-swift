@@ -330,11 +330,6 @@ public final class Results<T: Object>: ResultsBase {
      continue to be sent to the block. To stop receiving updates, call stop() on the
      token.
 
-     The determination for whether or not a write transaction has changed the
-     results is currently very coarse, and the block may be called even if no
-     changes occurred. The opposite (not being called despite changes) will not
-     happen. This will become more precise in future versions.
-
      If an error occurs the block will be called with `nil` for the results
      parameter and a non-`nil` error. Currently the only errors that can occur are
      when opening the Realm on the background worker thread or the destination
@@ -362,6 +357,30 @@ public final class Results<T: Object>: ResultsBase {
         }
     }
 
+    /**
+     Register a block to be called each time the Results changes.
+
+     The block will be asynchronously called with the initial results, and then
+     called again after each write transaction which causes the results to change.
+     You must retain the returned token for as long as you want the results to
+     continue to be sent to the block. To stop receiving updates, call stop() on the
+     token.
+
+     This version of this method reports changes made to the Results as row
+     indices within the Results. See the RealmCollectionChange documentation for
+     more information.
+
+     At the time when the block is called, the Results object will be fully
+     evaluated and up-to-date, and as long as you do not perform a write transaction
+     on the same thread or explicitly call realm.refresh(), accessing it will never
+     perform blocking work.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the source realm is read-only.
+
+     - parameter block: The block to be called with the evaluated results.
+     - returns: A token which must be held for as long as you want query results to be delivered.
+     */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (RealmCollectionChange<Results> -> Void)) -> NotificationToken {
         return rlmResults.addNotificationBlock { results, change, error in
@@ -369,6 +388,31 @@ public final class Results<T: Object>: ResultsBase {
         }
     }
 
+    /**
+     Register a block to be called each time the Results changes.
+
+     The block will be asynchronously called with the initial results, and then
+     called again after each write transaction which causes the results to change.
+     You must retain the returned token for as long as you want the results to
+     continue to be sent to the block. To stop receiving updates, call stop() on the
+     token.
+
+     This version of this method reports changes made to the Results as row
+     index paths suitable for use with UITableView. See the
+     RealmCollectionChange documentation for more information and an example of
+     use.
+
+     At the time when the block is called, the Results object will be fully
+     evaluated and up-to-date, and as long as you do not perform a write transaction
+     on the same thread or explicitly call realm.refresh(), accessing it will never
+     perform blocking work.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the source realm is read-only.
+
+     - parameter block: The block to be called with the evaluated results.
+     - returns: A token which must be held for as long as you want query results to be delivered.
+     */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (RealmCollectionChangePaths<Results> -> Void)) -> NotificationToken {
         return rlmResults.addNotificationBlock { results, change, error in

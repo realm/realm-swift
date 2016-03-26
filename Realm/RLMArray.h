@@ -62,7 +62,7 @@ RLM_ASSUME_NONNULL_BEGIN
 @interface RLMArray RLM_GENERIC_COLLECTION : NSObject<RLMCollection, NSFastEnumeration>
 
 #pragma mark - Properties
- 
+
 /**
  Number of objects in the array.
  */
@@ -291,17 +291,23 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Register a block to be called each time the RLMArray changes.
 
- The block will be asynchronously called with the initial array, and then
- called again after each write transaction which changes the array or any
- items contained in the array. You must retain the returned token for as long as
- you want the block to continue to be called. To stop receiving updates, call
- `-stop` on the token.
+ The block will be asynchronously called with the initial array and a nil change
+ object, and then called again with the new array and a non-nil, change object
+ after each write transaction which changes the array or any items contained in
+ the array. You must retain the returned token for as long as you want the block
+ to continue to be called. To stop receiving updates, call `-stop` on the token.
 
- The error parameter will always be `nil`, and is present only for compatiblity
- with the RLMResults version of this method, which can potentially fail.
+ If an error occurs the block will be called with `nil` for the array and change
+ parameters and a non-`nil` error. Currently the only error that can occur is
+ when opening the RLMRealm on the background worker thread fails.
+
+ @warning This method cannot be called during a write transaction, or when the
+          containing realm is read-only.
+ @warning This method can only be called on RLMArray object which has been add
+          to or retrieved from a Realm.
 
  @param block The block to be called each time the array changes.
- @return A token which must be held for as long as you want notifications to be delivered.
+ @return A token which must be held for as long as you want query results to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray RLM_GENERIC_RETURN *__nullable array,
                                                          RLMCollectionChange *__nullable changes,

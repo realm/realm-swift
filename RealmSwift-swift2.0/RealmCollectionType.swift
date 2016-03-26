@@ -41,11 +41,33 @@ public final class RLMGenerator<T: Object>: GeneratorType {
 }
 
 /**
- Changes made to a collection
+ RealmCollectionChange is passed to the notification blocks for Realm
+ collections, and reports the current state of the collection and what changes
+ were made to the collection since the last time the notification was called.
  */
 public enum RealmCollectionChange<T> {
+    /// The initial run of the query has completed (if applicable), and the
+    /// collection can now be used without performing any blocking work.
     case Initial(T)
+
+    /// A write transaction has been committed which either changed which objects
+    /// are in the collection and/or modified one or more of the objects in the
+    /// collection.
+    ///
+    /// All three of the change arrays are always sorted in ascending order.
+    ///
+    /// @param deletions The indices in the previous version of the collection
+    ///                  which were removed from this one.
+    /// @param insertion The indices in the new collection which were added in
+    ///                  this version.
+    /// @param insertion The indices of the objects in the new collection which
+    ///                  were modified in this version.
     case Update(T, deletions: [Int], insertions: [Int], modifications: [Int])
+
+    /// If an error occurs, notification blocks are called one time with a
+    /// .Error result and an NSError with details. Currently the only thing
+    /// that can fail is opening the Realm on a background worker thread to
+    /// calculate the change set.
     case Error(NSError)
 
     static func fromObjc(value: T, change: RLMCollectionChange?, error: NSError?) -> RealmCollectionChange {
@@ -62,9 +84,60 @@ public enum RealmCollectionChange<T> {
     }
 }
 
+/**
+ RealmCollectionChange is passed to the notification blocks for Realm
+ collections, and reports the current state of the collection and what changes
+ were made to the collection since the last time the notification was called.
+
+ This differs from RealmCollectionChange<T> only in that it reports changes as
+ arrays of index paths suitable for use with UITableView rather than arrays of
+ Ints. A complete example of updating a UITableView given a change object is:
+
+        self.notificationToken = results.addNotificationBlock { (change: RealmCollectionChangePaths) in
+            switch change {
+            case .Initial:
+                // Results are now populated and can be accessed without blocking the UI
+                self.tableView.reloadData()
+                break
+            case .Update(_, let deletions, let insertions, let modifications):
+                // Query results have changed, so apply them to the TableView
+                self.tableView.beginUpdates()
+                self.tableView.insertRowsAtIndexPaths(insertions, withRowAnimation: .Automatic)
+                self.tableView.deleteRowsAtIndexPaths(deletions, withRowAnimation: .Automatic)
+                self.tableView.reloadRowsAtIndexPaths(modifications, withRowAnimation: .Automatic)
+                self.tableView.endUpdates()
+                break
+            case .Error(let err):
+                // An error occured while opening the Realm file on the background worker thread
+                fatalError("\(err)")
+                break
+            }
+        }
+
+ */
 public enum RealmCollectionChangePaths<T> {
+    /// The initial run of the query has completed (if applicable), and the
+    /// collection can now be used without performing any blocking work.
     case Initial(T)
+
+    /// A write transaction has been committed which either changed which objects
+    /// are in the collection and/or modified one or more of the objects in the
+    /// collection.
+    ///
+    /// All three of the change arrays are always sorted in ascending order.
+    ///
+    /// @param deletions The paths in the previous version of the collection
+    ///                  which were removed from this one.
+    /// @param insertion The paths in the new collection which were added in
+    ///                  this version.
+    /// @param insertion The paths of the objects in the new collection which
+    ///                  were modified in this version.
     case Update(T, deletions: [NSIndexPath], insertions: [NSIndexPath], modifications: [NSIndexPath])
+
+    /// If an error occurs, notification blocks are called one time with a
+    /// .Error result and an NSError with details. Currently the only thing
+    /// that can fail is opening the Realm on a background worker thread to
+    /// calculate the change set.
     case Error(NSError)
 
     static func fromObjc(value: T, change: RLMCollectionChange?, error: NSError?) -> RealmCollectionChangePaths {
@@ -268,7 +341,57 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     /// :nodoc:
     func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken
 
+    /**
+     Register a block to be called each time the collection changes.
+
+     The block will be asynchronously called with the initial collection, and
+     then called again after each write transaction which causes the collection
+     to change. You must retain the returned token for as long as you want
+     updates to continue to be sent to the block. To explicitly stop receiving
+     updates, call stop() on the token.
+
+     This version of this method reports changes made to the collection as
+     indices within the collection. See the RealmCollectionChange documentation
+     for more information.
+
+     At the time when the block is called, the collection object will be fully
+     evaluated and up-to-date, and as long as you do not perform a write
+     transaction on the same thread or explicitly call realm.refresh(),
+     accessing it will never perform blocking work.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the source realm is read-only.
+
+     - parameter block: The block to be called with the evaluated collection and change information.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
     func addNotificationBlock(block: (RealmCollectionChange<Self>) -> ()) -> NotificationToken
+
+    /**
+     Register a block to be called each time the collection changes.
+
+     The block will be asynchronously called with the initial collection, and
+     then called again after each write transaction which causes the collection
+     to change. You must retain the returned token for as long as you want
+     updates to continue to be sent to the block. To explicitly stop receiving
+     updates, call stop() on the token.
+
+     This version of this method reports changes made to the collection as
+     index paths suitable for use with UITableView. See the
+     RealmCollectionChange documentation for more information and an example of
+     use.
+
+     At the time when the block is called, the collection object will be fully
+     evaluated and up-to-date, and as long as you do not perform a write
+     transaction on the same thread or explicitly call realm.refresh(),
+     accessing it will never perform blocking work.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the source realm is read-only.
+
+     - parameter block: The block to be called with the evaluated collection and change information.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
     func addNotificationBlock(block: (RealmCollectionChangePaths<Self>) -> ()) -> NotificationToken
 }
 
@@ -539,6 +662,7 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
         return base._addNotificationBlock(block)
     }
 
+    /// :nodoc:
     override func addNotificationBlock(wrapper: Wrapper, block: (RealmCollectionChange<Wrapper>) -> ())
             -> NotificationToken {
         return base.addNotificationBlock { (change: RealmCollectionChange<C>) in
@@ -559,6 +683,7 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
         }
     }
 
+    /// :nodoc:
     override func addNotificationBlock(wrapper: Wrapper, block: (RealmCollectionChangePaths<Wrapper>) -> ())
             -> NotificationToken {
         return base.addNotificationBlock { (change: RealmCollectionChangePaths<C>) in
@@ -827,8 +952,59 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     /// :nodoc:
     public func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ())
         -> NotificationToken { return base._addNotificationBlock(block) }
+
+    /**
+     Register a block to be called each time the collection changes.
+
+     The block will be asynchronously called with the initial collection, and
+     then called again after each write transaction which causes the collection
+     to change. You must retain the returned token for as long as you want
+     updates to continue to be sent to the block. To explicitly stop receiving
+     updates, call stop() on the token.
+
+     This version of this method reports changes made to the collection as
+     indices within the collection. See the RealmCollectionChange documentation
+     for more information.
+
+     At the time when the block is called, the collection object will be fully
+     evaluated and up-to-date, and as long as you do not perform a write
+     transaction on the same thread or explicitly call realm.refresh(),
+     accessing it will never perform blocking work.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the source realm is read-only.
+
+     - parameter block: The block to be called with the evaluated collection and change information.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
     public func addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
         -> NotificationToken { return base.addNotificationBlock(self, block: block) }
+
+    /**
+     Register a block to be called each time the collection changes.
+
+     The block will be asynchronously called with the initial collection, and
+     then called again after each write transaction which causes the collection
+     to change. You must retain the returned token for as long as you want
+     updates to continue to be sent to the block. To explicitly stop receiving
+     updates, call stop() on the token.
+
+     This version of this method reports changes made to the collection as
+     index paths suitable for use with UITableView. See the
+     RealmCollectionChange documentation for more information and an example of
+     use.
+
+     At the time when the block is called, the collection object will be fully
+     evaluated and up-to-date, and as long as you do not perform a write
+     transaction on the same thread or explicitly call realm.refresh(),
+     accessing it will never perform blocking work.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the source realm is read-only.
+
+     - parameter block: The block to be called with the evaluated collection and change information.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
     public func addNotificationBlock(block: (RealmCollectionChangePaths<AnyRealmCollection>) -> ())
         -> NotificationToken { return base.addNotificationBlock(self, block: block) }
 }
