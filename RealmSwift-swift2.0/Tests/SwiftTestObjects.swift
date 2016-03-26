@@ -194,13 +194,13 @@ class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
     let boolArray = List<SwiftBoolObject>()
 }
 
-class SwiftLinkToPrimaryStringObject: Object {
+class SwiftLinkToPrimaryStringObject: Object, PrimaryKeyObject {
     // swiftlint:disable:next variable_name
     dynamic var pk = ""
     dynamic var object: SwiftPrimaryStringObject?
     let objects = List<SwiftPrimaryStringObject>()
 
-    override class func primaryKey() -> String? {
+    class func primaryKey() -> String {
         return "pk"
     }
 }
@@ -226,11 +226,11 @@ class SwiftRecursiveObject: Object {
     let objects = List<SwiftRecursiveObject>()
 }
 
-class SwiftPrimaryStringObject: Object {
+class SwiftPrimaryStringObject: Object, PrimaryKeyObject {
     dynamic var stringCol = ""
     dynamic var intCol = 0
 
-    override class func primaryKey() -> String? {
+    class func primaryKey() -> String {
         return "stringCol"
     }
 }

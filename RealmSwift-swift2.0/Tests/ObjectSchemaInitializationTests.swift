@@ -130,6 +130,8 @@ class ObjectSchemaInitializationTests: TestCase {
 
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDatePrimaryKey.self),
             "Should throw when setting a non int/string primary key")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithPrimaryKeyMethodButWithoutProtocol.self),
+            "Should throw when declaring primaryKey method but not implementing PrimaryKeyObject protocol")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSURL.self),
             "Should throw when not ignoring a property of a type we can't persist")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonOptionalLinkProperty.self),
@@ -197,7 +199,6 @@ class ObjectSchemaInitializationTests: TestCase {
 
 class SwiftFakeObject: NSObject {
     dynamic class func objectUtilClass(isSwift: Bool) -> AnyClass { return ObjectUtil.self }
-    dynamic class func primaryKey() -> String? { return nil }
     dynamic class func ignoredProperties() -> [String] { return [] }
     dynamic class func indexedProperties() -> [String] { return [] }
 }
@@ -231,11 +232,19 @@ class SwiftObjectWithStruct: SwiftFakeObject {
     var swiftStruct = SortDescriptor(property: "prop")
 }
 
-class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {
+class SwiftObjectWithDatePrimaryKey: SwiftFakeObject, PrimaryKeyObject {
     dynamic var date = NSDate()
 
-    dynamic override class func primaryKey() -> String? {
+    class func primaryKey() -> String {
         return "date"
+    }
+}
+
+class SwiftObjectWithPrimaryKeyMethodButWithoutProtocol: SwiftFakeObject {
+    dynamic var stringCol = ""
+
+    dynamic class func primaryKey() -> String {
+        return "stringCol"
     }
 }
 

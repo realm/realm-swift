@@ -122,7 +122,8 @@ using namespace realm;
         }
     }
 
-    if (NSString *primaryKey = [objectClass primaryKey]) {
+    Class objectUtil = [objectClass objectUtilClass:isSwift];
+    if (NSString *primaryKey = [objectUtil primaryKeyPropertyForClass:objectClass]) {
         for (RLMProperty *prop in schema.properties) {
             if ([primaryKey isEqualToString:prop.name]) {
                 prop.indexed = YES;

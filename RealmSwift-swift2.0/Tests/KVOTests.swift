@@ -25,7 +25,7 @@ func nextPrimaryKey() -> Int {
     return pkCounter
 }
 
-class KVOObject: Object {
+class KVOObject: Object, PrimaryKeyObject {
     // swiftlint:disable:next variable_name
     dynamic var pk = nextPrimaryKey() // primary key for equality
     dynamic var ignored: Int = 0
@@ -50,7 +50,7 @@ class KVOObject: Object {
     dynamic var optBinaryCol: NSData?
     dynamic var optDateCol: NSDate?
 
-    override class func primaryKey() -> String { return "pk" }
+    class func primaryKey() -> String { return "pk" }
     override class func ignoredProperties() -> [String] { return ["ignored"] }
 }
 

@@ -141,16 +141,6 @@ public class Object: RLMObjectBase {
     // MARK: Object Customization
 
     /**
-    Override to designate a property as the primary key for an `Object` subclass. Only properties of
-    type String and Int can be designated as the primary key. Primary key
-    properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
-    Indexes are created automatically for primary key properties.
-
-    - returns: Name of the property designated as the primary key, or `nil` if the model has no primary key.
-    */
-    public class func primaryKey() -> String? { return nil }
-
-    /**
     Override to return an array of property names to ignore. These properties will not be persisted
     and are treated as transient.
 
@@ -273,6 +263,18 @@ public class Object: RLMObjectBase {
     }
 }
 
+/// Implement this protocol to designate a property as the primary key of an `Object` subclass.
+public protocol PrimaryKeyObject : class {
+    /**
+     Override to designate a property as the primary key for an `Object` subclass. Only properties of
+     type String and Int can be designated as the primary key. Primary key
+     properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
+     Indexes are created automatically for primary key properties.
+
+     - returns: Name of the property designated as the primary key.
+     */
+    static func primaryKey() -> String
+}
 
 
 /// Object interface which allows untyped getters and setters for Objects.
@@ -336,6 +338,21 @@ public class ObjectUtil: NSObject {
     @objc private class func indexedPropertiesForClass(type: AnyClass) -> NSArray? {
         if let type = type as? Object.Type {
             return type.indexedProperties() as NSArray?
+        }
+        return nil
+    }
+
+    @objc private class func primaryKeyPropertyForClass(type: AnyClass) -> String? {
+        if let type = type as? PrimaryKeyObject.Type {
+            return type.primaryKey()
+        }
+        // Note: This shoud prevent that a schema definition error is mystified by the requirement
+        // of a schema version bump, if previously a property was designated as primary key by
+        // overriding the inherited method but the later introduced protocol `PrimaryKeyObject` was
+        // not adopted yet.
+        if type.respondsToSelector("primaryKey") {
+            throwRealmException("WARNING: '\(type)' declares a static method 'primaryKey' but"
+                + "doesn't implement the protocol 'PrimaryKeyObject'.")
         }
         return nil
     }
