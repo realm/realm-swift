@@ -25,18 +25,115 @@
 #include <stddef.h>
 
 namespace realm {
-class IndexSet {
+class IndexSet;
+
+namespace _impl {
+template<typename OuterIterator>
+class MutableChunkedRangeVectorIterator;
+
+// An iterator for ChunkedRangeVector, templated on the vector iterator/const_iterator
+template<typename OuterIterator>
+class ChunkedRangeVectorIterator {
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = typename std::remove_reference<decltype(*OuterIterator()->data.begin())>::type;
+    using difference_type = ptrdiff_t;
+    using pointer = const value_type*;
+    using reference = const value_type&;
+
+    ChunkedRangeVectorIterator(OuterIterator outer, OuterIterator end, value_type* inner)
+    : m_outer(outer), m_end(end), m_inner(inner) { }
+
+    reference operator*() const { return *m_inner; }
+    pointer operator->() const { return m_inner; }
+
+    template<typename Other> bool operator==(Other const& it) const;
+    template<typename Other> bool operator!=(Other const& it) const;
+
+    ChunkedRangeVectorIterator& operator++();
+    ChunkedRangeVectorIterator operator++(int);
+
+    ChunkedRangeVectorIterator& operator--();
+    ChunkedRangeVectorIterator operator--(int);
+
+    // Advance directly to the next outer block
+    void next_chunk();
+
+    OuterIterator outer() const { return m_outer; }
+    size_t offset() const { return m_inner - &m_outer->data[0]; }
+
+private:
+    OuterIterator m_outer;
+    OuterIterator m_end;
+    value_type* m_inner;
+    friend struct ChunkedRangeVector;
+    friend class MutableChunkedRangeVectorIterator<OuterIterator>;
+};
+
+// A mutable iterator that adds some invariant-preserving mutation methods
+template<typename OuterIterator>
+class MutableChunkedRangeVectorIterator : public ChunkedRangeVectorIterator<OuterIterator> {
+public:
+    using ChunkedRangeVectorIterator<OuterIterator>::ChunkedRangeVectorIterator;
+
+    // Set this iterator to the given range and update the parent if needed
+    void set(size_t begin, size_t end);
+    // Adjust the begin and end of this iterator by the given amounts and
+    // update the parent if needed
+    void adjust(ptrdiff_t front, ptrdiff_t back);
+    // Shift this iterator by the given amount and update the parent if needed
+    void shift(ptrdiff_t distance);
+};
+
+// A vector which stores ranges in chunks with a maximum size
+struct ChunkedRangeVector {
+    struct Chunk {
+        std::vector<std::pair<size_t, size_t>> data;
+        size_t begin;
+        size_t end;
+        size_t count;
+    };
+    std::vector<Chunk> m_data;
+
+    using value_type = std::pair<size_t, size_t>;
+    using iterator = MutableChunkedRangeVectorIterator<typename decltype(m_data)::iterator>;
+    using const_iterator = ChunkedRangeVectorIterator<typename decltype(m_data)::const_iterator>;
+
+#ifdef REALM_DEBUG
+    static const size_t max_size = 4;
+#else
+    static const size_t max_size = 4096 / sizeof(std::pair<size_t, size_t>);
+#endif
+
+    iterator begin() { return empty() ? end() : iterator(m_data.begin(), m_data.end(), &m_data[0].data[0]); }
+    iterator end() { return iterator(m_data.end(), m_data.end(), nullptr); }
+    const_iterator begin() const { return cbegin(); }
+    const_iterator end() const { return cend(); }
+    const_iterator cbegin() const { return empty() ? cend() : const_iterator(m_data.cbegin(), m_data.end(), &m_data[0].data[0]); }
+    const_iterator cend() const { return const_iterator(m_data.end(), m_data.end(), nullptr); }
+
+    bool empty() const noexcept { return m_data.empty(); }
+
+    iterator insert(iterator pos, value_type value);
+    iterator erase(iterator pos);
+    void push_back(value_type value);
+    iterator ensure_space(iterator pos);
+
+    void verify() const noexcept;
+};
+} // namespace _impl
+
+class IndexSet : private _impl::ChunkedRangeVector {
 public:
     static const size_t npos = -1;
 
-    using value_type = std::pair<size_t, size_t>;
-    using iterator = std::vector<value_type>::iterator;
-    using const_iterator = std::vector<value_type>::const_iterator;
-
-    const_iterator begin() const { return m_ranges.begin(); }
-    const_iterator end() const { return m_ranges.end(); }
-    bool empty() const { return m_ranges.empty(); }
-    size_t size() const { return m_ranges.size(); }
+    using ChunkedRangeVector::value_type;
+    using ChunkedRangeVector::iterator;
+    using ChunkedRangeVector::const_iterator;
+    using ChunkedRangeVector::begin;
+    using ChunkedRangeVector::end;
+    using ChunkedRangeVector::empty;
+    using ChunkedRangeVector::verify;
 
     IndexSet() = default;
     IndexSet(std::initializer_list<size_t>);
@@ -45,7 +142,7 @@ public:
     bool contains(size_t index) const;
 
     // Counts the number of indices in the set in the given range
-    size_t count(size_t start_index, size_t end_index) const;
+    size_t count(size_t start_index=0, size_t end_index=-1) const;
 
     // Add an index to the set, doing nothing if it's already present
     void add(size_t index);
@@ -90,8 +187,6 @@ public:
 
     // Remove all indexes from the set
     void clear();
-
-    void verify() const noexcept;
 
     // An iterator over the indivual indices in the set rather than the ranges
     class IndexIterator : public std::iterator<std::forward_iterator_tag, size_t> {
@@ -140,8 +235,6 @@ public:
     IndexIteratableAdaptor as_indexes() const { return *this; }
 
 private:
-    std::vector<value_type> m_ranges;
-
     // Find the range which contains the index, or the first one after it if
     // none do
     iterator find(size_t index);
@@ -153,9 +246,80 @@ private:
     void do_erase(iterator it, size_t index);
     iterator do_remove(iterator it, size_t index, size_t count);
 
-    // Add an index which must be greater than the largest index in the set
-    void add_back(size_t index);
+    void shift_until_end_by(iterator begin, ptrdiff_t shift);
 };
+
+namespace util {
+// This was added in C++14 but is missing from libstdc++ 4.9
+template<typename Iterator>
+std::reverse_iterator<Iterator> make_reverse_iterator(Iterator it)
+{
+    return std::reverse_iterator<Iterator>(it);
+}
+} // namespace util
+
+
+namespace _impl {
+template<typename T>
+template<typename OtherIterator>
+inline bool ChunkedRangeVectorIterator<T>::operator==(OtherIterator const& it) const
+{
+    return m_outer == it.outer() && m_inner == it.operator->();
+}
+
+template<typename T>
+template<typename OtherIterator>
+inline bool ChunkedRangeVectorIterator<T>::operator!=(OtherIterator const& it) const
+{
+    return !(*this == it);
+}
+
+template<typename T>
+inline ChunkedRangeVectorIterator<T>& ChunkedRangeVectorIterator<T>::operator++()
+{
+    ++m_inner;
+    if (offset() == m_outer->data.size())
+        next_chunk();
+    return *this;
+}
+
+template<typename T>
+inline ChunkedRangeVectorIterator<T> ChunkedRangeVectorIterator<T>::operator++(int)
+{
+    auto value = *this;
+    ++*this;
+    return value;
+}
+
+template<typename T>
+inline ChunkedRangeVectorIterator<T>& ChunkedRangeVectorIterator<T>::operator--()
+{
+    if (!m_inner || m_inner == &m_outer->data.front()) {
+        --m_outer;
+        m_inner = &m_outer->data.back();
+    }
+    else {
+        --m_inner;
+    }
+    return *this;
+}
+
+template<typename T>
+inline ChunkedRangeVectorIterator<T> ChunkedRangeVectorIterator<T>::operator--(int)
+{
+    auto value = *this;
+    --*this;
+    return value;
+}
+
+template<typename T>
+inline void ChunkedRangeVectorIterator<T>::next_chunk()
+{
+    ++m_outer;
+    m_inner = m_outer != m_end ? &m_outer->data[0] : nullptr;
+}
+} // namespace _impl
+
 } // namespace realm
 
 #endif // REALM_INDEX_SET_HPP
