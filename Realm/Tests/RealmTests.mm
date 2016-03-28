@@ -168,7 +168,10 @@ extern "C" {
 - (void)testFileFormatUpgradeRequiredButDisabled {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.disableFormatUpgrade = true;
-    config.path = [[NSBundle bundleForClass:RealmTests.class] pathForResource:@"fileformat-pre-null.realm" ofType:nil];
+
+    NSString *bundledRealmPath = [[NSBundle bundleForClass:[RealmTests class]] pathForResource:@"fileformat-pre-null.realm" ofType:nil];
+    [[NSFileManager defaultManager] copyItemAtPath:bundledRealmPath toPath:config.path error:nil];
+
     RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileFormatUpgradeRequired);
 }
 

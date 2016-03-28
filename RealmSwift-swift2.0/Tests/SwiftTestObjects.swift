@@ -18,6 +18,7 @@
 
 import Foundation
 import RealmSwift
+import Realm
 
 class SwiftStringObject: Object {
     dynamic var stringCol = ""
@@ -270,5 +271,38 @@ class SwiftIndexedOptinalPropertiesObject: Object {
     override class func indexedProperties() -> [String] {
         return ["optionalStringCol", "optionalIntCol", "optionalInt8Col", "optionalInt16Col",
             "optionalInt32Col", "optionalInt64Col", "optionalBoolCol", "optionalDateCol"]
+    }
+}
+
+class SwiftCustomInitializerObject: Object {
+    dynamic var stringCol: String
+
+    init(stringVal: String) {
+        stringCol = stringVal
+        super.init()
+    }
+
+    required init() {
+        stringCol = ""
+        super.init()
+    }
+
+    required init(realm: RLMRealm, schema: RLMObjectSchema) {
+        stringCol = ""
+        super.init(realm: realm, schema: schema)
+    }
+
+    required init(value: AnyObject, schema: RLMSchema) {
+        stringCol = ""
+        super.init(value: value, schema: schema)
+    }
+}
+
+class SwiftConvenienceInitializerObject: Object {
+    dynamic var stringCol = ""
+
+    convenience init(stringCol: String) {
+        self.init()
+        self.stringCol = stringCol
     }
 }
