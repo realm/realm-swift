@@ -29,7 +29,7 @@ class RLMObservationInfo;
 @interface RLMObjectBase () {
     @public
     realm::Row _row;
-    std::unique_ptr<RLMObservationInfo> _observationInfo;
+    RLMObservationInfo *_observationInfo;
 }
 @end
 
