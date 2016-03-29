@@ -474,6 +474,47 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
+- (void)testCommitWriteTransactionWithResultsNotification {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:5];
+        RLMResults *results = [StringObject allObjectsInRealm:realm];
+        id token = [results addNotificationBlock:^(__unused RLMResults *results, __unused RLMCollectionChange *change, __unused NSError *error) {
+            CFRunLoopStop(CFRunLoopGetCurrent());
+        }];
+        CFRunLoopRun();
+
+        [realm beginWriteTransaction];
+        [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol = 'a'"]];
+        [realm commitWriteTransaction];
+
+        [self startMeasuring];
+        CFRunLoopRun();
+        [token stop];
+    }];
+}
+
+- (void)testCommitWriteTransactionWithListNotification {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:5];
+        [realm beginWriteTransaction];
+        ArrayPropertyObject *arrayObj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
+        [realm commitWriteTransaction];
+
+        id token = [arrayObj.array addNotificationBlock:^(__unused RLMArray *results, __unused RLMCollectionChange *change, __unused NSError *error) {
+            CFRunLoopStop(CFRunLoopGetCurrent());
+        }];
+        CFRunLoopRun();
+
+        [realm beginWriteTransaction];
+        [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol = 'a'"]];
+        [realm commitWriteTransaction];
+
+        [self startMeasuring];
+        CFRunLoopRun();
+        [token stop];
+    }];
+}
+
 - (void)testCrossThreadSyncLatency {
     const int stopValue = 500;
 
