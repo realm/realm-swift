@@ -549,6 +549,10 @@ void ObjectStore::rename_column(Group *group, Schema& passed_schema, StringData 
     size_t column_to_remove = new_property->table_column;
     table->rename_column(old_property->table_column, new_name);
     table->remove_column(column_to_remove);
+    // update table_column for each property after the one we just removed
+    for (size_t i = column_to_remove; i < passed_object_schema->properties.size(); i++) {
+        passed_object_schema->properties[i].table_column--;
+    }
     if (new_property->is_primary && !old_property->is_primary) {
         set_primary_key_for_object(group, object_type, new_name);
     }
