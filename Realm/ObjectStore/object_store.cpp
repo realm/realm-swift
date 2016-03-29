@@ -432,7 +432,6 @@ void ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
     auto to_delete = create_tables(group, schema, migrating);
 
     if (!migrating) {
-        remove_properties(group, schema, to_delete);
         // If we aren't migrating, then verify that all of the tables which
         // were already present are valid (newly created ones always are)
         verify_schema(old_schema, schema, true);
