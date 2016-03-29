@@ -361,7 +361,7 @@ class SwiftPerformanceTests: TestCase {
                 }
             }
         }
-        _ = realm.path
+        _ = realm
     }
 
     func testRealmCreationUncached() {
