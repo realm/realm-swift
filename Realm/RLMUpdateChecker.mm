@@ -19,6 +19,7 @@
 #import "RLMUpdateChecker.hpp"
 
 #import "RLMRealm.h"
+#import "RLMUtil.hpp"
 
 #if TARGET_IPHONE_SIMULATOR && !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"
@@ -26,7 +27,7 @@
 
 void RLMCheckForUpdates() {
 #if TARGET_IPHONE_SIMULATOR
-    if (getenv("REALM_DISABLE_UPDATE_CHECKER")) {
+    if (getenv("REALM_DISABLE_UPDATE_CHECKER") || RLMIsRunningInPlayground()) {
         return;
     }
 
