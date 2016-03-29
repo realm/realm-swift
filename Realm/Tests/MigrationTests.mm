@@ -1197,8 +1197,8 @@ RLM_ARRAY_TYPE(MigrationObject);
     objectSchema.properties = afterProperties;
 
     RLMRealmConfiguration *config = [self renameConfigurationWithObjectSchemas:@[objectSchema, stringObjectSchema]
-                                                                migrationBlock:^(RLMMigration * _Nonnull migration, __unused uint64_t oldSchemaVersion) {
-        [afterProperties enumerateObjectsUsingBlock:^(RLMProperty * _Nonnull property, NSUInteger idx, __unused BOOL * _Nonnull stop) {
+                                                                migrationBlock:^(RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+        [afterProperties enumerateObjectsUsingBlock:^(RLMProperty *property, NSUInteger idx, __unused BOOL *stop) {
             [migration renamePropertyForClass:AllTypesObject.className oldName:[beforeProperties[idx] name] newName:property.name];
         }];
     }];
@@ -1207,7 +1207,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     RLMAssertRealmSchemaMatchesTable(self, realm);
 
-    RLMResults<AllTypesObject *> *allObjects = [AllTypesObject allObjectsInRealm:realm];
+    RLMResults *allObjects = [AllTypesObject allObjectsInRealm:realm];
     XCTAssertEqual(1U, allObjects.count);
     XCTAssertEqual(1U, [[StringObject allObjectsInRealm:realm] count]);
 
@@ -1292,8 +1292,8 @@ RLM_ARRAY_TYPE(MigrationObject);
 - (void)testMigrationRenamePropertyObjectTypeMismatch {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationLinkObject.class];
     RLMObjectSchema *migrationObjectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
-    NSArray<RLMProperty *> *afterProperties = objectSchema.properties;
-    NSMutableArray<RLMProperty *> *beforeProperties = [NSMutableArray arrayWithCapacity:2];
+    NSArray *afterProperties = objectSchema.properties;
+    NSMutableArray *beforeProperties = [NSMutableArray arrayWithCapacity:2];
     for (RLMProperty *property in afterProperties) {
         RLMProperty *beforeProperty = [property copyWithNewName:[NSString stringWithFormat:@"before_%@", property.name]];
         beforeProperty.objectClassName = MigrationLinkObject.className;
@@ -1308,10 +1308,10 @@ RLM_ARRAY_TYPE(MigrationObject);
     objectSchema.properties = afterProperties;
 
     [self assertPropertyRenameError:@"Old property 'before_object' of type '<MigrationLinkObject>' cannot be renamed to property 'object' of type '<MigrationObject>'."
-                      objectSchemas:@[objectSchema, migrationObjectSchema] className:MigrationLinkObject.className oldName:beforeProperties[0].name newName:afterProperties[0].name];
+                      objectSchemas:@[objectSchema, migrationObjectSchema] className:MigrationLinkObject.className oldName:[beforeProperties[0] name] newName:[afterProperties[0] name]];
 
     [self assertPropertyRenameError:@"Old property 'before_array' of type 'array<MigrationLinkObject>' cannot be renamed to property 'array' of type 'array<MigrationObject>'."
-                      objectSchemas:@[objectSchema, migrationObjectSchema] className:MigrationLinkObject.className oldName:beforeProperties[1].name newName:afterProperties[1].name];
+                      objectSchemas:@[objectSchema, migrationObjectSchema] className:MigrationLinkObject.className oldName:[beforeProperties[1] name] newName:[afterProperties[1] name]];
 }
 
 - (void)testMigrationRenameMissingPropertiesAndClasses {
