@@ -60,7 +60,7 @@ namespace {
 
 class SyncLogger: public util::Logger {
 public:
-    void do_log(const std::string& message) override
+    void do_log(std::string message) override
     {
         NSString *message2 = [[NSString alloc] initWithBytes:message.data()
                                                      length:message.size()
