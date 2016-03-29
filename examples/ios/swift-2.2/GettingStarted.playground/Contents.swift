@@ -10,32 +10,31 @@ import RealmSwift
 //: I. Define the data entities
 
 class Person: Object, CustomStringConvertible {
-    
+
     dynamic var name = ""
     dynamic var age = 0
     dynamic var spouse: Person?
-    
+
     let cars = List<Car>()
-    
+
     override var description: String { return "Person {\(name), \(age), \(spouse?.name)}" }
 }
 
 class Car: Object, CustomStringConvertible {
-    
+
     dynamic var brand = ""
     dynamic var name: String?
     dynamic var year = 0
-    
+
     override var description: String { return "Car {\(brand), \(name), \(year)}" }
 }
 
 //: II. Init the realm file
 
-Realm.Configuration.defaultConfiguration.inMemoryIdentifier = "TemporaryRealm"
-
-let realm = try! Realm()
+let realm = try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: "TemporaryRealm"))
 
 //: III. Create the objects
+
 let car1 = Car(value: ["brand": "BMW", "year": 1980])
 
 let car2 = Car()
@@ -43,17 +42,17 @@ car2.brand = "DeLorean"
 car2.name = "Outatime"
 car2.year = 1981
 
-//people
+// people
 let wife = Person()
 wife.name = "Jennifer"
 wife.cars.appendContentsOf([car1, car2])
 wife.age = 47
 
-let husband = Person(value:
-    ["name": "Marty",
-      "age": 47,
-   "spouse": wife]
-)
+let husband = Person(value: [
+    "name": "Marty",
+    "age": 47,
+    "spouse": wife
+])
 
 wife.spouse = husband
 
@@ -67,38 +66,33 @@ try! realm.write {
 
 let favorites = ["Jennifer"]
 
-for person in realm.objects(Person.self)
-    .filter("cars.@count > %i AND spouse != nil", 1)
+let favoritePeopleWithSpousesAndCars = realm.objects(Person)
+    .filter("cars.@count > 1 && spouse != nil && name IN %@", favorites)
     .sorted("age")
-    .filter({ person -> Bool in
-        return favorites.contains(person.name)
-    })
-{
-    
-    "fetched person"
+
+for person in favoritePeopleWithSpousesAndCars {
     person.name
     person.age
-    
-    if person.cars.count > 0 {
-        let car = person.cars[Int(arc4random_uniform(UInt32(person.cars.count)))]
-        
-        "fetched car"
-        car.name
-        car.brand
-        
-//: VI. Update objects
-        try! realm.write {
-            car.year += 1
-        }
-        car.year
+
+    guard let car = person.cars.first else {
+        continue
     }
+    car.name
+    car.brand
+
+//: VI. Update objects
+
+    try! realm.write {
+        car.year += 1
+    }
+    car.year
 }
 
 //: VII. Delete objects
+
 try! realm.write {
     realm.deleteAll()
 }
 
-realm.objects(Person.self).count
+realm.objects(Person).count
 //: Thanks! To learn more about Realm go to http://www.realm.io
-
