@@ -153,8 +153,9 @@
 		5D8DD54B1C62C5A4005077F2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5D8DD54C1C62C5A4005077F2 /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		5FC3B714C9E93753A534F397 /* Pods-ReactKitTableView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactKitTableView.release.xcconfig"; path = "Pods/Target Support Files/Pods-ReactKitTableView/Pods-ReactKitTableView.release.xcconfig"; sourceTree = "<group>"; };
-		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C318E8C1CA42C7800879076 /* GettingStarted.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = GettingStarted.playground; sourceTree = "<group>"; };
+		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBC0988E1843A2BB42BC405F /* Pods-ReactKitTableView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactKitTableView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ReactKitTableView/Pods-ReactKitTableView.debug.xcconfig"; sourceTree = "<group>"; };
 		D00630224166C0631FC7AD2B /* Pods_ReactKitTableView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ReactKitTableView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -300,6 +301,7 @@
 		E805758C19BA55E600376620 = {
 			isa = PBXGroup;
 			children = (
+				9C318E8C1CA42C7800879076 /* GettingStarted.playground */,
 				0A73D4411B1443A700E1E8EE /* README.md */,
 				E8D3F2751A11766A00620884 /* Backlink */,
 				E8CB087F19BA6AEE0018434A /* Encryption */,
