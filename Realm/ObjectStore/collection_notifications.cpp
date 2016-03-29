@@ -284,52 +284,43 @@ void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
     else
         modifications.remove(row_ndx);
 
+    bool row_is_insertion = insertions.contains(row_ndx);
+    bool last_is_insertion = !insertions.empty() && prev(insertions.end())->second == last_row + 1;
+    REALM_ASSERT_DEBUG(insertions.empty() || prev(insertions.end())->second <= last_row + 1);
+
     bool updated_existing_move = false;
-    for (size_t i = 0; i < moves.size(); ++i) {
-        auto& move = moves[i];
-        // Remove moves to the row being deleted
-        if (move.to == row_ndx) {
-            moves.erase(moves.begin() + i);
-            --i;
-            continue;
+    if (row_is_insertion || last_is_insertion) {
+        for (size_t i = 0; i < moves.size(); ++i) {
+            auto& move = moves[i];
+            // Remove moves to the row being deleted
+            if (move.to == row_ndx) {
+                moves.erase(moves.begin() + i);
+                --i;
+                continue;
+            }
+            if (move.to != last_row)
+                continue;
+            REALM_ASSERT(!updated_existing_move);
+
+            // Collapse A -> B, B -> C into a single A -> C move
+            move.to = row_ndx;
+            updated_existing_move = true;
         }
-        if (move.to != last_row)
-            continue;
-        REALM_ASSERT(!updated_existing_move);
-
-        // Collapse A -> B, B -> C into a single A -> C move
-        move.to = row_ndx;
-        updated_existing_move = true;
-
-        if (!insertions.empty()) {
-            REALM_ASSERT(std::prev(insertions.end())->second - 1 <= last_row);
-            insertions.remove(last_row);
-        }
-
-        // Don't mark the moved-over row as deleted if it was a new insertion
-        if (!insertions.contains(row_ndx)) {
-            deletions.add_shifted(insertions.unshift(row_ndx));
-            insertions.add(row_ndx);
-        }
-
-        // Because this is a move, the unshifted source row has already been marked as deleted
     }
-
-    if (updated_existing_move)
-        return;
 
     // Don't report deletions/moves if last_row is newly inserted
-    if (!insertions.empty() && prev(insertions.end())->second == last_row + 1) {
+    if (last_is_insertion) {
         insertions.remove(last_row);
     }
-    else {
+    // If it was previously moved, the unshifted source row has already been marked as deleted
+    else if (!updated_existing_move) {
         auto shifted_last_row = insertions.unshift(last_row);
         shifted_last_row = deletions.add_shifted(shifted_last_row);
         moves.push_back({shifted_last_row, row_ndx});
     }
 
     // Don't mark the moved-over row as deleted if it was a new insertion
-    if (!insertions.contains(row_ndx)) {
+    if (!row_is_insertion) {
         deletions.add_shifted(insertions.unshift(row_ndx));
         insertions.add(row_ndx);
     }
