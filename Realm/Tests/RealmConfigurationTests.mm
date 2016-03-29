@@ -118,17 +118,19 @@
 
 - (void)testDefaultRealmUsesDefaultConfiguration {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.path, config.path); }
+    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.path, config.path); }
 
     config.path = RLMTestRealmPath();
-    @autoreleasepool { XCTAssertNotEqualObjects(RLMRealm.defaultRealm.path, config.path); }
+    @autoreleasepool { XCTAssertNotEqualObjects(RLMRealm.defaultRealm.configuration.path, config.path); }
     RLMRealmConfiguration.defaultConfiguration = config;
-    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.path, config.path); }
+    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.path, config.path); }
 
     config.inMemoryIdentifier = @"default";
     RLMRealmConfiguration.defaultConfiguration = config;
     @autoreleasepool {
         RLMRealm *realm = RLMRealm.defaultRealm;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         XCTAssertTrue([realm.path hasSuffix:@"/default"]);
         XCTAssertTrue([realm.path hasPrefix:NSTemporaryDirectory()]);
     }
@@ -139,6 +141,7 @@
         RLMRealm *realm = RLMRealm.defaultRealm;
         XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:realm.path error:nil]);
     }
+#pragma clang diagnostic pop
 
     config.path = RLMDefaultRealmPath();
     RLMRealmConfiguration.defaultConfiguration = config;

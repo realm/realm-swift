@@ -90,7 +90,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Path to the file where this Realm is persisted.
  */
-@property (nonatomic, readonly) NSString *path;
+@property (nonatomic, readonly) NSString *path DEPRECATED_MSG_ATTRIBUTE("use configuration.path");
 
 /**
  Indicates if this Realm was opened in read-only mode.

@@ -69,8 +69,11 @@ extern "C" {
     config.inMemoryIdentifier = @"identifier";
     RLMRealm *inMemoryRealm = [RLMRealm realmWithConfiguration:config error:nil];
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     // make sure we can't open disk-realm at same path
     config.path = inMemoryRealm.path;
+#pragma clang diagnostic pop
     NSError *error; // passing in a reference to assert that this error can't be catched!
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:&error], @"Realm at path '.*' already opened with different inMemory settings");
 }
@@ -1090,7 +1093,7 @@ extern "C" {
     // runloop) is actually destroyed
     std::thread([&] { realm = [RLMRealm defaultRealm]; }).join();
 
-    [realm path]; // ensure ARC releases the object after the thread has finished
+    [realm.configuration path]; // ensure ARC releases the object after the thread has finished
 }
 
 - (void)testBackgroundRealmIsNotified {
@@ -1396,7 +1399,7 @@ extern "C" {
     RLMRealm *realm = [self realmWithTestPath];
 
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.path = realm.path;
+    configuration.path = realm.configuration.path;
     XCTAssertThrows([RLMRealm migrateRealm:configuration]);
 }
 
@@ -1424,7 +1427,7 @@ extern "C" {
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
         return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
     };
-    unsigned long long fileSizeBefore = fileSize(realm.path);
+    unsigned long long fileSizeBefore = fileSize(realm.configuration.path);
     StringObject *object = [StringObject allObjectsInRealm:realm].firstObject;
 
     XCTAssertTrue([realm compact]);
@@ -1434,7 +1437,7 @@ extern "C" {
     XCTAssertEqualObjects(@"A", [[StringObject allObjectsInRealm:realm].firstObject stringCol]);
     XCTAssertEqualObjects(@"B", [[StringObject allObjectsInRealm:realm].lastObject stringCol]);
 
-    unsigned long long fileSizeAfter = fileSize(realm.path);
+    unsigned long long fileSizeAfter = fileSize(realm.configuration.path);
     XCTAssertGreaterThan(fileSizeBefore, fileSizeAfter);
 }
 
