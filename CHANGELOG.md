@@ -5,6 +5,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Deprecate `-[RLMRealm removeNotification:]` in favor of
   `-[RLMNotificationToken stop]`.
+* `RLMRealm.path` and `RLMRealm.readOnly` have been deprecated in favor of their
+  counterparts on `RLMRealmConfiguration`.
 
 ### Enhancements
 
