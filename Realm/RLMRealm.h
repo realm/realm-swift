@@ -95,7 +95,7 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Indicates if this Realm was opened in read-only mode.
  */
-@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
+@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly DEPRECATED_MSG_ATTRIBUTE("use configuration.readOnly");
 
 /**
  The RLMSchema used by this RLMRealm.

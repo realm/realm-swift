@@ -411,15 +411,11 @@ void RLMRealmTranslateException(NSError **error) {
     [RLMRealmConfiguration resetRealmConfigurationState];
 }
 
-static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a read-only Realm") {
-    if (realm.readOnly) {
-        @throw RLMException(@"%@", msg);
-    }
-}
-
 - (void)verifyNotificationsAreSupported {
     [self verifyThread];
-    CheckReadWrite(self, @"Read-only Realms do not change and do not have change notifications");
+    if (self.configuration.readOnly) {
+        @throw RLMException(@"Read-only Realms do not change and do not have change notifications");
+    }
     if (!_realm->can_deliver_notifications()) {
         @throw RLMException(@"Can only add notification blocks from within runloops.");
     }
@@ -454,7 +450,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)sendNotifications:(NSString *)notification {
-    NSAssert(!self.readOnly, @"Read-only realms do not have notifications");
+    NSAssert(!self.configuration.readOnly, @"Read-only realms do not have notifications");
 
     // call this realms notification blocks
     for (RLMRealmNotificationToken *token in [_notificationHandlers allObjects]) {
