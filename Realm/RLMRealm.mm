@@ -413,7 +413,7 @@ void RLMRealmTranslateException(NSError **error) {
 
 - (void)verifyNotificationsAreSupported {
     [self verifyThread];
-    if (self.configuration.readOnly) {
+    if (_realm->config().read_only) {
         @throw RLMException(@"Read-only Realms do not change and do not have change notifications");
     }
     if (!_realm->can_deliver_notifications()) {
@@ -450,7 +450,7 @@ void RLMRealmTranslateException(NSError **error) {
 }
 
 - (void)sendNotifications:(NSString *)notification {
-    NSAssert(!self.configuration.readOnly, @"Read-only realms do not have notifications");
+    NSAssert(!_realm->config().read_only, @"Read-only realms do not have notifications");
 
     // call this realms notification blocks
     for (RLMRealmNotificationToken *token in [_notificationHandlers allObjects]) {
