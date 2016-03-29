@@ -163,7 +163,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @param notificationToken   The token returned from `-addNotificationBlock:`
                             corresponding to the notification block to remove.
  */
-- (void)removeNotification:(RLMNotificationToken *)notificationToken;
+- (void)removeNotification:(RLMNotificationToken *)notificationToken DEPRECATED_MSG_ATTRIBUTE("use -[RLMNotificationToken stop]");
 
 #pragma mark - Transactions
 
