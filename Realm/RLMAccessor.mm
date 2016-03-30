@@ -508,7 +508,7 @@ static IMP RLMAccessorGetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
 
 template<typename Function>
 static void RLMWrapSetter(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained NSString *const name, Function&& f) {
-    if (RLMObservationInfo *info = RLMGetObservationInfo(obj->_observationInfo.get(), obj->_row.get_index(), obj->_objectSchema)) {
+    if (RLMObservationInfo *info = RLMGetObservationInfo(obj->_observationInfo, obj->_row.get_index(), obj->_objectSchema)) {
         info->willChange(name);
         f();
         info->didChange(name);

@@ -64,6 +64,13 @@ static bool RLMInitializedObjectSchema(RLMObjectBase *obj) {
     return self;
 }
 
+- (void)dealloc {
+    // This can't be a unique_ptr because associated objects are removed
+    // *after* c++ members are destroyed, and we need it to still be alive when
+    // that happens
+    delete _observationInfo;
+}
+
 static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
     if (RLMIsObjectValidForProperty(obj, prop)) {
         return obj;
@@ -286,7 +293,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
             options:(NSKeyValueObservingOptions)options
             context:(void *)context {
     if (!_observationInfo) {
-        _observationInfo = std::make_unique<RLMObservationInfo>(self);
+        _observationInfo = new RLMObservationInfo(self);
     }
     _observationInfo->recordObserver(_row, _objectSchema, keyPath);
 
@@ -298,16 +305,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     _observationInfo->removeObserver();
 }
 
-- (void *)observationInfo {
-    return _observationInfo ? _observationInfo->kvoInfo : nullptr;
-}
-
-- (void)setObservationInfo:(void *)observationInfo {
-    _observationInfo->kvoInfo = observationInfo;
-}
-
-+ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
-{
++ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key {
     const char *className = class_getName(self);
     const char accessorClassPrefix[] = "RLMAccessor_";
     if (!strncmp(className, accessorClassPrefix, sizeof(accessorClassPrefix) - 1)) {
