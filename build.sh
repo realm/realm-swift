@@ -909,10 +909,12 @@ case "$COMMAND" in
           mv core/include include/core
 
           mkdir -p include/impl/apple
+          mkdir -p include/util
           cp Realm/*.hpp include
           cp Realm/ObjectStore/*.hpp include
           cp Realm/ObjectStore/impl/*.hpp include/impl
           cp Realm/ObjectStore/impl/apple/*.hpp include/impl/apple
+          cp Realm/ObjectStore/util/*.hpp include/util
 
           touch Realm/RLMPlatform.h
           if [ -n "$COCOAPODS_VERSION" ]; then
