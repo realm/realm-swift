@@ -289,17 +289,25 @@ download_core() {
     mkdir -p "${TMP_DIR}"
     CORE_TMP_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2.tmp"
     CORE_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2"
+    CORE_CACHE_NAME="realm-core-${REALM_CORE_VERSION}.tar.bz2"
+
     if [ ! -f "${CORE_TAR}" ]; then
-        local CORE_URL="https://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.bz2"
-        set +e # temporarily disable immediate exit
-        local ERROR # sweeps the exit code unless declared separately
-        ERROR=$(curl --fail --silent --show-error --location "$CORE_URL" --output "${CORE_TMP_TAR}" 2>&1 >/dev/null)
-        if [[ $? -ne 0 ]]; then
-            echo "Downloading core failed:\n${ERROR}"
-            exit 1
+        if [ -f ${CORE_CACHE_NAME} ]; then
+          echo "using cache ${CORE_CACHE_NAME}"
+          mv ${CORE_CACHE_NAME} "${CORE_TAR}"
+        else
+          local CORE_URL="https://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.bz2"
+          echo "Downloading ${CORE_URL}"
+          set +e # temporarily disable immediate exit
+          local ERROR # sweeps the exit code unless declared separately
+          ERROR=$(curl --fail --silent --show-error --location "$CORE_URL" --output "${CORE_TMP_TAR}" 2>&1 >/dev/null)
+          if [[ $? -ne 0 ]]; then
+              echo "Downloading core failed:\n${ERROR}"
+              exit 1
+          fi
+          set -e # re-enable flag
+          mv "${CORE_TMP_TAR}" "${CORE_TAR}"
         fi
-        set -e # re-enable flag
-        mv "${CORE_TMP_TAR}" "${CORE_TAR}"
     fi
 
     (
