@@ -79,7 +79,7 @@ class SwiftRealmTests: RLMTestCase {
             try! realm.commitWriteTransaction()
         }
         waitForExpectationsWithTimeout(2.0, handler: nil)
-        realm.removeNotification(token)
+        token.stop()
 
         // get object
         let objects = SwiftStringObject.allObjectsInRealm(realm)
@@ -137,7 +137,7 @@ class SwiftRealmTests: RLMTestCase {
         }
 
         waitForExpectationsWithTimeout(2.0, handler: nil)
-        realm.removeNotification(token)
+        token.stop()
     }
 
     func testRealmIsUpdatedImmediatelyAfterBackgroundUpdate() {
@@ -162,7 +162,7 @@ class SwiftRealmTests: RLMTestCase {
         }
 
         waitForExpectationsWithTimeout(2.0, handler: nil)
-        realm.removeNotification(token)
+        token.stop()
 
         // get object
         let objects = SwiftStringObject.allObjectsInRealm(realm)
@@ -216,7 +216,7 @@ class SwiftRealmTests: RLMTestCase {
             try! realm.commitWriteTransaction()
         }
         waitForExpectationsWithTimeout(2.0, handler: nil)
-        realm.removeNotification(token)
+        token.stop()
 
         // get object
         let objects = StringObject.allObjectsInRealm(realm)
@@ -247,7 +247,7 @@ class SwiftRealmTests: RLMTestCase {
         }
 
         waitForExpectationsWithTimeout(2.0, handler: nil)
-        realm.removeNotification(token)
+        token.stop()
 
         // get object
         let objects = StringObject.allObjectsInRealm(realm)

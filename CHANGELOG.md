@@ -3,7 +3,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* Deprecate `-[RLMRealm removeNotification:]` in favor of
+  `-[RLMNotificationToken stop]`.
 
 ### Enhancements
 
