@@ -24,6 +24,7 @@
 
 #include <exception>
 #include <functional>
+#include <unordered_map>
 
 namespace realm {
 namespace _impl {
@@ -95,8 +96,13 @@ public:
     void clear(size_t old_size);
     void move(size_t from, size_t to);
 
+    void parse_complete();
+
 private:
+    std::unordered_map<size_t, size_t> m_move_mapping;
+
     void verify();
+
 };
 } // namespace _impl
 } // namespace realm

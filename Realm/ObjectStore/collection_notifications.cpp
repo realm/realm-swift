@@ -172,6 +172,19 @@ void CollectionChangeBuilder::clean_up_stale_moves()
     }), end(moves));
 }
 
+void CollectionChangeBuilder::parse_complete()
+{
+    moves.reserve(m_move_mapping.size());
+    for (auto move : m_move_mapping) {
+        REALM_ASSERT_DEBUG(deletions.contains(move.second));
+        REALM_ASSERT_DEBUG(insertions.contains(move.first));
+        moves.push_back({move.second, move.first});
+    }
+    m_move_mapping.clear();
+    std::sort(begin(moves), end(moves),
+              [](auto const& a, auto const& b) { return a.from < b.from; });
+}
+
 void CollectionChangeBuilder::modify(size_t ndx)
 {
     modifications.add(ndx);
@@ -218,12 +231,14 @@ void CollectionChangeBuilder::clear(size_t old_size)
     modifications.clear();
     insertions.clear();
     moves.clear();
+    m_move_mapping.clear();
     deletions.set(old_size);
 }
 
 void CollectionChangeBuilder::move(size_t from, size_t to)
 {
     REALM_ASSERT(from != to);
+    REALM_ASSERT(m_move_mapping.empty());
 
     bool updated_existing_move = false;
     for (auto& move : moves) {
@@ -268,6 +283,7 @@ void CollectionChangeBuilder::move(size_t from, size_t to)
 
 void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
 {
+    REALM_ASSERT(moves.empty());
     REALM_ASSERT(row_ndx <= last_row);
     REALM_ASSERT(insertions.empty() || prev(insertions.end())->second - 1 <= last_row);
     REALM_ASSERT(modifications.empty() || prev(modifications.end())->second - 1 <= last_row);
@@ -288,24 +304,22 @@ void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
     bool last_is_insertion = !insertions.empty() && prev(insertions.end())->second == last_row + 1;
     REALM_ASSERT_DEBUG(insertions.empty() || prev(insertions.end())->second <= last_row + 1);
 
-    bool updated_existing_move = false;
-    if (row_is_insertion || last_is_insertion) {
-        for (size_t i = 0; i < moves.size(); ++i) {
-            auto& move = moves[i];
-            // Remove moves to the row being deleted
-            if (move.to == row_ndx) {
-                moves.erase(moves.begin() + i);
-                --i;
-                continue;
-            }
-            if (move.to != last_row)
-                continue;
-            REALM_ASSERT(!updated_existing_move);
-
-            // Collapse A -> B, B -> C into a single A -> C move
-            move.to = row_ndx;
-            updated_existing_move = true;
+    // Collapse A -> B, B -> C into a single A -> C move
+    bool last_was_already_moved = false;
+    if (last_is_insertion) {
+        auto it = m_move_mapping.find(last_row);
+        if (it != m_move_mapping.end() && it->first == last_row) {
+            m_move_mapping[row_ndx] = it->second;
+            m_move_mapping.erase(it);
+            last_was_already_moved = true;
         }
+    }
+
+    // Remove moves to the row being deleted
+    if (row_is_insertion && !last_was_already_moved) {
+        auto it = m_move_mapping.find(row_ndx);
+        if (it != m_move_mapping.end() && it->first == row_ndx)
+            m_move_mapping.erase(it);
     }
 
     // Don't report deletions/moves if last_row is newly inserted
@@ -313,10 +327,10 @@ void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
         insertions.remove(last_row);
     }
     // If it was previously moved, the unshifted source row has already been marked as deleted
-    else if (!updated_existing_move) {
+    else if (!last_was_already_moved) {
         auto shifted_last_row = insertions.unshift(last_row);
         shifted_last_row = deletions.add_shifted(shifted_last_row);
-        moves.push_back({shifted_last_row, row_ndx});
+        m_move_mapping[row_ndx] = shifted_last_row;
     }
 
     // Don't mark the moved-over row as deleted if it was a new insertion

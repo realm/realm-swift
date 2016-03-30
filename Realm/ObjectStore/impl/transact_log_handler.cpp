@@ -446,8 +446,10 @@ public:
 
     void parse_complete()
     {
-        for (auto& list : m_info.lists)
-        {
+        for (auto& table : m_info.tables) {
+            table.parse_complete();
+        }
+        for (auto& list : m_info.lists) {
             list.changes->clean_up_stale_moves();
         }
     }

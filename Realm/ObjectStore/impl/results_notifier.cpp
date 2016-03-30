@@ -106,13 +106,11 @@ void ResultsNotifier::run()
             next_rows.push_back(m_tv[i].get_index());
 
         if (changes) {
-            auto move_map = changes->moves;
-            std::sort(begin(move_map), end(move_map),
-                      [](auto const& a, auto const& b) { return a.from < b.from; });
+            auto const& moves = changes->moves;
             for (auto& idx : m_previous_rows) {
-                auto it = lower_bound(begin(move_map), end(move_map), idx,
+                auto it = lower_bound(begin(moves), end(moves), idx,
                                       [](auto const& a, auto b) { return a.from < b; });
-                if (it != move_map.end() && it->from == idx)
+                if (it != moves.end() && it->from == idx)
                     idx = it->to;
                 else if (changes->deletions.contains(idx))
                     idx = npos;
