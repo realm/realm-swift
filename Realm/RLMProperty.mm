@@ -206,7 +206,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
                 Class cls = [RLMSchema classForString:className];
                 if (!cls) {
                     @throw RLMException(@"Property '%@' is declared as '%@', which is not a supported RLMObject property type. "
-                                        @"All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. "
+                                        @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, or subclasses of RLMObject. "
                                         @"See https://realm.io/docs/objc/latest/api/Classes/RLMObject.html for more information.", _name, className);
                 }
 
