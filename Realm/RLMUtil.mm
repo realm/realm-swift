@@ -344,6 +344,10 @@ BOOL RLMIsDebuggerAttached()
     return (info.kp_proc.p_flag & P_TRACED) != 0;
 }
 
+BOOL RLMIsRunningInPlayground() {
+    return [[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."];
+}
+
 id RLMMixedToObjc(realm::Mixed const& mixed) {
     switch (mixed.get_type()) {
         case realm::type_String:

@@ -29,6 +29,7 @@
 
 #import <atomic>
 #import <memory>
+#import <objc/runtime.h>
 #import <vector>
 
 RLM_ARRAY_TYPE(KVOObject)
@@ -133,6 +134,30 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @end
 @implementation ObjectWithNoLinksToOrFrom
 @end
+
+// An object which removes a KVO registration when it's deallocated, for use
+// as an associated object
+@interface KVOUnregisterHelper : NSObject
+@end
+@implementation KVOUnregisterHelper {
+    __unsafe_unretained id _obj;
+    __unsafe_unretained id _observer;
+    NSString *_keyPath;
+}
+
++ (void)automaticallyUnregister:(id)observer object:(id)obj keyPath:(NSString *)keyPath {
+    KVOUnregisterHelper *helper = [self new];
+    helper->_observer = observer;
+    helper->_obj = obj;
+    helper->_keyPath = keyPath;
+    objc_setAssociatedObject(obj, (__bridge void *)helper, helper, OBJC_ASSOCIATION_RETAIN);
+}
+
+- (void)dealloc {
+    [_obj removeObserver:_observer forKeyPath:_keyPath];
+}
+@end
+
 
 @interface KVOTests : RLMTestCase
 // get an object that should be observed for the given object being mutated
@@ -1047,6 +1072,15 @@ public:
     XCTAssertThrows([obj.arrayCol addObserver:self forKeyPath:@"self" options:0 context:0]);
     XCTAssertNoThrow([obj.arrayCol addObserver:self forKeyPath:RLMInvalidatedKey options:0 context:0]);
     XCTAssertNoThrow([obj.arrayCol removeObserver:self forKeyPath:RLMInvalidatedKey context:0]);
+}
+
+- (void)testUnregisteringViaAnAssociatedObject {
+    @autoreleasepool {
+        __attribute__((objc_precise_lifetime)) KVOObject *obj = [self createObject];
+        [obj addObserver:self forKeyPath:@"boolCol" options:0 context:0];
+        [KVOUnregisterHelper automaticallyUnregister:self object:obj keyPath:@"boolCol"];
+    }
+    // Throws if the unregistration doesn't succeed
 }
 
 @end

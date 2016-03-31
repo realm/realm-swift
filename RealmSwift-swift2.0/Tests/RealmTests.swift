@@ -100,7 +100,9 @@ class RealmTests: TestCase {
     #if DEBUG
     func testFileFormatUpgradeRequiredButDisabled() {
         var config = Realm.Configuration()
-        config.path = NSBundle(forClass: RealmTests.self).pathForResource("fileformat-pre-null.realm", ofType: nil)!
+        var bundledRealmPath = NSBundle(forClass: RealmTests.self).pathForResource("fileformat-pre-null.realm",
+                                                                                   ofType: nil)!
+        try! NSFileManager.defaultManager.copyItemAtPath(bundledRealmPath, toPath: config.path)
         config.disableFormatUpgrade = true
         assertFails(Error.FileFormatUpgradeRequired) {
             try Realm(configuration: config)
@@ -535,7 +537,7 @@ class RealmTests: TestCase {
         XCTAssertFalse(notificationCalled)
         try! realm.write {}
         XCTAssertTrue(notificationCalled)
-        realm.removeNotification(token)
+        token.stop()
     }
 
     func testRemoveNotification() {
@@ -545,7 +547,7 @@ class RealmTests: TestCase {
             XCTAssertEqual(realm.path, self.defaultRealmPath())
             notificationCalled = true
         }
-        realm.removeNotification(token)
+        token.stop()
         try! realm.write {}
         XCTAssertFalse(notificationCalled)
     }
@@ -573,7 +575,7 @@ class RealmTests: TestCase {
             }
         }
         waitForExpectationsWithTimeout(1, handler: nil)
-        realm.removeNotification(token)
+        token.stop()
 
         // get object
         let results = realm.objects(SwiftStringObject)
@@ -603,7 +605,7 @@ class RealmTests: TestCase {
             }
         }
         waitForExpectationsWithTimeout(1, handler: nil)
-        realm.removeNotification(token)
+        token.stop()
 
         XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
 

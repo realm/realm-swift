@@ -126,10 +126,6 @@ private:
     RLMObservationInfo(RLMObservationInfo&&) = delete;
     RLMObservationInfo& operator=(RLMObservationInfo const&) = delete;
     RLMObservationInfo& operator=(RLMObservationInfo&&) = delete;
-
-public:
-    // storage for the observationInfo property on RLMObjectBase
-    void *kvoInfo = nullptr;
 };
 
 // Get the the observation info chain for the given row

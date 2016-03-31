@@ -40,7 +40,11 @@ This simple app demonstrates how to define models with inverse relationships usi
 
 ## iOS (Swift)
 
-In the `ios/swift/RealmExamples.xcodeproj` project, you will find the following examples (Xcode6-Beta6 required):
+In the `ios/swift/RealmExamples.xcodeproj` project, you will find the following examples:
+
+### GettingStarted.playground
+
+This is a Swift Playground that goes over a few Realm basics.
 
 ### Simple
 
