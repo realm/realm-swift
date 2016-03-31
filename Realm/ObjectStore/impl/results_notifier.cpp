@@ -65,6 +65,12 @@ bool ResultsNotifier::do_add_required_change_info(TransactionChangeInfo& info)
 {
     REALM_ASSERT(m_query);
     m_info = &info;
+
+    auto table_ndx = m_query->get_table()->get_index_in_group();
+    if (info.table_moves_needed.size() <= table_ndx)
+        info.table_moves_needed.resize(table_ndx + 1);
+    info.table_moves_needed[table_ndx] = true;
+
     return m_initial_run_complete && have_callbacks();
 }
 

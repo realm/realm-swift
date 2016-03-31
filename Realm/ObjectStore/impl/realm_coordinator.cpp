@@ -370,7 +370,7 @@ void RealmCoordinator::run_async_notifiers()
         for (auto& notifier : new_notifiers) {
             if (version != notifier->version()) {
                 transaction::advance(*m_advancer_sg, *info, notifier->version());
-                change_info.push_back({{}, std::move(info->lists)});
+                change_info.push_back({{}, {}, std::move(info->lists)});
                 info = &change_info.back();
                 version = notifier->version();
             }

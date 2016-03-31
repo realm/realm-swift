@@ -166,10 +166,10 @@ void BackgroundCollection::add_required_change_info(TransactionChangeInfo& info)
     }
 
     auto max = *max_element(begin(m_relevant_tables), end(m_relevant_tables)) + 1;
-    if (max > info.tables_needed.size())
-        info.tables_needed.resize(max, false);
+    if (max > info.table_modifications_needed.size())
+        info.table_modifications_needed.resize(max, false);
     for (auto table_ndx : m_relevant_tables) {
-        info.tables_needed[table_ndx] = true;
+        info.table_modifications_needed[table_ndx] = true;
     }
 }
 
@@ -384,9 +384,12 @@ void CollectionChangeBuilder::modify(size_t ndx)
     modifications.add(ndx);
 }
 
-void CollectionChangeBuilder::insert(size_t index, size_t count)
+void CollectionChangeBuilder::insert(size_t index, size_t count, bool track_moves)
 {
     modifications.shift_for_insert_at(index, count);
+    if (!track_moves)
+        return;
+
     insertions.insert_at(index, count);
 
     for (auto& move : moves) {
@@ -474,12 +477,12 @@ void CollectionChangeBuilder::move(size_t from, size_t to)
         modifications.shift_for_insert_at(to);
 }
 
-void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
+void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row, bool track_moves)
 {
     REALM_ASSERT(row_ndx <= last_row);
     REALM_ASSERT(insertions.empty() || prev(insertions.end())->second - 1 <= last_row);
     REALM_ASSERT(modifications.empty() || prev(modifications.end())->second - 1 <= last_row);
-    if (row_ndx == last_row) {
+    if (track_moves && row_ndx == last_row) {
         erase(row_ndx);
         return;
     }
@@ -491,6 +494,9 @@ void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row)
     }
     else
         modifications.remove(row_ndx);
+
+    if (!track_moves)
+        return;
 
     bool row_is_insertion = insertions.contains(row_ndx);
     bool last_is_insertion = !insertions.empty() && prev(insertions.end())->second == last_row + 1;

@@ -426,12 +426,18 @@ class LinkViewObserver : public TransactLogValidationMixin, public MarkDirtyMixi
     _impl::CollectionChangeBuilder* get_change()
     {
         auto tbl_ndx = current_table();
-        if (tbl_ndx >= m_info.tables_needed.size() || !m_info.tables_needed[tbl_ndx])
+        if (tbl_ndx >= m_info.table_modifications_needed.size() || !m_info.table_modifications_needed[tbl_ndx])
             return nullptr;
         if (m_info.tables.size() <= tbl_ndx) {
             m_info.tables.resize(std::max(m_info.tables.size() * 2, tbl_ndx + 1));
         }
         return &m_info.tables[tbl_ndx];
+    }
+
+    bool need_move_info() const
+    {
+        auto tbl_ndx = current_table();
+        return tbl_ndx < m_info.table_moves_needed.size() && m_info.table_moves_needed[tbl_ndx];
     }
 
 public:
@@ -520,7 +526,7 @@ public:
     {
         REALM_ASSERT(!unordered);
         if (auto change = get_change())
-            change->insert(row_ndx, num_rows_to_insert);
+            change->insert(row_ndx, num_rows_to_insert, need_move_info());
 
         return true;
     }
@@ -544,7 +550,7 @@ public:
         }
 
         if (auto change = get_change())
-            change->move_over(row_ndx, last_row);
+            change->move_over(row_ndx, last_row, need_move_info());
         return true;
     }
 
@@ -598,7 +604,7 @@ void advance(SharedGroup& sg,
              TransactionChangeInfo& info,
              SharedGroup::VersionID version)
 {
-    if (info.tables_needed.empty() && info.lists.empty()) {
+    if (info.table_modifications_needed.empty() && info.lists.empty()) {
         LangBindHelper::advance_read(sg, version);
     }
     else {

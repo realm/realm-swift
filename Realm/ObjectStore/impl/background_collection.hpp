@@ -52,10 +52,10 @@ public:
     void merge(CollectionChangeBuilder&&);
     void clean_up_stale_moves();
 
-    void insert(size_t ndx, size_t count=1);
+    void insert(size_t ndx, size_t count=1, bool track_moves=true);
     void modify(size_t ndx);
     void erase(size_t ndx);
-    void move_over(size_t ndx, size_t last_ndx);
+    void move_over(size_t ndx, size_t last_ndx, bool track_moves=true);
     void clear(size_t old_size);
     void move(size_t from, size_t to);
 
@@ -75,7 +75,8 @@ struct ListChangeInfo {
 };
 
 struct TransactionChangeInfo {
-    std::vector<bool> tables_needed;
+    std::vector<bool> table_modifications_needed;
+    std::vector<bool> table_moves_needed;
     std::vector<ListChangeInfo> lists;
     std::vector<CollectionChangeBuilder> tables;
 
