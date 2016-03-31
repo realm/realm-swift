@@ -23,8 +23,6 @@
 #include "util/atomic_shared_ptr.hpp"
 
 #include <exception>
-#include <functional>
-#include <unordered_map>
 
 namespace realm {
 namespace _impl {
@@ -62,49 +60,9 @@ struct CollectionChangeIndices {
     std::vector<Move> moves;
 
     bool empty() const { return deletions.empty() && insertions.empty() && modifications.empty() && moves.empty(); }
-
-    CollectionChangeIndices(CollectionChangeIndices const&) = default;
-    CollectionChangeIndices(CollectionChangeIndices&&) = default;
-    CollectionChangeIndices& operator=(CollectionChangeIndices const&) = default;
-    CollectionChangeIndices& operator=(CollectionChangeIndices&&) = default;
-
-    CollectionChangeIndices(IndexSet deletions = {},
-                            IndexSet insertions = {},
-                            IndexSet modification = {},
-                            std::vector<Move> moves = {});
 };
 
 using CollectionChangeCallback = std::function<void (CollectionChangeIndices, std::exception_ptr)>;
-
-namespace _impl {
-class CollectionChangeBuilder : public CollectionChangeIndices {
-public:
-    using CollectionChangeIndices::CollectionChangeIndices;
-
-    static CollectionChangeBuilder calculate(std::vector<size_t> const& old_rows,
-                                             std::vector<size_t> const& new_rows,
-                                             std::function<bool (size_t)> row_did_change,
-                                             bool sort);
-
-    void merge(CollectionChangeBuilder&&);
-    void clean_up_stale_moves();
-
-    void insert(size_t ndx, size_t count=1);
-    void modify(size_t ndx);
-    void erase(size_t ndx);
-    void move_over(size_t ndx, size_t last_ndx);
-    void clear(size_t old_size);
-    void move(size_t from, size_t to);
-
-    void parse_complete();
-
-private:
-    std::unordered_map<size_t, size_t> m_move_mapping;
-
-    void verify();
-
-};
-} // namespace _impl
 } // namespace realm
 
 #endif // REALM_COLLECTION_NOTIFICATIONS_HPP

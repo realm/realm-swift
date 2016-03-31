@@ -26,11 +26,47 @@
 #include <mutex>
 #include <functional>
 #include <thread>
+#include <unordered_map>
 
 namespace realm {
 class Realm;
 
 namespace _impl {
+class CollectionChangeBuilder : public CollectionChangeIndices {
+public:
+    CollectionChangeBuilder(CollectionChangeBuilder const&) = default;
+    CollectionChangeBuilder(CollectionChangeBuilder&&) = default;
+    CollectionChangeBuilder& operator=(CollectionChangeBuilder const&) = default;
+    CollectionChangeBuilder& operator=(CollectionChangeBuilder&&) = default;
+
+    CollectionChangeBuilder(IndexSet deletions = {},
+                            IndexSet insertions = {},
+                            IndexSet modification = {},
+                            std::vector<Move> moves = {});
+
+    static CollectionChangeBuilder calculate(std::vector<size_t> const& old_rows,
+                                             std::vector<size_t> const& new_rows,
+                                             std::function<bool (size_t)> row_did_change,
+                                             bool sort);
+
+    void merge(CollectionChangeBuilder&&);
+    void clean_up_stale_moves();
+
+    void insert(size_t ndx, size_t count=1);
+    void modify(size_t ndx);
+    void erase(size_t ndx);
+    void move_over(size_t ndx, size_t last_ndx);
+    void clear(size_t old_size);
+    void move(size_t from, size_t to);
+
+    void parse_complete();
+
+private:
+    std::unordered_map<size_t, size_t> m_move_mapping;
+
+    void verify();
+
+};
 struct ListChangeInfo {
     size_t table_ndx;
     size_t row_ndx;
