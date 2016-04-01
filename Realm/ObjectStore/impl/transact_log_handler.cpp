@@ -20,8 +20,8 @@
 
 #include "binding_context.hpp"
 #include "impl/background_collection.hpp"
+#include "index_set.hpp"
 
-#include <realm/commit_log.hpp>
 #include <realm/group_shared.hpp>
 #include <realm/lang_bind_helper.hpp>
 

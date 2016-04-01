@@ -18,7 +18,6 @@
 
 #include "impl/results_notifier.hpp"
 
-#include "impl/realm_coordinator.hpp"
 #include "results.hpp"
 
 using namespace realm;

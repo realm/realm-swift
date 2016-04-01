@@ -19,25 +19,19 @@
 #ifndef REALM_COORDINATOR_HPP
 #define REALM_COORDINATOR_HPP
 
-#include "index_set.hpp"
 #include "shared_realm.hpp"
 
-#include <realm/string_data.hpp>
-
-#include <map>
+#include <mutex>
 
 namespace realm {
 class Replication;
-class Results;
 class Schema;
 class SharedGroup;
-class Table;
-struct CollectionChangeIndices;
+class StringData;
 
 namespace _impl {
 class BackgroundCollection;
 class ExternalCommitHelper;
-class ListNotifier;
 class WeakRealmNotifier;
 
 // RealmCoordinator manages the weak cache of Realm instances and communication

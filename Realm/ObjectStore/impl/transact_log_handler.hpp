@@ -21,11 +21,8 @@
 
 #include <realm/group_shared.hpp>
 
-#include "index_set.hpp"
-
 namespace realm {
 class BindingContext;
-class SharedGroup;
 
 namespace _impl {
 struct TransactionChangeInfo;

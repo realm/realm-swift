@@ -23,14 +23,12 @@
 #include "shared_realm.hpp"
 
 #include <realm/table_view.hpp>
-#include <realm/table.hpp>
 #include <realm/util/optional.hpp>
 
 namespace realm {
 template<typename T> class BasicRowExpr;
 using RowExpr = BasicRowExpr<Table>;
 class Mixed;
-class Results;
 
 namespace _impl {
     class ResultsNotifier;

@@ -19,14 +19,15 @@
 #ifndef REALM_INDEX_SET_HPP
 #define REALM_INDEX_SET_HPP
 
+#include <cstddef>
 #include <cstdlib>
+#include <initializer_list>
 #include <iterator>
+#include <type_traits>
+#include <utility>
 #include <vector>
-#include <stddef.h>
 
 namespace realm {
-class IndexSet;
-
 namespace _impl {
 template<typename OuterIterator>
 class MutableChunkedRangeVectorIterator;

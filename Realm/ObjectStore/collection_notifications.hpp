@@ -23,6 +23,9 @@
 #include "util/atomic_shared_ptr.hpp"
 
 #include <exception>
+#include <functional>
+#include <memory>
+#include <vector>
 
 namespace realm {
 namespace _impl {

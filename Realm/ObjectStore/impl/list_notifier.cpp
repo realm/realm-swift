@@ -18,7 +18,6 @@
 
 #include "impl/list_notifier.hpp"
 
-#include "impl/realm_coordinator.hpp"
 #include "shared_realm.hpp"
 
 #include <realm/link_view.hpp>

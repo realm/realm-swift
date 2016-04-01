@@ -21,15 +21,17 @@
 
 #include "collection_notifications.hpp"
 
-#include <realm/link_view.hpp>
+#include <realm/link_view_fwd.hpp>
+#include <realm/row.hpp>
 
+#include <functional>
 #include <memory>
 
 namespace realm {
-template<typename T> class BasicRowExpr;
 using RowExpr = BasicRowExpr<Table>;
 
 class ObjectSchema;
+class Query;
 class Realm;
 class Results;
 struct SortOrder;

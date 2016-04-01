@@ -21,7 +21,6 @@
 #include "schema.hpp"
 
 #include <realm/group.hpp>
-#include <realm/link_view.hpp>
 #include <realm/table.hpp>
 #include <realm/table_view.hpp>
 #include <realm/util/assert.hpp>

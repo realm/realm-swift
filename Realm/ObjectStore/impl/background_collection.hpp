@@ -23,8 +23,10 @@
 
 #include <realm/group_shared.hpp>
 
-#include <mutex>
+#include <atomic>
+#include <exception>
 #include <functional>
+#include <mutex>
 #include <thread>
 #include <unordered_map>
 

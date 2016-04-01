@@ -21,8 +21,7 @@
 #include "object_store.hpp"
 #include "property.hpp"
 
-#include <realm/group_shared.hpp>
-#include <realm/link_view.hpp>
+#include <realm/table.hpp>
 
 using namespace realm;
 

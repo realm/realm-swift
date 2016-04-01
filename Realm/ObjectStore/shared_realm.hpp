@@ -19,20 +19,15 @@
 #ifndef REALM_REALM_HPP
 #define REALM_REALM_HPP
 
-#include <realm/handover_defs.hpp>
-
 #include <memory>
-#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
-#include <mutex>
 
 namespace realm {
     class BindingContext;
     class Group;
     class Realm;
-    class RealmDelegate;
     class Replication;
     class Schema;
     class SharedGroup;

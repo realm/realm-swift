@@ -19,8 +19,6 @@
 #ifndef REALM_SCHEMA_HPP
 #define REALM_SCHEMA_HPP
 
-#include "property.hpp"
-
 #include <string>
 #include <vector>
 

@@ -24,13 +24,8 @@
 
 #include <realm/group_shared.hpp>
 
-#include <mutex>
-#include <functional>
-
 namespace realm {
 namespace _impl {
-struct TransactionChangeInfo;
-
 class ResultsNotifier : public BackgroundCollection {
 public:
     ResultsNotifier(Results& target);

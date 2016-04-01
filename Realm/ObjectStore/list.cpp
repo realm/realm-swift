@@ -23,6 +23,8 @@
 #include "results.hpp"
 #include "shared_realm.hpp"
 
+#include <realm/link_view.hpp>
+
 using namespace realm;
 using namespace realm::_impl;
 
