@@ -21,6 +21,7 @@
 #include "impl/realm_coordinator.hpp"
 #include "impl/results_notifier.hpp"
 #include "object_store.hpp"
+#include "util/format.hpp"
 
 #include <stdexcept>
 
@@ -303,6 +304,7 @@ size_t Results::index_of(size_t row_ndx)
 
 template<typename Int, typename Float, typename Double, typename Timestamp>
 util::Optional<Mixed> Results::aggregate(size_t column, bool return_none_for_empty,
+                                         const char* name,
                                          Int agg_int, Float agg_float,
                                          Double agg_double, Timestamp agg_timestamp)
 {
@@ -341,13 +343,13 @@ util::Optional<Mixed> Results::aggregate(size_t column, bool return_none_for_emp
         case type_Float: return do_agg(agg_float);
         case type_Int: return do_agg(agg_int);
         default:
-            throw UnsupportedColumnTypeException{column, m_table};
+            throw UnsupportedColumnTypeException{column, m_table, name};
     }
 }
 
 util::Optional<Mixed> Results::max(size_t column)
 {
-    return aggregate(column, true,
+    return aggregate(column, true, "max",
                      [=](auto const& table) { return table.maximum_int(column); },
                      [=](auto const& table) { return table.maximum_float(column); },
                      [=](auto const& table) { return table.maximum_double(column); },
@@ -356,7 +358,7 @@ util::Optional<Mixed> Results::max(size_t column)
 
 util::Optional<Mixed> Results::min(size_t column)
 {
-    return aggregate(column, true,
+    return aggregate(column, true, "min",
                      [=](auto const& table) { return table.minimum_int(column); },
                      [=](auto const& table) { return table.minimum_float(column); },
                      [=](auto const& table) { return table.minimum_double(column); },
@@ -365,20 +367,20 @@ util::Optional<Mixed> Results::min(size_t column)
 
 util::Optional<Mixed> Results::sum(size_t column)
 {
-    return aggregate(column, false,
+    return aggregate(column, false, "sum",
                      [=](auto const& table) { return table.sum_int(column); },
                      [=](auto const& table) { return table.sum_float(column); },
                      [=](auto const& table) { return table.sum_double(column); },
-                     [=](auto const&) -> util::None { throw UnsupportedColumnTypeException{column, m_table}; });
+                     [=](auto const&) -> util::None { throw UnsupportedColumnTypeException{column, m_table, "sum"}; });
 }
 
 util::Optional<Mixed> Results::average(size_t column)
 {
-    return aggregate(column, true,
+    return aggregate(column, true, "average",
                      [=](auto const& table) { return table.average_int(column); },
                      [=](auto const& table) { return table.average_float(column); },
                      [=](auto const& table) { return table.average_double(column); },
-                     [=](auto const&) -> util::None { throw UnsupportedColumnTypeException{column, m_table}; });
+                     [=](auto const&) -> util::None { throw UnsupportedColumnTypeException{column, m_table, "average"}; });
 }
 
 void Results::clear()
@@ -531,8 +533,14 @@ void Results::Internal::set_table_view(Results& results, realm::TableView &&tv)
     REALM_ASSERT(results.m_table_view.is_attached());
 }
 
-Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t column, const Table* table)
-: std::runtime_error((std::string)"Operation not supported on '" + table->get_column_name(column).data() + "' columns")
+Results::OutOfBoundsIndexException::OutOfBoundsIndexException(size_t r, size_t c)
+: std::out_of_range(util::format("Requested index %1 greater than max %2", r, c))
+, requested(r), valid_count(c) {}
+
+Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t column, const Table* table, const char* operation)
+: std::runtime_error(util::format("Cannot %1 property '%2': operation not supported for '%3' properties",
+                                  operation, table->get_column_name(column),
+                                  string_for_property_type(static_cast<PropertyType>(table->get_column_type(column)))))
 , column_index(column)
 , column_name(table->get_column_name(column))
 , column_type(table->get_column_type(column))

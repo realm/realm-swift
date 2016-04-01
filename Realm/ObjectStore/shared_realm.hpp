@@ -218,12 +218,12 @@ namespace realm {
 
     class MismatchedConfigException : public std::runtime_error {
     public:
-        MismatchedConfigException(std::string message) : std::runtime_error(message) {}
+        MismatchedConfigException(std::string message) : std::runtime_error(move(message)) {}
     };
 
     class InvalidTransactionException : public std::runtime_error {
     public:
-        InvalidTransactionException(std::string message) : std::runtime_error(message) {}
+        InvalidTransactionException(std::string message) : std::runtime_error(move(message)) {}
     };
 
     class IncorrectThreadException : public std::runtime_error {
@@ -233,7 +233,7 @@ namespace realm {
 
     class UninitializedRealmException : public std::runtime_error {
     public:
-        UninitializedRealmException(std::string message) : std::runtime_error(message) {}
+        UninitializedRealmException(std::string message) : std::runtime_error(move(message)) {}
     };
 }
 
