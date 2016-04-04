@@ -3,7 +3,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* Deprecate `-[RLMRealm removeNotification:]` in favor of
+  `-[RLMNotificationToken stop]`.
 
 ### Enhancements
 
@@ -15,6 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
   correctly defined in Swift Object subclasses, which don't qualify for auto-inheriting the required initializers.
 * `-[RLMResults indexOfObjectWithPredicate:]` now returns correct results
   for `RLMResults` instances that were created by filtering an `RLMArray`.
+* Adjust how RLMObjects are destroyed in order to support using an associated
+  object on an RLMObject to remove KVO observers from that RLMObject.
 
 0.98.6 Release notes (2016-03-25)
 =============================================================

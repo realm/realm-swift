@@ -537,7 +537,7 @@ class RealmTests: TestCase {
         XCTAssertFalse(notificationCalled)
         try! realm.write {}
         XCTAssertTrue(notificationCalled)
-        realm.removeNotification(token)
+        token.stop()
     }
 
     func testRemoveNotification() {
@@ -547,7 +547,7 @@ class RealmTests: TestCase {
             XCTAssertEqual(realm.path, self.defaultRealmPath())
             notificationCalled = true
         }
-        realm.removeNotification(token)
+        token.stop()
         try! realm.write {}
         XCTAssertFalse(notificationCalled)
     }
@@ -575,7 +575,7 @@ class RealmTests: TestCase {
             }
         }
         waitForExpectationsWithTimeout(1, handler: nil)
-        realm.removeNotification(token)
+        token.stop()
 
         // get object
         let results = realm.objects(SwiftStringObject)
@@ -605,7 +605,7 @@ class RealmTests: TestCase {
             }
         }
         waitForExpectationsWithTimeout(1, handler: nil)
-        realm.removeNotification(token)
+        token.stop()
 
         XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
 

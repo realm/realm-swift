@@ -189,7 +189,7 @@ static BOOL encryptTests() {
     // wait for queue to finish
     dispatch_sync(queue, ^{});
 
-    [realm removeNotification:token];
+    [token stop];
 }
 
 - (void)dispatchAsync:(dispatch_block_t)block {

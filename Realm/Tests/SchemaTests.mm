@@ -468,11 +468,12 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 }
 
 - (void)testClassWithInvalidNSNumberProtocolProperty {
-    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberProtocolObject.class], @"RLMFastEnumerable' is not supported as an NSNumber object type.");
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberProtocolObject.class],
+                                      @"Property 'number' is of type 'NSNumber<RLMFastEnumerable>' which is not a supported NSNumber object type.");
 }
 
 - (void)testClassWithInvalidNSNumberNoProtocolProperty {
-    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberNoProtocolObject.class], @"NSNumber properties require a protocol defining the contained type");
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberNoProtocolObject.class], @"Property 'number' requires a protocol defining the contained type");
 }
 
 // Can't spawn child processes on iOS
@@ -589,7 +590,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         }
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
-    [realm removeNotification:token];
+    [token stop];
 
     // Release the write transaction and let them run
     [realm cancelWriteTransaction];
