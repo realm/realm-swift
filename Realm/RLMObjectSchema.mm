@@ -296,19 +296,10 @@ using namespace realm;
         return NO;
     }
 
-    // compare ordered list of properties
-    NSArray *otherProperties = objectSchema.properties;
-    for (NSUInteger i = 0; i < _properties.count; i++) {
-        RLMProperty *p1 = _properties[i], *p2 = otherProperties[i];
-        if (p1.type != p2.type ||
-            p1.column != p2.column ||
-            p1.isPrimary != p2.isPrimary ||
-            p1.optional != p2.optional ||
-            ![p1.name isEqualToString:p2.name] ||
-            !(p1.objectClassName == p2.objectClassName || [p1.objectClassName isEqualToString:p2.objectClassName])) {
-            return NO;
-        }
+    if (![_properties isEqualToArray:objectSchema.properties]) {
+        return NO;
     }
+
     return YES;
 }
 

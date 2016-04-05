@@ -439,8 +439,18 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     return prop;
 }
 
+- (BOOL)isEqual:(id)object
+{
+    if (![object isKindOfClass:[RLMProperty class]]) {
+        return NO;
+    }
+
+    return [self isEqualToProperty:object];
+}
+
 - (BOOL)isEqualToProperty:(RLMProperty *)property {
     return _type == property->_type
+        && _column == property->_column
         && _indexed == property->_indexed
         && _isPrimary == property->_isPrimary
         && _optional == property->_optional
