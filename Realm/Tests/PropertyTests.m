@@ -65,7 +65,7 @@
         for (NSString *propertyName in expectedProperties) {
             RLMProperty *schemaProperty = objectSchema[propertyName];
             RLMProperty *expectedProperty = expectedProperties[propertyName];
-            XCTAssertTrue([schemaProperty isEqualToProperty:expectedProperty]);
+            XCTAssertEqualObjects(schemaProperty, expectedProperty);
         }
     }
     // Test indexed property
@@ -73,7 +73,7 @@
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[IndexedStringObject class]];
         RLMProperty *stringProperty = objectSchema[@"stringCol"];
         RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES optional:optionalsEnabled];
-        XCTAssertTrue([stringProperty isEqualToProperty:expectedProperty]);
+        XCTAssertEqualObjects(stringProperty, expectedProperty);
     }
     // Test primary key property
     {
@@ -81,7 +81,7 @@
         RLMProperty *stringProperty = objectSchema[@"stringCol"];
         RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES optional:optionalsEnabled];
         expectedProperty.isPrimary = YES;
-        XCTAssertTrue([stringProperty isEqualToProperty:expectedProperty]);
+        XCTAssertEqualObjects(stringProperty, expectedProperty);
     }
 }
 
@@ -93,7 +93,7 @@
     objc_property_t objcProperty2 = class_getProperty(IntObject.class, name);
     RLMProperty *property2 = [[RLMProperty alloc] initWithName:@(name) indexed:YES property:objcProperty2];
 
-    XCTAssertTrue([property1 isEqualToProperty:property2]);
+    XCTAssertEqualObjects(property1, property2);
 }
 
 - (void)testTwoPropertiesAreUnequal {
@@ -105,7 +105,7 @@
     objc_property_t objcProperty2 = class_getProperty(IntObject.class, name);
     RLMProperty *property2 = [[RLMProperty alloc] initWithName:@(name) indexed:YES property:objcProperty2];
 
-    XCTAssertFalse([property1 isEqualToProperty:property2]);
+    XCTAssertNotEqualObjects(property1, property2);
 }
 
 @end

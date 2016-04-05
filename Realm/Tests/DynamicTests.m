@@ -95,7 +95,7 @@
         for (NSUInteger propertyIndex = 0; propertyIndex < expectedObjectSchema.properties.count; propertyIndex++) {
             RLMProperty *dynamicProperty = dynamicObjectSchema.properties[propertyIndex];
             RLMProperty *expectedProperty = expectedObjectSchema.properties[propertyIndex];
-            XCTAssertTrue([dynamicProperty isEqualToProperty:expectedProperty]);
+            XCTAssertEqualObjects(dynamicProperty, expectedProperty);
         }
     }
 }
