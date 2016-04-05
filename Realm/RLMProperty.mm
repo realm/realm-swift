@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMProperty_Private.h"
+#import "RLMProperty_Private.hpp"
 
 #import "RLMArray.h"
 #import "RLMListBase.h"
@@ -43,6 +43,16 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 }
 
 @implementation RLMProperty
+
++ (instancetype)propertyForObjectStoreProperty:(const realm::Property &)prop
+{
+    return [[RLMProperty alloc] initWithName:@(prop.name.c_str())
+                                        type:(RLMPropertyType)prop.type
+                             objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
+                                     indexed:prop.is_indexed
+                                    optional:prop.is_nullable];
+}
+
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
@@ -440,6 +450,17 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 
 - (NSString *)description {
     return [NSString stringWithFormat:@"%@ {\n\ttype = %@;\n\tobjectClassName = %@;\n\tindexed = %@;\n\tisPrimary = %@;\n\toptional = %@;\n}", self.name, RLMTypeToString(self.type), self.objectClassName, self.indexed ? @"YES" : @"NO", self.isPrimary ? @"YES" : @"NO", self.optional ? @"YES" : @"NO"];
+}
+
+- (realm::Property)objectStoreCopy
+{
+    realm::Property p;
+    p.name = _name.UTF8String;
+    p.type = (realm::PropertyType)_type;
+    p.object_type = _objectClassName ? _objectClassName.UTF8String : "";
+    p.is_indexed = _indexed;
+    p.is_nullable = _optional;
+    return p;
 }
 
 @end

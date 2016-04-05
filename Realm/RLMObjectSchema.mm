@@ -21,7 +21,7 @@
 #import "RLMArray.h"
 #import "RLMListBase.h"
 #import "RLMObject_Private.h"
-#import "RLMProperty_Private.h"
+#import "RLMProperty_Private.hpp"
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
@@ -336,13 +336,8 @@ using namespace realm;
     objectSchema.name = _className.UTF8String;
     objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.name.UTF8String : "";
     for (RLMProperty *prop in _properties) {
-        Property p;
-        p.name = prop.name.UTF8String;
-        p.type = (PropertyType)prop.type;
-        p.object_type = prop.objectClassName ? prop.objectClassName.UTF8String : "";
-        p.is_indexed = prop.indexed;
+        Property p = [prop objectStoreCopy];
         p.is_primary = (prop == _primaryKeyProperty);
-        p.is_nullable = prop.optional;
         objectSchema.properties.push_back(std::move(p));
     }
     return objectSchema;
@@ -355,11 +350,7 @@ using namespace realm;
     // create array of RLMProperties
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:objectSchema.properties.size()];
     for (Property &prop : objectSchema.properties) {
-        RLMProperty *property = [[RLMProperty alloc] initWithName:@(prop.name.c_str())
-                                                             type:(RLMPropertyType)prop.type
-                                                  objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
-                                                          indexed:prop.is_indexed
-                                                         optional:prop.is_nullable];
+        RLMProperty *property = [RLMProperty propertyForObjectStoreProperty:prop];
         property.isPrimary = (prop.name == objectSchema.primary_key);
         [propArray addObject:property];
     }
