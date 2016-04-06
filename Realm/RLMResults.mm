@@ -287,10 +287,18 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     Query query = translateErrors([&] { return _results.get_query(); });
     RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _objectSchema);
 
-    // FIXME: We're only looking for a single object so we'd like to be able to use `Query::find`
-    // for this, but as of core v0.97.1 it gives incorrect results if the query is restricted
-    // to a link view (<https://github.com/realm/realm-core/issues/1565>).
-    auto table_view = query.find_all(0, -1, 1);
+    TableView table_view;
+    if (const auto& sort = _results.get_sort()) {
+        // A sort order is specified so we need to return the first match given that ordering.
+        table_view = query.find_all();
+        table_view.sort(sort.columnIndices, sort.ascending);
+    } else {
+        // No sort order is specified so we only need to find a single match.
+        // FIXME: We're only looking for a single object so we'd like to be able to use `Query::find`
+        // for this, but as of core v0.97.1 it gives incorrect results if the query is restricted
+        // to a link view (<https://github.com/realm/realm-core/issues/1565>).
+        table_view = query.find_all(0, -1, 1);
+    }
     if (!table_view.size()) {
         return NSNotFound;
     }

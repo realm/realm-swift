@@ -479,6 +479,7 @@
     [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
     [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"Phil", @"age": @38, @"hired": @NO}];
     [realm commitWriteTransaction];
 
     RLMResults *results = [EmployeeObject objectsWhere:@"hired = YES"];
@@ -491,6 +492,14 @@
     XCTAssertEqual(1U, ([results indexOfObjectWhere:@"age = %d", 30]));
     XCTAssertEqual(2U, ([results indexOfObjectWhere:@"age = %d", 25]));
     XCTAssertEqual((NSUInteger)NSNotFound, ([results indexOfObjectWhere:@"age = %d", 35]));
+
+    results = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+    NSUInteger youngestHired = [results indexOfObjectWhere:@"hired = YES"];
+    XCTAssertEqual(0U, youngestHired);
+    XCTAssertEqualObjects(@"Jill", [results[youngestHired] name]);
+    NSUInteger youngestNotHired = [results indexOfObjectWhere:@"hired = NO"];
+    XCTAssertEqual(1U, youngestNotHired);
+    XCTAssertEqualObjects(@"John", [results[youngestNotHired] name]);
 }
 
 - (void)testSubqueryLifetime
