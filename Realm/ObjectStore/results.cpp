@@ -68,6 +68,16 @@ Results::Results(SharedRealm r, LinkViewRef lv, util::Optional<Query> q, SortOrd
     }
 }
 
+Results::Results(SharedRealm r, SortOrder s, TableView tv)
+: m_realm(std::move(r))
+, m_table_view(std::move(tv))
+, m_table(&m_table_view.get_parent())
+, m_sort(std::move(s))
+, m_mode(Mode::TableView)
+{
+    REALM_ASSERT(m_sort.column_indices.size() == m_sort.ascending.size());
+}
+
 Results::~Results()
 {
     if (m_notifier) {

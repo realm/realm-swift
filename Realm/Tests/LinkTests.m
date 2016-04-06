@@ -206,5 +206,33 @@
     XCTAssertEqualObjects(obj1.data, obj.next.data, @"objects should be equal");
  }
 
+- (void)testLinkingObjects
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    OwnerObject *owner = [[OwnerObject alloc] init];
+    owner.name = @"Tim";
+    owner.dog = [[DogObject alloc] init];
+    owner.dog.dogName = @"Harvie";
+
+    XCTAssertNil(owner.dog.owners, @"Linking objects are not available until the object is persisted");
+    RLMAssertThrowsWithReasonMatching(owner.dog.owners = nil, @"Linking objects properties are read-only");
+
+    [realm beginWriteTransaction];
+    [realm addObject:owner];
+    RLMAssertThrowsWithReasonMatching(owner.dog.owners = nil, @"Linking objects properties are read-only");
+    [realm commitWriteTransaction];
+
+    RLMLinkingObjects *owners = owner.dog.owners;
+    XCTAssertEqual(1u, owners.count);
+    XCTAssertEqualObjects(owner.name, [owners.firstObject name]);
+
+    [realm beginWriteTransaction];
+    owner.dog = nil;
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(0u, owners.count);
+}
+
 @end
 
