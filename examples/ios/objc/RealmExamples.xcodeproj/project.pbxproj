@@ -18,6 +18,7 @@
 		227D20881CB4E5D5008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20871CB4E5D5008F641B /* LaunchScreen.storyboard */; };
 		227D208A1CB4E660008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20891CB4E660008F641B /* LaunchScreen.storyboard */; };
 		227D208D1CB4E6D2008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D208B1CB4E6AC008F641B /* LaunchScreen.storyboard */; };
+		227D208F1CB4E85F008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D208E1CB4E85F008F641B /* LaunchScreen.storyboard */; };
 		3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
@@ -158,6 +159,7 @@
 		227D20871CB4E5D5008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		227D20891CB4E660008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = RACTableView/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		227D208B1CB4E6AC008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		227D208E1CB4E85F008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
 		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
 		3F78C9AD1B431CDF00A0988E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RACTableView/Images.xcassets; sourceTree = "<group>"; };
@@ -585,6 +587,7 @@
 				E8F70E9B19BA508B006F60D5 /* TableView-Info.plist */,
 				E8F70E9C19BA508B006F60D5 /* TableViewController.h */,
 				E8F70E9D19BA508B006F60D5 /* TableViewController.m */,
+				227D208E1CB4E85F008F641B /* LaunchScreen.storyboard */,
 			);
 			path = TableView;
 			sourceTree = SOURCE_ROOT;
@@ -1002,6 +1005,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8F70E9F19BA508B006F60D5 /* Images.xcassets in Resources */,
+				227D208F1CB4E85F008F641B /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
