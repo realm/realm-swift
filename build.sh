@@ -239,7 +239,7 @@ build_docs() {
     local language="$1"
     local version=$(sh build.sh get-version)
 
-    local xcodebuild_arguments="--objc,Realm/Realm.h,-x,objective-c,-isysroot,$(xcrun --show-sdk-path),-I,$(pwd)"
+    local xcodebuild_arguments="--objc,Realm/Realm.h,--,-x,objective-c,-isysroot,$(xcrun --show-sdk-path),-I,$(pwd)"
     local module="Realm"
     local objc="--objc"
 
