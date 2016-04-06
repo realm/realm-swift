@@ -11,6 +11,9 @@
 		0295B91719D103BE0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
+		227D20921CB4EB1B008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20901CB4EAFD008F641B /* LaunchScreen.storyboard */; };
+		227D20951CB4EEED008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20931CB4EE99008F641B /* LaunchScreen.storyboard */; };
+		227D20971CB4F00D008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20961CB4F00D008F641B /* LaunchScreen.storyboard */; };
 		27F824B119611EFF4A9EE8A0 /* Pods_ReactKitTableView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D00630224166C0631FC7AD2B /* Pods_ReactKitTableView.framework */; };
 		3FC898FF1A1414110067CBEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FE1A1414110067CBEC /* ViewController.swift */; };
 		5D8DD54D1C62C5A4005077F2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8DD5491C62C5A4005077F2 /* AppDelegate.swift */; };
@@ -146,6 +149,9 @@
 /* Begin PBXFileReference section */
 		0295B91519D103A70036D6C3 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		0A73D4411B1443A700E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
+		227D20901CB4EAFD008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		227D20931CB4EE99008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		227D20961CB4F00D008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		5D8DD5361C62C572005077F2 /* ReactKitTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReactKitTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D8DD5491C62C5A4005077F2 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -338,6 +344,7 @@
 				E886FB641A12A73E00CB2D0B /* Images.xcassets */,
 				E886FB651A12A73E00CB2D0B /* Info.plist */,
 				E886FB661A12A73E00CB2D0B /* TableViewController.swift */,
+				227D20961CB4F00D008F641B /* LaunchScreen.storyboard */,
 			);
 			path = GroupedTableView;
 			sourceTree = "<group>";
@@ -348,6 +355,7 @@
 				E8CB088019BA6AEE0018434A /* AppDelegate.swift */,
 				E8CB088119BA6AEE0018434A /* Info.plist */,
 				3FC898FE1A1414110067CBEC /* ViewController.swift */,
+				227D20931CB4EE99008F641B /* LaunchScreen.storyboard */,
 			);
 			path = Encryption;
 			sourceTree = "<group>";
@@ -389,6 +397,7 @@
 			children = (
 				E8D3F2761A11766A00620884 /* AppDelegate.swift */,
 				E8D3F2771A11766A00620884 /* Info.plist */,
+				227D20901CB4EAFD008F641B /* LaunchScreen.storyboard */,
 			);
 			path = Backlink;
 			sourceTree = "<group>";
@@ -445,6 +454,7 @@
 				E8CB07EC19BA6AB60018434A /* Frameworks */,
 				C01304E91A60B77600EB3E1E /* CopyFiles */,
 				C06D6CCE1B016A590066C324 /* Strip Framework Architectures */,
+				227D20941CB4EEE7008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -519,6 +529,7 @@
 				E8D3F2501A11765200620884 /* Frameworks */,
 				C01304E31A60A4A000EB3E1E /* CopyFiles */,
 				C06D6CCE1B016A590066C324 /* Strip Framework Architectures */,
+				227D20911CB4EB18008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -584,6 +595,22 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		227D20911CB4EB18008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20921CB4EB1B008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D20941CB4EEE7008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20951CB4EEED008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5D8DD5341C62C572005077F2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -597,6 +624,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E886FB681A12A73E00CB2D0B /* Images.xcassets in Resources */,
+				227D20971CB4F00D008F641B /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
