@@ -12,6 +12,12 @@
 		0295B90119D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90219D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90319D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		227D20811CB4E371008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D207F1CB4E32A008F641B /* LaunchScreen.storyboard */; };
+		227D20841CB4E4D3008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20821CB4E4AE008F641B /* LaunchScreen.storyboard */; };
+		227D20861CB4E56C008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20851CB4E56C008F641B /* LaunchScreen.storyboard */; };
+		227D20881CB4E5D5008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20871CB4E5D5008F641B /* LaunchScreen.storyboard */; };
+		227D208A1CB4E660008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20891CB4E660008F641B /* LaunchScreen.storyboard */; };
+		227D208D1CB4E6D2008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D208B1CB4E6AC008F641B /* LaunchScreen.storyboard */; };
 		3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
@@ -144,8 +150,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
+		227D207F1CB4E32A008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		227D20821CB4E4AE008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		227D20851CB4E56C008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		227D20871CB4E5D5008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		227D20891CB4E660008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = RACTableView/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		227D208B1CB4E6AC008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
 		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
 		3F78C9AD1B431CDF00A0988E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RACTableView/Images.xcassets; sourceTree = "<group>"; };
@@ -383,6 +395,7 @@
 				3F78C9AF1B431CDF00A0988E /* main.m */,
 				3F78C9AC1B431CDF00A0988E /* TableViewController.h */,
 				3F78C9B01B431CDF00A0988E /* TableViewController.m */,
+				227D20891CB4E660008F641B /* LaunchScreen.storyboard */,
 			);
 			name = RACTableView;
 			sourceTree = "<group>";
@@ -444,6 +457,7 @@
 				C0DC41FD1A7073E40067156A /* main.m */,
 				C0DC41FA1A7072DE0067156A /* Tick.h */,
 				C0DC41FB1A7072DE0067156A /* Tick.m */,
+				227D20821CB4E4AE008F641B /* LaunchScreen.storyboard */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -478,6 +492,7 @@
 				E879D9DF1A12AA400035E2EB /* main.m */,
 				E879D9E01A12AA400035E2EB /* TableViewController.h */,
 				E879D9E11A12AA400035E2EB /* TableViewController.m */,
+				227D20851CB4E56C008F641B /* LaunchScreen.storyboard */,
 			);
 			path = GroupedTableView;
 			sourceTree = "<group>";
@@ -579,6 +594,7 @@
 			children = (
 				E8F70EA419BA5093006F60D5 /* AppDelegate.h */,
 				E8F70EA519BA5093006F60D5 /* AppDelegate.m */,
+				227D208B1CB4E6AC008F641B /* LaunchScreen.storyboard */,
 				E8F70EA619BA5093006F60D5 /* main.m */,
 				E8F70EA719BA5093006F60D5 /* REST-Info.plist */,
 				E8F70EA819BA5093006F60D5 /* Venue.h */,
@@ -599,6 +615,7 @@
 				E8F70EB319BA50A3006F60D5 /* default-v2.realm */,
 				E8F70EB419BA50A3006F60D5 /* main.m */,
 				E8F70EB519BA50A3006F60D5 /* Migration-Info.plist */,
+				227D20871CB4E5D5008F641B /* LaunchScreen.storyboard */,
 			);
 			path = Migration;
 			sourceTree = "<group>";
@@ -612,6 +629,7 @@
 				3FC898FB1A140F550067CBEC /* LabelViewController.h */,
 				3FC898FC1A140F550067CBEC /* LabelViewController.m */,
 				E8F70EC319BA50AB006F60D5 /* main.m */,
+				227D207F1CB4E32A008F641B /* LaunchScreen.storyboard */,
 			);
 			path = Encryption;
 			sourceTree = "<group>";
@@ -678,6 +696,7 @@
 				C0DC41C81A7072670067156A /* Sources */,
 				C0DC41C91A7072670067156A /* Frameworks */,
 				C06134E21A718BB800D22D12 /* Embed App Extensions */,
+				227D20831CB4E4B9008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -763,6 +782,7 @@
 			buildPhases = (
 				E8AB723419BA504000F3EDB4 /* Sources */,
 				E8AB723519BA504000F3EDB4 /* Frameworks */,
+				227D20801CB4E36D008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -796,6 +816,7 @@
 			buildPhases = (
 				E8AB729019BA504900F3EDB4 /* Sources */,
 				E8AB729119BA504900F3EDB4 /* Frameworks */,
+				227D208C1CB4E6C5008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -897,11 +918,36 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		227D20801CB4E36D008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20811CB4E371008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D20831CB4E4B9008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20841CB4E4D3008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D208C1CB4E6C5008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D208D1CB4E6D2008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3F78C9C21B431CF300A0988E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				3F78C9C31B431CF300A0988E /* Images.xcassets in Resources */,
+				227D208A1CB4E660008F641B /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -936,6 +982,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E879D9E31A12AA400035E2EB /* Images.xcassets in Resources */,
+				227D20861CB4E56C008F641B /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -944,6 +991,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8F70EB919BA50A3006F60D5 /* default-v0.realm in Resources */,
+				227D20881CB4E5D5008F641B /* LaunchScreen.storyboard in Resources */,
 				E8F70EBA19BA50A3006F60D5 /* default-v1.realm in Resources */,
 				E8F70EBB19BA50A3006F60D5 /* default-v2.realm in Resources */,
 			);
