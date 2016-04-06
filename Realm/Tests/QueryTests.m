@@ -33,12 +33,33 @@
 
 #pragma mark PersonObject
 
+@class PersonObject;
+RLM_ARRAY_TYPE(PersonObject);
+
 @interface PersonObject : RLMObject
 @property NSString *name;
 @property NSInteger age;
+@property RLMArray<PersonObject> *children;
+@property (readonly) RLMLinkingObjects *parents;
 @end
 
 @implementation PersonObject
+
++ (NSDictionary *)linkingObjectsProperties
+{
+    return @{@"parents": @{@"class": @"PersonObject", @"property": @"children"} };
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![other isKindOfClass:[PersonObject class]]) {
+        return NO;
+    }
+
+    PersonObject *otherPerson = other;
+    return [self.name isEqual:otherPerson.name] && self.age == otherPerson.age && [self.children isEqual:otherPerson.children];
+}
+
 @end
 
 @interface PersonLinkObject : RLMObject
@@ -1257,7 +1278,7 @@
     XCTAssertTrue([circle.next.next isEqualToObject:[CircleObject objectsInRealm:realm where:@"next.next.data = '0'"].firstObject]);
 
     XCTAssertNoThrow(([CircleObject objectsInRealm:realm where:@"next = %@", circle]));
-    XCTAssertThrows(([CircleObject objectsInRealm:realm where:@"next.next = %@", circle]));
+    XCTAssertNoThrow(([CircleObject objectsInRealm:realm where:@"next.next = %@", circle]));
     XCTAssertTrue([circle.next.next.next.next isEqualToObject:[CircleObject objectsInRealm:realm where:@"next = nil"].firstObject]);
 }
 
@@ -1802,6 +1823,137 @@
 
     RLMAssertCount(LinkToCompanyObject, 1U, @"SUBQUERY(company.employees, $employee, $employee.age > 30 AND $employee.hired = FALSE).@count > 0");
     RLMAssertCount(LinkToCompanyObject, 2U, @"SUBQUERY(company.employees, $employee, $employee.age < 30 AND $employee.hired = TRUE).@count == 0");
+}
+
+- (void)testLinkingObjects
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+
+    PersonObject *hannah   = [PersonObject createInRealm:realm withValue:@[ @"Hannah",   @0 ]];
+    PersonObject *elijah   = [PersonObject createInRealm:realm withValue:@[ @"Elijah",   @3 ]];
+
+    PersonObject *mark     = [PersonObject createInRealm:realm withValue:@[ @"Mark",     @30, @[ hannah ]]];
+    PersonObject *jason    = [PersonObject createInRealm:realm withValue:@[ @"Jason",    @31, @[ elijah ]]];
+
+    PersonObject *diane    = [PersonObject createInRealm:realm withValue:@[ @"Diane",    @29, @[ hannah ]]];
+    PersonObject *carol    = [PersonObject createInRealm:realm withValue:@[ @"Carol",    @31 ]];
+
+    PersonObject *michael  = [PersonObject createInRealm:realm withValue:@[ @"Michael",  @57, @[ jason, mark ]]];
+    PersonObject *raewynne = [PersonObject createInRealm:realm withValue:@[ @"Raewynne", @57, @[ jason, mark ]]];
+
+    PersonObject *don      = [PersonObject createInRealm:realm withValue:@[ @"Don",      @64, @[ carol, diane ]]];
+    PersonObject *diane_sr = [PersonObject createInRealm:realm withValue:@[ @"Diane",    @60, @[ carol, diane ]]];
+
+    [realm commitWriteTransaction];
+
+    NSArray *(^asArray)(RLMResults *) = ^(RLMResults *results) {
+        return [[self evaluate:results] valueForKeyPath:@"self"];
+    };
+
+    // People that have a parent with a name that starts with 'M'.
+    RLMResults *r1 = [PersonObject objectsWhere:@"ANY parents.name BEGINSWITH 'M'"];
+    XCTAssertEqualObjects(asArray(r1), (@[ hannah, mark, jason ]));
+
+    // People that have a grandparent with a name that starts with 'M'.
+    RLMResults *r2 = [PersonObject objectsWhere:@"ANY parents.parents.name BEGINSWITH 'M'"];
+    XCTAssertEqualObjects(asArray(r2), (@[ hannah, elijah ]));
+
+    // People that have children that have a parent named Diane.
+    RLMResults *r3 = [PersonObject objectsWhere:@"ANY children.parents.name == 'Diane'"];
+    XCTAssertEqualObjects(asArray(r3), (@[ mark, diane, don, diane_sr ]));
+
+    // People that have children that have a grandparent named Don.
+    RLMResults *r4 = [PersonObject objectsWhere:@"ANY children.parents.parents.name == 'Don'"];
+    XCTAssertEqualObjects(asArray(r4), (@[ mark, diane ]));
+
+    // People whose parents have an average age of < 60.
+    RLMResults *r5 = [PersonObject objectsWhere:@"parents.@avg.age < 60"];
+    XCTAssertEqualObjects(asArray(r5), (@[ hannah, elijah, mark, jason ]));
+
+    // People that have at least one sibling.
+    RLMResults *r6 = [PersonObject objectsWhere:@"SUBQUERY(parents, $parent, $parent.children.@count > 1).@count > 0"];
+    XCTAssertEqualObjects(asArray(r6), (@[ mark, jason, diane, carol ]));
+
+    // People that have Raewynne as a parent.
+    RLMResults *r7 = [PersonObject objectsWhere:@"ANY parents == %@", raewynne];
+    XCTAssertEqualObjects(asArray(r7), (@[ mark, jason ]));
+
+    // People that have Mark as a child.
+    RLMResults *r8 = [PersonObject objectsWhere:@"ANY children == %@", mark];
+    XCTAssertEqualObjects(asArray(r8), (@[ michael, raewynne ]));
+
+    // People that have Michael as a grandparent.
+    RLMResults *r9 = [PersonObject objectsWhere:@"ANY parents.parents == %@", michael];
+    XCTAssertEqualObjects(asArray(r9), (@[ hannah, elijah ]));
+
+    // People that have Hannah as a grandchild.
+    RLMResults *r10 = [PersonObject objectsWhere:@"ANY children.children == %@", hannah];
+    XCTAssertEqualObjects(asArray(r10), (@[ michael, raewynne, don, diane_sr ]));
+
+    // People that have no listed parents.
+    RLMResults *r11 = [PersonObject objectsWhere:@"parents.@count == 0"];
+    XCTAssertEqualObjects(asArray(r11), (@[ michael, raewynne, don, diane_sr ]));
+
+    // No links are equal to a detached row accessor.
+    RLMResults *r12 = [PersonObject objectsWhere:@"ANY parents == %@", [PersonObject new]];
+    XCTAssertEqualObjects(asArray(r12), (@[ ]));
+
+    // All links are not equal to a detached row accessor so this will match all rows that are linked to.
+    RLMResults *r13 = [PersonObject objectsWhere:@"ANY parents != %@", [PersonObject new]];
+    XCTAssertEqualObjects(asArray(r13), (@[ hannah, elijah, mark, jason, diane, carol ]));
+
+    // Linking objects cannot contain null so their members cannot be compared with null.
+    XCTAssertThrows([PersonObject objectsWhere:@"ANY parents == NULL"]);
+
+
+    // Add a new link and verify that the existing results update as expected.
+    __block PersonObject *mackenzie;
+    [realm transactionWithBlock:^{
+        mackenzie = [PersonObject createInRealm:realm withValue:@[ @"Mackenzie", @0 ]];
+        [jason.children addObject:mackenzie];
+    }];
+
+
+    // People that have a parent with a name that starts with 'M'.
+    XCTAssertEqualObjects(asArray(r1), (@[ hannah, mark, jason ]));
+
+    // People that have a grandparent with a name that starts with 'M'.
+    XCTAssertEqualObjects(asArray(r2), (@[ hannah, elijah, mackenzie ]));
+
+    // People that have children that have a parent named Diane.
+    XCTAssertEqualObjects(asArray(r3), (@[ mark, diane, don, diane_sr ]));
+
+    // People that have children that have a grandparent named Don.
+    XCTAssertEqualObjects(asArray(r4), (@[ mark, diane ]));
+
+    // People whose parents have an average age of < 60.
+    XCTAssertEqualObjects(asArray(r5), (@[ hannah, elijah, mark, jason, mackenzie ]));
+
+    // People that have at least one sibling.
+    XCTAssertEqualObjects(asArray(r6), (@[ elijah, mark, jason, diane, carol, mackenzie ]));
+
+    // People that have Raewynne as a parent.
+    XCTAssertEqualObjects(asArray(r7), (@[ mark, jason ]));
+
+    // People that have Mark as a child.
+    XCTAssertEqualObjects(asArray(r8), (@[ michael, raewynne ]));
+
+    // People that have Michael as a grandparent.
+    XCTAssertEqualObjects(asArray(r9), (@[ hannah, elijah, mackenzie ]));
+
+    // People that have Hannah as a grandchild.
+    XCTAssertEqualObjects(asArray(r10), (@[ michael, raewynne, don, diane_sr ]));
+
+    // People that have no listed parents.
+    XCTAssertEqualObjects(asArray(r11), (@[ michael, raewynne, don, diane_sr ]));
+
+    // No links are equal to a detached row accessor.
+    XCTAssertEqualObjects(asArray(r12), (@[ ]));
+
+    // All links are not equal to a detached row accessor so this will match all rows that are linked to.
+    XCTAssertEqualObjects(asArray(r13), (@[ hannah, elijah, mark, jason, diane, carol, mackenzie ]));
 }
 
 @end
