@@ -66,7 +66,11 @@ void Schema::validate() const
     std::vector<ObjectSchemaValidationException> exceptions;
     for (auto const& object : *this) {
         const Property *primary = nullptr;
-        for (auto const& prop : object.properties) {
+
+        std::vector<Property> all_properties = object.persisted_properties;
+        all_properties.insert(all_properties.end(), object.computed_properties.begin(), object.computed_properties.end());
+
+        for (auto const& prop : all_properties) {
             // check object_type existence
             if (!prop.object_type.empty() && find(prop.object_type) == end()) {
                 exceptions.emplace_back(MissingObjectTypeException(object.name, prop));

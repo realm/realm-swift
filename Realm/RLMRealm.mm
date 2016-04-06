@@ -202,10 +202,10 @@ static id RLMAutorelease(id value) {
 }
 
 static void RLMCopyColumnMapping(RLMObjectSchema *targetSchema, const ObjectSchema &tableSchema) {
-    REALM_ASSERT_DEBUG(targetSchema.properties.count == tableSchema.properties.size());
+    REALM_ASSERT_DEBUG(targetSchema.properties.count == tableSchema.persisted_properties.size());
 
     // copy updated column mapping
-    for (auto const& prop : tableSchema.properties) {
+    for (auto const& prop : tableSchema.persisted_properties) {
         RLMProperty *targetProp = targetSchema[@(prop.name.c_str())];
         targetProp.column = prop.table_column;
     }

@@ -34,7 +34,7 @@ using namespace realm;
 
 // private properties
 @interface RLMObjectSchema ()
-@property (nonatomic, readwrite) NSDictionary RLM_GENERIC(id, RLMProperty *) *propertiesByName;
+@property (nonatomic, readwrite) NSDictionary RLM_GENERIC(id, RLMProperty *) *allPropertiesByName;
 @property (nonatomic, readwrite) NSString *className;
 @end
 
@@ -56,12 +56,24 @@ using namespace realm;
 
 // return properties by name
 -(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key {
-    return _propertiesByName[key];
+    return _allPropertiesByName[key];
 }
 
 // create property map when setting property array
 -(void)setProperties:(NSArray *)properties {
     _properties = properties;
+    _propertiesInDeclaredOrder = nil;
+    [self _propertiesDidChange];
+}
+
+- (void)setComputedProperties:(NSArray *)computedProperties
+{
+    _computedProperties = computedProperties;
+    [self _propertiesDidChange];
+}
+
+- (void)_propertiesDidChange
+{
     NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
     for (RLMProperty *prop in _properties) {
         map[prop.name] = prop;
@@ -69,9 +81,12 @@ using namespace realm;
             self.primaryKeyProperty = prop;
         }
     }
-    _propertiesByName = map;
-    _propertiesInDeclaredOrder = nil;
+    for (RLMProperty *prop in _computedProperties) {
+        map[prop.name] = prop;
+    }
+    _allPropertiesByName = map;
 }
+
 
 - (void)setPrimaryKeyProperty:(RLMProperty *)primaryKeyProperty {
     _primaryKeyProperty.isPrimary = NO;
@@ -96,21 +111,23 @@ using namespace realm;
     // create array of RLMProperties, inserting properties of superclasses first
     Class cls = objectClass;
     Class superClass = class_getSuperclass(cls);
-    NSArray *props = @[];
+    NSArray *allProperties = @[];
     while (superClass && superClass != RLMObjectBase.class) {
-        props = [[RLMObjectSchema propertiesForClass:cls isSwift:isSwift] arrayByAddingObjectsFromArray:props];
+        allProperties = [[RLMObjectSchema propertiesForClass:cls isSwift:isSwift] arrayByAddingObjectsFromArray:allProperties];
         cls = superClass;
         superClass = class_getSuperclass(superClass);
     }
+    NSArray *persistedProperties = allProperties;
     NSUInteger index = 0;
-    for (RLMProperty *prop in props) {
+    for (RLMProperty *prop in persistedProperties) {
         prop.declarationIndex = index++;
     }
-    schema.properties = props;
+    schema.properties = persistedProperties;
+    schema.computedProperties = @[];
 
     // verify that we didn't add any properties twice due to inheritance
-    if (props.count != [NSSet setWithArray:[props valueForKey:@"name"]].count) {
-        NSCountedSet *countedPropertyNames = [NSCountedSet setWithArray:[props valueForKey:@"name"]];
+    if (allProperties.count != [NSSet setWithArray:[allProperties valueForKey:@"name"]].count) {
+        NSCountedSet *countedPropertyNames = [NSCountedSet setWithArray:[allProperties valueForKey:@"name"]];
         NSSet *duplicatePropertyNames = [countedPropertyNames filteredSetUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id object, NSDictionary *) {
             return [countedPropertyNames countForObject:object] > 1;
         }]];
@@ -268,6 +285,7 @@ using namespace realm;
 
     // call property setter to reset map and primary key
     schema.properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
+    schema.computedProperties = [[NSArray allocWithZone:zone] initWithArray:_computedProperties copyItems:YES];
 
     // _table not copied as it's realm::Group-specific
     return schema;
@@ -282,9 +300,10 @@ using namespace realm;
     schema->_standaloneClass = _standaloneClass;
     schema->_isSwiftClass = _isSwiftClass;
 
-    // reuse propery array, map, and primary key instnaces
+    // reuse property array, map, and primary key instnaces
     schema->_properties = _properties;
-    schema->_propertiesByName = _propertiesByName;
+    schema->_computedProperties = _computedProperties;
+    schema->_allPropertiesByName = _allPropertiesByName;
     schema->_primaryKeyProperty = _primaryKeyProperty;
 
     // _table not copied as it's realm::Group-specific
@@ -299,6 +318,9 @@ using namespace realm;
     if (![_properties isEqualToArray:objectSchema.properties]) {
         return NO;
     }
+    if (![_computedProperties isEqualToArray:objectSchema.computedProperties]) {
+        return NO;
+    }
 
     return YES;
 }
@@ -306,6 +328,9 @@ using namespace realm;
 - (NSString *)description {
     NSMutableString *propertiesString = [NSMutableString string];
     for (RLMProperty *property in self.properties) {
+        [propertiesString appendFormat:@"\t%@\n", [property.description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"]];
+    }
+    for (RLMProperty *property in self.computedProperties) {
         [propertiesString appendFormat:@"\t%@\n", [property.description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"]];
     }
     return [NSString stringWithFormat:@"%@ {\n%@}", self.className, propertiesString];
@@ -329,7 +354,10 @@ using namespace realm;
     for (RLMProperty *prop in _properties) {
         Property p = [prop objectStoreCopy];
         p.is_primary = (prop == _primaryKeyProperty);
-        objectSchema.properties.push_back(std::move(p));
+        objectSchema.persisted_properties.push_back(std::move(p));
+    }
+    for (RLMProperty *prop in _computedProperties) {
+        objectSchema.computed_properties.push_back([prop objectStoreCopy]);
     }
     return objectSchema;
 }
@@ -339,14 +367,20 @@ using namespace realm;
     schema.className = @(objectSchema.name.c_str());
 
     // create array of RLMProperties
-    NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:objectSchema.properties.size()];
-    for (Property &prop : objectSchema.properties) {
+    NSMutableArray *properties = [NSMutableArray arrayWithCapacity:objectSchema.persisted_properties.size()];
+    for (const Property &prop : objectSchema.persisted_properties) {
         RLMProperty *property = [RLMProperty propertyForObjectStoreProperty:prop];
         property.isPrimary = (prop.name == objectSchema.primary_key);
-        [propArray addObject:property];
+        [properties addObject:property];
     }
-    schema.properties = propArray;
-    
+    schema.properties = properties;
+
+    NSMutableArray *computedProperties = [NSMutableArray arrayWithCapacity:objectSchema.computed_properties.size()];
+    for (const Property &prop : objectSchema.computed_properties) {
+        [computedProperties addObject:[RLMProperty propertyForObjectStoreProperty:prop]];
+    }
+    schema.computedProperties = computedProperties;
+
     // get primary key from realm metadata
     if (objectSchema.primary_key.length()) {
         NSString *primaryKeyString = [NSString stringWithUTF8String:objectSchema.primary_key.c_str()];
