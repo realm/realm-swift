@@ -461,6 +461,10 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     return [cls indexedProperties];
 }
 
++ (NSDictionary *)linkingObjectsPropertiesForClass:(Class)cls {
+    return [cls linkingObjectsProperties];
+}
+
 + (NSArray *)getGenericListPropertyNames:(__unused id)obj {
     return nil;
 }

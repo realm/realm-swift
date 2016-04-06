@@ -73,6 +73,10 @@
 #pragma mark AllTypesObject
 
 @implementation AllTypesObject
++ (NSDictionary *)linkingObjectsProperties
+{
+    return @{ @"linkingObjectsCol": @{ @"class": @"LinkToAllTypesObject", @"property": @"allTypesCol" } };
+}
 @end
 
 @implementation ArrayOfAllTypesObject
@@ -105,6 +109,10 @@
 #pragma mark DogObject
 
 @implementation DogObject
++ (NSDictionary *)linkingObjectsProperties
+{
+    return @{ @"owners": @{ @"class": @"OwnerObject", @"property": @"dog" } };
+}
 @end
 
 #pragma mark OwnerObject
@@ -216,4 +224,5 @@
 + (NSArray *)indexedProperties { return nil; }
 + (NSString *)primaryKey { return nil; }
 + (NSArray *)requiredProperties { return nil; }
++ (NSDictionary *)linkingObjectsProperties { return nil; }
 @end

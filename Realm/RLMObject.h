@@ -278,6 +278,21 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (NSArray RLM_GENERIC(NSString *) *)requiredProperties;
 
+/**
+ Implement to return a dictionary providing information related to linking objects properties.
+
+ Properties of type RLMLinkingObjects must have a corresponding entry in the dictionary to provide
+ information about the origin of the link that they represent. Their corresponding value in the
+ dictionary must be of the form:
+
+     @{ @"class": @"SomeClass", @"property": @"someProperty" }
+
+ Where `SomeClass` is a class that has a property `someProperty` that forms a relationship with this class.
+
+ @return     NSDictionary mapping property names to information about linking objects properties.
+ */
++ (NSDictionary *)linkingObjectsProperties;
+
 
 #pragma mark - Getting & Querying Objects from the Default Realm
 

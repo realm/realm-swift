@@ -31,6 +31,7 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType);
 
 - (instancetype)initWithName:(NSString *)name
                      indexed:(BOOL)indexed
+              linkingObjects:(NSDictionary *)linkingObjectsInfo
                     property:(objc_property_t)property;
 
 - (instancetype)initSwiftPropertyWithName:(NSString *)name
