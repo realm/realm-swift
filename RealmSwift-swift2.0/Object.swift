@@ -340,6 +340,10 @@ public class ObjectUtil: NSObject {
         return nil
     }
 
+    @objc private class func linkingObjectsPropertiesForClass(type: AnyClass) -> NSDictionary? {
+        return nil
+    }
+
     // Get the names of all properties in the object which are of type List<>.
     @objc private class func getGenericListPropertyNames(object: AnyObject) -> NSArray {
         return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in

@@ -179,6 +179,7 @@ using namespace realm;
 + (NSArray *)propertiesForClass:(Class)objectClass isSwift:(bool)isSwiftClass {
     Class objectUtil = [objectClass objectUtilClass:isSwiftClass];
     NSArray *ignoredProperties = [objectUtil ignoredPropertiesForClass:objectClass];
+    NSDictionary *linkingObjectsProperties = [objectUtil linkingObjectsPropertiesForClass:objectClass];
 
     // For Swift classes we need an instance of the object when parsing properties
     id swiftObjectInstance = isSwiftClass ? [[objectClass alloc] init] : nil;
@@ -201,7 +202,10 @@ using namespace realm;
                                                          instance:swiftObjectInstance];
         }
         else {
-            prop = [[RLMProperty alloc] initWithName:propertyName indexed:[indexed containsObject:propertyName] property:props[i]];
+            prop = [[RLMProperty alloc] initWithName:propertyName
+                                             indexed:[indexed containsObject:propertyName]
+                                      linkingObjects:linkingObjectsProperties[propertyName]
+                                            property:props[i]];
         }
 
         if (prop) {

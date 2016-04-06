@@ -47,6 +47,14 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType)
     return propertyType == RLMPropertyTypeLinkingObjects;
 }
 
+static bool rawTypeIsComputedProperty(NSString *rawType)
+{
+    if ([rawType isEqualToString:@"@\"RLMLinkingObjects\""]) {
+        return true;
+    }
+
+    return false;
+}
 
 @implementation RLMProperty
 
@@ -220,6 +228,15 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType)
                                         @"See https://realm.io/docs/objc/latest for more information.", _name, numberType);
                 }
             }
+            else if (strcmp(code, "@\"RLMLinkingObjects\"") == 0) {
+                _type = RLMPropertyTypeLinkingObjects;
+                _optional = false;
+
+                if (!_objectClassName || !_linkOriginPropertyName) {
+                    @throw RLMException(@"Property '%@' is of type RLMLinkingObjects but +linkingObjectsProperties did not specify the class "
+                                        "or property that is the origin of the link.", _name);
+                }
+            }
             else if (strcmp(code, "@\"NSNumber\"") == 0) {
                 @throw RLMException(@"Property '%@' requires a protocol defining the contained type - example: NSNumber<RLMInt>.", _name);
             }
@@ -253,14 +270,14 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType)
     unsigned int count;
     objc_property_attribute_t *attrs = property_copyAttributeList(property, &count);
 
-    bool ignore = false;
+    bool isReadOnly = false;
     for (size_t i = 0; i < count; ++i) {
         switch (*attrs[i].name) {
             case 'T':
                 _objcRawType = @(attrs[i].value);
                 break;
             case 'R':
-                ignore = true;
+                isReadOnly = true;
                 break;
             case 'N':
                 // nonatomic
@@ -280,7 +297,7 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType)
     }
     free(attrs);
 
-    return ignore;
+    return isReadOnly;
 }
 
 - (instancetype)initSwiftPropertyWithName:(NSString *)name
@@ -364,6 +381,7 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType)
 
 - (instancetype)initWithName:(NSString *)name
                      indexed:(BOOL)indexed
+              linkingObjects:(NSDictionary *)linkingObjectsInfo
                     property:(objc_property_t)property
 {
     self = [super init];
@@ -373,8 +391,11 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType)
 
     _name = name;
     _indexed = indexed;
+    _objectClassName = linkingObjectsInfo[@"class"];
+    _linkOriginPropertyName = linkingObjectsInfo[@"property"];
 
-    if ([self parseObjcProperty:property]) {
+    bool isReadOnly = [self parseObjcProperty:property];
+    if (isReadOnly && !rawTypeIsComputedProperty(_objcRawType)) {
         return nil;
     }
 

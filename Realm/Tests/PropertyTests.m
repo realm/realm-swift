@@ -89,10 +89,10 @@
 - (void)testTwoPropertiesAreEqual {
     const char *name = "intCol";
     objc_property_t objcProperty1 = class_getProperty(AllTypesObject.class, name);
-    RLMProperty *property1 = [[RLMProperty alloc] initWithName:@(name) indexed:YES property:objcProperty1];
+    RLMProperty *property1 = [[RLMProperty alloc] initWithName:@(name) indexed:YES linkingObjects:nil property:objcProperty1];
 
     objc_property_t objcProperty2 = class_getProperty(IntObject.class, name);
-    RLMProperty *property2 = [[RLMProperty alloc] initWithName:@(name) indexed:YES property:objcProperty2];
+    RLMProperty *property2 = [[RLMProperty alloc] initWithName:@(name) indexed:YES linkingObjects:nil property:objcProperty2];
 
     XCTAssertEqualObjects(property1, property2);
 }
@@ -100,11 +100,11 @@
 - (void)testTwoPropertiesAreUnequal {
     const char *name = "stringCol";
     objc_property_t objcProperty1 = class_getProperty(AllTypesObject.class, name);
-    RLMProperty *property1 = [[RLMProperty alloc] initWithName:@(name) indexed:YES property:objcProperty1];
+    RLMProperty *property1 = [[RLMProperty alloc] initWithName:@(name) indexed:YES linkingObjects:nil property:objcProperty1];
 
     name = "intCol";
     objc_property_t objcProperty2 = class_getProperty(IntObject.class, name);
-    RLMProperty *property2 = [[RLMProperty alloc] initWithName:@(name) indexed:YES property:objcProperty2];
+    RLMProperty *property2 = [[RLMProperty alloc] initWithName:@(name) indexed:YES linkingObjects:nil property:objcProperty2];
 
     XCTAssertNotEqualObjects(property1, property2);
 }

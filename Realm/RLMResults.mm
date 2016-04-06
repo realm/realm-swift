@@ -404,3 +404,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 #pragma clang diagnostic pop
 @end
+
+@implementation RLMLinkingObjects
+@end

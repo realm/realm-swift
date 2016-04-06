@@ -257,6 +257,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     // on, these tests should be altered to verify all types.
     
     NSArray *expectedTypes = @[@"AllTypesObject",
+                               @"LinkToAllTypesObject",
                                @"StringObject",
                                @"IntObject"];
     
@@ -426,6 +427,14 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = YES;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tlinkingObjectsCol {\n"
+                                              @"\t\t\ttype = linking objects;\n"
+                                              @"\t\t\tobjectClassName = LinkToAllTypesObject;\n"
+                                              @"\t\t\tlinkOriginPropertyName = allTypesCol;\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
                                               @"\tIntObject {\n"
