@@ -14,6 +14,7 @@
 		227D20921CB4EB1B008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20901CB4EAFD008F641B /* LaunchScreen.storyboard */; };
 		227D20951CB4EEED008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20931CB4EE99008F641B /* LaunchScreen.storyboard */; };
 		227D20971CB4F00D008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20961CB4F00D008F641B /* LaunchScreen.storyboard */; };
+		227D20991CB4F0B8008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20981CB4F0B8008F641B /* LaunchScreen.storyboard */; };
 		27F824B119611EFF4A9EE8A0 /* Pods_ReactKitTableView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D00630224166C0631FC7AD2B /* Pods_ReactKitTableView.framework */; };
 		3FC898FF1A1414110067CBEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FE1A1414110067CBEC /* ViewController.swift */; };
 		5D8DD54D1C62C5A4005077F2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8DD5491C62C5A4005077F2 /* AppDelegate.swift */; };
@@ -152,6 +153,7 @@
 		227D20901CB4EAFD008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		227D20931CB4EE99008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		227D20961CB4F00D008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		227D20981CB4F0B8008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		5D8DD5361C62C572005077F2 /* ReactKitTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReactKitTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D8DD5491C62C5A4005077F2 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -368,6 +370,7 @@
 				E8CB088719BA6AF70018434A /* default-v1.realm */,
 				E8CB088819BA6AF70018434A /* default-v2.realm */,
 				E8CB088919BA6AF70018434A /* Info.plist */,
+				227D20981CB4F0B8008F641B /* LaunchScreen.storyboard */,
 			);
 			path = Migration;
 			sourceTree = "<group>";
@@ -633,6 +636,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8CB088B19BA6AF70018434A /* default-v0.realm in Resources */,
+				227D20991CB4F0B8008F641B /* LaunchScreen.storyboard in Resources */,
 				E8CB088C19BA6AF70018434A /* default-v1.realm in Resources */,
 				E8CB088D19BA6AF70018434A /* default-v2.realm in Resources */,
 			);
