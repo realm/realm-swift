@@ -27,6 +27,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
+#import "results.hpp"
 
 #import <objc/runtime.h>
 #import <realm/descriptor.hpp>
@@ -45,6 +46,7 @@ typedef NS_ENUM(char, RLMAccessorCode) {
     RLMAccessorCodeData,
     RLMAccessorCodeLink,
     RLMAccessorCodeArray,
+    RLMAccessorCodeLinkingObjects,
     RLMAccessorCodeAny,
 
     RLMAccessorCodeIntObject,
@@ -376,6 +378,18 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
     }
 }
 
+static inline RLMLinkingObjects *RLMGetLinkingObjects(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const property) {
+    RLMObjectSchema *objectSchema = obj->_realm.schema[property.objectClassName];
+    RLMProperty *linkingProperty = objectSchema[property.linkOriginPropertyName];
+    auto backlinkView = obj->_row.get_table()->get_backlink_view(obj->_row.get_index(), objectSchema.table, linkingProperty.column);
+    realm::Results results(obj->_realm->_realm, {}, std::move(backlinkView));
+    return [RLMLinkingObjects resultsWithObjectSchema:objectSchema results:std::move(results)];
+}
+
+static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const, NSUInteger, __unsafe_unretained RLMResults*)
+{
+    @throw RLMException(@"Linking objects properties are read-only");
+}
 
 // any getter/setter
 static inline id RLMGetAnyProperty(__unsafe_unretained RLMObjectBase *const obj, NSUInteger col_ndx) {
@@ -503,6 +517,10 @@ static IMP RLMAccessorGetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
             return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
                 return RLMGetBoolObject(obj, colIndex);
             });
+        case RLMAccessorCodeLinkingObjects:
+            return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
+                return RLMGetLinkingObjects(obj, prop);
+            });
     }
 }
 
@@ -555,6 +573,7 @@ static IMP RLMAccessorSetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
         case RLMAccessorCodeFloatObject:  return RLMMakeSetter<NSNumber<RLMFloat> *>(prop);
         case RLMAccessorCodeDoubleObject: return RLMMakeSetter<NSNumber<RLMDouble> *>(prop);
         case RLMAccessorCodeBoolObject:   return RLMMakeSetter<NSNumber<RLMBool> *>(prop);
+        case RLMAccessorCodeLinkingObjects:    return RLMMakeSetter<RLMResults *>(prop);
     }
 }
 
@@ -578,7 +597,7 @@ static void RLMSuperSet(RLMObjectBase *obj, NSString *propName, id val) {
 
 // getter/setter for standalone
 static IMP RLMAccessorStandaloneGetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
-    // only override getters for RLMArray properties
+    // only override getters for RLMArray and linking objects properties
     if (accessorCode == RLMAccessorCodeArray) {
         NSString *objectClassName = prop.objectClassName;
         NSString *propName = prop.name;
@@ -592,10 +611,15 @@ static IMP RLMAccessorStandaloneGetter(RLMProperty *prop, RLMAccessorCode access
             return val;
         });
     }
+    else if (accessorCode == RLMAccessorCodeLinkingObjects) {
+        return imp_implementationWithBlock(^(RLMObjectBase *){
+            return nil;
+        });
+    }
     return nil;
 }
 static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
-    // only override getters for RLMArray properties
+    // only override getters for RLMArray and linking objects properties
     if (accessorCode == RLMAccessorCodeArray) {
         NSString *propName = prop.name;
         NSString *objectClassName = prop.objectClassName;
@@ -604,6 +628,11 @@ static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, RLMAccessorCode access
             RLMArray *standaloneAr = [[RLMArray alloc] initWithObjectClassName:objectClassName];
             [standaloneAr addObjects:ar];
             RLMSuperSet(obj, propName, standaloneAr);
+        });
+    }
+    else if (accessorCode == RLMAccessorCodeLinkingObjects) {
+        return imp_implementationWithBlock(^(RLMObjectBase *, RLMResults *) {
+            @throw RLMException(@"Linking objects properties are read-only");
         });
     }
     return nil;
@@ -666,13 +695,15 @@ static RLMAccessorCode accessorCodeForType(char objcTypeCode, RLMPropertyType rl
                 case RLMPropertyTypeDouble: return RLMAccessorCodeDoubleObject;
                 case RLMPropertyTypeFloat: return RLMAccessorCodeFloatObject;
                 case RLMPropertyTypeInt: return RLMAccessorCodeIntObject;
-                default: break;
+
+                case RLMPropertyTypeLinkingObjects: return RLMAccessorCodeLinkingObjects;
             }
         case 'c':
             switch (rlmType) {
                 case RLMPropertyTypeInt: return RLMAccessorCodeByte;
                 case RLMPropertyTypeBool: return RLMAccessorCodeBool;
-                default: break;
+                default:
+                    @throw RLMException(@"Unexpected property type for Objective-C type code");
             }
         case 'B': return RLMAccessorCodeBool;
         case 's': return RLMAccessorCodeShort;
@@ -742,7 +773,7 @@ static Class RLMCreateAccessorClass(Class objectClass,
         objc_registerClassPair(accClass);
     }
 
-    // override getters/setters for each property
+    // override getters/setters for each propery
     NSArray *allProperties = [schema.properties arrayByAddingObjectsFromArray:schema.computedProperties];
     for (RLMProperty *prop in allProperties) {
         RLMAccessorCode accessorCode = accessorCodeForType(prop.objcType, prop.type);
@@ -872,6 +903,8 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
             case RLMAccessorCodeAny:
                 RLMSetValue(obj, col, val);
                 break;
+            case RLMAccessorCodeLinkingObjects:
+                @throw RLMException(@"Linking objects properties are read-only");
         }
     });
 }
@@ -905,5 +938,6 @@ id RLMDynamicGet(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained RLM
         case RLMAccessorCodeFloatObject:  return RLMGetFloatObject(obj, col);
         case RLMAccessorCodeDoubleObject: return RLMGetDoubleObject(obj, col);
         case RLMAccessorCodeBoolObject:   return RLMGetBoolObject(obj, col);
+        case RLMAccessorCodeLinkingObjects: return RLMGetLinkingObjects(obj, prop);
     }
 }
