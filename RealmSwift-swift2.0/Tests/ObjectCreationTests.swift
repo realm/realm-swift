@@ -563,7 +563,8 @@ class ObjectCreationTests: TestCase {
                 [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])],
                 [persistedObject, [false]]
             ]
-            case .Any:      XCTFail("not supported")
+            case .Any:            XCTFail("not supported")
+            case .LinkingObjects: XCTFail("not supported")
         }
         return []
     }
@@ -583,7 +584,9 @@ class ObjectCreationTests: TestCase {
             case .Date:     return ["invalid"]
             case .Object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
             case .Array:    return ["invalid", [["a"]], [["boolCol" : "a"]], [[SwiftIntObject()]], [[persistedObject]]]
-            case .Any:      XCTFail("not supported")
+
+            case .Any:            XCTFail("not supported")
+            case .LinkingObjects: XCTFail("not supported")
         }
         return []
     }

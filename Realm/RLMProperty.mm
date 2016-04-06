@@ -42,6 +42,12 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     }
 }
 
+BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType)
+{
+    return propertyType == RLMPropertyTypeLinkingObjects;
+}
+
+
 @implementation RLMProperty
 
 + (instancetype)propertyForObjectStoreProperty:(const realm::Property &)prop
@@ -49,6 +55,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     return [[RLMProperty alloc] initWithName:@(prop.name.c_str())
                                         type:(RLMPropertyType)prop.type
                              objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
+                      linkOriginPropertyName:prop.link_origin_property_name.length() ? @(prop.link_origin_property_name.c_str()) : nil
                                      indexed:prop.is_indexed
                                     optional:prop.is_nullable];
 }
@@ -56,6 +63,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
+      linkOriginPropertyName:(NSString *)linkOriginPropertyName
                      indexed:(BOOL)indexed
                     optional:(BOOL)optional {
     self = [super init];
@@ -63,6 +71,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
         _name = name;
         _type = type;
         _objectClassName = objectClassName;
+        _linkOriginPropertyName = linkOriginPropertyName;
         _indexed = indexed;
         _optional = optional;
         [self setObjcCodeFromType];
@@ -121,6 +130,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
         case RLMPropertyTypeDate:
         case RLMPropertyTypeObject:
         case RLMPropertyTypeString:
+        case RLMPropertyTypeLinkingObjects:
             _objcType = '@';
             break;
     }
@@ -435,6 +445,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     prop->_swiftIvar = _swiftIvar;
     prop->_optional = _optional;
     prop->_declarationIndex = _declarationIndex;
+    prop->_linkOriginPropertyName = _linkOriginPropertyName;
 
     return prop;
 }
@@ -455,11 +466,12 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
         && _isPrimary == property->_isPrimary
         && _optional == property->_optional
         && [_name isEqualToString:property->_name]
-        && (_objectClassName == property->_objectClassName  || [_objectClassName isEqualToString:property->_objectClassName]);
+        && (_objectClassName == property->_objectClassName  || [_objectClassName isEqualToString:property->_objectClassName])
+        && (_linkOriginPropertyName == property->_linkOriginPropertyName  || [_linkOriginPropertyName isEqualToString:property->_linkOriginPropertyName]);
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@ {\n\ttype = %@;\n\tobjectClassName = %@;\n\tindexed = %@;\n\tisPrimary = %@;\n\toptional = %@;\n}", self.name, RLMTypeToString(self.type), self.objectClassName, self.indexed ? @"YES" : @"NO", self.isPrimary ? @"YES" : @"NO", self.optional ? @"YES" : @"NO"];
+    return [NSString stringWithFormat:@"%@ {\n\ttype = %@;\n\tobjectClassName = %@;\n\tlinkOriginPropertyName = %@;\n\tindexed = %@;\n\tisPrimary = %@;\n\toptional = %@;\n}", self.name, RLMTypeToString(self.type), self.objectClassName, self.linkOriginPropertyName, self.indexed ? @"YES" : @"NO", self.isPrimary ? @"YES" : @"NO", self.optional ? @"YES" : @"NO"];
 }
 
 - (realm::Property)objectStoreCopy
@@ -470,6 +482,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     p.object_type = _objectClassName ? _objectClassName.UTF8String : "";
     p.is_indexed = _indexed;
     p.is_nullable = _optional;
+    p.link_origin_property_name = _linkOriginPropertyName ? _linkOriginPropertyName.UTF8String : "";
     return p;
 }
 

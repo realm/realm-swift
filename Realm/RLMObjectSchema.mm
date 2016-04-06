@@ -117,13 +117,19 @@ using namespace realm;
         cls = superClass;
         superClass = class_getSuperclass(superClass);
     }
-    NSArray *persistedProperties = allProperties;
+    NSArray *persistedProperties = [allProperties filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(RLMProperty *property, NSDictionary *) {
+        return !RLMPropertyTypeIsComputed(property.type);
+    }]];
     NSUInteger index = 0;
     for (RLMProperty *prop in persistedProperties) {
         prop.declarationIndex = index++;
     }
     schema.properties = persistedProperties;
-    schema.computedProperties = @[];
+
+    NSArray *computedProperties = [allProperties filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(RLMProperty *property, NSDictionary *) {
+        return RLMPropertyTypeIsComputed(property.type);
+    }]];
+    schema.computedProperties = computedProperties;
 
     // verify that we didn't add any properties twice due to inheritance
     if (allProperties.count != [NSSet setWithArray:[allProperties valueForKey:@"name"]].count) {
