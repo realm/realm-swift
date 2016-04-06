@@ -36,6 +36,7 @@
     XCTAssertEqualObjects(property.description, @"objectCol {\n"
                                                 @"\ttype = object;\n"
                                                 @"\tobjectClassName = StringObject;\n"
+                                                @"\tlinkOriginPropertyName = (null);\n"
                                                 @"\tindexed = NO;\n"
                                                 @"\tisPrimary = NO;\n"
                                                 @"\toptional = YES;\n"
@@ -49,17 +50,17 @@
     {
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[AllTypesObject class]];
         NSDictionary *expectedProperties = @{
-                                             @"boolCol":   [[RLMProperty alloc] initWithName:@"boolCol"   type:RLMPropertyTypeBool   objectClassName:nil             indexed:NO optional:NO],
-                                             @"intCol":    [[RLMProperty alloc] initWithName:@"intCol"    type:RLMPropertyTypeInt    objectClassName:nil             indexed:NO optional:NO],
-                                             @"floatCol":  [[RLMProperty alloc] initWithName:@"floatCol"  type:RLMPropertyTypeFloat  objectClassName:nil             indexed:NO optional:NO],
-                                             @"doubleCol": [[RLMProperty alloc] initWithName:@"doubleCol" type:RLMPropertyTypeDouble objectClassName:nil             indexed:NO optional:NO],
-                                             @"stringCol": [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil             indexed:NO optional:optionalsEnabled],
-                                             @"binaryCol": [[RLMProperty alloc] initWithName:@"binaryCol" type:RLMPropertyTypeData   objectClassName:nil             indexed:NO optional:optionalsEnabled],
-                                             @"dateCol":   [[RLMProperty alloc] initWithName:@"dateCol"   type:RLMPropertyTypeDate   objectClassName:nil             indexed:NO optional:optionalsEnabled],
-                                             @"cBoolCol":  [[RLMProperty alloc] initWithName:@"cBoolCol"  type:RLMPropertyTypeBool   objectClassName:nil             indexed:NO optional:NO],
-                                             @"longCol":   [[RLMProperty alloc] initWithName:@"longCol"   type:RLMPropertyTypeInt    objectClassName:nil             indexed:NO optional:NO],
-                                             @"mixedCol":  [[RLMProperty alloc] initWithName:@"mixedCol"  type:RLMPropertyTypeAny    objectClassName:nil             indexed:NO optional:NO],
-                                             @"objectCol": [[RLMProperty alloc] initWithName:@"objectCol" type:RLMPropertyTypeObject objectClassName:@"StringObject" indexed:NO optional:YES]
+                                             @"boolCol":     [[RLMProperty alloc] initWithName:@"boolCol"     type:RLMPropertyTypeBool     objectClassName:nil                     linkOriginPropertyName:nil            indexed:NO optional:NO],
+                                             @"intCol":      [[RLMProperty alloc] initWithName:@"intCol"      type:RLMPropertyTypeInt      objectClassName:nil                     linkOriginPropertyName:nil            indexed:NO optional:NO],
+                                             @"floatCol":    [[RLMProperty alloc] initWithName:@"floatCol"    type:RLMPropertyTypeFloat    objectClassName:nil                     linkOriginPropertyName:nil            indexed:NO optional:NO],
+                                             @"doubleCol":   [[RLMProperty alloc] initWithName:@"doubleCol"   type:RLMPropertyTypeDouble   objectClassName:nil                     linkOriginPropertyName:nil            indexed:NO optional:NO],
+                                             @"stringCol":   [[RLMProperty alloc] initWithName:@"stringCol"   type:RLMPropertyTypeString   objectClassName:nil                     linkOriginPropertyName:nil            indexed:NO optional:optionalsEnabled],
+                                             @"binaryCol":   [[RLMProperty alloc] initWithName:@"binaryCol"   type:RLMPropertyTypeData     objectClassName:nil                     linkOriginPropertyName:nil            indexed:NO optional:optionalsEnabled],
+                                             @"dateCol":     [[RLMProperty alloc] initWithName:@"dateCol"     type:RLMPropertyTypeDate     objectClassName:nil                     linkOriginPropertyName:nil            indexed:NO optional:optionalsEnabled],
+                                             @"cBoolCol":    [[RLMProperty alloc] initWithName:@"cBoolCol"    type:RLMPropertyTypeBool     objectClassName:nil                     linkOriginPropertyName:nil            indexed:NO optional:NO],
+                                             @"longCol":     [[RLMProperty alloc] initWithName:@"longCol"     type:RLMPropertyTypeInt      objectClassName:nil                     linkOriginPropertyName:nil            indexed:NO optional:NO],
+                                             @"mixedCol":    [[RLMProperty alloc] initWithName:@"mixedCol"    type:RLMPropertyTypeAny      objectClassName:nil                     linkOriginPropertyName:nil            indexed:NO optional:NO],
+                                             @"objectCol":   [[RLMProperty alloc] initWithName:@"objectCol"   type:RLMPropertyTypeObject   objectClassName:@"StringObject"         linkOriginPropertyName:nil            indexed:NO optional:YES],
                                              };
         XCTAssertEqual(objectSchema.properties.count, expectedProperties.allKeys.count);
         for (NSString *propertyName in expectedProperties) {
@@ -72,14 +73,14 @@
     {
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[IndexedStringObject class]];
         RLMProperty *stringProperty = objectSchema[@"stringCol"];
-        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES optional:optionalsEnabled];
+        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil linkOriginPropertyName:nil indexed:YES optional:optionalsEnabled];
         XCTAssertEqualObjects(stringProperty, expectedProperty);
     }
     // Test primary key property
     {
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[PrimaryStringObject class]];
         RLMProperty *stringProperty = objectSchema[@"stringCol"];
-        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES optional:optionalsEnabled];
+        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil linkOriginPropertyName:nil indexed:YES optional:optionalsEnabled];
         expectedProperty.isPrimary = YES;
         XCTAssertEqualObjects(stringProperty, expectedProperty);
     }

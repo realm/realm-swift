@@ -79,6 +79,11 @@ RLM_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy, nullable) NSString *objectClassName;
 
 /**
+ Property name of the origin of a link. Specified for linking objects properties.
+ */
+@property (nonatomic, readonly, copy, nullable) NSString *linkOriginPropertyName;
+
+/**
  Whether this property is optional.
  */
 @property (nonatomic, readonly) BOOL optional;

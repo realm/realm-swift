@@ -105,6 +105,7 @@
     RLMProperty *prop = [[RLMProperty alloc] initWithName:@"a"
                                                      type:RLMPropertyTypeInt
                                           objectClassName:nil
+                                   linkOriginPropertyName:nil
                                                   indexed:NO
                                                  optional:NO];
     RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"TrulyDynamicObject"
