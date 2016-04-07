@@ -465,7 +465,16 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     return [cls linkingObjectsProperties];
 }
 
++ (NSDictionary *)linkingObjectProperties:(__unused id)object
+{
+    return nil;
+}
+
 + (NSArray *)getGenericListPropertyNames:(__unused id)obj {
+    return nil;
+}
+
++ (NSDictionary *)getLinkingObjectsProperties:(__unused id)obj {
     return nil;
 }
 
@@ -473,6 +482,9 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 }
 
 + (void)initializeOptionalProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property {
+}
+
++ (void)initializeLinkingObjectsProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property results:(__unused RLMResults *)results {
 }
 
 + (NSDictionary *)getOptionalProperties:(__unused id)obj {

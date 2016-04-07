@@ -271,6 +271,11 @@ public class Object: RLMObjectBase {
     internal func optionalForProperty(prop: RLMProperty) -> RLMOptionalBase {
         return object_getIvar(self, prop.swiftIvar) as! RLMOptionalBase
     }
+
+    // Helper for getting the linking objects object for a property
+    internal func linkingObjectsForProperty(prop: RLMProperty) -> ResultsBase? {
+        return object_getIvar(self, prop.swiftIvar) as? ResultsBase
+    }
 }
 
 
@@ -300,6 +305,11 @@ public final class DynamicObject: Object {
         optional.property = prop
         optionalProperties[prop.name] = optional
         return optional
+    }
+
+    // Dynamic objects never have linking objects properties
+    internal override func linkingObjectsForProperty(prop: RLMProperty) -> ResultsBase? {
+        return nil
     }
 
     /// :nodoc:
@@ -341,6 +351,7 @@ public class ObjectUtil: NSObject {
     }
 
     @objc private class func linkingObjectsPropertiesForClass(type: AnyClass) -> NSDictionary? {
+        // Not used for Swift. getLinkingObjectsProperties(_:) is used instead.
         return nil
     }
 
@@ -402,5 +413,24 @@ public class ObjectUtil: NSObject {
 
     @objc private class func requiredPropertiesForClass(_: AnyClass) -> NSArray? {
         return nil
+    }
+
+    // Get information about each of the linking objects properties.
+    @objc private class func getLinkingObjectsProperties(object: AnyObject) -> NSDictionary {
+        let properties = Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
+            return prop.value as? LinkingObjectsInfo != nil
+        }.flatMap { (prop: Mirror.Child) in
+            (prop.label!, prop.value as! LinkingObjectsInfo)
+        }
+        return properties.reduce([:] as [String : [String: String ]]) { (dictionary, property) in
+            var d = dictionary
+            let (name, results) = property
+            d[name] = ["class": results.objectClassName, "property": results.propertyName]
+            return d
+        }
+    }
+
+    @objc private class func initializeLinkingObjectsProperty(object: RLMObjectBase, property: RLMProperty, results: RLMResults) {
+        (object as! Object).linkingObjectsForProperty(property)?.rlmResults = results
     }
 }

@@ -48,6 +48,11 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType);
                                              ivar:(Ivar)ivar
                                      propertyType:(RLMPropertyType)propertyType;
 
+- (instancetype)initSwiftLinkingObjectsPropertyWithName:(NSString *)name
+                                                   ivar:(Ivar)ivar
+                                        objectClassName:(NSString *)objectClassName
+                                 linkOriginPropertyName:(NSString *)linkOriginPropertyName;
+
 // private setters
 @property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, readwrite, assign) RLMPropertyType type;

@@ -22,4 +22,7 @@
 
 @interface RLMResults ()
 @property (nonatomic, unsafe_unretained) RLMObjectSchema *objectSchema;
+
++ (instancetype)emptyDetachedResults;
+
 @end

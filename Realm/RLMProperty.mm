@@ -451,6 +451,27 @@ static bool rawTypeIsComputedProperty(NSString *rawType)
     return self;
 }
 
+- (instancetype)initSwiftLinkingObjectsPropertyWithName:(NSString *)name
+                                                   ivar:(Ivar)ivar
+                                        objectClassName:(NSString *)objectClassName
+                                 linkOriginPropertyName:(NSString *)linkOriginPropertyName {
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+
+    _name = name;
+    _type = RLMPropertyTypeLinkingObjects;
+    _objectClassName = objectClassName;
+    _linkOriginPropertyName = linkOriginPropertyName;
+    _objcType = '@';
+    _swiftIvar = ivar;
+
+    // no obj-c property for generic linking objects properties, and thus no getter/setter names
+
+    return self;
+}
+
 - (id)copyWithZone:(NSZone *)zone {
     RLMProperty *prop = [[RLMProperty allocWithZone:zone] init];
     prop->_name = _name;

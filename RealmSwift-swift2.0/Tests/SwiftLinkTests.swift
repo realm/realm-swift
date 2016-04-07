@@ -86,4 +86,29 @@ class SwiftLinkTests: TestCase {
         XCTAssertNil(owner2.dog, "Dog should be nullified when deleted")
         XCTAssertEqual(realm.objects(SwiftDogObject).count, Int(0), "Expecting 0 dogs")
     }
+
+    func testLinkingObjects() {
+        let realm = realmWithTestPath()
+
+        let owner = SwiftOwnerObject()
+        owner.name = "Tim"
+        owner.dog = SwiftDogObject()
+        owner.dog!.dogName = "Harvie"
+
+        XCTAssertEqual(0, owner.dog!.owners.count, "Linking objects are not available until the object is persisted")
+
+        try! realm.write {
+            realm.add(owner)
+        }
+
+        let owners = owner.dog!.owners
+        XCTAssertEqual(1, owners.count)
+        XCTAssertEqual(owner.name, owners.first!.name)
+
+        try! realm.write {
+            owner.dog = nil
+        }
+
+        XCTAssertEqual(0, owners.count)
+    }
 }
