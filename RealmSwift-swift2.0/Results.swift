@@ -47,13 +47,7 @@ extension Int64: AddableType {}
 /// :nodoc:
 /// Internal class. Do not use directly.
 public class ResultsBase: NSObject, NSFastEnumeration {
-    internal let rlmResults: RLMResults
-
-    /// Returns a human-readable description of the objects contained in these results.
-    public override var description: String {
-        let type = "Results<\(rlmResults.objectClassName)>"
-        return gsub("RLMResults <0x[a-z0-9]+>", template: type, string: rlmResults.description) ?? type
-    }
+    internal var rlmResults: RLMResults
 
     // MARK: Initializers
 
@@ -96,7 +90,7 @@ up-to-date done on a background thread whenever possible.
 
 Results cannot be created directly.
 */
-public final class Results<T: Object>: ResultsBase {
+public class Results<T: Object>: ResultsBase {
 
     /// Element type contained in this collection.
     public typealias Element = T
@@ -116,6 +110,12 @@ public final class Results<T: Object>: ResultsBase {
 
     internal override init(_ rlmResults: RLMResults) {
         super.init(rlmResults)
+    }
+
+    /// Returns a human-readable description of the objects contained in these results.
+    public override var description: String {
+        let type = "Results<\(rlmResults.objectClassName)>"
+        return gsub("RLMResults <0x[a-z0-9]+>", template: type, string: rlmResults.description) ?? type
     }
 
     // MARK: Index Retrieval
@@ -473,4 +473,29 @@ extension Results: RealmCollectionType {
             block(RealmCollectionChange.fromObjc(anyCollection, change: change, error: error))
         }
     }
+}
+
+internal protocol LinkingObjectsInfo {
+    var objectClassName: String { get }
+    var propertyName: String { get }
+}
+
+/**
+ LinkingObjects is an auto-updating container type that represents a group of objects that
+ link to a given object.
+ */
+public class LinkingObjects<T: Object> : Results<T>, LinkingObjectsInfo {
+    public init(fromType type: T.Type, property propertyName: String) {
+        self.propertyName = propertyName
+        super.init(RLMResults.emptyDetachedResults())
+    }
+
+    /// Returns a human-readable description of these linking objects.
+    public override var description: String {
+        let type = "LinkingObjects<\(objectClassName)>"
+        return gsub("RLMResults <0x[a-z0-9]+>", template: type, string: rlmResults.description) ?? type
+    }
+
+    internal var objectClassName: String { return (T.self as Object.Type).className() }
+    internal let propertyName: String
 }

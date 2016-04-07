@@ -232,6 +232,25 @@ using namespace realm;
                                                                                ivar:ivar
                                                                     objectClassName:className]];
         }
+
+        // Ditto for LinkingObjects<> properties.
+        NSDictionary *linkingObjectsProperties = [objectUtil getLinkingObjectsProperties:swiftObjectInstance];
+        for (NSString *propName in linkingObjectsProperties) {
+            NSDictionary *info = linkingObjectsProperties[propName];
+            Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
+
+            NSUInteger existing = [propArray indexOfObjectPassingTest:^BOOL(RLMProperty *obj, __unused NSUInteger idx, __unused BOOL *stop) {
+                return [obj.name isEqualToString:propName];
+            }];
+            if (existing != NSNotFound) {
+                [propArray removeObjectAtIndex:existing];
+            }
+
+            [propArray addObject:[[RLMProperty alloc] initSwiftLinkingObjectsPropertyWithName:propName
+                                                                                         ivar:ivar
+                                                                              objectClassName:info[@"class"]
+                                                                       linkOriginPropertyName:info[@"property"]]];
+        }
     }
 
     if (auto optionalProperties = [objectUtil getOptionalProperties:swiftObjectInstance]) {
