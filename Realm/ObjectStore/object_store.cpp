@@ -152,6 +152,13 @@ static inline bool property_can_be_migrated_to_nullable(const Property& old_prop
         && new_property.name == old_property.name;
 }
 
+static inline bool property_can_be_migrated_to_required(const Property& old_property, const Property& new_property) {
+    return old_property.type == new_property.type
+    && old_property.is_nullable
+    && !new_property.is_nullable
+    && new_property.name == old_property.name;
+}
+
 void ObjectStore::verify_schema(Schema const& actual_schema, Schema& target_schema, bool allow_missing_tables) {
     std::vector<ObjectSchemaValidationException> errors;
     for (auto &object_schema : target_schema) {
@@ -215,6 +222,9 @@ static void copy_property_values(const Property& old_property, const Property& n
     size_t old_column = old_property.table_column, new_column = new_property.table_column;
     size_t count = table.size();
     for (size_t i = 0; i < count; i++) {
+        if (table.is_null(old_column, i) && !new_property.is_nullable) {
+            continue;
+        }
         (table.*setter)(new_column, i, (table.*getter)(old_column, i));
     }
 }
@@ -272,7 +282,8 @@ void ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
         // handle columns changing from required to optional
         for (auto& current_prop : current_schema.properties) {
             auto target_prop = target_object_schema->property_for_name(current_prop.name);
-            if (!target_prop || !property_can_be_migrated_to_nullable(current_prop, *target_prop))
+            if (!target_prop || (!property_can_be_migrated_to_nullable(current_prop, *target_prop)
+                                 && !property_can_be_migrated_to_required(current_prop, *target_prop)))
                 continue;
 
             target_prop->table_column = current_prop.table_column;
@@ -294,7 +305,7 @@ void ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
 
             auto target_prop = target_object_schema->property_for_name(current_prop.name);
             if (!target_prop || (property_has_changed(current_prop, *target_prop)
-                                 && !property_can_be_migrated_to_nullable(current_prop, *target_prop))) {
+                                 && !property_can_be_migrated_to_nullable(current_prop, *target_prop) && !property_can_be_migrated_to_required(current_prop, *target_prop))) {
                 if (deleted == current_schema.properties.size() - 1) {
                     // We're about to remove the last column from the table. Insert a placeholder column to preserve
                     // the number of rows in the table for the addition of new columns below.
