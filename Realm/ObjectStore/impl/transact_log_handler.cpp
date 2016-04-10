@@ -99,7 +99,6 @@ public:
     }
     bool insert_column(size_t, DataType, StringData, bool) { return schema_error_unless_new_table(); }
     bool insert_link_column(size_t, DataType, StringData, size_t, size_t) { return schema_error_unless_new_table(); }
-    bool add_primary_key(size_t) { return schema_error_unless_new_table(); }
     bool set_link_type(size_t, LinkType) { return schema_error_unless_new_table(); }
 
     // Removing or renaming things while a Realm is open is never supported
@@ -108,7 +107,6 @@ public:
     bool erase_column(size_t) { schema_error(); }
     bool erase_link_column(size_t, size_t, size_t) { schema_error(); }
     bool rename_column(size_t, StringData) { schema_error(); }
-    bool remove_primary_key() { schema_error(); }
     bool move_column(size_t, size_t) { schema_error(); }
     bool move_group_level_table(size_t, size_t) { schema_error(); }
 
