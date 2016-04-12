@@ -28,6 +28,7 @@
 #include <exception>
 #include <functional>
 #include <mutex>
+#include <thread>
 #include <unordered_map>
 
 namespace realm {
@@ -146,9 +147,27 @@ public:
     // transaction advance, and register all required information in it
     void add_required_change_info(TransactionChangeInfo& info);
 
-    virtual void run() = 0;
+    // Do all background work needed to prepare the notification
+    // Always called on a single thread, without any locks held
+    virtual void run(SharedGroup&) = 0;
+
+    // Update all cached state so that calculating the next changeset can be
+    // done from this version, but do not actually do the work needed to prepare
+    // the handover object or calculate changes
+    // Always called on a single thread, without any locks held
+    virtual void skip(SharedGroup&) = 0;
+
+    // Actually populate the fields used for delivery with the data calculated in run()
+    // Called on the same thread as run(), with a lock guarding this and deliver()
     void prepare_handover();
+
+    // Called on the target thread, with a lock guarding this and prepare_handover()
     bool deliver(Realm&, SharedGroup&, std::exception_ptr);
+
+    SharedGroup::VersionID skip_to_version() const { return m_skip_to_version; }
+    void skip_to_version(SharedGroup::VersionID version) { m_skip_to_version = version; }
+
+    bool is_for_current_thread() const { return m_thread_id == std::this_thread::get_id(); }
 
 protected:
     bool have_callbacks() const noexcept { return m_have_callbacks; }
@@ -161,13 +180,16 @@ protected:
 private:
     virtual void do_attach_to(SharedGroup&) = 0;
     virtual void do_detach_from(SharedGroup&) = 0;
-    virtual void do_prepare_handover(SharedGroup&) = 0;
+    virtual void do_prepare_handover() = 0;
     virtual bool do_deliver(SharedGroup&) { return true; }
     virtual bool do_add_required_change_info(TransactionChangeInfo&) = 0;
+
+    const std::thread::id m_thread_id = std::this_thread::get_id();
 
     mutable std::mutex m_realm_mutex;
     std::shared_ptr<Realm> m_realm;
 
+    SharedGroup::VersionID m_skip_to_version;
     SharedGroup::VersionID m_sg_version;
     SharedGroup* m_sg = nullptr;
 

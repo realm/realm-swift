@@ -107,7 +107,7 @@ namespace realm {
 
         const Config &config() const { return m_config; }
 
-        void begin_transaction();
+        void begin_transaction(bool stuff = false);
         void commit_transaction();
         void cancel_transaction();
         bool is_in_transaction() const noexcept;
@@ -163,6 +163,7 @@ namespace realm {
         Config m_config;
         std::thread::id m_thread_id = std::this_thread::get_id();
         bool m_auto_refresh = true;
+        bool m_notification_stuff = true;
 
         std::unique_ptr<Replication> m_history;
         std::unique_ptr<SharedGroup> m_shared_group;

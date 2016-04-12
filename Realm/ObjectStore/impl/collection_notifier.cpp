@@ -183,7 +183,7 @@ size_t CollectionNotifier::add_callback(CollectionChangeCallback callback)
     auto token = next_token();
     m_callbacks.push_back({std::move(callback), token, false});
     if (m_callback_index == npos) { // Don't need to wake up if we're already sending notifications
-        Realm::Internal::get_coordinator(*m_realm).send_commit_notifications();
+        Realm::Internal::get_coordinator(*m_realm).send_commit_notifications(nullptr);
         m_have_callbacks = true;
     }
     return token;
@@ -259,7 +259,7 @@ void CollectionNotifier::prepare_handover()
 {
     REALM_ASSERT(m_sg);
     m_sg_version = m_sg->get_version_of_current_transaction();
-    do_prepare_handover(*m_sg);
+    do_prepare_handover();
 }
 
 bool CollectionNotifier::deliver(Realm& realm, SharedGroup& sg, std::exception_ptr err)

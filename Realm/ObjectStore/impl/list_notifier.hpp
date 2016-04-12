@@ -46,9 +46,10 @@ private:
     CollectionChangeBuilder m_change;
     TransactionChangeInfo* m_info;
 
-    void run() override;
+    void run(SharedGroup&) override;
+    void skip(SharedGroup&) override;
 
-    void do_prepare_handover(SharedGroup&) override;
+    void do_prepare_handover() override;
 
     void do_attach_to(SharedGroup& sg) override;
     void do_detach_from(SharedGroup& sg) override;

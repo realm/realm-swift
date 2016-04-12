@@ -83,7 +83,7 @@ bool ListNotifier::do_add_required_change_info(TransactionChangeInfo& info)
     return true;
 }
 
-void ListNotifier::run()
+void ListNotifier::run(SharedGroup&)
 {
     if (!m_lv || !m_lv->is_attached()) {
         // LV was deleted, so report all of the rows being removed if this is
@@ -116,7 +116,18 @@ void ListNotifier::run()
     m_prev_size = m_lv->size();
 }
 
-void ListNotifier::do_prepare_handover(SharedGroup&)
+void ListNotifier::skip(SharedGroup&)
+{
+    if (!m_lv || !m_lv->is_attached()) {
+        m_prev_size = 0;
+    }
+    else {
+        m_prev_size = m_lv->size();
+    }
+    skip_to_version(SharedGroup::VersionID{});
+}
+
+void ListNotifier::do_prepare_handover()
 {
     add_changes(std::move(m_change));
 }

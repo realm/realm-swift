@@ -201,6 +201,19 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (void)beginWriteTransaction;
 
 /**
+ Begins a write transaction which does not notify the current thread of changes.
+
+ Like `beginWriteTransaction`, but when committed the write transaction will not
+ produce any notifications on the current thread. This is needed when updating
+ saved data based on changes made in the UI, where re-applying the changes
+ in a notification block would give incorrect results.
+
+ If there are pending notifications waiting to be delivered to the current
+ thread, this method will first deliver them.
+ */
+- (void)beginWriteTransactionWithNotificationStuff;
+
+/**
  Commits all write operations in the current write transaction, and ends the 
  transaction.
 

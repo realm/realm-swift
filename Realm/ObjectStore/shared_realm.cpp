@@ -289,7 +289,7 @@ bool Realm::is_in_transaction() const noexcept
     return m_shared_group->get_transact_stage() == SharedGroup::transact_Writing;
 }
 
-void Realm::begin_transaction()
+void Realm::begin_transaction(bool stuff)
 {
     check_read_write(this);
     verify_thread();
@@ -302,6 +302,11 @@ void Realm::begin_transaction()
     read_group();
 
     transaction::begin(*m_shared_group, m_binding_context.get());
+    m_notification_stuff = stuff;
+
+    if (stuff) {
+        m_coordinator->process_async(*this);
+    }
 }
 
 void Realm::commit_transaction()
@@ -314,7 +319,7 @@ void Realm::commit_transaction()
     }
 
     transaction::commit(*m_shared_group, m_binding_context.get());
-    m_coordinator->send_commit_notifications();
+    m_coordinator->send_commit_notifications(m_notification_stuff ? this : nullptr); // FIXME: race
 }
 
 void Realm::cancel_transaction()
