@@ -73,7 +73,7 @@ bool ResultsNotifier::do_add_required_change_info(TransactionChangeInfo& info)
     return m_initial_run_complete && have_callbacks();
 }
 
-void ResultsNotifier::run()
+bool ResultsNotifier::need_to_run()
 {
     REALM_ASSERT(m_info);
     REALM_ASSERT(!m_tv.is_attached());
@@ -82,7 +82,7 @@ void ResultsNotifier::run()
         auto lock = lock_target();
         // Don't run the query if the results aren't actually going to be used
         if (!get_realm() || (!have_callbacks() && !m_target_results->wants_background_updates())) {
-            return;
+            return false;
         }
     }
 
@@ -91,16 +91,15 @@ void ResultsNotifier::run()
         // Make an empty tableview from the query to get the table version, since
         // Query doesn't expose it
         if (m_query->find_all(0, 0, 0).sync_if_needed() == m_last_seen_version) {
-            return;
+            return false;
         }
     }
 
-    m_tv = m_query->find_all();
-    if (m_sort) {
-        m_tv.sort(m_sort.column_indices, m_sort.ascending);
-    }
-    m_last_seen_version = m_tv.sync_if_needed();
+    return true;
+}
 
+void ResultsNotifier::calculate_changes()
+{
     size_t table_ndx = m_query->get_table()->get_index_in_group();
     if (m_initial_run_complete) {
         auto changes = table_ndx < m_info->tables.size() ? &m_info->tables[table_ndx] : nullptr;
@@ -129,16 +128,26 @@ void ResultsNotifier::run()
                                                        m_sort || m_from_linkview);
 
         m_previous_rows = std::move(next_rows);
-        if (m_changes.empty()) {
-            m_tv = {};
-            return;
-        }
     }
     else {
         m_previous_rows.resize(m_tv.size());
         for (size_t i = 0; i < m_tv.size(); ++i)
             m_previous_rows[i] = m_tv[i].get_index();
     }
+}
+
+void ResultsNotifier::run()
+{
+    if (!need_to_run())
+        return;
+
+    m_tv = m_query->find_all();
+    if (m_sort) {
+        m_tv.sort(m_sort.column_indices, m_sort.ascending);
+    }
+    m_last_seen_version = m_tv.sync_if_needed();
+
+    calculate_changes();
 }
 
 void ResultsNotifier::do_prepare_handover(SharedGroup& sg)

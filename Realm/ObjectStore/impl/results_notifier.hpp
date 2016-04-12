@@ -62,6 +62,9 @@ private:
     // can lead to deliver() being called before that
     bool m_initial_run_complete = false;
 
+    bool need_to_run();
+    void calculate_changes();
+
     void run() override;
     void do_prepare_handover(SharedGroup&) override;
     bool do_deliver(SharedGroup& sg) override;
