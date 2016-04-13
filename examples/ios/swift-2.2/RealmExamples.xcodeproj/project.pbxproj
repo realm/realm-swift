@@ -11,6 +11,13 @@
 		0295B91719D103BE0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
+		227D20F21CB609A1008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.storyboard */; };
+		227D20F31CB609A1008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.storyboard */; };
+		227D20F41CB609A1008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.storyboard */; };
+		227D20F51CB609A1008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.storyboard */; };
+		227D20F61CB609A1008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.storyboard */; };
+		227D20F71CB609A1008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.storyboard */; };
+		227D20F81CB609A1008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.storyboard */; };
 		27F824B119611EFF4A9EE8A0 /* Pods_ReactKitTableView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D00630224166C0631FC7AD2B /* Pods_ReactKitTableView.framework */; };
 		3FC898FF1A1414110067CBEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FE1A1414110067CBEC /* ViewController.swift */; };
 		5D8DD54D1C62C5A4005077F2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8DD5491C62C5A4005077F2 /* AppDelegate.swift */; };
@@ -146,6 +153,7 @@
 /* Begin PBXFileReference section */
 		0295B91519D103A70036D6C3 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		0A73D4411B1443A700E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
+		227D20F11CB609A1008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		5D8DD5361C62C572005077F2 /* ReactKitTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReactKitTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D8DD5491C62C5A4005077F2 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -270,6 +278,14 @@
 			name = RealmSwift;
 			sourceTree = "<group>";
 		};
+		227D20F01CB609A1008F641B /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				227D20F11CB609A1008F641B /* LaunchScreen.storyboard */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
 		2E5A12793BFB7BE6066D95F3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -304,6 +320,7 @@
 				9C318E8C1CA42C7800879076 /* GettingStarted.playground */,
 				0A73D4411B1443A700E1E8EE /* README.md */,
 				E8D3F2751A11766A00620884 /* Backlink */,
+				227D20F01CB609A1008F641B /* Common */,
 				E8CB087F19BA6AEE0018434A /* Encryption */,
 				E886FB621A12A73E00CB2D0B /* GroupedTableView */,
 				E8CB088419BA6AF70018434A /* Migration */,
@@ -445,6 +462,7 @@
 				E8CB07EC19BA6AB60018434A /* Frameworks */,
 				C01304E91A60B77600EB3E1E /* CopyFiles */,
 				C06D6CCE1B016A590066C324 /* Strip Framework Architectures */,
+				227D20941CB4EEE7008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -501,6 +519,7 @@
 				E8CB085B19BA6ACA0018434A /* Frameworks */,
 				C09C490D1A6059BA00638C9F /* CopyFiles */,
 				C06D6CCE1B016A590066C324 /* Strip Framework Architectures */,
+				227D209D1CB4F451008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -519,6 +538,7 @@
 				E8D3F2501A11765200620884 /* Frameworks */,
 				C01304E31A60A4A000EB3E1E /* CopyFiles */,
 				C06D6CCE1B016A590066C324 /* Strip Framework Architectures */,
+				227D20911CB4EB18008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -584,11 +604,36 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		227D20911CB4EB18008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20F21CB609A1008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D20941CB4EEE7008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20F31CB609A1008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D209D1CB4F451008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20F61CB609A1008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5D8DD5341C62C572005077F2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				5D8DD54E1C62C5A4005077F2 /* Images.xcassets in Resources */,
+				227D20F81CB609A1008F641B /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -597,6 +642,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E886FB681A12A73E00CB2D0B /* Images.xcassets in Resources */,
+				227D20F41CB609A1008F641B /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -605,6 +651,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8CB088B19BA6AF70018434A /* default-v0.realm in Resources */,
+				227D20F51CB609A1008F641B /* LaunchScreen.storyboard in Resources */,
 				E8CB088C19BA6AF70018434A /* default-v1.realm in Resources */,
 				E8CB088D19BA6AF70018434A /* default-v2.realm in Resources */,
 			);
@@ -615,6 +662,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8CB089A19BA6B080018434A /* Images.xcassets in Resources */,
+				227D20F71CB609A1008F641B /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

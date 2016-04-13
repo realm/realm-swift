@@ -12,6 +12,15 @@
 		0295B90119D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90219D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90319D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		227D20DE1CB6009D008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.storyboard */; };
+		227D20DF1CB6009D008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.storyboard */; };
+		227D20E01CB6009D008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.storyboard */; };
+		227D20E11CB6009D008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.storyboard */; };
+		227D20E21CB6009D008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.storyboard */; };
+		227D20E31CB6009D008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.storyboard */; };
+		227D20E41CB6009D008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.storyboard */; };
+		227D20E51CB6009D008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.storyboard */; };
+		227D20E61CB6009D008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.storyboard */; };
 		3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
@@ -144,8 +153,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
+		227D20DD1CB6009D008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
 		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
 		3F78C9AD1B431CDF00A0988E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RACTableView/Images.xcassets; sourceTree = "<group>"; };
@@ -373,6 +383,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		227D20DC1CB6009D008F641B /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				227D20DD1CB6009D008F641B /* LaunchScreen.storyboard */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
 		3F78C9AA1B431CB200A0988E /* RACTableView */ = {
 			isa = PBXGroup;
 			children = (
@@ -486,6 +504,7 @@
 			isa = PBXGroup;
 			children = (
 				E8BDBFC71A116FCB00450CFF /* Backlink */,
+				227D20DC1CB6009D008F641B /* Common */,
 				E8F70EBF19BA50AB006F60D5 /* Encryption */,
 				C0DC41CD1A7072670067156A /* Extension */,
 				C0658DC31A76CBD8002F7A84 /* extension WatchKit App */,
@@ -678,6 +697,7 @@
 				C0DC41C81A7072670067156A /* Sources */,
 				C0DC41C91A7072670067156A /* Frameworks */,
 				C06134E21A718BB800D22D12 /* Embed App Extensions */,
+				227D20831CB4E4B9008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -730,6 +750,7 @@
 			buildPhases = (
 				E8AB71D819BA503500F3EDB4 /* Sources */,
 				E8AB71D919BA503500F3EDB4 /* Frameworks */,
+				227D20A51CB50248008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -763,6 +784,7 @@
 			buildPhases = (
 				E8AB723419BA504000F3EDB4 /* Sources */,
 				E8AB723519BA504000F3EDB4 /* Frameworks */,
+				227D20801CB4E36D008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -796,6 +818,7 @@
 			buildPhases = (
 				E8AB729019BA504900F3EDB4 /* Sources */,
 				E8AB729119BA504900F3EDB4 /* Frameworks */,
+				227D208C1CB4E6C5008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -812,6 +835,7 @@
 			buildPhases = (
 				E8BDBF9D1A116FAC00450CFF /* Sources */,
 				E8BDBF9E1A116FAC00450CFF /* Frameworks */,
+				227D20A21CB501A1008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -897,11 +921,52 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		227D20801CB4E36D008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20DF1CB6009D008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D20831CB4E4B9008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20E01CB6009D008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D208C1CB4E6C5008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20E41CB6009D008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D20A21CB501A1008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20DE1CB6009D008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D20A51CB50248008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20E51CB6009D008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3F78C9C21B431CF300A0988E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				3F78C9C31B431CF300A0988E /* Images.xcassets in Resources */,
+				227D20E21CB6009D008F641B /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -936,6 +1001,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E879D9E31A12AA400035E2EB /* Images.xcassets in Resources */,
+				227D20E11CB6009D008F641B /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -944,6 +1010,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8F70EB919BA50A3006F60D5 /* default-v0.realm in Resources */,
+				227D20E31CB6009D008F641B /* LaunchScreen.storyboard in Resources */,
 				E8F70EBA19BA50A3006F60D5 /* default-v1.realm in Resources */,
 				E8F70EBB19BA50A3006F60D5 /* default-v2.realm in Resources */,
 			);
@@ -954,6 +1021,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8F70E9F19BA508B006F60D5 /* Images.xcassets in Resources */,
+				227D20E61CB6009D008F641B /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
