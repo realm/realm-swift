@@ -21,6 +21,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * `-[RLMResults indexOfObjectWithPredicate:]` now returns the index of the first matching object for a
   sorted `RLMResults`, matching its documented behavior.
 * Fix a crash when canceling a transaction that set a relationship.
+* Fix a crash when a query referenced a deleted object.
 
 0.98.6 Release notes (2016-03-25)
 =============================================================
