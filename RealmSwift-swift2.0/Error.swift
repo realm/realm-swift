@@ -62,6 +62,8 @@ public enum Error: ErrorType {
             return RLMError.IncompatibleLockFile
         case .FileFormatUpgradeRequired:
             return RLMError.FileFormatUpgradeRequired
+        case .AddressSpaceExhausted:
+            return RLMError.AddressSpaceExhausted
         }
     }
 
@@ -90,6 +92,9 @@ public enum Error: ErrorType {
     /// Error thrown by Realm if a file format upgrade is required to open the file,
     /// but upgrades were explicilty disabled.
     case FileFormatUpgradeRequired
+
+    /// Error thrown by Realm if there is insufficient available address space.
+    case AddressSpaceExhausted
 }
 
 // MARK: Equatable
