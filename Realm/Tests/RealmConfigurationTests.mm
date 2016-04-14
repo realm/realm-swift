@@ -126,9 +126,9 @@
 
     config.inMemoryIdentifier = @"default";
     RLMRealmConfiguration.defaultConfiguration = config;
-    __block NSString *realmPath = nil;
     @autoreleasepool {
-        realmPath = @(config.config.path.c_str());
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        NSString *realmPath = @(realm.configuration.config.path.c_str());
         XCTAssertTrue([realmPath hasSuffix:@"/default"]);
         XCTAssertTrue([realmPath hasPrefix:NSTemporaryDirectory()]);
     }
@@ -136,7 +136,8 @@
     config.schemaVersion = 1;
     RLMRealmConfiguration.defaultConfiguration = config;
     @autoreleasepool {
-        __unused RLMRealm *realm = RLMRealm.defaultRealm;
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        NSString *realmPath = @(realm.configuration.config.path.c_str());
         XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:realmPath error:nil]);
     }
 
