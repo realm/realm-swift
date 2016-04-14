@@ -12,6 +12,21 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
+* None.
+
+0.98.7 Release notes (2016-04-13)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
 * Mark further initializers in Objective-C as NS_DESIGNATED_INITIALIZER to prevent that these aren't
   correctly defined in Swift Object subclasses, which don't qualify for auto-inheriting the required initializers.
 * `-[RLMResults indexOfObjectWithPredicate:]` now returns correct results
