@@ -127,21 +127,25 @@
 
     config.inMemoryIdentifier = @"default";
     RLMRealmConfiguration.defaultConfiguration = config;
+    __block NSString *realmPath = nil;
     @autoreleasepool {
-        RLMRealm *realm = RLMRealm.defaultRealm;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        XCTAssertTrue([realm.path hasSuffix:@"/default"]);
-        XCTAssertTrue([realm.path hasPrefix:NSTemporaryDirectory()]);
+        // using deprecated realm.path property here to validate the underlying
+        // shared group location because configuration.path is nil for in-memory
+        // realms.
+        realmPath = RLMRealm.defaultRealm.path;
+#pragma clang diagnostic pop
+        XCTAssertTrue([realmPath hasSuffix:@"/default"]);
+        XCTAssertTrue([realmPath hasPrefix:NSTemporaryDirectory()]);
     }
 
     config.schemaVersion = 1;
     RLMRealmConfiguration.defaultConfiguration = config;
     @autoreleasepool {
-        RLMRealm *realm = RLMRealm.defaultRealm;
-        XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:realm.path error:nil]);
+        __unused RLMRealm *realm = RLMRealm.defaultRealm;
+        XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:realmPath error:nil]);
     }
-#pragma clang diagnostic pop
 
     config.path = RLMDefaultRealmPath();
     RLMRealmConfiguration.defaultConfiguration = config;
