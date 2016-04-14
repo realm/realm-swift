@@ -18,12 +18,11 @@
 
 #import "RLMTestCase.h"
 
-#import "RLMRealmConfiguration_Private.h"
+#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMTestObjects.h"
 #import "RLMUtil.hpp"
 
 @interface RealmConfigurationTests : RLMTestCase
-
 @end
 
 @implementation RealmConfigurationTests
@@ -129,13 +128,7 @@
     RLMRealmConfiguration.defaultConfiguration = config;
     __block NSString *realmPath = nil;
     @autoreleasepool {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        // using deprecated realm.path property here to validate the underlying
-        // shared group location because configuration.path is nil for in-memory
-        // realms.
-        realmPath = RLMRealm.defaultRealm.path;
-#pragma clang diagnostic pop
+        realmPath = @(config.config.path.c_str());
         XCTAssertTrue([realmPath hasSuffix:@"/default"]);
         XCTAssertTrue([realmPath hasPrefix:NSTemporaryDirectory()]);
     }

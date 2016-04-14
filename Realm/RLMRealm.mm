@@ -20,7 +20,7 @@
 
 #import "RLMAnalytics.hpp"
 #import "RLMArray_Private.hpp"
-#import "RLMRealmConfiguration_Private.h"
+#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMMigration_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
@@ -46,10 +46,6 @@
 
 using namespace realm;
 using util::File;
-
-@interface RLMRealmConfiguration ()
-- (realm::Realm::Config&)config;
-@end
 
 @interface RLMRealm ()
 - (void)sendNotifications:(NSString *)notification;
