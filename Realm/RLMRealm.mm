@@ -67,17 +67,14 @@ void RLMDisableSyncToDisk() {
 
 @implementation RLMRealmNotificationToken
 - (void)stop {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [_realm removeNotification:self];
-#pragma clang diagnostic pop
 }
 
 - (void)dealloc {
     if (_realm || _block) {
         NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "
               @"on to the RLMNotificationToken returned from addNotificationBlock and call "
-              @"-[RLMNotificationToken stop] when you no longer wish to recieve RLMRealm notifications.");
+              @"removeNotification: when you no longer wish to recieve RLMRealm notifications.");
     }
 }
 @end

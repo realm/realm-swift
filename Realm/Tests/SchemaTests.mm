@@ -590,7 +590,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         }
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
-    [token stop];
+    [realm removeNotification:token];
 
     // Release the write transaction and let them run
     [realm cancelWriteTransaction];

@@ -402,7 +402,7 @@ class SwiftPerformanceTests: TestCase {
                 try! realm.write { object.intCol += 1 }
             }
             self.stopMeasuring()
-            token.stop()
+            realm.removeNotification(token)
         }
     }
 
@@ -430,7 +430,7 @@ class SwiftPerformanceTests: TestCase {
                         dispatch_semaphore_signal(semaphore)
                     }
                     CFRunLoopRun()
-                    token.stop()
+                    realm.removeNotification(token)
                 }
             }
 
@@ -470,7 +470,7 @@ class SwiftPerformanceTests: TestCase {
                         dispatch_semaphore_signal(semaphore)
                     }
                     CFRunLoopRun()
-                    token.stop()
+                    realm.removeNotification(token)
                 }
             }
 
@@ -488,7 +488,7 @@ class SwiftPerformanceTests: TestCase {
             }
             dispatch_sync(queue) {}
             self.stopMeasuring()
-            token.stop()
+            realm.removeNotification(token)
         }
     }
 }
