@@ -43,8 +43,7 @@
 }
 
 template<typename IndexSetFactory>
-static void changeArray(__unsafe_unretained RLMArray *const ar,
-                        NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
+static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
     if (!ar->_backingArray) {
         ar->_backingArray = [NSMutableArray new];
     }

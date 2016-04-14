@@ -429,7 +429,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
             }];
         }
         [self stopMeasuring];
-        [token stop];
+        [realm removeNotification:token];
     }];
 }
 
@@ -458,7 +458,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
             });
             CFRunLoopRun();
 
-            [token stop];
+            [realm removeNotification:token];
         }];
 
         dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
@@ -506,7 +506,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
             });
             CFRunLoopRun();
 
-            [token stop];
+            [realm removeNotification:token];
         }];
 
         RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) {
@@ -529,7 +529,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         [self dispatchAsyncAndWait:^{}];
         [self stopMeasuring];
 
-        [token stop];
+        [realm removeNotification:token];
     }];
 }
 

@@ -385,13 +385,7 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
         }
     });
 
-    try {
-        block();
-    }
-    catch (...) {
-        realm.group->set_cascade_notification_handler(nullptr);
-        throw;
-    }
+    block();
 
     for (auto const& change : reverse(changes)) {
         change.info->didChange(change.property, NSKeyValueChangeRemoval, change.indexes);

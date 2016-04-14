@@ -470,9 +470,8 @@ public final class Realm {
     - parameter notificationToken: The token returned from `addNotificationBlock(_:)`
                                    corresponding to the notification block to remove.
     */
-    @available(*, deprecated=1, message="Use NotificationToken.stop()")
     public func removeNotification(notificationToken: NotificationToken) {
-        notificationToken.stop()
+        rlmRealm.removeNotification(notificationToken)
     }
 
 
