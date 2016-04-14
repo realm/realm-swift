@@ -87,7 +87,7 @@ public enum Error: ErrorType {
     /// cannot share with the current process due to an architecture mismatch.
     case IncompatibleLockFile
 
-    /// Returned by RLMRealm if a file format upgrade is required to open the file,
+    /// Error thrown by Realm if a file format upgrade is required to open the file,
     /// but upgrades were explicilty disabled.
     case FileFormatUpgradeRequired
 }
