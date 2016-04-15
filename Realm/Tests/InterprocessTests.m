@@ -138,7 +138,7 @@
         XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
     }
 
-    [token stop];
+    [realm removeNotification:token];
 }
 
 - (void)testShareInMemoryRealm {
@@ -197,7 +197,7 @@
         }
     }
 
-    [token stop];
+    [realm removeNotification:token];
 }
 
 - (void)testManyWriters {
@@ -229,7 +229,7 @@
             CFRunLoopStop(CFRunLoopGetCurrent());
         }];
         CFRunLoopRun();
-        [token stop];
+        [realm removeNotification:token];
     };
 
     IntObject *obj = [IntObject allObjects].firstObject;

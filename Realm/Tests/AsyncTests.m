@@ -325,7 +325,7 @@
                 token = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
                     CFRunLoopStop(CFRunLoopGetCurrent());
                     dispatch_semaphore_signal(sema);
-                    [token stop];
+                    [realm removeNotification:token];
                     token = nil;
                 }];
                 dispatch_semaphore_signal(sema);

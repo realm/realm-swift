@@ -677,7 +677,7 @@ extern "C" {
     [realm beginWriteTransaction];
     [realm commitWriteTransaction];
 
-    [token stop];
+    [realm removeNotification:token];
     XCTAssertTrue(notificationFired);
 }
 
@@ -710,7 +710,7 @@ extern "C" {
     XCTAssertTrue(notificationFired);
 
     [realm cancelWriteTransaction];
-    [token stop];
+    [realm removeNotification:token];
 }
 
 - (void)testReadOnlyRealmIsImmutable
@@ -1109,7 +1109,7 @@ extern "C" {
                 XCTAssertEqual(note, RLMRealmDidChangeNotification);
                 XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
                 fulfilled = true;
-                [token stop];
+                [realm removeNotification:token];
             }];
 
             // notify main thread that we're ready for it to commit
@@ -1145,7 +1145,7 @@ extern "C" {
         CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
             RLMNotificationToken *token;
             XCTAssertNoThrow(token = [realm addNotificationBlock:^(NSString *, RLMRealm *) { }]);
-            [token stop];
+            [realm removeNotification:token];
             CFRunLoopStop(CFRunLoopGetCurrent());
         });
 
