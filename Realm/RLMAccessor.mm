@@ -387,11 +387,6 @@ static inline RLMLinkingObjects *RLMGetLinkingObjects(__unsafe_unretained RLMObj
     return [RLMLinkingObjects resultsWithObjectSchema:objectSchema results:std::move(results)];
 }
 
-static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const, NSUInteger, __unsafe_unretained RLMResults*)
-{
-    @throw RLMException(@"Linking objects properties are read-only");
-}
-
 // any getter/setter
 static inline id RLMGetAnyProperty(__unsafe_unretained RLMObjectBase *const obj, NSUInteger col_ndx) {
     RLMVerifyAttached(obj);
@@ -574,7 +569,7 @@ static IMP RLMAccessorSetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
         case RLMAccessorCodeFloatObject:  return RLMMakeSetter<NSNumber<RLMFloat> *>(prop);
         case RLMAccessorCodeDoubleObject: return RLMMakeSetter<NSNumber<RLMDouble> *>(prop);
         case RLMAccessorCodeBoolObject:   return RLMMakeSetter<NSNumber<RLMBool> *>(prop);
-        case RLMAccessorCodeLinkingObjects:    return RLMMakeSetter<RLMResults *>(prop);
+        case RLMAccessorCodeLinkingObjects: return nil;
     }
 }
 
@@ -629,11 +624,6 @@ static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, RLMAccessorCode access
             RLMArray *standaloneAr = [[RLMArray alloc] initWithObjectClassName:objectClassName];
             [standaloneAr addObjects:ar];
             RLMSuperSet(obj, propName, standaloneAr);
-        });
-    }
-    else if (accessorCode == RLMAccessorCodeLinkingObjects) {
-        return imp_implementationWithBlock(^(RLMObjectBase *, RLMResults *) {
-            @throw RLMException(@"Linking objects properties are read-only");
         });
     }
     return nil;
