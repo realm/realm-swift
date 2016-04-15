@@ -337,6 +337,11 @@ public final class Results<T: Object>: ResultsBase {
      on the same thread or explicitly call realm.refresh(), accessing it will never
      perform blocking work.
 
+     Notifications can't be delivered as long as the runloop is blocked by
+     other activity. When notifications can't be delivered instantly, multiple
+     notifications may be coalesced. That can include the notification about the
+     initial collection.
+
      You must retain the returned token for as long as you want updates to continue
      to be sent to the block. To stop receiving updates, call stop() on the token.
 
