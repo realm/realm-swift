@@ -31,37 +31,6 @@
 @implementation NonRealmEmployeeObject
 @end
 
-#pragma mark PersonObject
-
-@class PersonObject;
-RLM_ARRAY_TYPE(PersonObject);
-
-@interface PersonObject : RLMObject
-@property NSString *name;
-@property NSInteger age;
-@property RLMArray<PersonObject> *children;
-@property (readonly) RLMLinkingObjects *parents;
-@end
-
-@implementation PersonObject
-
-+ (NSDictionary *)linkingObjectsProperties
-{
-    return @{@"parents": @{@"class": @"PersonObject", @"property": @"children"} };
-}
-
-- (BOOL)isEqual:(id)other
-{
-    if (![other isKindOfClass:[PersonObject class]]) {
-        return NO;
-    }
-
-    PersonObject *otherPerson = other;
-    return [self.name isEqual:otherPerson.name] && self.age == otherPerson.age && [self.children isEqual:otherPerson.children];
-}
-
-@end
-
 @interface PersonLinkObject : RLMObject
 @property PersonObject *person;
 @end

@@ -321,6 +321,18 @@ RLM_ARRAY_TYPE(CircleObject);
 @property NSString *stringCol;
 @end
 
+#pragma mark PersonObject
+
+@class PersonObject;
+RLM_ARRAY_TYPE(PersonObject);
+
+@interface PersonObject : RLMObject
+@property NSString *name;
+@property NSInteger age;
+@property RLMArray<PersonObject> *children;
+@property (readonly) RLMLinkingObjects *parents;
+@end
+
 #pragma mark FakeObject
 
 @interface FakeObject : NSObject

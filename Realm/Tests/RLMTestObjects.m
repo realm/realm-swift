@@ -216,6 +216,29 @@
 
 @end
 
+#pragma mark PersonObject
+
+@implementation PersonObject
+
++ (NSDictionary *)linkingObjectsProperties
+{
+    return @{@"parents": @{@"class": @"PersonObject", @"property": @"children"} };
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![other isKindOfClass:[PersonObject class]]) {
+        return NO;
+    }
+
+    PersonObject *otherPerson = other;
+    return [self.name isEqual:otherPerson.name] && self.age == otherPerson.age && [self.children isEqual:otherPerson.children];
+}
+
+@end
+
+
+
 #pragma mark FakeObject
 
 @implementation FakeObject

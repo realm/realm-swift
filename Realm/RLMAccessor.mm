@@ -25,6 +25,7 @@
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
+#import "RLMResults_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
 #import "results.hpp"
@@ -613,7 +614,7 @@ static IMP RLMAccessorStandaloneGetter(RLMProperty *prop, RLMAccessorCode access
     }
     else if (accessorCode == RLMAccessorCodeLinkingObjects) {
         return imp_implementationWithBlock(^(RLMObjectBase *){
-            return nil;
+            return [RLMResults emptyDetachedResults];
         });
     }
     return nil;
