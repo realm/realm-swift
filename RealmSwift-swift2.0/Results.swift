@@ -326,9 +326,6 @@ public final class Results<T: Object>: ResultsBase {
 
      The block will be asynchronously called with the initial results, and then
      called again after each write transaction which causes the results to change.
-     You must retain the returned token for as long as you want the results to
-     continue to be sent to the block. To stop receiving updates, call stop() on the
-     token.
 
      If an error occurs the block will be called with `nil` for the results
      parameter and a non-`nil` error. Currently the only errors that can occur are
@@ -339,6 +336,9 @@ public final class Results<T: Object>: ResultsBase {
      evaluated and up-to-date, and as long as you do not perform a write transaction
      on the same thread or explicitly call realm.refresh(), accessing it will never
      perform blocking work.
+
+     You must retain the returned token for as long as you want updates to continue
+     to be sent to the block. To stop receiving updates, call stop() on the token.
 
      - warning: This method cannot be called during a write transaction, or when
                 the source realm is read-only.

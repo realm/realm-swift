@@ -841,9 +841,10 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
 
     The block will be asynchronously called with the initial collection, and
     then called again after each write transaction which changes the collection
-    or any of the items in the collection. You must retain the returned token for
-    as long as you want updates to continue to be sent to the block. To stop
-    receiving updates, call stop() on the token.
+    or any of the items in the collection.
+
+    You must retain the returned token for as long as you want updates to continue
+    to be sent to the block. To stop receiving updates, call stop() on the token.
 
     - parameter block: The block to be called each time the collection changes.
     - returns: A token which must be held for as long as you want notifications to be delivered.
