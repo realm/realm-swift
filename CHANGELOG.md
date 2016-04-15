@@ -1,3 +1,20 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* Deprecate `-[RLMRealm removeNotification:]` in favor of
+  `-[RLMNotificationToken stop]`.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fixed a bug that caused encrypted files created using
+  `-[RLMRealm writeCopyToPath:encryptionKey:error:]` to fail to open.
+
 0.98.7 Release notes (2016-04-13)
 =============================================================
 
