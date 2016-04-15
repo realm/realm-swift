@@ -120,7 +120,7 @@ RLM_ARRAY_TYPE(IntObject)
 @property int64_t     longCol;
 @property id            mixedCol;
 @property StringObject *objectCol;
-@property RLMLinkingObjects *linkingObjectsCol;
+@property (readonly) RLMLinkingObjects *linkingObjectsCol;
 
 @end
 
@@ -181,7 +181,7 @@ RLM_ARRAY_TYPE(EmployeeObject)
 @interface DogObject : RLMObject
 @property NSString *dogName;
 @property int age;
-@property RLMLinkingObjects *owners;
+@property (readonly) RLMLinkingObjects *owners;
 @end
 
 RLM_ARRAY_TYPE(DogObject)

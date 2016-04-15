@@ -137,6 +137,35 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @implementation InvalidNSNumberNoProtocolObject
 @end
 
+@class InvalidReadWriteLinkingObjectsProperty;
+@class InvalidLinkingObjectsPropertiesMethod;
+
+@interface InvalidObjectsLinkSource : FakeObject
+@property InvalidReadWriteLinkingObjectsProperty *irwlop;
+@property InvalidLinkingObjectsPropertiesMethod *iloprm;
+@end
+@implementation InvalidObjectsLinkSource
+@end
+
+@interface InvalidReadWriteLinkingObjectsProperty : FakeObject
+@property RLMLinkingObjects *linkingObjects;
+@end
+
+@implementation InvalidReadWriteLinkingObjectsProperty
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": @{ @"class": @"InvalidObjectsLinkSource", @"property": @"irwlop" } };
+}
+
+@end
+
+@interface InvalidLinkingObjectsPropertiesMethod : FakeObject
+@property (readonly) RLMLinkingObjects *linkingObjects;
+@end
+
+@implementation InvalidLinkingObjectsPropertiesMethod
+@end
+
 @interface SchemaTests : RLMMultiProcessTestCase
 @end
 
@@ -496,6 +525,16 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 - (void)testClassWithInvalidNSNumberNoProtocolProperty {
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberNoProtocolObject.class], @"Property 'number' requires a protocol defining the contained type");
+}
+
+- (void)testClassWithReadWriteLinkingObjectsProperty {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidReadWriteLinkingObjectsProperty.class],
+                                      @"Property 'linkingObjects' must be declared as readonly .* linking objects");
+}
+
+- (void)testClassWithInvalidLinkingObjectsPropertiesMethod {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidLinkingObjectsPropertiesMethod.class],
+                                      @"Property 'linkingObjects' .* but \\+linkingObjectsProperties .* class or property");
 }
 
 // Can't spawn child processes on iOS
