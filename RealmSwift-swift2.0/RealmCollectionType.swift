@@ -59,9 +59,12 @@ public final class RLMGenerator<T: Object>: GeneratorType {
             case .Update(_, let deletions, let insertions, let modifications):
                 // Query results have changed, so apply them to the TableView
                 self.tableView.beginUpdates()
-                self.tableView.insertRowsAtIndexPaths(insertions.map { NSIndexPath(forRow: $0, inSection: 0) }, withRowAnimation: .Automatic)
-                self.tableView.deleteRowsAtIndexPaths(deletions.map { NSIndexPath(forRow: $0, inSection: 0) }, withRowAnimation: .Automatic)
-                self.tableView.reloadRowsAtIndexPaths(modifications.map { NSIndexPath(forRow: $0, inSection: 0) }, withRowAnimation: .Automatic)
+                self.tableView.insertRowsAtIndexPaths(insertions.map { NSIndexPath(forRow: $0, inSection: 0) },
+                    withRowAnimation: .Automatic)
+                self.tableView.deleteRowsAtIndexPaths(deletions.map { NSIndexPath(forRow: $0, inSection: 0) },
+                    withRowAnimation: .Automatic)
+                self.tableView.reloadRowsAtIndexPaths(modifications.map { NSIndexPath(forRow: $0, inSection: 0) },
+                    withRowAnimation: .Automatic)
                 self.tableView.endUpdates()
                 break
             case .Error(let err):
