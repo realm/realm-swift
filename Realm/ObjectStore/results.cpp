@@ -368,8 +368,18 @@ Query Results::get_query() const
         case Mode::Empty:
         case Mode::Query:
             return m_query;
-        case Mode::TableView:
-            return m_table_view.get_query();
+        case Mode::TableView: {
+            // A TableView has an associated Query if it was produced by Query::find_all. This is indicated
+            // by TableView::get_query returning a Query with a non-null table.
+            Query query = m_table_view.get_query();
+            if (query.get_table()) {
+                return query;
+            }
+
+            // The TableView has no associated query so create one with no conditions that is restricted
+            // to the rows in the TableView.
+            return Query(*m_table, std::make_unique<TableView>(m_table_view));
+        }
         case Mode::LinkView:
             return m_table->where(m_link_view);
         case Mode::Table:
