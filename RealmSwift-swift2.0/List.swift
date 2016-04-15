@@ -451,35 +451,6 @@ public final class List<T: Object>: ListBase {
             block(RealmCollectionChange<List>.fromObjc(self, change: change, error: error))
         }
     }
-
-    /**
-    Register a block to be called each time the List changes.
-
-    The block will be asynchronously called with the initial list, and then
-    called again after each write transaction which changes the list or any of
-    the items in the list. You must retain the returned token for as long as
-    you want the results to continue to be sent to the block. To stop receiving
-    updates, call stop() on the token.
-
-    This version of this method reports which of the objects in the List were
-    added, removed, or modified in each write transaction as index paths
-    suitable for use with UITableView. See the RealmCollectionChange
-    documentation for more information and an example of use.
-
-     - warning: This method cannot be called during a write transaction, or when
-                the source realm is read-only.
-     - warning: This method can only be called on Lists which are stored on an
-                Object which has been added to or retrieved from a Realm.
-
-    - parameter block: The block to be called each time the list changes.
-    - returns: A token which must be held for as long as you want notifications to be delivered.
-    */
-    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (RealmCollectionChangePaths<List>) -> ()) -> NotificationToken {
-        return _rlmArray.addNotificationBlock { list, change, error in
-            block(RealmCollectionChangePaths<List>.fromObjc(self, change: change, error: error))
-        }
-    }
 }
 
 extension List: RealmCollectionType, RangeReplaceableCollectionType {
