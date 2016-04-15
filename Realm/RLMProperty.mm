@@ -42,13 +42,11 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     }
 }
 
-BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType)
-{
+BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType) {
     return propertyType == RLMPropertyTypeLinkingObjects;
 }
 
-static bool rawTypeIsComputedProperty(NSString *rawType)
-{
+static bool rawTypeIsComputedProperty(NSString *rawType) {
     if ([rawType isEqualToString:@"@\"RLMLinkingObjects\""]) {
         return true;
     }
@@ -58,8 +56,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType)
 
 @implementation RLMProperty
 
-+ (instancetype)propertyForObjectStoreProperty:(const realm::Property &)prop
-{
++ (instancetype)propertyForObjectStoreProperty:(const realm::Property &)prop {
     return [[RLMProperty alloc] initWithName:@(prop.name.c_str())
                                         type:(RLMPropertyType)prop.type
                              objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
@@ -492,8 +489,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType)
     return prop;
 }
 
-- (BOOL)isEqual:(id)object
-{
+- (BOOL)isEqual:(id)object {
     if (![object isKindOfClass:[RLMProperty class]]) {
         return NO;
     }
@@ -516,8 +512,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType)
     return [NSString stringWithFormat:@"%@ {\n\ttype = %@;\n\tobjectClassName = %@;\n\tlinkOriginPropertyName = %@;\n\tindexed = %@;\n\tisPrimary = %@;\n\toptional = %@;\n}", self.name, RLMTypeToString(self.type), self.objectClassName, self.linkOriginPropertyName, self.indexed ? @"YES" : @"NO", self.isPrimary ? @"YES" : @"NO", self.optional ? @"YES" : @"NO"];
 }
 
-- (realm::Property)objectStoreCopy
-{
+- (realm::Property)objectStoreCopy {
     realm::Property p;
     p.name = _name.UTF8String;
     p.type = (realm::PropertyType)_type;

@@ -222,7 +222,7 @@
 
 + (NSDictionary *)linkingObjectsProperties
 {
-    return @{@"parents": @{@"class": @"PersonObject", @"property": @"children"} };
+    return @{ @"parents": @{ @"class": @"PersonObject", @"property": @"children" } };
 }
 
 - (BOOL)isEqual:(id)other

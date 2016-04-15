@@ -465,8 +465,7 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     return [cls linkingObjectsProperties];
 }
 
-+ (NSDictionary *)linkingObjectProperties:(__unused id)object
-{
++ (NSDictionary *)linkingObjectProperties:(__unused id)object {
     return nil;
 }
 
