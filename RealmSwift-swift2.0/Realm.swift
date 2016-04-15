@@ -448,6 +448,9 @@ public final class Realm {
     are currently within a run loop. Unless you are specifically creating and
     running a run loop on a background thread, this normally will only be the
     main thread.
+     
+    You must retain the returned token for as long as you want updates to continue
+    to be sent to the block. To stop receiving updates, call stop() on the token.
 
     - parameter block: A block which is called to process Realm notifications.
                        It receives the following parameters:
