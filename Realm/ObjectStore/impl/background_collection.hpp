@@ -132,7 +132,7 @@ public:
 
     bool is_alive() const noexcept;
 
-    // Attach the handed-over query to `sg`. Must not be already attaged to a SharedGroup.
+    // Attach the handed-over query to `sg`. Must not be already attached to a SharedGroup.
     void attach_to(SharedGroup& sg);
     // Create a new query handover object and stop using the previously attached
     // SharedGroup
