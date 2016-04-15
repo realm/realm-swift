@@ -64,6 +64,15 @@ static RLMObjectSchema *RLMRegisterClass(Class cls) {
     RLMObjectSchema *schema = [RLMObjectSchema schemaForObjectClass:cls];
     s_sharedSchemaState = prevState;
 
+    // check whether mixed properties are used
+    for (RLMProperty *property in schema.properties) {
+        if (property.type == RLMPropertyTypeAny) {
+            NSLog(@"WARNING: Property '%@' of class '%@' is declared as type 'id'. "
+                   "Mixed properties are deprecated and support for them will be "
+                   "removed in a future release.", property.name, schema.className);
+        }
+    }
+
     // set standalone class on shared shema for standalone object creation
     schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(schema.objectClass, schema);
 
