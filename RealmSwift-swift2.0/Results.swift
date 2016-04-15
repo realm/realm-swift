@@ -347,6 +347,20 @@ public final class Results<T: Object>: ResultsBase {
      notifications may be coalesced. That can include the notification about the
      initial collection.
      
+     This will never be actually received by the passed block, if a write transcation is
+     executed directly after setting up the observation like seen in the example below:
+
+         let results = realm.objects(Dog)
+         print("dogs.count: \(dogs?.count)") // => 0
+         results.addNotificationBlock { (dogs, error) in
+             // Only fired once for the example
+             print("dogs.count: \(dogs?.count)") // will only print "dogs.count: 1"
+         }
+         try! realm.write {
+             realm.add(Dog.self, value: ["name": "Rex", "age": 7])
+         }
+         // end of runloop execution context
+
      You must retain the returned token for as long as you want updates to continue
      to be sent to the block. To stop receiving updates, call stop() on the token.
 
