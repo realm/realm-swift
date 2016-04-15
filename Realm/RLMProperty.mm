@@ -47,7 +47,7 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType) {
 }
 
 static bool rawTypeIsComputedProperty(NSString *rawType) {
-    if ([rawType isEqualToString:@"@\"RLMLinkingObjects\""]) {
+    if ([rawType isEqualToString:@"@\"RLMLinkingObjects\""] || [rawType hasPrefix:@"@\"RLMLinkingObjects<"]) {
         return true;
     }
 
@@ -172,6 +172,9 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
             static const char numberPrefix[] = "@\"NSNumber<";
             static const int numberPrefixLen = sizeof(numberPrefix) - 1;
 
+            static const char linkingObjectsPrefix[] = "@\"RLMLinkingObjects";
+            static const int linkingObjectsPrefixLen = sizeof(linkingObjectsPrefix) - 1;
+
             if (code[1] == '\0') {
                 // string is "@"
                 _type = RLMPropertyTypeAny;
@@ -225,13 +228,27 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
                                         @"See https://realm.io/docs/objc/latest for more information.", _name, numberType);
                 }
             }
-            else if (strcmp(code, "@\"RLMLinkingObjects\"") == 0) {
+            else if (strncmp(code, linkingObjectsPrefix, linkingObjectsPrefixLen) == 0 &&
+                     (code[linkingObjectsPrefixLen] == '"' || code[linkingObjectsPrefixLen] == '<')) {
                 _type = RLMPropertyTypeLinkingObjects;
                 _optional = false;
 
                 if (!_objectClassName || !_linkOriginPropertyName) {
                     @throw RLMException(@"Property '%@' is of type RLMLinkingObjects but +linkingObjectsProperties did not specify the class "
                                         "or property that is the origin of the link.", _name);
+                }
+
+                // If the property was declared with a protocol indicating the contained type, validate that it matches
+                // the class from the dictionary returned by +linkingObjectsProperties.
+                if (code[linkingObjectsPrefixLen] == '<') {
+                    NSString *classNameFromProtocol = [[NSString alloc] initWithBytes:code + linkingObjectsPrefixLen + 1
+                                                                               length:strlen(code + linkingObjectsPrefixLen) - 3 // drop trailing >"
+                                                                             encoding:NSUTF8StringEncoding];
+                    if (![_objectClassName isEqualToString:classNameFromProtocol]) {
+                        @throw RLMException(@"Property '%@' was declared with type RLMLinkingObjects<%@>, but a conflicting "
+                                            "class name of '%@' was returned by +linkingObjectsProperties.", _name,
+                                            classNameFromProtocol, _objectClassName);
+                    }
                 }
             }
             else if (strcmp(code, "@\"NSNumber\"") == 0) {

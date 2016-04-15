@@ -139,13 +139,19 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 @class InvalidReadWriteLinkingObjectsProperty;
 @class InvalidLinkingObjectsPropertiesMethod;
+@class ValidLinkingObjectsPropertyWithProtocol;
+@class InvalidLinkingObjectsPropertyProtocol;
 
-@interface InvalidObjectsLinkSource : FakeObject
+@interface SchemaTestsLinkSource : FakeObject
 @property InvalidReadWriteLinkingObjectsProperty *irwlop;
 @property InvalidLinkingObjectsPropertiesMethod *iloprm;
+@property ValidLinkingObjectsPropertyWithProtocol *vlopwp;
+@property InvalidLinkingObjectsPropertyProtocol *ilopp;
 @end
-@implementation InvalidObjectsLinkSource
+@implementation SchemaTestsLinkSource
 @end
+
+RLM_ARRAY_TYPE(SchemaTestsLinkSource)
 
 @interface InvalidReadWriteLinkingObjectsProperty : FakeObject
 @property RLMLinkingObjects *linkingObjects;
@@ -154,7 +160,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @implementation InvalidReadWriteLinkingObjectsProperty
 
 + (NSDictionary *)linkingObjectsProperties {
-    return @{ @"linkingObjects": @{ @"class": @"InvalidObjectsLinkSource", @"property": @"irwlop" } };
+    return @{ @"linkingObjects": @{ @"class": @"SchemaTestsLinkSource", @"property": @"irwlop" } };
 }
 
 @end
@@ -165,6 +171,34 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 @implementation InvalidLinkingObjectsPropertiesMethod
 @end
+
+
+@interface ValidLinkingObjectsPropertyWithProtocol : FakeObject
+@property (readonly) RLMLinkingObjects<SchemaTestsLinkSource> *linkingObjects;
+@end
+
+@implementation ValidLinkingObjectsPropertyWithProtocol
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": @{ @"class": @"SchemaTestsLinkSource", @"property": @"vlopwp" } };
+}
+
+@end
+
+RLM_ARRAY_TYPE(NotARealClass)
+
+@interface InvalidLinkingObjectsPropertyProtocol : FakeObject
+@property (readonly) RLMLinkingObjects<NotARealClass> *linkingObjects;
+@end
+
+@implementation InvalidLinkingObjectsPropertyProtocol
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": @{ @"class": @"SchemaTestsLinkSource", @"property": @"ilopp" } };
+}
+
+@end
+
 
 @interface SchemaTests : RLMMultiProcessTestCase
 @end
@@ -535,6 +569,16 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 - (void)testClassWithInvalidLinkingObjectsPropertiesMethod {
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidLinkingObjectsPropertiesMethod.class],
                                       @"Property 'linkingObjects' .* but \\+linkingObjectsProperties .* class or property");
+}
+
+- (void)testClassWithLinkingObjectsPropertyWithProtocol {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:ValidLinkingObjectsPropertyWithProtocol.class];
+    XCTAssertEqual(objectSchema[@"linkingObjects"].type, RLMPropertyTypeLinkingObjects);
+}
+
+- (void)testClassWithInvalidLinkingObjectsPropertyProtocol {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidLinkingObjectsPropertyProtocol.class],
+                                      @"Property 'linkingObjects' .* type RLMLinkingObjects<NotARealClass>.*conflicting class name.*'SchemaTestsLinkSource'");
 }
 
 // Can't spawn child processes on iOS
