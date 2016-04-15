@@ -450,6 +450,9 @@ public final class Realm {
     specifically creating and running a run loop on a background thread, this
     normally will only be the main thread.
      
+    Notifications can't be delivered as long as the runloop is blocked by
+    other activity. When notifications can't be delivered instantly, multiple
+    notifications may be coalesced.
      
     You must retain the returned token for as long as you want updates to continue
     to be sent to the block. To stop receiving updates, call stop() on the token.
