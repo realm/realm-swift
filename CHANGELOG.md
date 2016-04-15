@@ -12,7 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* Fixed a bug that caused encrypted files created using
+* Fixed a bug that caused some encrypted files created using
   `-[RLMRealm writeCopyToPath:encryptionKey:error:]` to fail to open.
 
 0.98.7 Release notes (2016-04-13)
