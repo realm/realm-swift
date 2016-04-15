@@ -12,7 +12,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fixed a bug that caused some encrypted files created using
+  `-[RLMRealm writeCopyToPath:encryptionKey:error:]` to fail to open.
 
 0.98.7 Release notes (2016-04-13)
 =============================================================
