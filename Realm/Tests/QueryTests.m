@@ -1794,8 +1794,7 @@
     RLMAssertCount(LinkToCompanyObject, 2U, @"SUBQUERY(company.employees, $employee, $employee.age < 30 AND $employee.hired = TRUE).@count == 0");
 }
 
-- (void)testLinkingObjects
-{
+- (void)testLinkingObjects {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];

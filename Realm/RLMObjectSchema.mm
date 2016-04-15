@@ -66,14 +66,12 @@ using namespace realm;
     [self _propertiesDidChange];
 }
 
-- (void)setComputedProperties:(NSArray *)computedProperties
-{
+- (void)setComputedProperties:(NSArray *)computedProperties {
     _computedProperties = computedProperties;
     [self _propertiesDidChange];
 }
 
-- (void)_propertiesDidChange
-{
+- (void)_propertiesDidChange {
     NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
     for (RLMProperty *prop in _properties) {
         map[prop.name] = prop;

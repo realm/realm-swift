@@ -484,7 +484,7 @@ internal protocol LinkingObjectsInfo {
  LinkingObjects is an auto-updating container type that represents a group of objects that
  link to a given object.
  */
-public class LinkingObjects<T: Object> : Results<T>, LinkingObjectsInfo {
+public final class LinkingObjects<T: Object> : Results<T>, LinkingObjectsInfo {
     public init(fromType type: T.Type, property propertyName: String) {
         self.propertyName = propertyName
         super.init(RLMResults.emptyDetachedResults())
