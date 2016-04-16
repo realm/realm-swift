@@ -221,13 +221,13 @@ RLM_ASSUME_NONNULL_BEGIN
 
  The change information is available in two formats: a simple array of row
  indices in the collection for each type of change, and an array of index paths
- in section zero suitable for passing directly to UITableView's batch update
- methods. A complete example of updating a `UITableView` named `tv`:
+ in a requested section suitable for passing directly to UITableView's batch
+ update methods. A complete example of updating a `UITableView` named `tv`:
 
      [tv beginUpdates];
-     [tv deleteRowsAtIndexPaths:changes.deletionPaths withRowAnimation:UITableViewRowAnimationAutomatic];
-     [tv insertRowsAtIndexPaths:changes.insertionPaths withRowAnimation:UITableViewRowAnimationAutomatic];
-     [tv reloadRowsAtIndexPaths:changes.modificationPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+     [tv deleteRowsAtIndexPaths:[changes deletionsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+     [tv insertRowsAtIndexPaths:[changes insertionsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+     [tv reloadRowsAtIndexPaths:[changes modificationsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
      [tv endUpdates];
 
  All of the arrays in an RLMCollectionChange are always sorted in ascending order.
@@ -248,19 +248,9 @@ RLM_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSArray RLM_GENERIC(NSNumber *) *modifications;
 
 
-/// The paths of objects in the previous version of the collection which have
-/// been removed from this one.
-@property (nonatomic, readonly) NSArray RLM_GENERIC(NSIndexPath *) *deletionPaths;
-
-/// The paths in the new version of the collection which were newly inserted.
-@property (nonatomic, readonly) NSArray RLM_GENERIC(NSIndexPath *) *insertionPaths;
-
-/// The paths in the new version of the collection which were modified. For
-/// RLMResults, this means that one or more of the properties of the object at
-/// that index were modified (or an object linked to by that object was
-/// modified). For RLMArray, the array itself being modified to contain a
-/// different object at that index will also be reported as a modification.
-@property (nonatomic, readonly) NSArray RLM_GENERIC(NSIndexPath *) *modificationPaths;
+- (NSArray RLM_GENERIC(NSIndexPath *)*)deletionsInSection:(NSUInteger)section;
+- (NSArray RLM_GENERIC(NSIndexPath *)*)insertionsInSection:(NSUInteger)section;
+- (NSArray RLM_GENERIC(NSIndexPath *)*)modificationsInSection:(NSUInteger)section;
 @end
 
 RLM_ASSUME_NONNULL_END

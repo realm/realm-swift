@@ -178,6 +178,9 @@
 @end
 
 @implementation NSIndexPath (UITableView)
+- (NSInteger)section {
+    return [self indexAtPosition:0];
+}
 - (NSInteger)row {
     return [self indexAtPosition:1];
 }
@@ -223,9 +226,17 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
     XCTAssertEqualObjects(deletions, changes.deletions);
     XCTAssertEqualObjects(insertions, changes.insertions);
     XCTAssertEqualObjects(modifications, changes.modifications);
-    XCTAssertEqualObjects(deletions, [changes.deletionPaths valueForKey:@"row"]);
-    XCTAssertEqualObjects(insertions, [changes.insertionPaths valueForKey:@"row"]);
-    XCTAssertEqualObjects(modifications, [changes.modificationPaths valueForKey:@"row"]);
+
+    NSInteger section = __LINE__;
+    NSArray *deletionPaths = [changes deletionsInSection:section];
+    NSArray *insertionPaths = [changes insertionsInSection:section + 1];
+    NSArray *modificationPaths = [changes modificationsInSection:section + 2];
+    XCTAssert(deletionPaths.count == 0 || [deletionPaths[0] section] == section);
+    XCTAssert(insertionPaths.count == 0 || [insertionPaths[0] section] == section + 1);
+    XCTAssert(modificationPaths.count == 0 || [modificationPaths[0] section] == section + 2);
+    XCTAssertEqualObjects(deletions, [deletionPaths valueForKey:@"row"]);
+    XCTAssertEqualObjects(insertions, [insertionPaths valueForKey:@"row"]);
+    XCTAssertEqualObjects(modifications, [modificationPaths valueForKey:@"row"]);
 }
 
 #define ExpectNoChange(self, block) XCTAssertNil(getChange((self), (block)))

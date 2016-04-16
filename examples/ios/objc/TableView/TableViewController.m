@@ -66,9 +66,9 @@ static NSString * const kTableName = @"table";
 
         // changes is non-nil, so we just need to update the tableview
         [tv beginUpdates];
-        [tv deleteRowsAtIndexPaths:changes.deletionPaths withRowAnimation:UITableViewRowAnimationAutomatic];
-        [tv insertRowsAtIndexPaths:changes.insertionPaths withRowAnimation:UITableViewRowAnimationAutomatic];
-        [tv reloadRowsAtIndexPaths:changes.modificationPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tv deleteRowsAtIndexPaths:[changes deletionsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tv insertRowsAtIndexPaths:[changes insertionsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tv reloadRowsAtIndexPaths:[changes modificationsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
         [tv endUpdates];
     }];
 }
