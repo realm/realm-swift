@@ -173,10 +173,10 @@ bool ResultsNotifier::do_deliver(SharedGroup& sg)
 {
     auto lock = lock_target();
 
-    // Target results being null here indicates that it was destroyed while we
+    // Target realm being null here indicates that we were unregistered while we
     // were in the process of advancing the Realm version and preparing for
-    // delivery, i.e. it was destroyed from the "wrong" thread
-    if (!m_target_results) {
+    // delivery, i.e. the results was destroyed from the "wrong" thread
+    if (!get_realm()) {
         return false;
     }
 
