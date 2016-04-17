@@ -202,7 +202,11 @@ bool BackgroundCollection::deliver(SharedGroup& sg, std::exception_ptr err)
 
     bool should_call_callbacks = do_deliver(sg);
     m_changes_to_deliver = std::move(m_accumulated_changes);
-    m_changes_to_deliver.modifications.remove(m_changes_to_deliver.insertions);
+
+    // fixup modifications to be source rows rather than dest rows
+    m_changes_to_deliver.modifications.erase_at(m_changes_to_deliver.insertions);
+    m_changes_to_deliver.modifications.shift_for_insert_at(m_changes_to_deliver.deletions);
+
     return should_call_callbacks && have_callbacks();
 }
 

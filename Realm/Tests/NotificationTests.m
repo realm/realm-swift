@@ -342,6 +342,13 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
     });
 }
 
+- (void)testModifyObjectShiftedByDeletion {
+    ExpectChange(self, @[@1], @[], @[@2], ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];
+        [[IntObject objectsInRealm:realm where:@"intCol = 3"] setValue:@4 forKey:@"intCol"];
+    });
+}
+
 - (void)testDeleteObjectMatchingQuery {
     ExpectChange(self, @[@0], @[], @[], ^(RLMRealm *realm) {
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 1"]];
@@ -599,6 +606,18 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
 - (void)testDeleteArray {
     ExpectChange(self, @[@0, @1, @2, @3], @[], @[], ^(RLMRealm *realm) {
                       [realm deleteObjects:[ArrayPropertyObject allObjectsInRealm:realm]];
+    });
+}
+
+- (void)testModifyObjectShiftedByInsertsAndDeletions {
+    ExpectChange(self, @[@1], @[], @[@2], ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];
+        [[IntObject objectsInRealm:realm where:@"intCol = 3"] setValue:@4 forKey:@"intCol"];
+    });
+    ExpectChange(self, @[], @[@0], @[@3], ^(RLMRealm *realm) {
+        RLMArray *array = [[[ArrayPropertyObject allObjectsInRealm:realm] firstObject] intArray];
+        [array insertObject:[IntObject createInRealm:realm withValue:@[@3]] atIndex:0];
+        [[IntObject objectsInRealm:realm where:@"intCol = 4"] setValue:@3 forKey:@"intCol"];
     });
 }
 @end
