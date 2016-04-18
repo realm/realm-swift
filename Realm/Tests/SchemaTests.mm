@@ -25,7 +25,8 @@
 #import "RLMProperty_Private.h"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMRealm_Dynamic.h"
-#import "RLMSchema_Private.h"
+#import "RLMSchema_Private.hpp"
+#import "schema.hpp"
 
 #import <algorithm>
 #import <objc/runtime.h>
@@ -199,11 +200,75 @@ RLM_ARRAY_TYPE(NotARealClass)
 
 @end
 
+@interface InvalidLinkingObjectsPropertyMissingSourceClassOfLink : FakeObject
+@property (readonly) RLMLinkingObjects *linkingObjects;
+@end
+
+@implementation InvalidLinkingObjectsPropertyMissingSourceClassOfLink
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": @{ @"class": @"NotARealClass",
+                                    @"property": @"nosuchproperty" } };
+}
+
+@end
+
+
+@interface InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink : FakeObject
+@property (readonly) RLMLinkingObjects *linkingObjects;
+@property InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink *link;
+@end
+
+@implementation InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": @{ @"class": @"InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink",
+                                    @"property": @"nosuchproperty" } };
+}
+
+@end
+
+
+@interface InvalidLinkingObjectsPropertySourcePropertyNotALink : FakeObject
+@property (readonly) RLMLinkingObjects *linkingObjects;
+@property int64_t integer;
+@end
+
+@implementation InvalidLinkingObjectsPropertySourcePropertyNotALink
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": @{ @"class": @"InvalidLinkingObjectsPropertySourcePropertyNotALink",
+                                    @"property": @"integer" } };
+}
+
+@end
+
+
+@interface InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere : FakeObject
+@property (readonly) RLMLinkingObjects *linkingObjects;
+@property IntObject *source;
+@end
+
+@implementation InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": @{ @"class": @"InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere",
+                                    @"property": @"source" } };
+}
+
+@end
+
 
 @interface SchemaTests : RLMMultiProcessTestCase
 @end
 
 @implementation SchemaTests
+
++ (void)tearDown
+{
+    RLMSetTreatFakeObjectAsRLMObject(NO);
+    [super tearDown];
+}
 
 - (void)testNoSchemaForUnpersistedObjectClasses {
     RLMSchema *schema = [RLMSchema sharedSchema];
@@ -579,6 +644,39 @@ RLM_ARRAY_TYPE(NotARealClass)
 - (void)testClassWithInvalidLinkingObjectsPropertyProtocol {
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidLinkingObjectsPropertyProtocol.class],
                                       @"Property 'linkingObjects' .* type RLMLinkingObjects<NotARealClass>.*conflicting class name.*'SchemaTestsLinkSource'");
+}
+
+- (void)testClassWithInvalidLinkingObjectsPropertyMissingSourceClassOfLink {
+    RLMSetTreatFakeObjectAsRLMObject(YES);
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertyMissingSourceClassOfLink.class ]];
+    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
+                                      @"Target type 'NotARealClass' doesn't exist for property 'linkingObjects'");
+}
+
+- (void)testClassWithInvalidLinkingObjectsPropertyMissingSourcePropertyOfLink {
+    RLMSetTreatFakeObjectAsRLMObject(YES);
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink.class ]];
+    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
+                                      @"Property 'nosuchproperty' .* origin of linking objects property 'linkingObjects' does not exist");
+}
+
+- (void)testClassWithInvalidLinkingObjectsPropertySourcePropertyNotALink {
+    RLMSetTreatFakeObjectAsRLMObject(YES);
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyNotALink.class ]];
+    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
+                                      @"Property 'integer' .* origin of linking objects property 'linkingObjects' is not a link");
+}
+
+- (void)testClassWithInvalidLinkingObjectsPropertySourcePropertysLinkElsewhere {
+    RLMSetTreatFakeObjectAsRLMObject(YES);
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere.class, IntObject.class ]];
+    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
+                                      @"Property 'source' .* origin of linking objects property 'linkingObjects' does "
+                                      "not link to class 'InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere'");
 }
 
 // Can't spawn child processes on iOS

@@ -28,7 +28,7 @@
 #import "RLMUtil.hpp"
 
 BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
-    return propertyType != RLMPropertyTypeAny && propertyType != RLMPropertyTypeArray;
+    return propertyType != RLMPropertyTypeAny && propertyType != RLMPropertyTypeArray && propertyType != RLMPropertyTypeLinkingObjects;
 }
 
 BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
