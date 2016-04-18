@@ -27,6 +27,8 @@ extern "C" {
 }
 
 #import <thread>
+#import <mach/mach_init.h>
+#import <mach/vm_map.h>
 
 @interface RLMRealm ()
 + (BOOL)isCoreDebug;
@@ -173,6 +175,57 @@ extern "C" {
     [[NSFileManager defaultManager] copyItemAtPath:bundledRealmPath toPath:config.path error:nil];
 
     RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileFormatUpgradeRequired);
+}
+
+- (void)testExceedingVirtualAddressSpace {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+
+    const NSUInteger stringLength = 1024 * 1024;
+    void *mem = calloc(stringLength, '1');
+    NSString *largeString = [[NSString alloc] initWithBytesNoCopy:mem
+                                                           length:stringLength
+                                                         encoding:NSUTF8StringEncoding
+                                                     freeWhenDone:YES];
+
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        [realm beginWriteTransaction];
+        StringObject *stringObj = [StringObject new];
+        stringObj.stringCol = largeString;
+        [realm addObject:stringObj];
+        [realm commitWriteTransaction];
+    }
+
+    struct VirtualMemoryChunk {
+        vm_address_t address;
+        vm_size_t size;
+    };
+
+    std::vector<VirtualMemoryChunk> allocatedChunks;
+    NSUInteger size = 1024 * 1024 * 1024;
+    while (size >= stringLength) {
+        VirtualMemoryChunk chunk { .size = size };
+        kern_return_t ret = vm_allocate(mach_task_self(), &chunk.address, chunk.size,
+                                        VM_FLAGS_ANYWHERE);
+        if (ret == KERN_NO_SPACE) {
+            size /= 2;
+        } else {
+            allocatedChunks.push_back(chunk);
+        }
+    }
+
+    @autoreleasepool {
+        RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorAddressSpaceExhausted);
+    }
+
+    for (auto chunk : allocatedChunks) {
+        kern_return_t ret = vm_deallocate(mach_task_self(), chunk.address, chunk.size);
+        assert(ret == KERN_SUCCESS);
+    }
+
+    @autoreleasepool {
+        XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
+    }
 }
 
 #pragma mark - Adding and Removing Objects
