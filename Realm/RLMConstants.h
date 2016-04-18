@@ -54,9 +54,9 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
 
     /** Object type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
     RLMPropertyTypeObject = 12,
-    /** Array type. See [Realm Models](http://realm.io/docs/objc/latest/#models) */
+    /** Array type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
     RLMPropertyTypeArray  = 13,
-    /** Linking objects. See [Realm Models](http://realm.io/docs/objc/latest/#models) */
+    /** Linking objects. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
     RLMPropertyTypeLinkingObjects = 14,
 };
 
