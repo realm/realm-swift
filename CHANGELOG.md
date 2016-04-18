@@ -7,6 +7,8 @@ x.x.x Release notes (yyyy-MM-dd)
   `-[RLMNotificationToken stop]`.
 * `RLMRealm.path` and `RLMRealm.readOnly` have been deprecated in favor of their
   counterparts on `RLMRealmConfiguration`.
+* Deprecate properties of type `id`/`AnyObject`. This type was rarely used,
+  rarely useful and unsupported in every other Realm binding.
 
 ### Enhancements
 
