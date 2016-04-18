@@ -248,4 +248,5 @@
 + (NSString *)primaryKey { return nil; }
 + (NSArray *)requiredProperties { return nil; }
 + (NSDictionary *)linkingObjectsProperties { return nil; }
++ (BOOL)shouldIncludeInDefaultSchema { return NO; }
 @end

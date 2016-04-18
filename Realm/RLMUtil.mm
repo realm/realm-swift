@@ -275,8 +275,34 @@ static inline BOOL RLMIsSubclass(Class class1, Class class2) {
     return RLMIsKindOfClass(class1, class2);
 }
 
+static bool treatFakeObjectAsRLMObject = false;
+
+void RLMSetTreatFakeObjectAsRLMObject(BOOL flag) {
+    treatFakeObjectAsRLMObject = flag;
+}
+
+BOOL RLMIsObjectOrSubclass(Class klass) {
+    if (RLMIsKindOfClass(klass, RLMObjectBase.class)) {
+        return YES;
+    }
+
+    if (treatFakeObjectAsRLMObject) {
+        static Class FakeObjectClass = NSClassFromString(@"FakeObject");
+        return RLMIsKindOfClass(klass, FakeObjectClass);
+    }
+    return NO;
+}
+
 BOOL RLMIsObjectSubclass(Class klass) {
-    return RLMIsSubclass(class_getSuperclass(klass), RLMObjectBase.class);
+    if (RLMIsSubclass(class_getSuperclass(klass), RLMObjectBase.class)) {
+        return YES;
+    }
+
+    if (treatFakeObjectAsRLMObject) {
+        static Class FakeObjectClass = NSClassFromString(@"FakeObject");
+        return RLMIsSubclass(klass, FakeObjectClass);
+    }
+    return NO;
 }
 
 BOOL RLMIsDebuggerAttached()

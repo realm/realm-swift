@@ -68,6 +68,9 @@ static inline BOOL RLMIsKindOfClass(Class class1, Class class2) {
     return NO;
 }
 
+// Returns whether the class is a descendent of RLMObjectBase
+BOOL RLMIsObjectOrSubclass(Class klass);
+
 // Returns whether the class is an indirect descendant of RLMObjectBase
 BOOL RLMIsObjectSubclass(Class klass);
 
@@ -169,3 +172,7 @@ static inline NSUInteger RLMConvertNotFound(size_t index) {
 }
 
 id RLMMixedToObjc(realm::Mixed const& value);
+
+// For unit testing purposes, allow an Objective-C class named FakeObject to also be used
+// as the base class of persisted objects. This allows for testing invalid schemas.
+void RLMSetTreatFakeObjectAsRLMObject(BOOL flag);

@@ -551,11 +551,23 @@ MissingPropertyException::MissingPropertyException(std::string const& object_typ
 InvalidNullabilityException::InvalidNullabilityException(std::string const& object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
-    if (property.type == PropertyType::Object) {
-        m_what = "'Object' property '" + property.name + "' must be nullable.";
-    }
-    else {
-        m_what = "Array or Mixed property '" + property.name + "' cannot be nullable";
+    switch (property.type) {
+        case PropertyType::Object:
+            m_what = "'Object' property '" + property.name + "' must be nullable.";
+            break;
+        case PropertyType::Any:
+        case PropertyType::Array:
+        case PropertyType::LinkingObjects:
+            m_what = "Property '" + property.name + "' of type '" + string_for_property_type(property.type) + "' cannot be nullable";
+            break;
+        case PropertyType::Int:
+        case PropertyType::Bool:
+        case PropertyType::Data:
+        case PropertyType::Date:
+        case PropertyType::Float:
+        case PropertyType::Double:
+        case PropertyType::String:
+            REALM_ASSERT(false);
     }
 }
 
@@ -601,3 +613,18 @@ DuplicatePrimaryKeysException::DuplicatePrimaryKeysException(std::string const& 
     m_what = "Duplicate primary keys for object '" + object_type + "'.";
 }
 
+InvalidLinkingObjectsPropertyException::InvalidLinkingObjectsPropertyException(Type error_type, std::string const& object_type, Property const& property)
+: ObjectSchemaPropertyException(object_type, property)
+{
+    switch (error_type) {
+        case Type::OriginPropertyDoesNotExist:
+            m_what = "Property '" + property.link_origin_property_name + "' declared as origin of linking objects property '" + property.name + "' does not exist.";
+            break;
+        case Type::OriginPropertyIsNotALink:
+            m_what = "Property '" + property.link_origin_property_name + "' declared as origin of linking objects property '" + property.name + "' is not a link.";
+            break;
+        case Type::OriginPropertyInvalidLinkTarget:
+            m_what = "Property '" + property.link_origin_property_name + "' declared as origin of linking objects property '" + property.name + "' does not link to class '" + object_type + "'.";
+            break;
+    }
+}
