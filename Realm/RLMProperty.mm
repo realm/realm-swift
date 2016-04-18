@@ -57,9 +57,17 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
         _optional = optional;
         [self setObjcCodeFromType];
         [self updateAccessors];
+        [self logWarningIfMixed];
     }
 
     return self;
+}
+
+- (void)logWarningIfMixed {
+    if (_type == RLMPropertyTypeAny) {
+        NSLog(@"WARNING: Property '%@' is declared as type 'id', which is a deprecated type. "
+              "Support for 'id' properties will be removed in a future release.", _name);
+    }
 }
 
 -(void)updateAccessors {
@@ -317,6 +325,8 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
             // Don't throw if the property is a List/RealmOptional property because those types only
             // get reported to ObjC with Swift 1.2 and not 2+.
             throwForPropertyName(self.name);
+        } else {
+            [self logWarningIfMixed];
         }
     } else if (_objcType == 'c') {
         // Check if it's a BOOL or Int8 by trying to set it to 2 and seeing if
@@ -352,6 +362,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
         @throw RLMException(@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", self.name);
     }
+    [self logWarningIfMixed];
 
     // update getter/setter names
     [self updateAccessors];
