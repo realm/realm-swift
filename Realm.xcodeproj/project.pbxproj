@@ -81,6 +81,10 @@
 		3F75566D1BE94CEA0058BC7E /* results.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556691BE94CCC0058BC7E /* results.cpp */; };
 		3F7556751BE95A0C0058BC7E /* AsyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.m */; };
 		3F7556761BE95A0D0058BC7E /* AsyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.m */; };
+		3F7A3FAE1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7A3FAC1CC6EB7300301A17 /* collection_change_builder.cpp */; };
+		3F7A3FAF1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7A3FAC1CC6EB7300301A17 /* collection_change_builder.cpp */; };
+		3F7A3FB01CC6EB7300301A17 /* collection_change_builder.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F7A3FAD1CC6EB7300301A17 /* collection_change_builder.hpp */; };
+		3F7A3FB11CC6EB7300301A17 /* collection_change_builder.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F7A3FAD1CC6EB7300301A17 /* collection_change_builder.hpp */; };
 		3F8DCA7519930FCB0008BD7F /* SwiftTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */; };
 		3F8DCA7619930FCB0008BD7F /* SwiftArrayPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */; };
 		3F8DCA7719930FCB0008BD7F /* SwiftArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */; };
@@ -521,6 +525,8 @@
 		3F7556691BE94CCC0058BC7E /* results.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = results.cpp; path = ObjectStore/results.cpp; sourceTree = "<group>"; };
 		3F75566A1BE94CCC0058BC7E /* results.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = results.hpp; path = ObjectStore/results.hpp; sourceTree = "<group>"; };
 		3F7556731BE95A050058BC7E /* AsyncTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncTests.m; sourceTree = "<group>"; };
+		3F7A3FAC1CC6EB7300301A17 /* collection_change_builder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = collection_change_builder.cpp; path = ObjectStore/impl/collection_change_builder.cpp; sourceTree = "<group>"; };
+		3F7A3FAD1CC6EB7300301A17 /* collection_change_builder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = collection_change_builder.hpp; path = ObjectStore/impl/collection_change_builder.hpp; sourceTree = "<group>"; };
 		3F90260F1C625C5D006AE98E /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = list.cpp; path = ObjectStore/list.cpp; sourceTree = "<group>"; };
 		3F9026101C625C5D006AE98E /* list.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = list.hpp; path = ObjectStore/list.hpp; sourceTree = "<group>"; };
 		3F9801951C8E4F3F000A8B07 /* weak_realm_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = weak_realm_notifier.hpp; path = ObjectStore/impl/apple/weak_realm_notifier.hpp; sourceTree = "<group>"; };
@@ -777,6 +783,8 @@
 			isa = PBXGroup;
 			children = (
 				3F2118A71B97CBAD005A4CFE /* Apple */,
+				3F7A3FAC1CC6EB7300301A17 /* collection_change_builder.cpp */,
+				3F7A3FAD1CC6EB7300301A17 /* collection_change_builder.hpp */,
 				3F98019E1C8E4F55000A8B07 /* collection_notifier.cpp */,
 				3F98019A1C8E4F55000A8B07 /* collection_notifier.hpp */,
 				3F0543F61C56F78300AA5322 /* external_commit_helper.hpp */,
@@ -1107,6 +1115,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5D659EA61BE04556006515A0 /* binding_context.hpp in Headers */,
+				3F7A3FB01CC6EB7300301A17 /* collection_change_builder.hpp in Headers */,
 				3F9801AA1C8E4F6B000A8B07 /* collection_notifications.hpp in Headers */,
 				3F9801A01C8E4F55000A8B07 /* collection_notifier.hpp in Headers */,
 				5D659EA01BE04556006515A0 /* external_commit_helper.hpp in Headers */,
@@ -1180,6 +1189,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5DD755A41BE056DE002800DA /* binding_context.hpp in Headers */,
+				3F7A3FB11CC6EB7300301A17 /* collection_change_builder.hpp in Headers */,
 				5DD7559E1BE056DE002800DA /* external_commit_helper.hpp in Headers */,
 				5DD7559F1BE056DE002800DA /* index_set.hpp in Headers */,
 				5DD755A01BE056DE002800DA /* object_schema.hpp in Headers */,
@@ -1701,6 +1711,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F7A3FAE1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */,
 				3F9801AB1C8E4F6B000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A41C8E4F55000A8B07 /* collection_notifier.cpp in Sources */,
 				5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */,
@@ -1798,6 +1809,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F7A3FAF1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */,
 				3F9801AC1C8E4F6F000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A61C8E4F5A000A8B07 /* collection_notifier.cpp in Sources */,
 				5DD7557F1BE056DE002800DA /* external_commit_helper.cpp in Sources */,
