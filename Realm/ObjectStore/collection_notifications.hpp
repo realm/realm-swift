@@ -35,7 +35,7 @@ namespace _impl {
 // A token which keeps an asynchronous query alive
 struct NotificationToken {
     NotificationToken() = default;
-    NotificationToken(std::shared_ptr<_impl::BackgroundCollection> query, size_t token);
+    NotificationToken(std::shared_ptr<_impl::BackgroundCollection> notifier, size_t token);
     ~NotificationToken();
 
     NotificationToken(NotificationToken&&);
@@ -45,7 +45,7 @@ struct NotificationToken {
     NotificationToken& operator=(NotificationToken const&) = delete;
 
 private:
-    util::AtomicSharedPtr<_impl::BackgroundCollection> m_query;
+    util::AtomicSharedPtr<_impl::BackgroundCollection> m_notifier;
     size_t m_token;
 };
 

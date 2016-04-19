@@ -23,21 +23,21 @@
 using namespace realm;
 using namespace realm::_impl;
 
-NotificationToken::NotificationToken(std::shared_ptr<_impl::BackgroundCollection> query, size_t token)
-: m_query(std::move(query)), m_token(token)
+NotificationToken::NotificationToken(std::shared_ptr<_impl::BackgroundCollection> notifier, size_t token)
+: m_notifier(std::move(notifier)), m_token(token)
 {
 }
 
 NotificationToken::~NotificationToken()
 {
-    // m_query itself (and not just the pointed-to thing) needs to be accessed
+    // m_notifier itself (and not just the pointed-to thing) needs to be accessed
     // atomically to ensure that there are no data races when the token is
     // destroyed after being modified on a different thread.
     // This is needed despite the token not being thread-safe in general as
     // users find it very surpringing for obj-c objects to care about what
     // thread they are deallocated on.
-    if (auto query = m_query.exchange({})) {
-        query->remove_callback(m_token);
+    if (auto notifier = m_notifier.exchange({})) {
+        notifier->remove_callback(m_token);
     }
 }
 
@@ -46,10 +46,10 @@ NotificationToken::NotificationToken(NotificationToken&& rgt) = default;
 NotificationToken& NotificationToken::operator=(realm::NotificationToken&& rgt)
 {
     if (this != &rgt) {
-        if (auto query = m_query.exchange({})) {
-            query->remove_callback(m_token);
+        if (auto notifier = m_notifier.exchange({})) {
+            notifier->remove_callback(m_token);
         }
-        m_query = std::move(rgt.m_query);
+        m_notifier = std::move(rgt.m_notifier);
         m_token = rgt.m_token;
     }
     return *this;
