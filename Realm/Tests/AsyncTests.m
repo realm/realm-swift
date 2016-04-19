@@ -399,7 +399,7 @@
 
     // Force an error when opening the helper SharedGroups by deleting the file
     // after opening the Realm
-    [NSFileManager.defaultManager removeItemAtPath:realm.configuration.path error:nil];
+    [NSFileManager.defaultManager removeItemAtURL:realm.configuration.fileURL error:nil];
 
     __block bool called = false;
     XCTestExpectation *exp = [self expectationWithDescription:@""];

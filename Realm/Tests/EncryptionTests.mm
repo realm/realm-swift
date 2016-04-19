@@ -30,7 +30,7 @@
 
 - (RLMRealmConfiguration *)configurationWithKey:(NSData *)key {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    configuration.path = RLMDefaultRealmPath();
+    configuration.fileURL = [NSURL fileURLWithPath:RLMDefaultRealmPath()];
     configuration.encryptionKey = key;
     return configuration;
 }
@@ -139,7 +139,7 @@
 
     @autoreleasepool {
         RLMRealmConfiguration *config = [self configurationWithKey:key2];
-        config.path = RLMTestRealmPath();
+        config.fileURL = [NSURL fileURLWithPath:RLMTestRealmPath()];
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
     }

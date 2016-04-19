@@ -39,7 +39,7 @@ class TestCase: XCTestCase {
 
     func realmWithTestPath(configuration: Realm.Configuration = Realm.Configuration()) -> Realm {
         var configuration = configuration
-        configuration.path = testRealmPath()
+        configuration.fileURL = NSURL(fileURLWithPath: testRealmPath())
         return try! Realm(configuration: configuration)
     }
 
@@ -75,7 +75,7 @@ class TestCase: XCTestCase {
         try! NSFileManager.defaultManager().createDirectoryAtPath(testDir, withIntermediateDirectories: true,
             attributes: nil)
 
-        Realm.Configuration.defaultConfiguration = Realm.Configuration(path: defaultRealmPath())
+        Realm.Configuration.defaultConfiguration = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()))
 
         exceptionThrown = false
         autoreleasepool { super.invokeTest() }

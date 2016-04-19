@@ -66,7 +66,7 @@
         // RLMRealmConfiguration isn't aware of this, but our test's RLMDefaultRealmPath helper does.
         // Use it to reset the default configuration's path so it matches the parent.
         RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-        configuration.path = RLMDefaultRealmPath();
+        configuration.fileURL = [NSURL fileURLWithPath:RLMDefaultRealmPath()];
         [RLMRealmConfiguration setDefaultConfiguration:configuration];
     }
 

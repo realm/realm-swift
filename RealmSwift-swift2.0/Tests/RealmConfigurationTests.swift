@@ -24,7 +24,7 @@ class RealmConfigurationTests: TestCase {
     func testDefaultConfiguration() {
         let defaultConfiguration = Realm.Configuration.defaultConfiguration
 
-        XCTAssertEqual(defaultConfiguration.path, try! Realm().configuration.path)
+        XCTAssertEqual(defaultConfiguration.fileURL, try! Realm().configuration.fileURL)
         XCTAssertNil(defaultConfiguration.inMemoryIdentifier)
         XCTAssertNil(defaultConfiguration.encryptionKey)
         XCTAssertFalse(defaultConfiguration.readOnly)
@@ -33,10 +33,10 @@ class RealmConfigurationTests: TestCase {
     }
 
     func testSetDefaultConfiguration() {
-        let path = Realm.Configuration.defaultConfiguration.path!
-        let configuration = Realm.Configuration(path: "path")
+        let fileURL = Realm.Configuration.defaultConfiguration.fileURL
+        let configuration = Realm.Configuration(fileURL: NSURL(fileURLWithPath: "/dev/null"))
         Realm.Configuration.defaultConfiguration = configuration
-        XCTAssertEqual(Realm.Configuration.defaultConfiguration.path, "/private/tmp/path")
-        Realm.Configuration.defaultConfiguration.path = path
+        XCTAssertEqual(Realm.Configuration.defaultConfiguration.fileURL, NSURL(fileURLWithPath: "/dev/null"))
+        Realm.Configuration.defaultConfiguration.fileURL = fileURL
     }
 }

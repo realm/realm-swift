@@ -62,7 +62,7 @@ extern "C" {
 
 - (void)testOpeningInvalidPathThrows {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.path = @"/dev/null/foo";
+    config.fileURL = [NSURL fileURLWithPath:@"/dev/null/foo"];
     RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileAccess);
 }
 
@@ -72,7 +72,7 @@ extern "C" {
     RLMRealm *inMemoryRealm = [RLMRealm realmWithConfiguration:config error:nil];
 
     // make sure we can't open disk-realm at same path
-    config.path = @(inMemoryRealm.configuration.config.path.c_str());;
+    config.fileURL = [NSURL fileURLWithPath:@(inMemoryRealm.configuration.config.path.c_str())];
     NSError *error; // passing in a reference to assert that this error can't be catched!
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:&error], @"Realm at path '.*' already opened with different inMemory settings");
 }
@@ -172,7 +172,7 @@ extern "C" {
     config.disableFormatUpgrade = true;
 
     NSString *bundledRealmPath = [[NSBundle bundleForClass:[RealmTests class]] pathForResource:@"fileformat-pre-null.realm" ofType:nil];
-    [[NSFileManager defaultManager] copyItemAtPath:bundledRealmPath toPath:config.path error:nil];
+    [[NSFileManager defaultManager] copyItemAtPath:bundledRealmPath toPath:config.fileURL.path error:nil];
 
     RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileFormatUpgradeRequired);
 }
@@ -1145,7 +1145,7 @@ extern "C" {
     // runloop) is actually destroyed
     std::thread([&] { realm = [RLMRealm defaultRealm]; }).join();
 
-    [realm.configuration path]; // ensure ARC releases the object after the thread has finished
+    [realm.configuration fileURL]; // ensure ARC releases the object after the thread has finished
 }
 
 - (void)testBackgroundRealmIsNotified {
@@ -1388,12 +1388,12 @@ extern "C" {
 
     NSString *content = @"Some content";
     NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
-    NSString *filePath = RLMRealmPathForFile(@"filename.realm");
-    [[NSFileManager defaultManager] createFileAtPath:filePath contents:fileContents attributes:nil];
+    NSURL *fileURL = [NSURL fileURLWithPath:RLMRealmPathForFile(@"filename.realm")];
+    [[NSFileManager defaultManager] createFileAtPath:fileURL.path contents:fileContents attributes:nil];
 
     NSError *error;
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.path = filePath;
+    configuration.fileURL = fileURL;
     XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Invalid database");
     XCTAssertNotNil(error, @"Should populate error object");
 }
@@ -1425,7 +1425,7 @@ extern "C" {
     // Create the realm file and lock file
     @autoreleasepool { [RLMRealm defaultRealm]; }
 
-    int fd = open([RLMRealmConfiguration.defaultConfiguration.path stringByAppendingString:@".lock"].UTF8String, O_RDWR);
+    int fd = open([RLMRealmConfiguration.defaultConfiguration.fileURL.path stringByAppendingString:@".lock"].UTF8String, O_RDWR);
     XCTAssertNotEqual(-1, fd);
 
     // Change the value of the mutex size field in the shared info header
@@ -1451,7 +1451,7 @@ extern "C" {
     RLMRealm *realm = [self realmWithTestPath];
 
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.path = realm.configuration.path;
+    configuration.fileURL = realm.configuration.fileURL;
     XCTAssertThrows([RLMRealm migrateRealm:configuration]);
 }
 
@@ -1479,7 +1479,7 @@ extern "C" {
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
         return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
     };
-    unsigned long long fileSizeBefore = fileSize(realm.configuration.path);
+    unsigned long long fileSizeBefore = fileSize(realm.configuration.fileURL.path);
     StringObject *object = [StringObject allObjectsInRealm:realm].firstObject;
 
     XCTAssertTrue([realm compact]);
@@ -1489,7 +1489,7 @@ extern "C" {
     XCTAssertEqualObjects(@"A", [[StringObject allObjectsInRealm:realm].firstObject stringCol]);
     XCTAssertEqualObjects(@"B", [[StringObject allObjectsInRealm:realm].lastObject stringCol]);
 
-    unsigned long long fileSizeAfter = fileSize(realm.configuration.path);
+    unsigned long long fileSizeAfter = fileSize(realm.configuration.fileURL.path);
     XCTAssertGreaterThan(fileSizeBefore, fileSizeAfter);
 }
 

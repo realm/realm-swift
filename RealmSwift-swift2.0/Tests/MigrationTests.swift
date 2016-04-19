@@ -59,7 +59,7 @@ class MigrationTests: TestCase {
     private func migrateAndTestRealm(realmPath: String, shouldRun: Bool = true, schemaVersion: UInt64 = 1,
                                      autoMigration: Bool = false, block: MigrationBlock? = nil) {
         var didRun = false
-        let config = Realm.Configuration(path: realmPath, schemaVersion: schemaVersion,
+        let config = Realm.Configuration(fileURL: NSURL(fileURLWithPath: realmPath), schemaVersion: schemaVersion,
             migrationBlock: { migration, oldSchemaVersion in
                 if let block = block {
                     block(migration: migration, oldSchemaVersion: oldSchemaVersion)
@@ -81,7 +81,7 @@ class MigrationTests: TestCase {
 
     private func migrateAndTestDefaultRealm(schemaVersion: UInt64 = 1, block: MigrationBlock) {
         migrateAndTestRealm(defaultRealmPath(), schemaVersion: schemaVersion, block: block)
-        Realm.Configuration.defaultConfiguration = Realm.Configuration(path: defaultRealmPath(),
+        Realm.Configuration.defaultConfiguration = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()),
             schemaVersion: schemaVersion)
     }
 
@@ -91,7 +91,7 @@ class MigrationTests: TestCase {
         createAndTestRealmAtPath(defaultRealmPath())
 
         var didRun = false
-        let config = Realm.Configuration(path: defaultRealmPath(), schemaVersion: 1, migrationBlock: { _, _ in
+        let config = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()), schemaVersion: 1, migrationBlock: { _, _ in
             didRun = true
         })
         Realm.Configuration.defaultConfiguration = config

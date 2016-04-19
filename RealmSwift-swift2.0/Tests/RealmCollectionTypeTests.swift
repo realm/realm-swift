@@ -97,7 +97,7 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testRealm() {
-        XCTAssertEqual(collection.realm!.configuration.path, realmWithTestPath().configuration.path)
+        XCTAssertEqual(collection.realm!.configuration.fileURL!.path, realmWithTestPath().configuration.fileURL?.path)
     }
 
     func testDescription() {

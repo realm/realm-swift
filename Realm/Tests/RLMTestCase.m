@@ -162,7 +162,7 @@ static BOOL encryptTests() {
 
 - (RLMRealm *)readOnlyRealmWithPath:(NSString *)path error:(NSError **)error {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.path = path;
+    configuration.fileURL = [NSURL fileURLWithPath:path];
     configuration.readOnly = true;
     return [RLMRealm realmWithConfiguration:configuration error:error];
 }
