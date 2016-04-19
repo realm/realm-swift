@@ -178,6 +178,7 @@ public class Object: RLMObjectBase {
 
     - returns: An `Array` of objects of type `T` which have this object as their value for the `propertyName` property.
     */
+    @available(*, deprecated=1, message="Use a LinkingObjects property")
     public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
         return RLMObjectBaseLinkingObjectsOfClass(self, (T.self as Object.Type).className(), propertyName) as! [T]
     }
