@@ -407,9 +407,36 @@ public final class List<T: Object>: ListBase {
 
     The block will be asynchronously called with the initial list, and then
     called again after each write transaction which changes the list or any of
-    the items in the list. You must retain the returned token for as long as
-    you want the results to continue to be sent to the block. To stop receiving
-    updates, call stop() on the token.
+    the items in the list.
+     
+    The block is called on the same thread as it was added on, and can only
+    be added on threads which are currently within a run loop. Unless you are
+    specifically creating and running a run loop on a background thread, this
+    normally will only be the main thread.
+     
+    Notifications can't be delivered as long as the runloop is blocked by
+    other activity. When notifications can't be delivered instantly, multiple
+    notifications may be coalesced. That can include the notification about the
+    initial list.
+     
+    This will never be actually received by the passed block, if a write transcation is
+    executed directly after setting up the observation like seen in the example below:
+
+        let person = realm.objects(Person).first!
+        print("dogs.count: \(person.dogs.count)") // => 0
+        person.dogs.addNotificationBlock { dogs in
+            // Only fired once for the example
+            print("dogs.count: \(dogs.count)") // will only print "dogs.count: 1"
+        }
+        try! realm.write {
+            let dog = Dog()
+            dog.name = "Rex"
+            person.dogs.append(dog)
+        }
+        // end of runloop execution context
+     
+    You must retain the returned token for as long as you want updates to continue
+    to be sent to the block. To stop receiving updates, call stop() on the token.
 
     - parameter block: The block to be called each time the list changes.
     - returns: A token which must be held for as long as you want notifications to be delivered.

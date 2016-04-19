@@ -326,9 +326,6 @@ public final class Results<T: Object>: ResultsBase {
 
      The block will be asynchronously called with the initial results, and then
      called again after each write transaction which causes the results to change.
-     You must retain the returned token for as long as you want the results to
-     continue to be sent to the block. To stop receiving updates, call stop() on the
-     token.
 
      The determination for whether or not a write transaction has changed the
      results is currently very coarse, and the block may be called even if no
@@ -344,6 +341,28 @@ public final class Results<T: Object>: ResultsBase {
      evaluated and up-to-date, and as long as you do not perform a write transaction
      on the same thread or explicitly call realm.refresh(), accessing it will never
      perform blocking work.
+
+     Notifications can't be delivered as long as the runloop is blocked by
+     other activity. When notifications can't be delivered instantly, multiple
+     notifications may be coalesced. That can include the notification about the
+     initial collection.
+     
+     This will never be actually received by the passed block, if a write transcation is
+     executed directly after setting up the observation like seen in the example below:
+
+         let results = realm.objects(Dog)
+         print("dogs.count: \(dogs?.count)") // => 0
+         results.addNotificationBlock { (dogs, error) in
+             // Only fired once for the example
+             print("dogs.count: \(dogs?.count)") // will only print "dogs.count: 1"
+         }
+         try! realm.write {
+             realm.add(Dog.self, value: ["name": "Rex", "age": 7])
+         }
+         // end of runloop execution context
+
+     You must retain the returned token for as long as you want updates to continue
+     to be sent to the block. To stop receiving updates, call stop() on the token.
 
      - warning: This method cannot be called during a write transaction, or when
                 the source realm is read-only.
