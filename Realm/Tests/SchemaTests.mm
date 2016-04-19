@@ -107,12 +107,12 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @end
 
 
-@interface InvalidPrimaryKeyType : FakeObject
-@property double primaryKey;
+@interface InvalidObjectIDType : FakeObject
+@property double objectID;
 @end
-@implementation InvalidPrimaryKeyType
-+ (NSString *)primaryKey {
-    return @"primaryKey";
+@implementation InvalidObjectIDType
++ (NSString *)objectID {
+    return @"objectID";
 }
 @end
 
@@ -343,77 +343,77 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\ttype = bool;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tintCol {\n"
                                               @"\t\t\ttype = int;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tfloatCol {\n"
                                               @"\t\t\ttype = float;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tdoubleCol {\n"
                                               @"\t\t\ttype = double;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tstringCol {\n"
                                               @"\t\t\ttype = string;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t\tbinaryCol {\n"
                                               @"\t\t\ttype = data;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t\tdateCol {\n"
                                               @"\t\t\ttype = date;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t\tcBoolCol {\n"
                                               @"\t\t\ttype = bool;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tlongCol {\n"
                                               @"\t\t\ttype = int;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tmixedCol {\n"
                                               @"\t\t\ttype = any;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tobjectCol {\n"
                                               @"\t\t\ttype = object;\n"
                                               @"\t\t\tobjectClassName = StringObject;\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
@@ -422,7 +422,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\ttype = int;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
@@ -431,7 +431,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\t\ttype = string;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tisObjectID = NO;\n"
                                               @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
@@ -445,8 +445,8 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithMultipleDuplicateProperties.class], @"'SchemaTestClassWithMultipleDuplicateProperties' .* declared multiple times");
 }
 
-- (void)testClassWithInvalidPrimaryKey {
-    XCTAssertThrows([RLMObjectSchema schemaForObjectClass:InvalidPrimaryKeyType.class]);
+- (void)testClassWithInvalidObjectID {
+    XCTAssertThrows([RLMObjectSchema schemaForObjectClass:InvalidObjectIDType.class]);
 }
 
 - (void)testClassWithUnindexableProperty {

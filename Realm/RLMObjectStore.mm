@@ -116,24 +116,24 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
 }
 
 template<typename F>
-static inline NSUInteger RLMCreateOrGetRowForObject(__unsafe_unretained RLMObjectSchema *const schema, F primaryValueGetter, bool createOrUpdate, bool &created) {
+static inline NSUInteger RLMCreateOrGetRowForObject(__unsafe_unretained RLMObjectSchema *const schema, F objectIDValueGetter, bool createOrUpdate, bool &created) {
     // try to get existing row if updating
     size_t rowIndex = realm::not_found;
     realm::Table &table = *schema.table;
-    RLMProperty *primaryProperty = schema.primaryKeyProperty;
-    if (createOrUpdate && primaryProperty) {
-        // get primary value
-        id primaryValue = primaryValueGetter(primaryProperty);
-        if (primaryValue == NSNull.null) {
-            primaryValue = nil;
+    RLMProperty *objectIDProperty = schema.objectIDProperty;
+    if (createOrUpdate && objectIDProperty) {
+        // get object ID value
+        id objectIDValue = objectIDValueGetter(objectIDProperty);
+        if (objectIDValue == NSNull.null) {
+            objectIDValue = nil;
         }
         
-        // search for existing object based on primary key type
-        if (primaryProperty.type == RLMPropertyTypeString) {
-            rowIndex = table.find_first_string(primaryProperty.column, RLMStringDataWithNSString(primaryValue));
+        // search for existing object based on object ID type
+        if (objectIDProperty.type == RLMPropertyTypeString) {
+            rowIndex = table.find_first_string(objectIDProperty.column, RLMStringDataWithNSString(objectIDValue));
         }
         else {
-            rowIndex = table.find_first_int(primaryProperty.column, [primaryValue longLongValue]);
+            rowIndex = table.find_first_int(objectIDProperty.column, [objectIDValue longLongValue]);
         }
     }
 
@@ -183,8 +183,8 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
 
     // get or create row
     bool created;
-    auto primaryGetter = [=](__unsafe_unretained RLMProperty *const p) { return [object valueForKey:p.getterName]; };
-    object->_row = (*schema.table)[RLMCreateOrGetRowForObject(schema, primaryGetter, createOrUpdate, created)];
+    auto objectIDGetter = [=](__unsafe_unretained RLMProperty *const p) { return [object valueForKey:p.getterName]; };
+    object->_row = (*schema.table)[RLMCreateOrGetRowForObject(schema, objectIDGetter, createOrUpdate, created)];
 
     RLMCreationOptions creationOptions = RLMCreationOptionsPromoteStandalone;
     if (createOrUpdate) {
@@ -214,8 +214,8 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         }
 
         // set in table with out validation
-        // skip primary key when updating since it doesn't change
-        if (created || !prop.isPrimary) {
+        // skip object ID when updating since it doesn't change
+        if (created || !prop.isObjectID) {
             RLMDynamicSet(object, prop, RLMCoerceToNil(value), creationOptions);
         }
 
@@ -338,7 +338,7 @@ static void RLMValidateValueForObjectSchema(__unsafe_unretained id const value,
                 }
                 obj = defaults[prop.name];
             }
-            if (obj || prop.isPrimary || !allowMissing) {
+            if (obj || prop.isObjectID || !allowMissing) {
                 RLMValidateValueForProperty(obj, prop, schema, true, allowMissing);
             }
         }
@@ -374,15 +374,15 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // get or create our accessor
         bool created;
-        auto primaryGetter = [=](__unsafe_unretained RLMProperty *const p) { return array[p.column]; };
-        object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, createOrUpdate, created)];
+        auto objectIDGetter = [=](__unsafe_unretained RLMProperty *const p) { return array[p.column]; };
+        object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, objectIDGetter, createOrUpdate, created)];
 
         // populate
         NSArray *props = objectSchema.propertiesInDeclaredOrder;
         for (NSUInteger i = 0; i < array.count; i++) {
             RLMProperty *prop = props[i];
-            // skip primary key when updating since it doesn't change
-            if (created || !prop.isPrimary) {
+            // skip object ID when updating since it doesn't change
+            if (created || !prop.isObjectID) {
                 id val = array[i];
                 RLMValidateValueForProperty(val, prop, schema, false, false);
                 RLMDynamicSet(object, prop, RLMCoerceToNil(val), creationOptions);
@@ -392,8 +392,8 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     else {
         // get or create our accessor
         bool created;
-        auto primaryGetter = [=](RLMProperty *p) { return [value valueForKey:p.name]; };
-        object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, createOrUpdate, created)];
+        auto objectIDGetter = [=](RLMProperty *p) { return [value valueForKey:p.name]; };
+        object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, objectIDGetter, createOrUpdate, created)];
 
         // populate
         NSDictionary *defaultValues = nil;
@@ -411,8 +411,8 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
             }
 
             if (propValue) {
-                if (created || !prop.isPrimary) {
-                    // skip missing properties and primary key when updating since it doesn't change
+                if (created || !prop.isObjectID) {
+                    // skip missing properties and object ID when updating since it doesn't change
                     RLMValidateValueForProperty(propValue, prop, schema, false, false);
                     RLMDynamicSet(object, prop, RLMCoerceToNil(propValue), creationOptions);
                 }
@@ -484,9 +484,9 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
 
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
 
-    RLMProperty *primaryProperty = objectSchema.primaryKeyProperty;
-    if (!primaryProperty) {
-        @throw RLMException(@"%@ does not have a primary key", objectClassName);
+    RLMProperty *objectIDProperty = objectSchema.objectIDProperty;
+    if (!objectIDProperty) {
+        @throw RLMException(@"%@ does not have an object ID", objectClassName);
     }
 
     if (!objectSchema.table) {
@@ -498,25 +498,25 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     key = RLMCoerceToNil(key);
 
     size_t row = realm::not_found;
-    if (primaryProperty.type == RLMPropertyTypeString) {
+    if (objectIDProperty.type == RLMPropertyTypeString) {
         NSString *str = RLMDynamicCast<NSString>(key);
-        if (str || (!key && primaryProperty.optional)) {
-            row = objectSchema.table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(str));
+        if (str || (!key && objectIDProperty.optional)) {
+            row = objectSchema.table->find_first_string(objectIDProperty.column, RLMStringDataWithNSString(str));
         }
         else {
-            @throw RLMException(@"Invalid value '%@' for primary key", key);
+            @throw RLMException(@"Invalid value '%@' for object ID", key);
         }
     }
     else {
         NSNumber *number = RLMDynamicCast<NSNumber>(key);
         if (number) {
-            row = objectSchema.table->find_first_int(primaryProperty.column, number.longLongValue);
+            row = objectSchema.table->find_first_int(objectIDProperty.column, number.longLongValue);
         }
-        else if (!key && primaryProperty.optional) {
-            row = objectSchema.table->find_first_null(primaryProperty.column);
+        else if (!key && objectIDProperty.optional) {
+            row = objectSchema.table->find_first_null(objectIDProperty.column);
         }
         else {
-            @throw RLMException(@"Invalid value '%@' for primary key", key);
+            @throw RLMException(@"Invalid value '%@' for object ID", key);
         }
     }
 

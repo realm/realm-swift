@@ -489,38 +489,38 @@ class RealmTests: TestCase {
         XCTAssertEqual(object["optObjectCol"]?.boolCol, true)
     }
 
-    func testObjectForPrimaryKey() {
+    func testObjectForObjectID() {
         let realm = try! Realm()
         try! realm.write {
             realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
             realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
         }
 
-        XCTAssertNotNil(realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "a"))
+        XCTAssertNotNil(realm.objectForObjectID(SwiftPrimaryStringObject.self, key: "a"))
 
         // When this is directly inside the XCTAssertNil, it fails for some reason
-        let missingObject = realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "z")
+        let missingObject = realm.objectForObjectID(SwiftPrimaryStringObject.self, key: "z")
         XCTAssertNil(missingObject)
     }
 
-    func testDynamicObjectForPrimaryKey() {
+    func testDynamicObjectForObjectID() {
         let realm = try! Realm()
         try! realm.write {
             realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
             realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
         }
 
-        XCTAssertNotNil(realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "a"))
-        XCTAssertNil(realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "z"))
+        XCTAssertNotNil(realm.dynamicObjectForObjectID("SwiftPrimaryStringObject", key: "a"))
+        XCTAssertNil(realm.dynamicObjectForObjectID("SwiftPrimaryStringObject", key: "z"))
     }
 
-    func testDynamicObjectForPrimaryKeySubscripting() {
+    func testDynamicObjectForObjectIDSubscripting() {
         let realm = try! Realm()
         try! realm.write {
             realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
         }
 
-        let object = realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "a")
+        let object = realm.dynamicObjectForObjectID("SwiftPrimaryStringObject", key: "a")
 
         let stringVal = object!["stringCol"] as! String
 

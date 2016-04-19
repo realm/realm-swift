@@ -115,7 +115,7 @@ RLM_ARRAY_TYPE(CycleObject)
 RLM_ARRAY_TYPE(PrimaryIntObject);
 
 @implementation PrimaryIntObject
-+ (NSString *)primaryKey {
++ (NSString *)objectID {
     return @"intCol";
 }
 @end
@@ -125,7 +125,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @end
 
 @implementation PrimaryInt64Object
-+ (NSString *)primaryKey {
++ (NSString *)objectID {
     return @"int64Col";
 }
 @end
@@ -135,7 +135,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @end
 
 @implementation PrimaryNullableIntObject
-+ (NSString *)primaryKey {
++ (NSString *)objectID {
     return @"optIntCol";
 }
 @end
@@ -157,7 +157,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @end
 
 @implementation PrimaryNestedObject
-+ (NSString *)primaryKey {
++ (NSString *)objectID {
     return @"primaryCol";
 }
 + (NSDictionary *)defaultPropertyValues {
@@ -215,7 +215,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @end
 
 @implementation PrimaryEmployeeObject
-+ (NSString *)primaryKey {
++ (NSString *)objectID {
     return @"name";
 }
 @end
@@ -237,7 +237,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 @end
 
 @implementation PrimaryCompanyObject
-+ (NSString *)primaryKey {
++ (NSString *)objectID {
     return @"name";
 }
 @end
@@ -528,7 +528,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertNil(obj0[@"name"]);
 }
 
-- (void)testCannotUpdatePrimaryKey {
+- (void)testCannotUpdateObjectID {
     PrimaryIntObject *intObj = [[PrimaryIntObject alloc] init];
     intObj.intCol = 1;
     XCTAssertNoThrow(intObj.intCol = 0);
@@ -1324,7 +1324,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [realm commitWriteTransaction];
 }
 
-- (void)testCreateInRealmReusesExistingNestedObjectsByPrimaryKey {
+- (void)testCreateInRealmReusesExistingNestedObjectsByObjectID {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
@@ -1657,33 +1657,33 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertNil(obj1.realm, @"Realm should be nil after deletion");
 }
 
-- (void)testPrimaryKey {
+- (void)testObjectID {
     [[RLMRealm defaultRealm] beginWriteTransaction];
 
     [PrimaryStringObject createInDefaultRealmWithValue:(@[@"string", @1])];
     PrimaryStringObject *obj = [PrimaryStringObject createInDefaultRealmWithValue:(@[@"string2", @1])];
-    XCTAssertThrows([PrimaryStringObject createInDefaultRealmWithValue:(@[@"string", @1])], @"Duplicate primary key should throw");
-    XCTAssertThrows(obj.stringCol = @"string2", @"Setting primary key should throw");
+    XCTAssertThrows([PrimaryStringObject createInDefaultRealmWithValue:(@[@"string", @1])], @"Duplicate object ID should throw");
+    XCTAssertThrows(obj.stringCol = @"string2", @"Setting object ID should throw");
 
     [PrimaryIntObject createInDefaultRealmWithValue:(@[@1])];
     PrimaryIntObject *obj1 = [PrimaryIntObject createInDefaultRealmWithValue:(@{@"intCol": @2})];
-    XCTAssertThrows([PrimaryIntObject createInDefaultRealmWithValue:(@[@1])], @"Duplicate primary key should throw");
-    XCTAssertThrows(obj1.intCol = 2, @"Setting primary key should throw");
+    XCTAssertThrows([PrimaryIntObject createInDefaultRealmWithValue:(@[@1])], @"Duplicate object ID should throw");
+    XCTAssertThrows(obj1.intCol = 2, @"Setting object ID should throw");
 
     [PrimaryInt64Object createInDefaultRealmWithValue:(@[@(1LL << 40)])];
     PrimaryInt64Object *obj2 = [PrimaryInt64Object createInDefaultRealmWithValue:(@[@(1LL << 41)])];
-    XCTAssertThrows([PrimaryInt64Object createInDefaultRealmWithValue:(@[@(1LL << 40)])], @"Duplicate primary key should throw");
-    XCTAssertThrows(obj2.int64Col = 1LL << 41, @"Setting primary key should throw");
+    XCTAssertThrows([PrimaryInt64Object createInDefaultRealmWithValue:(@[@(1LL << 40)])], @"Duplicate object ID should throw");
+    XCTAssertThrows(obj2.int64Col = 1LL << 41, @"Setting object ID should throw");
 
     [PrimaryNullableIntObject createInDefaultRealmWithValue:@[@1]];
     PrimaryNullableIntObject *obj3 = [PrimaryNullableIntObject createInDefaultRealmWithValue:(@{@"optIntCol": @2})];
-    XCTAssertThrows(obj3.optIntCol = @2, @"Setting primary key should throw");
-    XCTAssertThrows(obj3.optIntCol = nil, @"Setting primary key should throw");
+    XCTAssertThrows(obj3.optIntCol = @2, @"Setting object ID should throw");
+    XCTAssertThrows(obj3.optIntCol = nil, @"Setting object ID should throw");
     PrimaryNullableIntObject *obj4 = [PrimaryNullableIntObject createInDefaultRealmWithValue:@[NSNull.null]];
-    XCTAssertThrows(obj4.optIntCol = @2, @"Setting primary key should throw");
-    XCTAssertThrows(obj4.optIntCol = nil, @"Setting primary key should throw");
-    XCTAssertThrows([PrimaryNullableIntObject createInDefaultRealmWithValue:(@[@1])], @"Duplicate primary key should throw");
-    XCTAssertThrows([PrimaryNullableIntObject createInDefaultRealmWithValue:(@[NSNull.null])], @"Duplicate primary key should throw");
+    XCTAssertThrows(obj4.optIntCol = @2, @"Setting object ID should throw");
+    XCTAssertThrows(obj4.optIntCol = nil, @"Setting object ID should throw");
+    XCTAssertThrows([PrimaryNullableIntObject createInDefaultRealmWithValue:(@[@1])], @"Duplicate object ID should throw");
+    XCTAssertThrows([PrimaryNullableIntObject createInDefaultRealmWithValue:(@[NSNull.null])], @"Duplicate object ID should throw");
 
     [[RLMRealm defaultRealm] commitWriteTransaction];
 }
@@ -1702,16 +1702,16 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
     [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"intCol": @5}];
     [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"intCol": @7}];
-    XCTAssertEqual([PrimaryStringObject objectInRealm:realm forPrimaryKey:NSNull.null].intCol, 7);
+    XCTAssertEqual([PrimaryStringObject objectInRealm:realm forObjectID:NSNull.null].intCol, 7);
     [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"stringCol": NSNull.null, @"intCol": @11}];
-    XCTAssertEqual([PrimaryStringObject objectInRealm:realm forPrimaryKey:nil].intCol, 11);
+    XCTAssertEqual([PrimaryStringObject objectInRealm:realm forObjectID:nil].intCol, 11);
 
     // upsert with new secondary property
     [PrimaryStringObject createOrUpdateInDefaultRealmWithValue:@[@"string", @3]];
     XCTAssertEqual([objects count], 3U, @"Should have 3 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 3, @"Value should be 3");
 
-    // upsert on non-primary key object should throw
+    // upsert on non-object ID object should throw
     XCTAssertThrows([StringObject createOrUpdateInDefaultRealmWithValue:@[@"string"]]);
     XCTAssertThrows([StringObject createOrUpdateInRealm:realm withValue:@[@"string"]]);
 
@@ -1765,7 +1765,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertEqual([[PrimaryIntObject allObjects] count], 2U, @"Should have 2 objects");
     XCTAssertEqual([(PrimaryStringObject *)[[PrimaryStringObject allObjects] lastObject] intCol], 4, @"intCol should be 4");
 
-    // creating new object with same primary key should throw
+    // creating new object with same object ID should throw
     XCTAssertThrows([PrimaryStringObject createInDefaultRealmWithValue:(@[@"string", @1])]);
 
     [realm commitWriteTransaction];
@@ -1775,18 +1775,18 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 - (void)testObjectInSet {
     [[RLMRealm defaultRealm] beginWriteTransaction];
 
-    // set object with primary and non primary keys as they both override isEqual and hash
+    // set object with and withou object IDs as they both override isEqual and hash
     PrimaryStringObject *obj = [PrimaryStringObject createInDefaultRealmWithValue:(@[@"string2", @1])];
     StringObject *strObj = [StringObject createInDefaultRealmWithValue:@[@"string"]];
     NSMutableSet *dict = [NSMutableSet set];
     [dict addObject:obj];
     [dict addObject:strObj];
 
-    // primary key objects should match even with duplicate instances of the same object
+    // object ID objects should match even with duplicate instances of the same object
     XCTAssertTrue([dict containsObject:obj]);
     XCTAssertTrue([dict containsObject:[[PrimaryStringObject allObjects] firstObject]]);
 
-    // non-primary key objects should only match when comparing identical instances
+    // non-object ID objects should only match when comparing identical instances
     XCTAssertTrue([dict containsObject:strObj]);
     XCTAssertFalse([dict containsObject:[[StringObject allObjects] firstObject]]);
 
@@ -1803,34 +1803,34 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [RLMRealm.defaultRealm commitWriteTransaction];
 
     // no PK
-    XCTAssertThrows([StringObject objectForPrimaryKey:@""]);
-    XCTAssertThrows([IntObject objectForPrimaryKey:@0]);
-    XCTAssertThrows([StringObject objectForPrimaryKey:NSNull.null]);
-    XCTAssertThrows([StringObject objectForPrimaryKey:nil]);
-    XCTAssertThrows([IntObject objectForPrimaryKey:nil]);
+    XCTAssertThrows([StringObject objectForObjectID:@""]);
+    XCTAssertThrows([IntObject objectForObjectID:@0]);
+    XCTAssertThrows([StringObject objectForObjectID:NSNull.null]);
+    XCTAssertThrows([StringObject objectForObjectID:nil]);
+    XCTAssertThrows([IntObject objectForObjectID:nil]);
 
     // wrong PK type
-    XCTAssertThrows([PrimaryStringObject objectForPrimaryKey:@0]);
-    XCTAssertThrows([PrimaryIntObject objectForPrimaryKey:@""]);
-    XCTAssertThrows([PrimaryIntObject objectForPrimaryKey:@""]);
-    XCTAssertThrows([PrimaryIntObject objectForPrimaryKey:NSNull.null]);
-    XCTAssertThrows([PrimaryIntObject objectForPrimaryKey:nil]);
+    XCTAssertThrows([PrimaryStringObject objectForObjectID:@0]);
+    XCTAssertThrows([PrimaryIntObject objectForObjectID:@""]);
+    XCTAssertThrows([PrimaryIntObject objectForObjectID:@""]);
+    XCTAssertThrows([PrimaryIntObject objectForObjectID:NSNull.null]);
+    XCTAssertThrows([PrimaryIntObject objectForObjectID:nil]);
 
     // no object with key
-    XCTAssertNil([PrimaryStringObject objectForPrimaryKey:@"bad key"]);
-    XCTAssertNil([PrimaryIntObject objectForPrimaryKey:@1]);
+    XCTAssertNil([PrimaryStringObject objectForObjectID:@"bad key"]);
+    XCTAssertNil([PrimaryIntObject objectForObjectID:@1]);
 
     // object with key exists
-    XCTAssertEqualObjects(strObj, [PrimaryStringObject objectForPrimaryKey:@"key"]);
-    XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectForPrimaryKey:NSNull.null]);
-    XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectForPrimaryKey:nil]);
-    XCTAssertEqualObjects(intObj, [PrimaryIntObject objectForPrimaryKey:@0]);
-    XCTAssertEqualObjects(nonNullIntObj, [PrimaryNullableIntObject objectForPrimaryKey:@0]);
-    XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectForPrimaryKey:NSNull.null]);
-    XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectForPrimaryKey:nil]);
+    XCTAssertEqualObjects(strObj, [PrimaryStringObject objectForObjectID:@"key"]);
+    XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectForObjectID:NSNull.null]);
+    XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectForObjectID:nil]);
+    XCTAssertEqualObjects(intObj, [PrimaryIntObject objectForObjectID:@0]);
+    XCTAssertEqualObjects(nonNullIntObj, [PrimaryNullableIntObject objectForObjectID:@0]);
+    XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectForObjectID:NSNull.null]);
+    XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectForObjectID:nil]);
 
     // nil realm throws
-    XCTAssertThrows([PrimaryIntObject objectInRealm:self.nonLiteralNil forPrimaryKey:@0]);
+    XCTAssertThrows([PrimaryIntObject objectInRealm:self.nonLiteralNil forObjectID:@0]);
 }
 
 - (void)testBacklinks {

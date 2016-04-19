@@ -450,7 +450,7 @@ extern "C" {
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 3, @"Value should be 3");
 
-    // upsert on non-primary key object should throw
+    // upsert on non-object ID object should throw
     XCTAssertThrows([realm addOrUpdateObject:[[StringObject alloc] initWithValue:@[@"string"]]]);
 
     [realm commitWriteTransaction];

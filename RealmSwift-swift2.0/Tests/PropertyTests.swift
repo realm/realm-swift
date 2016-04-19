@@ -22,7 +22,7 @@ import RealmSwift
 class PropertyTests: TestCase {
     var primitiveProperty: Property!
     var linkProperty: Property!
-    var primaryProperty: Property!
+    var objectIDProperty: Property!
     var optionalProperty: Property!
 
     override func setUp() {
@@ -31,7 +31,7 @@ class PropertyTests: TestCase {
             let schema = try! Realm().schema
             self.primitiveProperty = schema["SwiftObject"]!["intCol"]!
             self.linkProperty = schema["SwiftOptionalObject"]!["optObjectCol"]!
-            self.primaryProperty = schema["SwiftPrimaryStringObject"]!["stringCol"]!
+            self.objectIDProperty = schema["SwiftPrimaryStringObject"]!["stringCol"]!
             self.optionalProperty = schema["SwiftOptionalObject"]!["optObjectCol"]!
         }
     }
@@ -39,19 +39,19 @@ class PropertyTests: TestCase {
     func testName() {
         XCTAssertEqual(primitiveProperty.name, "intCol")
         XCTAssertEqual(linkProperty.name, "optObjectCol")
-        XCTAssertEqual(primaryProperty.name, "stringCol")
+        XCTAssertEqual(objectIDProperty.name, "stringCol")
     }
 
     func testType() {
         XCTAssertEqual(primitiveProperty.type, PropertyType.Int)
         XCTAssertEqual(linkProperty.type, PropertyType.Object)
-        XCTAssertEqual(primaryProperty.type, PropertyType.String)
+        XCTAssertEqual(objectIDProperty.type, PropertyType.String)
     }
 
     func testIndexed() {
         XCTAssertFalse(primitiveProperty.indexed)
         XCTAssertFalse(linkProperty.indexed)
-        XCTAssertTrue(primaryProperty.indexed)
+        XCTAssertTrue(objectIDProperty.indexed)
     }
 
     func testOptional() {
@@ -62,7 +62,7 @@ class PropertyTests: TestCase {
     func testObjectClassName() {
         XCTAssertNil(primitiveProperty.objectClassName)
         XCTAssertEqual(linkProperty.objectClassName!, "SwiftBoolObject")
-        XCTAssertNil(primaryProperty.objectClassName)
+        XCTAssertNil(objectIDProperty.objectClassName)
     }
 
     func testEquals() {

@@ -164,12 +164,12 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Create or update an RLMObject in the default Realm with a given object.
 
- This method can only be called on object types with a primary key defined. If there is already
- an object with the same primary key value in the default RLMRealm its values are updated and the object
+ This method can only be called on object types with an object ID defined. If there is already
+ an object with the same object ID value in the default RLMRealm its values are updated and the object
  is returned. Otherwise this creates and populates a new instance of this object in the default Realm.
  
  If nested objects are included in the argument, `createOrUpdateInDefaultRealmWithValue:` will be
- called on them if have a primary key (`createInDefaultRealmWithValue:` otherwise).
+ called on them if have an object ID (`createInDefaultRealmWithValue:` otherwise).
  
  This is a no-op if the argument is an RLMObject of the same type already backed by the target realm.
 
@@ -180,19 +180,19 @@ RLM_ASSUME_NONNULL_BEGIN
 
  When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
 
- @see   defaultPropertyValues, primaryKey
+ @see   defaultPropertyValues, objectID
  */
 + (instancetype)createOrUpdateInDefaultRealmWithValue:(id)value;
 
 /**
  Create or update an RLMObject with a given object.
 
- This method can only be called on object types with a primary key defined. If there is already
- an object with the same primary key value in the provided RLMRealm its values are updated and the object
+ This method can only be called on object types with an object ID defined. If there is already
+ an object with the same object ID value in the provided RLMRealm its values are updated and the object
  is returned. Otherwise this creates and populates a new instance of this object in the provided Realm.
  
  If nested objects are included in the argument, `createOrUpdateInRealm:withValue:` will be
- called on them if have a primary key (`createInRealm:withValue:` otherwise).
+ called on them if have an object ID (`createInRealm:withValue:` otherwise).
 
  This is a no-op if the argument is an RLMObject of the same type already backed by the target realm.
 
@@ -204,7 +204,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
 
- @see   defaultPropertyValues, primaryKey
+ @see   defaultPropertyValues, objectID
  */
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value;
 
@@ -246,14 +246,14 @@ RLM_ASSUME_NONNULL_BEGIN
 + (nullable NSDictionary *)defaultPropertyValues;
 
 /**
- Implement to designate a property as the primary key for an RLMObject subclass. Only properties of
- type RLMPropertyTypeString and RLMPropertyTypeInt can be designated as the primary key. Primary key 
+ Implement to designate a property as the object ID for an RLMObject subclass. Only properties of
+ type RLMPropertyTypeString and RLMPropertyTypeInt can be designated as the object ID. Object ID 
  properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
- Indexes are created automatically for primary key properties.
+ Indexes are created automatically for object ID properties.
 
- @return    Name of the property designated as the primary key.
+ @return    Name of the property designated as the object ID.
  */
-+ (nullable NSString *)primaryKey;
++ (nullable NSString *)objectID;
 
 /**
  Implement to return an array of property names to ignore. These properties will not be persisted
@@ -311,18 +311,18 @@ RLM_ASSUME_NONNULL_BEGIN
 + (RLMResults *)objectsWithPredicate:(nullable NSPredicate *)predicate;
 
 /**
- Get the single object with the given primary key from the default Realm.
+ Get the single object with the given object ID from the default Realm.
 
- Returns the object from the default Realm which has the given primary key, or
+ Returns the object from the default Realm which has the given object ID, or
  `nil` if the object does not exist. This is slightly faster than the otherwise
- equivalent `[[SubclassName objectsWhere:@"primaryKeyPropertyName = %@", key] firstObject]`.
+ equivalent `[[SubclassName objectsWhere:@"objectIDPropertyName = %@", key] firstObject]`.
 
- This method requires that `primaryKey` be overridden on the receiving subclass.
+ This method requires that `objectID` be overridden on the receiving subclass.
 
- @return    An object of the subclass type or nil if an object with the given primary key does not exist.
- @see       -primaryKey
+ @return    An object of the subclass type or nil if an object with the given object ID does not exist.
+ @see       -objectID
  */
-+ (nullable instancetype)objectForPrimaryKey:(nullable id)primaryKey;
++ (nullable instancetype)objectForObjectID:(nullable id)objectID;
 
 
 #pragma mark - Querying Specific Realms
@@ -360,18 +360,18 @@ RLM_ASSUME_NONNULL_BEGIN
 + (RLMResults *)objectsInRealm:(RLMRealm *)realm withPredicate:(nullable NSPredicate *)predicate;
 
 /**
- Get the single object with the given primary key from the specified Realm.
+ Get the single object with the given object ID from the specified Realm.
 
- Returns the object from the specified Realm which has the given primary key, or
+ Returns the object from the specified Realm which has the given object ID, or
  `nil` if the object does not exist. This is slightly faster than the otherwise
- equivalent `[[SubclassName objectsInRealm:realm where:@"primaryKeyPropertyName = %@", key] firstObject]`.
+ equivalent `[[SubclassName objectsInRealm:realm where:@"objectIDPropertyName = %@", key] firstObject]`.
 
- This method requires that `primaryKey` be overridden on the receiving subclass.
+ This method requires that `objectID` be overridden on the receiving subclass.
 
- @return    An object of the subclass type or nil if an object with the given primary key does not exist.
- @see       -primaryKey
+ @return    An object of the subclass type or nil if an object with the given object ID does not exist.
+ @see       -objectID
  */
-+ (nullable instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(nullable id)primaryKey;
++ (nullable instancetype)objectInRealm:(RLMRealm *)realm forObjectID:(nullable id)objectID;
 
 #pragma mark - Other Instance Methods
 
@@ -388,7 +388,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  Returns YES if another RLMObject points to the same object in an RLMRealm. For RLMObject types
- with a primary, key, `isEqual:` is overridden to use this method (along with a corresponding
+ with an object ID, `isEqual:` is overridden to use this method (along with a corresponding
  implementation for `hash`.
 
  @param object  The object to compare to.

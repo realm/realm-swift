@@ -397,7 +397,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 /**
  Adds or updates an object to be persisted in this Realm. The object provided must have a designated
- primary key. If no objects exist in the RLMRealm instance with the same primary key value, the object is
+ object ID. If no objects exist in the RLMRealm instance with the same object ID value, the object is
  inserted. Otherwise, the existing object is updated with any changed values.
 
  As with `addObject:`, the object cannot already be persisted in a different

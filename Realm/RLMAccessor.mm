@@ -69,7 +69,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
         return;
     }
     if (row != realm::not_found) {
-        @throw RLMException(@"Can't set primary key property '%@' to existing value '%lld'.", propName, val);
+        @throw RLMException(@"Can't set object ID property '%@' to existing value '%lld'.", propName, val);
     }
     obj->_row.set_int(colIndex, val);
 }
@@ -127,7 +127,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
         return;
     }
     if (row != realm::not_found) {
-        @throw RLMException(@"Can't set primary key property '%@' to existing value '%@'.", propName, val);
+        @throw RLMException(@"Can't set object ID property '%@' to existing value '%@'.", propName, val);
     }
     try {
         obj->_row.set_string(colIndex, str);
@@ -305,7 +305,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
         return;
     }
     if (row != realm::not_found) {
-        @throw RLMException(@"Can't set primary key property '%@' to existing value '%@'.", propName, intObject);
+        @throw RLMException(@"Can't set object ID property '%@' to existing value '%@'.", propName, intObject);
     }
 
     if (intObject) {
@@ -522,9 +522,9 @@ template<typename ArgType, typename StorageType=ArgType>
 static IMP RLMMakeSetter(RLMProperty *prop) {
     NSUInteger colIndex = prop.column;
     NSString *name = prop.name;
-    if (prop.isPrimary) {
+    if (prop.isObjectID) {
         return imp_implementationWithBlock(^(__unused RLMObjectBase *obj, __unused ArgType val) {
-            @throw RLMException(@"Primary key can't be changed after an object is inserted.");
+            @throw RLMException(@"Object ID can't be changed after an object is inserted.");
         });
     }
     return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj, ArgType val) {
@@ -780,8 +780,8 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     if (!prop) {
         @throw RLMException(@"Invalid property name `%@` for class `%@`.", propName, obj->_objectSchema.className);
     }
-    if (prop.isPrimary) {
-        @throw RLMException(@"Primary key can't be changed to '%@' after an object is inserted.", val);
+    if (prop.isObjectID) {
+        @throw RLMException(@"Object ID can't be changed to '%@' after an object is inserted.", val);
     }
     if (!RLMIsObjectValidForProperty(val, prop)) {
         @throw RLMException(@"Invalid property value `%@` for property `%@` of class `%@`", val, propName, obj->_objectSchema.className);
@@ -800,7 +800,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
             case RLMAccessorCodeInt:
             case RLMAccessorCodeLong:
             case RLMAccessorCodeLongLong:
-                if (prop.isPrimary) {
+                if (prop.isObjectID) {
                     RLMSetValueUnique(obj, col, prop.name, [val longLongValue]);
                 }
                 else {
@@ -817,7 +817,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
                 RLMSetValue(obj, col, [val boolValue]);
                 break;
             case RLMAccessorCodeIntObject:
-                if (prop.isPrimary) {
+                if (prop.isObjectID) {
                     RLMSetValueUnique(obj, col, prop.name, (NSNumber<RLMInt> *)val);
                 }
                 else {
@@ -834,7 +834,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
                 RLMSetValue(obj, col, (NSNumber<RLMBool> *)val);
                 break;
             case RLMAccessorCodeString:
-                if (prop.isPrimary) {
+                if (prop.isObjectID) {
                     RLMSetValueUnique(obj, col, prop.name, (NSString *)val);
                 }
                 else {

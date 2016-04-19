@@ -49,12 +49,12 @@ namespace realm {
         std::string name;
         PropertyType type;
         std::string object_type;
-        bool is_primary = false;
+        bool is_object_id = false;
         bool is_indexed = false;
         bool is_nullable = false;
 
         size_t table_column = -1;
-        bool requires_index() const { return is_primary || is_indexed; }
+        bool requires_index() const { return is_object_id || is_indexed; }
         bool is_indexable() const {
             return type == PropertyType::Int
                 || type == PropertyType::Bool

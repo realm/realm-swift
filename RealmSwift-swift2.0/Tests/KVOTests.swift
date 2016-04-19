@@ -20,14 +20,14 @@ import XCTest
 import RealmSwift
 
 var pkCounter = 0
-func nextPrimaryKey() -> Int {
+func nextObjectID() -> Int {
     pkCounter += 1
     return pkCounter
 }
 
 class KVOObject: Object {
     // swiftlint:disable:next variable_name
-    dynamic var pk = nextPrimaryKey() // primary key for equality
+    dynamic var pk = nextObjectID() // object ID for equality
     dynamic var ignored: Int = 0
 
     dynamic var boolCol: Bool = false
@@ -50,7 +50,7 @@ class KVOObject: Object {
     dynamic var optBinaryCol: NSData?
     dynamic var optDateCol: NSDate?
 
-    override class func primaryKey() -> String { return "pk" }
+    override class func objectID() -> String { return "pk" }
     override class func ignoredProperties() -> [String] { return ["ignored"] }
 }
 
@@ -221,7 +221,7 @@ class KVOTests: TestCase {
     func testAllPropertyTypesMultipleAccessors() {
         let obj = KVOObject()
         realm.add(obj)
-        let obs = realm.objectForPrimaryKey(KVOObject.self, key: obj.pk)!
+        let obs = realm.objectForObjectID(KVOObject.self, key: obj.pk)!
 
         observeChange(obs, "boolCol", false, true) { obj.boolCol = true }
         observeChange(obs, "int8Col", 1, 10) { obj.int8Col = 10 }
@@ -268,7 +268,7 @@ class KVOTests: TestCase {
 
         let obj2 = KVOObject()
         realm.add(obj2)
-        let obs2 = realm.objectForPrimaryKey(KVOObject.self, key: obj2.pk)!
+        let obs2 = realm.objectForObjectID(KVOObject.self, key: obj2.pk)!
         observeChange(obs2, "arrayCol.invalidated", false, true) {
             self.realm.delete(obj2)
         }

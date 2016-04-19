@@ -128,18 +128,18 @@ class ObjectSchemaInitializationTests: TestCase {
         // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
         _ = RLMObjectSchema(forObjectClass: SwiftObjectWithStruct.self)
 
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDatePrimaryKey.self),
-            "Should throw when setting a non int/string primary key")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDateObjectID.self),
+            "Should throw when setting a non int/string object ID")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSURL.self),
             "Should throw when not ignoring a property of a type we can't persist")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonOptionalLinkProperty.self),
             "Should throw when not marking a link property as optional")
     }
 
-    func testPrimaryKey() {
-        XCTAssertNil(SwiftObject().objectSchema.primaryKeyProperty,
-            "Object should default to having no primary key property")
-        XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
+    func testObjectID() {
+        XCTAssertNil(SwiftObject().objectSchema.objectIDProperty,
+            "Object should default to having no object ID property")
+        XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.objectIDProperty!.name, "stringCol")
     }
 
     func testIgnoredProperties() {
@@ -197,7 +197,7 @@ class ObjectSchemaInitializationTests: TestCase {
 
 class SwiftFakeObject: NSObject {
     dynamic class func objectUtilClass(isSwift: Bool) -> AnyClass { return ObjectUtil.self }
-    dynamic class func primaryKey() -> String? { return nil }
+    dynamic class func objectID() -> String? { return nil }
     dynamic class func ignoredProperties() -> [String] { return [] }
     dynamic class func indexedProperties() -> [String] { return [] }
 }
@@ -231,10 +231,10 @@ class SwiftObjectWithStruct: SwiftFakeObject {
     var swiftStruct = SortDescriptor(property: "prop")
 }
 
-class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {
+class SwiftObjectWithDateObjectID: SwiftFakeObject {
     dynamic var date = NSDate()
 
-    dynamic override class func primaryKey() -> String? {
+    dynamic override class func objectID() -> String? {
         return "date"
     }
 }

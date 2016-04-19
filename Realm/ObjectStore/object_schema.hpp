@@ -31,7 +31,7 @@ struct Property;
 class ObjectSchema {
 public:
     ObjectSchema();
-    ObjectSchema(std::string name, std::string primary_key, std::initializer_list<Property> properties);
+    ObjectSchema(std::string name, std::string object_id, std::initializer_list<Property> properties);
     ~ObjectSchema();
 
     // create object schema from existing table
@@ -40,19 +40,19 @@ public:
 
     std::string name;
     std::vector<Property> properties;
-    std::string primary_key;
+    std::string object_id;
 
     Property *property_for_name(StringData name);
     const Property *property_for_name(StringData name) const;
-    Property *primary_key_property() {
-        return property_for_name(primary_key);
+    Property *object_id_property() {
+        return property_for_name(object_id);
     }
-    const Property *primary_key_property() const {
-        return property_for_name(primary_key);
+    const Property *object_id_property() const {
+        return property_for_name(object_id);
     }
 
 private:
-    void set_primary_key_property();
+    void set_object_id_property();
 };
 }
 

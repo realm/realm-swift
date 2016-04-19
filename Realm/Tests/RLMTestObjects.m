@@ -158,7 +158,7 @@
 #pragma mark PrimaryStringObject
 
 @implementation PrimaryStringObject
-+ (NSString *)primaryKey {
++ (NSString *)objectID {
     return @"stringCol";
 }
 @end
@@ -214,6 +214,6 @@
 + (Class)objectUtilClass:(BOOL)isSwift { return RLMObjectUtilClass(isSwift); }
 + (NSArray *)ignoredProperties { return nil; }
 + (NSArray *)indexedProperties { return nil; }
-+ (NSString *)primaryKey { return nil; }
++ (NSString *)objectID { return nil; }
 + (NSArray *)requiredProperties { return nil; }
 @end

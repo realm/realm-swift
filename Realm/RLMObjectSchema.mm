@@ -65,18 +65,18 @@ using namespace realm;
     NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
     for (RLMProperty *prop in _properties) {
         map[prop.name] = prop;
-        if (prop.isPrimary) {
-            self.primaryKeyProperty = prop;
+        if (prop.isObjectID) {
+            self.objectIDProperty = prop;
         }
     }
     _propertiesByName = map;
     _propertiesInDeclaredOrder = nil;
 }
 
-- (void)setPrimaryKeyProperty:(RLMProperty *)primaryKeyProperty {
-    _primaryKeyProperty.isPrimary = NO;
-    primaryKeyProperty.isPrimary = YES;
-    _primaryKeyProperty = primaryKeyProperty;
+- (void)setObjectIDProperty:(RLMProperty *)objectIDProperty {
+    _objectIDProperty.isObjectID = NO;
+    objectIDProperty.isObjectID = YES;
+    _objectIDProperty = objectIDProperty;
 }
 
 + (instancetype)schemaForObjectClass:(Class)objectClass {
@@ -122,20 +122,20 @@ using namespace realm;
         }
     }
 
-    if (NSString *primaryKey = [objectClass primaryKey]) {
+    if (NSString *objectID = [objectClass objectID]) {
         for (RLMProperty *prop in schema.properties) {
-            if ([primaryKey isEqualToString:prop.name]) {
+            if ([objectID isEqualToString:prop.name]) {
                 prop.indexed = YES;
-                schema.primaryKeyProperty = prop;
+                schema.objectIDProperty = prop;
                 break;
             }
         }
 
-        if (!schema.primaryKeyProperty) {
-            @throw RLMException(@"Primary key property '%@' does not exist on object '%@'", primaryKey, className);
+        if (!schema.objectIDProperty) {
+            @throw RLMException(@"Object ID property '%@' does not exist on object '%@'", objectID, className);
         }
-        if (schema.primaryKeyProperty.type != RLMPropertyTypeInt && schema.primaryKeyProperty.type != RLMPropertyTypeString) {
-            @throw RLMException(@"Only 'string' and 'int' properties can be designated the primary key");
+        if (schema.objectIDProperty.type != RLMPropertyTypeInt && schema.objectIDProperty.type != RLMPropertyTypeString) {
+            @throw RLMException(@"Only 'string' and 'int' properties can be designated the object ID");
         }
     }
 
@@ -266,7 +266,7 @@ using namespace realm;
     schema->_standaloneClass = _standaloneClass;
     schema->_isSwiftClass = _isSwiftClass;
 
-    // call property setter to reset map and primary key
+    // call property setter to reset map and object ID
     schema.properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
 
     // _table not copied as it's realm::Group-specific
@@ -282,10 +282,10 @@ using namespace realm;
     schema->_standaloneClass = _standaloneClass;
     schema->_isSwiftClass = _isSwiftClass;
 
-    // reuse propery array, map, and primary key instnaces
+    // reuse propery array, map, and object ID instnaces
     schema->_properties = _properties;
     schema->_propertiesByName = _propertiesByName;
-    schema->_primaryKeyProperty = _primaryKeyProperty;
+    schema->_objectIDProperty = _objectIDProperty;
 
     // _table not copied as it's realm::Group-specific
     return schema;
@@ -302,7 +302,7 @@ using namespace realm;
         RLMProperty *p1 = _properties[i], *p2 = otherProperties[i];
         if (p1.type != p2.type ||
             p1.column != p2.column ||
-            p1.isPrimary != p2.isPrimary ||
+            p1.isObjectID != p2.isObjectID ||
             p1.optional != p2.optional ||
             ![p1.name isEqualToString:p2.name] ||
             !(p1.objectClassName == p2.objectClassName || [p1.objectClassName isEqualToString:p2.objectClassName])) {
@@ -334,14 +334,14 @@ using namespace realm;
 - (realm::ObjectSchema)objectStoreCopy {
     ObjectSchema objectSchema;
     objectSchema.name = _className.UTF8String;
-    objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.name.UTF8String : "";
+    objectSchema.object_id = _objectIDProperty ? _objectIDProperty.name.UTF8String : "";
     for (RLMProperty *prop in _properties) {
         Property p;
         p.name = prop.name.UTF8String;
         p.type = (PropertyType)prop.type;
         p.object_type = prop.objectClassName ? prop.objectClassName.UTF8String : "";
         p.is_indexed = prop.indexed;
-        p.is_primary = (prop == _primaryKeyProperty);
+        p.is_object_id = (prop == _objectIDProperty);
         p.is_nullable = prop.optional;
         objectSchema.properties.push_back(std::move(p));
     }
@@ -360,17 +360,17 @@ using namespace realm;
                                                   objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
                                                           indexed:prop.is_indexed
                                                          optional:prop.is_nullable];
-        property.isPrimary = (prop.name == objectSchema.primary_key);
+        property.isObjectID = (prop.name == objectSchema.object_id);
         [propArray addObject:property];
     }
     schema.properties = propArray;
     
-    // get primary key from realm metadata
-    if (objectSchema.primary_key.length()) {
-        NSString *primaryKeyString = [NSString stringWithUTF8String:objectSchema.primary_key.c_str()];
-        schema.primaryKeyProperty = schema[primaryKeyString];
-        if (!schema.primaryKeyProperty) {
-            @throw RLMException(@"No property matching primary key '%@'", primaryKeyString);
+    // get object ID from realm metadata
+    if (objectSchema.object_id.length()) {
+        NSString *objectIDString = [NSString stringWithUTF8String:objectSchema.object_id.c_str()];
+        schema.objectIDProperty = schema[objectIDString];
+        if (!schema.objectIDProperty) {
+            @throw RLMException(@"No property matching object ID '%@'", objectIDString);
         }
     }
 

@@ -196,8 +196,8 @@ public final class Realm {
     /**
     Adds or updates an object to be persisted it in this Realm.
 
-    When 'update' is 'true', the object must have a primary key. If no objects exist in
-    the Realm instance with the same primary key value, the object is inserted. Otherwise,
+    When 'update' is 'true', the object must have a object ID. If no objects exist in
+    the Realm instance with the same object ID value, the object is inserted. Otherwise,
     the existing object is updated with any changed values.
 
     When added, all (child) relationships referenced by this object will also be
@@ -210,11 +210,11 @@ public final class Realm {
     from a Realm (i.e. `invalidated` must be false).
 
     - parameter object: Object to be added to this Realm.
-    - parameter update: If true will try to update existing objects with the same primary key.
+    - parameter update: If true will try to update existing objects with the same object ID.
     */
     public func add(object: Object, update: Bool = false) {
-        if update && object.objectSchema.primaryKeyProperty == nil {
-            throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
+        if update && object.objectSchema.objectIDProperty == nil {
+            throwRealmException("'\(object.objectSchema.className)' does not have a object ID and can not be updated")
         }
         RLMAddObjectToRealm(object, rlmRealm, update)
     }
@@ -227,7 +227,7 @@ public final class Realm {
     - warning: This method can only be called during a write transaction.
 
     - parameter objects: A sequence which contains objects to be added to this Realm.
-    - parameter update: If true will try to update existing objects with the same primary key.
+    - parameter update: If true will try to update existing objects with the same object ID.
     */
     public func add<S: SequenceType where S.Generator.Element: Object>(objects: S, update: Bool = false) {
         for obj in objects {
@@ -241,8 +241,8 @@ public final class Realm {
     Creates or updates an instance of this object and adds it to the `Realm` populating
     the object with the given value.
 
-    When 'update' is 'true', the object must have a primary key. If no objects exist in
-    the Realm instance with the same primary key value, the object is inserted. Otherwise,
+    When 'update' is 'true', the object must have a object ID. If no objects exist in
+    the Realm instance with the same object ID value, the object is inserted. Otherwise,
     the existing object is updated with any changed values.
 
     - warning: This method can only be called during a write transaction.
@@ -254,14 +254,14 @@ public final class Realm {
                         thrown if any required properties are not present and no default is set.
                         When passing in an `Array`, all properties must be present,
                         valid and in the same order as the properties defined in the model.
-    - parameter update: If true will try to update existing objects with the same primary key.
+    - parameter update: If true will try to update existing objects with the same object ID.
 
     - returns: The created object.
     */
     public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
         let className = (type as Object.Type).className()
-        if update && schema[className]?.primaryKeyProperty == nil {
-            throwRealmException("'\(className)' does not have a primary key and can not be updated")
+        if update && schema[className]?.objectIDProperty == nil {
+            throwRealmException("'\(className)' does not have a object ID and can not be updated")
         }
         return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), T.self)
     }
@@ -274,8 +274,8 @@ public final class Realm {
     Creates or updates an object with the given class name and adds it to the `Realm`, populating
     the object with the given value.
 
-    When 'update' is 'true', the object must have a primary key. If no objects exist in
-    the Realm instance with the same primary key value, the object is inserted. Otherwise,
+    When 'update' is 'true', the object must have a object ID. If no objects exist in
+    the Realm instance with the same object ID value, the object is inserted. Otherwise,
     the existing object is updated with any changed values.
 
     - warning: This method can only be called during a write transaction.
@@ -288,15 +288,15 @@ public final class Realm {
 
     When passing in an `Array`, all properties must be present,
     valid and in the same order as the properties defined in the model.
-    - parameter update:     If true will try to update existing objects with the same primary key.
+    - parameter update:     If true will try to update existing objects with the same object ID.
 
     - returns: The created object.
 
     :nodoc:
     */
     public func dynamicCreate(className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
-        if update && schema[className]?.primaryKeyProperty == nil {
-            throwRealmException("'\(className)' does not have a primary key and can not be updated")
+        if update && schema[className]?.objectIDProperty == nil {
+            throwRealmException("'\(className)' does not have a object ID and can not be updated")
         }
         return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), DynamicObject.self)
     }
@@ -396,47 +396,47 @@ public final class Realm {
     }
 
     /**
-    Get an object with the given primary key.
+    Get an object with the given object ID.
 
-    Returns `nil` if no object exists with the given primary key.
+    Returns `nil` if no object exists with the given object ID.
 
-    This method requires that `primaryKey()` be overridden on the given subclass.
+    This method requires that `objectID()` be overridden on the given subclass.
 
-    - see: Object.primaryKey()
+    - see: Object.objectID()
 
     - parameter type: The type of the objects to be returned.
-    - parameter key:  The primary key of the desired object.
+    - parameter id:   The object ID of the desired object.
 
-    - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
+    - returns: An object of type `type` or `nil` if an object with the given object ID does not exist.
     */
-    public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), Optional<T>.self)
+    public func objectForObjectID<T: Object>(type: T.Type, id: AnyObject) -> T? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), id), Optional<T>.self)
     }
 
     /**
     This method is useful only in specialized circumstances, for example, when building
     components that integrate with Realm. If you are simply building an app on Realm, it is
-    recommended to use the typed method `objectForPrimaryKey(_:key:)`.
+    recommended to use the typed method `objectForObjectID(_:key:)`.
 
-    Get a dynamic object with the given class name and primary key.
+    Get a dynamic object with the given class name and object ID.
 
-    Returns `nil` if no object exists with the given class name and primary key.
+    Returns `nil` if no object exists with the given class name and object ID.
 
-    This method requires that `primaryKey()` be overridden on the given subclass.
+    This method requires that `objectID()` be overridden on the given subclass.
 
-    - see: Object.primaryKey()
+    - see: Object.objectID()
 
     - warning: This method is useful only in specialized circumstances.
 
     - parameter className:  The class name of the object to be returned.
-    - parameter key:        The primary key of the desired object.
+    - parameter id:         The object ID of the desired object.
 
-    - returns: An object of type `DynamicObject` or `nil` if an object with the given primary key does not exist.
+    - returns: An object of type `DynamicObject` or `nil` if an object with the given object ID does not exist.
 
     :nodoc:
     */
-    public func dynamicObjectForPrimaryKey(className: String, key: AnyObject) -> DynamicObject? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, className, key), Optional<DynamicObject>.self)
+    public func dynamicObjectForObjectID(className: String, id: AnyObject) -> DynamicObject? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, className, id), Optional<DynamicObject>.self)
     }
 
     // MARK: Notifications

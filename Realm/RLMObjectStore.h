@@ -42,7 +42,7 @@ typedef NS_OPTIONS(NSUInteger, RLMCreationOptions) {
     // Normal object creation
     RLMCreationOptionsNone = 0,
     // If the property is a link or array property, upsert the linked objects
-    // if they have a primary key, and insert them otherwise.
+    // if they have an object ID, and insert them otherwise.
     RLMCreationOptionsCreateOrUpdate = 1 << 0,
     // Allow standalone objects to be promoted to persisted objects
     // if false objects are copied during object creation
@@ -66,7 +66,7 @@ void RLMDeleteAllObjectsFromRealm(RLMRealm *realm);
 // get objects of a given class
 RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) NS_RETURNS_RETAINED;
 
-// get an object with the given primary key
+// get an object with the given object ID
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) NS_RETURNS_RETAINED;
 
 // create object from array or dictionary

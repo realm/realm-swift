@@ -605,9 +605,9 @@ void RLMRealmTranslateException(NSError **error) {
 }
 
 - (void)addOrUpdateObject:(RLMObject *)object {
-    // verify primary key
-    if (!object.objectSchema.primaryKeyProperty) {
-        @throw RLMException(@"'%@' does not have a primary key and can not be updated", object.objectSchema.className);
+    // verify object ID
+    if (!object.objectSchema.objectIDProperty) {
+        @throw RLMException(@"'%@' does not have an object ID and can not be updated", object.objectSchema.className);
     }
 
     RLMAddObjectToRealm(object, self, true);
@@ -666,8 +666,8 @@ void RLMRealmTranslateException(NSError **error) {
     return RLMGetObjects(self, objectClassName, predicate);
 }
 
-- (RLMObject *)objectWithClassName:(NSString *)className forPrimaryKey:(id)primaryKey {
-    return RLMGetObject(self, className, primaryKey);
+- (RLMObject *)objectWithClassName:(NSString *)className forObjectID:(id)objectID {
+    return RLMGetObject(self, className, objectID);
 }
 
 + (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error {

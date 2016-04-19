@@ -48,9 +48,9 @@ RLM_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSString *className;
 
 /**
- The property which is the primary key for this object (if any).
+ The property which is the object ID for this object (if any).
  */
-@property (nonatomic, readonly, nullable) RLMProperty *primaryKeyProperty;
+@property (nonatomic, readonly, nullable) RLMProperty *objectIDProperty;
 
 #pragma mark - Methods
 

@@ -97,20 +97,20 @@ namespace realm {
         static std::vector<ObjectSchemaValidationException> verify_object_schema(ObjectSchema const& expected,
                                                                                  ObjectSchema &target_schema);
 
-        // get primary key property name for object type
-        static StringData get_primary_key_for_object(const Group *group, StringData object_type);
+        // get object ID property name for object type
+        static StringData get_object_id_for_object(const Group *group, StringData object_type);
 
-        // sets primary key property for object type
+        // sets object ID property for object type
         // must be in write transaction to set
-        static void set_primary_key_for_object(Group *group, StringData object_type, StringData primary_key);
+        static void set_object_id_for_object(Group *group, StringData object_type, StringData object_id);
 
         static TableRef table_for_object_type_create_if_needed(Group *group, StringData object_type, bool &created);
 
         // returns if any indexes were changed
         static bool update_indexes(Group *group, Schema &schema);
 
-        // validates that all primary key properties have unique values
-        static void validate_primary_column_uniqueness(const Group *group, Schema const& schema);
+        // validates that all object ID properties have unique values
+        static void validate_object_id_column_uniqueness(const Group *group, Schema const& schema);
 
         friend ObjectSchema;
     };
@@ -137,10 +137,10 @@ namespace realm {
         uint64_t m_old_version, m_new_version;
     };
 
-    class DuplicatePrimaryKeyValueException : public MigrationException {
+    class DuplicateObjectIDValueException : public MigrationException {
       public:
-        DuplicatePrimaryKeyValueException(std::string const& object_type, Property const& property);
-        DuplicatePrimaryKeyValueException(std::string const& object_type, Property const& property, const std::string message);
+        DuplicateObjectIDValueException(std::string const& object_type, Property const& property);
+        DuplicateObjectIDValueException(std::string const& object_type, Property const& property, const std::string message);
 
         std::string object_type() const { return m_object_type; }
         Property const& property() const { return m_property; }
@@ -210,9 +210,9 @@ namespace realm {
         MissingObjectTypeException(std::string const& object_type, Property const& property);
     };
 
-    class DuplicatePrimaryKeysException : public ObjectSchemaValidationException {
+    class DuplicateObjectIDsException : public ObjectSchemaValidationException {
     public:
-        DuplicatePrimaryKeysException(std::string const& object_type);
+        DuplicateObjectIDsException(std::string const& object_type);
     };
 
     class MismatchedPropertiesException : public ObjectSchemaValidationException {
@@ -224,21 +224,21 @@ namespace realm {
         Property m_old_property, m_new_property;
     };
 
-    class ChangedPrimaryKeyException : public ObjectSchemaValidationException {
+    class ChangedObjectIDException : public ObjectSchemaValidationException {
       public:
-        ChangedPrimaryKeyException(std::string const& object_type, std::string const& old_primary, std::string const& new_primary);
-        std::string old_primary() const { return m_old_primary; }
-        std::string new_primary() const { return m_new_primary; }
+        ChangedObjectIDException(std::string const& object_type, std::string const& old_object_id, std::string const& new_object_id);
+        std::string old_object_id() const { return m_old_object_id; }
+        std::string new_object_id() const { return m_new_object_id; }
       private:
-        std::string m_old_primary, m_new_primary;
+        std::string m_old_object_id, m_new_object_id;
     };
 
-    class InvalidPrimaryKeyException : public ObjectSchemaValidationException {
+    class InvalidObjectIDException : public ObjectSchemaValidationException {
       public:
-        InvalidPrimaryKeyException(std::string const& object_type, std::string const& primary_key);
-        std::string primary_key() const { return m_primary_key; }
+        InvalidObjectIDException(std::string const& object_type, std::string const& object_id);
+        std::string object_id() const { return m_object_id; }
       private:
-        std::string m_primary_key;
+        std::string m_object_id;
     };
 }
 

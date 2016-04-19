@@ -68,9 +68,9 @@
     
     RLMRealm *testRealm = [self realmWithTestPath];
     
-    RLMObject *object = [testRealm objectWithClassName:@"PrimaryStringObject" forPrimaryKey:@"key"];
+    RLMObject *object = [testRealm objectWithClassName:@"PrimaryStringObject" forObjectID:@"key"];
     
-    XCTAssertNotNil(object, @"Should be able to retrieve object by primary key dynamically");
+    XCTAssertNotNil(object, @"Should be able to retrieve object by object ID dynamically");
     XCTAssert([[object valueForKey:@"stringCol"] isEqualToString:@"key"],@"stringCol should equal 'key'");
     XCTAssert([[[object class] className] isEqualToString:@"PrimaryStringObject"],@"Object class name should equal 'PrimaryStringObject'");
     XCTAssert([object isKindOfClass:[PrimaryStringObject class]], @"Object should be of class 'PrimaryStringObject'");
