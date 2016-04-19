@@ -399,7 +399,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return    An NSArray of objects of type `className` which have this object as their value for the `property` property.
  */
-- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
+- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property DEPRECATED_MSG_ATTRIBUTE("Use an RLMLinkingObjects property");
 
 /**
  Returns YES if another RLMObject points to the same object in an RLMRealm. For RLMObject types

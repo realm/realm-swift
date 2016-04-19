@@ -1834,6 +1834,8 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 }
 
 - (void)testBacklinks {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     StringObject *obj = [[StringObject alloc] initWithValue:@[@"string"]];
 
     // calling on standalone should throw
@@ -1864,6 +1866,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
         [realm deleteObject:obj];
         XCTAssertThrows([obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"]);
     }];
+#pragma clang diagnostic pop
 }
 
 @end
