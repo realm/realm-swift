@@ -75,7 +75,7 @@
 @implementation AllTypesObject
 + (NSDictionary *)linkingObjectsProperties
 {
-    return @{ @"linkingObjectsCol": @{ @"class": @"LinkToAllTypesObject", @"property": @"allTypesCol" } };
+    return @{ @"linkingObjectsCol": [RLMPropertyDescriptor descriptorWithClass:LinkToAllTypesObject.class propertyName:@"allTypesCol"] };
 }
 @end
 
@@ -108,10 +108,12 @@
 
 #pragma mark DogObject
 
+@class OwnerObject;
+
 @implementation DogObject
 + (NSDictionary *)linkingObjectsProperties
 {
-    return @{ @"owners": @{ @"class": @"OwnerObject", @"property": @"dog" } };
+    return @{ @"owners": [RLMPropertyDescriptor descriptorWithClass:OwnerObject.class propertyName:@"dog"] };
 }
 @end
 
@@ -222,7 +224,7 @@
 
 + (NSDictionary *)linkingObjectsProperties
 {
-    return @{ @"parents": @{ @"class": @"PersonObject", @"property": @"children" } };
+    return @{ @"parents": [RLMPropertyDescriptor descriptorWithClass:PersonObject.class propertyName:@"children"] };
 }
 
 - (BOOL)isEqual:(id)other

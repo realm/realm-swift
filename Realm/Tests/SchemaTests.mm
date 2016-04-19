@@ -161,7 +161,7 @@ RLM_ARRAY_TYPE(SchemaTestsLinkSource)
 @implementation InvalidReadWriteLinkingObjectsProperty
 
 + (NSDictionary *)linkingObjectsProperties {
-    return @{ @"linkingObjects": @{ @"class": @"SchemaTestsLinkSource", @"property": @"irwlop" } };
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:SchemaTestsLinkSource.class propertyName:@"irwlop"] };
 }
 
 @end
@@ -181,7 +181,7 @@ RLM_ARRAY_TYPE(SchemaTestsLinkSource)
 @implementation ValidLinkingObjectsPropertyWithProtocol
 
 + (NSDictionary *)linkingObjectsProperties {
-    return @{ @"linkingObjects": @{ @"class": @"SchemaTestsLinkSource", @"property": @"vlopwp" } };
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:SchemaTestsLinkSource.class propertyName:@"vlopwp"] };
 }
 
 @end
@@ -195,20 +195,7 @@ RLM_ARRAY_TYPE(NotARealClass)
 @implementation InvalidLinkingObjectsPropertyProtocol
 
 + (NSDictionary *)linkingObjectsProperties {
-    return @{ @"linkingObjects": @{ @"class": @"SchemaTestsLinkSource", @"property": @"ilopp" } };
-}
-
-@end
-
-@interface InvalidLinkingObjectsPropertyMissingSourceClassOfLink : FakeObject
-@property (readonly) RLMLinkingObjects *linkingObjects;
-@end
-
-@implementation InvalidLinkingObjectsPropertyMissingSourceClassOfLink
-
-+ (NSDictionary *)linkingObjectsProperties {
-    return @{ @"linkingObjects": @{ @"class": @"NotARealClass",
-                                    @"property": @"nosuchproperty" } };
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:SchemaTestsLinkSource.class propertyName:@"ilopp"] };
 }
 
 @end
@@ -222,8 +209,8 @@ RLM_ARRAY_TYPE(NotARealClass)
 @implementation InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink
 
 + (NSDictionary *)linkingObjectsProperties {
-    return @{ @"linkingObjects": @{ @"class": @"InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink",
-                                    @"property": @"nosuchproperty" } };
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink.class
+                                                               propertyName:@"nosuchproperty"] };
 }
 
 @end
@@ -237,8 +224,8 @@ RLM_ARRAY_TYPE(NotARealClass)
 @implementation InvalidLinkingObjectsPropertySourcePropertyNotALink
 
 + (NSDictionary *)linkingObjectsProperties {
-    return @{ @"linkingObjects": @{ @"class": @"InvalidLinkingObjectsPropertySourcePropertyNotALink",
-                                    @"property": @"integer" } };
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:InvalidLinkingObjectsPropertySourcePropertyNotALink.class
+                                                               propertyName:@"integer"] };
 }
 
 @end
@@ -246,14 +233,14 @@ RLM_ARRAY_TYPE(NotARealClass)
 
 @interface InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere : FakeObject
 @property (readonly) RLMLinkingObjects *linkingObjects;
-@property IntObject *source;
+@property IntObject *link;
 @end
 
 @implementation InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere
 
 + (NSDictionary *)linkingObjectsProperties {
-    return @{ @"linkingObjects": @{ @"class": @"InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere",
-                                    @"property": @"source" } };
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere.class
+                                                               propertyName:@"link"] };
 }
 
 @end
@@ -646,14 +633,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                       @"Property 'linkingObjects' .* type RLMLinkingObjects<NotARealClass>.*conflicting class name.*'SchemaTestsLinkSource'");
 }
 
-- (void)testClassWithInvalidLinkingObjectsPropertyMissingSourceClassOfLink {
-    RLMSetTreatFakeObjectAsRLMObject(YES);
-    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertyMissingSourceClassOfLink.class ]];
-    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                      @"Target type 'NotARealClass' doesn't exist for property 'linkingObjects'");
-}
-
 - (void)testClassWithInvalidLinkingObjectsPropertyMissingSourcePropertyOfLink {
     RLMSetTreatFakeObjectAsRLMObject(YES);
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
@@ -675,7 +654,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere.class, IntObject.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                      @"Property 'source' .* origin of linking objects property 'linkingObjects' does "
+                                      @"Property 'link' .* origin of linking objects property 'linkingObjects' does "
                                       "not link to class 'InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere'");
 }
 
