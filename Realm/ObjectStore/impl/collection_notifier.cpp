@@ -561,7 +561,7 @@ struct RowInfo {
     size_t shifted_tv_index;
 };
 
-void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, IndexSet& removed, CollectionChangeIndices& changeset)
+void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, IndexSet& removed, CollectionChangeSet& changeset)
 {
     size_t expected = 0;
     for (auto& row : new_rows) {
@@ -591,7 +591,7 @@ void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, IndexSet& removed,
 
 class SortedMoveCalculator {
 public:
-    SortedMoveCalculator(std::vector<RowInfo>& new_rows, CollectionChangeIndices& changeset)
+    SortedMoveCalculator(std::vector<RowInfo>& new_rows, CollectionChangeSet& changeset)
     : m_modified(changeset.modifications)
     {
         std::vector<Row> old_candidates;

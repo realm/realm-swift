@@ -24,7 +24,7 @@ namespace realm {
     class List;
     class Results;
     class TableView;
-    struct CollectionChangeIndices;
+    struct CollectionChangeSet;
     struct NotificationToken;
 }
 @class RLMObjectSchema;
@@ -58,7 +58,7 @@ namespace realm {
 @end
 
 @interface RLMCollectionChange ()
-- (instancetype)initWithChanges:(realm::CollectionChangeIndices)indices;
+- (instancetype)initWithChanges:(realm::CollectionChangeSet)indices;
 @end
 
 template<typename Collection>

@@ -425,7 +425,7 @@ void Results::prepare_async()
 NotificationToken Results::async(std::function<void (std::exception_ptr)> target)
 {
     prepare_async();
-    auto wrap = [=](CollectionChangeIndices, std::exception_ptr e) { target(e); };
+    auto wrap = [=](CollectionChangeSet, std::exception_ptr e) { target(e); };
     return {m_notifier, m_notifier->add_callback(wrap)};
 }
 

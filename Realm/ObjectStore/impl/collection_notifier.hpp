@@ -34,7 +34,7 @@ namespace realm {
 class Realm;
 
 namespace _impl {
-class CollectionChangeBuilder : public CollectionChangeIndices {
+class CollectionChangeBuilder : public CollectionChangeSet {
 public:
     CollectionChangeBuilder(CollectionChangeBuilder const&) = default;
     CollectionChangeBuilder(CollectionChangeBuilder&&) = default;
@@ -170,7 +170,7 @@ private:
 
     std::exception_ptr m_error;
     CollectionChangeBuilder m_accumulated_changes;
-    CollectionChangeIndices m_changes_to_deliver;
+    CollectionChangeSet m_changes_to_deliver;
 
     // Tables which this collection needs change information for
     std::vector<size_t> m_relevant_tables;

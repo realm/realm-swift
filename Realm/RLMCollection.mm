@@ -235,10 +235,10 @@ NSString *RLMDescriptionWithMaxDepth(NSString *name,
 @end
 
 @implementation RLMCollectionChange {
-    realm::CollectionChangeIndices _indices;
+    realm::CollectionChangeSet _indices;
 }
 
-- (instancetype)initWithChanges:(realm::CollectionChangeIndices)indices {
+- (instancetype)initWithChanges:(realm::CollectionChangeSet)indices {
     self = [super init];
     if (self) {
         _indices = std::move(indices);
@@ -304,7 +304,7 @@ RLMNotificationToken *RLMAddNotificationBlock(id objcCollection,
             return true;
         }
     };
-    auto cb = [=, &collection](realm::CollectionChangeIndices const& changes,
+    auto cb = [=, &collection](realm::CollectionChangeSet const& changes,
                                std::exception_ptr err) mutable {
         if (err) {
             try {

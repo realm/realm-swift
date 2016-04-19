@@ -49,7 +49,7 @@ private:
     size_t m_token;
 };
 
-struct CollectionChangeIndices {
+struct CollectionChangeSet {
     struct Move {
         size_t from;
         size_t to;
@@ -65,7 +65,7 @@ struct CollectionChangeIndices {
     bool empty() const { return deletions.empty() && insertions.empty() && modifications.empty() && moves.empty(); }
 };
 
-using CollectionChangeCallback = std::function<void (CollectionChangeIndices, std::exception_ptr)>;
+using CollectionChangeCallback = std::function<void (CollectionChangeSet, std::exception_ptr)>;
 } // namespace realm
 
 #endif // REALM_COLLECTION_NOTIFICATIONS_HPP
