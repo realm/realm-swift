@@ -44,6 +44,8 @@ using namespace realm;
     NSArray *_propertiesInDeclaredOrder;
 }
 
+@dynamic primaryKeyProperty; // forwards getter to objectIDProperty
+
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
     self = [super init];
     self.className = objectClassName;
@@ -71,6 +73,10 @@ using namespace realm;
     }
     _propertiesByName = map;
     _propertiesInDeclaredOrder = nil;
+}
+
+- (RLMProperty *)primaryKeyProperty {
+    return self.objectIDProperty;
 }
 
 - (void)setObjectIDProperty:(RLMProperty *)objectIDProperty {
@@ -121,8 +127,11 @@ using namespace realm;
             @throw RLMException(@"Object '%@' has properties that are declared multiple times in its class hierarchy: '%@'", className, [duplicatePropertyNames.allObjects componentsJoinedByString:@"', '"]);
         }
     }
-
-    if (NSString *objectID = [objectClass objectID]) {
+    NSString *objectID = [objectClass objectID];
+    if (!objectID) {
+        objectID = [objectClass primaryKey];
+    }
+    if (objectID) {
         for (RLMProperty *prop in schema.properties) {
             if ([objectID isEqualToString:prop.name]) {
                 prop.indexed = YES;

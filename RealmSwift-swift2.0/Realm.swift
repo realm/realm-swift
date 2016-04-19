@@ -396,6 +396,25 @@ public final class Realm {
     }
 
     /**
+    Get an object with the given primary key.
+
+    Returns `nil` if no object exists with the given primary key.
+
+    This method requires that `primaryKey()` be overridden on the given subclass.
+
+    - see: Object.primaryKey()
+
+    - parameter type: The type of the objects to be returned.
+    - parameter key:  The primary key of the desired object.
+
+    - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
+    */
+    @available(*, deprecated=1, message="Use Realm.objectForObjectID(_:id:)")
+    public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), Optional<T>.self)
+    }
+
+    /**
     Get an object with the given object ID.
 
     Returns `nil` if no object exists with the given object ID.
@@ -411,6 +430,33 @@ public final class Realm {
     */
     public func objectForObjectID<T: Object>(type: T.Type, id: AnyObject) -> T? {
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), id), Optional<T>.self)
+    }
+
+    /**
+    This method is useful only in specialized circumstances, for example, when building
+    components that integrate with Realm. If you are simply building an app on Realm, it is
+    recommended to use the typed method `objectForPrimaryKey(_:key:)`.
+
+    Get a dynamic object with the given class name and primary key.
+
+    Returns `nil` if no object exists with the given class name and primary key.
+
+    This method requires that `primaryKey()` be overridden on the given subclass.
+
+    - see: Object.primaryKey()
+
+    - warning: This method is useful only in specialized circumstances.
+
+    - parameter className:  The class name of the object to be returned.
+    - parameter key:        The primary key of the desired object.
+
+    - returns: An object of type `DynamicObject` or `nil` if an object with the given primary key does not exist.
+
+    :nodoc:
+    */
+    @available(*, deprecated=1, message="Use Realm.dynamicObjectForObjectID(_:id:)")
+    public func dynamicObjectForPrimaryKey(className: String, key: AnyObject) -> DynamicObject? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, className, key), Optional<DynamicObject>.self)
     }
 
     /**

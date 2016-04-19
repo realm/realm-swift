@@ -197,6 +197,7 @@ class ObjectSchemaInitializationTests: TestCase {
 
 class SwiftFakeObject: NSObject {
     dynamic class func objectUtilClass(isSwift: Bool) -> AnyClass { return ObjectUtil.self }
+    dynamic class func primaryKey() -> String? { return nil }
     dynamic class func objectID() -> String? { return nil }
     dynamic class func ignoredProperties() -> [String] { return [] }
     dynamic class func indexedProperties() -> [String] { return [] }

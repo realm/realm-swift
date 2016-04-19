@@ -496,10 +496,10 @@ class RealmTests: TestCase {
             realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
         }
 
-        XCTAssertNotNil(realm.objectForObjectID(SwiftPrimaryStringObject.self, key: "a"))
+        XCTAssertNotNil(realm.objectForObjectID(SwiftPrimaryStringObject.self, id: "a"))
 
         // When this is directly inside the XCTAssertNil, it fails for some reason
-        let missingObject = realm.objectForObjectID(SwiftPrimaryStringObject.self, key: "z")
+        let missingObject = realm.objectForObjectID(SwiftPrimaryStringObject.self, id: "z")
         XCTAssertNil(missingObject)
     }
 
@@ -510,8 +510,8 @@ class RealmTests: TestCase {
             realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
         }
 
-        XCTAssertNotNil(realm.dynamicObjectForObjectID("SwiftPrimaryStringObject", key: "a"))
-        XCTAssertNil(realm.dynamicObjectForObjectID("SwiftPrimaryStringObject", key: "z"))
+        XCTAssertNotNil(realm.dynamicObjectForObjectID("SwiftPrimaryStringObject", id: "a"))
+        XCTAssertNil(realm.dynamicObjectForObjectID("SwiftPrimaryStringObject", id: "z"))
     }
 
     func testDynamicObjectForObjectIDSubscripting() {
@@ -520,7 +520,7 @@ class RealmTests: TestCase {
             realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
         }
 
-        let object = realm.dynamicObjectForObjectID("SwiftPrimaryStringObject", key: "a")
+        let object = realm.dynamicObjectForObjectID("SwiftPrimaryStringObject", id: "a")
 
         let stringVal = object!["stringCol"] as! String
 

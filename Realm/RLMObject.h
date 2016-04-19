@@ -246,6 +246,16 @@ RLM_ASSUME_NONNULL_BEGIN
 + (nullable NSDictionary *)defaultPropertyValues;
 
 /**
+ Implement to designate a property as the primary key for an RLMObject subclass. Only properties of
+ type RLMPropertyTypeString and RLMPropertyTypeInt can be designated as the primary key. Primary key 
+ properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
+ Indexes are created automatically for primary key properties.
+
+ @return    Name of the property designated as the primary key.
+ */
++ (nullable NSString *)primaryKey DEPRECATED_MSG_ATTRIBUTE("use objectID");
+
+/**
  Implement to designate a property as the object ID for an RLMObject subclass. Only properties of
  type RLMPropertyTypeString and RLMPropertyTypeInt can be designated as the object ID. Object ID 
  properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
@@ -311,6 +321,20 @@ RLM_ASSUME_NONNULL_BEGIN
 + (RLMResults *)objectsWithPredicate:(nullable NSPredicate *)predicate;
 
 /**
+ Get the single object with the given primary key from the default Realm.
+
+ Returns the object from the default Realm which has the given primary key, or
+ `nil` if the object does not exist. This is slightly faster than the otherwise
+ equivalent `[[SubclassName objectsWhere:@"primaryKeyPropertyName = %@", key] firstObject]`.
+
+ This method requires that `primaryKey` be overridden on the receiving subclass.
+
+ @return    An object of the subclass type or nil if an object with the given primary key does not exist.
+ @see       -primaryKey
+ */
++ (nullable instancetype)objectForPrimaryKey:(nullable id)primaryKey DEPRECATED_MSG_ATTRIBUTE("use +[RLMObject objectForObjectID:]");
+
+/**
  Get the single object with the given object ID from the default Realm.
 
  Returns the object from the default Realm which has the given object ID, or
@@ -358,6 +382,20 @@ RLM_ASSUME_NONNULL_BEGIN
  @return    An RLMResults of objects of the subclass type in the specified Realm that match the given predicate
  */
 + (RLMResults *)objectsInRealm:(RLMRealm *)realm withPredicate:(nullable NSPredicate *)predicate;
+
+/**
+ Get the single object with the given primary key from the specified Realm.
+
+ Returns the object from the specified Realm which has the given primary key, or
+ `nil` if the object does not exist. This is slightly faster than the otherwise
+ equivalent `[[SubclassName objectsInRealm:realm where:@"primaryKeyPropertyName = %@", key] firstObject]`.
+
+ This method requires that `primaryKey` be overridden on the receiving subclass.
+
+ @return    An object of the subclass type or nil if an object with the given primary key does not exist.
+ @see       -primaryKey
+ */
++ (nullable instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(nullable id)primaryKey DEPRECATED_MSG_ATTRIBUTE("use +[RLMObject objectInRealm:forObjectID:]");
 
 /**
  Get the single object with the given object ID from the specified Realm.

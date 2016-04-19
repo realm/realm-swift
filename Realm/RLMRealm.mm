@@ -666,6 +666,10 @@ void RLMRealmTranslateException(NSError **error) {
     return RLMGetObjects(self, objectClassName, predicate);
 }
 
+- (RLMObject *)objectWithClassName:(NSString *)className forPrimaryKey:(id)primaryKey {
+    return RLMGetObject(self, className, primaryKey);
+}
+
 - (RLMObject *)objectWithClassName:(NSString *)className forObjectID:(id)objectID {
     return RLMGetObject(self, className, objectID);
 }

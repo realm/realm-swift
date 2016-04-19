@@ -154,8 +154,16 @@
     return RLMGetObjects(realm, self.className, predicate);
 }
 
++ (instancetype)objectForPrimaryKey:(id)primaryKey {
+    return RLMGetObject(RLMRealm.defaultRealm, self.className, primaryKey);
+}
+
 + (instancetype)objectForObjectID:(id)objectID {
     return RLMGetObject(RLMRealm.defaultRealm, self.className, objectID);
+}
+
++ (instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(id)primaryKey {
+    return RLMGetObject(realm, self.className, primaryKey);
 }
 
 + (instancetype)objectInRealm:(RLMRealm *)realm forObjectID:(id)objectID {
@@ -183,6 +191,10 @@
 }
 
 + (NSDictionary *)defaultPropertyValues {
+    return nil;
+}
+
++ (NSString *)primaryKey {
     return nil;
 }
 

@@ -41,6 +41,12 @@ public final class ObjectSchema: CustomStringConvertible {
     /// The name of the class this schema describes.
     public var className: String { return rlmObjectSchema.className }
 
+    /// The property that serves as the primary key, if there is a primary key.
+    @available(*, deprecated=1, message="Use objectIDProperty")
+    public var primaryKeyProperty: Property? {
+        return objectIDProperty
+    }
+
     /// The property that serves as the object ID, if there is a object ID.
     public var objectIDProperty: Property? {
         if let rlmProperty = rlmObjectSchema.objectIDProperty {

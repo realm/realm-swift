@@ -91,6 +91,26 @@
  that integrate with Realm. If you are simply building an app on Realm, it is
  recommended to use the class methods on `RLMObject`.
  
+ Get an object of a given class name with a primary key
+ 
+ The preferred way to get an object of a single class is to use the class methods on RLMObject.
+ 
+ @warning This method is useful only in specialized circumstances.
+ 
+ @param className   The class name for the object you are looking for
+ @param primaryKey  The primary key value for the object you are looking for
+ 
+ @return    An object or nil if an object with the given primary key does not exist.
+ 
+ @see       RLMObject objectForPrimaryKey:
+ */
+- (RLMObject *)objectWithClassName:(NSString *)className forPrimaryKey:(id)primaryKey DEPRECATED_MSG_ATTRIBUTE("use -[RLMRealm objectWithClassName:forObjectID:]");
+
+/**
+ This method is useful only in specialized circumstances, for example, when building components
+ that integrate with Realm. If you are simply building an app on Realm, it is
+ recommended to use the class methods on `RLMObject`.
+ 
  Get an object of a given class name with an object ID
  
  The preferred way to get an object of a single class is to use the class methods on RLMObject.
