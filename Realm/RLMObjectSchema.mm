@@ -72,7 +72,7 @@ using namespace realm;
 }
 
 - (void)_propertiesDidChange {
-    NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
+    NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count + _computedProperties.count];
     for (RLMProperty *prop in _properties) {
         map[prop.name] = prop;
         if (prop.isPrimary) {
