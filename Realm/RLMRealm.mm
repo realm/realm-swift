@@ -101,7 +101,9 @@ std::atomic<bool> g_syncLogEverything{false};
         sync::Client::LogLevel logLevel = sync::Client::LogLevel::normal;
         if (g_syncLogEverything)
             logLevel = sync::Client::LogLevel::everything;
-        _client.reset(new sync::Client(userToken.UTF8String, userTokenSignature.UTF8String,
+        std::ostringstream complete_token;
+        complete_token << userToken.UTF8String << ":" << userTokenSignature.UTF8String;
+        _client.reset(new sync::Client(complete_token.str(),
                                        &_logger, logLevel)); // Throws
         sync::Client& client = *_client;
         auto runLoopThread = [&client] {
