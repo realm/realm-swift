@@ -260,12 +260,8 @@ CollectionChangeBuilder::CollectionChangeBuilder(IndexSet deletions,
                                                  IndexSet insertions,
                                                  IndexSet modifications,
                                                  std::vector<Move> moves)
+: CollectionChangeSet({std::move(deletions), std::move(insertions), std::move(modifications), std::move(moves)})
 {
-    this->deletions = std::move(deletions);
-    this->insertions = std::move(insertions);
-    this->modifications = std::move(modifications);
-    this->moves = std::move(moves);
-
     for (auto&& move : this->moves) {
         this->deletions.add(move.from);
         this->insertions.add(move.to);
