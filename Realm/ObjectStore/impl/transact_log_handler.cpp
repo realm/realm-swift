@@ -463,11 +463,13 @@ public:
         mark_dirty(row, col);
 
         m_active = nullptr;
-        for (auto& o : m_info.lists) {
-            if (o.table_ndx == current_table() && o.row_ndx == row && o.col_ndx == col) {
-                m_active = o.changes;
-                // need to use last match for multiple source version logic
-//                break;
+        // When there are multiple source versions there could be multiple
+        // change objects for a single LinkView, in which case we need to use
+        // the last one
+        for (auto it = m_info.lists.rbegin(), end = m_info.lists.rend(); it != end; ++it) {
+            if (it->table_ndx == current_table() && it->row_ndx == row && it->col_ndx == col) {
+                m_active = it->changes;
+                break;
             }
         }
         return true;
