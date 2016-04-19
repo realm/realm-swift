@@ -202,7 +202,7 @@ using namespace realm;
         else {
             prop = [[RLMProperty alloc] initWithName:propertyName
                                              indexed:[indexed containsObject:propertyName]
-                                      linkingObjects:linkingObjectsProperties[propertyName]
+                              linkPropertyDescriptor:linkingObjectsProperties[propertyName]
                                             property:props[i]];
         }
 

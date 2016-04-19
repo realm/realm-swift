@@ -97,4 +97,17 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @end
 
+
+/**
+ This class describes a specific property on a given class.
+ */
+@interface RLMPropertyDescriptor : NSObject
+
++ (instancetype)descriptorWithClass:(Class)klass propertyName:(NSString *)propertyName;
+
+@property (nonatomic, readonly) Class klass;
+@property (nonatomic, readonly) NSString *propertyName;
+
+@end
+
 RLM_ASSUME_NONNULL_END

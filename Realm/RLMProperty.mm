@@ -395,7 +395,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
 - (instancetype)initWithName:(NSString *)name
                      indexed:(BOOL)indexed
-              linkingObjects:(NSDictionary *)linkingObjectsInfo
+      linkPropertyDescriptor:(RLMPropertyDescriptor *)linkPropertyDescriptor
                     property:(objc_property_t)property
 {
     self = [super init];
@@ -405,8 +405,11 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
     _name = name;
     _indexed = indexed;
-    _objectClassName = linkingObjectsInfo[@"class"];
-    _linkOriginPropertyName = linkingObjectsInfo[@"property"];
+
+    if (linkPropertyDescriptor) {
+        _objectClassName = NSStringFromClass(linkPropertyDescriptor.klass);
+        _linkOriginPropertyName = linkPropertyDescriptor.propertyName;
+    }
 
     bool isReadOnly = [self parseObjcProperty:property];
     bool isComputedProperty = rawTypeIsComputedProperty(_objcRawType);
@@ -544,6 +547,18 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     p.is_nullable = _optional;
     p.link_origin_property_name = _linkOriginPropertyName ? _linkOriginPropertyName.UTF8String : "";
     return p;
+}
+
+@end
+
+@implementation RLMPropertyDescriptor
+
++ (instancetype)descriptorWithClass:(Class)klass propertyName:(NSString *)propertyName
+{
+    RLMPropertyDescriptor *descriptor = [[RLMPropertyDescriptor alloc] init];
+    descriptor->_klass = klass;
+    descriptor->_propertyName = propertyName;
+    return descriptor;
 }
 
 @end
