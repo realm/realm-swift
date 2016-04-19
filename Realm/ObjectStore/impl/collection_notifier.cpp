@@ -204,6 +204,8 @@ bool CollectionNotifier::deliver(SharedGroup& sg, std::exception_ptr err)
     m_changes_to_deliver = std::move(m_accumulated_changes);
 
     // fixup modifications to be source rows rather than dest rows
+    // FIXME: the actual change calculations should be updated to just calculate
+    // the correct thing instead
     m_changes_to_deliver.modifications.erase_at(m_changes_to_deliver.insertions);
     m_changes_to_deliver.modifications.shift_for_insert_at(m_changes_to_deliver.deletions);
 
