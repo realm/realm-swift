@@ -118,9 +118,7 @@ static auto translateErrors(Function&& f, NSString *aggregateMethod=nil) {
 
 + (instancetype)emptyDetachedResults
 {
-    RLMResults *results = [[self alloc] initPrivate];
-    results->_results = Results();
-    return results;
+    return [[self alloc] initPrivate];
 }
 
 static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMResults *const ar) {
