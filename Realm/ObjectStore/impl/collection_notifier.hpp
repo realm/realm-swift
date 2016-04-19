@@ -107,7 +107,7 @@ public:
     // transaction advance, and register all required information in it
     void add_required_change_info(TransactionChangeInfo& info);
 
-    virtual void run() { }
+    virtual void run() = 0;
     void prepare_handover();
     bool deliver(SharedGroup&, std::exception_ptr);
 
@@ -122,7 +122,7 @@ private:
     virtual void do_detach_from(SharedGroup&) = 0;
     virtual void do_prepare_handover(SharedGroup&) = 0;
     virtual bool do_deliver(SharedGroup&) { return true; }
-    virtual bool do_add_required_change_info(TransactionChangeInfo&) { return true; }
+    virtual bool do_add_required_change_info(TransactionChangeInfo&) = 0;
 
     const std::thread::id m_thread_id = std::this_thread::get_id();
     bool is_for_current_thread() const { return m_thread_id == std::this_thread::get_id(); }
