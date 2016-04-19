@@ -172,12 +172,12 @@
 - (void)prepare;
 @end
 
-#if !TARGET_OS_WATCH && !TARGET_OS_TV && !TARGET_OS_IPHONE
-@interface NSIndexPath (UITableView)
+@interface NSIndexPath (TableViewHelpers)
+@property (nonatomic, readonly) NSInteger section;
 @property (nonatomic, readonly) NSInteger row;
 @end
 
-@implementation NSIndexPath (UITableView)
+@implementation NSIndexPath (TableViewHelpers)
 - (NSInteger)section {
     return [self indexAtPosition:0];
 }
@@ -185,7 +185,6 @@
     return [self indexAtPosition:1];
 }
 @end
-#endif
 
 static RLMCollectionChange *getChange(RLMTestCase<ChangesetTestCase> *self, void (^block)(RLMRealm *)) {
     [self prepare];
