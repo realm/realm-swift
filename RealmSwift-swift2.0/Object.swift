@@ -431,7 +431,8 @@ public class ObjectUtil: NSObject {
         }
     }
 
-    @objc private class func initializeLinkingObjectsProperty(object: RLMObjectBase, property: RLMProperty, results: RLMResults) {
+    @objc private class func initializeLinkingObjectsProperty(object: RLMObjectBase, property: RLMProperty,
+                                                              results: RLMResults) {
         (object as! Object).linkingObjectsForProperty(property)?.rlmResults = results
     }
 }
