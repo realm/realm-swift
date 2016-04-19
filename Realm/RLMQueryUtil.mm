@@ -149,25 +149,8 @@ public:
     {
     }
 
-    template <typename T, typename std::enable_if<!std::is_same<T, Link>::value>::type* = nullptr>
-    auto resolve(Query& query) const
-    {
-        return table_for_query(query)->template column<T>(index());
-    }
-
-    template <typename T, typename std::enable_if<std::is_same<T, Link>::value>::type* = nullptr>
-    auto resolve(Query& query) const
-    {
-        if (type() != RLMPropertyTypeLinkingObjects) {
-            return table_for_query(query)->template column<T>(index());
-        }
-        else {
-            RLMObjectSchema *link_origin_schema = m_schema[property().objectClassName];
-            Table& link_origin_table = *link_origin_schema.table;
-            size_t link_origin_column = link_origin_schema[property().linkOriginPropertyName].column;
-            return table_for_query(query)->template column<T>(link_origin_table, link_origin_column);
-        }
-    }
+    template <typename T>
+    auto resolve(Query& query) const;
 
     template <typename T>
     auto resolveWithSubquery(Query& query, Query subquery) const
@@ -224,6 +207,26 @@ private:
     RLMProperty *m_property;
     RLMSchema *m_schema;
 };
+
+template <typename T>
+auto ColumnReference::resolve(Query& query) const
+{
+    return table_for_query(query)->template column<T>(index());
+}
+
+template <>
+auto ColumnReference::resolve<Link>(Query& query) const
+{
+    if (type() != RLMPropertyTypeLinkingObjects) {
+        return table_for_query(query)->template column<Link>(index());
+    }
+    else {
+        RLMObjectSchema *link_origin_schema = m_schema[property().objectClassName];
+        Table& link_origin_table = *link_origin_schema.table;
+        size_t link_origin_column = link_origin_schema[property().linkOriginPropertyName].column;
+        return table_for_query(query)->template column<Link>(link_origin_table, link_origin_column);
+    }
+}
 
 class CollectionOperation {
 public:
