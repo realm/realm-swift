@@ -291,15 +291,49 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  Register a block to be called each time the RLMArray changes.
 
- The block will be asynchronously called with the initial array and a nil change
- object, and then called again with the new array and a non-nil, change object
- after each write transaction which changes the array or any items contained in
- the array. You must retain the returned token for as long as you want the block
- to continue to be called. To stop receiving updates, call `-stop` on the token.
+ The block will be asynchronously called with the initial array, and then
+ called again after each write transaction which changes any of the objects in
+ the array, which objects are in the results, or the order of the objects in the
+ array.
 
- If an error occurs the block will be called with `nil` for the array and change
- parameters and a non-`nil` error. Currently the only error that can occur is
- when opening the RLMRealm on the background worker thread fails.
+ The change parameter will be `nil` the first time the block is called with the
+ initial array. For each call after that, it will contain information about
+ which rows in the array were added, removed or modified. If a write transaction
+ did not modify any objects in this array, the block is not called at all.
+ See the RLMCollectionChange documentation for information on how the changes
+ are reported and an example of updating a UITableView.
+
+ If an error occurs the block will be called with `nil` for the results
+ parameter and a non-`nil` error. Currently the only errors that can occur are
+ when opening the RLMRealm on the background worker thread.
+
+ Notifications are delivered via the standard run loop, and so can't be
+ delivered while the run loop is blocked by other activity. When
+ notifications can't be delivered instantly, multiple notifications may be
+ coalesced into a single notification. This can include the notification
+ with the initial results. For example, the following code performs a write
+ transaction immediate after adding the notification block, so there is no
+ opportunity for the initial notification to be delivered first. As a
+ result, the initial notification will reflect the state of the Realm after
+ the write transaction.
+
+     Person *person = [[Person allObjectsInRealm:realm] firstObject];
+     NSLog(@"person.dogs.count: %zu", person.dogs.count); // => 0
+     self.token = [person.dogs RLMAddNotificationBlock(RLMArray<Dog *> *dogs,
+                                                       RLMCollectionChange *changes,
+                                                       NSError *error) {
+         // Only fired once for the example
+         NSLog(@"dogs.count: %zu", dogs.count) // => 1
+     }];
+     [realm transactionWithBlock:^{
+         Dog *dog = [[Dog alloc] init];
+         dog.name = @"Rex";
+         [person.dogs addObject:dog];
+     }];
+     // end of run loop execution context
+
+ You must retain the returned token for as long as you want updates to continue
+ to be sent to the block. To stop receiving updates, call `-stop` on the token.
 
  @warning This method cannot be called during a write transaction, or when the
           containing realm is read-only.
@@ -307,7 +341,7 @@ RLM_ASSUME_NONNULL_BEGIN
           to or retrieved from a Realm.
 
  @param block The block to be called each time the array changes.
- @return A token which must be held for as long as you want query results to be delivered.
+ @return A token which must be held for as long as you want updates to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray RLM_GENERIC_RETURN *__nullable array,
                                                          RLMCollectionChange *__nullable changes,
