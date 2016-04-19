@@ -36,9 +36,9 @@
     XCTAssertNil(configuration.path);
     XCTAssertEqualObjects(configuration.inMemoryIdentifier, @"identifier");
 
-    configuration.path = @"path";
+    configuration.path = @"/dev/null";
     XCTAssertNil(configuration.inMemoryIdentifier);
-    XCTAssertEqualObjects(configuration.path, @"path");
+    XCTAssertEqualObjects(configuration.path, @"/dev/null");
 }
 
 - (void)testPathValidation {
@@ -98,9 +98,9 @@
 
 - (void)testSetDefaultConfiguration {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    configuration.path = @"path";
+    configuration.path = @"/dev/null";
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
-    XCTAssertEqualObjects(RLMRealmConfiguration.defaultConfiguration.path, @"path");
+    XCTAssertEqualObjects(RLMRealmConfiguration.defaultConfiguration.path, @"/dev/null");
 }
 
 - (void)testDefaultConfiugrationUsesValueSemantics {

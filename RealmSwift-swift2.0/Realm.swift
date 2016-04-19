@@ -47,7 +47,7 @@ public final class Realm {
     // MARK: Properties
 
     /// Path to the file where this Realm is persisted.
-    @available(*, deprecated=1, message="Use configuration.path")
+    @available(*, deprecated=1, message="Use configuration.fileURL")
     public var path: String { return configuration.path! }
 
     /// Indicates if this Realm was opened in read-only mode.
@@ -87,7 +87,7 @@ public final class Realm {
     */
     public convenience init(path: String) throws {
         var configuration = Configuration.defaultConfiguration
-        configuration.path = path
+        configuration.fileURL = NSURL(fileURLWithPath: path)
         try self.init(configuration: configuration)
     }
 

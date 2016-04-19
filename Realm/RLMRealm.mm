@@ -163,7 +163,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 
 + (instancetype)realmWithPath:(NSString *)path {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.path = path;
+    configuration.fileURL = [NSURL fileURLWithPath:path];
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
@@ -180,7 +180,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
         configuration.inMemoryIdentifier = path.lastPathComponent;
     }
     else {
-        configuration.path = path;
+        configuration.fileURL = [NSURL fileURLWithPath:path];
     }
     configuration.encryptionKey = key;
     configuration.readOnly = readonly;
@@ -684,7 +684,7 @@ void RLMRealmTranslateException(NSError **error) {
 + (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)outError {
     try {
         RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-        config.path = realmPath;
+        config.fileURL = [NSURL fileURLWithPath:realmPath];
         config.encryptionKey = RLMRealmValidatedEncryptionKey(key);
 
         uint64_t version = Realm::get_schema_version(config.config);

@@ -36,7 +36,7 @@ class RealmConfigurationTests: TestCase {
         let path = Realm.Configuration.defaultConfiguration.path!
         let configuration = Realm.Configuration(path: "path")
         Realm.Configuration.defaultConfiguration = configuration
-        XCTAssertEqual(Realm.Configuration.defaultConfiguration.path, "path")
+        XCTAssertEqual(Realm.Configuration.defaultConfiguration.path, "/private/tmp/path")
         Realm.Configuration.defaultConfiguration.path = path
     }
 }
