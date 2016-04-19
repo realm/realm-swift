@@ -369,7 +369,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
             }
         }
     }];
-    [realm path];
+    [realm.configuration path];
 }
 
 - (void)testRealmCreationUncached {

@@ -47,10 +47,12 @@ public final class Realm {
     // MARK: Properties
 
     /// Path to the file where this Realm is persisted.
-    public var path: String { return rlmRealm.path }
+    @available(*, deprecated=1, message="Use configuration.path")
+    public var path: String { return configuration.path! }
 
     /// Indicates if this Realm was opened in read-only mode.
-    public var readOnly: Bool { return rlmRealm.readOnly }
+    @available(*, deprecated=1, message="Use configuration.readOnly")
+    public var readOnly: Bool { return configuration.readOnly }
 
     /// The Schema used by this realm.
     public var schema: Schema { return Schema(rlmRealm.schema) }

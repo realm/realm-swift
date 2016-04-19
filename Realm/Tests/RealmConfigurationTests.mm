@@ -18,12 +18,11 @@
 
 #import "RLMTestCase.h"
 
-#import "RLMRealmConfiguration_Private.h"
+#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMTestObjects.h"
 #import "RLMUtil.hpp"
 
 @interface RealmConfigurationTests : RLMTestCase
-
 @end
 
 @implementation RealmConfigurationTests
@@ -118,26 +117,28 @@
 
 - (void)testDefaultRealmUsesDefaultConfiguration {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.path, config.path); }
+    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.path, config.path); }
 
     config.path = RLMTestRealmPath();
-    @autoreleasepool { XCTAssertNotEqualObjects(RLMRealm.defaultRealm.path, config.path); }
+    @autoreleasepool { XCTAssertNotEqualObjects(RLMRealm.defaultRealm.configuration.path, config.path); }
     RLMRealmConfiguration.defaultConfiguration = config;
-    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.path, config.path); }
+    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.path, config.path); }
 
     config.inMemoryIdentifier = @"default";
     RLMRealmConfiguration.defaultConfiguration = config;
     @autoreleasepool {
         RLMRealm *realm = RLMRealm.defaultRealm;
-        XCTAssertTrue([realm.path hasSuffix:@"/default"]);
-        XCTAssertTrue([realm.path hasPrefix:NSTemporaryDirectory()]);
+        NSString *realmPath = @(realm.configuration.config.path.c_str());
+        XCTAssertTrue([realmPath hasSuffix:@"/default"]);
+        XCTAssertTrue([realmPath hasPrefix:NSTemporaryDirectory()]);
     }
 
     config.schemaVersion = 1;
     RLMRealmConfiguration.defaultConfiguration = config;
     @autoreleasepool {
         RLMRealm *realm = RLMRealm.defaultRealm;
-        XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:realm.path error:nil]);
+        NSString *realmPath = @(realm.configuration.config.path.c_str());
+        XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:realmPath error:nil]);
     }
 
     config.path = RLMDefaultRealmPath();

@@ -26,19 +26,19 @@ import Foundation
 
 class RealmTests: TestCase {
     func testPath() {
-        XCTAssertEqual(try! Realm(path: testRealmPath()).path, testRealmPath())
+        XCTAssertEqual(try! Realm(path: testRealmPath()).configuration.path, testRealmPath())
     }
 
     func testReadOnly() {
         autoreleasepool {
-            XCTAssertEqual(try! Realm().readOnly, false)
+            XCTAssertEqual(try! Realm().configuration.readOnly, false)
 
             try! Realm().write {
                 try! Realm().create(SwiftIntObject.self, value: [100])
             }
         }
         let readOnlyRealm = try! Realm(configuration: Realm.Configuration(path: defaultRealmPath(), readOnly: true))
-        XCTAssertEqual(true, readOnlyRealm.readOnly)
+        XCTAssertEqual(true, readOnlyRealm.configuration.readOnly)
         XCTAssertEqual(1, readOnlyRealm.objects(SwiftIntObject).count)
 
         assertThrows(try! Realm(), "Realm has different readOnly settings")
@@ -135,7 +135,7 @@ class RealmTests: TestCase {
     }
 
     func testInit() {
-        XCTAssertEqual(try! Realm(path: testRealmPath()).path, testRealmPath())
+        XCTAssertEqual(try! Realm(path: testRealmPath()).configuration.path, testRealmPath())
         assertThrows(try! Realm(path: ""))
     }
 
@@ -531,7 +531,7 @@ class RealmTests: TestCase {
         let realm = try! Realm()
         var notificationCalled = false
         let token = realm.addNotificationBlock { _, realm in
-            XCTAssertEqual(realm.path, self.defaultRealmPath())
+            XCTAssertEqual(realm.configuration.path, self.defaultRealmPath())
             notificationCalled = true
         }
         XCTAssertFalse(notificationCalled)
@@ -544,7 +544,7 @@ class RealmTests: TestCase {
         let realm = try! Realm()
         var notificationCalled = false
         let token = realm.addNotificationBlock { (notification, realm) -> Void in
-            XCTAssertEqual(realm.path, self.defaultRealmPath())
+            XCTAssertEqual(realm.configuration.path, self.defaultRealmPath())
             notificationCalled = true
         }
         token.stop()
