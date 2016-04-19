@@ -19,13 +19,13 @@
 #ifndef REALM_LIST_NOTIFIER_HPP
 #define REALM_LIST_NOTIFIER_HPP
 
-#include "impl/background_collection.hpp"
+#include "impl/collection_notifier.hpp"
 
 #include <realm/group_shared.hpp>
 
 namespace realm {
 namespace _impl {
-class ListNotifier : public BackgroundCollection {
+class ListNotifier : public CollectionNotifier {
 public:
     ListNotifier(LinkViewRef lv, std::shared_ptr<Realm> realm);
 

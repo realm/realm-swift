@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "impl/background_collection.hpp"
+#include "impl/collection_notifier.hpp"
 
 #include "impl/realm_coordinator.hpp"
 #include "shared_realm.hpp"
@@ -58,20 +58,20 @@ bool TransactionChangeInfo::row_did_change(Table const& table, size_t idx, int d
     return false;
 }
 
-BackgroundCollection::BackgroundCollection(std::shared_ptr<Realm> realm)
+CollectionNotifier::CollectionNotifier(std::shared_ptr<Realm> realm)
 : m_realm(std::move(realm))
 , m_sg_version(Realm::Internal::get_shared_group(*m_realm).get_version_of_current_transaction())
 {
 }
 
-BackgroundCollection::~BackgroundCollection()
+CollectionNotifier::~CollectionNotifier()
 {
     // Need to do this explicitly to ensure m_realm is destroyed with the mutex
     // held to avoid potential double-deletion
     unregister();
 }
 
-size_t BackgroundCollection::add_callback(CollectionChangeCallback callback)
+size_t CollectionNotifier::add_callback(CollectionChangeCallback callback)
 {
     m_realm->verify_thread();
 
@@ -95,7 +95,7 @@ size_t BackgroundCollection::add_callback(CollectionChangeCallback callback)
     return token;
 }
 
-void BackgroundCollection::remove_callback(size_t token)
+void CollectionNotifier::remove_callback(size_t token)
 {
     Callback old;
     {
@@ -122,19 +122,19 @@ void BackgroundCollection::remove_callback(size_t token)
     }
 }
 
-void BackgroundCollection::unregister() noexcept
+void CollectionNotifier::unregister() noexcept
 {
     std::lock_guard<std::mutex> lock(m_realm_mutex);
     m_realm = nullptr;
 }
 
-bool BackgroundCollection::is_alive() const noexcept
+bool CollectionNotifier::is_alive() const noexcept
 {
     std::lock_guard<std::mutex> lock(m_realm_mutex);
     return m_realm != nullptr;
 }
 
-std::unique_lock<std::mutex> BackgroundCollection::lock_target()
+std::unique_lock<std::mutex> CollectionNotifier::lock_target()
 {
     return std::unique_lock<std::mutex>{m_realm_mutex};
 }
@@ -154,12 +154,12 @@ static void find_relevant_tables(std::vector<size_t>& out, Table const& table)
     }
 }
 
-void BackgroundCollection::set_table(Table const& table)
+void CollectionNotifier::set_table(Table const& table)
 {
     find_relevant_tables(m_relevant_tables, table);
 }
 
-void BackgroundCollection::add_required_change_info(TransactionChangeInfo& info)
+void CollectionNotifier::add_required_change_info(TransactionChangeInfo& info)
 {
     if (!do_add_required_change_info(info)) {
         return;
@@ -173,14 +173,14 @@ void BackgroundCollection::add_required_change_info(TransactionChangeInfo& info)
     }
 }
 
-void BackgroundCollection::prepare_handover()
+void CollectionNotifier::prepare_handover()
 {
     REALM_ASSERT(m_sg);
     m_sg_version = m_sg->get_version_of_current_transaction();
     do_prepare_handover(*m_sg);
 }
 
-bool BackgroundCollection::deliver(SharedGroup& sg, std::exception_ptr err)
+bool CollectionNotifier::deliver(SharedGroup& sg, std::exception_ptr err)
 {
     if (!is_for_current_thread()) {
         return false;
@@ -210,7 +210,7 @@ bool BackgroundCollection::deliver(SharedGroup& sg, std::exception_ptr err)
     return should_call_callbacks && have_callbacks();
 }
 
-void BackgroundCollection::call_callbacks()
+void CollectionNotifier::call_callbacks()
 {
     while (auto fn = next_callback()) {
         fn(m_changes_to_deliver, m_error);
@@ -224,7 +224,7 @@ void BackgroundCollection::call_callbacks()
     }
 }
 
-CollectionChangeCallback BackgroundCollection::next_callback()
+CollectionChangeCallback CollectionNotifier::next_callback()
 {
     std::lock_guard<std::mutex> callback_lock(m_callback_mutex);
 
@@ -241,7 +241,7 @@ CollectionChangeCallback BackgroundCollection::next_callback()
     return nullptr;
 }
 
-void BackgroundCollection::attach_to(SharedGroup& sg)
+void CollectionNotifier::attach_to(SharedGroup& sg)
 {
     REALM_ASSERT(!m_sg);
 
@@ -249,7 +249,7 @@ void BackgroundCollection::attach_to(SharedGroup& sg)
     do_attach_to(sg);
 }
 
-void BackgroundCollection::detach()
+void CollectionNotifier::detach()
 {
     REALM_ASSERT(m_sg);
     do_detach_from(*m_sg);

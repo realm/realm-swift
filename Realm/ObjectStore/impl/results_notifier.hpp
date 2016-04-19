@@ -19,14 +19,14 @@
 #ifndef REALM_RESULTS_NOTIFIER_HPP
 #define REALM_RESULTS_NOTIFIER_HPP
 
-#include "background_collection.hpp"
+#include "collection_notifier.hpp"
 #include "results.hpp"
 
 #include <realm/group_shared.hpp>
 
 namespace realm {
 namespace _impl {
-class ResultsNotifier : public BackgroundCollection {
+class ResultsNotifier : public CollectionNotifier {
 public:
     ResultsNotifier(Results& target);
 

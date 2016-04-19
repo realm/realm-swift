@@ -24,7 +24,7 @@ using namespace realm;
 using namespace realm::_impl;
 
 ResultsNotifier::ResultsNotifier(Results& target)
-: BackgroundCollection(target.get_realm())
+: CollectionNotifier(target.get_realm())
 , m_target_results(&target)
 , m_sort(target.get_sort())
 , m_from_linkview(target.get_linkview().get() != nullptr)

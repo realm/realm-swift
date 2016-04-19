@@ -35,7 +35,7 @@ namespace realm {
     typedef std::weak_ptr<Realm> WeakRealm;
 
     namespace _impl {
-        class BackgroundCollection;
+        class CollectionNotifier;
         class ListNotifier;
         class RealmCoordinator;
         class ResultsNotifier;
@@ -139,7 +139,7 @@ namespace realm {
         // Expose some internal functionality to other parts of the ObjectStore
         // without making it public to everyone
         class Internal {
-            friend class _impl::BackgroundCollection;
+            friend class _impl::CollectionNotifier;
             friend class _impl::ListNotifier;
             friend class _impl::RealmCoordinator;
             friend class _impl::ResultsNotifier;
@@ -148,7 +148,7 @@ namespace realm {
             // to be able to call the handover functions, which are not very wrappable
             static SharedGroup& get_shared_group(Realm& realm) { return *realm.m_shared_group; }
 
-            // BackgroundCollection needs to be able to access the owning
+            // CollectionNotifier needs to be able to access the owning
             // coordinator to wake up the worker thread when a callback is
             // added, and coordinators need to be able to get themselves from a Realm
             static _impl::RealmCoordinator& get_coordinator(Realm& realm) { return *realm.m_coordinator; }

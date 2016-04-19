@@ -30,7 +30,7 @@ class SharedGroup;
 class StringData;
 
 namespace _impl {
-class BackgroundCollection;
+class CollectionNotifier;
 class ExternalCommitHelper;
 class WeakRealmNotifier;
 
@@ -81,7 +81,7 @@ public:
     // Update the schema in the cached config
     void update_schema(Schema const& new_schema);
 
-    static void register_notifier(std::shared_ptr<BackgroundCollection> notifier);
+    static void register_notifier(std::shared_ptr<CollectionNotifier> notifier);
 
     // Advance the Realm to the most recent transaction version which all async
     // work is complete for
@@ -95,8 +95,8 @@ private:
     std::vector<WeakRealmNotifier> m_weak_realm_notifiers;
 
     std::mutex m_notifier_mutex;
-    std::vector<std::shared_ptr<_impl::BackgroundCollection>> m_new_notifiers;
-    std::vector<std::shared_ptr<_impl::BackgroundCollection>> m_notifiers;
+    std::vector<std::shared_ptr<_impl::CollectionNotifier>> m_new_notifiers;
+    std::vector<std::shared_ptr<_impl::CollectionNotifier>> m_notifiers;
 
     // SharedGroup used for actually running async notifiers
     // Will have a read transaction iff m_notifiers is non-empty

@@ -18,7 +18,7 @@
 
 #include "impl/realm_coordinator.hpp"
 
-#include "impl/background_collection.hpp"
+#include "impl/collection_notifier.hpp"
 #include "impl/external_commit_helper.hpp"
 #include "impl/transact_log_handler.hpp"
 #include "impl/weak_realm_notifier.hpp"
@@ -253,7 +253,7 @@ void RealmCoordinator::pin_version(uint_fast64_t version, uint_fast32_t index)
     }
 }
 
-void RealmCoordinator::register_notifier(std::shared_ptr<BackgroundCollection> notifier)
+void RealmCoordinator::register_notifier(std::shared_ptr<CollectionNotifier> notifier)
 {
     auto version = notifier->version();
     auto& self = Realm::Internal::get_coordinator(*notifier->get_realm());
@@ -314,7 +314,7 @@ namespace {
 class IncrementalChangeInfo {
 public:
     IncrementalChangeInfo(SharedGroup& sg,
-                          std::vector<std::shared_ptr<_impl::BackgroundCollection>>& notifiers)
+                          std::vector<std::shared_ptr<_impl::CollectionNotifier>>& notifiers)
     : m_sg(sg)
     {
         if (notifiers.empty())

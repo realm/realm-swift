@@ -90,10 +90,10 @@ struct TransactionChangeInfo {
 // most of the lifetime-management issues related to sharing an object between
 // the worker thread and the collection on the target thread, along with the
 // thread-safe callback collection.
-class BackgroundCollection {
+class CollectionNotifier {
 public:
-    BackgroundCollection(std::shared_ptr<Realm>);
-    virtual ~BackgroundCollection();
+    CollectionNotifier(std::shared_ptr<Realm>);
+    virtual ~CollectionNotifier();
 
     // ------------------------------------------------------------------------
     // Public API for the collections using this to get notifications:
@@ -123,7 +123,7 @@ public:
     // Release references to all core types
     // This is called on the worker thread to ensure that non-thread-safe things
     // can be destroyed on the correct thread, even if the last reference to the
-    // BackgroundCollection is released on a different thread
+    // CollectionNotifier is released on a different thread
     virtual void release_data() noexcept = 0;
 
     // Call each of the currently registered callbacks, if there have been any

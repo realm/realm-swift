@@ -19,7 +19,7 @@
 #include "impl/transact_log_handler.hpp"
 
 #include "binding_context.hpp"
-#include "impl/background_collection.hpp"
+#include "impl/collection_notifier.hpp"
 #include "index_set.hpp"
 
 #include <realm/group_shared.hpp>

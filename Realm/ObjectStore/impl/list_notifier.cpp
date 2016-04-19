@@ -26,7 +26,7 @@ using namespace realm;
 using namespace realm::_impl;
 
 ListNotifier::ListNotifier(LinkViewRef lv, std::shared_ptr<Realm> realm)
-: BackgroundCollection(std::move(realm))
+: CollectionNotifier(std::move(realm))
 , m_prev_size(lv->size())
 {
     // Find the lv's column, since that isn't tracked directly

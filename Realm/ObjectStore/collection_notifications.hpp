@@ -29,13 +29,13 @@
 
 namespace realm {
 namespace _impl {
-    class BackgroundCollection;
+    class CollectionNotifier;
 }
 
 // A token which keeps an asynchronous query alive
 struct NotificationToken {
     NotificationToken() = default;
-    NotificationToken(std::shared_ptr<_impl::BackgroundCollection> notifier, size_t token);
+    NotificationToken(std::shared_ptr<_impl::CollectionNotifier> notifier, size_t token);
     ~NotificationToken();
 
     NotificationToken(NotificationToken&&);
@@ -45,7 +45,7 @@ struct NotificationToken {
     NotificationToken& operator=(NotificationToken const&) = delete;
 
 private:
-    util::AtomicSharedPtr<_impl::BackgroundCollection> m_notifier;
+    util::AtomicSharedPtr<_impl::CollectionNotifier> m_notifier;
     size_t m_token;
 };
 
