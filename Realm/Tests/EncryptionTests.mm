@@ -157,8 +157,8 @@
 
     // Create the Realm file on disk
     @autoreleasepool {
-        [RLMRealm realmWithPath:RLMDefaultRealmPath() key:key readOnly:NO
-                       inMemory:NO dynamic:YES schema: schema error:nil];
+        [RLMRealm realmWithFileURL:[NSURL fileURLWithPath:RLMDefaultRealmPath()] key:key readOnly:NO
+                          inMemory:NO dynamic:YES schema: schema error:nil];
     }
 
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];

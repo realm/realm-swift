@@ -27,7 +27,7 @@ RLM_ASSUME_NONNULL_BEGIN
  An RLMRealm instance (also referred to as "a realm") represents a Realm
  database.
 
- Realms can either be stored on disk (see +[RLMRealm realmWithPath:]) or in
+ Realms can either be stored on disk (see +[RLMRealm realmWithFileURL:]) or in
  memory (see RLMRealmConfiguration).
 
  RLMRealm instances are cached internally, and constructing equivalent RLMRealm
@@ -85,7 +85,16 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return An `RLMRealm` instance.
  */
-+ (instancetype)realmWithPath:(NSString *)path;
++ (instancetype)realmWithPath:(NSString *)path DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm realmWithFileURL:]");
+
+/**
+ Obtains an `RLMRealm` instance persisted at a specific file URL.
+
+ @param fileURL Local URL to the file you want the data saved in.
+
+ @return An `RLMRealm` instance.
+ */
++ (instancetype)realmWithFileURL:(NSURL *)fileURL;
 
 /**
  Path to the file where this Realm is persisted.

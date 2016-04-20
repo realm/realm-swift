@@ -85,9 +85,23 @@ public final class Realm {
 
     - throws: An NSError if the Realm could not be initialized.
     */
+    @available(*, deprecated=1, message="Use Realm(fileURL:)")
     public convenience init(path: String) throws {
         var configuration = Configuration.defaultConfiguration
         configuration.fileURL = NSURL(fileURLWithPath: path)
+        try self.init(configuration: configuration)
+    }
+
+    /**
+    Obtains a Realm instance persisted at the specified file URL.
+
+    - parameter fileURL: Local URL to the realm file.
+
+    - throws: An NSError if the Realm could not be initialized.
+    */
+    public convenience init(fileURL: NSURL) throws {
+        var configuration = Configuration.defaultConfiguration
+        configuration.fileURL = fileURL
         try self.init(configuration: configuration)
     }
 

@@ -86,7 +86,7 @@
     XCTAssertNotNil(expectedSchema);
 
     NSError *error = nil;
-    RLMSchema *dynamicSchema = [[RLMRealm realmWithPath:RLMTestRealmPath() key:nil readOnly:NO inMemory:NO dynamic:YES schema:nil error:&error] schema];
+    RLMSchema *dynamicSchema = [[RLMRealm realmWithFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] key:nil readOnly:NO inMemory:NO dynamic:YES schema:nil error:&error] schema];
     XCTAssertNil(error);
     XCTAssertEqual(dynamicSchema.objectSchema.count, expectedSchema.objectSchema.count);
     for (RLMObjectSchema *expectedObjectSchema in expectedSchema.objectSchema) {

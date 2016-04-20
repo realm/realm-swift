@@ -24,7 +24,7 @@ import Realm.Dynamic
 import Foundation
 
 private func realmWithCustomSchema(path: String, schema: RLMSchema) -> RLMRealm {
-    return try! RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: true, schema: schema)
+    return try! RLMRealm(fileURL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false, dynamic: true, schema: schema)
 }
 
 private func realmWithSingleClass(path: String, objectSchema: RLMObjectSchema) -> RLMRealm {
@@ -39,7 +39,7 @@ private func realmWithSingleClassProperties(path: String, className: String, pro
 }
 
 private func dynamicRealm(path: String) -> RLMRealm {
-    return try! RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: true, schema: nil)
+    return try! RLMRealm(fileURL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false, dynamic: true, schema: nil)
 }
 
 class MigrationTests: TestCase {
