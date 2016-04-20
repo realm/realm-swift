@@ -759,12 +759,20 @@ void RLMRealmTranslateException(NSError **error) {
     return [self writeCopyToPath:path key:nil error:error];
 }
 
+- (BOOL)writeCopyToFileURL:(NSURL *)fileURL error:(NSError **)error {
+    return [self writeCopyToPath:fileURL.path key:nil error:error];
+}
+
 - (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error {
+    return [self writeCopyToFileURL:[NSURL fileURLWithPath:path] encryptionKey:key error:error];
+}
+
+- (BOOL)writeCopyToFileURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
     if (!key) {
         @throw RLMException(@"Encryption key must not be nil");
     }
 
-    return [self writeCopyToPath:path key:key error:error];
+    return [self writeCopyToPath:fileURL.path key:key error:error];
 }
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator {

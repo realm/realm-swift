@@ -326,7 +326,21 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
  @return YES if the realm was copied successfully. Returns NO if an error occurred.
 */
-- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error;
+- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm writeCopyToFileURL:error:]");
+
+/**
+ Write a compacted copy of the RLMRealm to the given local URL.
+
+ The destination file cannot already exist.
+
+ Note that if this is called from within a write transaction it writes the
+ *current* data, and not data when the last write transaction was committed.
+
+ @param fileURL Local URL to save the Realm to.
+ @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
+ @return YES if the realm was copied successfully. Returns NO if an error occurred.
+*/
+- (BOOL)writeCopyToFileURL:(NSURL *)fileURL error:(NSError **)error;
 
 /**
  Write an encrypted and compacted copy of the RLMRealm to the given path.
@@ -341,7 +355,22 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
  @return YES if the realm was copied successfully. Returns NO if an error occurred.
 */
-- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error;
+- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm writeCopyToFileURL:encryptionKey:error:]");
+
+/**
+ Write an encrypted and compacted copy of the RLMRealm to the given local URL.
+
+ The destination file cannot already exist.
+
+ Note that if this is called from within a write transaction it writes the
+ *current* data, and not data when the last write transaction was committed.
+
+ @param fileURL Local URL to save the Realm to.
+ @param key     64-byte encryption key to encrypt the new file with
+ @param error   On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
+ @return YES    if the realm was copied successfully. Returns NO if an error occurred.
+*/
+- (BOOL)writeCopyToFileURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error;
 
 /**
  Invalidate all RLMObjects and RLMResults read from this Realm.

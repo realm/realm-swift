@@ -591,11 +591,29 @@ public final class Realm {
 
     - throws: An NSError if the copy could not be written.
     */
+    @available(*, deprecated=1, message="Use Realm.writeCopyToURL(_:encryptionKey:)")
     public func writeCopyToPath(path: String, encryptionKey: NSData? = nil) throws {
+        try writeCopyToFileURL(NSURL(fileURLWithPath: path))
+    }
+
+    /**
+    Write an encrypted and compacted copy of the Realm to the given local URL.
+
+    The destination file cannot already exist.
+
+    Note that if this is called from within a write transaction it writes the
+    *current* data, and not data when the last write transaction was committed.
+
+    - parameter fileURL:       Local URL to save the Realm to.
+    - parameter encryptionKey: Optional 64-byte encryption key to encrypt the new file with.
+
+    - throws: An NSError if the copy could not be written.
+    */
+    public func writeCopyToFileURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws {
         if let encryptionKey = encryptionKey {
-            try rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey)
+            try rlmRealm.writeCopyToFileURL(fileURL, encryptionKey: encryptionKey)
         } else {
-            try rlmRealm.writeCopyToPath(path)
+            try rlmRealm.writeCopyToFileURL(fileURL)
         }
     }
 
