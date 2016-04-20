@@ -21,11 +21,11 @@
 #include "object_store.hpp"
 #include "property.hpp"
 
-#include <realm/group_shared.hpp>
-#include <realm/link_view.hpp>
+#include <realm/table.hpp>
 
 using namespace realm;
 
+ObjectSchema::ObjectSchema() = default;
 ObjectSchema::~ObjectSchema() = default;
 
 ObjectSchema::ObjectSchema(std::string name, std::string primary_key, std::initializer_list<Property> properties)
@@ -47,9 +47,9 @@ ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(n
         property.type = (PropertyType)table->get_column_type(col);
         property.is_indexed = table->has_search_index(col);
         property.is_primary = false;
-        property.is_nullable = table->is_nullable(col) || property.type == PropertyTypeObject;
+        property.is_nullable = table->is_nullable(col) || property.type == PropertyType::Object;
         property.table_column = col;
-        if (property.type == PropertyTypeObject || property.type == PropertyTypeArray) {
+        if (property.type == PropertyType::Object || property.type == PropertyType::Array) {
             // set link type for objects and arrays
             ConstTableRef linkTable = table->get_link_target(col);
             property.object_type = ObjectStore::object_type_for_table_name(linkTable->get_name().data());

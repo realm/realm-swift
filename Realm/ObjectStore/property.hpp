@@ -22,27 +22,27 @@
 #include <string>
 
 namespace realm {
-    enum PropertyType {
+    enum class PropertyType {
         /** Integer type: NSInteger, int, long, Int (Swift) */
-        PropertyTypeInt    = 0,
+        Int    = 0,
         /** Boolean type: BOOL, bool, Bool (Swift) */
-        PropertyTypeBool   = 1,
+        Bool   = 1,
         /** Float type: float, Float (Swift) */
-        PropertyTypeFloat  = 9,
+        Float  = 9,
         /** Double type: double, Double (Swift) */
-        PropertyTypeDouble = 10,
+        Double = 10,
         /** String type: NSString, String (Swift) */
-        PropertyTypeString = 2,
+        String = 2,
         /** Data type: NSData */
-        PropertyTypeData   = 4,
+        Data   = 4,
         /** Any type: id, **not supported in Swift** */
-        PropertyTypeAny    = 6,
+        Any    = 6,
         /** Date type: NSDate */
-        PropertyTypeDate   = 7,
+        Date   = 7,
         /** Object type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
-        PropertyTypeObject = 12,
+        Object = 12,
         /** Array type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
-        PropertyTypeArray  = 13,
+        Array  = 13,
     };
 
     struct Property {
@@ -51,34 +51,39 @@ namespace realm {
         std::string object_type;
         bool is_primary = false;
         bool is_indexed = false;
-        bool is_indexable() const { return type == PropertyTypeInt || type == PropertyTypeBool || type == PropertyTypeString || type == PropertyTypeDate; }
         bool is_nullable = false;
 
         size_t table_column = -1;
         bool requires_index() const { return is_primary || is_indexed; }
+        bool is_indexable() const {
+            return type == PropertyType::Int
+                || type == PropertyType::Bool
+                || type == PropertyType::String
+                || type == PropertyType::Date;
+        }
     };
 
     static inline const char *string_for_property_type(PropertyType type) {
         switch (type) {
-            case PropertyTypeString:
+            case PropertyType::String:
                 return "string";
-            case PropertyTypeInt:
+            case PropertyType::Int:
                 return "int";
-            case PropertyTypeBool:
+            case PropertyType::Bool:
                 return "bool";
-            case PropertyTypeDate:
+            case PropertyType::Date:
                 return "date";
-            case PropertyTypeData:
+            case PropertyType::Data:
                 return "data";
-            case PropertyTypeDouble:
+            case PropertyType::Double:
                 return "double";
-            case PropertyTypeFloat:
+            case PropertyType::Float:
                 return "float";
-            case PropertyTypeAny:
+            case PropertyType::Any:
                 return "any";
-            case PropertyTypeObject:
+            case PropertyType::Object:
                 return "object";
-            case PropertyTypeArray:
+            case PropertyType::Array:
                 return "array";
         }
     }

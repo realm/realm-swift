@@ -19,15 +19,19 @@
 #ifndef REALM_LIST_HPP
 #define REALM_LIST_HPP
 
-#include <realm/link_view.hpp>
+#include "collection_notifications.hpp"
 
+#include <realm/link_view_fwd.hpp>
+#include <realm/row.hpp>
+
+#include <functional>
 #include <memory>
 
 namespace realm {
-template<typename T> class BasicRowExpr;
 using RowExpr = BasicRowExpr<Table>;
 
 class ObjectSchema;
+class Query;
 class Realm;
 class Results;
 struct SortOrder;
@@ -62,8 +66,11 @@ public:
     void delete_all();
 
     Results sort(SortOrder order);
+    Results filter(Query q);
 
     bool operator==(List const& rgt) const noexcept;
+
+    NotificationToken add_notification_callback(CollectionChangeCallback cb);
 
     // This should go away once we have real List notifications
     uint_fast64_t get_version_counter() const noexcept;
@@ -95,6 +102,7 @@ public:
 private:
     std::shared_ptr<Realm> m_realm;
     LinkViewRef m_link_view;
+    std::shared_ptr<_impl::CollectionNotifier> m_notifier;
 
     void verify_valid_row(size_t row_ndx, bool insertion = false) const;
 

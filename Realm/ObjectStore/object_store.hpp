@@ -140,6 +140,8 @@ namespace realm {
     class DuplicatePrimaryKeyValueException : public MigrationException {
       public:
         DuplicatePrimaryKeyValueException(std::string const& object_type, Property const& property);
+        DuplicatePrimaryKeyValueException(std::string const& object_type, Property const& property, const std::string message);
+
         std::string object_type() const { return m_object_type; }
         Property const& property() const { return m_property; }
       private:

@@ -18,15 +18,18 @@
 
 #include "schema.hpp"
 
-#include "object_schema.hpp"
 #include "object_store.hpp"
 #include "property.hpp"
+
+#include <algorithm>
 
 using namespace realm;
 
 static bool compare_by_name(ObjectSchema const& lft, ObjectSchema const& rgt) {
     return lft.name < rgt.name;
 }
+
+Schema::Schema(std::initializer_list<ObjectSchema> types) : Schema(base(types)) { }
 
 Schema::Schema(base types) : base(std::move(types)) {
     std::sort(begin(), end(), compare_by_name);
@@ -71,11 +74,11 @@ void Schema::validate() const
 
             // check nullablity
             if (prop.is_nullable) {
-                if (prop.type == PropertyTypeArray || prop.type == PropertyTypeAny) {
+                if (prop.type == PropertyType::Array || prop.type == PropertyType::Any) {
                     exceptions.emplace_back(InvalidNullabilityException(object.name, prop));
                 }
             }
-            else if (prop.type == PropertyTypeObject) {
+            else if (prop.type == PropertyType::Object) {
                 exceptions.emplace_back(InvalidNullabilityException(object.name, prop));
             }
 
@@ -88,10 +91,8 @@ void Schema::validate() const
             }
 
             // check indexable
-            if (prop.is_indexed) {
-                if (!prop.is_indexable()) {
-                    exceptions.emplace_back(PropertyTypeNotIndexableException(object.name, prop));
-                }
+            if (prop.is_indexed && !prop.is_indexable()) {
+                exceptions.emplace_back(PropertyTypeNotIndexableException(object.name, prop));
             }
         }
     }

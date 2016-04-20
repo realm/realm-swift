@@ -18,14 +18,23 @@
 
 #include "list.hpp"
 
+#include "impl/list_notifier.hpp"
+#include "impl/realm_coordinator.hpp"
 #include "results.hpp"
 #include "shared_realm.hpp"
+
+#include <realm/link_view.hpp>
 
 using namespace realm;
 using namespace realm::_impl;
 
 List::List() noexcept = default;
-List::~List() = default;
+List::~List()
+{
+    if (m_notifier) {
+        m_notifier->unregister();
+    }
+}
 
 List::List(std::shared_ptr<Realm> r, LinkViewRef l) noexcept
 : m_realm(std::move(r))
@@ -160,7 +169,14 @@ void List::delete_all()
 
 Results List::sort(SortOrder order)
 {
-    return Results(m_realm, get_query(), std::move(order));
+    verify_attached();
+    return Results(m_realm, m_link_view, util::none, std::move(order));
+}
+
+Results List::filter(Query q)
+{
+    verify_attached();
+    return Results(m_realm, m_link_view, get_query().and_query(std::move(q)));
 }
 
 // These definitions rely on that LinkViews are interned by core
@@ -174,6 +190,16 @@ size_t hash<realm::List>::operator()(realm::List const& list) const
 {
     return std::hash<void*>()(list.m_link_view.get());
 }
+}
+
+NotificationToken List::add_notification_callback(CollectionChangeCallback cb)
+{
+    verify_attached();
+    if (!m_notifier) {
+        m_notifier = std::make_shared<ListNotifier>(m_link_view, m_realm);
+        RealmCoordinator::register_notifier(m_notifier);
+    }
+    return {m_notifier, m_notifier->add_callback(std::move(cb))};
 }
 
 uint_fast64_t List::get_version_counter() const noexcept

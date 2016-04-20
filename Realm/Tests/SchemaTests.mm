@@ -126,7 +126,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @end
 
 @interface InvalidNSNumberProtocolObject : FakeObject
-@property NSNumber<RLMFastEnumerable> *number;
+@property NSNumber<NSFastEnumeration> *number;
 @end
 @implementation InvalidNSNumberProtocolObject
 @end
@@ -469,7 +469,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 - (void)testClassWithInvalidNSNumberProtocolProperty {
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberProtocolObject.class],
-                                      @"Property 'number' is of type 'NSNumber<RLMFastEnumerable>' which is not a supported NSNumber object type.");
+                                      @"Property 'number' is of type 'NSNumber<NSFastEnumeration>' which is not a supported NSNumber object type.");
 }
 
 - (void)testClassWithInvalidNSNumberNoProtocolProperty {

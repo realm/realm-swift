@@ -445,11 +445,19 @@ public final class Realm {
     Add a notification handler for changes in this Realm.
 
     Notification handlers are called after each write transaction is committed,
-    either on the current thread or other threads. The block is called on the
-    same thread as they were added on, and can only be added on threads which
-    are currently within a run loop. Unless you are specifically creating and
-    running a run loop on a background thread, this normally will only be the
-    main thread.
+    independent from the thread or process.
+
+    The block is called on the same thread as it was added on, and can only
+    be added on threads which are currently within a run loop. Unless you are
+    specifically creating and running a run loop on a background thread, this
+    normally will only be the main thread.
+
+    Notifications can't be delivered as long as the runloop is blocked by
+    other activity. When notifications can't be delivered instantly, multiple
+    notifications may be coalesced.
+
+    You must retain the returned token for as long as you want updates to continue
+    to be sent to the block. To stop receiving updates, call stop() on the token.
 
     - parameter block: A block which is called to process Realm notifications.
                        It receives the following parameters:
@@ -457,8 +465,7 @@ public final class Realm {
                        - `Notification`: The incoming notification.
                        - `Realm`:        The realm for which this notification occurred.
 
-    - returns: A notification token which can later be passed to `removeNotification(_:)`
-               to remove this notification.
+    - returns: A token which must be held for as long as you want notifications to be delivered.
     */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {

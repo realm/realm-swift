@@ -9,10 +9,13 @@ x.x.x Release notes (yyyy-MM-dd)
   counterparts on `RLMRealmConfiguration`.
 * Deprecate properties of type `id`/`AnyObject`. This type was rarely used,
   rarely useful and unsupported in every other Realm binding.
+* The block for `-[RLMArray addNotificationBlock:]` and
+  `-[RLMResults addNotificationBlock:]` now takes another parameter.
 
 ### Enhancements
 
-* None.
+* Add information about what rows were added, removed, or modified to the
+  notifications sent to the Realm collections.
 
 ### Bugfixes
 

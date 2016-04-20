@@ -395,6 +395,45 @@ class ResultsTests: RealmCollectionTypeTests {
         token.stop()
         realm.beginWrite()
     }
+
+    func testNotificationBlockChangeIndices() {
+        let collection = collectionBase()
+
+        let realm = realmWithTestPath()
+        try! realm.commitWrite()
+
+        var expectation = expectationWithDescription("")
+        var calls = 0
+        let token = collection.addNotificationBlock { (change: RealmCollectionChange) in
+            switch change {
+            case .Initial(let results):
+                XCTAssertEqual(calls, 0)
+                XCTAssertEqual(results.count, 2)
+                break
+            case .Update(let results, let deletions, let insertions, let modifications):
+                XCTAssertEqual(calls, 1)
+                XCTAssertEqual(results.count, 3)
+                XCTAssertEqual(deletions, [])
+                XCTAssertEqual(insertions, [2])
+                XCTAssertEqual(modifications, [])
+                break
+            case .Error(let err):
+                XCTFail(err.description)
+                break
+            }
+
+            calls += 1
+            expectation.fulfill()
+        }
+        waitForExpectationsWithTimeout(1, handler: nil)
+
+        expectation = expectationWithDescription("")
+        addObjectToResults()
+        waitForExpectationsWithTimeout(1, handler: nil)
+
+        token.stop()
+        realm.beginWrite()
+    }
 }
 
 class ResultsWithCustomInitializerTest: TestCase {
@@ -494,7 +533,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         try! realm.commitWrite()
 
         let expectation = expectationWithDescription("")
-        let token = collection.addNotificationBlock { list in
+        let token = collection.addNotificationBlock { (list: List<SwiftStringObject>) in
             XCTAssertEqual(list.count, 2)
             expectation.fulfill()
         }
@@ -608,7 +647,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         let realm = realmWithTestPath()
         try! realm.commitWrite()
 
-        assertThrows(collection.addNotificationBlock { _ in })
+        assertThrows(collection.addNotificationBlock { (list: List<SwiftStringObject>) in })
         realm.beginWrite()
     }
 }

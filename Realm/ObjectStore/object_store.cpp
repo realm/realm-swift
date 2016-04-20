@@ -21,7 +21,6 @@
 #include "schema.hpp"
 
 #include <realm/group.hpp>
-#include <realm/link_view.hpp>
 #include <realm/table.hpp>
 #include <realm/table_view.hpp>
 #include <realm/util/assert.hpp>
@@ -221,25 +220,25 @@ static void copy_property_values(const Property& old_property, const Property& n
 
 static void copy_property_values(const Property& source, const Property& destination, Table& table) {
     switch (destination.type) {
-        case PropertyTypeInt:
+        case PropertyType::Int:
             copy_property_values(source, destination, table, &Table::get_int, &Table::set_int);
             break;
-        case PropertyTypeBool:
+        case PropertyType::Bool:
             copy_property_values(source, destination, table, &Table::get_bool, &Table::set_bool);
             break;
-        case PropertyTypeFloat:
+        case PropertyType::Float:
             copy_property_values(source, destination, table, &Table::get_float, &Table::set_float);
             break;
-        case PropertyTypeDouble:
+        case PropertyType::Double:
             copy_property_values(source, destination, table, &Table::get_double, &Table::set_double);
             break;
-        case PropertyTypeString:
+        case PropertyType::String:
             copy_property_values(source, destination, table, &Table::get_string, &Table::set_string);
             break;
-        case PropertyTypeData:
+        case PropertyType::Data:
             copy_property_values(source, destination, table, &Table::get_binary, &Table::set_binary);
             break;
-        case PropertyTypeDate:
+        case PropertyType::Date:
             copy_property_values(source, destination, table, &Table::get_datetime, &Table::set_datetime);
             break;
         default:
@@ -316,8 +315,8 @@ void ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
             if (!current_prop || current_prop->table_column == npos) {
                 switch (target_prop.type) {
                         // for objects and arrays, we have to specify target table
-                    case PropertyTypeObject:
-                    case PropertyTypeArray: {
+                    case PropertyType::Object:
+                    case PropertyType::Array: {
                         TableRef link_table = ObjectStore::table_for_object_type(group, target_prop.object_type);
                         REALM_ASSERT(link_table);
                         target_prop.table_column = table->add_column_link(DataType(target_prop.type), target_prop.name, *link_table);
@@ -552,7 +551,7 @@ MissingPropertyException::MissingPropertyException(std::string const& object_typ
 InvalidNullabilityException::InvalidNullabilityException(std::string const& object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
-    if (property.type == PropertyTypeObject) {
+    if (property.type == PropertyType::Object) {
         m_what = "'Object' property '" + property.name + "' must be nullable.";
     }
     else {
@@ -601,3 +600,4 @@ DuplicatePrimaryKeysException::DuplicatePrimaryKeysException(std::string const& 
 {
     m_what = "Duplicate primary keys for object '" + object_type + "'.";
 }
+
