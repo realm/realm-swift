@@ -26,7 +26,7 @@ import Foundation
 
 class RealmTests: TestCase {
     func testFileURL() {
-        XCTAssertEqual(try! Realm(path: testRealmPath()).configuration.fileURL, NSURL(fileURLWithPath: testRealmPath()))
+        XCTAssertEqual(try! Realm(fileURL: NSURL(fileURLWithPath: testRealmPath())).configuration.fileURL, NSURL(fileURLWithPath: testRealmPath()))
     }
 
     func testReadOnly() {
@@ -52,7 +52,7 @@ class RealmTests: TestCase {
 
     func testReadOnlyFile() {
         autoreleasepool {
-            let realm = try! Realm(path: testRealmPath())
+            let realm = try! Realm(fileURL: NSURL(fileURLWithPath: testRealmPath()))
             try! realm.write {
                 realm.create(SwiftStringObject.self, value: ["a"])
             }
@@ -63,7 +63,7 @@ class RealmTests: TestCase {
 
         // Should not be able to open read-write
         assertFails(Error.Fail) {
-            try Realm(path: testRealmPath())
+            try Realm(fileURL: NSURL(fileURLWithPath: testRealmPath()))
         }
 
         assertSucceeds {
@@ -82,7 +82,7 @@ class RealmTests: TestCase {
 
     func testFilePermissionDenied() {
         autoreleasepool {
-            let _ = try! Realm(path: testRealmPath())
+            let _ = try! Realm(fileURL: NSURL(fileURLWithPath: testRealmPath()))
         }
 
         // Make Realm at test path temporarily unreadable
@@ -91,7 +91,7 @@ class RealmTests: TestCase {
         try! fileManager.setAttributes([ NSFilePosixPermissions: NSNumber(int: 0000) ], ofItemAtPath: testRealmPath())
 
         assertFails(Error.FilePermissionDenied) {
-            try Realm(path: testRealmPath())
+            try Realm(fileURL: NSURL(fileURLWithPath: testRealmPath()))
         }
 
         try! fileManager.setAttributes([ NSFilePosixPermissions: permissions ], ofItemAtPath: testRealmPath())
@@ -135,8 +135,7 @@ class RealmTests: TestCase {
     }
 
     func testInit() {
-        XCTAssertEqual(try! Realm(path: testRealmPath()).configuration.fileURL, NSURL(fileURLWithPath: testRealmPath()))
-        // FIXME: assertThrows(try! Realm(path: ""))
+        XCTAssertEqual(try! Realm(fileURL: NSURL(fileURLWithPath: testRealmPath())).configuration.fileURL, NSURL(fileURLWithPath: testRealmPath()))
     }
 
     func testInitFailable() {
@@ -401,7 +400,7 @@ class RealmTests: TestCase {
     }
 
     func testDeleteResults() {
-        let realm = try! Realm(path: testRealmPath())
+        let realm = try! Realm(fileURL: NSURL(fileURLWithPath: testRealmPath()))
         XCTAssertEqual(0, realm.objects(SwiftCompanyObject).count)
         try! realm.write {
             realm.add(SwiftIntObject(value: [1]))
@@ -647,7 +646,7 @@ class RealmTests: TestCase {
             XCTFail("writeCopyToPath failed")
         }
         autoreleasepool {
-            let copy = try! Realm(path: path)
+            let copy = try! Realm(fileURL: NSURL(fileURLWithPath: path))
             XCTAssertEqual(1, copy.objects(SwiftObject).count)
         }
         try! NSFileManager.defaultManager().removeItemAtPath(path)

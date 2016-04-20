@@ -82,7 +82,7 @@ extern "C" {
     RLMRealmConfiguration *newDefaultConfiguration = [originalDefaultConfiguration copy];
     newDefaultConfiguration.objectClasses = @[];
     [RLMRealmConfiguration setDefaultConfiguration:newDefaultConfiguration];
-    XCTAssertEqual([[[[RLMRealm realmWithPath:RLMTestRealmPath()] configuration] objectClasses] count], 0U);
+    XCTAssertEqual([[[[RLMRealm realmWithFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()]] configuration] objectClasses] count], 0U);
     [RLMRealmConfiguration setDefaultConfiguration:originalDefaultConfiguration];
 }
 
@@ -1383,8 +1383,7 @@ extern "C" {
 
 - (void)testRealmFileAccess
 {
-    XCTAssertThrows([RLMRealm realmWithPath:self.nonLiteralNil], @"nil path");
-    XCTAssertThrows([RLMRealm realmWithPath:@""], @"empty path");
+    XCTAssertThrows([RLMRealm realmWithFileURL:self.nonLiteralNil], @"nil path");
 
     NSString *content = @"Some content";
     NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
@@ -1507,7 +1506,7 @@ extern "C" {
 {
     NSMutableArray *realms = [NSMutableArray array];
     for (NSString *realmPath in self.pathsFor100Realms) {
-        [realms addObject:[RLMRealm realmWithPath:realmPath]];
+        [realms addObject:[RLMRealm realmWithFileURL:[NSURL fileURLWithPath:realmPath]]];
     }
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"Block dispatched to concurrent queue should be executed"];

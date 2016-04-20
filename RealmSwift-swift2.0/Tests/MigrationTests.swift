@@ -49,7 +49,7 @@ class MigrationTests: TestCase {
     // create realm at path and test version is 0
     private func createAndTestRealmAtPath(realmPath: String) {
         autoreleasepool {
-            _ = try! Realm(path: realmPath)
+            _ = try! Realm(fileURL: NSURL(fileURLWithPath: realmPath))
             return
         }
         XCTAssertEqual(UInt64(0), schemaVersionAtPath(realmPath)!, "Initial version should be 0")

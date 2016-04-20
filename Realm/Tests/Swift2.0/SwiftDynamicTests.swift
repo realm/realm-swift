@@ -28,7 +28,7 @@ class SwiftDynamicTests: RLMTestCase {
     func testDynamicRealmExists() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm(path: RLMTestRealmPath())
+            let realm = RLMRealm(fileURL: NSURL(fileURLWithPath: RLMTestRealmPath()))
             realm.beginWriteTransaction()
             SwiftDynamicObject.createInRealm(realm, withValue: ["column1", 1])
             SwiftDynamicObject.createInRealm(realm, withValue: ["column2", 2])
@@ -54,7 +54,7 @@ class SwiftDynamicTests: RLMTestCase {
     func testDynamicProperties() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm(path: RLMTestRealmPath())
+            let realm = RLMRealm(fileURL: NSURL(fileURLWithPath: RLMTestRealmPath()))
             realm.beginWriteTransaction()
             SwiftDynamicObject.createInRealm(realm, withValue: ["column1", 1])
             SwiftDynamicObject.createInRealm(realm, withValue: ["column2", 2])
@@ -74,7 +74,7 @@ class SwiftDynamicTests: RLMTestCase {
     func testDynamicRealmExists_objc() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm(path: RLMTestRealmPath())
+            let realm = RLMRealm(fileURL: NSURL(fileURLWithPath: RLMTestRealmPath()))
             realm.beginWriteTransaction()
             DynamicObject.createInRealm(realm, withValue: ["column1", 1])
             DynamicObject.createInRealm(realm, withValue: ["column2", 2])
@@ -100,7 +100,7 @@ class SwiftDynamicTests: RLMTestCase {
     func testDynamicProperties_objc() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm(path: RLMTestRealmPath())
+            let realm = RLMRealm(fileURL: NSURL(fileURLWithPath: RLMTestRealmPath()))
             realm.beginWriteTransaction()
             DynamicObject.createInRealm(realm, withValue: ["column1", 1])
             DynamicObject.createInRealm(realm, withValue: ["column2", 2])
