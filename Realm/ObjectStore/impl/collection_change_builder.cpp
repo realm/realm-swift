@@ -352,78 +352,65 @@ void calculate_moves_unsorted(std::vector<RowInfo>& new_rows, IndexSet& removed,
     }
 }
 
-class SortedMoveCalculator {
+class LongestCommonSubsequenceCalculator {
 public:
-    SortedMoveCalculator(std::vector<RowInfo>& new_rows, CollectionChangeSet& changeset)
-    : m_modified(changeset.modifications)
-    {
-        std::vector<Row> old_candidates;
-        old_candidates.reserve(new_rows.size());
-        for (auto& row : new_rows) {
-            old_candidates.push_back({row.row_index, row.prev_tv_index});
-        }
-        std::sort(begin(old_candidates), end(old_candidates), [](auto a, auto b) {
-            return std::tie(a.tv_index, a.row_index) < std::tie(b.tv_index, b.row_index);
-        });
-
-        // First check if the order of any of the rows actually changed
-        size_t first_difference = IndexSet::npos;
-        for (size_t i = 0; i < old_candidates.size(); ++i) {
-            if (old_candidates[i].row_index != new_rows[i].row_index) {
-                first_difference = i;
-                break;
-            }
-        }
-        if (first_difference == IndexSet::npos)
-            return;
-
-        // A map from row index -> tv index in new results
-        b.reserve(new_rows.size());
-        for (size_t i = 0; i < new_rows.size(); ++i)
-            b.push_back({new_rows[i].row_index, i});
-        std::sort(begin(b), end(b), [](auto a, auto b) {
-            return std::tie(a.row_index, a.tv_index) < std::tie(b.row_index, b.tv_index);
-        });
-
-        a = std::move(old_candidates);
-
-        find_longest_matches(first_difference, a.size(),
-                             first_difference, new_rows.size());
-        m_longest_matches.push_back({a.size(), new_rows.size(), 0});
-
-        size_t i = first_difference, j = first_difference;
-        for (auto match : m_longest_matches) {
-            for (; i < match.i; ++i)
-                changeset.deletions.add(a[i].tv_index);
-            for (; j < match.j; ++j)
-                changeset.insertions.add(new_rows[j].tv_index);
-            i += match.size;
-            j += match.size;
-        }
-    }
-
-private:
-    struct Match {
-        size_t i, j, size, modified;
-    };
+    // A pair of an index in the table and an index in the table view
     struct Row {
         size_t row_index;
         size_t tv_index;
     };
 
-    IndexSet const& m_modified;
+    struct Match {
+        // The index in `a` at which this match begins
+        size_t i;
+        // The index in `b` at which this match begins
+        size_t j;
+        // The length of this match
+        size_t size;
+        // The number of rows in this block which were modified
+        size_t modified;
+    };
     std::vector<Match> m_longest_matches;
 
-    std::vector<Row> a, b;
+    LongestCommonSubsequenceCalculator(std::vector<Row>& a, std::vector<Row>& b,
+                                       size_t start_index,
+                                       IndexSet const& modifications)
+    : m_modified(modifications)
+    , a(a), b(b)
+    {
+        find_longest_matches(start_index, a.size(),
+                             start_index, b.size());
+        m_longest_matches.push_back({a.size(), b.size(), 0});
+    }
 
+private:
+    IndexSet const& m_modified;
+
+    // The two arrays of rows being diffed
+    // a is sorted by tv_index, b is sorted by row_index
+    std::vector<Row> &a, &b;
+
+    // Find the longest matching range in (a + begin1, a + end1) and (b + begin2, b + end2)
+    // "Matching" is defined as "has the same row index"; the TV index is just
+    // there to let us turn an index in a/b into an index which can be reported
+    // in the output changeset.
+    //
+    // This is done with the O(N) space variant of the dynamic programming
+    // algorithm for longest common subsequence, where N is the maximum number
+    // of the most common row index (which for everything but linkview-derived
+    // TVs will be 1).
     Match find_longest_match(size_t begin1, size_t end1, size_t begin2, size_t end2)
     {
         struct Length {
             size_t j, len;
         };
-        std::vector<Length> cur;
+        // The length of the matching block for each `j` for the previously checked row
         std::vector<Length> prev;
+        // The length of the matching block for each `j` for the row currently being checked
+        std::vector<Length> cur;
 
+        // Calculate the length of the matching block *ending* at b[j], which
+        // is 1 if b[j - 1] did not match, and b[j - 1] + 1 otherwise.
         auto length = [&](size_t j) -> size_t {
             for (auto const& pair : prev) {
                 if (pair.j + 1 == j)
@@ -432,17 +419,15 @@ private:
             return 1;
         };
 
-        Match best = {begin1, begin2, 0, 0};
-
-        for (size_t i = begin1; i < end1; ++i) {
-            cur.clear();
-
+        // Iterate over each `j` which has the same row index as a[i] and falls
+        // within the range begin2 <= j < end2
+        auto for_each_b_match = [&](size_t i, auto&& f) {
             size_t ai = a[i].row_index;
             // Find the TV indicies at which this row appears in the new results
-            // There should always be at least one (or it would have been filtered out earlier),
-            // but can be multiple if there are dupes
-            auto it = lower_bound(begin(b), end(b), Row{ai, 0},
-                                  [](auto a, auto b) { return a.row_index < b.row_index; });
+            // There should always be at least one (or it would have been
+            // filtered out earlier), but there can be multiple if there are dupes
+            auto it = lower_bound(begin(b), end(b), ai,
+                                  [](auto lft, auto rgt) { return lft.row_index < rgt; });
             REALM_ASSERT(it != end(b) && it->row_index == ai);
             for (; it != end(b) && it->row_index == ai; ++it) {
                 size_t j = it->tv_index;
@@ -450,9 +435,23 @@ private:
                     continue;
                 if (j >= end2)
                     break; // b is sorted by tv_index so this can't transition from false to true
+                f(j);
+            }
+        };
 
+        Match best = {begin1, begin2, 0, 0};
+        for (size_t i = begin1; i < end1; ++i) {
+            // prev = std::move(cur), but avoids discarding prev's heap allocation
+            cur.swap(prev);
+            cur.clear();
+
+            for_each_b_match(i, [&](size_t j) {
                 size_t size = length(j);
+
                 cur.push_back({j, size});
+
+                // If the matching block ending at a[i] and b[j] is longer than
+                // the previous one, select it as the best
                 if (size > best.size)
                     best = {i - size + 1, j - size + 1, size, IndexSet::npos};
                 // Given two equal-length matches, prefer the one with fewer modified rows
@@ -463,10 +462,11 @@ private:
                     if (count < best.modified)
                         best = {i - size + 1, j - size + 1, size, count};
                 }
+
+                // The best block should always fall within the range being searched
                 REALM_ASSERT(best.i >= begin1 && best.i + best.size <= end1);
                 REALM_ASSERT(best.j >= begin2 && best.j + best.size <= end2);
-            }
-            cur.swap(prev);
+            });
         }
         return best;
     }
@@ -488,6 +488,57 @@ private:
             find_longest_matches(m.i + m.size, end1, m.j + m.size, end2);
     }
 };
+
+void calculate_moves_sorted(std::vector<RowInfo>& rows, CollectionChangeSet& changeset)
+{
+    // The RowInfo array contains information about the old and new TV indices of
+    // each row, which we need to turn into two sequences of rows, which we'll
+    // then find matches in
+    std::vector<LongestCommonSubsequenceCalculator::Row> a, b;
+
+    a.reserve(rows.size());
+    for (auto& row : rows) {
+        a.push_back({row.row_index, row.prev_tv_index});
+    }
+    std::sort(begin(a), end(a), [](auto lft, auto rgt) {
+        return std::tie(lft.tv_index, lft.row_index) < std::tie(rgt.tv_index, rgt.row_index);
+    });
+
+    // Before constructing `b`, first find the first index in `a` which will
+    // actually differ in `b`, and skip everything else if there aren't any
+    size_t first_difference = IndexSet::npos;
+    for (size_t i = 0; i < a.size(); ++i) {
+        if (a[i].row_index != rows[i].row_index) {
+            first_difference = i;
+            break;
+        }
+    }
+    if (first_difference == IndexSet::npos)
+        return;
+
+    // Note that `b` is sorted by row_index, while `a` is sorted by tv_index
+    b.reserve(rows.size());
+    for (size_t i = 0; i < rows.size(); ++i)
+        b.push_back({rows[i].row_index, i});
+    std::sort(begin(b), end(b), [](auto lft, auto rgt) {
+        return std::tie(lft.row_index, lft.tv_index) < std::tie(rgt.row_index, rgt.tv_index);
+    });
+
+    // Calculate the LCS of the two sequences
+    auto matches = LongestCommonSubsequenceCalculator(a, b, first_difference,
+                                                      changeset.modifications).m_longest_matches;
+
+    // And then insert and delete rows as needed to align them
+    size_t i = first_difference, j = first_difference;
+    for (auto match : matches) {
+        for (; i < match.i; ++i)
+            changeset.deletions.add(a[i].tv_index);
+        for (; j < match.j; ++j)
+            changeset.insertions.add(rows[j].tv_index);
+        i += match.size;
+        j += match.size;
+    }
+}
 
 } // Anonymous namespace
 
@@ -524,8 +575,14 @@ CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> c
         return lft.row_index < rgt.row_index;
     });
 
+    // Don't add rows which were modified to not match the query to `deletions`
+    // immediately because the unsorted move logic needs to be able to distinuish
+    // them from rows which were outright deleted
     IndexSet removed;
 
+    // Now that our old and new sets of rows are sorted by row index, we can
+    // iterate over them and either record old+new TV indices for rows present
+    // in both, or mark them as inserted/deleted if they appear only in one
     size_t i = 0, j = 0;
     while (i < old_rows.size() && j < new_rows.size()) {
         auto old_index = old_rows[i];
@@ -566,7 +623,7 @@ CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> c
     }
 
     if (sort) {
-        SortedMoveCalculator(new_rows, ret);
+        calculate_moves_sorted(new_rows, ret);
     }
     else {
         calculate_moves_unsorted(new_rows, removed, ret);

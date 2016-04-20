@@ -37,6 +37,8 @@ public:
                             IndexSet modification = {},
                             std::vector<Move> moves = {});
 
+    // Calculate where rows need to be inserted or deleted from old_rows to turn
+    // it into new_rows, and check all matching rows for modifications
     static CollectionChangeBuilder calculate(std::vector<size_t> const& old_rows,
                                              std::vector<size_t> const& new_rows,
                                              std::function<bool (size_t)> row_did_change,
