@@ -21,6 +21,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix a use-after-free when an associated object's dealloc method is used to
   remove observers from an RLMObject.
+* Fix a small memory leak each time a Realm file is opened.
 
 0.98.8 Release notes (2016-04-15)
 =============================================================

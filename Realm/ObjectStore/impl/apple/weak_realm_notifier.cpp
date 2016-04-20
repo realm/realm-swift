@@ -34,7 +34,7 @@ WeakRealmNotifier::WeakRealmNotifier(const std::shared_ptr<Realm>& realm, bool c
     };
 
     CFRunLoopSourceContext ctx{};
-    ctx.info = new RefCountedWeakPointer{realm, {1}};
+    ctx.info = new RefCountedWeakPointer{realm, {0}};
     ctx.perform = [](void* info) {
         if (auto realm = static_cast<RefCountedWeakPointer*>(info)->realm.lock()) {
             realm->notify();
