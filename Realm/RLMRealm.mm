@@ -685,20 +685,28 @@ void RLMRealmTranslateException(NSError **error) {
     return [RLMRealm schemaVersionAtPath:realmPath encryptionKey:nil error:error];
 }
 
-+ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)outError {
++ (uint64_t)schemaVersionAtFileURL:(NSURL *)fileURL error:(NSError * _Nullable __autoreleasing *)error {
+    return [RLMRealm schemaVersionAtFileURL:fileURL encryptionKey:nil error:error];
+}
+
++ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)error {
+    return [self schemaVersionAtFileURL:[NSURL fileURLWithPath:realmPath] encryptionKey:key error:error];
+}
+
++ (uint64_t)schemaVersionAtFileURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
     try {
         RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-        config.fileURL = [NSURL fileURLWithPath:realmPath];
+        config.fileURL = fileURL;
         config.encryptionKey = RLMRealmValidatedEncryptionKey(key);
 
         uint64_t version = Realm::get_schema_version(config.config);
         if (version == realm::ObjectStore::NotVersioned) {
-            RLMSetErrorOrThrow([NSError errorWithDomain:RLMErrorDomain code:RLMErrorFail userInfo:@{NSLocalizedDescriptionKey:@"Cannot open an uninitialized realm in read-only mode"}], outError);
+            RLMSetErrorOrThrow([NSError errorWithDomain:RLMErrorDomain code:RLMErrorFail userInfo:@{NSLocalizedDescriptionKey:@"Cannot open an uninitialized realm in read-only mode"}], error);
         }
         return version;
     }
     catch (std::exception &exp) {
-        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), outError);
+        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), error);
         return RLMNotVersioned;
     }
 }

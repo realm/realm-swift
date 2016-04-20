@@ -510,7 +510,19 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
  @return            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
  */
-+ (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error;
++ (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm schemaVersionAtFileURL:error:]");
+
+/**
+ Get the schema version for a Realm at a given local URL.
+
+ @param fileURL Local URL to a Realm file.
+ @param error   If an error occurs, upon return contains an `NSError` object
+                that describes the problem. If you are not interested in
+                possible errors, pass in `NULL`.
+
+ @return        The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
+ */
++ (uint64_t)schemaVersionAtFileURL:(NSURL *)fileURL error:(NSError **)error;
 
 /**
  Get the schema version for an encrypted Realm at a given path.
@@ -521,9 +533,22 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
                     that describes the problem. If you are not interested in
                     possible errors, pass in `NULL`.
 
- @return            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
+ @return            The version of the Realm at `fileURL` or RLMNotVersioned if the version cannot be read.
  */
-+ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(nullable NSData *)key error:(NSError **)error;
++ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(nullable NSData *)key error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm schemaVersionAtFileURL:encryptionKey:error:]");
+
+/**
+ Get the schema version for an encrypted Realm at a given local URL.
+
+ @param fileURL Local URL to a Realm file
+ @param key     64-byte encryption key.
+ @param error   If an error occurs, upon return contains an `NSError` object
+                that describes the problem. If you are not interested in
+                possible errors, pass in `NULL`.
+
+ @return        The version of the Realm at `fileURL` or RLMNotVersioned if the version cannot be read.
+ */
++ (uint64_t)schemaVersionAtFileURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
 /**
  Performs the given Realm configuration's migration block on a Realm at the given path.
