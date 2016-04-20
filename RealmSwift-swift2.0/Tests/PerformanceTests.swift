@@ -97,7 +97,7 @@ class SwiftPerformanceTests: TestCase {
             fatalError("Unexpected error: \(error)")
         }
 
-        try! realm.writeCopyToPath(testRealmPath())
+        try! realm.writeCopyToFileURL(NSURL(fileURLWithPath: testRealmPath()))
         return realmWithTestPath()
     }
 

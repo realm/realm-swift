@@ -132,7 +132,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     config.inMemoryIdentifier = @(factor).stringValue;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     [NSFileManager.defaultManager removeItemAtPath:RLMTestRealmPath() error:nil];
-    [realm writeCopyToPath:RLMTestRealmPath() error:nil];
+    [realm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] error:nil];
     return [self realmWithTestPath];
 }
 

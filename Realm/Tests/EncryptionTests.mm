@@ -42,13 +42,13 @@
 #pragma mark - Key validation
 
 - (void)testBadEncryptionKeys {
-    XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:self.nonLiteralNil error:nil]);
-    XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:NSData.data error:nil]);
+    XCTAssertThrows([RLMRealm.defaultRealm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] encryptionKey:self.nonLiteralNil error:nil]);
+    XCTAssertThrows([RLMRealm.defaultRealm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] encryptionKey:NSData.data error:nil]);
 }
 
 - (void)testValidEncryptionKeys {
     NSData *key = [[NSMutableData alloc] initWithLength:64];
-    XCTAssertNoThrow([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:key error:nil]);
+    XCTAssertNoThrow([RLMRealm.defaultRealm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] encryptionKey:key error:nil]);
 }
 
 #pragma mark - realmWithPath:
@@ -116,7 +116,7 @@
         [realm transactionWithBlock:^{
             [IntObject createInRealm:realm withValue:@[@1]];
         }];
-        [realm writeCopyToPath:RLMTestRealmPath() error:nil];
+        [realm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] error:nil];
     }
 
     @autoreleasepool {
@@ -134,7 +134,7 @@
         [realm transactionWithBlock:^{
             [IntObject createInRealm:realm withValue:@[@1]];
         }];
-        [realm writeCopyToPath:RLMTestRealmPath() encryptionKey:key2 error:nil];
+        [realm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] encryptionKey:key2 error:nil];
     }
 
     @autoreleasepool {
