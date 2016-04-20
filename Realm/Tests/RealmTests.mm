@@ -177,6 +177,7 @@ extern "C" {
     RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileFormatUpgradeRequired);
 }
 
+#if TARGET_OS_IPHONE && (!TARGET_IPHONE_SIMULATOR || !TARGET_RT_64_BIT)
 - (void)testExceedingVirtualAddressSpace {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
 
@@ -227,6 +228,7 @@ extern "C" {
         XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
     }
 }
+#endif
 
 #pragma mark - Adding and Removing Objects
 
