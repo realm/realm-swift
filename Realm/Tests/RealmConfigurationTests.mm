@@ -137,7 +137,7 @@
     @autoreleasepool {
         RLMRealm *realm = RLMRealm.defaultRealm;
         NSString *realmPath = @(realm.configuration.config.path.c_str());
-        XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:realmPath error:nil]);
+        XCTAssertEqual(1U, [RLMRealm schemaVersionAtFileURL:[NSURL fileURLWithPath:realmPath] error:nil]);
     }
 
     config.fileURL = [NSURL fileURLWithPath:RLMDefaultRealmPath()];

@@ -48,11 +48,12 @@ class MigrationTests: TestCase {
 
     // create realm at path and test version is 0
     private func createAndTestRealmAtPath(realmPath: String) {
+        let fileURL = NSURL(fileURLWithPath: realmPath)
         autoreleasepool {
-            _ = try! Realm(fileURL: NSURL(fileURLWithPath: realmPath))
+            _ = try! Realm(fileURL: fileURL)
             return
         }
-        XCTAssertEqual(UInt64(0), schemaVersionAtPath(realmPath)!, "Initial version should be 0")
+        XCTAssertEqual(0, try! schemaVersionAtFileURL(fileURL), "Initial version should be 0")
     }
 
     // migrate realm at path and ensure migration
@@ -99,24 +100,27 @@ class MigrationTests: TestCase {
         migrateRealm()
 
         XCTAssertEqual(didRun, true)
-        XCTAssertEqual(UInt64(1), schemaVersionAtPath(defaultRealmPath())!)
+        XCTAssertEqual(1, try! schemaVersionAtFileURL(NSURL(fileURLWithPath: defaultRealmPath())))
     }
 
     func testSetSchemaVersion() {
         createAndTestRealmAtPath(testRealmPath())
         migrateAndTestRealm(testRealmPath())
 
-        XCTAssertEqual(UInt64(1), schemaVersionAtPath(testRealmPath())!)
+        XCTAssertEqual(1, try! schemaVersionAtFileURL(NSURL(fileURLWithPath: testRealmPath())))
     }
 
-    func testSchemaVersionAtPath() {
-        var error: NSError? = nil
-        assertNil(schemaVersionAtPath(defaultRealmPath(), error: &error), "Version should be nil before Realm creation")
-        XCTAssertNotNil(error, "Error should be set")
+    func testSchemaVersionAtFileURL() {
+        assertFails(.Fail) {
+            // Version should throw before Realm creation
+            try schemaVersionAtFileURL(NSURL(fileURLWithPath: defaultRealmPath()))
+        }
 
         _ = try! Realm()
-        XCTAssertEqual(UInt64(0), schemaVersionAtPath(defaultRealmPath())!, "Initial version should be 0")
-        assertThrows(schemaVersionAtPath("/dev/null"))
+        XCTAssertEqual(0, try! schemaVersionAtFileURL(NSURL(fileURLWithPath: defaultRealmPath())), "Initial version should be 0")
+        assertFails(.Fail) {
+            try schemaVersionAtFileURL(NSURL(fileURLWithPath: "/dev/null"))
+        }
     }
 
     func testMigrateRealm() {
