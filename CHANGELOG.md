@@ -16,7 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix a use-after-free when an associated object's dealloc method is used to
+  remove observers from an RLMObject.
 
 0.98.8 Release notes (2016-04-15)
 =============================================================
