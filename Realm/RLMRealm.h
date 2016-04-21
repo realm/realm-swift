@@ -352,9 +352,13 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  *current* data, and not data when the last write transaction was committed.
 
  @param fileURL Local URL to save the Realm to.
- @param key     64-byte encryption key to encrypt the new file with
- @param error   On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
- @return YES    if the realm was copied successfully. Returns NO if an error occurred.
+ @param key   Optional 64-byte encryption key to encrypt the new file with.
+ @param error On input, a pointer to an error object. If an error occurs, this
+              pointer is set to an actual error object containing the error
+              information. You may specify nil for this parameter if you do not
+              want the error information.
+
+ @return YES if the realm was copied successfully. Returns NO if an error occurred.
 */
 - (BOOL)writeCopyToFileURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
@@ -515,12 +519,12 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
  Get the schema version for an encrypted Realm at a given local URL.
 
  @param fileURL Local URL to a Realm file
- @param key     64-byte encryption key.
+ @param key     Optional 64-byte encryption key.
  @param error   If an error occurs, upon return contains an `NSError` object
                 that describes the problem. If you are not interested in
                 possible errors, pass in `NULL`.
 
- @return        The version of the Realm at `fileURL` or RLMNotVersioned if the version cannot be read.
+ @return The version of the Realm at `fileURL` or RLMNotVersioned if the version cannot be read.
  */
 + (uint64_t)schemaVersionAtFileURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
