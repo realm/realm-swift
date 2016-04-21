@@ -344,7 +344,7 @@ RLM_ASSUME_NONNULL_BEGIN
  This method requires that `objectID` be overridden on the receiving subclass.
 
  @return    An object of the subclass type or nil if an object with the given object ID does not exist.
- @see       -objectID
+ @see       +objectID
  */
 + (nullable instancetype)objectForObjectID:(nullable id)objectID;
 
@@ -407,7 +407,7 @@ RLM_ASSUME_NONNULL_BEGIN
  This method requires that `objectID` be overridden on the receiving subclass.
 
  @return    An object of the subclass type or nil if an object with the given object ID does not exist.
- @see       -objectID
+ @see       +objectID
  */
 + (nullable instancetype)objectInRealm:(RLMRealm *)realm forObjectID:(nullable id)objectID;
 
