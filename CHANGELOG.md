@@ -16,6 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Add information about what rows were added, removed, or modified to the
   notifications sent to the Realm collections.
+* Improve error when illegally appending to an `RLMArray` / `List` property from a default value
+  or the standalone initializer (`init()`) before the schema is ready.
 
 ### Bugfixes
 
