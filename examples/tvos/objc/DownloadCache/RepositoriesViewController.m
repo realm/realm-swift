@@ -33,7 +33,7 @@
 @implementation RepositoriesViewController
 
 - (void)dealloc {
-    [[RLMRealm defaultRealm] removeNotification:self.token];
+    [self.token stop];
 }
 
 - (void)viewDidLoad {

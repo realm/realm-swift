@@ -27,10 +27,7 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
     var token: NotificationToken?
 
     deinit {
-        let realm = try! Realm()
-        if let token = token {
-            realm.removeNotification(token)
-        }
+        token?.stop()
     }
 
     override func viewDidLoad() {
