@@ -576,8 +576,8 @@ CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> c
     });
 
     // Don't add rows which were modified to not match the query to `deletions`
-    // immediately because the unsorted move logic needs to be able to distinuish
-    // them from rows which were outright deleted
+    // immediately because the unsorted move logic needs to be able to
+    // distinguish them from rows which were outright deleted
     IndexSet removed;
 
     // Now that our old and new sets of rows are sorted by row index, we can
