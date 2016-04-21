@@ -387,7 +387,7 @@ public:
             }
         }
 
-        // Copy the list change info if there's multiple LinkViews for the same LinkList
+        // Copy the list change info if there are multiple LinkViews for the same LinkList
         auto id = [](auto const& list) { return std::tie(list.table_ndx, list.col_ndx, list.row_ndx); };
         for (size_t i = 1; i < m_current->lists.size(); ++i) {
             for (size_t j = i; j > 0; --j) {

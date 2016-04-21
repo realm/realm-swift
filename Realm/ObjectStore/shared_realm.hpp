@@ -62,7 +62,7 @@ namespace realm {
             bool in_memory = false;
 
             // The following are intended for internal/testing purposes and
-            // should not be publically exposed in binding APIs
+            // should not be publicly exposed in binding APIs
 
             // If false, always return a new Realm instance, and don't return
             // that Realm instance for other requests for a cached Realm. Useful

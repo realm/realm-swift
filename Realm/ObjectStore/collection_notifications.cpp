@@ -34,7 +34,7 @@ NotificationToken::~NotificationToken()
     // atomically to ensure that there are no data races when the token is
     // destroyed after being modified on a different thread.
     // This is needed despite the token not being thread-safe in general as
-    // users find it very surpringing for obj-c objects to care about what
+    // users find it very surprising for obj-c objects to care about what
     // thread they are deallocated on.
     if (auto notifier = m_notifier.exchange({})) {
         notifier->remove_callback(m_token);

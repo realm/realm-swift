@@ -334,7 +334,7 @@ public:
         }
         else {
             // Array KVO can only send a single kind of change at a time, so
-            // if there's multiple just give up and send "Set"
+            // if there are multiple just give up and send "Set"
             o->indices.set(0);
             o->kind = ColumnInfo::Kind::SetAll;
         }

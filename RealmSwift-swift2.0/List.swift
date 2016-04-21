@@ -419,7 +419,7 @@ public final class List<T: Object>: ListBase {
     notifications can't be delivered instantly, multiple notifications may be
     coalesced into a single notification. This can include the notification
     with the initial list. For example, the following code performs a write
-    transaction immediate after adding the notification block, so there is no
+    transaction immediately after adding the notification block, so there is no
     opportunity for the initial notification to be delivered first. As a
     result, the initial notification will reflect the state of the Realm after
     the write transaction.
@@ -475,7 +475,7 @@ public final class List<T: Object>: ListBase {
     other activity. When notifications can't be delivered instantly, multiple
     notifications may be coalesced into a single notification. This can include
     the notification with the initial list. For example, the following code
-    performs a write transaction immediate after adding the notification block,
+    performs a write transaction immediately after adding the notification block,
     so there is no opportunity for the initial notification to be delivered first.
     As a result, the initial notification will reflect the state of the Realm
     after the write transaction, and will not include change information.

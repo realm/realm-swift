@@ -189,7 +189,7 @@ public:
     // Remove all indexes from the set
     void clear();
 
-    // An iterator over the indivual indices in the set rather than the ranges
+    // An iterator over the individual indices in the set rather than the ranges
     class IndexIterator : public std::iterator<std::forward_iterator_tag, size_t> {
     public:
         IndexIterator(IndexSet::const_iterator it) : m_iterator(it) { }
