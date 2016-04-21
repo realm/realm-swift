@@ -24,7 +24,8 @@ import Realm.Dynamic
 import Foundation
 
 private func realmWithCustomSchema(path: String, schema: RLMSchema) -> RLMRealm {
-    return try! RLMRealm(fileURL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false, dynamic: true, schema: schema)
+    return try! RLMRealm(fileURL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false,
+                         dynamic: true, schema: schema)
 }
 
 private func realmWithSingleClass(path: String, objectSchema: RLMObjectSchema) -> RLMRealm {
@@ -39,7 +40,8 @@ private func realmWithSingleClassProperties(path: String, className: String, pro
 }
 
 private func dynamicRealm(path: String) -> RLMRealm {
-    return try! RLMRealm(fileURL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false, dynamic: true, schema: nil)
+    return try! RLMRealm(fileURL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false,
+                         dynamic: true, schema: nil)
 }
 
 class MigrationTests: TestCase {
@@ -82,8 +84,9 @@ class MigrationTests: TestCase {
 
     private func migrateAndTestDefaultRealm(schemaVersion: UInt64 = 1, block: MigrationBlock) {
         migrateAndTestRealm(defaultRealmPath(), schemaVersion: schemaVersion, block: block)
-        Realm.Configuration.defaultConfiguration = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()),
-            schemaVersion: schemaVersion)
+        let config = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()),
+                                         schemaVersion: schemaVersion)
+        Realm.Configuration.defaultConfiguration = config
     }
 
     // MARK Test cases
@@ -92,9 +95,8 @@ class MigrationTests: TestCase {
         createAndTestRealmAtPath(defaultRealmPath())
 
         var didRun = false
-        let config = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()), schemaVersion: 1, migrationBlock: { _, _ in
-            didRun = true
-        })
+        let config = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()), schemaVersion: 1,
+                                         migrationBlock: { _, _ in didRun = true })
         Realm.Configuration.defaultConfiguration = config
 
         migrateRealm()
@@ -117,7 +119,8 @@ class MigrationTests: TestCase {
         }
 
         _ = try! Realm()
-        XCTAssertEqual(0, try! schemaVersionAtFileURL(NSURL(fileURLWithPath: defaultRealmPath())), "Initial version should be 0")
+        XCTAssertEqual(0, try! schemaVersionAtFileURL(NSURL(fileURLWithPath: defaultRealmPath())),
+                       "Initial version should be 0")
         assertFails(.Fail) {
             try schemaVersionAtFileURL(NSURL(fileURLWithPath: "/dev/null"))
         }

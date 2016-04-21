@@ -75,7 +75,8 @@ class TestCase: XCTestCase {
         try! NSFileManager.defaultManager().createDirectoryAtPath(testDir, withIntermediateDirectories: true,
             attributes: nil)
 
-        Realm.Configuration.defaultConfiguration = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()))
+        let config = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()))
+        Realm.Configuration.defaultConfiguration = config
 
         exceptionThrown = false
         autoreleasepool { super.invokeTest() }

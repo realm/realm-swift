@@ -26,7 +26,8 @@ import Foundation
 
 class RealmTests: TestCase {
     func testFileURL() {
-        XCTAssertEqual(try! Realm(fileURL: NSURL(fileURLWithPath: testRealmPath())).configuration.fileURL, NSURL(fileURLWithPath: testRealmPath()))
+        XCTAssertEqual(try! Realm(fileURL: NSURL(fileURLWithPath: testRealmPath())).configuration.fileURL,
+                       NSURL(fileURLWithPath: testRealmPath()))
     }
 
     func testReadOnly() {
@@ -37,7 +38,8 @@ class RealmTests: TestCase {
                 try! Realm().create(SwiftIntObject.self, value: [100])
             }
         }
-        let readOnlyRealm = try! Realm(configuration: Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()),readOnly: true))
+        let config = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()), readOnly: true)
+        let readOnlyRealm = try! Realm(configuration: config)
         XCTAssertEqual(true, readOnlyRealm.configuration.readOnly)
         XCTAssertEqual(1, readOnlyRealm.objects(SwiftIntObject).count)
 
@@ -67,7 +69,8 @@ class RealmTests: TestCase {
         }
 
         assertSucceeds {
-            let realm = try Realm(configuration: Realm.Configuration(fileURL: NSURL(fileURLWithPath: testRealmPath()), readOnly: true))
+            let realm = try Realm(configuration:
+                Realm.Configuration(fileURL: NSURL(fileURLWithPath: testRealmPath()), readOnly: true))
             XCTAssertEqual(1, realm.objects(SwiftStringObject).count)
         }
 
@@ -76,7 +79,8 @@ class RealmTests: TestCase {
 
     func testReadOnlyRealmMustExist() {
         assertFails(Error.FileNotFound) {
-            try Realm(configuration: Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()), readOnly: true))
+            try Realm(configuration:
+                Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()), readOnly: true))
         }
     }
 
@@ -135,7 +139,8 @@ class RealmTests: TestCase {
     }
 
     func testInit() {
-        XCTAssertEqual(try! Realm(fileURL: NSURL(fileURLWithPath: testRealmPath())).configuration.fileURL, NSURL(fileURLWithPath: testRealmPath()))
+        XCTAssertEqual(try! Realm(fileURL: NSURL(fileURLWithPath: testRealmPath())).configuration.fileURL,
+                       NSURL(fileURLWithPath: testRealmPath()))
     }
 
     func testInitFailable() {
