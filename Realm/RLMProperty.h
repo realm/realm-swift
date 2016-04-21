@@ -103,9 +103,9 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @interface RLMPropertyDescriptor : NSObject
 
-+ (instancetype)descriptorWithClass:(Class)klass propertyName:(NSString *)propertyName;
++ (instancetype)descriptorWithClass:(Class)objectClass propertyName:(NSString *)propertyName;
 
-@property (nonatomic, readonly) Class klass;
+@property (nonatomic, readonly) Class objectClass;
 @property (nonatomic, readonly) NSString *propertyName;
 
 @end

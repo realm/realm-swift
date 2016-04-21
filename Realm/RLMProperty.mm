@@ -407,7 +407,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _indexed = indexed;
 
     if (linkPropertyDescriptor) {
-        _objectClassName = NSStringFromClass(linkPropertyDescriptor.klass);
+        _objectClassName = NSStringFromClass(linkPropertyDescriptor.objectClass);
         _linkOriginPropertyName = linkPropertyDescriptor.propertyName;
     }
 
@@ -553,10 +553,10 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
 @implementation RLMPropertyDescriptor
 
-+ (instancetype)descriptorWithClass:(Class)klass propertyName:(NSString *)propertyName
++ (instancetype)descriptorWithClass:(Class)objectClass propertyName:(NSString *)propertyName
 {
     RLMPropertyDescriptor *descriptor = [[RLMPropertyDescriptor alloc] init];
-    descriptor->_klass = klass;
+    descriptor->_objectClass = objectClass;
     descriptor->_propertyName = propertyName;
     return descriptor;
 }
