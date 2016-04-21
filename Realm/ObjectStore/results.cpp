@@ -260,10 +260,10 @@ size_t Results::index_of(size_t row_ndx)
     REALM_UNREACHABLE();
 }
 
-template<typename Int, typename Float, typename Double, typename DateTime>
+template<typename Int, typename Float, typename Double, typename Timestamp>
 util::Optional<Mixed> Results::aggregate(size_t column, bool return_none_for_empty,
                                          Int agg_int, Float agg_float,
-                                         Double agg_double, DateTime agg_datetime)
+                                         Double agg_double, Timestamp agg_timestamp)
 {
     validate_read();
     if (!m_table)
@@ -295,7 +295,7 @@ util::Optional<Mixed> Results::aggregate(size_t column, bool return_none_for_emp
 
     switch (m_table->get_column_type(column))
     {
-        case type_DateTime: return do_agg(agg_datetime);
+        case type_Timestamp: return do_agg(agg_timestamp);
         case type_Double: return do_agg(agg_double);
         case type_Float: return do_agg(agg_float);
         case type_Int: return do_agg(agg_int);
@@ -310,7 +310,7 @@ util::Optional<Mixed> Results::max(size_t column)
                      [=](auto const& table) { return table.maximum_int(column); },
                      [=](auto const& table) { return table.maximum_float(column); },
                      [=](auto const& table) { return table.maximum_double(column); },
-                     [=](auto const& table) { return table.maximum_datetime(column); });
+                     [=](auto const& table) { return table.maximum_timestamp(column); });
 }
 
 util::Optional<Mixed> Results::min(size_t column)
@@ -319,7 +319,7 @@ util::Optional<Mixed> Results::min(size_t column)
                      [=](auto const& table) { return table.minimum_int(column); },
                      [=](auto const& table) { return table.minimum_float(column); },
                      [=](auto const& table) { return table.minimum_double(column); },
-                     [=](auto const& table) { return table.minimum_datetime(column); });
+                     [=](auto const& table) { return table.minimum_timestamp(column); });
 }
 
 util::Optional<Mixed> Results::sum(size_t column)

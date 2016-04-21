@@ -98,6 +98,8 @@
 		3F9026111C625C5D006AE98E /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F90260F1C625C5D006AE98E /* list.cpp */; };
 		3F9026121C625C5D006AE98E /* list.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F9026101C625C5D006AE98E /* list.hpp */; };
 		3F9026131C625C63006AE98E /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F90260F1C625C5D006AE98E /* list.cpp */; };
+		3F9182441CD1713E00A50120 /* fileformat-old-date.realm in Resources */ = {isa = PBXBuildFile; fileRef = 3F9182421CD1712F00A50120 /* fileformat-old-date.realm */; };
+		3F9182451CD1713F00A50120 /* fileformat-old-date.realm in Resources */ = {isa = PBXBuildFile; fileRef = 3F9182421CD1712F00A50120 /* fileformat-old-date.realm */; };
 		3F9801971C8E4F3F000A8B07 /* weak_realm_notifier.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F9801951C8E4F3F000A8B07 /* weak_realm_notifier.hpp */; };
 		3F9801981C8E4F3F000A8B07 /* weak_realm_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F9801961C8E4F3F000A8B07 /* weak_realm_notifier.cpp */; };
 		3F9801991C8E4F42000A8B07 /* weak_realm_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F9801961C8E4F3F000A8B07 /* weak_realm_notifier.cpp */; };
@@ -534,6 +536,7 @@
 		3F7A3FAD1CC6EB7300301A17 /* collection_change_builder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = collection_change_builder.hpp; path = ObjectStore/impl/collection_change_builder.hpp; sourceTree = "<group>"; };
 		3F90260F1C625C5D006AE98E /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = list.cpp; path = ObjectStore/list.cpp; sourceTree = "<group>"; };
 		3F9026101C625C5D006AE98E /* list.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = list.hpp; path = ObjectStore/list.hpp; sourceTree = "<group>"; };
+		3F9182421CD1712F00A50120 /* fileformat-old-date.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fileformat-old-date.realm"; sourceTree = "<group>"; };
 		3F9801951C8E4F3F000A8B07 /* weak_realm_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = weak_realm_notifier.hpp; path = ObjectStore/impl/apple/weak_realm_notifier.hpp; sourceTree = "<group>"; };
 		3F9801961C8E4F3F000A8B07 /* weak_realm_notifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = weak_realm_notifier.cpp; path = ObjectStore/impl/apple/weak_realm_notifier.cpp; sourceTree = "<group>"; };
 		3F98019A1C8E4F55000A8B07 /* collection_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = collection_notifier.hpp; path = ObjectStore/impl/collection_notifier.hpp; sourceTree = "<group>"; };
@@ -1112,6 +1115,7 @@
 		E8D89BA81955FC6D00CF2B9A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				3F9182421CD1712F00A50120 /* fileformat-old-date.realm */,
 				29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */,
 				E81A1FC21955FE0100FDED82 /* RealmTests-Info.plist */,
 			);
@@ -1474,6 +1478,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F9182451CD1713F00A50120 /* fileformat-old-date.realm in Resources */,
 				29B7FDFC1C0DE8110023224E /* fileformat-pre-null.realm in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1482,6 +1487,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F9182441CD1713E00A50120 /* fileformat-old-date.realm in Resources */,
 				29B7FDFB1C0DE8100023224E /* fileformat-pre-null.realm in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

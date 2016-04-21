@@ -171,9 +171,41 @@ extern "C" {
     config.disableFormatUpgrade = true;
 
     NSURL *bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-pre-null" withExtension:@"realm"];
-    [[NSFileManager defaultManager] copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
+    [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
 
-    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileFormatUpgradeRequired);
+    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil],
+                                    RLMErrorFileFormatUpgradeRequired);
+    XCTAssertEqualObjects([NSData dataWithContentsOfURL:bundledRealmURL],
+                          [NSData dataWithContentsOfURL:config.fileURL]);
+
+    bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-old-date" withExtension:@"realm"];
+    [NSFileManager.defaultManager removeItemAtURL:config.fileURL error:nil];
+    [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
+
+    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil],
+                                    RLMErrorFileFormatUpgradeRequired);
+    XCTAssertEqualObjects([NSData dataWithContentsOfURL:bundledRealmURL],
+                          [NSData dataWithContentsOfURL:config.fileURL]);
+}
+
+- (void)testFileFormatUpgradeRequiredButReadOnly {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.readOnly = true;
+
+    NSURL *bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-pre-null" withExtension:@"realm"];
+    [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
+
+    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileAccess);
+    XCTAssertEqualObjects([NSData dataWithContentsOfURL:bundledRealmURL],
+                          [NSData dataWithContentsOfURL:config.fileURL]);
+
+    bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-old-date" withExtension:@"realm"];
+    [NSFileManager.defaultManager removeItemAtURL:config.fileURL error:nil];
+    [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
+
+    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorFileAccess);
+    XCTAssertEqualObjects([NSData dataWithContentsOfURL:bundledRealmURL],
+                          [NSData dataWithContentsOfURL:config.fileURL]);
 }
 
 #if TARGET_OS_IPHONE && (!TARGET_IPHONE_SIMULATOR || !TARGET_RT_64_BIT)

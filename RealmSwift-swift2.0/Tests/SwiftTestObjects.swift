@@ -251,11 +251,11 @@ class SwiftIndexedPropertiesObject: Object {
     dynamic var dataCol = NSData()
 
     override class func indexedProperties() -> [String] {
-        return ["stringCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "boolCol", "dateCol"]
+        return ["stringCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "boolCol"]
     }
 }
 
-class SwiftIndexedOptinalPropertiesObject: Object {
+class SwiftIndexedOptionalPropertiesObject: Object {
     dynamic var optionalStringCol: String? = ""
     let optionalIntCol = RealmOptional<Int>()
     let optionalInt8Col = RealmOptional<Int8>()
@@ -271,7 +271,7 @@ class SwiftIndexedOptinalPropertiesObject: Object {
 
     override class func indexedProperties() -> [String] {
         return ["optionalStringCol", "optionalIntCol", "optionalInt8Col", "optionalInt16Col",
-            "optionalInt32Col", "optionalInt64Col", "optionalBoolCol", "optionalDateCol"]
+            "optionalInt32Col", "optionalInt64Col", "optionalBoolCol"]
     }
 }
 

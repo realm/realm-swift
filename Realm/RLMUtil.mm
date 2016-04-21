@@ -340,11 +340,10 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
             return @(mixed.get_double());
         case realm::type_Bool:
             return @(mixed.get_bool());
-        case realm::type_DateTime:
-            return RLMDateTimeToNSDate(mixed.get_datetime());
-        case realm::type_Binary: {
+        case realm::type_Timestamp:
+            return RLMTimestampToNSDate(mixed.get_timestamp());
+        case realm::type_Binary:
             return RLMBinaryDataToNSData(mixed.get_binary());
-        }
         case realm::type_Link:
         case realm::type_LinkList:
         default:

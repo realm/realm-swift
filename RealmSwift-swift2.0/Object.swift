@@ -160,7 +160,7 @@ public class Object: RLMObjectBase {
 
     /**
     Return an array of property names for properties which should be indexed. Only supported
-    for strings, integers, booleans and NSDate properties.
+    for string, integer and boolean properties.
 
     - returns: `Array` of property names to index.
     */

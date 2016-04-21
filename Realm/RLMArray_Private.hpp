@@ -22,7 +22,7 @@
 
 #import <Realm/RLMResults.h>
 
-#import <memory>
+#import <realm/link_view_fwd.hpp>
 #import <vector>
 
 namespace realm {
@@ -30,11 +30,6 @@ namespace realm {
     class Results;
     class TableView;
     struct SortOrder;
-
-    namespace util {
-        template<typename T> class bind_ptr;
-    }
-    typedef util::bind_ptr<LinkView> LinkViewRef;
 }
 
 @class RLMObjectBase;

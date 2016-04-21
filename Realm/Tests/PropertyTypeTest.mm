@@ -37,7 +37,7 @@
     XCTAssertEqual((int)RLMPropertyTypeString,  (int)realm::type_String,      @"String");
     XCTAssertEqual((int)RLMPropertyTypeData,    (int)realm::type_Binary,      @"Binary");
     XCTAssertEqual((int)RLMPropertyTypeAny,     (int)realm::type_Mixed,       @"Mixed");
-    XCTAssertEqual((int)RLMPropertyTypeDate,    (int)realm::type_DateTime,    @"Date");
+    XCTAssertEqual((int)RLMPropertyTypeDate,    (int)realm::type_Timestamp,   @"Date");
     
     // Array/Linked object types
     XCTAssertEqual((int)RLMPropertyTypeObject,  (int)realm::type_Link,        @"Link");

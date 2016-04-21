@@ -22,8 +22,8 @@
 
 #import <realm/array.hpp>
 #import <realm/binary_data.hpp>
-#import <realm/datetime.hpp>
 #import <realm/string_data.hpp>
+#import <realm/timestamp.hpp>
 #import <realm/util/file.hpp>
 
 namespace realm {
@@ -157,14 +157,28 @@ static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSDat
 }
 
 // Date convertion utilities
-static inline NSDate *RLMDateTimeToNSDate(realm::DateTime dateTime) {
-    auto timeInterval = static_cast<NSTimeInterval>(dateTime.get_datetime());
-    return [NSDate dateWithTimeIntervalSince1970:timeInterval];
+// These use the reference date and shift the seconds rather than just getting
+// the time interval since the epoch directly to avoid losing sub-second precision
+static inline NSDate *RLMTimestampToNSDate(realm::Timestamp ts) {
+    if (ts.is_null())
+        return nil;
+    auto timeInterval = ts.get_seconds() - NSTimeIntervalSince1970 + ts.get_nanoseconds() / 1'000'000'000.0;
+    return [NSDate dateWithTimeIntervalSinceReferenceDate:timeInterval];
 }
 
-static inline realm::DateTime RLMDateTimeForNSDate(__unsafe_unretained NSDate *const date) {
-    auto time = static_cast<int64_t>(date.timeIntervalSince1970);
-    return realm::DateTime(time);
+static inline realm::Timestamp RLMTimestampForNSDate(__unsafe_unretained NSDate *const date) {
+    auto timeInterval = date.timeIntervalSinceReferenceDate;
+    auto seconds = static_cast<int64_t>(timeInterval);
+    timeInterval -= seconds;
+    seconds += static_cast<int64_t>(NSTimeIntervalSince1970);
+
+    // Seconds and nanoseconds have to have the same sign
+    if (timeInterval < 0 && seconds > 0) {
+        ++timeInterval;
+        --seconds;
+    }
+    auto nanoseconds = static_cast<int32_t>(timeInterval * 1'000'000'000.0);
+    return {seconds, nanoseconds};
 }
 
 static inline NSUInteger RLMConvertNotFound(size_t index) {

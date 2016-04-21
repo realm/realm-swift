@@ -48,7 +48,7 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     /** Any type: id, **not supported in Swift** */
     RLMPropertyTypeAny    = 6,
     /** Date type: NSDate */
-    RLMPropertyTypeDate   = 7,
+    RLMPropertyTypeDate   = 8,
 
 #pragma mark - Array/Linked object types
 

@@ -414,7 +414,9 @@ void IndexSet::add_shifted_by(IndexSet const& shifted_by, IndexSet const& values
     copy(old_it, old_end, std::back_inserter(builder));
     m_data = builder.finalize();
 
-    REALM_ASSERT_DEBUG((size_t)std::distance(as_indexes().begin(), as_indexes().end()) == expected);
+#ifdef REALM_DEBUG
+    REALM_ASSERT((size_t)std::distance(as_indexes().begin(), as_indexes().end()) == expected);
+#endif
 }
 
 void IndexSet::set(size_t len)
