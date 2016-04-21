@@ -46,6 +46,19 @@ class SwiftRecursingSchemaTestObject : RLMObject {
     static var mayAccessSchema = false
 }
 
+class InitAppendsToArrayProperty : RLMObject {
+    dynamic var propertyWithIllegalDefaultValue: RLMArray = {
+        if mayAppend {
+            let array = RLMArray(objectClassName: SwiftIntObject.className())
+            array.addObject(SwiftIntObject())
+            return array
+        } else {
+            return RLMArray(objectClassName: SwiftIntObject.className())
+        }
+    }()
+
+    static var mayAppend = false
+}
 
 class SwiftSchemaTests: RLMMultiProcessTestCase {
     func testWorksAtAll() {
@@ -116,4 +129,17 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         SwiftRecursingSchemaTestObject.mayAccessSchema = true
         assertThrowsWithReasonMatching(RLMSchema.sharedSchema(), ".*recursive.*")
     }
+
+    func testAccessSchemaCreatesObjectWhichAttempsInsertionsToArrayProperty() {
+        if isParent {
+            XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
+            return
+        }
+
+        // This is different from the above tests in that it is a to-many link
+        // and it only occurs while the schema is initializing
+        InitAppendsToArrayProperty.mayAppend = true
+        assertThrowsWithReasonMatching(RLMSchema.sharedSchema(), ".*unless the schema is initialized.*")
+    }
+
 }
