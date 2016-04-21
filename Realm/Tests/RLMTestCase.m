@@ -147,11 +147,11 @@ static BOOL encryptTests() {
 
 - (RLMRealm *)realmWithTestPath
 {
-    return [RLMRealm realmWithFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()]];
+    return [RLMRealm realmWithURL:[NSURL fileURLWithPath:RLMTestRealmPath()]];
 }
 
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema {
-    return [RLMRealm realmWithFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] key:nil readOnly:NO inMemory:NO dynamic:YES schema:schema error:nil];
+    return [RLMRealm realmWithURL:[NSURL fileURLWithPath:RLMTestRealmPath()] key:nil readOnly:NO inMemory:NO dynamic:YES schema:schema error:nil];
 }
 
 - (RLMRealm *)inMemoryRealmWithIdentifier:(NSString *)identifier {

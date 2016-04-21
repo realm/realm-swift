@@ -9,31 +9,31 @@ x.x.x Release notes (yyyy-MM-dd)
   `-[RLMResults addNotificationBlock:]` now takes another parameter.
 * The following Objective-C APIs have been deprecated in favor of newer or preferred versions:
 
-| Deprecated API                                         | New API                                                   |
-|:-------------------------------------------------------|:----------------------------------------------------------|
-| `-[RLMRealm removeNotification:]`                      | `-[RLMNotificationToken stop]`                            |
-| `RLMRealmConfiguration.path`                           | `RLMRealmConfiguration.fileURL`                           |
-| `RLMRealm.path`                                        | `RLMRealmConfiguration.fileURL`                           |
-| `RLMRealm.readOnly`                                    | `RLMRealmConfiguration.readOnly`                          |
-| `+[RLMRealm realmWithPath:]`                           | `+[RLMRealm realmWithFileURL:]`                           |
-| `+[RLMRealm writeCopyToPath:error:]`                   | `+[RLMRealm writeCopyToFileURL:encryptionKey:error:]`     |
-| `+[RLMRealm writeCopyToPath:encryptionKey:error:]`     | `+[RLMRealm writeCopyToFileURL:encryptionKey:error:]`     |
-| `+[RLMRealm schemaVersionAtPath:error:]`               | `+[RLMRealm schemaVersionAtFileURL:encryptionKey:error:]` |
-| `+[RLMRealm writeCopyToPath:error:]`                   | `+[RLMRealm writeCopyToFileURL:error:]`                   |
-| `+[RLMRealm writeCopyToPath:encryptionKey:error:]`     | `+[RLMRealm writeCopyToFileURL:encryptionKey:error:]`     |
-| `+[RLMRealm schemaVersionAtPath:error:]`               | `+[RLMRealm schemaVersionAtFileURL:error:]`               |
-| `+[RLMRealm schemaVersionAtPath:encryptionKey:error:]` | `+[RLMRealm schemaVersionAtFileURL:encryptionKey:error:]` |
+| Deprecated API                                         | New API                                               |
+|:-------------------------------------------------------|:------------------------------------------------------|
+| `-[RLMRealm removeNotification:]`                      | `-[RLMNotificationToken stop]`                        |
+| `RLMRealmConfiguration.path`                           | `RLMRealmConfiguration.fileURL`                       |
+| `RLMRealm.path`                                        | `RLMRealmConfiguration.fileURL`                       |
+| `RLMRealm.readOnly`                                    | `RLMRealmConfiguration.readOnly`                      |
+| `+[RLMRealm realmWithPath:]`                           | `+[RLMRealm realmWithURL:]`                       |
+| `+[RLMRealm writeCopyToPath:error:]`                   | `+[RLMRealm writeCopyToURL:encryptionKey:error:]`     |
+| `+[RLMRealm writeCopyToPath:encryptionKey:error:]`     | `+[RLMRealm writeCopyToURL:encryptionKey:error:]`     |
+| `+[RLMRealm schemaVersionAtPath:error:]`               | `+[RLMRealm schemaVersionAtURL:encryptionKey:error:]` |
+| `+[RLMRealm writeCopyToPath:error:]`                   | `+[RLMRealm writeCopyToURL:error:]`                   |
+| `+[RLMRealm writeCopyToPath:encryptionKey:error:]`     | `+[RLMRealm writeCopyToURL:encryptionKey:error:]`     |
+| `+[RLMRealm schemaVersionAtPath:error:]`               | `+[RLMRealm schemaVersionAtURL:error:]`               |
+| `+[RLMRealm schemaVersionAtPath:encryptionKey:error:]` | `+[RLMRealm schemaVersionAtURL:encryptionKey:error:]` |
 
 * The following Swift APIs have been deprecated in favor of newer or preferred versions:
 
-| Deprecated API                                | New API                                      |
-|:----------------------------------------------|:---------------------------------------------|
-| `Realm.removeNotification(_:)`                | `NotificationToken.stop()`                   |
-| `Realm.Configuration.path`                    | `Realm.Configuration.fileURL`                |
-| `Realm.path`                                  | `Realm.Configuration.fileURL`                |
-| `Realm.readOnly`                              | `Realm.Configuration.readOnly`               |
-| `Realm.writeCopyToPath(_:encryptionKey:)`     | `Realm.writeCopyToFileURL(_:encryptionKey:)` |
-| `schemaVersionAtPath(_:encryptionKey:error:)` | `schemaVersionAtFileURL(_:encryptionKey:)`   |
+| Deprecated API                                | New API                                  |
+|:----------------------------------------------|:-----------------------------------------|
+| `Realm.removeNotification(_:)`                | `NotificationToken.stop()`               |
+| `Realm.Configuration.path`                    | `Realm.Configuration.fileURL`            |
+| `Realm.path`                                  | `Realm.Configuration.fileURL`            |
+| `Realm.readOnly`                              | `Realm.Configuration.readOnly`           |
+| `Realm.writeCopyToPath(_:encryptionKey:)`     | `Realm.writeCopyToURL(_:encryptionKey:)` |
+| `schemaVersionAtPath(_:encryptionKey:error:)` | `schemaVersionAtURL(_:encryptionKey:)`   |
 
 ### Enhancements
 

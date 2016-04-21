@@ -52,7 +52,7 @@ Get the schema version for a Realm at a given path.
 
 - returns: The version of the Realm at `realmPath` or `nil` if the version cannot be read.
 */
-@available(*, deprecated=1, message="Use schemaVersionAtFileURL(_:encryptionKey:)")
+@available(*, deprecated=1, message="Use schemaVersionAtURL(_:encryptionKey:)")
 public func schemaVersionAtPath(realmPath: String, encryptionKey: NSData? = nil,
                                 error: NSErrorPointer = nil) -> UInt64? {
     let version = RLMRealm.schemaVersionAtPath(realmPath, encryptionKey: encryptionKey, error: error)
@@ -72,9 +72,9 @@ Get the schema version for a Realm at a given local URL.
 
 - returns: The version of the Realm at `fileURL`.
 */
-public func schemaVersionAtFileURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws -> UInt64 {
+public func schemaVersionAtURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws -> UInt64 {
     var error: NSError? = nil
-    let version = RLMRealm.schemaVersionAtFileURL(fileURL, encryptionKey: encryptionKey, error: &error)
+    let version = RLMRealm.schemaVersionAtURL(fileURL, encryptionKey: encryptionKey, error: &error)
     if let error = error {
         throw error
     }

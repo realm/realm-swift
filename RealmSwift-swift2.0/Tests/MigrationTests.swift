@@ -24,7 +24,7 @@ import Realm.Dynamic
 import Foundation
 
 private func realmWithCustomSchema(path: String, schema: RLMSchema) -> RLMRealm {
-    return try! RLMRealm(fileURL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false,
+    return try! RLMRealm(URL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false,
                          dynamic: true, schema: schema)
 }
 
@@ -40,7 +40,7 @@ private func realmWithSingleClassProperties(path: String, className: String, pro
 }
 
 private func dynamicRealm(path: String) -> RLMRealm {
-    return try! RLMRealm(fileURL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false,
+    return try! RLMRealm(URL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false,
                          dynamic: true, schema: nil)
 }
 
@@ -55,7 +55,7 @@ class MigrationTests: TestCase {
             _ = try! Realm(fileURL: fileURL)
             return
         }
-        XCTAssertEqual(0, try! schemaVersionAtFileURL(fileURL), "Initial version should be 0")
+        XCTAssertEqual(0, try! schemaVersionAtURL(fileURL), "Initial version should be 0")
     }
 
     // migrate realm at path and ensure migration
@@ -102,27 +102,27 @@ class MigrationTests: TestCase {
         migrateRealm()
 
         XCTAssertEqual(didRun, true)
-        XCTAssertEqual(1, try! schemaVersionAtFileURL(NSURL(fileURLWithPath: defaultRealmPath())))
+        XCTAssertEqual(1, try! schemaVersionAtURL(NSURL(fileURLWithPath: defaultRealmPath())))
     }
 
     func testSetSchemaVersion() {
         createAndTestRealmAtPath(testRealmPath())
         migrateAndTestRealm(testRealmPath())
 
-        XCTAssertEqual(1, try! schemaVersionAtFileURL(NSURL(fileURLWithPath: testRealmPath())))
+        XCTAssertEqual(1, try! schemaVersionAtURL(NSURL(fileURLWithPath: testRealmPath())))
     }
 
-    func testSchemaVersionAtFileURL() {
+    func testSchemaVersionAtURL() {
         assertFails(.Fail) {
             // Version should throw before Realm creation
-            try schemaVersionAtFileURL(NSURL(fileURLWithPath: defaultRealmPath()))
+            try schemaVersionAtURL(NSURL(fileURLWithPath: defaultRealmPath()))
         }
 
         _ = try! Realm()
-        XCTAssertEqual(0, try! schemaVersionAtFileURL(NSURL(fileURLWithPath: defaultRealmPath())),
+        XCTAssertEqual(0, try! schemaVersionAtURL(NSURL(fileURLWithPath: defaultRealmPath())),
                        "Initial version should be 0")
         assertFails(.Fail) {
-            try schemaVersionAtFileURL(NSURL(fileURLWithPath: "/dev/null"))
+            try schemaVersionAtURL(NSURL(fileURLWithPath: "/dev/null"))
         }
     }
 

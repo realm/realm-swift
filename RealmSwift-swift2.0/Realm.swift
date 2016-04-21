@@ -593,7 +593,7 @@ public final class Realm {
     */
     @available(*, deprecated=1, message="Use Realm.writeCopyToURL(_:encryptionKey:)")
     public func writeCopyToPath(path: String, encryptionKey: NSData? = nil) throws {
-        try writeCopyToFileURL(NSURL(fileURLWithPath: path))
+        try writeCopyToURL(NSURL(fileURLWithPath: path))
     }
 
     /**
@@ -609,8 +609,8 @@ public final class Realm {
 
     - throws: An NSError if the copy could not be written.
     */
-    public func writeCopyToFileURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws {
-        try rlmRealm.writeCopyToFileURL(fileURL, encryptionKey: encryptionKey)
+    public func writeCopyToURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws {
+        try rlmRealm.writeCopyToURL(fileURL, encryptionKey: encryptionKey)
     }
 
     // MARK: Internal

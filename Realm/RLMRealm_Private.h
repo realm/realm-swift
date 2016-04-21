@@ -41,7 +41,7 @@ void RLMRealmTranslateException(NSError **error);
  This method is useful only in specialized circumstances, for example, when opening Realm files
  retrieved externally that contain a different schema than defined in your application.
  If you are simply building an app on Realm you should consider using:
- [defaultRealm]([RLMRealm defaultRealm]) or [realmWithFileURL:]([RLMRealm realmWithFileURL:])
+ [defaultRealm]([RLMRealm defaultRealm]) or [realmWithURL:]([RLMRealm realmWithURL:])
  
  Obtains an `RLMRealm` instance with persistence to a specific file path with
  options.
@@ -61,11 +61,11 @@ void RLMRealmTranslateException(NSError **error);
  @return An `RLMRealm` instance.
  
  @see RLMRealm defaultRealm
- @see RLMRealm realmWithFileURL:
- @see RLMRealm realmWithFileURL:readOnly:error:
- @see RLMRealm realmWithFileURL:encryptionKey:readOnly:error:
+ @see RLMRealm realmWithURL:
+ @see RLMRealm realmWithURL:readOnly:error:
+ @see RLMRealm realmWithURL:encryptionKey:readOnly:error:
  */
-+ (instancetype)realmWithFileURL:(NSURL *)fileURL
++ (instancetype)realmWithURL:(NSURL *)fileURL
                           key:(NSData *)key
                      readOnly:(BOOL)readonly
                      inMemory:(BOOL)inMemory

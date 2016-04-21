@@ -646,9 +646,9 @@ class RealmTests: TestCase {
         let path = ((defaultRealmPath() as NSString).stringByDeletingLastPathComponent as NSString )
             .stringByAppendingPathComponent("copy.realm")
         do {
-            try realm.writeCopyToFileURL(NSURL(fileURLWithPath: path))
+            try realm.writeCopyToURL(NSURL(fileURLWithPath: path))
         } catch {
-            XCTFail("writeCopyToFileURL failed")
+            XCTFail("writeCopyToURL failed")
         }
         autoreleasepool {
             let copy = try! Realm(fileURL: NSURL(fileURLWithPath: path))
