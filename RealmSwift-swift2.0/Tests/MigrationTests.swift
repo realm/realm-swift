@@ -23,25 +23,15 @@ import Realm.Private
 import Realm.Dynamic
 import Foundation
 
-private func realmWithCustomSchema(path: String, schema: RLMSchema) -> RLMRealm {
-    return try! RLMRealm(URL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false,
-                         dynamic: true, schema: schema)
-}
-
-private func realmWithSingleClass(path: String, objectSchema: RLMObjectSchema) -> RLMRealm {
+private func realmWithSingleClassProperties(fileURL: NSURL, className: String, properties: [AnyObject]) -> RLMRealm {
     let schema = RLMSchema()
-    schema.objectSchema = [objectSchema]
-    return realmWithCustomSchema(path, schema: schema)
-}
-
-private func realmWithSingleClassProperties(path: String, className: String, properties: [AnyObject]) -> RLMRealm {
     let objectSchema = RLMObjectSchema(className: className, objectClass: MigrationObject.self, properties: properties)
-    return realmWithSingleClass(path, objectSchema: objectSchema)
+    schema.objectSchema = [objectSchema]
+    return try! RLMRealm(URL: fileURL, key: nil, readOnly: false, inMemory: false, dynamic: true, schema: schema)
 }
 
-private func dynamicRealm(path: String) -> RLMRealm {
-    return try! RLMRealm(URL: NSURL(fileURLWithPath: path), key: nil, readOnly: false, inMemory: false,
-                         dynamic: true, schema: nil)
+private func dynamicRealm(fileURL: NSURL) -> RLMRealm {
+    return try! RLMRealm(URL: fileURL, key: nil, readOnly: false, inMemory: false, dynamic: true, schema: nil)
 }
 
 class MigrationTests: TestCase {
@@ -49,8 +39,7 @@ class MigrationTests: TestCase {
     // MARK Utility methods
 
     // create realm at path and test version is 0
-    private func createAndTestRealmAtPath(realmPath: String) {
-        let fileURL = NSURL(fileURLWithPath: realmPath)
+    private func createAndTestRealmAtURL(fileURL: NSURL) {
         autoreleasepool {
             _ = try! Realm(fileURL: fileURL)
             return
@@ -59,10 +48,10 @@ class MigrationTests: TestCase {
     }
 
     // migrate realm at path and ensure migration
-    private func migrateAndTestRealm(realmPath: String, shouldRun: Bool = true, schemaVersion: UInt64 = 1,
+    private func migrateAndTestRealm(fileURL: NSURL, shouldRun: Bool = true, schemaVersion: UInt64 = 1,
                                      autoMigration: Bool = false, block: MigrationBlock? = nil) {
         var didRun = false
-        let config = Realm.Configuration(fileURL: NSURL(fileURLWithPath: realmPath), schemaVersion: schemaVersion,
+        let config = Realm.Configuration(fileURL: fileURL, schemaVersion: schemaVersion,
             migrationBlock: { migration, oldSchemaVersion in
                 if let block = block {
                     block(migration: migration, oldSchemaVersion: oldSchemaVersion)
@@ -83,8 +72,8 @@ class MigrationTests: TestCase {
     }
 
     private func migrateAndTestDefaultRealm(schemaVersion: UInt64 = 1, block: MigrationBlock) {
-        migrateAndTestRealm(defaultRealmPath(), schemaVersion: schemaVersion, block: block)
-        let config = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()),
+        migrateAndTestRealm(defaultRealmURL(), schemaVersion: schemaVersion, block: block)
+        let config = Realm.Configuration(fileURL: defaultRealmURL(),
                                          schemaVersion: schemaVersion)
         Realm.Configuration.defaultConfiguration = config
     }
@@ -92,34 +81,34 @@ class MigrationTests: TestCase {
     // MARK Test cases
 
     func testSetDefaultRealmSchemaVersion() {
-        createAndTestRealmAtPath(defaultRealmPath())
+        createAndTestRealmAtURL(defaultRealmURL())
 
         var didRun = false
-        let config = Realm.Configuration(fileURL: NSURL(fileURLWithPath: defaultRealmPath()), schemaVersion: 1,
+        let config = Realm.Configuration(fileURL: defaultRealmURL(), schemaVersion: 1,
                                          migrationBlock: { _, _ in didRun = true })
         Realm.Configuration.defaultConfiguration = config
 
         migrateRealm()
 
         XCTAssertEqual(didRun, true)
-        XCTAssertEqual(1, try! schemaVersionAtURL(NSURL(fileURLWithPath: defaultRealmPath())))
+        XCTAssertEqual(1, try! schemaVersionAtURL(defaultRealmURL()))
     }
 
     func testSetSchemaVersion() {
-        createAndTestRealmAtPath(testRealmPath())
-        migrateAndTestRealm(testRealmPath())
+        createAndTestRealmAtURL(testRealmURL())
+        migrateAndTestRealm(testRealmURL())
 
-        XCTAssertEqual(1, try! schemaVersionAtURL(NSURL(fileURLWithPath: testRealmPath())))
+        XCTAssertEqual(1, try! schemaVersionAtURL(testRealmURL()))
     }
 
     func testSchemaVersionAtURL() {
         assertFails(.Fail) {
             // Version should throw before Realm creation
-            try schemaVersionAtURL(NSURL(fileURLWithPath: defaultRealmPath()))
+            try schemaVersionAtURL(defaultRealmURL())
         }
 
         _ = try! Realm()
-        XCTAssertEqual(0, try! schemaVersionAtURL(NSURL(fileURLWithPath: defaultRealmPath())),
+        XCTAssertEqual(0, try! schemaVersionAtURL(defaultRealmURL()),
                        "Initial version should be 0")
         assertFails(.Fail) {
             try schemaVersionAtURL(NSURL(fileURLWithPath: "/dev/null"))
@@ -127,23 +116,23 @@ class MigrationTests: TestCase {
     }
 
     func testMigrateRealm() {
-        createAndTestRealmAtPath(testRealmPath())
+        createAndTestRealmAtURL(testRealmURL())
 
         // manually migrate (autoMigration == false)
-        migrateAndTestRealm(testRealmPath(), shouldRun: true, autoMigration: false)
+        migrateAndTestRealm(testRealmURL(), shouldRun: true, autoMigration: false)
 
         // calling again should be no-op
-        migrateAndTestRealm(testRealmPath(), shouldRun: false, autoMigration: false)
+        migrateAndTestRealm(testRealmURL(), shouldRun: false, autoMigration: false)
 
         // test auto-migration
-        migrateAndTestRealm(testRealmPath(), schemaVersion: 2, shouldRun: true, autoMigration: true)
+        migrateAndTestRealm(testRealmURL(), schemaVersion: 2, shouldRun: true, autoMigration: true)
     }
 
     func testMigrationProperties() {
         let prop = RLMProperty(name: "stringCol", type: RLMPropertyType.Int, objectClassName: nil, indexed: false,
             optional: false)
         autoreleasepool {
-            realmWithSingleClassProperties(defaultRealmPath(), className: "SwiftStringObject", properties: [prop])
+            realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftStringObject", properties: [prop])
         }
 
         migrateAndTestDefaultRealm() { migration, oldSchemaVersion in
@@ -301,7 +290,8 @@ class MigrationTests: TestCase {
 
     func testDeleteData() {
         autoreleasepool {
-            let realm = realmWithSingleClassProperties(defaultRealmPath(), className: "DeletedClass", properties: [])
+            let realm = realmWithSingleClassProperties(defaultRealmURL(),
+                className: "DeletedClass", properties: [])
             try! realm.transactionWithBlock {
                 realm.createObject("DeletedClass", withValue: [])
             }
@@ -317,7 +307,7 @@ class MigrationTests: TestCase {
             XCTAssertTrue(migration.deleteData(SwiftStringObject.className()))
         }
 
-        let realm = dynamicRealm(defaultRealmPath())
+        let realm = dynamicRealm(defaultRealmURL())
         XCTAssertNil(realm.schema.schemaForClassName("DeletedClass"))
         XCTAssertEqual(0, realm.allObjects("SwiftStringObject").count)
     }
