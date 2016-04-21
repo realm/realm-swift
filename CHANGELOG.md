@@ -22,6 +22,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix a use-after-free when an associated object's dealloc method is used to
   remove observers from an RLMObject.
 * Fix a small memory leak each time a Realm file is opened.
+* Return a recoverable `RLMErrorAddressSpaceExhausted` error rather than
+  crash when there is insufficient available address space on Realm
+  initialization or write commit.
 
 0.98.8 Release notes (2016-04-15)
 =============================================================
@@ -37,8 +40,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* Fixed a bug that caused some encrypted files created using
-  `-[RLMRealm writeCopyToPath:encryptionKey:error:]` to fail to open.
+* None.
 
 0.98.7 Release notes (2016-04-13)
 =============================================================
