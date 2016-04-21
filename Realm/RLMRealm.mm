@@ -670,7 +670,7 @@ void RLMRealmTranslateException(NSError **error) {
     return RLMGetObject(self, className, primaryKey);
 }
 
-- (RLMObject *)objectWithClassName:(NSString *)className forObjectID:(id)objectID {
+- (RLMObject *)objectWithClassName:(NSString *)className withID:(id)objectID {
     return RLMGetObject(self, className, objectID);
 }
 

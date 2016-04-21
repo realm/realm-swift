@@ -1702,9 +1702,9 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
     [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"intCol": @5}];
     [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"intCol": @7}];
-    XCTAssertEqual([PrimaryStringObject objectInRealm:realm forObjectID:NSNull.null].intCol, 7);
+    XCTAssertEqual([PrimaryStringObject objectInRealm:realm withID:NSNull.null].intCol, 7);
     [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"stringCol": NSNull.null, @"intCol": @11}];
-    XCTAssertEqual([PrimaryStringObject objectInRealm:realm forObjectID:nil].intCol, 11);
+    XCTAssertEqual([PrimaryStringObject objectInRealm:realm withID:nil].intCol, 11);
 
     // upsert with new secondary property
     [PrimaryStringObject createOrUpdateInDefaultRealmWithValue:@[@"string", @3]];
@@ -1803,34 +1803,34 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [RLMRealm.defaultRealm commitWriteTransaction];
 
     // no PK
-    XCTAssertThrows([StringObject objectForObjectID:@""]);
-    XCTAssertThrows([IntObject objectForObjectID:@0]);
-    XCTAssertThrows([StringObject objectForObjectID:NSNull.null]);
-    XCTAssertThrows([StringObject objectForObjectID:nil]);
-    XCTAssertThrows([IntObject objectForObjectID:nil]);
+    XCTAssertThrows([StringObject objectWithID:@""]);
+    XCTAssertThrows([IntObject objectWithID:@0]);
+    XCTAssertThrows([StringObject objectWithID:NSNull.null]);
+    XCTAssertThrows([StringObject objectWithID:nil]);
+    XCTAssertThrows([IntObject objectWithID:nil]);
 
     // wrong PK type
-    XCTAssertThrows([PrimaryStringObject objectForObjectID:@0]);
-    XCTAssertThrows([PrimaryIntObject objectForObjectID:@""]);
-    XCTAssertThrows([PrimaryIntObject objectForObjectID:@""]);
-    XCTAssertThrows([PrimaryIntObject objectForObjectID:NSNull.null]);
-    XCTAssertThrows([PrimaryIntObject objectForObjectID:nil]);
+    XCTAssertThrows([PrimaryStringObject objectWithID:@0]);
+    XCTAssertThrows([PrimaryIntObject objectWithID:@""]);
+    XCTAssertThrows([PrimaryIntObject objectWithID:@""]);
+    XCTAssertThrows([PrimaryIntObject objectWithID:NSNull.null]);
+    XCTAssertThrows([PrimaryIntObject objectWithID:nil]);
 
     // no object with key
-    XCTAssertNil([PrimaryStringObject objectForObjectID:@"bad key"]);
-    XCTAssertNil([PrimaryIntObject objectForObjectID:@1]);
+    XCTAssertNil([PrimaryStringObject objectWithID:@"bad key"]);
+    XCTAssertNil([PrimaryIntObject objectWithID:@1]);
 
     // object with key exists
-    XCTAssertEqualObjects(strObj, [PrimaryStringObject objectForObjectID:@"key"]);
-    XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectForObjectID:NSNull.null]);
-    XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectForObjectID:nil]);
-    XCTAssertEqualObjects(intObj, [PrimaryIntObject objectForObjectID:@0]);
-    XCTAssertEqualObjects(nonNullIntObj, [PrimaryNullableIntObject objectForObjectID:@0]);
-    XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectForObjectID:NSNull.null]);
-    XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectForObjectID:nil]);
+    XCTAssertEqualObjects(strObj, [PrimaryStringObject objectWithID:@"key"]);
+    XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectWithID:NSNull.null]);
+    XCTAssertEqualObjects(nullStrObj, [PrimaryStringObject objectWithID:nil]);
+    XCTAssertEqualObjects(intObj, [PrimaryIntObject objectWithID:@0]);
+    XCTAssertEqualObjects(nonNullIntObj, [PrimaryNullableIntObject objectWithID:@0]);
+    XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectWithID:NSNull.null]);
+    XCTAssertEqualObjects(nullIntObj, [PrimaryNullableIntObject objectWithID:nil]);
 
     // nil realm throws
-    XCTAssertThrows([PrimaryIntObject objectInRealm:self.nonLiteralNil forObjectID:@0]);
+    XCTAssertThrows([PrimaryIntObject objectInRealm:self.nonLiteralNil withID:@0]);
 }
 
 - (void)testBacklinks {

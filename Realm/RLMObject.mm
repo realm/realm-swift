@@ -158,7 +158,7 @@
     return RLMGetObject(RLMRealm.defaultRealm, self.className, primaryKey);
 }
 
-+ (instancetype)objectForObjectID:(id)objectID {
++ (instancetype)objectWithID:(id)objectID {
     return RLMGetObject(RLMRealm.defaultRealm, self.className, objectID);
 }
 
@@ -166,7 +166,7 @@
     return RLMGetObject(realm, self.className, primaryKey);
 }
 
-+ (instancetype)objectInRealm:(RLMRealm *)realm forObjectID:(id)objectID {
++ (instancetype)objectInRealm:(RLMRealm *)realm withID:(id)objectID {
     return RLMGetObject(realm, self.className, objectID);
 }
 

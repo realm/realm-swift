@@ -332,7 +332,7 @@ RLM_ASSUME_NONNULL_BEGIN
  @return    An object of the subclass type or nil if an object with the given primary key does not exist.
  @see       -primaryKey
  */
-+ (nullable instancetype)objectForPrimaryKey:(nullable id)primaryKey DEPRECATED_MSG_ATTRIBUTE("use +[RLMObject objectForObjectID:]");
++ (nullable instancetype)objectForPrimaryKey:(nullable id)primaryKey DEPRECATED_MSG_ATTRIBUTE("use +[RLMObject objectWithID:]");
 
 /**
  Get the single object with the given object ID from the default Realm.
@@ -346,7 +346,7 @@ RLM_ASSUME_NONNULL_BEGIN
  @return    An object of the subclass type or nil if an object with the given object ID does not exist.
  @see       +objectID
  */
-+ (nullable instancetype)objectForObjectID:(nullable id)objectID;
++ (nullable instancetype)objectWithID:(nullable id)objectID;
 
 
 #pragma mark - Querying Specific Realms
@@ -395,7 +395,7 @@ RLM_ASSUME_NONNULL_BEGIN
  @return    An object of the subclass type or nil if an object with the given primary key does not exist.
  @see       -primaryKey
  */
-+ (nullable instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(nullable id)primaryKey DEPRECATED_MSG_ATTRIBUTE("use +[RLMObject objectInRealm:forObjectID:]");
++ (nullable instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(nullable id)primaryKey DEPRECATED_MSG_ATTRIBUTE("use +[RLMObject objectInRealm:withID:]");
 
 /**
  Get the single object with the given object ID from the specified Realm.
@@ -409,7 +409,7 @@ RLM_ASSUME_NONNULL_BEGIN
  @return    An object of the subclass type or nil if an object with the given object ID does not exist.
  @see       +objectID
  */
-+ (nullable instancetype)objectInRealm:(RLMRealm *)realm forObjectID:(nullable id)objectID;
++ (nullable instancetype)objectInRealm:(RLMRealm *)realm withID:(nullable id)objectID;
 
 #pragma mark - Other Instance Methods
 

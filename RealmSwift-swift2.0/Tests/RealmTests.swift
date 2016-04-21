@@ -496,10 +496,10 @@ class RealmTests: TestCase {
             realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
         }
 
-        XCTAssertNotNil(realm.objectForObjectID(SwiftPrimaryStringObject.self, id: "a"))
+        XCTAssertNotNil(realm.objectWithID(SwiftPrimaryStringObject.self, id: "a"))
 
         // When this is directly inside the XCTAssertNil, it fails for some reason
-        let missingObject = realm.objectForObjectID(SwiftPrimaryStringObject.self, id: "z")
+        let missingObject = realm.objectWithID(SwiftPrimaryStringObject.self, id: "z")
         XCTAssertNil(missingObject)
     }
 

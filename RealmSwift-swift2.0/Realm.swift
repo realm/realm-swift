@@ -409,7 +409,7 @@ public final class Realm {
 
     - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
-    @available(*, deprecated=1, message="Use Realm.objectForObjectID(_:id:)")
+    @available(*, deprecated=1, message="Use Realm.objectWithID(_:id:)")
     public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T? {
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), Optional<T>.self)
     }
@@ -428,7 +428,7 @@ public final class Realm {
 
     - returns: An object of type `type` or `nil` if an object with the given object ID does not exist.
     */
-    public func objectForObjectID<T: Object>(type: T.Type, id: AnyObject) -> T? {
+    public func objectWithID<T: Object>(type: T.Type, id: AnyObject) -> T? {
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), id), Optional<T>.self)
     }
 
@@ -462,7 +462,7 @@ public final class Realm {
     /**
     This method is useful only in specialized circumstances, for example, when building
     components that integrate with Realm. If you are simply building an app on Realm, it is
-    recommended to use the typed method `objectForObjectID(_:key:)`.
+    recommended to use the typed method `objectWithID(_:key:)`.
 
     Get a dynamic object with the given class name and object ID.
 

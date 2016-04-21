@@ -104,7 +104,7 @@
  
  @see       RLMObject objectForPrimaryKey:
  */
-- (RLMObject *)objectWithClassName:(NSString *)className forPrimaryKey:(id)primaryKey DEPRECATED_MSG_ATTRIBUTE("use -[RLMRealm objectWithClassName:forObjectID:]");
+- (RLMObject *)objectWithClassName:(NSString *)className forPrimaryKey:(id)primaryKey DEPRECATED_MSG_ATTRIBUTE("use -[RLMRealm objectWithClassName:withID:]");
 
 /**
  This method is useful only in specialized circumstances, for example, when building components
@@ -122,9 +122,9 @@
  
  @return    An object or nil if an object with the given object ID does not exist.
  
- @see       RLMObject objectForObjectID:
+ @see       RLMObject objectWithID:
  */
-- (RLMObject *)objectWithClassName:(NSString *)className forObjectID:(id)objectID;
+- (RLMObject *)objectWithClassName:(NSString *)className withID:(id)objectID;
 
 /**
  This method is useful only in specialized circumstances, for example, when building components

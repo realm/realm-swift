@@ -13,8 +13,8 @@ x.x.x Release notes (yyyy-MM-dd)
 |:--------------------------------------------|:------------------------------------------|
 | `-[RLMRealm removeNotification:]`           | `-[RLMNotificationToken stop]`            |
 | `+[RLMObject primaryKey]`                   | `+[RLMObject objectID]`                   |
-| `+[RLMObject objectForPrimaryKey:]`         | `+[RLMObject objectForObjectID:]`         |
-| `+[RLMObject objectInRealm:forPrimaryKey:]` | `+[RLMObject objectInRealm:forObjectID:]` |
+| `+[RLMObject objectForPrimaryKey:]`         | `+[RLMObject objectWithID:]`              |
+| `+[RLMObject objectInRealm:forPrimaryKey:]` | `+[RLMObject objectInRealm:withID:]`      |
 | `-[RLMObjectSchema primaryKeyProperty]`     | `-[RLMObjectSchema objectIDProperty]`     |
 | `RLMRealm.path`                             | `RLMConfiguration.path`                   |
 | `RLMRealm.readOnly`                         | `RLMConfiguration.readOnly`               |
@@ -25,7 +25,7 @@ x.x.x Release notes (yyyy-MM-dd)
 |:------------------------------------|:---------------------------------|
 | `Realm.removeNotification(_:)`      | `NotificationToken.stop()`       |
 | `Object.primaryKey()`               | `Object.objectID()`              |
-| `Realm.objectForPrimaryKey(_:key:)` | `Realm.objectForObjectID(_:id:)` |
+| `Realm.objectForPrimaryKey(_:key:)` | `Realm.objectWithID(_:id:)`      |
 | `ObjectSchema.primaryKeyProperty`   | `ObjectSchema.objectIDProperty`  |
 | `Realm.path`                        | `Realm.Configuration.fileURL`    |
 | `Realm.readOnly`                    | `Realm.Configuration.readOnly`   |
