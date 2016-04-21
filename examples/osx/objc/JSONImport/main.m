@@ -40,7 +40,7 @@ int main(int argc, const char * argv[])
         dateFormatter.dateFormat = @"MMMM dd, yyyy";
         dateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
 
-        [[NSFileManager defaultManager] removeItemAtPath:[RLMRealmConfiguration defaultConfiguration].path
+        [[NSFileManager defaultManager] removeItemAtURL:[RLMRealmConfiguration defaultConfiguration].fileURL
                                                    error:nil];
 
         RLMRealm *realm = [RLMRealm defaultRealm];
