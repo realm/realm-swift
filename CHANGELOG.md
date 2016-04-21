@@ -12,9 +12,9 @@ x.x.x Release notes (yyyy-MM-dd)
 | Deprecated API                                         | New API                                                   |
 |:-------------------------------------------------------|:----------------------------------------------------------|
 | `-[RLMRealm removeNotification:]`                      | `-[RLMNotificationToken stop]`                            |
-| `RLMRealmConfiguration.path`                           | `RLMConfiguration.fileURL`                                |
-| `RLMRealm.path`                                        | `RLMConfiguration.fileURL`                                |
-| `RLMRealm.readOnly`                                    | `RLMConfiguration.readOnly`                               |
+| `RLMRealmConfiguration.path`                           | `RLMRealmConfiguration.fileURL`                           |
+| `RLMRealm.path`                                        | `RLMRealmConfiguration.fileURL`                           |
+| `RLMRealm.readOnly`                                    | `RLMRealmConfiguration.readOnly`                          |
 | `+[RLMRealm realmWithPath:]`                           | `+[RLMRealm realmWithFileURL:]`                           |
 | `+[RLMRealm writeCopyToPath:error:]`                   | `+[RLMRealm writeCopyToFileURL:encryptionKey:error:]`     |
 | `+[RLMRealm writeCopyToPath:encryptionKey:error:]`     | `+[RLMRealm writeCopyToFileURL:encryptionKey:error:]`     |
