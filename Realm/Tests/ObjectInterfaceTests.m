@@ -20,15 +20,15 @@
 
 #pragma mark - Test Objects
 
-@interface PrimaryKeyWithLinkObject : RLMObject
-@property NSString *primaryKey;
+@interface ObjectIDWithLinkObject : RLMObject
+@property NSString *objectID;
 @property StringObject *string;
 @end
 
-@implementation PrimaryKeyWithLinkObject
-+ (NSString *)primaryKey
+@implementation ObjectIDWithLinkObject
++ (NSString *)objectID
 {
-    return @"primaryKey";
+    return @"objectID";
 }
 @end
 
@@ -89,8 +89,8 @@
 {
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
-    PrimaryKeyWithLinkObject *object = [PrimaryKeyWithLinkObject createInRealm:realm withValue:@[@"", @[@""]]];
-    PrimaryKeyWithLinkObject *returnedObject = [PrimaryKeyWithLinkObject createOrUpdateInRealm:realm withValue:object];
+    ObjectIDWithLinkObject *object = [ObjectIDWithLinkObject createInRealm:realm withValue:@[@"", @[@""]]];
+    ObjectIDWithLinkObject *returnedObject = [ObjectIDWithLinkObject createOrUpdateInRealm:realm withValue:object];
     XCTAssertEqual(object, returnedObject);
     [realm commitWriteTransaction];
 }

@@ -258,7 +258,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 
 - (BOOL)isEqual:(id)object {
     if (RLMObjectBase *other = RLMDynamicCast<RLMObjectBase>(object)) {
-        if (_objectSchema.primaryKeyProperty) {
+        if (_objectSchema.objectIDProperty) {
             return RLMObjectBaseAreEqual(self, other);
         }
     }
@@ -266,11 +266,11 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 }
 
 - (NSUInteger)hash {
-    if (_objectSchema.primaryKeyProperty) {
-        id primaryProperty = [self valueForKey:_objectSchema.primaryKeyProperty.name];
+    if (_objectSchema.objectIDProperty) {
+        id objectIDProperty = [self valueForKey:_objectSchema.objectIDProperty.name];
 
-        // modify the hash of our primary key value to avoid potential (although unlikely) collisions
-        return [primaryProperty hash] ^ 1;
+        // modify the hash of our object ID value to avoid potential (although unlikely) collisions
+        return [objectIDProperty hash] ^ 1;
     }
     else {
         return [super hash];

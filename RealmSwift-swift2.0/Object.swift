@@ -148,7 +148,18 @@ public class Object: RLMObjectBase {
 
     - returns: Name of the property designated as the primary key, or `nil` if the model has no primary key.
     */
+    @available(*, deprecated=1, message="Use Object.objectID()")
     public class func primaryKey() -> String? { return nil }
+
+    /**
+    Override to designate a property as the object ID for an `Object` subclass. Only properties of
+    type String and Int can be designated as the object ID. Primary key
+    properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
+    Indexes are created automatically for object ID properties.
+
+    - returns: Name of the property designated as the object ID, or `nil` if the model has no object ID.
+    */
+    public class func objectID() -> String? { return nil }
 
     /**
     Override to return an array of property names to ignore. These properties will not be persisted

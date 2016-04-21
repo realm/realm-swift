@@ -3,14 +3,32 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* Deprecate `-[RLMRealm removeNotification:]` in favor of
-  `-[RLMNotificationToken stop]`.
-* `RLMRealm.path` and `RLMRealm.readOnly` have been deprecated in favor of their
-  counterparts on `RLMRealmConfiguration`.
 * Deprecate properties of type `id`/`AnyObject`. This type was rarely used,
   rarely useful and unsupported in every other Realm binding.
 * The block for `-[RLMArray addNotificationBlock:]` and
   `-[RLMResults addNotificationBlock:]` now takes another parameter.
+* The following Objective-C APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API                              | New API                                   |
+|:--------------------------------------------|:------------------------------------------|
+| `-[RLMRealm removeNotification:]`           | `-[RLMNotificationToken stop]`            |
+| `+[RLMObject primaryKey]`                   | `+[RLMObject objectID]`                   |
+| `+[RLMObject objectForPrimaryKey:]`         | `+[RLMObject objectWithID:]`              |
+| `+[RLMObject objectInRealm:forPrimaryKey:]` | `+[RLMObject objectInRealm:withID:]`      |
+| `-[RLMObjectSchema primaryKeyProperty]`     | `-[RLMObjectSchema objectIDProperty]`     |
+| `RLMRealm.path`                             | `RLMConfiguration.path`                   |
+| `RLMRealm.readOnly`                         | `RLMConfiguration.readOnly`               |
+
+* The following Swift APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API                      | New API                          |
+|:------------------------------------|:---------------------------------|
+| `Realm.removeNotification(_:)`      | `NotificationToken.stop()`       |
+| `Object.primaryKey()`               | `Object.objectID()`              |
+| `Realm.objectForPrimaryKey(_:key:)` | `Realm.objectWithID(_:id:)`      |
+| `ObjectSchema.primaryKeyProperty`   | `ObjectSchema.objectIDProperty`  |
+| `Realm.path`                        | `Realm.Configuration.fileURL`    |
+| `Realm.readOnly`                    | `Realm.Configuration.readOnly`   |
 
 ### Enhancements
 

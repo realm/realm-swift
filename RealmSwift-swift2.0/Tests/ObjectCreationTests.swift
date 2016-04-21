@@ -328,7 +328,7 @@ class ObjectCreationTests: TestCase {
         let standalone1 = SwiftPrimaryStringObject(value: ["p3", 11])
         try! Realm().beginWrite()
         assertThrows(try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p3", ["p3", 11], [standalone1]]),
-            "Should throw with duplicate primary key")
+            "Should throw with duplicate object ID")
         try! Realm().commitWrite()
     }
 

@@ -56,7 +56,7 @@ FOUNDATION_EXTERN BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType);
 // private properties
 @property (nonatomic, assign) char objcType;
 @property (nonatomic, copy) NSString *objcRawType;
-@property (nonatomic, assign) BOOL isPrimary;
+@property (nonatomic, assign) BOOL isObjectID;
 @property (nonatomic, assign) Ivar swiftIvar;
 @property (nonatomic, assign) NSUInteger declarationIndex;
 

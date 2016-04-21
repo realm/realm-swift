@@ -28,12 +28,12 @@ using namespace realm;
 ObjectSchema::ObjectSchema() = default;
 ObjectSchema::~ObjectSchema() = default;
 
-ObjectSchema::ObjectSchema(std::string name, std::string primary_key, std::initializer_list<Property> properties)
+ObjectSchema::ObjectSchema(std::string name, std::string object_id, std::initializer_list<Property> properties)
 : name(std::move(name))
 , properties(properties)
-, primary_key(std::move(primary_key))
+, object_id(std::move(object_id))
 {
-    set_primary_key_property();
+    set_object_id_property();
 }
 
 ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(name) {
@@ -46,7 +46,7 @@ ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(n
         property.name = table->get_column_name(col).data();
         property.type = (PropertyType)table->get_column_type(col);
         property.is_indexed = table->has_search_index(col);
-        property.is_primary = false;
+        property.is_object_id = false;
         property.is_nullable = table->is_nullable(col) || property.type == PropertyType::Object;
         property.table_column = col;
         if (property.type == PropertyType::Object || property.type == PropertyType::Array) {
@@ -57,8 +57,8 @@ ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(n
         properties.push_back(std::move(property));
     }
 
-    primary_key = realm::ObjectStore::get_primary_key_for_object(group, name);
-    set_primary_key_property();
+    object_id = realm::ObjectStore::get_object_id_for_object(group, name);
+    set_object_id_property();
 }
 
 Property *ObjectSchema::property_for_name(StringData name) {
@@ -74,13 +74,13 @@ const Property *ObjectSchema::property_for_name(StringData name) const {
     return const_cast<ObjectSchema *>(this)->property_for_name(name);
 }
 
-void ObjectSchema::set_primary_key_property()
+void ObjectSchema::set_object_id_property()
 {
-    if (primary_key.length()) {
-        auto primary_key_prop = primary_key_property();
-        if (!primary_key_prop) {
-            throw InvalidPrimaryKeyException(name, primary_key);
+    if (object_id.length()) {
+        auto object_id_prop = object_id_property();
+        if (!object_id_prop) {
+            throw InvalidObjectIDException(name, object_id);
         }
-        primary_key_prop->is_primary = true;
+        object_id_prop->is_object_id = true;
     }
 }

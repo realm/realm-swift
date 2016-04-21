@@ -89,10 +89,10 @@
 }
 
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value {
-    // verify primary key
+    // verify object ID
     RLMObjectSchema *schema = [self sharedSchema];
-    if (!schema.primaryKeyProperty) {
-        NSString *reason = [NSString stringWithFormat:@"'%@' does not have a primary key and can not be updated", schema.className];
+    if (!schema.objectIDProperty) {
+        NSString *reason = [NSString stringWithFormat:@"'%@' does not have an object ID and can not be updated", schema.className];
         @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
     }
     return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, true);
@@ -158,8 +158,16 @@
     return RLMGetObject(RLMRealm.defaultRealm, self.className, primaryKey);
 }
 
++ (instancetype)objectWithID:(id)objectID {
+    return RLMGetObject(RLMRealm.defaultRealm, self.className, objectID);
+}
+
 + (instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(id)primaryKey {
     return RLMGetObject(realm, self.className, primaryKey);
+}
+
++ (instancetype)objectInRealm:(RLMRealm *)realm withID:(id)objectID {
+    return RLMGetObject(realm, self.className, objectID);
 }
 
 #pragma mark - Other Instance Methods
@@ -187,6 +195,10 @@
 }
 
 + (NSString *)primaryKey {
+    return nil;
+}
+
++ (NSString *)objectID {
     return nil;
 }
 

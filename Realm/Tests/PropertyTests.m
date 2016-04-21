@@ -37,7 +37,7 @@
                                                 @"\ttype = object;\n"
                                                 @"\tobjectClassName = StringObject;\n"
                                                 @"\tindexed = NO;\n"
-                                                @"\tisPrimary = NO;\n"
+                                                @"\tisObjectID = NO;\n"
                                                 @"\toptional = YES;\n"
                                                 @"}");
 }
@@ -75,12 +75,12 @@
         RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES optional:optionalsEnabled];
         XCTAssertTrue([stringProperty isEqualToProperty:expectedProperty]);
     }
-    // Test primary key property
+    // Test object ID property
     {
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[PrimaryStringObject class]];
         RLMProperty *stringProperty = objectSchema[@"stringCol"];
         RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES optional:optionalsEnabled];
-        expectedProperty.isPrimary = YES;
+        expectedProperty.isObjectID = YES;
         XCTAssertTrue([stringProperty isEqualToProperty:expectedProperty]);
     }
 }

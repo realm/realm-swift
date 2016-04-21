@@ -421,7 +421,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     prop->_setterName = _setterName;
     prop->_getterSel = _getterSel;
     prop->_setterSel = _setterSel;
-    prop->_isPrimary = _isPrimary;
+    prop->_isObjectID = _isObjectID;
     prop->_swiftIvar = _swiftIvar;
     prop->_optional = _optional;
     prop->_declarationIndex = _declarationIndex;
@@ -432,14 +432,14 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 - (BOOL)isEqualToProperty:(RLMProperty *)property {
     return _type == property->_type
         && _indexed == property->_indexed
-        && _isPrimary == property->_isPrimary
+        && _isObjectID == property->_isObjectID
         && _optional == property->_optional
         && [_name isEqualToString:property->_name]
         && (_objectClassName == property->_objectClassName  || [_objectClassName isEqualToString:property->_objectClassName]);
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@ {\n\ttype = %@;\n\tobjectClassName = %@;\n\tindexed = %@;\n\tisPrimary = %@;\n\toptional = %@;\n}", self.name, RLMTypeToString(self.type), self.objectClassName, self.indexed ? @"YES" : @"NO", self.isPrimary ? @"YES" : @"NO", self.optional ? @"YES" : @"NO"];
+    return [NSString stringWithFormat:@"%@ {\n\ttype = %@;\n\tobjectClassName = %@;\n\tindexed = %@;\n\tisObjectID = %@;\n\toptional = %@;\n}", self.name, RLMTypeToString(self.type), self.objectClassName, self.indexed ? @"YES" : @"NO", self.isObjectID ? @"YES" : @"NO", self.optional ? @"YES" : @"NO"];
 }
 
 @end

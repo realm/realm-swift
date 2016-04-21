@@ -95,12 +95,12 @@ class ObjectTests: TestCase {
         // swiftlint:enable line_length
     }
 
-    func testPrimaryKey() {
-        XCTAssertNil(Object.primaryKey(), "primary key should default to nil")
-        XCTAssertNil(SwiftStringObject.primaryKey())
-        XCTAssertNil(SwiftStringObject().objectSchema.primaryKeyProperty)
-        XCTAssertEqual(SwiftPrimaryStringObject.primaryKey()!, "stringCol")
-        XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
+    func testObjectID() {
+        XCTAssertNil(Object.objectID(), "object ID should default to nil")
+        XCTAssertNil(SwiftStringObject.objectID())
+        XCTAssertNil(SwiftStringObject().objectSchema.objectIDProperty)
+        XCTAssertEqual(SwiftPrimaryStringObject.objectID()!, "stringCol")
+        XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.objectIDProperty!.name, "stringCol")
     }
 
     func testIgnoredProperties() {

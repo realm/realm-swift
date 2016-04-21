@@ -39,7 +39,7 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
         Table *table = objectSchema.table;
         for (RLMProperty *property in objectSchema.properties) {
             XCTAssertEqual(property.column, table->get_column_index(RLMStringDataWithNSString(property.name)));
-            XCTAssertEqual(property.indexed || property.isPrimary, table->has_search_index(property.column));
+            XCTAssertEqual(property.indexed || property.isObjectID, table->has_search_index(property.column));
         }
     }
 }
@@ -53,22 +53,22 @@ RLM_ARRAY_TYPE(MigrationObject);
 @implementation MigrationObject
 @end
 
-@interface MigrationPrimaryKeyObject : RLMObject
+@interface MigrationObjectIDObject : RLMObject
 @property int intCol;
 @end
 
-@implementation MigrationPrimaryKeyObject
-+ (NSString *)primaryKey {
+@implementation MigrationObjectIDObject
++ (NSString *)objectID {
     return @"intCol";
 }
 @end
 
-@interface MigrationStringPrimaryKeyObject : RLMObject
+@interface MigrationStringObjectIDObject : RLMObject
 @property NSString * stringCol;
 @end
 
-@implementation MigrationStringPrimaryKeyObject
-+ (NSString *)primaryKey {
+@implementation MigrationStringObjectIDObject
++ (NSString *)objectID {
     return @"stringCol";
 }
 @end
@@ -313,30 +313,30 @@ RLM_ARRAY_TYPE(MigrationObject);
     [self assertNoMigrationRequiredForChangeFrom:@[from] to:@[to]];
 }
 
-- (void)testAddingPrimaryKeyRequiresMigration {
+- (void)testAddingObjectIDRequiresMigration {
     RLMObjectSchema *from = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
 
     RLMObjectSchema *to = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
-    to.primaryKeyProperty = to.properties[0];
+    to.objectIDProperty = to.properties[0];
 
     [self assertMigrationRequiredForChangeFrom:@[from] to:@[to]];
 }
 
-- (void)testRemovingPrimaryKeyRequiresMigration {
+- (void)testRemovingObjectIDRequiresMigration {
     RLMObjectSchema *from = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
-    from.primaryKeyProperty = from.properties[0];
+    from.objectIDProperty = from.properties[0];
 
     RLMObjectSchema *to = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
 
     [self assertMigrationRequiredForChangeFrom:@[from] to:@[to]];
 }
 
-- (void)testChangingPrimaryKeyRequiresMigration {
+- (void)testChangingObjectIDRequiresMigration {
     RLMObjectSchema *from = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
-    from.primaryKeyProperty = from.properties[0];
+    from.objectIDProperty = from.properties[0];
 
     RLMObjectSchema *to = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
-    to.primaryKeyProperty = to.properties[1];
+    to.objectIDProperty = to.properties[1];
 
     [self assertMigrationRequiredForChangeFrom:@[from] to:@[to]];
 }
@@ -791,28 +791,28 @@ RLM_ARRAY_TYPE(MigrationObject);
 }
 
 - (void)testMakingPropertyPrimaryPreservesValues {
-    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationStringPrimaryKeyObject.class];
-    objectSchema.primaryKeyProperty = nil;
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationStringObjectIDObject.class];
+    objectSchema.objectIDProperty = nil;
 
     [self createTestRealmWithSchema:@[objectSchema] block:^(RLMRealm *realm) {
-        [realm createObject:MigrationStringPrimaryKeyObject.className withValue:@[@"1"]];
-        [realm createObject:MigrationStringPrimaryKeyObject.className withValue:@[@"2"]];
+        [realm createObject:MigrationStringObjectIDObject.className withValue:@[@"1"]];
+        [realm createObject:MigrationStringObjectIDObject.className withValue:@[@"2"]];
     }];
 
     RLMRealm *realm = [self migrateTestRealmWithBlock:nil];
-    RLMResults *objects = [MigrationStringPrimaryKeyObject allObjectsInRealm:realm];
+    RLMResults *objects = [MigrationStringObjectIDObject allObjectsInRealm:realm];
     XCTAssertEqualObjects(@"1", [objects[0] stringCol]);
     XCTAssertEqualObjects(@"2", [objects[1] stringCol]);
 }
 
-- (void)testAddingPrimaryKeyShouldRejectDuplicateValues {
+- (void)testAddingObjectIDShouldRejectDuplicateValues {
     // make the pk non-primary so that we can add duplicate values
-    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
-    objectSchema.primaryKeyProperty = nil;
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObjectIDObject.class];
+    objectSchema.objectIDProperty = nil;
     [self createTestRealmWithSchema:@[objectSchema] block:^(RLMRealm *realm) {
         // populate with values that will be invalid when the property is made primary
-        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
-        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
+        [realm createObject:MigrationObjectIDObject.className withValue:@[@1]];
+        [realm createObject:MigrationObjectIDObject.className withValue:@[@1]];
     }];
 
     // Fails due to duplicate values
@@ -822,7 +822,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     RLMRealm *realm = [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t) {
         NSMutableSet *seen = [NSMutableSet set];
         __block bool duplicateDeleted = false;
-        [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
+        [migration enumerateObjects:@"MigrationObjectIDObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
            if ([seen containsObject:newObject[@"intCol"]]) {
                duplicateDeleted = true;
                [migration deleteObject:newObject];
@@ -835,15 +835,15 @@ RLM_ARRAY_TYPE(MigrationObject);
     }];
 
     // make sure deletion occurred
-    XCTAssertEqual(1U, [[MigrationPrimaryKeyObject allObjectsInRealm:realm] count]);
+    XCTAssertEqual(1U, [[MigrationObjectIDObject allObjectsInRealm:realm] count]);
 }
 
 - (void)testIncompleteMigrationIsRolledBack {
-    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
-    objectSchema.primaryKeyProperty = nil;
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObjectIDObject.class];
+    objectSchema.objectIDProperty = nil;
     [self createTestRealmWithSchema:@[objectSchema] block:^(RLMRealm *realm) {
-        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
-        [realm createObject:MigrationPrimaryKeyObject.className withValue:@[@1]];
+        [realm createObject:MigrationObjectIDObject.className withValue:@[@1]];
+        [realm createObject:MigrationObjectIDObject.className withValue:@[@1]];
     }];
 
     // fail to apply migration

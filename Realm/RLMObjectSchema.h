@@ -50,7 +50,12 @@ RLM_ASSUME_NONNULL_BEGIN
 /**
  The property which is the primary key for this object (if any).
  */
-@property (nonatomic, readonly, nullable) RLMProperty *primaryKeyProperty;
+@property (nonatomic, readonly, nullable) RLMProperty *primaryKeyProperty DEPRECATED_MSG_ATTRIBUTE("use objectIDProperty");
+
+/**
+ The property which is the object ID for this object (if any).
+ */
+@property (nonatomic, readonly, nullable) RLMProperty *objectIDProperty;
 
 #pragma mark - Methods
 

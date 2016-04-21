@@ -65,7 +65,7 @@ void Schema::validate() const
 {
     std::vector<ObjectSchemaValidationException> exceptions;
     for (auto const& object : *this) {
-        const Property *primary = nullptr;
+        const Property *object_id = nullptr;
         for (auto const& prop : object.properties) {
             // check object_type existence
             if (!prop.object_type.empty() && find(prop.object_type) == end()) {
@@ -82,12 +82,12 @@ void Schema::validate() const
                 exceptions.emplace_back(InvalidNullabilityException(object.name, prop));
             }
 
-            // check primary keys
-            if (prop.is_primary) {
-                if (primary) {
-                    exceptions.emplace_back(DuplicatePrimaryKeysException(object.name));
+            // check object IDs
+            if (prop.is_object_id) {
+                if (object_id) {
+                    exceptions.emplace_back(DuplicateObjectIDsException(object.name));
                 }
-                primary = &prop;
+                object_id = &prop;
             }
 
             // check indexable

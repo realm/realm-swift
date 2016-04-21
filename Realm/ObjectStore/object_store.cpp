@@ -34,11 +34,11 @@ const char * const c_metadataTableName = "metadata";
 const char * const c_versionColumnName = "version";
 const size_t c_versionColumnIndex = 0;
 
-const char * const c_primaryKeyTableName = "pk";
-const char * const c_primaryKeyObjectClassColumnName = "pk_table";
-const size_t c_primaryKeyObjectClassColumnIndex =  0;
-const char * const c_primaryKeyPropertyNameColumnName = "pk_property";
-const size_t c_primaryKeyPropertyNameColumnIndex =  1;
+const char * const c_objectIDTableName = "pk";
+const char * const c_objectIDObjectClassColumnName = "pk_table";
+const size_t c_objectIDObjectClassColumnIndex =  0;
+const char * const c_objectIDPropertyNameColumnName = "pk_property";
+const size_t c_objectIDPropertyNameColumnIndex =  1;
 
 const size_t c_zeroRowIndex = 0;
 
@@ -48,14 +48,14 @@ const char c_object_table_prefix[] = "class_";
 const uint64_t ObjectStore::NotVersioned = std::numeric_limits<uint64_t>::max();
 
 bool ObjectStore::has_metadata_tables(const Group *group) {
-    return group->get_table(c_primaryKeyTableName) && group->get_table(c_metadataTableName);
+    return group->get_table(c_objectIDTableName) && group->get_table(c_metadataTableName);
 }
 
 void ObjectStore::create_metadata_tables(Group *group) {
-    TableRef table = group->get_or_add_table(c_primaryKeyTableName);
+    TableRef table = group->get_or_add_table(c_objectIDTableName);
     if (table->get_column_count() == 0) {
-        table->add_column(type_String, c_primaryKeyObjectClassColumnName);
-        table->add_column(type_String, c_primaryKeyPropertyNameColumnName);
+        table->add_column(type_String, c_objectIDObjectClassColumnName);
+        table->add_column(type_String, c_objectIDPropertyNameColumnName);
     }
 
     table = group->get_or_add_table(c_metadataTableName);
@@ -81,36 +81,36 @@ void ObjectStore::set_schema_version(Group *group, uint64_t version) {
     table->set_int(c_versionColumnIndex, c_zeroRowIndex, version);
 }
 
-StringData ObjectStore::get_primary_key_for_object(const Group *group, StringData object_type) {
-    ConstTableRef table = group->get_table(c_primaryKeyTableName);
+StringData ObjectStore::get_object_id_for_object(const Group *group, StringData object_type) {
+    ConstTableRef table = group->get_table(c_objectIDTableName);
     if (!table) {
         return "";
     }
-    size_t row = table->find_first_string(c_primaryKeyObjectClassColumnIndex, object_type);
+    size_t row = table->find_first_string(c_objectIDObjectClassColumnIndex, object_type);
     if (row == not_found) {
         return "";
     }
-    return table->get_string(c_primaryKeyPropertyNameColumnIndex, row);
+    return table->get_string(c_objectIDPropertyNameColumnIndex, row);
 }
 
-void ObjectStore::set_primary_key_for_object(Group *group, StringData object_type, StringData primary_key) {
-    TableRef table = group->get_table(c_primaryKeyTableName);
+void ObjectStore::set_object_id_for_object(Group *group, StringData object_type, StringData object_id) {
+    TableRef table = group->get_table(c_objectIDTableName);
 
     // get row or create if new object and populate
-    size_t row = table->find_first_string(c_primaryKeyObjectClassColumnIndex, object_type);
-    if (row == not_found && primary_key.size()) {
+    size_t row = table->find_first_string(c_objectIDObjectClassColumnIndex, object_type);
+    if (row == not_found && object_id.size()) {
         row = table->add_empty_row();
-        table->set_string(c_primaryKeyObjectClassColumnIndex, row, object_type);
+        table->set_string(c_objectIDObjectClassColumnIndex, row, object_type);
     }
 
     // set if changing, or remove if setting to nil
-    if (primary_key.size() == 0) {
+    if (object_id.size() == 0) {
         if (row != not_found) {
             table->remove(row);
         }
     }
     else {
-        table->set_string(c_primaryKeyPropertyNameColumnIndex, row, primary_key);
+        table->set_string(c_objectIDPropertyNameColumnIndex, row, object_id);
     }
 }
 
@@ -192,9 +192,9 @@ std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(O
         target_prop->table_column = current_prop.table_column;
     }
 
-    // check for change to primary key
-    if (table_schema.primary_key != target_schema.primary_key) {
-        exceptions.emplace_back(ChangedPrimaryKeyException(table_schema.name, table_schema.primary_key, target_schema.primary_key));
+    // check for change to object ID
+    if (table_schema.object_id != target_schema.object_id) {
+        exceptions.emplace_back(ChangedObjectIDException(table_schema.name, table_schema.object_id, target_schema.object_id));
     }
 
     // check for new missing properties
@@ -344,15 +344,15 @@ void ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
         }
 
         // update table metadata
-        if (target_object_schema->primary_key.length()) {
-            // if there is a primary key set, check if it is the same as the old key
-            if (current_schema.primary_key != target_object_schema->primary_key) {
-                set_primary_key_for_object(group, target_object_schema->name, target_object_schema->primary_key);
+        if (target_object_schema->object_id.length()) {
+            // if there is an object ID set, check if it is the same as the old key
+            if (current_schema.object_id != target_object_schema->object_id) {
+                set_object_id_for_object(group, target_object_schema->name, target_object_schema->object_id);
             }
         }
-        else if (current_schema.primary_key.length()) {
-            // there is no primary key, so if there was one nil out
-            set_primary_key_for_object(group, target_object_schema->name, "");
+        else if (current_schema.object_id.length()) {
+            // there is no object ID, so if there was one nil out
+            set_object_id_for_object(group, target_object_schema->name, "");
         }
     }
 }
@@ -417,7 +417,7 @@ void ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
     if (get_schema_version(group) != ObjectStore::NotVersioned) {
         migration(group, schema);
 
-        validate_primary_column_uniqueness(group, schema);
+        validate_object_id_column_uniqueness(group, schema);
     }
 
     set_schema_version(group, version);
@@ -464,16 +464,16 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
     return changed;
 }
 
-void ObjectStore::validate_primary_column_uniqueness(const Group *group, Schema const& schema) {
+void ObjectStore::validate_object_id_column_uniqueness(const Group *group, Schema const& schema) {
     for (auto& object_schema : schema) {
-        auto primary_prop = object_schema.primary_key_property();
-        if (!primary_prop) {
+        auto object_id_prop = object_schema.object_id_property();
+        if (!object_id_prop) {
             continue;
         }
 
         ConstTableRef table = table_for_object_type(group, object_schema.name);
-        if (table->get_distinct_view(primary_prop->table_column).size() != table->size()) {
-            throw DuplicatePrimaryKeyValueException(object_schema.name, *primary_prop);
+        if (table->get_distinct_view(object_id_prop->table_column).size() != table->size()) {
+            throw DuplicateObjectIDValueException(object_schema.name, *object_id_prop);
         }
     }
 }
@@ -482,7 +482,7 @@ void ObjectStore::delete_data_for_object(Group *group, StringData object_type) {
     TableRef table = table_for_object_type(group, object_type);
     if (table) {
         group->remove_table(table->get_index_in_group());
-        set_primary_key_for_object(group, object_type, "");
+        set_object_id_for_object(group, object_type, "");
     }
 }
 
@@ -506,10 +506,10 @@ InvalidSchemaVersionException::InvalidSchemaVersionException(uint64_t old_versio
     m_what = "Provided schema version " + std::to_string(new_version) + " is less than last set version " + std::to_string(old_version) + ".";
 }
 
-DuplicatePrimaryKeyValueException::DuplicatePrimaryKeyValueException(std::string const& object_type, Property const& property) :
+DuplicateObjectIDValueException::DuplicateObjectIDValueException(std::string const& object_type, Property const& property) :
     m_object_type(object_type), m_property(property)
 {
-    m_what = "Primary key property '" + property.name + "' has duplicate values after migration.";
+    m_what = "Object ID property '" + property.name + "' has duplicate values after migration.";
 }
 
 SchemaValidationException::SchemaValidationException(std::vector<ObjectSchemaValidationException> const& errors) :
@@ -580,24 +580,24 @@ MismatchedPropertiesException::MismatchedPropertiesException(std::string const& 
     }
 }
 
-ChangedPrimaryKeyException::ChangedPrimaryKeyException(std::string const& object_type, std::string const& old_primary, std::string const& new_primary) : ObjectSchemaValidationException(object_type), m_old_primary(old_primary), m_new_primary(new_primary)
+ChangedObjectIDException::ChangedObjectIDException(std::string const& object_type, std::string const& old_object_id, std::string const& new_object_id) : ObjectSchemaValidationException(object_type), m_old_object_id(old_object_id), m_new_object_id(new_object_id)
 {
-    if (old_primary.size()) {
-        m_what = "Property '" + old_primary + "' is no longer a primary key.";
+    if (old_object_id.size()) {
+        m_what = "Property '" + old_object_id + "' is no longer an object ID.";
     }
     else {
-        m_what = "Property '" + new_primary + "' has been made a primary key.";
+        m_what = "Property '" + new_object_id + "' has been made an object ID.";
     }
 }
 
-InvalidPrimaryKeyException::InvalidPrimaryKeyException(std::string const& object_type, std::string const& primary) :
-    ObjectSchemaValidationException(object_type), m_primary_key(primary)
+InvalidObjectIDException::InvalidObjectIDException(std::string const& object_type, std::string const& object_id) :
+    ObjectSchemaValidationException(object_type), m_object_id(object_id)
 {
-    m_what = "Specified primary key property '" + primary + "' does not exist.";
+    m_what = "Specified object ID property '" + object_id + "' does not exist.";
 }
 
-DuplicatePrimaryKeysException::DuplicatePrimaryKeysException(std::string const& object_type) : ObjectSchemaValidationException(object_type)
+DuplicateObjectIDsException::DuplicateObjectIDsException(std::string const& object_type) : ObjectSchemaValidationException(object_type)
 {
-    m_what = "Duplicate primary keys for object '" + object_type + "'.";
+    m_what = "Duplicate object IDs for object '" + object_type + "'.";
 }
 

@@ -100,9 +100,9 @@ using namespace realm;
 
 - (void)execute:(RLMMigrationBlock)block {
     @autoreleasepool {
-        // disable all primary keys for migration
+        // disable all object IDs for migration
         for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
-            objectSchema.primaryKeyProperty.isPrimary = NO;
+            objectSchema.objectIDProperty.isObjectID = NO;
         }
 
         // apply block and set new schema version

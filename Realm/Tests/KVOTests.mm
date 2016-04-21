@@ -36,7 +36,7 @@ RLM_ARRAY_TYPE(KVOObject)
 RLM_ARRAY_TYPE(KVOLinkObject1)
 
 @interface KVOObject : RLMObject
-@property int pk; // Primary key for isEqual:
+@property int pk; // Object ID for isEqual:
 @property int ignored;
 
 @property BOOL                 boolCol;
@@ -58,7 +58,7 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSNumber<RLMBool> *optBoolCol;
 @end
 @implementation KVOObject
-+ (NSString *)primaryKey {
++ (NSString *)objectID {
     return @"pk";
 }
 + (NSArray *)ignoredProperties {
@@ -67,23 +67,23 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @end
 
 @interface KVOLinkObject1 : RLMObject
-@property int pk; // Primary key for isEqual:
+@property int pk; // Object ID for isEqual:
 @property KVOObject *obj;
 @property RLMArray<KVOObject> *array;
 @end
 @implementation KVOLinkObject1
-+ (NSString *)primaryKey {
++ (NSString *)objectID {
     return @"pk";
 }
 @end
 
 @interface KVOLinkObject2 : RLMObject
-@property int pk; // Primary key for isEqual:
+@property int pk; // Object ID for isEqual:
 @property KVOLinkObject1 *obj;
 @property RLMArray<KVOLinkObject1> *array;
 @end
 @implementation KVOLinkObject2
-+ (NSString *)primaryKey {
++ (NSString *)objectID {
     return @"pk";
 }
 @end
