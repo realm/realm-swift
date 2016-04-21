@@ -1308,7 +1308,7 @@ extern "C" {
     }];
 
     NSError *writeError;
-    XCTAssertTrue([realm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] error:&writeError]);
+    XCTAssertTrue([realm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] encryptionKey:nil error:&writeError]);
     XCTAssertNil(writeError);
     RLMRealm *copy = [self realmWithTestPath];
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
@@ -1322,7 +1322,7 @@ extern "C" {
     }];
 
     NSError *writeError;
-    XCTAssertFalse([realm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] error:&writeError]);
+    XCTAssertFalse([realm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] encryptionKey:nil error:&writeError]);
     XCTAssertEqual(writeError.code, RLMErrorFileExists);
 }
 
@@ -1334,7 +1334,7 @@ extern "C" {
     }];
 
     NSError *writeError;
-    XCTAssertFalse([realm writeCopyToFileURL:[NSURL fileURLWithPath:@"/tmp/RLMTestDirMayNotExist/foo"] error:&writeError]);
+    XCTAssertFalse([realm writeCopyToFileURL:[NSURL fileURLWithPath:@"/tmp/RLMTestDirMayNotExist/foo"] encryptionKey:nil error:&writeError]);
     XCTAssertEqual(writeError.code, RLMErrorFileNotFound);
 }
 
@@ -1345,7 +1345,7 @@ extern "C" {
         [IntObject createInRealm:realm withValue:@[@0]];
 
         NSError *writeError;
-        XCTAssertTrue([realm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] error:&writeError]);
+        XCTAssertTrue([realm writeCopyToFileURL:[NSURL fileURLWithPath:RLMTestRealmPath()] encryptionKey:nil error:&writeError]);
         XCTAssertNil(writeError);
         RLMRealm *copy = [self realmWithTestPath];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);

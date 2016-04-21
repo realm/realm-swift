@@ -326,21 +326,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
  @return YES if the realm was copied successfully. Returns NO if an error occurred.
 */
-- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm writeCopyToFileURL:error:]");
-
-/**
- Write a compacted copy of the RLMRealm to the given local URL.
-
- The destination file cannot already exist.
-
- Note that if this is called from within a write transaction it writes the
- *current* data, and not data when the last write transaction was committed.
-
- @param fileURL Local URL to save the Realm to.
- @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
- @return YES if the realm was copied successfully. Returns NO if an error occurred.
-*/
-- (BOOL)writeCopyToFileURL:(NSURL *)fileURL error:(NSError **)error;
+- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm writeCopyToFileURL:encryptionKey:error:]");
 
 /**
  Write an encrypted and compacted copy of the RLMRealm to the given path.
@@ -370,7 +356,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @param error   On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
  @return YES    if the realm was copied successfully. Returns NO if an error occurred.
 */
-- (BOOL)writeCopyToFileURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error;
+- (BOOL)writeCopyToFileURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
 /**
  Invalidate all RLMObjects and RLMResults read from this Realm.
@@ -510,19 +496,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
  @return            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
  */
-+ (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm schemaVersionAtFileURL:error:]");
-
-/**
- Get the schema version for a Realm at a given local URL.
-
- @param fileURL Local URL to a Realm file.
- @param error   If an error occurs, upon return contains an `NSError` object
-                that describes the problem. If you are not interested in
-                possible errors, pass in `NULL`.
-
- @return        The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
- */
-+ (uint64_t)schemaVersionAtFileURL:(NSURL *)fileURL error:(NSError **)error;
++ (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm schemaVersionAtFileURL:encryptionKey:error:]");
 
 /**
  Get the schema version for an encrypted Realm at a given path.

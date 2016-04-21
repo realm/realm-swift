@@ -682,11 +682,7 @@ void RLMRealmTranslateException(NSError **error) {
 }
 
 + (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error {
-    return [RLMRealm schemaVersionAtPath:realmPath encryptionKey:nil error:error];
-}
-
-+ (uint64_t)schemaVersionAtFileURL:(NSURL *)fileURL error:(NSError * _Nullable __autoreleasing *)error {
-    return [RLMRealm schemaVersionAtFileURL:fileURL encryptionKey:nil error:error];
+    return [RLMRealm schemaVersionAtFileURL:[NSURL fileURLWithPath:realmPath] encryptionKey:nil error:error];
 }
 
 + (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)error {
@@ -727,8 +723,17 @@ void RLMRealmTranslateException(NSError **error) {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, value, false);
 }
 
-- (BOOL)writeCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
+- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {
+    return [self writeCopyToFileURL:[NSURL fileURLWithPath:path] encryptionKey:nil error:error];
+}
+
+- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error {
+    return [self writeCopyToFileURL:[NSURL fileURLWithPath:path] encryptionKey:key error:error];
+}
+
+- (BOOL)writeCopyToFileURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
     key = RLMRealmValidatedEncryptionKey(key);
+    NSString *path = fileURL.path;
 
     try {
         self.group->write(path.UTF8String, static_cast<const char *>(key.bytes));
@@ -761,26 +766,6 @@ void RLMRealmTranslateException(NSError **error) {
     }
 
     return NO;
-}
-
-- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {
-    return [self writeCopyToPath:path key:nil error:error];
-}
-
-- (BOOL)writeCopyToFileURL:(NSURL *)fileURL error:(NSError **)error {
-    return [self writeCopyToPath:fileURL.path key:nil error:error];
-}
-
-- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error {
-    return [self writeCopyToFileURL:[NSURL fileURLWithPath:path] encryptionKey:key error:error];
-}
-
-- (BOOL)writeCopyToFileURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
-    if (!key) {
-        @throw RLMException(@"Encryption key must not be nil");
-    }
-
-    return [self writeCopyToPath:fileURL.path key:key error:error];
 }
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator {

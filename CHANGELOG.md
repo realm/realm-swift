@@ -11,6 +11,57 @@ x.x.x Release notes (yyyy-MM-dd)
   rarely useful and unsupported in every other Realm binding.
 * The block for `-[RLMArray addNotificationBlock:]` and
   `-[RLMResults addNotificationBlock:]` now takes another parameter.
+* The following Objective-C APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API                              | New API                                   |
+|:--------------------------------------------|:------------------------------------------|
+| `-[RLMRealm removeNotification:]`           | `-[RLMNotificationToken stop]`            |
+| `+[RLMObject primaryKey]`                   | `+[RLMObject objectID]`                   |
+| `+[RLMObject objectForPrimaryKey:]`         | `+[RLMObject objectForObjectID:]`         |
+| `+[RLMObject objectInRealm:forPrimaryKey:]` | `+[RLMObject objectInRealm:forObjectID:]` |
+| `-[RLMObjectSchema primaryKeyProperty]`     | `-[RLMObjectSchema objectIDProperty]`     |
+| `RLMRealm.path`                             | `RLMConfiguration.path`                   |
+| `RLMRealm.readOnly`                         | `RLMConfiguration.readOnly`               |
+
+* The following Swift APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API                      | New API                          |
+|:------------------------------------|:---------------------------------|
+| `Realm.removeNotification(_:)`      | `NotificationToken.stop()`       |
+| `Object.primaryKey()`               | `Object.objectID()`              |
+| `Realm.objectForPrimaryKey(_:key:)` | `Realm.objectForObjectID(_:id:)` |
+| `ObjectSchema.primaryKeyProperty`   | `ObjectSchema.objectIDProperty`  |
+| `Realm.path`                        | `Realm.Configuration.fileURL`    |
+| `Realm.readOnly`                    | `Realm.Configuration.readOnly`   |
+| Deprecated API                                         | New API                                                   |
+|:-------------------------------------------------------|:----------------------------------------------------------|
+| `-[RLMRealm removeNotification:]`                      | `-[RLMNotificationToken stop]`                            |
+| `+[RLMObject primaryKey]`                              | `+[RLMObject objectID]`                                   |
+| `+[RLMObject objectForPrimaryKey:]`                    | `+[RLMObject objectWithID:]`                              |
+| `+[RLMObject objectInRealm:forPrimaryKey:]`            | `+[RLMObject objectInRealm:withID:]`                      |
+| `-[RLMObjectSchema primaryKeyProperty]`                | `-[RLMObjectSchema objectIDProperty]`                     |
+| `RLMRealmConfiguration.path`                           | `RLMConfiguration.fileURL`                                |
+| `RLMRealm.path`                                        | `RLMConfiguration.fileURL`                                |
+| `RLMRealm.readOnly`                                    | `RLMConfiguration.readOnly`                               |
+| `+[RLMRealm realmWithPath:]`                           | `+[RLMRealm realmWithFileURL:]`                           |
+| `+[RLMRealm writeCopyToPath:error:]`                   | `+[RLMRealm writeCopyToFileURL:encryptionKey:error:]`     |
+| `+[RLMRealm writeCopyToPath:encryptionKey:error:]`     | `+[RLMRealm writeCopyToFileURL:encryptionKey:error:]`     |
+| `+[RLMRealm schemaVersionAtPath:error:]`               | `+[RLMRealm schemaVersionAtFileURL:encryptionKey:error:]` |
+| `+[RLMRealm schemaVersionAtPath:encryptionKey:error:]` | `+[RLMRealm schemaVersionAtFileURL:encryptionKey:error:]` |
+
+* The following Swift APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API                                | New API                                      |
+|:----------------------------------------------|:---------------------------------------------|
+| `Realm.removeNotification(_:)`                | `NotificationToken.stop()`                   |
+| `Object.primaryKey()`                         | `Object.objectID()`                          |
+| `Realm.objectForPrimaryKey(_:key:)`           | `Realm.objectWithID(_:id:)`                  |
+| `ObjectSchema.primaryKeyProperty`             | `ObjectSchema.objectIDProperty`              |
+| `Realm.Configuration.path`                    | `Realm.Configuration.fileURL`                |
+| `Realm.path`                                  | `Realm.Configuration.fileURL`                |
+| `Realm.readOnly`                              | `Realm.Configuration.readOnly`               |
+| `Realm.writeCopyToPath(_:encryptionKey:)`     | `Realm.writeCopyToFileURL(_:encryptionKey:)` |
+| `schemaVersionAtPath(_:encryptionKey:error:)` | `schemaVersionAtFileURL(_:encryptionKey:)`   |
 
 ### Enhancements
 

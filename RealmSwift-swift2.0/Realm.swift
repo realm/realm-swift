@@ -610,11 +610,7 @@ public final class Realm {
     - throws: An NSError if the copy could not be written.
     */
     public func writeCopyToFileURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws {
-        if let encryptionKey = encryptionKey {
-            try rlmRealm.writeCopyToFileURL(fileURL, encryptionKey: encryptionKey)
-        } else {
-            try rlmRealm.writeCopyToFileURL(fileURL)
-        }
+        try rlmRealm.writeCopyToFileURL(fileURL, encryptionKey: encryptionKey)
     }
 
     // MARK: Internal
