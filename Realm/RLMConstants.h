@@ -81,6 +81,8 @@ typedef NS_ENUM(NSInteger, RLMError) {
         process which cannot share with the current process due to an
         architecture mismatch. */
     RLMErrorIncompatibleLockFile  = 8,
+    /** Returned by RLMRealm if there is insufficient available address space. */
+    RLMErrorAddressSpaceExhausted = 9,
 };
 
 #pragma mark - Constants

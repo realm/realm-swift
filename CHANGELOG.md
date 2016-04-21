@@ -32,7 +32,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Return a recoverable `RLMErrorAddressSpaceExhausted` error rather than crashing when failing to
+  mmap in Realm initialization or write commit.
 
 ### Bugfixes
 
