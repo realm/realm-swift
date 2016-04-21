@@ -35,12 +35,12 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* Return a recoverable `RLMErrorAddressSpaceExhausted` error rather than crashing when failing to
-  mmap in Realm initialization or write commit.
+* None.
 
 ### Bugfixes
 
-* None.
+* Fixed a bug that caused some encrypted files created using
+  `-[RLMRealm writeCopyToPath:encryptionKey:error:]` to fail to open.
 
 0.98.7 Release notes (2016-04-13)
 =============================================================
