@@ -79,11 +79,11 @@
     XCTAssertNoThrow(configuration.objectClasses = (@[CompanyObject.class, EmployeeObject.class]));
 }
 
-#pragma mark - Default Confiugration
+#pragma mark - Default Configuration
 
 - (void)testDefaultConfiguration {
     RLMRealmConfiguration *defaultConfiguration = [RLMRealmConfiguration defaultConfiguration];
-    XCTAssertEqualObjects(defaultConfiguration.fileURL.path, RLMDefaultRealmPath());
+    XCTAssertEqualObjects(defaultConfiguration.fileURL, RLMDefaultRealmURL());
     XCTAssertNil(defaultConfiguration.inMemoryIdentifier);
     XCTAssertNil(defaultConfiguration.encryptionKey);
     XCTAssertFalse(defaultConfiguration.readOnly);
@@ -118,7 +118,7 @@
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.fileURL, config.fileURL); }
 
-    config.fileURL = [NSURL fileURLWithPath:RLMTestRealmPath()];
+    config.fileURL = RLMTestRealmURL();
     @autoreleasepool { XCTAssertNotEqualObjects(RLMRealm.defaultRealm.configuration.fileURL, config.fileURL); }
     RLMRealmConfiguration.defaultConfiguration = config;
     @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.fileURL, config.fileURL); }
@@ -140,7 +140,7 @@
         XCTAssertEqual(1U, [RLMRealm schemaVersionAtURL:[NSURL fileURLWithPath:realmPath] encryptionKey:nil error:nil]);
     }
 
-    config.fileURL = [NSURL fileURLWithPath:RLMDefaultRealmPath()];
+    config.fileURL = RLMDefaultRealmURL();
     RLMRealmConfiguration.defaultConfiguration = config;
 
     config.encryptionKey = RLMGenerateKey();
@@ -150,7 +150,7 @@
         XCTAssertThrows([RLMRealm defaultRealm]);
     }
 
-    [self deleteRealmFileAtPath:config.fileURL.path];
+    [self deleteRealmFileAtURL:config.fileURL];
     // Create and then re-open with same key
     @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
     @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
@@ -162,7 +162,7 @@
 
     // Verify that the default realm's migration block is used implicitly
     // when needed
-    [self deleteRealmFileAtPath:config.fileURL.path];
+    [self deleteRealmFileAtURL:config.fileURL];
     @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
 
     config.schemaVersion = 2;

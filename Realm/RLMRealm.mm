@@ -172,12 +172,12 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 }
 
 + (instancetype)realmWithURL:(NSURL *)fileURL
-                          key:(NSData *)key
-                     readOnly:(BOOL)readonly
-                     inMemory:(BOOL)inMemory
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError
+                         key:(NSData *)key
+                    readOnly:(BOOL)readonly
+                    inMemory:(BOOL)inMemory
+                     dynamic:(BOOL)dynamic
+                      schema:(RLMSchema *)customSchema
+                       error:(NSError **)outError
 {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
     if (inMemory) {

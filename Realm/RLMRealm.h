@@ -344,7 +344,8 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm writeCopyToURL:encryptionKey:error:]");
 
 /**
- Write an encrypted and compacted copy of the RLMRealm to the given local URL.
+ Write a compacted and optionally encrypted copy of the RLMRealm to the given
+ local URL.
 
  The destination file cannot already exist.
 
@@ -352,11 +353,11 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  *current* data, and not data when the last write transaction was committed.
 
  @param fileURL Local URL to save the Realm to.
- @param key   Optional 64-byte encryption key to encrypt the new file with.
- @param error On input, a pointer to an error object. If an error occurs, this
-              pointer is set to an actual error object containing the error
-              information. You may specify nil for this parameter if you do not
-              want the error information.
+ @param key     Optional 64-byte encryption key to encrypt the new file with.
+ @param error   On input, a pointer to an error object. If an error occurs,
+                this pointer is set to an actual error object containing the
+                error information. You may specify nil for this parameter if you
+                do not want the error information.
 
  @return YES if the realm was copied successfully. Returns NO if an error occurred.
 */
@@ -516,10 +517,10 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 + (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(nullable NSData *)key error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm schemaVersionAtURL:encryptionKey:error:]");
 
 /**
- Get the schema version for an encrypted Realm at a given local URL.
+ Get the schema version for a Realm at a given local URL.
 
- @param fileURL Local URL to a Realm file
- @param key     Optional 64-byte encryption key.
+ @param fileURL Local URL to a Realm file.
+ @param key     64-byte key used to encrypt the file, or nil if it is unencrypted.
  @param error   If an error occurs, upon return contains an `NSError` object
                 that describes the problem. If you are not interested in
                 possible errors, pass in `NULL`.

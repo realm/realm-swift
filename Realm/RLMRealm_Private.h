@@ -66,12 +66,12 @@ void RLMRealmTranslateException(NSError **error);
  @see RLMRealm realmWithURL:encryptionKey:readOnly:error:
  */
 + (instancetype)realmWithURL:(NSURL *)fileURL
-                          key:(NSData *)key
-                     readOnly:(BOOL)readonly
-                     inMemory:(BOOL)inMemory
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError;
+                         key:(NSData *)key
+                    readOnly:(BOOL)readonly
+                    inMemory:(BOOL)inMemory
+                     dynamic:(BOOL)dynamic
+                      schema:(RLMSchema *)customSchema
+                       error:(NSError **)outError;
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator;
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator;
