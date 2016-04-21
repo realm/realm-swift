@@ -91,8 +91,10 @@ class RealmTests: TestCase {
 
         // Make Realm at test path temporarily unreadable
         let fileManager = NSFileManager.defaultManager()
-        let permissions = try! fileManager.attributesOfItemAtPath(testRealmURL().path!)[NSFilePosixPermissions] as! NSNumber
-        try! fileManager.setAttributes([ NSFilePosixPermissions: NSNumber(int: 0000) ], ofItemAtPath: testRealmURL().path!)
+        let permissions = try! fileManager
+            .attributesOfItemAtPath(testRealmURL().path!)[NSFilePosixPermissions] as! NSNumber
+        try! fileManager.setAttributes([ NSFilePosixPermissions: NSNumber(int: 0000) ],
+                                       ofItemAtPath: testRealmURL().path!)
 
         assertFails(Error.FilePermissionDenied) {
             try Realm(fileURL: testRealmURL())
