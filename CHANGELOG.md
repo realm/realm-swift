@@ -15,13 +15,10 @@ x.x.x Release notes (yyyy-MM-dd)
 | `RLMRealmConfiguration.path`                           | `RLMRealmConfiguration.fileURL`                       |
 | `RLMRealm.path`                                        | `RLMRealmConfiguration.fileURL`                       |
 | `RLMRealm.readOnly`                                    | `RLMRealmConfiguration.readOnly`                      |
-| `+[RLMRealm realmWithPath:]`                           | `+[RLMRealm realmWithURL:]`                       |
+| `+[RLMRealm realmWithPath:]`                           | `+[RLMRealm realmWithURL:]`                           |
 | `+[RLMRealm writeCopyToPath:error:]`                   | `+[RLMRealm writeCopyToURL:encryptionKey:error:]`     |
 | `+[RLMRealm writeCopyToPath:encryptionKey:error:]`     | `+[RLMRealm writeCopyToURL:encryptionKey:error:]`     |
 | `+[RLMRealm schemaVersionAtPath:error:]`               | `+[RLMRealm schemaVersionAtURL:encryptionKey:error:]` |
-| `+[RLMRealm writeCopyToPath:error:]`                   | `+[RLMRealm writeCopyToURL:error:]`                   |
-| `+[RLMRealm writeCopyToPath:encryptionKey:error:]`     | `+[RLMRealm writeCopyToURL:encryptionKey:error:]`     |
-| `+[RLMRealm schemaVersionAtPath:error:]`               | `+[RLMRealm schemaVersionAtURL:error:]`               |
 | `+[RLMRealm schemaVersionAtPath:encryptionKey:error:]` | `+[RLMRealm schemaVersionAtURL:encryptionKey:error:]` |
 
 * The following Swift APIs have been deprecated in favor of newer or preferred versions:
