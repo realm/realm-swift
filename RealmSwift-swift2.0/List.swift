@@ -431,7 +431,7 @@ public final class List<T: Object>: ListBase {
 
         let person = realm.objects(Person).first!
         print("dogs.count: \(person.dogs.count)") // => 0
-        let token = person.dogs.addNotificationBlock { (changes: RealmCollectionChange) in
+        let token = person.dogs.addNotificationBlock { changes in
             switch changes {
                 case .Initial(let dogs):
                     // Will print "dogs.count: 1"
@@ -465,7 +465,7 @@ public final class List<T: Object>: ListBase {
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (RealmCollectionChange<List>) -> ()) -> NotificationToken {
         return _rlmArray.addNotificationBlock { list, change, error in
-            block(RealmCollectionChange<List>.fromObjc(self, change: change, error: error))
+            block(RealmCollectionChange.fromObjc(self, change: change, error: error))
         }
     }
 }
@@ -506,8 +506,11 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
     public var endIndex: Int { return count }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (AnyRealmCollection<T>?, NSError?) -> ()) -> NotificationToken {
+    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+        NotificationToken {
         let anyCollection = AnyRealmCollection(self)
-        return _rlmArray.addNotificationBlock { _, _, _ in block(anyCollection, nil) }
+        return _rlmArray.addNotificationBlock { _, change, error in
+            block(RealmCollectionChange.fromObjc(anyCollection, change: change, error: error))
+        }
     }
 }

@@ -298,7 +298,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     // MARK: Notifications
 
     /// :nodoc:
-    func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken
+    func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
 private class _AnyRealmCollectionBase<T: Object> {
@@ -327,10 +327,7 @@ private class _AnyRealmCollectionBase<T: Object> {
     func valueForKey(key: String) -> AnyObject? { fatalError() }
     func valueForKeyPath(keyPath: String) -> AnyObject? { fatalError() }
     func setValue(value: AnyObject?, forKey key: String) { fatalError() }
-    func _addNotificationBlock(block: (Wrapper?, NSError?) -> ()) -> NotificationToken {
-        fatalError()
-    }
-    func addNotificationBlock(collection: Wrapper, block: (RealmCollectionChange<Wrapper>) -> ())
+    func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
 }
 
@@ -562,9 +559,8 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     // MARK: Notifications
 
     /// :nodoc:
-    override func _addNotificationBlock(block: (Wrapper?, NSError?) -> ()) -> NotificationToken {
-        return base._addNotificationBlock(block)
-    }
+    override func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
+        -> NotificationToken { return base._addNotificationBlock(block) }
 }
 
 /**
@@ -794,39 +790,6 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     // MARK: Notifications
 
     /**
-    Register a block to be called each time the collection changes.
-
-    The block will be asynchronously called with the initial collection, and
-    then called again after each write transaction which changes the collection
-    or any of the items in the collection.
-
-    The block is called on the same thread as it was added on, and can only
-    be added on threads which are currently within a run loop. Unless you are
-    specifically creating and running a run loop on a background thread, this
-    normally will only be the main thread.
-
-    Notifications can't be delivered as long as the runloop is blocked by
-    other activity. When notifications can't be delivered instantly, multiple
-    notifications may be coalesced. That can include the notification about the
-    initial collection.
-
-    You must retain the returned token for as long as you want updates to continue
-    to be sent to the block. To stop receiving updates, call stop() on the token.
-
-    - parameter block: The block to be called each time the collection changes.
-    - returns: A token which must be held for as long as you want notifications to be delivered.
-    */
-    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (collection: AnyRealmCollection<Element>?,
-                                             error: NSError?) -> ()) -> NotificationToken {
-        return base._addNotificationBlock(block)
-    }
-
-    /// :nodoc:
-    public func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ())
-        -> NotificationToken { return base._addNotificationBlock(block) }
-
-    /**
      Register a block to be called each time the collection changes.
 
      The block will be asynchronously called with the initial results, and then
@@ -850,7 +813,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
 
          let results = realm.objects(Dog)
          print("dogs.count: \(dogs?.count)") // => 0
-         let token = dogs.addNotificationBlock { (changes: RealmCollectionChange) in
+         let token = dogs.addNotificationBlock { changes in
              switch changes {
                  case .Initial(let dogs):
                      // Will print "dogs.count: 1"
@@ -880,5 +843,11 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
-        -> NotificationToken { return base.addNotificationBlock(self, block: block) }
+        -> NotificationToken { return base._addNotificationBlock(block) }
+
+    // MARK: Notifications
+
+    /// :nodoc:
+    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
+        -> NotificationToken { return base._addNotificationBlock(block) }
 }

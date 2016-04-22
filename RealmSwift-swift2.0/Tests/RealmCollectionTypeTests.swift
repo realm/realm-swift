@@ -312,10 +312,19 @@ class RealmCollectionTypeTests: TestCase {
         try! realm.commitWrite()
 
         let expectation = expectationWithDescription("")
-        let token = collection.addNotificationBlock { c, error in
-            XCTAssertNil(error)
-            XCTAssertNotNil(c)
-            XCTAssertEqual(c!.count, 2)
+        let token = collection.addNotificationBlock { changes in
+            switch changes {
+            case .Initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+                break
+            case .Update:
+                XCTFail("Shouldn't happen")
+                break
+            case .Error:
+                XCTFail("Shouldn't happen")
+                break
+            }
+
             expectation.fulfill()
         }
         waitForExpectationsWithTimeout(1, handler: nil)
@@ -655,7 +664,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func testAddNotificationBlock() {
         let realm = realmWithTestPath()
         try! realm.commitWrite()
-        assertThrows(self.collection.addNotificationBlock { _, _ in })
+        assertThrows(self.collection.addNotificationBlock { _ in })
         realm.beginWrite()
     }
 
