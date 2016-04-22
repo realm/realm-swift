@@ -312,7 +312,7 @@ class RealmCollectionTypeTests: TestCase {
         try! realm.commitWrite()
 
         let expectation = expectationWithDescription("")
-        let token = collection.addNotificationBlock { changes in
+        let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
             case .Initial(let collection):
                 XCTAssertEqual(collection.count, 2)
@@ -385,7 +385,7 @@ class ResultsTests: RealmCollectionTypeTests {
 
         var expectation = expectationWithDescription("")
         var calls = 0
-        let token = collection.addNotificationBlock { changes in
+        let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
             case .Initial(let results):
                 XCTAssertEqual(results.count, calls + 2)
@@ -549,7 +549,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         try! realm.commitWrite()
 
         let expectation = expectationWithDescription("")
-        let token = collection.addNotificationBlock { changes in
+        let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
             case .Initial(let list):
                 XCTAssertEqual(list.count, 2)
@@ -664,7 +664,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func testAddNotificationBlock() {
         let realm = realmWithTestPath()
         try! realm.commitWrite()
-        assertThrows(self.collection.addNotificationBlock { _ in })
+        assertThrows(self.collection.addNotificationBlock { (changes: RealmCollectionChange) in })
         realm.beginWrite()
     }
 
@@ -673,7 +673,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         let realm = realmWithTestPath()
         try! realm.commitWrite()
 
-        assertThrows(collection.addNotificationBlock { _ in })
+        assertThrows(collection.addNotificationBlock { (changes: RealmCollectionChange) in })
         realm.beginWrite()
     }
 }
