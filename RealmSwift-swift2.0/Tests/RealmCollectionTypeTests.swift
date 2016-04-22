@@ -312,10 +312,19 @@ class RealmCollectionTypeTests: TestCase {
         try! realm.commitWrite()
 
         let expectation = expectationWithDescription("")
-        let token = collection.addNotificationBlock { c, error in
-            XCTAssertNil(error)
-            XCTAssertNotNil(c)
-            XCTAssertEqual(c!.count, 2)
+        let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+            switch changes {
+            case .Initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+                break
+            case .Update:
+                XCTFail("Shouldn't happen")
+                break
+            case .Error:
+                XCTFail("Shouldn't happen")
+                break
+            }
+
             expectation.fulfill()
         }
         waitForExpectationsWithTimeout(1, handler: nil)
@@ -376,14 +385,21 @@ class ResultsTests: RealmCollectionTypeTests {
 
         var expectation = expectationWithDescription("")
         var calls = 0
-        let token = collection.addNotificationBlock { results, error in
-            XCTAssertNil(error)
-            XCTAssertNotNil(results)
-
-            XCTAssertEqual(results!.count, calls + 2)
-            XCTAssertEqual(results, collection)
+        let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+            switch changes {
+            case .Initial(let results):
+                XCTAssertEqual(results.count, calls + 2)
+                XCTAssertEqual(results, collection)
+                break
+            case .Update(let results, _, _, _):
+                XCTAssertEqual(results.count, calls + 2)
+                XCTAssertEqual(results, collection)
+                break
+            case .Error:
+                XCTFail("Shouldn't happen")
+                break
+            }
             calls += 1
-
             expectation.fulfill()
         }
         waitForExpectationsWithTimeout(1, handler: nil)
@@ -533,8 +549,18 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         try! realm.commitWrite()
 
         let expectation = expectationWithDescription("")
-        let token = collection.addNotificationBlock { (list: List<SwiftStringObject>) in
-            XCTAssertEqual(list.count, 2)
+        let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+            switch changes {
+            case .Initial(let list):
+                XCTAssertEqual(list.count, 2)
+                break
+            case .Update:
+                XCTFail("Shouldn't happen")
+                break
+            case .Error:
+                XCTFail("Shouldn't happen")
+                break
+            }
             expectation.fulfill()
         }
         waitForExpectationsWithTimeout(1, handler: nil)
@@ -638,7 +664,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func testAddNotificationBlock() {
         let realm = realmWithTestPath()
         try! realm.commitWrite()
-        assertThrows(self.collection.addNotificationBlock { _, _ in })
+        assertThrows(self.collection.addNotificationBlock { (changes: RealmCollectionChange) in })
         realm.beginWrite()
     }
 
@@ -647,7 +673,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         let realm = realmWithTestPath()
         try! realm.commitWrite()
 
-        assertThrows(collection.addNotificationBlock { (list: List<SwiftStringObject>) in })
+        assertThrows(collection.addNotificationBlock { (changes: RealmCollectionChange) in })
         realm.beginWrite()
     }
 }

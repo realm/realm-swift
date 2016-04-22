@@ -298,7 +298,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     // MARK: Notifications
 
     /// :nodoc:
-    func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ()) -> NotificationToken
+    func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
 private class _AnyRealmCollectionBase<T: Object> {
@@ -327,10 +327,7 @@ private class _AnyRealmCollectionBase<T: Object> {
     func valueForKey(key: String) -> AnyObject? { fatalError() }
     func valueForKeyPath(keyPath: String) -> AnyObject? { fatalError() }
     func setValue(value: AnyObject?, forKey key: String) { fatalError() }
-    func _addNotificationBlock(block: (Wrapper?, NSError?) -> ()) -> NotificationToken {
-        fatalError()
-    }
-    func addNotificationBlock(collection: Wrapper, block: (RealmCollectionChange<Wrapper>) -> ())
+    func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
 }
 
@@ -562,9 +559,8 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     // MARK: Notifications
 
     /// :nodoc:
-    override func _addNotificationBlock(block: (Wrapper?, NSError?) -> ()) -> NotificationToken {
-        return base._addNotificationBlock(block)
-    }
+    override func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
+        -> NotificationToken { return base._addNotificationBlock(block) }
 }
 
 /**
@@ -816,15 +812,24 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     - parameter block: The block to be called each time the collection changes.
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
+    @available(*, deprecated=1, message="Use addNotificationBlock with changes")
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (collection: AnyRealmCollection<Element>?,
                                              error: NSError?) -> ()) -> NotificationToken {
-        return base._addNotificationBlock(block)
+        return base._addNotificationBlock { changes in
+            switch changes {
+            case .Initial(let collection):
+                block(collection: collection, error: nil)
+                break
+            case .Update(let collection, _, _, _):
+                block(collection: collection, error: nil)
+                break
+            case .Error(let error):
+                block(collection: nil, error: error)
+                break
+            }
+        }
     }
-
-    /// :nodoc:
-    public func _addNotificationBlock(block: (AnyRealmCollection<Element>?, NSError?) -> ())
-        -> NotificationToken { return base._addNotificationBlock(block) }
 
     /**
      Register a block to be called each time the collection changes.
@@ -880,5 +885,9 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
-        -> NotificationToken { return base.addNotificationBlock(self, block: block) }
+        -> NotificationToken { return base._addNotificationBlock(block) }
+
+    /// :nodoc:
+    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
+        -> NotificationToken { return base._addNotificationBlock(block) }
 }

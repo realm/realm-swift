@@ -448,6 +448,7 @@ public final class List<T: Object>: ListBase {
     - parameter block: The block to be called each time the list changes.
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
+    @available(*, deprecated=1, message="Use addNotificationBlock with changes")
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (list: List<T>) -> ()) -> NotificationToken {
         return _rlmArray.addNotificationBlock { _, _, _ in block(list: self) }
@@ -516,7 +517,7 @@ public final class List<T: Object>: ListBase {
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (RealmCollectionChange<List>) -> ()) -> NotificationToken {
         return _rlmArray.addNotificationBlock { list, change, error in
-            block(RealmCollectionChange<List>.fromObjc(self, change: change, error: error))
+            block(RealmCollectionChange.fromObjc(self, change: change, error: error))
         }
     }
 }
@@ -557,8 +558,11 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
     public var endIndex: Int { return count }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (AnyRealmCollection<T>?, NSError?) -> ()) -> NotificationToken {
+    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+        NotificationToken {
         let anyCollection = AnyRealmCollection(self)
-        return _rlmArray.addNotificationBlock { _, _, _ in block(anyCollection, nil) }
+        return _rlmArray.addNotificationBlock { _, change, error in
+            block(RealmCollectionChange.fromObjc(anyCollection, change: change, error: error))
+        }
     }
 }

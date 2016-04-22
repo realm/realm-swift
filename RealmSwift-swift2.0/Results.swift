@@ -367,6 +367,7 @@ public final class Results<T: Object>: ResultsBase {
      - parameter block: The block to be called with the evaluated results.
      - returns: A token which must be held for as long as you want query results to be delivered.
      */
+    @available(*, deprecated=1, message="Use addNotificationBlock with changes")
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (results: Results<T>?, error: NSError?) -> ()) -> NotificationToken {
         return rlmResults.addNotificationBlock { results, changes, error in
@@ -440,7 +441,7 @@ public final class Results<T: Object>: ResultsBase {
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (RealmCollectionChange<Results> -> Void)) -> NotificationToken {
         return rlmResults.addNotificationBlock { results, change, error in
-            block(RealmCollectionChange<Results>.fromObjc(self, change: change, error: error))
+            block(RealmCollectionChange.fromObjc(self, change: change, error: error))
         }
     }
 }
@@ -465,14 +466,11 @@ extension Results: RealmCollectionType {
     public var endIndex: Int { return count }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (AnyRealmCollection<T>?, NSError?) -> ()) -> NotificationToken {
+    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+        NotificationToken {
         let anyCollection = AnyRealmCollection(self)
-        return rlmResults.addNotificationBlock { results, change, error in
-            if results != nil {
-                block(anyCollection, nil)
-            } else {
-                block(nil, error)
-            }
+        return rlmResults.addNotificationBlock { _, change, error in
+            block(RealmCollectionChange.fromObjc(anyCollection, change: change, error: error))
         }
     }
 }
