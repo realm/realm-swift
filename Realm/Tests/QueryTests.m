@@ -1323,9 +1323,9 @@
 
     // check for ANY object in array
     RLMAssertCount(ArrayOfAllTypesObject, 2U, @"ANY array = %@", obj0);
-    RLMAssertCount(ArrayOfAllTypesObject, 2U, @"ANY array != %@", obj1);
+    RLMAssertCount(ArrayOfAllTypesObject, 3U, @"ANY array != %@", obj1);
     RLMAssertCount(ArrayOfAllTypesObject, 2U, @"NONE array = %@", obj0);
-    RLMAssertCount(ArrayOfAllTypesObject, 2U, @"NONE array != %@", obj1);
+    RLMAssertCount(ArrayOfAllTypesObject, 1U, @"NONE array != %@", obj1);
     XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array = %@", obj0].count));
     XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array != %@", obj0].count));
 }

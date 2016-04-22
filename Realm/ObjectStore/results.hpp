@@ -162,6 +162,9 @@ public:
 
     bool wants_background_updates() const { return m_wants_background_updates; }
 
+    // Returns whether the rows are guaranteed to be in table order.
+    bool is_in_table_order() const;
+
     // Helper type to let ResultsNotifier update the tableview without giving access
     // to any other privates or letting anyone else do so
     class Internal {

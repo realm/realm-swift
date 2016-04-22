@@ -27,7 +27,7 @@ ResultsNotifier::ResultsNotifier(Results& target)
 : CollectionNotifier(target.get_realm())
 , m_target_results(&target)
 , m_sort(target.get_sort())
-, m_from_linkview(target.get_linkview().get() != nullptr)
+, m_target_is_in_table_order(target.is_in_table_order())
 {
     Query q = target.get_query();
     set_table(*q.get_table());
@@ -125,7 +125,7 @@ void ResultsNotifier::calculate_changes()
 
         m_changes = CollectionChangeBuilder::calculate(m_previous_rows, next_rows,
                                                        [&](size_t row) { return m_info->row_did_change(*m_query->get_table(), row); },
-                                                       m_sort || m_from_linkview);
+                                                       m_target_is_in_table_order && !m_sort);
 
         m_previous_rows = std::move(next_rows);
     }
