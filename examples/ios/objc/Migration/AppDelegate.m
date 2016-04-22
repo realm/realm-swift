@@ -29,12 +29,11 @@
     [self.window makeKeyAndVisible];
 
     // copy over old data files for migration
-    NSString *defaultRealmPath = [RLMRealmConfiguration defaultConfiguration].path;
-    NSString *defaultRealmParentPath = [defaultRealmPath stringByDeletingLastPathComponent];
-    NSString *v0Path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"default-v0.realm"];
-    [[NSFileManager defaultManager] removeItemAtPath:defaultRealmPath error:nil];
-    [[NSFileManager defaultManager] copyItemAtPath:v0Path toPath:defaultRealmPath error:nil];
-
+    NSURL *defaultRealmURL = [RLMRealmConfiguration defaultConfiguration].fileURL;
+    NSURL *defaultRealmParentURL = [defaultRealmURL URLByDeletingLastPathComponent];
+    NSURL *v0URL = [[NSBundle mainBundle] URLForResource:@"default-v0" withExtension:@"realm"];
+    [[NSFileManager defaultManager] removeItemAtURL:defaultRealmURL error:nil];
+    [[NSFileManager defaultManager] copyItemAtURL:v0URL toURL:defaultRealmURL error:nil];
 
     // trying to open an outdated realm file without first registering a new schema version and migration block
     // with throw
@@ -95,21 +94,21 @@
     //
     // Migrate other Realm versions
     //
-    NSString *v1Path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"default-v1.realm"];
-    NSString *v2Path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"default-v2.realm"];
-    NSString *realmv1Path = [defaultRealmParentPath stringByAppendingPathComponent:@"default-v1.realm"];
-    NSString *realmv2Path = [defaultRealmParentPath stringByAppendingPathComponent:@"default-v2.realm"];
-    [[NSFileManager defaultManager] removeItemAtPath:realmv1Path error:nil];
-    [[NSFileManager defaultManager] copyItemAtPath:v1Path toPath:realmv1Path error:nil];
-    [[NSFileManager defaultManager] removeItemAtPath:realmv2Path error:nil];
-    [[NSFileManager defaultManager] copyItemAtPath:v2Path toPath:realmv2Path error:nil];
+    NSURL *v1URL = [[NSBundle mainBundle] URLForResource:@"default-v1" withExtension:@"realm"];
+    NSURL *v2URL = [[NSBundle mainBundle] URLForResource:@"default-v2" withExtension:@"realm"];
+    NSURL *realmv1URL = [defaultRealmParentURL URLByAppendingPathComponent:@"default-v1.realm"];
+    NSURL *realmv2URL = [defaultRealmParentURL URLByAppendingPathComponent:@"default-v2.realm"];
+    [[NSFileManager defaultManager] removeItemAtURL:realmv1URL error:nil];
+    [[NSFileManager defaultManager] copyItemAtURL:v1URL toURL:realmv1URL error:nil];
+    [[NSFileManager defaultManager] removeItemAtURL:realmv2URL error:nil];
+    [[NSFileManager defaultManager] copyItemAtURL:v2URL toURL:realmv2URL error:nil];
 
     // set schemave versions and migration blocks form Realms at each path
     RLMRealmConfiguration *realmv1Configuration = [configuration copy];
-    realmv1Configuration.path = realmv1Path;
+    realmv1Configuration.fileURL = realmv1URL;
 
     RLMRealmConfiguration *realmv2Configuration = [configuration copy];
-    realmv2Configuration.path = realmv2Path;
+    realmv2Configuration.fileURL = realmv2URL;
 
     // manully migration v1Path, v2Path is migrated implicitly on access
     [RLMRealm migrateRealm:realmv1Configuration];

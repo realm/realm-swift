@@ -65,7 +65,7 @@ class ViewController: UIViewController {
         // Opening wihout supplying a key at all fails
         autoreleasepool {
             do {
-                _ = try Realm(path: Realm.Configuration.defaultConfiguration.path!)
+                _ = try Realm()
             } catch {
                 log("Open with no key: \(error)")
             }

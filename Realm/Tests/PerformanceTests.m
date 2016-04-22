@@ -131,8 +131,8 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     config.inMemoryIdentifier = @(factor).stringValue;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-    [NSFileManager.defaultManager removeItemAtPath:RLMTestRealmPath() error:nil];
-    [realm writeCopyToPath:RLMTestRealmPath() error:nil];
+    [NSFileManager.defaultManager removeItemAtPath:RLMTestRealmURL() error:nil];
+    [realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:nil];
     return [self realmWithTestPath];
 }
 

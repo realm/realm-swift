@@ -90,14 +90,14 @@ class SwiftPerformanceTests: TestCase {
 
     private func copyRealmToTestPath(realm: Realm) -> Realm {
         do {
-            try NSFileManager.defaultManager().removeItemAtPath(testRealmPath())
+            try NSFileManager.defaultManager().removeItemAtURL(testRealmURL())
         } catch let error as NSError {
             XCTAssertTrue(error.domain == NSCocoaErrorDomain && error.code == 4)
         } catch {
             fatalError("Unexpected error: \(error)")
         }
 
-        try! realm.writeCopyToPath(testRealmPath())
+        try! realm.writeCopyToURL(testRealmURL())
         return realmWithTestPath()
     }
 

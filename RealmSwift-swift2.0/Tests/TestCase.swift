@@ -39,7 +39,7 @@ class TestCase: XCTestCase {
 
     func realmWithTestPath(configuration: Realm.Configuration = Realm.Configuration()) -> Realm {
         var configuration = configuration
-        configuration.path = testRealmPath()
+        configuration.fileURL = testRealmURL()
         return try! Realm(configuration: configuration)
     }
 
@@ -75,14 +75,15 @@ class TestCase: XCTestCase {
         try! NSFileManager.defaultManager().createDirectoryAtPath(testDir, withIntermediateDirectories: true,
             attributes: nil)
 
-        Realm.Configuration.defaultConfiguration = Realm.Configuration(path: defaultRealmPath())
+        let config = Realm.Configuration(fileURL: defaultRealmURL())
+        Realm.Configuration.defaultConfiguration = config
 
         exceptionThrown = false
         autoreleasepool { super.invokeTest() }
 
         if !exceptionThrown {
-            XCTAssertFalse(RLMHasCachedRealmForPath(defaultRealmPath()))
-            XCTAssertFalse(RLMHasCachedRealmForPath(testRealmPath()))
+            XCTAssertFalse(RLMHasCachedRealmForPath(defaultRealmURL().path!))
+            XCTAssertFalse(RLMHasCachedRealmForPath(testRealmURL().path!))
         }
 
         resetRealmState()
@@ -154,21 +155,21 @@ class TestCase: XCTestCase {
     private func realmFilePrefix() -> String {
         let remove = NSCharacterSet(charactersInString: "-[]")
 #if REALM_XCODE_VERSION_0730
-        return self.name!.stringByTrimmingCharactersInSet(remove)
+        return name!.stringByTrimmingCharactersInSet(remove)
 #else
-        return self.name.stringByTrimmingCharactersInSet(remove)
+        return name.stringByTrimmingCharactersInSet(remove)
 #endif
     }
 
-    internal func testRealmPath() -> String {
-        return realmPathForFile("test.realm")
+    internal func testRealmURL() -> NSURL {
+        return realmURLForFile("test.realm")
     }
 
-    internal func defaultRealmPath() -> String {
-        return realmPathForFile("default.realm")
+    internal func defaultRealmURL() -> NSURL {
+        return realmURLForFile("default.realm")
     }
 
-    private func realmPathForFile(fileName: String) -> String {
-        return (testDir as NSString).stringByAppendingPathComponent(fileName)
+    private func realmURLForFile(fileName: String) -> NSURL {
+        return NSURL(fileURLWithPath: testDir).URLByAppendingPathComponent(fileName)
     }
 }

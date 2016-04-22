@@ -23,8 +23,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-NSString *RLMTestRealmPath(void);
-NSString *RLMDefaultRealmPath(void);
+NSURL *RLMTestRealmURL(void);
+NSURL *RLMDefaultRealmURL(void);
 NSString *RLMRealmPathForFile(NSString *);
 NSData *RLMGenerateKey(void);
 #ifdef __cplusplus
@@ -37,10 +37,10 @@ NSData *RLMGenerateKey(void);
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
 
 - (RLMRealm *)inMemoryRealmWithIdentifier:(NSString *)identifier;
-- (RLMRealm *)readOnlyRealmWithPath:(NSString *)path error:(NSError **)error;
+- (RLMRealm *)readOnlyRealmWithURL:(NSURL *)fileURL error:(NSError **)error;
 
 - (void)deleteFiles;
-- (void)deleteRealmFileAtPath:(NSString *)realmPath;
+- (void)deleteRealmFileAtURL:(NSURL *)fileURL;
 
 - (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block;
 

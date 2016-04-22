@@ -33,11 +33,7 @@
 
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.readOnly = YES;
-
-    NSBundle *mainBundle = [NSBundle mainBundle];
-    NSString *seedFilePath = [mainBundle pathForResource:@"Places" ofType:@"realm"];
-    config.path = seedFilePath;
-
+    config.fileURL = [[NSBundle mainBundle] URLForResource:@"Places" withExtension:@"realm"];
     [RLMRealmConfiguration setDefaultConfiguration:config];
 
     [self reloadData];

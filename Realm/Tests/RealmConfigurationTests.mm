@@ -33,18 +33,17 @@
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
 
     configuration.inMemoryIdentifier = @"identifier";
-    XCTAssertNil(configuration.path);
+    XCTAssertNil(configuration.fileURL);
     XCTAssertEqualObjects(configuration.inMemoryIdentifier, @"identifier");
 
-    configuration.path = @"path";
+    configuration.fileURL = [NSURL fileURLWithPath:@"/dev/null"];
     XCTAssertNil(configuration.inMemoryIdentifier);
-    XCTAssertEqualObjects(configuration.path, @"path");
+    XCTAssertEqualObjects(configuration.fileURL.path, @"/dev/null");
 }
 
-- (void)testPathValidation {
+- (void)testFileURLValidation {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    XCTAssertThrows(configuration.path = nil);
-    XCTAssertThrows(configuration.path = @"");
+    XCTAssertThrows(configuration.fileURL = nil);
 }
 
 - (void)testEncryptionKeyValidation {
@@ -80,11 +79,11 @@
     XCTAssertNoThrow(configuration.objectClasses = (@[CompanyObject.class, EmployeeObject.class]));
 }
 
-#pragma mark - Default Confiugration
+#pragma mark - Default Configuration
 
 - (void)testDefaultConfiguration {
     RLMRealmConfiguration *defaultConfiguration = [RLMRealmConfiguration defaultConfiguration];
-    XCTAssertEqualObjects(defaultConfiguration.path, RLMDefaultRealmPath());
+    XCTAssertEqualObjects(defaultConfiguration.fileURL, RLMDefaultRealmURL());
     XCTAssertNil(defaultConfiguration.inMemoryIdentifier);
     XCTAssertNil(defaultConfiguration.encryptionKey);
     XCTAssertFalse(defaultConfiguration.readOnly);
@@ -98,31 +97,31 @@
 
 - (void)testSetDefaultConfiguration {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    configuration.path = @"path";
+    configuration.fileURL = [NSURL fileURLWithPath:@"/dev/null"];
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
-    XCTAssertEqualObjects(RLMRealmConfiguration.defaultConfiguration.path, @"path");
+    XCTAssertEqualObjects(RLMRealmConfiguration.defaultConfiguration.fileURL.path, @"/dev/null");
 }
 
 - (void)testDefaultConfiugrationUsesValueSemantics {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.path = @"path";
-    XCTAssertNotEqualObjects(config.path, RLMRealmConfiguration.defaultConfiguration.path);
+    config.fileURL = [NSURL fileURLWithPath:@"/dev/null"];
+    XCTAssertNotEqualObjects(config.fileURL, RLMRealmConfiguration.defaultConfiguration.fileURL);
 
     [RLMRealmConfiguration setDefaultConfiguration:config];
-    XCTAssertEqualObjects(config.path, RLMRealmConfiguration.defaultConfiguration.path);
+    XCTAssertEqualObjects(config.fileURL, RLMRealmConfiguration.defaultConfiguration.fileURL);
 
-    config.path = @"path2";
-    XCTAssertNotEqualObjects(config.path, RLMRealmConfiguration.defaultConfiguration.path);
+    config.fileURL = [NSURL fileURLWithPath:@"/dev/null/foo"];
+    XCTAssertNotEqualObjects(config.fileURL, RLMRealmConfiguration.defaultConfiguration.fileURL);
 }
 
 - (void)testDefaultRealmUsesDefaultConfiguration {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.path, config.path); }
+    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.fileURL, config.fileURL); }
 
-    config.path = RLMTestRealmPath();
-    @autoreleasepool { XCTAssertNotEqualObjects(RLMRealm.defaultRealm.configuration.path, config.path); }
+    config.fileURL = RLMTestRealmURL();
+    @autoreleasepool { XCTAssertNotEqualObjects(RLMRealm.defaultRealm.configuration.fileURL, config.fileURL); }
     RLMRealmConfiguration.defaultConfiguration = config;
-    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.path, config.path); }
+    @autoreleasepool { XCTAssertEqualObjects(RLMRealm.defaultRealm.configuration.fileURL, config.fileURL); }
 
     config.inMemoryIdentifier = @"default";
     RLMRealmConfiguration.defaultConfiguration = config;
@@ -138,10 +137,10 @@
     @autoreleasepool {
         RLMRealm *realm = RLMRealm.defaultRealm;
         NSString *realmPath = @(realm.configuration.config.path.c_str());
-        XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:realmPath error:nil]);
+        XCTAssertEqual(1U, [RLMRealm schemaVersionAtURL:[NSURL fileURLWithPath:realmPath] encryptionKey:nil error:nil]);
     }
 
-    config.path = RLMDefaultRealmPath();
+    config.fileURL = RLMDefaultRealmURL();
     RLMRealmConfiguration.defaultConfiguration = config;
 
     config.encryptionKey = RLMGenerateKey();
@@ -151,7 +150,7 @@
         XCTAssertThrows([RLMRealm defaultRealm]);
     }
 
-    [self deleteRealmFileAtPath:config.path];
+    [self deleteRealmFileAtURL:config.fileURL];
     // Create and then re-open with same key
     @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
     @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
@@ -163,7 +162,7 @@
 
     // Verify that the default realm's migration block is used implicitly
     // when needed
-    [self deleteRealmFileAtPath:config.path];
+    [self deleteRealmFileAtURL:config.fileURL];
     @autoreleasepool { XCTAssertNoThrow([RLMRealm defaultRealm]); }
 
     config.schemaVersion = 2;

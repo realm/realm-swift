@@ -162,25 +162,29 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 }
 
 + (instancetype)realmWithPath:(NSString *)path {
+    return [RLMRealm realmWithURL:[NSURL fileURLWithPath:path]];
+}
+
++ (instancetype)realmWithURL:(NSURL *)fileURL {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.path = path;
+    configuration.fileURL = fileURL;
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
-+ (instancetype)realmWithPath:(NSString *)path
-                          key:(NSData *)key
-                     readOnly:(BOOL)readonly
-                     inMemory:(BOOL)inMemory
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError
++ (instancetype)realmWithURL:(NSURL *)fileURL
+                         key:(NSData *)key
+                    readOnly:(BOOL)readonly
+                    inMemory:(BOOL)inMemory
+                     dynamic:(BOOL)dynamic
+                      schema:(RLMSchema *)customSchema
+                       error:(NSError **)outError
 {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
     if (inMemory) {
-        configuration.inMemoryIdentifier = path.lastPathComponent;
+        configuration.inMemoryIdentifier = fileURL.lastPathComponent;
     }
     else {
-        configuration.path = path;
+        configuration.fileURL = fileURL;
     }
     configuration.encryptionKey = key;
     configuration.readOnly = readonly;
@@ -678,23 +682,27 @@ void RLMRealmTranslateException(NSError **error) {
 }
 
 + (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error {
-    return [RLMRealm schemaVersionAtPath:realmPath encryptionKey:nil error:error];
+    return [RLMRealm schemaVersionAtURL:[NSURL fileURLWithPath:realmPath] encryptionKey:nil error:error];
 }
 
-+ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)outError {
++ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)error {
+    return [self schemaVersionAtURL:[NSURL fileURLWithPath:realmPath] encryptionKey:key error:error];
+}
+
++ (uint64_t)schemaVersionAtURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
     try {
         RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-        config.path = realmPath;
+        config.fileURL = fileURL;
         config.encryptionKey = RLMRealmValidatedEncryptionKey(key);
 
         uint64_t version = Realm::get_schema_version(config.config);
         if (version == realm::ObjectStore::NotVersioned) {
-            RLMSetErrorOrThrow([NSError errorWithDomain:RLMErrorDomain code:RLMErrorFail userInfo:@{NSLocalizedDescriptionKey:@"Cannot open an uninitialized realm in read-only mode"}], outError);
+            RLMSetErrorOrThrow([NSError errorWithDomain:RLMErrorDomain code:RLMErrorFail userInfo:@{NSLocalizedDescriptionKey:@"Cannot open an uninitialized realm in read-only mode"}], error);
         }
         return version;
     }
     catch (std::exception &exp) {
-        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), outError);
+        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), error);
         return RLMNotVersioned;
     }
 }
@@ -715,8 +723,17 @@ void RLMRealmTranslateException(NSError **error) {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, value, false);
 }
 
-- (BOOL)writeCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
+- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {
+    return [self writeCopyToURL:[NSURL fileURLWithPath:path] encryptionKey:nil error:error];
+}
+
+- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error {
+    return [self writeCopyToURL:[NSURL fileURLWithPath:path] encryptionKey:key error:error];
+}
+
+- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
     key = RLMRealmValidatedEncryptionKey(key);
+    NSString *path = fileURL.path;
 
     try {
         self.group->write(path.UTF8String, static_cast<const char *>(key.bytes));
@@ -749,18 +766,6 @@ void RLMRealmTranslateException(NSError **error) {
     }
 
     return NO;
-}
-
-- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {
-    return [self writeCopyToPath:path key:nil error:error];
-}
-
-- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error {
-    if (!key) {
-        @throw RLMException(@"Encryption key must not be nil");
-    }
-
-    return [self writeCopyToPath:path key:key error:error];
 }
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator {

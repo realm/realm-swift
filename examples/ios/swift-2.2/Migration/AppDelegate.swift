@@ -47,9 +47,8 @@ class Person: Object {
     let pets = List<Pet>() // Add pets field
 }
 
-func bundlePath(path: String) -> String? {
-    let resourcePath = NSBundle.mainBundle().resourcePath as NSString?
-    return resourcePath?.stringByAppendingPathComponent(path)
+func bundleURL(name: String) -> NSURL? {
+    return NSBundle.mainBundle().URLForResource(name, withExtension: "realm")
 }
 
 @UIApplicationMain
@@ -63,13 +62,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
 
         // copy over old data files for migration
-        let defaultPath = Realm.Configuration.defaultConfiguration.path!
-        let defaultParentPath = (defaultPath as NSString).stringByDeletingLastPathComponent
+        let defaultURL = Realm.Configuration.defaultConfiguration.fileURL!
+        let defaultParentURL = defaultURL.URLByDeletingLastPathComponent
 
-        if let v0Path = bundlePath("default-v0.realm") {
+        if let v0URL = bundleURL("default-v0") {
             do {
-                try NSFileManager.defaultManager().removeItemAtPath(defaultPath)
-                try NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath)
+                try NSFileManager.defaultManager().removeItemAtURL(defaultURL)
+                try NSFileManager.defaultManager().copyItemAtURL(v0URL, toURL: defaultURL)
             } catch {}
         }
 
@@ -109,18 +108,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //
         // Migrate a realms at a custom paths
         //
-        if let v1Path = bundlePath("default-v1.realm"), v2Path = bundlePath("default-v2.realm") {
-            let realmv1Path = (defaultParentPath as NSString).stringByAppendingPathComponent("default-v1.realm")
-            let realmv2Path = (defaultParentPath as NSString).stringByAppendingPathComponent("default-v2.realm")
+        if let v1URL = bundleURL("default-v1"), v2URL = bundleURL("default-v2") {
+            let realmv1URL = defaultParentURL!.URLByAppendingPathComponent("default-v1.realm")
+            let realmv2URL = defaultParentURL!.URLByAppendingPathComponent("default-v2.realm")
 
-            let realmv1Configuration = Realm.Configuration(path: realmv1Path, schemaVersion: 3, migrationBlock: migrationBlock)
-            let realmv2Configuration = Realm.Configuration(path: realmv2Path, schemaVersion: 3, migrationBlock: migrationBlock)
+            let realmv1Configuration = Realm.Configuration(fileURL: realmv1URL, schemaVersion: 2, migrationBlock: migrationBlock)
+            let realmv2Configuration = Realm.Configuration(fileURL: realmv2URL, schemaVersion: 3, migrationBlock: migrationBlock)
 
             do {
-                try NSFileManager.defaultManager().removeItemAtPath(realmv1Path)
-                try NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path)
-                try NSFileManager.defaultManager().removeItemAtPath(realmv2Path)
-                try NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path)
+                try NSFileManager.defaultManager().removeItemAtURL(realmv1URL)
+                try NSFileManager.defaultManager().copyItemAtURL(v1URL, toURL: realmv1URL)
+                try NSFileManager.defaultManager().removeItemAtURL(realmv2URL)
+                try NSFileManager.defaultManager().copyItemAtURL(v2URL, toURL: realmv2URL)
             } catch {}
 
             // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access

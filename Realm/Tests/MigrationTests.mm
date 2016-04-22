@@ -115,7 +115,7 @@ RLM_ARRAY_TYPE(MigrationObject);
 
 - (RLMRealmConfiguration *)config {
     RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-    config.path = RLMTestRealmPath();
+    config.fileURL = RLMTestRealmURL();
     return config;
 }
 
@@ -130,7 +130,7 @@ RLM_ARRAY_TYPE(MigrationObject);
 - (void)createTestRealmWithSchema:(NSArray *)objectSchema block:(void (^)(RLMRealm *realm))block {
     @autoreleasepool {
         RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-        config.path = RLMTestRealmPath();
+        config.fileURL = RLMTestRealmURL();
         config.customSchema = [self schemaWithObjects:objectSchema];
 
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
@@ -143,7 +143,7 @@ RLM_ARRAY_TYPE(MigrationObject);
 - (RLMRealm *)migrateTestRealmWithBlock:(RLMMigrationBlock)block NS_RETURNS_RETAINED {
     @autoreleasepool {
         RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-        config.path = RLMTestRealmPath();
+        config.fileURL = RLMTestRealmURL();
         config.schemaVersion = 1;
         config.migrationBlock = block;
         XCTAssertNil([RLMRealm migrateRealm:config]);
@@ -157,7 +157,7 @@ RLM_ARRAY_TYPE(MigrationObject);
 - (void)failToMigrateTestRealmWithBlock:(RLMMigrationBlock)block {
     @autoreleasepool {
         RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-        config.path = RLMTestRealmPath();
+        config.fileURL = RLMTestRealmURL();
         config.schemaVersion = 1;
         config.migrationBlock = block;
         XCTAssertNotNil([RLMRealm migrateRealm:config]);
@@ -203,14 +203,14 @@ RLM_ARRAY_TYPE(MigrationObject);
 #pragma mark - Schema versions
 
 - (void)testGetSchemaVersion {
-    XCTAssertThrows([RLMRealm schemaVersionAtPath:RLMDefaultRealmPath() encryptionKey:nil error:nil]);
+    XCTAssertThrows([RLMRealm schemaVersionAtURL:RLMDefaultRealmURL() encryptionKey:nil error:nil]);
     NSError *error;
-    XCTAssertEqual(RLMNotVersioned, [RLMRealm schemaVersionAtPath:RLMDefaultRealmPath() encryptionKey:nil error:&error]);
+    XCTAssertEqual(RLMNotVersioned, [RLMRealm schemaVersionAtURL:RLMDefaultRealmURL() encryptionKey:nil error:&error]);
     XCTAssertNotNil(error);
 
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     @autoreleasepool { [RLMRealm realmWithConfiguration:config error:nil]; }
-    XCTAssertEqual(0U, [RLMRealm schemaVersionAtPath:config.path encryptionKey:nil error:nil]);
+    XCTAssertEqual(0U, [RLMRealm schemaVersionAtURL:config.fileURL encryptionKey:nil error:nil]);
 
     config.schemaVersion = 1;
     config.migrationBlock = ^(__unused RLMMigration *migration, uint64_t oldSchemaVersion) {
@@ -218,14 +218,14 @@ RLM_ARRAY_TYPE(MigrationObject);
     };
 
     @autoreleasepool { [RLMRealm realmWithConfiguration:config error:nil]; }
-    XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:config.path encryptionKey:nil error:nil]);
+    XCTAssertEqual(1U, [RLMRealm schemaVersionAtURL:config.fileURL encryptionKey:nil error:nil]);
 }
 
 - (void)testSchemaVersionCannotGoDown {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.schemaVersion = 10;
     @autoreleasepool { [RLMRealm realmWithConfiguration:config error:nil]; }
-    XCTAssertEqual(10U, [RLMRealm schemaVersionAtPath:config.path encryptionKey:nil error:nil]);
+    XCTAssertEqual(10U, [RLMRealm schemaVersionAtURL:config.fileURL encryptionKey:nil error:nil]);
 
     config.schemaVersion = 5;
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
@@ -236,16 +236,16 @@ RLM_ARRAY_TYPE(MigrationObject);
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.schemaVersion = 10;
     @autoreleasepool { [RLMRealm realmWithConfiguration:config error:nil]; }
-    XCTAssertEqual(10U, [RLMRealm schemaVersionAtPath:config.path encryptionKey:nil error:nil]);
+    XCTAssertEqual(10U, [RLMRealm schemaVersionAtURL:config.fileURL encryptionKey:nil error:nil]);
 
     RLMRealmConfiguration *config2 = [RLMRealmConfiguration defaultConfiguration];
     config2.schemaVersion = 5;
-    config2.path = RLMTestRealmPath();
+    config2.fileURL = RLMTestRealmURL();
     @autoreleasepool { [RLMRealm realmWithConfiguration:config2 error:nil]; }
-    XCTAssertEqual(5U, [RLMRealm schemaVersionAtPath:config2.path encryptionKey:nil error:nil]);
+    XCTAssertEqual(5U, [RLMRealm schemaVersionAtURL:config2.fileURL encryptionKey:nil error:nil]);
 
     // Should not have been changed
-    XCTAssertEqual(10U, [RLMRealm schemaVersionAtPath:config.path encryptionKey:nil error:nil]);
+    XCTAssertEqual(10U, [RLMRealm schemaVersionAtURL:config.fileURL encryptionKey:nil error:nil]);
 }
 
 #pragma mark - Migration Requirements
@@ -487,7 +487,7 @@ RLM_ARRAY_TYPE(MigrationObject);
 
     Class intObjectAccessorClass;
     @autoreleasepool {
-        RLMRealm *realm = [self readOnlyRealmWithPath:RLMTestRealmPath() error:nil];
+        RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
 
         intObjectAccessorClass = realm.schema[IntObject.className].accessorClass;
 
@@ -943,7 +943,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     RLMRealm *realm;
     @autoreleasepool {
         RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-        config.path = RLMTestRealmPath();
+        config.fileURL = RLMTestRealmURL();
         config.customSchema = [self schemaWithObjects:@[ objectSchema ]];
         config.schemaVersion = 1;
         XCTAssertNil([RLMRealm migrateRealm:config]);
@@ -987,7 +987,7 @@ RLM_ARRAY_TYPE(MigrationObject);
 
     objectSchema = [RLMObjectSchema schemaForObjectClass:RequiredPropertiesObject.class];
     RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-    config.path = RLMTestRealmPath();
+    config.fileURL = RLMTestRealmURL();
     config.customSchema = [self schemaWithObjects:@[objectSchema]];
     config.schemaVersion = 1;
     config.migrationBlock = ^(RLMMigration *migration, uint64_t) {
