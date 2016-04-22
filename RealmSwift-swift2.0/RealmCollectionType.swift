@@ -120,7 +120,7 @@ and operated upon.
 public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
 
     /// Element type contained in this collection.
-    typealias Element: Object
+    associatedtype Element: Object
 
 
     // MARK: Properties
