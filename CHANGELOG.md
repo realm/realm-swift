@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.99.0 Release notes (2016-04-22)
 =============================================================
 
 ### API breaking changes
