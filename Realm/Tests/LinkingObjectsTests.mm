@@ -46,6 +46,11 @@
     [realm commitWriteTransaction];
 
     XCTAssertEqualObjects(asArray(hannahsParents), (@[ mark, diane ]));
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:hannah];
+    [realm commitWriteTransaction];
+    RLMAssertThrowsWithReasonMatching(asArray(hannahsParents), @"has been invalidated");
 }
 
 - (void)testNotificationSentInitially {

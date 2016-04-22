@@ -91,7 +91,7 @@ void Results::validate_read() const
         m_realm->verify_thread();
     if (m_table && !m_table->is_attached())
         throw InvalidatedException();
-    if (m_mode == Mode::TableView && !m_table_view.is_attached())
+    if (m_mode == Mode::TableView && (!m_table_view.is_attached() || m_table_view.depends_on_deleted_object()))
         throw InvalidatedException();
     if (m_mode == Mode::LinkView && !m_link_view->is_attached())
         throw InvalidatedException();
@@ -419,15 +419,11 @@ StringData Results::get_object_type() const noexcept
 
 Results Results::sort(realm::SortOrder&& sort) const
 {
-    if (m_link_view)
-        return Results(m_realm, m_link_view, m_query, std::move(sort));
     return Results(m_realm, get_query(), std::move(sort));
 }
 
 Results Results::filter(Query&& q) const
 {
-    if (m_link_view)
-        return Results(m_realm, m_link_view, get_query().and_query(std::move(q)), m_sort);
     return Results(m_realm, get_query().and_query(std::move(q)), m_sort);
 }
 
@@ -457,6 +453,21 @@ NotificationToken Results::add_notification_callback(CollectionChangeCallback cb
 {
     prepare_async();
     return {m_notifier, m_notifier->add_callback(std::move(cb))};
+}
+
+bool Results::is_in_table_order() const
+{
+    switch (m_mode) {
+        case Mode::Empty:
+        case Mode::Table:
+            return true;
+        case Mode::LinkView:
+            return false;
+        case Mode::Query:
+            return m_query.produces_results_in_table_order() && !m_sort;
+        case Mode::TableView:
+            return m_table_view.is_in_table_order();
+    }
 }
 
 void Results::Internal::set_table_view(Results& results, realm::TableView &&tv)
