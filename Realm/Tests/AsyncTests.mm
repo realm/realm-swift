@@ -23,6 +23,8 @@
 
 #import "impl/realm_coordinator.hpp"
 
+#import <sys/resource.h>
+
 // A whole bunch of blocks don't use their RLMResults parameter
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
@@ -400,15 +402,21 @@
 - (void)testErrorHandling {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    // Force an error when opening the helper SharedGroups by deleting the file
-    // after opening the Realm
-    [NSFileManager.defaultManager removeItemAtURL:realm.configuration.fileURL error:nil];
+    // Set the max open files to zero so that opening new files will fail
+    rlimit oldrl;
+    getrlimit(RLIMIT_NOFILE, &oldrl);
+    rlimit rl = oldrl;
+    rl.rlim_cur = 0;
+    setrlimit(RLIMIT_NOFILE, &rl);
 
+    // Will try to open another copy of the file for the pin SG
     __block bool called = false;
     XCTestExpectation *exp = [self expectationWithDescription:@""];
     auto token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
         XCTAssertNil(results);
         XCTAssertNotNil(error);
+        XCTAssertEqual(error.code, RLMErrorFail);
+        XCTAssert([error.localizedDescription rangeOfString:@"Too many open files"].location != NSNotFound);
         called = true;
         [exp fulfill];
     }];
@@ -417,6 +425,10 @@
     XCTAssertFalse(called);
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTAssertTrue(called);
+
+    // Restore the old open file limit now so that we can make commits
+    setrlimit(RLIMIT_NOFILE, &oldrl);
 
     // Neither adding a new async query nor commiting a write transaction should
     // cause it to resend the error
