@@ -3,17 +3,23 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* `-[RLMObject linkingObjectsOfClass:forProperty]` and `Object.linkingObjects(_:forProperty:)`
+  are deprecated in favor of properties of type `RLMLinkingObjects` / `LinkingObjects`.
 
 ### Enhancements
 
-* None.
+* The automatically-maintained inverse direction of relationships can now be exposed as
+  properties of type `RLMLinkingObjects` / `LinkingObjects`. These properties automatically
+  update to reflect the objects that link to the target object, can be used in queries, and
+  can be filtered like other Realm collection types.
+* Queries that compare objects for equality now support multi-level key paths.
 
 ### Bugfixes
 
 * Fix an assertion failure when a second write transaction is committed after a
   write transaction deleted the object containing an RLMArray/List which had an
   active notification block.
+* Queries that compare `RLMArray` / `List` properties using != now give the correct results.
 
 0.99.1 Release notes (2016-04-26)
 =============================================================
