@@ -575,7 +575,7 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
 
         // Query version now matches the SG version, so we can deliver them
         for (auto& notifier : m_notifiers) {
-            if (notifier->deliver(sg, m_async_error)) {
+            if (notifier->deliver(realm, sg, m_async_error)) {
                 notifiers.push_back(notifier);
             }
         }
@@ -594,7 +594,7 @@ void RealmCoordinator::process_available_async(Realm& realm)
     {
         std::lock_guard<std::mutex> lock(m_notifier_mutex);
         for (auto& notifier : m_notifiers) {
-            if (notifier->deliver(sg, m_async_error)) {
+            if (notifier->deliver(realm, sg, m_async_error)) {
                 notifiers.push_back(notifier);
             }
         }
