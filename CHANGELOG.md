@@ -11,7 +11,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix a scenario that could lead to the assertion failure
+  "m_advancer_sg->get_version_of_current_transaction() ==
+  new_notifiers.front()->version()".
 
 0.99.0 Release notes (2016-04-22)
 =============================================================

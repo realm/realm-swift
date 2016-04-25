@@ -180,10 +180,13 @@ void CollectionNotifier::prepare_handover()
     do_prepare_handover(*m_sg);
 }
 
-bool CollectionNotifier::deliver(SharedGroup& sg, std::exception_ptr err)
+bool CollectionNotifier::deliver(Realm& realm, SharedGroup& sg, std::exception_ptr err)
 {
-    if (!is_for_current_thread()) {
-        return false;
+    {
+        std::lock_guard<std::mutex> lock(m_realm_mutex);
+        if (m_realm.get() != &realm) {
+            return false;
+        }
     }
 
     if (err) {

@@ -243,13 +243,17 @@ void RealmCoordinator::pin_version(uint_fast64_t version, uint_fast32_t index)
     }
     else if (m_new_notifiers.empty()) {
         // If this is the first notifier then we don't already have a read transaction
+        REALM_ASSERT_3(m_advancer_sg->get_transact_stage(), ==, SharedGroup::transact_Ready);
         m_advancer_sg->begin_read(versionid);
     }
-    else if (versionid < m_advancer_sg->get_version_of_current_transaction()) {
-        // Ensure we're holding a readlock on the oldest version we have a
-        // handover object for, as handover objects don't
-        m_advancer_sg->end_read();
-        m_advancer_sg->begin_read(versionid);
+    else {
+        REALM_ASSERT_3(m_advancer_sg->get_transact_stage(), ==, SharedGroup::transact_Reading);
+        if (versionid < m_advancer_sg->get_version_of_current_transaction()) {
+            // Ensure we're holding a readlock on the oldest version we have a
+            // handover object for, as handover objects don't
+            m_advancer_sg->end_read();
+            m_advancer_sg->begin_read(versionid);
+        }
     }
 }
 
@@ -290,10 +294,12 @@ void RealmCoordinator::clean_up_dead_notifiers()
         // are no notifiers left, but don't close them entirely as opening shared
         // groups is expensive
         if (m_notifiers.empty() && m_notifier_sg) {
+            REALM_ASSERT_3(m_notifier_sg->get_transact_stage(), ==, SharedGroup::transact_Reading);
             m_notifier_sg->end_read();
         }
     }
     if (swap_remove(m_new_notifiers)) {
+        REALM_ASSERT_3(m_advancer_sg->get_transact_stage(), ==, SharedGroup::transact_Reading);
         if (m_new_notifiers.empty() && m_advancer_sg) {
             m_advancer_sg->end_read();
         }
@@ -432,7 +438,14 @@ void RealmCoordinator::run_async_notifiers()
     IncrementalChangeInfo new_notifier_change_info(*m_advancer_sg, new_notifiers);
 
     if (!new_notifiers.empty()) {
-        REALM_ASSERT(m_advancer_sg->get_version_of_current_transaction() == new_notifiers.front()->version());
+        REALM_ASSERT_3(m_advancer_sg->get_transact_stage(), ==, SharedGroup::transact_Reading);
+        REALM_ASSERT_3(m_advancer_sg->get_version_of_current_transaction().version,
+                       <=, new_notifiers.front()->version().version);
+
+        // The advancer SG can be at an older version than the oldest new notifier
+        // if a notifier was added and then removed before it ever got the chance
+        // to run, as we don't move the pin forward when removing dead notifiers
+        transaction::advance(*m_advancer_sg, nullptr, new_notifiers.front()->version());
 
         // Advance each of the new notifiers to the latest version, attaching them
         // to the SG at their handover version. This requires a unique
@@ -454,6 +467,7 @@ void RealmCoordinator::run_async_notifiers()
         version = m_advancer_sg->get_version_of_current_transaction();
         m_advancer_sg->end_read();
     }
+    REALM_ASSERT_3(m_advancer_sg->get_transact_stage(), ==, SharedGroup::transact_Ready);
 
     // Make a copy of the notifiers vector and then release the lock to avoid
     // blocking other threads trying to register or unregister notifiers while we run them
@@ -561,7 +575,7 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
 
         // Query version now matches the SG version, so we can deliver them
         for (auto& notifier : m_notifiers) {
-            if (notifier->deliver(sg, m_async_error)) {
+            if (notifier->deliver(realm, sg, m_async_error)) {
                 notifiers.push_back(notifier);
             }
         }
@@ -580,7 +594,7 @@ void RealmCoordinator::process_available_async(Realm& realm)
     {
         std::lock_guard<std::mutex> lock(m_notifier_mutex);
         for (auto& notifier : m_notifiers) {
-            if (notifier->deliver(sg, m_async_error)) {
+            if (notifier->deliver(realm, sg, m_async_error)) {
                 notifiers.push_back(notifier);
             }
         }
