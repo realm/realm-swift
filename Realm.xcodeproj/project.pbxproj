@@ -79,8 +79,8 @@
 		3F75566B1BE94CCC0058BC7E /* results.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556691BE94CCC0058BC7E /* results.cpp */; };
 		3F75566C1BE94CCC0058BC7E /* results.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F75566A1BE94CCC0058BC7E /* results.hpp */; };
 		3F75566D1BE94CEA0058BC7E /* results.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556691BE94CCC0058BC7E /* results.cpp */; };
-		3F7556751BE95A0C0058BC7E /* AsyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.m */; };
-		3F7556761BE95A0D0058BC7E /* AsyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.m */; };
+		3F7556751BE95A0C0058BC7E /* AsyncTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.mm */; };
+		3F7556761BE95A0D0058BC7E /* AsyncTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.mm */; };
 		3F7A3FAE1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7A3FAC1CC6EB7300301A17 /* collection_change_builder.cpp */; };
 		3F7A3FAF1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7A3FAC1CC6EB7300301A17 /* collection_change_builder.cpp */; };
 		3F7A3FB01CC6EB7300301A17 /* collection_change_builder.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F7A3FAD1CC6EB7300301A17 /* collection_change_builder.hpp */; };
@@ -524,7 +524,7 @@
 		3F6B89AE19EF40BA004E8EA8 /* librealm-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "librealm-ios.a"; path = "../core/librealm-ios.a"; sourceTree = "<group>"; };
 		3F7556691BE94CCC0058BC7E /* results.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = results.cpp; path = ObjectStore/results.cpp; sourceTree = "<group>"; };
 		3F75566A1BE94CCC0058BC7E /* results.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = results.hpp; path = ObjectStore/results.hpp; sourceTree = "<group>"; };
-		3F7556731BE95A050058BC7E /* AsyncTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncTests.m; sourceTree = "<group>"; };
+		3F7556731BE95A050058BC7E /* AsyncTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AsyncTests.mm; sourceTree = "<group>"; };
 		3F7A3FAC1CC6EB7300301A17 /* collection_change_builder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = collection_change_builder.cpp; path = ObjectStore/impl/collection_change_builder.cpp; sourceTree = "<group>"; };
 		3F7A3FAD1CC6EB7300301A17 /* collection_change_builder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = collection_change_builder.hpp; path = ObjectStore/impl/collection_change_builder.hpp; sourceTree = "<group>"; };
 		3F90260F1C625C5D006AE98E /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = list.cpp; path = ObjectStore/list.cpp; sourceTree = "<group>"; };
@@ -922,7 +922,7 @@
 			isa = PBXGroup;
 			children = (
 				E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */,
-				3F7556731BE95A050058BC7E /* AsyncTests.m */,
+				3F7556731BE95A050058BC7E /* AsyncTests.mm */,
 				E81A1FBA1955FE0100FDED82 /* DynamicTests.m */,
 				021A882F1AAFB5BE00EEAC84 /* EncryptionTests.mm */,
 				E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */,
@@ -1858,7 +1858,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E856D214195615A900FB2FCF /* ArrayPropertyTests.m in Sources */,
-				3F7556761BE95A0D0058BC7E /* AsyncTests.m in Sources */,
+				3F7556761BE95A0D0058BC7E /* AsyncTests.mm in Sources */,
 				E856D216195615A900FB2FCF /* DynamicTests.m in Sources */,
 				021A88331AAFB5C900EEAC84 /* EncryptionTests.mm in Sources */,
 				E856D217195615A900FB2FCF /* EnumeratorTests.m in Sources */,
@@ -1903,7 +1903,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */,
-				3F7556751BE95A0C0058BC7E /* AsyncTests.m in Sources */,
+				3F7556751BE95A0C0058BC7E /* AsyncTests.mm in Sources */,
 				02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */,
 				021A88321AAFB5C800EEAC84 /* EncryptionTests.mm in Sources */,
 				E81A1FDB1955FE0100FDED82 /* EnumeratorTests.m in Sources */,
