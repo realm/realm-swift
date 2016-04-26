@@ -250,9 +250,9 @@
     [token stop];
 }
 
-- (RLMNotificationToken *)subscribeAndWaitForInitial:(RLMResults *)query block:(void (^)(RLMResults *))block {
+- (RLMNotificationToken *)subscribeAndWaitForInitial:(id<RLMCollection>)query block:(void (^)(id))block {
     __block XCTestExpectation *exp = [self expectationWithDescription:@"wait for initial results"];
-    auto token = [query addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *e) {
+    auto token = [query addNotificationBlock:^(id results, RLMCollectionChange *change, NSError *e) {
         XCTAssertNotNil(results);
         XCTAssertNil(e);
         if (exp) {
@@ -898,6 +898,43 @@
             XCTFail(@"should not be called");
         }]);
     }];
+}
+
+- (void)testTransactionsAfterDeletingLinkView {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    IntObject *io = [IntObject createInRealm:realm withValue:@[@5]];
+    ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[io]]];
+    [realm commitWriteTransaction];
+
+    RLMNotificationToken *token1 = [self subscribeAndWaitForInitial:apo.intArray block:^(RLMArray *array) {
+        XCTAssertEqual(array.count, 0U);
+    }];
+    RLMResults *asResults = [apo.intArray objectsWhere:@"intCol = 5"];
+    RLMNotificationToken *token2 = [self subscribeAndWaitForInitial:asResults block:^(RLMResults *results) {
+        XCTAssertEqual(results.count, 0U);
+    }];
+
+    // Delete the object containing the RLMArray with notifiers
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [realm deleteObject:[ArrayPropertyObject allObjectsInRealm:realm].firstObject];
+        }];
+    }];
+
+    // Perform another transaction while the notifiers are still alive as
+    // transactions deleting the RLMArray and transactions with the RLMArray
+    // already deleted hit different code paths
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+        }];
+    }];
+
+    [token1 stop];
+    [token2 stop];
 }
 
 @end
