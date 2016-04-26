@@ -29,7 +29,7 @@ RLM_ARRAY_TYPE(Dog)
 
 @interface Person : RLMObject
 @property NSString      *name;
-@property RLMArray<Dog *><Dog> *dogs;
+@property RLMArray<Dog> *dogs;
 @end
 
 @implementation Person
