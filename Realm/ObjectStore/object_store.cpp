@@ -517,7 +517,7 @@ void ObjectStore::delete_data_for_object(Group *group, StringData object_type) {
     }
 }
 
-void ObjectStore::rename_column(Group *group, Schema& passed_schema, StringData object_type, StringData old_name, StringData new_name) {
+void ObjectStore::rename_property(Group *group, Schema& passed_schema, StringData object_type, StringData old_name, StringData new_name) {
     Schema schema = schema_from_group(group);
     auto matching_schema = schema.find(object_type);
     if (matching_schema == schema.end()) {

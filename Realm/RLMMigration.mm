@@ -147,7 +147,7 @@ using namespace realm;
 }
 
 - (void)renamePropertyForClass:(NSString *)className oldName:(NSString *)oldName newName:(NSString *)newName {
-    realm::ObjectStore::rename_column(_realm.group, *_realm->_realm->config().schema, className.UTF8String, oldName.UTF8String, newName.UTF8String);
+    realm::ObjectStore::rename_property(_realm.group, *_realm->_realm->config().schema, className.UTF8String, oldName.UTF8String, newName.UTF8String);
 }
 
 @end

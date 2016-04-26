@@ -70,7 +70,7 @@ namespace realm {
         static void delete_data_for_object(Group *group, StringData object_type);
 
         // renames the object_type's column of the old_name to the new name
-        static void rename_column(Group *group, Schema& passed_schema, StringData object_type, StringData old_name, StringData new_name);
+        static void rename_property(Group *group, Schema& passed_schema, StringData object_type, StringData old_name, StringData new_name);
 
         // indicates if this group contains any objects
         static bool is_empty(const Group *group);
