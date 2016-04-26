@@ -353,6 +353,7 @@ void RLMRealmTranslateException(NSError **error) {
     // protects the realm cache and accessors cache
     static id initLock = [NSObject new];
     @synchronized(initLock) {
+        configuration.customSchema = configuration.customSchema ?: [RLMSchema.sharedSchema copy];
         realm->_realm = [self openSharedRealm:config error:error];
         if (!realm->_realm) {
             return nil;
