@@ -317,7 +317,7 @@ class MigrationTests: TestCase {
             let prop = RLMProperty(name: "before_stringCol", type: .String, objectClassName: nil, indexed: false,
                 optional: false)
             autoreleasepool {
-                let realm = realmWithSingleClassProperties(defaultRealmPath(), className: "SwiftStringObject",
+                let realm = realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftStringObject",
                     properties: [prop])
                 try! realm.transactionWithBlock {
                     realm.createObject("SwiftStringObject", withValue: ["a"])
@@ -330,7 +330,7 @@ class MigrationTests: TestCase {
                     newName: "stringCol")
             }
 
-            let realm = dynamicRealm(defaultRealmPath())
+            let realm = dynamicRealm(defaultRealmURL())
             XCTAssertEqual(realm.schema.schemaForClassName("SwiftStringObject")!.properties.count, 1)
             XCTAssertEqual(1, realm.allObjects("SwiftStringObject").count)
             XCTAssertEqual("a", realm.allObjects("SwiftStringObject").firstObject()?["stringCol"] as? String)
