@@ -406,8 +406,13 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     [_realm verifyNotificationsAreSupported];
     return RLMAddNotificationBlock(self, _results, block, false);
 }
-
 #pragma clang diagnostic pop
+
+- (BOOL)isAttached
+{
+    return !!_realm;
+}
+
 @end
 
 @implementation RLMLinkingObjects
