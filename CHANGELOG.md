@@ -11,7 +11,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix an assertion failure when a second write transaction is committed after a
+  write transaction deleted the object containing an RLMArray/List which had an
+  active notification block.
 
 0.99.1 Release notes (2016-04-26)
 =============================================================

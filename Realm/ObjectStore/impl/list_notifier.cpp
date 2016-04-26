@@ -71,7 +71,7 @@ void ListNotifier::do_detach_from(SharedGroup& sg)
 bool ListNotifier::do_add_required_change_info(TransactionChangeInfo& info)
 {
     REALM_ASSERT(!m_lv_handover);
-    if (!m_lv) {
+    if (!m_lv || !m_lv->is_attached()) {
         return false; // origin row was deleted after the notification was added
     }
 
@@ -91,6 +91,9 @@ void ListNotifier::run()
         if (m_prev_size) {
             m_change.deletions.set(m_prev_size);
             m_prev_size = 0;
+        }
+        else {
+            m_change = {};
         }
         return;
     }
