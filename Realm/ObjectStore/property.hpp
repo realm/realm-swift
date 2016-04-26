@@ -88,7 +88,6 @@ namespace realm {
         std::string object_type;
         bool is_primary = false;
         bool is_indexed = false;
-        bool is_indexable() const { return type == PropertyTypeInt || type == PropertyTypeBool || type == PropertyTypeString || type == PropertyTypeDate; }
         bool is_nullable = false;
 
         size_t table_column = -1;
@@ -101,18 +100,18 @@ namespace realm {
         }
         std::string type_string() const {
             switch(type) {
-                case PropertyTypeString:
-                case PropertyTypeInt:
-                case PropertyTypeBool:
-                case PropertyTypeDate:
-                case PropertyTypeData:
-                case PropertyTypeDouble:
-                case PropertyTypeFloat:
-                case PropertyTypeAny:
+                case PropertyType::String:
+                case PropertyType::Int:
+                case PropertyType::Bool:
+                case PropertyType::Date:
+                case PropertyType::Data:
+                case PropertyType::Double:
+                case PropertyType::Float:
+                case PropertyType::Any:
                     return string_for_property_type(type);
-                case PropertyTypeObject:
+                case PropertyType::Object:
                     return "<" + object_type + ">";
-                case PropertyTypeArray:
+                case PropertyType::Array:
                     return "array<" + object_type + ">";
             }
         }

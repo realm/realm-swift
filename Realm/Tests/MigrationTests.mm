@@ -227,7 +227,7 @@ RLM_ARRAY_TYPE(MigrationObject);
 
 - (RLMRealmConfiguration *)renameConfigurationWithObjectSchemas:(NSArray *)objectSchemas migrationBlock:(RLMMigrationBlock)block {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration new];
-    configuration.path = RLMTestRealmPath();
+    configuration.fileURL = RLMTestRealmURL();
     configuration.schemaVersion = 1;
     configuration.customSchema = [self schemaWithObjects:objectSchemas];
     configuration.migrationBlock = block;
