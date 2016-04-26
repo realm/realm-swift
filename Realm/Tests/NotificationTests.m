@@ -291,6 +291,10 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol > 4"]];
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol < 1"]];
     });
+
+    ExpectChange(self, @[@0, @1, @2, @3], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[[IntObject allObjectsInRealm:realm] valueForKey:@"self"]];
+    });
 }
 
 - (void)testDeleteNewlyInsertedRowMatchingQuery {
