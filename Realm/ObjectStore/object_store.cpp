@@ -537,7 +537,8 @@ void ObjectStore::rename_property(Group *group, Schema& passed_schema, StringDat
     }
     Property *new_property = matching_schema->property_for_name(new_name);
     if (new_property == nullptr) {
-        throw PropertyRenameMissingNewPropertyException(old_name, new_name);
+        table->rename_column(old_property->table_column, new_name);
+        return;
     }
     if (old_property->type != new_property->type ||
         old_property->object_type != new_property->object_type) {
@@ -614,12 +615,6 @@ PropertyRenameMissingOldPropertyException::PropertyRenameMissingOldPropertyExcep
     PropertyRenameException(old_property_name, new_property_name)
 {
     m_what = "Old property '" + old_property_name + "' is missing from the Realm file so it cannot be renamed to '" + new_property_name + "'.";
-}
-
-PropertyRenameMissingNewPropertyException::PropertyRenameMissingNewPropertyException(std::string old_property_name, std::string new_property_name) :
-    PropertyRenameException(old_property_name, new_property_name)
-{
-    m_what = "Old property '" + old_property_name + "' cannot be renamed to '" + new_property_name + "' because the new property is not present in the specified schema.";
 }
 
 PropertyRenameOldStillExistsException::PropertyRenameOldStillExistsException(std::string old_property_name, std::string new_property_name) :

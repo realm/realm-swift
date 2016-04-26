@@ -245,7 +245,7 @@ RLM_ARRAY_TYPE(MigrationObject);
                         className:(NSString *)className oldName:(NSString *)oldName newName:(NSString *)newName {
     RLMRealmConfiguration *config = [self renameConfigurationWithObjectSchemas:objectSchemas className:className
                                                                        oldName:oldName newName:newName];
-    XCTAssertEqualObjects([[RLMRealm migrateRealm:config] localizedDescription], errorMessage);
+    XCTAssertTrue([[[RLMRealm migrateRealm:config] localizedDescription] rangeOfString:errorMessage].location != NSNotFound);
 }
 
 - (void)assertPropertyRenameError:(NSString *)errorMessage
@@ -1225,6 +1225,34 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqualObjects(inputValue[10], @[obj.objectCol.stringCol]);
 }
 
+- (void)testMultipleMigrationRenameProperty {
+    RLMObjectSchema *schema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+    schema.properties = @[[schema.properties.firstObject copyWithNewName:@"stringCol0"]];
+
+    [self createTestRealmWithSchema:@[schema] block:^(RLMRealm *realm) {
+        [StringObject createInRealm:realm withValue:@[@"0"]];
+    }];
+
+    schema.properties = @[[schema.properties.firstObject copyWithNewName:@"stringCol"]];
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.fileURL = RLMTestRealmURL();
+    config.customSchema = [self schemaWithObjects:@[schema]];
+    config.schemaVersion = 2;
+    config.migrationBlock = ^(RLMMigration *migration, uint64_t oldVersion){
+        if (oldVersion < 1) {
+            [migration renamePropertyForClass:StringObject.className oldName:@"stringCol0" newName:@"stringCol1"];
+        }
+        if (oldVersion < 2) {
+            [migration renamePropertyForClass:StringObject.className oldName:@"stringCol1" newName:@"stringCol"];
+        }
+    };
+
+    XCTAssertNil([RLMRealm migrateRealm:config]);
+    NSLog(@"%@", [StringObject allObjectsInRealm:[RLMRealm realmWithConfiguration:config error:nil]]);
+    XCTAssertEqualObjects(@"0", [[[StringObject allObjectsInRealm:[RLMRealm realmWithConfiguration:config error:nil]] firstObject] stringCol]);
+}
+
 - (void)testMigrationRenamePropertyPrimaryKeyBoth {
     [self assertPropertyRenameError:nil firstSchemaTransform:^(RLMObjectSchema *schema, RLMProperty *beforeProperty, __unused RLMProperty *afterProperty) {
         schema.primaryKeyProperty = beforeProperty;
@@ -1326,7 +1354,7 @@ RLM_ARRAY_TYPE(MigrationObject);
                       objectSchemas:@[objectSchema] className:StringObject.className oldName:@"nonExistentProperty1" newName:@"nonExistentProperty2"];
 
     // Missing New Property
-    [self assertPropertyRenameError:@"Old property 'stringCol' cannot be renamed to 'nonExistentProperty' because the new property is not present in the specified schema."
+    [self assertPropertyRenameError:@"Property 'nonExistentProperty' is missing from latest object model"
                       objectSchemas:@[objectSchema] className:StringObject.className oldName:@"stringCol" newName:@"nonExistentProperty"];
 
     // Non Existent Class

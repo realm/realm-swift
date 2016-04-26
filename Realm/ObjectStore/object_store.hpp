@@ -168,11 +168,6 @@ namespace realm {
         PropertyRenameMissingOldPropertyException(std::string old_property_name, std::string new_property_name);
     };
 
-    class PropertyRenameMissingNewPropertyException : public PropertyRenameException {
-      public:
-        PropertyRenameMissingNewPropertyException(std::string old_property_name, std::string new_property_name);
-    };
-
     class PropertyRenameOldStillExistsException : public PropertyRenameException {
       public:
         PropertyRenameOldStillExistsException(std::string old_property_name, std::string new_property_name);
