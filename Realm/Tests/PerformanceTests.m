@@ -131,7 +131,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     config.inMemoryIdentifier = @(factor).stringValue;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-    [NSFileManager.defaultManager removeItemAtPath:RLMTestRealmURL() error:nil];
+    [NSFileManager.defaultManager removeItemAtURL:RLMTestRealmURL() error:nil];
     [realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:nil];
     return [self realmWithTestPath];
 }
@@ -369,7 +369,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
             }
         }
     }];
-    [realm.configuration path];
+    [realm configuration];
 }
 
 - (void)testRealmCreationUncached {
