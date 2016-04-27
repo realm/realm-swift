@@ -933,7 +933,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     [self createTestRealmWithSchema:@[objectSchema] block:^(RLMRealm *realm) {
         [AllOptionalTypes createInRealm:realm withValue:@[ [NSNull null], [NSNull null], [NSNull null], [NSNull null],
                                                            [NSNull null], [NSNull null], [NSNull null]]];
-        [AllOptionalTypes createInRealm:realm withValue:@[@2, @2, @2, @0, @"str2",
+        [AllOptionalTypes createInRealm:realm withValue:@[@2, @2, @2, @1, @"str2",
                                                           [@"data2" dataUsingEncoding:NSUTF8StringEncoding],
                                                           [NSDate dateWithTimeIntervalSince1970:2]]];
     }];
@@ -965,13 +965,13 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:0], obj.date);
 
     obj = allObjects[1];
-    XCTAssertEqualObjects(@0, obj.intObj);
-    XCTAssertEqualObjects(@0, obj.floatObj);
-    XCTAssertEqualObjects(@0, obj.doubleObj);
-    XCTAssertEqualObjects(@0, obj.boolObj);
-    XCTAssertEqualObjects(@"", obj.string);
-    XCTAssertEqualObjects(NSData.data, obj.data);
-    XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:0], obj.date);
+    XCTAssertEqualObjects(@2, obj.intObj);
+    XCTAssertEqualObjects(@2, obj.floatObj);
+    XCTAssertEqualObjects(@2, obj.doubleObj);
+    XCTAssertEqualObjects(@1, obj.boolObj);
+    XCTAssertEqualObjects(@"str2", obj.string);
+    XCTAssertEqualObjects([@"data2" dataUsingEncoding:NSUTF8StringEncoding], obj.data);
+    XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:2], obj.date);
 }
 
 - (void)testMigrationAfterReorderingProperties {
