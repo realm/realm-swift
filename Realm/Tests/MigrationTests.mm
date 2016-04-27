@@ -238,7 +238,7 @@ RLM_ARRAY_TYPE(MigrationObject);
                                                         oldName:(NSString *)oldName newName:(NSString *)newName {
     return [self renameConfigurationWithObjectSchemas:objectSchemas migrationBlock:^(RLMMigration *migration, uint64_t) {
         [migration renamePropertyForClass:className oldName:oldName newName:newName];
-        [migration enumerateObjects:AllTypesObject.className block:^(RLMObject * _Nullable oldObject, RLMObject * _Nullable newObject) {
+        [migration enumerateObjects:AllTypesObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertNotNil(oldObject[oldName]);
             RLMAssertThrowsWithReasonMatching(newObject[newName], @"Invalid property name");
             XCTAssertEqualObjects(oldObject[oldName], newObject[newName]);
@@ -1206,14 +1206,14 @@ RLM_ARRAY_TYPE(MigrationObject);
                                                                 migrationBlock:^(RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
         [afterProperties enumerateObjectsUsingBlock:^(RLMProperty *property, NSUInteger idx, __unused BOOL *stop) {
             [migration renamePropertyForClass:AllTypesObject.className oldName:[beforeProperties[idx] name] newName:property.name];
-            [migration enumerateObjects:AllTypesObject.className block:^(RLMObject * _Nullable oldObject, RLMObject * _Nullable newObject) {
+            [migration enumerateObjects:AllTypesObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
                 XCTAssertNotNil(oldObject[[beforeProperties[idx] name]]);
                 RLMAssertThrowsWithReasonMatching(newObject[[beforeProperties[idx] name]], @"Invalid property name");
                 if (![property.objectClassName isEqualToString:@""]) { return; }
                 XCTAssertEqualObjects(oldObject[[beforeProperties[idx] name]], newObject[property.name]);
             }];
         }];
-        [migration enumerateObjects:AllTypesObject.className block:^(RLMObject * _Nullable oldObject, RLMObject * _Nullable newObject) {
+        [migration enumerateObjects:AllTypesObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertEqualObjects([oldObject.description stringByReplacingOccurrencesOfString:@"before_" withString:@""], newObject.description);
         }];
     }];
@@ -1261,7 +1261,7 @@ RLM_ARRAY_TYPE(MigrationObject);
         __block id oldValue = nil;
         if (oldVersion < 1) {
             [migration renamePropertyForClass:StringObject.className oldName:@"stringCol0" newName:@"stringCol1"];
-            [migration enumerateObjects:StringObject.className block:^(RLMObject * _Nullable oldObject, RLMObject * _Nullable newObject) {
+            [migration enumerateObjects:StringObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
                 oldValue = oldObject[@"stringCol0"];
                 XCTAssertNotNil(oldValue);
                 XCTAssertEqualObjects(newObject[@"stringCol1"], oldValue);
@@ -1271,7 +1271,7 @@ RLM_ARRAY_TYPE(MigrationObject);
         if (oldVersion < 2) {
             [migration renamePropertyForClass:StringObject.className oldName:@"stringCol1" newName:@"stringCol"];
 
-            [migration enumerateObjects:StringObject.className block:^(RLMObject * _Nullable oldObject, RLMObject * _Nullable newObject) {
+            [migration enumerateObjects:StringObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
                 XCTAssertEqualObjects(oldObject[@"stringCol0"], oldValue);
                 XCTAssertEqualObjects(newObject[@"stringCol"], oldValue);
                 RLMAssertThrowsWithReasonMatching(newObject[@"stringCol0"], @"Invalid property name");
