@@ -300,10 +300,7 @@ std::vector<Property> ObjectStore::create_tables(Group *group, Schema &target_sc
             auto target_prop = target_object_schema->property_for_name(current_prop.name);
             // mark property for deletion
             if (!target_prop) {
-                auto original_property = current_prop;
-                to_delete.push_back(original_property);
-                // Set to empty string to prevent `property_for_name` from matching properties marked for deletion
-                current_prop.name = "";
+                to_delete.push_back(current_prop);
             }
             else if ((property_has_changed(current_prop, *target_prop) &&
                       !property_can_be_migrated_to_nullable(current_prop, *target_prop))) {
@@ -540,6 +537,8 @@ void ObjectStore::rename_property(Group *group, Schema& passed_schema, StringDat
     }
     Property *new_property = matching_schema->property_for_name(new_name);
     if (new_property == nullptr) {
+        new_property = matching_schema->property_for_name(old_name);
+        new_property->name = new_name;
         table->rename_column(old_property->table_column, new_name);
         return;
     }
@@ -554,8 +553,9 @@ void ObjectStore::rename_property(Group *group, Schema& passed_schema, StringDat
     table->rename_column(old_property->table_column, new_name);
     table->remove_column(column_to_remove);
     // update table_column for each property after the one we just removed
-    for (size_t i = column_to_remove; i < passed_object_schema->properties.size(); i++) {
-        passed_object_schema->properties[i].table_column--;
+    for (auto& current_prop : passed_object_schema->properties) {
+        auto target_prop = matching_schema->property_for_name(current_prop.name);
+        current_prop.table_column = target_prop->table_column;
     }
     if (new_property->is_primary && !old_property->is_primary) {
         set_primary_key_for_object(group, object_type, new_name);
