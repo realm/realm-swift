@@ -279,35 +279,19 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     }
 }
 
-- (NSString *)syncIdentity {
-    if (!_config.sync_identity) {
+- (NSString *)syncUserToken {
+    if (!_config.sync_user_token) {
         return nil;
     }
 
-    return @(_config.sync_identity->c_str());
+    return @(_config.sync_user_token->c_str());
 }
 
-- (void)setSyncIdentity:(NSString *)syncIdentity {
-    if (!syncIdentity) {
-        _config.sync_identity = realm::util::none;
+- (void)setSyncUserToken:(NSString *)syncUserToken {
+    if (!syncUserToken) {
+        _config.sync_user_token = realm::util::none;
     } else {
-        _config.sync_identity = std::string(syncIdentity.UTF8String);
-    }
-}
-
-- (NSString *)syncSignature {
-    if (!_config.sync_signature) {
-        return nil;
-    }
-
-    return @(_config.sync_signature->c_str());
-}
-
-- (void)setSyncSignature:(NSString *)syncSignature {
-    if (!syncSignature) {
-        _config.sync_signature = realm::util::none;
-    } else {
-        _config.sync_signature = std::string(syncSignature.UTF8String);
+        _config.sync_user_token = std::string(syncUserToken.UTF8String);
     }
 }
 

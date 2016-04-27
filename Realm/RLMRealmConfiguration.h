@@ -88,15 +88,13 @@ RLM_ASSUME_NONNULL_BEGIN
 
 /**
  The user identity token used for synchronization.
- Must be a base64-encoded JSON document.
+ It has the form "syncIdentity:syncSignature"
+ Where:
+    syncIdentity is a base64-encoded JSON document.
+    syncSignature is a base64-encoded cryptographic signature.
+        Must match the value of syncIdentity.
 */
-@property (nonatomic, copy, nullable) NSString *syncIdentity;
-
-/**
- A base64-encoded cryptographic signature.
- Must match the value of syncIdentity.
-*/
-@property (nonatomic, copy, nullable) NSString *syncSignature;
+@property (nonatomic, copy, nullable) NSString *syncUserToken;
 
 @end
 

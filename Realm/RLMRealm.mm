@@ -94,16 +94,13 @@ std::atomic<bool> g_syncLogEverything{false};
     std::thread _runLoopThread;
 }
 
-- (instancetype)initWithUserToken:(NSString *)userToken
-               userTokenSignature:(NSString *)userTokenSignature {
+- (instancetype)initWithUserToken:(NSString *)syncUserToken {
     self = [super init];
     if (self) {
         sync::Client::LogLevel logLevel = sync::Client::LogLevel::normal;
         if (g_syncLogEverything)
             logLevel = sync::Client::LogLevel::everything;
-        std::ostringstream complete_token;
-        complete_token << userToken.UTF8String << ":" << userTokenSignature.UTF8String;
-        _client.reset(new sync::Client(complete_token.str(), &_logger, logLevel)); // Throws
+        _client.reset(new sync::Client(syncUserToken.UTF8String, &_logger, logLevel)); // Throws
         sync::Client& client = *_client;
         auto runLoopThread = [&client] {
             client.run(); // Throws
@@ -487,14 +484,9 @@ void RLMRealmTranslateException(NSError **error) {
                                                    reason:@"Server synchronization URL mismatch"
                                                  userInfo:nil];
                 }
-                if (![realm.configuration.syncIdentity isEqual:cachedRealm.configuration.syncIdentity]) {
+                if (![realm.configuration.syncUserToken isEqual:cachedRealm.configuration.syncUserToken]) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:@"Server synchronization user token mismatch"
-                                                 userInfo:nil];
-                }
-                if (![realm.configuration.syncSignature isEqual:cachedRealm.configuration.syncSignature]) {
-                    @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:@"Server synchronization user token signature mismatch"
                                                  userInfo:nil];
                 }
                 realm->_syncSession = cachedRealm->_syncSession;
@@ -515,16 +507,11 @@ void RLMRealmTranslateException(NSError **error) {
             RLMSyncSession *session = [g_syncSessions objectForKey:realm.path];
             if (!session) {
                 if (NSURL *serverURL = realm.configuration.syncServerURL) {
-                    NSString *clientKey = [NSString stringWithFormat:@"%@:%@",
-                                                    realm.configuration.syncIdentity,
-                                                    realm.configuration.syncSignature];
-                    RLMSyncClient *client = [g_syncClients objectForKey:clientKey];
+                    RLMSyncClient *client = [g_syncClients objectForKey:realm.configuration.syncUserToken];
                     if (!client) {
-                        NSString *userToken          = realm.configuration.syncIdentity;
-                        NSString *userTokenSignature = realm.configuration.syncSignature;
-                        client = [[RLMSyncClient alloc] initWithUserToken:userToken
-                                                       userTokenSignature:userTokenSignature];
-                        [g_syncClients setObject:client forKey:clientKey];
+                        NSString *syncUserToken          = realm.configuration.syncUserToken;
+                        client = [[RLMSyncClient alloc] initWithUserToken:syncUserToken];
+                        [g_syncClients setObject:client forKey:realm.configuration.syncUserToken];
                     }
                     session = [[RLMSyncSession alloc] initWithClient:client
                                                                 path:realm.path

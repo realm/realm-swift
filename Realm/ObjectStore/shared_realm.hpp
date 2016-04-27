@@ -58,8 +58,7 @@ namespace realm {
             bool disable_format_upgrade = false;
             std::vector<char> encryption_key;
             util::Optional<std::string> sync_server_url;
-            util::Optional<std::string> sync_identity;
-            util::Optional<std::string> sync_signature;
+            util::Optional<std::string> sync_user_token;
 
             std::unique_ptr<Schema> schema;
             uint64_t schema_version;
