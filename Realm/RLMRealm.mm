@@ -285,7 +285,11 @@ void RLMRealmTranslateException(NSError **error) {
         return Realm::get_shared_realm(config);
     }
     catch (...) {
-        RLMRealmTranslateException(outError);
+        if (config.delete_realm_if_migration_needed) {
+            throw;
+        } else {
+            RLMRealmTranslateException(outError);
+        }
     }
     return nullptr;
 }
@@ -353,7 +357,23 @@ void RLMRealmTranslateException(NSError **error) {
     // protects the realm cache and accessors cache
     static id initLock = [NSObject new];
     @synchronized(initLock) {
-        realm->_realm = [self openSharedRealm:config error:error];
+        try {
+            realm->_realm = [self openSharedRealm:config error:error];
+        }
+        catch (SchemaMismatchException const& exception) {
+            if (configuration.deleteRealmIfMigrationNeeded) {
+                BOOL success = [[NSFileManager defaultManager] removeItemAtURL:configuration.fileURL error:nil];
+                if (success) {
+                    realm->_realm = [self openSharedRealm:config error:error];
+                } else {
+                    RLMSetErrorOrThrow(RLMMakeError(RLMException(exception)), error);
+                    return nil;
+                }
+            } else {
+                RLMSetErrorOrThrow(RLMMakeError(RLMException(exception)), error);
+                return nil;
+            }
+        }
         if (!realm->_realm) {
             return nil;
         }
@@ -382,6 +402,18 @@ void RLMRealmTranslateException(NSError **error) {
                 }
 
                 RLMRealmSetSchemaAndAlign(realm, schema);
+            } catch (SchemaMismatchException const& exception) {
+                if (configuration.deleteRealmIfMigrationNeeded) {
+                    BOOL success = [[NSFileManager defaultManager] removeItemAtURL:configuration.fileURL error:nil];
+                    if (success) {
+                        realm->_realm->close();
+                        realm = nil;
+                        return [self realmWithConfiguration:configuration error:error];
+                    }
+                }
+
+                RLMSetErrorOrThrow(RLMMakeError(RLMException(exception)), error);
+                return nil;
             } catch (std::exception const& exception) {
                 RLMSetErrorOrThrow(RLMMakeError(RLMException(exception)), error);
                 return nil;
