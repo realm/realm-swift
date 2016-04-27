@@ -60,8 +60,7 @@ extension Realm {
         - parameter migrationBlock:     The block which migrates the Realm to the current version.
         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
         - parameter syncServerURL:      The synchronization server URL.
-        - parameter syncIdentity:       The user identity token used for synchronization.
-        - parameter syncSignature:      The signature matching the identity token.
+        - parameter syncUserToken:       The user token used for synchronization.
         */
         public init(path: String? = RLMRealmPathForFile("default.realm"),
             inMemoryIdentifier: String? = nil,
@@ -71,8 +70,7 @@ extension Realm {
             migrationBlock: MigrationBlock? = nil,
             objectTypes: [Object.Type]? = nil,
             syncServerURL: NSURL? = nil,
-            syncIdentity: String? = nil,
-            syncSignature: String? = nil) {
+            syncUserToken: String? = nil) {
                 self.path = path
                 if inMemoryIdentifier != nil {
                     self.inMemoryIdentifier = inMemoryIdentifier
@@ -83,8 +81,7 @@ extension Realm {
                 self.migrationBlock = migrationBlock
                 self.objectTypes = objectTypes
                 self.syncServerURL = syncServerURL
-                self.syncIdentity = syncIdentity
-                self.syncSignature = syncSignature
+                self.syncUserToken = syncUserToken
         }
 
         // MARK: Configuration Properties
@@ -152,16 +149,14 @@ extension Realm {
         public var syncServerURL: NSURL? = nil
 
         /**
-        The user identity token used for synchronization.
-        Must be a base64-encoded JSON document.
+        The user token used for synchronization.
+        It has the form "syncIdentity:syncSignature"
+        Where:
+            syncIdentity is a base64-encoded JSON document.
+            syncSignature is a base64-encoded cryptographic signature.
+                Must match the value of syncIdentity..
         */
-        public var syncIdentity: String? = nil;
-
-        /**
-        A base64-encoded cryptographic signature.
-        Must match the value of syncIdentity.
-        */
-        public var syncSignature: String? = nil;
+        public var syncUserToken: String? = nil;
 
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema? = nil
@@ -187,8 +182,7 @@ extension Realm {
             configuration.customSchema = self.customSchema
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.syncServerURL = self.syncServerURL
-            configuration.syncIdentity = self.syncIdentity
-            configuration.syncSignature = self.syncSignature
+            configuration.syncUserToken = self.syncUserToken
             return configuration
         }
 
@@ -207,8 +201,7 @@ extension Realm {
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
             configuration.syncServerURL = rlmConfiguration.syncServerURL
-            configuration.syncIdentity = rlmConfiguration.syncIdentity
-            configuration.syncSignature = rlmConfiguration.syncSignature
+            configuration.syncUserToken = rlmConfiguration.syncUserToken
             return configuration
         }
     }
