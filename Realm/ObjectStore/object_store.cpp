@@ -446,7 +446,7 @@ void ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
     // apply the migration block if provided and there's any old data
     if (get_schema_version(group) != ObjectStore::NotVersioned) {
         migration(group, schema);
-        remove_properties(group, schema, to_delete);
+        remove_properties(group, schema, std::move(to_delete));
         verify_schema(schema_from_group(group), schema);
         validate_primary_column_uniqueness(group, schema);
     }
