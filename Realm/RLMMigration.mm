@@ -26,7 +26,7 @@
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMResults_Private.h"
-#import "RLMSchema_Private.h"
+#import "RLMSchema_Private.hpp"
 
 #import "object_store.hpp"
 #import "shared_realm.hpp"
@@ -148,11 +148,18 @@ using namespace realm;
 }
 
 - (void)renamePropertyForClass:(NSString *)className oldName:(NSString *)oldName newName:(NSString *)newName {
-    RLMObjectSchema *objectSchema = _realm.schema[className];
     realm::ObjectStore::rename_property(_realm.group, *_realm->_realm->config().schema, className.UTF8String, oldName.UTF8String, newName.UTF8String);
+    auto objectStoreSchema = *realm::ObjectStore::schema_from_group(_realm.group).find(className.UTF8String);
+    RLMObjectSchema *objectSchema = [RLMObjectSchema objectSchemaForObjectStoreSchema:objectStoreSchema];
+    NSMutableArray *mutableObjectSchemas = [NSMutableArray arrayWithArray:_realm.schema.objectSchema];
+    [mutableObjectSchemas replaceObjectAtIndex:[mutableObjectSchemas indexOfObject:_realm.schema[className]]
+                                    withObject:objectSchema];
+    objectSchema.realm = _realm;
+    _realm.schema.objectSchema = [mutableObjectSchemas copy];
     for (RLMProperty *property in objectSchema.properties) {
         property.column = realm::ObjectStore::schema_from_group(_realm.group).find(className.UTF8String)->property_for_name(property.name.UTF8String)->table_column;
     }
+    RLMClearAccessorCache();
 }
 
 @end

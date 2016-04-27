@@ -1209,7 +1209,7 @@ RLM_ARRAY_TYPE(MigrationObject);
             [migration enumerateObjects:AllTypesObject.className block:^(RLMObject * _Nullable oldObject, RLMObject * _Nullable newObject) {
                 XCTAssertNotNil(oldObject[[beforeProperties[idx] name]]);
                 RLMAssertThrowsWithReasonMatching(newObject[[beforeProperties[idx] name]], @"Invalid property name");
-                if ([property.name isEqualToString:@"objectCol"]) { return; }
+                if (![property.objectClassName isEqualToString:@""]) { return; }
                 XCTAssertEqualObjects(oldObject[[beforeProperties[idx] name]], newObject[property.name]);
             }];
         }];
@@ -1264,8 +1264,7 @@ RLM_ARRAY_TYPE(MigrationObject);
             [migration enumerateObjects:StringObject.className block:^(RLMObject * _Nullable oldObject, RLMObject * _Nullable newObject) {
                 oldValue = oldObject[@"stringCol0"];
                 XCTAssertNotNil(oldValue);
-                // FIXME: accessing intermediate values should work...
-                // XCTAssertEqualObjects(newObject[@"stringCol1"], oldValue);
+                XCTAssertEqualObjects(newObject[@"stringCol1"], oldValue);
                 RLMAssertThrowsWithReasonMatching(newObject[@"stringCol0"], @"Invalid property name");
             }];
         }

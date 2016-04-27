@@ -55,6 +55,7 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType);
 
 // private setters
 @property (nonatomic, assign) NSUInteger column;
+@property (nonatomic, readwrite) NSString *name;
 @property (nonatomic, readwrite, assign) RLMPropertyType type;
 @property (nonatomic, readwrite) BOOL indexed;
 @property (nonatomic, readwrite) BOOL optional;
