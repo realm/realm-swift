@@ -90,7 +90,7 @@ extension Realm {
         - parameter migrationBlock:     The block which migrates the Realm to the current version.
         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
         */
-        public init(fileURL: NSURL? = NSURL(fileURLWithPath: RLMRealmPathForFile("default.realm")),
+        public init(fileURL: NSURL? = NSURL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
             inMemoryIdentifier: String? = nil,
             encryptionKey: NSData? = nil,
             readOnly: Bool = false,

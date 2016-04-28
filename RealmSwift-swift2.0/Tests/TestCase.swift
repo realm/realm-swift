@@ -170,6 +170,7 @@ class TestCase: XCTestCase {
     }
 
     private func realmURLForFile(fileName: String) -> NSURL {
-        return NSURL(fileURLWithPath: testDir).URLByAppendingPathComponent(fileName)
+        let directory = NSURL(fileURLWithPath: testDir, isDirectory: true)
+        return directory.URLByAppendingPathComponent(fileName, isDirectory: false)
     }
 }
