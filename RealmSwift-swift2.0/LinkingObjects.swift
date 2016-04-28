@@ -19,11 +19,27 @@
 import Foundation
 import Realm
 
-// Used for reflection and initialization
-internal protocol UntypedLinkingObjects {
-    var rlmResults: RLMResults { get set }
-    var objectClassName: String { get }
-    var propertyName: String { get }
+/// :nodoc:
+/// Internal class. Do not use directly. Used for reflection and initialization
+public class LinkingObjectsBase: NSObject, NSFastEnumeration {
+    internal var rlmResults: RLMResults
+    internal let objectClassName: String
+    internal let propertyName: String
+
+    init(results: RLMResults, fromClassName objectClassName: String, property propertyName: String) {
+        self.rlmResults = results
+        self.objectClassName = objectClassName
+        self.propertyName = propertyName
+    }
+
+    // MARK: Fast Enumeration
+    public func countByEnumeratingWithState(state: UnsafeMutablePointer<NSFastEnumerationState>,
+                                            objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>,
+                                                    count len: Int) -> Int {
+        return Int(rlmResults.countByEnumeratingWithState(state,
+            objects: buffer,
+            count: UInt(len)))
+    }
 }
 
 /**
@@ -41,11 +57,7 @@ internal protocol UntypedLinkingObjects {
  LinkingObjects can only be used as a property on `Object` models. The property must
  be declared as `let` and cannot be `dynamic`.
  */
-public class LinkingObjects<T: Object>: NSObject, UntypedLinkingObjects {
-    internal var rlmResults: RLMResults
-    internal var objectClassName: String { return (T.self as Object.Type).className() }
-    internal let propertyName: String
-
+public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     /// Element type contained in this collection.
     public typealias Element = T
 
@@ -60,8 +72,8 @@ public class LinkingObjects<T: Object>: NSObject, UntypedLinkingObjects {
     // MARK: Initializers
 
     public init(fromType type: T.Type, property propertyName: String) {
-        self.propertyName = propertyName
-        self.rlmResults = RLMResults.emptyDetachedResults()
+        let className = (T.self as Object.Type).className()
+        super.init(results: RLMResults.emptyDetachedResults(), fromClassName: className, property: propertyName)
     }
 
     /// Returns a human-readable description of the objects contained in these linking objects.
@@ -395,16 +407,6 @@ public class LinkingObjects<T: Object>: NSObject, UntypedLinkingObjects {
         return rlmResults.addNotificationBlock { results, change, error in
             block(RealmCollectionChange.fromObjc(self, change: change, error: error))
         }
-    }
-
-    // MARK: Fast Enumeration
-
-    public func countByEnumeratingWithState(state: UnsafeMutablePointer<NSFastEnumerationState>,
-                                            objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>,
-                                                    count len: Int) -> Int {
-        return Int(rlmResults.countByEnumeratingWithState(state,
-            objects: buffer,
-            count: UInt(len)))
     }
 }
 

@@ -274,8 +274,8 @@ public class Object: RLMObjectBase {
     }
 
     // Helper for getting the linking objects object for a property
-    internal func linkingObjectsForProperty(prop: RLMProperty) -> UntypedLinkingObjects? {
-        return object_getIvar(self, prop.swiftIvar) as? UntypedLinkingObjects
+    internal func linkingObjectsForProperty(prop: RLMProperty) -> LinkingObjectsBase? {
+        return object_getIvar(self, prop.swiftIvar) as? LinkingObjectsBase
     }
 }
 
@@ -309,7 +309,7 @@ public final class DynamicObject: Object {
     }
 
     // Dynamic objects never have linking objects properties
-    internal override func linkingObjectsForProperty(prop: RLMProperty) -> UntypedLinkingObjects? {
+    internal override func linkingObjectsForProperty(prop: RLMProperty) -> LinkingObjectsBase? {
         return nil
     }
 
@@ -419,9 +419,9 @@ public class ObjectUtil: NSObject {
     // Get information about each of the linking objects properties.
     @objc private class func getLinkingObjectsProperties(object: AnyObject) -> NSDictionary {
         let properties = Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
-            return prop.value as? UntypedLinkingObjects != nil
+            return prop.value as? LinkingObjectsBase != nil
         }.flatMap { (prop: Mirror.Child) in
-            (prop.label!, prop.value as! UntypedLinkingObjects)
+            (prop.label!, prop.value as! LinkingObjectsBase)
         }
         return properties.reduce([:] as [String : [String: String ]]) { (dictionary, property) in
             var d = dictionary
@@ -433,7 +433,7 @@ public class ObjectUtil: NSObject {
 
     @objc private class func initializeLinkingObjectsProperty(object: RLMObjectBase, property: RLMProperty,
                                                               results: RLMResults) {
-        guard var linkingObjects = (object as! Object).linkingObjectsForProperty(property) else { return }
+        guard let linkingObjects = (object as! Object).linkingObjectsForProperty(property) else { return }
         linkingObjects.rlmResults = results
     }
 }
