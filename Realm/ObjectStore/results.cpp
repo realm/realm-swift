@@ -110,8 +110,10 @@ size_t Results::size()
     switch (m_mode) {
         case Mode::Empty:    return 0;
         case Mode::Table:    return m_table->size();
-        case Mode::Query:    return m_query.count();
         case Mode::LinkView: return m_link_view->size();
+        case Mode::Query:
+            m_query.sync_view_if_needed();
+            return m_query.count();
         case Mode::TableView:
             update_tableview();
             return m_table_view.size();
@@ -206,6 +208,7 @@ void Results::update_tableview()
         case Mode::LinkView:
             return;
         case Mode::Query:
+            m_query.sync_view_if_needed();
             m_table_view = m_query.find_all();
             if (m_sort) {
                 m_table_view.sort(m_sort.column_indices, m_sort.ascending);
@@ -378,6 +381,7 @@ Query Results::get_query() const
 
             // The TableView has no associated query so create one with no conditions that is restricted
             // to the rows in the TableView.
+            m_table_view.sync_if_needed();
             return Query(*m_table, std::make_unique<TableView>(m_table_view));
         }
         case Mode::LinkView:

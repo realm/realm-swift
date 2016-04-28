@@ -87,12 +87,8 @@ bool ResultsNotifier::need_to_run()
     }
 
     // If we've run previously, check if we need to rerun
-    if (m_initial_run_complete) {
-        // Make an empty tableview from the query to get the table version, since
-        // Query doesn't expose it
-        if (m_query->find_all(0, 0, 0).sync_if_needed() == m_last_seen_version) {
-            return false;
-        }
+    if (m_initial_run_complete && m_query->sync_view_if_needed() == m_last_seen_version) {
+        return false;
     }
 
     return true;
@@ -141,6 +137,7 @@ void ResultsNotifier::run()
     if (!need_to_run())
         return;
 
+    m_query->sync_view_if_needed();
     m_tv = m_query->find_all();
     if (m_sort) {
         m_tv.sort(m_sort.column_indices, m_sort.ascending);

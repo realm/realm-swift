@@ -171,6 +171,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     Query query = translateErrors([&] { return _results.get_query(); });
     RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _objectSchema);
 
+    query.sync_view_if_needed();
+
     TableView table_view;
     if (const auto& sort = _results.get_sort()) {
         // A sort order is specified so we need to return the first match given that ordering.

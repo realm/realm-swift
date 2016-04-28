@@ -53,6 +53,33 @@
     RLMAssertThrowsWithReasonMatching(asArray(hannahsParents), @"has been invalidated");
 }
 
+- (void)testFilteredLinkingObjects {
+    NSArray *(^asArray)(id) = ^(id arrayLike) {
+        return [arrayLike valueForKeyPath:@"self"];
+    };
+
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+
+    PersonObject *hannah = [PersonObject createInRealm:realm withValue:@[ @"Hannah", @0 ]];
+    PersonObject *mark   = [PersonObject createInRealm:realm withValue:@[ @"Mark",  @30, @[ hannah ]]];
+    PersonObject *diane  = [PersonObject createInRealm:realm withValue:@[ @"Diane", @29, @[ hannah ]]];
+
+    RLMLinkingObjects *hannahsParents = hannah.parents;
+
+    // Three separate queries so that accessing a property on one doesn't invalidate testing of other properties.
+    RLMResults *resultsA = [hannahsParents objectsWhere:@"age > 25"];
+    RLMResults *resultsB = [hannahsParents objectsWhere:@"age > 25"];
+    RLMResults *resultsC = [hannahsParents objectsWhere:@"age > 25"];
+
+    [mark.children removeAllObjects];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(resultsA.count, 1u);
+    XCTAssertEqual(NSNotFound, [resultsB indexOfObjectWhere:@"name = 'Mark'"]);
+    XCTAssertEqualObjects(asArray(resultsC), (@[ diane ]));
+}
+
 - (void)testNotificationSentInitially {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
