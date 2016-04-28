@@ -252,9 +252,9 @@ static void copy_property_values(const Property& source, const Property& destina
 // set references to tables on targetSchema and create/update any missing or out-of-date tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
-std::vector<Property> ObjectStore::create_tables(Group *group, Schema &target_schema, bool update_existing) {
+std::vector<std::pair<std::string, Property>> ObjectStore::create_tables(Group *group, Schema &target_schema, bool update_existing) {
     // properties to delete
-    std::vector<Property> to_delete;
+    std::vector<std::pair<std::string,Property>> to_delete;
 
     // first pass to create missing tables
     std::vector<ObjectSchema *> to_update;
@@ -298,9 +298,9 @@ std::vector<Property> ObjectStore::create_tables(Group *group, Schema &target_sc
             current_prop.table_column -= deleted;
 
             auto target_prop = target_object_schema->property_for_name(current_prop.name);
-            // mark property for deletion
+            // mark object name & property pairs for deletion
             if (!target_prop) {
-                to_delete.push_back(current_prop);
+                to_delete.push_back(std::make_pair(current_schema.name, current_prop));
             }
             else if ((property_has_changed(current_prop, *target_prop) &&
                       !property_can_be_migrated_to_nullable(current_prop, *target_prop))) {
@@ -368,7 +368,7 @@ std::vector<Property> ObjectStore::create_tables(Group *group, Schema &target_sc
     return to_delete;
 }
 
-void ObjectStore::remove_properties(Group *group, Schema &target_schema, std::vector<Property> to_delete) {
+void ObjectStore::remove_properties(Group *group, Schema &target_schema, std::vector<std::pair<std::string, Property>> to_delete) {
     for (auto& target_object_schema : target_schema) {
         TableRef table = table_for_object_type(group, target_object_schema.name);
         ObjectSchema current_schema(group, target_object_schema.name);
@@ -376,8 +376,9 @@ void ObjectStore::remove_properties(Group *group, Schema &target_schema, std::ve
         for (auto& current_prop : current_schema.properties) {
             current_prop.table_column -= deleted;
             for (auto& single_to_delete : to_delete) {
-                if (current_prop.name == single_to_delete.name &&
-                    current_prop.object_type == single_to_delete.object_type) {
+                if (target_object_schema.name == single_to_delete.first &&
+                    current_prop.name == single_to_delete.second.name &&
+                    current_prop.object_type == single_to_delete.second.object_type) {
                     table->remove_column(current_prop.table_column);
                     ++deleted;
                     current_prop.table_column = npos;
