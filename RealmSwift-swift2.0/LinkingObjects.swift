@@ -145,11 +145,13 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: KVC
 
     /**
-     Returns an Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
+     Returns an Array containing the results of invoking `valueForKey(_:)` using key on each of the
+     collection's objects.
 
      - parameter key: The name of the property.
 
-     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
+     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the
+       collection's objects.
      */
     public override func valueForKey(key: String) -> AnyObject? {
         return rlmResults.valueForKey(key)
@@ -162,7 +164,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter keyPath: The key path to the property.
 
      - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
-     collection's objects.
+       collection's objects.
      */
     public override func valueForKeyPath(keyPath: String) -> AnyObject? {
         return rlmResults.valueForKeyPath(keyPath)
@@ -238,7 +240,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter property: The name of a property conforming to `MinMaxType` to look for a minimum on.
 
-     - returns: The minimum value for the property amongst objects in the collection, or `nil` if the collection is empty.
+     - returns: The minimum value for the property amongst objects in the collection, or `nil` if the collection
+       is empty.
      */
     public func min<U: MinMaxType>(property: String) -> U? {
         return rlmResults.minOfProperty(property) as! U?
@@ -251,7 +254,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter property: The name of a property conforming to `MinMaxType` to look for a maximum on.
 
-     - returns: The maximum value for the property amongst objects in the collection, or `nil` if the collection is empty.
+     - returns: The maximum value for the property amongst objects in the collection, or `nil` if the collection
+       is empty.
      */
     public func max<U: MinMaxType>(property: String) -> U? {
         return rlmResults.maxOfProperty(property) as! U?
@@ -277,7 +281,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter property: The name of a property conforming to `AddableType` to calculate average on.
 
-     - returns: The average of the given property over all objects in the collection, or `nil` if the collection is empty.
+     - returns: The average of the given property over all objects in the collection, or `nil` if the collection
+       is empty.
      */
     public func average<U: AddableType>(property: String) -> U? {
         return rlmResults.averageOfProperty(property) as! U?
@@ -334,7 +339,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      */
     @available(*, deprecated=1, message="Use addNotificationBlock with changes")
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (linkingObjects: LinkingObjects<T>?, error: NSError?) -> ()) -> NotificationToken {
+    public func addNotificationBlock(block: (linkingObjects: LinkingObjects<T>?, error: NSError?) -> ())
+        -> NotificationToken {
         return rlmResults.addNotificationBlock { results, changes, error in
             if results != nil {
                 block(linkingObjects: self, error: nil)
