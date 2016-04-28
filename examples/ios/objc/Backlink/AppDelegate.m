@@ -23,7 +23,7 @@
 @interface Dog : RLMObject
 @property NSString *name;
 @property NSInteger age;
-@property (readonly) RLMLinkingObjects *owners; // Realm doesn't persist this property because it is readonly
+@property (readonly) RLMLinkingObjects *owners;
 @end
 RLM_ARRAY_TYPE(Dog)
 
