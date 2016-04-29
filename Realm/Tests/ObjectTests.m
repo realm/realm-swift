@@ -1575,7 +1575,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     XCTAssertTrue(boolProperty.indexed, @"indexed property should have an index");
 
     RLMProperty *dateProperty = schema[IndexedObject.className][@"dateCol"];
-    XCTAssertFalse(dateProperty.indexed, @"non-indexed property should have an index");
+    XCTAssertFalse(dateProperty.indexed, @"non-indexed property should no have an index");
 
     RLMProperty *optionalIntProperty = schema[IndexedObject.className][@"optionalIntCol"];
     XCTAssertTrue(optionalIntProperty.indexed, @"indexed property should have an index");
