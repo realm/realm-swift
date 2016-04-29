@@ -178,6 +178,7 @@ public class Object: RLMObjectBase {
 
     - returns: An `Array` of objects of type `T` which have this object as their value for the `propertyName` property.
     */
+    @available(*, deprecated=1, message="Use a LinkingObjects property")
     public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
         return RLMObjectBaseLinkingObjectsOfClass(self, (T.self as Object.Type).className(), propertyName) as! [T]
     }
@@ -271,6 +272,11 @@ public class Object: RLMObjectBase {
     internal func optionalForProperty(prop: RLMProperty) -> RLMOptionalBase {
         return object_getIvar(self, prop.swiftIvar) as! RLMOptionalBase
     }
+
+    // Helper for getting the linking objects object for a property
+    internal func linkingObjectsForProperty(prop: RLMProperty) -> LinkingObjectsBase? {
+        return object_getIvar(self, prop.swiftIvar) as? LinkingObjectsBase
+    }
 }
 
 
@@ -300,6 +306,11 @@ public final class DynamicObject: Object {
         optional.property = prop
         optionalProperties[prop.name] = optional
         return optional
+    }
+
+    // Dynamic objects never have linking objects properties
+    internal override func linkingObjectsForProperty(prop: RLMProperty) -> LinkingObjectsBase? {
+        return nil
     }
 
     /// :nodoc:
@@ -337,6 +348,11 @@ public class ObjectUtil: NSObject {
         if let type = type as? Object.Type {
             return type.indexedProperties() as NSArray?
         }
+        return nil
+    }
+
+    @objc private class func linkingObjectsPropertiesForClass(type: AnyClass) -> NSDictionary? {
+        // Not used for Swift. getLinkingObjectsProperties(_:) is used instead.
         return nil
     }
 
@@ -398,5 +414,26 @@ public class ObjectUtil: NSObject {
 
     @objc private class func requiredPropertiesForClass(_: AnyClass) -> NSArray? {
         return nil
+    }
+
+    // Get information about each of the linking objects properties.
+    @objc private class func getLinkingObjectsProperties(object: AnyObject) -> NSDictionary {
+        let properties = Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
+            return prop.value as? LinkingObjectsBase != nil
+        }.flatMap { (prop: Mirror.Child) in
+            (prop.label!, prop.value as! LinkingObjectsBase)
+        }
+        return properties.reduce([:] as [String : [String: String ]]) { (dictionary, property) in
+            var d = dictionary
+            let (name, results) = property
+            d[name] = ["class": results.objectClassName, "property": results.propertyName]
+            return d
+        }
+    }
+
+    @objc private class func initializeLinkingObjectsProperty(object: RLMObjectBase, property: RLMProperty,
+                                                              results: RLMResults) {
+        guard let linkingObjects = (object as! Object).linkingObjectsForProperty(property) else { return }
+        linkingObjects.rlmResults = results
     }
 }

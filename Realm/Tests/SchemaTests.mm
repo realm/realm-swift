@@ -25,7 +25,8 @@
 #import "RLMProperty_Private.h"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMRealm_Dynamic.h"
-#import "RLMSchema_Private.h"
+#import "RLMSchema_Private.hpp"
+#import "schema.hpp"
 
 #import <algorithm>
 #import <objc/runtime.h>
@@ -137,10 +138,124 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @implementation InvalidNSNumberNoProtocolObject
 @end
 
+@class InvalidReadWriteLinkingObjectsProperty;
+@class InvalidLinkingObjectsPropertiesMethod;
+@class ValidLinkingObjectsPropertyWithProtocol;
+@class InvalidLinkingObjectsPropertyProtocol;
+
+@interface SchemaTestsLinkSource : FakeObject
+@property InvalidReadWriteLinkingObjectsProperty *irwlop;
+@property InvalidLinkingObjectsPropertiesMethod *iloprm;
+@property ValidLinkingObjectsPropertyWithProtocol *vlopwp;
+@property InvalidLinkingObjectsPropertyProtocol *ilopp;
+@end
+@implementation SchemaTestsLinkSource
+@end
+
+RLM_ARRAY_TYPE(SchemaTestsLinkSource)
+
+@interface InvalidReadWriteLinkingObjectsProperty : FakeObject
+@property RLMLinkingObjects *linkingObjects;
+@end
+
+@implementation InvalidReadWriteLinkingObjectsProperty
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:SchemaTestsLinkSource.class propertyName:@"irwlop"] };
+}
+
+@end
+
+@interface InvalidLinkingObjectsPropertiesMethod : FakeObject
+@property (readonly) RLMLinkingObjects *linkingObjects;
+@end
+
+@implementation InvalidLinkingObjectsPropertiesMethod
+@end
+
+
+@interface ValidLinkingObjectsPropertyWithProtocol : FakeObject
+@property (readonly) RLMLinkingObjects<SchemaTestsLinkSource> *linkingObjects;
+@end
+
+@implementation ValidLinkingObjectsPropertyWithProtocol
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:SchemaTestsLinkSource.class propertyName:@"vlopwp"] };
+}
+
+@end
+
+RLM_ARRAY_TYPE(NotARealClass)
+
+@interface InvalidLinkingObjectsPropertyProtocol : FakeObject
+@property (readonly) RLMLinkingObjects<NotARealClass> *linkingObjects;
+@end
+
+@implementation InvalidLinkingObjectsPropertyProtocol
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:SchemaTestsLinkSource.class propertyName:@"ilopp"] };
+}
+
+@end
+
+
+@interface InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink : FakeObject
+@property (readonly) RLMLinkingObjects *linkingObjects;
+@property InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink *link;
+@end
+
+@implementation InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink.class
+                                                               propertyName:@"nosuchproperty"] };
+}
+
+@end
+
+
+@interface InvalidLinkingObjectsPropertySourcePropertyNotALink : FakeObject
+@property (readonly) RLMLinkingObjects *linkingObjects;
+@property int64_t integer;
+@end
+
+@implementation InvalidLinkingObjectsPropertySourcePropertyNotALink
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:InvalidLinkingObjectsPropertySourcePropertyNotALink.class
+                                                               propertyName:@"integer"] };
+}
+
+@end
+
+
+@interface InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere : FakeObject
+@property (readonly) RLMLinkingObjects *linkingObjects;
+@property IntObject *link;
+@end
+
+@implementation InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere
+
++ (NSDictionary *)linkingObjectsProperties {
+    return @{ @"linkingObjects": [RLMPropertyDescriptor descriptorWithClass:InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere.class
+                                                               propertyName:@"link"] };
+}
+
+@end
+
+
 @interface SchemaTests : RLMMultiProcessTestCase
 @end
 
 @implementation SchemaTests
+
++ (void)tearDown
+{
+    RLMSetTreatFakeObjectAsRLMObject(NO);
+    [super tearDown];
+}
 
 - (void)testNoSchemaForUnpersistedObjectClasses {
     RLMSchema *schema = [RLMSchema sharedSchema];
@@ -257,6 +372,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     // on, these tests should be altered to verify all types.
     
     NSArray *expectedTypes = @[@"AllTypesObject",
+                               @"LinkToAllTypesObject",
                                @"StringObject",
                                @"IntObject"];
     
@@ -342,6 +458,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tboolCol {\n"
                                               @"\t\t\ttype = bool;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
@@ -349,6 +466,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tintCol {\n"
                                               @"\t\t\ttype = int;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
@@ -356,6 +474,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tfloatCol {\n"
                                               @"\t\t\ttype = float;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
@@ -363,6 +482,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tdoubleCol {\n"
                                               @"\t\t\ttype = double;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
@@ -370,6 +490,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tstringCol {\n"
                                               @"\t\t\ttype = string;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = YES;\n"
@@ -377,6 +498,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tbinaryCol {\n"
                                               @"\t\t\ttype = data;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = YES;\n"
@@ -384,6 +506,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tdateCol {\n"
                                               @"\t\t\ttype = date;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = YES;\n"
@@ -391,6 +514,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tcBoolCol {\n"
                                               @"\t\t\ttype = bool;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
@@ -398,6 +522,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tlongCol {\n"
                                               @"\t\t\ttype = int;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
@@ -405,6 +530,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tmixedCol {\n"
                                               @"\t\t\ttype = any;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
@@ -412,15 +538,25 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tobjectCol {\n"
                                               @"\t\t\ttype = object;\n"
                                               @"\t\t\tobjectClassName = StringObject;\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = YES;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tlinkingObjectsCol {\n"
+                                              @"\t\t\ttype = linking objects;\n"
+                                              @"\t\t\tobjectClassName = LinkToAllTypesObject;\n"
+                                              @"\t\t\tlinkOriginPropertyName = allTypesCol;\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
                                               @"\tIntObject {\n"
                                               @"\t\tintCol {\n"
                                               @"\t\t\ttype = int;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
@@ -430,6 +566,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
                                               @"\t\tstringCol {\n"
                                               @"\t\t\ttype = string;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\toptional = YES;\n"
@@ -474,6 +611,51 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
 - (void)testClassWithInvalidNSNumberNoProtocolProperty {
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidNSNumberNoProtocolObject.class], @"Property 'number' requires a protocol defining the contained type");
+}
+
+- (void)testClassWithReadWriteLinkingObjectsProperty {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidReadWriteLinkingObjectsProperty.class],
+                                      @"Property 'linkingObjects' must be declared as readonly .* linking objects");
+}
+
+- (void)testClassWithInvalidLinkingObjectsPropertiesMethod {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidLinkingObjectsPropertiesMethod.class],
+                                      @"Property 'linkingObjects' .* but \\+linkingObjectsProperties .* class or property");
+}
+
+- (void)testClassWithLinkingObjectsPropertyWithProtocol {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:ValidLinkingObjectsPropertyWithProtocol.class];
+    XCTAssertEqual(objectSchema[@"linkingObjects"].type, RLMPropertyTypeLinkingObjects);
+}
+
+- (void)testClassWithInvalidLinkingObjectsPropertyProtocol {
+    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:InvalidLinkingObjectsPropertyProtocol.class],
+                                      @"Property 'linkingObjects' .* type RLMLinkingObjects<NotARealClass>.*conflicting class name.*'SchemaTestsLinkSource'");
+}
+
+- (void)testClassWithInvalidLinkingObjectsPropertyMissingSourcePropertyOfLink {
+    RLMSetTreatFakeObjectAsRLMObject(YES);
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink.class ]];
+    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
+                                      @"Property 'nosuchproperty' .* origin of linking objects property 'linkingObjects' does not exist");
+}
+
+- (void)testClassWithInvalidLinkingObjectsPropertySourcePropertyNotALink {
+    RLMSetTreatFakeObjectAsRLMObject(YES);
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyNotALink.class ]];
+    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
+                                      @"Property 'integer' .* origin of linking objects property 'linkingObjects' is not a link");
+}
+
+- (void)testClassWithInvalidLinkingObjectsPropertySourcePropertysLinkElsewhere {
+    RLMSetTreatFakeObjectAsRLMObject(YES);
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere.class, IntObject.class ]];
+    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
+                                      @"Property 'link' .* origin of linking objects property 'linkingObjects' does "
+                                      "not link to class 'InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere'");
 }
 
 // Can't spawn child processes on iOS

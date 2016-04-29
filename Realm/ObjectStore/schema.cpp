@@ -66,15 +66,42 @@ void Schema::validate() const
     std::vector<ObjectSchemaValidationException> exceptions;
     for (auto const& object : *this) {
         const Property *primary = nullptr;
-        for (auto const& prop : object.properties) {
+
+        std::vector<Property> all_properties = object.persisted_properties;
+        all_properties.insert(all_properties.end(), object.computed_properties.begin(), object.computed_properties.end());
+
+        for (auto const& prop : all_properties) {
             // check object_type existence
-            if (!prop.object_type.empty() && find(prop.object_type) == end()) {
-                exceptions.emplace_back(MissingObjectTypeException(object.name, prop));
+            if (!prop.object_type.empty()) {
+                auto it = find(prop.object_type);
+                if (it == end()) {
+                    exceptions.emplace_back(MissingObjectTypeException(object.name, prop));
+                }
+                // validate linking objects property.
+                else if (!prop.link_origin_property_name.empty()) {
+                    using ErrorType = InvalidLinkingObjectsPropertyException::Type;
+                    util::Optional<ErrorType> error;
+
+                    const Property *origin_property = it->property_for_name(prop.link_origin_property_name);
+                    if (!origin_property) {
+                        error = ErrorType::OriginPropertyDoesNotExist;
+                    }
+                    else if (origin_property->type != PropertyType::Object && origin_property->type != PropertyType::Array) {
+                        error = ErrorType::OriginPropertyIsNotALink;
+                    }
+                    else if (origin_property->object_type != object.name) {
+                        error = ErrorType::OriginPropertyInvalidLinkTarget;
+                    }
+
+                    if (error) {
+                        exceptions.emplace_back(InvalidLinkingObjectsPropertyException(*error, object.name, prop));
+                    }
+                }
             }
 
             // check nullablity
             if (prop.is_nullable) {
-                if (prop.type == PropertyType::Array || prop.type == PropertyType::Any) {
+                if (prop.type == PropertyType::Array || prop.type == PropertyType::Any || prop.type == PropertyType::LinkingObjects) {
                     exceptions.emplace_back(InvalidNullabilityException(object.name, prop));
                 }
             }

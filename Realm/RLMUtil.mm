@@ -142,7 +142,8 @@ BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
             return [obj isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny:
             return object_has_valid_type(obj);
-        case RLMPropertyTypeObject: {
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeLinkingObjects: {
             // only NSNull, nil, or objects which derive from RLMObject and match the given
             // object class are valid
             RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(obj);
@@ -274,8 +275,34 @@ static inline BOOL RLMIsSubclass(Class class1, Class class2) {
     return RLMIsKindOfClass(class1, class2);
 }
 
+static bool treatFakeObjectAsRLMObject = false;
+
+void RLMSetTreatFakeObjectAsRLMObject(BOOL flag) {
+    treatFakeObjectAsRLMObject = flag;
+}
+
+BOOL RLMIsObjectOrSubclass(Class klass) {
+    if (RLMIsKindOfClass(klass, RLMObjectBase.class)) {
+        return YES;
+    }
+
+    if (treatFakeObjectAsRLMObject) {
+        static Class FakeObjectClass = NSClassFromString(@"FakeObject");
+        return RLMIsKindOfClass(klass, FakeObjectClass);
+    }
+    return NO;
+}
+
 BOOL RLMIsObjectSubclass(Class klass) {
-    return RLMIsSubclass(class_getSuperclass(klass), RLMObjectBase.class);
+    if (RLMIsSubclass(class_getSuperclass(klass), RLMObjectBase.class)) {
+        return YES;
+    }
+
+    if (treatFakeObjectAsRLMObject) {
+        static Class FakeObjectClass = NSClassFromString(@"FakeObject");
+        return RLMIsSubclass(klass, FakeObjectClass);
+    }
+    return NO;
 }
 
 BOOL RLMIsDebuggerAttached()

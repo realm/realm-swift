@@ -19,39 +19,65 @@
 import XCTest
 import RealmSwift
 
-class SwiftAggregateObjectList: Object {
-    let list = List<SwiftAggregateObject>()
+class CTTAggregateObject: Object {
+    dynamic var intCol = 0
+    dynamic var floatCol = 0 as Float
+    dynamic var doubleCol = 0.0
+    dynamic var boolCol = false
+    dynamic var dateCol = NSDate()
+    dynamic var trueCol = true
+    let stringListCol = List<CTTStringObjectWithLink>()
+    dynamic var linkCol: CTTLinkTarget?
+}
+
+class CTTAggregateObjectList: Object {
+    let list = List<CTTAggregateObject>()
+}
+
+class CTTStringObjectWithLink: Object {
+    dynamic var stringCol = ""
+    dynamic var linkCol: CTTLinkTarget?
+}
+
+class CTTLinkTarget: Object {
+    dynamic var id = 0
+    let stringObjects = LinkingObjects(fromType: CTTStringObjectWithLink.self, property: "linkCol")
+    let aggregateObjects = LinkingObjects(fromType: CTTAggregateObject.self, property: "linkCol")
+}
+
+class CTTStringList: Object {
+    let array = List<CTTStringObjectWithLink>()
 }
 
 class RealmCollectionTypeTests: TestCase {
-    var str1: SwiftStringObject!
-    var str2: SwiftStringObject!
-    var collection: AnyRealmCollection<SwiftStringObject>!
+    var str1: CTTStringObjectWithLink!
+    var str2: CTTStringObjectWithLink!
+    var collection: AnyRealmCollection<CTTStringObjectWithLink>!
 
-    func getCollection() -> AnyRealmCollection<SwiftStringObject> {
+    func getCollection() -> AnyRealmCollection<CTTStringObjectWithLink> {
         fatalError("abstract")
     }
 
-    func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
+    func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
         fatalError("abstract")
     }
 
-    func makeAggregateableObjects() -> [SwiftAggregateObject] {
-        let obj1 = SwiftAggregateObject()
+    func makeAggregateableObjects() -> [CTTAggregateObject] {
+        let obj1 = CTTAggregateObject()
         obj1.intCol = 1
         obj1.floatCol = 1.1
         obj1.doubleCol = 1.11
         obj1.dateCol = NSDate(timeIntervalSince1970: 1)
         obj1.boolCol = false
 
-        let obj2 = SwiftAggregateObject()
+        let obj2 = CTTAggregateObject()
         obj2.intCol = 2
         obj2.floatCol = 2.2
         obj2.doubleCol = 2.22
         obj2.dateCol = NSDate(timeIntervalSince1970: 2)
         obj2.boolCol = false
 
-        let obj3 = SwiftAggregateObject()
+        let obj3 = CTTAggregateObject()
         obj3.intCol = 3
         obj3.floatCol = 2.2
         obj3.doubleCol = 2.22
@@ -65,9 +91,9 @@ class RealmCollectionTypeTests: TestCase {
     override func setUp() {
         super.setUp()
 
-        str1 = SwiftStringObject()
+        str1 = CTTStringObjectWithLink()
         str1.stringCol = "1"
-        str2 = SwiftStringObject()
+        str2 = CTTStringObjectWithLink()
         str2.stringCol = "2"
 
         let realm = realmWithTestPath()
@@ -102,7 +128,7 @@ class RealmCollectionTypeTests: TestCase {
 
     func testDescription() {
         // swiftlint:disable:next line_length
-        XCTAssertEqual(collection.description, "Results<SwiftStringObject> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
+        XCTAssertEqual(collection.description, "Results<CTTStringObjectWithLink> (\n\t[0] CTTStringObjectWithLink {\n\t\tstringCol = 1;\n\t\tlinkCol = (null);\n\t},\n\t[1] CTTStringObjectWithLink {\n\t\tstringCol = 2;\n\t\tlinkCol = (null);\n\t}\n)")
     }
 
     func testCount() {
@@ -163,7 +189,7 @@ class RealmCollectionTypeTests: TestCase {
         let actual = collection.valueForKey("stringCol") as! [String]!
         XCTAssertEqual(expected, actual)
 
-        XCTAssertEqual(collection.map { $0 }, collection.valueForKey("self") as! [SwiftStringObject])
+        XCTAssertEqual(collection.map { $0 }, collection.valueForKey("self") as! [CTTStringObjectWithLink])
     }
 
     func testSetValueForKey() {
@@ -304,7 +330,7 @@ class RealmCollectionTypeTests: TestCase {
         let collection = getAggregateableCollection()
 
         // Should not throw a type error.
-        collection.filter("ANY stringListCol == %@", SwiftStringObject())
+        collection.filter("ANY stringListCol == %@", CTTStringObjectWithLink())
     }
 
     func testAddNotificationBlock() {
@@ -356,16 +382,16 @@ class ResultsTests: RealmCollectionTypeTests {
         return super.defaultTestSuite()
     }
 
-    func collectionBase() -> Results<SwiftStringObject> {
+    func collectionBase() -> Results<CTTStringObjectWithLink> {
         fatalError("abstract")
     }
 
-    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
+    override func getCollection() -> AnyRealmCollection<CTTStringObjectWithLink> {
         return AnyRealmCollection(collectionBase())
     }
 
     override func testAssignListProperty() {
-        let array = SwiftArrayPropertyObject()
+        let array = CTTStringList()
         realmWithTestPath().add(array)
         array["array"] = collectionBase()
     }
@@ -373,7 +399,7 @@ class ResultsTests: RealmCollectionTypeTests {
     func addObjectToResults() {
         let realm = realmWithTestPath()
         try! realm.write {
-            realm.create(SwiftStringObject.self, value: ["a"])
+            realm.create(CTTStringObjectWithLink.self, value: ["a"])
         }
     }
 
@@ -464,40 +490,40 @@ class ResultsWithCustomInitializerTest: TestCase {
         let actual = collection.valueForKey("stringCol") as! [String]!
         XCTAssertEqual(expected, actual)
 
-        XCTAssertEqual(collection.map { $0 }, collection.valueForKey("self") as! [SwiftStringObject])
+        XCTAssertEqual(collection.map { $0 }, collection.valueForKey("self") as! [CTTStringObjectWithLink])
     }
 }
 
 class ResultsFromTableTests: ResultsTests {
-    override func collectionBase() -> Results<SwiftStringObject> {
-        return realmWithTestPath().objects(SwiftStringObject)
+    override func collectionBase() -> Results<CTTStringObjectWithLink> {
+        return realmWithTestPath().objects(CTTStringObjectWithLink)
     }
 
-    override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
+    override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
         makeAggregateableObjects()
-        return AnyRealmCollection(realmWithTestPath().objects(SwiftAggregateObject))
+        return AnyRealmCollection(realmWithTestPath().objects(CTTAggregateObject))
     }
 }
 
 class ResultsFromTableViewTests: ResultsTests {
-    override func collectionBase() -> Results<SwiftStringObject> {
-        return realmWithTestPath().objects(SwiftStringObject).filter("stringCol != ''")
+    override func collectionBase() -> Results<CTTStringObjectWithLink> {
+        return realmWithTestPath().objects(CTTStringObjectWithLink).filter("stringCol != ''")
     }
 
-    override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
+    override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
         makeAggregateableObjects()
-        return AnyRealmCollection(realmWithTestPath().objects(SwiftAggregateObject).filter("trueCol == true"))
+        return AnyRealmCollection(realmWithTestPath().objects(CTTAggregateObject).filter("trueCol == true"))
     }
 }
 
 class ResultsFromLinkViewTests: ResultsTests {
-    override func collectionBase() -> Results<SwiftStringObject> {
-        let array = realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
+    override func collectionBase() -> Results<CTTStringObjectWithLink> {
+        let array = realmWithTestPath().create(CTTStringList.self, value: [[str1, str2]])
         return array.array.filter(NSPredicate(value: true))
     }
 
-    override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
-        let list = SwiftAggregateObjectList()
+    override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
+        let list = CTTAggregateObjectList()
         realmWithTestPath().add(list)
         list.list.appendContentsOf(makeAggregateableObjects())
         return AnyRealmCollection(list.list.filter(NSPredicate(value: true)))
@@ -506,8 +532,8 @@ class ResultsFromLinkViewTests: ResultsTests {
     override func addObjectToResults() {
         let realm = realmWithTestPath()
         try! realm.write {
-            let array = realm.objects(SwiftArrayPropertyObject).last!
-            array.array.append(realm.create(SwiftStringObject.self, value: ["a"]))
+            let array = realm.objects(CTTStringList).last!
+            array.array.append(realm.create(CTTStringObjectWithLink.self, value: ["a"]))
         }
     }
 }
@@ -523,23 +549,23 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         return super.defaultTestSuite()
     }
 
-    func collectionBase() -> List<SwiftStringObject> {
+    func collectionBase() -> List<CTTStringObjectWithLink> {
         fatalError("abstract")
     }
 
-    override func getCollection() -> AnyRealmCollection<SwiftStringObject> {
+    override func getCollection() -> AnyRealmCollection<CTTStringObjectWithLink> {
         return AnyRealmCollection(collectionBase())
     }
 
     override func testAssignListProperty() {
-        let array = SwiftArrayPropertyObject()
+        let array = CTTStringList()
         realmWithTestPath().add(array)
         array["array"] = collectionBase()
     }
 
     override func testDescription() {
         // swiftlint:disable:next line_length
-        XCTAssertEqual(collection.description, "List<SwiftStringObject> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
+        XCTAssertEqual(collection.description, "List<CTTStringObjectWithLink> (\n\t[0] CTTStringObjectWithLink {\n\t\tstringCol = 1;\n\t\tlinkCol = (null);\n\t},\n\t[1] CTTStringObjectWithLink {\n\t\tstringCol = 2;\n\t\tlinkCol = (null);\n\t}\n)")
     }
 
     func testAddNotificationBlockDirect() {
@@ -571,12 +597,12 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
 }
 
 class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func collectionBase() -> List<SwiftStringObject> {
-        return SwiftArrayPropertyObject(value: ["", [str1, str2], []]).array
+    override func collectionBase() -> List<CTTStringObjectWithLink> {
+        return CTTStringList(value: [[str1, str2]]).array
     }
 
-    override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
-        return AnyRealmCollection(SwiftAggregateObjectList(value: [makeAggregateableObjects()]).list)
+    override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
+        return AnyRealmCollection(CTTAggregateObjectList(value: [makeAggregateableObjects()]).list)
     }
 
     override func testRealm() {
@@ -632,7 +658,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     }
 
     override func testArrayAggregateWithSwiftObjectDoesntThrow() {
-        assertThrows(self.collection.filter("ANY stringListCol == %@", SwiftStringObject()))
+        assertThrows(self.collection.filter("ANY stringListCol == %@", CTTStringObjectWithLink()))
     }
 
     override func testMin() {
@@ -679,41 +705,75 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 }
 
 class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func collectionBase() -> List<SwiftStringObject> {
-        let array = SwiftArrayPropertyObject(value: ["", [str1, str2], []])
+    override func collectionBase() -> List<CTTStringObjectWithLink> {
+        let array = CTTStringList(value: [[str1, str2]])
         realmWithTestPath().add(array)
         return array.array
     }
 
-    override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
-        let list = SwiftAggregateObjectList(value: [makeAggregateableObjects()])
+    override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
+        let list = CTTAggregateObjectList(value: [makeAggregateableObjects()])
         realmWithTestPath().add(list)
         return AnyRealmCollection(list.list)
     }
 }
 
 class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func collectionBase() -> List<SwiftStringObject> {
-        let array = realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
+    override func collectionBase() -> List<CTTStringObjectWithLink> {
+        let array = realmWithTestPath().create(CTTStringList.self, value: [[str1, str2]])
         return array.array
     }
 
-    override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
-        let list = realmWithTestPath().create(SwiftAggregateObjectList.self, value: [makeAggregateableObjects()])
+    override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
+        let list = realmWithTestPath().create(CTTAggregateObjectList.self, value: [makeAggregateableObjects()])
         return AnyRealmCollection(list.list)
     }
 }
 
 class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func collectionBase() -> List<SwiftStringObject> {
-        realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
-        let array = realmWithTestPath().objects(SwiftArrayPropertyObject).first!
+    override func collectionBase() -> List<CTTStringObjectWithLink> {
+        realmWithTestPath().create(CTTStringList.self, value: [[str1, str2]])
+        let array = realmWithTestPath().objects(CTTStringList).first!
         return array.array
     }
 
-    override func getAggregateableCollection() -> AnyRealmCollection<SwiftAggregateObject> {
-        realmWithTestPath().create(SwiftAggregateObjectList.self, value: [makeAggregateableObjects()])
-        let list = realmWithTestPath().objects(SwiftAggregateObjectList.self).first!
+    override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
+        realmWithTestPath().create(CTTAggregateObjectList.self, value: [makeAggregateableObjects()])
+        let list = realmWithTestPath().objects(CTTAggregateObjectList.self).first!
         return AnyRealmCollection(list.list)
+    }
+}
+
+class LinkingObjectsCollectionTypeTests: RealmCollectionTypeTests {
+    func collectionBase() -> LinkingObjects<CTTStringObjectWithLink> {
+        let target = realmWithTestPath().create(CTTLinkTarget.self, value: [0])
+        for object in realmWithTestPath().objects(CTTStringObjectWithLink) {
+            object.linkCol = target
+        }
+        return target.stringObjects
+    }
+
+    override func getCollection() -> AnyRealmCollection<CTTStringObjectWithLink> {
+        return AnyRealmCollection(collectionBase())
+    }
+
+    override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
+        let objects = makeAggregateableObjects()
+        let target = realmWithTestPath().create(CTTLinkTarget.self, value: [0])
+        for object in objects {
+            object.linkCol = target
+        }
+        return AnyRealmCollection(target.aggregateObjects)
+    }
+
+    override func testDescription() {
+        // swiftlint:disable:next line_length
+        XCTAssertEqual(collection.description, "LinkingObjects<CTTStringObjectWithLink> (\n\t[0] CTTStringObjectWithLink {\n\t\tstringCol = 1;\n\t\tlinkCol = CTTLinkTarget {\n\t\t\tid = 0;\n\t\t};\n\t},\n\t[1] CTTStringObjectWithLink {\n\t\tstringCol = 2;\n\t\tlinkCol = CTTLinkTarget {\n\t\t\tid = 0;\n\t\t};\n\t}\n)")
+    }
+
+    override func testAssignListProperty() {
+        let array = CTTStringList()
+        realmWithTestPath().add(array)
+        array["array"] = collectionBase()
     }
 }

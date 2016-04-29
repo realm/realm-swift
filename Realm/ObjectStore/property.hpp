@@ -43,12 +43,15 @@ namespace realm {
         Object = 12,
         /** Array type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
         Array  = 13,
+        /** Linking objects type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
+        LinkingObjects = 14,
     };
 
     struct Property {
         std::string name;
         PropertyType type;
         std::string object_type;
+        std::string link_origin_property_name;
         bool is_primary = false;
         bool is_indexed = false;
         bool is_nullable = false;
@@ -85,6 +88,8 @@ namespace realm {
                 return "object";
             case PropertyType::Array:
                 return "array";
+            case PropertyType::LinkingObjects:
+                return "linking objects";
         }
     }
 }

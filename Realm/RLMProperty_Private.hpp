@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2016 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMResults.h>
+#import <Realm/RLMProperty_Private.h>
 
-@class RLMObjectSchema;
+#import "property.hpp"
 
-@interface RLMResults ()
-@property (nonatomic, unsafe_unretained) RLMObjectSchema *objectSchema;
-@property (nonatomic, readonly, getter=isAttached) BOOL attached;
+@interface RLMProperty ()
 
-+ (instancetype)emptyDetachedResults;
++ (instancetype)propertyForObjectStoreProperty:(const realm::Property&)property;
+
+- (realm::Property)objectStoreCopy;
 
 @end

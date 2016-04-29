@@ -635,3 +635,89 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
     });
 }
 @end
+
+
+@interface LinkingObjectsChangesetTests : RLMTestCase <ChangesetTestCase>
+@end
+
+@implementation LinkingObjectsChangesetTests
+- (void)prepare {
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [realm deleteAllObjects];
+            PersonObject *child = [PersonObject createInDefaultRealmWithValue:@[ @"Child", @0 ]];
+            for (int i = 0; i < 10; ++i) {
+                // It takes a village to raise a child…
+                NSString *name = [NSString stringWithFormat:@"Parent %d", i];
+                [PersonObject createInDefaultRealmWithValue:@[ name, @(25 + i), @[ child ]]];
+            }
+        }];
+    }
+}
+
+- (RLMResults *)query {
+    return [[PersonObject.allObjects firstObject] parents];
+}
+
+- (void)testDeleteOneLinkingObject {
+    ExpectChange(self, @[@5], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[PersonObject objectsInRealm:realm where:@"age == 30"]];
+    });
+}
+
+- (void)testDeleteSomeLinkingObjects {
+    ExpectChange(self, @[@2, @8, @9], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[PersonObject objectsInRealm:realm where:@"age > 32"]];
+        [realm deleteObjects:[PersonObject objectsInRealm:realm where:@"age == 27"]];
+    });
+}
+
+- (void)testDeleteAllLinkingObjects {
+    ExpectChange(self, @[@0, @1, @2, @3, @4, @5, @6, @7, @8, @9], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[PersonObject objectsInRealm:realm where:@"age > 20"]];
+    });
+}
+
+- (void)testDeleteAll {
+    ExpectChange(self, @[@0, @1, @2, @3, @4, @5, @6, @7, @8, @9], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[PersonObject allObjectsInRealm:realm]];
+    });
+}
+
+- (void)testUnlinkOne {
+    ExpectChange(self, @[@4], @[], @[], ^(RLMRealm *realm) {
+        PersonObject *parent = [[PersonObject objectsInRealm:realm where:@"age == 29"] firstObject];
+        [parent.children removeAllObjects];
+    });
+}
+
+- (void)testUnlinkAll {
+    ExpectChange(self, @[@0, @1, @2, @3, @4, @5, @6, @7, @8, @9], @[], @[], ^(RLMRealm *realm) {
+        for (PersonObject *parent in [PersonObject objectsInRealm:realm where:@"age > 20"])
+            [parent.children removeAllObjects];
+    });
+}
+
+- (void)testAddNewParent {
+    ExpectChange(self, @[], @[@10], @[], ^(RLMRealm *realm) {
+        PersonObject *child = [[PersonObject objectsInRealm:realm where:@"children.@count == 0"] firstObject];
+        [PersonObject createInDefaultRealmWithValue:@[ @"New parent", @40, @[ child ]]];
+    });
+}
+
+- (void)testAddDuplicateParent {
+    ExpectChange(self, @[], @[@10], @[@7], ^(RLMRealm *realm) {
+        PersonObject *parent = [[PersonObject objectsInRealm:realm where:@"age == 32"] firstObject];
+        [parent.children addObject:[parent.children firstObject]];
+    });
+}
+
+- (void)testModifyParent {
+    ExpectChange(self, @[], @[], @[@3], ^(RLMRealm *realm) {
+        PersonObject *parent = [[PersonObject objectsInRealm:realm where:@"age == 28"] firstObject];
+        parent.age = parent.age + 1;
+    });
+}
+
+@end

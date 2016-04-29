@@ -306,4 +306,11 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @end
 
+/**
+ RLMLinkingObjects is an auto-updating container type that represents a collection of objects that
+ link to a given object.
+ */
+@interface RLMLinkingObjects RLM_GENERIC_COLLECTION : RLMResults
+@end
+
 RLM_ASSUME_NONNULL_END

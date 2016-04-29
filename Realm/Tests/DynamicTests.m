@@ -95,7 +95,7 @@
         for (NSUInteger propertyIndex = 0; propertyIndex < expectedObjectSchema.properties.count; propertyIndex++) {
             RLMProperty *dynamicProperty = dynamicObjectSchema.properties[propertyIndex];
             RLMProperty *expectedProperty = expectedObjectSchema.properties[propertyIndex];
-            XCTAssertTrue([dynamicProperty isEqualToProperty:expectedProperty]);
+            XCTAssertEqualObjects(dynamicProperty, expectedProperty);
         }
     }
 }
@@ -105,6 +105,7 @@
     RLMProperty *prop = [[RLMProperty alloc] initWithName:@"a"
                                                      type:RLMPropertyTypeInt
                                           objectClassName:nil
+                                   linkOriginPropertyName:nil
                                                   indexed:NO
                                                  optional:NO];
     RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"TrulyDynamicObject"

@@ -550,9 +550,9 @@ void calculate_moves_sorted(std::vector<RowInfo>& rows, CollectionChangeSet& cha
 CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> const& prev_rows,
                                                            std::vector<size_t> const& next_rows,
                                                            std::function<bool (size_t)> row_did_change,
-                                                           bool sort)
+                                                           bool rows_are_in_table_order)
 {
-    REALM_ASSERT_DEBUG(sort || std::is_sorted(begin(next_rows), end(next_rows)));
+    REALM_ASSERT_DEBUG(!rows_are_in_table_order || std::is_sorted(begin(next_rows), end(next_rows)));
 
     CollectionChangeBuilder ret;
 
@@ -627,7 +627,7 @@ CollectionChangeBuilder CollectionChangeBuilder::calculate(std::vector<size_t> c
         }
     }
 
-    if (sort) {
+    if (!rows_are_in_table_order) {
         calculate_moves_sorted(new_rows, ret);
     }
     else {

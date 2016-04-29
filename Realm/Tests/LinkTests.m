@@ -204,7 +204,7 @@
     CircleObject *obj1 = [CircleObject allObjectsInRealm:realm].firstObject;
     XCTAssertEqualObjects(obj1.data, @"b", @"data should be 'b'");
     XCTAssertEqualObjects(obj1.data, obj.next.data, @"objects should be equal");
- }
+}
 
 @end
 

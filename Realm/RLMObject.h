@@ -22,6 +22,7 @@
 
 RLM_ASSUME_NONNULL_BEGIN
 
+@class RLMPropertyDescriptor;
 @class RLMRealm;
 @class RLMResults;
 @class RLMObjectSchema;
@@ -30,7 +31,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  In Realm you define your model classes by subclassing `RLMObject` and adding properties to be persisted.
  You then instantiate and use your custom subclasses instead of using the `RLMObject` class directly.
- 
+
      // Dog.h
      @interface Dog : RLMObject
      @property NSString *name;
@@ -278,6 +279,21 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (NSArray RLM_GENERIC(NSString *) *)requiredProperties;
 
+/**
+ Implement to return a dictionary providing information related to linking objects properties.
+
+ Properties of type RLMLinkingObjects must have a corresponding entry in the dictionary to provide
+ information about the origin of the link that they represent. Their corresponding value in the
+ dictionary must be an instance of RLMPropertyDescriptor that describes a property that forms a
+ relationship with this class:
+
+     return @{ @"owners": [RLMPropertyDescriptor descriptorWithClass:Owner.class propertyName:@"dogs"] };
+
+
+ @return     NSDictionary mapping property names to RLMPropertyDescriptor objects.
+ */
++ (NSDictionary RLM_GENERIC(NSString *, RLMPropertyDescriptor *) *)linkingObjectsProperties;
+
 
 #pragma mark - Getting & Querying Objects from the Default Realm
 
@@ -384,7 +400,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return    An NSArray of objects of type `className` which have this object as their value for the `property` property.
  */
-- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
+- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property DEPRECATED_MSG_ATTRIBUTE("Use an RLMLinkingObjects property");
 
 /**
  Returns YES if another RLMObject points to the same object in an RLMRealm. For RLMObject types

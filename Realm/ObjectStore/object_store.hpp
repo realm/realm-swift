@@ -240,6 +240,16 @@ namespace realm {
       private:
         std::string m_primary_key;
     };
+
+    class InvalidLinkingObjectsPropertyException : public ObjectSchemaPropertyException {
+    public:
+        enum class Type {
+            OriginPropertyDoesNotExist,
+            OriginPropertyIsNotALink,
+            OriginPropertyInvalidLinkTarget,
+        };
+        InvalidLinkingObjectsPropertyException(Type error_type, std::string const& object_type, Property const& property);
+    };
 }
 
 #endif /* defined(REALM_OBJECT_STORE_HPP) */

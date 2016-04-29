@@ -73,6 +73,10 @@
 #pragma mark AllTypesObject
 
 @implementation AllTypesObject
++ (NSDictionary *)linkingObjectsProperties
+{
+    return @{ @"linkingObjectsCol": [RLMPropertyDescriptor descriptorWithClass:LinkToAllTypesObject.class propertyName:@"allTypesCol"] };
+}
 @end
 
 @implementation ArrayOfAllTypesObject
@@ -104,7 +108,13 @@
 
 #pragma mark DogObject
 
+@class OwnerObject;
+
 @implementation DogObject
++ (NSDictionary *)linkingObjectsProperties
+{
+    return @{ @"owners": [RLMPropertyDescriptor descriptorWithClass:OwnerObject.class propertyName:@"dog"] };
+}
 @end
 
 #pragma mark OwnerObject
@@ -208,6 +218,29 @@
 
 @end
 
+#pragma mark PersonObject
+
+@implementation PersonObject
+
++ (NSDictionary *)linkingObjectsProperties
+{
+    return @{ @"parents": [RLMPropertyDescriptor descriptorWithClass:PersonObject.class propertyName:@"children"] };
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![other isKindOfClass:[PersonObject class]]) {
+        return NO;
+    }
+
+    PersonObject *otherPerson = other;
+    return [self.name isEqual:otherPerson.name] && self.age == otherPerson.age && [self.children isEqual:otherPerson.children];
+}
+
+@end
+
+
+
 #pragma mark FakeObject
 
 @implementation FakeObject
@@ -216,4 +249,6 @@
 + (NSArray *)indexedProperties { return nil; }
 + (NSString *)primaryKey { return nil; }
 + (NSArray *)requiredProperties { return nil; }
++ (NSDictionary *)linkingObjectsProperties { return nil; }
++ (BOOL)shouldIncludeInDefaultSchema { return NO; }
 @end

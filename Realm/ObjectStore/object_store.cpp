@@ -176,7 +176,7 @@ std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(O
     std::vector<ObjectSchemaValidationException> exceptions;
 
     // check to see if properties are the same
-    for (auto& current_prop : table_schema.properties) {
+    for (auto& current_prop : table_schema.persisted_properties) {
         auto target_prop = target_schema.property_for_name(current_prop.name);
 
         if (!target_prop) {
@@ -198,7 +198,7 @@ std::vector<ObjectSchemaValidationException> ObjectStore::verify_object_schema(O
     }
 
     // check for new missing properties
-    for (auto& target_prop : target_schema.properties) {
+    for (auto& target_prop : target_schema.persisted_properties) {
         if (!table_schema.property_for_name(target_prop.name)) {
             exceptions.emplace_back(ExtraPropertyException(table_schema.name, target_prop));
         }
@@ -266,10 +266,10 @@ void ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
     for (auto& target_object_schema : to_update) {
         TableRef table = table_for_object_type(group, target_object_schema->name);
         ObjectSchema current_schema(group, target_object_schema->name);
-        std::vector<Property> &target_props = target_object_schema->properties;
+        std::vector<Property> &target_props = target_object_schema->persisted_properties;
 
         // handle columns changing from required to optional
-        for (auto& current_prop : current_schema.properties) {
+        for (auto& current_prop : current_schema.persisted_properties) {
             auto target_prop = target_object_schema->property_for_name(current_prop.name);
             if (!target_prop || !property_can_be_migrated_to_nullable(current_prop, *target_prop))
                 continue;
@@ -288,13 +288,13 @@ void ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
 
         // remove extra columns
         size_t deleted = 0;
-        for (auto& current_prop : current_schema.properties) {
+        for (auto& current_prop : current_schema.persisted_properties) {
             current_prop.table_column -= deleted;
 
             auto target_prop = target_object_schema->property_for_name(current_prop.name);
             if (!target_prop || (property_has_changed(current_prop, *target_prop)
                                  && !property_can_be_migrated_to_nullable(current_prop, *target_prop))) {
-                if (deleted == current_schema.properties.size() - 1) {
+                if (deleted == current_schema.persisted_properties.size() - 1) {
                     // We're about to remove the last column from the table. Insert a placeholder column to preserve
                     // the number of rows in the table for the addition of new columns below.
                     table->add_column(type_Bool, "placeholder");
@@ -373,14 +373,14 @@ bool ObjectStore::needs_update(Schema const& old_schema, Schema const& schema) {
             return true;
         }
 
-        if (matching_schema->properties.size() != target_schema.properties.size()) {
+        if (matching_schema->persisted_properties.size() != target_schema.persisted_properties.size()) {
             // If the number of properties don't match then a migration is required
             return false;
         }
 
         // Check that all of the property indexes are up to date
-        for (size_t i = 0, count = target_schema.properties.size(); i < count; ++i) {
-            if (target_schema.properties[i].is_indexed != matching_schema->properties[i].is_indexed) {
+        for (size_t i = 0, count = target_schema.persisted_properties.size(); i < count; ++i) {
+            if (target_schema.persisted_properties[i].is_indexed != matching_schema->persisted_properties[i].is_indexed) {
                 return true;
             }
         }
@@ -442,7 +442,7 @@ bool ObjectStore::update_indexes(Group *group, Schema &schema) {
             continue;
         }
 
-        for (auto& property : object_schema.properties) {
+        for (auto& property : object_schema.persisted_properties) {
             if (property.requires_index() == table->has_search_index(property.table_column)) {
                 continue;
             }
@@ -551,11 +551,23 @@ MissingPropertyException::MissingPropertyException(std::string const& object_typ
 InvalidNullabilityException::InvalidNullabilityException(std::string const& object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
-    if (property.type == PropertyType::Object) {
-        m_what = "'Object' property '" + property.name + "' must be nullable.";
-    }
-    else {
-        m_what = "Array or Mixed property '" + property.name + "' cannot be nullable";
+    switch (property.type) {
+        case PropertyType::Object:
+            m_what = "'Object' property '" + property.name + "' must be nullable.";
+            break;
+        case PropertyType::Any:
+        case PropertyType::Array:
+        case PropertyType::LinkingObjects:
+            m_what = "Property '" + property.name + "' of type '" + string_for_property_type(property.type) + "' cannot be nullable";
+            break;
+        case PropertyType::Int:
+        case PropertyType::Bool:
+        case PropertyType::Data:
+        case PropertyType::Date:
+        case PropertyType::Float:
+        case PropertyType::Double:
+        case PropertyType::String:
+            REALM_ASSERT(false);
     }
 }
 
@@ -601,3 +613,18 @@ DuplicatePrimaryKeysException::DuplicatePrimaryKeysException(std::string const& 
     m_what = "Duplicate primary keys for object '" + object_type + "'.";
 }
 
+InvalidLinkingObjectsPropertyException::InvalidLinkingObjectsPropertyException(Type error_type, std::string const& object_type, Property const& property)
+: ObjectSchemaPropertyException(object_type, property)
+{
+    switch (error_type) {
+        case Type::OriginPropertyDoesNotExist:
+            m_what = "Property '" + property.link_origin_property_name + "' declared as origin of linking objects property '" + property.name + "' does not exist.";
+            break;
+        case Type::OriginPropertyIsNotALink:
+            m_what = "Property '" + property.link_origin_property_name + "' declared as origin of linking objects property '" + property.name + "' is not a link.";
+            break;
+        case Type::OriginPropertyInvalidLinkTarget:
+            m_what = "Property '" + property.link_origin_property_name + "' declared as origin of linking objects property '" + property.name + "' does not link to class '" + object_type + "'.";
+            break;
+    }
+}

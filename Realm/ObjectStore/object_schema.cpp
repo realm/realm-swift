@@ -28,9 +28,9 @@ using namespace realm;
 ObjectSchema::ObjectSchema() = default;
 ObjectSchema::~ObjectSchema() = default;
 
-ObjectSchema::ObjectSchema(std::string name, std::string primary_key, std::initializer_list<Property> properties)
+ObjectSchema::ObjectSchema(std::string name, std::string primary_key, std::initializer_list<Property> persisted_properties)
 : name(std::move(name))
-, properties(properties)
+, persisted_properties(persisted_properties)
 , primary_key(std::move(primary_key))
 {
     set_primary_key_property();
@@ -40,7 +40,7 @@ ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(n
     ConstTableRef table = ObjectStore::table_for_object_type(group, name);
 
     size_t count = table->get_column_count();
-    properties.reserve(count);
+    persisted_properties.reserve(count);
     for (size_t col = 0; col < count; col++) {
         Property property;
         property.name = table->get_column_name(col).data();
@@ -54,7 +54,7 @@ ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(n
             ConstTableRef linkTable = table->get_link_target(col);
             property.object_type = ObjectStore::object_type_for_table_name(linkTable->get_name().data());
         }
-        properties.push_back(std::move(property));
+        persisted_properties.push_back(std::move(property));
     }
 
     primary_key = realm::ObjectStore::get_primary_key_for_object(group, name);
@@ -62,7 +62,12 @@ ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(n
 }
 
 Property *ObjectSchema::property_for_name(StringData name) {
-    for (auto& prop : properties) {
+    for (auto& prop : persisted_properties) {
+        if (StringData(prop.name) == name) {
+            return &prop;
+        }
+    }
+    for (auto& prop : computed_properties) {
         if (StringData(prop.name) == name) {
             return &prop;
         }
