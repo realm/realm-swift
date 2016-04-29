@@ -1186,6 +1186,7 @@ RLM_ARRAY_TYPE(MigrationObject);
 - (void)testMigrationRenameProperty {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:AllTypesObject.class];
     RLMObjectSchema *stringObjectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+    RLMObjectSchema *linkingObjectsSchema = [RLMObjectSchema schemaForObjectClass:LinkToAllTypesObject.class];
     NSMutableArray *beforeProperties = [NSMutableArray arrayWithCapacity:objectSchema.properties.count];
     for (RLMProperty *property in objectSchema.properties) {
         [beforeProperties addObject:[property copyWithNewName:[NSString stringWithFormat:@"before_%@", property.name]]];
@@ -1196,13 +1197,13 @@ RLM_ARRAY_TYPE(MigrationObject);
     NSDate *now = [NSDate dateWithTimeIntervalSince1970:100000];
     id inputValue = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, @0, @[@"a"]];
 
-    [self createTestRealmWithSchema:@[objectSchema, stringObjectSchema] block:^(RLMRealm *realm) {
+    [self createTestRealmWithSchema:@[objectSchema, stringObjectSchema, linkingObjectsSchema] block:^(RLMRealm *realm) {
         [AllTypesObject createInRealm:realm withValue:inputValue];
     }];
 
     objectSchema.properties = afterProperties;
 
-    RLMRealmConfiguration *config = [self renameConfigurationWithObjectSchemas:@[objectSchema, stringObjectSchema]
+    RLMRealmConfiguration *config = [self renameConfigurationWithObjectSchemas:@[objectSchema, stringObjectSchema, linkingObjectsSchema]
                                                                 migrationBlock:^(RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
         [afterProperties enumerateObjectsUsingBlock:^(RLMProperty *property, NSUInteger idx, __unused BOOL *stop) {
             [migration renamePropertyForClass:AllTypesObject.className oldName:[beforeProperties[idx] name] newName:property.name];

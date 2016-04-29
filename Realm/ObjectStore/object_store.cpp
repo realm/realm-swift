@@ -373,7 +373,7 @@ void ObjectStore::remove_properties(Group *group, Schema &target_schema, std::ve
         TableRef table = table_for_object_type(group, target_object_schema.name);
         ObjectSchema current_schema(group, target_object_schema.name);
         size_t deleted = 0;
-        for (auto& current_prop : current_schema.properties) {
+        for (auto& current_prop : current_schema.persisted_properties) {
             current_prop.table_column -= deleted;
             for (auto& single_to_delete : to_delete) {
                 if (target_object_schema.name == single_to_delete.first &&
@@ -554,7 +554,7 @@ void ObjectStore::rename_property(Group *group, Schema& passed_schema, StringDat
     table->rename_column(old_property->table_column, new_name);
     table->remove_column(column_to_remove);
     // update table_column for each property since it may have shifted
-    for (auto& current_prop : passed_object_schema->properties) {
+    for (auto& current_prop : passed_object_schema->persisted_properties) {
         auto target_prop = matching_schema.property_for_name(current_prop.name);
         current_prop.table_column = target_prop->table_column;
     }
