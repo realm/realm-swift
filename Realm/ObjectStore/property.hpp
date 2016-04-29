@@ -33,7 +33,6 @@ namespace realm {
         Date   = 8,
         Object = 12,
         Array  = 13,
-        /** Linking objects type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
         LinkingObjects = 14,
     };
 
