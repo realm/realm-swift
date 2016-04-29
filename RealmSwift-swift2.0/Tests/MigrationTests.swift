@@ -314,8 +314,8 @@ class MigrationTests: TestCase {
 
     func testRenameProperty() {
         autoreleasepool {
-            let prop = RLMProperty(name: "before_stringCol", type: .String, objectClassName: nil, indexed: false,
-                optional: false)
+            let prop = RLMProperty(name: "before_stringCol", type: .String, objectClassName: nil,
+                linkOriginPropertyName: nil, indexed: false, optional: false)
             autoreleasepool {
                 let realm = realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftStringObject",
                     properties: [prop])
