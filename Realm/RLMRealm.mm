@@ -97,6 +97,7 @@ std::atomic<bool> g_syncLogEverything{false};
 - (instancetype)initWithUserToken:(NSString *)syncUserToken {
     self = [super init];
     if (self) {
+        NSAssert(syncUserToken, @"syncUserToken should not be nil");
         sync::Client::LogLevel logLevel = sync::Client::LogLevel::normal;
         if (g_syncLogEverything)
             logLevel = sync::Client::LogLevel::everything;
