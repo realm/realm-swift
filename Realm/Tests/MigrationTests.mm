@@ -1389,10 +1389,6 @@ RLM_ARRAY_TYPE(MigrationObject);
     [self assertPropertyRenameError:@"Property 'nonExistentProperty' is missing from latest object model"
                       objectSchemas:@[objectSchema] className:StringObject.className oldName:@"stringCol" newName:@"nonExistentProperty"];
 
-    // Non Existent Class
-    [self assertPropertyRenameError:@"Cannot rename properties on type 'MigrationObject' because it is missing from the Realm file."
-                      objectSchemas:@[[RLMObjectSchema schemaForObjectClass:IntObject.class]] className:MigrationObject.className oldName:@"" newName:@""];
-
     // Removed Class
     [self assertPropertyRenameError:@"Cannot rename properties on type 'StringObject' because it is missing from the specified schema."
                       objectSchemas:@[[RLMObjectSchema schemaForObjectClass:IntObject.class]] className:StringObject.className oldName:@"stringCol" newName:@"stringCol2"];

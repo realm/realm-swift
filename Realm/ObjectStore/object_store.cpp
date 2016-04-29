@@ -519,26 +519,26 @@ void ObjectStore::delete_data_for_object(Group *group, StringData object_type) {
 }
 
 void ObjectStore::rename_property(Group *group, Schema& passed_schema, StringData object_type, StringData old_name, StringData new_name) {
-    Schema schema = schema_from_group(group);
-    auto matching_schema = schema.find(object_type);
-    if (matching_schema == schema.end()) {
-        throw PropertyRenameMissingOldObjectTypeException(object_type);
-    }
-    Property *old_property = matching_schema->property_for_name(old_name);
-    if (old_property == nullptr) {
-        throw PropertyRenameMissingOldPropertyException(old_name, new_name);
-    }
     TableRef table = table_for_object_type(group, object_type);
     if (!table) {
         throw PropertyRenameMissingNewObjectTypeException(object_type);
+    }
+    ObjectSchema matching_schema(group, object_type);
+    Property *old_property = matching_schema.property_for_name(old_name);
+    if (old_property == nullptr) {
+        throw PropertyRenameMissingOldPropertyException(old_name, new_name);
     }
     auto passed_object_schema = passed_schema.find(object_type);
     if (passed_object_schema == passed_schema.end()) {
         throw PropertyRenameMissingNewObjectTypeException(object_type);
     }
-    Property *new_property = matching_schema->property_for_name(new_name);
+    Property *new_property = matching_schema.property_for_name(new_name);
     if (new_property == nullptr) {
-        new_property = matching_schema->property_for_name(old_name);
+        // new property not in new schema, which means we're probably renaming
+        // to an intermediate property in a multi-version migration.
+        // this is safe because the migration will fail schema validation unless
+        // this property is renamed again.
+        new_property = matching_schema.property_for_name(old_name);
         new_property->name = new_name;
         table->rename_column(old_property->table_column, new_name);
         return;
@@ -553,18 +553,19 @@ void ObjectStore::rename_property(Group *group, Schema& passed_schema, StringDat
     size_t column_to_remove = new_property->table_column;
     table->rename_column(old_property->table_column, new_name);
     table->remove_column(column_to_remove);
-    // update table_column for each property after the one we just removed
+    // update table_column for each property since it may have shifted
     for (auto& current_prop : passed_object_schema->properties) {
-        auto target_prop = matching_schema->property_for_name(current_prop.name);
+        auto target_prop = matching_schema.property_for_name(current_prop.name);
         current_prop.table_column = target_prop->table_column;
     }
-    if (new_property->is_primary && !old_property->is_primary) {
-        set_primary_key_for_object(group, object_type, new_name);
-    }
+    // update index for new column
     if (new_property->requires_index() && !old_property->requires_index()) {
         table->add_search_index(old_property->table_column);
+    } else if (!new_property->requires_index() && old_property->requires_index()) {
+        table->remove_search_index(old_property->table_column);
     }
     old_property->name = new_name;
+    // update nullability for column
     if (property_can_be_migrated_to_nullable(*old_property, *new_property)) {
         new_property->table_column = old_property->table_column;
         old_property->table_column = old_property->table_column + 1;
