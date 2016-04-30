@@ -90,7 +90,7 @@ public enum Error: ErrorType {
     case IncompatibleLockFile
 
     /// Error thrown by Realm if a file format upgrade is required to open the file,
-    /// but upgrades were explicilty disabled.
+    /// but upgrades were explicitly disabled.
     case FileFormatUpgradeRequired
 
     /// Error thrown by Realm if there is insufficient available address space.
