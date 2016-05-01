@@ -43,10 +43,10 @@ public:
     List(std::shared_ptr<Realm> r, LinkViewRef l) noexcept;
     ~List();
 
-    List(const List&) = default;
-    List& operator=(const List&) = default;
-    List(List&&) = default;
-    List& operator=(List&&) = default;
+    List(const List&);
+    List& operator=(const List&);
+    List(List&&);
+    List& operator=(List&&);
 
     const std::shared_ptr<Realm>& get_realm() const { return m_realm; }
     Query get_query() const;

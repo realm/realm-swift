@@ -31,6 +31,11 @@ using namespace realm::_impl;
 List::List() noexcept = default;
 List::~List() = default;
 
+List::List(const List&) = default;
+List& List::operator=(const List&) = default;
+List::List(List&&) = default;
+List& List::operator=(List&&) = default;
+
 List::List(std::shared_ptr<Realm> r, LinkViewRef l) noexcept
 : m_realm(std::move(r))
 , m_link_view(std::move(l))
