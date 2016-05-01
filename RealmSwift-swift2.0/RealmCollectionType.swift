@@ -45,7 +45,7 @@ public final class RLMGenerator<T: Object>: GeneratorType {
  collections, and reports the current state of the collection and what changes
  were made to the collection since the last time the notification was called.
 
- The arrays of indices in the .Update varation follow UITableView's batching
+ The arrays of indices in the .Update variation follow UITableView's batching
  conventions, and can be passed as-is to a table view's batch update functions
  after converting to index paths in the appropriate section. For example, for a
  simple one-section table view, you can do the following:
