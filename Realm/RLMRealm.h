@@ -255,7 +255,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (void)transactionWithBlock:(RLM_NOESCAPE void(^)(void))block RLM_SWIFT_UNAVAILABLE("");
 
 /**
- Performs actions contained within the given block inside a write transation.
+ Performs actions contained within the given block inside a write transaction.
  
  Write transactions cannot be nested, and trying to execute a write transaction 
  on a `RLMRealm` which is already in a write transaction will throw an 

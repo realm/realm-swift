@@ -77,7 +77,7 @@ typedef NS_ENUM(NSInteger, RLMError) {
         read-only or if the directory part of the specified path was not
         found when a copy should be written. */
     RLMErrorFileNotFound          = 5,
-    /** Returned by RLMRealm if a file format upgrade is required to open the file, but upgrades were explicilty disabled. */
+    /** Returned by RLMRealm if a file format upgrade is required to open the file, but upgrades were explicitly disabled. */
     RLMErrorFileFormatUpgradeRequired = 6,
     /** Returned by RLMRealm if the database file is currently open in another
         process which cannot share with the current process due to an
