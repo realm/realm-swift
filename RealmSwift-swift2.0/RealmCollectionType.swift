@@ -85,12 +85,12 @@ public enum RealmCollectionChange<T> {
     ///
     /// All three of the change arrays are always sorted in ascending order.
     ///
-    /// @param deletions The indices in the previous version of the collection
-    ///                  which were removed from this one.
-    /// @param insertion The indices in the new collection which were added in
-    ///                  this version.
-    /// @param insertion The indices of the objects in the new collection which
-    ///                  were modified in this version.
+    /// - parameter deletions:     The indices in the previous version of the collection
+    ///                            which were removed from this one.
+    /// - parameter insertions:    The indices in the new collection which were added in
+    ///                            this version.
+    /// - parameter modifications: The indices of the objects in the new collection which
+    ///                            were modified in this version.
     case Update(T, deletions: [Int], insertions: [Int], modifications: [Int])
 
     /// If an error occurs, notification blocks are called one time with a
