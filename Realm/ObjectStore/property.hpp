@@ -50,7 +50,8 @@ namespace realm {
         bool is_indexable() const {
             return type == PropertyType::Int
                 || type == PropertyType::Bool
-                || type == PropertyType::String;
+                || type == PropertyType::String
+                || type == PropertyType::Date;
         }
     };
 

@@ -111,7 +111,7 @@ class ObjectTests: TestCase {
 
     func testIndexedProperties() {
         XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
-        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 7)
+        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 8)
 
         let objectSchema = SwiftIndexedPropertiesObject().objectSchema
         XCTAssertTrue(objectSchema["stringCol"]!.indexed)
@@ -121,17 +121,18 @@ class ObjectTests: TestCase {
         XCTAssertTrue(objectSchema["int32Col"]!.indexed)
         XCTAssertTrue(objectSchema["int64Col"]!.indexed)
         XCTAssertTrue(objectSchema["boolCol"]!.indexed)
+        XCTAssertTrue(objectSchema["dateCol"]!.indexed)
 
         XCTAssertFalse(objectSchema["floatCol"]!.indexed)
         XCTAssertFalse(objectSchema["doubleCol"]!.indexed)
         XCTAssertFalse(objectSchema["dataCol"]!.indexed)
-        XCTAssertFalse(objectSchema["dateCol"]!.indexed)
     }
 
     func testIndexedOptionalProperties() {
         XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
-        XCTAssertEqual(SwiftIndexedOptionalPropertiesObject.indexedProperties().count, 7)
+        XCTAssertEqual(SwiftIndexedOptionalPropertiesObject.indexedProperties().count, 8)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalStringCol"]!.indexed)
+        XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDateCol"]!.indexed)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalBoolCol"]!.indexed)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalIntCol"]!.indexed)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalInt8Col"]!.indexed)
@@ -142,7 +143,6 @@ class ObjectTests: TestCase {
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDataCol"]!.indexed)
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalFloatCol"]!.indexed)
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDoubleCol"]!.indexed)
-        XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDateCol"]!.indexed)
     }
 
     func testLinkingObjects() {

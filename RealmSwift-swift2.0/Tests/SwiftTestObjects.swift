@@ -251,7 +251,7 @@ class SwiftIndexedPropertiesObject: Object {
     dynamic var dataCol = NSData()
 
     override class func indexedProperties() -> [String] {
-        return ["stringCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "boolCol"]
+        return ["stringCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "boolCol", "dateCol"]
     }
 }
 
@@ -271,7 +271,7 @@ class SwiftIndexedOptionalPropertiesObject: Object {
 
     override class func indexedProperties() -> [String] {
         return ["optionalStringCol", "optionalIntCol", "optionalInt8Col", "optionalInt16Col",
-            "optionalInt32Col", "optionalInt64Col", "optionalBoolCol"]
+            "optionalInt32Col", "optionalInt64Col", "optionalBoolCol", "optionalDateCol"]
     }
 }
 

@@ -3,7 +3,6 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* NSDate properties can no longer be indexed.
 * Files written by this version of Realm cannot be read by older versions of
   Realm. Existing files will automatically be upgraded when they are opened.
 
