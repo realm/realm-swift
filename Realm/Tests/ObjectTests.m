@@ -722,6 +722,49 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     });
 }
 
+- (void)testDatesOutsideOfTimestampRange {
+    NSDate *date = [NSDate date];
+    NSDate *maxDate = [NSDate dateWithTimeIntervalSince1970:(double)(1ULL << 63) + .999999999];
+    NSDate *minDate = [NSDate dateWithTimeIntervalSince1970:-(double)(1ULL << 63) - .999999999];
+    NSDate *justOverMaxDate = [NSDate dateWithTimeIntervalSince1970:nextafter(maxDate.timeIntervalSince1970, DBL_MAX)];
+    NSDate *justUnderMaxDate = [NSDate dateWithTimeIntervalSince1970:nextafter(maxDate.timeIntervalSince1970, -DBL_MAX)];
+    NSDate *justOverMinDate = [NSDate dateWithTimeIntervalSince1970:nextafter(minDate.timeIntervalSince1970, DBL_MAX)];
+    NSDate *justUnderMinDate = [NSDate dateWithTimeIntervalSince1970:nextafter(minDate.timeIntervalSince1970, -DBL_MAX)];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DateObject *dateObject = [DateObject createInRealm:realm withValue:@[date]];
+
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:0.0/0.0];
+    XCTAssertEqualObjects(dateObject.dateCol, [NSDate dateWithTimeIntervalSince1970:0]);
+
+    dateObject.dateCol = maxDate;
+    XCTAssertEqualObjects(dateObject.dateCol, maxDate);
+    dateObject.dateCol = justOverMaxDate;
+    XCTAssertEqualObjects(dateObject.dateCol, maxDate);
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:DBL_MAX];
+    XCTAssertEqualObjects(dateObject.dateCol, maxDate);
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:1.0/0.0];
+    XCTAssertEqualObjects(dateObject.dateCol, maxDate);
+
+    dateObject.dateCol = minDate;
+    XCTAssertEqualObjects(dateObject.dateCol, minDate);
+    dateObject.dateCol = justUnderMinDate;
+    XCTAssertEqualObjects(dateObject.dateCol, minDate);
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:-DBL_MAX];
+    XCTAssertEqualObjects(dateObject.dateCol, minDate);
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:-1.0/0.0];
+    XCTAssertEqualObjects(dateObject.dateCol, minDate);
+
+    dateObject.dateCol = justUnderMaxDate;
+    XCTAssertEqualObjects(dateObject.dateCol, justUnderMaxDate);
+
+    dateObject.dateCol = justOverMinDate;
+    XCTAssertEqualObjects(dateObject.dateCol, justOverMinDate);
+
+    [realm commitWriteTransaction];
+}
+
 - (void)testDataSizeLimits {
     RLMRealm *realm = [RLMRealm defaultRealm];
 

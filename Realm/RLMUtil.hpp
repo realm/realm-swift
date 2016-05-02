@@ -168,6 +168,15 @@ static inline NSDate *RLMTimestampToNSDate(realm::Timestamp ts) {
 
 static inline realm::Timestamp RLMTimestampForNSDate(__unsafe_unretained NSDate *const date) {
     auto timeInterval = date.timeIntervalSinceReferenceDate;
+    if (isnan(timeInterval))
+        return {0, 0}; // Arbitrary choice
+
+    // Clamp dates that we can't represent as a Timestamp to the maximum value
+    if (timeInterval >= std::numeric_limits<int64_t>::max() - NSTimeIntervalSince1970)
+        return {std::numeric_limits<int64_t>::max(), 1'000'000'000 - 1};
+    if (timeInterval - NSTimeIntervalSince1970 < std::numeric_limits<int64_t>::min())
+        return {std::numeric_limits<int64_t>::min(), -1'000'000'000 + 1};
+
     auto seconds = static_cast<int64_t>(timeInterval);
     timeInterval -= seconds;
     seconds += static_cast<int64_t>(NSTimeIntervalSince1970);
