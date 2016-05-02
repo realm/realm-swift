@@ -316,17 +316,17 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      result, the initial notification will reflect the state of the Realm after
      the write transaction.
 
-     let dog = realm.objects(Dog).first!
-     let owners = dog.owners
-     print("owners.count: \(owners.count)") // => 0
-     let token = owners.addNotificationBlock { (owners, error) in
-         // Only fired once for the example
-         print("owners.count: \(owners.count)") // will only print "owners.count: 1"
-     }
-     try! realm.write {
-         realm.add(Person.self, value: ["name": "Mark", dogs: [dog]])
-     }
-     // end of runloop execution context
+         let dog = realm.objects(Dog).first!
+         let owners = dog.owners
+         print("owners.count: \(owners.count)") // => 0
+         let token = owners.addNotificationBlock { (owners, error) in
+             // Only fired once for the example
+             print("owners.count: \(owners.count)") // will only print "owners.count: 1"
+         }
+         try! realm.write {
+             realm.add(Person.self, value: ["name": "Mark", dogs: [dog]])
+         }
+         // end of runloop execution context
 
      You must retain the returned token for as long as you want updates to continue
      to be sent to the block. To stop receiving updates, call stop() on the token.
@@ -378,26 +378,26 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      result, the initial notification will reflect the state of the Realm after
      the write transaction.
 
-     let dog = realm.objects(Dog).first!
-     let owners = dog.owners
-     print("owners.count: \(owners.count)") // => 0
-     let token = owners.addNotificationBlock { (changes: RealmCollectionChange) in
-         switch changes {
-             case .Initial(let owners):
-                 // Will print "owners.count: 1"
-                 print("owners.count: \(owners.count)")
-                 break
-             case .Update:
-                 // Will not be hit in this example
-                 break
-             case .Error:
-                 break
+         let dog = realm.objects(Dog).first!
+         let owners = dog.owners
+         print("owners.count: \(owners.count)") // => 0
+         let token = owners.addNotificationBlock { (changes: RealmCollectionChange) in
+             switch changes {
+                 case .Initial(let owners):
+                     // Will print "owners.count: 1"
+                     print("owners.count: \(owners.count)")
+                     break
+                 case .Update:
+                     // Will not be hit in this example
+                     break
+                 case .Error:
+                     break
+             }
          }
-     }
-     try! realm.write {
-         realm.add(Person.self, value: ["name": "Mark", dogs: [dog]])
-     }
-     // end of runloop execution context
+         try! realm.write {
+             realm.add(Person.self, value: ["name": "Mark", dogs: [dog]])
+         }
+         // end of runloop execution context
 
      You must retain the returned token for as long as you want updates to continue
      to be sent to the block. To stop receiving updates, call stop() on the token.
