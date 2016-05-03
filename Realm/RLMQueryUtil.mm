@@ -153,7 +153,7 @@ public:
     auto resolve(Query& query) const;
 
     template <typename T>
-    auto resolveWithSubquery(Query& query, Query subquery) const
+    auto resolve_with_subquery(Query& query, Query subquery) const
     {
         if (type() != RLMPropertyTypeLinkingObjects) {
             return table_for_query(query)->template column<T>(index(), std::move(subquery));
@@ -170,7 +170,7 @@ public:
     size_t index() const { return property().column; }
     RLMPropertyType type() const { return property().type; }
 
-    RLMObjectSchema *linkTargetObjectSchema() const
+    RLMObjectSchema *link_target_object_schema() const
     {
         switch (type()) {
             case RLMPropertyTypeObject:
@@ -550,7 +550,7 @@ void add_link_constraint_to_query(realm::Query & query,
 
     // NOTE: This precondition assumes that the argument `obj` will be always originating from the
     // queried table as verified before by `validate_property_value`
-    RLMPrecondition(column.linkTargetObjectSchema() == obj.objectSchema || !obj->_row.is_attached(),
+    RLMPrecondition(column.link_target_object_schema() == obj.objectSchema || !obj->_row.is_attached(),
                     @"Invalid value origin", @"Object must be from the Realm being queried");
 
     if (operatorType == NSEqualToPredicateOperatorType) {
@@ -1072,7 +1072,7 @@ void update_query_with_subquery_count_expression(RLMSchema *schema, RLMObjectSch
     Query subquery = collectionMemberObjectSchema.table->where();
     RLMUpdateQueryWithPredicate(&subquery, subqueryPredicate, schema, collectionMemberObjectSchema);
 
-    add_numeric_constraint_to_query(query, RLMPropertyTypeInt, operatorType, collectionColumn.resolveWithSubquery<LinkList>(query, std::move(subquery)).count(), value);
+    add_numeric_constraint_to_query(query, RLMPropertyTypeInt, operatorType, collectionColumn.resolve_with_subquery<LinkList>(query, std::move(subquery)).count(), value);
 }
 
 void update_query_with_function_subquery_expression(RLMSchema *schema, RLMObjectSchema *objectSchema, realm::Query& query,
