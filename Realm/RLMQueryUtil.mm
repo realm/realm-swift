@@ -184,6 +184,20 @@ public:
 
     bool has_links() const { return m_links.size(); }
 
+    util::Optional<ColumnReference> last_link_column() const {
+        if (!m_links.size()) {
+            return util::none;
+        }
+        auto links = m_links;
+        RLMProperty *property = links.back();
+        links.resize(links.size() - 1);
+        return ColumnReference(m_schema, property, std::move(links));
+    }
+
+    ColumnReference column_ignoring_links() const {
+        return {m_schema, m_property};
+    }
+
 private:
     Table* table_for_query(Query& query) const
     {
@@ -460,34 +474,23 @@ void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
                              L lhs, R rhs);
 
 void add_between_constraint_to_query(realm::Query &query, const ColumnReference& column, id value) {
+    if (auto link_column = column.last_link_column()) {
+        Query subquery = link_column->link_target_object_schema().table->where();
+        add_between_constraint_to_query(subquery, column.column_ignoring_links(), value);
+
+        query.and_query(link_column->resolve_with_subquery<Link>(query, std::move(subquery)).count() > 0);
+        return;
+    }
+
     id from, to;
     validate_and_extract_between_range(value, column.property(), &from, &to);
 
     RLMPropertyType type = column.type();
-    if (column.has_links() || type == RLMPropertyTypeDate) {
-        query.group();
-        add_constraint_to_query(query, type, NSGreaterThanOrEqualToPredicateOperatorType, 0, column, from);
-        add_constraint_to_query(query, type, NSLessThanOrEqualToPredicateOperatorType, 0, column, to);
-        query.end_group();
-        return;
-    }
 
-    // add to query
-    NSUInteger index = column.index();
-    switch (type) {
-        case type_Double:
-            query.between(index, [from doubleValue], [to doubleValue]);
-            break;
-        case type_Float:
-            query.between(index, [from floatValue], [to floatValue]);
-            break;
-        case type_Int:
-            query.between(index, [from longLongValue], [to longLongValue]);
-            break;
-        default:
-            @throw RLMPredicateException(@"Unsupported predicate value type",
-                                         @"Object type %@ not supported for BETWEEN operations", RLMTypeToString(type));
-    }
+    query.group();
+    add_constraint_to_query(query, type, NSGreaterThanOrEqualToPredicateOperatorType, 0, column, from);
+    add_constraint_to_query(query, type, NSLessThanOrEqualToPredicateOperatorType, 0, column, to);
+    query.end_group();
 }
 
 template<typename T>
