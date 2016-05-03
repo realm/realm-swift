@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix an assertion failure of "!more_before || index >= std::prev(it)->second)"
+  in `IndexSet::do_add()`.
 
 0.100.0 Release notes (2016-04-29)
 =============================================================

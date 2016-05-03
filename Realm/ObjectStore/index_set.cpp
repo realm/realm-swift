@@ -151,7 +151,7 @@ ChunkedRangeVector::iterator ChunkedRangeVector::erase(iterator pos)
     if (chunk.data.size() == 0) {
         pos.m_outer = m_data.erase(pos.m_outer);
         pos.m_end = m_data.end();
-        pos.m_inner = pos.m_outer == m_data.end() ? nullptr : &pos.m_outer->data.back();
+        pos.m_inner = pos.m_outer == m_data.end() ? nullptr : &pos.m_outer->data.front();
         verify();
         return pos;
     }
