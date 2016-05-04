@@ -150,17 +150,9 @@ RealmCoordinator::~RealmCoordinator()
 void RealmCoordinator::unregister_realm(Realm* realm)
 {
     std::lock_guard<std::mutex> lock(m_realm_mutex);
-    for (size_t i = 0; i < m_weak_realm_notifiers.size(); ++i) {
-        auto& weak_realm_notifier = m_weak_realm_notifiers[i];
-        if (!weak_realm_notifier.expired() && !weak_realm_notifier.is_for_realm(realm)) {
-            continue;
-        }
-
-        if (i + 1 < m_weak_realm_notifiers.size()) {
-            weak_realm_notifier = std::move(m_weak_realm_notifiers.back());
-        }
-        m_weak_realm_notifiers.pop_back();
-    }
+    auto new_end = remove_if(begin(m_weak_realm_notifiers), end(m_weak_realm_notifiers),
+                             [=](auto& notifier) { return notifier.expired() || notifier.is_for_realm(realm); });
+    m_weak_realm_notifiers.erase(new_end, end(m_weak_realm_notifiers));
 }
 
 void RealmCoordinator::clear_cache()
