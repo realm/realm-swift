@@ -26,36 +26,130 @@
 using namespace realm;
 using namespace realm::_impl;
 
-bool TransactionChangeInfo::row_did_change(Table const& table, size_t idx, int depth) const
+std::function<bool (size_t)>
+CollectionNotifier::get_modification_checker(TransactionChangeInfo const& info,
+                                             Table const& root_table)
 {
-    if (depth > 16)  // arbitrary limit
+    // First check if any of the tables accessible from the root table were
+    // actually modified. This can be false if there were only insertions, or
+    // deletions which were not linked to by any row in the linking table
+    auto table_modified = [&](auto& tbl) {
+        return tbl.table_ndx < info.tables.size()
+            && !info.tables[tbl.table_ndx].modifications.empty();
+    };
+    if (!any_of(begin(m_related_tables), end(m_related_tables), table_modified)) {
+        return [](size_t) { return false; };
+    }
+
+    return DeepChangeChecker(info, root_table, m_related_tables);
+}
+
+void DeepChangeChecker::find_related_tables(std::vector<RelatedTable>& out, Table const& table)
+{
+    auto table_ndx = table.get_index_in_group();
+    if (any_of(begin(out), end(out), [=](auto& tbl) { return tbl.table_ndx == table_ndx; }))
+        return;
+
+    // We need to add this table to `out` before recurring so that the check
+    // above works, but we can't store a pointer to the thing being populated
+    // because the recursive calls may resize `out`, so instead look it up by
+    // index every time
+    size_t out_index = out.size();
+    out.push_back({table_ndx, {}});
+
+    for (size_t i = 0, count = table.get_column_count(); i != count; ++i) {
+        auto type = table.get_column_type(i);
+        if (type == type_Link || type == type_LinkList) {
+            out[out_index].links.push_back({i, type == type_LinkList});
+            find_related_tables(out, *table.get_link_target(i));
+        }
+    }
+}
+
+DeepChangeChecker::DeepChangeChecker(TransactionChangeInfo const& info,
+                                     Table const& root_table,
+                                     std::vector<RelatedTable> const& related_tables)
+: m_info(info)
+, m_root_table(root_table)
+, m_root_table_ndx(root_table.get_index_in_group())
+, m_root_modifications(m_root_table_ndx < info.tables.size() ? &info.tables[m_root_table_ndx].modifications : nullptr)
+, m_related_tables(related_tables)
+{
+}
+
+bool DeepChangeChecker::check_outgoing_links(size_t table_ndx,
+                                             Table const& table,
+                                             size_t row_ndx, size_t depth)
+{
+    auto it = find_if(begin(m_related_tables), end(m_related_tables),
+                      [&](auto&& tbl) { return tbl.table_ndx == table_ndx; });
+    if (it == m_related_tables.end())
         return false;
 
-    size_t table_ndx = table.get_index_in_group();
-    if (table_ndx < tables.size() && tables[table_ndx].modifications.contains(idx))
-        return true;
-
-    for (size_t i = 0, count = table.get_column_count(); i < count; ++i) {
-        auto type = table.get_column_type(i);
-        if (type == type_Link) {
-            if (table.is_null_link(i, idx))
-                continue;
-            auto dst = table.get_link(i, idx);
-            return row_did_change(*table.get_link_target(i), dst, depth + 1);
+    // Check if we're already checking if the destination of the link is
+    // modified, and if not add it to the stack
+    auto already_checking = [&](size_t col) {
+        for (auto p = m_current_path.begin(); p < m_current_path.begin() + depth; ++p) {
+            if (p->table == table_ndx && p->row == row_ndx && p->col == col)
+                return true;
         }
-        if (type != type_LinkList)
-            continue;
+        m_current_path[depth] = {table_ndx, row_ndx, col, false};
+        return false;
+    };
 
-        auto& target = *table.get_link_target(i);
-        auto lvr = table.get_linklist(i, idx);
-        for (size_t j = 0; j < lvr->size(); ++j) {
+    for (auto const& link : it->links) {
+        if (already_checking(link.col_ndx))
+            continue;
+        if (!link.is_list) {
+            if (table.is_null_link(link.col_ndx, row_ndx))
+                continue;
+            auto dst = table.get_link(link.col_ndx, row_ndx);
+            return check_row(*table.get_link_target(link.col_ndx), dst, depth + 1);
+        }
+
+        auto& target = *table.get_link_target(link.col_ndx);
+        auto lvr = table.get_linklist(link.col_ndx, row_ndx);
+        for (size_t j = 0, size = lvr->size(); j < size; ++j) {
             size_t dst = lvr->get(j).get_index();
-            if (row_did_change(target, dst, depth + 1))
+            if (check_row(target, dst, depth + 1))
                 return true;
         }
     }
 
     return false;
+}
+
+bool DeepChangeChecker::check_row(Table const& table, size_t idx, size_t depth)
+{
+    // Arbitrary upper limit on the maximum depth to search
+    if (depth >= m_current_path.size()) {
+        // Don't mark any of the intermediate rows checked along the path as
+        // not modified, as a search starting from them might hit a modification
+        for (size_t i = 1; i < m_current_path.size(); ++i)
+            m_current_path[i].depth_exceeded = true;
+        return false;
+    }
+
+    size_t table_ndx = table.get_index_in_group();
+    if (depth > 0 && table_ndx < m_info.tables.size() && m_info.tables[table_ndx].modifications.contains(idx))
+        return true;
+
+    if (m_not_modified.size() <= table_ndx)
+        m_not_modified.resize(table_ndx + 1);
+    if (m_not_modified[table_ndx].contains(idx))
+        return false;
+
+    bool ret = check_outgoing_links(table_ndx, table, idx, depth);
+    if (!ret && !m_current_path[depth].depth_exceeded)
+        m_not_modified[table_ndx].add(idx);
+    return ret;
+}
+
+bool DeepChangeChecker::operator()(size_t ndx)
+{
+    if (m_root_modifications && m_root_modifications->contains(ndx))
+        return true;
+    return check_row(m_root_table, ndx, 0);
 }
 
 CollectionNotifier::CollectionNotifier(std::shared_ptr<Realm> realm)
@@ -139,24 +233,10 @@ std::unique_lock<std::mutex> CollectionNotifier::lock_target()
     return std::unique_lock<std::mutex>{m_realm_mutex};
 }
 
-// Recursively add `table` and all tables it links to to `out`
-static void find_relevant_tables(std::vector<size_t>& out, Table const& table)
-{
-    auto table_ndx = table.get_index_in_group();
-    if (find(begin(out), end(out), table_ndx) != end(out))
-        return;
-    out.push_back(table_ndx);
-
-    for (size_t i = 0, count = table.get_column_count(); i != count; ++i) {
-        if (table.get_column_type(i) == type_Link || table.get_column_type(i) == type_LinkList) {
-            find_relevant_tables(out, *table.get_link_target(i));
-        }
-    }
-}
-
 void CollectionNotifier::set_table(Table const& table)
 {
-    find_relevant_tables(m_relevant_tables, table);
+    m_related_tables.clear();
+    DeepChangeChecker::find_related_tables(m_related_tables, table);
 }
 
 void CollectionNotifier::add_required_change_info(TransactionChangeInfo& info)
@@ -165,11 +245,13 @@ void CollectionNotifier::add_required_change_info(TransactionChangeInfo& info)
         return;
     }
 
-    auto max = *max_element(begin(m_relevant_tables), end(m_relevant_tables)) + 1;
-    if (max > info.table_modifications_needed.size())
-        info.table_modifications_needed.resize(max, false);
-    for (auto table_ndx : m_relevant_tables) {
-        info.table_modifications_needed[table_ndx] = true;
+    auto max = max_element(begin(m_related_tables), end(m_related_tables),
+                           [](auto&& a, auto&& b) { return a.table_ndx < b.table_ndx; });
+
+    if (max->table_ndx >= info.table_modifications_needed.size())
+        info.table_modifications_needed.resize(max->table_ndx + 1, false);
+    for (auto& tbl : m_related_tables) {
+        info.table_modifications_needed[tbl.table_ndx] = true;
     }
 }
 

@@ -7,7 +7,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Greatly improve performance of collection change calculation for complex
+  object graphs, especially for ones with cycles.
 
 ### Bugfixes
 
