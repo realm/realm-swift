@@ -50,12 +50,17 @@ void DeepChangeChecker::find_related_tables(std::vector<RelatedTable>& out, Tabl
     if (any_of(begin(out), end(out), [=](auto& tbl) { return tbl.table_ndx == table_ndx; }))
         return;
 
-    size_t info = out.size();
+    // We need to add this table to `out` before recurring so that the check
+    // above works, but we can't store a pointer to the thing being populated
+    // because the recursive calls may resize `out`, so instead look it up by
+    // index every time
+    size_t out_index = out.size();
     out.push_back({table_ndx, {}});
+
     for (size_t i = 0, count = table.get_column_count(); i != count; ++i) {
         auto type = table.get_column_type(i);
         if (type == type_Link || type == type_LinkList) {
-            out[info].links.push_back({i, type == type_LinkList});
+            out[out_index].links.push_back({i, type == type_LinkList});
             find_related_tables(out, *table.get_link_target(i));
         }
     }
