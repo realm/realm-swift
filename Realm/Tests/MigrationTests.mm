@@ -243,6 +243,35 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqual(1U, [RLMRealm schemaVersionAtURL:config.fileURL encryptionKey:nil error:nil]);
 }
 
+- (void)testGetSchemaVersionOnReadOnlyRealm {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSURL *directoryURL = [RLMDefaultRealmURL() URLByDeletingLastPathComponent];
+    
+    NSError *error = nil;
+    NSURL *readOnlyDirectoryURL = [directoryURL URLByAppendingPathComponent:@"ReadOnly"];
+    XCTAssertTrue([fileManager createDirectoryAtURL:readOnlyDirectoryURL withIntermediateDirectories:YES attributes:nil error:&error]);
+    XCTAssertNil(error);
+    
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.fileURL = [readOnlyDirectoryURL URLByAppendingPathComponent:@"default.realm"];
+    @autoreleasepool { [RLMRealm realmWithURL:config.fileURL]; }
+    XCTAssertEqual(0U, [RLMRealm schemaVersionAtURL:config.fileURL encryptionKey:nil error:nil]);
+    
+    error = nil;
+    XCTAssertTrue([fileManager setAttributes:@{NSFilePosixPermissions: @0x140} ofItemAtPath:config.fileURL.path error:&error]);
+    XCTAssertTrue([fileManager setAttributes:@{NSFilePosixPermissions: @0x140} ofItemAtPath:readOnlyDirectoryURL.path error:&error]);
+    XCTAssertNil(error);
+    
+    error = nil;
+    XCTAssertEqual(0U, [RLMRealm schemaVersionAtURL:config.fileURL encryptionKey:nil error:&error]);
+    XCTAssertNil(error);
+
+    error = nil;
+    XCTAssertTrue([fileManager setAttributes:@{NSFilePosixPermissions: @0x1C0} ofItemAtPath:readOnlyDirectoryURL.path error:&error]);
+    XCTAssertTrue([fileManager removeItemAtURL:readOnlyDirectoryURL error:&error]);
+    XCTAssertNil(error);
+}
+
 - (void)testSchemaVersionCannotGoDown {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.schemaVersion = 10;

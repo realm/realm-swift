@@ -693,6 +693,7 @@ void RLMRealmTranslateException(NSError **error) {
     try {
         RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
         config.fileURL = fileURL;
+        config.readOnly = YES;
         config.encryptionKey = RLMRealmValidatedEncryptionKey(key);
 
         uint64_t version = Realm::get_schema_version(config.config);
