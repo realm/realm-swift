@@ -184,6 +184,12 @@ public:
 
     bool has_links() const { return m_links.size(); }
 
+    bool has_any_to_many_links() const {
+        return std::any_of(begin(m_links), end(m_links), [](RLMProperty *property) {
+            return property.type == RLMPropertyTypeArray || property.type == RLMPropertyTypeLinkingObjects;
+        });
+    }
+
     util::Optional<ColumnReference> last_link_column() const {
         if (!m_links.size()) {
             return util::none;
@@ -474,11 +480,12 @@ void add_constraint_to_query(realm::Query &query, RLMPropertyType type,
                              L lhs, R rhs);
 
 void add_between_constraint_to_query(realm::Query &query, const ColumnReference& column, id value) {
-    if (auto link_column = column.last_link_column()) {
-        Query subquery = link_column->link_target_object_schema().table->where();
+    if (column.has_any_to_many_links()) {
+        auto link_column = *column.last_link_column();
+        Query subquery = link_column.link_target_object_schema().table->where();
         add_between_constraint_to_query(subquery, column.column_ignoring_links(), value);
 
-        query.and_query(link_column->resolve_with_subquery<Link>(query, std::move(subquery)).count() > 0);
+        query.and_query(link_column.resolve_with_subquery<Link>(query, std::move(subquery)).count() > 0);
         return;
     }
 
