@@ -21,9 +21,24 @@
 #include "object_store.hpp"
 #include "property.hpp"
 
+#include <realm/data_type.hpp>
 #include <realm/table.hpp>
 
 using namespace realm;
+
+#define ASSERT_PROPERTY_TYPE_VALUE(property, type) \
+    static_assert(static_cast<int>(PropertyType::property) == type_##type, \
+                  "PropertyType and DataType must have the same values")
+
+ASSERT_PROPERTY_TYPE_VALUE(Int, Int);
+ASSERT_PROPERTY_TYPE_VALUE(Bool, Bool);
+ASSERT_PROPERTY_TYPE_VALUE(Float, Float);
+ASSERT_PROPERTY_TYPE_VALUE(Double, Double);
+ASSERT_PROPERTY_TYPE_VALUE(Data, Binary);
+ASSERT_PROPERTY_TYPE_VALUE(Date, Timestamp);
+ASSERT_PROPERTY_TYPE_VALUE(Any, Mixed);
+ASSERT_PROPERTY_TYPE_VALUE(Object, Link);
+ASSERT_PROPERTY_TYPE_VALUE(Array, LinkList);
 
 ObjectSchema::ObjectSchema() = default;
 ObjectSchema::~ObjectSchema() = default;

@@ -19,6 +19,7 @@
 #import "RLMTestCase.h"
 
 #import <libkern/OSAtomic.h>
+#import <math.h>
 #import <objc/runtime.h>
 #import <stdalign.h>
 
@@ -651,26 +652,145 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     [realm commitWriteTransaction];
 }
 
-- (void)testDatePrecisionPreservation
-{
-    DateObject *dateObject = [[DateObject alloc] initWithValue:@[NSDate.distantFuture]];
+- (void)testDateDistantFuture {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    [realm addObject:dateObject];
+    DateObject *dateObject = [DateObject createInRealm:realm withValue:@[NSDate.distantFuture]];
     [realm commitWriteTransaction];
     XCTAssertEqualObjects(NSDate.distantFuture, dateObject.dateCol);
+}
 
+- (void)testDateDistantPast {
+    RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    NSDate *date = ({
-        NSCalendarUnit units = (NSCalendarUnit)(NSCalendarUnitMonth | NSCalendarUnitYear | NSCalendarUnitDay);
-        NSDateComponents *components = [[NSCalendar currentCalendar] components:units fromDate:NSDate.date];
-        components.calendar = [NSCalendar currentCalendar];
-        components.year += 50000;
-        components.date;
-    });
-    dateObject.dateCol = date;
+    DateObject *dateObject = [DateObject createInRealm:realm withValue:@[NSDate.distantPast]];
     [realm commitWriteTransaction];
-    XCTAssertEqualObjects(date, dateObject.dateCol);
+    XCTAssertEqualObjects(NSDate.distantPast, dateObject.dateCol);
+}
+
+- (void)testDate50kYears {
+    NSCalendarUnit units = (NSCalendarUnit)(NSCalendarUnitMonth | NSCalendarUnitYear | NSCalendarUnitDay);
+    NSDateComponents *components = [[NSCalendar currentCalendar] components:units fromDate:NSDate.date];
+    components.calendar = [NSCalendar currentCalendar];
+    components.year += 50000;
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DateObject *dateObject = [DateObject createInRealm:realm withValue:@[components.date]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects(components.date, dateObject.dateCol);
+}
+
+static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^check)(NSDate *, NSDate *)) {
+    NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:from];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DateObject *dateObject = [DateObject createInRealm:realm withValue:@[date]];
+
+    while (from < to) @autoreleasepool {
+        check(dateObject.dateCol, date);
+        from = nextafter(from, DBL_MAX);
+        date = [NSDate dateWithTimeIntervalSinceReferenceDate:from];
+        dateObject.dateCol = date;
+    }
+    [realm commitWriteTransaction];
+}
+
+- (void)testExactRepresentationOfDatesAroundNow {
+    NSDate *date = [NSDate date];
+    NSTimeInterval time = date.timeIntervalSinceReferenceDate;
+    testDatesInRange(time - .001, time + .001, ^(NSDate *d1, NSDate *d2) {
+        XCTAssertEqualObjects(d1, d2);
+    });
+}
+
+- (void)testExactRepresentationOfDatesAroundDistantFuture {
+    NSDate *date = [NSDate distantFuture];
+    NSTimeInterval time = date.timeIntervalSinceReferenceDate;
+    testDatesInRange(time - .001, time + .001, ^(NSDate *d1, NSDate *d2) {
+        XCTAssertEqualObjects(d1, d2);
+    });
+}
+
+- (void)testExactRepresentationOfDatesAroundEpoch {
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:0];
+    NSTimeInterval time = date.timeIntervalSinceReferenceDate;
+    testDatesInRange(time - .001, time + .001, ^(NSDate *d1, NSDate *d2) {
+        XCTAssertEqualObjects(d1, d2);
+    });
+}
+
+- (void)testExactRepresentationOfDatesAroundReferenceDate {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    NSDate *zero = [NSDate dateWithTimeIntervalSinceReferenceDate:0];
+    DateObject *dateObject = [DateObject createInRealm:realm withValue:@[zero]];
+    XCTAssertEqualObjects(dateObject.dateCol, zero);
+
+    // Just shy of 1ns should still be zero
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:nextafter(1e-9, -DBL_MAX)];
+    XCTAssertEqualObjects(dateObject.dateCol, zero);
+
+    // Very slightly over 1ns (since 1e-9 can't be exactly represented by a double)
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:1e-9];
+    XCTAssertNotEqualObjects(dateObject.dateCol, zero);
+
+    // Round toward zero, so -1ns + epsilon is zero
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:nextafter(0, -DBL_MAX)];
+    XCTAssertEqualObjects(dateObject.dateCol, zero);
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:nextafter(-1e-9, DBL_MAX)];
+    XCTAssertEqualObjects(dateObject.dateCol, zero);
+
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:-1e-9];
+    XCTAssertNotEqualObjects(dateObject.dateCol, zero);
+
+    [realm commitWriteTransaction];
+}
+
+- (void)testDatesOutsideOfTimestampRange {
+    NSDate *date = [NSDate date];
+    NSDate *maxDate = [NSDate dateWithTimeIntervalSince1970:(double)(1ULL << 63) + .999999999];
+    NSDate *minDate = [NSDate dateWithTimeIntervalSince1970:-(double)(1ULL << 63) - .999999999];
+    NSDate *justOverMaxDate = [NSDate dateWithTimeIntervalSince1970:nextafter(maxDate.timeIntervalSince1970, DBL_MAX)];
+    NSDate *justUnderMaxDate = [NSDate dateWithTimeIntervalSince1970:nextafter(maxDate.timeIntervalSince1970, -DBL_MAX)];
+    NSDate *justOverMinDate = [NSDate dateWithTimeIntervalSince1970:nextafter(minDate.timeIntervalSince1970, DBL_MAX)];
+    NSDate *justUnderMinDate = [NSDate dateWithTimeIntervalSince1970:nextafter(minDate.timeIntervalSince1970, -DBL_MAX)];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DateObject *dateObject = [DateObject createInRealm:realm withValue:@[date]];
+
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:0.0/0.0];
+    XCTAssertEqualObjects(dateObject.dateCol, [NSDate dateWithTimeIntervalSince1970:0]);
+
+    dateObject.dateCol = maxDate;
+    XCTAssertEqualObjects(dateObject.dateCol, maxDate);
+    dateObject.dateCol = justOverMaxDate;
+    XCTAssertEqualObjects(dateObject.dateCol, maxDate);
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:DBL_MAX];
+    XCTAssertEqualObjects(dateObject.dateCol, maxDate);
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:1.0/0.0];
+    XCTAssertEqualObjects(dateObject.dateCol, maxDate);
+
+    dateObject.dateCol = minDate;
+    XCTAssertEqualObjects(dateObject.dateCol, minDate);
+    dateObject.dateCol = justUnderMinDate;
+    XCTAssertEqualObjects(dateObject.dateCol, minDate);
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:-DBL_MAX];
+    XCTAssertEqualObjects(dateObject.dateCol, minDate);
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:-1.0/0.0];
+    XCTAssertEqualObjects(dateObject.dateCol, minDate);
+
+    dateObject.dateCol = justUnderMaxDate;
+    XCTAssertEqualObjects(dateObject.dateCol, justUnderMaxDate);
+
+    dateObject.dateCol = justOverMinDate;
+    XCTAssertEqualObjects(dateObject.dateCol, justOverMinDate);
+
+    [realm commitWriteTransaction];
 }
 
 - (void)testDataSizeLimits {

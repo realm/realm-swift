@@ -464,7 +464,7 @@ void add_between_constraint_to_query(realm::Query &query, const ColumnReference&
     validate_and_extract_between_range(value, column.property(), &from, &to);
 
     RLMPropertyType type = column.type();
-    if (column.has_links()) {
+    if (column.has_links() || type == RLMPropertyTypeDate) {
         query.group();
         add_constraint_to_query(query, type, NSGreaterThanOrEqualToPredicateOperatorType, 0, column, from);
         add_constraint_to_query(query, type, NSLessThanOrEqualToPredicateOperatorType, 0, column, to);
@@ -475,11 +475,6 @@ void add_between_constraint_to_query(realm::Query &query, const ColumnReference&
     // add to query
     NSUInteger index = column.index();
     switch (type) {
-        case type_DateTime:
-            query.between_datetime(index,
-                                   [from timeIntervalSince1970],
-                                   [to timeIntervalSince1970]);
-            break;
         case type_Double:
             query.between(index, [from doubleValue], [to doubleValue]);
             break;
@@ -627,8 +622,8 @@ template <typename RequestedType>
 RequestedType convert(id value);
 
 template <>
-DateTime convert<DateTime>(id value) {
-    return [value timeIntervalSince1970];
+Timestamp convert<Timestamp>(id value) {
+    return RLMTimestampForNSDate(value);
 }
 
 template <>
@@ -685,7 +680,7 @@ void do_add_constraint_to_query(realm::Query &query, RLMPropertyType type,
             add_bool_constraint_to_query(query, operatorType, value_of_type_for_query<bool>(query, values)...);
             break;
         case RLMPropertyTypeDate:
-            add_numeric_constraint_to_query(query, type, operatorType, value_of_type_for_query<realm::DateTime>(query, values)...);
+            add_numeric_constraint_to_query(query, type, operatorType, value_of_type_for_query<realm::Timestamp>(query, values)...);
             break;
         case RLMPropertyTypeDouble:
             add_numeric_constraint_to_query(query, type, operatorType, value_of_type_for_query<Double>(query, values)...);

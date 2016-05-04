@@ -32,6 +32,8 @@
 #import "object_store.hpp"
 #import "shared_realm.hpp"
 
+#import <realm/version.hpp>
+
 using namespace realm;
 
 static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
@@ -99,6 +101,26 @@ RLM_ARRAY_TYPE(MigrationObject);
 @end
 
 @interface MigrationTests : RLMTestCase
+@end
+
+@interface DateMigrationObject : RLMObject
+@property (nonatomic, strong) NSDate *nonNullNonIndexed;
+@property (nonatomic, strong) NSDate *nullNonIndexed;
+@property (nonatomic, strong) NSDate *nonNullIndexed;
+@property (nonatomic, strong) NSDate *nullIndexed;
+@property (nonatomic) int cookie;
+@end
+
+#define RLM_OLD_DATE_FORMAT (REALM_VER_MAJOR < 1 && REALM_VER_MINOR < 100)
+
+@implementation DateMigrationObject
++ (NSArray *)requiredProperties {
+    return @[@"nonNullNonIndexed", @"nonNullIndexed"];
+}
+
++ (NSArray *)indexedProperties {
+    return @[@"nonNullIndexed", @"nullIndexed"];
+}
 @end
 
 @implementation MigrationTests
@@ -1000,6 +1022,100 @@ RLM_ARRAY_TYPE(MigrationObject);
     RLMResults *allObjects = [RequiredPropertiesObject allObjectsInRealm:realm];
     XCTAssertEqualObjects(@"Hello", [allObjects[0] stringCol]);
     XCTAssertEqualObjects(@"World", [allObjects[1] stringCol]);
+}
+
+- (void)testDateTimeFormatAutoMigration {
+    static const int cookieValue = 0xDEADBEEF;
+
+    NSDate *distantPast = NSDate.distantPast;
+    NSDate *distantFuture = NSDate.distantFuture;
+    NSDate *beforeEpoch = [NSDate dateWithTimeIntervalSince1970:-100];
+    NSDate *epoch = [NSDate dateWithTimeIntervalSince1970:0];
+    NSDate *afterEpoch = [NSDate dateWithTimeIntervalSince1970:100];
+    NSDate *referenceDate = [NSDate dateWithTimeIntervalSinceReferenceDate:0];
+
+    NSArray *expectedDates = @[distantPast, distantFuture, beforeEpoch, epoch, afterEpoch, referenceDate];
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[[DateMigrationObject class]];
+
+    @autoreleasepool {
+#if RLM_OLD_DATE_FORMAT
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        [realm beginWriteTransaction];
+        for (NSDate *date in expectedDates) {
+            [DateMigrationObject createInRealm:realm withValue:@[date, date, date, date, @(cookieValue)]];
+            [DateMigrationObject createInRealm:realm withValue:@[date, NSNull.null, date, NSNull.null, @(cookieValue)]];
+        }
+        [realm commitWriteTransaction];
+
+        NSURL *url = [config.fileURL.URLByDeletingLastPathComponent URLByAppendingPathComponent:@"fileformat-old-date.realm"];
+        [realm writeCopyToURL:url encryptionKey:nil error:nil];
+        NSLog(@"wrote pre-migration realm to %@", url);
+#else
+        NSURL *bundledRealmURL = [[NSBundle bundleForClass:[DateMigrationObject class]]
+                                  URLForResource:@"fileformat-old-date" withExtension:@"realm"];
+        [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
+
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        RLMResults *dates = [DateMigrationObject allObjectsInRealm:realm];
+        XCTAssertEqual(expectedDates.count * 2, dates.count);
+        for (NSUInteger i = 0; i < expectedDates.count; ++i) {
+            NSDate *expected = expectedDates[i];
+            DateMigrationObject *obj = dates[i * 2];
+            XCTAssertEqualObjects(obj.nonNullNonIndexed, expected);
+            XCTAssertEqualObjects(obj.nonNullIndexed, expected);
+            XCTAssertEqualObjects(obj.nullNonIndexed, expected);
+            XCTAssertEqualObjects(obj.nullIndexed, expected);
+            XCTAssertEqual(obj.cookie, cookieValue);
+
+            obj = dates[i * 2 + 1];
+            XCTAssertEqualObjects(obj.nonNullNonIndexed, expected);
+            XCTAssertEqualObjects(obj.nonNullIndexed, expected);
+            XCTAssertNil(obj.nullNonIndexed);
+            XCTAssertNil(obj.nullIndexed);
+            XCTAssertEqual(obj.cookie, cookieValue);
+        }
+
+        for (NSDate *date in expectedDates) {
+            RLMResults *results = [DateMigrationObject objectsInRealm:realm
+                                   where:@"nonNullIndexed = %@ AND nullIndexed = %@",
+                                   date, date];
+            XCTAssertEqual(1U, results.count);
+            DateMigrationObject *obj = results.firstObject;
+            XCTAssertEqualObjects(date, obj.nonNullIndexed);
+            XCTAssertEqualObjects(date, obj.nullIndexed);
+
+            results = [DateMigrationObject objectsInRealm:realm
+                       where:@"nonNullIndexed = %@ AND nullIndexed = nil", date];
+            XCTAssertEqual(1U, results.count);
+            obj = results.firstObject;
+            XCTAssertEqualObjects(date, obj.nonNullIndexed);
+            XCTAssertNil(obj.nullIndexed);
+        }
+#endif
+    }
+
+    @autoreleasepool {
+        NSURL *bundledRealmURL = [[NSBundle bundleForClass:[DateMigrationObject class]]
+                                  URLForResource:@"fileformat-pre-null" withExtension:@"realm"];
+        [NSFileManager.defaultManager removeItemAtURL:config.fileURL error:nil];
+        [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
+
+        config.schemaVersion = 1; // Nullability of some properties changed
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        RLMResults *dates = [DateMigrationObject allObjectsInRealm:realm];
+        XCTAssertEqual(expectedDates.count, dates.count);
+        for (NSUInteger i = 0; i < expectedDates.count; ++i) {
+            NSDate *expected = expectedDates[i];
+            DateMigrationObject *obj = dates[i];
+            XCTAssertEqualObjects(obj.nonNullNonIndexed, expected);
+            XCTAssertEqualObjects(obj.nonNullIndexed, expected);
+            XCTAssertEqualObjects(obj.nullNonIndexed, expected);
+            XCTAssertEqualObjects(obj.nullIndexed, expected);
+            XCTAssertEqual(obj.cookie, cookieValue);
+        }
+    }
 }
 
 @end

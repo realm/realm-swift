@@ -3,17 +3,28 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* Files written by this version of Realm cannot be read by older versions of
+  Realm. Existing files will automatically be upgraded when they are opened.
 
 ### Enhancements
 
 * Greatly improve performance of collection change calculation for complex
   object graphs, especially for ones with cycles.
+* NSDate properties now support nanoseconds precision.
+* Opening a single Realm file on multiple threads now shares a single memory
+  mapping of the file for all threads, significantly reducing the memory
+  required to work with large files.
+* Crashing while in the middle of a write transaction no longer blocks other
+  processes from performing write transactions on the same file.
+* Improve the performance of refreshing a Realm (including via autorefresh)
+  when there are live Results/RLMResults objects for that Realm.
 
 ### Bugfixes
 
 * Fix an assertion failure of "!more_before || index >= std::prev(it)->second)"
   in `IndexSet::do_add()`.
+* Fix a crash when an `RLMArray` or `List` object is destroyed from the wrong
+  thread.
 
 0.100.0 Release notes (2016-04-29)
 =============================================================

@@ -127,8 +127,7 @@
 
     XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"], @[]);
 
-    // Truncate to seconds so it round-trips exactly
-    NSDate *dateMinInput = [NSDate dateWithTimeIntervalSince1970:(int64_t)[[NSDate date] timeIntervalSince1970]];
+    NSDate *dateMinInput = [NSDate date];
     NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
 
     [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
@@ -171,8 +170,7 @@
 
     [realm beginWriteTransaction];
 
-    // Truncate to seconds so it round-trips exactly
-    NSDate *dateMinInput = [NSDate dateWithTimeIntervalSince1970:(int64_t)[[NSDate date] timeIntervalSince1970]];
+    NSDate *dateMinInput = [NSDate date];
     NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
 
     [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
@@ -228,8 +226,7 @@
 
     [realm beginWriteTransaction];
 
-    // Truncate to seconds so it round-trips exactly
-    NSDate *dateMinInput = [NSDate dateWithTimeIntervalSince1970:(int64_t)[[NSDate date] timeIntervalSince1970]];
+    NSDate *dateMinInput = [NSDate date];
     NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
 
     [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];

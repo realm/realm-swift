@@ -130,9 +130,9 @@ class SwiftArrayTests: RLMTestCase {
 
         // Test date min
         var dateMinOutput = noArray.minOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, accuracy: 1, "Minimum should be dateMaxInput")
+        XCTAssertEqual(dateMinOutput, dateMaxInput, "Minimum should be dateMaxInput")
         dateMinOutput = yesArray.minOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, accuracy: 1, "Minimum should be dateMinInput")
+        XCTAssertEqual(dateMinOutput, dateMinInput, "Minimum should be dateMinInput")
 
         // MAX ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int max
@@ -155,9 +155,9 @@ class SwiftArrayTests: RLMTestCase {
 
         // Test date max
         var dateMaxOutput = noArray.maxOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, accuracy: 1, "Maximum should be dateMaxInput")
+        XCTAssertEqual(dateMaxOutput, dateMaxInput, "Maximum should be dateMaxInput")
         dateMaxOutput = yesArray.maxOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, accuracy: 1, "Maximum should be dateMinInput")
+        XCTAssertEqual(dateMaxOutput, dateMinInput, "Maximum should be dateMinInput")
     }
 
     func testArrayDescription() {
@@ -357,9 +357,9 @@ class SwiftArrayTests: RLMTestCase {
 
         // Test date min
         var dateMinOutput = noArray.minOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, accuracy: 1, "Minimum should be dateMaxInput")
+        XCTAssertEqual(dateMinOutput, dateMaxInput, "Minimum should be dateMaxInput")
         dateMinOutput = yesArray.minOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, accuracy: 1, "Minimum should be dateMinInput")
+        XCTAssertEqual(dateMinOutput, dateMinInput, "Minimum should be dateMinInput")
 
         // MAX ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int max
@@ -382,9 +382,9 @@ class SwiftArrayTests: RLMTestCase {
 
         // Test date max
         var dateMaxOutput = noArray.maxOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, accuracy: 1, "Maximum should be dateMaxInput")
+        XCTAssertEqual(dateMaxOutput, dateMaxInput, "Maximum should be dateMaxInput")
         dateMaxOutput = yesArray.maxOfProperty("dateCol") as! NSDate
-        XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, accuracy: 1, "Maximum should be dateMinInput")
+        XCTAssertEqual(dateMaxOutput, dateMinInput, "Maximum should be dateMinInput")
     }
 
     func testArrayDescription_objc() {

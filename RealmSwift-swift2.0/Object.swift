@@ -159,8 +159,8 @@ public class Object: RLMObjectBase {
     public class func ignoredProperties() -> [String] { return [] }
 
     /**
-    Return an array of property names for properties which should be indexed. Only supported
-    for strings, integers, booleans and NSDate properties.
+    Return an array of property names for properties which should be indexed.
+    Only supported for string, integer, boolean and NSDate properties.
 
     - returns: `Array` of property names to index.
     */

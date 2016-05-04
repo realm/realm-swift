@@ -233,8 +233,8 @@ RLM_ASSUME_NONNULL_BEGIN
 #pragma mark - Customizing your Objects
 
 /**
- Return an array of property names for properties which should be indexed. Only supported
- for strings, integers, booleans and NSDate properties.
+ Return an array of property names for properties which should be indexed.
+ Only supported for string, integer, boolean, and NSDate properties.
  @return    NSArray of property names.
  */
 + (NSArray RLM_GENERIC(NSString *) *)indexedProperties;

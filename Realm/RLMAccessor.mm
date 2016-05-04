@@ -146,14 +146,12 @@ static inline NSDate *RLMGetDate(__unsafe_unretained RLMObjectBase *const obj, N
     if (obj->_row.is_null(colIndex)) {
         return nil;
     }
-    realm::DateTime dt = obj->_row.get_datetime(colIndex);
-    return RLMDateTimeToNSDate(dt);
+    return RLMTimestampToNSDate(obj->_row.get_timestamp(colIndex));
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, __unsafe_unretained NSDate *const date) {
     RLMVerifyInWriteTransaction(obj);
     if (date) {
-        realm::DateTime dt = RLMDateTimeForNSDate(date);
-        obj->_row.set_datetime(colIndex, dt);
+        obj->_row.set_timestamp(colIndex, RLMTimestampForNSDate(date));
     }
     else {
         obj->_row.set_null(colIndex);
@@ -405,7 +403,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
         return;
     }
     if (NSDate *date = RLMDynamicCast<NSDate>(val)) {
-        obj->_row.set_mixed(col_ndx, RLMDateTimeForNSDate(date));
+        obj->_row.set_mixed(col_ndx, RLMTimestampForNSDate(date));
         return;
     }
     if (NSData *data = RLMDynamicCast<NSData>(val)) {

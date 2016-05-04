@@ -255,7 +255,7 @@ class SwiftIndexedPropertiesObject: Object {
     }
 }
 
-class SwiftIndexedOptinalPropertiesObject: Object {
+class SwiftIndexedOptionalPropertiesObject: Object {
     dynamic var optionalStringCol: String? = ""
     let optionalIntCol = RealmOptional<Int>()
     let optionalInt8Col = RealmOptional<Int8>()
