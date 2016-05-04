@@ -72,9 +72,6 @@ public:
 
     NotificationToken add_notification_callback(CollectionChangeCallback cb);
 
-    // This should go away once we have real List notifications
-    uint_fast64_t get_version_counter() const noexcept;
-
     // These are implemented in object_accessor.hpp
     template <typename ValueType, typename ContextType>
     void add(ContextType ctx, ValueType value);
