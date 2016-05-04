@@ -118,11 +118,9 @@ RLM_ARRAY_TYPE(MigrationObject);
     return @[@"nonNullNonIndexed", @"nonNullIndexed"];
 }
 
-#if RLM_OLD_DATE_FORMAT
 + (NSArray *)indexedProperties {
     return @[@"nonNullIndexed", @"nullIndexed"];
 }
-#endif
 @end
 
 @implementation MigrationTests
@@ -1077,6 +1075,23 @@ RLM_ARRAY_TYPE(MigrationObject);
             XCTAssertNil(obj.nullNonIndexed);
             XCTAssertNil(obj.nullIndexed);
             XCTAssertEqual(obj.cookie, cookieValue);
+        }
+
+        for (NSDate *date in expectedDates) {
+            RLMResults *results = [DateMigrationObject objectsInRealm:realm
+                                   where:@"nonNullIndexed = %@ AND nullIndexed = %@",
+                                   date, date];
+            XCTAssertEqual(1U, results.count);
+            DateMigrationObject *obj = results.firstObject;
+            XCTAssertEqualObjects(date, obj.nonNullIndexed);
+            XCTAssertEqualObjects(date, obj.nullIndexed);
+
+            results = [DateMigrationObject objectsInRealm:realm
+                       where:@"nonNullIndexed = %@ AND nullIndexed = nil", date];
+            XCTAssertEqual(1U, results.count);
+            obj = results.firstObject;
+            XCTAssertEqualObjects(date, obj.nonNullIndexed);
+            XCTAssertNil(obj.nullIndexed);
         }
 #endif
     }
