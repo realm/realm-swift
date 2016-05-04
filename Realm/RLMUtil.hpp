@@ -178,15 +178,14 @@ static inline realm::Timestamp RLMTimestampForNSDate(__unsafe_unretained NSDate 
         return {std::numeric_limits<int64_t>::min(), -1'000'000'000 + 1};
 
     auto seconds = static_cast<int64_t>(timeInterval);
-    timeInterval -= seconds;
+    auto nanoseconds = static_cast<int32_t>((timeInterval - seconds) * 1'000'000'000.0);
     seconds += static_cast<int64_t>(NSTimeIntervalSince1970);
 
     // Seconds and nanoseconds have to have the same sign
-    if (timeInterval < 0 && seconds > 0) {
-        ++timeInterval;
+    if (nanoseconds < 0 && seconds > 0) {
+        nanoseconds += 1'000'000'000;
         --seconds;
     }
-    auto nanoseconds = static_cast<int32_t>(timeInterval * 1'000'000'000.0);
     return {seconds, nanoseconds};
 }
 

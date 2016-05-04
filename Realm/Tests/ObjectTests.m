@@ -689,7 +689,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     [realm beginWriteTransaction];
     DateObject *dateObject = [DateObject createInRealm:realm withValue:@[date]];
 
-    while (from < to) {
+    while (from < to) @autoreleasepool {
         check(dateObject.dateCol, date);
         from = nextafter(from, DBL_MAX);
         date = [NSDate dateWithTimeIntervalSinceReferenceDate:from];
@@ -720,6 +720,34 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     testDatesInRange(time - .001, time + .001, ^(NSDate *d1, NSDate *d2) {
         XCTAssertEqualObjects(d1, d2);
     });
+}
+
+- (void)testExactRepresentationOfDatesAroundReferenceDate {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    NSDate *zero = [NSDate dateWithTimeIntervalSinceReferenceDate:0];
+    DateObject *dateObject = [DateObject createInRealm:realm withValue:@[zero]];
+    XCTAssertEqualObjects(dateObject.dateCol, zero);
+
+    // Just shy of 1ns should still be zero
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:nextafter(1e-9, -DBL_MAX)];
+    XCTAssertEqualObjects(dateObject.dateCol, zero);
+
+    // Very slightly over 1ns (since 1e-9 can't be exactly represented by a double)
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:1e-9];
+    XCTAssertNotEqualObjects(dateObject.dateCol, zero);
+
+    // Round toward zero, so -1ns + epsilon is zero
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:nextafter(0, -DBL_MAX)];
+    XCTAssertEqualObjects(dateObject.dateCol, zero);
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:nextafter(-1e-9, DBL_MAX)];
+    XCTAssertEqualObjects(dateObject.dateCol, zero);
+
+    dateObject.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:-1e-9];
+    XCTAssertNotEqualObjects(dateObject.dateCol, zero);
+
+    [realm commitWriteTransaction];
 }
 
 - (void)testDatesOutsideOfTimestampRange {
