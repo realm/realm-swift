@@ -159,7 +159,6 @@ using namespace realm;
     for (RLMProperty *property in objectSchema.properties) {
         property.column = objectStoreSchema.property_for_name(property.name.UTF8String)->table_column;
     }
-    RLMClearAccessorCache();
 }
 
 @end
