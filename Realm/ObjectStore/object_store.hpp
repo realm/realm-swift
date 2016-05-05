@@ -95,6 +95,9 @@ namespace realm {
         // returns pairs of object names & properties that should be deleted after the migration process
         static std::vector<std::pair<std::string, Property>> create_tables(realm::Group *group, Schema &target_schema, bool update_existing);
 
+        // verify to see if there are any renamed properties that don't align with the target schema 
+        static void verify_missing_renamed_properties(Schema const& actual_schema, Schema& target_schema);
+
         // remove properties marked for deletion by create_tables
         static void remove_properties(Group *group, Schema &target_schema, std::vector<std::pair<std::string, Property>> to_delete);
 
@@ -165,6 +168,14 @@ namespace realm {
     class PropertyRenameMissingOldPropertyException : public PropertyRenameException {
       public:
         PropertyRenameMissingOldPropertyException(std::string old_property_name, std::string new_property_name);
+    };
+
+    class PropertyRenameMissingNewPropertyException : public MigrationException {
+    public:
+        std::string new_property_name() const { return m_new_property_name; }
+        PropertyRenameMissingNewPropertyException(std::string new_property_name);
+    private:
+        std::string m_new_property_name;
     };
 
     class PropertyRenameOldStillExistsException : public PropertyRenameException {

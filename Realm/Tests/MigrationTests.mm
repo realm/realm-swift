@@ -1387,7 +1387,7 @@ RLM_ARRAY_TYPE(MigrationObject);
                       objectSchemas:@[objectSchema] className:StringObject.className oldName:@"nonExistentProperty1" newName:@"nonExistentProperty2"];
 
     // Missing New Property
-    [self assertPropertyRenameError:@"Property 'nonExistentProperty' is missing from latest object model"
+    [self assertPropertyRenameError:@"Renamed property 'nonExistentProperty' is not in the latest model."
                       objectSchemas:@[objectSchema] className:StringObject.className oldName:@"stringCol" newName:@"nonExistentProperty"];
 
     // Removed Class

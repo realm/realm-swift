@@ -154,6 +154,17 @@ static inline bool property_can_be_migrated_to_nullable(const Property& old_prop
         && new_property.name == old_property.name;
 }
 
+void ObjectStore::verify_missing_renamed_properties(Schema const& actual_schema, Schema& target_schema) {
+    for (auto &object_schema : target_schema) {
+        auto matching_schema = actual_schema.find(object_schema);
+        for (auto& target_prop : matching_schema->persisted_properties) {
+            if (!object_schema.property_for_name(target_prop.name)) {
+                throw PropertyRenameMissingNewPropertyException(target_prop.name);
+            }
+        }
+    }
+}
+
 void ObjectStore::verify_schema(Schema const& actual_schema, Schema& target_schema, bool allow_missing_tables) {
     std::vector<ObjectSchemaValidationException> errors;
     for (auto &object_schema : target_schema) {
@@ -448,7 +459,10 @@ void ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
     if (get_schema_version(group) != ObjectStore::NotVersioned) {
         migration(group, schema);
         remove_properties(group, schema, std::move(to_delete));
-        verify_schema(schema_from_group(group), schema);
+
+        Schema group_schema = schema_from_group(group);
+        verify_missing_renamed_properties(group_schema, schema);
+        verify_schema(group_schema, schema);
         validate_primary_column_uniqueness(group, schema);
     }
 
@@ -620,6 +634,12 @@ PropertyRenameMissingOldPropertyException::PropertyRenameMissingOldPropertyExcep
     PropertyRenameException(old_property_name, new_property_name)
 {
     m_what = "Old property '" + old_property_name + "' is missing from the Realm file so it cannot be renamed to '" + new_property_name + "'.";
+}
+
+PropertyRenameMissingNewPropertyException::PropertyRenameMissingNewPropertyException(std::string new_property_name) :
+    m_new_property_name(new_property_name)
+{
+    m_what = "Renamed property '" + new_property_name + "' is not in the latest model.";
 }
 
 PropertyRenameOldStillExistsException::PropertyRenameOldStillExistsException(std::string old_property_name, std::string new_property_name) :
