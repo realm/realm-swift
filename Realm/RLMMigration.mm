@@ -149,7 +149,7 @@ using namespace realm;
 
 - (void)renamePropertyForClass:(NSString *)className oldName:(NSString *)oldName newName:(NSString *)newName {
     realm::ObjectStore::rename_property(_realm.group, *_realm->_realm->config().schema, className.UTF8String, oldName.UTF8String, newName.UTF8String);
-    auto objectStoreSchema = *realm::ObjectStore::schema_from_group(_realm.group).find(className.UTF8String);
+    ObjectSchema objectStoreSchema(_realm.group, className.UTF8String);
     RLMObjectSchema *objectSchema = [RLMObjectSchema objectSchemaForObjectStoreSchema:objectStoreSchema];
     NSMutableArray *mutableObjectSchemas = [NSMutableArray arrayWithArray:_realm.schema.objectSchema];
     [mutableObjectSchemas replaceObjectAtIndex:[mutableObjectSchemas indexOfObject:_realm.schema[className]]
@@ -157,7 +157,7 @@ using namespace realm;
     objectSchema.realm = _realm;
     _realm.schema.objectSchema = [mutableObjectSchemas copy];
     for (RLMProperty *property in objectSchema.properties) {
-        property.column = realm::ObjectStore::schema_from_group(_realm.group).find(className.UTF8String)->property_for_name(property.name.UTF8String)->table_column;
+        property.column = objectStoreSchema.property_for_name(property.name.UTF8String)->table_column;
     }
     RLMClearAccessorCache();
 }
