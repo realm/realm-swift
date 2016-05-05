@@ -480,6 +480,15 @@ void RLMRealmTranslateException(NSError **error) {
     }
 }
 
+- (void)beginWriteTransactionWithNotificationStuff {
+    try {
+        _realm->begin_transaction(true);
+    }
+    catch (std::exception &ex) {
+        @throw RLMException(ex);
+    }
+}
+
 - (void)commitWriteTransaction {
     [self commitWriteTransaction:nil];
 }

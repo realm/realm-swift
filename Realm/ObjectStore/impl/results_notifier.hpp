@@ -42,9 +42,11 @@ private:
     std::unique_ptr<SharedGroup::Handover<Query>> m_query_handover;
     std::unique_ptr<Query> m_query;
 
-    // The TableView resulting from running the query. Will be detached unless
-    // the query was (re)run since the last time the handover object was created
-    TableView m_tv;
+    // The handover object calculated by the last call to run() or skip()
+    // Null if a rerun wasn't needed or when not between a call to run() and a
+    // call to prepare_handover()
+    std::unique_ptr<SharedGroup::Handover<TableView>> m_next_tv_handover;
+    // The handover object to actually deliver
     std::unique_ptr<SharedGroup::Handover<TableView>> m_tv_handover;
 
     // The table version from the last time the query was run. Used to avoid
@@ -63,10 +65,11 @@ private:
     bool m_initial_run_complete = false;
 
     bool need_to_run();
-    void calculate_changes();
+    void calculate_changes(TableView& tv);
 
-    void run() override;
-    void do_prepare_handover(SharedGroup&) override;
+    void skip(SharedGroup&) override;
+    void run(SharedGroup&) override;
+    void do_prepare_handover() override;
     bool do_deliver(SharedGroup& sg) override;
     bool do_add_required_change_info(TransactionChangeInfo& info) override;
 

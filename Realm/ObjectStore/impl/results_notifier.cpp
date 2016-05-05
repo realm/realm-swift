@@ -52,7 +52,7 @@ void ResultsNotifier::release_data() noexcept
 // lock.
 //
 // In total, this means that the safe data flow is as follows:
-//  - add_Required_change_info(), prepare_handover(), attach_to(), detach() and
+//  - add_required_change_info(), prepare_handover(), attach_to(), detach() and
 //    release_data() can read members written by each other
 //  - deliver() can read members written to in prepare_handover(), deliver(),
 //    and call_callbacks()
@@ -76,7 +76,6 @@ bool ResultsNotifier::do_add_required_change_info(TransactionChangeInfo& info)
 bool ResultsNotifier::need_to_run()
 {
     REALM_ASSERT(m_info);
-    REALM_ASSERT(!m_tv.is_attached());
 
     {
         auto lock = lock_target();
@@ -94,16 +93,21 @@ bool ResultsNotifier::need_to_run()
     return true;
 }
 
-void ResultsNotifier::calculate_changes()
+static void tableview_to_vector(TableView const& tv, std::vector<size_t>& vec)
+{
+    vec.resize(tv.size());
+    for (size_t i = 0; i < vec.size(); ++i)
+        vec[i] = tv[i].get_index();
+}
+
+void ResultsNotifier::calculate_changes(TableView& tv)
 {
     size_t table_ndx = m_query->get_table()->get_index_in_group();
     if (m_initial_run_complete) {
         auto changes = table_ndx < m_info->tables.size() ? &m_info->tables[table_ndx] : nullptr;
 
         std::vector<size_t> next_rows;
-        next_rows.reserve(m_tv.size());
-        for (size_t i = 0; i < m_tv.size(); ++i)
-            next_rows.push_back(m_tv[i].get_index());
+        tableview_to_vector(tv, next_rows);
 
         if (changes) {
             auto const& moves = changes->moves;
@@ -126,44 +130,53 @@ void ResultsNotifier::calculate_changes()
         m_previous_rows = std::move(next_rows);
     }
     else {
-        m_previous_rows.resize(m_tv.size());
-        for (size_t i = 0; i < m_tv.size(); ++i)
-            m_previous_rows[i] = m_tv[i].get_index();
+        tableview_to_vector(tv, m_previous_rows);
     }
 }
 
-void ResultsNotifier::run()
+void ResultsNotifier::run(SharedGroup& sg)
 {
     if (!need_to_run())
         return;
 
     m_query->sync_view_if_needed();
-    m_tv = m_query->find_all();
+    auto tv = m_query->find_all();
     if (m_sort) {
-        m_tv.sort(m_sort.column_indices, m_sort.ascending);
+        tv.sort(m_sort.column_indices, m_sort.ascending);
     }
-    m_last_seen_version = m_tv.sync_if_needed();
+    m_last_seen_version = tv.sync_if_needed();
 
-    calculate_changes();
+    calculate_changes(tv);
+    m_next_tv_handover = sg.export_for_handover(tv, MutableSourcePayload::Move);
 }
 
-void ResultsNotifier::do_prepare_handover(SharedGroup& sg)
+void ResultsNotifier::skip(SharedGroup& sg)
 {
-    if (!m_tv.is_attached()) {
+    skip_to_version(SharedGroup::VersionID{});
+    if (!need_to_run())
+        return;
+
+    auto tv = m_query->find_all();
+    if (m_sort) {
+        tv.sort(m_sort.column_indices, m_sort.ascending);
+    }
+    m_last_seen_version = tv.sync_if_needed();
+
+    tableview_to_vector(tv, m_previous_rows);
+    m_next_tv_handover = sg.export_for_handover(tv, MutableSourcePayload::Move);
+}
+
+void ResultsNotifier::do_prepare_handover()
+{
+    if (!m_next_tv_handover) {
         return;
     }
 
-    REALM_ASSERT(m_tv.is_in_sync());
-
     m_initial_run_complete = true;
-    m_tv_handover = sg.export_for_handover(m_tv, MutableSourcePayload::Move);
+    m_tv_handover = std::move(m_next_tv_handover);
 
     add_changes(std::move(m_changes));
     REALM_ASSERT(m_changes.empty());
-
-    // detach the TableView as we won't need it again and keeping it around
-    // makes advance_read() much more expensive
-    m_tv = {};
 }
 
 bool ResultsNotifier::do_deliver(SharedGroup& sg)
@@ -204,7 +217,7 @@ void ResultsNotifier::do_attach_to(SharedGroup& sg)
 void ResultsNotifier::do_detach_from(SharedGroup& sg)
 {
     REALM_ASSERT(m_query);
-    REALM_ASSERT(!m_tv.is_attached());
+    REALM_ASSERT(!m_next_tv_handover);
 
     m_query_handover = sg.export_for_handover(*m_query, MutableSourcePayload::Move);
     m_query = nullptr;

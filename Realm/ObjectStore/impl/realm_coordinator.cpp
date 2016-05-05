@@ -37,6 +37,7 @@ using namespace realm::_impl;
 
 static std::mutex s_coordinator_mutex;
 static std::unordered_map<std::string, std::weak_ptr<RealmCoordinator>> s_coordinators_per_path;
+static const auto no_version = std::numeric_limits<uint_fast64_t>::max();
 
 std::shared_ptr<RealmCoordinator> RealmCoordinator::get_coordinator(StringData path)
 {
@@ -213,9 +214,19 @@ void RealmCoordinator::clear_all_caches()
     }
 }
 
-void RealmCoordinator::send_commit_notifications()
+void RealmCoordinator::send_commit_notifications(Realm* source_realm)
 {
     REALM_ASSERT(!m_config.read_only);
+    if (source_realm) {
+        std::lock_guard<std::mutex> lock(m_notifier_mutex);
+        for (auto& notifier : m_notifiers) {
+            if (notifier->is_for_current_thread())
+                notifier->skip_to_version(Realm::Internal::get_shared_group(*source_realm).get_version_of_current_transaction());
+            else
+                notifier->is_for_current_thread();
+        }
+    }
+
     if (m_notifier) {
         m_notifier->notify_others();
     }
@@ -319,17 +330,18 @@ void RealmCoordinator::on_change()
 namespace {
 class IncrementalChangeInfo {
 public:
+    template<typename Func>
     IncrementalChangeInfo(SharedGroup& sg,
-                          std::vector<std::shared_ptr<_impl::CollectionNotifier>>& notifiers)
+                          std::vector<std::shared_ptr<_impl::CollectionNotifier>>& notifiers,
+                          Func&& version_function)
     : m_sg(sg)
     {
         if (notifiers.empty())
             return;
 
         auto cmp = [&](auto&& lft, auto&& rgt) {
-            return lft->version() < rgt->version();
+            return version_function(*lft) < version_function(*rgt);
         };
-
         // Sort the notifiers by their source version so that we can pull them
         // all forward to the latest version in a single pass over the transaction log
         std::sort(notifiers.begin(), notifiers.end(), cmp);
@@ -435,7 +447,8 @@ void RealmCoordinator::run_async_notifiers()
 
     // Advance all of the new notifiers to the most recent version, if any
     auto new_notifiers = std::move(m_new_notifiers);
-    IncrementalChangeInfo new_notifier_change_info(*m_advancer_sg, new_notifiers);
+    IncrementalChangeInfo new_notifier_change_info(*m_advancer_sg, new_notifiers,
+                                                   [](auto&& notifier) { return notifier.version(); });
 
     if (!new_notifiers.empty()) {
         REALM_ASSERT_3(m_advancer_sg->get_transact_stage(), ==, SharedGroup::transact_Reading);
@@ -476,8 +489,19 @@ void RealmCoordinator::run_async_notifiers()
 
     // Advance the non-new notifiers to the same version as we advanced the new
     // ones to (or the latest if there were no new ones)
-    IncrementalChangeInfo change_info(*m_notifier_sg, notifiers);
+    IncrementalChangeInfo change_info(*m_notifier_sg, notifiers,
+                                      [](auto&& notifier) { return notifier.skip_to_version(); });
+
     for (auto& notifier : notifiers) {
+        notifier->add_required_change_info(change_info.current());
+    }
+
+    for (auto& notifier : notifiers) {
+        auto skip_to = notifier->skip_to_version();
+        if (skip_to.version == no_version)
+            break;
+        change_info.advance_incremental(skip_to);
+        notifier->skip(*m_notifier_sg);
         notifier->add_required_change_info(change_info.current());
     }
     change_info.advance_to_final(version);
@@ -491,7 +515,7 @@ void RealmCoordinator::run_async_notifiers()
     // Change info is now all ready, so the notifiers can now perform their
     // background work
     for (auto& notifier : notifiers) {
-        notifier->run();
+        notifier->run(*m_notifier_sg);
     }
 
     // Reacquire the lock while updating the fields that are actually read on
@@ -502,6 +526,7 @@ void RealmCoordinator::run_async_notifiers()
     }
     m_notifiers = std::move(notifiers);
     clean_up_dead_notifiers();
+    m_notifier_cv.notify_all();
 }
 
 void RealmCoordinator::open_helper_shared_group()
@@ -548,7 +573,7 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
     }
 
     // no async notifiers; just advance to latest
-    if (version.version == std::numeric_limits<uint_fast64_t>::max()) {
+    if (version.version == no_version) {
         transaction::advance(sg, realm.m_binding_context.get());
         return;
     }
@@ -568,7 +593,7 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
         // so, we need to release the lock and re-advance
         std::lock_guard<std::mutex> lock(m_notifier_mutex);
         version = get_notifier_version();
-        if (version.version == std::numeric_limits<uint_fast64_t>::max())
+        if (version.version == no_version)
             return;
         if (version != sg.get_version_of_current_transaction())
             continue;
@@ -593,6 +618,40 @@ void RealmCoordinator::process_available_async(Realm& realm)
     decltype(m_notifiers) notifiers;
     {
         std::lock_guard<std::mutex> lock(m_notifier_mutex);
+        for (auto& notifier : m_notifiers) {
+            if (notifier->deliver(realm, sg, m_async_error)) {
+                notifiers.push_back(notifier);
+            }
+        }
+    }
+
+    for (auto& notifier : notifiers) {
+        notifier->call_callbacks();
+    }
+}
+
+void RealmCoordinator::process_async(Realm& realm)
+{
+    // This operation only makes sense if the target Realm is already in a
+    // write transaction
+    REALM_ASSERT(realm.is_in_transaction());
+
+    decltype(m_notifiers) notifiers;
+
+    auto& sg = Realm::Internal::get_shared_group(realm);
+    auto version = sg.get_version_of_current_transaction();
+
+    {
+        std::unique_lock<std::mutex> lock(m_notifier_mutex);
+        if (m_notifiers.empty() && m_new_notifiers.empty())
+            return;
+
+        m_notifier_cv.wait(lock, [&] {
+            return m_new_notifiers.empty()
+                && std::all_of(begin(m_notifiers), end(m_notifiers),
+                               [&](auto const& n) { return n->version() == version; });
+        });
+
         for (auto& notifier : m_notifiers) {
             if (notifier->deliver(realm, sg, m_async_error)) {
                 notifiers.push_back(notifier);

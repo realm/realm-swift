@@ -57,7 +57,7 @@ public:
 
     // Asynchronously call notify() on every Realm instance for this coordinator's
     // path, including those in other processes
-    void send_commit_notifications();
+    void send_commit_notifications(Realm* source_realm);
 
     // Clear the weak Realm cache for all paths
     // Should only be called in test code, as continuing to use the previously
@@ -86,7 +86,10 @@ public:
     // Advance the Realm to the most recent transaction version which all async
     // work is complete for
     void advance_to_ready(Realm& realm);
+    // Deliver any notifications which are ready for the realm's version
     void process_available_async(Realm& realm);
+    // Deliver notifications for the realm, blocking if some aren't ready yet
+    void process_async(Realm& realm);
 
 private:
     Realm::Config m_config;
@@ -95,6 +98,7 @@ private:
     std::vector<WeakRealmNotifier> m_weak_realm_notifiers;
 
     std::mutex m_notifier_mutex;
+    std::condition_variable m_notifier_cv;
     std::vector<std::shared_ptr<_impl::CollectionNotifier>> m_new_notifiers;
     std::vector<std::shared_ptr<_impl::CollectionNotifier>> m_notifiers;
 
