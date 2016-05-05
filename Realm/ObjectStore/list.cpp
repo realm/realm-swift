@@ -201,8 +201,3 @@ NotificationToken List::add_notification_callback(CollectionChangeCallback cb)
     }
     return {m_notifier, m_notifier->add_callback(std::move(cb))};
 }
-
-uint_fast64_t List::get_version_counter() const noexcept
-{
-    return m_link_view->get_origin_table().get_version_counter();
-}
