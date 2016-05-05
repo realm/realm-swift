@@ -68,7 +68,7 @@ extension Realm {
                     schemaVersion: UInt64 = 0,
                     migrationBlock: MigrationBlock? = nil,
                     objectTypes: [Object.Type]? = nil) {
-            self.fileURL = path.map(NSURL.init(fileURLWithPath:))
+            self.fileURL = path.map { NSURL(fileURLWithPath: $0) }
             if inMemoryIdentifier != nil {
                 self.inMemoryIdentifier = inMemoryIdentifier
             }
@@ -118,7 +118,7 @@ extension Realm {
                 _path = newValue?.path
             }
             get {
-                return _path.map(NSURL.init(fileURLWithPath:))
+                return _path.map { NSURL(fileURLWithPath: $0) }
             }
         }
 
