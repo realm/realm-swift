@@ -11,7 +11,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix `BETWEEN` queries that traverse `RLMArray`/`List` properties to ensure that
+  a single related object satisfies the `BETWEEN` criteria, rather than allowing
+  different objects in the array to satisfy the lower and upper bounds.
 
 0.101.0 Release notes (2016-05-04)
 =============================================================
