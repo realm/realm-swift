@@ -33,6 +33,7 @@
 #import "shared_realm.hpp"
 
 #import <realm/version.hpp>
+#import <objc/runtime.h>
 
 using namespace realm;
 
@@ -488,6 +489,57 @@ RLM_ARRAY_TYPE(MigrationObject);
     prop.objcType = 'q';
 
     [self assertNoMigrationRequiredForChangeFrom:@[from] to:@[to]];
+}
+
+- (void)testDeleteRealmIfMigrationNeededWithSetCustomSchema {
+    RLMObjectSchema *from = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
+    from.properties = [from.properties subarrayWithRange:{0, 1}];
+
+    RLMObjectSchema *to = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.customSchema = [self schemaWithObjects:@[from]];
+    @autoreleasepool { [RLMRealm realmWithConfiguration:config error:nil]; }
+
+    config.customSchema = [self schemaWithObjects:@[to]];
+    config.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+        XCTFail(@"Migration block should not have been called");
+    };
+
+    config.deleteRealmIfMigrationNeeded = YES;
+
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
+    RLMAssertRealmSchemaMatchesTable(self, [RLMRealm realmWithConfiguration:config error:nil]);
+}
+
+- (void)testDeleteRealmIfMigrationNeeded {
+    @autoreleasepool { [RLMRealm defaultRealm]; }
+
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
+    objectSchema.properties = [objectSchema.properties subarrayWithRange:{0, 1}];
+
+    Class metaClass = objc_getMetaClass("RLMSchema");
+    IMP imp = imp_implementationWithBlock(^{
+        return [self schemaWithObjects:@[objectSchema]];
+    });
+    IMP originalImp = class_getMethodImplementation(metaClass, @selector(sharedSchema));
+    class_replaceMethod(metaClass, @selector(sharedSchema), imp, "@@:");
+
+    @autoreleasepool {
+        XCTAssertThrows([RLMRealm defaultRealm]);
+    }
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+        XCTFail(@"Migration block should not have been called");
+    };
+
+    config.deleteRealmIfMigrationNeeded = YES;
+
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
+    RLMAssertRealmSchemaMatchesTable(self, [RLMRealm realmWithConfiguration:config error:nil]);
+
+    class_replaceMethod(metaClass, @selector(sharedSchema), originalImp, "@@:");
 }
 
 #pragma mark - Allowed schema mismatches

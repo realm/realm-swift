@@ -88,6 +88,8 @@ extension Realm {
         - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
         - parameter schemaVersion:      The current schema version.
         - parameter migrationBlock:     The block which migrates the Realm to the current version.
+        - parameter deleteRealmIfMigrationNeeded: If `true`, recreate the Realm file with the new schema
+                                                  if a migration is required.
         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
         */
         public init(fileURL: NSURL? = NSURL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
@@ -96,6 +98,7 @@ extension Realm {
             readOnly: Bool = false,
             schemaVersion: UInt64 = 0,
             migrationBlock: MigrationBlock? = nil,
+            deleteRealmIfMigrationNeeded: Bool = false,
             objectTypes: [Object.Type]? = nil) {
                 self.fileURL = fileURL
                 if inMemoryIdentifier != nil {
@@ -105,6 +108,7 @@ extension Realm {
                 self.readOnly = readOnly
                 self.schemaVersion = schemaVersion
                 self.migrationBlock = migrationBlock
+                self.deleteRealmIfMigrationNeeded = deleteRealmIfMigrationNeeded
                 self.objectTypes = objectTypes
         }
 
@@ -163,6 +167,9 @@ extension Realm {
         /// The block which migrates the Realm to the current version.
         public var migrationBlock: MigrationBlock? = nil
 
+        /// Recreate the Realm file with the new schema if a migration is required.
+        public var deleteRealmIfMigrationNeeded: Bool = false
+
         /// The classes persisted in the Realm.
         public var objectTypes: [Object.Type]? {
             set {
@@ -194,6 +201,7 @@ extension Realm {
             configuration.readOnly = self.readOnly
             configuration.schemaVersion = self.schemaVersion
             configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
+            configuration.deleteRealmIfMigrationNeeded = self.deleteRealmIfMigrationNeeded
             configuration.customSchema = self.customSchema
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             return configuration
@@ -211,6 +219,7 @@ extension Realm {
                     rlmMigration(migration.rlmMigration, schemaVersion)
                 }
             }
+            configuration.deleteRealmIfMigrationNeeded = rlmConfiguration.deleteRealmIfMigrationNeeded
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
             return configuration

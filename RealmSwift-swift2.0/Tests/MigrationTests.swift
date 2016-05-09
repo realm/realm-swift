@@ -434,4 +434,72 @@ class MigrationTests: TestCase {
         // make sure we added new bool objects as object property and in the list
         XCTAssertEqual(try! Realm().objects(SwiftBoolObject).count, 4)
     }
+
+    func testDeleteRealmIfMigrationNeededWithSetCustomSchema() {
+        let prop = RLMProperty(name: "name", type: RLMPropertyType.String, objectClassName: nil,
+                               linkOriginPropertyName: nil, indexed: false, optional: false)
+        autoreleasepool {
+            realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop])
+        }
+
+        var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
+        autoreleasepool {
+            do {
+                let _ = try Realm(configuration: config)
+                XCTFail("Migration error should be occurred")
+            } catch {}
+        }
+
+        config.migrationBlock = { _, _ in
+            XCTFail("Migration block should not have been called")
+        }
+        config.deleteRealmIfMigrationNeeded = true
+
+        autoreleasepool {
+            do {
+                let _ = try Realm(configuration: config)
+            } catch {
+                XCTFail("Migration error was occurred")
+            }
+        }
+    }
+
+    func testDeleteRealmIfMigrationNeeded() {
+        autoreleasepool { let _ = try! Realm(configuration: Realm.Configuration(fileURL: defaultRealmURL())) }
+
+        let objectSchema = RLMObjectSchema(forObjectClass: SwiftEmployeeObject.self)
+        objectSchema.properties = Array(objectSchema.properties[0..<1])
+
+        let metaClass = objc_getMetaClass("RLMSchema") as! AnyClass
+        let imp = imp_implementationWithBlock(unsafeBitCast({ () -> RLMSchema in
+            let schema = RLMSchema()
+            schema.objectSchema = [objectSchema]
+            return schema
+        } as @convention(block)() -> (RLMSchema), AnyObject.self))
+
+        let originalImp = class_getMethodImplementation(metaClass, "sharedSchema")
+        class_replaceMethod(metaClass, "sharedSchema", imp, "@@:")
+
+        autoreleasepool {
+            do {
+                let _ = try Realm()
+                XCTFail("Migration error should be occurred")
+            } catch {}
+        }
+
+        let migrationBlock: MigrationBlock = { _, _ in
+            XCTFail("Migration block should not have been called")
+        }
+        let config = Realm.Configuration(fileURL: defaultRealmURL(),
+                                         migrationBlock: migrationBlock,
+                                         deleteRealmIfMigrationNeeded: true)
+
+        do {
+            let _ = try Realm(configuration: config)
+        } catch {
+            XCTFail("Migration error was occurred")
+        }
+
+        class_replaceMethod(metaClass, "sharedSchema", originalImp, "@@:")
+    }
 }

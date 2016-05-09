@@ -33,6 +33,7 @@ static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"readOnly",
     @"schemaVersion",
     @"migrationBlock",
+    @"deleteRealmIfMigrationNeeded",
     @"dynamic",
     @"customSchema",
 };
@@ -229,6 +230,14 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
         @throw RLMException(@"Cannot set schema version to %llu (RLMNotVersioned)", RLMNotVersioned);
     }
     _config.schema_version = schemaVersion;
+}
+
+- (BOOL)deleteRealmIfMigrationNeeded {
+    return _config.delete_realm_if_migration_needed;
+}
+
+- (void)setDeleteRealmIfMigrationNeeded:(BOOL)deleteRealmIfMigrationNeeded {
+    _config.delete_realm_if_migration_needed = deleteRealmIfMigrationNeeded;
 }
 
 - (NSArray *)objectClasses {
