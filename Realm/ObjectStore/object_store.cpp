@@ -154,6 +154,17 @@ static inline bool property_can_be_migrated_to_nullable(const Property& old_prop
         && new_property.name == old_property.name;
 }
 
+void ObjectStore::verify_missing_renamed_properties(Schema const& actual_schema, Schema& target_schema) {
+    for (auto &object_schema : target_schema) {
+        auto matching_schema = actual_schema.find(object_schema);
+        for (auto& target_prop : matching_schema->persisted_properties) {
+            if (!object_schema.property_for_name(target_prop.name)) {
+                throw PropertyRenameMissingNewPropertyException(target_prop.name);
+            }
+        }
+    }
+}
+
 void ObjectStore::verify_schema(Schema const& actual_schema, Schema& target_schema, bool allow_missing_tables) {
     std::vector<ObjectSchemaValidationException> errors;
     for (auto &object_schema : target_schema) {
@@ -252,7 +263,10 @@ static void copy_property_values(const Property& source, const Property& destina
 // set references to tables on targetSchema and create/update any missing or out-of-date tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
-void ObjectStore::create_tables(Group *group, Schema &target_schema, bool update_existing) {
+std::vector<std::pair<std::string, Property>> ObjectStore::create_tables(Group *group, Schema &target_schema, bool update_existing) {
+    // properties to delete
+    std::vector<std::pair<std::string,Property>> to_delete;
+
     // first pass to create missing tables
     std::vector<ObjectSchema *> to_update;
     for (auto& object_schema : target_schema) {
@@ -295,8 +309,12 @@ void ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
             current_prop.table_column -= deleted;
 
             auto target_prop = target_object_schema->property_for_name(current_prop.name);
-            if (!target_prop || (property_has_changed(current_prop, *target_prop)
-                                 && !property_can_be_migrated_to_nullable(current_prop, *target_prop))) {
+            // mark object name & property pairs for deletion
+            if (!target_prop) {
+                to_delete.push_back(std::make_pair(current_schema.name, current_prop));
+            }
+            else if ((property_has_changed(current_prop, *target_prop) &&
+                      !property_can_be_migrated_to_nullable(current_prop, *target_prop))) {
                 if (deleted == current_schema.persisted_properties.size() - 1) {
                     // We're about to remove the last column from the table. Insert a placeholder column to preserve
                     // the number of rows in the table for the addition of new columns below.
@@ -358,6 +376,27 @@ void ObjectStore::create_tables(Group *group, Schema &target_schema, bool update
             set_primary_key_for_object(group, target_object_schema->name, "");
         }
     }
+    return to_delete;
+}
+
+void ObjectStore::remove_properties(Group *group, Schema &target_schema, std::vector<std::pair<std::string, Property>> to_delete) {
+    for (auto& target_object_schema : target_schema) {
+        TableRef table = table_for_object_type(group, target_object_schema.name);
+        ObjectSchema current_schema(group, target_object_schema.name);
+        size_t deleted = 0;
+        for (auto& current_prop : current_schema.persisted_properties) {
+            current_prop.table_column -= deleted;
+            for (auto& single_to_delete : to_delete) {
+                if (target_object_schema.name == single_to_delete.first &&
+                    current_prop.name == single_to_delete.second.name &&
+                    current_prop.object_type == single_to_delete.second.object_type) {
+                    table->remove_column(current_prop.table_column);
+                    ++deleted;
+                    current_prop.table_column = npos;
+                }
+            }
+        }
+    }
 }
 
 bool ObjectStore::is_schema_at_version(const Group *group, uint64_t version) {
@@ -402,7 +441,7 @@ void ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
 
     // create tables
     create_metadata_tables(group);
-    create_tables(group, schema, migrating);
+    auto to_delete = create_tables(group, schema, migrating);
 
     if (!migrating) {
         // If we aren't migrating, then verify that all of the tables which
@@ -419,7 +458,11 @@ void ObjectStore::update_realm_with_schema(Group *group, Schema const& old_schem
     // apply the migration block if provided and there's any old data
     if (get_schema_version(group) != ObjectStore::NotVersioned) {
         migration(group, schema);
+        remove_properties(group, schema, std::move(to_delete));
 
+        Schema group_schema = schema_from_group(group);
+        verify_missing_renamed_properties(group_schema, schema);
+        verify_schema(group_schema, schema);
         validate_primary_column_uniqueness(group, schema);
     }
 
@@ -489,6 +532,66 @@ void ObjectStore::delete_data_for_object(Group *group, StringData object_type) {
     }
 }
 
+void ObjectStore::rename_property(Group *group, Schema& passed_schema, StringData object_type, StringData old_name, StringData new_name) {
+    TableRef table = table_for_object_type(group, object_type);
+    if (!table) {
+        throw PropertyRenameMissingNewObjectTypeException(object_type);
+    }
+    ObjectSchema matching_schema(group, object_type);
+    Property *old_property = matching_schema.property_for_name(old_name);
+    if (old_property == nullptr) {
+        throw PropertyRenameMissingOldPropertyException(old_name, new_name);
+    }
+    auto passed_object_schema = passed_schema.find(object_type);
+    if (passed_object_schema == passed_schema.end()) {
+        throw PropertyRenameMissingNewObjectTypeException(object_type);
+    }
+    Property *new_property = matching_schema.property_for_name(new_name);
+    if (new_property == nullptr) {
+        // new property not in new schema, which means we're probably renaming
+        // to an intermediate property in a multi-version migration.
+        // this is safe because the migration will fail schema validation unless
+        // this property is renamed again.
+        new_property = matching_schema.property_for_name(old_name);
+        new_property->name = new_name;
+        table->rename_column(old_property->table_column, new_name);
+        return;
+    }
+    if (old_property->type != new_property->type ||
+        old_property->object_type != new_property->object_type) {
+        throw PropertyRenameTypeMismatchException(*old_property, *new_property);
+    }
+    if (passed_object_schema->property_for_name(old_name) != nullptr) {
+        throw PropertyRenameOldStillExistsException(old_name, new_name);
+    }
+    size_t column_to_remove = new_property->table_column;
+    table->rename_column(old_property->table_column, new_name);
+    table->remove_column(column_to_remove);
+    // update table_column for each property since it may have shifted
+    for (auto& current_prop : passed_object_schema->persisted_properties) {
+        auto target_prop = matching_schema.property_for_name(current_prop.name);
+        current_prop.table_column = target_prop->table_column;
+    }
+    // update index for new column
+    if (new_property->requires_index() && !old_property->requires_index()) {
+        table->add_search_index(old_property->table_column);
+    } else if (!new_property->requires_index() && old_property->requires_index()) {
+        table->remove_search_index(old_property->table_column);
+    }
+    old_property->name = new_name;
+    // update nullability for column
+    if (property_can_be_migrated_to_nullable(*old_property, *new_property)) {
+        new_property->table_column = old_property->table_column;
+        old_property->table_column = old_property->table_column + 1;
+
+        table->insert_column(new_property->table_column, DataType(new_property->type), new_property->name, new_property->is_nullable);
+        copy_property_values(*old_property, *new_property, *table);
+        table->remove_column(old_property->table_column);
+
+        old_property->table_column = new_property->table_column;
+    }
+}
+
 bool ObjectStore::is_empty(const Group *group) {
     for (size_t i = 0; i < group->size(); i++) {
         ConstTableRef table = group->get_table(i);
@@ -501,6 +604,54 @@ bool ObjectStore::is_empty(const Group *group) {
         }
     }
     return true;
+}
+
+PropertyRenameException::PropertyRenameException(std::string old_property_name, std::string new_property_name) :
+    m_old_property_name(old_property_name), m_new_property_name(new_property_name)
+{
+    m_what = "Old property '" + old_property_name + "' cannot be renamed to property '" + new_property_name + "'.";
+}
+
+PropertyRenameMissingObjectTypeException::PropertyRenameMissingObjectTypeException(std::string object_type) :
+    m_object_type(object_type)
+{
+    m_what = "Cannot rename properties on type '" + object_type + "'.";
+}
+
+PropertyRenameMissingOldObjectTypeException::PropertyRenameMissingOldObjectTypeException(std::string object_type) :
+    PropertyRenameMissingObjectTypeException(object_type)
+{
+    m_what = "Cannot rename properties on type '" + object_type + "' because it is missing from the Realm file.";
+}
+
+PropertyRenameMissingNewObjectTypeException::PropertyRenameMissingNewObjectTypeException(std::string object_type) :
+    PropertyRenameMissingObjectTypeException(object_type)
+{
+    m_what = "Cannot rename properties on type '" + object_type + "' because it is missing from the specified schema.";
+}
+
+PropertyRenameMissingOldPropertyException::PropertyRenameMissingOldPropertyException(std::string old_property_name, std::string new_property_name) :
+    PropertyRenameException(old_property_name, new_property_name)
+{
+    m_what = "Old property '" + old_property_name + "' is missing from the Realm file so it cannot be renamed to '" + new_property_name + "'.";
+}
+
+PropertyRenameMissingNewPropertyException::PropertyRenameMissingNewPropertyException(std::string new_property_name) :
+    m_new_property_name(new_property_name)
+{
+    m_what = "Renamed property '" + new_property_name + "' is not in the latest model.";
+}
+
+PropertyRenameOldStillExistsException::PropertyRenameOldStillExistsException(std::string old_property_name, std::string new_property_name) :
+    PropertyRenameException(old_property_name, new_property_name)
+{
+    m_what = "Old property '" + old_property_name + "' cannot be renamed to '" + new_property_name + "' because the old property is still present in the specified schema.";
+}
+
+PropertyRenameTypeMismatchException::PropertyRenameTypeMismatchException(Property const& old_property, Property const& new_property) :
+    m_old_property(old_property), m_new_property(new_property)
+{
+    m_what = "Old property '" + old_property.name + "' of type '" + old_property.type_string() + "' cannot be renamed to property '" + new_property.name + "' of type '" + new_property.type_string() + "'.";
 }
 
 InvalidSchemaVersionException::InvalidSchemaVersionException(uint64_t old_version, uint64_t new_version) :
@@ -518,16 +669,16 @@ DuplicatePrimaryKeyValueException::DuplicatePrimaryKeyValueException(std::string
 SchemaValidationException::SchemaValidationException(std::vector<ObjectSchemaValidationException> const& errors) :
     m_validation_errors(errors)
 {
-    m_what = "Schema validation failed due to the following errors: ";
+    m_what = "Schema validation failed due to the following errors:";
     for (auto const& error : errors) {
         m_what += std::string("\n- ") + error.what();
     }
 }
 
 SchemaMismatchException::SchemaMismatchException(std::vector<ObjectSchemaValidationException> const& errors) :
-m_validation_errors(errors)
+    m_validation_errors(errors)
 {
-    m_what ="Migration is required due to the following errors: ";
+    m_what ="Migration is required due to the following errors:";
     for (auto const& error : errors) {
         m_what += std::string("\n- ") + error.what();
     }
@@ -591,7 +742,7 @@ MismatchedPropertiesException::MismatchedPropertiesException(std::string const& 
         m_what = "Target object type for property '" + old_property.name + "' do not match. Old type '" + old_property.object_type + "', new type '" + new_property.object_type + "'";
     }
     else if (new_property.is_nullable != old_property.is_nullable) {
-        m_what = "Nullability for property '" + old_property.name + "' has changed from '" + std::to_string(old_property.is_nullable) + "' to  '" + std::to_string(new_property.is_nullable) + "'.";
+        m_what = "Nullability for property '" + old_property.name + "' has changed from '" + std::to_string(old_property.is_nullable) + "' to '" + std::to_string(new_property.is_nullable) + "'.";
     }
 }
 

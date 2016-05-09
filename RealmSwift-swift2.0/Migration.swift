@@ -174,6 +174,20 @@ public final class Migration {
         return rlmMigration.deleteDataForClassName(objectClassName)
     }
 
+    /**
+    Rename property of the given class from `oldName` to `newName`.
+
+    - parameter className: Class for which the property is to be renamed. Must be present
+                           in both the old and new Realm schemas.
+    - parameter oldName:   Old name for the property to be renamed. Must not be present
+                           in the new Realm.
+    - parameter newName:   New name for the property to be renamed. Must not be present
+                           in the old Realm.
+    */
+    public func renamePropertyForClass(className: String, oldName: String, newName: String) {
+        rlmMigration.renamePropertyForClass(className, oldName: oldName, newName: newName)
+    }
+
     private init(_ rlmMigration: RLMMigration) {
         self.rlmMigration = rlmMigration
     }

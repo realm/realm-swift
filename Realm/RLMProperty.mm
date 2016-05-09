@@ -94,7 +94,12 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     }
 }
 
--(void)updateAccessors {
+- (void)setName:(NSString *)name {
+    _name = name;
+    [self updateAccessors];
+}
+
+- (void)updateAccessors {
     // populate getter/setter names if generic
     if (!_getterName) {
         _getterName = _name;
@@ -512,6 +517,12 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     prop->_declarationIndex = _declarationIndex;
     prop->_linkOriginPropertyName = _linkOriginPropertyName;
 
+    return prop;
+}
+
+- (RLMProperty *)copyWithNewName:(NSString *)name {
+    RLMProperty *prop = [self copy];
+    prop.name = name;
     return prop;
 }
 
