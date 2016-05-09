@@ -20,6 +20,8 @@ x.x.x Release notes (yyyy-MM-dd)
   middle of being closed on another thread which could result in crashes.
 * Fix a bug which could result in changes made on one thread being applied
   incorrectly on other threads when those threads are refreshed.
+* Fix crash when migrating to the new date format introduced in 0.101.0.
+* Fix crash when querying inverse relationships when objects are deleted.
 
 0.101.0 Release notes (2016-05-04)
 =============================================================
