@@ -120,6 +120,7 @@ RLM_ARRAY_TYPE(IntObject)
 @property int64_t     longCol;
 @property id            mixedCol;
 @property StringObject *objectCol;
+@property (readonly) RLMLinkingObjects *linkingObjectsCol;
 
 @end
 
@@ -180,6 +181,7 @@ RLM_ARRAY_TYPE(EmployeeObject)
 @interface DogObject : RLMObject
 @property NSString *dogName;
 @property int age;
+@property (readonly) RLMLinkingObjects *owners;
 @end
 
 RLM_ARRAY_TYPE(DogObject)
@@ -317,6 +319,18 @@ RLM_ARRAY_TYPE(CircleObject);
 
 @interface CustomInitializerObject : RLMObject
 @property NSString *stringCol;
+@end
+
+#pragma mark PersonObject
+
+@class PersonObject;
+RLM_ARRAY_TYPE(PersonObject);
+
+@interface PersonObject : RLMObject
+@property NSString *name;
+@property NSInteger age;
+@property RLMArray<PersonObject> *children;
+@property (readonly) RLMLinkingObjects *parents;
 @end
 
 #pragma mark FakeObject

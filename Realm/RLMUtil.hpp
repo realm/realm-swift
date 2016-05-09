@@ -22,8 +22,8 @@
 
 #import <realm/array.hpp>
 #import <realm/binary_data.hpp>
-#import <realm/datetime.hpp>
 #import <realm/string_data.hpp>
+#import <realm/timestamp.hpp>
 #import <realm/util/file.hpp>
 
 namespace realm {
@@ -32,7 +32,6 @@ namespace realm {
 
 @class RLMObjectSchema;
 @class RLMProperty;
-@protocol RLMFastEnumerable;
 
 namespace realm {
     class RealmFileException;
@@ -57,10 +56,6 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 // merges with native property defaults if Swift class
 NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema);
 
-NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *key);
-
-void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value);
-
 BOOL RLMIsDebuggerAttached();
 BOOL RLMIsRunningInPlayground();
 
@@ -72,6 +67,9 @@ static inline BOOL RLMIsKindOfClass(Class class1, Class class2) {
     }
     return NO;
 }
+
+// Returns whether the class is a descendent of RLMObjectBase
+BOOL RLMIsObjectOrSubclass(Class klass);
 
 // Returns whether the class is an indirect descendant of RLMObjectBase
 BOOL RLMIsObjectSubclass(Class klass);
@@ -118,6 +116,8 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
             return @"object";
         case RLMPropertyTypeArray:
             return @"array";
+        case RLMPropertyTypeLinkingObjects:
+            return @"linking objects";
     }
     return @"Unknown";
 }
@@ -157,14 +157,36 @@ static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSDat
 }
 
 // Date convertion utilities
-static inline NSDate *RLMDateTimeToNSDate(realm::DateTime dateTime) {
-    auto timeInterval = static_cast<NSTimeInterval>(dateTime.get_datetime());
-    return [NSDate dateWithTimeIntervalSince1970:timeInterval];
+// These use the reference date and shift the seconds rather than just getting
+// the time interval since the epoch directly to avoid losing sub-second precision
+static inline NSDate *RLMTimestampToNSDate(realm::Timestamp ts) {
+    if (ts.is_null())
+        return nil;
+    auto timeInterval = ts.get_seconds() - NSTimeIntervalSince1970 + ts.get_nanoseconds() / 1'000'000'000.0;
+    return [NSDate dateWithTimeIntervalSinceReferenceDate:timeInterval];
 }
 
-static inline realm::DateTime RLMDateTimeForNSDate(__unsafe_unretained NSDate *const date) {
-    auto time = static_cast<int64_t>(date.timeIntervalSince1970);
-    return realm::DateTime(time);
+static inline realm::Timestamp RLMTimestampForNSDate(__unsafe_unretained NSDate *const date) {
+    auto timeInterval = date.timeIntervalSinceReferenceDate;
+    if (isnan(timeInterval))
+        return {0, 0}; // Arbitrary choice
+
+    // Clamp dates that we can't represent as a Timestamp to the maximum value
+    if (timeInterval >= std::numeric_limits<int64_t>::max() - NSTimeIntervalSince1970)
+        return {std::numeric_limits<int64_t>::max(), 1'000'000'000 - 1};
+    if (timeInterval - NSTimeIntervalSince1970 < std::numeric_limits<int64_t>::min())
+        return {std::numeric_limits<int64_t>::min(), -1'000'000'000 + 1};
+
+    auto seconds = static_cast<int64_t>(timeInterval);
+    auto nanoseconds = static_cast<int32_t>((timeInterval - seconds) * 1'000'000'000.0);
+    seconds += static_cast<int64_t>(NSTimeIntervalSince1970);
+
+    // Seconds and nanoseconds have to have the same sign
+    if (nanoseconds < 0 && seconds > 0) {
+        nanoseconds += 1'000'000'000;
+        --seconds;
+    }
+    return {seconds, nanoseconds};
 }
 
 static inline NSUInteger RLMConvertNotFound(size_t index) {
@@ -172,3 +194,7 @@ static inline NSUInteger RLMConvertNotFound(size_t index) {
 }
 
 id RLMMixedToObjc(realm::Mixed const& value);
+
+// For unit testing purposes, allow an Objective-C class named FakeObject to also be used
+// as the base class of persisted objects. This allows for testing invalid schemas.
+void RLMSetTreatFakeObjectAsRLMObject(BOOL flag);

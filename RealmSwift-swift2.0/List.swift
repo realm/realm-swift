@@ -407,16 +407,118 @@ public final class List<T: Object>: ListBase {
 
     The block will be asynchronously called with the initial list, and then
     called again after each write transaction which changes the list or any of
-    the items in the list. You must retain the returned token for as long as
-    you want the results to continue to be sent to the block. To stop receiving
-    updates, call stop() on the token.
+    the items in the list.
+
+    The block is called on the same thread as it was added on, and can only
+    be added on threads which are currently within a run loop. Unless you are
+    specifically creating and running a run loop on a background thread, this
+    will normally only be the main thread.
+
+    Notifications are delivered via the standard run loop, and so can't be
+    delivered while the run loop is blocked by other activity. When
+    notifications can't be delivered instantly, multiple notifications may be
+    coalesced into a single notification. This can include the notification
+    with the initial list. For example, the following code performs a write
+    transaction immediately after adding the notification block, so there is no
+    opportunity for the initial notification to be delivered first. As a
+    result, the initial notification will reflect the state of the Realm after
+    the write transaction.
+
+        let person = realm.objects(Person).first!
+        print("dogs.count: \(person.dogs.count)") // => 0
+        let token = person.dogs.addNotificationBlock { (dogs: List) in
+            // Only fired once for the example
+            print("dogs.count: \(dogs.count)") // will only print "dogs.count: 1"
+        }
+        try! realm.write {
+            let dog = Dog()
+            dog.name = "Rex"
+            person.dogs.append(dog)
+        }
+        // end of run loop execution context
+
+    You must retain the returned token for as long as you want updates to continue
+    to be sent to the block. To stop receiving updates, call stop() on the token.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the source realm is read-only.
+     - warning: This method can only be called on Lists which are stored on an
+                Object which has been added to or retrieved from a Realm.
+
+    - parameter block: The block to be called each time the list changes.
+    - returns: A token which must be held for as long as you want notifications to be delivered.
+    */
+    @available(*, deprecated=1, message="Use addNotificationBlock with changes")
+    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
+    public func addNotificationBlock(block: (list: List<T>) -> ()) -> NotificationToken {
+        return _rlmArray.addNotificationBlock { _, _, _ in block(list: self) }
+    }
+
+    /**
+    Register a block to be called each time the List changes.
+
+    The block will be asynchronously called with the initial list, and then
+    called again after each write transaction which changes the list or any of
+    the items in the list.
+
+    This version of this method reports which of the objects in the List were
+    added, removed, or modified in each write transaction as indices within the
+    List. See the RealmCollectionChange documentation for more information on
+    the change information supplied and an example of how to use it to update
+    a UITableView.
+
+    The block is called on the same thread as it was added on, and can only
+    be added on threads which are currently within a run loop. Unless you are
+    specifically creating and running a run loop on a background thread, this
+    will normally only be the main thread.
+
+    Notifications can't be delivered as long as the run loop is blocked by
+    other activity. When notifications can't be delivered instantly, multiple
+    notifications may be coalesced into a single notification. This can include
+    the notification with the initial list. For example, the following code
+    performs a write transaction immediately after adding the notification block,
+    so there is no opportunity for the initial notification to be delivered first.
+    As a result, the initial notification will reflect the state of the Realm
+    after the write transaction, and will not include change information.
+
+        let person = realm.objects(Person).first!
+        print("dogs.count: \(person.dogs.count)") // => 0
+        let token = person.dogs.addNotificationBlock { (changes: RealmCollectionChange) in
+            switch changes {
+                case .Initial(let dogs):
+                    // Will print "dogs.count: 1"
+                    print("dogs.count: \(dogs.count)")
+                    break
+                case .Update:
+                    // Will not be hit in this example
+                    break
+                case .Error:
+                    break
+            }
+        }
+        try! realm.write {
+            let dog = Dog()
+            dog.name = "Rex"
+            person.dogs.append(dog)
+        }
+        // end of run loop execution context
+
+    You must retain the returned token for as long as you want updates to continue
+    to be sent to the block. To stop receiving updates, call stop() on the token.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the source realm is read-only.
+     - warning: This method can only be called on Lists which are stored on an
+                Object which has been added to or retrieved from a Realm.
 
     - parameter block: The block to be called each time the list changes.
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (list: List<T>) -> ()) -> NotificationToken {
-        return _rlmArray.addNotificationBlock { _, _ in block(list: self) }
+    public func addNotificationBlock(block: (RealmCollectionChange<List>) -> ()) -> NotificationToken {
+        return _rlmArray.addNotificationBlock { list, change, error in
+            block(RealmCollectionChange.fromObjc(self, change: change, error: error))
+        }
     }
 }
 
@@ -456,8 +558,11 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
     public var endIndex: Int { return count }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (AnyRealmCollection<T>?, NSError?) -> ()) -> NotificationToken {
+    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+        NotificationToken {
         let anyCollection = AnyRealmCollection(self)
-        return _rlmArray.addNotificationBlock { _, _ in block(anyCollection, nil) }
+        return _rlmArray.addNotificationBlock { _, change, error in
+            block(RealmCollectionChange.fromObjc(anyCollection, change: change, error: error))
+        }
     }
 }

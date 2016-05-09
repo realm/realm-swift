@@ -175,25 +175,52 @@ RLM_ASSUME_NONNULL_BEGIN
  Register a block to be called each time the RLMResults changes.
 
  The block will be asynchronously called with the initial results, and then
- called again after each write transaction which causes the results to change.
- You must retain the returned token for as long as you want the results to
- continue to be sent to the block. To stop receiving updates, call -stop on the
- token.
+ called again after each write transaction which changes either any of the
+ objects in the results, or which objects are in the results.
 
- The determination for whether or not a write transaction has changed the
- results is currently very coarse, and the block may be called even if no
- changes occurred. The opposite (not being called despite changes) will not
- happen. This will become more precise in future versions.
+ The change parameter will be `nil` the first time the block is called with the
+ initial results. For each call after that, it will contain information about
+ which rows in the results were added, removed or modified. If a write transaction
+ did not modify any objects in this results, the block is not called at all.
+ See the RLMCollectionChange documentation for information on how the changes
+ are reported and an example of updating a UITableView.
 
  If an error occurs the block will be called with `nil` for the results
  parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the RLMRealm on the background worker thread or the destination
- queue fails.
+ when opening the RLMRealm on the background worker thread.
 
  At the time when the block is called, the RLMResults object will be fully
  evaluated and up-to-date, and as long as you do not perform a write transaction
  on the same thread or explicitly call `-[RLMRealm refresh]`, accessing it will
  never perform blocking work.
+
+ Notifications are delivered via the standard run loop, and so can't be
+ delivered while the run loop is blocked by other activity. When
+ notifications can't be delivered instantly, multiple notifications may be
+ coalesced into a single notification. This can include the notification
+ with the initial results. For example, the following code performs a write
+ transaction immediately after adding the notification block, so there is no
+ opportunity for the initial notification to be delivered first. As a
+ result, the initial notification will reflect the state of the Realm after
+ the write transaction.
+
+     RLMResults<Dog *> *results = [Dog allObjects];
+     NSLog(@"dogs.count: %zu", dogs.count); // => 0
+     self.token = [results addNotificationBlock:^(RLMResults *dogs,
+                                                  RLMCollectionChange *changes,
+                                                  NSError *error) {
+         // Only fired once for the example
+         NSLog(@"dogs.count: %zu", dogs.count); // => 1
+     }];
+     [realm transactionWithBlock:^{
+         Dog *dog = [[Dog alloc] init];
+         dog.name = @"Rex";
+         [realm addObject:dog];
+     }];
+     // end of run loop execution context
+
+ You must retain the returned token for as long as you want updates to continue
+ to be sent to the block. To stop receiving updates, call `-stop` on the token.
 
  @warning This method cannot be called during a write transaction, or when the
           containing realm is read-only.
@@ -201,7 +228,9 @@ RLM_ASSUME_NONNULL_BEGIN
  @param block The block to be called with the evaluated results.
  @return A token which must be held for as long as you want query results to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results, NSError *__nullable error))block RLM_WARN_UNUSED_RESULT;
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results,
+                                                         RLMCollectionChange *__nullable change,
+                                                         NSError *__nullable error))block RLM_WARN_UNUSED_RESULT;
 
 #pragma mark - Aggregating Property Values
 
@@ -275,6 +304,13 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)new __attribute__((unavailable("RLMResults cannot be created directly")));
 
+@end
+
+/**
+ RLMLinkingObjects is an auto-updating container type that represents a collection of objects that
+ link to a given object.
+ */
+@interface RLMLinkingObjects RLM_GENERIC_COLLECTION : RLMResults
 @end
 
 RLM_ASSUME_NONNULL_END

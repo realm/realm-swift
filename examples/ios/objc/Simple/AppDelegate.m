@@ -47,7 +47,7 @@ RLM_ARRAY_TYPE(Dog)
     self.window.rootViewController = [[UIViewController alloc] init];
     [self.window makeKeyAndVisible];
 
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealmConfiguration defaultConfiguration].path error:nil];
+    [[NSFileManager defaultManager] removeItemAtURL:[RLMRealmConfiguration defaultConfiguration].fileURL error:nil];
 
     // Create a standalone object
     Dog *mydog = [[Dog alloc] init];

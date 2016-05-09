@@ -56,14 +56,16 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     /** Any type: id, **not supported in Swift** */
     RLMPropertyTypeAny    = 6,
     /** Date type: NSDate */
-    RLMPropertyTypeDate   = 7,
+    RLMPropertyTypeDate   = 8,
 
 #pragma mark - Array/Linked object types
 
     /** Object type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
     RLMPropertyTypeObject = 12,
-    /** Array type. See [Realm Models](http://realms.io/docs/objc/latest/#models) */
+    /** Array type. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
     RLMPropertyTypeArray  = 13,
+    /** Linking objects. See [Realm Models](https://realm.io/docs/objc/latest/#models) */
+    RLMPropertyTypeLinkingObjects = 14,
 };
 
 /**
@@ -83,12 +85,14 @@ typedef NS_ENUM(NSInteger, RLMError) {
         read-only or if the directory part of the specified path was not
         found when a copy should be written. */
     RLMErrorFileNotFound          = 5,
-    /** Returned by RLMRealm if a file format upgrade is required to open the file, but upgrades were explicilty disabled. */
+    /** Returned by RLMRealm if a file format upgrade is required to open the file, but upgrades were explicitly disabled. */
     RLMErrorFileFormatUpgradeRequired = 6,
     /** Returned by RLMRealm if the database file is currently open in another
         process which cannot share with the current process due to an
         architecture mismatch. */
     RLMErrorIncompatibleLockFile  = 8,
+    /** Returned by RLMRealm if there is insufficient available address space. */
+    RLMErrorAddressSpaceExhausted = 9,
 };
 
 #pragma mark - Constants

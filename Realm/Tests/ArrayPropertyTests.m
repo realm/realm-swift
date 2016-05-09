@@ -887,8 +887,9 @@
     [realm commitWriteTransaction];
 
     id expectation = [self expectationWithDescription:@""];
-    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+    id token = [array.array addNotificationBlock:^(RLMArray *array, RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(array);
+        XCTAssertNil(change);
         XCTAssertNil(error);
         [expectation fulfill];
     }];
@@ -903,10 +904,13 @@
     ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
     [realm commitWriteTransaction];
 
+    __block bool first = true;
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+    id token = [array.array addNotificationBlock:^(RLMArray *array, RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(array);
+        XCTAssert(first ? !change : !!change);
         XCTAssertNil(error);
+        first = false;
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -915,7 +919,8 @@
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = self.realmWithTestPath;
         [realm transactionWithBlock:^{
-            [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+            RLMArray *array = (RLMArray *)[[ArrayPropertyObject allObjectsInRealm:realm].firstObject array];
+            [array addObject:[[StringObject alloc] init]];
         }];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -930,7 +935,7 @@
     [realm commitWriteTransaction];
 
     id expectation = [self expectationWithDescription:@""];
-    id token = [array.array addNotificationBlock:^(__unused RLMArray *array, __unused NSError *error) {
+    id token = [array.array addNotificationBlock:^(__unused RLMArray *array, __unused RLMCollectionChange *change, __unused NSError *error) {
         // will throw if it's incorrectly called a second time due to the
         // unrelated write transaction
         [expectation fulfill];
@@ -941,7 +946,10 @@
     // waiting for this one also waits for the above one to get a chance to run
     [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
         [self dispatchAsyncAndWait:^{
-            [self.realmWithTestPath transactionWithBlock:^{ }];
+            RLMRealm *realm = self.realmWithTestPath;
+            [realm transactionWithBlock:^{
+                [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+            }];
         }];
     }];
     [token stop];
@@ -954,7 +962,7 @@
     [realm commitWriteTransaction];
 
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+    id token = [array.array addNotificationBlock:^(RLMArray *array, __unused RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(array);
         XCTAssertNil(error);
         // will throw if it's called a second time before we create the new
@@ -972,7 +980,8 @@
         [self dispatchAsyncAndWait:^{
             RLMRealm *realm = self.realmWithTestPath;
             [realm transactionWithBlock:^{
-                [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+                RLMArray *array = (RLMArray *)[[ArrayPropertyObject allObjectsInRealm:realm].firstObject array];
+                [array addObject:[[StringObject alloc] init]];
             }];
         }];
     }];
@@ -991,7 +1000,7 @@
     [realm commitWriteTransaction];
 
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+    id token = [array.array addNotificationBlock:^(RLMArray *array, __unused RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(array);
         XCTAssertNil(error);
         [expectation fulfill];

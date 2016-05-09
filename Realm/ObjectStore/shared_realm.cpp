@@ -19,7 +19,6 @@
 #include "shared_realm.hpp"
 
 #include "binding_context.hpp"
-#include "impl/external_commit_helper.hpp"
 #include "impl/realm_coordinator.hpp"
 #include "impl/transact_log_handler.hpp"
 #include "object_store.hpp"
@@ -36,15 +35,16 @@ using namespace realm::_impl;
 
 Realm::Config::Config(const Config& c)
 : path(c.path)
+, encryption_key(c.encryption_key)
+, schema_version(c.schema_version)
+, migration_function(c.migration_function)
 , read_only(c.read_only)
 , in_memory(c.in_memory)
 , cache(c.cache)
 , disable_format_upgrade(c.disable_format_upgrade)
-, encryption_key(c.encryption_key)
+, automatic_change_notifications(c.automatic_change_notifications)
 , sync_server_url(c.sync_server_url)
 , sync_user_token(c.sync_user_token)
-, schema_version(c.schema_version)
-, migration_function(c.migration_function)
 {
     if (c.schema) {
         schema = std::make_unique<Schema>(*c.schema);

@@ -23,11 +23,8 @@ import RealmSwift
 class Dog: Object {
     dynamic var name = ""
     dynamic var age = 0
-    var owners: [Person] {
-        // Realm doesn't persist this property because it only has a getter defined
-        // Define "owners" as the inverse relationship to Person.dogs
-        return linkingObjects(Person.self, forProperty: "dogs")
-    }
+    // Define "owners" as the inverse relationship to Person.dogs
+    let owners = LinkingObjects(fromType: Person.self, property: "dogs")
 }
 
 class Person: Object {
@@ -46,7 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
 
         do {
-            try NSFileManager.defaultManager().removeItemAtPath(Realm.Configuration.defaultConfiguration.path!)
+            try NSFileManager.defaultManager().removeItemAtURL(Realm.Configuration.defaultConfiguration.fileURL!)
         } catch {}
 
         let realm = try! Realm()

@@ -63,10 +63,10 @@
 
     if (!self.isParent) {
         // For multi-process tests, the child's concept of a default path needs to match the parent.
-        // RLMRealmConfiguration isn't aware of this, but our test's RLMDefaultRealmPath helper does.
+        // RLMRealmConfiguration isn't aware of this, but our test's RLMDefaultRealmURL helper does.
         // Use it to reset the default configuration's path so it matches the parent.
         RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-        configuration.path = RLMDefaultRealmPath();
+        configuration.fileURL = RLMDefaultRealmURL();
         [RLMRealmConfiguration setDefaultConfiguration:configuration];
     }
 

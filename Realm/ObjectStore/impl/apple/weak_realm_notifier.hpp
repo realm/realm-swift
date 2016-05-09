@@ -16,35 +16,33 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include <realm/group_shared.hpp>
+#include "impl/weak_realm_notifier_base.hpp"
 
-#include <future>
+#include <CoreFoundation/CFRunLoop.h>
 
 namespace realm {
-class ClientHistory;
+class Realm;
 
 namespace _impl {
-class RealmCoordinator;
 
-class ExternalCommitHelper {
+class WeakRealmNotifier : public WeakRealmNotifierBase {
 public:
-    ExternalCommitHelper(RealmCoordinator& parent);
-    ~ExternalCommitHelper();
+    WeakRealmNotifier(const std::shared_ptr<Realm>& realm, bool cache);
+    ~WeakRealmNotifier();
 
-    // A no-op in this version, but needed for the Apple version
-    void notify_others() { }
+    WeakRealmNotifier(WeakRealmNotifier&&);
+    WeakRealmNotifier& operator=(WeakRealmNotifier&&);
+
+    WeakRealmNotifier(const WeakRealmNotifier&) = delete;
+    WeakRealmNotifier& operator=(const WeakRealmNotifier&) = delete;
+
+    // Asynchronously call notify() on the Realm on the appropriate thread
+    void notify();
 
 private:
-    RealmCoordinator& m_parent;
-
-    // A shared group used to listen for changes
-    std::unique_ptr<ClientHistory> m_history;
-    SharedGroup m_sg;
-
-    // The listener thread
-    std::future<void> m_thread;
+    CFRunLoopRef m_runloop;
+    CFRunLoopSourceRef m_signal;
 };
 
 } // namespace _impl
 } // namespace realm
-

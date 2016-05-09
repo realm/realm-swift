@@ -369,7 +369,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     auto query = translateErrors([&] { return _backingList.get_query(); });
     RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _objectSchema);
     return [RLMResults resultsWithObjectSchema:_objectSchema
-                                       results:realm::Results(_realm->_realm, std::move(query))];
+                                       results:_backingList.filter(std::move(query))];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
@@ -406,31 +406,9 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 // http://www.openradar.me/radar?id=6135653276319744
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, NSError *))block {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
     [_realm verifyNotificationsAreSupported];
-
-    __block uint_fast64_t prevVersion = -1;
-    auto noteBlock = ^(NSString *notification, RLMRealm *) {
-        if (notification != RLMRealmDidChangeNotification) {
-            return;
-        }
-
-        if (!_backingList.is_valid()) {
-            return;
-        }
-
-        auto version = _backingList.get_version_counter();
-        if (version != prevVersion) {
-            block(self, nil);
-            prevVersion = version;
-        }
-    };
-
-    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
-        noteBlock(RLMRealmDidChangeNotification, nil);
-    });
-
-    return [_realm addNotificationBlock:noteBlock];
+    return RLMAddNotificationBlock(self, _backingList, block);
 }
 #pragma clang diagnostic pop
 

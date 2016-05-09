@@ -39,7 +39,7 @@
     NSLog(@"%@ awakeWithContext", self);
 
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.path = [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.io.realm.examples.extension"] URLByAppendingPathComponent:@"extension.realm"].path;
+    configuration.fileURL = [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.io.realm.examples.extension"] URLByAppendingPathComponent:@"extension.realm"];
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
     self.tick = [Tick allObjects].firstObject;
     if (!self.tick) {

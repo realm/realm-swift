@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2015 Realm Inc.
+// Copyright 2016 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,21 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "impl/cached_realm_base.hpp"
+#import <Realm/RLMProperty_Private.h>
 
-namespace realm {
-class Realm;
+#import "property.hpp"
 
-namespace _impl {
+@interface RLMProperty ()
 
-class CachedRealm : public CachedRealmBase {
-public:
-    using CachedRealmBase::CachedRealmBase;
++ (instancetype)propertyForObjectStoreProperty:(const realm::Property&)property;
 
-    // Do nothing, as this can't be implemented portably
-    void notify() { }
-};
+- (realm::Property)objectStoreCopy;
 
-} // namespace _impl
-} // namespace realm
-
+@end

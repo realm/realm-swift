@@ -3,8 +3,164 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* Deprecate `-[RLMRealm removeNotification:]` in favor of
-  `-[RLMNotificationToken stop]`.
+* None.
+
+### Enhancements
+
+* Add a method to rename properties during migrations:
+  * Swift: `Migration.renamePropertyForClass(_:oldName:newName:)`
+  * Objective-C: `-[RLMMigration renamePropertyForClass:oldName:newName:]`
+
+### Bugfixes
+
+* Fix `BETWEEN` queries that traverse `RLMArray`/`List` properties to ensure that
+  a single related object satisfies the `BETWEEN` criteria, rather than allowing
+  different objects in the array to satisfy the lower and upper bounds.
+* Fix a race condition when a Realm is opened on one thread while it is in the
+  middle of being closed on another thread which could result in crashes.
+* Fix a bug which could result in changes made on one thread being applied
+  incorrectly on other threads when those threads are refreshed.
+
+0.101.0 Release notes (2016-05-04)
+=============================================================
+
+### API breaking changes
+
+* Files written by this version of Realm cannot be read by older versions of
+  Realm. Existing files will automatically be upgraded when they are opened.
+
+### Enhancements
+
+* Greatly improve performance of collection change calculation for complex
+  object graphs, especially for ones with cycles.
+* NSDate properties now support nanoseconds precision.
+* Opening a single Realm file on multiple threads now shares a single memory
+  mapping of the file for all threads, significantly reducing the memory
+  required to work with large files.
+* Crashing while in the middle of a write transaction no longer blocks other
+  processes from performing write transactions on the same file.
+* Improve the performance of refreshing a Realm (including via autorefresh)
+  when there are live Results/RLMResults objects for that Realm.
+
+### Bugfixes
+
+* Fix an assertion failure of "!more_before || index >= std::prev(it)->second)"
+  in `IndexSet::do_add()`.
+* Fix a crash when an `RLMArray` or `List` object is destroyed from the wrong
+  thread.
+
+0.100.0 Release notes (2016-04-29)
+=============================================================
+
+### API breaking changes
+
+* `-[RLMObject linkingObjectsOfClass:forProperty]` and `Object.linkingObjects(_:forProperty:)`
+  are deprecated in favor of properties of type `RLMLinkingObjects` / `LinkingObjects`.
+
+### Enhancements
+
+* The automatically-maintained inverse direction of relationships can now be exposed as
+  properties of type `RLMLinkingObjects` / `LinkingObjects`. These properties automatically
+  update to reflect the objects that link to the target object, can be used in queries, and
+  can be filtered like other Realm collection types.
+* Queries that compare objects for equality now support multi-level key paths.
+
+### Bugfixes
+
+* Fix an assertion failure when a second write transaction is committed after a
+  write transaction deleted the object containing an RLMArray/List which had an
+  active notification block.
+* Queries that compare `RLMArray` / `List` properties using != now give the correct results.
+
+0.99.1 Release notes (2016-04-26)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix a scenario that could lead to the assertion failure
+  "m_advancer_sg->get_version_of_current_transaction() ==
+  new_notifiers.front()->version()".
+
+0.99.0 Release notes (2016-04-22)
+=============================================================
+
+### API breaking changes
+
+* Deprecate properties of type `id`/`AnyObject`. This type was rarely used,
+  rarely useful and unsupported in every other Realm binding.
+* The block for `-[RLMArray addNotificationBlock:]` and
+  `-[RLMResults addNotificationBlock:]` now takes another parameter.
+* The following Objective-C APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API                                         | New API                                               |
+|:-------------------------------------------------------|:------------------------------------------------------|
+| `-[RLMRealm removeNotification:]`                      | `-[RLMNotificationToken stop]`                        |
+| `RLMRealmConfiguration.path`                           | `RLMRealmConfiguration.fileURL`                       |
+| `RLMRealm.path`                                        | `RLMRealmConfiguration.fileURL`                       |
+| `RLMRealm.readOnly`                                    | `RLMRealmConfiguration.readOnly`                      |
+| `+[RLMRealm realmWithPath:]`                           | `+[RLMRealm realmWithURL:]`                           |
+| `+[RLMRealm writeCopyToPath:error:]`                   | `+[RLMRealm writeCopyToURL:encryptionKey:error:]`     |
+| `+[RLMRealm writeCopyToPath:encryptionKey:error:]`     | `+[RLMRealm writeCopyToURL:encryptionKey:error:]`     |
+| `+[RLMRealm schemaVersionAtPath:error:]`               | `+[RLMRealm schemaVersionAtURL:encryptionKey:error:]` |
+| `+[RLMRealm schemaVersionAtPath:encryptionKey:error:]` | `+[RLMRealm schemaVersionAtURL:encryptionKey:error:]` |
+
+* The following Swift APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API                                | New API                                  |
+|:----------------------------------------------|:-----------------------------------------|
+| `Realm.removeNotification(_:)`                | `NotificationToken.stop()`               |
+| `Realm.Configuration.path`                    | `Realm.Configuration.fileURL`            |
+| `Realm.path`                                  | `Realm.Configuration.fileURL`            |
+| `Realm.readOnly`                              | `Realm.Configuration.readOnly`           |
+| `Realm.writeCopyToPath(_:encryptionKey:)`     | `Realm.writeCopyToURL(_:encryptionKey:)` |
+| `schemaVersionAtPath(_:encryptionKey:error:)` | `schemaVersionAtURL(_:encryptionKey:)`   |
+
+### Enhancements
+
+* Add information about what rows were added, removed, or modified to the
+  notifications sent to the Realm collections.
+* Improve error when illegally appending to an `RLMArray` / `List` property from a default value
+  or the standalone initializer (`init()`) before the schema is ready.
+
+### Bugfixes
+
+* Fix a use-after-free when an associated object's dealloc method is used to
+  remove observers from an RLMObject.
+* Fix a small memory leak each time a Realm file is opened.
+* Return a recoverable `RLMErrorAddressSpaceExhausted` error rather than
+  crash when there is insufficient available address space on Realm
+  initialization or write commit.
+
+0.98.8 Release notes (2016-04-15)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fixed a bug that caused some encrypted files created using
+  `-[RLMRealm writeCopyToPath:encryptionKey:error:]` to fail to open.
+
+0.98.7 Release notes (2016-04-13)
+=============================================================
+
+### API breaking changes
+
+* None.
 
 ### Enhancements
 
@@ -18,6 +174,10 @@ x.x.x Release notes (yyyy-MM-dd)
   for `RLMResults` instances that were created by filtering an `RLMArray`.
 * Adjust how RLMObjects are destroyed in order to support using an associated
   object on an RLMObject to remove KVO observers from that RLMObject.
+* `-[RLMResults indexOfObjectWithPredicate:]` now returns the index of the first matching object for a
+  sorted `RLMResults`, matching its documented behavior.
+* Fix a crash when canceling a transaction that set a relationship.
+* Fix a crash when a query referenced a deleted object.
 
 0.98.6 Release notes (2016-03-25)
 =============================================================

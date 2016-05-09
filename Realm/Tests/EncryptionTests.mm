@@ -30,7 +30,7 @@
 
 - (RLMRealmConfiguration *)configurationWithKey:(NSData *)key {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    configuration.path = RLMDefaultRealmPath();
+    configuration.fileURL = RLMDefaultRealmURL();
     configuration.encryptionKey = key;
     return configuration;
 }
@@ -42,13 +42,13 @@
 #pragma mark - Key validation
 
 - (void)testBadEncryptionKeys {
-    XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:self.nonLiteralNil error:nil]);
-    XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:NSData.data error:nil]);
+    XCTAssertThrows([RLMRealm.defaultRealm writeCopyToURL:RLMTestRealmURL() encryptionKey:NSData.data error:nil]);
 }
 
 - (void)testValidEncryptionKeys {
+    XCTAssertNoThrow([RLMRealm.defaultRealm writeCopyToURL:RLMTestRealmURL() encryptionKey:self.nonLiteralNil error:nil]);
     NSData *key = [[NSMutableData alloc] initWithLength:64];
-    XCTAssertNoThrow([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:key error:nil]);
+    XCTAssertNoThrow([RLMRealm.defaultRealm writeCopyToURL:RLMTestRealmURL() encryptionKey:key error:nil]);
 }
 
 #pragma mark - realmWithPath:
@@ -116,7 +116,7 @@
         [realm transactionWithBlock:^{
             [IntObject createInRealm:realm withValue:@[@1]];
         }];
-        [realm writeCopyToPath:RLMTestRealmPath() error:nil];
+        [realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:nil];
     }
 
     @autoreleasepool {
@@ -134,12 +134,12 @@
         [realm transactionWithBlock:^{
             [IntObject createInRealm:realm withValue:@[@1]];
         }];
-        [realm writeCopyToPath:RLMTestRealmPath() encryptionKey:key2 error:nil];
+        [realm writeCopyToURL:RLMTestRealmURL() encryptionKey:key2 error:nil];
     }
 
     @autoreleasepool {
         RLMRealmConfiguration *config = [self configurationWithKey:key2];
-        config.path = RLMTestRealmPath();
+        config.fileURL = RLMTestRealmURL();
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
     }
@@ -157,8 +157,8 @@
 
     // Create the Realm file on disk
     @autoreleasepool {
-        [RLMRealm realmWithPath:RLMDefaultRealmPath() key:key readOnly:NO
-                       inMemory:NO dynamic:YES schema: schema error:nil];
+        [RLMRealm realmWithURL:RLMDefaultRealmURL() key:key readOnly:NO
+                          inMemory:NO dynamic:YES schema: schema error:nil];
     }
 
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];

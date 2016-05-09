@@ -21,16 +21,31 @@
 #include "object_store.hpp"
 #include "property.hpp"
 
-#include <realm/group_shared.hpp>
-#include <realm/link_view.hpp>
+#include <realm/data_type.hpp>
+#include <realm/table.hpp>
 
 using namespace realm;
 
+#define ASSERT_PROPERTY_TYPE_VALUE(property, type) \
+    static_assert(static_cast<int>(PropertyType::property) == type_##type, \
+                  "PropertyType and DataType must have the same values")
+
+ASSERT_PROPERTY_TYPE_VALUE(Int, Int);
+ASSERT_PROPERTY_TYPE_VALUE(Bool, Bool);
+ASSERT_PROPERTY_TYPE_VALUE(Float, Float);
+ASSERT_PROPERTY_TYPE_VALUE(Double, Double);
+ASSERT_PROPERTY_TYPE_VALUE(Data, Binary);
+ASSERT_PROPERTY_TYPE_VALUE(Date, Timestamp);
+ASSERT_PROPERTY_TYPE_VALUE(Any, Mixed);
+ASSERT_PROPERTY_TYPE_VALUE(Object, Link);
+ASSERT_PROPERTY_TYPE_VALUE(Array, LinkList);
+
+ObjectSchema::ObjectSchema() = default;
 ObjectSchema::~ObjectSchema() = default;
 
-ObjectSchema::ObjectSchema(std::string name, std::string primary_key, std::initializer_list<Property> properties)
+ObjectSchema::ObjectSchema(std::string name, std::string primary_key, std::initializer_list<Property> persisted_properties)
 : name(std::move(name))
-, properties(properties)
+, persisted_properties(persisted_properties)
 , primary_key(std::move(primary_key))
 {
     set_primary_key_property();
@@ -40,21 +55,21 @@ ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(n
     ConstTableRef table = ObjectStore::table_for_object_type(group, name);
 
     size_t count = table->get_column_count();
-    properties.reserve(count);
+    persisted_properties.reserve(count);
     for (size_t col = 0; col < count; col++) {
         Property property;
         property.name = table->get_column_name(col).data();
         property.type = (PropertyType)table->get_column_type(col);
         property.is_indexed = table->has_search_index(col);
         property.is_primary = false;
-        property.is_nullable = table->is_nullable(col) || property.type == PropertyTypeObject;
+        property.is_nullable = table->is_nullable(col) || property.type == PropertyType::Object;
         property.table_column = col;
-        if (property.type == PropertyTypeObject || property.type == PropertyTypeArray) {
+        if (property.type == PropertyType::Object || property.type == PropertyType::Array) {
             // set link type for objects and arrays
             ConstTableRef linkTable = table->get_link_target(col);
             property.object_type = ObjectStore::object_type_for_table_name(linkTable->get_name().data());
         }
-        properties.push_back(std::move(property));
+        persisted_properties.push_back(std::move(property));
     }
 
     primary_key = realm::ObjectStore::get_primary_key_for_object(group, name);
@@ -62,7 +77,12 @@ ObjectSchema::ObjectSchema(const Group *group, const std::string &name) : name(n
 }
 
 Property *ObjectSchema::property_for_name(StringData name) {
-    for (auto& prop : properties) {
+    for (auto& prop : persisted_properties) {
+        if (StringData(prop.name) == name) {
+            return &prop;
+        }
+    }
+    for (auto& prop : computed_properties) {
         if (StringData(prop.name) == name) {
             return &prop;
         }

@@ -23,16 +23,8 @@
 @interface Dog : RLMObject
 @property NSString *name;
 @property NSInteger age;
-@property (readonly) NSArray *owners; // Realm doesn't persist this property because it is readonly
+@property (readonly) RLMLinkingObjects *owners;
 @end
-
-@implementation Dog
-// Define "owners" as the inverse relationship to Person.dogs
-- (NSArray *)owners {
-    return [self linkingObjectsOfClass:@"Person" forProperty:@"dogs"];
-}
-@end
-
 RLM_ARRAY_TYPE(Dog)
 
 @interface Person : RLMObject
@@ -43,6 +35,14 @@ RLM_ARRAY_TYPE(Dog)
 @implementation Person
 @end
 
+@implementation Dog
++ (NSDictionary *)linkingObjectsProperties
+{
+    // Define "owners" as the inverse relationship to Person.dogs
+    return @{ @"owners": [RLMPropertyDescriptor descriptorWithClass:Person.class propertyName:@"dogs"] };
+}
+@end
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -51,7 +51,7 @@ RLM_ARRAY_TYPE(Dog)
     self.window.rootViewController = [[UIViewController alloc] init];
     [self.window makeKeyAndVisible];
 
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealmConfiguration defaultConfiguration].path error:nil];
+    [[NSFileManager defaultManager] removeItemAtURL:[RLMRealmConfiguration defaultConfiguration].fileURL error:nil];
 
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2015 Realm Inc.
+// Copyright 2014 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,33 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "impl/cached_realm_base.hpp"
+#import "RLMRealmConfiguration_Private.h"
+#import "shared_realm.hpp"
 
-#include <CoreFoundation/CFRunLoop.h>
-
-namespace realm {
-class Realm;
-
-namespace _impl {
-
-class CachedRealm : public CachedRealmBase {
-public:
-    CachedRealm(const std::shared_ptr<Realm>& realm, bool cache);
-    ~CachedRealm();
-
-    CachedRealm(CachedRealm&&);
-    CachedRealm& operator=(CachedRealm&&);
-
-    CachedRealm(const CachedRealm&) = delete;
-    CachedRealm& operator=(const CachedRealm&) = delete;
-
-    // Asynchronously call notify() on the Realm on the appropriate thread
-    void notify();
-
-private:
-    CFRunLoopRef m_runloop;
-    CFRunLoopSourceRef m_signal;
-};
-
-} // namespace _impl
-} // namespace realm
+@interface RLMRealmConfiguration ()
+- (realm::Realm::Config&)config;
+@end

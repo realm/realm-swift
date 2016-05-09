@@ -12,6 +12,15 @@
 		0295B90119D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90219D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90319D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		227D20DE1CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		227D20DF1CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		227D20E01CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		227D20E11CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		227D20E21CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		227D20E31CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		227D20E41CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		227D20E51CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		227D20E61CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		22C389E81B44FB6C0055CE88 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389D21B44FB6C0055CE88 /* AppDelegate.m */; };
 		22C389E91B44FB6C0055CE88 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22C389D41B44FB6C0055CE88 /* LaunchScreen.xib */; };
 		22C389EA1B44FB6C0055CE88 /* RLMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389D81B44FB6C0055CE88 /* RLMViewController.m */; };
@@ -176,9 +185,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
 		22C389AB1B44FB030055CE88 /* Puzzle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Puzzle.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		227D20DD1CB6009D008F641B /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		22C389D11B44FB6C0055CE88 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		22C389D21B44FB6C0055CE88 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		22C389D51B44FB6C0055CE88 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = LaunchScreen.xib; sourceTree = "<group>"; };
@@ -471,6 +481,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		227D20DC1CB6009D008F641B /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				227D20DD1CB6009D008F641B /* LaunchScreen.xib */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
 		22C389AC1B44FB030055CE88 /* Puzzle */ = {
 			isa = PBXGroup;
 			children = (
@@ -670,6 +688,7 @@
 			isa = PBXGroup;
 			children = (
 				E8BDBFC71A116FCB00450CFF /* Backlink */,
+				227D20DC1CB6009D008F641B /* Common */,
 				E80ABD7F1AF2AA3F00A37843 /* Draw */,
 				E8F70EBF19BA50AB006F60D5 /* Encryption */,
 				C0DC41CD1A7072670067156A /* Extension */,
@@ -883,6 +902,7 @@
 				C0DC41C81A7072670067156A /* Sources */,
 				C0DC41C91A7072670067156A /* Frameworks */,
 				C06134E21A718BB800D22D12 /* Embed App Extensions */,
+				227D20831CB4E4B9008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -952,6 +972,7 @@
 			buildPhases = (
 				E8AB71D819BA503500F3EDB4 /* Sources */,
 				E8AB71D919BA503500F3EDB4 /* Frameworks */,
+				227D20A51CB50248008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -985,6 +1006,7 @@
 			buildPhases = (
 				E8AB723419BA504000F3EDB4 /* Sources */,
 				E8AB723519BA504000F3EDB4 /* Frameworks */,
+				227D20801CB4E36D008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -1018,6 +1040,7 @@
 			buildPhases = (
 				E8AB729019BA504900F3EDB4 /* Sources */,
 				E8AB729119BA504900F3EDB4 /* Frameworks */,
+				227D208C1CB4E6C5008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -1034,6 +1057,7 @@
 			buildPhases = (
 				E8BDBF9D1A116FAC00450CFF /* Sources */,
 				E8BDBF9E1A116FAC00450CFF /* Frameworks */,
+				227D20A21CB501A1008F641B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -1124,11 +1148,43 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		22C389A91B44FB030055CE88 /* Resources */ = {
+		227D20801CB4E36D008F641B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22C389E91B44FB6C0055CE88 /* LaunchScreen.xib in Resources */,
+				227D20DF1CB6009D008F641B /* LaunchScreen.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D20831CB4E4B9008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20E01CB6009D008F641B /* LaunchScreen.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D208C1CB4E6C5008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20E41CB6009D008F641B /* LaunchScreen.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D20A21CB501A1008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20DE1CB6009D008F641B /* LaunchScreen.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		227D20A51CB50248008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20E51CB6009D008F641B /* LaunchScreen.xib in Resources */,
 				22C389EB1B44FB6C0055CE88 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1138,6 +1194,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F78C9C31B431CF300A0988E /* Images.xcassets in Resources */,
+				227D20E21CB6009D008F641B /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1181,6 +1238,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E879D9E31A12AA400035E2EB /* Images.xcassets in Resources */,
+				227D20E11CB6009D008F641B /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1189,6 +1247,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8F70EB919BA50A3006F60D5 /* default-v0.realm in Resources */,
+				227D20E31CB6009D008F641B /* LaunchScreen.xib in Resources */,
 				E8F70EBA19BA50A3006F60D5 /* default-v1.realm in Resources */,
 				E8F70EBB19BA50A3006F60D5 /* default-v2.realm in Resources */,
 			);
@@ -1199,6 +1258,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8F70E9F19BA508B006F60D5 /* Images.xcassets in Resources */,
+				227D20E61CB6009D008F641B /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1462,6 +1522,10 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/RACTableView/Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
+					"$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/ReactiveCocoa",
+				);
 				PRODUCT_NAME = RACTableView;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1476,6 +1540,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "$(SRCROOT)/RACTableView/Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
+					"$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/ReactiveCocoa",
+				);
 				PRODUCT_NAME = RACTableView;
 				WRAPPER_EXTENSION = app;
 			};

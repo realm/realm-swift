@@ -47,10 +47,12 @@ public final class Realm {
     // MARK: Properties
 
     /// Path to the file where this Realm is persisted.
-    public var path: String { return rlmRealm.path }
+    @available(*, deprecated=1, message="Use configuration.fileURL")
+    public var path: String { return configuration.path! }
 
     /// Indicates if this Realm was opened in read-only mode.
-    public var readOnly: Bool { return rlmRealm.readOnly }
+    @available(*, deprecated=1, message="Use configuration.readOnly")
+    public var readOnly: Bool { return configuration.readOnly }
 
     /// The Schema used by this realm.
     public var schema: Schema { return Schema(rlmRealm.schema) }
@@ -83,16 +85,30 @@ public final class Realm {
 
     - throws: An NSError if the Realm could not be initialized.
     */
+    @available(*, deprecated=1, message="Use Realm(fileURL:)")
     public convenience init(path: String) throws {
         var configuration = Configuration.defaultConfiguration
-        configuration.path = path
+        configuration.fileURL = NSURL(fileURLWithPath: path)
+        try self.init(configuration: configuration)
+    }
+
+    /**
+    Obtains a Realm instance persisted at the specified file URL.
+
+    - parameter fileURL: Local URL to the realm file.
+
+    - throws: An NSError if the Realm could not be initialized.
+    */
+    public convenience init(fileURL: NSURL) throws {
+        var configuration = Configuration.defaultConfiguration
+        configuration.fileURL = fileURL
         try self.init(configuration: configuration)
     }
 
     // MARK: Transactions
 
     /**
-    Performs actions contained within the given block inside a write transation.
+    Performs actions contained within the given block inside a write transaction.
 
     Write transactions cannot be nested, and trying to execute a write transaction
 	on a `Realm` which is already in a write transaction will throw an exception.
@@ -443,11 +459,19 @@ public final class Realm {
     Add a notification handler for changes in this Realm.
 
     Notification handlers are called after each write transaction is committed,
-    either on the current thread or other threads. The block is called on the
-    same thread as they were added on, and can only be added on threads which
-    are currently within a run loop. Unless you are specifically creating and
-    running a run loop on a background thread, this normally will only be the
-    main thread.
+    independent from the thread or process.
+
+    The block is called on the same thread as it was added on, and can only
+    be added on threads which are currently within a run loop. Unless you are
+    specifically creating and running a run loop on a background thread, this
+    normally will only be the main thread.
+
+    Notifications can't be delivered as long as the runloop is blocked by
+    other activity. When notifications can't be delivered instantly, multiple
+    notifications may be coalesced.
+
+    You must retain the returned token for as long as you want updates to continue
+    to be sent to the block. To stop receiving updates, call stop() on the token.
 
     - parameter block: A block which is called to process Realm notifications.
                        It receives the following parameters:
@@ -455,8 +479,7 @@ public final class Realm {
                        - `Notification`: The incoming notification.
                        - `Realm`:        The realm for which this notification occurred.
 
-    - returns: A notification token which can later be passed to `removeNotification(_:)`
-               to remove this notification.
+    - returns: A token which must be held for as long as you want notifications to be delivered.
     */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {
@@ -568,12 +591,26 @@ public final class Realm {
 
     - throws: An NSError if the copy could not be written.
     */
+    @available(*, deprecated=1, message="Use Realm.writeCopyToURL(_:encryptionKey:)")
     public func writeCopyToPath(path: String, encryptionKey: NSData? = nil) throws {
-        if let encryptionKey = encryptionKey {
-            try rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey)
-        } else {
-            try rlmRealm.writeCopyToPath(path)
-        }
+        try writeCopyToURL(NSURL(fileURLWithPath: path))
+    }
+
+    /**
+    Write an encrypted and compacted copy of the Realm to the given local URL.
+
+    The destination file cannot already exist.
+
+    Note that if this is called from within a write transaction it writes the
+    *current* data, and not data when the last write transaction was committed.
+
+    - parameter fileURL:       Local URL to save the Realm to.
+    - parameter encryptionKey: Optional 64-byte encryption key to encrypt the new file with.
+
+    - throws: An NSError if the copy could not be written.
+    */
+    public func writeCopyToURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws {
+        try rlmRealm.writeCopyToURL(fileURL, encryptionKey: encryptionKey)
     }
 
     // MARK: Synchronization

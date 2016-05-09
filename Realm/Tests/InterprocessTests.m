@@ -291,6 +291,22 @@
     }
 }
 
+- (void)testRecoverAfterCrashWithFileAlreadyOpen {
+    if (self.isParent) {
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        [self runChildAndWait];
+        [realm beginWriteTransaction];
+        [IntObject createInRealm:realm withValue:@[@0]];
+        [realm commitWriteTransaction];
+        XCTAssertEqual(1U, [IntObject allObjects].count);
+    }
+    else {
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        [realm beginWriteTransaction];
+        abort();
+    }
+}
+
 - (void)testCanOpenAndReadWhileOtherProcessHoldsWriteLock {
     RLMRealm *realm = RLMRealm.defaultRealm;
     if (self.isParent) {

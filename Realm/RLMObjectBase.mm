@@ -66,9 +66,10 @@ static bool RLMInitializedObjectSchema(RLMObjectBase *obj) {
 
 - (void)dealloc {
     // This can't be a unique_ptr because associated objects are removed
-    // *after* c++ members are destroyed, and we need it to still be alive when
-    // that happens
+    // *after* c++ members are destroyed and dealloc is called, and we need it
+    // to be in a validish state when that happens
     delete _observationInfo;
+    _observationInfo = nullptr;
 }
 
 static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
@@ -302,7 +303,8 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 
 - (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath {
     [super removeObserver:observer forKeyPath:keyPath];
-    _observationInfo->removeObserver();
+    if (_observationInfo)
+        _observationInfo->removeObserver();
 }
 
 + (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key {
@@ -459,7 +461,19 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     return [cls indexedProperties];
 }
 
++ (NSDictionary *)linkingObjectsPropertiesForClass:(Class)cls {
+    return [cls linkingObjectsProperties];
+}
+
++ (NSDictionary *)linkingObjectProperties:(__unused id)object {
+    return nil;
+}
+
 + (NSArray *)getGenericListPropertyNames:(__unused id)obj {
+    return nil;
+}
+
++ (NSDictionary *)getLinkingObjectsProperties:(__unused id)obj {
     return nil;
 }
 
@@ -467,6 +481,9 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 }
 
 + (void)initializeOptionalProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property {
+}
+
++ (void)initializeLinkingObjectsProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property results:(__unused RLMResults *)results {
 }
 
 + (NSDictionary *)getOptionalProperties:(__unused id)obj {

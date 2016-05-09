@@ -18,15 +18,18 @@
 
 #include "schema.hpp"
 
-#include "object_schema.hpp"
 #include "object_store.hpp"
 #include "property.hpp"
+
+#include <algorithm>
 
 using namespace realm;
 
 static bool compare_by_name(ObjectSchema const& lft, ObjectSchema const& rgt) {
     return lft.name < rgt.name;
 }
+
+Schema::Schema(std::initializer_list<ObjectSchema> types) : Schema(base(types)) { }
 
 Schema::Schema(base types) : base(std::move(types)) {
     std::sort(begin(), end(), compare_by_name);
@@ -63,19 +66,46 @@ void Schema::validate() const
     std::vector<ObjectSchemaValidationException> exceptions;
     for (auto const& object : *this) {
         const Property *primary = nullptr;
-        for (auto const& prop : object.properties) {
+
+        std::vector<Property> all_properties = object.persisted_properties;
+        all_properties.insert(all_properties.end(), object.computed_properties.begin(), object.computed_properties.end());
+
+        for (auto const& prop : all_properties) {
             // check object_type existence
-            if (!prop.object_type.empty() && find(prop.object_type) == end()) {
-                exceptions.emplace_back(MissingObjectTypeException(object.name, prop));
+            if (!prop.object_type.empty()) {
+                auto it = find(prop.object_type);
+                if (it == end()) {
+                    exceptions.emplace_back(MissingObjectTypeException(object.name, prop));
+                }
+                // validate linking objects property.
+                else if (!prop.link_origin_property_name.empty()) {
+                    using ErrorType = InvalidLinkingObjectsPropertyException::Type;
+                    util::Optional<ErrorType> error;
+
+                    const Property *origin_property = it->property_for_name(prop.link_origin_property_name);
+                    if (!origin_property) {
+                        error = ErrorType::OriginPropertyDoesNotExist;
+                    }
+                    else if (origin_property->type != PropertyType::Object && origin_property->type != PropertyType::Array) {
+                        error = ErrorType::OriginPropertyIsNotALink;
+                    }
+                    else if (origin_property->object_type != object.name) {
+                        error = ErrorType::OriginPropertyInvalidLinkTarget;
+                    }
+
+                    if (error) {
+                        exceptions.emplace_back(InvalidLinkingObjectsPropertyException(*error, object.name, prop));
+                    }
+                }
             }
 
             // check nullablity
             if (prop.is_nullable) {
-                if (prop.type == PropertyTypeArray || prop.type == PropertyTypeAny) {
+                if (prop.type == PropertyType::Array || prop.type == PropertyType::Any || prop.type == PropertyType::LinkingObjects) {
                     exceptions.emplace_back(InvalidNullabilityException(object.name, prop));
                 }
             }
-            else if (prop.type == PropertyTypeObject) {
+            else if (prop.type == PropertyType::Object) {
                 exceptions.emplace_back(InvalidNullabilityException(object.name, prop));
             }
 
@@ -88,10 +118,8 @@ void Schema::validate() const
             }
 
             // check indexable
-            if (prop.is_indexed) {
-                if (!prop.is_indexable()) {
-                    exceptions.emplace_back(PropertyTypeNotIndexableException(object.name, prop));
-                }
+            if (prop.is_indexed && !prop.is_indexable()) {
+                exceptions.emplace_back(PropertyTypeNotIndexableException(object.name, prop));
             }
         }
     }

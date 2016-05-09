@@ -113,6 +113,13 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             [RLMObjectUtilClass(YES) initializeOptionalProperty:object property:prop];
         }
     }
+
+    for (RLMProperty *prop in object->_objectSchema.computedProperties) {
+        if (prop.type == RLMPropertyTypeLinkingObjects) {
+            RLMResults *results = RLMDynamicGet(object, prop);
+            [RLMObjectUtilClass(YES) initializeLinkingObjectsProperty:object property:prop results:results];
+        }
+    }
 }
 
 template<typename F>
@@ -308,6 +315,8 @@ static void RLMValidateValueForProperty(__unsafe_unretained id const obj,
             }
             break;
         }
+        case RLMPropertyTypeLinkingObjects:
+            @throw RLMException(@"Invalid value '%@' for property '%@'", obj, prop.name);
     }
 }
 

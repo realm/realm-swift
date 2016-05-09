@@ -131,8 +131,8 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     config.inMemoryIdentifier = @(factor).stringValue;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-    [NSFileManager.defaultManager removeItemAtPath:RLMTestRealmPath() error:nil];
-    [realm writeCopyToPath:RLMTestRealmPath() error:nil];
+    [NSFileManager.defaultManager removeItemAtURL:RLMTestRealmURL() error:nil];
+    [realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:nil];
     return [self realmWithTestPath];
 }
 
@@ -369,7 +369,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
             }
         }
     }];
-    [realm path];
+    [realm configuration];
 }
 
 - (void)testRealmCreationUncached {
@@ -471,6 +471,47 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
         [self dispatchAsyncAndWait:^{}];
         [self stopMeasuring];
+    }];
+}
+
+- (void)testCommitWriteTransactionWithResultsNotification {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:5];
+        RLMResults *results = [StringObject allObjectsInRealm:realm];
+        id token = [results addNotificationBlock:^(__unused RLMResults *results, __unused RLMCollectionChange *change, __unused NSError *error) {
+            CFRunLoopStop(CFRunLoopGetCurrent());
+        }];
+        CFRunLoopRun();
+
+        [realm beginWriteTransaction];
+        [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol = 'a'"]];
+        [realm commitWriteTransaction];
+
+        [self startMeasuring];
+        CFRunLoopRun();
+        [token stop];
+    }];
+}
+
+- (void)testCommitWriteTransactionWithListNotification {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:5];
+        [realm beginWriteTransaction];
+        ArrayPropertyObject *arrayObj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
+        [realm commitWriteTransaction];
+
+        id token = [arrayObj.array addNotificationBlock:^(__unused RLMArray *results, __unused RLMCollectionChange *change, __unused NSError *error) {
+            CFRunLoopStop(CFRunLoopGetCurrent());
+        }];
+        CFRunLoopRun();
+
+        [realm beginWriteTransaction];
+        [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol = 'a'"]];
+        [realm commitWriteTransaction];
+
+        [self startMeasuring];
+        CFRunLoopRun();
+        [token stop];
     }];
 }
 

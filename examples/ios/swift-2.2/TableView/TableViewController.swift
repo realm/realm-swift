@@ -37,7 +37,7 @@ class Cell: UITableViewCell {
 class TableViewController: UITableViewController {
 
     let realm = try! Realm()
-    let array = try! Realm().objects(DemoObject).sorted("date")
+    let results = try! Realm().objects(DemoObject).sorted("date")
     var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
@@ -46,8 +46,28 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set results notification block
-        notificationToken = array.addNotificationBlock { [unowned self] results, error in
-            self.tableView.reloadData()
+        self.notificationToken = results.addNotificationBlock { (changes: RealmCollectionChange) in
+            switch changes {
+            case .Initial:
+                // Results are now populated and can be accessed without blocking the UI
+                self.tableView.reloadData()
+                break
+            case .Update(_, let deletions, let insertions, let modifications):
+                // Query results have changed, so apply them to the TableView
+                self.tableView.beginUpdates()
+                self.tableView.insertRowsAtIndexPaths(insertions.map { NSIndexPath(forRow: $0, inSection: 0) },
+                    withRowAnimation: .Automatic)
+                self.tableView.deleteRowsAtIndexPaths(deletions.map { NSIndexPath(forRow: $0, inSection: 0) },
+                    withRowAnimation: .Automatic)
+                self.tableView.reloadRowsAtIndexPaths(modifications.map { NSIndexPath(forRow: $0, inSection: 0) },
+                    withRowAnimation: .Automatic)
+                self.tableView.endUpdates()
+                break
+            case .Error(let err):
+                // An error occurred while opening the Realm file on the background worker thread
+                fatalError("\(err)")
+                break
+            }
         }
     }
 
@@ -57,20 +77,22 @@ class TableViewController: UITableViewController {
         tableView.registerClass(Cell.self, forCellReuseIdentifier: "cell")
 
         self.title = "TableView"
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "BG Add", style: .Plain, target: self, action: "backgroundAdd")
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "add")
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "BG Add", style: .Plain,
+                                                                target: self, action: #selector(backgroundAdd))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add,
+                                                                 target: self, action: #selector(add))
     }
 
     // Table view data source
 
     override func tableView(tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
-        return array.count
+        return results.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! Cell
 
-        let object = array[indexPath.row]
+        let object = results[indexPath.row]
         cell.textLabel?.text = object.title
         cell.detailTextLabel?.text = object.date.description
 
@@ -80,7 +102,7 @@ class TableViewController: UITableViewController {
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             realm.beginWrite()
-            realm.delete(array[indexPath.row])
+            realm.delete(results[indexPath.row])
             try! realm.commitWrite()
         }
     }

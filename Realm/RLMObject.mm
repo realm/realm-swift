@@ -182,6 +182,10 @@
     return @[];
 }
 
++ (NSDictionary *)linkingObjectsProperties {
+    return @{};
+}
+
 + (NSDictionary *)defaultPropertyValues {
     return nil;
 }
