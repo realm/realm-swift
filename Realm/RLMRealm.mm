@@ -148,10 +148,11 @@ std::atomic<bool> g_syncLogEverything{false};
             //
             // FIXME: What to do if an error occurs in [RLMRealm
             // realmWithPath:]?
-            [RLMRealm realmWithPath:path]->_realm->notify_others();
+            [RLMRealm realmWithURL:[NSURL fileURLWithPath:path isDirectory:NO]]->_realm->notify_others();
         };
-        _session.reset(new sync::Session([client getClient], path.UTF8String, serverURL2.UTF8String,
-                                         syncTransactCallback)); // Throws
+        _session.reset(new sync::Session([client getClient], path.UTF8String)); // Throws
+        _session->set_sync_transact_callback(std::move(syncTransactCallback));
+        _session->bind(serverURL2.UTF8String);
     }
     return self;
 }
@@ -512,7 +513,7 @@ void RLMRealmTranslateException(NSError **error) {
             // as a basis for constructing the new RLMInstance. Note that
             // the inode number is only guaranteed to stay valid for as long
             // as you hold on to the the handle of the open file.
-            RLMSyncSession *session = [g_syncSessions objectForKey:realm.path];
+            RLMSyncSession *session = [g_syncSessions objectForKey:realm.configuration.fileURL.path];
             if (!session) {
                 if (NSURL *serverURL = realm.configuration.syncServerURL) {
                     RLMSyncClient *client = [g_syncClients objectForKey:realm.configuration.syncUserToken];
@@ -522,9 +523,9 @@ void RLMRealmTranslateException(NSError **error) {
                         [g_syncClients setObject:client forKey:realm.configuration.syncUserToken];
                     }
                     session = [[RLMSyncSession alloc] initWithClient:client
-                                                                path:realm.path
+                                                                path:realm.configuration.fileURL.path
                                                            serverURL:serverURL];
-                    [g_syncSessions setObject:session forKey:realm.path];
+                    [g_syncSessions setObject:session forKey:realm.configuration.fileURL.path];
                 }
             }
             realm->_syncSession = session;
