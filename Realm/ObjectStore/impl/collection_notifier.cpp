@@ -183,7 +183,7 @@ size_t CollectionNotifier::add_callback(CollectionChangeCallback callback)
     auto token = next_token();
     m_callbacks.push_back({std::move(callback), token, false});
     if (m_callback_index == npos) { // Don't need to wake up if we're already sending notifications
-        Realm::Internal::get_coordinator(*m_realm).send_commit_notifications();
+        Realm::Internal::get_coordinator(*m_realm).send_commit_notifications(*m_realm);
         m_have_callbacks = true;
     }
     return token;

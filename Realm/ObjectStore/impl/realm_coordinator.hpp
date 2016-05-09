@@ -29,6 +29,15 @@ class Schema;
 class SharedGroup;
 class StringData;
 
+namespace util {
+class Logger;
+}
+
+namespace sync {
+class Client;
+class Session;
+}
+
 namespace _impl {
 class CollectionNotifier;
 class ExternalCommitHelper;
@@ -57,7 +66,7 @@ public:
 
     // Asynchronously call notify() on every Realm instance for this coordinator's
     // path, including those in other processes
-    void send_commit_notifications();
+    void send_commit_notifications(Realm&);
 
     // Clear the weak Realm cache for all paths
     // Should only be called in test code, as continuing to use the previously
@@ -113,6 +122,10 @@ private:
     std::exception_ptr m_async_error;
 
     std::unique_ptr<_impl::ExternalCommitHelper> m_notifier;
+
+    std::unique_ptr<sync::Client> m_sync_client;
+    std::unique_ptr<sync::Session> m_sync_session;
+    std::thread m_sync_thread;
 
     // must be called with m_notifier_mutex locked
     void pin_version(uint_fast64_t version, uint_fast32_t index);
