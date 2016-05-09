@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.102.0 Release notes (2016-05-09)
 =============================================================
 
 ### API breaking changes
@@ -10,6 +10,10 @@ x.x.x Release notes (yyyy-MM-dd)
 * Add a method to rename properties during migrations:
   * Swift: `Migration.renamePropertyForClass(_:oldName:newName:)`
   * Objective-C: `-[RLMMigration renamePropertyForClass:oldName:newName:]`
+* Add `deleteRealmIfMigrationNeeded` to
+  `RLMRealmConfiguration`/`Realm.Configuration`. When this is set to `true`,
+  the Realm file will be automatically deleted and recreated when there is a
+  schema mismatch rather than migrated to the new schema.
 
 ### Bugfixes
 
