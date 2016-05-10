@@ -196,6 +196,7 @@ using namespace realm;
         if (isSwiftClass) {
             prop = [[RLMProperty alloc] initSwiftPropertyWithName:propertyName
                                                           indexed:[indexed containsObject:propertyName]
+                                           linkPropertyDescriptor:linkingObjectsProperties[propertyName]
                                                          property:props[i]
                                                          instance:swiftObjectInstance];
         }
