@@ -636,6 +636,54 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
 }
 @end
 
+@interface LinkedObjectChangesetTests : RLMTestCase <ChangesetTestCase>
+@end
+
+@implementation LinkedObjectChangesetTests
+- (void)prepare {
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [realm deleteAllObjects];
+            for (int i = 0; i < 5; ++i) {
+                [LinkStringObject createInRealm:realm
+                                      withValue:@[[StringObject createInRealm:realm
+                                                                    withValue:@[@""]]]];
+            }
+        }];
+    }
+}
+
+- (RLMResults *)query {
+    return LinkStringObject.allObjects;
+}
+
+- (void)testDeleteLinkedObject {
+    ExpectChange(self, @[], @[], @[@3], ^(RLMRealm *realm) {
+        [realm deleteObject:[StringObject allObjectsInRealm:realm][3]];
+    });
+}
+
+- (void)testModifyLinkedObject {
+    ExpectChange(self, @[], @[], @[@3], ^(RLMRealm *realm) {
+        [[StringObject allObjectsInRealm:realm][3] setStringCol:@"a"];
+    });
+}
+
+- (void)testInsertUnlinkedObject {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        [StringObject createInRealm:realm withValue:@[@""]];
+    });
+}
+
+- (void)testTableClearFollowedByInsertsAndDeletes {
+    ExpectChange(self, @[], @[], @[@0, @1, @2, @3, @4], ^(RLMRealm *realm) {
+        [realm deleteObjects:[StringObject allObjectsInRealm:realm]];
+        [StringObject createInRealm:realm withValue:@[@""]];
+        [realm deleteObject:[StringObject createInRealm:realm withValue:@[@""]]];
+    });
+}
+@end
 
 @interface LinkingObjectsChangesetTests : RLMTestCase <ChangesetTestCase>
 @end
