@@ -37,7 +37,7 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
 
     internal var rlmResults: RLMResults {
         if cachedRLMResults == nil {
-            if let object = self.object, let property = self.property {
+            if let object = self.object, property = self.property {
                 cachedRLMResults = RLMDynamicGet(object.object, property)! as? RLMResults
                 self.object = nil
                 self.property = nil
