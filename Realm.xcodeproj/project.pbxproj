@@ -564,7 +564,7 @@
 		3FE556431B9A43E5002A1129 /* schema.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = schema.hpp; path = ObjectStore/schema.hpp; sourceTree = "<group>"; };
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
-		5D1534B71CCFF545008976D7 /* LinkingObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LinkingObjects.swift; path = "RealmSwift-swift2.0/LinkingObjects.swift"; sourceTree = "<group>"; };
+		5D1534B71CCFF545008976D7 /* LinkingObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LinkingObjects.swift; path = "RealmSwift-swift2.0/LinkingObjects.swift"; sourceTree = SOURCE_ROOT; };
 		5D2E8F651C98DC0D00187B09 /* RLMProperty_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMProperty_Private.hpp; sourceTree = "<group>"; };
 		5D30B74A1B42039F00D90C5A /* RLMDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMDefines.h; sourceTree = "<group>"; };
 		5D3E1A2C1C1FC6D5002913BA /* RLMPredicateUtil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMPredicateUtil.hpp; sourceTree = "<group>"; };
@@ -851,6 +851,7 @@
 			children = (
 				5D660FE31BE98D670021E04F /* Aliases.swift */,
 				29B7FDF51C0DA6560023224E /* Error.swift */,
+				5D1534B71CCFF545008976D7 /* LinkingObjects.swift */,
 				5D660FE41BE98D670021E04F /* List.swift */,
 				5D660FE51BE98D670021E04F /* Migration.swift */,
 				5D660FE61BE98D670021E04F /* Object.swift */,
@@ -980,7 +981,6 @@
 		E8D89B8E1955FC6D00CF2B9A = {
 			isa = PBXGroup;
 			children = (
-				5D1534B71CCFF545008976D7 /* LinkingObjects.swift */,
 				5D660FB71BE98B770021E04F /* Configuration */,
 				E81A1FB41955FCE000FDED82 /* LICENSE */,
 				E8D89B991955FC6D00CF2B9A /* Products */,
