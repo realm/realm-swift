@@ -351,13 +351,13 @@ class SwiftPerformanceTests: TestCase {
     func testRealmCreationCached() {
         var realm: Realm!
         dispatchSyncNewThread {
-            realm = self.realmWithTestPath()
+            realm = try! Realm()
         }
 
         measureBlock {
             for _ in 0..<250 {
                 autoreleasepool {
-                    _ = self.realmWithTestPath()
+                    _ = try! Realm()
                 }
             }
         }
@@ -368,7 +368,7 @@ class SwiftPerformanceTests: TestCase {
         measureBlock {
             for _ in 0..<50 {
                 autoreleasepool {
-                    _ = self.realmWithTestPath()
+                    _ = try! Realm()
                 }
             }
         }

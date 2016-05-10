@@ -66,14 +66,24 @@ public final class Realm {
     // MARK: Initializers
 
     /**
-    Obtains a Realm instance with the given configuration. Defaults to the default Realm configuration,
-    which can be changed by setting `Realm.Configuration.defaultConfiguration`.
+    Obtains a Realm instance with the default Realm configuration, which can be
+    changed by setting `Realm.Configuration.defaultConfiguration`.
+
+    - throws: An NSError if the Realm could not be initialized.
+    */
+    public convenience init() throws {
+        let rlmRealm = try RLMRealm(configuration: RLMRealmConfiguration.defaultConfiguration())
+        self.init(rlmRealm)
+    }
+
+    /**
+    Obtains a Realm instance with the given configuration.
 
     - parameter configuration: The configuration to use when creating the Realm instance.
 
     - throws: An NSError if the Realm could not be initialized.
     */
-    public convenience init(configuration: Configuration = Configuration.defaultConfiguration) throws {
+    public convenience init(configuration: Configuration) throws {
         let rlmRealm = try RLMRealm(configuration: configuration.rlmConfiguration)
         self.init(rlmRealm)
     }
