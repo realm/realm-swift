@@ -136,7 +136,7 @@ void Realm::init(std::shared_ptr<RealmCoordinator> coordinator)
         if (target_schema) {
             if (m_config.read_only) {
                 if (m_config.schema_version == ObjectStore::NotVersioned) {
-                    throw UnitializedRealmException("Can't open an un-initialized Realm without a Schema");
+                    throw UninitializedRealmException("Can't open an un-initialized Realm without a Schema");
                 }
                 target_schema->validate();
                 ObjectStore::verify_schema(*m_config.schema, *target_schema, true);
