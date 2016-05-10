@@ -31,8 +31,7 @@ static NSString* signature = @"WlgbZ5kRWddefABP/DnrK02s6xCTvl19L2eEuK1xQn106aVZx
     
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/draw/demo"];
-    configuration.syncIdentity = identity;
-    configuration.syncSignature = signature;
+    configuration.syncUserToken = [NSString stringWithFormat:@"%@:%@", identity, signature];
     [RLMRealmConfiguration setDefaultConfiguration:configuration];
 
     [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelVerbose];
