@@ -58,6 +58,14 @@
 
 @end
 
+// A reference to an object's row that doesn't keep the object accessor alive.
+// Used by some Swift property types, such as LinkingObjects, to avoid retain cycles
+// with their containing object.
+@interface RLMWeakObjectHandle : NSObject
+- (instancetype)initWithObject:(RLMObjectBase *)object;
+@property (nonatomic, readonly) RLMObjectBase *object;
+@end
+
 //
 // Getters and setters for RLMObjectBase ivars for realm and objectSchema
 //
@@ -96,7 +104,7 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 
 + (void)initializeListProperty:(RLMObjectBase *)object property:(RLMProperty *)property array:(RLMArray *)array;
 + (void)initializeOptionalProperty:(RLMObjectBase *)object property:(RLMProperty *)property;
-+ (void)initializeLinkingObjectsProperty:(RLMObjectBase *)object property:(RLMProperty *)property results:(RLMResults *)results;
++ (void)initializeLinkingObjectsProperty:(RLMObjectBase *)object property:(RLMProperty *)property;
 
 + (NSDictionary RLM_GENERIC(NSString *, NSNumber *) *)getOptionalProperties:(id)obj;
 + (NSArray RLM_GENERIC(NSString *) *)requiredPropertiesForClass:(Class)cls;
