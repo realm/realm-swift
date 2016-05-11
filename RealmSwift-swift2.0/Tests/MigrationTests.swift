@@ -435,7 +435,7 @@ class MigrationTests: TestCase {
         XCTAssertEqual(try! Realm().objects(SwiftBoolObject).count, 4)
     }
 
-    func testDeleteRealmIfMigrationNeededWithSetCustomSchema() {
+    func testFailOnSchemaMismatch() {
         let prop = RLMProperty(name: "name", type: RLMPropertyType.String, objectClassName: nil,
                                linkOriginPropertyName: nil, indexed: false, optional: false)
         autoreleasepool {
@@ -448,7 +448,16 @@ class MigrationTests: TestCase {
                 try Realm(configuration: config)
             }
         }
+    }
 
+    func testDeleteRealmIfMigrationNeededWithSetCustomSchema() {
+        let prop = RLMProperty(name: "name", type: RLMPropertyType.String, objectClassName: nil,
+                               linkOriginPropertyName: nil, indexed: false, optional: false)
+        autoreleasepool {
+            realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop])
+        }
+
+        var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
         config.migrationBlock = { _, _ in
             XCTFail("Migration block should not be called")
         }
