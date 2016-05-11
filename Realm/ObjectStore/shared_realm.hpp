@@ -37,6 +37,10 @@ namespace realm {
     typedef std::shared_ptr<Realm> SharedRealm;
     typedef std::weak_ptr<Realm> WeakRealm;
 
+    namespace util {
+        class Logger;
+    }
+
     namespace _impl {
         class CollectionNotifier;
         class ListNotifier;
@@ -55,6 +59,8 @@ namespace realm {
             util::Optional<std::string> sync_server_url;
             util::Optional<std::string> sync_user_token;
 
+            util::Logger* logger = nullptr;
+
             // Optional schema for the file. If nullptr, the existing schema
             // from the file opened will be used. If present, the file will be
             // migrated to the schema if needed.
@@ -66,6 +72,8 @@ namespace realm {
 
             bool read_only = false;
             bool in_memory = false;
+
+            bool log_everything = false;
 
             // The following are intended for internal/testing purposes and
             // should not be publicly exposed in binding APIs
@@ -185,8 +193,6 @@ namespace realm {
 
         // FIXME private
         Group *read_group();
-
-        SharedGroup& get_shared_group();
     };
 
     class RealmFileException : public std::runtime_error {

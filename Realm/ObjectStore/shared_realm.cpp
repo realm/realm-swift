@@ -192,11 +192,6 @@ Group *Realm::read_group()
     return m_group;
 }
 
-SharedGroup& Realm::get_shared_group()
-{
-    return *m_shared_group;
-}
-
 SharedRealm Realm::get_shared_realm(Config config)
 {
     return RealmCoordinator::get_coordinator(config.path)->get_realm(std::move(config));
@@ -335,7 +330,7 @@ void Realm::commit_transaction()
     }
 
     transaction::commit(*m_shared_group, m_binding_context.get());
-    m_coordinator->send_commit_notifications();
+    m_coordinator->send_commit_notifications(*this);
 }
 
 void Realm::cancel_transaction()

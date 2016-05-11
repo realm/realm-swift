@@ -29,6 +29,8 @@
 #include <realm/group_shared.hpp>
 #include <realm/lang_bind_helper.hpp>
 #include <realm/string_data.hpp>
+#include <realm/sync/client.hpp>
+#include <realm/sync/history.hpp>
 
 #include <unordered_map>
 
@@ -86,6 +88,12 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
         if (m_config.schema_version != config.schema_version && config.schema_version != ObjectStore::NotVersioned) {
             throw MismatchedConfigException("Realm at path already opened with different schema version.");
         }
+        if (m_config.sync_user_token != config.sync_user_token) {
+            throw MismatchedConfigException("Realm at path already opened with different user token.");
+        }
+        if (m_config.sync_server_url != config.sync_server_url) {
+            throw MismatchedConfigException("Realm at path already opened with different server url.");
+        }
         // FIXME: verify that schema is compatible
         // Needs to verify that all tables present in both are identical, and
         // then updated m_config with any tables present in config but not in
@@ -107,6 +115,22 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
                 }
             }
         }
+    }
+
+    if (config.sync_server_url && config.sync_user_token && !m_sync_session) {
+        sync::Client::LogLevel log_level = sync::Client::LogLevel::normal;
+        if (config.log_everything)
+            log_level = sync::Client::LogLevel::everything;
+        m_sync_client = std::make_unique<sync::Client>(*config.sync_user_token, config.logger, log_level);
+
+        m_sync_session = std::make_unique<sync::Session>(*m_sync_client, config.path);
+        m_sync_session->set_sync_transact_callback([this] (sync::Session::version_type) {
+            if (m_notifier)
+                m_notifier->notify_others();
+        });
+        m_sync_session->bind(*config.sync_server_url);
+
+        m_sync_thread = std::thread(&sync::Client::run, m_sync_client.get());
     }
 
     auto realm = std::make_shared<Realm>(std::move(config));
@@ -136,6 +160,11 @@ RealmCoordinator::RealmCoordinator() = default;
 
 RealmCoordinator::~RealmCoordinator()
 {
+    if (m_sync_client) {
+        m_sync_client->stop();
+        m_sync_thread.join();
+    }
+
     std::lock_guard<std::mutex> coordinator_lock(s_coordinator_mutex);
     for (auto it = s_coordinators_per_path.begin(); it != s_coordinators_per_path.end(); ) {
         if (it->second.expired()) {
@@ -213,11 +242,16 @@ void RealmCoordinator::clear_all_caches()
     }
 }
 
-void RealmCoordinator::send_commit_notifications()
+void RealmCoordinator::send_commit_notifications(Realm& source_realm)
 {
     REALM_ASSERT(!m_config.read_only);
     if (m_notifier) {
         m_notifier->notify_others();
+    }
+    if (m_sync_session) {
+        auto& sg = Realm::Internal::get_shared_group(source_realm);
+        auto version = LangBindHelper::get_version_of_latest_snapshot(sg);
+        m_sync_session->nonsync_transact_notify(version);
     }
 }
 

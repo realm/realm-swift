@@ -50,118 +50,19 @@
 #include <realm/disable_sync_to_disk.hpp>
 #include <realm/lang_bind_helper.hpp>
 #include <realm/version.hpp>
-#include <realm/sync/history.hpp>
-#include <realm/sync/client.hpp>
 
 using namespace realm;
 using util::File;
 
 namespace {
-
-class SyncLogger: public util::Logger {
-public:
-    void do_log(std::string message) override
-    {
-        NSString *message2 = [[NSString alloc] initWithBytes:message.data()
-                                                     length:message.size()
-                                                   encoding:NSUTF8StringEncoding];
-        NSLog(@"RealmSync: %@", message2);
+struct SyncLogger : public util::Logger {
+    void do_log(std::string message) override {
+        NSLog(@"RealmSync: %@", RLMStringDataToNSString(message));
     }
-};
+} s_syncLogger;
 
-// Key is "<user token>:<user token signature>"
-NSMapTable *g_syncClients = [NSMapTable strongToWeakObjectsMapTable];
-
-// Maps local path to RLMSyncSession instance
-NSMapTable *g_syncSessions = [NSMapTable strongToWeakObjectsMapTable];
-
-std::atomic<bool> g_syncLogEverything{false};
-
-} // unnamed namespace
-
-
-@interface RLMSyncClient : NSObject
-@end
-
-
-@interface RLMSyncSession : NSObject
-@end
-
-
-@implementation RLMSyncClient {
-    SyncLogger _logger;
-    std::unique_ptr<sync::Client> _client;
-    std::thread _runLoopThread;
-}
-
-- (instancetype)initWithUserToken:(NSString *)syncUserToken {
-    self = [super init];
-    if (self) {
-        NSAssert(syncUserToken, @"syncUserToken should not be nil");
-        sync::Client::LogLevel logLevel = sync::Client::LogLevel::normal;
-        if (g_syncLogEverything)
-            logLevel = sync::Client::LogLevel::everything;
-        _client.reset(new sync::Client(syncUserToken.UTF8String, &_logger, logLevel)); // Throws
-        sync::Client& client = *_client;
-        auto runLoopThread = [&client] {
-            client.run(); // Throws
-        };
-        _runLoopThread = std::thread(runLoopThread); // Throws
-    }
-    return self;
-}
-
-- (void)dealloc {
-    if (_client) {
-        _client->stop();
-        if (_runLoopThread.joinable())
-            _runLoopThread.join();
-    }
-}
-
-- (sync::Client&)getClient {
-    return *_client;
-}
-
-@end
-
-
-@implementation RLMSyncSession {
-    RLMSyncClient *_client;
-    NSString* _path;
-    std::unique_ptr<sync::Session> _session;
-}
-
-
-- (instancetype)initWithClient:(RLMSyncClient *)client
-                        path:(NSString *)path
-                     serverURL:(NSURL *)serverURL {
-    self = [super init];
-    if (self) {
-        _client = client;
-        _path = path;
-        NSString *serverURL2 = [serverURL absoluteString];
-        auto syncTransactCallback = [path](sync::Session::version_type) {
-            // NOTE: This lambda is not allowed to refer to any part
-            // of the RLMSyncSession object, as it may execute after
-            // the deallocation of that object.
-            //
-            // FIXME: What to do if an error occurs in [RLMRealm
-            // realmWithPath:]?
-            [RLMRealm realmWithURL:[NSURL fileURLWithPath:path isDirectory:NO]]->_realm->notify_others();
-        };
-        _session.reset(new sync::Session([client getClient], path.UTF8String)); // Throws
-        _session->set_sync_transact_callback(std::move(syncTransactCallback));
-        _session->bind(serverURL2.UTF8String);
-    }
-    return self;
-}
-
-- (void)nonsyncTransactNotifyWithVersion:(sync::Session::version_type)version {
-    _session->nonsync_transact_notify(version);
-}
-
-@end
+std::atomic<bool> s_syncLogEverything;
+} // anonymous namespace
 
 
 @interface RLMRealmConfiguration ()
@@ -223,8 +124,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 @implementation RLMRealm {
     NSHashTable *_collectionEnumerators;
     NSHashTable *_notificationHandlers;
-
-    RLMSyncSession *_syncSession;
 }
 
 + (BOOL)isCoreDebug {
@@ -446,6 +345,8 @@ void RLMRealmTranslateException(NSError **error) {
 
     configuration = [configuration copy];
     Realm::Config& config = configuration.config;
+    config.log_everything = s_syncLogEverything;
+    config.logger = &s_syncLogger;
 
     RLMRealm *realm = [RLMRealm new];
     realm->_dynamic = dynamic;
@@ -506,50 +407,8 @@ void RLMRealmTranslateException(NSError **error) {
             for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
                 objectSchema.realm = realm;
             }
-
-            if (realm.configuration.syncServerURL) {
-                if (![realm.configuration.syncServerURL isEqual:cachedRealm.configuration.syncServerURL]) {
-                    @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:@"Server synchronization URL mismatch"
-                                                 userInfo:nil];
-                }
-                if (![realm.configuration.syncUserToken isEqual:cachedRealm.configuration.syncUserToken]) {
-                    @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:@"Server synchronization user token mismatch"
-                                                 userInfo:nil];
-                }
-                realm->_syncSession = cachedRealm->_syncSession;
-            }
         }
         else {
-            // FIXME: A file cannot be reliably identified by its path. A
-            // safe approach is to start by opening the file, then get the
-            // inode and device numbers from the file descriptor, then use
-            // that pair as a key to lookup a preexisting RLMRealm
-            // instance. If one is found, the opened file can be closed. If
-            // one is not found, a new RLMRealm instance can be created from
-            // the handle of the open file. Alternatively, on a system with
-            // a proc filesystem, on can use the path to the file descriptor
-            // as a basis for constructing the new RLMInstance. Note that
-            // the inode number is only guaranteed to stay valid for as long
-            // as you hold on to the the handle of the open file.
-            RLMSyncSession *session = [g_syncSessions objectForKey:realm.configuration.fileURL.path];
-            if (!session) {
-                if (NSURL *serverURL = realm.configuration.syncServerURL) {
-                    RLMSyncClient *client = [g_syncClients objectForKey:realm.configuration.syncUserToken];
-                    if (!client) {
-                        NSString *syncUserToken          = realm.configuration.syncUserToken;
-                        client = [[RLMSyncClient alloc] initWithUserToken:syncUserToken];
-                        [g_syncClients setObject:client forKey:realm.configuration.syncUserToken];
-                    }
-                    session = [[RLMSyncSession alloc] initWithClient:client
-                                                                path:realm.configuration.fileURL.path
-                                                           serverURL:serverURL];
-                    [g_syncSessions setObject:session forKey:realm.configuration.fileURL.path];
-                }
-            }
-            realm->_syncSession = session;
-
             try {
                 // set/align schema or perform migration if needed
                 RLMSchema *schema = [configuration.customSchema copy];
@@ -648,13 +507,6 @@ void RLMRealmTranslateException(NSError **error) {
 
 - (void)sendNotifications:(NSString *)notification {
     NSAssert(!_realm->config().read_only, @"Read-only realms do not have notifications");
-
-    if ([notification isEqualToString:RLMRealmDidChangeNotification]) {
-        if (_syncSession) {
-            auto version = LangBindHelper::get_version_of_latest_snapshot(_realm->get_shared_group());
-            [_syncSession nonsyncTransactNotifyWithVersion:version];
-        }
-    }
 
     // call this realms notification blocks
     for (RLMRealmNotificationToken *token in [_notificationHandlers allObjects]) {
@@ -988,7 +840,7 @@ void RLMRealmTranslateException(NSError **error) {
 }
 
 + (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level {
-    g_syncLogEverything = level == RLMSyncLogLevelVerbose;
+    s_syncLogEverything = level == RLMSyncLogLevelVerbose;
 }
 
 @end
