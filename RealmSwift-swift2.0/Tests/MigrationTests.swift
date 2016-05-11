@@ -444,22 +444,19 @@ class MigrationTests: TestCase {
 
         var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
         autoreleasepool {
-            do {
-                let _ = try Realm(configuration: config)
-                XCTFail("Migration error should be occurred")
-            } catch {}
+            assertFails(.Fail) {
+                try Realm(configuration: config)
+            }
         }
 
         config.migrationBlock = { _, _ in
-            XCTFail("Migration block should not have been called")
+            XCTFail("Migration block should not be called")
         }
         config.deleteRealmIfMigrationNeeded = true
 
         autoreleasepool {
-            do {
+            assertSucceeds {
                 let _ = try Realm(configuration: config)
-            } catch {
-                XCTFail("Migration error was occurred")
             }
         }
     }
@@ -481,10 +478,9 @@ class MigrationTests: TestCase {
         class_replaceMethod(metaClass, "sharedSchema", imp, "@@:")
 
         autoreleasepool {
-            do {
-                let _ = try Realm()
-                XCTFail("Migration error should be occurred")
-            } catch {}
+            assertFails(.Fail) {
+                try Realm()
+            }
         }
 
         let migrationBlock: MigrationBlock = { _, _ in
@@ -494,10 +490,8 @@ class MigrationTests: TestCase {
                                          migrationBlock: migrationBlock,
                                          deleteRealmIfMigrationNeeded: true)
 
-        do {
+        assertSucceeds {
             let _ = try Realm(configuration: config)
-        } catch {
-            XCTFail("Migration error was occurred")
         }
 
         class_replaceMethod(metaClass, "sharedSchema", originalImp, "@@:")
