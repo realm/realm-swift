@@ -484,7 +484,7 @@ class MigrationTests: TestCase {
         }
 
         let migrationBlock: MigrationBlock = { _, _ in
-            XCTFail("Migration block should not have been called")
+            XCTFail("Migration block should not be called")
         }
         let config = Realm.Configuration(fileURL: defaultRealmURL(),
                                          migrationBlock: migrationBlock,
