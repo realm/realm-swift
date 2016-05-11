@@ -56,6 +56,34 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) {
                                      [NSException exceptionWithName:RLMExceptionName reason:@"Reason" userInfo:expectedUserInfo]));
 }
 
+- (void)testRLMExceptionWithPOSIXSystemException {
+    int code = ENOENT;
+    NSString *description = @"No such file or directory";
+
+    std::system_error exception(code, std::generic_category());
+    NSDictionary *expectedUserInfo = @{
+                                       NSLocalizedDescriptionKey : description,
+                                       @"Error Code" : @(code),
+                                       @"Category": [NSString stringWithUTF8String:std::generic_category().name()]
+                                       };
+    XCTAssertEqualObjects(RLMMakeError(exception),
+                          [NSError errorWithDomain:NSPOSIXErrorDomain code:code userInfo:expectedUserInfo]);
+}
+
+- (void)testRLMExceptionWithNonPOSIXSystemException {
+    int code = 999;
+    NSString *description = @"unspecified system_category error";
+
+    std::system_error exception(code, std::system_category());
+    NSDictionary *expectedUserInfo = @{
+                                       NSLocalizedDescriptionKey : description,
+                                       @"Error Code" : @(code),
+                                       @"Category": [NSString stringWithUTF8String:std::system_category().name()]
+                                       };
+    XCTAssertEqualObjects(RLMMakeError(exception),
+                          [NSError errorWithDomain:RLMUnknownSystemErrorDomain code:code userInfo:expectedUserInfo]);
+}
+
 - (void)testRLMMakeError {
     std::runtime_error exception("Reason");
     RLMError code = RLMErrorFail;

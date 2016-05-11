@@ -124,6 +124,9 @@ extern const uint64_t RLMNotVersioned;
 /** Error domain used in Realm. */
 extern NSString * const RLMErrorDomain;
 
+/** Error domain used for non-specific system errors. */
+extern NSString * const RLMUnknownSystemErrorDomain;
+
 /** Key for name of Realm exceptions. */
 extern NSString * const RLMExceptionName;
 
