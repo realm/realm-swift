@@ -444,7 +444,7 @@ class MigrationTests: TestCase {
 
         var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
         autoreleasepool {
-            assertFails(.Fail) {
+            assertFails(.SchemaMismatch) {
                 try Realm(configuration: config)
             }
         }
@@ -487,7 +487,7 @@ class MigrationTests: TestCase {
         class_replaceMethod(metaClass, "sharedSchema", imp, "@@:")
 
         autoreleasepool {
-            assertFails(.Fail) {
+            assertFails(.SchemaMismatch) {
                 try Realm()
             }
         }

@@ -272,6 +272,9 @@ void RLMRealmTranslateException(NSError **error) {
     catch (AddressSpaceExhausted const &ex) {
         RLMSetErrorOrThrow(RLMMakeError(RLMErrorAddressSpaceExhausted, ex), error);
     }
+    catch (SchemaMismatchException const& ex) {
+        RLMSetErrorOrThrow(RLMMakeError(RLMErrorSchemaMismatch, ex), error);
+    }
     catch (std::system_error const& ex) {
         RLMSetErrorOrThrow(RLMMakeError(ex), error);
     }
@@ -360,17 +363,17 @@ void RLMRealmTranslateException(NSError **error) {
         try {
             realm->_realm = [self openSharedRealm:config error:error];
         }
-        catch (SchemaMismatchException const& exception) {
+        catch (SchemaMismatchException const& ex) {
             if (configuration.deleteRealmIfMigrationNeeded) {
                 BOOL success = [[NSFileManager defaultManager] removeItemAtURL:configuration.fileURL error:nil];
                 if (success) {
                     realm->_realm = [self openSharedRealm:config error:error];
                 } else {
-                    RLMSetErrorOrThrow(RLMMakeError(RLMException(exception)), error);
+                    RLMSetErrorOrThrow(RLMMakeError(RLMErrorSchemaMismatch, ex), error);
                     return nil;
                 }
             } else {
-                RLMSetErrorOrThrow(RLMMakeError(RLMException(exception)), error);
+                RLMSetErrorOrThrow(RLMMakeError(RLMErrorSchemaMismatch, ex), error);
                 return nil;
             }
         }
@@ -402,7 +405,7 @@ void RLMRealmTranslateException(NSError **error) {
                 }
 
                 RLMRealmSetSchemaAndAlign(realm, schema);
-            } catch (SchemaMismatchException const& exception) {
+            } catch (SchemaMismatchException const& ex) {
                 if (configuration.deleteRealmIfMigrationNeeded) {
                     BOOL success = [[NSFileManager defaultManager] removeItemAtURL:configuration.fileURL error:nil];
                     if (success) {
@@ -412,7 +415,7 @@ void RLMRealmTranslateException(NSError **error) {
                     }
                 }
 
-                RLMSetErrorOrThrow(RLMMakeError(RLMException(exception)), error);
+                RLMSetErrorOrThrow(RLMMakeError(RLMErrorSchemaMismatch, ex), error);
                 return nil;
             } catch (std::exception const& exception) {
                 RLMSetErrorOrThrow(RLMMakeError(RLMException(exception)), error);
