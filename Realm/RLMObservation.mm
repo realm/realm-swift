@@ -459,15 +459,17 @@ static NSIndexSet *convert(realm::IndexSet const& in, NSMutableIndexSet *out) {
 
 void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& observed,
                    std::vector<void *> const& invalidated) {
-    NSMutableIndexSet *indexes = [NSMutableIndexSet new];
     for (auto info : invalidated) {
         static_cast<RLMObservationInfo *>(info)->willChange(RLMInvalidatedKey);
     }
-    for (auto const& o : observed) {
-        forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
-            info->willChange([info->getObjectSchema().properties[i] name],
-                             convert(change.kind), convert(change.indices, indexes));
-        });
+    if (!observed.empty()) {
+        NSMutableIndexSet *indexes = [NSMutableIndexSet new];
+        for (auto const& o : observed) {
+            forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
+                info->willChange([info->getObjectSchema().properties[i] name],
+                                 convert(change.kind), convert(change.indices, indexes));
+            });
+        }
     }
     for (auto info : invalidated) {
         static_cast<RLMObservationInfo *>(info)->prepareForInvalidation();
@@ -476,13 +478,15 @@ void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& obse
 
 void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& observed,
                   std::vector<void *> const& invalidated) {
-    // Loop in reverse order to avoid O(N^2) behavior in Foundation
-    NSMutableIndexSet *indexes = [NSMutableIndexSet new];
-    for (auto const& o : reverse(observed)) {
-        forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
-            info->didChange([info->getObjectSchema().properties[i] name],
-                            convert(change.kind), convert(change.indices, indexes));
-        });
+    if (!observed.empty()) {
+        // Loop in reverse order to avoid O(N^2) behavior in Foundation
+        NSMutableIndexSet *indexes = [NSMutableIndexSet new];
+        for (auto const& o : reverse(observed)) {
+            forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
+                info->didChange([info->getObjectSchema().properties[i] name],
+                                convert(change.kind), convert(change.indices, indexes));
+            });
+        }
     }
     for (auto const& info : reverse(invalidated)) {
         static_cast<RLMObservationInfo *>(info)->didChange(RLMInvalidatedKey);
