@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* `RLMLinkingObjects` properties declared in Swift subclasses of `RLMObject`
+  now work correctly.
 
 0.102.0 Release notes (2016-05-09)
 =============================================================

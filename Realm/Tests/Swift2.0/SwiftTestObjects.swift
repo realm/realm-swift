@@ -127,3 +127,17 @@ class SwiftPrimaryStringObject: RLMObject {
         return "stringCol"
     }
 }
+
+class SwiftLinkSourceObject: RLMObject {
+    dynamic var id = 0
+    dynamic var link: SwiftLinkTargetObject?
+}
+
+class SwiftLinkTargetObject: RLMObject {
+    dynamic var id = 0
+    dynamic var backlinks: RLMLinkingObjects?
+
+    override class func linkingObjectsProperties() -> [String : RLMPropertyDescriptor] {
+        return ["backlinks": RLMPropertyDescriptor(withClass: SwiftLinkSourceObject.self, propertyName: "link")]
+    }
+}

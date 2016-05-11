@@ -321,6 +321,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
 - (instancetype)initSwiftPropertyWithName:(NSString *)name
                                   indexed:(BOOL)indexed
+                   linkPropertyDescriptor:(RLMPropertyDescriptor *)linkPropertyDescriptor
                                  property:(objc_property_t)property
                                  instance:(RLMObject *)obj {
     self = [super init];
@@ -330,6 +331,11 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
     _name = name;
     _indexed = indexed;
+
+    if (linkPropertyDescriptor) {
+        _objectClassName = [linkPropertyDescriptor.objectClass className];
+        _linkOriginPropertyName = linkPropertyDescriptor.propertyName;
+    }
 
     if ([self parseObjcProperty:property]) {
         return nil;
@@ -412,7 +418,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _indexed = indexed;
 
     if (linkPropertyDescriptor) {
-        _objectClassName = NSStringFromClass(linkPropertyDescriptor.objectClass);
+        _objectClassName = [linkPropertyDescriptor.objectClass className];
         _linkOriginPropertyName = linkPropertyDescriptor.propertyName;
     }
 
