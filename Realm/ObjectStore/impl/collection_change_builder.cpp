@@ -251,11 +251,13 @@ void CollectionChangeBuilder::move_over(size_t row_ndx, size_t last_row, bool tr
     REALM_ASSERT(modifications.empty() || prev(modifications.end())->second - 1 <= last_row);
 
     if (row_ndx == last_row) {
-        auto shifted_from = insertions.erase_or_unshift(row_ndx);
-        if (shifted_from != IndexSet::npos)
-            deletions.add_shifted(shifted_from);
+        if (track_moves) {
+            auto shifted_from = insertions.erase_or_unshift(row_ndx);
+            if (shifted_from != IndexSet::npos)
+                deletions.add_shifted(shifted_from);
+            m_move_mapping.erase(row_ndx);
+        }
         modifications.remove(row_ndx);
-        m_move_mapping.erase(row_ndx);
         return;
     }
 

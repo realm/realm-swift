@@ -13,6 +13,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * `RLMLinkingObjects` properties declared in Swift subclasses of `RLMObject`
   now work correctly.
+* Fix an assertion failure when deleting all objects of a type, inserting more
+  objects, and then deleting some of the newly inserted objects within a single
+  write transaction when there is an active notification block for a different
+  object type which links to the objects being deleted.
 
 0.102.0 Release notes (2016-05-09)
 =============================================================
