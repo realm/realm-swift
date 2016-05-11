@@ -199,7 +199,7 @@ RLM_ARRAY_TYPE(MigrationObject);
         XCTFail(@"Migration block should not have been called");
     };
 
-    XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
+    RLMAssertThrowsWithCodeMatching([RLMRealm realmWithConfiguration:config error:nil], RLMErrorSchemaMismatch);
 
     __block bool migrationCalled = false;
     config.schemaVersion = 1;
