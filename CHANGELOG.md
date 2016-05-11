@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* `RLMLinkingObjects` properties declared in Swift subclasses of `RLMObject`
+  now work correctly.
+
 0.102.0 Release notes (2016-05-09)
 =============================================================
 

@@ -98,6 +98,26 @@ class SwiftLinkTests: RLMTestCase {
         XCTAssertEqual(SwiftDogObject.allObjectsInRealm(realm).count, UInt(0), "Expecting 0 dogs")
     }
 
+    func testLinkingObjects() {
+        let realm = realmWithTestPath()
+
+        let target = SwiftLinkTargetObject()
+        target.id = 0
+
+        let source = SwiftLinkSourceObject()
+        source.id = 1234
+        source.link = target
+
+        XCTAssertEqual(0, target.backlinks!.count)
+
+        realm.beginWriteTransaction()
+        realm.addObject(source)
+        try! realm.commitWriteTransaction()
+
+        XCTAssertEqual(1, target.backlinks!.count)
+        XCTAssertEqual(1234, (target.backlinks!.firstObject() as! SwiftLinkSourceObject).id)
+    }
+
 //    FIXME - disabled until we fix commit log issue which break transacions when leaking realm objects
 //    func testCircularLinks() {
 //        let realm = realmWithTestPath()
