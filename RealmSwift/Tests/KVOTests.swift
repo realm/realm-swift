@@ -78,7 +78,7 @@ class KVOTests: TestCase {
     }
 
     func observeChange(obj: NSObject, _ key: String, _ old: AnyObject, _ new: AnyObject,
-                       fileName: TestLocationString = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
+                       fileName: TestLocationString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [.Old, .New], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
@@ -99,7 +99,7 @@ class KVOTests: TestCase {
     }
 
     func observeListChange(obj: NSObject, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet,
-                           fileName: TestLocationString = __FILE__, lineNumber: UInt = __LINE__, _ block: () -> Void) {
+                           fileName: TestLocationString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [.Old, .New], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)

@@ -6,8 +6,6 @@ Usage: sh $0 command [argument]
 
 command:
   test-all:                        tests all projects in this repo.
-  test-xcode6:                     tests all Xcode 6 projects in this repo.
-  test-xcode7:                     tests all Xcode 7 projects in this repo.
 
   test-ios-objc-static:            tests iOS Objective-C static example.
   test-ios-objc-dynamic:           tests iOS Objective-C dynamic example.
@@ -95,23 +93,10 @@ xctest() {
     xcodebuild $CMD -scheme $NAME clean $ACTION $DESTINATION
 }
 
-source "$(dirname "$0")/../../scripts/swift-version.sh"
-
 case "$COMMAND" in
     "test-all")
-        ./build.sh test-xcode6 || exit 1
-        ./build.sh test-xcode7 || exit 1
-        ;;
-
-    "test-xcode6")
-        for target in ios-objc-static ios-objc-dynamic ios-objc-cocoapods ios-objc-cocoapods-dynamic ios-objc-carthage osx-objc-dynamic osx-objc-cocoapods osx-objc-carthage; do
-            REALM_SWIFT_VERSION=1.2 ./build.sh test-$target || exit 1
-        done
-        ;;
-
-    "test-xcode7")
         for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage watchos-objc-dynamic test-watchos-objc-cocoapods test-watchos-objc-carthage watchos-swift-dynamic test-watchos-swift-cocoapods test-watchos-swift-carthage; do
-            REALM_SWIFT_VERSION=2.2 ./build.sh test-$target || exit 1
+            ./build.sh test-$target || exit 1
         done
         ;;
 
@@ -136,15 +121,15 @@ case "$COMMAND" in
         ;;
 
     "test-ios-swift-dynamic")
-        xctest ios swift-$REALM_SWIFT_VERSION DynamicExample
+        xctest ios swift DynamicExample
         ;;
 
     "test-ios-swift-cocoapods")
-        xctest ios swift-$REALM_SWIFT_VERSION CocoaPodsExample
+        xctest ios swift CocoaPodsExample
         ;;
 
     "test-ios-swift-carthage")
-        xctest ios swift-$REALM_SWIFT_VERSION CarthageExample
+        xctest ios swift CarthageExample
         ;;
 
     "test-osx-objc-dynamic")
@@ -160,11 +145,11 @@ case "$COMMAND" in
         ;;
 
     "test-osx-swift-dynamic")
-        xctest osx swift-$REALM_SWIFT_VERSION DynamicExample
+        xctest osx swift DynamicExample
         ;;
 
     "test-osx-swift-carthage")
-        xctest osx swift-$REALM_SWIFT_VERSION CarthageExample
+        xctest osx swift CarthageExample
         ;;
 
     "test-watchos-objc-dynamic")
@@ -180,15 +165,15 @@ case "$COMMAND" in
         ;;
 
     "test-watchos-swift-dynamic")
-        xctest watchos swift-$REALM_SWIFT_VERSION DynamicExample
+        xctest watchos swift DynamicExample
         ;;
 
     "test-watchos-swift-cocoapods")
-        xctest watchos swift-$REALM_SWIFT_VERSION CocoaPodsExample
+        xctest watchos swift CocoaPodsExample
         ;;
 
     "test-watchos-swift-carthage")
-        xctest watchos swift-$REALM_SWIFT_VERSION CarthageExample
+        xctest watchos swift CarthageExample
         ;;
 
     *)

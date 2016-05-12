@@ -3,7 +3,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* Support for Xcode 6.x & Swift prior to 2.2 has been completely removed.
 
 ### Enhancements
 

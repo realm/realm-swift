@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTestObjects.h"
-#import "RLMMultiProcessTestCase.h"
-#import "TestUtils.h"
-
+extension RLMTestCase {
+    func assertThrowsWithReasonMatching<T>(@autoclosure(escaping) block: () -> T, _ regexString: String,
+        _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+            RLMAssertThrowsWithReasonMatchingSwift(self, { _ = block() } as dispatch_block_t, regexString, message, fileName, lineNumber)
+    }
+}
