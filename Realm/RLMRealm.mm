@@ -40,7 +40,6 @@
 #include <thread>
 
 #include "impl/realm_coordinator.hpp"
-
 #include "object_store.hpp"
 #include "schema.hpp"
 #include "shared_realm.hpp"
@@ -90,6 +89,7 @@ void RLMDisableSyncToDisk() {
     [_realm removeNotification:self];
 #pragma clang diagnostic pop
 }
+
 - (void)dealloc {
     if (_realm || _block) {
         NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "
@@ -826,6 +826,7 @@ void RLMRealmTranslateException(NSError **error) {
         _collectionEnumerators = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
     }
     [_collectionEnumerators addObject:enumerator];
+
 }
 
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator {

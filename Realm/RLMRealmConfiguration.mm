@@ -320,3 +320,4 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 }
 
 @end
+

@@ -631,7 +631,6 @@ public final class Realm {
     }
 
     // MARK: Internal
-    
     internal var rlmRealm: RLMRealm
 
     internal init(_ rlmRealm: RLMRealm) {
