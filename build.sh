@@ -186,12 +186,6 @@ clean_retrieve() {
   cp -R "$1" "$2"
 }
 
-move_to_clean_dir() {
-    rm -rf "$2"
-    mkdir -p "$2"
-    mv "$1" "$2"
-}
-
 shutdown_simulators() {
     # Shut down simulators until there's no booted ones left
     # Only do one at a time because devices sometimes show up multiple times
@@ -731,11 +725,7 @@ case "$COMMAND" in
 
     "examples-ios")
         sh build.sh prelaunch-simulator
-        if [[ -d "examples/ios/objc" ]]; then
-            workspace="examples/ios/objc/RealmExamples.xcworkspace"
-        else
-            workspace="examples/ios/xcode-7/objc/RealmExamples.xcworkspace"
-        fi
+        workspace="examples/ios/objc/RealmExamples.xcworkspace"
         pod install --project-directory="$workspace/.." --no-repo-update
         xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
@@ -952,9 +942,9 @@ case "$COMMAND" in
         sh build.sh prelaunch-simulator
         sh build.sh test-ios-static
         sh build.sh ios-static
-        move_to_clean_dir build/ios-static/Realm.framework xcode-7
+        cd build/ios-static
 
-        zip --symlinks -r build/ios-static/realm-framework-ios.zip xcode-7
+        zip --symlinks -r realm-framework-ios.zip Realm.framework
         ;;
 
     "package-ios-dynamic")
@@ -962,9 +952,9 @@ case "$COMMAND" in
 
         sh build.sh prelaunch-simulator
         sh build.sh ios-dynamic
-        move_to_clean_dir build/ios/Realm.framework xcode-7
+        cd build/ios
 
-        zip --symlinks -r build/ios/realm-dynamic-framework-ios.zip xcode-7
+        zip --symlinks -r realm-dynamic-framework-ios.zip Realm.framework
         ;;
 
     "package-osx")
