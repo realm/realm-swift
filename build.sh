@@ -342,7 +342,6 @@ case "$COMMAND" in
     # Core
     ######################################
     "download-core")
-        exit 0
         if [ "$REALM_CORE_VERSION" = "current" ]; then
             echo "Using version of core already in core/ directory"
             exit 0
