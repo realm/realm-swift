@@ -71,9 +71,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.08</real>
+					<real>0.44978</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>May 11, 2016, 2:03:24 PM</string>
+					<string>May 12, 2016, 2:43:11 PM</string>
 					<key>maxRegression</key>
 					<real>0.001</real>
 				</dict>
@@ -95,9 +95,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.15727</real>
+					<real>1.3791</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>May 11, 2016, 2:03:24 PM</string>
+					<string>May 12, 2016, 2:43:11 PM</string>
 					<key>maxRegression</key>
 					<real>0.001</real>
 				</dict>
@@ -107,9 +107,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.15089</real>
+					<real>1.4184</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>May 11, 2016, 2:03:24 PM</string>
+					<string>May 12, 2016, 2:43:11 PM</string>
 					<key>maxRegression</key>
 					<real>0.001</real>
 				</dict>
@@ -119,9 +119,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.15311</real>
+					<real>1.3905</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>May 11, 2016, 2:03:24 PM</string>
+					<string>May 12, 2016, 2:43:11 PM</string>
 					<key>maxRegression</key>
 					<real>0.001</real>
 				</dict>
@@ -131,9 +131,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.16597</real>
+					<real>1.537</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>May 11, 2016, 2:03:24 PM</string>
+					<string>May 12, 2016, 2:43:11 PM</string>
 					<key>maxRegression</key>
 					<real>0.001</real>
 				</dict>
@@ -143,9 +143,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.084697</real>
+					<real>0.76781</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>May 11, 2016, 2:03:24 PM</string>
+					<string>May 12, 2016, 2:43:11 PM</string>
 					<key>maxRegression</key>
 					<real>0.001</real>
 				</dict>
@@ -155,9 +155,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.25125</real>
+					<real>1.9894</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>May 11, 2016, 2:03:24 PM</string>
+					<string>May 12, 2016, 2:43:11 PM</string>
 					<key>maxRegression</key>
 					<real>0.001</real>
 				</dict>
@@ -167,9 +167,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.033401</real>
+					<real>1.049</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>May 11, 2016, 2:03:24 PM</string>
+					<string>May 12, 2016, 2:43:11 PM</string>
 					<key>maxRegression</key>
 					<real>0.001</real>
 				</dict>
@@ -227,9 +227,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.058231</real>
+					<real>0.43999</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>May 11, 2016, 2:03:24 PM</string>
+					<string>May 12, 2016, 2:43:11 PM</string>
 					<key>maxRegression</key>
 					<real>0.001</real>
 				</dict>
@@ -282,14 +282,19 @@
 					<real>0.001</real>
 				</dict>
 			</dict>
+			<key>testRealmCreationUncached()</key>
+			<dict>
+				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
+				<dict/>
+			</dict>
 			<key>testSortingAllObjects()</key>
 			<dict>
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.039768</real>
+					<real>0.20726</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>May 11, 2016, 2:03:24 PM</string>
+					<string>May 12, 2016, 2:43:11 PM</string>
 					<key>maxRegression</key>
 					<real>0.001</real>
 				</dict>
