@@ -69,7 +69,7 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
                 m_notifier = std::make_unique<ExternalCommitHelper>(*this);
             }
             catch (std::system_error const& ex) {
-                throw RealmFileException(RealmFileException::Kind::AccessError, config.path, ex.code().message());
+                throw RealmFileException(RealmFileException::Kind::AccessError, config.path, ex.code().message(), "");
             }
         }
     }

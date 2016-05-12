@@ -415,6 +415,8 @@
     auto token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
         XCTAssertNil(results);
         XCTAssertNotNil(error);
+        // Validate error
+        XCTAssertEqualObjects(error.domain, RLMErrorDomain);
         XCTAssertEqual(error.code, RLMErrorFail);
         XCTAssert([error.localizedDescription rangeOfString:@"Too many open files"].location != NSNotFound);
         called = true;
@@ -436,6 +438,9 @@
     auto token2 = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
         XCTAssertNil(results);
         XCTAssertNotNil(error);
+        // Validate error
+        XCTAssertEqualObjects(error.domain, RLMErrorDomain);
+        XCTAssertEqual(error.code, RLMErrorFail);
         [exp2 fulfill];
     }];
     [realm beginWriteTransaction];

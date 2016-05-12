@@ -56,7 +56,7 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) {
                                      [NSException exceptionWithName:RLMExceptionName reason:@"Reason" userInfo:expectedUserInfo]));
 }
 
-- (void)testRLMExceptionWithPOSIXSystemException {
+- (void)testSystemExceptionWithPOSIXSystemException {
     int code = ENOENT;
     NSString *description = @"No such file or directory";
 
@@ -70,7 +70,7 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) {
                           [NSError errorWithDomain:NSPOSIXErrorDomain code:code userInfo:expectedUserInfo]);
 }
 
-- (void)testRLMExceptionWithNonPOSIXSystemException {
+- (void)testSystemExceptionWithNonPOSIXSystemException {
     int code = 999;
     NSString *description = @"unspecified system_category error";
 
@@ -82,6 +82,24 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) {
                                        };
     XCTAssertEqualObjects(RLMMakeError(exception),
                           [NSError errorWithDomain:RLMUnknownSystemErrorDomain code:code userInfo:expectedUserInfo]);
+}
+
+using namespace realm;
+#import "shared_realm.hpp"
+
+- (void)testRealmFileException {
+    RealmFileException exception(RealmFileException::Kind::NotFound,
+                                 "/some/path",
+                                 "don't do that to your files",
+                                 "lp0 on fire");
+    RLMError dummyCode = RLMErrorFail;
+    NSDictionary *expectedUserInfo = @{NSLocalizedDescriptionKey: @"don't do that to your files",
+                                       NSFilePathErrorKey: @"/some/path",
+                                       @"Error Code": @(dummyCode),
+                                       @"Underlying": @"lp0 on fire"};
+
+    XCTAssertEqualObjects(RLMMakeError(dummyCode, exception),
+                          [NSError errorWithDomain:RLMErrorDomain code:dummyCode userInfo:expectedUserInfo]);
 }
 
 - (void)testRLMMakeError {

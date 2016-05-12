@@ -236,16 +236,18 @@ NSError *RLMMakeError(RLMError code, const realm::util::File::AccessError& excep
 }
 
 NSError *RLMMakeError(RLMError code, const realm::RealmFileException& exception) {
+    NSString *underlying = @(exception.underlying().c_str());
     return [NSError errorWithDomain:RLMErrorDomain
                                code:code
                            userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
                                       NSFilePathErrorKey: @(exception.path().c_str()),
-                                      @"Error Code": @(code)}];
+                                      @"Error Code": @(code),
+                                      @"Underlying": underlying.length == 0 ? @"n/a" : underlying}];
 }
 
 NSError *RLMMakeError(std::system_error const& exception) {
     BOOL isGenericCategoryError = (exception.code().category() == std::generic_category());
-    NSString *category = [NSString stringWithUTF8String:exception.code().category().name()];
+    NSString *category = @(exception.code().category().name());
     NSString *errorDomain = isGenericCategoryError ? NSPOSIXErrorDomain : RLMUnknownSystemErrorDomain;
 
     return [NSError errorWithDomain:errorDomain
