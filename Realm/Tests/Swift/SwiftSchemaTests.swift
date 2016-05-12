@@ -75,7 +75,7 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
 
         let config = RLMRealmConfiguration.defaultConfiguration()
         config.objectClasses = [IgnoredLinkPropertyObject.self]
-        config.inMemoryIdentifier = __FUNCTION__
+        config.inMemoryIdentifier = #function
         let r = try! RLMRealm(configuration: config)
         try! r.transactionWithBlock {
             IgnoredLinkPropertyObject.createInRealm(r, withValue: [1])
@@ -112,7 +112,7 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
 
         let config = RLMRealmConfiguration.defaultConfiguration()
         config.objectClasses = [IgnoredLinkPropertyObject.self]
-        config.inMemoryIdentifier = __FUNCTION__
+        config.inMemoryIdentifier = #function
         let _ = try! RLMRealm(configuration: config)
         let r = try! RLMRealm(configuration: RLMRealmConfiguration.defaultConfiguration())
         try! r.transactionWithBlock {
