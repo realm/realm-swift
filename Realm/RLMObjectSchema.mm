@@ -42,6 +42,7 @@ using namespace realm;
     // table accessor optimization
     realm::TableRef _table;
     NSArray *_propertiesInDeclaredOrder;
+    NSArray *_swiftGenericProperties;
 }
 
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
@@ -333,6 +334,7 @@ using namespace realm;
     schema->_computedProperties = _computedProperties;
     schema->_allPropertiesByName = _allPropertiesByName;
     schema->_primaryKeyProperty = _primaryKeyProperty;
+    schema->_swiftGenericProperties = _swiftGenericProperties;
 
     // _table not copied as it's realm::Group-specific
     return schema;
@@ -444,6 +446,35 @@ using namespace realm;
         }];
     }
     return _propertiesInDeclaredOrder;
+}
+
+- (NSArray *)swiftGenericProperties {
+    if (_swiftGenericProperties) {
+        return _swiftGenericProperties;
+    }
+
+    // This check isn't semantically required, but avoiding accessing the local
+    // static helps perf in the obj-c case
+    if (!_isSwiftClass) {
+        return _swiftGenericProperties = @[];
+    }
+
+    // Check if it's a swift class using the obj-c API
+    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwiftObject");
+    if (![_accessorClass isSubclassOfClass:s_swiftObjectClass]) {
+        return _swiftGenericProperties = @[];
+    }
+
+    NSMutableArray *genericProperties = [NSMutableArray new];
+    for (RLMProperty *prop in _properties) {
+        if (prop->_swiftIvar || prop->_type == RLMPropertyTypeArray) {
+            [genericProperties addObject:prop];
+        }
+    }
+    // Currently all computed properties are Swift generics
+    [genericProperties addObjectsFromArray:_computedProperties];
+
+    return _swiftGenericProperties = genericProperties;
 }
 
 @end

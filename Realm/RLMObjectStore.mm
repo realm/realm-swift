@@ -92,32 +92,25 @@ static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *con
 }
 
 void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const object) {
-    if (!object || !object->_row || !object->_objectSchema.isSwiftClass) {
+    if (!object || !object->_row || !object->_objectSchema->_isSwiftClass) {
         return;
     }
 
-    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwiftObject");
-    if (![object isKindOfClass:s_swiftObjectClass]) {
-        return; // Is a Swift class using the obj-c API
-    }
-
-    for (RLMProperty *prop in object->_objectSchema.properties) {
-        if (prop.type == RLMPropertyTypeArray) {
+    for (RLMProperty *prop in object->_objectSchema.swiftGenericProperties) {
+        if (prop->_type == RLMPropertyTypeArray) {
             RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
                                                                     view:object->_row.get_linklist(prop.column)
                                                                    realm:object->_realm
                                                                      key:prop.name
                                                             parentSchema:object->_objectSchema];
             [RLMObjectUtilClass(YES) initializeListProperty:object property:prop array:array];
-        } else if (prop.swiftIvar) {
-            [RLMObjectUtilClass(YES) initializeOptionalProperty:object property:prop];
         }
-    }
-
-    for (RLMProperty *prop in object->_objectSchema.computedProperties) {
-        if (prop.type == RLMPropertyTypeLinkingObjects) {
+        else if (prop.type == RLMPropertyTypeLinkingObjects) {
             RLMResults *results = RLMDynamicGet(object, prop);
             [RLMObjectUtilClass(YES) initializeLinkingObjectsProperty:object property:prop results:results];
+        }
+        else {
+            [RLMObjectUtilClass(YES) initializeOptionalProperty:object property:prop];
         }
     }
 }
