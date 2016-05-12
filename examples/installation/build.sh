@@ -95,8 +95,6 @@ xctest() {
     xcodebuild $CMD -scheme $NAME clean $ACTION $DESTINATION
 }
 
-source "$(dirname "$0")/../../scripts/swift-version.sh"
-
 case "$COMMAND" in
     "test-all")
         ./build.sh test-xcode6 || exit 1
