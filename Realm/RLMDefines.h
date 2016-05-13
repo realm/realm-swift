@@ -20,10 +20,6 @@
 
 @class RLMObject;
 
-#ifndef __has_feature
-#define __has_feature(x) 0
-#endif
-
 #pragma mark - Generics
 
 #if __has_extension(objc_generics)
