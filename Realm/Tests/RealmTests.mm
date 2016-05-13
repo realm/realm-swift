@@ -148,6 +148,31 @@ extern "C" {
         XCTAssertNoThrow([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]);
         RLMAssertThrowsWithReasonMatching([self realmWithTestPath], exceptionReason);
     }
+
+    [self dispatchAsyncAndWait:^{
+        XCTAssertNoThrow([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]);
+        RLMAssertThrowsWithReasonMatching([self realmWithTestPath], exceptionReason);
+    }];
+}
+
+- (void)testCanOpenReadOnlyOnMulitpleThreadsAtOnce {
+    @autoreleasepool {
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withValue:@[@"a"]];
+        [realm commitWriteTransaction];
+    }
+
+    RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
+        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+    }];
+
+    // Verify that closing the other RLMRealm didn't manage to break anything
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 }
 
 - (void)testFilePermissionDenied {
