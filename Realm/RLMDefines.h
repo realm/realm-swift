@@ -39,37 +39,6 @@ typedef id RLMObjectType;
 typedef RLMObject * RLMObjectArgument;
 #endif
 
-#pragma mark - Nullability
-
-#if !__has_feature(nullability)
-#ifndef __nullable
-#define __nullable
-#endif
-#ifndef __nonnull
-#define __nonnull
-#endif
-#ifndef __null_unspecified
-#define __null_unspecified
-#endif
-#ifndef nullable
-#define nullable
-#endif
-#ifndef nonnull
-#define nonnull
-#endif
-#ifndef null_unspecified
-#define null_unspecified
-#endif
-#endif
-
-#if defined(NS_ASSUME_NONNULL_BEGIN) && defined(NS_ASSUME_NONNULL_END)
-#define RLM_ASSUME_NONNULL_BEGIN NS_ASSUME_NONNULL_BEGIN
-#define RLM_ASSUME_NONNULL_END NS_ASSUME_NONNULL_END
-#else
-#define RLM_ASSUME_NONNULL_BEGIN
-#define RLM_ASSUME_NONNULL_END
-#endif
-
 #pragma mark - Escaping
 
 #if __has_attribute(noescape)

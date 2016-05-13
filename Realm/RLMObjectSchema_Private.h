@@ -19,7 +19,7 @@
 #import <Realm/RLMDefines.h>
 #import <Realm/RLMObjectSchema.h>
 
-RLM_ASSUME_NONNULL_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 @class RLMRealm;
 
@@ -72,4 +72,4 @@ RLM_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties;
 @end
 
-RLM_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END

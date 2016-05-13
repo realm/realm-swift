@@ -21,7 +21,7 @@
 #import <Realm/RLMCollection.h>
 #import <Realm/RLMDefines.h>
 
-RLM_ASSUME_NONNULL_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObject, RLMRealm, RLMResults RLM_GENERIC_COLLECTION, RLMNotificationToken;
 
@@ -369,4 +369,4 @@ RLM_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 @end
 
-RLM_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END

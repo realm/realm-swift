@@ -20,7 +20,7 @@
 #import <Realm/RLMCollection.h>
 #import <Realm/RLMDefines.h>
 
-RLM_ASSUME_NONNULL_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObject, RLMRealm, RLMNotificationToken;
 
@@ -313,4 +313,4 @@ RLM_ASSUME_NONNULL_BEGIN
 @interface RLMLinkingObjects RLM_GENERIC_COLLECTION : RLMResults
 @end
 
-RLM_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END

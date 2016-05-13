@@ -20,7 +20,7 @@
 
 #import <Realm/RLMObjectBase.h>
 
-RLM_ASSUME_NONNULL_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 @class RLMPropertyDescriptor;
 @class RLMRealm;
@@ -427,4 +427,4 @@ RLM_ASSUME_NONNULL_BEGIN
 @protocol RLM_OBJECT_SUBCLASS <NSObject>   \
 @end
 
-RLM_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END

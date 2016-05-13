@@ -18,7 +18,7 @@
 
 #import <Realm/RLMDefines.h>
 
-RLM_ASSUME_NONNULL_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 @class RLMRealm, RLMResults, RLMObject, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange;
 
@@ -310,4 +310,4 @@ RLM_ASSUME_NONNULL_BEGIN
 - (NSArray RLM_GENERIC(NSIndexPath *)*)modificationsInSection:(NSUInteger)section;
 @end
 
-RLM_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END
