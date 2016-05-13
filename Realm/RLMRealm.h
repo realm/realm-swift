@@ -178,7 +178,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  @warning This method can only be called during a write transaction.
  */
-- (void)commitWriteTransaction RLM_SWIFT_UNAVAILABLE("");
+- (void)commitWriteTransaction NS_SWIFT_UNAVAILABLE("");
 
 /**
  Commits all write operations in the current write transaction, and ends the
@@ -224,7 +224,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Helper to perform a block within a transaction.
  */
-- (void)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block RLM_SWIFT_UNAVAILABLE("");
+- (void)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block NS_SWIFT_UNAVAILABLE("");
 
 /**
  Performs actions contained within the given block inside a write transaction.

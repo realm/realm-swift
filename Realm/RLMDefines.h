@@ -38,11 +38,3 @@
 typedef id RLMObjectType;
 typedef RLMObject * RLMObjectArgument;
 #endif
-
-#pragma mark - Swift Availability
-
-#if defined(NS_SWIFT_UNAVAILABLE)
-#  define RLM_SWIFT_UNAVAILABLE(msg) NS_SWIFT_UNAVAILABLE(msg)
-#else
-#  define RLM_SWIFT_UNAVAILABLE(msg)
-#endif
