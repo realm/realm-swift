@@ -18,7 +18,6 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
-#import <Realm/RLMDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

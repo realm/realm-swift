@@ -19,7 +19,6 @@ Pod::Spec.new do |s|
   public_header_files       = 'include/**/RLMArray.h',
                               'include/**/RLMCollection.h',
                               'include/**/RLMConstants.h',
-                              'include/**/RLMDefines.h',
                               'include/**/RLMListBase.h',
                               'include/**/RLMMigration.h',
                               'include/**/RLMObject.h',

@@ -18,7 +18,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Realm/RLMDefines.h>
 
 @class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMProperty;
 

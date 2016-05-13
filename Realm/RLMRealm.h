@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMDefines.h>
 
 @class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 

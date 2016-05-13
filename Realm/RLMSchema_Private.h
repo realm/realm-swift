@@ -21,7 +21,6 @@ extern "C" {
 #endif
 
 #import <Realm/RLMSchema.h>
-#import <Realm/RLMDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

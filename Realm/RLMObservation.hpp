@@ -20,7 +20,6 @@
 
 #import "binding_context.hpp"
 
-#import <Realm/RLMDefines.h>
 
 #import <realm/link_view.hpp> // required by row.hpp
 #import <realm/row.hpp>
