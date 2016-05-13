@@ -62,8 +62,12 @@
 // Used by some Swift property types, such as LinkingObjects, to avoid retain cycles
 // with their containing object.
 @interface RLMWeakObjectHandle : NSObject
+
 - (instancetype)initWithObject:(RLMObjectBase *)object;
+
+// Consumes the row, so can only usefully be called once.
 @property (nonatomic, readonly) RLMObjectBase *object;
+
 @end
 
 //

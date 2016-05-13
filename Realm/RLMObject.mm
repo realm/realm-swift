@@ -242,7 +242,7 @@
 
 - (RLMObjectBase *)object {
     RLMObjectBase *object = [[_objectClass alloc] initWithRealm:_realm schema:_objectSchema];
-    object->_row = _row;
+    object->_row = std::move(_row);
     return object;
 }
 
