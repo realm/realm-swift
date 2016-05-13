@@ -21,6 +21,37 @@
 
 #pragma mark - Test Objects
 
+@class LinkChain2, LinkChain3;
+
+@interface LinkChain1 : RLMObject
+@property int value;
+@property LinkChain2 *next;
+@end
+
+@interface LinkChain2 : RLMObject
+@property LinkChain3 *next;
+@property (readonly) RLMLinkingObjects *prev;
+@end
+
+@interface LinkChain3 : RLMObject
+@property (readonly) RLMLinkingObjects *prev;
+@end
+
+@implementation LinkChain1
+@end
+
+@implementation LinkChain2
++ (NSDictionary *)linkingObjectsProperties {
+    return @{@"prev": [RLMPropertyDescriptor descriptorWithClass:LinkChain1.class propertyName:@"next"]};
+}
+@end
+
+@implementation LinkChain3
++ (NSDictionary *)linkingObjectsProperties {
+    return @{@"prev": [RLMPropertyDescriptor descriptorWithClass:LinkChain2.class propertyName:@"next"]};
+}
+@end
+
 #pragma mark NonRealmEmployeeObject
 
 @interface NonRealmEmployeeObject : NSObject
@@ -1289,6 +1320,27 @@
     XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY data.circles = '2'"]);
     XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"circles.data = '2'"]);
     XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"NONE data.circles = '2'"]);
+}
+
+- (void)testMultiLevelBackLinkQuery
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    LinkChain1 *root1 = [LinkChain1 createInRealm:realm withValue:@{@"value": @1, @"next": @[@[]]}];
+    LinkChain1 *root2 = [LinkChain1 createInRealm:realm withValue:@{@"value": @2, @"next": @[@[]]}];
+    [realm commitWriteTransaction];
+
+    RLMResults *results = [LinkChain3 objectsInRealm:realm where:@"ANY prev.prev.value = 1"];
+    XCTAssertEqual(1U, results.count);
+    XCTAssertTrue([root1.next.next isEqualToObject:results.firstObject]);
+
+    results = [LinkChain3 objectsInRealm:realm where:@"ANY prev.prev.value = 2"];
+    XCTAssertEqual(1U, results.count);
+    XCTAssertTrue([root2.next.next isEqualToObject:results.firstObject]);
+
+    results = [LinkChain3 objectsInRealm:realm where:@"ANY prev.prev.value = 3"];
+    XCTAssertEqual(0U, results.count);
 }
 
 - (void)testQueryWithObjects
