@@ -39,14 +39,6 @@ typedef id RLMObjectType;
 typedef RLMObject * RLMObjectArgument;
 #endif
 
-#pragma mark - Escaping
-
-#if __has_attribute(noescape)
-#  define RLM_NOESCAPE __attribute__((noescape))
-#else
-#  define RLM_NOESCAPE
-#endif
-
 #pragma mark - Unused Result
 
 #if __has_attribute(warn_unused_result)
