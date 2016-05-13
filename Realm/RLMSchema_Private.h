@@ -39,9 +39,9 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return An `RLMSchema` containing only the given classes.
  */
-+ (instancetype)schemaWithObjectClasses:(NSArray RLM_GENERIC(Class) *)classes;
++ (instancetype)schemaWithObjectClasses:(NSArray<Class> *)classes;
 
-@property (nonatomic, readwrite, copy) NSArray RLM_GENERIC(RLMObjectSchema *) *objectSchema;
+@property (nonatomic, readwrite, copy) NSArray<RLMObjectSchema *> *objectSchema;
 
 // schema based on runtime objects
 + (instancetype)sharedSchema;

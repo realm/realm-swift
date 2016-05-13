@@ -145,7 +145,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return    An RLMResults sorted by the specified properties.
  */
-- (RLMResults *)sortedResultsUsingDescriptors:(NSArray RLM_GENERIC(RLMSortDescriptor *) *)properties;
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties;
 
 /// :nodoc:
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
@@ -288,26 +288,26 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMCollectionChange : NSObject
 /// The indices of objects in the previous version of the collection which have
 /// been removed from this one.
-@property (nonatomic, readonly) NSArray RLM_GENERIC(NSNumber *) *deletions;
+@property (nonatomic, readonly) NSArray<NSNumber *> *deletions;
 
 /// The indices in the new version of the collection which were newly inserted.
-@property (nonatomic, readonly) NSArray RLM_GENERIC(NSNumber *) *insertions;
+@property (nonatomic, readonly) NSArray<NSNumber *> *insertions;
 
 /// The indices in the new version of the collection which were modified. For
 /// RLMResults, this means that one or more of the properties of the object at
 /// that index were modified (or an object linked to by that object was
 /// modified). For RLMArray, the array itself being modified to contain a
 /// different object at that index will also be reported as a modification.
-@property (nonatomic, readonly) NSArray RLM_GENERIC(NSNumber *) *modifications;
+@property (nonatomic, readonly) NSArray<NSNumber *> *modifications;
 
 /// Returns index paths of the deletion indices in the given section.
-- (NSArray RLM_GENERIC(NSIndexPath *)*)deletionsInSection:(NSUInteger)section;
+- (NSArray<NSIndexPath *> *)deletionsInSection:(NSUInteger)section;
 
 /// Returns index paths of the insertion indices in the given section.
-- (NSArray RLM_GENERIC(NSIndexPath *)*)insertionsInSection:(NSUInteger)section;
+- (NSArray<NSIndexPath *> *)insertionsInSection:(NSUInteger)section;
 
 /// Returns index paths of the modification indices in the given section.
-- (NSArray RLM_GENERIC(NSIndexPath *)*)modificationsInSection:(NSUInteger)section;
+- (NSArray<NSIndexPath *> *)modificationsInSection:(NSUInteger)section;
 @end
 
 NS_ASSUME_NONNULL_END

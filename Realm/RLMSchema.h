@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @see RLMObjectSchema
  */
-@property (nonatomic, readonly, copy) NSArray RLM_GENERIC(RLMObjectSchema *) *objectSchema;
+@property (nonatomic, readonly, copy) NSArray<RLMObjectSchema *> *objectSchema;
 
 #pragma mark - Methods
 

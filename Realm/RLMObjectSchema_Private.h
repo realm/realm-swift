@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 // writable redecleration
-@property (nonatomic, readwrite, copy) NSArray RLM_GENERIC(RLMProperty *) *properties;
+@property (nonatomic, readwrite, copy) NSArray<RLMProperty *> *properties;
 @property (nonatomic, readwrite, assign) bool isSwiftClass;
 
 // class used for this object schema
@@ -40,9 +40,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readwrite, nullable) RLMProperty *primaryKeyProperty;
 
-@property (nonatomic, readonly) NSArray RLM_GENERIC(RLMProperty *) *propertiesInDeclaredOrder;
-@property (nonatomic, copy) NSArray RLM_GENERIC(RLMProperty *) *computedProperties;
-@property (nonatomic, readonly) NSArray RLM_GENERIC(RLMProperty *) *swiftGenericProperties;
+@property (nonatomic, readonly) NSArray<RLMProperty *> *propertiesInDeclaredOrder;
+@property (nonatomic, copy) NSArray<RLMProperty *> *computedProperties;
+@property (nonatomic, readonly) NSArray<RLMProperty *> *swiftGenericProperties;
 
 // The Realm retains its object schemas, so they need to not retain the Realm
 @property (nonatomic, unsafe_unretained, nullable) RLMRealm *realm;
