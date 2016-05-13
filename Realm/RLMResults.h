@@ -106,7 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param object  An object (of the same type as returned from the objectClassName selector).
  */
-- (NSUInteger)indexOfObject:(RLMObjectArgument)object;
+- (NSUInteger)indexOfObject:(RLMObjectType)object;
 
 /**
  Gets the index of the first object matching the predicate.

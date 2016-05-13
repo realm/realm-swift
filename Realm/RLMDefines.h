@@ -17,14 +17,3 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-
-@class RLMObject;
-
-#pragma mark - Generics
-
-#if __has_extension(objc_generics)
-#define RLMObjectArgument RLMObjectType
-#else
-typedef id RLMObjectType;
-typedef RLMObject * RLMObjectArgument;
-#endif

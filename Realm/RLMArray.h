@@ -123,7 +123,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param object  An RLMObject of the type contained in this RLMArray.
  */
-- (void)addObject:(RLMObjectArgument)object;
+- (void)addObject:(RLMObjectType)object;
 
 /**
  Adds an array of objects at the end of the array.
@@ -145,7 +145,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param anObject  An RLMObject of the type contained in this RLMArray.
  @param index   The array index at which the object is inserted.
  */
-- (void)insertObject:(RLMObjectArgument)anObject atIndex:(NSUInteger)index;
+- (void)insertObject:(RLMObjectType)anObject atIndex:(NSUInteger)index;
 
 /**
  Removes an object at a given index.
@@ -182,7 +182,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param index       The array index of the object to be replaced.
  @param anObject    An object (of the same type as returned from the objectClassName selector).
  */
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObjectArgument)anObject;
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObjectType)anObject;
 
 /**
  Moves the object at the given source index to the given destination index.
@@ -217,7 +217,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param object  An object (of the same type as returned from the objectClassName selector).
  */
-- (NSUInteger)indexOfObject:(RLMObjectArgument)object;
+- (NSUInteger)indexOfObject:(RLMObjectType)object;
 
 /**
  Gets the index of the first object matching the predicate.
