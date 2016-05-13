@@ -409,6 +409,8 @@ void RLMRealmTranslateException(NSError **error) {
             }
         }
         else {
+            beganReadTransaction = !realm->_realm->is_in_read_transaction();
+
             try {
                 // set/align schema or perform migration if needed
                 RLMSchema *schema = [configuration.customSchema copy];
