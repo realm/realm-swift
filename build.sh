@@ -38,7 +38,7 @@ Usage: sh $0 command [argument]
 command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
-  set-core-bitcode-symlink: set core symlink to bitcode version for Xcode 7+ or non-bitcode version otherwise
+  set-core-bitcode-symlink: set core symlink to bitcode version
   build:                builds all iOS  and OS X frameworks
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
@@ -164,7 +164,7 @@ build_combined() {
     LIPO_OUTPUT="$out_path/$product_name/$module_name"
     xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
 
-    if [[ $REALM_SWIFT_VERSION != '1.2' && "$destination" != "" && "$config" == "Release" ]]; then
+    if [[ "$destination" != "" && "$config" == "Release" ]]; then
         sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
     fi
 }
@@ -373,15 +373,10 @@ case "$COMMAND" in
     "set-core-bitcode-symlink")
         cd core
         rm -f librealm-ios.a librealm-ios-dbg.a
-        if [ $REALM_SWIFT_VERSION = '1.2' ]; then
-            echo "Using core without bitcode"
-            ln -s librealm-ios-no-bitcode.a librealm-ios.a
-            ln -s librealm-ios-no-bitcode-dbg.a librealm-ios-dbg.a
-        else
-            echo "Using core with bitcode"
-            ln -s librealm-ios-bitcode.a librealm-ios.a
-            ln -s librealm-ios-bitcode-dbg.a librealm-ios-dbg.a
-        fi
+        # FIXME: Stop bundling core with & without bitcode
+        echo "Using core with bitcode"
+        ln -s librealm-ios-bitcode.a librealm-ios.a
+        ln -s librealm-ios-bitcode-dbg.a librealm-ios-dbg.a
         ;;
 
     ######################################
@@ -888,14 +883,8 @@ case "$COMMAND" in
     ######################################
     "cocoapods-setup")
         if [[ "$2" != "swift" ]]; then
-            sh build.sh download-core
-            if [[ "$REALM_SWIFT_VERSION" = "1.2" ]]; then
-                echo 'Installing for Xcode 6.'
-                mv core/librealm-ios-no-bitcode.a core/librealm-ios.a
-              else
-                echo 'Installing for Xcode 7+.'
-                mv core/librealm-ios-bitcode.a core/librealm-ios.a
-            fi
+          echo 'Installing for Xcode 7+.'
+          mv core/librealm-ios-bitcode.a core/librealm-ios.a
         fi
 
         # CocoaPods won't automatically preserve files referenced via symlinks
