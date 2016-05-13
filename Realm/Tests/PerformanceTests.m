@@ -629,16 +629,17 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         [self observeObject:obj keyPath:@"array"
                       until:^(id obj) { return [obj array].count >= count; }];
 
+        RLMArray *array = obj.array;
         [self startMeasuring];
         [realm beginWriteTransaction];
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
-            [obj.array addObject:so];
-            if (obj.array.count % factor == 0) {
+            [array addObject:so];
+            if (array.count % factor == 0) {
                 [realm commitWriteTransaction];
                 dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
                 [realm beginWriteTransaction];
             }
-            if (obj.array.count > count) {
+            if (array.count > count) {
                 break;
             }
         }
@@ -661,21 +662,22 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         [self observeObject:obj keyPath:@"array"
                       until:^(id obj) { return [obj array].count >= count; }];
 
+        RLMArray *array = obj.array;
         [self startMeasuring];
         [realm beginWriteTransaction];
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
-            NSUInteger index = obj.array.count;
-            if (obj.array.count > factor) {
+            NSUInteger index = array.count;
+            if (array.count > factor) {
                 index = index * 3 % factor;
             }
-            [obj.array insertObject:so atIndex:index];
+            [array insertObject:so atIndex:index];
 
-            if (obj.array.count % factor == 0) {
+            if (array.count % factor == 0) {
                 [realm commitWriteTransaction];
                 dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
                 [realm beginWriteTransaction];
             }
-            if (obj.array.count > count) {
+            if (array.count > count) {
                 break;
             }
         }

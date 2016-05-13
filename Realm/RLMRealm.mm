@@ -487,10 +487,21 @@ void RLMRealmTranslateException(NSError **error) {
 - (void)sendNotifications:(NSString *)notification {
     NSAssert(!_realm->config().read_only, @"Read-only realms do not have notifications");
 
+    NSUInteger count = _notificationHandlers.count;
+    if (count == 0) {
+        return;
+    }
     // call this realms notification blocks
-    for (RLMRealmNotificationToken *token in [_notificationHandlers allObjects]) {
-        if (token.block) {
-            token.block(notification, self);
+    if (count == 1) {
+        if (auto block = [_notificationHandlers.anyObject block]) {
+            block(notification, self);
+        }
+    }
+    else {
+        for (RLMRealmNotificationToken *token in _notificationHandlers.allObjects) {
+            if (auto block = token.block) {
+                block(notification, self);
+            }
         }
     }
 }
