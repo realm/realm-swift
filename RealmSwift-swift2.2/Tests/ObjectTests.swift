@@ -191,8 +191,8 @@ class ObjectTests: TestCase {
 
         let boolObject = SwiftBoolObject(value: [true])
         setter(object, boolObject, "objectCol")
-        XCTAssertEqual(getter(object, "objectCol") as! SwiftBoolObject, boolObject)
-        XCTAssertEqual((getter(object, "objectCol")! as! SwiftBoolObject).boolCol, true)
+        XCTAssertEqual(getter(object, "objectCol") as? SwiftBoolObject, boolObject)
+        XCTAssertEqual((getter(object, "objectCol") as! SwiftBoolObject).boolCol, true)
 
         let list = List<SwiftBoolObject>()
         list.append(boolObject)
