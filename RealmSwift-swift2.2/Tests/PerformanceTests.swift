@@ -16,8 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import XCTest
+import Darwin
+import Realm.Private
 import RealmSwift
+import XCTest
 
 private func createStringObjects(factor: Int) -> Realm {
     let realm = inMemoryRealm(factor.description)
@@ -36,6 +38,9 @@ private var largeRealm: Realm!
 
 private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
 
+private var fsyncPath: String!
+private var fsyncFd: Int32 = -1
+
 class SwiftPerformanceTests: TestCase {
     override class func defaultTestSuite() -> XCTestSuite {
 #if !DEBUG && os(iOS)
@@ -53,9 +58,21 @@ class SwiftPerformanceTests: TestCase {
             mediumRealm = createStringObjects(5)
             largeRealm = createStringObjects(50)
         }
+
+        fsyncPath = RLMRealmPathForFile("fsync")
+        let fm = NSFileManager.defaultManager()
+        try! fm.createDirectoryAtPath((fsyncPath as NSString).stringByDeletingLastPathComponent,
+                                      withIntermediateDirectories: true,
+                                      attributes: nil)
+        fsyncFd = open(fsyncPath, O_CREAT|O_RDWR, 0644)
+        if fsyncFd == -1 {
+            fatalError("failed to open fsync file \(fsyncPath): \(errno) \(String.fromCString(strerror(errno)))")
+        }
     }
 
     override class func tearDown() {
+        close(fsyncFd)
+        unlink(fsyncPath)
         smallRealm = nil
         mediumRealm = nil
         largeRealm = nil
@@ -67,24 +84,18 @@ class SwiftPerformanceTests: TestCase {
     }
 
     override func measureBlock(block: (() -> Void)) {
-        super.measureBlock {
-            autoreleasepool {
-                block()
-            }
-        }
-    }
-
-    override func measureMetrics(metrics: [String], automaticallyStartMeasuring: Bool, forBlock block: () -> Void) {
-        super.measureMetrics(metrics, automaticallyStartMeasuring: automaticallyStartMeasuring) {
-            autoreleasepool {
-                block()
-            }
+        inMeasureBlock {
+            self.startMeasuring()
+            block()
         }
     }
 
     func inMeasureBlock(block: () -> ()) {
         measureMetrics(self.dynamicType.defaultPerformanceMetrics(), automaticallyStartMeasuring: false) {
-            _ = block()
+            autoreleasepool {
+                _ = fcntl(fsyncFd, F_FULLFSYNC)
+                _ = block()
+            }
         }
     }
 
@@ -470,6 +481,7 @@ class SwiftPerformanceTests: TestCase {
             }
 
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
+            _ = fcntl(fsyncFd, F_FULLFSYNC)
 
             self.startMeasuring()
             try! realm.write { object.intCol += 1 }

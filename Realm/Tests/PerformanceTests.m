@@ -18,10 +18,13 @@
 
 #import "RLMTestCase.h"
 
+#if !DEBUG && TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
+
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.h"
 
-#if !DEBUG && TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
+#include <fcntl.h>
+#include <unistd.h>
 
 @interface PerformanceTests : RLMTestCase
 @property (nonatomic) dispatch_queue_t queue;
@@ -29,6 +32,9 @@
 @end
 
 static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
+
+static int s_fsyncFd;
+static NSString *s_fsyncPath;
 
 @implementation PerformanceTests
 
@@ -38,9 +44,19 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     s_smallRealm = [self createStringObjects:1];
     s_mediumRealm = [self createStringObjects:5];
     s_largeRealm = [self createStringObjects:50];
+
+    s_fsyncPath = RLMRealmPathForFile(@"fsync");
+    s_fsyncFd = open(s_fsyncPath.UTF8String, O_RDWR|O_CREAT, 0644);
+    if (s_fsyncFd == -1) {
+        NSLog(@"Failed to open fsync fd: %d %s", errno, strerror(errno));
+        abort();
+    }
 }
 
 + (void)tearDown {
+    close(s_fsyncFd);
+    unlink(s_fsyncPath.UTF8String);
+
     s_smallRealm = s_mediumRealm = s_largeRealm = nil;
     [RLMRealm resetRealmState];
     [super tearDown];
@@ -51,15 +67,18 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)measureBlock:(void (^)(void))block {
-    [super measureBlock:^{
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        fcntl(s_fsyncFd, F_FULLFSYNC);
+        [self startMeasuring];
         @autoreleasepool {
             block();
         }
     }];
 }
 
-- (void)measureMetrics:(NSArray *)metrics automaticallyStartMeasuring:(BOOL)automaticallyStartMeasuring forBlock:(void (^)(void))block {
-    [super measureMetrics:metrics automaticallyStartMeasuring:automaticallyStartMeasuring forBlock:^{
+- (void)measureBlockWithoutAutoStart:(void (^)(void))block {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        fcntl(s_fsyncFd, F_FULLFSYNC);
         @autoreleasepool {
             block();
         }
@@ -88,7 +107,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testInsertMultiple {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = self.realmWithTestPath;
         [self startMeasuring];
         [realm beginWriteTransaction];
@@ -256,7 +275,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testDeleteAll {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = [self getStringObjects:50];
 
         [self startMeasuring];
@@ -268,7 +287,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testQueryDeletion {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = [self getStringObjects:5];
 
         [self startMeasuring];
@@ -280,7 +299,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testManualDeletion {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = [self getStringObjects:5];
 
         NSMutableArray *objects = [NSMutableArray arrayWithCapacity:10000];
@@ -398,7 +417,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testCommitWriteTransaction {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = self.testRealm;
         [realm beginWriteTransaction];
         IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
@@ -415,7 +434,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testCommitWriteTransactionWithLocalNotification {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = self.testRealm;
         [realm beginWriteTransaction];
         IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
@@ -436,7 +455,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testCommitWriteTransactionWithCrossThreadNotification {
     const int stopValue = 500;
 
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = self.testRealm;
         [realm beginWriteTransaction];
         IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
@@ -475,7 +494,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testCommitWriteTransactionWithResultsNotification {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = [self getStringObjects:5];
         RLMResults *results = [StringObject allObjectsInRealm:realm];
         id token = [results addNotificationBlock:^(__unused RLMResults *results, __unused RLMCollectionChange *change, __unused NSError *error) {
@@ -494,7 +513,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testCommitWriteTransactionWithListNotification {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = [self getStringObjects:5];
         [realm beginWriteTransaction];
         ArrayPropertyObject *arrayObj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
@@ -518,7 +537,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testCrossThreadSyncLatency {
     const int stopValue = 500;
 
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = self.testRealm;
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
@@ -575,7 +594,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testArrayKVOIndexHandlingRemoveForward {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = [self getStringObjects:50];
         [realm beginWriteTransaction];
         ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
@@ -596,7 +615,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testArrayKVOIndexHandlingRemoveBackwards {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = [self getStringObjects:50];
         [realm beginWriteTransaction];
         ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
@@ -617,7 +636,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testArrayKVOIndexHandlingInsertCompact {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = [self getStringObjects:50];
         [realm beginWriteTransaction];
         ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
@@ -650,7 +669,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testArrayKVOIndexHandlingInsertSparse {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+    [self measureBlockWithoutAutoStart:^{
         RLMRealm *realm = [self getStringObjects:50];
         [realm beginWriteTransaction];
         ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
