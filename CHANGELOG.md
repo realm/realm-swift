@@ -18,6 +18,10 @@ x.x.x Release notes (yyyy-MM-dd)
   objects, and then deleting some of the newly inserted objects within a single
   write transaction when there is an active notification block for a different
   object type which links to the objects being deleted.
+* Fix crashes and/or incorrect results when querying over multiple levels of
+  `LinkingObjects` properties.
+* Fix opening read-only Realms on multiple threads at once.
+* Fix a `BadTransactLog` exception when storing dates before the unix epoch (1970-01-01).
 
 0.102.0 Release notes (2016-05-09)
 =============================================================
