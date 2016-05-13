@@ -345,7 +345,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray RLM_GENERIC_RETURN *__nullable array,
                                                          RLMCollectionChange *__nullable changes,
-                                                         NSError *__nullable error))block RLM_WARN_UNUSED_RESULT;
+                                                         NSError *__nullable error))block __attribute__((warn_unused_result));
 
 #pragma mark - Unavailable Methods
 

@@ -39,14 +39,6 @@ typedef id RLMObjectType;
 typedef RLMObject * RLMObjectArgument;
 #endif
 
-#pragma mark - Unused Result
-
-#if __has_attribute(warn_unused_result)
-#  define RLM_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
-#else
-#  define RLM_WARN_UNUSED_RESULT
-#endif
-
 #pragma mark - Swift Availability
 
 #if defined(NS_SWIFT_UNAVAILABLE)
