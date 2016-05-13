@@ -100,20 +100,14 @@ class SwiftPerformanceTests: TestCase {
     }
 
     private func copyRealmToTestPath(realm: Realm) -> Realm {
-        do {
-            try NSFileManager.defaultManager().removeItemAtURL(testRealmURL())
-        } catch let error as NSError {
-            XCTAssertTrue(error.domain == NSCocoaErrorDomain && error.code == 4)
-        } catch {
-            fatalError("Unexpected error: \(error)")
-        }
-
+        cleanUpTestDir()
         try! realm.writeCopyToURL(testRealmURL())
         return realmWithTestPath()
     }
 
     func testInsertMultiple() {
         inMeasureBlock {
+            self.cleanUpTestDir()
             let realm = self.realmWithTestPath()
             self.startMeasuring()
             try! realm.write {
@@ -123,13 +117,12 @@ class SwiftPerformanceTests: TestCase {
                     realm.add(obj)
                 }
             }
-            self.stopMeasuring()
-            self.tearDown()
         }
     }
 
     func testInsertSingleLiteral() {
         inMeasureBlock {
+            self.cleanUpTestDir()
             let realm = self.realmWithTestPath()
             self.startMeasuring()
             for _ in 0..<50 {
@@ -137,13 +130,12 @@ class SwiftPerformanceTests: TestCase {
                     _ = realm.create(SwiftStringObject.self, value: ["a"])
                 }
             }
-            self.stopMeasuring()
-            self.tearDown()
         }
     }
 
     func testInsertMultipleLiteral() {
         inMeasureBlock {
+            self.cleanUpTestDir()
             let realm = self.realmWithTestPath()
             self.startMeasuring()
             try! realm.write {
@@ -151,8 +143,6 @@ class SwiftPerformanceTests: TestCase {
                     realm.create(SwiftStringObject.self, value: ["a"])
                 }
             }
-            self.stopMeasuring()
-            self.tearDown()
         }
     }
 
@@ -235,8 +225,9 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testEnumerateAndMutateAll() {
-        let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        inMeasureBlock {
+            let realm = self.copyRealmToTestPath(largeRealm)
+            self.startMeasuring()
             try! realm.write {
                 for stringObject in realm.objects(SwiftStringObject) {
                     stringObject.stringCol = "c"
@@ -246,8 +237,9 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testEnumerateAndMutateQuery() {
-        let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        inMeasureBlock {
+            let realm = self.copyRealmToTestPath(largeRealm)
+            self.startMeasuring()
             try! realm.write {
                 for stringObject in realm.objects(SwiftStringObject).filter("stringCol != 'b'") {
                     stringObject.stringCol = "c"
@@ -263,7 +255,6 @@ class SwiftPerformanceTests: TestCase {
             try! realm.write {
                 realm.delete(realm.objects(SwiftStringObject))
             }
-            self.stopMeasuring()
         }
     }
 
@@ -274,7 +265,6 @@ class SwiftPerformanceTests: TestCase {
             try! realm.write {
                 realm.delete(realm.objects(SwiftStringObject).filter("stringCol = 'a' OR stringCol = 'b'"))
             }
-            self.stopMeasuring()
         }
     }
 
@@ -286,7 +276,6 @@ class SwiftPerformanceTests: TestCase {
             try! realm.write {
                 realm.delete(objects)
             }
-            self.stopMeasuring()
         }
     }
 
@@ -384,7 +373,6 @@ class SwiftPerformanceTests: TestCase {
             while object.intCol < 100 {
                 try! realm.write { object.intCol += 1 }
             }
-            self.stopMeasuring()
         }
     }
 
@@ -439,7 +427,6 @@ class SwiftPerformanceTests: TestCase {
                 try! realm.write { object.intCol += 1 }
             }
             dispatch_sync(queue) {}
-            self.stopMeasuring()
         }
     }
 

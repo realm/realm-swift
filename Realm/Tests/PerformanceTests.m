@@ -108,6 +108,7 @@ static NSString *s_fsyncPath;
 
 - (void)testInsertMultiple {
     [self measureBlockWithoutAutoStart:^{
+        [self deleteRealmFileAtURL:RLMTestRealmURL()];
         RLMRealm *realm = self.realmWithTestPath;
         [self startMeasuring];
         [realm beginWriteTransaction];
@@ -118,31 +119,34 @@ static NSString *s_fsyncPath;
         }
         [realm commitWriteTransaction];
         [self stopMeasuring];
-        [self tearDown];
     }];
 }
 
 - (void)testInsertSingleLiteral {
-    [self measureBlock:^{
+    [self measureBlockWithoutAutoStart:^{
+        [self deleteRealmFileAtURL:RLMTestRealmURL()];
         RLMRealm *realm = self.realmWithTestPath;
+        [self startMeasuring];
         for (int i = 0; i < 50; ++i) {
             [realm beginWriteTransaction];
             [StringObject createInRealm:realm withValue:@[@"a"]];
             [realm commitWriteTransaction];
         }
-        [self tearDown];
+        [self stopMeasuring];
     }];
 }
 
 - (void)testInsertMultipleLiteral {
-    [self measureBlock:^{
+    [self measureBlockWithoutAutoStart:^{
+        [self deleteRealmFileAtURL:RLMTestRealmURL()];
         RLMRealm *realm = self.realmWithTestPath;
+        [self startMeasuring];
         [realm beginWriteTransaction];
         for (int i = 0; i < 5000; ++i) {
             [StringObject createInRealm:realm withValue:@[@"a"]];
         }
         [realm commitWriteTransaction];
-        [self tearDown];
+        [self stopMeasuring];
     }];
 }
 
@@ -240,9 +244,9 @@ static NSString *s_fsyncPath;
 }
 
 - (void)testEnumerateAndMutateAll {
-    RLMRealm *realm = [self getStringObjects:5];
-
-    [self measureBlock:^{
+    [self measureBlockWithoutAutoStart:^{
+        RLMRealm *realm = [self getStringObjects:5];
+        [self startMeasuring];
         [realm beginWriteTransaction];
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
             so.stringCol = @"c";
@@ -252,9 +256,10 @@ static NSString *s_fsyncPath;
 }
 
 - (void)testEnumerateAndMutateQuery {
-    RLMRealm *realm = [self getStringObjects:1];
+    [self measureBlockWithoutAutoStart:^{
+        RLMRealm *realm = [self getStringObjects:5];
+        [self startMeasuring];
 
-    [self measureBlock:^{
         [realm beginWriteTransaction];
         for (StringObject *so in [StringObject objectsInRealm:realm where:@"stringCol != 'b'"]) {
             so.stringCol = @"c";
@@ -418,6 +423,7 @@ static NSString *s_fsyncPath;
 
 - (void)testCommitWriteTransaction {
     [self measureBlockWithoutAutoStart:^{
+        [self deleteRealmFileAtURL:RLMTestRealmURL()];
         RLMRealm *realm = self.testRealm;
         [realm beginWriteTransaction];
         IntObject *obj = [IntObject createInRealm:realm withValue:@[@0]];
