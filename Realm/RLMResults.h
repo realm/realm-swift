@@ -136,10 +136,10 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return                An RLMResults of objects that match the given predicate
  */
-- (RLMResults RLM_GENERIC_RETURN*)objectsWhere:(NSString *)predicateFormat, ...;
+- (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
-- (RLMResults RLM_GENERIC_RETURN*)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
+- (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
 /**
  Get objects matching the given predicate in the RLMResults.
@@ -148,7 +148,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return            An RLMResults of objects that match the given predicate
  */
-- (RLMResults RLM_GENERIC_RETURN*)objectsWithPredicate:(NSPredicate *)predicate;
+- (RLMResults<RLMObjectType> *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get a sorted `RLMResults` from an existing `RLMResults` sorted by a property.
@@ -158,7 +158,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return    An RLMResults sorted by the specified property.
  */
-- (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults<RLMObjectType> *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
 /**
  Get a sorted `RLMResults` from an existing `RLMResults` sorted by an `NSArray`` of `RLMSortDescriptor`s.
@@ -167,7 +167,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return    An RLMResults sorted by the specified properties.
  */
-- (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingDescriptors:(NSArray *)properties;
+- (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray *)properties;
 
 #pragma mark - Notifications
 
@@ -228,7 +228,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param block The block to be called with the evaluated results.
  @return A token which must be held for as long as you want query results to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults<RLMObjectType> *__nullable results,
                                                          RLMCollectionChange *__nullable change,
                                                          NSError *__nullable error))block __attribute__((warn_unused_result));
 

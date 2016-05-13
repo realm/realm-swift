@@ -247,10 +247,10 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return                An RLMResults of objects that match the given predicate
  */
-- (RLMResults RLM_GENERIC_RETURN*)objectsWhere:(NSString *)predicateFormat, ...;
+- (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
-- (RLMResults RLM_GENERIC_RETURN*)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
+- (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
 /**
  Get objects matching the given predicate in the RLMArray.
@@ -259,7 +259,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return            An RLMResults of objects that match the given predicate
  */
-- (RLMResults RLM_GENERIC_RETURN*)objectsWithPredicate:(NSPredicate *)predicate;
+- (RLMResults<RLMObjectType> *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get a sorted RLMResults from an RLMArray
@@ -269,7 +269,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return    An RLMResults sorted by the specified property.
  */
-- (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults<RLMObjectType> *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
 /**
  Get a sorted RLMResults from an RLMArray
@@ -278,7 +278,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return    An RLMResults sorted by the specified properties.
  */
-- (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingDescriptors:(NSArray *)properties;
+- (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray *)properties;
 
 /// :nodoc:
 - (RLMObjectType)objectAtIndexedSubscript:(NSUInteger)index;
@@ -343,7 +343,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param block The block to be called each time the array changes.
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray RLM_GENERIC_RETURN *__nullable array,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray<RLMObjectType> *__nullable array,
                                                          RLMCollectionChange *__nullable changes,
                                                          NSError *__nullable error))block __attribute__((warn_unused_result));
 
