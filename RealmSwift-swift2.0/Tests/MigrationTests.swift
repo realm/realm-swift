@@ -435,7 +435,7 @@ class MigrationTests: TestCase {
         XCTAssertEqual(try! Realm().objects(SwiftBoolObject).count, 4)
     }
 
-    func testDeleteRealmIfMigrationNeededWithSetCustomSchema() {
+    func testFailOnSchemaMismatch() {
         let prop = RLMProperty(name: "name", type: RLMPropertyType.String, objectClassName: nil,
                                linkOriginPropertyName: nil, indexed: false, optional: false)
         autoreleasepool {
@@ -444,22 +444,28 @@ class MigrationTests: TestCase {
 
         var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
         autoreleasepool {
-            do {
-                let _ = try Realm(configuration: config)
-                XCTFail("Migration error should be occurred")
-            } catch {}
+            assertFails(.SchemaMismatch) {
+                try Realm(configuration: config)
+            }
+        }
+    }
+
+    func testDeleteRealmIfMigrationNeededWithSetCustomSchema() {
+        let prop = RLMProperty(name: "name", type: RLMPropertyType.String, objectClassName: nil,
+                               linkOriginPropertyName: nil, indexed: false, optional: false)
+        autoreleasepool {
+            realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop])
         }
 
+        var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
         config.migrationBlock = { _, _ in
-            XCTFail("Migration block should not have been called")
+            XCTFail("Migration block should not be called")
         }
         config.deleteRealmIfMigrationNeeded = true
 
         autoreleasepool {
-            do {
+            assertSucceeds {
                 let _ = try Realm(configuration: config)
-            } catch {
-                XCTFail("Migration error was occurred")
             }
         }
     }
@@ -481,23 +487,20 @@ class MigrationTests: TestCase {
         class_replaceMethod(metaClass, "sharedSchema", imp, "@@:")
 
         autoreleasepool {
-            do {
-                let _ = try Realm()
-                XCTFail("Migration error should be occurred")
-            } catch {}
+            assertFails(.SchemaMismatch) {
+                try Realm()
+            }
         }
 
         let migrationBlock: MigrationBlock = { _, _ in
-            XCTFail("Migration block should not have been called")
+            XCTFail("Migration block should not be called")
         }
         let config = Realm.Configuration(fileURL: defaultRealmURL(),
                                          migrationBlock: migrationBlock,
                                          deleteRealmIfMigrationNeeded: true)
 
-        do {
+        assertSucceeds {
             let _ = try Realm(configuration: config)
-        } catch {
-            XCTFail("Migration error was occurred")
         }
 
         class_replaceMethod(metaClass, "sharedSchema", originalImp, "@@:")

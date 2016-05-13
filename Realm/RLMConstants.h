@@ -85,6 +85,8 @@ typedef NS_ENUM(NSInteger, RLMError) {
     RLMErrorIncompatibleLockFile  = 8,
     /** Returned by RLMRealm if there is insufficient available address space. */
     RLMErrorAddressSpaceExhausted = 9,
+    /** Returned by RLMRealm if there is a schema version mismatch, so that a migration is required. */
+    RLMErrorSchemaMismatch = 10,
 };
 
 #pragma mark - Constants

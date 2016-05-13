@@ -224,9 +224,9 @@ namespace realm {
         IncorrectThreadException() : std::runtime_error("Realm accessed from incorrect thread.") {}
     };
 
-    class UnitializedRealmException : public std::runtime_error {
+    class UninitializedRealmException : public std::runtime_error {
     public:
-        UnitializedRealmException(std::string message) : std::runtime_error(message) {}
+        UninitializedRealmException(std::string message) : std::runtime_error(message) {}
     };
 }
 
