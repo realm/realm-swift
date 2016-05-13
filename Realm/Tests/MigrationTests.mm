@@ -290,12 +290,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertThrows([RLMRealm schemaVersionAtURL:RLMDefaultRealmURL() encryptionKey:nil error:nil]);
     NSError *error;
     XCTAssertEqual(RLMNotVersioned, [RLMRealm schemaVersionAtURL:RLMDefaultRealmURL() encryptionKey:nil error:&error]);
-    XCTAssertNotNil(error);
-    // Validate error
-    XCTAssertEqualObjects(error.domain, RLMErrorDomain);
-    XCTAssertEqual(error.code, RLMErrorFail);
-    XCTAssert([error.localizedDescription rangeOfString:
-               @"Cannot open an uninitialized realm in read-only mode"].location != NSNotFound);
+    RLMValidateRealmError(error, RLMErrorFail, @"Cannot open an uninitialized realm in read-only mode", nil);
 
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     @autoreleasepool { [RLMRealm realmWithConfiguration:config error:nil]; }

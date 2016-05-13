@@ -1463,6 +1463,7 @@ extern "C" {
     configuration.fileURL = fileURL;
     XCTAssertNotNil([RLMRealm realmWithConfiguration:configuration error:&error],
                     @"Database should have been created");
+    XCTAssertNil(error);
 }
 
 - (void)testRealmFileAccessInvalidFile
@@ -1478,33 +1479,21 @@ extern "C" {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = fileURL;
     XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Invalid database");
-    XCTAssertNotNil(error, @"Should populate error object");
-    // Validate error contents
-    XCTAssertEqualObjects(error.domain, RLMErrorDomain);
-    XCTAssertEqual(error.code, RLMErrorFileAccess);
-    XCTAssert([error.userInfo[@"Underlying"] rangeOfString:@"Realm file has bad size"].location != NSNotFound);
+    RLMValidateRealmError(error, RLMErrorFileAccess, @"Unable to open a realm at path", @"Realm file has bad size");
 }
 
 - (void)testRealmFileAccessFileIsDirectory
 {
-    NSURL *fileURL = [NSURL fileURLWithPath:RLMRealmPathForFile(@"filename.realm")];
-    [[NSFileManager defaultManager] removeItemAtPath:fileURL.path error:nil];
-    assert(![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]);
-    [[NSFileManager defaultManager] createDirectoryAtPath:fileURL.path withIntermediateDirectories:NO attributes:nil error:nil];
-    // Make sure test set itself up correctly
-    BOOL checkResult = NO;
-    [[NSFileManager defaultManager] fileExistsAtPath:fileURL.path isDirectory:&checkResult];
-    assert(checkResult == YES);
-
+    NSURL *testURL = RLMTestRealmURL();
+    [[NSFileManager defaultManager] createDirectoryAtPath:testURL.path
+                              withIntermediateDirectories:NO
+                                               attributes:nil
+                                                    error:nil];
     NSError *error;
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.fileURL = fileURL;
+    configuration.fileURL = testURL;
     XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Invalid database");
-    XCTAssertNotNil(error, @"Should populate error object");
-    // Validate error contents
-    XCTAssertEqualObjects(error.domain, RLMErrorDomain);
-    XCTAssertEqual(error.code, RLMErrorFileAccess);
-    XCTAssert([error.userInfo[@"Underlying"] rangeOfString:@"Is a directory"].location != NSNotFound);
+    RLMValidateRealmError(error, RLMErrorFileAccess, @"Unable to open a realm at path", @"Is a directory");
 }
 
 - (void)testMultipleRealms
@@ -1549,12 +1538,7 @@ extern "C" {
     NSError *error;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:RLMRealmConfiguration.defaultConfiguration error:&error];
     XCTAssertNil(realm);
-    XCTAssertNotNil(error);
-    // Validate error
-    XCTAssertEqualObjects(error.domain, RLMErrorDomain);
-    XCTAssertEqual(error.code, RLMErrorIncompatibleLockFile);
-    XCTAssert([error.userInfo[NSLocalizedDescriptionKey]
-               rangeOfString:@"Realm file is currently open in another process"].location != NSNotFound);
+    RLMValidateRealmError(error, RLMErrorIncompatibleLockFile, @"Realm file is currently open in another process", nil);
 
     flock(fd, LOCK_UN);
     close(fd);

@@ -414,11 +414,7 @@
     XCTestExpectation *exp = [self expectationWithDescription:@""];
     auto token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
         XCTAssertNil(results);
-        XCTAssertNotNil(error);
-        // Validate error
-        XCTAssertEqualObjects(error.domain, RLMErrorDomain);
-        XCTAssertEqual(error.code, RLMErrorFail);
-        XCTAssert([error.localizedDescription rangeOfString:@"Too many open files"].location != NSNotFound);
+        RLMValidateRealmError(error, RLMErrorFail, @"Too many open files", nil);
         called = true;
         [exp fulfill];
     }];
@@ -437,10 +433,7 @@
     XCTestExpectation *exp2 = [self expectationWithDescription:@""];
     auto token2 = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
         XCTAssertNil(results);
-        XCTAssertNotNil(error);
-        // Validate error
-        XCTAssertEqualObjects(error.domain, RLMErrorDomain);
-        XCTAssertEqual(error.code, RLMErrorFail);
+        RLMValidateRealmError(error, RLMErrorFail, @"Too many open files", nil);
         [exp2 fulfill];
     }];
     [realm beginWriteTransaction];

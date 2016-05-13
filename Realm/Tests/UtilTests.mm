@@ -22,6 +22,8 @@
 #import "RLMUtil.hpp"
 #import "RLMVersion.h"
 
+#import "shared_realm.hpp"
+
 @interface UtilTests : RLMTestCase
 
 @end
@@ -84,11 +86,8 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) {
                           [NSError errorWithDomain:RLMUnknownSystemErrorDomain code:code userInfo:expectedUserInfo]);
 }
 
-using namespace realm;
-#import "shared_realm.hpp"
-
 - (void)testRealmFileException {
-    RealmFileException exception(RealmFileException::Kind::NotFound,
+    realm::RealmFileException exception(realm::RealmFileException::Kind::NotFound,
                                  "/some/path",
                                  "don't do that to your files",
                                  "lp0 on fire");
