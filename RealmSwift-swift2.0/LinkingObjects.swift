@@ -22,12 +22,33 @@ import Realm
 /// :nodoc:
 /// Internal class. Do not use directly. Used for reflection and initialization
 public class LinkingObjectsBase: NSObject, NSFastEnumeration {
-    internal var rlmResults: RLMResults
     internal let objectClassName: String
     internal let propertyName: String
 
-    init(results: RLMResults, fromClassName objectClassName: String, property propertyName: String) {
-        self.rlmResults = results
+    private var cachedRLMResults: RLMResults?
+    private var object: RLMWeakObjectHandle?
+    private var property: RLMProperty?
+
+    internal func attachTo(object object: RLMObjectBase, property: RLMProperty) {
+        self.object = RLMWeakObjectHandle(object: object)
+        self.property = property
+        self.cachedRLMResults = nil
+    }
+
+    internal var rlmResults: RLMResults {
+        if cachedRLMResults == nil {
+            if let object = self.object, property = self.property {
+                cachedRLMResults = RLMDynamicGet(object.object, property)! as? RLMResults
+                self.object = nil
+                self.property = nil
+            } else {
+                cachedRLMResults = RLMResults.emptyDetachedResults()
+            }
+        }
+        return cachedRLMResults!
+    }
+
+    init(fromClassName objectClassName: String, property propertyName: String) {
         self.objectClassName = objectClassName
         self.propertyName = propertyName
     }
@@ -73,7 +94,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
     public init(fromType type: T.Type, property propertyName: String) {
         let className = (T.self as Object.Type).className()
-        super.init(results: RLMResults.emptyDetachedResults(), fromClassName: className, property: propertyName)
+        super.init(fromClassName: className, property: propertyName)
     }
 
     /// Returns a human-readable description of the objects contained in these linking objects.

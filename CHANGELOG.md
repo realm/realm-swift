@@ -9,6 +9,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Return `RLMErrorSchemaMismatch` error rather than the more generic `RLMErrorFail`
   when a migration is required.
+* Improve the performance of allocating instances of `Object` subclasses
+  that have `LinkingObjects` properties.
 
 ### Bugfixes
 

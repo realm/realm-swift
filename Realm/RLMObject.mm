@@ -219,3 +219,31 @@
 }
 
 @end
+
+@implementation RLMWeakObjectHandle {
+    realm::Row _row;
+    RLMRealm *_realm;
+    RLMObjectSchema *_objectSchema;
+    Class _objectClass;
+}
+
+- (instancetype)initWithObject:(RLMObjectBase *)object {
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _row = object->_row;
+    _realm = object->_realm;
+    _objectSchema = object->_objectSchema;
+    _objectClass = object.class;
+
+    return self;
+}
+
+- (RLMObjectBase *)object {
+    RLMObjectBase *object = [[_objectClass alloc] initWithRealm:_realm schema:_objectSchema];
+    object->_row = std::move(_row);
+    return object;
+}
+
+@end
