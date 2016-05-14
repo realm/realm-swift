@@ -61,6 +61,11 @@ Pod::Spec.new do |s|
                                 'APPLICATION_EXTENSION_API_ONLY' => 'YES',
                                 'HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include/core"',
                                 'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"' }
+
+  # CocoaPods 1.0 doesn't create header folder symlinks for OS X frameworks correctly
+  s.osx.pod_target_xcconfig = { 'PUBLIC_HEADERS_FOLDER_PATH'  => '$(WRAPPER_NAME)/Headers',
+                                'PRIVATE_HEADERS_FOLDER_PATH' => '$(WRAPPER_NAME)/PrivateHeaders' }
+
   s.preserve_paths          = %w(build.sh include)
 
   s.ios.deployment_target   = '7.0'
