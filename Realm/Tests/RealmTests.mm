@@ -1496,6 +1496,28 @@ extern "C" {
     RLMValidateRealmError(error, RLMErrorFileAccess, @"Unable to open a realm at path", @"Is a directory");
 }
 
+#if TARGET_OS_TV
+#else
+- (void)testRealmFifoError
+{
+    NSFileManager *manager = [NSFileManager defaultManager];
+    NSURL *testURL = RLMTestRealmURL();
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = testURL;
+
+    // Create the expected fifo URL and create a directory.
+    // Note that creating a file when a directory with the same name exists produces a different errno, which is good.
+    NSURL *fifoURL = [[testURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"realm.note"];
+    assert(![manager fileExistsAtPath:fifoURL.path]);
+    [manager createDirectoryAtPath:fifoURL.path withIntermediateDirectories:YES attributes:nil error:nil];
+
+    NSError *error;
+    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Should not have been able to open FIFO");
+    XCTAssertNotNil(error);
+    RLMValidateRealmError(error, RLMErrorFileAccess, @"Is a directory", nil);
+}
+#endif
+
 - (void)testMultipleRealms
 {
     // Create one StringObject in two different realms
