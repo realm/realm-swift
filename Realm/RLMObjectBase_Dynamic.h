@@ -45,19 +45,6 @@ FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *obje
 /**
  This function is useful only in specialized circumstances, for example, when building components
  that integrate with Realm. If you are simply building an app on Realm, it is
- recommended to retrieve the linking objects via `RLMObject`.
- 
- @param object		an RLMObjectBase obtained via a Swift Object or RLMObject
- @param className	The type of object on which the relationship to query is defined.
- @param property	The name of the property which defines the relationship.
- 
- @return An NSArray of objects of type `className` which have this object as their value for the `property` property.
- */
-FOUNDATION_EXTERN NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property);
-
-/**
- This function is useful only in specialized circumstances, for example, when building components
- that integrate with Realm. If you are simply building an app on Realm, it is
  recommended to retrieve key values via `RLMObject`.
  
  @warning Will throw `NSUndefinedKeyException` if key is not present on the object

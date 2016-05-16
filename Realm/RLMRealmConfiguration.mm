@@ -181,14 +181,6 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     _config.in_memory = false;
 }
 
-- (NSString *)path {
-    return self.fileURL.path;
-}
-
-- (void)setPath:(NSString *)path {
-    self.fileURL = [NSURL fileURLWithPath:path];
-}
-
 - (NSString *)inMemoryIdentifier {
     if (!_config.in_memory) {
         return nil;

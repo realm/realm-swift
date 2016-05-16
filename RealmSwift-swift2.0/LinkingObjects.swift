@@ -318,66 +318,6 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      called again after each write transaction which changes either any of the
      objects in the collection, or which objects are in the collection.
 
-     If an error occurs the block will be called with `nil` for the linkingObjects
-     parameter and a non-`nil` error. Currently the only errors that can occur are
-     when opening the Realm on the background worker thread fails.
-
-     At the time when the block is called, the LinkingObjects object will be fully
-     evaluated and up-to-date, and as long as you do not perform a write transaction
-     on the same thread or explicitly call realm.refresh(), accessing it will never
-     perform blocking work.
-
-     Notifications are delivered via the standard run loop, and so can't be
-     delivered while the run loop is blocked by other activity. When
-     notifications can't be delivered instantly, multiple notifications may be
-     coalesced into a single notification. This can include the notification
-     with the initial results. For example, the following code performs a write
-     transaction immediately after adding the notification block, so there is no
-     opportunity for the initial notification to be delivered first. As a
-     result, the initial notification will reflect the state of the Realm after
-     the write transaction.
-
-         let dog = realm.objects(Dog).first!
-         let owners = dog.owners
-         print("owners.count: \(owners.count)") // => 0
-         let token = owners.addNotificationBlock { (owners, error) in
-             // Only fired once for the example
-             print("owners.count: \(owners.count)") // will only print "owners.count: 1"
-         }
-         try! realm.write {
-             realm.add(Person.self, value: ["name": "Mark", dogs: [dog]])
-         }
-         // end of runloop execution context
-
-     You must retain the returned token for as long as you want updates to continue
-     to be sent to the block. To stop receiving updates, call stop() on the token.
-
-     - warning: This method cannot be called during a write transaction, or when
-     the source realm is read-only.
-
-     - parameter block: The block to be called with the evaluated linking objects.
-     - returns: A token which must be held for as long as you want query results to be delivered.
-     */
-    @available(*, deprecated=1, message="Use addNotificationBlock with changes")
-    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (linkingObjects: LinkingObjects<T>?, error: NSError?) -> ())
-        -> NotificationToken {
-        return rlmResults.addNotificationBlock { results, changes, error in
-            if results != nil {
-                block(linkingObjects: self, error: nil)
-            } else {
-                block(linkingObjects: nil, error: error)
-            }
-        }
-    }
-
-    /**
-     Register a block to be called each time the LinkingObjects changes.
-
-     The block will be asynchronously called with the initial set of objects, and then
-     called again after each write transaction which changes either any of the
-     objects in the collection, or which objects are in the collection.
-
      This version of this method reports which of the objects in the collection were
      added, removed, or modified in each write transaction as indices within the
      collection. See the RealmCollectionChange documentation for more information on

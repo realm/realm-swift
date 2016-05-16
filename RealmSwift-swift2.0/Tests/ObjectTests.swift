@@ -145,22 +145,6 @@ class ObjectTests: TestCase {
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDoubleCol"]!.indexed)
     }
 
-    func testLinkingObjects() {
-        let realm = try! Realm()
-        let object = SwiftEmployeeObject()
-        assertThrows(object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees"))
-        try! realm.write {
-            realm.add(object)
-            self.assertThrows(object.linkingObjects(SwiftCompanyObject.self, forProperty: "noSuchCol"))
-            XCTAssertEqual(0, object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees").count)
-            for _ in 0..<10 {
-                realm.create(SwiftCompanyObject.self, value: [[object]])
-            }
-            XCTAssertEqual(10, object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees").count)
-        }
-        XCTAssertEqual(10, object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees").count)
-    }
-
     func testValueForKey() {
         let test: (SwiftObject) -> () = { object in
             XCTAssertEqual(object.valueForKey("boolCol") as! Bool!, false)

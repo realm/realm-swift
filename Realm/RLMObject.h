@@ -392,17 +392,6 @@ RLM_ASSUME_NONNULL_BEGIN
 #pragma mark - Other Instance Methods
 
 /**
- Get an `NSArray` of objects of type `className` which have this object as the given property value. This can
- be used to get the inverse relationship value for `RLMObject` and `RLMArray` properties.
-
- @param className   The type of object on which the relationship to query is defined.
- @param property    The name of the property which defines the relationship.
-
- @return    An NSArray of objects of type `className` which have this object as their value for the `property` property.
- */
-- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property DEPRECATED_MSG_ATTRIBUTE("Use an RLMLinkingObjects property");
-
-/**
  Returns YES if another RLMObject points to the same object in an RLMRealm. For RLMObject types
  with a primary, key, `isEqual:` is overridden to use this method (along with a corresponding
  implementation for `hash`.
