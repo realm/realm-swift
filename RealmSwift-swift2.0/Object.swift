@@ -167,22 +167,6 @@ public class Object: RLMObjectBase {
     public class func indexedProperties() -> [String] { return [] }
 
 
-    // MARK: Inverse Relationships
-
-    /**
-    Get an `Array` of objects of type `T` which have this object as the given property value. This can
-    be used to get the inverse relationship value for `Object` and `List` properties.
-
-    - parameter type:          The type of object on which the relationship to query is defined.
-    - parameter propertyName:  The name of the property which defines the relationship.
-
-    - returns: An `Array` of objects of type `T` which have this object as their value for the `propertyName` property.
-    */
-    @available(*, deprecated=1, message="Use a LinkingObjects property")
-    public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
-        return RLMObjectBaseLinkingObjectsOfClass(self, (T.self as Object.Type).className(), propertyName) as! [T]
-    }
-
     // MARK: Key-Value Coding & Subscripting
 
     /// Returns or sets the value of the property with the given name.

@@ -51,7 +51,7 @@
     XCTAssertNoThrow([RLMRealm.defaultRealm writeCopyToURL:RLMTestRealmURL() encryptionKey:key error:nil]);
 }
 
-#pragma mark - realmWithPath:
+#pragma mark - realmWithURL:
 
 - (void)testReopenWithSameKeyWorks {
     NSData *key = RLMGenerateKey();
@@ -107,7 +107,7 @@
     XCTAssertThrows([self realmWithKey:RLMGenerateKey()]);
 }
 
-#pragma mark - writeCopyToPath:
+#pragma mark - writeCopyToURL:
 
 - (void)testWriteCopyToPathWithNoKeyWritesDecrypted {
     NSData *key = RLMGenerateKey();

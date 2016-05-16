@@ -52,36 +52,6 @@ extension Realm {
         /**
         Initializes a `Realm.Configuration`, suitable for creating new `Realm` instances.
 
-        - parameter path:               The path to the realm file.
-        - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
-        - parameter encryptionKey:      64-byte key to use to encrypt the data.
-        - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
-        - parameter schemaVersion:      The current schema version.
-        - parameter migrationBlock:     The block which migrates the Realm to the current version.
-        - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
-        */
-        @available(*, deprecated=1, message="Use init(fileURL:...)")
-        public init(path: String?,
-                    inMemoryIdentifier: String? = nil,
-                    encryptionKey: NSData? = nil,
-                    readOnly: Bool = false,
-                    schemaVersion: UInt64 = 0,
-                    migrationBlock: MigrationBlock? = nil,
-                    objectTypes: [Object.Type]? = nil) {
-            self.fileURL = path.map { NSURL(fileURLWithPath: $0) }
-            if inMemoryIdentifier != nil {
-                self.inMemoryIdentifier = inMemoryIdentifier
-            }
-            self.encryptionKey = encryptionKey
-            self.readOnly = readOnly
-            self.schemaVersion = schemaVersion
-            self.migrationBlock = migrationBlock
-            self.objectTypes = objectTypes
-        }
-
-        /**
-        Initializes a `Realm.Configuration`, suitable for creating new `Realm` instances.
-
         - parameter fileURL:            The local URL to the realm file.
         - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
         - parameter encryptionKey:      64-byte key to use to encrypt the data.
@@ -123,19 +93,6 @@ extension Realm {
             }
             get {
                 return _path.map { NSURL(fileURLWithPath: $0) }
-            }
-        }
-
-        /// The path to the realm file.
-        /// Mutually exclusive with `inMemoryIdentifier`.
-        @available(*, deprecated=1, message="Use fileURL")
-        public var path: String? {
-            set {
-                _inMemoryIdentifier = nil
-                _path = newValue
-            }
-            get {
-                return _path
             }
         }
 

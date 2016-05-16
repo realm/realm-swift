@@ -48,6 +48,7 @@ using namespace realm;
 using util::File;
 
 @interface RLMRealm ()
+@property (nonatomic, strong) NSHashTable *notificationHandlers;
 - (void)sendNotifications:(NSString *)notification;
 @end
 
@@ -63,10 +64,10 @@ void RLMDisableSyncToDisk() {
 
 @implementation RLMRealmNotificationToken
 - (void)stop {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [_realm removeNotification:self];
-#pragma clang diagnostic pop
+    [_realm verifyThread];
+    [_realm.notificationHandlers removeObject:self];
+    _realm = nil;
+    _block = nil;
 }
 
 - (void)dealloc {
@@ -102,7 +103,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 
 @implementation RLMRealm {
     NSHashTable *_collectionEnumerators;
-    NSHashTable *_notificationHandlers;
 }
 
 + (BOOL)isCoreDebug {
@@ -133,19 +133,11 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     return _realm->is_in_transaction();
 }
 
-- (NSString *)path {
-    return @(_realm->config().path.c_str());
-}
-
 - (realm::Group *)group {
     return _realm->read_group();
 }
 
-- (BOOL)isReadOnly {
-    return _realm->config().read_only;
-}
-
--(BOOL)autorefresh {
+- (BOOL)autorefresh {
     return _realm->auto_refresh();
 }
 
@@ -159,10 +151,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 
 + (instancetype)defaultRealm {
     return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration rawDefaultConfiguration] error:nil];
-}
-
-+ (instancetype)realmWithPath:(NSString *)path {
-    return [RLMRealm realmWithURL:[NSURL fileURLWithPath:path]];
 }
 
 + (instancetype)realmWithURL:(NSURL *)fileURL {
@@ -478,15 +466,6 @@ void RLMRealmTranslateException(NSError **error) {
     return token;
 }
 
-- (void)removeNotification:(RLMNotificationToken *)token {
-    [self verifyThread];
-    if (auto realmToken = RLMDynamicCast<RLMRealmNotificationToken>(token)) {
-        [_notificationHandlers removeObject:token];
-        realmToken.realm = nil;
-        realmToken.block = nil;
-    }
-}
-
 - (void)sendNotifications:(NSString *)notification {
     NSAssert(!_realm->config().read_only, @"Read-only realms do not have notifications");
 
@@ -727,14 +706,6 @@ void RLMRealmTranslateException(NSError **error) {
     return RLMGetObject(self, className, primaryKey);
 }
 
-+ (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error {
-    return [RLMRealm schemaVersionAtURL:[NSURL fileURLWithPath:realmPath] encryptionKey:nil error:error];
-}
-
-+ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)error {
-    return [self schemaVersionAtURL:[NSURL fileURLWithPath:realmPath] encryptionKey:key error:error];
-}
-
 + (uint64_t)schemaVersionAtURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
     try {
         RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
@@ -767,14 +738,6 @@ void RLMRealmTranslateException(NSError **error) {
 
 - (RLMObject *)createObject:(NSString *)className withValue:(id)value {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, value, false);
-}
-
-- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {
-    return [self writeCopyToURL:[NSURL fileURLWithPath:path] encryptionKey:nil error:error];
-}
-
-- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error {
-    return [self writeCopyToURL:[NSURL fileURLWithPath:path] encryptionKey:key error:error];
 }
 
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {

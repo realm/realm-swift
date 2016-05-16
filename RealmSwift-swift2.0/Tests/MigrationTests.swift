@@ -442,7 +442,7 @@ class MigrationTests: TestCase {
             realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop])
         }
 
-        var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
+        let config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
         autoreleasepool {
             assertFails(.SchemaMismatch) {
                 try Realm(configuration: config)

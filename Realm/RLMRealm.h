@@ -79,15 +79,6 @@ RLM_ASSUME_NONNULL_BEGIN
 + (nullable instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
 /**
- Obtains an `RLMRealm` instance persisted at a specific file path.
-
- @param path Path to the file you want the data saved in.
-
- @return An `RLMRealm` instance.
- */
-+ (instancetype)realmWithPath:(NSString *)path DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm realmWithURL:]");
-
-/**
  Obtains an `RLMRealm` instance persisted at a specific file URL.
 
  @param fileURL Local URL to the file you want the data saved in.
@@ -95,16 +86,6 @@ RLM_ASSUME_NONNULL_BEGIN
  @return An `RLMRealm` instance.
  */
 + (instancetype)realmWithURL:(NSURL *)fileURL;
-
-/**
- Path to the file where this Realm is persisted.
- */
-@property (nonatomic, readonly) NSString *path DEPRECATED_MSG_ATTRIBUTE("use configuration.fileURL");
-
-/**
- Indicates if this Realm was opened in read-only mode.
- */
-@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly DEPRECATED_MSG_ATTRIBUTE("use configuration.readOnly");
 
 /**
  The RLMSchema used by this RLMRealm.
@@ -164,15 +145,6 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
          receiving change notifications.
  */
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block RLM_WARN_UNUSED_RESULT;
-
-/**
- Remove a previously registered notification handler using the token returned
- from `-addNotificationBlock:`
-
- @param notificationToken   The token returned from `-addNotificationBlock:`
-                            corresponding to the notification block to remove.
- */
-- (void)removeNotification:(RLMNotificationToken *)notificationToken DEPRECATED_MSG_ATTRIBUTE("use -[RLMNotificationToken stop]");
 
 #pragma mark - Transactions
 
@@ -313,35 +285,6 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Defaults to YES.
  */
 @property (nonatomic) BOOL autorefresh;
-
-/**
- Write a compacted copy of the RLMRealm to the given path.
-
- The destination file cannot already exist.
-
- Note that if this is called from within a write transaction it writes the
- *current* data, and not data when the last write transaction was committed.
-
- @param path Path to save the Realm to.
- @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
- @return YES if the realm was copied successfully. Returns NO if an error occurred.
-*/
-- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm writeCopyToURL:encryptionKey:error:]");
-
-/**
- Write an encrypted and compacted copy of the RLMRealm to the given path.
-
- The destination file cannot already exist.
-
- Note that if this is called from within a write transaction it writes the
- *current* data, and not data when the last write transaction was committed.
-
- @param path Path to save the Realm to.
- @param key 64-byte encryption key to encrypt the new file with
- @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
- @return YES if the realm was copied successfully. Returns NO if an error occurred.
-*/
-- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm writeCopyToURL:encryptionKey:error:]");
 
 /**
  Write a compacted and optionally encrypted copy of the RLMRealm to the given
@@ -490,31 +433,6 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @param oldSchemaVersion    The schema version of the `RLMRealm` being migrated.
  */
 typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVersion);
-
-/**
- Get the schema version for a Realm at a given path.
-
- @param realmPath   Path to a Realm file
- @param error       If an error occurs, upon return contains an `NSError` object
-                    that describes the problem. If you are not interested in
-                    possible errors, pass in `NULL`.
-
- @return            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
- */
-+ (uint64_t)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm schemaVersionAtURL:encryptionKey:error:]");
-
-/**
- Get the schema version for an encrypted Realm at a given path.
-
- @param realmPath   Path to a Realm file
- @param key         64-byte encryption key.
- @param error       If an error occurs, upon return contains an `NSError` object
-                    that describes the problem. If you are not interested in
-                    possible errors, pass in `NULL`.
-
- @return            The version of the Realm at `fileURL` or RLMNotVersioned if the version cannot be read.
- */
-+ (uint64_t)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(nullable NSData *)key error:(NSError **)error DEPRECATED_MSG_ATTRIBUTE("use +[RLMRealm schemaVersionAtURL:encryptionKey:error:]");
 
 /**
  Get the schema version for a Realm at a given local URL.

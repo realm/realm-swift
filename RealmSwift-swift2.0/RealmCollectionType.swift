@@ -845,48 +845,6 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     // MARK: Notifications
 
     /**
-    Register a block to be called each time the collection changes.
-
-    The block will be asynchronously called with the initial collection, and
-    then called again after each write transaction which changes the collection
-    or any of the items in the collection.
-
-    The block is called on the same thread as it was added on, and can only
-    be added on threads which are currently within a run loop. Unless you are
-    specifically creating and running a run loop on a background thread, this
-    normally will only be the main thread.
-
-    Notifications can't be delivered as long as the runloop is blocked by
-    other activity. When notifications can't be delivered instantly, multiple
-    notifications may be coalesced. That can include the notification about the
-    initial collection.
-
-    You must retain the returned token for as long as you want updates to continue
-    to be sent to the block. To stop receiving updates, call stop() on the token.
-
-    - parameter block: The block to be called each time the collection changes.
-    - returns: A token which must be held for as long as you want notifications to be delivered.
-    */
-    @available(*, deprecated=1, message="Use addNotificationBlock with changes")
-    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (collection: AnyRealmCollection<Element>?,
-                                             error: NSError?) -> ()) -> NotificationToken {
-        return base._addNotificationBlock { changes in
-            switch changes {
-            case .Initial(let collection):
-                block(collection: collection, error: nil)
-                break
-            case .Update(let collection, _, _, _):
-                block(collection: collection, error: nil)
-                break
-            case .Error(let error):
-                block(collection: nil, error: error)
-                break
-            }
-        }
-    }
-
-    /**
      Register a block to be called each time the collection changes.
 
      The block will be asynchronously called with the initial results, and then

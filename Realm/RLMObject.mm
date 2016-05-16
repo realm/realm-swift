@@ -164,10 +164,6 @@
 
 #pragma mark - Other Instance Methods
 
-- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
-    return RLMObjectBaseLinkingObjectsOfClass(self, className, property);
-}
-
 - (BOOL)isEqualToObject:(RLMObject *)object {
     return [object isKindOfClass:RLMObject.class] && RLMObjectBaseAreEqual(self, object);
 }
