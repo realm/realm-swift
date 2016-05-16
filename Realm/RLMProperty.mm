@@ -28,7 +28,7 @@
 #import "RLMUtil.hpp"
 
 BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
-    return propertyType != RLMPropertyTypeAny && propertyType != RLMPropertyTypeArray && propertyType != RLMPropertyTypeLinkingObjects;
+    return propertyType != RLMPropertyTypeArray && propertyType != RLMPropertyTypeLinkingObjects;
 }
 
 BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
@@ -81,17 +81,9 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         _optional = optional;
         [self setObjcCodeFromType];
         [self updateAccessors];
-        [self logWarningIfMixed];
     }
 
     return self;
-}
-
-- (void)logWarningIfMixed {
-    if (_type == RLMPropertyTypeAny) {
-        NSLog(@"WARNING: Property '%@' is declared as type 'id', which is a deprecated type. "
-              "Support for 'id' properties will be removed in a future release.", _name);
-    }
 }
 
 - (void)setName:(NSString *)name {
@@ -181,9 +173,9 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
             static const int linkingObjectsPrefixLen = sizeof(linkingObjectsPrefix) - 1;
 
             if (code[1] == '\0') {
-                // string is "@"
-                _type = RLMPropertyTypeAny;
-                _optional = false;
+                @throw RLMException(@"Property '%@' is declared as 'id', which is not a supported RLMObject property type. "
+                                    @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, or subclasses of RLMObject. "
+                                    @"See https://realm.io/docs/objc/latest/api/Classes/RLMObject.html for more information.", _name);
             }
             else if (strcmp(code, "@\"NSString\"") == 0) {
                 _type = RLMPropertyTypeString;
@@ -370,27 +362,17 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         }
     }
 
-    void (^throwForPropertyName)(NSString *) = ^(NSString *propertyName){
+    auto throwForPropertyName = ^(NSString *propertyName){
         @throw RLMException(@"Can't persist property '%@' with incompatible type. "
-                            "Add to Object.ignoredProperties() class method to ignore.", propertyName);
+                            "Add to Object.ignoredProperties() class method to ignore.",
+                            propertyName);
     };
 
     if (![self setTypeFromRawType]) {
         throwForPropertyName(self.name);
     }
 
-    if (_type == RLMPropertyTypeAny && propertyValue != nil) {
-        if ([propertyValue isKindOfClass:[NSString class]]) {
-            // NSStrings are parsed as Any.
-            _type = RLMPropertyTypeString;
-        } else if (![propertyValue isKindOfClass:[RLMListBase class]] && ![propertyValue isKindOfClass:[RLMOptionalBase class]]) {
-            // Don't throw if the property is a List/RealmOptional property because those types only
-            // get reported to ObjC with Swift 1.2 and not 2+.
-            throwForPropertyName(self.name);
-        } else {
-            [self logWarningIfMixed];
-        }
-    } else if (_objcType == 'c') {
+    if (_objcType == 'c') {
         // Check if it's a BOOL or Int8 by trying to set it to 2 and seeing if
         // it actually sets it to 1.
         [obj setValue:@2 forKey:name];
@@ -432,7 +414,6 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         @throw RLMException(@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", self.name);
     }
-    [self logWarningIfMixed];
 
     if (!isReadOnly && isComputedProperty) {
         @throw RLMException(@"Property '%@' must be declared as readonly as %@ properties cannot be written to.",

@@ -137,16 +137,14 @@ class SwiftDynamicTests: RLMTestCase {
         let date = NSDate(timeIntervalSince1970: 100000)
         let data = "a".dataUsingEncoding(NSUTF8StringEncoding)!
         let obj1 = [Nb(true), Ni(1), Nf(1.1), Nd(1.11), "string" as NSString,
-            data as AnyObject, date, Nb(true),
-            Ni(11), Ni(0), NSNull()] as NSArray
+            data as AnyObject, date, Nb(true), Ni(11), NSNull()] as NSArray
 
         let obj = StringObject()
         obj.stringCol = "string"
 
         let data2 = "b".dataUsingEncoding(NSUTF8StringEncoding)!
         let obj2 = [Nb(false), Ni(2), Nf(2.2), Nd(2.22), "string2" as NSString,
-            data2 as AnyObject, date, Nb(false),
-            Ni(22), date, obj] as NSArray
+            data2 as AnyObject, date, Nb(false), Ni(22), obj] as NSArray
 
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
@@ -159,21 +157,23 @@ class SwiftDynamicTests: RLMTestCase {
 
         // verify properties
         let dyrealm = realmWithTestPathAndSchema(nil)
-        let array = dyrealm.allObjects(AllTypesObject.className())
-        XCTAssertEqual(array.count, UInt(2))
+        let results = dyrealm.allObjects(AllTypesObject.className())
+        XCTAssertEqual(results.count, UInt(2))
+        let robj1 = results[0] as! RLMObject
+        let robj2 = results[1] as! RLMObject
 
         let schema = dyrealm.schema[AllTypesObject.className()]
-        for idx in 0..<10 {
+        for idx in 0..<obj1.count - 1 {
             let prop = schema.properties[idx]
-            XCTAssertTrue(obj1[idx].isEqual((array[0] as! RLMObject)[prop.name]))
-            XCTAssertTrue(obj2[idx].isEqual((array[1] as! RLMObject)[prop.name]))
+            XCTAssertTrue(obj1[idx].isEqual(robj1[prop.name]))
+            XCTAssertTrue(obj2[idx].isEqual(robj2[prop.name]))
         }
 
         // check sub object type
-        XCTAssertTrue(schema.properties[10].objectClassName! == "StringObject")
+        XCTAssertTrue(schema.properties[9].objectClassName! == "StringObject")
 
         // check object equality
-        XCTAssertNil((array[0] as! RLMObject)["objectCol"], "object should be nil")
-        XCTAssertTrue(((array[1] as! RLMObject)["objectCol"] as! RLMObject)["stringCol"] as! String == "string")
+        XCTAssertNil(robj1["objectCol"], "object should be nil")
+        XCTAssertTrue((robj2["objectCol"] as! RLMObject)["stringCol"] as! String == "string")
     }
 }

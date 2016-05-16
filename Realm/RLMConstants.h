@@ -45,7 +45,7 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeString = 2,
     /** Data type: NSData */
     RLMPropertyTypeData   = 4,
-    /** Any type: id, **not supported in Swift** */
+    /** Any type: id. No longer supported in models, but can be migrated from */
     RLMPropertyTypeAny    = 6,
     /** Date type: NSDate */
     RLMPropertyTypeDate   = 8,

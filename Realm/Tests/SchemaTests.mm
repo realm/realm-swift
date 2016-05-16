@@ -152,6 +152,13 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @implementation SchemaTestsLinkSource
 @end
 
+@interface MixedProperty : FakeObject
+@property id mixed;
+@end
+
+@implementation MixedProperty
+@end
+
 RLM_ARRAY_TYPE(SchemaTestsLinkSource)
 
 @interface InvalidReadWriteLinkingObjectsProperty : FakeObject
@@ -493,7 +500,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              @"\t\t\toptional = YES;\n"
+                                              @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tbinaryCol {\n"
                                               @"\t\t\ttype = data;\n"
@@ -501,7 +508,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              @"\t\t\toptional = YES;\n"
+                                              @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tdateCol {\n"
                                               @"\t\t\ttype = date;\n"
@@ -509,7 +516,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
-                                              @"\t\t\toptional = YES;\n"
+                                              @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tcBoolCol {\n"
                                               @"\t\t\ttype = bool;\n"
@@ -521,14 +528,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t}\n"
                                               @"\t\tlongCol {\n"
                                               @"\t\t\ttype = int;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
-                                              @"\t\t\tindexed = NO;\n"
-                                              @"\t\t\tisPrimary = NO;\n"
-                                              @"\t\t\toptional = NO;\n"
-                                              @"\t\t}\n"
-                                              @"\t\tmixedCol {\n"
-                                              @"\t\t\ttype = any;\n"
                                               @"\t\t\tobjectClassName = (null);\n"
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
@@ -656,6 +655,13 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
                                       @"Property 'link' .* origin of linking objects property 'linkingObjects' does "
                                       "not link to class 'InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere'");
+}
+
+- (void)testMixedIsRejected {
+    RLMSetTreatFakeObjectAsRLMObject(YES);
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    RLMAssertThrowsWithReasonMatching(config.objectClasses = @[[MixedProperty class]],
+                                      @"Property 'mixed' is declared as 'id'.*");
 }
 
 // Can't spawn child processes on iOS
