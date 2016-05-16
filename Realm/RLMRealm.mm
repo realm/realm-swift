@@ -65,11 +65,9 @@ void RLMDisableSyncToDisk() {
 @implementation RLMRealmNotificationToken
 - (void)stop {
     [_realm verifyThread];
-    if (auto realmToken = RLMDynamicCast<RLMRealmNotificationToken>(self)) {
-        [_realm.notificationHandlers removeObject:self];
-        realmToken.realm = nil;
-        realmToken.block = nil;
-    }
+    [_realm.notificationHandlers removeObject:self];
+    _realm = nil;
+    _block = nil;
 }
 
 - (void)dealloc {
