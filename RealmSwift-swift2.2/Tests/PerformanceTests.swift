@@ -279,34 +279,6 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
-    func testUnindexedStringLookup() {
-        let realm = realmWithTestPath()
-        try! realm.write {
-            for i in 0..<1000 {
-                realm.create(SwiftStringObject.self, value: [i.description])
-            }
-        }
-        measureBlock {
-            for i in 0..<1000 {
-                realm.objects(SwiftStringObject).filter("stringCol = %@", i.description).first
-            }
-        }
-    }
-
-    func testIndexedStringLookup() {
-        let realm = realmWithTestPath()
-        try! realm.write {
-            for i in 0..<1000 {
-                realm.create(SwiftIndexedPropertiesObject.self, value: [i.description, i])
-            }
-        }
-        measureBlock {
-            for i in 0..<1000 {
-                realm.objects(SwiftIndexedPropertiesObject).filter("stringCol = %@", i.description).first
-            }
-        }
-    }
-
     func testLargeINQuery() {
         let realm = realmWithTestPath()
         realm.beginWrite()
