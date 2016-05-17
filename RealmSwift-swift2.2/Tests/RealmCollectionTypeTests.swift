@@ -751,7 +751,8 @@ class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
         var list: CTTAggregateObjectList?
         try! realmWithTestPath().write {
-            list = realmWithTestPath().create(CTTAggregateObjectList.self, value: [makeAggregateableObjectsInWriteTransaction()])
+            list = realmWithTestPath().create(CTTAggregateObjectList.self,
+                value: [makeAggregateableObjectsInWriteTransaction()])
         }
         return AnyRealmCollection(list!.list)
     }
@@ -767,7 +768,8 @@ class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
         var list: CTTAggregateObjectList?
         try! realmWithTestPath().write {
-            realmWithTestPath().create(CTTAggregateObjectList.self, value: [makeAggregateableObjectsInWriteTransaction()])
+            realmWithTestPath().create(CTTAggregateObjectList.self,
+                value: [makeAggregateableObjectsInWriteTransaction()])
             list = realmWithTestPath().objects(CTTAggregateObjectList.self).first
         }
         return AnyRealmCollection(list!.list)
