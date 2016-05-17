@@ -380,6 +380,12 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(6, collection.valueForKeyPath("@sum.intCol")?.longValue)
         XCTAssertEqual(2.0, collection.valueForKeyPath("@avg.intCol")?.doubleValue)
     }
+
+    func testInvalidate() {
+        XCTAssertFalse(collection.invalidated)
+        realmWithTestPath().invalidate()
+        XCTAssertTrue(collection.realm == nil || collection.invalidated)
+    }
 }
 
 // MARK: Results
