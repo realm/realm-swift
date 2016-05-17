@@ -199,14 +199,16 @@ namespace realm {
             /** Thrown if the file needs to be upgraded to a new format, but upgrades have been explicitly disabled. */
             FormatUpgradeRequired,
         };
-        RealmFileException(Kind kind, std::string path, std::string message) :
-            std::runtime_error(std::move(message)), m_kind(kind), m_path(std::move(path)) {}
+        RealmFileException(Kind kind, std::string path, std::string message, std::string underlying) :
+            std::runtime_error(std::move(message)), m_kind(kind), m_path(std::move(path)), m_underlying(std::move(underlying)) {}
         Kind kind() const { return m_kind; }
         const std::string& path() const { return m_path; }
+        const std::string& underlying() const { return m_underlying; }
 
     private:
         Kind m_kind;
         std::string m_path;
+        std::string m_underlying;
     };
 
     class MismatchedConfigException : public std::runtime_error {
