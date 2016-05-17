@@ -643,12 +643,24 @@ case "$COMMAND" in
         ;;
 
     "verify-cocoapods")
-        pod setup
-        pod spec lint Realm.podspec
-        # allow warnings in the Swift podspec because there's no way to
-        # prevent the typealias->associatedtype deprecation warning without
-        # also breaking backwards compatibility with previous Swift 2.x versions
-        pod spec lint RealmSwift.podspec --allow-warnings
+        sed -i '' "s|https://github.com/realm/realm-cocoa.git|$PWD|" Realm.podspec
+        sed -i '' "s|:tag => \"v#{s.version}\"|:tag => \"v#{s.version}-pod-lint\"|" Realm.podspec
+        if [ -d .git ]; then
+          git add Realm.podspec
+        else
+          git init
+          git add .
+        fi
+        git commit -m "commit for pod lint"
+        tag="v$(sh build.sh get-version)-pod-lint"
+        git tag $tag
+        pod spec lint --verbose || (
+          git tag -d $tag
+          git reset --hard HEAD^
+          exit 1
+        )
+        git tag -d $tag
+        git reset --hard HEAD^
         cd examples/installation
         sh build.sh test-ios-objc-cocoapods || exit 1
         sh build.sh test-ios-swift-cocoapods || exit 1
@@ -876,6 +888,11 @@ case "$COMMAND" in
     # CocoaPods
     ######################################
     "cocoapods-setup")
+        if [ ! -d core ]; then
+          # core directory won't exist if running `pod spec lint` locally
+          ./build.sh download-core
+        fi
+
         if [[ "$2" != "swift" ]]; then
           echo 'Installing for Xcode 7+.'
           mv core/librealm-ios-bitcode.a core/librealm-ios.a
