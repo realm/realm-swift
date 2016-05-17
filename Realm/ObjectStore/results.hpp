@@ -124,8 +124,8 @@ public:
     // Ideally this would not be public but it's needed for some KVO stuff
     Mode get_mode() const { return m_mode; }
 
-    // Has the Realm this Results is associated with been invalidated?
-    bool is_invalidated() const;
+    // Is this Results associated with a Realm that has not been invalidated?
+    bool is_valid() const;
 
     // The Results object has been invalidated (due to the Realm being invalidated)
     // All non-noexcept functions can throw this
