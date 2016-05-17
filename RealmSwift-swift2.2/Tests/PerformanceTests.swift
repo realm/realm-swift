@@ -32,7 +32,6 @@ private func createStringObjects(factor: Int) -> Realm {
     return realm
 }
 
-private var smallRealm: Realm!
 private var mediumRealm: Realm!
 private var largeRealm: Realm!
 
@@ -54,7 +53,6 @@ class SwiftPerformanceTests: TestCase {
     override class func setUp() {
         super.setUp()
         autoreleasepool {
-            smallRealm = createStringObjects(1)
             mediumRealm = createStringObjects(5)
             largeRealm = createStringObjects(50)
         }
@@ -73,7 +71,6 @@ class SwiftPerformanceTests: TestCase {
     override class func tearDown() {
         close(fsyncFd)
         unlink(fsyncPath)
-        smallRealm = nil
         mediumRealm = nil
         largeRealm = nil
         super.tearDown()
