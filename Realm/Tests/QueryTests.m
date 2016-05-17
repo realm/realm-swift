@@ -827,14 +827,18 @@
     RLMAssertCount(StringObject, 0U, @"stringCol BEGINSWITH 'abd'");
     RLMAssertCount(StringObject, 0U, @"stringCol BEGINSWITH 'c'");
     RLMAssertCount(StringObject, 0U, @"stringCol BEGINSWITH 'A'");
+    RLMAssertCount(StringObject, 0U, @"stringCol BEGINSWITH ''");
     RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH[c] 'a'");
     RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH[c] 'A'");
+    RLMAssertCount(StringObject, 0U, @"stringCol BEGINSWITH[c] ''");
 
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol BEGINSWITH 'a'");
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol BEGINSWITH 'c'");
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol BEGINSWITH 'A'");
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol BEGINSWITH ''");
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol BEGINSWITH[c] 'a'");
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol BEGINSWITH[c] 'A'");
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol BEGINSWITH[c] ''");
 }
 
 - (void)testStringEndsWith
