@@ -658,11 +658,11 @@ case "$COMMAND" in
         git tag $tag
         pod spec lint --verbose || (
           git tag -d $tag
-          git reset --hard HEAD^
+          git reset --hard HEAD^ || true
           exit 1
         )
         git tag -d $tag
-        git reset --hard HEAD^
+        git reset --hard HEAD^ || true
         cd examples/installation
         sh build.sh test-ios-objc-cocoapods || exit 1
         sh build.sh test-ios-swift-cocoapods || exit 1
