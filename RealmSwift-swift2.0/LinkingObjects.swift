@@ -92,6 +92,14 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
     // MARK: Initializers
 
+    /**
+     Creates a LinkingObjects. This initializer should only be called when
+     declaring a property on a Realm model.
+
+     - parameter type:         The originating type linking to this object type.
+     - parameter propertyName: The property name of the incoming relationship
+                               this LinkingObjects should refer to.
+    */
     public init(fromType type: T.Type, property propertyName: String) {
         let className = (T.self as Object.Type).className()
         super.init(fromClassName: className, property: propertyName)
