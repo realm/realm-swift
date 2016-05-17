@@ -711,8 +711,8 @@ case "$COMMAND" in
     "verify-docs")
         sh build.sh docs
         for lang in swift objc; do
-            undocumented="docs/${lang}_output/undocumented.txt"
-            if [ -s "$undocumented" ]; then
+            undocumented="docs/${lang}_output/undocumented.json"
+            if ! cat "$undocumented" | grep '"warnings":\[\]' > /dev/null 2>&1; then
               echo "Undocumented Realm $lang declarations:"
               cat "$undocumented"
               exit 1
