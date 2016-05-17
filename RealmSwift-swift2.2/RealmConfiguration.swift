@@ -59,7 +59,8 @@ extension Realm {
         - parameter schemaVersion:      The current schema version.
         - parameter migrationBlock:     The block which migrates the Realm to the current version.
         - parameter deleteRealmIfMigrationNeeded: If `true`, recreate the Realm file with the new schema
-                                                  if a migration is required.
+                                                  if a migration is required or if the schema version on this
+                                                  configuration is different from the schema version of the Realm file.
         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
         */
         public init(fileURL: NSURL? = NSURL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
@@ -124,7 +125,9 @@ extension Realm {
         /// The block which migrates the Realm to the current version.
         public var migrationBlock: MigrationBlock? = nil
 
-        /// Recreate the Realm file with the new schema if a migration is required.
+        /// Recreate the Realm file with the new schema if a migration is required,
+        /// or if the schema version on this configuration is different from the
+        /// schema version of the Realm file.
         public var deleteRealmIfMigrationNeeded: Bool = false
 
         /// The classes persisted in the Realm.

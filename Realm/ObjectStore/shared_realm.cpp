@@ -236,6 +236,11 @@ void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
             return;
         }
     }
+    else if (m_config.delete_realm_if_migration_needed && current_schema_version != ObjectStore::NotVersioned) {
+        // Delete realm rather than run migration if delete_realm_if_migration_needed is set and the Realm file exists.
+        // FIXME: not a schema mismatch exception, but this is the exception used to signal the Realm file deletion.
+        throw SchemaMismatchException(std::vector<ObjectSchemaValidationException>());
+    }
 
     Config old_config(m_config);
     auto migration_function = [&](Group*,  Schema&) {
