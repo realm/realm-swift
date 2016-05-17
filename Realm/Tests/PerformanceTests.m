@@ -31,7 +31,7 @@
 @property (nonatomic) dispatch_semaphore_t sema;
 @end
 
-static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
+static RLMRealm *s_mediumRealm, *s_largeRealm;
 
 static int s_fsyncFd;
 static NSString *s_fsyncPath;
@@ -41,7 +41,6 @@ static NSString *s_fsyncPath;
 + (void)setUp {
     [super setUp];
 
-    s_smallRealm = [self createStringObjects:1];
     s_mediumRealm = [self createStringObjects:5];
     s_largeRealm = [self createStringObjects:50];
 
@@ -57,9 +56,30 @@ static NSString *s_fsyncPath;
     close(s_fsyncFd);
     unlink(s_fsyncPath.UTF8String);
 
-    s_smallRealm = s_mediumRealm = s_largeRealm = nil;
+    s_mediumRealm = s_largeRealm = nil;
     [RLMRealm resetRealmState];
     [super tearDown];
+}
+
++ (RLMRealm *)createStringObjects:(int)factor {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.inMemoryIdentifier = @(factor).stringValue;
+
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    [realm beginWriteTransaction];
+    for (int i = 0; i < 1000 * factor; ++i) {
+        [StringObject createInRealm:realm withValue:@[@"a"]];
+        [StringObject createInRealm:realm withValue:@[@"b"]];
+    }
+    [realm commitWriteTransaction];
+
+    return realm;
+}
+
+- (RLMRealm *)openCopyOf:(RLMRealm *)sourceRealm {
+    [self deleteRealmFileAtURL:RLMTestRealmURL()];
+    [sourceRealm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:nil];
+    return [self realmWithTestPath];
 }
 
 - (void)resetRealmState {
@@ -102,21 +122,6 @@ static NSString *s_fsyncPath;
             block();
         }
     }];
-}
-
-+ (RLMRealm *)createStringObjects:(int)factor {
-    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-    config.inMemoryIdentifier = @(factor).stringValue;
-
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-    [realm beginWriteTransaction];
-    for (int i = 0; i < 1000 * factor; ++i) {
-        [StringObject createInRealm:realm withValue:@[@"a"]];
-        [StringObject createInRealm:realm withValue:@[@"b"]];
-    }
-    [realm commitWriteTransaction];
-
-    return realm;
 }
 
 - (RLMRealm *)testRealm {
@@ -169,17 +174,8 @@ static NSString *s_fsyncPath;
     }];
 }
 
-- (RLMRealm *)getStringObjects:(int)factor {
-    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-    config.inMemoryIdentifier = @(factor).stringValue;
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-    [NSFileManager.defaultManager removeItemAtURL:RLMTestRealmURL() error:nil];
-    [realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:nil];
-    return [self realmWithTestPath];
-}
-
 - (void)testCountWhereQuery {
-    RLMRealm *realm = [self getStringObjects:50];
+    RLMRealm *realm = [self openCopyOf:s_largeRealm];
     [self measureBlock:^{
         for (int i = 0; i < 50; ++i) {
             RLMResults *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
@@ -189,7 +185,7 @@ static NSString *s_fsyncPath;
 }
 
 - (void)testCountWhereTableView {
-    RLMRealm *realm = [self getStringObjects:50];
+    RLMRealm *realm = [self openCopyOf:s_largeRealm];
     [self measureBlock:^{
         for (int i = 0; i < 10; ++i) {
             RLMResults *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
@@ -200,7 +196,7 @@ static NSString *s_fsyncPath;
 }
 
 - (void)testEnumerateAndAccessQuery {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self openCopyOf:s_mediumRealm];
 
     [self measureBlockDiscardingFirst:^{
         for (StringObject *so in [StringObject objectsInRealm:realm where:@"stringCol = 'a'"]) {
@@ -210,7 +206,7 @@ static NSString *s_fsyncPath;
 }
 
 - (void)testEnumerateAndAccessAll {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self openCopyOf:s_mediumRealm];
 
     [self measureBlockDiscardingFirst:^{
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
@@ -220,7 +216,7 @@ static NSString *s_fsyncPath;
 }
 
 - (void)testEnumerateAndAccessAllSlow {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self openCopyOf:s_mediumRealm];
 
     [self measureBlockDiscardingFirst:^{
         RLMResults *all = [StringObject allObjectsInRealm:realm];
@@ -232,7 +228,7 @@ static NSString *s_fsyncPath;
 }
 
 - (void)testEnumerateAndAccessArrayProperty {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self openCopyOf:s_mediumRealm];
 
     [realm beginWriteTransaction];
     ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm
@@ -247,7 +243,7 @@ static NSString *s_fsyncPath;
 }
 
 - (void)testEnumerateAndAccessArrayPropertySlow {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self openCopyOf:s_mediumRealm];
 
     [realm beginWriteTransaction];
     ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm
@@ -264,7 +260,7 @@ static NSString *s_fsyncPath;
 
 - (void)testEnumerateAndMutateAll {
     [self measureBlockWithoutAutoStart:^{
-        RLMRealm *realm = [self getStringObjects:5];
+        RLMRealm *realm = [self openCopyOf:s_mediumRealm];
         [self startMeasuring];
         [realm beginWriteTransaction];
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
@@ -276,7 +272,7 @@ static NSString *s_fsyncPath;
 
 - (void)testEnumerateAndMutateQuery {
     [self measureBlockWithoutAutoStart:^{
-        RLMRealm *realm = [self getStringObjects:5];
+        RLMRealm *realm = [self openCopyOf:s_mediumRealm];
         [self startMeasuring];
 
         [realm beginWriteTransaction];
@@ -300,7 +296,7 @@ static NSString *s_fsyncPath;
 
 - (void)testDeleteAll {
     [self measureBlockWithoutAutoStart:^{
-        RLMRealm *realm = [self getStringObjects:50];
+        RLMRealm *realm = [self openCopyOf:s_largeRealm];
 
         [self startMeasuring];
         [realm beginWriteTransaction];
@@ -312,7 +308,7 @@ static NSString *s_fsyncPath;
 
 - (void)testQueryDeletion {
     [self measureBlockWithoutAutoStart:^{
-        RLMRealm *realm = [self getStringObjects:5];
+        RLMRealm *realm = [self openCopyOf:s_mediumRealm];
 
         [self startMeasuring];
         [realm beginWriteTransaction];
@@ -324,7 +320,7 @@ static NSString *s_fsyncPath;
 
 - (void)testManualDeletion {
     [self measureBlockWithoutAutoStart:^{
-        RLMRealm *realm = [self getStringObjects:5];
+        RLMRealm *realm = [self openCopyOf:s_mediumRealm];
 
         NSMutableArray *objects = [NSMutableArray arrayWithCapacity:10000];
         for (StringObject *obj in [StringObject allObjectsInRealm:realm]) {
@@ -521,7 +517,7 @@ static NSString *s_fsyncPath;
 
 - (void)testCommitWriteTransactionWithResultsNotification {
     [self measureBlockWithoutAutoStart:^{
-        RLMRealm *realm = [self getStringObjects:5];
+        RLMRealm *realm = [self openCopyOf:s_mediumRealm];
         RLMResults *results = [StringObject allObjectsInRealm:realm];
         id token = [results addNotificationBlock:^(__unused RLMResults *results, __unused RLMCollectionChange *change, __unused NSError *error) {
             CFRunLoopStop(CFRunLoopGetCurrent());
@@ -540,7 +536,7 @@ static NSString *s_fsyncPath;
 
 - (void)testCommitWriteTransactionWithListNotification {
     [self measureBlockWithoutAutoStart:^{
-        RLMRealm *realm = [self getStringObjects:5];
+        RLMRealm *realm = [self openCopyOf:s_mediumRealm];
         [realm beginWriteTransaction];
         ArrayPropertyObject *arrayObj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
         [realm commitWriteTransaction];
@@ -621,7 +617,7 @@ static NSString *s_fsyncPath;
 
 - (void)testArrayKVOIndexHandlingRemoveForward {
     [self measureBlockWithoutAutoStart:^{
-        RLMRealm *realm = [self getStringObjects:50];
+        RLMRealm *realm = [self openCopyOf:s_largeRealm];
         [realm beginWriteTransaction];
         ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
         [realm commitWriteTransaction];
@@ -642,7 +638,7 @@ static NSString *s_fsyncPath;
 
 - (void)testArrayKVOIndexHandlingRemoveBackwards {
     [self measureBlockWithoutAutoStart:^{
-        RLMRealm *realm = [self getStringObjects:50];
+        RLMRealm *realm = [self openCopyOf:s_largeRealm];
         [realm beginWriteTransaction];
         ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
         [realm commitWriteTransaction];
@@ -663,7 +659,7 @@ static NSString *s_fsyncPath;
 
 - (void)testArrayKVOIndexHandlingInsertCompact {
     [self measureBlockWithoutAutoStart:^{
-        RLMRealm *realm = [self getStringObjects:50];
+        RLMRealm *realm = [self openCopyOf:s_largeRealm];
         [realm beginWriteTransaction];
         ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
         [realm commitWriteTransaction];
@@ -696,7 +692,7 @@ static NSString *s_fsyncPath;
 
 - (void)testArrayKVOIndexHandlingInsertSparse {
     [self measureBlockWithoutAutoStart:^{
-        RLMRealm *realm = [self getStringObjects:50];
+        RLMRealm *realm = [self openCopyOf:s_largeRealm];
         [realm beginWriteTransaction];
         ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
         [realm commitWriteTransaction];
