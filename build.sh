@@ -643,6 +643,7 @@ case "$COMMAND" in
         ;;
 
     "verify-cocoapods")
+        pod setup
         for podspec in Realm.podspec RealmSwift.podspec; do
           sed -i '' "s|https://github.com/realm/realm-cocoa.git|$PWD|" $podspec
           sed -i '' "s|:tag => \"v#{s.version}\"|:tag => \"v#{s.version}-pod-lint\"|" $podspec
