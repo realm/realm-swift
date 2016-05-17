@@ -341,44 +341,6 @@ RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *ob
     return object ? object->_objectSchema : nil;
 }
 
-NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property) {
-    if (!object) {
-        return nil;
-    }
-
-    if (!object->_realm) {
-        @throw RLMException(@"Linking object only available for objects in a Realm.");
-    }
-    [object->_realm verifyThread];
-
-    if (!object->_row.is_attached()) {
-        @throw RLMException(@"Object has been deleted or invalidated and is no longer valid.");
-    }
-
-    RLMObjectSchema *schema = object->_realm.schema[className];
-    RLMProperty *prop = schema[property];
-    if (!prop) {
-        @throw RLMException(@"Invalid property '%@'", property);
-    }
-
-    if (![prop.objectClassName isEqualToString:object->_objectSchema.className]) {
-        @throw RLMException(@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, object->_objectSchema.className);
-    }
-
-    Table *table = schema.table;
-    if (!table) {
-        return @[];
-    }
-
-    size_t col = prop.column;
-    NSUInteger count = object->_row.get_backlink_count(*table, col);
-    NSMutableArray *links = [NSMutableArray arrayWithCapacity:count];
-    for (NSUInteger i = 0; i < count; i++) {
-        [links addObject:RLMCreateObjectAccessor(object->_realm, schema, object->_row.get_backlink(*table, col, i))];
-    }
-    return [links copy];
-}
-
 id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key) {
     if (!object) {
         return nil;

@@ -1953,40 +1953,4 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     XCTAssertThrows([PrimaryIntObject objectInRealm:self.nonLiteralNil forPrimaryKey:@0]);
 }
 
-- (void)testBacklinks {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    StringObject *obj = [[StringObject alloc] initWithValue:@[@"string"]];
-
-    // calling on standalone should throw
-    XCTAssertThrows([obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"]);
-
-    RLMRealm *realm = RLMRealm.defaultRealm;
-    [realm transactionWithBlock:^{
-        [realm addObject:obj];
-    }];
-
-    XCTAssertThrows([obj linkingObjectsOfClass:StringObject.className forProperty:@"stringCol"]);
-    XCTAssertThrows([obj linkingObjectsOfClass:OwnerObject.className forProperty:@"dog"]);
-    XCTAssertThrows([obj linkingObjectsOfClass:@"invalidClassName" forProperty:@"stringObjectCol"]);
-    XCTAssertEqual(0U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
-
-    [realm transactionWithBlock:^{
-        StringLinkObject *lObj = [StringLinkObject createInDefaultRealmWithValue:@[obj, @[]]];
-        XCTAssertEqual(1U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
-
-        lObj.stringObjectCol = nil;
-        XCTAssertEqual(0U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
-
-        [lObj.stringObjectArrayCol addObject:obj];
-        XCTAssertEqual(1U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectArrayCol"] count]);
-        [lObj.stringObjectArrayCol addObject:obj];
-        XCTAssertEqual(2U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectArrayCol"] count]);
-
-        [realm deleteObject:obj];
-        XCTAssertThrows([obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"]);
-    }];
-#pragma clang diagnostic pop
-}
-
 @end

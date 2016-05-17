@@ -56,9 +56,6 @@ RLM_ASSUME_NONNULL_BEGIN
 /// The local URL to the realm file. Mutually exclusive with `inMemoryIdentifier`.
 @property (nonatomic, copy, nullable) NSURL *fileURL;
 
-/// The path to the realm file. Mutually exclusive with `inMemoryIdentifier`.
-@property (nonatomic, copy, nullable) NSString *path DEPRECATED_MSG_ATTRIBUTE("use fileURL");
-
 /// A string used to identify a particular in-memory Realm. Mutually exclusive with `path`.
 @property (nonatomic, copy, nullable) NSString *inMemoryIdentifier;
 
