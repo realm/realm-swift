@@ -23,6 +23,8 @@ NSString * const RLMRealmDidChangeNotification = @"RLMRealmDidChangeNotification
 
 NSString * const RLMErrorDomain = @"io.realm";
 
+NSString * const RLMUnknownSystemErrorDomain = @"io.realm.unknown";
+
 NSString * const RLMExceptionName = @"RLMException";
 
 NSString * const RLMRealmVersionKey = @"RLMRealmVersion";

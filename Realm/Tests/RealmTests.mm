@@ -1448,22 +1448,76 @@ extern "C" {
     XCTAssertFalse(realm.isEmpty, @"Realm should not be empty after committing a write transaction that added an object.");
 }
 
+- (void)testRealmFileAccessNilPath {
+    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithURL:self.nonLiteralNil],
+                                      @"Realm path must not be empty", @"nil path");
+}
 
-- (void)testRealmFileAccess
+- (void)testRealmFileAccessNoExistingFile
 {
-    XCTAssertThrows([RLMRealm realmWithURL:self.nonLiteralNil], @"nil path");
+    NSURL *fileURL = [NSURL fileURLWithPath:RLMRealmPathForFile(@"filename.realm")];
+    [[NSFileManager defaultManager] removeItemAtPath:fileURL.path error:nil];
+    assert(![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]);
 
+    NSError *error;
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = fileURL;
+    XCTAssertNotNil([RLMRealm realmWithConfiguration:configuration error:&error],
+                    @"Database should have been created");
+    XCTAssertNil(error);
+}
+
+- (void)testRealmFileAccessInvalidFile
+{
     NSString *content = @"Some content";
     NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
     NSURL *fileURL = [NSURL fileURLWithPath:RLMRealmPathForFile(@"filename.realm")];
+    [[NSFileManager defaultManager] removeItemAtPath:fileURL.path error:nil];
+    assert(![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]);
     [[NSFileManager defaultManager] createFileAtPath:fileURL.path contents:fileContents attributes:nil];
 
     NSError *error;
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = fileURL;
     XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Invalid database");
-    XCTAssertNotNil(error, @"Should populate error object");
+    RLMValidateRealmError(error, RLMErrorFileAccess, @"Unable to open a realm at path", @"Realm file has bad size");
 }
+
+- (void)testRealmFileAccessFileIsDirectory
+{
+    NSURL *testURL = RLMTestRealmURL();
+    [[NSFileManager defaultManager] createDirectoryAtPath:testURL.path
+                              withIntermediateDirectories:NO
+                                               attributes:nil
+                                                    error:nil];
+    NSError *error;
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = testURL;
+    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Invalid database");
+    RLMValidateRealmError(error, RLMErrorFileAccess, @"Unable to open a realm at path", @"Is a directory");
+}
+
+#if TARGET_OS_TV
+#else
+- (void)testRealmFifoError
+{
+    NSFileManager *manager = [NSFileManager defaultManager];
+    NSURL *testURL = RLMTestRealmURL();
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = testURL;
+
+    // Create the expected fifo URL and create a directory.
+    // Note that creating a file when a directory with the same name exists produces a different errno, which is good.
+    NSURL *fifoURL = [[testURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"realm.note"];
+    assert(![manager fileExistsAtPath:fifoURL.path]);
+    [manager createDirectoryAtPath:fifoURL.path withIntermediateDirectories:YES attributes:nil error:nil];
+
+    NSError *error;
+    XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Should not have been able to open FIFO");
+    XCTAssertNotNil(error);
+    RLMValidateRealmError(error, RLMErrorFileAccess, @"Is a directory", nil);
+}
+#endif
 
 - (void)testMultipleRealms
 {
@@ -1507,8 +1561,7 @@ extern "C" {
     NSError *error;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:RLMRealmConfiguration.defaultConfiguration error:&error];
     XCTAssertNil(realm);
-    XCTAssertNotNil(error);
-    XCTAssertEqual(RLMErrorIncompatibleLockFile, error.code);
+    RLMValidateRealmError(error, RLMErrorIncompatibleLockFile, @"Realm file is currently open in another process", nil);
 
     flock(fd, LOCK_UN);
     close(fd);

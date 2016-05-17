@@ -29,7 +29,7 @@ namespace realm {
         Double = 10,
         String = 2,
         Data   = 4,
-        Any    = 6, // Deprecated and will be removed in the future
+        Any    = 6, // Deprecated
         Date   = 8,
         Object = 12,
         Array  = 13,

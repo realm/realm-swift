@@ -17,9 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMDefines.h>
 
-RLM_ASSUME_NONNULL_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 @class RLMProperty;
 
@@ -40,7 +39,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  @see RLMProperty
  */
-@property (nonatomic, readonly, copy) NSArray RLM_GENERIC(RLMProperty *) *properties;
+@property (nonatomic, readonly, copy) NSArray<RLMProperty *> *properties;
 
 /**
  The name of the class this schema describes.
@@ -70,4 +69,4 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @end
 
-RLM_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END

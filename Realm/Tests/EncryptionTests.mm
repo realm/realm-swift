@@ -75,7 +75,10 @@
     }
 
     @autoreleasepool {
-        XCTAssertThrows([RLMRealm defaultRealm]);
+        RLMAssertThrowsWithError([RLMRealm defaultRealm],
+                                 @"Unable to open a realm at path",
+                                 RLMErrorFileAccess,
+                                 @"Not a Realm file");
     }
 }
 
@@ -87,7 +90,10 @@
 
     @autoreleasepool {
         NSData *key = RLMGenerateKey();
-        XCTAssertThrows([self realmWithKey:key]);
+        RLMAssertThrowsWithError([self realmWithKey:key],
+                                 @"Unable to open a realm at path",
+                                 RLMErrorFileAccess,
+                                 @"Realm file decryption failed");
     }
 }
 
@@ -98,13 +104,16 @@
 
     @autoreleasepool {
         NSData *key = RLMGenerateKey();
-        XCTAssertThrows([self realmWithKey:key]);
+        RLMAssertThrowsWithError([self realmWithKey:key],
+                                 @"Unable to open a realm at path",
+                                 RLMErrorFileAccess,
+                                 @"Realm file decryption failed");
     }
 }
 
 - (void)testOpenWithNewKeyWhileAlreadyOpenThrows {
     [self realmWithKey:RLMGenerateKey()];
-    XCTAssertThrows([self realmWithKey:RLMGenerateKey()]);
+    RLMAssertThrows([self realmWithKey:RLMGenerateKey()], @"already opened with different encryption key");
 }
 
 #pragma mark - writeCopyToURL:

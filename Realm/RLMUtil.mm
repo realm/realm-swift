@@ -99,14 +99,6 @@ static inline bool nsnumber_is_like_double(__unsafe_unretained NSNumber *const o
            data_type == *@encode(unsigned long long);
 }
 
-static inline bool object_has_valid_type(__unsafe_unretained id const obj)
-{
-    return ([obj isKindOfClass:[NSString class]] ||
-            [obj isKindOfClass:[NSNumber class]] ||
-            [obj isKindOfClass:[NSDate class]] ||
-            [obj isKindOfClass:[NSData class]]);
-}
-
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
                                  __unsafe_unretained RLMProperty *const property) {
     if (property.optional && !RLMCoerceToNil(obj)) {
@@ -141,7 +133,7 @@ BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
         case RLMPropertyTypeData:
             return [obj isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny:
-            return object_has_valid_type(obj);
+            return NO;
         case RLMPropertyTypeObject:
         case RLMPropertyTypeLinkingObjects: {
             // only NSNull, nil, or objects which derive from RLMObject and match the given
@@ -236,18 +228,25 @@ NSError *RLMMakeError(RLMError code, const realm::util::File::AccessError& excep
 }
 
 NSError *RLMMakeError(RLMError code, const realm::RealmFileException& exception) {
+    NSString *underlying = @(exception.underlying().c_str());
     return [NSError errorWithDomain:RLMErrorDomain
                                code:code
                            userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
                                       NSFilePathErrorKey: @(exception.path().c_str()),
-                                      @"Error Code": @(code)}];
+                                      @"Error Code": @(code),
+                                      @"Underlying": underlying.length == 0 ? @"n/a" : underlying}];
 }
 
 NSError *RLMMakeError(std::system_error const& exception) {
-    return [NSError errorWithDomain:RLMErrorDomain
+    BOOL isGenericCategoryError = (exception.code().category() == std::generic_category());
+    NSString *category = @(exception.code().category().name());
+    NSString *errorDomain = isGenericCategoryError ? NSPOSIXErrorDomain : RLMUnknownSystemErrorDomain;
+
+    return [NSError errorWithDomain:errorDomain
                                code:exception.code().value()
                            userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
-                                      @"Error Code": @(exception.code().value())}];
+                                      @"Error Code": @(exception.code().value()),
+                                      @"Category": category}];
 }
 
 NSError *RLMMakeError(NSException *exception) {
@@ -332,7 +331,7 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
     switch (mixed.get_type()) {
         case realm::type_String:
             return RLMStringDataToNSString(mixed.get_string());
-        case realm::type_Int: {
+        case realm::type_Int:
             return @(mixed.get_int());
         case realm::type_Float:
             return @(mixed.get_float());
@@ -348,6 +347,5 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
         case realm::type_LinkList:
         default:
             @throw RLMException(@"Invalid data type for RLMPropertyTypeAny property.");
-        }
     }
 }

@@ -17,9 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMDefines.h>
 
-RLM_ASSUME_NONNULL_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObjectSchema;
 
@@ -41,7 +40,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @see RLMObjectSchema
  */
-@property (nonatomic, readonly, copy) NSArray RLM_GENERIC(RLMObjectSchema *) *objectSchema;
+@property (nonatomic, readonly, copy) NSArray<RLMObjectSchema *> *objectSchema;
 
 #pragma mark - Methods
 
@@ -73,4 +72,4 @@ RLM_ASSUME_NONNULL_BEGIN
 
 @end
 
-RLM_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END

@@ -33,7 +33,6 @@
 @property NSDate   *dateCol;
 @property NSString *stringCol;
 @property NSData   *binaryCol;
-@property id        mixedCol;
 @end
 
 @implementation DefaultObject
@@ -48,8 +47,7 @@
              @"boolCol" : @YES,
              @"dateCol" : [NSDate dateWithTimeIntervalSince1970:999999],
              @"stringCol" : @"potato",
-             @"binaryCol" : binaryData,
-             @"mixedCol" : @"foo"};
+             @"binaryCol" : binaryData};
 }
 @end
 
@@ -576,14 +574,13 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     c.dateCol = timeZero;
     c.cBoolCol = false;
     c.longCol = 99;
-    c.mixedCol = @"string";
     c.objectCol = [[StringObject alloc] init];
     c.objectCol.stringCol = @"c";
     
     [realm addObject:c];
 
     [AllTypesObject createInRealm:realm withValue:@[@YES, @506, @7.7f, @8.8, @"banach", bin2,
-                                                     timeNow, @YES, @(-20), @2, NSNull.null]];
+                                                     timeNow, @YES, @(-20), NSNull.null]];
     [realm commitWriteTransaction];
     
     AllTypesObject *row1 = [AllTypesObject allObjects][0];
@@ -609,9 +606,6 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertEqual(row2.longCol, -20L,                  @"row2.IntCol");
     XCTAssertTrue([row1.objectCol.stringCol isEqual:@"c"], @"row1.objectCol");
     XCTAssertNil(row2.objectCol,                        @"row2.objectCol");
-
-    XCTAssertTrue([row1.mixedCol isEqual:@"string"],    @"row1.mixedCol");
-    XCTAssertEqualObjects(row2.mixedCol, @2,            @"row2.mixedCol");
 
     [realm transactionWithBlock:^{
         row1.boolCol = NO;
@@ -1151,8 +1145,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
              @"boolCol"   : @NO,
              @"dateCol"   : [NSDate dateWithTimeIntervalSince1970:454321],
              @"stringCol" : @"Westeros",
-             @"binaryCol" : [@"inputData" dataUsingEncoding:NSUTF8StringEncoding],
-             @"mixedCol"  : @"Tyrion"};
+             @"binaryCol" : [@"inputData" dataUsingEncoding:NSUTF8StringEncoding]};
 }
 
 - (void)testDefaultValuesFromNoValuePresent
@@ -1304,13 +1297,13 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
                                                @"dateCol"   : timeNow,
                                                @"cBoolCol"  : @NO,
                                                @"longCol"   : @(99),
-                                               @"mixedCol"  : @"mixed",
                                                @"objectCol" : NSNull.null};
     
     [realm beginWriteTransaction];
     
     // Test NSDictonary
-    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withValue:dictValidAllTypes]), @"Creating object with valid value types should not throw exception");
+    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withValue:dictValidAllTypes]),
+                     @"Creating object with valid value types should not throw exception");
     
     for (NSString *keyToInvalidate in dictValidAllTypes.allKeys) {
         NSMutableDictionary *invalidInput = [dictValidAllTypes mutableCopy];
@@ -1321,10 +1314,8 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
         
         invalidInput[keyToInvalidate] = obj;
         
-        // Ignoring test for mixedCol since only NSObjects can go in NSDictionary
-        if (![keyToInvalidate isEqualToString:@"mixedCol"]) {
-            XCTAssertThrows(([AllTypesObject createInRealm:realm withValue:invalidInput]), @"Creating object with invalid value types should throw exception");
-        }
+        XCTAssertThrows(([AllTypesObject createInRealm:realm withValue:invalidInput]),
+                        @"Creating object with invalid value types should throw exception");
     }
     
     
@@ -1343,15 +1334,15 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     const char bin[4] = { 0, 1, 2, 3 };
     NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-    NSArray *const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed", to];
+    NSArray *const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), to];
     
     [realm beginWriteTransaction];
     
     // Test NSArray
-    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withValue:arrayValidAllTypes]), @"Creating object with valid value types should not throw exception");
+    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withValue:arrayValidAllTypes]),
+                     @"Creating object with valid value types should not throw exception");
     
     const NSInteger stringColIndex = 4;
-    const NSInteger mixedColIndex = 9;
     for (NSUInteger i = 0; i < arrayValidAllTypes.count; i++) {
         NSMutableArray *invalidInput = [arrayValidAllTypes mutableCopy];
         
@@ -1362,10 +1353,8 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
         
         invalidInput[i] = obj;
         
-        // Ignoring test for mixedCol since only NSObjects can go in NSArray
-        if (i != mixedColIndex) {
-            XCTAssertThrows(([AllTypesObject createInRealm:realm withValue:invalidInput]), @"Creating object with invalid value types should throw exception");
-        }
+        XCTAssertThrows(([AllTypesObject createInRealm:realm withValue:invalidInput]),
+                        @"Creating object with invalid value types should throw exception");
     }
     
     [realm commitWriteTransaction];

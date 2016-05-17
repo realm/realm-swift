@@ -52,11 +52,11 @@ class SwiftOptionalObject: RLMObject {
 //    dynamic var optIntCol: Int?
 //    dynamic var optFloatCol: Float?
 //    dynamic var optDoubleCol: Double?
-    dynamic var optStringCol: NSString?
+    dynamic var optStringCol: String?
+    dynamic var optNSStringCol: NSString?
     dynamic var optBinaryCol: NSData?
     dynamic var optDateCol: NSDate?
     dynamic var optObjectCol: SwiftBoolObject?
-//    dynamic var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
 }
 
 class SwiftDogObject: RLMObject {
@@ -65,7 +65,7 @@ class SwiftDogObject: RLMObject {
 
 class SwiftOwnerObject: RLMObject {
     dynamic var name = ""
-    dynamic var dog = SwiftDogObject()
+    dynamic var dog: SwiftDogObject? = SwiftDogObject()
 }
 
 class SwiftAggregateObject: RLMObject {
@@ -114,7 +114,7 @@ class SwiftIgnoredPropertiesObject: RLMObject {
     dynamic var runtimeProperty: AnyObject?
     dynamic var readOnlyProperty: Int { return 0 }
 
-    override class func ignoredProperties() -> [AnyObject]? {
+    override class func ignoredProperties() -> [String]? {
         return ["runtimeProperty"]
     }
 }
@@ -125,5 +125,19 @@ class SwiftPrimaryStringObject: RLMObject {
 
     override class func primaryKey() -> String {
         return "stringCol"
+    }
+}
+
+class SwiftLinkSourceObject: RLMObject {
+    dynamic var id = 0
+    dynamic var link: SwiftLinkTargetObject?
+}
+
+class SwiftLinkTargetObject: RLMObject {
+    dynamic var id = 0
+    dynamic var backlinks: RLMLinkingObjects?
+
+    override class func linkingObjectsProperties() -> [String : RLMPropertyDescriptor] {
+        return ["backlinks": RLMPropertyDescriptor(withClass: SwiftLinkSourceObject.self, propertyName: "link")]
     }
 }

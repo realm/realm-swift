@@ -118,7 +118,6 @@ RLM_ARRAY_TYPE(IntObject)
 @property NSDate       *dateCol;
 @property bool          cBoolCol;
 @property int64_t     longCol;
-@property id            mixedCol;
 @property StringObject *objectCol;
 @property (readonly) RLMLinkingObjects *linkingObjectsCol;
 
@@ -202,16 +201,6 @@ RLM_ARRAY_TYPE(DogObject)
 
 #pragma mark - Specific Use Objects
 #pragma mark -
-
-#pragma mark MixedObject
-
-@interface MixedObject : RLMObject
-
-@property BOOL hired;
-@property id other;
-@property NSInteger age;
-
-@end
 
 #pragma mark CustomAccessorsObject
 

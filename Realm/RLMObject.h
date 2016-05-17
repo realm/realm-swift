@@ -20,7 +20,7 @@
 
 #import <Realm/RLMObjectBase.h>
 
-RLM_ASSUME_NONNULL_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 @class RLMPropertyDescriptor;
 @class RLMRealm;
@@ -237,7 +237,7 @@ RLM_ASSUME_NONNULL_BEGIN
  Only supported for string, integer, boolean, and NSDate properties.
  @return    NSArray of property names.
  */
-+ (NSArray RLM_GENERIC(NSString *) *)indexedProperties;
++ (NSArray<NSString *> *)indexedProperties;
 
 /**
  Implement to indicate the default values to be used for each property.
@@ -262,7 +262,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  @return    NSArray of property names to ignore.
  */
-+ (nullable NSArray RLM_GENERIC(NSString *) *)ignoredProperties;
++ (nullable NSArray<NSString *> *)ignoredProperties;
 
 /**
  Implement to return an array of property names that should not allow storing nil.
@@ -277,7 +277,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return    NSArray of property names that are required.
  */
-+ (NSArray RLM_GENERIC(NSString *) *)requiredProperties;
++ (NSArray<NSString *> *)requiredProperties;
 
 /**
  Implement to return a dictionary providing information related to linking objects properties.
@@ -292,7 +292,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return     NSDictionary mapping property names to RLMPropertyDescriptor objects.
  */
-+ (NSDictionary RLM_GENERIC(NSString *, RLMPropertyDescriptor *) *)linkingObjectsProperties;
++ (NSDictionary<NSString *, RLMPropertyDescriptor *> *)linkingObjectsProperties;
 
 
 #pragma mark - Getting & Querying Objects from the Default Realm
@@ -427,4 +427,4 @@ RLM_ASSUME_NONNULL_BEGIN
 @protocol RLM_OBJECT_SUBCLASS <NSObject>   \
 @end
 
-RLM_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END

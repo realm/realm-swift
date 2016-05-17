@@ -18,9 +18,8 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMCollection.h>
-#import <Realm/RLMDefines.h>
 
-RLM_ASSUME_NONNULL_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObject, RLMRealm, RLMNotificationToken;
 
@@ -49,7 +48,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  RLMResults cannot be created directly.
  */
-@interface RLMResults RLM_GENERIC_COLLECTION : NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMResults<RLMObjectType: RLMObject *> : NSObject<RLMCollection, NSFastEnumeration>
 
 #pragma mark - Properties
 
@@ -106,7 +105,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @param object  An object (of the same type as returned from the objectClassName selector).
  */
-- (NSUInteger)indexOfObject:(RLMObjectArgument)object;
+- (NSUInteger)indexOfObject:(RLMObjectType)object;
 
 /**
  Gets the index of the first object matching the predicate.
@@ -136,10 +135,10 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return                An RLMResults of objects that match the given predicate
  */
-- (RLMResults RLM_GENERIC_RETURN*)objectsWhere:(NSString *)predicateFormat, ...;
+- (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
-- (RLMResults RLM_GENERIC_RETURN*)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
+- (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
 /**
  Get objects matching the given predicate in the RLMResults.
@@ -148,7 +147,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return            An RLMResults of objects that match the given predicate
  */
-- (RLMResults RLM_GENERIC_RETURN*)objectsWithPredicate:(NSPredicate *)predicate;
+- (RLMResults<RLMObjectType> *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get a sorted `RLMResults` from an existing `RLMResults` sorted by a property.
@@ -158,7 +157,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return    An RLMResults sorted by the specified property.
  */
-- (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults<RLMObjectType> *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
 /**
  Get a sorted `RLMResults` from an existing `RLMResults` sorted by an `NSArray`` of `RLMSortDescriptor`s.
@@ -167,7 +166,7 @@ RLM_ASSUME_NONNULL_BEGIN
 
  @return    An RLMResults sorted by the specified properties.
  */
-- (RLMResults RLM_GENERIC_RETURN*)sortedResultsUsingDescriptors:(NSArray *)properties;
+- (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray *)properties;
 
 #pragma mark - Notifications
 
@@ -228,9 +227,9 @@ RLM_ASSUME_NONNULL_BEGIN
  @param block The block to be called with the evaluated results.
  @return A token which must be held for as long as you want query results to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults RLM_GENERIC_RETURN *__nullable results,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults<RLMObjectType> *__nullable results,
                                                          RLMCollectionChange *__nullable change,
-                                                         NSError *__nullable error))block RLM_WARN_UNUSED_RESULT;
+                                                         NSError *__nullable error))block __attribute__((warn_unused_result));
 
 #pragma mark - Aggregating Property Values
 
@@ -310,7 +309,7 @@ RLM_ASSUME_NONNULL_BEGIN
  RLMLinkingObjects is an auto-updating container type that represents a collection of objects that
  link to a given object.
  */
-@interface RLMLinkingObjects RLM_GENERIC_COLLECTION : RLMResults
+@interface RLMLinkingObjects<RLMObjectType: RLMObject *> : RLMResults
 @end
 
-RLM_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END

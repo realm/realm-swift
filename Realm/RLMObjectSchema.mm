@@ -34,7 +34,7 @@ using namespace realm;
 
 // private properties
 @interface RLMObjectSchema ()
-@property (nonatomic, readwrite) NSDictionary RLM_GENERIC(id, RLMProperty *) *allPropertiesByName;
+@property (nonatomic, readwrite) NSDictionary<id, RLMProperty *> *allPropertiesByName;
 @property (nonatomic, readwrite) NSString *className;
 @end
 
@@ -166,13 +166,9 @@ using namespace realm;
     }
 
     for (RLMProperty *prop in schema.properties) {
-        RLMPropertyType type = prop.type;
-        if (prop.optional && !RLMPropertyTypeIsNullable(type)) {
-            NSString *error = [NSString stringWithFormat:@"Only 'string', 'binary', and 'object' properties can be made optional, and property '%@' is of type '%@'.", prop.name, RLMTypeToString(type)];
-            if (prop.type == RLMPropertyTypeAny && isSwift) {
-                error = [error stringByAppendingString:@"\nIf this is a 'String?' property, it must be declared as 'NSString?' instead."];
-            }
-            @throw RLMException(@"%@", error);
+        if (prop.optional && !RLMPropertyTypeIsNullable(prop.type)) {
+            @throw RLMException(@"Only 'string', 'binary', and 'object' properties can be made optional, and property '%@' is of type '%@'.",
+                                prop.name, RLMTypeToString(prop.type));
         }
     }
 

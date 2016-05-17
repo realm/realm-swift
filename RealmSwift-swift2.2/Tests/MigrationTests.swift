@@ -476,15 +476,15 @@ class MigrationTests: TestCase {
         let objectSchema = RLMObjectSchema(forObjectClass: SwiftEmployeeObject.self)
         objectSchema.properties = Array(objectSchema.properties[0..<1])
 
-        let metaClass = objc_getMetaClass("RLMSchema") as! AnyClass
+        let metaClass: AnyClass = objc_getMetaClass("RLMSchema") as! AnyClass
         let imp = imp_implementationWithBlock(unsafeBitCast({ () -> RLMSchema in
             let schema = RLMSchema()
             schema.objectSchema = [objectSchema]
             return schema
         } as @convention(block)() -> (RLMSchema), AnyObject.self))
 
-        let originalImp = class_getMethodImplementation(metaClass, "sharedSchema")
-        class_replaceMethod(metaClass, "sharedSchema", imp, "@@:")
+        let originalImp = class_getMethodImplementation(metaClass, #selector(RLMObjectBase.sharedSchema))
+        class_replaceMethod(metaClass, #selector(RLMObjectBase.sharedSchema), imp, "@@:")
 
         autoreleasepool {
             assertFails(.SchemaMismatch) {
@@ -503,6 +503,6 @@ class MigrationTests: TestCase {
             let _ = try Realm(configuration: config)
         }
 
-        class_replaceMethod(metaClass, "sharedSchema", originalImp, "@@:")
+        class_replaceMethod(metaClass, #selector(RLMObjectBase.sharedSchema), originalImp, "@@:")
     }
 }

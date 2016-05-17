@@ -1,5 +1,4 @@
-included:
-  - RealmSwift-swift2.0
+included: RealmSwift-swift2.2
 line_length: 120
 variable_name:
   min_length: # not possible to disable this partial rule, so set it to zero
