@@ -857,13 +857,11 @@ static vm_size_t get_resident_size() {
 
 - (void)testAllMethodsCheckForInvalidation {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    __block IntegerArrayPropertyObject *object;
     [realm transactionWithBlock:^{
-        IntObject* intObject = [IntObject createInDefaultRealmWithValue:@[@0]];
-        object = [IntegerArrayPropertyObject createInDefaultRealmWithValue:@[ @0, @[ intObject ] ]];
+        [IntObject createInDefaultRealmWithValue:@[@0]];
     }];
 
-    RLMResults *results = [object.array sortedResultsUsingProperty:@"intCol" ascending:YES];
+    RLMResults *results = [IntObject allObjects];
     XCTAssertFalse(results.isInvalidated);
     XCTAssertNoThrow([results objectAtIndex:0]);
     XCTAssertNoThrow([results firstObject]);
