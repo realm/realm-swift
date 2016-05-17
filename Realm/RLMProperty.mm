@@ -172,12 +172,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
             static const char linkingObjectsPrefix[] = "@\"RLMLinkingObjects";
             static const int linkingObjectsPrefixLen = sizeof(linkingObjectsPrefix) - 1;
 
-            if (code[1] == '\0') {
-                @throw RLMException(@"Property '%@' is declared as 'id', which is not a supported RLMObject property type. "
-                                    @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, or subclasses of RLMObject. "
-                                    @"See https://realm.io/docs/objc/latest/api/Classes/RLMObject.html for more information.", _name);
-            }
-            else if (strcmp(code, "@\"NSString\"") == 0) {
+            if (strcmp(code, "@\"NSString\"") == 0) {
                 _type = RLMPropertyTypeString;
             }
             else if (strcmp(code, "@\"NSDate\"") == 0) {
@@ -255,14 +250,20 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
                 @throw RLMException(@"Property '%@' requires a protocol defining the contained type - example: RLMArray<Person>.", _name);
             }
             else {
-                // for objects strip the quotes and @
-                NSString *className = [_objcRawType substringWithRange:NSMakeRange(2, _objcRawType.length-3)];
+                NSString *className;
+                Class cls = nil;
+                if (code[1] == '\0') {
+                    className = @"id";
+                }
+                else {
+                    // for objects strip the quotes and @
+                    className = [_objcRawType substringWithRange:NSMakeRange(2, _objcRawType.length-3)];
+                    cls = [RLMSchema classForString:className];
+                }
 
-                // verify type
-                Class cls = [RLMSchema classForString:className];
                 if (!cls) {
                     @throw RLMException(@"Property '%@' is declared as '%@', which is not a supported RLMObject property type. "
-                                        @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, or subclasses of RLMObject. "
+                                        @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, RLMLinkingObjects, or subclasses of RLMObject. "
                                         @"See https://realm.io/docs/objc/latest/api/Classes/RLMObject.html for more information.", _name, className);
                 }
 
