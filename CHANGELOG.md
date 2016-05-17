@@ -4,6 +4,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### API breaking changes
 
 * All functionality deprecated in previous releases has been removed entirely.
+* Support for Xcode 6.x & Swift prior to 2.2 has been completely removed.
 
 ### Enhancements
 
@@ -18,7 +19,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* Support for Xcode 6.x & Swift prior to 2.2 has been completely removed.
+* None.
 
 ### Enhancements
 
