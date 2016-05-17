@@ -1231,6 +1231,48 @@ RLM_ARRAY_TYPE(MigrationObject);
     }
 }
 
+- (void)testMigratingFromMixed {
+    NSArray *values = @[@YES, @1, @1.1, @1.2f, @"str",
+                        [@"data" dataUsingEncoding:NSUTF8StringEncoding],
+                        [NSDate dateWithTimeIntervalSince1970:100]];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[[AllTypesObject class], [LinkToAllTypesObject class], [StringObject class]];
+
+#if 0 // Code for generating the test realm
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    [realm beginWriteTransaction];
+    for (id value in values) {
+        [AllTypesObject createInRealm:realm withValue:@[@NO, @0, @0, @0, @"",
+                                                        NSData.data, NSDate.date,
+                                                        @NO, @0, value, NSNull.null]];
+    }
+    [realm commitWriteTransaction];
+
+    NSURL *url = [config.fileURL.URLByDeletingLastPathComponent URLByAppendingPathComponent:@"mixed-column.realm"];
+    [realm writeCopyToURL:url encryptionKey:nil error:nil];
+    NSLog(@"wrote pre-migration realm to %@", url);
+#else
+    NSURL *bundledRealmURL = [[NSBundle bundleForClass:[DateMigrationObject class]]
+                              URLForResource:@"mixed-column" withExtension:@"realm"];
+    [NSFileManager.defaultManager removeItemAtURL:config.fileURL error:nil];
+    [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
+
+    __block bool migrationCalled = false;
+    config.schemaVersion = 1;
+    config.migrationBlock = ^(RLMMigration *migration, uint64_t) {
+        __block NSUInteger i = values.count;
+        [migration enumerateObjects:@"AllTypesObject" block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(values[--i], oldObject[@"mixedCol"]);
+            RLMAssertThrowsWithReasonMatching(newObject[@"mixedCol"],
+                                              @"Invalid property name `mixedCol` for class `AllTypesObject`.");
+        }];
+        migrationCalled = true;
+    };
+    XCTAssertNil([RLMRealm migrateRealm:config]);
+    XCTAssertTrue(migrationCalled);
+#endif
+}
+
 #pragma mark - Property Rename
 
 // Successful Property Rename Tests
@@ -1247,7 +1289,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     objectSchema.properties = beforeProperties;
 
     NSDate *now = [NSDate dateWithTimeIntervalSince1970:100000];
-    id inputValue = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, @0, @[@"a"]];
+    id inputValue = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, @[@"a"]];
 
     [self createTestRealmWithSchema:@[objectSchema, stringObjectSchema, linkingObjectsSchema] block:^(RLMRealm *realm) {
         [AllTypesObject createInRealm:realm withValue:inputValue];
@@ -1289,8 +1331,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqualObjects(inputValue[6], obj.dateCol);
     XCTAssertEqualObjects(inputValue[7], @(obj.cBoolCol));
     XCTAssertEqualObjects(inputValue[8], @(obj.longCol));
-    XCTAssertEqualObjects(inputValue[9], obj.mixedCol);
-    XCTAssertEqualObjects(inputValue[10], @[obj.objectCol.stringCol]);
+    XCTAssertEqualObjects(inputValue[9], @[obj.objectCol.stringCol]);
 }
 
 - (void)testMultipleMigrationRenameProperty {

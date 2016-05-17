@@ -77,6 +77,10 @@
 {
     return @{ @"linkingObjectsCol": [RLMPropertyDescriptor descriptorWithClass:LinkToAllTypesObject.class propertyName:@"allTypesCol"] };
 }
++ (NSArray *)requiredProperties
+{
+    return @[@"stringCol", @"dateCol", @"binaryCol"];
+}
 @end
 
 @implementation ArrayOfAllTypesObject
@@ -124,11 +128,6 @@
 
 #pragma mark - Specific Use Objects
 #pragma mark -
-
-#pragma mark MixedObject
-
-@implementation MixedObject
-@end
 
 #pragma mark CustomAccessorsObject
 

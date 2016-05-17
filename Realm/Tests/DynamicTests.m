@@ -138,11 +138,11 @@
 
 - (void)testDynamicTypes {
     NSDate *now = [NSDate dateWithTimeIntervalSince1970:100000];
-    id obj1 = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, @0, NSNull.null];
+    id obj1 = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, NSNull.null];
     
     StringObject *obj = [[StringObject alloc] init];
     obj.stringCol = @"string";
-    id obj2 = @[@NO, @2, @2.2f, @2.22, @"string2", [NSData dataWithBytes:"b" length:1], now, @NO, @22, now, obj];
+    id obj2 = @[@NO, @2, @2.2f, @2.22, @"string2", [NSData dataWithBytes:"b" length:1], now, @NO, @22, obj];
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
         RLMRealm *realm = [RLMRealm realmWithURL:RLMTestRealmURL()];
@@ -158,14 +158,14 @@
     XCTAssertEqual(results.count, (NSUInteger)2, @"Should have 2 objects");
     
     RLMObjectSchema *schema = dyrealm.schema[AllTypesObject.className];
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 9; i++) {
         NSString *propName = [schema.properties[i] name];
         XCTAssertEqualObjects(obj1[i], results[0][propName], @"Invalid property value");
         XCTAssertEqualObjects(obj2[i], results[1][propName], @"Invalid property value");
     }
     
     // check sub object type
-    XCTAssertEqualObjects([schema.properties[10] objectClassName], @"StringObject",
+    XCTAssertEqualObjects([schema.properties[9] objectClassName], @"StringObject",
                           @"Sub-object type in schema should be 'StringObject'");
     
     // check object equality
@@ -184,7 +184,7 @@
     [dyrealm beginWriteTransaction];
     RLMObject *stringObject = [dyrealm createObject:StringObject.className withValue:@[@"string"]];
     [dyrealm createObject:AllTypesObject.className withValue:@[@NO, @2, @2.2f, @2.22, @"string2",
-        [NSData dataWithBytes:"b" length:1], NSDate.date, @NO, @22, @0, stringObject]];
+        [NSData dataWithBytes:"b" length:1], NSDate.date, @NO, @22, stringObject]];
     [dyrealm commitWriteTransaction];
 
     XCTAssertEqual(1U, [dyrealm allObjects:StringObject.className].count);

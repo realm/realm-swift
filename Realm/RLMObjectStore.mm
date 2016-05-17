@@ -206,7 +206,6 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
             value = [object valueForKey:prop.getterName];
         }
 
-        // FIXME: Add condition to check for Mixed once it can support a nil value.
         if (!value && !prop.optional) {
             @throw RLMException(@"No value or default value specified for property '%@' in '%@'",
                                 prop.name, schema.className);
@@ -283,7 +282,6 @@ static void RLMValidateValueForProperty(__unsafe_unretained id const obj,
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble:
         case RLMPropertyTypeData:
-        case RLMPropertyTypeAny:
             if (!RLMIsObjectValidForProperty(obj, prop)) {
                 @throw RLMException(@"Invalid value '%@' for property '%@'", obj, prop.name);
             }
@@ -307,6 +305,7 @@ static void RLMValidateValueForProperty(__unsafe_unretained id const obj,
             }
             break;
         }
+        case RLMPropertyTypeAny:
         case RLMPropertyTypeLinkingObjects:
             @throw RLMException(@"Invalid value '%@' for property '%@'", obj, prop.name);
     }

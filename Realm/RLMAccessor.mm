@@ -390,47 +390,9 @@ static inline id RLMGetAnyProperty(__unsafe_unretained RLMObjectBase *const obj,
     RLMVerifyAttached(obj);
     return RLMMixedToObjc(obj->_row.get_mixed(col_ndx));
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger col_ndx, __unsafe_unretained id val) {
+static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger, __unsafe_unretained id) {
     RLMVerifyInWriteTransaction(obj);
-
-    // FIXME - enable when Any supports links
-    //    if (obj == nil) {
-    //        table.nullify_link(col_ndx, row_ndx);
-    //        return;
-    //    }
-    if (NSString *str = RLMDynamicCast<NSString>(val)) {
-        obj->_row.set_mixed(col_ndx, RLMStringDataWithNSString(str));
-        return;
-    }
-    if (NSDate *date = RLMDynamicCast<NSDate>(val)) {
-        obj->_row.set_mixed(col_ndx, RLMTimestampForNSDate(date));
-        return;
-    }
-    if (NSData *data = RLMDynamicCast<NSData>(val)) {
-        obj->_row.set_mixed(col_ndx, RLMBinaryDataForNSData(data));
-        return;
-    }
-    if (NSNumber *number = RLMDynamicCast<NSNumber>(val)) {
-        switch (number.objCType[0]) {
-            case 'i':
-            case 's':
-            case 'l':
-            case 'q':
-                obj->_row.set_mixed(col_ndx, number.longLongValue);
-                return;
-            case 'f':
-                obj->_row.set_mixed(col_ndx, number.floatValue);
-                return;
-            case 'd':
-                obj->_row.set_mixed(col_ndx, number.doubleValue);
-                return;
-            case 'B':
-            case 'c':
-                obj->_row.set_mixed(col_ndx, (bool)number.boolValue);
-                return;
-        }
-    }
-    @throw RLMException(@"Inserting invalid object of class %@ for an RLMPropertyTypeAny property (%@).", [val class], [obj->_objectSchema.properties[col_ndx] name]);
+    @throw RLMException(@"Modifying Mixed properties is not supported");
 }
 
 // dynamic getter with column closure
@@ -492,9 +454,7 @@ static IMP RLMAccessorGetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
                 return RLMGetArray(obj, colIndex, objectClassName, name);
             });
         case RLMAccessorCodeAny:
-            return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
-                return RLMGetAnyProperty(obj, colIndex);
-            });
+            @throw RLMException(@"Cannot create accessor class for schema with Mixed properties");
         case RLMAccessorCodeIntObject:
             return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
                 return RLMGetIntObject(obj, colIndex);
