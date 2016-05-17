@@ -643,36 +643,12 @@ case "$COMMAND" in
         ;;
 
     "verify-cocoapods")
-        pod setup
-        if [ -d .git ]; then
-          git diff-index --quiet HEAD || (
-            echo "Cannot test the podspec with uncommitted changes"
-            exit 1
-          )
-        fi
-        for podspec in Realm.podspec RealmSwift.podspec; do
-          sed -i '' "s|https://github.com/realm/realm-cocoa.git|$PWD|" $podspec
-          sed -i '' "s|:tag => \"v#{s.version}\"|:tag => \"v#{s.version}-pod-lint\"|" $podspec
-        done
-        if [ -d .git ]; then
-          git add *.podspec
-        else
-          git init
-          git add .
-        fi
-        git commit -m "commit for pod lint"
-        tag="v$(sh build.sh get-version)-pod-lint"
-        git tag $tag
-        pod spec lint --verbose || (
-          git tag -d $tag
-          git reset --hard HEAD^ || true
-          exit 1
-        )
-        git tag -d $tag
-        git reset --hard HEAD^ || true
         cd examples/installation
-        sh build.sh test-ios-objc-cocoapods || exit 1
-        sh build.sh test-ios-swift-cocoapods || exit 1
+        test-ios-objc-cocoapods
+        test-ios-swift-cocoapods
+        test-osx-objc-cocoapods
+        test-watchos-objc-cocoapods
+        test-watchos-swift-cocoapods
         ;;
 
     "verify-osx-encryption")
