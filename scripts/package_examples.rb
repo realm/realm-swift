@@ -34,14 +34,12 @@ end
 # Script
 ##########################
 
-# Create Xcode 6 and Xcode 7 versions of the iOS examples
-FileUtils.mkdir 'examples/ios/xcode-6'
-FileUtils.move 'examples/ios/objc', 'examples/ios/xcode-6'
-FileUtils.move 'examples/ios/rubymotion', 'examples/ios/xcode-6'
-FileUtils.cp_r 'examples/ios/xcode-6', 'examples/ios/xcode-7'
+# Create iOS examples
+FileUtils.mkdir 'examples/ios/xcode-7'
+FileUtils.move 'examples/ios/objc', 'examples/ios/xcode-7'
+FileUtils.move 'examples/ios/rubymotion', 'examples/ios/xcode-7'
 
 examples = [
-  "examples/ios/xcode-6/objc",
   "examples/ios/xcode-7/objc",
   "examples/osx/objc",
   "examples/tvos/objc",
@@ -55,7 +53,6 @@ examples.each do |example|
 end
 
 framework_directory_for_example = {
-  'examples/ios/xcode-6/objc' => '../../../../ios/static/xcode-6',
   'examples/ios/xcode-7/objc' => '../../../../ios/static/xcode-7',
   'examples/osx/objc' => '../../../osx',
   'examples/tvos/objc' => '../../../tvos',
@@ -74,5 +71,4 @@ end
 
 # Update RubyMotion sample
 
-replace_in_file('examples/ios/xcode-6/rubymotion/Simple/Rakefile', '/build/ios', '/ios/static/xcode-6')
 replace_in_file('examples/ios/xcode-7/rubymotion/Simple/Rakefile', '/build/ios', '/ios/static/xcode-7')

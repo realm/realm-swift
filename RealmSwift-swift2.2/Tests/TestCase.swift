@@ -117,13 +117,13 @@ class TestCase: XCTestCase {
     }
 
     func assertThrows<T>(@autoclosure(escaping) block: () -> T, _ message: String? = nil,
-                         named: String? = RLMExceptionName, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
+                         named: String? = RLMExceptionName, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrows(self, { _ = block() } as dispatch_block_t, named, message, fileName, lineNumber)
     }
 
-    func assertSucceeds(message: String? = nil, fileName: TestLocationString = __FILE__,
-                        lineNumber: UInt = __LINE__, @noescape block: () throws -> ()) {
+    func assertSucceeds(message: String? = nil, fileName: TestLocationString = #file,
+                        lineNumber: UInt = #line, @noescape block: () throws -> ()) {
         do {
             try block()
         } catch {
@@ -133,7 +133,7 @@ class TestCase: XCTestCase {
     }
 
     func assertFails<T>(expectedError: Error, _ message: String? = nil,
-                        fileName: TestLocationString = __FILE__, lineNumber: UInt = __LINE__,
+                        fileName: TestLocationString = #file, lineNumber: UInt = #line,
                         @noescape block: () throws -> T) {
         do {
             try block()
@@ -148,7 +148,7 @@ class TestCase: XCTestCase {
     }
 
     func assertNil<T>(@autoclosure block: () -> T?, _ message: String? = nil,
-                      fileName: TestLocationString = __FILE__, lineNumber: UInt = __LINE__) {
+                      fileName: TestLocationString = #file, lineNumber: UInt = #line) {
         XCTAssert(block() == nil, message ?? "", file: fileName, line: lineNumber)
     }
 

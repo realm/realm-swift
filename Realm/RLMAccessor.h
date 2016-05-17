@@ -18,7 +18,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Realm/RLMDefines.h>
 
 @class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMProperty;
 
@@ -28,7 +27,7 @@ typedef NSUInteger RLMCreationOptions;
 typedef NS_OPTIONS(NSUInteger, RLMCreationOptions);
 #endif
 
-RLM_ASSUME_NONNULL_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 //
 // Accessors Class Creation/Caching
@@ -61,4 +60,4 @@ void RLMReplaceClassNameMethod(Class accessorClass, NSString *className);
 // Replace sharedSchema method for the given class
 void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema * __nullable schema);
 
-RLM_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END

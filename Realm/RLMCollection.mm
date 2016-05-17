@@ -276,16 +276,16 @@ static NSArray *toIndexPathArray(realm::IndexSet const& set, NSUInteger section)
     return ret;
 }
 
-- (NSArray RLM_GENERIC(NSIndexPath *)*)deletionsInSection:(NSUInteger)section {
+- (NSArray<NSIndexPath *> *)deletionsInSection:(NSUInteger)section {
     return toIndexPathArray(_indices.deletions, section);
 }
 
-- (NSArray RLM_GENERIC(NSIndexPath *)*)insertionsInSection:(NSUInteger)section {
+- (NSArray<NSIndexPath *> *)insertionsInSection:(NSUInteger)section {
     return toIndexPathArray(_indices.insertions, section);
 
 }
 
-- (NSArray RLM_GENERIC(NSIndexPath *)*)modificationsInSection:(NSUInteger)section {
+- (NSArray<NSIndexPath *> *)modificationsInSection:(NSUInteger)section {
     return toIndexPathArray(_indices.modifications, section);
 
 }

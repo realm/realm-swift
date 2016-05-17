@@ -17,11 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMDefines.h>
 
 @class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
-RLM_ASSUME_NONNULL_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  An RLMRealm instance (also referred to as "a realm") represents a Realm
@@ -144,7 +143,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @return A token object which must be stored as long as you wish to continue
          receiving change notifications.
  */
-- (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block RLM_WARN_UNUSED_RESULT;
+- (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block __attribute__((warn_unused_result));
 
 #pragma mark - Transactions
 
@@ -178,7 +177,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  @warning This method can only be called during a write transaction.
  */
-- (void)commitWriteTransaction RLM_SWIFT_UNAVAILABLE("");
+- (void)commitWriteTransaction NS_SWIFT_UNAVAILABLE("");
 
 /**
  Commits all write operations in the current write transaction, and ends the
@@ -224,7 +223,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Helper to perform a block within a transaction.
  */
-- (void)transactionWithBlock:(RLM_NOESCAPE void(^)(void))block RLM_SWIFT_UNAVAILABLE("");
+- (void)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block NS_SWIFT_UNAVAILABLE("");
 
 /**
  Performs actions contained within the given block inside a write transaction.
@@ -246,7 +245,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  @return Whether the transaction succeeded.
  */
-- (BOOL)transactionWithBlock:(RLM_NOESCAPE void(^)(void))block error:(NSError **)error;
+- (BOOL)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
 
 /**
  Update an `RLMRealm` and outstanding objects to point to the most recent data for this `RLMRealm`.
@@ -476,4 +475,4 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 - (void)stop;
 @end
 
-RLM_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END

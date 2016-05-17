@@ -28,7 +28,7 @@ class IgnoredLinkPropertyObject : RLMObject {
     dynamic var value = 0
     var obj = SwiftIntObject()
 
-    override class func ignoredProperties() -> [AnyObject]? {
+    override class func ignoredProperties() -> [String] {
         return ["obj"]
     }
 }
@@ -46,6 +46,19 @@ class SwiftRecursingSchemaTestObject : RLMObject {
     static var mayAccessSchema = false
 }
 
+class InitAppendsToArrayProperty : RLMObject {
+    dynamic var propertyWithIllegalDefaultValue: RLMArray = {
+        if mayAppend {
+            let array = RLMArray(objectClassName: SwiftIntObject.className())
+            array.addObject(SwiftIntObject())
+            return array
+        } else {
+            return RLMArray(objectClassName: SwiftIntObject.className())
+        }
+    }()
+
+    static var mayAppend = false
+}
 
 class SwiftSchemaTests: RLMMultiProcessTestCase {
     func testWorksAtAll() {
@@ -62,9 +75,9 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
 
         let config = RLMRealmConfiguration.defaultConfiguration()
         config.objectClasses = [IgnoredLinkPropertyObject.self]
-        config.inMemoryIdentifier = __FUNCTION__
-        let r = RLMRealm(configuration: config, error: nil)!
-        r.transactionWithBlock {
+        config.inMemoryIdentifier = #function
+        let r = try! RLMRealm(configuration: config)
+        try! r.transactionWithBlock {
             IgnoredLinkPropertyObject.createInRealm(r, withValue: [1])
         }
     }
@@ -99,10 +112,10 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
 
         let config = RLMRealmConfiguration.defaultConfiguration()
         config.objectClasses = [IgnoredLinkPropertyObject.self]
-        config.inMemoryIdentifier = __FUNCTION__
-        let _ = RLMRealm(configuration: config, error: nil)!
-        let r = RLMRealm(configuration: RLMRealmConfiguration.defaultConfiguration(), error: nil)!
-        r.transactionWithBlock {
+        config.inMemoryIdentifier = #function
+        let _ = try! RLMRealm(configuration: config)
+        let r = try! RLMRealm(configuration: RLMRealmConfiguration.defaultConfiguration())
+        try! r.transactionWithBlock {
             IgnoredLinkPropertyObject.createInRealm(r, withValue: [1])
         }
     }
@@ -116,4 +129,17 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         SwiftRecursingSchemaTestObject.mayAccessSchema = true
         assertThrowsWithReasonMatching(RLMSchema.sharedSchema(), ".*recursive.*")
     }
+
+    func testAccessSchemaCreatesObjectWhichAttempsInsertionsToArrayProperty() {
+        if isParent {
+            XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
+            return
+        }
+
+        // This is different from the above tests in that it is a to-many link
+        // and it only occurs while the schema is initializing
+        InitAppendsToArrayProperty.mayAppend = true
+        assertThrowsWithReasonMatching(RLMSchema.sharedSchema(), ".*unless the schema is initialized.*")
+    }
+
 }
