@@ -644,11 +644,11 @@ case "$COMMAND" in
 
     "verify-cocoapods")
         cd examples/installation
-        test-ios-objc-cocoapods
-        test-ios-swift-cocoapods
-        test-osx-objc-cocoapods
-        test-watchos-objc-cocoapods
-        test-watchos-swift-cocoapods
+        sh build.sh test-ios-objc-cocoapods
+        sh build.sh test-ios-swift-cocoapods
+        sh build.sh test-osx-objc-cocoapods
+        sh build.sh test-watchos-objc-cocoapods
+        sh build.sh test-watchos-swift-cocoapods
         ;;
 
     "verify-osx-encryption")
