@@ -127,7 +127,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (BOOL)isInvalidated {
-    return translateErrors([&] { return _results.is_invalidated(); });
+    return translateErrors([&] { return !_results.is_valid(); });
 }
 
 - (NSUInteger)count {
