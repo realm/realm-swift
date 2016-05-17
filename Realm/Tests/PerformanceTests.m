@@ -76,6 +76,25 @@ static NSString *s_fsyncPath;
     }];
 }
 
+// Some of the perf tests are significantly slower on the first iteration
+// (sometimes because they're the only one which performs I/O, but there is
+// more slowdown than can be explained by only that), so call the block an
+// extra time and discard the first result. Note that the extra call does
+// need to happen after the call to measureMetrics() (and thus within the
+// wrapper block); it's not clear why.
+- (void)measureBlockDiscardingFirst:(void (^)(void))block {
+    __block bool first = true;
+    [self measureBlockWithoutAutoStart:^{
+        if (first) {
+            @autoreleasepool { block(); }
+            first = false;
+        }
+        [self startMeasuring];
+        block();
+
+    }];
+}
+
 - (void)measureBlockWithoutAutoStart:(void (^)(void))block {
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         fcntl(s_fsyncFd, F_FULLFSYNC);
@@ -183,7 +202,7 @@ static NSString *s_fsyncPath;
 - (void)testEnumerateAndAccessQuery {
     RLMRealm *realm = [self getStringObjects:5];
 
-    [self measureBlock:^{
+    [self measureBlockDiscardingFirst:^{
         for (StringObject *so in [StringObject objectsInRealm:realm where:@"stringCol = 'a'"]) {
             (void)[so stringCol];
         }
@@ -193,7 +212,7 @@ static NSString *s_fsyncPath;
 - (void)testEnumerateAndAccessAll {
     RLMRealm *realm = [self getStringObjects:5];
 
-    [self measureBlock:^{
+    [self measureBlockDiscardingFirst:^{
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
             (void)[so stringCol];
         }
@@ -203,7 +222,7 @@ static NSString *s_fsyncPath;
 - (void)testEnumerateAndAccessAllSlow {
     RLMRealm *realm = [self getStringObjects:5];
 
-    [self measureBlock:^{
+    [self measureBlockDiscardingFirst:^{
         RLMResults *all = [StringObject allObjectsInRealm:realm];
         for (NSUInteger i = 0; i < all.count; ++i) {
             (void)[all[i] stringCol];
@@ -220,7 +239,7 @@ static NSString *s_fsyncPath;
                                                        withValue:@[@"name", [StringObject allObjectsInRealm:realm], @[]]];
     [realm commitWriteTransaction];
 
-    [self measureBlock:^{
+    [self measureBlockDiscardingFirst:^{
         for (StringObject *so in apo.array) {
             (void)[so stringCol];
         }
@@ -235,7 +254,7 @@ static NSString *s_fsyncPath;
                                                        withValue:@[@"name", [StringObject allObjectsInRealm:realm], @[]]];
     [realm commitWriteTransaction];
 
-    [self measureBlock:^{
+    [self measureBlockDiscardingFirst:^{
         RLMArray *array = apo.array;
         for (NSUInteger i = 0; i < array.count; ++i) {
             (void)[array[i] stringCol];
@@ -272,7 +291,7 @@ static NSString *s_fsyncPath;
     RLMRealm *realm = self.realmWithTestPath;
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and longCol != 7 and stringCol IN {'a', 'b', 'c'}"];
 
-    [self measureBlock:^{
+    [self measureBlockDiscardingFirst:^{
         for (int i = 0; i < 500; ++i) {
             [AllTypesObject objectsInRealm:realm withPredicate:predicate];
         }
@@ -328,7 +347,7 @@ static NSString *s_fsyncPath;
     }
     [realm commitWriteTransaction];
 
-    [self measureBlock:^{
+    [self measureBlockDiscardingFirst:^{
         for (int i = 0; i < 1000; ++i) {
             [[StringObject objectsInRealm:realm where:@"stringCol = %@", @(i).stringValue] firstObject];
         }
@@ -343,7 +362,7 @@ static NSString *s_fsyncPath;
     }
     [realm commitWriteTransaction];
 
-    [self measureBlock:^{
+    [self measureBlockDiscardingFirst:^{
         for (int i = 0; i < 1000; ++i) {
             [[IndexedStringObject objectsInRealm:realm where:@"stringCol = %@", @(i).stringValue] firstObject];
         }
@@ -362,7 +381,7 @@ static NSString *s_fsyncPath;
     }
     [realm commitWriteTransaction];
 
-    [self measureBlock:^{
+    [self measureBlockDiscardingFirst:^{
         (void)[[IntObject objectsInRealm:realm where:@"intCol IN %@", ids] firstObject];
     }];
 }
@@ -375,7 +394,7 @@ static NSString *s_fsyncPath;
     }
     [realm commitWriteTransaction];
 
-    [self measureBlock:^{
+    [self measureBlockDiscardingFirst:^{
         (void)[[IntObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"intCol" ascending:YES].lastObject;
     }];
 }
@@ -397,6 +416,7 @@ static NSString *s_fsyncPath;
 }
 
 - (void)testRealmCreationUncached {
+    @autoreleasepool { [self realmWithTestPath]; }
     [self measureBlock:^{
         for (int i = 0; i < 50; ++i) {
             @autoreleasepool {

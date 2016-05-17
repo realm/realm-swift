@@ -90,6 +90,26 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
+    // Some of the perf tests are significantly slower on the first iteration
+    // (sometimes because they're the only one which performs I/O, but there is
+    // more slowdown than can be explained by only that), so call the block an
+    // extra time and discard the first result. Note that the extra call does
+    // need to happen after the call to measureMetrics() (and thus within the
+    // wrapper block); it's not clear why.
+    func measureBlockDiscardingFirst(block: (() -> Void)) {
+        var first = true
+        inMeasureBlock {
+            if first {
+                autoreleasepool {
+                    block()
+                }
+                first = false
+            }
+            self.startMeasuring()
+            block()
+        }
+    }
+
     func inMeasureBlock(block: () -> ()) {
         measureMetrics(self.dynamicType.defaultPerformanceMetrics(), automaticallyStartMeasuring: false) {
             autoreleasepool {
@@ -148,7 +168,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testCountWhereQuery() {
         let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        measureBlockDiscardingFirst {
             for _ in 0..<50 {
                 let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
                 _ = results.count
@@ -158,7 +178,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testCountWhereTableView() {
         let realm = copyRealmToTestPath(mediumRealm)
-        measureBlock {
+        measureBlockDiscardingFirst {
             for _ in 0..<50 {
                 let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
                 _ = results.first
@@ -169,7 +189,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testEnumerateAndAccessQuery() {
         let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        measureBlockDiscardingFirst {
             for stringObject in realm.objects(SwiftStringObject).filter("stringCol = 'a'") {
                 _ = stringObject.stringCol
             }
@@ -178,7 +198,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testEnumerateAndAccessAll() {
         let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        measureBlockDiscardingFirst {
             for stringObject in realm.objects(SwiftStringObject) {
                 _ = stringObject.stringCol
             }
@@ -187,7 +207,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testEnumerateAndAccessAllSlow() {
         let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        measureBlockDiscardingFirst {
             let results = realm.objects(SwiftStringObject)
             for i in 0..<results.count {
                 _ = results[i].stringCol
@@ -202,7 +222,7 @@ class SwiftPerformanceTests: TestCase {
             value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
         try! realm.commitWrite()
 
-        measureBlock {
+        measureBlockDiscardingFirst {
             for stringObject in arrayPropertyObject.array {
                 _ = stringObject.stringCol
             }
@@ -216,7 +236,7 @@ class SwiftPerformanceTests: TestCase {
             value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
         try! realm.commitWrite()
 
-        measureBlock {
+        measureBlockDiscardingFirst {
             let list = arrayPropertyObject.array
             for i in 0..<list.count {
                 _ = list[i].stringCol
@@ -290,7 +310,7 @@ class SwiftPerformanceTests: TestCase {
             }
         }
         try! realm.commitWrite()
-        measureBlock {
+        measureBlockDiscardingFirst {
             _ = realm.objects(SwiftIntObject).filter("intCol IN %@", ids).first
         }
     }
@@ -303,7 +323,7 @@ class SwiftPerformanceTests: TestCase {
                 realm.create(SwiftIntObject.self, value: [randomNumber])
             }
         }
-        measureBlock {
+        measureBlockDiscardingFirst {
             _ = realm.objects(SwiftIntObject).sorted("intCol", ascending: true).last
         }
     }
