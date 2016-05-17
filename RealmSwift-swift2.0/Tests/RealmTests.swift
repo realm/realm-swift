@@ -502,7 +502,9 @@ class RealmTests: TestCase {
             realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
         }
 
-        XCTAssertNotNil(realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "a"))
+        // When this is directly inside the XCTAssertNotNil, it doesn't work
+        let object = realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "a")
+        XCTAssertNotNil(object)
 
         // When this is directly inside the XCTAssertNil, it fails for some reason
         let missingObject = realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "z")
