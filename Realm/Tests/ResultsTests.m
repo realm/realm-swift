@@ -862,6 +862,7 @@ static vm_size_t get_resident_size() {
     }];
 
     RLMResults *results = [object.array sortedResultsUsingProperty:@"intCol" ascending:YES];
+    XCTAssertFalse(results.isInvalidated);
     XCTAssertNoThrow([results objectAtIndex:0]);
     XCTAssertNoThrow([results firstObject]);
     XCTAssertNoThrow([results lastObject]);
@@ -882,6 +883,7 @@ static vm_size_t get_resident_size() {
 
     [realm invalidate];
 
+    XCTAssertTrue(results.isInvalidated);
     XCTAssertThrows([results objectAtIndex:0]);
     XCTAssertThrows([results firstObject]);
     XCTAssertThrows([results lastObject]);
@@ -918,6 +920,9 @@ static vm_size_t get_resident_size() {
         [realm deleteObject:object];
     }];
 
+    XCTAssertFalse(results.isInvalidated);
+    XCTAssertFalse(unevaluatedResults.isInvalidated);
+
     XCTAssertEqual(0u, results.count);
     XCTAssertEqual(0u, unevaluatedResults.count);
 
@@ -941,6 +946,9 @@ static vm_size_t get_resident_size() {
     [realm transactionWithBlock:^{
         [realm deleteObject:dog];
     }];
+
+    XCTAssertFalse(results.isInvalidated);
+    XCTAssertFalse(unevaluatedResults.isInvalidated);
 
     XCTAssertEqual(0u, results.count);
     XCTAssertEqual(0u, unevaluatedResults.count);
