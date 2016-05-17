@@ -816,6 +816,7 @@ static vm_size_t get_resident_size() {
     }];
 
     RLMResults *results = [IntObject allObjects];
+    XCTAssertNoThrow([results isInvalidated]);
     XCTAssertNoThrow([results objectAtIndex:0]);
     XCTAssertNoThrow([results firstObject]);
     XCTAssertNoThrow([results lastObject]);
@@ -834,6 +835,7 @@ static vm_size_t get_resident_size() {
     XCTAssertNoThrow([results valueForKey:@"intCol"]);
 
     [self dispatchAsyncAndWait:^{
+        XCTAssertThrows([results isInvalidated]);
         XCTAssertThrows([results objectAtIndex:0]);
         XCTAssertThrows([results firstObject]);
         XCTAssertThrows([results lastObject]);
