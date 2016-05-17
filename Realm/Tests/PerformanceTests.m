@@ -526,9 +526,10 @@ static NSString *s_fsyncPath;
 
         [realm beginWriteTransaction];
         [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol = 'a'"]];
-        [realm commitWriteTransaction];
 
         [self startMeasuring];
+        [realm commitWriteTransaction];
+
         CFRunLoopRun();
         [token stop];
     }];
@@ -548,9 +549,10 @@ static NSString *s_fsyncPath;
 
         [realm beginWriteTransaction];
         [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol = 'a'"]];
-        [realm commitWriteTransaction];
 
         [self startMeasuring];
+        [realm commitWriteTransaction];
+
         CFRunLoopRun();
         [token stop];
     }];
