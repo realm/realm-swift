@@ -50,7 +50,7 @@
     [realm beginWriteTransaction];
     [realm deleteObject:hannah];
     [realm commitWriteTransaction];
-    RLMAssertThrowsWithReasonMatching(asArray(hannahsParents), @"has been invalidated");
+    XCTAssertEqualObjects(asArray(hannahsParents), (@[ ]));
 }
 
 - (void)testFilteredLinkingObjects {
