@@ -300,9 +300,13 @@ RLM_ASSUME_NONNULL_BEGIN
 /// different object at that index will also be reported as a modification.
 @property (nonatomic, readonly) NSArray RLM_GENERIC(NSNumber *) *modifications;
 
-
+/// Returns index paths of the deletion indices in the given section.
 - (NSArray RLM_GENERIC(NSIndexPath *)*)deletionsInSection:(NSUInteger)section;
+
+/// Returns index paths of the insertion indices in the given section.
 - (NSArray RLM_GENERIC(NSIndexPath *)*)insertionsInSection:(NSUInteger)section;
+
+/// Returns index paths of the modification indices in the given section.
 - (NSArray RLM_GENERIC(NSIndexPath *)*)modificationsInSection:(NSUInteger)section;
 @end
 

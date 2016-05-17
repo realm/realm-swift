@@ -103,9 +103,18 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @interface RLMPropertyDescriptor : NSObject
 
+/**
+ Creates a property descriptor.
+
+ @param objectClass  The class of this property descriptor.
+ @param propertyName The name of this property descriptor.
+ */
 + (instancetype)descriptorWithClass:(Class)objectClass propertyName:(NSString *)propertyName;
 
+/// The class of the property.
 @property (nonatomic, readonly) Class objectClass;
+
+/// The name of the property.
 @property (nonatomic, readonly) NSString *propertyName;
 
 @end
