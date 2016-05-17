@@ -85,11 +85,23 @@ Results::~Results()
     }
 }
 
+bool Results::is_invalidated() const
+{
+    // We cannot use validate_read as it calls is_invalidated.
+    if (m_realm)
+        m_realm->verify_thread();
+
+    if (m_table && !m_table->is_attached())
+        return true;
+
+    return false;
+}
+
 void Results::validate_read() const
 {
     if (m_realm)
         m_realm->verify_thread();
-    if (m_table && !m_table->is_attached())
+    if (is_invalidated())
         throw InvalidatedException();
 }
 
