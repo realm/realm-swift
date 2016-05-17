@@ -91,10 +91,6 @@ void Results::validate_read() const
         m_realm->verify_thread();
     if (m_table && !m_table->is_attached())
         throw InvalidatedException();
-    if (m_mode == Mode::TableView && (!m_table_view.is_attached() || m_table_view.depends_on_deleted_object()))
-        throw InvalidatedException();
-    if (m_mode == Mode::LinkView && !m_link_view->is_attached())
-        throw InvalidatedException();
 }
 
 void Results::validate_write() const
