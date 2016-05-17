@@ -643,10 +643,12 @@ case "$COMMAND" in
         ;;
 
     "verify-cocoapods")
-        sed -i '' "s|https://github.com/realm/realm-cocoa.git|$PWD|" Realm.podspec
-        sed -i '' "s|:tag => \"v#{s.version}\"|:tag => \"v#{s.version}-pod-lint\"|" Realm.podspec
+        for podspec in Realm.podspec RealmSwift.podspec; do
+          sed -i '' "s|https://github.com/realm/realm-cocoa.git|$PWD|" $podspec
+          sed -i '' "s|:tag => \"v#{s.version}\"|:tag => \"v#{s.version}-pod-lint\"|" $podspec
+        done
         if [ -d .git ]; then
-          git add Realm.podspec
+          git add *.podspec
         else
           git init
           git add .
