@@ -87,7 +87,6 @@ Results::~Results()
 
 bool Results::is_valid() const
 {
-    // We cannot use validate_read as it calls is_valid.
     if (m_realm)
         m_realm->verify_thread();
 
@@ -99,8 +98,7 @@ bool Results::is_valid() const
 
 void Results::validate_read() const
 {
-    if (m_realm)
-        m_realm->verify_thread();
+    // is_valid ensures that we're on the correct thread.
     if (!is_valid())
         throw InvalidatedException();
 }
