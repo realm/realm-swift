@@ -1449,7 +1449,8 @@ extern "C" {
 }
 
 - (void)testRealmFileAccessNilPath {
-    XCTAssertThrows([RLMRealm realmWithURL:self.nonLiteralNil], @"nil path");
+    RLMAssertThrowsWithReasonMatching([RLMRealm realmWithURL:self.nonLiteralNil],
+                                      @"Realm path must not be empty", @"nil path");
 }
 
 - (void)testRealmFileAccessNoExistingFile

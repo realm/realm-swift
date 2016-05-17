@@ -63,30 +63,30 @@
     XCTAssertEqual([exception.userInfo[NSUnderlyingErrorKey] code], expectedCode, __VA_ARGS__); \
 })
 
-#define RLMValidateRealmError(__error, __errnum, __description, __underlying)                        \
+#define RLMValidateRealmError(macro_error, macro_errnum, macro_description, macro_underlying)        \
 ({                                                                                                   \
-    NSString *__dsc = __description;                                                                 \
-    NSString *__usl = __underlying;                                                                  \
-    NSError *__castErr = (NSError *)__error;                                                         \
-    XCTAssertNotNil(__castErr);                                                                      \
-    XCTAssertEqual(__castErr.domain, RLMErrorDomain);                                                \
-    XCTAssertEqual(__castErr.code, __errnum);                                                        \
-    if (__dsc.length) {                                                                              \
-        NSString *__dscActual = __castErr.userInfo[NSLocalizedDescriptionKey];                       \
-        XCTAssertNotNil(__dscActual);                                                                \
-        XCTAssert([__dscActual rangeOfString:__dsc].location != NSNotFound);                         \  
+    NSString *macro_dsc = macro_description;                                                         \
+    NSString *macro_usl = macro_underlying;                                                          \
+    NSError *macro_castErr = (NSError *)macro_error;                                                 \
+    XCTAssertNotNil(macro_castErr);                                                                  \
+    XCTAssertEqual(macro_castErr.domain, RLMErrorDomain);                                            \
+    XCTAssertEqual(macro_castErr.code, macro_errnum);                                                \
+    if (macro_dsc.length) {                                                                          \
+        NSString *macro_dscActual = macro_castErr.userInfo[NSLocalizedDescriptionKey];               \
+        XCTAssertNotNil(macro_dscActual);                                                            \
+        XCTAssert([macro_dscActual rangeOfString:macro_dsc].location != NSNotFound);                 \
     }                                                                                                \
-    if (__usl.length) {                                                                              \
-        NSString *__uslActual = __castErr.userInfo[@"Underlying"];                                   \
-        XCTAssertNotNil(__uslActual);                                                                \
-        XCTAssert([__uslActual rangeOfString:__usl].location != NSNotFound);                         \
+    if (macro_usl.length) {                                                                          \
+        NSString *macro_uslActual = macro_castErr.userInfo[@"Underlying"];                           \
+        XCTAssertNotNil(macro_uslActual);                                                            \
+        XCTAssert([macro_uslActual rangeOfString:macro_usl].location != NSNotFound);                 \
     }                                                                                                \
 })
 
 /// Check that an exception is thrown, and validate additional details about its underlying error.
-#define RLMAssertThrowsWithError(__expr, __except_string, __errnum, __underlying_string)               \
-({                                                                                                     \
-    NSException *__exception = RLMAssertThrowsWithReasonMatching(__expr, __except_string);             \
-    NSError *__excErr = (NSError *)(__exception.userInfo[NSUnderlyingErrorKey]);                       \
-    RLMValidateRealmError(__excErr, __errnum, nil, __underlying_string);                               \
+#define RLMAssertThrowsWithError(macro_expr, macro_except_string, macro_errnum, macro_underlying_string) \
+({                                                                                                       \
+    NSException *macro_exception = RLMAssertThrowsWithReasonMatching(macro_expr, macro_except_string);   \
+    NSError *macro_excErr = (NSError *)(macro_exception.userInfo[NSUnderlyingErrorKey]);                 \
+    RLMValidateRealmError(macro_excErr, macro_errnum, nil, macro_underlying_string);                     \
 })
