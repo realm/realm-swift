@@ -177,6 +177,11 @@ Group *Realm::read_group()
     return m_group;
 }
 
+SharedGroup& Realm::shared_group()
+{
+    return *m_shared_group;
+}
+
 SharedRealm Realm::get_shared_realm(Config config)
 {
     return RealmCoordinator::get_coordinator(config.path)->get_realm(std::move(config));

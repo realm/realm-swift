@@ -704,6 +704,21 @@ extern "C" {
     [realm cancelWriteTransaction];
 }
 
+- (void)testAsyncAddObjects {
+    RLMRealm *realm = [self realmWithTestPath];
+    
+    [realm writeAsyncWithBlock:^(RLMRealm * _Nonnull realm) {
+        [StringObject createInRealm:realm withValue:@[@"a"]];
+        [StringObject createInRealm:realm withValue:@[@"b"]];
+        [StringObject createInRealm:realm withValue:@[@"c"]];
+        XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, 3U, @"Expecting 3 objects");
+    } completion:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+        RLMResults *objects = [StringObject allObjectsInRealm:realm];
+        XCTAssertEqual(objects.count, 3U, @"Expecting 3 objects");
+    }];
+}
+
 #pragma mark - Transactions
 
 - (void)testRealmTransactionBlock {

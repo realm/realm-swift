@@ -34,6 +34,7 @@
 #import "RLMSchema_Private.hpp"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
+#import "RLMResults_Private.h"
 
 #include "impl/realm_coordinator.hpp"
 #include "object_store.hpp"
@@ -43,6 +44,11 @@
 #include <realm/commit_log.hpp>
 #include <realm/disable_sync_to_disk.hpp>
 #include <realm/version.hpp>
+
+#import <realm/group_shared.hpp>
+#import <realm/link_view.hpp>
+#import <realm/row.hpp>
+#import <realm/results.hpp>
 
 using namespace realm;
 using util::File;
@@ -794,6 +800,167 @@ void RLMRealmTranslateException(NSError **error) {
         [enumerator detach];
     }
     _collectionEnumerators = nil;
+}
+
+#pragma mark - Async Writes
+
+- (void)writeAsyncWithBlock:(RLMAsyncWriteBlock)block completion:(RLMCompletionBlock)completion {
+    RLMRealmConfiguration *config = self.configuration;
+    
+    __block NSError *error;
+    __block BOOL didComplete;
+    
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+    __block RLMNotificationToken *token = [self addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+        if (didComplete) {
+            completion(error);
+            [token stop];
+        }
+    }];
+#pragma GCC diagnostic pop
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSError *error = nil;
+        RLMRealm *newRealm = [RLMRealm realmWithConfiguration:config error:nil];
+        
+        [newRealm transactionWithBlock:^{
+            block(newRealm);
+            didComplete = YES;
+        } error:&error];
+    });
+}
+
+- (void)writeObjectAsync:(RLMObject *)object withBlock:(RLMAsyncWriteObjectBlock)block completion:(RLMCompletionBlock)completion {
+    if (object.realm->_realm != self->_realm) {
+        @throw RLMException(@"Object is not persisted in this Realm");
+    }
+    
+    auto& sg = object.realm->_realm->shared_group();
+    __block std::unique_ptr<realm::SharedGroup::Handover<realm::Row> > handover_row = sg.export_for_handover(object->_row);
+    
+    RLMRealmConfiguration *config = object.realm.configuration;
+    Class accessorClass = object.objectSchema.accessorClass;
+    RLMObjectSchema *objectSchema = object.objectSchema;
+    
+    __block NSError *error;
+    __block BOOL didComplete;
+    
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+    __block RLMNotificationToken *token = [self addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+        if (didComplete) {
+            completion(error);
+            [token stop];
+        }
+    }];
+#pragma GCC diagnostic pop
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSError *error = nil;
+        RLMRealm *newRealm = [RLMRealm realmWithConfiguration:config error:nil];
+        
+        newRealm->_realm->read_group();
+        auto& new_sg = newRealm->_realm->shared_group();
+        std::unique_ptr<realm::Row> new_row( new_sg.import_from_handover(move(handover_row)) );
+        
+        RLMObject *handoverObject = [[accessorClass alloc] initWithRealm:newRealm
+                                                                  schema:objectSchema];
+        handoverObject->_row = *new_row;
+        
+        [newRealm transactionWithBlock:^{
+            block(newRealm, handoverObject);
+            didComplete = YES;
+        } error:&error];
+    });
+}
+
+- (void)writeCollectionAsync:(id<RLMCollection>)collection withBlock:(RLMAsyncWriteCollectionBlock)block completion:(RLMCompletionBlock)completion
+{
+    if (collection.realm->_realm != self->_realm) {
+        @throw RLMException(@"Collection is not persisted in this Realm");
+    }
+    
+    auto& sg = collection.realm->_realm->shared_group();
+    RLMRealmConfiguration *config = collection.realm.configuration;
+    
+    if ([(NSObject *)collection isKindOfClass:[RLMArray class]]) {
+        RLMArrayLinkView *array = (RLMArrayLinkView *)collection;
+        LinkViewRef lv = array.linkView;
+        NSString *key = array->_key;
+        RLMObjectSchema *objectSchema = array.objectSchema;
+        
+        __block std::unique_ptr<SharedGroup::Handover<LinkView> > handover_link_view = sg.export_linkview_for_handover(lv);
+        
+        __block NSError *error;
+        __block BOOL didComplete;
+        
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+        __block RLMNotificationToken *token = [self addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+            if (didComplete) {
+                completion(error);
+                [token stop];
+            }
+        }];
+#pragma GCC diagnostic pop
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            RLMRealm *newRealm = [RLMRealm realmWithConfiguration:config error:nil];
+            
+            newRealm->_realm->read_group();
+            auto& new_sg = newRealm->_realm->shared_group();
+            LinkViewRef new_lv(new_sg.import_linkview_from_handover(move(handover_link_view)) );
+            
+            RLMArrayLinkView *handoverArray = [RLMArrayLinkView arrayWithObjectClassName:objectSchema.className
+                                                                                    view:new_lv
+                                                                                   realm:newRealm
+                                                                                     key:key
+                                                                            parentSchema:objectSchema];
+            
+            [newRealm transactionWithBlock:^{
+                block(newRealm, handoverArray);
+                didComplete = YES;
+            } error:&error];
+        });
+    }
+    else {
+        RLMResults *results = (RLMResults *)collection;
+        realm::Results pvResults = results.results;
+        RLMObjectSchema *objectSchema = results.objectSchema;
+        
+        TableView tv = pvResults.get_tableview();
+        __block std::unique_ptr<SharedGroup::Handover<TableView>> handover_table_view = sg.export_for_handover(tv, ConstSourcePayload::Copy);
+        
+        __block NSError *error;
+        __block BOOL didComplete;
+        
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+        __block RLMNotificationToken *token = [self addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+            if (didComplete) {
+                completion(error);
+                [token stop];
+            }
+        }];
+#pragma GCC diagnostic pop
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            RLMRealm *newRealm = [RLMRealm realmWithConfiguration:config error:nil];
+            
+            newRealm->_realm->read_group();
+            auto& new_sg = newRealm->_realm->shared_group();
+            std::unique_ptr<TableView> new_tv(new_sg.import_from_handover(move(handover_table_view)) );
+            Query query = new_tv->get_query();
+            
+            RLMResults *handoverResults = [RLMResults resultsWithObjectSchema:objectSchema results:realm::Results(newRealm->_realm, std::move(query))];
+            
+            [newRealm transactionWithBlock:^{
+                block(newRealm, handoverResults);
+                didComplete = YES;
+            } error:&error];
+        });
+    }
 }
 
 @end

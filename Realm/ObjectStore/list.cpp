@@ -179,6 +179,11 @@ Results List::filter(Query q)
     return Results(m_realm, m_link_view, get_query().and_query(std::move(q)));
 }
 
+LinkViewRef List::link_view()
+{
+    return m_link_view;
+}
+
 // These definitions rely on that LinkViews are interned by core
 bool List::operator==(List const& rgt) const noexcept
 {

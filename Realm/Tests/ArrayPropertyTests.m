@@ -127,6 +127,36 @@
     XCTAssertEqualObjects([children[1] stringCol], @"b", @"Second child should be 'b'");
 }
 
+- (void)testAsyncInsertMultiple {
+    RLMRealm *realm = [self realmWithTestPath];
+    NSString *path = realm.path;
+    
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"arrayObject", @[], @[]]];
+    StringObject *child1 = [StringObject createInRealm:realm withValue:@[@"a"]];
+    [obj.array addObject:child1];
+    [realm commitWriteTransaction];
+    
+    XCTestExpectation *expectation =
+    [self expectationWithDescription:@""];
+    
+    [realm writeCollectionAsync:obj.array withBlock:^(RLMRealm * _Nonnull realm, RLMArray * _Nonnull array) {
+        XCTAssert([path isEqualToString:realm.path], @"Both Realms should have same path");
+        XCTAssertEqual(array.count, 1U, @"Should be 1 child object");
+        StringObject *child2 = [[StringObject alloc] init];
+        child2.stringCol = @"b";
+        [array addObject:child2];
+    } completion:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+        RLMResults *children = [StringObject allObjectsInRealm:realm];
+        XCTAssertEqualObjects([children[0] stringCol], @"a", @"First child should be 'a'");
+        XCTAssertEqualObjects([children[1] stringCol], @"b", @"Second child should be 'b'");
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+}
+
 -(void)testInsertAtIndex {
     RLMRealm *realm = [self realmWithTestPath];
 

@@ -1621,6 +1621,33 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     XCTAssertNoThrow(obj.description);
 }
 
+- (void)testAsyncObjectWrite {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    NSString *path = realm.path;
+    [realm beginWriteTransaction];
+    DogObject *dog = [[DogObject alloc] init];
+    dog.dogName = @"Fido";
+    dog.age = 5;
+    [realm addObject:dog];
+    [realm commitWriteTransaction];
+    
+    XCTestExpectation *expectation =
+    [self expectationWithDescription:@""];
+    
+    [realm writeObjectAsync:dog withBlock:^(RLMRealm * _Nonnull realm, DogObject * _Nonnull dog) {
+        XCTAssert([path isEqualToString:realm.path], @"Both Realms should have same path");
+        XCTAssertEqual([DogObject allObjectsInRealm:realm].count, 1U, @"Should be 1 dog object");
+        XCTAssertEqual(dog.age, 5, @"Dog should be 5 years old");
+        dog.age = 6;
+    } completion:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(dog.age, 6, @"Dog should be 6 years old");
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+}
+
 #pragma mark - Indexing Tests
 
 - (void)testIndex

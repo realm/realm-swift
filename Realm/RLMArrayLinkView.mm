@@ -400,6 +400,10 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     return translateErrors([&] { return _backingList.get_query(); }).find_all();
 }
 
+- (realm::LinkViewRef)linkView {
+    return _backingList.link_view();
+}
+
 // The compiler complains about the method's argument type not matching due to
 // it not having the generic type attached, but it doesn't seem to be possible
 // to actually include the generic type

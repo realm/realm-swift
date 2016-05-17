@@ -398,6 +398,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return translateErrors([&] { return _results.get_tableview(); });
 }
 
+- (realm::Results)results {
+    return _results;
+}
+
 // The compiler complains about the method's argument type not matching due to
 // it not having the generic type attached, but it doesn't seem to be possible
 // to actually include the generic type

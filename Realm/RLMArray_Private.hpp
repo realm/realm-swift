@@ -60,6 +60,7 @@ class RLMObservationInfo;
 
 // deletes all objects in the RLMArray from their containing realms
 - (void)deleteObjectsFromRealm;
+- (realm::LinkViewRef)linkView;
 @end
 
 void RLMValidateArrayObservationKey(NSString *keyPath, RLMArray *array);
@@ -77,4 +78,5 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
                                    results:(realm::Results)results;
 
 - (void)deleteObjectsFromRealm;
+- (realm::Results)results;
 @end
