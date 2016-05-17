@@ -644,6 +644,10 @@ case "$COMMAND" in
 
     "verify-cocoapods")
         pod setup
+        git diff-index --quiet HEAD || (
+          echo "Cannot test the podspec with uncommitted changes"
+          exit 1
+        )
         for podspec in Realm.podspec RealmSwift.podspec; do
           sed -i '' "s|https://github.com/realm/realm-cocoa.git|$PWD|" $podspec
           sed -i '' "s|:tag => \"v#{s.version}\"|:tag => \"v#{s.version}-pod-lint\"|" $podspec
@@ -892,8 +896,7 @@ case "$COMMAND" in
     ######################################
     "cocoapods-setup")
         if [ ! -d core ]; then
-          # core directory won't exist if running `pod spec lint` locally
-          ./build.sh download-core
+          sh build.sh download-core
         fi
 
         if [[ "$2" != "swift" ]]; then
