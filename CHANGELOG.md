@@ -7,6 +7,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Support for Xcode 6.x & Swift prior to 2.2 has been completely removed.
 * `RLMResults`/`Results` now become empty when a `RLMArray`/`List` or row they depend on is deleted,
   rather than throwing an exception when accessed.
+* Migrations are no longer run when `deleteRealmIfMigrationNeeded` is set,
+  recreating the file instead.
 
 ### Enhancements
 

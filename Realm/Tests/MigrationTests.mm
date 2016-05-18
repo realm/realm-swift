@@ -513,33 +513,45 @@ RLM_ARRAY_TYPE(MigrationObject);
 }
 
 - (void)testDeleteRealmIfMigrationNeeded {
-    @autoreleasepool { [RLMRealm defaultRealm]; }
+    for (uint64_t targetSchemaVersion = 1; targetSchemaVersion < 2; targetSchemaVersion++) {
+        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
+        configuration.customSchema = [self schemaWithObjects:@[objectSchema]];
 
-    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationTwoStringObject.class];
-    objectSchema.properties = [objectSchema.properties subarrayWithRange:{0, 1}];
+        @autoreleasepool {
+            [[NSFileManager defaultManager] removeItemAtURL:configuration.fileURL error:nil];
+            RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+            [realm transactionWithBlock:^{
+                [realm addObject:[MigrationObject new]];
+            }];
+        }
 
-    Class metaClass = objc_getMetaClass("RLMSchema");
-    IMP imp = imp_implementationWithBlock(^{
-        return [self schemaWithObjects:@[objectSchema]];
-    });
-    IMP originalImp = class_getMethodImplementation(metaClass, @selector(sharedSchema));
-    class_replaceMethod(metaClass, @selector(sharedSchema), imp, "@@:");
+        // Change string to int, requiring a migration
+        RLMProperty *stringCol = objectSchema.properties[1];
+        stringCol.type = RLMPropertyTypeInt;
+        stringCol.objcType = 'i';
+        stringCol.optional = NO;
+        objectSchema.properties = @[stringCol];
 
-    @autoreleasepool {
-        XCTAssertThrows([RLMRealm defaultRealm]);
+        configuration.customSchema = [self schemaWithObjects:@[objectSchema]];
+
+        @autoreleasepool {
+            XCTAssertThrows([RLMRealm realmWithConfiguration:configuration error:nil]);
+            RLMRealmConfiguration *dynamicConfiguration = [RLMRealmConfiguration defaultConfiguration];
+            dynamicConfiguration.dynamic = YES;
+            XCTAssertFalse([[RLMRealm realmWithConfiguration:dynamicConfiguration error:nil] isEmpty]);
+        }
+
+        configuration.schemaVersion = targetSchemaVersion;
+        configuration.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+            XCTFail(@"Migration block should not have been called");
+        };
+        configuration.deleteRealmIfMigrationNeeded = YES;
+
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+        RLMAssertRealmSchemaMatchesTable(self, realm);
+        XCTAssertTrue(realm.isEmpty);
     }
-
-    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-    config.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
-        XCTFail(@"Migration block should not have been called");
-    };
-
-    config.deleteRealmIfMigrationNeeded = YES;
-
-    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
-    RLMAssertRealmSchemaMatchesTable(self, [RLMRealm realmWithConfiguration:config error:nil]);
-
-    class_replaceMethod(metaClass, @selector(sharedSchema), originalImp, "@@:");
 }
 
 #pragma mark - Allowed schema mismatches

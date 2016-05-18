@@ -58,8 +58,8 @@ extension Realm {
         - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
         - parameter schemaVersion:      The current schema version.
         - parameter migrationBlock:     The block which migrates the Realm to the current version.
-        - parameter deleteRealmIfMigrationNeeded: If `true`, recreate the Realm file with the new schema
-                                                  if a migration is required.
+        - parameter deleteRealmIfMigrationNeeded: If `true`, recreate the Realm file with the provided
+                                                  schema if a migration is required.
         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
         */
         public init(fileURL: NSURL? = NSURL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
@@ -124,7 +124,14 @@ extension Realm {
         /// The block which migrates the Realm to the current version.
         public var migrationBlock: MigrationBlock? = nil
 
-        /// Recreate the Realm file with the new schema if a migration is required.
+        /**
+        Recreate the Realm file with the provided schema if a migration is required.
+        This is the case when the stored schema differs from the provided schema or
+        the stored schema version differs from the version on this configuration.
+        This deletes the file if a migration would otherwise be required or run.
+
+        - note: This doesn't disable file format migrations.
+        */
         public var deleteRealmIfMigrationNeeded: Bool = false
 
         /// The classes persisted in the Realm.
