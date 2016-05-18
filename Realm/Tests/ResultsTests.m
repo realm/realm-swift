@@ -816,6 +816,7 @@ static vm_size_t get_resident_size() {
     }];
 
     RLMResults *results = [IntObject allObjects];
+    XCTAssertNoThrow([results isInvalidated]);
     XCTAssertNoThrow([results objectAtIndex:0]);
     XCTAssertNoThrow([results firstObject]);
     XCTAssertNoThrow([results lastObject]);
@@ -834,6 +835,7 @@ static vm_size_t get_resident_size() {
     XCTAssertNoThrow([results valueForKey:@"intCol"]);
 
     [self dispatchAsyncAndWait:^{
+        XCTAssertThrows([results isInvalidated]);
         XCTAssertThrows([results objectAtIndex:0]);
         XCTAssertThrows([results firstObject]);
         XCTAssertThrows([results lastObject]);
@@ -860,6 +862,7 @@ static vm_size_t get_resident_size() {
     }];
 
     RLMResults *results = [IntObject allObjects];
+    XCTAssertFalse(results.isInvalidated);
     XCTAssertNoThrow([results objectAtIndex:0]);
     XCTAssertNoThrow([results firstObject]);
     XCTAssertNoThrow([results lastObject]);
@@ -880,6 +883,7 @@ static vm_size_t get_resident_size() {
 
     [realm invalidate];
 
+    XCTAssertTrue(results.isInvalidated);
     XCTAssertThrows([results objectAtIndex:0]);
     XCTAssertThrows([results firstObject]);
     XCTAssertThrows([results lastObject]);
@@ -897,6 +901,60 @@ static vm_size_t get_resident_size() {
     XCTAssertThrows(results[0]);
     XCTAssertThrows([results valueForKey:@"intCol"]);
     XCTAssertThrows({for (__unused id obj in results);});
+}
+
+- (void)testResultsDependingOnDeletedLinkView {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block IntegerArrayPropertyObject *object;
+    [realm transactionWithBlock:^{
+        IntObject* intObject = [IntObject createInDefaultRealmWithValue:@[@0]];
+        object = [IntegerArrayPropertyObject createInDefaultRealmWithValue:@[ @0, @[ intObject ] ]];
+    }];
+
+    RLMResults *results = [object.array sortedResultsUsingProperty:@"intCol" ascending:YES];
+    [results firstObject];
+
+    RLMResults *unevaluatedResults = [object.array sortedResultsUsingProperty:@"intCol" ascending:YES];
+
+    [realm transactionWithBlock:^{
+        [realm deleteObject:object];
+    }];
+
+    XCTAssertFalse(results.isInvalidated);
+    XCTAssertFalse(unevaluatedResults.isInvalidated);
+
+    XCTAssertEqual(0u, results.count);
+    XCTAssertEqual(0u, unevaluatedResults.count);
+
+    XCTAssertEqualObjects(nil, results.firstObject);
+    XCTAssertEqualObjects(nil, unevaluatedResults.firstObject);
+}
+
+- (void)testResultsDependingOnDeletedTableView {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block DogObject *dog;
+    [realm transactionWithBlock:^{
+        dog = [DogObject createInDefaultRealmWithValue:@[ @"Fido", @3 ]];
+        [OwnerObject createInDefaultRealmWithValue:@[ @"John", dog ]];
+    }];
+
+    RLMResults *results = [dog.owners objectsWhere:@"name != 'Not a real name'"];
+    [results firstObject];
+
+    RLMResults *unevaluatedResults = [dog.owners objectsWhere:@"name != 'Not a real name'"];
+
+    [realm transactionWithBlock:^{
+        [realm deleteObject:dog];
+    }];
+
+    XCTAssertFalse(results.isInvalidated);
+    XCTAssertFalse(unevaluatedResults.isInvalidated);
+
+    XCTAssertEqual(0u, results.count);
+    XCTAssertEqual(0u, unevaluatedResults.count);
+
+    XCTAssertEqualObjects(nil, results.firstObject);
+    XCTAssertEqualObjects(nil, unevaluatedResults.firstObject);
 }
 
 @end

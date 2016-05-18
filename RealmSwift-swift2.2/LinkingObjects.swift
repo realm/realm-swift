@@ -87,6 +87,11 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     /// Returns the Realm these linking objects are associated with.
     public var realm: Realm? { return rlmResults.attached ? Realm(rlmResults.realm) : nil }
 
+    /// Indicates if the linking objects can no longer be accessed.
+    ///
+    /// Linking objects can no longer be accessed if `invalidate` is called on the containing `Realm`.
+    public var invalidated: Bool { return rlmResults.invalidated }
+
     /// Returns the number of objects in these linking objects.
     public var count: Int { return Int(rlmResults.count) }
 

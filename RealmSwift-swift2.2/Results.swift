@@ -109,6 +109,11 @@ public final class Results<T: Object>: ResultsBase {
     /// cannot exist independently from a `Realm`.
     public var realm: Realm? { return Realm(rlmResults.realm) }
 
+    /// Indicates if the results can no longer be accessed.
+    ///
+    /// Results can no longer be accessed if `invalidate` is called on the containing `Realm`.
+    public var invalidated: Bool { return rlmResults.invalidated }
+
     /// Returns the number of objects in these results.
     public var count: Int { return Int(rlmResults.count) }
 
