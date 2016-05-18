@@ -58,7 +58,7 @@ extension Realm {
         - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
         - parameter schemaVersion:      The current schema version.
         - parameter migrationBlock:     The block which migrates the Realm to the current version.
-        - parameter deleteRealmIfMigrationNeeded: If `true`, recreate the Realm file with the provided 
+        - parameter deleteRealmIfMigrationNeeded: If `true`, recreate the Realm file with the provided
                                                   schema if a migration is required.
         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
         */
