@@ -130,6 +130,11 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     /// standalone).
     var realm: Realm? { get }
 
+    /// Indicates if the collection can no longer be accessed.
+    ///
+    /// The collection can no longer be accessed if `invalidate` is called on the containing `Realm`.
+    var invalidated: Bool { get }
+
     /// Returns the number of objects in this collection.
     var count: Int { get }
 
@@ -360,6 +365,7 @@ private class _AnyRealmCollectionBase<T: Object> {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
     var realm: Realm? { fatalError() }
+    var invalidated: Bool { fatalError() }
     var count: Int { fatalError() }
     var description: String { fatalError() }
     func indexOf(object: Element) -> Int? { fatalError() }
@@ -398,6 +404,11 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     /// collection's owning object does not belong to a realm (the collection is
     /// standalone).
     override var realm: Realm? { return base.realm }
+
+    /// Indicates if the collection can no longer be accessed.
+    ///
+    /// The collection can no longer be accessed if `invalidate` is called on the containing `Realm`.
+    override var invalidated: Bool { return base.invalidated }
 
     /// Returns the number of objects in this collection.
     override var count: Int { return base.count }
@@ -641,6 +652,11 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     /// collection's owning object does not belong to a realm (the collection is
     /// standalone).
     public var realm: Realm? { return base.realm }
+
+    /// Indicates if the collection can no longer be accessed.
+    ///
+    /// The collection can no longer be accessed if `invalidate` is called on the containing `Realm`.
+    public var invalidated: Bool { return base.invalidated }
 
     /// Returns the number of objects in this collection.
     public var count: Int { return base.count }
