@@ -63,24 +63,26 @@
     XCTAssertEqual([exception.userInfo[NSUnderlyingErrorKey] code], expectedCode, __VA_ARGS__); \
 })
 
-#define RLMValidateRealmError(macro_error, macro_errnum, macro_description, macro_underlying)        \
-({                                                                                                   \
-    NSString *macro_dsc = macro_description;                                                         \
-    NSString *macro_usl = macro_underlying;                                                          \
-    NSError *macro_castErr = (NSError *)macro_error;                                                 \
-    XCTAssertNotNil(macro_castErr);                                                                  \
-    XCTAssertEqual(macro_castErr.domain, RLMErrorDomain);                                            \
-    XCTAssertEqual(macro_castErr.code, macro_errnum);                                                \
-    if (macro_dsc.length) {                                                                          \
-        NSString *macro_dscActual = macro_castErr.userInfo[NSLocalizedDescriptionKey];               \
-        XCTAssertNotNil(macro_dscActual);                                                            \
-        XCTAssert([macro_dscActual rangeOfString:macro_dsc].location != NSNotFound);                 \
-    }                                                                                                \
-    if (macro_usl.length) {                                                                          \
-        NSString *macro_uslActual = macro_castErr.userInfo[@"Underlying"];                           \
-        XCTAssertNotNil(macro_uslActual);                                                            \
-        XCTAssert([macro_uslActual rangeOfString:macro_usl].location != NSNotFound);                 \
-    }                                                                                                \
+#define RLMValidateRealmError(macro_error, macro_errnum, macro_description, macro_underlying)            \
+({                                                                                                       \
+    NSString *macro_dsc = macro_description;                                                             \
+    NSString *macro_usl = macro_underlying;                                                              \
+    macro_dsc = [macro_dsc lowercaseString];                                                             \
+    macro_usl = [macro_usl lowercaseString];                                                             \
+    NSError *macro_castErr = (NSError *)macro_error;                                                     \
+    XCTAssertNotNil(macro_castErr);                                                                      \
+    XCTAssertEqual(macro_castErr.domain, RLMErrorDomain, @"Was expecting the error domain '%@', but got non-interned '%@' instead", RLMErrorDomain, macro_castErr.domain); \
+    XCTAssertEqual(macro_castErr.code, macro_errnum);                                                    \
+    if (macro_dsc.length) {                                                                              \
+        NSString *macro_dscActual = [macro_castErr.userInfo[NSLocalizedDescriptionKey] lowercaseString]; \
+        XCTAssertNotNil(macro_dscActual);                                                                \
+        XCTAssert([macro_dscActual containsString:macro_dsc], @"Did not find the expected string '%@' in the description string '%@'", macro_dsc, macro_dscActual); \
+    }                                                                                                    \
+    if (macro_usl.length) {                                                                              \
+        NSString *macro_uslActual = [macro_castErr.userInfo[@"Underlying"] lowercaseString];             \
+        XCTAssertNotNil(macro_uslActual);                                                                \
+        XCTAssert([macro_uslActual containsString:macro_usl], @"Did not find the expected string '%@' in the underlying info string '%@'", macro_usl, macro_uslActual); \
+    }                                                                                                    \
 })
 
 /// Check that an exception is thrown, and validate additional details about its underlying error.
