@@ -1,12 +1,12 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.103.0 Release notes (2016-05-18)
 =============================================================
 
 ### API breaking changes
 
 * All functionality deprecated in previous releases has been removed entirely.
 * Support for Xcode 6.x & Swift prior to 2.2 has been completely removed.
-* `RLMResults`/`Results` now become empty when a `RLMArray`/`List` or row they depend on is deleted,
-  rather than throwing an exception when accessed.
+* `RLMResults`/`Results` now become empty when a `RLMArray`/`List` or object
+  they depend on is deleted, rather than throwing an exception when accessed.
 * Migrations are no longer run when `deleteRealmIfMigrationNeeded` is set,
   recreating the file instead.
 
@@ -15,6 +15,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Added `invalidated` properties to `RLMResults`/`Results`, `RLMLinkingObjects`/`LinkingObjects`,
   `RealmCollectionType` and `AnyRealmCollection`. These properties report whether the Realm
   the object is associated with has been invalidated.
+* Some `NSError`s created by Realm now have more descriptive user info payloads.
 
 ### Bugfixes
 
