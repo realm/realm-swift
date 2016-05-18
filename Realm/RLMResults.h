@@ -67,6 +67,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
+/**
+ Indicates if the results can no longer be accessed.
+
+ The results can no longer be accessed if `invalidate` is called on the containing `realm`.
+ */
+@property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
+
 #pragma mark - Accessing Objects from an RLMResults
 
 /**

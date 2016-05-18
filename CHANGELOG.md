@@ -5,10 +5,14 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * All functionality deprecated in previous releases has been removed entirely.
 * Support for Xcode 6.x & Swift prior to 2.2 has been completely removed.
+* `RLMResults`/`Results` now become empty when a `RLMArray`/`List` or row they depend on is deleted,
+  rather than throwing an exception when accessed.
 
 ### Enhancements
 
-* None.
+* Added `invalidated` properties to `RLMResults`/`Results`, `RLMLinkingObjects`/`LinkingObjects`,
+  `RealmCollectionType` and `AnyRealmCollection`. These properties report whether the Realm
+  the object is associated with has been invalidated.
 
 ### Bugfixes
 
