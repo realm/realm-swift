@@ -643,6 +643,20 @@ case "$COMMAND" in
         ;;
 
     "verify-cocoapods")
+        if [[ -d .git ]]; then
+          # Verify the current branch, unless one was already specified in the sha environment variable.
+          if [[ -z $sha ]]; then
+            export sha=$(git rev-parse --abbrev-ref HEAD)
+          fi
+
+          if [[ $(git log -1 @{push}..) != "" ]] || ! git diff-index --quiet HEAD; then
+            echo "WARNING: verify-cocoapods will test the latest revision of $sha found on GitHub."
+            echo "         Any unpushed local changes will not be tested."
+            echo ""
+            sleep 1
+          fi
+        fi
+
         cd examples/installation
         sh build.sh test-ios-objc-cocoapods
         sh build.sh test-ios-swift-cocoapods
