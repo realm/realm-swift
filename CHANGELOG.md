@@ -3,7 +3,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* Fix empty strings and null on the right side of `BEGINSWITH`, `ENDSWITH` and `CONTAINS`
+  operators in predicates to match Foundation's semantics of never matching any strings.
 
 ### Enhancements
 
