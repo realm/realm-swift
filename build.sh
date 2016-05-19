@@ -656,7 +656,7 @@ case "$COMMAND" in
         ;;
 
     "verify-osx-encryption")
-        REALM_ENCRYPT_ALL=YES sh build.sh test-osx || exit 1
+        REALM_ENCRYPT_ALL=YES sh build.sh test-osx
         exit 0
         ;;
 
@@ -667,7 +667,7 @@ case "$COMMAND" in
         (
             cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/$CONFIGURATION
             DYLD_FRAMEWORK_PATH=. ./JSONImport >/dev/null
-        ) || exit 1
+        )
         exit 0
         ;;
 
