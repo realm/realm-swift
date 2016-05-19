@@ -21,7 +21,6 @@
 
 @interface DrawPoint : RLMObject
 
-@property NSString *pointID;
 @property double x;
 @property double y;
 

@@ -39,9 +39,9 @@
     return path;
 }
 
-+ (NSString *)primaryKey
++ (NSDictionary *)defaultPropertyValues
 {
-    return @"pathID";
+    return @{ @"drawerID" : @"" };
 }
 
 + (NSArray *)ignoredProperties

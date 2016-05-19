@@ -22,11 +22,18 @@
 #import "SwatchColor.h"
 #import "SwatchesView.h"
 
-NSString * const host = @"Alexanders-MacBook-Pro.local";
+#error Specify sync server URL
+NSString * const serverURLString = @"realm://127.0.0.1:7800/draw";
+
+#error Specify user identity
+NSString * const identity = @"ewogICAgImlkZW50aXR5IjogImRyYXdhcHAiLAogICAgImFjY2VzcyI6IFsiZG93bmxvYWQiLCAidXBsb2FkIl0sCiAgICAiYXBwX2lkIjogImlvLnJlYWxtLkRyYXciLAogICAgImV4cGlyZXMiOiBudWxsLAogICAgInRpbWVzdGFtcCI6IDE0NTYxNTU0MzYKfQ==";
+
+#error Specify user identity signature
+NSString * const signature = @"GjYdXNtumU9FssnOn/Psf1S/KeF2H58yzWozbav/QPSL/b7BcYuxQFU+iHuSeQEzZD3jHLaJvmifilW0TzRg+KqMxZ+veOFCMPHScCSVApA6E0qdSn12LEehpKjJ9ewOypXuPlyrulFF51HFcSByIq2UlfYiv50bq7+X22/y0VCNuoRpsSn8n9NxOCPIQZcTxeRFgDMmClqbcUN6pSR4T10HzmHsoAQH3vP2+vIm9gfm9ZOW0wZn2Iw/mev+6YuDIXaOskssfNAB6CdzgUf7vOns87OPzxXNU1r3QmZR/AVZgN9G4ipeFmY6FYZN/T3gowikGOTFscRWhEkeTbZ1dg==";
 
 @interface DrawView ()
 
-@property NSString *pathID;
+@property DrawPath *drawPath;
 @property RLMResults *paths;
 @property RLMNotificationToken *notificationToken;
 @property NSString *vendorID;
@@ -37,16 +44,15 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
 
 @implementation DrawView
 
-
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
-    self.vendorID = host;
+    self.vendorID = [[NSHost currentHost] localizedName];
+
     if (self) {
         RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-        [[NSFileManager defaultManager] removeItemAtPath:configuration.path error:nil];
-        configuration.syncServerURL = [NSURL URLWithString:@"realm://hydrogen.fr.sync.realm.io/draw"];
-        configuration.syncIdentity = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        configuration.syncServerURL = [NSURL URLWithString:serverURLString];
+        configuration.syncUserToken = [NSString stringWithFormat:@"%@:%@", identity, signature];
         [RLMRealmConfiguration setDefaultConfiguration:configuration];
 
         [RLMRealm setGlobalSynchronizationLoggingLevel:RLMSyncLogLevelVerbose];
@@ -55,6 +61,7 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
             self.paths = [DrawPath allObjects];
             [self setNeedsDisplay:YES];
         }];
+        
         self.paths = [DrawPath allObjects];
         
         self.swatchesView = [[SwatchesView alloc] initWithFrame:CGRectZero];
@@ -67,6 +74,7 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
         
         [self resizeSubviewsWithOldSize:self.frame.size];
     }
+    
     return self;
 }
 
@@ -81,83 +89,53 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
     [self.swatchesView setNeedsLayout:YES];
 }
 
-- (void)mouseDown:(NSEvent *)theEvent {
-    self.pathID = [[NSUUID UUID] UUIDString];
-    NSBezierPath *path = [NSBezierPath bezierPath];
-    path.lineWidth = 4.0f;
-    CGPoint point = theEvent.locationInWindow;
-    [[RLMRealm defaultRealm] transactionWithBlock:^{
-        NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
-        [DrawPath createInDefaultRealmWithValue:@[self.pathID, self.vendorID, colorName, @[]]];
-        [DrawPoint createInDefaultRealmWithValue:@[[NSUUID UUID].UUIDString, @(point.x), @(self.frame.size.height - point.y)]];
-    }];
-}
-
--(void)mouseDragged:(NSEvent *)theEvent {
-    [self addPoint:theEvent.locationInWindow];
-}
-
-- (void)mouseUp:(NSEvent *)theEvent {
-    [self addPoint:theEvent.locationInWindow];
-
-    [[RLMRealm defaultRealm] transactionWithBlock:^{
-        DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
-        currentPath.drawerID = @""; // mark this path as ended
-    }];
-}
-
-/*
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)mouseDown:(NSEvent *)theEvent
 {
-    self.pathID = [[NSUUID UUID] UUIDString];
-    NSBezierPath *path = [NSBezierPath bezierPath];
-    path.lineWidth = 4.0f;
-    CGPoint point = [[touches anyObject] locationInView:self];
-    NSArray *pointArray = @[@(point.x), @(point.y)];
-    [[RLMRealm defaultRealm] transactionWithBlock:^{
-        [DrawPath createInDefaultRealmWithObject:@[self.pathID, self.vendorID, @[pointArray]]];
+    NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
+    self.drawPath = [[DrawPath alloc] init];
+    self.drawPath.color = colorName;
+    
+    CGPoint point = [self convertPoint:theEvent.locationInWindow fromView:nil];
+    DrawPoint *drawPoint = [[DrawPoint alloc] init];
+    drawPoint.x = point.x;
+    drawPoint.y = point.y;
+    
+    [self.drawPath.points addObject:drawPoint];
+    
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    [defaultRealm transactionWithBlock:^{
+        [defaultRealm addObject:self.drawPath];
     }];
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+-(void)mouseDragged:(NSEvent *)theEvent
 {
-    CGPoint point = [[touches anyObject] locationInView:self];
+    NSPoint point = [self convertPoint:theEvent.locationInWindow fromView:nil];
     [self addPoint:point];
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)mouseUp:(NSEvent *)theEvent
 {
-    CGPoint point = [[touches anyObject] locationInView:self];
-    [self addPoint:point];
+    [self addPoint:[self convertPoint:theEvent.locationInWindow fromView:nil]];
+
+    [[RLMRealm defaultRealm] transactionWithBlock:^{
+        self.drawPath.drawerID = self.vendorID; // mark this path as ended
+    }];
+    
+    self.drawPath = nil;
 }
-
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    [self touchesEnded:touches withEvent:event];
-}
-
- - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
- {
- if ( event.subtype == UIEventSubtypeMotionShake )
- {
- RLMRealm *realm = [RLMRealm defaultRealm];
- [realm transactionWithBlock:^{
- [realm deleteAllObjects];
- }];
- }
-
- if ( [super respondsToSelector:@selector(motionEnded:withEvent:)] )
- [super motionEnded:motion withEvent:event];
- }
-
- */
 
 - (void)addPoint:(CGPoint)point
 {
-    DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        DrawPoint *newPoint = [DrawPoint createInDefaultRealmWithValue:@[[NSUUID UUID].UUIDString, @(point.x), @(self.frame.size.height - point.y)]];
-        [currentPath.points addObject:newPoint];
+        if (self.drawPath.isInvalidated) {
+            self.drawPath = [[DrawPath alloc] init];
+            self.drawPath.color = self.currentColor ? self.currentColor.name : @"Black";
+            [[RLMRealm defaultRealm] addObject:self.drawPath];
+        }
+        
+        DrawPoint *newPoint = [DrawPoint createInDefaultRealmWithValue:@[@(point.x), @(point.y)]];
+        [self.drawPath.points addObject:newPoint];
     }];
 }
 
@@ -176,7 +154,8 @@ NSString * const host = @"Alexanders-MacBook-Pro.local";
     [super drawRect:rect];
 }
 
-- (BOOL)isFlipped {
+- (BOOL)isFlipped
+{
     return YES;
 }
 
