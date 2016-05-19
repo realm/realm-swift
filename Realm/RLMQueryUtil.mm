@@ -402,10 +402,8 @@ void add_bool_constraint_to_query(realm::Query &query, NSPredicateOperatorType o
 }
 
 
-struct SkipCheckForEmptyAndNullStrings {};
-
 template <typename T>
-void add_substring_constraint_to_query(SkipCheckForEmptyAndNullStrings, Query& query, NSPredicateOperatorType operatorType, bool caseSensitive, Columns<String> column, T value)
+void add_substring_constraint_without_empty_string_checks_to_query(Query& query, NSPredicateOperatorType operatorType, bool caseSensitive, Columns<String> column, T value)
 {
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
@@ -431,7 +429,7 @@ void add_substring_constraint_to_query(Query& query, NSPredicateOperatorType ope
         return;
     }
 
-    add_substring_constraint_to_query(SkipCheckForEmptyAndNullStrings{}, query, operatorType, caseSensitive, std::move(column), value);
+    add_substring_constraint_without_empty_string_checks_to_query(query, operatorType, caseSensitive, std::move(column), value);
 }
 
 void add_substring_constraint_to_query(Query& query, NSPredicateOperatorType operatorType, bool caseSensitive, Columns<String> column1, Columns<String> column2)
@@ -441,7 +439,7 @@ void add_substring_constraint_to_query(Query& query, NSPredicateOperatorType ope
     // and producing multiple values per row as such expressions will have been rejected.
     query.group();
     query.and_query(column2 != null() && column2 != "");
-    add_substring_constraint_to_query(SkipCheckForEmptyAndNullStrings{}, query, operatorType, caseSensitive, std::move(column1), std::move(column2));
+    add_substring_constraint_without_empty_string_checks_to_query(query, operatorType, caseSensitive, std::move(column1), std::move(column2));
     query.end_group();
 }
 
