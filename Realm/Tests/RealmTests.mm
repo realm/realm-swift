@@ -99,7 +99,7 @@ extern "C" {
     [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:RLMTestRealmURL().path error:nil];
 
     // Should not be able to open read-write
-    RLMAssertThrowsWithCodeMatching([self realmWithTestPath], RLMErrorFail);
+    RLMAssertThrowsWithCodeMatching([self realmWithTestPath], RLMErrorFileAccess);
 
     RLMRealm *realm;
     XCTAssertNoThrow(realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]);

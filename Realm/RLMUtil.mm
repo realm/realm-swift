@@ -228,10 +228,24 @@ NSError *RLMMakeError(RLMError code, const realm::util::File::AccessError& excep
 }
 
 NSError *RLMMakeError(RLMError code, const realm::RealmFileException& exception) {
-    NSString *underlying = @(exception.underlying().c_str());
+    // Errors for `open()` now include the path in the exception message, but
+    // RealmFileException's message already has the path, so remove the second
+    // copy as it makes errors much less readable.
+    NSString *underlying;
+    auto pathPos = exception.underlying().find(exception.path());
+    if (pathPos != std::string::npos) {
+        auto trimmed = exception.underlying();
+        trimmed.replace(pathPos, exception.path().size(), "");
+        underlying = @(trimmed.c_str());
+    }
+    else {
+        underlying = @(exception.underlying().c_str());
+    }
+
+    NSString *msg = underlying.length ? [NSString stringWithFormat:@"%s: %@", exception.what(), underlying] : @(exception.what());
     return [NSError errorWithDomain:RLMErrorDomain
                                code:code
-                           userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
+                           userInfo:@{NSLocalizedDescriptionKey: msg,
                                       NSFilePathErrorKey: @(exception.path().c_str()),
                                       @"Error Code": @(code),
                                       @"Underlying": underlying.length == 0 ? @"n/a" : underlying}];
