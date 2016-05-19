@@ -229,16 +229,9 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
                 RLMRegisterClassLocalNames(classes.get(), numClasses);
             }
 
-            // FIXME: Temporary hack to ensure that initial transactions are
-            // identical as long as the application code is identical.
-            NSArray *newClassesOrderedByName = [s_localNameToClass.allValues sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
-                NSString *a2 = NSStringFromClass((Class)a);
-                NSString *b2 = NSStringFromClass((Class)b);
-                return [a2 compare:b2];
-            }];
-            for (Class cls in newClassesOrderedByName) {
+            [s_localNameToClass enumerateKeysAndObjectsUsingBlock:^(NSString *, Class cls, BOOL *) {
                 RLMRegisterClass(cls);
-            }
+            }];
         }
         catch (...) {
             s_sharedSchemaState = SharedSchemaState::Uninitialized;
