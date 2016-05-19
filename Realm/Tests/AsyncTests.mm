@@ -414,7 +414,7 @@
     XCTestExpectation *exp = [self expectationWithDescription:@""];
     auto token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
         XCTAssertNil(results);
-        RLMValidateRealmError(error, RLMErrorFail, @"Too many open files", nil);
+        RLMValidateRealmError(error, RLMErrorFileAccess, @"Too many open files", nil);
         called = true;
         [exp fulfill];
     }];
@@ -433,7 +433,7 @@
     XCTestExpectation *exp2 = [self expectationWithDescription:@""];
     auto token2 = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
         XCTAssertNil(results);
-        RLMValidateRealmError(error, RLMErrorFail, @"Too many open files", nil);
+        RLMValidateRealmError(error, RLMErrorFileAccess, @"Too many open files", nil);
         [exp2 fulfill];
     }];
     [realm beginWriteTransaction];

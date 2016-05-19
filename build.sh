@@ -14,7 +14,7 @@ set -o pipefail
 set -e
 
 # You can override the version of the core library
-: ${REALM_CORE_VERSION:=0.100.4} # set to "current" to always use the current build
+: ${REALM_CORE_VERSION:=1.0.0} # set to "current" to always use the current build
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
@@ -38,7 +38,6 @@ Usage: sh $0 command [argument]
 command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
-  set-core-bitcode-symlink: set core symlink to bitcode version
   build:                builds all iOS  and OS X frameworks
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
@@ -368,15 +367,6 @@ case "$COMMAND" in
             echo "The core library seems to be up to date."
         fi
         exit 0
-        ;;
-
-    "set-core-bitcode-symlink")
-        cd core
-        rm -f librealm-ios.a librealm-ios-dbg.a
-        # FIXME: Stop bundling core with & without bitcode
-        echo "Using core with bitcode"
-        ln -s librealm-ios-bitcode.a librealm-ios.a
-        ln -s librealm-ios-bitcode-dbg.a librealm-ios-dbg.a
         ;;
 
     ######################################
@@ -889,11 +879,6 @@ case "$COMMAND" in
     "cocoapods-setup")
         if [ ! -d core ]; then
           sh build.sh download-core
-        fi
-
-        if [[ "$2" != "swift" ]]; then
-          echo 'Installing for Xcode 7+.'
-          mv core/librealm-ios-bitcode.a core/librealm-ios.a
         fi
 
         # CocoaPods won't automatically preserve files referenced via symlinks
