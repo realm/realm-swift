@@ -396,7 +396,7 @@
 		E8645BBB1C7913D600C241AA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "CocoaPodsExample WatchKit Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample.watchkitapp.watchkitextension;
@@ -411,7 +411,7 @@
 		E8645BBC1C7913D600C241AA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "CocoaPodsExample WatchKit Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample.watchkitapp.watchkitextension;
@@ -427,6 +427,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				IBSC_MODULE = CocoaPodsExample_WatchKit_Extension;
 				INFOPLIST_FILE = "CocoaPodsExample WatchKit App/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample.watchkitapp;
@@ -442,6 +443,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				IBSC_MODULE = CocoaPodsExample_WatchKit_Extension;
 				INFOPLIST_FILE = "CocoaPodsExample WatchKit App/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample.watchkitapp;
@@ -457,6 +459,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = CocoaPodsExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample;
@@ -468,6 +471,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = CocoaPodsExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample;
