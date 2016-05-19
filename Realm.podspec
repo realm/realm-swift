@@ -68,15 +68,11 @@ Pod::Spec.new do |s|
   s.osx.deployment_target   = '10.9'
   s.osx.vendored_library    = 'core/librealm-macosx.a'
 
-  if s.respond_to?(:watchos)
-    s.watchos.deployment_target = '2.0'
-    s.watchos.vendored_library  = 'core/librealm-watchos.a'
-  end
+  s.watchos.deployment_target = '2.0'
+  s.watchos.vendored_library  = 'core/librealm-watchos.a'
 
-  if s.respond_to?(:tvos)
-    s.tvos.deployment_target = '9.0'
-    s.tvos.vendored_library  = 'core/librealm-tvos.a'
-  end
+  s.tvos.deployment_target = '9.0'
+  s.tvos.vendored_library  = 'core/librealm-tvos.a'
 
   s.subspec 'Headers' do |s|
     s.source_files          = public_header_files
