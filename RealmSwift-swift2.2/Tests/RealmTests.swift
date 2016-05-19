@@ -64,7 +64,7 @@ class RealmTests: TestCase {
         try! fileManager.setAttributes([ NSFileImmutable: NSNumber(bool: true) ], ofItemAtPath: testRealmURL().path!)
 
         // Should not be able to open read-write
-        assertFails(Error.Fail) {
+        assertFails(Error.FileAccess) {
             try Realm(fileURL: testRealmURL())
         }
 

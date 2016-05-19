@@ -11,7 +11,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix a bug that sometimes resulted in a single object's NSData properties
+  changing from `nil` to a zero-length non-`nil` NSData when a different object
+  of the same type was deleted.
 
 0.103.0 Release notes (2016-05-18)
 =============================================================
