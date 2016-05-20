@@ -33,8 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  When declaring an `RLMArray` property, the type must be marked as conforming to a
  protocol by the same name as the objects it should contain (see the
- `RLM_ARRAY_TYPE` macro). `RLMArray` properties can also use Objective-C generics
- if available. For example:
+ `RLM_ARRAY_TYPE` macro). In addition, the property can be declared using Objective-C
+ generics for better compile-time type safety.
 
      RLM_ARRAY_TYPE(ObjectType)
      ...
@@ -348,13 +348,13 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Unavailable Methods
 
 /**
- `- (RLMArray)init` is not available because `RLMArray`s cannot be created directly.
+ `-[RLMArray init]` is not available because `RLMArray`s cannot be created directly.
  `RLMArray` properties on `RLMObject`s are lazily created when accessed, or can be obtained by querying a Realm.
  */
 - (instancetype)init __attribute__((unavailable("RLMArrays cannot be created directly")));
 
 /**
- `+ (RLMArray)new` is not available because `RLMArray`s cannot be created directly.
+ `+[RLMArray new]` is not available because `RLMArray`s cannot be created directly.
  `RLMArray` properties on `RLMObject`s are lazily created when accessed, or can be obtained by querying a Realm.
  */
 + (instancetype)new __attribute__((unavailable("RLMArrays cannot be created directly")));
