@@ -18,17 +18,15 @@
 
 #import "RLMTestCase.h"
 
-#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Dynamic.h"
-
-extern "C" {
 #import "RLMSchema_Private.h"
-}
 
-#import <thread>
 #import <mach/mach_init.h>
 #import <mach/vm_map.h>
+#import <sys/resource.h>
+#import <thread>
 
 #import <realm/util/file.hpp>
 
@@ -1391,20 +1389,73 @@ extern "C" {
     }];
 
     NSError *writeError;
+    // Does not throw when given a nil error out param
+    XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:nil]);
+
+    NSString *expectedError = [NSString stringWithFormat:@"File at path '%@' already exists.", RLMTestRealmURL().path];
+    NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: file exists", RLMTestRealmURL().path];
     XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
-    XCTAssertEqual(writeError.code, RLMErrorFileExists);
+    RLMValidateRealmError(writeError, RLMErrorFileExists, expectedError, expectedUnderlying);
 }
 
-- (void)testCannotWriteInNotExistingDir
+- (void)testCannotWriteInNonExistentDirectory
 {
     RLMRealm *realm = [self realmWithTestPath];
     [realm transactionWithBlock:^{
         [IntObject createInRealm:realm withValue:@[@0]];
     }];
 
+    NSString *badPath = @"/tmp/RLMTestDirMayNotExist/foo";
+
+    NSString *expectedError = [NSString stringWithFormat:@"Directory at path '%@' does not exist.", badPath];
+    NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: no such file or directory", badPath];
     NSError *writeError;
-    XCTAssertFalse([realm writeCopyToURL:[NSURL fileURLWithPath:@"/tmp/RLMTestDirMayNotExist/foo"] encryptionKey:nil error:&writeError]);
-    XCTAssertEqual(writeError.code, RLMErrorFileNotFound);
+    XCTAssertFalse([realm writeCopyToURL:[NSURL fileURLWithPath:badPath] encryptionKey:nil error:&writeError]);
+    RLMValidateRealmError(writeError, RLMErrorFileNotFound, expectedError, expectedUnderlying);
+}
+
+- (void)testWriteToReadOnlyDirectory
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    // Make the parent directory temporarily read-only
+    NSString *directory = RLMTestRealmURL().URLByDeletingLastPathComponent.path;
+    NSFileManager *fm = NSFileManager.defaultManager;
+    NSNumber *oldPermissions = [fm attributesOfItemAtPath:directory error:nil][NSFilePosixPermissions];
+    [fm setAttributes:@{NSFilePosixPermissions: @(0100)} ofItemAtPath:directory error:nil];
+
+    NSString *expectedError = [NSString stringWithFormat:@"Unable to open a Realm at path '%@'. Please use a path where your app has read-write permissions.", RLMTestRealmURL().path];
+    NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: permission denied", RLMTestRealmURL().path];
+    NSError *writeError;
+    XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
+    RLMValidateRealmError(writeError, RLMErrorFilePermissionDenied, expectedError, expectedUnderlying);
+
+    // Restore old permissions
+    [fm setAttributes:@{NSFilePosixPermissions: oldPermissions} ofItemAtPath:directory error:nil];
+}
+
+- (void)testWriteWithNonSpecialCasedError
+{
+    // Testing an open() error which doesn't have its own exception type and
+    // just uses the generic "something failed" error
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    // Set the max open files to zero so that opening new files will fail
+    rlimit oldrl;
+    getrlimit(RLIMIT_NOFILE, &oldrl);
+    rlimit rl = oldrl;
+    rl.rlim_cur = 0;
+    setrlimit(RLIMIT_NOFILE, &rl);
+
+    NSString *expectedError = [NSString stringWithFormat:@"Unable to open a Realm at path '%@': open() failed: too many open files",
+                               RLMTestRealmURL().path];
+    NSString *expectedUnderlying = [NSString stringWithFormat:@"open(\"%@\") failed: too many open files", RLMTestRealmURL().path];
+    NSError *writeError;
+    XCTAssertFalse([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
+    RLMValidateRealmError(writeError, RLMErrorFileAccess, expectedError, expectedUnderlying);
+
+    // Restore the old open file limit
+    setrlimit(RLIMIT_NOFILE, &oldrl);
 }
 
 - (void)testWritingCopyUsesWriteTransactionInProgress
