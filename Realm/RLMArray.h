@@ -243,7 +243,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param predicateFormat A predicate format string; variable arguments are supported.
 
- @return                A `RLMResults` of objects that match the given predicate
+ @return                An `RLMResults` of objects that match the given predicate
  */
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
 
@@ -255,7 +255,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param predicate   The predicate to use to filter the objects.
 
- @return            A `RLMResults` of objects that match the given predicate
+ @return            An `RLMResults` of objects that match the given predicate
  */
 - (RLMResults<RLMObjectType> *)objectsWithPredicate:(NSPredicate *)predicate;
 
@@ -263,9 +263,9 @@ NS_ASSUME_NONNULL_BEGIN
  Returns a sorted `RLMResults` from the array.
 
  @param property    The property name to sort by.
- @param ascending   The direction to sort.
+ @param ascending   The direction to sort in.
 
- @return    A `RLMResults` sorted by the specified property.
+ @return    An `RLMResults` sorted by the specified property.
  */
 - (RLMResults<RLMObjectType> *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
@@ -274,7 +274,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param properties  An array of `RLMSortDescriptor`s to sort by.
 
- @return    A `RLMResults` sorted by the specified properties.
+ @return    An `RLMResults` sorted by the specified properties.
  */
 - (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray *)properties;
 

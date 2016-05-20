@@ -23,7 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMRealm, RLMResults, RLMObject, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange;
 
 /**
- A homogenous collection of `RLMObject` instances. Examples of conforming types include `RLMArray` and `RLMResults`.
+ A homogenous collection of `RLMObject` instances. Examples of conforming types include `RLMArray`,
+ `RLMResults`, and `RLMLinkingObjects`.
  */
 @protocol RLMCollection <NSFastEnumeration>
 
@@ -134,7 +135,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param property    The property name to sort by.
  @param ascending   The direction to sort.
 
- @return    A `RLMResults` sorted by the specified property.
+ @return    An `RLMResults` sorted by the specified property.
  */
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
@@ -235,7 +236,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- A `RLMSortDescriptor` stores a property name and a sort order for use with
+ An `RLMSortDescriptor` stores a property name and a sort order for use with
  `sortedResultsUsingDescriptors:`. It is similar to `NSSortDescriptor`, but supports
  only the subset of functionality which can be efficiently run by the query
  engine. `RLMSortDescriptor` instances are immutable.
@@ -257,12 +258,12 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Methods
 
 /**
- Returns a new sort descriptor for the given property name and sort order.
+ Returns a new sort descriptor for the given property name and sort direction.
  */
 + (instancetype)sortDescriptorWithProperty:(NSString *)propertyName ascending:(BOOL)ascending;
 
 /**
- Returns a copy of the receiver with the sort order reversed.
+ Returns a copy of the receiver with the sort direction reversed.
  */
 - (instancetype)reversedSortDescriptor;
 

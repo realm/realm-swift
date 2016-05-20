@@ -77,7 +77,7 @@ typedef NS_ENUM(NSInteger, RLMError) {
     RLMErrorFileAccess            = 2,
 
     /** 
-     Denotes a file permissions error that ocurred when trying to open a Realm.
+     Denotes a file permission error that ocurred when trying to open a Realm.
      
      This error can occur if the user does not have permission to open or create
      the specified file in the specified access mode when opening a Realm.
@@ -129,7 +129,7 @@ typedef NS_ENUM(NSInteger, RLMError) {
 
  More specifically, this notification is posted after a Realm has been refreshed to
  reflect a write transaction. This can happen when an autorefresh occurs, when
- `[RLMRealm refresh]` is called, after an implicit refresh from `[RLMRealm beginWriteTransaction]`,
+ `-[RLMRealm refresh]` is called, after an implicit refresh from `-[RLMRealm beginWriteTransaction]`,
  or after a local write transaction is completed.
  */
 extern NSString * const RLMRealmRefreshRequiredNotification;
@@ -138,11 +138,11 @@ extern NSString * const RLMRealmRefreshRequiredNotification;
  This notification is posted by a Realm when a write transaction has been
  committed to a Realm on a different thread for the same file.
  
- It is not posted if `[RLMRealm autorefresh]` is enabled, or if the Realm is
+ It is not posted if `-[RLMRealm autorefresh]` is enabled, or if the Realm is
  refreshed before the notification has a chance to run.
 
  Realms with autorefresh disabled should normally install a handler for this
- notification which calls `[RLMRealm refresh]` after doing some work. Refreshing
+ notification which calls `-[RLMRealm refresh]` after doing some work. Refreshing
  the Realm is optional, but not refreshing the Realm may lead to large Realm
  files. This is because Realm must keep an extra copy of the data for the stale
  Realm.
