@@ -236,6 +236,105 @@ class SwiftPrimaryStringObject: Object {
     }
 }
 
+class SwiftPrimaryOptionalStringObject: Object {
+    dynamic var stringCol: String? = ""
+    dynamic var intCol = 0
+
+    override class func primaryKey() -> String? {
+        return "stringCol"
+    }
+}
+
+class SwiftPrimaryIntObject: Object {
+    dynamic var stringCol = ""
+    dynamic var intCol = 0
+
+    override class func primaryKey() -> String? {
+        return "intCol"
+    }
+}
+
+class SwiftPrimaryOptionalIntObject: Object {
+    dynamic var stringCol = ""
+    let intCol = RealmOptional<Int>()
+
+    override class func primaryKey() -> String? {
+        return "intCol"
+    }
+}
+
+class SwiftPrimaryInt8Object: Object {
+    dynamic var stringCol = ""
+    dynamic var int8Col: Int8 = 0
+
+    override class func primaryKey() -> String? {
+        return "int8Col"
+    }
+}
+
+class SwiftPrimaryOptionalInt8Object: Object {
+    dynamic var stringCol = ""
+    let int8Col = RealmOptional<Int8>()
+
+    override class func primaryKey() -> String? {
+        return "int8Col"
+    }
+}
+
+class SwiftPrimaryInt16Object: Object {
+    dynamic var stringCol = ""
+    dynamic var int16Col: Int16 = 0
+
+    override class func primaryKey() -> String? {
+        return "int16Col"
+    }
+}
+
+class SwiftPrimaryOptionalInt16Object: Object {
+    dynamic var stringCol = ""
+    let int16Col = RealmOptional<Int16>()
+
+    override class func primaryKey() -> String? {
+        return "int16Col"
+    }
+}
+
+class SwiftPrimaryInt32Object: Object {
+    dynamic var stringCol = ""
+    dynamic var int32Col: Int32 = 0
+
+    override class func primaryKey() -> String? {
+        return "int32Col"
+    }
+}
+
+class SwiftPrimaryOptionalInt32Object: Object {
+    dynamic var stringCol = ""
+    let int32Col = RealmOptional<Int32>()
+
+    override class func primaryKey() -> String? {
+        return "int32Col"
+    }
+}
+
+class SwiftPrimaryInt64Object: Object {
+    dynamic var stringCol = ""
+    dynamic var int64Col: Int64 = 0
+
+    override class func primaryKey() -> String? {
+        return "int64Col"
+    }
+}
+
+class SwiftPrimaryOptionalInt64Object: Object {
+    dynamic var stringCol = ""
+    let int64Col = RealmOptional<Int64>()
+
+    override class func primaryKey() -> String? {
+        return "int64Col"
+    }
+}
+
 class SwiftIndexedPropertiesObject: Object {
     dynamic var stringCol = ""
     dynamic var intCol = 0
