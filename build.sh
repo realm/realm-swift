@@ -672,6 +672,7 @@ case "$COMMAND" in
 
     "verify-osx")
         sh build.sh test-osx
+        sh build.sh analyze-osx
         sh build.sh examples-osx
 
         (
