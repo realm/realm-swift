@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMRealm, RLMResults, RLMObject, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange;
 
 /**
- A homogenous collection of `RLMObject`s like `RLMArray` or `RLMResults`.
+ A homogenous collection of `RLMObject` instances. Examples of conforming types include `RLMArray` and `RLMResults`.
  */
 @protocol RLMCollection <NSFastEnumeration>
 
@@ -32,17 +32,17 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Properties
 
 /**
- Number of objects in the collection.
+ The number of objects in the collection.
  */
 @property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
- The class name (i.e. type) of the RLMObjects contained in this RLMCollection.
+ The class name (i.e. type) of the `RLMObject`s contained in the collection.
  */
 @property (nonatomic, readonly, copy) NSString *objectClassName;
 
 /**
- The Realm in which this collection is persisted. Returns nil for standalone collections.
+ The Realm which manages the collection. Returns `nil` for unmanaged collections.
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
@@ -53,45 +53,45 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param index   The index to look up.
 
- @return An RLMObject of the type contained in this RLMCollection.
+ @return An `RLMObject` of the type contained in the collection.
  */
 - (id)objectAtIndex:(NSUInteger)index;
 
 /**
  Returns the first object in the collection.
 
- Returns `nil` if called on an empty RLMCollection.
+ Returns `nil` if called on an empty collection.
 
- @return An RLMObject of the type contained in this RLMCollection.
+ @return An `RLMObject` of the type contained in the collection.
  */
 - (nullable id)firstObject;
 
 /**
  Returns the last object in the collection.
 
- Returns `nil` if called on an empty RLMCollection.
+ Returns `nil` if called on an empty collection.
 
- @return An RLMObject of the type contained in this RLMCollection.
+ @return An `RLMObject` of the type contained in the collection.
  */
 - (nullable id)lastObject;
 
 #pragma mark - Querying a Collection
 
 /**
- Gets the index of an object.
+ Returns the index of an object in the collection.
 
- Returns NSNotFound if the object is not found in this RLMCollection.
+ Returns `NSNotFound` if the object is not found in the collection.
 
- @param object  An object (of the same type as returned from the objectClassName selector).
+ @param object  An object (of the same type as returned from the `objectClassName` selector).
  */
 - (NSUInteger)indexOfObject:(RLMObject *)object;
 
 /**
- Gets the index of the first object matching the predicate.
+ Returns the index of the first object matching the predicate.
 
  @param predicateFormat The predicate format string which can accept variable arguments.
 
- @return    Index of object or NSNotFound if the object is not found in this RLMCollection.
+ @return    The index of the object, or `NSNotFound` if the object is not found in the collection.
  */
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
 
@@ -99,20 +99,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
 
 /**
- Gets the index of the first object matching the predicate.
+ Returns the index of the first object in the collection matching the predicate.
 
- @param predicate   The predicate to filter the objects.
+ @param predicate   The predicate to use to filter the objects.
 
- @return    Index of object or NSNotFound if the object is not found in this RLMCollection.
+ @return    The index of the object, or `NSNotFound` if the object is not found in the collection.
  */
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
 
 /**
- Get objects matching the given predicate in the RLMCollection.
+ Returns all objects matching the given predicate in the collection.
 
- @param predicateFormat The predicate format string which can accept variable arguments.
+ @param predicateFormat A predicate format string; variable arguments are supported.
 
- @return    An RLMResults of objects that match the given predicate
+ @return    An `RLMResults` of objects that match the given predicate.
  */
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
 
@@ -120,30 +120,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
 /**
- Get objects matching the given predicate in the RLMCollection.
+ Returns all objects matching the given predicate in the collection.
 
- @param predicate   The predicate to filter the objects.
+ @param predicate   The predicate to use to filter the objects.
 
- @return            An RLMResults of objects that match the given predicate
+ @return            An `RLMResults` of objects that match the given predicate.
  */
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
- Get a sorted RLMResults from an RLMCollection.
+ Returns a sorted `RLMResults` from the collection.
 
  @param property    The property name to sort by.
- @param ascending   The direction to sort by.
+ @param ascending   The direction to sort.
 
- @return    An RLMResults sorted by the specified property.
+ @return    A `RLMResults` sorted by the specified property.
  */
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
 /**
- Get a sorted RLMResults from an RLMCollection.
+ Returns a sorted `RLMResults` from the collection.
 
  @param properties  An array of `RLMSortDescriptor`s to sort by.
 
- @return    An RLMResults sorted by the specified properties.
+ @return    An `RLMResults` sorted by the specified properties.
  */
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties;
 
@@ -151,16 +151,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 
 /**
- Returns an NSArray containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+ Returns an `NSArray` containing the results of invoking `valueForKey:` using `key` on each of the collection's objects.
 
  @param key The name of the property.
 
- @return NSArray containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+ @return An `NSArray` containing results.
  */
 - (nullable id)valueForKey:(NSString *)key;
 
 /**
- Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+ Invokes `setValue:forKey:` on each of the collection's objects using the specified `value` and `key`.
 
  @warning This method can only be called during a write transaction.
 
@@ -172,24 +172,24 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Notifications
 
 /**
- Register a block to be called each time the RLMCollection changes.
+ Registers a block to be called each time the collection changes.
 
  The block will be asynchronously called with the initial collection, and then
  called again after each write transaction which changes either any of the
  objects in the collection, or which objects are in the collection.
 
- The change parameter will be `nil` the first time the block is called with the
- initial collection. For each call after that, it will contain information about
+ The change parameter will be `nil` the first time the block is called.
+ For each call after that, it will contain information about
  which rows in the collection were added, removed or modified. If a write transaction
  did not modify any objects in this collection, the block is not called at all.
- See the RLMCollectionChange documentation for information on how the changes
- are reported and an example of updating a UITableView.
+ See the `RLMCollectionChange` documentation for information on how the changes
+ are reported and an example of updating a `UITableView`.
 
  If an error occurs the block will be called with `nil` for the collection
  parameter and a non-`nil` error. Currently the only errors that can occur are
- when opening the RLMRealm on the background worker thread.
+ when opening the Realm on the background worker thread.
 
- At the time when the block is called, the RLMCollection object will be fully
+ At the time when the block is called, the collection object will be fully
  evaluated and up-to-date, and as long as you do not perform a write transaction
  on the same thread or explicitly call `-[RLMRealm refresh]`, accessing it will
  never perform blocking work.
@@ -223,9 +223,9 @@ NS_ASSUME_NONNULL_BEGIN
  to be sent to the block. To stop receiving updates, call `-stop` on the token.
 
  @warning This method cannot be called during a write transaction, or when the
-          containing realm is read-only.
+          containing Realm is read-only.
 
- @param block The block to be called with the evaluated collection.
+ @param block The block to be called each time the collection changes.
  @return A token which must be held for as long as you want collection notifications to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(id<RLMCollection> __nullable collection,
@@ -233,30 +233,31 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSError *__nullable error))block __attribute__((warn_unused_result));
 
 @end
+
 /**
- An RLMSortDescriptor stores a property name and a sort order for use with
- `sortedResultsUsingDescriptors:`. It is similar to NSSortDescriptor, but supports
+ A `RLMSortDescriptor` stores a property name and a sort order for use with
+ `sortedResultsUsingDescriptors:`. It is similar to `NSSortDescriptor`, but supports
  only the subset of functionality which can be efficiently run by the query
- engine. RLMSortDescriptor instances are immutable.
+ engine. `RLMSortDescriptor` instances are immutable.
  */
 @interface RLMSortDescriptor : NSObject
 
 #pragma mark - Properties
 
 /**
- The name of the property which this sort descriptor orders results by.
+ The name of the property which the sort descriptor orders results by.
  */
 @property (nonatomic, readonly) NSString *property;
 
 /**
- Whether this descriptor sorts in ascending or descending order.
+ Whether the descriptor sorts in ascending or descending order.
  */
 @property (nonatomic, readonly) BOOL ascending;
 
 #pragma mark - Methods
 
 /**
- Returns a new sort descriptor for the given property name and order.
+ Returns a new sort descriptor for the given property name and sort order.
  */
 + (instancetype)sortDescriptorWithProperty:(NSString *)propertyName ascending:(BOOL)ascending;
 
@@ -268,13 +269,16 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- RLMCollectionChange is passed to the notification blocks registered with
- -addNotificationBlock on RLMArray and RLMResults, and reports what rows in the
+ A `RLMCollectionChange` object encapsulates information about changes to collections
+ that are reported by Realm notifications.
+
+ `RLMCollectionChange` is passed to the notification blocks registered with
+ `-addNotificationBlock` on `RLMArray` and `RLMResults`, and reports what rows in the
  collection changed since the last time the notification block was called.
 
  The change information is available in two formats: a simple array of row
  indices in the collection for each type of change, and an array of index paths
- in a requested section suitable for passing directly to UITableView's batch
+ in a requested section suitable for passing directly to `UITableView`'s batch
  update methods. A complete example of updating a `UITableView` named `tv`:
 
      [tv beginUpdates];
@@ -283,7 +287,7 @@ NS_ASSUME_NONNULL_BEGIN
      [tv reloadRowsAtIndexPaths:[changes modificationsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
      [tv endUpdates];
 
- All of the arrays in an RLMCollectionChange are always sorted in ascending order.
+ All of the arrays in an `RLMCollectionChange` are always sorted in ascending order.
  */
 @interface RLMCollectionChange : NSObject
 /// The indices of objects in the previous version of the collection which have
@@ -293,20 +297,25 @@ NS_ASSUME_NONNULL_BEGIN
 /// The indices in the new version of the collection which were newly inserted.
 @property (nonatomic, readonly) NSArray<NSNumber *> *insertions;
 
-/// The indices in the new version of the collection which were modified. For
-/// RLMResults, this means that one or more of the properties of the object at
-/// that index were modified (or an object linked to by that object was
-/// modified). For RLMArray, the array itself being modified to contain a
-/// different object at that index will also be reported as a modification.
+/**
+ The indices in the new version of the collection which were modified.
+ 
+ For `RLMResults`, this means that one or more of the properties of the object at
+ that index were modified (or an object linked to by that object was
+ modified).
+ 
+ For `RLMArray`, the array itself being modified to contain a
+ different object at that index will also be reported as a modification.
+ */
 @property (nonatomic, readonly) NSArray<NSNumber *> *modifications;
 
-/// Returns index paths of the deletion indices in the given section.
+/// Returns the index paths of the deletion indices in the given section.
 - (NSArray<NSIndexPath *> *)deletionsInSection:(NSUInteger)section;
 
-/// Returns index paths of the insertion indices in the given section.
+/// Returns the index paths of the insertion indices in the given section.
 - (NSArray<NSIndexPath *> *)insertionsInSection:(NSUInteger)section;
 
-/// Returns index paths of the modification indices in the given section.
+/// Returns the index paths of the modification indices in the given section.
 - (NSArray<NSIndexPath *> *)modificationsInSection:(NSUInteger)section;
 @end
 
