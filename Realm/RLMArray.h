@@ -25,7 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMObject, RLMRealm, RLMResults<RLMObjectType: RLMObject *>, RLMNotificationToken;
 
 /**
-
  `RLMArray` is the container type in Realm used to define to-many relationships.
 
  Unlike an `NSArray`, `RLMArray`s hold a single type, specified by the `objectClassName` property.
@@ -89,25 +88,25 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param index   The index to look up.
 
- @return An `RLMObject` of the type contained in this `RLMArray`.
+ @return An `RLMObject` of the type contained in the array.
  */
 - (RLMObjectType)objectAtIndex:(NSUInteger)index;
 
 /**
  Returns the first object in the array.
 
- Returns `nil` if called on an empty `RLMArray`.
+ Returns `nil` if called on an empty array.
 
- @return An `RLMObject` of the type contained in this `RLMArray`.
+ @return An `RLMObject` of the type contained in the array.
  */
 - (nullable RLMObjectType)firstObject;
 
 /**
  Returns the last object in the array.
 
- Returns `nil` if called on an empty RLMArray.
+ Returns `nil` if called on an empty array.
 
- @return An `RLMObject` of the type contained in this `RLMArray`.
+ @return An `RLMObject` of the type contained in the array.
  */
 - (nullable RLMObjectType)lastObject;
 
@@ -125,11 +124,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addObject:(RLMObjectType)object;
 
 /**
- Adds an array of objects at the end of the array.
+ Adds an array of objects to the end of the array.
 
  @warning This method can only be called during a write transaction.
 
- @param objects     An enumerable object such as `NSArray` or RLMResults`` which contains objects of the
+ @param objects     An enumerable object such as `NSArray` or `RLMResults` which contains objects of the
                     same class as the array.
  */
 - (void)addObjects:(id<NSFastEnumeration>)objects;
@@ -196,7 +195,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)moveObjectAtIndex:(NSUInteger)sourceIndex toIndex:(NSUInteger)destinationIndex;
 
 /**
- Exchanges the objects in the array at given indexes.
+ Exchanges the objects in the array at given indices.
 
  Throws an exception if either index exceeds the bounds of the array.
 
@@ -242,9 +241,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns all the objects matching the given predicate in the array.
 
- @param predicateFormat The predicate format string which can accept variable arguments.
+ @param predicateFormat A predicate format string; variable arguments are supported.
 
- @return                A `RLMResults` of objects that match the given predicate
+ @return                An `RLMResults` of objects that match the given predicate
  */
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
 
@@ -256,7 +255,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param predicate   The predicate to use to filter the objects.
 
- @return            A `RLMResults` of objects that match the given predicate
+ @return            An `RLMResults` of objects that match the given predicate
  */
 - (RLMResults<RLMObjectType> *)objectsWithPredicate:(NSPredicate *)predicate;
 
@@ -264,9 +263,9 @@ NS_ASSUME_NONNULL_BEGIN
  Returns a sorted `RLMResults` from the array.
 
  @param property    The property name to sort by.
- @param ascending   The direction to sort by.
+ @param ascending   The direction to sort in.
 
- @return    A `RLMResults` sorted by the specified property.
+ @return    An `RLMResults` sorted by the specified property.
  */
 - (RLMResults<RLMObjectType> *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
@@ -275,7 +274,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param properties  An array of `RLMSortDescriptor`s to sort by.
 
- @return    A `RLMResults` sorted by the specified properties.
+ @return    An `RLMResults` sorted by the specified properties.
  */
 - (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray *)properties;
 
