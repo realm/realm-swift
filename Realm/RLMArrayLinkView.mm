@@ -90,7 +90,7 @@ static void throwError() {
         throw;
     }
     catch (realm::InvalidTransactionException const&) {
-        @throw RLMException(@"Cannot modify persisted RLMArray outside of a write transaction");
+        @throw RLMException(@"Cannot modify managed RLMArray outside of a write transaction");
     }
     catch (realm::IncorrectThreadException const&) {
         @throw RLMException(@"Realm accessed from incorrect thread");
