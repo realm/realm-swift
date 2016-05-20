@@ -48,6 +48,7 @@ command:
   tvos-swift:           builds RealmSwift framework for tvOS
   osx:                  builds OS X framework
   osx-swift:            builds RealmSwift framework for OS X
+  analyze-osx:          analyzes OS X framework
   test:                 tests all iOS and OS X frameworks
   test-all:             tests all iOS and OS X frameworks in both Debug and Release configurations
   test-ios-static:      tests static iOS framework on 32-bit and 64-bit simulators
@@ -504,6 +505,15 @@ case "$COMMAND" in
         destination="build/osx/swift-$REALM_SWIFT_VERSION"
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
         cp -R build/osx/Realm.framework "$destination"
+        exit 0
+        ;;
+
+    ######################################
+    # Analysis
+    ######################################
+
+    "analyze-osx")
+        xc "-scheme Realm -configuration $CONFIGURATION analyze"
         exit 0
         ;;
 
