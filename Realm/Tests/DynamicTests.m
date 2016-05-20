@@ -85,8 +85,12 @@
     }
     XCTAssertNotNil(expectedSchema);
 
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.fileURL = RLMTestRealmURL();
+    config.dynamic = YES;
+
     NSError *error = nil;
-    RLMSchema *dynamicSchema = [[RLMRealm realmWithURL:RLMTestRealmURL() key:nil readOnly:NO inMemory:NO dynamic:YES schema:nil error:&error] schema];
+    RLMSchema *dynamicSchema = [[RLMRealm realmWithConfiguration:config error:&error] schema];
     XCTAssertNil(error);
     XCTAssertEqual(dynamicSchema.objectSchema.count, expectedSchema.objectSchema.count);
     for (RLMObjectSchema *expectedObjectSchema in expectedSchema.objectSchema) {
