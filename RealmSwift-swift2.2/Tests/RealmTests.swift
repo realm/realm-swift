@@ -548,8 +548,11 @@ class RealmTests: TestCase {
             let object1 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: NSNull())
             XCTAssertNotNil(object1)
 
-            let object2 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: "b")
-            XCTAssertNotNil(object2)
+            let object2 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: nil)
+            XCTAssertEqual(object1, object2)
+
+            let object3 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: "b")
+            XCTAssertNotNil(object3)
 
             let missingObject = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: "z")
             XCTAssertNil(missingObject)
@@ -567,8 +570,11 @@ class RealmTests: TestCase {
             let object1 = realm.objectForPrimaryKey(objectType, key: NSNull())
             XCTAssertNotNil(object1)
 
-            let object2 = realm.objectForPrimaryKey(objectType, key: 2)
-            XCTAssertNotNil(object2)
+            let object2 = realm.objectForPrimaryKey(objectType, key: nil)
+            XCTAssertEqual(object1, object2)
+
+            let object3 = realm.objectForPrimaryKey(objectType, key: 2)
+            XCTAssertNotNil(object3)
 
             let missingObject = realm.objectForPrimaryKey(objectType, key: 0)
             XCTAssertNil(missingObject)
