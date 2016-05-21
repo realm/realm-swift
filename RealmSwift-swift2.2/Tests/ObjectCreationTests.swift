@@ -162,8 +162,8 @@ class ObjectCreationTests: TestCase {
         let dateValue2 = [ "dateCol": theDate ]
         let dateValue3 = [ "dateCol": "1971-02-03" ]
 
-        XCTAssertEqual(SwiftObject(value:dateValue1).dateCol,theDate)
-        XCTAssertEqual(SwiftObject(value:dateValue2).dateCol,theDate)
+        XCTAssertEqual(SwiftObject(value:dateValue1).dateCol, theDate)
+        XCTAssertEqual(SwiftObject(value:dateValue2).dateCol, theDate)
         assertThrows(SwiftObject(value:dateValue3), "Date field should throw exception")
 
     }
