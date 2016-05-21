@@ -92,7 +92,12 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
             [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"]; 
         }
         NSDate *date = [dateFormatter dateFromString:obj]; 
-        return date; 
+        if (date) {
+            return date; 
+        } else {
+            // if not convertible to prop throw
+            @throw RLMException(@"Invalid date value '%@' for property '%@' which should be either date or string in format [yyyy-MM-dd'T'HH:mm:ss.SSS'Z']", obj, prop.name);
+        }
     }
 
     // check for object or array of properties
