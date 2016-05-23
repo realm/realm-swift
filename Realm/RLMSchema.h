@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
  Returns an `RLMObjectSchema` for the given class name in the schema.
 
  @param className   The object class name.
- @return            A `RLMObjectSchema` for the given class in the schema.
+ @return            An `RLMObjectSchema` for the given class in the schema.
 
  @see               `RLMObjectSchema`
  */
@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
  If there is no object of type `className` in the schema, an exception will be thrown.
 
  @param className   The object class name.
- @return            A `RLMObjectSchema` for the given class in this Realm.
+ @return            An `RLMObjectSchema` for the given class in this Realm.
 
  @see               `RLMObjectSchema`
  */

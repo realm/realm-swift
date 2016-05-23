@@ -37,10 +37,10 @@ NS_ASSUME_NONNULL_BEGIN
  some of them are deleted or modified to be excluded by the filter during the
  enumeration.
 
- `RLMResults` are lazily evaluated, and only run queries when the result
- of the query is requested. This means that chaining several temporary
- `RLMResults` to sort and filter your data does not perform any extra work
- processing the intermediate state.
+ `RLMResults` are lazily evaluated the first time they are accessed; they only
+ run queries when the result of the query is requested. This means that 
+ chaining several temporary `RLMResults` to sort and filter your data does not 
+ perform any extra work processing the intermediate state.
 
  Once the results have been evaluated or a notification block has been added,
  the results are eagerly kept up-to-date, with the work done to keep them

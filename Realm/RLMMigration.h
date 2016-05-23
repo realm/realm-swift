@@ -39,7 +39,8 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
  `RLMMigration` instances encapsulate information intended to facilitate a schema migration.
  
  A `RLMMigration` instance is passed into a user-defined `RLMMigrationBlock` block when updating
- the version of a Realm. This instance provides access to the old and new database schemas.
+ the version of a Realm. This instance provides access to the old and new database schemas, the
+ objects in the Realm, and provides functionality for modifying the Realm during the migration.
  */
 @interface RLMMigration : NSObject
 
