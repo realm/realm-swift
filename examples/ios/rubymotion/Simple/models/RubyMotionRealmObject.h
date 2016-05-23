@@ -19,7 +19,6 @@ RLM_ARRAY_TYPE(StringObject);
 @property NSDate       *dateProp;
 @property bool          cBoolProp;
 @property long          longProp;
-@property id            mixedProp;
 @property StringObject *objectProp;
 
 // FIXME: Support array properties in RubyMotion
