@@ -22,6 +22,7 @@ command:
   test-osx-objc-cocoapods:         tests OS X Objective-C CocoaPods example.
   test-osx-objc-carthage:          tests OS X Objective-C Carthage example.
   test-osx-swift-dynamic:          tests OS X Swift dynamic example.
+  test-osx-swift-cocoapods:        tests OS X Swift CocoaPods example.
   test-osx-swift-carthage:         tests OS X Swift Carthage example.
 
   test-watchos-objc-dynamic:       tests watchOS Objective-C dynamic example.
@@ -161,6 +162,10 @@ case "$COMMAND" in
 
     "test-osx-swift-dynamic")
         xctest osx swift-$REALM_SWIFT_VERSION DynamicExample
+        ;;
+
+    "test-osx-swift-cocoapods")
+        xctest osx swift-$REALM_SWIFT_VERSION CocoaPodsExample
         ;;
 
     "test-osx-swift-carthage")
