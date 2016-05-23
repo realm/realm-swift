@@ -48,6 +48,7 @@ command:
   tvos-swift:           builds RealmSwift framework for tvOS
   osx:                  builds OS X framework
   osx-swift:            builds RealmSwift framework for OS X
+  analyze-osx:          analyzes OS X framework
   test:                 tests all iOS and OS X frameworks
   test-all:             tests all iOS and OS X frameworks in both Debug and Release configurations
   test-ios-static:      tests static iOS framework on 32-bit and 64-bit simulators
@@ -508,6 +509,15 @@ case "$COMMAND" in
         ;;
 
     ######################################
+    # Analysis
+    ######################################
+
+    "analyze-osx")
+        xc "-scheme Realm -configuration $CONFIGURATION analyze"
+        exit 0
+        ;;
+
+    ######################################
     # Testing
     ######################################
     "test")
@@ -656,18 +666,19 @@ case "$COMMAND" in
         ;;
 
     "verify-osx-encryption")
-        REALM_ENCRYPT_ALL=YES sh build.sh test-osx || exit 1
+        REALM_ENCRYPT_ALL=YES sh build.sh test-osx
         exit 0
         ;;
 
     "verify-osx")
         sh build.sh test-osx
+        sh build.sh analyze-osx
         sh build.sh examples-osx
 
         (
             cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/$CONFIGURATION
             DYLD_FRAMEWORK_PATH=. ./JSONImport >/dev/null
-        ) || exit 1
+        )
         exit 0
         ;;
 

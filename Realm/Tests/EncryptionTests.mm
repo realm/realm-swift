@@ -19,6 +19,7 @@
 #import "RLMTestCase.h"
 
 #import "RLMObjectSchema_Private.h"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMRealm_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
@@ -166,8 +167,11 @@
 
     // Create the Realm file on disk
     @autoreleasepool {
-        [RLMRealm realmWithURL:RLMDefaultRealmURL() key:key readOnly:NO
-                          inMemory:NO dynamic:YES schema: schema error:nil];
+        RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+        config.encryptionKey = key;
+        config.dynamic = YES;
+        config.customSchema = schema;
+        [RLMRealm realmWithConfiguration:config error:nil];
     }
 
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];

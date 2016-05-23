@@ -27,11 +27,18 @@ private func realmWithSingleClassProperties(fileURL: NSURL, className: String, p
     let schema = RLMSchema()
     let objectSchema = RLMObjectSchema(className: className, objectClass: MigrationObject.self, properties: properties)
     schema.objectSchema = [objectSchema]
-    return try! RLMRealm(URL: fileURL, key: nil, readOnly: false, inMemory: false, dynamic: true, schema: schema)
+    let config = RLMRealmConfiguration()
+    config.fileURL = fileURL
+    config.dynamic = true
+    config.customSchema = schema
+    return try! RLMRealm(configuration: config)
 }
 
 private func dynamicRealm(fileURL: NSURL) -> RLMRealm {
-    return try! RLMRealm(URL: fileURL, key: nil, readOnly: false, inMemory: false, dynamic: true, schema: nil)
+    let config = RLMRealmConfiguration()
+    config.fileURL = fileURL
+    config.dynamic = true
+    return try! RLMRealm(configuration: config)
 }
 
 class MigrationTests: TestCase {
