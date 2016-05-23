@@ -659,8 +659,10 @@ case "$COMMAND" in
 
         cd examples/installation
         sh build.sh test-ios-objc-cocoapods
+        sh build.sh test-ios-objc-cocoapods-dynamic
         sh build.sh test-ios-swift-cocoapods
         sh build.sh test-osx-objc-cocoapods
+        sh build.sh test-osx-swift-cocoapods
         sh build.sh test-watchos-objc-cocoapods
         sh build.sh test-watchos-swift-cocoapods
         ;;

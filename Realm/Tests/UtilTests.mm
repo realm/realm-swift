@@ -92,23 +92,13 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) {
                                         "don't do that to your files",
                                         "lp0 on fire");
     RLMError dummyCode = RLMErrorFail;
-    NSDictionary *expectedUserInfo = @{NSLocalizedDescriptionKey: @"don't do that to your files: lp0 on fire",
+    NSDictionary *expectedUserInfo = @{NSLocalizedDescriptionKey: @"don't do that to your files",
                                        NSFilePathErrorKey: @"/some/path",
                                        @"Error Code": @(dummyCode),
                                        @"Underlying": @"lp0 on fire"};
 
     XCTAssertEqualObjects(RLMMakeError(dummyCode, exception),
                           [NSError errorWithDomain:RLMErrorDomain code:dummyCode userInfo:expectedUserInfo]);
-}
-
-- (void)testRealmFileExceptionStripsRedundantCopyOfPath {
-    realm::RealmFileException exception(realm::RealmFileException::Kind::NotFound,
-                                        "/some/path",
-                                        "Could not open /some/path",
-                                        "open(/some/path) failed: Unknown error");
-
-    XCTAssertEqualObjects(RLMMakeError(RLMErrorFileAccess, exception).localizedDescription,
-                          @"Could not open /some/path: open() failed: Unknown error");
 }
 
 - (void)testRLMMakeError {

@@ -15,14 +15,6 @@ class AppDelegate
     obj.cBoolProp = true
     obj.longProp = 123456
 
-    # Property types of "id" supports any other type
-    obj.mixedProp = true
-    obj.mixedProp = 123
-    obj.mixedProp = 123.45
-    obj.mixedProp = "abcd"
-    obj.mixedProp = "abcd".dataUsingEncoding(NSUTF8StringEncoding)
-    obj.mixedProp = NSDate.date
-
     # Object properties are supported
     stringObj = StringObject.new
     stringObj.stringProp = "xyz"

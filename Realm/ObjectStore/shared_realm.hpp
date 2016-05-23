@@ -28,12 +28,14 @@
 #include <realm/handover_defs.hpp>
 
 namespace realm {
+    class BinaryData;
     class BindingContext;
     class Group;
     class Realm;
     class Replication;
     class Schema;
     class SharedGroup;
+    class StringData;
     typedef std::shared_ptr<Realm> SharedRealm;
     typedef std::weak_ptr<Realm> WeakRealm;
 
@@ -134,6 +136,7 @@ namespace realm {
 
         void invalidate();
         bool compact();
+        void write_copy(StringData path, BinaryData encryption_key);
 
         std::thread::id thread_id() const { return m_thread_id; }
         void verify_thread() const;
