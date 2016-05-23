@@ -69,6 +69,55 @@ Realm::Realm(Config config)
     }
 }
 
+REALM_NOINLINE static void translate_file_exception(StringData path, bool read_only=false)
+{
+    try {
+        throw;
+    }
+    catch (util::File::PermissionDenied const& ex) {
+        throw RealmFileException(RealmFileException::Kind::PermissionDenied, ex.get_path(),
+                                 "Unable to open a realm at path '" + ex.get_path() +
+                                 "'. Please use a path where your app has " + (read_only ? "read" : "read-write") + " permissions.",
+                                 ex.what());
+    }
+    catch (util::File::Exists const& ex) {
+        throw RealmFileException(RealmFileException::Kind::Exists, ex.get_path(),
+                                 "File at path '" + ex.get_path() + "' already exists.",
+                                 ex.what());
+    }
+    catch (util::File::NotFound const& ex) {
+        throw RealmFileException(RealmFileException::Kind::NotFound, ex.get_path(),
+                                 "Directory at path '" + ex.get_path() + "' does not exist.",
+                                 ex.what());
+    }
+    catch (util::File::AccessError const& ex) {
+        // Errors for `open()` include the path, but other errors don't. We
+        // don't want two copies of the path in the error, so strip it out if it
+        // appears, and then include it in our prefix.
+        std::string underlying = ex.what();
+        auto pos = underlying.find(ex.get_path());
+        if (pos != std::string::npos && pos > 0) {
+            // One extra char at each end for the quotes
+            underlying.replace(pos - 1, ex.get_path().size() + 2, "");
+        }
+        throw RealmFileException(RealmFileException::Kind::AccessError, ex.get_path(),
+                                 "Unable to open a realm at path '" + ex.get_path() + "': " + underlying,
+                                 ex.what());
+    }
+    catch (IncompatibleLockFile const& ex) {
+        throw RealmFileException(RealmFileException::Kind::IncompatibleLockFile, path,
+                                 "Realm file is currently open in another process "
+                                 "which cannot share access with this process. All processes sharing a single file must be the same architecture.",
+                                 ex.what());
+    }
+    catch (FileFormatUpgradeRequired const& ex) {
+        throw RealmFileException(RealmFileException::Kind::FormatUpgradeRequired, path,
+                                 "The Realm file format must be allowed to be upgraded "
+                                 "in order to proceed.",
+                                 ex.what());
+    }
+}
+
 void Realm::open_with_config(const Config& config,
                              std::unique_ptr<Replication>& history,
                              std::unique_ptr<SharedGroup>& shared_group,
@@ -85,38 +134,8 @@ void Realm::open_with_config(const Config& config,
             shared_group = std::make_unique<SharedGroup>(*history, durability, config.encryption_key.data(), !config.disable_format_upgrade);
         }
     }
-    catch (util::File::PermissionDenied const& ex) {
-        throw RealmFileException(RealmFileException::Kind::PermissionDenied, ex.get_path(),
-                                 "Unable to open a realm at path '" + ex.get_path() +
-                                 "'. Please use a path where your app has " + (config.read_only ? "read" : "read-write") + " permissions.",
-                                 ex.what());
-    }
-    catch (util::File::Exists const& ex) {
-        throw RealmFileException(RealmFileException::Kind::Exists, ex.get_path(),
-                                 "File at path '" + ex.get_path() + "' already exists.",
-                                 ex.what());
-    }
-    catch (util::File::NotFound const& ex) {
-        throw RealmFileException(RealmFileException::Kind::NotFound, ex.get_path(),
-                                 "File at path '" + ex.get_path() + "' does not exist.",
-                                 ex.what());
-    }
-    catch (util::File::AccessError const& ex) {
-        throw RealmFileException(RealmFileException::Kind::AccessError, ex.get_path(),
-                                 "Unable to open a realm at path '" + ex.get_path() + "'",
-                                 ex.what());
-    }
-    catch (IncompatibleLockFile const& ex) {
-        throw RealmFileException(RealmFileException::Kind::IncompatibleLockFile, config.path,
-                                 "Realm file is currently open in another process "
-                                 "which cannot share access with this process. All processes sharing a single file must be the same architecture.",
-                                 ex.what());
-    }
-    catch (FileFormatUpgradeRequired const& ex) {
-        throw RealmFileException(RealmFileException::Kind::FormatUpgradeRequired, config.path,
-                                 "The Realm file format must be allowed to be upgraded "
-                                 "in order to proceed.",
-                                 ex.what());
+    catch (...) {
+        translate_file_exception(config.path, config.read_only);
     }
 }
 
@@ -376,6 +395,18 @@ bool Realm::compact()
     m_group = nullptr;
 
     return m_shared_group->compact();
+}
+
+void Realm::write_copy(StringData path, BinaryData key)
+{
+    REALM_ASSERT(!key.data() || key.size() == 64);
+    verify_thread();
+    try {
+        read_group()->write(path, key.data());
+    }
+    catch (...) {
+        translate_file_exception(path);
+    }
 }
 
 void Realm::notify()

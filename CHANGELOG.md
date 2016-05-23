@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Improve the error messages when an I/O error occurs in `writeCopyToURL`.
 
 ### Bugfixes
 
