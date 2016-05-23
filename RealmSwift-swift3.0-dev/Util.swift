@@ -28,7 +28,7 @@ internal func notFoundToNil(index: UInt) -> Int? {
     return Int(index)
 }
 
-internal func throwRealmException(message: String, userInfo: [String:AnyObject] = [:]) {
+internal func throwRealmException(_ message: String, userInfo: [String:AnyObject] = [:]) {
     NSException(name: RLMExceptionName, reason: message, userInfo: userInfo).raise()
 }
 
@@ -39,13 +39,8 @@ internal func throwForNegativeIndex(int: Int, parameterName: String = "index") {
 }
 
 internal func gsub(pattern: String, template: String, string: String, error: NSErrorPointer = nil) -> String? {
-    do {
-        let regex = try NSRegularExpression(pattern: pattern, options: [])
-        return regex.stringByReplacingMatchesInString(string, options: [],
-                                                      range: NSRange(location: 0, length: string.utf16.count),
-                                                      withTemplate: template)
-    } catch {
-        // no-op
-    }
-    return nil
+    let regex = try? NSRegularExpression(pattern: pattern, options: [])
+    return regex?.stringByReplacingMatches(in: string, options: [],
+                                           range: NSRange(location: 0, length: string.utf16.count),
+                                           withTemplate: template)
 }

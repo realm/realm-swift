@@ -62,7 +62,7 @@ public final class ObjectSchema: CustomStringConvertible {
 
     /// Returns the property with the given name, if it exists.
     public subscript(propertyName: String) -> Property? {
-        if let rlmProperty = rlmObjectSchema[propertyName] {
+        if let rlmProperty = rlmObjectSchema[propertyName as NSString] {
             return Property(rlmProperty)
         }
         return nil
@@ -75,5 +75,5 @@ extension ObjectSchema: Equatable {}
 
 /// Returns whether the two object schemas are equal.
 public func == (lhs: ObjectSchema, rhs: ObjectSchema) -> Bool { // swiftlint:disable:this valid_docs
-    return lhs.rlmObjectSchema.isEqualToObjectSchema(rhs.rlmObjectSchema)
+    return lhs.rlmObjectSchema.isEqual(to: rhs.rlmObjectSchema)
 }

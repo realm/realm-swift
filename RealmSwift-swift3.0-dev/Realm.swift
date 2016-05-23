@@ -50,7 +50,7 @@ public final class Realm {
     public var schema: Schema { return Schema(rlmRealm.schema) }
 
     /// Returns the `Configuration` that was used to create this `Realm` instance.
-    public var configuration: Configuration { return Configuration.fromRLMRealmConfiguration(rlmRealm.configuration) }
+    public var configuration: Configuration { return Configuration.fromRLMRealmConfiguration(rlmConfiguration: rlmRealm.configuration) }
 
     /// Indicates if this Realm contains any objects.
     public var isEmpty: Bool { return rlmRealm.isEmpty }
@@ -64,7 +64,7 @@ public final class Realm {
     - throws: An NSError if the Realm could not be initialized.
     */
     public convenience init() throws {
-        let rlmRealm = try RLMRealm(configuration: RLMRealmConfiguration.defaultConfiguration())
+        let rlmRealm = try RLMRealm(configuration: RLMRealmConfiguration.default())
         self.init(rlmRealm)
     }
 
@@ -111,8 +111,8 @@ public final class Realm {
 
     - throws: An NSError if the transaction could not be written.
     */
-    public func write(@noescape block: (() -> Void)) throws {
-        try rlmRealm.transactionWithBlock(block)
+    public func write(block: @noescape () -> Void) throws {
+        try rlmRealm.transaction(block)
     }
 
     /**
@@ -214,7 +214,7 @@ public final class Realm {
     - parameter object: Object to be added to this Realm.
     - parameter update: If true will try to update existing objects with the same primary key.
     */
-    public func add(object: Object, update: Bool = false) {
+    public func add(_ object: Object, update: Bool = false) {
         if update && object.objectSchema.primaryKeyProperty == nil {
             throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
         }
@@ -231,7 +231,7 @@ public final class Realm {
     - parameter objects: A sequence which contains objects to be added to this Realm.
     - parameter update: If true will try to update existing objects with the same primary key.
     */
-    public func add<S: SequenceType where S.Generator.Element: Object>(objects: S, update: Bool = false) {
+    public func add<S: Sequence where S.Iterator.Element: Object>(_ objects: S, update: Bool = false) {
         for obj in objects {
             add(obj, update: update)
         }
@@ -260,12 +260,12 @@ public final class Realm {
 
     - returns: The created object.
     */
-    public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
+    public func create<T: Object>(_ type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
         let className = (type as Object.Type).className()
         if update && schema[className]?.primaryKeyProperty == nil {
             throwRealmException("'\(className)' does not have a primary key and can not be updated")
         }
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), T.self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), to: T.self)
     }
 
     /**
@@ -296,11 +296,11 @@ public final class Realm {
 
     :nodoc:
     */
-    public func dynamicCreate(className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
+    public func dynamicCreate(_ className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
         if update && schema[className]?.primaryKeyProperty == nil {
             throwRealmException("'\(className)' does not have a primary key and can not be updated")
         }
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), DynamicObject.self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), to: DynamicObject.self)
     }
 
     // MARK: Deleting objects
@@ -312,7 +312,7 @@ public final class Realm {
 
     - parameter object: The object to be deleted.
     */
-    public func delete(object: Object) {
+    public func delete(_ object: Object) {
         RLMDeleteObjectFromRealm(object, rlmRealm)
     }
 
@@ -324,7 +324,7 @@ public final class Realm {
     - parameter objects: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
                          or any other enumerable SequenceType which generates Object.
     */
-    public func delete<S: SequenceType where S.Generator.Element: Object>(objects: S) {
+    public func delete<S: Sequence where S.Iterator.Element: Object>(_ objects: S) {
         for obj in objects {
             delete(obj)
         }
@@ -374,7 +374,7 @@ public final class Realm {
 
     - returns: All objects of the given type in Realm.
     */
-    public func objects<T: Object>(type: T.Type) -> Results<T> {
+    public func objects<T: Object>(_ type: T.Type) -> Results<T> {
         return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
     }
 
@@ -393,7 +393,7 @@ public final class Realm {
 
     :nodoc:
     */
-    public func dynamicObjects(className: String) -> Results<DynamicObject> {
+    public func dynamicObjects(_ className: String) -> Results<DynamicObject> {
         return Results<DynamicObject>(RLMGetObjects(rlmRealm, className, nil))
     }
 
@@ -411,8 +411,8 @@ public final class Realm {
 
     - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
-    public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), Optional<T>.self)
+    public func objectForPrimaryKey<T: Object>(_ type: T.Type, key: AnyObject) -> T? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), to: Optional<T>.self)
     }
 
     /**
@@ -437,8 +437,8 @@ public final class Realm {
 
     :nodoc:
     */
-    public func dynamicObjectForPrimaryKey(className: String, key: AnyObject) -> DynamicObject? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, className, key), Optional<DynamicObject>.self)
+    public func dynamicObjectForPrimaryKey(_ className: String, key: AnyObject) -> DynamicObject? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, className, key), to: Optional<DynamicObject>.self)
     }
 
     // MARK: Notifications
@@ -469,7 +469,6 @@ public final class Realm {
 
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
-    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
             if rlmNotification == RLMRealmDidChangeNotification {
@@ -572,8 +571,8 @@ public final class Realm {
 
     - throws: An NSError if the copy could not be written.
     */
-    public func writeCopyToURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws {
-        try rlmRealm.writeCopyToURL(fileURL, encryptionKey: encryptionKey)
+    public func writeCopyToURL(_ fileURL: NSURL, encryptionKey: NSData? = nil) throws {
+        try rlmRealm.writeCopy(to: fileURL, encryptionKey: encryptionKey)
     }
 
     // MARK: Internal

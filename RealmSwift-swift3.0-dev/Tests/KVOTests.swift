@@ -71,15 +71,15 @@ class KVOTests: TestCase {
         super.tearDown()
     }
 
-    var changeDictionary: [NSObject: AnyObject]?
-    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?,
-                  change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    var changeDictionary: [String: AnyObject]?
+    override func observeValue(forKeyPath keyPath: String?, of object: AnyObject?,
+                               change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>?) {
         changeDictionary = change
     }
 
-    func observeChange(obj: NSObject, _ key: String, _ old: AnyObject, _ new: AnyObject,
-                       fileName: TestLocationString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
-        obj.addObserver(self, forKeyPath: key, options: [.Old, .New], context: nil)
+    func observeChange(_ obj: NSObject, _ key: String, _ old: AnyObject, _ new: AnyObject,
+                       fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
+        obj.addObserver(self, forKeyPath: key, options: [.old, .new], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
 
@@ -98,9 +98,9 @@ class KVOTests: TestCase {
         changeDictionary = nil
     }
 
-    func observeListChange(obj: NSObject, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet,
-                           fileName: TestLocationString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
-        obj.addObserver(self, forKeyPath: key, options: [.Old, .New], context: nil)
+    func observeListChange(_ obj: NSObject, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet,
+                           fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
+        obj.addObserver(self, forKeyPath: key, options: [.old, .new], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
 
@@ -109,8 +109,7 @@ class KVOTests: TestCase {
             return
         }
 
-        let actualKind = NSKeyValueChange(rawValue: (changeDictionary![NSKeyValueChangeKindKey] as! NSNumber)
-            .unsignedLongValue)!
+        let actualKind = NSKeyValueChange(rawValue: (changeDictionary![NSKeyValueChangeKindKey] as! NSNumber).uintValue)!
         let actualIndexes = changeDictionary![NSKeyValueChangeIndexesKey]! as! NSIndexSet
         XCTAssert(actualKind == kind, "Change kind: expected \(kind), got \(actualKind)", file: fileName,
             line: lineNumber)
@@ -134,16 +133,16 @@ class KVOTests: TestCase {
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obj, "objectCol", NSNull(), obj) { obj.objectCol = obj }
 
-        let data = "abc".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+        let data = "abc".data(using: NSUTF8StringEncoding, allowLossyConversion: false)!
         observeChange(obj, "binaryCol", NSData(), data) { obj.binaryCol = data }
 
         let date = NSDate(timeIntervalSince1970: 1)
         observeChange(obj, "dateCol", NSDate(timeIntervalSince1970: 0), date) { obj.dateCol = date }
 
-        observeListChange(obj, "arrayCol", .Insertion, NSIndexSet(index: 0)) {
+        observeListChange(obj, "arrayCol", .insertion, NSIndexSet(index: 0)) {
             obj.arrayCol.append(obj)
         }
-        observeListChange(obj, "arrayCol", .Removal, NSIndexSet(index: 0)) {
+        observeListChange(obj, "arrayCol", .removal, NSIndexSet(index: 0)) {
             obj.arrayCol.removeAll()
         }
 
@@ -178,16 +177,16 @@ class KVOTests: TestCase {
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obj, "objectCol", NSNull(), obj) { obj.objectCol = obj }
 
-        let data = "abc".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+        let data = "abc".data(using: NSUTF8StringEncoding, allowLossyConversion: false)!
         observeChange(obj, "binaryCol", NSData(), data) { obj.binaryCol = data }
 
         let date = NSDate(timeIntervalSince1970: 1)
         observeChange(obj, "dateCol", NSDate(timeIntervalSince1970: 0), date) { obj.dateCol = date }
 
-        observeListChange(obj, "arrayCol", .Insertion, NSIndexSet(index: 0)) {
+        observeListChange(obj, "arrayCol", .insertion, NSIndexSet(index: 0)) {
             obj.arrayCol.append(obj)
         }
-        observeListChange(obj, "arrayCol", .Removal, NSIndexSet(index: 0)) {
+        observeListChange(obj, "arrayCol", .removal, NSIndexSet(index: 0)) {
             obj.arrayCol.removeAll()
         }
 
@@ -221,7 +220,7 @@ class KVOTests: TestCase {
     func testAllPropertyTypesMultipleAccessors() {
         let obj = KVOObject()
         realm.add(obj)
-        let obs = realm.objectForPrimaryKey(KVOObject.self, key: obj.pk)!
+        let obs = realm.objectForPrimaryKey(KVOObject.self, key: obj.pk as AnyObject)!
 
         observeChange(obs, "boolCol", false, true) { obj.boolCol = true }
         observeChange(obs, "int8Col", 1, 10) { obj.int8Col = 10 }
@@ -233,16 +232,16 @@ class KVOTests: TestCase {
         observeChange(obs, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obs, "objectCol", NSNull(), obj) { obj.objectCol = obj }
 
-        let data = "abc".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+        let data = "abc".data(using: NSUTF8StringEncoding, allowLossyConversion: false)!
         observeChange(obs, "binaryCol", NSData(), data) { obj.binaryCol = data }
 
         let date = NSDate(timeIntervalSince1970: 1)
         observeChange(obs, "dateCol", NSDate(timeIntervalSince1970: 0), date) { obj.dateCol = date }
 
-        observeListChange(obs, "arrayCol", .Insertion, NSIndexSet(index: 0)) {
+        observeListChange(obs, "arrayCol", .insertion, NSIndexSet(index: 0)) {
             obj.arrayCol.append(obj)
         }
-        observeListChange(obs, "arrayCol", .Removal, NSIndexSet(index: 0)) {
+        observeListChange(obs, "arrayCol", .removal, NSIndexSet(index: 0)) {
             obj.arrayCol.removeAll()
         }
 
@@ -268,7 +267,7 @@ class KVOTests: TestCase {
 
         let obj2 = KVOObject()
         realm.add(obj2)
-        let obs2 = realm.objectForPrimaryKey(KVOObject.self, key: obj2.pk)!
+        let obs2 = realm.objectForPrimaryKey(KVOObject.self, key: obj2.pk as AnyObject)!
         observeChange(obs2, "arrayCol.invalidated", false, true) {
             self.realm.delete(obj2)
         }

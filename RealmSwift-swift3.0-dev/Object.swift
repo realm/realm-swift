@@ -92,7 +92,7 @@ public class Object: RLMObjectBase {
     */
     public init(value: AnyObject) {
         self.dynamicType.sharedSchema() // ensure this class' objectSchema is loaded in the partialSharedSchema
-        super.init(value: value, schema: RLMSchema.partialSharedSchema())
+        super.init(value: value, schema: RLMSchema.partialShared())
     }
 
 
@@ -116,7 +116,7 @@ public class Object: RLMObjectBase {
     ///
     /// An object can no longer be accessed if the object has been deleted from the containing
     /// `realm` or if `invalidate` is called on the containing `realm`.
-    public override var invalidated: Bool { return super.invalidated }
+    public override var isInvalidated: Bool { return super.isInvalidated }
 
     /// Returns a human-readable description of this object.
     public override var description: String { return super.description }
@@ -133,7 +133,7 @@ public class Object: RLMObjectBase {
     WARNING: This is an internal helper method not intended for public use.
     :nodoc:
     */
-    public override class func objectUtilClass(isSwift: Bool) -> AnyClass {
+    public override class func objectUtilClass(_ isSwift: Bool) -> AnyClass {
         return ObjectUtil.self
     }
 
@@ -173,11 +173,11 @@ public class Object: RLMObjectBase {
     public subscript(key: String) -> AnyObject? {
         get {
             if realm == nil {
-                return valueForKey(key)
+                return value(forKey: key)
             }
             let property = RLMValidatedGetProperty(self, key)
-            if property.type == .Array {
-                return listForProperty(property)
+            if property.type == .array {
+                return listForProperty(prop: property)
             }
             // No special logic is needed for optional numbers here because the NSNumber returned by RLMDynamicGet
             // is better for callers than the RealmOptional that optionalForProperty would give us.
@@ -209,8 +209,8 @@ public class Object: RLMObjectBase {
 
     :nodoc:
     */
-    public func dynamicList(propertyName: String) -> List<DynamicObject> {
-        return unsafeBitCast(listForProperty(RLMValidatedGetProperty(self, propertyName)), List<DynamicObject>.self)
+    public func dynamicList(_ propertyName: String) -> List<DynamicObject> {
+        return unsafeBitCast(listForProperty(prop: RLMValidatedGetProperty(self, propertyName)), to: List<DynamicObject>.self)
     }
 
     // MARK: Equatable
@@ -223,7 +223,7 @@ public class Object: RLMObjectBase {
 
     - parameter object: Object to compare for equality.
     */
-    public override func isEqual(object: AnyObject?) -> Bool {
+    public override func isEqual(to object: AnyObject?) -> Bool {
         return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
 
@@ -287,9 +287,9 @@ public final class DynamicObject: Object {
             return optional
         }
         let optional = RLMOptionalBase()
-        optional.property = prop
+        optional?.property = prop
         optionalProperties[prop.name] = optional
-        return optional
+        return optional!
     }
 
     // Dynamic objects never have linking objects properties
@@ -298,12 +298,12 @@ public final class DynamicObject: Object {
     }
 
     /// :nodoc:
-    public override func valueForUndefinedKey(key: String) -> AnyObject? {
+    public override func value(forUndefinedKey key: String) -> AnyObject? {
         return self[key]
     }
 
     /// :nodoc:
-    public override func setValue(value: AnyObject?, forUndefinedKey key: String) {
+    public override func setValue(_ value: AnyObject?, forUndefinedKey key: String) {
         self[key] = value
     }
 
@@ -318,82 +318,82 @@ public final class DynamicObject: Object {
 @objc(RealmSwiftObjectUtil)
 public class ObjectUtil: NSObject {
     @objc private class func swiftVersion() -> NSString {
-        return swiftLanguageVersion
+        return swiftLanguageVersion as NSString
     }
 
-    @objc private class func ignoredPropertiesForClass(type: AnyClass) -> NSArray? {
+    @objc private class func ignoredPropertiesForClass(_ type: AnyClass) -> NSArray? {
         if let type = type as? Object.Type {
             return type.ignoredProperties() as NSArray?
         }
         return nil
     }
 
-    @objc private class func indexedPropertiesForClass(type: AnyClass) -> NSArray? {
+    @objc private class func indexedPropertiesForClass(_ type: AnyClass) -> NSArray? {
         if let type = type as? Object.Type {
             return type.indexedProperties() as NSArray?
         }
         return nil
     }
 
-    @objc private class func linkingObjectsPropertiesForClass(type: AnyClass) -> NSDictionary? {
+    @objc private class func linkingObjectsPropertiesForClass(_ type: AnyClass) -> NSDictionary? {
         // Not used for Swift. getLinkingObjectsProperties(_:) is used instead.
         return nil
     }
 
     // Get the names of all properties in the object which are of type List<>.
-    @objc private class func getGenericListPropertyNames(object: AnyObject) -> NSArray {
+    @objc private class func getGenericListPropertyNames(_ object: AnyObject) -> NSArray {
         return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
             return prop.value.dynamicType is RLMListBase.Type
         }.flatMap { (prop: Mirror.Child) in
             return prop.label
-        }
+        } as NSArray
     }
 
-    @objc private class func initializeListProperty(object: RLMObjectBase, property: RLMProperty, array: RLMArray) {
-        (object as! Object).listForProperty(property)._rlmArray = array
+    @objc private class func initializeListProperty(_ object: RLMObjectBase, property: RLMProperty, array: RLMArray<RLMObject>) {
+        (object as! Object).listForProperty(prop: property)._rlmArray = array
     }
 
-    @objc private class func initializeOptionalProperty(object: RLMObjectBase, property: RLMProperty) {
-        let optional = (object as! Object).optionalForProperty(property)
+    @objc private class func initializeOptionalProperty(_ object: RLMObjectBase, property: RLMProperty) {
+        let optional = (object as! Object).optionalForProperty(prop: property)
         optional.property = property
         optional.object = object
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
+    @objc private class func getOptionalProperties(_ object: AnyObject) -> NSDictionary {
         let children = Mirror(reflecting: object).children
-        return children.reduce([String: AnyObject]()) { ( properties: [String:AnyObject], prop: Mirror.Child) in
+        return children.reduce([String: AnyObject]()) { (properties: [String:AnyObject], prop: Mirror.Child) in
             guard let name = prop.label else { return properties }
             let mirror = Mirror(reflecting: prop.value)
             let type = mirror.subjectType
             var properties = properties
             if type is Optional<String>.Type || type is Optional<NSString>.Type {
-                properties[name] = Int(PropertyType.String.rawValue)
+                properties[name] = NSNumber(value: PropertyType.string.rawValue)
             } else if type is Optional<NSDate>.Type {
-                properties[name] = Int(PropertyType.Date.rawValue)
+                properties[name] = NSNumber(value: PropertyType.date.rawValue)
             } else if type is Optional<NSData>.Type {
-                properties[name] = Int(PropertyType.Data.rawValue)
+                properties[name] = NSNumber(value: PropertyType.data.rawValue)
             } else if type is Optional<Object>.Type {
-                properties[name] = Int(PropertyType.Object.rawValue)
+                properties[name] = NSNumber(value: PropertyType.object.rawValue)
             } else if type is RealmOptional<Int>.Type ||
                       type is RealmOptional<Int8>.Type ||
                       type is RealmOptional<Int16>.Type ||
                       type is RealmOptional<Int32>.Type ||
                       type is RealmOptional<Int64>.Type {
-                properties[name] = Int(PropertyType.Int.rawValue)
+                properties[name] = NSNumber(value: PropertyType.int.rawValue)
             } else if type is RealmOptional<Float>.Type {
-                properties[name] = Int(PropertyType.Float.rawValue)
+                properties[name] = NSNumber(value: PropertyType.float.rawValue)
             } else if type is RealmOptional<Double>.Type {
-                properties[name] = Int(PropertyType.Double.rawValue)
+                properties[name] = NSNumber(value: PropertyType.double.rawValue)
             } else if type is RealmOptional<Bool>.Type {
-                properties[name] = Int(PropertyType.Bool.rawValue)
+                properties[name] = NSNumber(value: PropertyType.bool.rawValue)
             } else if prop.value as? RLMOptionalBase != nil {
                 throwRealmException("'\(type)' is not a a valid RealmOptional type.")
-            } else if mirror.displayStyle == .Optional {
+            } else if mirror.displayStyle == .optional {
                 properties[name] = NSNull()
             }
             return properties
-        }
+        } as NSDictionary
     }
 
     @objc private class func requiredPropertiesForClass(_: AnyClass) -> NSArray? {
@@ -401,22 +401,22 @@ public class ObjectUtil: NSObject {
     }
 
     // Get information about each of the linking objects properties.
-    @objc private class func getLinkingObjectsProperties(object: AnyObject) -> NSDictionary {
+    @objc private class func getLinkingObjectsProperties(_ object: AnyObject) -> NSDictionary {
         let properties = Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
             return prop.value as? LinkingObjectsBase != nil
         }.flatMap { (prop: Mirror.Child) in
             (prop.label!, prop.value as! LinkingObjectsBase)
         }
-        return properties.reduce([:] as [String : [String: String ]]) { (dictionary, property) in
+        return properties.reduce([String : [String: String ]]()) { (dictionary, property) in
             var d = dictionary
             let (name, results) = property
             d[name] = ["class": results.objectClassName, "property": results.propertyName]
             return d
-        }
+        } as NSDictionary
     }
 
-    @objc private class func initializeLinkingObjectsProperty(object: RLMObjectBase, property: RLMProperty) {
-        guard let linkingObjects = (object as! Object).linkingObjectsForProperty(property) else { return }
+    @objc private class func initializeLinkingObjectsProperty(_ object: RLMObjectBase, property: RLMProperty) {
+        guard let linkingObjects = (object as! Object).linkingObjectsForProperty(prop: property) else { return }
         linkingObjects.attachTo(object: object, property: property)
     }
 }

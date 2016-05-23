@@ -32,7 +32,7 @@ happening when initializing a Realm instance.
     }
 
 */
-public enum Error: ErrorType {
+public enum Error: ErrorProtocol {
     // swiftlint:disable variable_name
     /// :nodoc:
     public var _code: Int {
@@ -49,23 +49,23 @@ public enum Error: ErrorType {
     private var rlmError: RLMError {
         switch self {
         case .Fail:
-            return RLMError.Fail
+            return .fail
         case .FileAccess:
-            return RLMError.FileAccess
+            return .fileAccess
         case .FilePermissionDenied:
-            return RLMError.FilePermissionDenied
+            return .filePermissionDenied
         case .FileExists:
-            return RLMError.FileExists
+            return .fileExists
         case .FileNotFound:
-            return RLMError.FileNotFound
+            return .fileNotFound
         case .IncompatibleLockFile:
-            return RLMError.IncompatibleLockFile
+            return .incompatibleLockFile
         case .FileFormatUpgradeRequired:
-            return RLMError.FileFormatUpgradeRequired
+            return .fileFormatUpgradeRequired
         case .AddressSpaceExhausted:
-            return RLMError.AddressSpaceExhausted
+            return .addressSpaceExhausted
         case .SchemaMismatch:
-            return RLMError.SchemaMismatch
+            return .schemaMismatch
         }
     }
 
@@ -107,7 +107,7 @@ public enum Error: ErrorType {
 extension Error: Equatable {}
 
 /// Returns whether the two errors are identical
-public func == (lhs: ErrorType, rhs: ErrorType) -> Bool { // swiftlint:disable:this valid_docs
+public func == (lhs: ErrorProtocol, rhs: ErrorProtocol) -> Bool { // swiftlint:disable:this valid_docs
     return lhs._code == rhs._code
         && lhs._domain == rhs._domain
 }
@@ -118,6 +118,6 @@ public func == (lhs: ErrorType, rhs: ErrorType) -> Bool { // swiftlint:disable:t
 Explicitly implement pattern matching for `Realm.Error`, so that the instances can be used in the
 `do … syntax`.
 */
-public func ~= (lhs: Error, rhs: ErrorType) -> Bool { // swiftlint:disable:this valid_docs
+public func ~= (lhs: Error, rhs: ErrorProtocol) -> Bool { // swiftlint:disable:this valid_docs
     return lhs == rhs
 }
