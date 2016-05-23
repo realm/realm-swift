@@ -115,15 +115,15 @@
  
  @warning This method is useful only in specialized circumstances.
 
- @param value   The value used to populate the object. This can be any key/value coding compliant
-                object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
-                an NSArray with one object for each persisted property. An exception will be
-                thrown if any required properties are not present and those properties were not defined with
-                default values.
+ @param value    The value used to populate the object. This can be any key-value coding compliant
+                 object, or an array or dictionary returned from the methods in `NSJSONSerialization`, or
+                 an `NSArray` containing one element for each persisted property. An exception will be
+                 thrown if any required properties are not present and those properties were not defined with
+                 default values.
 
-                When passing in an NSArray, all properties must be present, valid and in the same order as
-                the properties defined in the model.
- 
+                 When passing in an `NSArray`, all properties must be present,
+                 valid and in the same order as the properties defined in the model.
+
  @return    An RLMObject of type `className`
  */
 -(RLMObject *)createObject:(NSString *)className withValue:(id)value;

@@ -58,8 +58,10 @@ NS_ASSUME_NONNULL_BEGIN
  ### Querying
  
  You can initiate queries directly via the class methods: `allObjects`, `objectsWhere:`, and `objectsWithPredicate:`.
- These methods allow you to easily query a custom subclass for instances of that class in the
- default Realm. To search in a Realm other than the default Realm, use the interface on an `RLMRealm` instance.
+ These methods allow you to easily query a custom subclass for instances of that class in the default Realm.
+ 
+ To search in a Realm other than the default Realm, use the `allObjectsInRealm:`, `objectsInRealm:where:`,
+ and `objectsInRealm:withPredicate:` class methods.
  
  @see `RLMRealm`
  
@@ -82,7 +84,7 @@ NS_ASSUME_NONNULL_BEGIN
     object.
  2. Unmanaged `RLMObject` instances cannot be added to a Realm while they have any
     observed properties.
- 3. Modifying managed `RLMObject`s using `-observeValueForKeyPath:ofObject:change:context:`
+ 3. Modifying managed `RLMObject`s within `-observeValueForKeyPath:ofObject:change:context:`
     is not recommended. Properties may change even when the Realm is not in a write
     transaction (for example, when `-[RLMRealm refresh]` is called after changes
     are made on a different thread), and notifications sent prior to the change
@@ -132,14 +134,14 @@ NS_ASSUME_NONNULL_BEGIN
  If nested objects are included in the argument, `createInDefaultRealmWithValue:` will be recursively called
  on them.
 
- @param value   A value used to populate the object. This can be any key/value coding compliant
-                object, or a JSON object such as those returned from the methods in `NSJSONSerialization`, or
-                an `NSArray` with one object for each persisted property. An exception will be
-                thrown if any required properties are not present and those properties were not defined with
-                default values.
+ @param value    The value used to populate the object. This can be any key-value coding compliant
+                 object, or an array or dictionary returned from the methods in `NSJSONSerialization`, or
+                 an `NSArray` containing one element for each persisted property. An exception will be
+                 thrown if any required properties are not present and those properties were not defined with
+                 default values.
 
-                When passing in an `NSArray`, all properties must be present, valid, and in the same order
-                as the properties defined in the model.
+                 When passing in an `NSArray`, all properties must be present,
+                 valid and in the same order as the properties defined in the model.
 
  @see   `defaultPropertyValues`
  */
@@ -151,16 +153,16 @@ NS_ASSUME_NONNULL_BEGIN
  If nested objects are included in the argument, `createInRealm:withValue:` will be recursively called
  on them.
  
- @param realm   The Realm which should manage the newly-created object.
- @param value   A value used to populate the object. This can be any key/value coding compliant
-                object, or a JSON object such as those returned from the methods in `NSJSONSerialization`, or
-                an `NSArray` with one object for each persisted property. An exception will be
-                thrown if any required properties are not present and and those properties were not defined with
-                default values.
+ @param realm    The Realm which should manage the newly-created object.
+ @param value    The value used to populate the object. This can be any key-value coding compliant
+                 object, or an array or dictionary returned from the methods in `NSJSONSerialization`, or
+                 an `NSArray` containing one element for each persisted property. An exception will be
+                 thrown if any required properties are not present and those properties were not defined with
+                 default values.
 
-                When passing in an `NSArray`, all properties must be present, valid and in the same order
-                as the properties defined in the model.
- 
+                 When passing in an `NSArray`, all properties must be present,
+                 valid and in the same order as the properties defined in the model.
+
  @see   `defaultPropertyValues`
  */
 + (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value;
@@ -173,21 +175,19 @@ NS_ASSUME_NONNULL_BEGIN
  is returned. Otherwise, this method creates and populates a new instance of the object in the default Realm.
  
  If nested objects are included in the argument, `createOrUpdateInDefaultRealmWithValue:` will be
- recursively called on them if have a primary key, `createInDefaultRealmWithValue:` if they do not.
- 
- If there is a Realm object managed by the default
+ recursively called on them if they have primary keys, `createInDefaultRealmWithValue:` if they do not.
 
  If the argument is a Realm object already managed by the default Realm, the argument's type is the same
  as the receiver, and the objects have identical values for their persisted properties, this method does nothing.
 
- @param value   A value used to populate the object. This can be any key/value coding compliant
-                object, or a JSON object such as those returned from the methods in `NSJSONSerialization`, or
-                an `NSArray` with one object for each persisted property. An exception will be
-                thrown if any required properties are not present and those properties were not defined with
-                default values.
+ @param value    The value used to populate the object. This can be any key-value coding compliant
+                 object, or an array or dictionary returned from the methods in `NSJSONSerialization`, or
+                 an `NSArray` containing one element for each persisted property. An exception will be
+                 thrown if any required properties are not present and those properties were not defined with
+                 default values.
 
-                When passing in an `NSArray`, all properties must be present, valid and in the same order
-                as the properties defined in the model.
+                 When passing in an `NSArray`, all properties must be present,
+                 valid and in the same order as the properties defined in the model.
 
  @see   `defaultPropertyValues`, `primaryKey`
  */
@@ -201,20 +201,20 @@ NS_ASSUME_NONNULL_BEGIN
  is returned. Otherwise this method creates and populates a new instance of this object in the given Realm.
  
  If nested objects are included in the argument, `createOrUpdateInRealm:withValue:` will be
- recursively called on them if have a primary key, `createInRealm:withValue:` otherwise.
+ recursively called on them if they have primary keys, `createInRealm:withValue:` if they do not.
 
  If the argument is a Realm object already managed by the given Realm, the argument's type is the same
  as the receiver, and the objects have identical values for their persisted properties, this method does nothing.
 
- @param realm   The Realm which should own the object.
- @param value   A value used to populate the object. This can be any key/value coding compliant
-                object, or a JSON object such as those returned from the methods in `NSJSONSerialization`, or
-                an `NSArray` with one object for each persisted property. An exception will be
-                thrown if any required properties are not present and those properties were not defined with
-                default values.
-            
-                When passing in an `NSArray`, all properties must be present, valid and in the same order
-                as the properties defined in the model.
+ @param realm    The Realm which should own the object.
+ @param value    The value used to populate the object. This can be any key-value coding compliant
+                 object, or an array or dictionary returned from the methods in `NSJSONSerialization`, or
+                 an `NSArray` containing one element for each persisted property. An exception will be
+                 thrown if any required properties are not present and those properties were not defined with
+                 default values.
+
+                 When passing in an `NSArray`, all properties must be present,
+                 valid and in the same order as the properties defined in the model.
 
  @see   `defaultPropertyValues`, `primaryKey`
  */

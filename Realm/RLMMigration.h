@@ -77,20 +77,20 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
  Creates and returns an `RLMObject` instance of type `className` in the Realm being migrated.
 
  @param className   The name of the `RLMObject` class to create.
- @param value       The value used to populate the created object. This can be any key/value coding compliant
-                    object, or a JSON object such as those returned from the methods in `NSJSONSerialization`, or
+ @param value       The value used to populate the object. This can be any key-value coding compliant
+                    object, or an array or dictionary returned from the methods in `NSJSONSerialization`, or
                     an `NSArray` containing one element for each persisted property. An exception will be
                     thrown if any required properties are not present and those properties were not defined with
                     default values.
 
-                    When passing in an `NSArray`, all properties must be present, valid, and in the same order
-                    as the properties defined in the model.
+                    When passing in an `NSArray`, all properties must be present,
+                    valid and in the same order as the properties defined in the model.
  */
 - (RLMObject *)createObject:(NSString *)className withValue:(id)value;
 
 /**
  Deletes an object from a Realm during a migration.
- 
+
  It is permitted to call this method from within the block passed to `-[enumerateObjects:block:]`.
 
  @param object  Object to be deleted from the Realm being migrated.
