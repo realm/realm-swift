@@ -220,7 +220,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns the index of the first object in the array matching the predicate.
 
- @param predicateFormat A predicate format string; variable arguments are supported.
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
 
  @return    The index of the object, or `NSNotFound` if the object is not found in the array.
  */
@@ -241,7 +241,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns all the objects matching the given predicate in the array.
 
- @param predicateFormat A predicate format string; variable arguments are supported.
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
 
  @return                An `RLMResults` of objects that match the given predicate.
  */

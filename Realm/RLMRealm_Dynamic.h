@@ -58,7 +58,7 @@
  @warning This method is useful only in specialized circumstances.
 
  @param className       The type of objects you are looking for (name of the class).
- @param predicateFormat The predicate format string which can accept variable arguments.
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
 
  @return    An RLMResults of results matching the given predicate.
 
@@ -118,9 +118,10 @@
  @param value   The value used to populate the object. This can be any key/value coding compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                 an NSArray with one object for each persisted property. An exception will be
-                thrown if any required properties are not present and no default is set.
+                thrown if any required properties are not present and those properties were not defined with
+                default values.
 
-                When passing in an NSArray, all properties must be present, valid and in the same order as 
+                When passing in an NSArray, all properties must be present, valid and in the same order as
                 the properties defined in the model.
  
  @return    An RLMObject of type `className`
