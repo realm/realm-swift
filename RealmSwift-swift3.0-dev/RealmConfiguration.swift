@@ -40,10 +40,10 @@ extension Realm {
         /// configuration is explicitly specified (i.e. `Realm()`).
         public static var defaultConfiguration: Configuration {
             get {
-                return fromRLMRealmConfiguration(RLMRealmConfiguration.defaultConfiguration())
+                return fromRLMRealmConfiguration(rlmConfiguration: RLMRealmConfiguration.default())
             }
             set {
-                RLMRealmConfiguration.setDefaultConfiguration(newValue.rlmConfiguration)
+                RLMRealmConfiguration.setDefault(newValue.rlmConfiguration)
             }
         }
 
@@ -196,7 +196,7 @@ extension Realm {
 extension Realm.Configuration: CustomStringConvertible {
     /// Returns a human-readable description of the configuration.
     public var description: String {
-        return gsub("\\ARLMRealmConfiguration",
+        return gsub(pattern: "\\ARLMRealmConfiguration",
                     template: "Realm.Configuration",
                     string: rlmConfiguration.description) ?? ""
     }

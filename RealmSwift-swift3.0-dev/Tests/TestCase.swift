@@ -23,13 +23,7 @@ import Realm.Dynamic
 import RealmSwift
 import XCTest
 
-#if REALM_XCODE_VERSION_0730
-    typealias TestLocationString = StaticString
-#else
-    typealias TestLocationString = String
-#endif
-
-func inMemoryRealm(inMememoryIdentifier: String) -> Realm {
+func inMemoryRealm(_ inMememoryIdentifier: String) -> Realm {
     return try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: inMememoryIdentifier))
 }
 
@@ -53,7 +47,7 @@ class TestCase: XCTestCase {
 #endif
         do {
             // Clean up any potentially lingering Realm files from previous runs
-            try NSFileManager.defaultManager().removeItemAtPath(RLMRealmPathForFile(""))
+            try NSFileManager.default().removeItem(atPath: RLMRealmPathForFile(""))
         } catch {
             // The directory might not actually already exist, so not an error
         }
@@ -68,12 +62,12 @@ class TestCase: XCTestCase {
         testDir = RLMRealmPathForFile(realmFilePrefix())
 
         do {
-            try NSFileManager.defaultManager().removeItemAtPath(testDir)
+            try NSFileManager.default().removeItem(atPath: testDir)
         } catch {
             // The directory shouldn't actually already exist, so not an error
         }
-        try! NSFileManager.defaultManager().createDirectoryAtPath(testDir, withIntermediateDirectories: true,
-            attributes: nil)
+        try! NSFileManager.default().createDirectory(at: NSURL(fileURLWithPath: testDir, isDirectory: true),
+                                                     withIntermediateDirectories: true, attributes: nil)
 
         let config = Realm.Configuration(fileURL: defaultRealmURL())
         Realm.Configuration.defaultConfiguration = config
@@ -89,14 +83,14 @@ class TestCase: XCTestCase {
         resetRealmState()
 
         do {
-            try NSFileManager.defaultManager().removeItemAtPath(testDir)
+            try NSFileManager.default().removeItem(atPath: testDir)
         } catch {
             XCTFail("Unable to delete realm files")
         }
 
         // Verify that there are no remaining realm files after the test
-        let parentDir = (testDir as NSString).stringByDeletingLastPathComponent
-        for url in NSFileManager().enumeratorAtPath(parentDir)! {
+        let parentDir = (testDir as NSString).deletingLastPathComponent
+        for url in NSFileManager().enumerator(atPath: parentDir)! {
             XCTAssertNotEqual(url.pathExtension, "realm", "Lingering realm file at \(parentDir)/\(url)")
             assert(url.pathExtension != "realm")
         }
@@ -108,22 +102,22 @@ class TestCase: XCTestCase {
 
     func dispatchSyncNewThread(block: dispatch_block_t) {
         let queue = dispatch_queue_create("background", nil)
-        dispatch_async(queue) {
+        dispatch_async(queue!) {
             autoreleasepool {
                 block()
             }
         }
-        dispatch_sync(queue) {}
+        dispatch_sync(queue!) {}
     }
 
-    func assertThrows<T>(@autoclosure(escaping) block: () -> T, _ message: String? = nil,
+    func assertThrows<T>(_ block: @autoclosure(escaping)() -> T, _ message: String? = nil,
                          named: String? = RLMExceptionName, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrows(self, { _ = block() } as dispatch_block_t, named, message, fileName, lineNumber)
     }
 
-    func assertSucceeds(message: String? = nil, fileName: TestLocationString = #file,
-                        lineNumber: UInt = #line, @noescape block: () throws -> ()) {
+    func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
+                        lineNumber: UInt = #line, block: @noescape () throws -> ()) {
         do {
             try block()
         } catch {
@@ -132,9 +126,9 @@ class TestCase: XCTestCase {
         }
     }
 
-    func assertFails<T>(expectedError: Error, _ message: String? = nil,
-                        fileName: TestLocationString = #file, lineNumber: UInt = #line,
-                        @noescape block: () throws -> T) {
+    func assertFails<T>(_ expectedError: Error, _ message: String? = nil,
+                        fileName: StaticString = #file, lineNumber: UInt = #line,
+                        block: @noescape () throws -> T) {
         do {
             try block()
             XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
@@ -147,18 +141,13 @@ class TestCase: XCTestCase {
         }
     }
 
-    func assertNil<T>(@autoclosure block: () -> T?, _ message: String? = nil,
-                      fileName: TestLocationString = #file, lineNumber: UInt = #line) {
+    func assertNil<T>(block: @autoclosure() -> T?, _ message: String? = nil,
+                      fileName: StaticString = #file, lineNumber: UInt = #line) {
         XCTAssert(block() == nil, message ?? "", file: fileName, line: lineNumber)
     }
 
     private func realmFilePrefix() -> String {
-        let remove = NSCharacterSet(charactersInString: "-[]")
-#if REALM_XCODE_VERSION_0730
-        return name!.stringByTrimmingCharactersInSet(remove)
-#else
-        return name.stringByTrimmingCharactersInSet(remove)
-#endif
+        return name!.trimmingCharacters(in: NSCharacterSet(charactersIn: "-[]"))
     }
 
     internal func testRealmURL() -> NSURL {
@@ -169,8 +158,8 @@ class TestCase: XCTestCase {
         return realmURLForFile("default.realm")
     }
 
-    private func realmURLForFile(fileName: String) -> NSURL {
+    private func realmURLForFile(_ fileName: String) -> NSURL {
         let directory = NSURL(fileURLWithPath: testDir, isDirectory: true)
-        return directory.URLByAppendingPathComponent(fileName, isDirectory: false)
+        return directory.appendingPathComponent(fileName, isDirectory: false)
     }
 }

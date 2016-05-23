@@ -43,9 +43,9 @@ class PropertyTests: TestCase {
     }
 
     func testType() {
-        XCTAssertEqual(primitiveProperty.type, PropertyType.Int)
-        XCTAssertEqual(linkProperty.type, PropertyType.Object)
-        XCTAssertEqual(primaryProperty.type, PropertyType.String)
+        XCTAssertEqual(primitiveProperty.type, PropertyType.int)
+        XCTAssertEqual(linkProperty.type, PropertyType.object)
+        XCTAssertEqual(primaryProperty.type, PropertyType.string)
     }
 
     func testIndexed() {

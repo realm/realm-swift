@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-private func createStringObjects(factor: Int) -> Realm {
+private func createStringObjects(_ factor: Int) -> Realm {
     let realm = inMemoryRealm(factor.description)
     try! realm.write {
         for _ in 0..<(1000 * factor) {
@@ -66,15 +66,15 @@ class SwiftPerformanceTests: TestCase {
         // Do nothing, as we need to keep our in-memory realms around between tests
     }
 
-    override func measureBlock(block: (() -> Void)) {
-        super.measureBlock {
+    override func measure(_ block: (() -> Void)) {
+        super.measure {
             autoreleasepool {
                 block()
             }
         }
     }
 
-    override func measureMetrics(metrics: [String], automaticallyStartMeasuring: Bool, forBlock block: () -> Void) {
+    override func measureMetrics(_ metrics: [String], automaticallyStartMeasuring: Bool, for block: () -> Void) {
         super.measureMetrics(metrics, automaticallyStartMeasuring: automaticallyStartMeasuring) {
             autoreleasepool {
                 block()
@@ -88,9 +88,9 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
-    private func copyRealmToTestPath(realm: Realm) -> Realm {
+    private func copyRealmToTestPath(_ realm: Realm) -> Realm {
         do {
-            try NSFileManager.defaultManager().removeItemAtURL(testRealmURL())
+            try NSFileManager.default().removeItem(at: testRealmURL())
         } catch let error as NSError {
             XCTAssertTrue(error.domain == NSCocoaErrorDomain && error.code == 4)
         } catch {
@@ -147,7 +147,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testCountWhereQuery() {
         let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        measure {
             for _ in 0..<50 {
                 let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
                 _ = results.count
@@ -157,7 +157,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testCountWhereTableView() {
         let realm = copyRealmToTestPath(mediumRealm)
-        measureBlock {
+        measure {
             for _ in 0..<50 {
                 let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
                 _ = results.first
@@ -168,7 +168,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testEnumerateAndAccessQuery() {
         let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        measure {
             for stringObject in realm.objects(SwiftStringObject).filter("stringCol = 'a'") {
                 _ = stringObject.stringCol
             }
@@ -177,7 +177,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testEnumerateAndAccessAll() {
         let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        measure {
             for stringObject in realm.objects(SwiftStringObject) {
                 _ = stringObject.stringCol
             }
@@ -186,7 +186,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testEnumerateAndAccessAllSlow() {
         let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        measure {
             let results = realm.objects(SwiftStringObject)
             for i in 0..<results.count {
                 _ = results[i].stringCol
@@ -198,10 +198,10 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(largeRealm)
         realm.beginWrite()
         let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self,
-            value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
+            value: ["name", realm.objects(SwiftStringObject).map { $0 } as NSArray, []])
         try! realm.commitWrite()
 
-        measureBlock {
+        measure {
             for stringObject in arrayPropertyObject.array {
                 _ = stringObject.stringCol
             }
@@ -212,10 +212,10 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(largeRealm)
         realm.beginWrite()
         let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self,
-            value: ["name", realm.objects(SwiftStringObject).map { $0 }, []])
+            value: ["name", realm.objects(SwiftStringObject).map { $0 } as NSArray, []])
         try! realm.commitWrite()
 
-        measureBlock {
+        measure {
             let list = arrayPropertyObject.array
             for i in 0..<list.count {
                 _ = list[i].stringCol
@@ -225,7 +225,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testEnumerateAndMutateAll() {
         let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        measure {
             try! realm.write {
                 for stringObject in realm.objects(SwiftStringObject) {
                     stringObject.stringCol = "c"
@@ -236,7 +236,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testEnumerateAndMutateQuery() {
         let realm = copyRealmToTestPath(largeRealm)
-        measureBlock {
+        measure {
             try! realm.write {
                 for stringObject in realm.objects(SwiftStringObject).filter("stringCol != 'b'") {
                     stringObject.stringCol = "c"
@@ -283,12 +283,12 @@ class SwiftPerformanceTests: TestCase {
         let realm = realmWithTestPath()
         try! realm.write {
             for i in 0..<1000 {
-                realm.create(SwiftStringObject.self, value: [i.description])
+                realm.create(SwiftStringObject.self, value: [i.description] as AnyObject)
             }
         }
-        measureBlock {
+        measure {
             for i in 0..<1000 {
-                realm.objects(SwiftStringObject).filter("stringCol = %@", i.description).first
+                realm.objects(SwiftStringObject).filter("stringCol = %@", i.description as AnyObject).first
             }
         }
     }
@@ -297,12 +297,12 @@ class SwiftPerformanceTests: TestCase {
         let realm = realmWithTestPath()
         try! realm.write {
             for i in 0..<1000 {
-                realm.create(SwiftIndexedPropertiesObject.self, value: [i.description, i])
+                realm.create(SwiftIndexedPropertiesObject.self, value: [i.description as AnyObject, i as AnyObject])
             }
         }
-        measureBlock {
+        measure {
             for i in 0..<1000 {
-                realm.objects(SwiftIndexedPropertiesObject).filter("stringCol = %@", i.description).first
+                realm.objects(SwiftIndexedPropertiesObject).filter("stringCol = %@", i.description as AnyObject).first
             }
         }
     }
@@ -312,14 +312,14 @@ class SwiftPerformanceTests: TestCase {
         realm.beginWrite()
         var ids = [Int]()
         for i in 0..<10000 {
-            realm.create(SwiftIntObject.self, value: [i])
+            realm.create(SwiftIntObject.self, value: [i as AnyObject])
             if i % 2 != 0 {
                 ids.append(i)
             }
         }
         try! realm.commitWrite()
-        measureBlock {
-            _ = realm.objects(SwiftIntObject).filter("intCol IN %@", ids).first
+        measure {
+            _ = realm.objects(SwiftIntObject).filter("intCol IN %@", ids as AnyObject).first
         }
     }
 
@@ -328,10 +328,10 @@ class SwiftPerformanceTests: TestCase {
         try! realm.write {
             for _ in 0..<8000 {
                 let randomNumber = Int(arc4random_uniform(UInt32(INT_MAX)))
-                realm.create(SwiftIntObject.self, value: [randomNumber])
+                realm.create(SwiftIntObject.self, value: [randomNumber as AnyObject])
             }
         }
-        measureBlock {
+        measure {
             _ = realm.objects(SwiftIntObject).sorted("intCol", ascending: true).last
         }
     }
@@ -342,7 +342,7 @@ class SwiftPerformanceTests: TestCase {
             realm = try! Realm()
         }
 
-        measureBlock {
+        measure {
             for _ in 0..<250 {
                 autoreleasepool {
                     _ = try! Realm()
@@ -353,7 +353,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testRealmCreationUncached() {
-        measureBlock {
+        measure {
             for _ in 0..<50 {
                 autoreleasepool {
                     _ = try! Realm()
@@ -404,7 +404,7 @@ class SwiftPerformanceTests: TestCase {
 
             let queue = dispatch_queue_create("background", nil)
             let semaphore = dispatch_semaphore_create(0)
-            dispatch_async(queue) {
+            dispatch_async(queue!) {
                 autoreleasepool {
                     let realm = inMemoryRealm("test")
                     let object = realm.objects(SwiftIntObject).first!
@@ -415,19 +415,19 @@ class SwiftPerformanceTests: TestCase {
                                 CFRunLoopStop(CFRunLoopGetCurrent())
                             }
                         }
-                        dispatch_semaphore_signal(semaphore)
+                        dispatch_semaphore_signal(semaphore!)
                     }
                     CFRunLoopRun()
                     token.stop()
                 }
             }
 
-            dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
+            dispatch_semaphore_wait(semaphore!, DISPATCH_TIME_FOREVER)
             self.startMeasuring()
             while object.intCol < stopValue {
                 try! realm.write { object.intCol += 1 }
             }
-            dispatch_sync(queue) {}
+            dispatch_sync(queue!) {}
             self.stopMeasuring()
         }
     }
@@ -443,7 +443,7 @@ class SwiftPerformanceTests: TestCase {
             let object = realm.create(SwiftIntObject)
             try! realm.commitWrite()
 
-            dispatch_async(queue) {
+            dispatch_async(queue!) {
                 autoreleasepool {
                     let realm = inMemoryRealm("test")
                     let object = realm.objects(SwiftIntObject).first!
@@ -456,7 +456,7 @@ class SwiftPerformanceTests: TestCase {
                                 try! realm.write { object.intCol += 1 }
                             }
                         }
-                        dispatch_semaphore_signal(semaphore)
+                        dispatch_semaphore_signal(semaphore!)
                     }
                     CFRunLoopRun()
                     token.stop()
@@ -469,14 +469,14 @@ class SwiftPerformanceTests: TestCase {
                 }
             }
 
-            dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
+            dispatch_semaphore_wait(semaphore!, DISPATCH_TIME_FOREVER)
 
             self.startMeasuring()
             try! realm.write { object.intCol += 1 }
             while object.intCol < stopValue {
-                NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture())
+                NSRunLoop.current().run(mode: NSDefaultRunLoopMode, before: NSDate.distantFuture())
             }
-            dispatch_sync(queue) {}
+            dispatch_sync(queue!) {}
             self.stopMeasuring()
             token.stop()
         }

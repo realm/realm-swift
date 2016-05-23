@@ -21,7 +21,7 @@ import RealmSwift
 import Foundation
 
 class ObjectAccessorTests: TestCase {
-    func setAndTestAllProperties(object: SwiftObject) {
+    func setAndTestAllProperties(_ object: SwiftObject) {
         object.boolCol = true
         XCTAssertEqual(object.boolCol, true)
         object.boolCol = false
@@ -54,7 +54,7 @@ class ObjectAccessorTests: TestCase {
         object.stringCol = utf8TestString
         XCTAssertEqual(object.stringCol, utf8TestString)
 
-        let data = "b".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+        let data = "b".data(using: NSUTF8StringEncoding, allowLossyConversion: false)!
         object.binaryCol = data
         XCTAssertEqual(object.binaryCol, data)
 
@@ -95,28 +95,28 @@ class ObjectAccessorTests: TestCase {
         try! realm.write {
             let obj = SwiftAllIntSizesObject()
 
-            let testObject: Void -> Void = {
+            let testObject: (Void) -> Void = {
                 obj.objectSchema.properties.map { $0.name }.forEach { obj[$0] = 0 }
 
-                obj["int8"] = Int(v8)
+                obj["int8"] = NSNumber(value: v8)
                 XCTAssertEqual((obj["int8"]! as! Int), Int(v8))
-                obj["int16"] = Int(v16)
+                obj["int16"] = NSNumber(value: v16)
                 XCTAssertEqual((obj["int16"]! as! Int), Int(v16))
-                obj["int32"] = Int(v32)
+                obj["int32"] = NSNumber(value: v32)
                 XCTAssertEqual((obj["int32"]! as! Int), Int(v32))
-                obj["int64"] = NSNumber(longLong: v64)
-                XCTAssertEqual((obj["int64"]! as! NSNumber), NSNumber(longLong: v64))
+                obj["int64"] = NSNumber(value: v64)
+                XCTAssertEqual((obj["int64"]! as! NSNumber), NSNumber(value: v64))
 
                 obj.objectSchema.properties.map { $0.name }.forEach { obj[$0] = 0 }
 
-                obj.setValue(Int(v8), forKey: "int8")
-                XCTAssertEqual((obj.valueForKey("int8")! as! Int), Int(v8))
-                obj.setValue(Int(v16), forKey: "int16")
-                XCTAssertEqual((obj.valueForKey("int16")! as! Int), Int(v16))
-                obj.setValue(Int(v32), forKey: "int32")
-                XCTAssertEqual((obj.valueForKey("int32")! as! Int), Int(v32))
-                obj.setValue(NSNumber(longLong: v64), forKey: "int64")
-                XCTAssertEqual((obj.valueForKey("int64")! as! NSNumber), NSNumber(longLong: v64))
+                obj.setValue(NSNumber(value: v8), forKey: "int8")
+                XCTAssertEqual((obj.value(forKey: "int8")! as! Int), Int(v8))
+                obj.setValue(NSNumber(value: v16), forKey: "int16")
+                XCTAssertEqual((obj.value(forKey: "int16")! as! Int), Int(v16))
+                obj.setValue(NSNumber(value: v32), forKey: "int32")
+                XCTAssertEqual((obj.value(forKey: "int32")! as! Int), Int(v32))
+                obj.setValue(NSNumber(value: v64), forKey: "int64")
+                XCTAssertEqual((obj.value(forKey: "int64")! as! NSNumber), NSNumber(value: v64))
 
                 obj.objectSchema.properties.map { $0.name }.forEach { obj[$0] = 0 }
 
@@ -153,9 +153,9 @@ class ObjectAccessorTests: TestCase {
         let realm = realmWithTestPath()
 
         realm.beginWrite()
-        realm.create(SwiftLongObject.self, value: [NSNumber(longLong: longNumber)])
-        realm.create(SwiftLongObject.self, value: [NSNumber(longLong: intNumber)])
-        realm.create(SwiftLongObject.self, value: [NSNumber(longLong: negativeLongNumber)])
+        realm.create(SwiftLongObject.self, value: [NSNumber(value: longNumber)])
+        realm.create(SwiftLongObject.self, value: [NSNumber(value: intNumber)])
+        realm.create(SwiftLongObject.self, value: [NSNumber(value: negativeLongNumber)])
         try! realm.commitWrite()
 
         let objects = realm.objects(SwiftLongObject)
@@ -226,12 +226,12 @@ class ObjectAccessorTests: TestCase {
         }
     }
 
-    func setAndTestAllOptionalProperties(object: SwiftOptionalObject) {
+    func setAndTestAllOptionalProperties(_ object: SwiftOptionalObject) {
         object.optNSStringCol = ""
         XCTAssertEqual(object.optNSStringCol!, "")
         let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
-        object.optNSStringCol = utf8TestString
-        XCTAssertEqual(object.optNSStringCol!, utf8TestString)
+        object.optNSStringCol = utf8TestString as NSString?
+        XCTAssertEqual(object.optNSStringCol! as String, utf8TestString)
         object.optNSStringCol = nil
         XCTAssertNil(object.optNSStringCol)
 
@@ -242,7 +242,7 @@ class ObjectAccessorTests: TestCase {
         object.optStringCol = nil
         XCTAssertNil(object.optStringCol)
 
-        let data = "b".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+        let data = "b".data(using: NSUTF8StringEncoding, allowLossyConversion: false)!
         object.optBinaryCol = data
         XCTAssertEqual(object.optBinaryCol!, data)
         object.optBinaryCol = nil

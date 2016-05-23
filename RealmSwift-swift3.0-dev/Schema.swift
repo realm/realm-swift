@@ -52,7 +52,7 @@ public final class Schema: CustomStringConvertible {
 
     /// Returns the object schema with the given class name, if it exists.
     public subscript(className: String) -> ObjectSchema? {
-        if let rlmObjectSchema = rlmSchema.schemaForClassName(className) {
+        if let rlmObjectSchema = rlmSchema.schema(forClassName: className) {
             return ObjectSchema(rlmObjectSchema)
         }
         return nil
@@ -65,5 +65,5 @@ extension Schema: Equatable {}
 
 /// Returns whether the two schemas are equal.
 public func == (lhs: Schema, rhs: Schema) -> Bool { // swiftlint:disable:this valid_docs
-    return lhs.rlmSchema.isEqualToSchema(rhs.rlmSchema)
+    return lhs.rlmSchema.isEqual(to: rhs.rlmSchema)
 }
