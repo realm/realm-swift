@@ -257,7 +257,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (BOOL)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
 
 /**
- Updates the Realm and outstanding objects associated with the Realm to point to the most recent data.
+ Updates the Realm and outstanding objects managed by the Realm to point to the most recent data.
 
  @return    Whether there were any updates for the Realm. Note that `YES` may be returned even if no data actually changed.
  */
@@ -407,7 +407,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (void)addOrUpdateObjectsFromArray:(id)array;
 
 /**
- Deletes an object from the Realm. Once the object is deleted it is considered unmanaged.
+ Deletes an object from the Realm. Once the object is deleted it is considered invalidated.
 
  @warning This method may only be called during a write transaction.
 
