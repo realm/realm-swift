@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 //
 
 // get accessor classes for an object class - generates classes if not cached
-Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema, NSString *prefix);
+Class RLMManagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema, const char *name);
 Class RLMUnmanagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
 // Check if a given class is a generated accessor class

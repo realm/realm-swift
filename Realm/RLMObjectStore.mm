@@ -41,14 +41,21 @@
 using namespace realm;
 
 void RLMRealmCreateAccessors(RLMSchema *schema) {
+    const size_t bufferSize = sizeof("RLMAccessor__") // includes null terminator
+                            + std::numeric_limits<unsigned long long>::digits10
+                            + realm::Group::max_table_name_length;
+
+    char className[bufferSize] = "RLMAccessor_";
+    char *const start = className + strlen(className);
+
     for (RLMObjectSchema *objectSchema in schema.objectSchema) {
         if (objectSchema.accessorClass != objectSchema.objectClass) {
             continue;
         }
 
         static unsigned long long count = 0;
-        NSString *prefix = [NSString stringWithFormat:@"RLMAccessor_%llu_", count++];
-        objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, prefix);
+        sprintf(start, "%llu_%s", count++, objectSchema.className.UTF8String);
+        objectSchema.accessorClass = RLMManagedAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, className);
     }
 }
 
