@@ -432,7 +432,7 @@ public final class Realm {
 
      :nodoc:
      */
-    public func dynamicObjectForPrimaryKey(className: String, key: AnyObject) -> DynamicObject? {
+    public func dynamicObjectForPrimaryKey(className: String, key: AnyObject?) -> DynamicObject? {
         return unsafeBitCast(RLMGetObject(rlmRealm, className, key), Optional<DynamicObject>.self)
     }
 
