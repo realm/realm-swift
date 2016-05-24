@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy) NSString *objectClassName;
 
 /**
- The Realm which manages the collection. Returns `nil` for unmanaged collections.
+ The Realm which manages the collection, or `nil` for unmanaged collections.
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
@@ -102,7 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns the index of the first object in the collection matching the predicate.
 
- @param predicate   The predicate to use to filter the objects.
+ @param predicate   The predicate with which to filter the objects.
 
  @return    The index of the object, or `NSNotFound` if the object is not found in the collection.
  */
@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
 
- @return    An `RLMResults` of objects that match the given predicate.
+ @return    An `RLMResults` containing objects that match the given predicate.
  */
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
 
@@ -123,9 +123,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns all objects matching the given predicate in the collection.
 
- @param predicate   The predicate to use to filter the objects.
+ @param predicate   The predicate with which to filter the objects.
 
- @return            An `RLMResults` of objects that match the given predicate.
+ @return            An `RLMResults` containing objects that match the given predicate.
  */
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
 
@@ -133,7 +133,7 @@ NS_ASSUME_NONNULL_BEGIN
  Returns a sorted `RLMResults` from the collection.
 
  @param property    The property name to sort by.
- @param ascending   The direction to sort.
+ @param ascending   The direction to sort in.
 
  @return    An `RLMResults` sorted by the specified property.
  */
@@ -163,7 +163,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Invokes `setValue:forKey:` on each of the collection's objects using the specified `value` and `key`.
 
- @warning This method can only be called during a write transaction.
+ @warning This method may only be called during a write transaction.
 
  @param value The object value.
  @param key   The name of the property.
@@ -179,7 +179,7 @@ NS_ASSUME_NONNULL_BEGIN
  called again after each write transaction which changes either any of the
  objects in the collection, or which objects are in the collection.
 
- The change parameter will be `nil` the first time the block is called.
+ The `change` parameter will be `nil` the first time the block is called.
  For each call after that, it will contain information about
  which rows in the collection were added, removed or modified. If a write transaction
  did not modify any objects in this collection, the block is not called at all.
@@ -238,7 +238,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  An `RLMSortDescriptor` stores a property name and a sort order for use with
  `sortedResultsUsingDescriptors:`. It is similar to `NSSortDescriptor`, but supports
- only the subset of functionality which can be efficiently run by the query
+ only the subset of functionality which can be efficiently run by Realm's query
  engine.
  
  `RLMSortDescriptor` instances are immutable.

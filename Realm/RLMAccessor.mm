@@ -205,7 +205,7 @@ static inline RLMObjectBase *RLMGetLinkedObjectForValue(__unsafe_unretained RLMR
         @throw RLMException(@"Can not add objects from a different Realm");
     }
 
-    // copy from another realm or copy from standalone
+    // copy from another realm or copy from unmanaged
     return RLMCreateObjectInRealmWithValue(realm, className, link, creationOptions & RLMCreationOptionsCreateOrUpdate);
 }
 
@@ -549,7 +549,7 @@ static void RLMSuperSet(RLMObjectBase *obj, NSString *propName, id val) {
     superSetter(obj, prop.setterSel, val);
 }
 
-// getter/setter for standalone
+// getter/setter for unmanaged
 static IMP RLMAccessorStandaloneGetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
     // only override getters for RLMArray and linking objects properties
     if (accessorCode == RLMAccessorCodeArray) {

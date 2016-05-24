@@ -49,13 +49,13 @@ static bool RLMInitializedObjectSchema(RLMObjectBase *obj) {
         }
     }
 
-    // set standalone accessor class
+    // set unmanaged accessor class
     object_setClass(obj, obj->_objectSchema.standaloneClass);
     return true;
 }
 
 @implementation RLMObjectBase
-// standalone init
+// unmanaged init
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -252,7 +252,7 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 }
 
 - (BOOL)isInvalidated {
-    // if not standalone and our accessor has been detached, we have been deleted
+    // if not unmanaged and our accessor has been detached, we have been deleted
     return self.class == _objectSchema.accessorClass && !_row.is_attached();
 }
 
