@@ -225,4 +225,28 @@
     XCTAssertEqualObjects(array[1][@"stringCol"], stringObject[@"stringCol"]);
 }
 
+- (void)testReadingNulls {
+    @autoreleasepool {
+        // open realm in autoreleasepool to create tables and then dispose
+        [RLMRealm realmWithURL:RLMTestRealmURL()];
+    }
+
+    RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
+    [dyrealm beginWriteTransaction];
+    [dyrealm createObject:AllOptionalTypes.className withValue:@[ [NSNull null], [NSNull null], [NSNull null], [NSNull null], [NSNull null], [NSNull null], [NSNull null] ]];
+    [dyrealm commitWriteTransaction];
+
+    RLMResults *results = [dyrealm allObjects:AllOptionalTypes.className];
+    XCTAssertEqual(1U, results.count);
+    RLMObject *object = results.firstObject;
+
+    XCTAssertNil(object[@"intObj"]);
+    XCTAssertNil(object[@"floatObj"]);
+    XCTAssertNil(object[@"doubleObj"]);
+    XCTAssertNil(object[@"boolObj"]);
+    XCTAssertNil(object[@"string"]);
+    XCTAssertNil(object[@"data"]);
+    XCTAssertNil(object[@"date"]);
+}
+
 @end
