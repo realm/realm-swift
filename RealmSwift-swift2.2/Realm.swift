@@ -286,8 +286,8 @@ public final class Realm {
 
     - parameter className:  The class name of the object to create.
     - parameter value:      The value used to populate the object. This can be any key-value coding compliant
-                            object, or a JSON object such as those returned from the methods in `NSJSONSerialization`, or
-                            an `Array` containing one element for each persisted property. An exception will be
+                            object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                            or an `Array` containing one element for each persisted property. An exception will be
                             thrown if any required properties are not present and those properties were not defined with
                             default values.
 
