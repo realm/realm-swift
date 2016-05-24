@@ -11,7 +11,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix an assertion failure which could occur when opening a Realm after opening
+  that Realm failed previously in some specific ways in the same run of the
+  application.
 
 0.103.1 Release notes (2016-05-19)
 =============================================================
