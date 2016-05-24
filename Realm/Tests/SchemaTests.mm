@@ -311,6 +311,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     // Test each permutation of loading orders and verify that all properties
     // are initialized correctly
     std::sort(testClasses, std::end(testClasses), pred);
+    unsigned long iteration = 0;
     do @autoreleasepool {
         // Clean up any existing overridden things
         for (Class cls : testClasses) {
@@ -330,9 +331,11 @@ RLM_ARRAY_TYPE(NotARealClass)
         schema.objectSchema = objectSchemas;
 
         for (RLMObjectSchema *objectSchema in objectSchemas) {
-            objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, @"RLMAccessor_");
+            NSString *name = [NSString stringWithFormat:@"RLMTestAccessor_%lu_%@", iteration, objectSchema.className];
+            objectSchema.accessorClass = RLMManagedAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, name.UTF8String);
             objectSchema.unmanagedClass = RLMUnmanagedAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
         }
+        ++iteration;
 
         for (Class cls : testClasses) {
             NSString *className = NSStringFromClass(cls);

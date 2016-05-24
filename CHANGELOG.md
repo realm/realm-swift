@@ -11,6 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
   write does not actually change existing values.
 * Improve performance of deleting all objects in an RLMResults.
 * Reduce the number of files opened per thread-specific Realm on macOS.
+* Improve startup performance with large numbers of `RLMObject`/`Object`
+  subclasses.
 
 ### Bugfixes
 

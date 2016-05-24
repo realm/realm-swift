@@ -491,7 +491,7 @@ static IMP RLMAccessorUnmanagedSetter(RLMProperty *prop, RLMAccessorCode accesso
 #define SETTER_TYPES(C) "v@:" C
 
 // getter type strings
-// NOTE: this typecode is really the the first charachter of the objc/runtime.h type
+// NOTE: this typecode is really the the first character of the objc/runtime.h type
 //       the @ type maps to multiple core types (string, date, array, mixed, any which are id in objc)
 static const char *getterTypeStringForObjcCode(char code) {
     switch (code) {
@@ -509,7 +509,7 @@ static const char *getterTypeStringForObjcCode(char code) {
 }
 
 // setter type strings
-// NOTE: this typecode is really the the first charachter of the objc/runtime.h type
+// NOTE: this typecode is really the the first character of the objc/runtime.h type
 //       the @ type maps to multiple core types (string, date, array, mixed, any which are id in objc)
 static const char *setterTypeStringForObjcCode(char code) {
     switch (code) {
@@ -616,54 +616,53 @@ bool RLMIsGeneratedClass(Class cls) {
 
 static Class RLMCreateAccessorClass(Class objectClass,
                                     RLMObjectSchema *schema,
-                                    NSString *accessorClassPrefix,
+                                    const char *accessorClassName,
                                     IMP (*getterGetter)(RLMProperty *, RLMAccessorCode),
                                     IMP (*setterGetter)(RLMProperty *, RLMAccessorCode)) {
-    // throw if no schema, prefix, or object class
-    if (!objectClass || !schema || !accessorClassPrefix) {
-        @throw RLMException(@"Missing arguments");
-    }
-    if (!RLMIsObjectOrSubclass(objectClass)) {
-        @throw RLMException(@"objectClass must derive from RLMObject or Object");
-    }
+    REALM_ASSERT_DEBUG(RLMIsObjectOrSubclass(objectClass));
 
     // create and register proxy class which derives from object class
-    NSString *accessorClassName = [accessorClassPrefix stringByAppendingString:schema.className];
-    Class accClass = objc_getClass(accessorClassName.UTF8String);
+    Class accClass = objc_allocateClassPair(objectClass, accessorClassName, 0);
     if (!accClass) {
-        accClass = objc_allocateClassPair(objectClass, accessorClassName.UTF8String, 0);
-        objc_registerClassPair(accClass);
+        // Class with that name already exists, so just return the pre-existing one
+        // This should only happen for our standalone "accessors"
+        return objc_lookUpClass(accessorClassName);
     }
 
     // override getters/setters for each propery
-    NSArray *allProperties = [schema.properties arrayByAddingObjectsFromArray:schema.computedProperties];
-    for (RLMProperty *prop in allProperties) {
+    for (RLMProperty *prop in schema.properties) {
         RLMAccessorCode accessorCode = accessorCodeForType(prop.objcType, prop.type);
         if (prop.getterSel && getterGetter) {
-            IMP getterImp = getterGetter(prop, accessorCode);
-            if (getterImp) {
-                class_replaceMethod(accClass, prop.getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
+            if (IMP getterImp = getterGetter(prop, accessorCode)) {
+                class_addMethod(accClass, prop.getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
             }
         }
         if (prop.setterSel && setterGetter) {
-            IMP setterImp = setterGetter(prop, accessorCode);
-            if (setterImp) {
-                class_replaceMethod(accClass, prop.setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
+            if (IMP setterImp = setterGetter(prop, accessorCode)) {
+                class_addMethod(accClass, prop.setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
+            }
+        }
+    }
+    for (RLMProperty *prop in schema.computedProperties) {
+        if (prop.getterSel && getterGetter) {
+            if (IMP getterImp = getterGetter(prop, accessorCodeForType(prop.objcType, prop.type))) {
+                class_addMethod(accClass, prop.getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
             }
         }
     }
 
     RLMMarkClassAsGenerated(accClass);
+    objc_registerClassPair(accClass);
 
     return accClass;
 }
 
-Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema, NSString *prefix) {
-    return RLMCreateAccessorClass(objectClass, schema, prefix, RLMAccessorGetter, RLMAccessorSetter);
+Class RLMManagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema, const char *name) {
+    return RLMCreateAccessorClass(objectClass, schema, name, RLMAccessorGetter, RLMAccessorSetter);
 }
 
 Class RLMUnmanagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
-    return RLMCreateAccessorClass(objectClass, schema, @"RLMUnmanaged_",
+    return RLMCreateAccessorClass(objectClass, schema, [@"RLMUnmanaged_" stringByAppendingString:schema.className].UTF8String,
                                   RLMAccessorUnmanagedGetter, RLMAccessorUnmanagedSetter);
 }
 
