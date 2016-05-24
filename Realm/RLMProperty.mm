@@ -112,6 +112,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 -(void)setObjcCodeFromType {
     if (_optional) {
         _objcType = '@';
+        return;
     }
     switch (_type) {
         case RLMPropertyTypeInt:

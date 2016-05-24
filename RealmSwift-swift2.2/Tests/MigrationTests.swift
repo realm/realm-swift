@@ -512,4 +512,38 @@ class MigrationTests: TestCase {
 
         class_replaceMethod(metaClass, #selector(RLMObjectBase.sharedSchema), originalImp, "@@:")
     }
+
+    func testReadNullsDuringMigration() {
+        autoreleasepool {
+            try! Realm().write {
+                try! Realm().add(SwiftOptionalObject())
+            }
+        }
+
+        var migrated = false
+        migrateAndTestDefaultRealm() { migration, oldSchemaVersion in
+            migrated = true
+
+            var enumerated = false
+            migration.enumerate("SwiftOptionalObject") { oldObj, newObj in
+                XCTAssertNil(oldObj!["optNSStringCol"])
+                XCTAssertNil(oldObj!["optStringCol"])
+                XCTAssertNil(oldObj!["optBinaryCol"])
+                XCTAssertNil(oldObj!["optDateCol"])
+                XCTAssertNil(oldObj!["optIntCol"])
+                XCTAssertNil(oldObj!["optInt8Col"])
+                XCTAssertNil(oldObj!["optInt16Col"])
+                XCTAssertNil(oldObj!["optInt32Col"])
+                XCTAssertNil(oldObj!["optInt64Col"])
+                XCTAssertNil(oldObj!["optFloatCol"])
+                XCTAssertNil(oldObj!["optDoubleCol"])
+                XCTAssertNil(oldObj!["optBoolCol"])
+                XCTAssertNil(oldObj!["optObjectCol"])
+
+                enumerated = true
+            }
+            XCTAssertTrue(enumerated)
+        }
+        XCTAssertTrue(migrated)
+    }
 }

@@ -88,9 +88,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSUInteger)indexOfObject:(RLMObject *)object;
 
 /**
- Returns the index of the first object matching the predicate.
+ Returns the index of the first object in the collection matching the predicate.
 
- @param predicateFormat The predicate format string which can accept variable arguments.
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
 
  @return    The index of the object, or `NSNotFound` if the object is not found in the collection.
  */
@@ -111,7 +111,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns all objects matching the given predicate in the collection.
 
- @param predicateFormat A predicate format string; variable arguments are supported.
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
 
  @return    An `RLMResults` of objects that match the given predicate.
  */
@@ -239,7 +239,9 @@ NS_ASSUME_NONNULL_BEGIN
  An `RLMSortDescriptor` stores a property name and a sort order for use with
  `sortedResultsUsingDescriptors:`. It is similar to `NSSortDescriptor`, but supports
  only the subset of functionality which can be efficiently run by the query
- engine. `RLMSortDescriptor` instances are immutable.
+ engine.
+ 
+ `RLMSortDescriptor` instances are immutable.
  */
 @interface RLMSortDescriptor : NSObject
 
