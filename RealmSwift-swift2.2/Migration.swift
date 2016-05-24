@@ -119,11 +119,11 @@ public final class Migration {
     Create an `Object` of type `className` in the Realm being migrated.
 
     - parameter className: The name of the `Object` class to create.
-    - parameter value:     The object used to populate the new `Object`. This can be any key/value coding
-                           compliant object, or a JSON object such as those returned from the methods in
-                           `NSJSONSerialization`, or an `Array` with one object for each persisted
-                           property. An exception will be thrown if any required properties are not
-                           present and no default is set.
+   - parameter value:     The value used to populate the created object. This can be any key-value coding compliant
+                          object, or a JSON object such as those returned from the methods in `NSJSONSerialization`, or
+                          an `Array` containing one element for each persisted property. An exception will be
+                          thrown if any required properties are not present and those properties were not defined with
+                          default values.
 
     - returns: The created object.
     */

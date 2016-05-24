@@ -85,10 +85,14 @@ public class Object: RLMObjectBase {
     `Dictionary<String, AnyObject>`.
     Call `add(_:)` on a `Realm` to add standalone objects to a realm.
 
-    - parameter value: The value used to populate the object. This can be any key/value coding compliant
-                       object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-                       or an `Array` with one object for each persisted property. An exception will be
-                       thrown if any required properties are not present and no default is set.
+   - parameter value:  The value used to populate the object. This can be any key-value coding compliant
+                       object, or an array or dictionary returned from the methods in `NSJSONSerialization`, or
+                       an `Array` containing one element for each persisted property. An exception will be
+                       thrown if any required properties are not present and those properties were not defined with
+                       default values.
+
+                       When passing in an `Array`, all properties must be present,
+                       valid and in the same order as the properties defined in the model.
     */
     public init(value: AnyObject) {
         self.dynamicType.sharedSchema() // ensure this class' objectSchema is loaded in the partialSharedSchema

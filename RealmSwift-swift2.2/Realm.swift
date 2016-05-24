@@ -250,10 +250,12 @@ public final class Realm {
     - warning: This method can only be called during a write transaction.
 
     - parameter type:   The object type to create.
-    - parameter value:  The value used to populate the object. This can be any key/value coding compliant
-                        object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
-                        or an `Array` with one object for each persisted property. An exception will be
-                        thrown if any required properties are not present and no default is set.
+    - parameter value:  The value used to populate the object. This can be any key-value coding compliant
+                        object, or a JSON object such as those returned from the methods in `NSJSONSerialization`, or
+                        an `Array` containing one element for each persisted property. An exception will be
+                        thrown if any required properties are not present and those properties were not defined with
+                        default values.
+
                         When passing in an `Array`, all properties must be present,
                         valid and in the same order as the properties defined in the model.
     - parameter update: If true will try to update existing objects with the same primary key.
@@ -283,13 +285,14 @@ public final class Realm {
     - warning: This method can only be called during a write transaction.
 
     - parameter className:  The class name of the object to create.
-    - parameter value:      The value used to populate the object. This can be any key/value coding compliant
-    object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
-    or an `Array` with one object for each persisted property. An exception will be
-    thrown if any required properties are not present and no default is set.
+    - parameter value:      The value used to populate the object. This can be any key-value coding compliant
+                            object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                            or an `Array` containing one element for each persisted property. An exception will be
+                            thrown if any required properties are not present and those properties were not defined with
+                            default values.
 
-    When passing in an `Array`, all properties must be present,
-    valid and in the same order as the properties defined in the model.
+                            When passing in an `Array`, all properties must be present,
+                            valid and in the same order as the properties defined in the model.
     - parameter update:     If true will try to update existing objects with the same primary key.
 
     - returns: The created object.
