@@ -20,12 +20,12 @@ import Foundation
 import Realm
 
 /**
-This class represents Realm model object schemas.
+ This class represents Realm model object schemas.
 
-When using Realm, `ObjectSchema` objects allow performing migrations and
-introspecting the database's schema.
+ When using Realm, `ObjectSchema` instances allow performing migrations and
+ introspecting the database's schema.
 
-`ObjectSchema`s map to tables in the core database.
+ Object schemas map to tables in the core database.
 */
 public final class ObjectSchema: CustomStringConvertible {
 
@@ -33,15 +33,19 @@ public final class ObjectSchema: CustomStringConvertible {
 
     internal let rlmObjectSchema: RLMObjectSchema
 
-    /// Array of persisted `Property` objects for an object.
+    /**
+     An array of `Property` instances representing the persisted properties of a class described by the schema.
+
+     - see: `Property`
+     */
     public var properties: [Property] {
         return rlmObjectSchema.properties.map { Property($0) }
     }
 
-    /// The name of the class this schema describes.
+    /// The name of the class the schema describes.
     public var className: String { return rlmObjectSchema.className }
 
-    /// The property that serves as the primary key, if there is a primary key.
+    /// The property which serves as the primary key for the class the schema describes, if any.
     public var primaryKeyProperty: Property? {
         if let rlmProperty = rlmObjectSchema.primaryKeyProperty {
             return Property(rlmProperty)
@@ -49,7 +53,7 @@ public final class ObjectSchema: CustomStringConvertible {
         return nil
     }
 
-    /// Returns a human-readable description of the properties contained in this object schema.
+    /// Returns a human-readable description of the properties contained in the object schema.
     public var description: String { return rlmObjectSchema.description }
 
     // MARK: Initializers

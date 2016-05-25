@@ -66,7 +66,7 @@
           methods on `RLMObject`.
 
  @param className   The type of objects you are looking for (name of the class).
- @param predicate   The predicate to use to filter the objects.
+ @param predicate   The predicate with which to filter the objects.
 
  @return    An `RLMResults` containing results matching the given predicate.
 

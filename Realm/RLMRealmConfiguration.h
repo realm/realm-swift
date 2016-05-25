@@ -22,15 +22,17 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- An `RLMRealmConfiguration` is used to describe the different options used to
- create an `RLMRealm` instance.
+ An `RLMRealmConfiguration` instance describes the different options used to
+ create an instance of a Realm.
 
- `RLMRealmConfiguration` instances are just plain NSObjects, and unlike RLMRealm
- and RLMObjects can be freely shared between threads as long as you do not
- mutate them. Creating configuration objects for class subsets (by setting the
- `objectClasses` property) can be expensive, and so you will normally want to
- cache and reuse a single configuration object for each distinct configuration
- that you are using rather than creating a new one each time you open a Realm.
+ `RLMRealmConfiguration` instances are just plain `NSObject`s. Unlike `RLMRealm`s
+ and `RLMObject`s, they can be freely shared between threads as long as you do not
+ mutate them.
+ 
+ Creating configuration objects for class subsets (by setting the
+ `objectClasses` property) can be expensive. Because of this, you will normally want to
+ cache and reuse a single configuration object for each distinct configuration rather than 
+ creating a new object each time you open a Realm.
  */
 @interface RLMRealmConfiguration : NSObject<NSCopying>
 
@@ -53,16 +55,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Properties
 
-/// The local URL to the realm file. Mutually exclusive with `inMemoryIdentifier`.
+/// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`.
 @property (nonatomic, copy, nullable) NSURL *fileURL;
 
 /// A string used to identify a particular in-memory Realm. Mutually exclusive with `path`.
 @property (nonatomic, copy, nullable) NSString *inMemoryIdentifier;
 
-/// 64-byte key to use to encrypt the data.
+/// A 64-byte key to use to encrypt the data, or `nil` if encryption is not enabled.
 @property (nonatomic, copy, nullable) NSData *encryptionKey;
 
-/// Whether the Realm is read-only (must be YES for read-only files).
+/// Whether the Realm is read-only (must be `YES` for read-only files).
 @property (nonatomic) BOOL readOnly;
 
 /// The current schema version.
@@ -72,12 +74,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) RLMMigrationBlock migrationBlock;
 
 /**
- Recreate the Realm file with the provided schema if a migration is required.
+ Whether to recreate the Realm file with the provided schema if a migration is required.
  This is the case when the stored schema differs from the provided schema or
  the stored schema version differs from the version on this configuration.
- This deletes the file if a migration would otherwise be required or run.
+ Setting this property to `YES` deletes the file if a migration would otherwise be required or executed.
 
- @note This doesn't disable file format migrations.
+ @note Setting this property to `YES` doesn't disable file format migrations.
  */
 @property (nonatomic) BOOL deleteRealmIfMigrationNeeded;
 

@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable RLMObjectSchema *)schemaForClassName:(NSString *)className;
 
 /**
- Looks up and returns a `RLMObjectSchema` for the given class name in the Realm.
+ Looks up and returns an `RLMObjectSchema` for the given class name in the Realm.
  
  If there is no object of type `className` in the schema, an exception will be thrown.
 

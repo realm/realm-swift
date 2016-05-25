@@ -130,7 +130,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns the index of the first object in the results collection matching the predicate.
 
- @param predicate   The predicate to use to filter the objects.
+ @param predicate   The predicate with which to filter the objects.
 
  @return    The index of the object, or `NSNotFound` if the object is not found in the results collection.
  */
@@ -141,7 +141,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
 
- @return                An RLMResults of objects that match the given predicate.
+ @return                An `RLMResults` of objects that match the given predicate.
  */
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
 
@@ -151,7 +151,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns all the objects matching the given predicate in the results collection.
 
- @param predicate   The predicate to use to filter the objects.
+ @param predicate   The predicate with which to filter the objects.
 
  @return            An `RLMResults` of objects that match the given predicate.
  */
@@ -185,7 +185,7 @@ NS_ASSUME_NONNULL_BEGIN
  and then called again after each write transaction which changes either any
  of the objects in the results, or which objects are in the results.
 
- The change parameter will be `nil` the first time the block is called.
+ The `change` parameter will be `nil` the first time the block is called.
  For each call after that, it will contain information about
  which rows in the results collection were added, removed or modified. If a
  write transaction did not modify any objects in the results collection,
@@ -233,8 +233,8 @@ NS_ASSUME_NONNULL_BEGIN
  @warning This method cannot be called during a write transaction, or when the
           containing Realm is read-only.
 
- @param block The block to be called with the evaluated results.
- @return A token which must be held for as long as you want query results to be delivered.
+ @param block The block to be called whenever a change occurs.
+ @return A token which must be held for as long as you want updates to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults<RLMObjectType> *__nullable results,
                                                          RLMCollectionChange *__nullable change,
@@ -250,51 +250,53 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
 
- @param property The property whose minimum value is desired. Only properties of types `int`, `float`, `double`, and `NSDate` are supported.
+ @param property The property whose minimum value is desired. Only properties of types `int`, `float`, `double`, and
+                 `NSDate` are supported.
 
- @return The minimum value for the property.
+ @return The minimum value of the property.
  */
 - (nullable id)minOfProperty:(NSString *)property;
 
 /**
- Returns the maximum (highest) value of the given property among all the objects
- represented by the results collection.
+ Returns the maximum (highest) value of the given property among all the objects represented by the results collection.
 
      NSNumber *max = [results maxOfProperty:@"age"];
 
  @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
 
- @param property The property whose maximum value is desired. Only properties of types `int`, `float`, `double`, and `NSDate` are supported.
+ @param property The property whose maximum value is desired. Only properties of types `int`, `float`, `double`, and 
+                 `NSDate` are supported.
 
- @return The maximum value for the property.
+ @return The maximum value of the property.
  */
 - (nullable id)maxOfProperty:(NSString *)property;
 
 /**
- Returns the sum of the values of a given property for all the objects represented
- by the results collection.
+ Returns the sum of the values of a given property over all the objects represented by the results collection.
 
      NSNumber *sum = [results sumOfProperty:@"age"];
 
  @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
 
- @param property The property whose values should be summed. Only properties of types `int`, `float`, and `double` are supported.
+ @param property The property whose values should be summed. Only properties of types `int`, `float`, and `double` are
+                 supported.
 
  @return The sum of the given property.
  */
 - (NSNumber *)sumOfProperty:(NSString *)property;
 
 /**
- Returns the average value of a given property for all the objects represented by
- the results collection.
+ Returns the average value of a given property over the objects represented by the results collection.
 
      NSNumber *average = [results averageOfProperty:@"age"];
 
  @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
 
- @param property The property whose average value should be calculated. Only properties of types `int`, `float`, and `double` are supported.
+ @param property The property whose average value should be calculated. Only properties of types `int`, `float`, and
+                 `double` are supported.
 
- @return    The average value of the given property. This will be of type `double` for both `float` and `double` properties.
+ @return    The average value of the given property. This will be of type `double` for both `float` and `double`
+            properties.
  */
 - (nullable NSNumber *)averageOfProperty:(NSString *)property;
 

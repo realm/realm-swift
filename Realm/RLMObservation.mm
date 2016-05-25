@@ -91,7 +91,7 @@ RLMObservationInfo::~RLMObservationInfo() {
             }
         }
     }
-    // Otherwise the observed object was standalone, so nothing to do
+    // Otherwise the observed object was unmanaged, so nothing to do
 
 #ifdef DEBUG
     // ensure that incorrect cleanup fails noisily
