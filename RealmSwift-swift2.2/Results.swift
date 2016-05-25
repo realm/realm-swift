@@ -73,48 +73,48 @@ public class ResultsBase: NSObject, NSFastEnumeration {
 }
 
 /**
-Results is an auto-updating container type in Realm returned from object queries.
+ `Results` is an auto-updating container type in Realm returned from object queries.
 
-Results can be queried with the same predicates as `List<T>` and you can chain
-queries to further filter query results.
+ `Results` can be queried with the same predicates as `List<T>`, and you can chain
+ queries to further filter query results.
 
-Results always reflect the current state of the Realm on the current thread,
-including during write transactions on the current thread. The one exception to
-this is when using `for...in` enumeration, which will always enumerate over the
+ `Results` always reflect the current state of the Realm on the current thread,
+ including during write transactions on the current thread. The one exception to
+ this is when using `for...in` enumeration, which will always enumerate over the
  objects which matched the query when the enumeration is begun, even if
-some of them are deleted or modified to be excluded by the filter during the
-enumeration.
+ some of them are deleted or modified to be excluded by the filter during the
+ enumeration.
 
-Results are initially lazily evaluated, and only run queries when the result
-of the query is requested. This means that chaining several temporary
-Results to sort and filter your data does not perform any extra work
-processing the intermediate state.
+ `Results` are lazily evaluated the first time they are accessed; they only
+ run queries when the result of the query is requested. This means that
+ chaining several temporary `Results` to sort and filter your data does not
+ perform any extra work processing the intermediate state.
 
-Once the results have been evaluated or a notification block has been added,
-the results are eagerly kept up-to-date, with the work done to keep them
-up-to-date done on a background thread whenever possible.
+ Once the results have been evaluated or a notification block has been added,
+ the results are eagerly kept up-to-date, with the work done to keep them
+ up-to-date done on a background thread whenever possible.
 
-Results cannot be created directly.
+ `Results` cannot be directly instantiated.
 */
 public final class Results<T: Object>: ResultsBase {
 
-    /// Element type contained in this collection.
+    /// The type of the objects contained in the collection.
     public typealias Element = T
 
     // MARK: Properties
 
-    /// Returns the Realm these results are associated with.
-    /// Despite returning an `Optional<Realm>` in order to conform to
-    /// `RealmCollectionType`, it will always return `.Some()` since a `Results`
-    /// cannot exist independently from a `Realm`.
+    /// The Realm which manages this results collection. Note that this property will never return `nil`.
     public var realm: Realm? { return Realm(rlmResults.realm) }
 
-    /// Indicates if the results can no longer be accessed.
-    ///
-    /// Results can no longer be accessed if `invalidate` is called on the containing `Realm`.
+    /**
+     Indicates if the results collection is no longer valid.
+
+     The results collection becomes invalid if `invalidate` is called on the containing `realm`.
+     An invalidated results collection can be accessed, but will always be empty.
+     */
     public var invalidated: Bool { return rlmResults.invalidated }
 
-    /// Returns the number of objects in these results.
+    /// The number of objects in the results collection.
     public var count: Int { return Int(rlmResults.count) }
 
     // MARK: Initializers
@@ -126,36 +126,34 @@ public final class Results<T: Object>: ResultsBase {
     // MARK: Index Retrieval
 
     /**
-    Returns the index of the given object, or `nil` if the object is not in the results.
+     Returns the index of an object in the results collection.
 
-    - parameter object: The object whose index is being queried.
+     - parameter object: An object.
 
-    - returns: The index of the given object, or `nil` if the object is not in the results.
-    */
+     - returns: The index of the given object, or `nil` if the object is not in the results collection.
+     */
     public func indexOf(object: T) -> Int? {
         return notFoundToNil(rlmResults.indexOfObject(unsafeBitCast(object, RLMObject.self)))
     }
 
     /**
-    Returns the index of the first object matching the given predicate,
-    or `nil` if no objects match.
+     Returns the index of the first object matching the predicate.
 
-    - parameter predicate: The predicate to filter the objects.
+     - parameter predicate: The predicate with which to filter the objects.
 
-    - returns: The index of the first matching object, or `nil` if no objects match.
-    */
+     - returns: The index of the first object that matches, or `nil` if no objects match.
+     */
     public func indexOf(predicate: NSPredicate) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWithPredicate(predicate))
     }
 
     /**
-    Returns the index of the first object matching the given predicate,
-    or `nil` if no objects match.
+     Returns the index of the first object matching the predicate.
 
-    - parameter predicateFormat: The predicate format string which can accept variable arguments.
+     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
 
-    - returns: The index of the first matching object, or `nil` if no objects match.
-    */
+     - returns: The index of the first object that matches, or `nil` if no objects match.
+     */
     public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat,
                                                                                argumentArray: args)))
@@ -164,12 +162,12 @@ public final class Results<T: Object>: ResultsBase {
     // MARK: Object Retrieval
 
     /**
-    Returns the object at the given `index`.
+     Returns the object at the given `index`.
 
-    - parameter index: The index.
+     - parameter index: An index.
 
-    - returns: The object at the given `index`.
-    */
+     - returns: The object at the given `index`.
+     */
     public subscript(index: Int) -> T {
         get {
             throwForNegativeIndex(index)
@@ -177,46 +175,46 @@ public final class Results<T: Object>: ResultsBase {
         }
     }
 
-    /// Returns the first object in the results, or `nil` if empty.
+    /// Returns the first object in the results collection, or `nil` if the collection is empty.
     public var first: T? { return unsafeBitCast(rlmResults.firstObject(), Optional<T>.self) }
 
-    /// Returns the last object in the results, or `nil` if empty.
+    /// Returns the last object in the results collection, or `nil` if the collection is empty.
     public var last: T? { return unsafeBitCast(rlmResults.lastObject(), Optional<T>.self) }
 
     // MARK: KVC
 
     /**
-    Returns an Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
+     Returns an `Array` containing the results of invoking `valueForKey(_:)` with `key` on each of the results
+     collection's objects.
 
-    - parameter key: The name of the property.
+     - parameter key: The name of the property.
 
-    - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
-    */
+     - returns: An `Array` containing the results.
+     */
     public override func valueForKey(key: String) -> AnyObject? {
         return rlmResults.valueForKey(key)
     }
 
     /**
-     Returns an Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
+     Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` with `keyPath` on each of the results
      collection's objects.
 
      - parameter keyPath: The key path to the property.
 
-     - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
-     collection's objects.
+     - returns: An `Array` containing the results.
      */
     public override func valueForKeyPath(keyPath: String) -> AnyObject? {
         return rlmResults.valueForKeyPath(keyPath)
     }
 
     /**
-    Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
+     Invokes `setValue(_:forKey:)` on each of the results collection's objects using the specified `value` and `key`.
 
-    - warning: This method can only be called during a write transaction.
+     - warning: This method may only be called during a write transaction.
 
-    - parameter value: The object value.
-    - parameter key:   The name of the property.
-    */
+     - parameter value: The object value.
+     - parameter key:   The name of the property.
+     */
     public override func setValue(value: AnyObject?, forKey key: String) {
         return rlmResults.setValue(value, forKey: key)
     }
@@ -224,23 +222,23 @@ public final class Results<T: Object>: ResultsBase {
     // MARK: Filtering
 
     /**
-    Filters the results to the objects that match the given predicate.
+     Returns all objects matching the given predicate in the collection.
 
-    - parameter predicateFormat: The predicate format string which can accept variable arguments.
+     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
 
-    - returns: Results containing objects that match the given predicate.
-    */
+     - returns: A `Results` containing objects that match the given predicate.
+     */
     public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T> {
         return Results<T>(rlmResults.objectsWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
     /**
-    Filters the results to the objects that match the given predicate.
+     Returns all objects matching the given predicate in the collection.
 
-    - parameter predicate: The predicate to filter the objects.
+     - parameter predicate: The predicate with which to filter the objects.
 
-    - returns: Results containing objects that match the given predicate.
-    */
+     - returns: A `Results` containing objects that match the given predicate.
+     */
     public func filter(predicate: NSPredicate) -> Results<T> {
         return Results<T>(rlmResults.objectsWithPredicate(predicate))
     }
@@ -248,24 +246,24 @@ public final class Results<T: Object>: ResultsBase {
     // MARK: Sorting
 
     /**
-    Returns `Results` with elements sorted by the given property name.
+     Returns a sorted `Results` from the collection.
 
-    - parameter property:  The property name to sort by.
-    - parameter ascending: The direction to sort by.
+     - parameter property:  The property name to sort by.
+     - parameter ascending: The direction to sort in.
 
-    - returns: `Results` with elements sorted by the given property name.
-    */
+     - returns: A `Results` sorted by the specified property.
+     */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
         return sorted([SortDescriptor(property: property, ascending: ascending)])
     }
 
     /**
-    Returns `Results` with elements sorted by the given sort descriptors.
+     Returns a sorted `Results` from the collection.
 
-    - parameter sortDescriptors: `SortDescriptor`s to sort by.
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
 
-    - returns: `Results` with elements sorted by the given sort descriptors.
-    */
+     - returns: A `Results` sorted by the specified properties.
+     */
     public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T> {
         return Results<T>(rlmResults.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
@@ -273,53 +271,53 @@ public final class Results<T: Object>: ResultsBase {
     // MARK: Aggregate Operations
 
     /**
-    Returns the minimum value of the given property.
+     Returns the minimum (lowest) value of the given property among all the objects represented by the collection.
 
-    - warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
-    - parameter property: The name of a property conforming to `MinMaxType` to look for a minimum on.
+     - parameter property: The name of a property whose minimum value is desired.
 
-    - returns: The minimum value for the property amongst objects in the Results, or `nil` if the Results is empty.
-    */
+     - returns: The minimum value of the property, or `nil` if the collection is empty.
+     */
     public func min<U: MinMaxType>(property: String) -> U? {
         return rlmResults.minOfProperty(property) as! U?
     }
 
     /**
-    Returns the maximum value of the given property.
+     Returns the maximum (highest) value of the given property among all the objects represented by the collection.
 
-    - warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
-    - parameter property: The name of a property conforming to `MinMaxType` to look for a maximum on.
+     - parameter property: The name of a property whose minimum value is desired.
 
-    - returns: The maximum value for the property amongst objects in the Results, or `nil` if the Results is empty.
-    */
+     - returns: The maximum value of the property, or `nil` if the collection is empty.
+     */
     public func max<U: MinMaxType>(property: String) -> U? {
         return rlmResults.maxOfProperty(property) as! U?
     }
 
     /**
-    Returns the sum of the given property for objects in the Results.
+     Returns the sum of the values of a given property over all the objects represented by the collection.
 
-    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
-    - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
+     - parameter property: The name of a property whose values should be summed.
 
-    - returns: The sum of the given property over all objects in the Results.
-    */
+     - returns: The sum of the given property.
+     */
     public func sum<U: AddableType>(property: String) -> U {
         return rlmResults.sumOfProperty(property) as AnyObject as! U
     }
 
     /**
-    Returns the average of the given property for objects in the Results.
+     Returns the average value of a given property over all the objects represented by the collection.
 
-    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+     - warning: Only the name of a property whose type conforms to the `AddableType` protocol can be specified.
 
-    - parameter property: The name of a property conforming to `AddableType` to calculate average on.
+     - parameter property: The name of a property whose average value should be calculated.
 
-    - returns: The average of the given property over all objects in the Results, or `nil` if the Results is empty.
-    */
+     - returns: The average value of the given property, or `nil` if the collection is empty.
+     */
     public func average<U: AddableType>(property: String) -> U? {
         return rlmResults.averageOfProperty(property) as! U?
     }
@@ -327,28 +325,27 @@ public final class Results<T: Object>: ResultsBase {
     // MARK: Notifications
 
     /**
-     Register a block to be called each time the Results changes.
+     Registers a block to be called each time the results collection changes.
 
      The block will be asynchronously called with the initial results, and then
      called again after each write transaction which changes either any of the
-     objects in the results, or which objects are in the results.
+     objects in the collection, or which objects are in the collection.
 
-     This version of this method reports which of the objects in the results were
-     added, removed, or modified in each write transaction as indices within the
-     results. See the RealmCollectionChange documentation for more information on
-     the change information supplied and an example of how to use it to update
-     a UITableView.
+     The `change` parameter that is passed to the block reports, in the form of indices within the
+     collection, which of the objects were added, removed, or modified during each write transaction. See the
+     `RealmCollectionChange` documentation for more information on the change information supplied and an example of how
+     to use it to update a `UITableView`.
 
-     At the time when the block is called, the Results object will be fully
-     evaluated and up-to-date, and as long as you do not perform a write transaction
-     on the same thread or explicitly call realm.refresh(), accessing it will never
-     perform blocking work.
+     At the time when the block is called, the collection will be fully
+     evaluated and up-to-date, and as long as you do not perform a write
+     transaction on the same thread or explicitly call `realm.refresh()`,
+     accessing it will never perform blocking work.
 
      Notifications are delivered via the standard run loop, and so can't be
      delivered while the run loop is blocked by other activity. When
      notifications can't be delivered instantly, multiple notifications may be
      coalesced into a single notification. This can include the notification
-     with the initial results. For example, the following code performs a write
+     with the initial collection. For example, the following code performs a write
      transaction immediately after adding the notification block, so there is no
      opportunity for the initial notification to be delivered first. As a
      result, the initial notification will reflect the state of the Realm after
@@ -377,13 +374,13 @@ public final class Results<T: Object>: ResultsBase {
          // end of run loop execution context
 
      You must retain the returned token for as long as you want updates to continue
-     to be sent to the block. To stop receiving updates, call stop() on the token.
+     to be sent to the block. To stop receiving updates, call `stop()` on the token.
 
      - warning: This method cannot be called during a write transaction, or when
-                the source realm is read-only.
+                the containing Realm is read-only.
 
-     - parameter block: The block to be called with the evaluated results and change information.
-     - returns: A token which must be held for as long as you want query results to be delivered.
+     - parameter block: The block to be called whenever a change occurs.
+     - returns: A token which must be retained for as long as you want updates to be delivered.
      */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: (RealmCollectionChange<Results> -> Void)) -> NotificationToken {
@@ -404,12 +401,12 @@ extension Results: RealmCollectionType {
     // MARK: Collection Support
 
     /// The position of the first element in a non-empty collection.
-    /// Identical to endIndex in an empty collection.
+    /// Identical to `endIndex` in an empty collection.
     public var startIndex: Int { return 0 }
 
     /// The collection's "past the end" position.
-    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
-    /// zero or more applications of successor().
+    /// `endIndex` is not a valid argument to `subscript`, and is always reachable from `startIndex` by
+    /// zero or more applications of `successor()`.
     public var endIndex: Int { return count }
 
     /// :nodoc:

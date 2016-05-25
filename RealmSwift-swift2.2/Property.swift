@@ -20,12 +20,11 @@ import Foundation
 import Realm
 
 /**
-This class represents properties persisted to Realm in an `ObjectSchema`.
+ `Property` instances represent properties persisted to Realm in the context of an object schema.
 
-When using Realm, `Property` objects allow performing migrations and
-introspecting the database's schema.
+ When using Realm, `Property` instances allow performing migrations and introspecting the database's schema.
 
-These properties map to columns in the core database.
+ These property instances map to columns in the core database.
 */
 public final class Property: CustomStringConvertible {
 
@@ -33,19 +32,20 @@ public final class Property: CustomStringConvertible {
 
     internal let rlmProperty: RLMProperty
 
-    /// Property name.
+    /// The name of the property.
     public var name: String { return rlmProperty.name }
 
-    /// Property type.
+    /// The type of the property.
     public var type: PropertyType { return rlmProperty.type }
 
-    /// Whether this property is indexed.
+    /// Indicates whether this property is indexed.
     public var indexed: Bool { return rlmProperty.indexed }
 
-    /// Whether this property is optional (can contain `nil` values).
+    /// Indicates whether this property is optional. (Note that certain numeric types must be wrapped in a
+    /// `RealmOptional` instance in order to be declared as optional.)
     public var optional: Bool { return rlmProperty.optional }
 
-    /// Object class name - specify object types for `Object` and `List` properties.
+    /// For `Object` and `List` properties, the name of the class of object stored in the property.
     public var objectClassName: String? { return rlmProperty.objectClassName }
 
     /// Returns a human-readable description of this property.
@@ -62,7 +62,7 @@ public final class Property: CustomStringConvertible {
 
 extension Property: Equatable {}
 
-/// Returns whether the two properties are equal.
+/// Returns whether the two property objects are equal.
 public func == (lhs: Property, rhs: Property) -> Bool { // swiftlint:disable:this valid_docs
     return lhs.rlmProperty.isEqualToProperty(rhs.rlmProperty)
 }

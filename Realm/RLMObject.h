@@ -28,7 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMObjectSchema;
 
 /**
- 
  `RLMObject` is a base class for model objects representing data stored in Realms.
 
  Define your model classes by subclassing `RLMObject` and adding properties to be persisted. 
@@ -52,8 +51,8 @@ NS_ASSUME_NONNULL_BEGIN
  - `NSDate`
  - `NSData`
  - `NSNumber<X>`, where `X` is one of `RLMInt`, `RLMFloat`, `RLMDouble` or `RLMBool`, for optional number properties
- - `RLMObject` subclasses, so you can have many-to-one relationships.
- - `RLMArray<X>`, where `X` is an `RLMObject` subclass, so you can have many-to-many relationships.
+ - `RLMObject` subclasses, to model many-to-one relationships.
+ - `RLMArray<X>`, where `X` is an `RLMObject` subclass, to model many-to-many relationships.
 
  ### Querying
  
@@ -170,7 +169,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Creates or updates a Realm object within the default Realm.
 
- This method can only be called on Realm object types with a primary key defined. If there is already
+ This method may only be called on Realm object types with a primary key defined. If there is already
  an object with the same primary key value in the default Realm, its values are updated and the object
  is returned. Otherwise, this method creates and populates a new instance of the object in the default Realm.
  
@@ -196,7 +195,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Creates or updates an Realm object within a specified Realm.
 
- This method can only be called on Realm object types with a primary key defined. If there is already
+ This method may only be called on Realm object types with a primary key defined. If there is already
  an object with the same primary key value in the given Realm, its values are updated and the object
  is returned. Otherwise this method creates and populates a new instance of this object in the given Realm.
  
@@ -246,7 +245,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns an array of property names for properties which should be indexed.
  
- Only string, integer, boolean, and `NSData` properties are supported.
+ Only string, integer, boolean, and `NSDate` properties are supported.
 
  @return    An array of property names.
  */
@@ -332,7 +331,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns all objects of this object type matching the given predicate from the default Realm.
 
- @param predicate   The predicate to use to filter the objects.
+ @param predicate   The predicate with which to filter the objects.
 
  @return    An `RLMResults` containing all objects of this type in the default Realm that match the given predicate.
  */

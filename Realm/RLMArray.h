@@ -117,7 +117,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Adds an object to the end of the array.
 
- @warning This method can only be called during a write transaction.
+ @warning This method may only be called during a write transaction.
 
  @param object  An `RLMObject` of the type contained in the array.
  */
@@ -126,7 +126,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Adds an array of objects to the end of the array.
 
- @warning This method can only be called during a write transaction.
+ @warning This method may only be called during a write transaction.
 
  @param objects     An enumerable object such as `NSArray` or `RLMResults` which contains objects of the
                     same class as the array.
@@ -138,19 +138,19 @@ NS_ASSUME_NONNULL_BEGIN
 
  Throws an exception if the index exceeds the bounds of the array.
 
- @warning This method can only be called during a write transaction.
+ @warning This method may only be called during a write transaction.
 
  @param anObject  An `RLMObject` of the type contained in the array.
- @param index   The array index at which the object is inserted.
+ @param index   The index at which to insert the object.
  */
 - (void)insertObject:(RLMObjectType)anObject atIndex:(NSUInteger)index;
 
 /**
- Removes an object at a given index.
+ Removes an object at the given index.
 
  Throws an exception if the index exceeds the bounds of the array.
 
- @warning This method can only be called during a write transaction.
+ @warning This method may only be called during a write transaction.
 
  @param index   The array index identifying the object to be removed.
  */
@@ -159,14 +159,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Removes the last object in the array.
 
- @warning This method can only be called during a write transaction.
+ @warning This method may only be called during a write transaction.
 */
 - (void)removeLastObject;
 
 /**
  Removes all objects from the array.
 
- @warning This method can only be called during a write transaction.
+ @warning This method may only be called during a write transaction.
  */
 - (void)removeAllObjects;
 
@@ -175,7 +175,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Throws an exception if the index exceeds the bounds of the array.
 
- @warning This method can only be called during a write transaction.
+ @warning This method may only be called during a write transaction.
 
  @param index       The index of the object to be replaced.
  @param anObject    An object (of the same type as returned from the `objectClassName` selector).
@@ -187,7 +187,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Throws an exception if the index exceeds the bounds of the array.
 
- @warning This method can only be called during a write transaction.
+ @warning This method may only be called during a write transaction.
 
  @param sourceIndex      The index of the object to be moved.
  @param destinationIndex The index to which the object at `sourceIndex` should be moved.
@@ -199,7 +199,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Throws an exception if either index exceeds the bounds of the array.
 
- @warning This method can only be called during a write transaction.
+ @warning This method may only be called during a write transaction.
 
  @param index1 The index of the object which should replace the object at index `index2`.
  @param index2 The index of the object which should replace the object at index `index1`.
@@ -232,7 +232,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns the index of the first object in the array matching the predicate.
 
- @param predicate   The predicate to use to filter the objects.
+ @param predicate   The predicate with which to filter the objects.
 
  @return    The index of the object, or `NSNotFound` if the object is not found in the array.
  */
@@ -253,7 +253,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns all the objects matching the given predicate in the array.
 
- @param predicate   The predicate to use to filter the objects.
+ @param predicate   The predicate with which to filter the objects.
 
  @return            An `RLMResults` of objects that match the given predicate
  */
@@ -294,7 +294,7 @@ NS_ASSUME_NONNULL_BEGIN
  the array, which objects are in the results, or the order of the objects in the
  array.
 
- The change parameter will be `nil` the first time the block is called.
+ The `changes` parameter will be `nil` the first time the block is called.
  For each call after that, it will contain information about
  which rows in the array were added, removed or modified. If a write transaction
  did not modify any objects in the array, the block is not called at all.
@@ -335,7 +335,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning This method cannot be called during a write transaction, or when the
           containing Realm is read-only.
- @warning This method can only be called on a managed array.
+ @warning This method may only be called on a managed array.
 
  @param block The block to be called each time the array changes.
  @return A token which must be held for as long as you want updates to be delivered.

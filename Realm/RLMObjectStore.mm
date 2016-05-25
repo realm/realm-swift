@@ -152,7 +152,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
                          bool createOrUpdate) {
     RLMVerifyInWriteTransaction(realm);
 
-    // verify that object is standalone
+    // verify that object is unmanaged
     if (object.invalidated) {
         @throw RLMException(@"Adding a deleted or invalidated object to a Realm is not permitted");
     }

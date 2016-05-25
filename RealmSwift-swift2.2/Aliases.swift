@@ -25,29 +25,29 @@ import Realm
 // MARK: Aliases
 
 /**
-An enum of the different property types supported by Realm. Object type.
+ `PropertyType` is an enum describing all property types supported in Realm models.
 
-See [Realm Models](http://realm.io/docs/swift/latest/#models).
+ For more information, see [Realm Models](https://realm.io/docs/swift/latest/#models).
 
-## Primitive types
+ ### Primitive types
 
-* Int
-* Bool
-* Float
-* Double
+ * `Int`
+ * `Bool`
+ * `Float`
+ * `Double`
 
-## Object types
+ ### Object types
 
-* String
-* Data
-* Date
+ * `String`
+ * `Data`
+ * `Date`
 
-## Relationships: List (Array) and Object types
+ ### Relationships: List (`Array`) and `Object` types
 
-* Object
-* Array
+ * `Object`
+ * `Array`
 */
 public typealias PropertyType = RLMPropertyType
 
-/// An opaque token used to unregister notification blocks from Realms.
+/// An opaque token which is returned from methods which subscribe to changes to a Realm.
 public typealias NotificationToken = RLMNotificationToken

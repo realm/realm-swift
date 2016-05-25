@@ -369,7 +369,7 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate
 {
-    @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
+    @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
 }
 
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
@@ -379,7 +379,7 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties
 {
-    @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
+    @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
 }
 
 // The compiler complains about the method's argument type not matching due to
@@ -388,7 +388,7 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 // http://www.openradar.me/radar?id=6135653276319744
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
-    @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
+    @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
 }
 #pragma clang diagnostic pop
 

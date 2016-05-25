@@ -28,7 +28,7 @@
     __unsafe_unretained RLMObjectSchema *_objectSchema;
 }
 
-// standalone initializer
+// unmanaged initializer
 - (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema NS_DESIGNATED_INITIALIZER;
 
 // live accessor initializer
@@ -45,7 +45,7 @@
 
 @interface RLMObject ()
 
-// standalone initializer
+// unmanaged initializer
 - (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema NS_DESIGNATED_INITIALIZER;
 
 // live accessor initializer
