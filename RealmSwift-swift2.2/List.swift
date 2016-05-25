@@ -43,15 +43,18 @@ public class ListBase: RLMListBase {
 /**
  `List` is the container type in Realm used to define to-many relationships.
 
- Like Swift's `Array`s, Lists are parameterized on a single `Object` subclass (`T`).
+ Like Swift's `Array`, `List` is a generic type that is parameterized on the type of `Object` it stores.
+ 
+ Unlike Swift's native collections, `List`s are reference types, and are only immutable if the Realm that manages them
+ is opened as read-only.
 
  Lists can be filtered and sorted with the same predicates as `Results<T>`.
-
- When added as a property on `Object` models, the property must be declared as `let` and cannot be `dynamic`.
+ 
+ Properties of `List` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
 */
 public final class List<T: Object>: ListBase {
 
-    /// The type of the elements contained within this list.
+    /// The type of the elements contained within the collection.
     public typealias Element = T
 
     // MARK: Properties
@@ -66,7 +69,7 @@ public final class List<T: Object>: ListBase {
 
     // MARK: Initializers
 
-    /// Creates a `List` that holds objects of type `T`.
+    /// Creates a `List` that holds Realm model objects of type `T`.
     public override init() {
         super.init(array: RLMArray(objectClassName: (T.self as Object.Type).className()))
     }
@@ -74,33 +77,27 @@ public final class List<T: Object>: ListBase {
     // MARK: Index Retrieval
 
     /**
-     Returns the index of an object in the list.
+     Returns the index of an object in the list, or `nil` if the object is not present.
 
      - parameter object: An object to find.
-
-     - returns: The index of the object, or `nil` if the object is not in the list.
      */
     public func indexOf(object: T) -> Int? {
         return notFoundToNil(_rlmArray.indexOfObject(unsafeBitCast(object, RLMObject.self)))
     }
 
     /**
-     Returns the index of the first object in the list matching the predicate.
+     Returns the index of the first object in the list matching the predicate, or `nil` if no objects match.
 
      - parameter predicate: The predicate with which to filter the objects.
-
-     - returns: The index of the first matching object, or `nil` if no objects match.
      */
     public func indexOf(predicate: NSPredicate) -> Int? {
         return notFoundToNil(_rlmArray.indexOfObjectWithPredicate(predicate))
     }
 
     /**
-     Returns the index of the first object in the list matching the predicate.
+     Returns the index of the first object in the list matching the predicate, or `nil` if no objects match.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-
-     - returns: The index of the first matching object, or `nil` if no objects match.
      */
     public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
         return indexOf(NSPredicate(format: predicateFormat, argumentArray: args))
@@ -115,7 +112,7 @@ public final class List<T: Object>: ListBase {
 
      - parameter index: The index of the object to retrieve or replace.
 
-     - returns: The object at the given `index`.
+     - returns: The object at the given index.
      */
     public subscript(index: Int) -> T {
         get {
@@ -140,9 +137,7 @@ public final class List<T: Object>: ListBase {
      Returns an `Array` containing the results of invoking `valueForKey(_:)` using `key` on each of the collection's
      objects.
 
-     - parameter key: The name of the property.
-
-     - returns: An `Array` containing the results.
+     - parameter key: The name of the property whose values are desired.
      */
     public override func valueForKey(key: String) -> AnyObject? {
         return _rlmArray.valueForKey(key)
@@ -152,9 +147,7 @@ public final class List<T: Object>: ListBase {
      Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` using `keyPath` on each of the
      collection's objects.
 
-     - parameter keyPath: The key path to the property.
-
-     - returns: An `Array` containing the results.
+     - parameter keyPath: The key path to the property whose values are desired.
      */
     public override func valueForKeyPath(keyPath: String) -> AnyObject? {
         return _rlmArray.valueForKeyPath(keyPath)
@@ -166,7 +159,7 @@ public final class List<T: Object>: ListBase {
      - warning: This method can only be called during a write transaction.
 
      - parameter value: The object value.
-     - parameter key:   The name of the property.
+     - parameter key:   The name of the property whose value should be set on each object.
      */
     public override func setValue(value: AnyObject?, forKey key: String) {
         return _rlmArray.setValue(value, forKey: key)
@@ -175,22 +168,18 @@ public final class List<T: Object>: ListBase {
     // MARK: Filtering
 
     /**
-     Returns all objects matching the given predicate in the list.
+     Returns a `Results` containing all objects matching the given predicate in the list.
 
     - parameter predicateFormat: A predicate format string; variable arguments are supported.
-
-    - returns: A `Results` containing objects that match the predicate.
     */
     public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T> {
         return Results<T>(_rlmArray.objectsWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
     /**
-     Returns all objects matching the given predicate in the list.
+     Returns a `Results` containing all objects matching the given predicate in the list.
 
      - parameter predicate: The predicate with which to filter the objects.
-
-     - returns: A `Results` containing objects that match the predicate.
      */
     public func filter(predicate: NSPredicate) -> Results<T> {
         return Results<T>(_rlmArray.objectsWithPredicate(predicate))
@@ -199,23 +188,30 @@ public final class List<T: Object>: ListBase {
     // MARK: Sorting
 
     /**
-     Returns a sorted `Results` from the list.
+     Returns a `Results` containing the objects in the list, but sorted.
 
-     - parameter property:  The property name to sort by.
-     - parameter ascending: The direction to sort by.
+     Objects are sorted based on the values of the given property. For example, to sort a list of `Student`s from
+     youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
 
-     - returns: A `Results` containing the list objects sorted by the specified property.
+     - warning: Lists may only be sorted by properties of boolean, `NSDate`, single and double-precision floating point,
+                integer, and string types.
+
+     - parameter property:  The name of the property to sort by.
+     - parameter ascending: The direction to sort in.
      */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
         return sorted([SortDescriptor(property: property, ascending: ascending)])
     }
 
     /**
-     Returns a sorted `Results` from the list.
+     Returns a `Results` containing the objects in the list, but sorted.
 
-     - parameter sortDescriptors: An sequence of `SortDescriptor`s to sort by.
+     - warning: Lists may only be sorted by properties of boolean, `NSDate`, single and double-precision floating point,
+                integer, and string types.
 
-     - returns: A `Results` containing the list objects sorted by the specified property.
+     - see: `sorted(_:ascending:)`
+
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
     public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T> {
         return Results<T>(_rlmArray.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
@@ -243,7 +239,7 @@ public final class List<T: Object>: ListBase {
 
      - parameter property: The name of a property whose maximum value is desired.
 
-     - returns: The maximum value of the property, or '`nil` if the list is empty.
+     - returns: The maximum value of the property, or `nil` if the list is empty.
      */
     public func max<U: MinMaxType>(property: String) -> U? {
         return filter(NSPredicate(value: true)).max(property)
@@ -269,7 +265,7 @@ public final class List<T: Object>: ListBase {
 
      - parameter property: The name of a property whose average value should be calculated.
 
-     - returns: The average value of the given property.
+     - returns: The average value of the given property, or `nil` if the list is empty.
      */
     public func average<U: AddableType>(property: String) -> U? {
         return filter(NSPredicate(value: true)).average(property)
@@ -426,30 +422,32 @@ public final class List<T: Object>: ListBase {
      As a result, the initial notification will reflect the state of the Realm
      after the write transaction, and will not include change information.
 
-         let person = realm.objects(Person).first!
-         print("dogs.count: \(person.dogs.count)") // => 0
-         let token = person.dogs.addNotificationBlock { (changes: RealmCollectionChange) in
-             switch changes {
-                 case .Initial(let dogs):
-                     // Will print "dogs.count: 1"
-                     print("dogs.count: \(dogs.count)")
-                     break
-                 case .Update:
-                     // Will not be hit in this example
-                     break
-                 case .Error:
-                     break
-             }
+     ```swift
+     let person = realm.objects(Person).first!
+     print("dogs.count: \(person.dogs.count)") // => 0
+     let token = person.dogs.addNotificationBlock { (changes: RealmCollectionChange) in
+         switch changes {
+             case .Initial(let dogs):
+                 // Will print "dogs.count: 1"
+                 print("dogs.count: \(dogs.count)")
+                 break
+             case .Update:
+                 // Will not be hit in this example
+                 break
+             case .Error:
+                 break
          }
-         try! realm.write {
-             let dog = Dog()
-             dog.name = "Rex"
-             person.dogs.append(dog)
-         }
-         // end of run loop execution context
+     }
+     try! realm.write {
+         let dog = Dog()
+         dog.name = "Rex"
+         person.dogs.append(dog)
+     }
+     // end of run loop execution context
+     ```
 
-     You must retain the returned token for as long as you want updates to continue
-     to be sent to the block. To stop receiving updates, call `stop()` on the token.
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `stop()` on the token.
 
      - warning: This method cannot be called during a write transaction, or when
      the containing Realm is read-only.
@@ -469,7 +467,7 @@ public final class List<T: Object>: ListBase {
 extension List: RealmCollectionType, RangeReplaceableCollectionType {
     // MARK: Sequence Support
 
-    /// Returns a `GeneratorOf<T>` that yields successive elements in the list.
+    /// Returns a `RLMGenerator` that yields successive elements in the list.
     public func generate() -> RLMGenerator<T> {
         return RLMGenerator(collection: _rlmArray)
     }

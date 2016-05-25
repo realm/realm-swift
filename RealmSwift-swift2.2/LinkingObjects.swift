@@ -120,35 +120,27 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: Index Retrieval
 
     /**
-     Returns the index of the given object, or `nil` if the object is not present.
+     Returns the index of an object in the linking objects collection, or `nil` if the object is not present.
 
      - parameter object: The object whose index is being queried.
-
-     - returns: The index of the given object, or `nil` if the object is not present.
      */
     public func indexOf(object: T) -> Int? {
         return notFoundToNil(rlmResults.indexOfObject(unsafeBitCast(object, RLMObject.self)))
     }
 
     /**
-     Returns the index of the first object matching the given predicate,
-     or `nil` if no objects match.
+     Returns the index of the first object matching the given predicate, or `nil` if no objects match.
 
      - parameter predicate: The predicate with which to filter the objects.
-
-     - returns: The index of the first matching object, or `nil` if no objects match.
      */
     public func indexOf(predicate: NSPredicate) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWithPredicate(predicate))
     }
 
     /**
-     Returns the index of the first object matching the given predicate,
-     or `nil` if no objects match.
+     Returns the index of the first object matching the given predicate, or `nil` if no objects match.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-
-     - returns: The index of the first matching object, or `nil` if no objects match.
      */
     public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat,
@@ -183,9 +175,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      Returns an `Array` containing the results of invoking `valueForKey(_:)` with `key` on each of the linking objects
      collection's objects.
 
-     - parameter key: The name of the property.
-
-     - returns: An `Array` containing the results.
+     - parameter key: The name of the property whose values are desired.
      */
     public override func valueForKey(key: String) -> AnyObject? {
         return rlmResults.valueForKey(key)
@@ -195,9 +185,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` with `keyPath` on each of the linking
      objects collection's objects.
 
-     - parameter keyPath: The key path to the property.
-
-     - returns: An `Array` containing the results.
+     - parameter keyPath: The key path to the property whose values are desired.
      */
     public override func valueForKeyPath(keyPath: String) -> AnyObject? {
         return rlmResults.valueForKeyPath(keyPath)
@@ -209,8 +197,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - warning: This method may only be called during a write transaction.
 
-     - parameter value: The object value.
-     - parameter key:   The name of the property.
+     - parameter value: The value to set the property to.
+     - parameter key:   The name of the property whose value should be set on each object.
      */
     public override func setValue(value: AnyObject?, forKey key: String) {
         return rlmResults.setValue(value, forKey: key)
@@ -219,22 +207,18 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: Filtering
 
     /**
-     Returns all the objects matching the given predicate in the linking objects collection.
+     Returns a `Results` containing all objects matching the given predicate in the linking objects collection.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-
-     - returns: A `Results` object containing the results.
      */
     public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T> {
         return Results<T>(rlmResults.objectsWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
     /**
-     Returns all the objects matching the given predicate in the linking objects collection.
+     Returns a `Results` containing all objects matching the given predicate in the linking objects collection.
 
      - parameter predicate: The predicate with which to filter the objects.
-
-     - returns: A `Results` object containing the results.
      */
     public func filter(predicate: NSPredicate) -> Results<T> {
         return Results<T>(rlmResults.objectsWithPredicate(predicate))
@@ -243,23 +227,30 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: Sorting
 
     /**
-     Returns a `Results` containing the linking objects collection's elements sorted by the given property name.
+     Returns a `Results` containing the objects in the linking objects collection, but sorted.
+     
+     Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
+     
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+                point, integer, and string types.
 
-     - parameter property:  The property name to sort by.
+     - parameter property:  The name of the property to sort by.
      - parameter ascending: The direction to sort in.
-
-     - returns: A `Results` object.
      */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
         return sorted([SortDescriptor(property: property, ascending: ascending)])
     }
 
     /**
-     Returns a `Results` containing the linking objects collection's elements sorted by the given sort descriptors.
+     Returns a `Results` containing the objects in the linking objects collection, but sorted.
+
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+                point, integer, and string types.
+
+     - see: `sorted(_:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
-
-     - returns: A `Results` object.
      */
     public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T> {
         return Results<T>(rlmResults.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
@@ -351,29 +342,31 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      result, the initial notification will reflect the state of the Realm after
      the write transaction.
 
-         let dog = realm.objects(Dog).first!
-         let owners = dog.owners
-         print("owners.count: \(owners.count)") // => 0
-         let token = owners.addNotificationBlock { (changes: RealmCollectionChange) in
-             switch changes {
-                 case .Initial(let owners):
-                     // Will print "owners.count: 1"
-                     print("owners.count: \(owners.count)")
-                     break
-                 case .Update:
-                     // Will not be hit in this example
-                     break
-                 case .Error:
-                     break
-             }
+     ```swift
+     let dog = realm.objects(Dog).first!
+     let owners = dog.owners
+     print("owners.count: \(owners.count)") // => 0
+     let token = owners.addNotificationBlock { (changes: RealmCollectionChange) in
+         switch changes {
+             case .Initial(let owners):
+                 // Will print "owners.count: 1"
+                 print("owners.count: \(owners.count)")
+                 break
+             case .Update:
+                 // Will not be hit in this example
+                 break
+             case .Error:
+                 break
          }
-         try! realm.write {
-             realm.add(Person.self, value: ["name": "Mark", dogs: [dog]])
-         }
-         // end of runloop execution context
+     }
+     try! realm.write {
+         realm.add(Person.self, value: ["name": "Mark", dogs: [dog]])
+     }
+     // end of runloop execution context
+     ```
 
-     You must retain the returned token for as long as you want updates to continue
-     to be sent to the block. To stop receiving updates, call `stop()` on the token.
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `stop()` on the token.
 
      - warning: This method cannot be called during a write transaction, or when
      the containing Realm is read-only.
@@ -392,7 +385,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 extension LinkingObjects: RealmCollectionType {
     // MARK: Sequence Support
 
-    /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
+    /// Returns a `RLMGenerator` that yields successive elements in the results.
     public func generate() -> RLMGenerator<T> {
         return RLMGenerator(collection: rlmResults)
     }

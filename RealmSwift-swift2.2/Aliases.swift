@@ -42,12 +42,16 @@ import Realm
  * `Data`
  * `Date`
 
- ### Relationships: List (`Array`) and `Object` types
+ ### Relationships: `List` (array) and `Object` types
 
  * `Object`
- * `Array`
+ * `List`
 */
 public typealias PropertyType = RLMPropertyType
 
-/// An opaque token which is returned from methods which subscribe to changes to a Realm.
+/**
+ An opaque token which is returned from methods which subscribe to changes to a Realm.
+ 
+ - see: `addNotificationBlock(_:)`
+ */
 public typealias NotificationToken = RLMNotificationToken

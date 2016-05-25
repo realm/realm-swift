@@ -22,14 +22,17 @@ import Realm
 /**
  `Error` is an enum representing all recoverable errors. It is associated with the
  Realm error domain specified in `RLMErrorDomain`.
+ 
+ `Error` is a Swift `ErrorType`:
 
-    let realm: Realm?
-    do {
-        realm = Realm()
-    } catch RealmSwift.Error.IncompatibleLockFile() {
-        print("Realm Browser app may be attached to Realm on device?")
-    }
-
+ ```swift
+ let realm: Realm?
+ do {
+     realm = try Realm()
+ } catch RealmSwift.Error.IncompatibleLockFile() {
+     print("Incompatible lock file. Perhaps the Realm Browser app may be attached to a Realm on the device?")
+ }	
+ ```
 */
 public enum Error: ErrorType {
     // swiftlint:disable variable_name

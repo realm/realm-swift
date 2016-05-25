@@ -122,7 +122,6 @@ public final class Migration {
                             an `Array` containing one element for each persisted property. An exception will be
                             thrown if any required properties are not present and those properties were not defined with
                             default values.
-
                             When passing in an `Array`, all properties must be present,
                             valid and in the same order as the properties defined in the model.
 
@@ -137,7 +136,7 @@ public final class Migration {
 
      It is permitted to call this method from within the block passed to `enumerate(_:block:)`.
 
-     - parameter object: Object to be deleted from the Realm being migrated.
+     - parameter object: An object to be deleted from the Realm being migrated.
      */
     public func delete(object: MigrationObject) {
         RLMDeleteObjectFromRealm(object, RLMObjectBaseRealm(object))
@@ -146,7 +145,7 @@ public final class Migration {
     /**
      Deletes the data for the class with the given name.
 
-     All objects of the given class will be deleted. If the `RLMObject` subclass no longer exists in your program, any
+     All objects of the given class will be deleted. If the `Object` subclass no longer exists in your program, any
      remaining metadata for the class will be removed from the Realm file.
 
      - parameter objectClassName: The name of the `Object` class to delete.

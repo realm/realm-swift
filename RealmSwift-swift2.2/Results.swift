@@ -21,7 +21,11 @@ import Realm
 
 // MARK: MinMaxType
 
-/// Types which can be used for min()/max().
+/** 
+ Types of properties which can be used with the minimum and maximum value APIs.
+ 
+ - see: `min(_:)`, `max(_:)`
+ */
 public protocol MinMaxType {}
 extension Double: MinMaxType {}
 extension Float: MinMaxType {}
@@ -34,7 +38,11 @@ extension NSDate: MinMaxType {}
 
 // MARK: AddableType
 
-/// Types which can be used for average()/sum().
+/**
+ Types of properties which can be used with the sum and average value APIs.
+ 
+ - see: `sum(_:)`, `average(_:)`
+ */
 public protocol AddableType {}
 extension Double: AddableType {}
 extension Float: AddableType {}
@@ -126,33 +134,27 @@ public final class Results<T: Object>: ResultsBase {
     // MARK: Index Retrieval
 
     /**
-     Returns the index of an object in the results collection.
+     Returns the index of an object in the results collection, or `nil` if the object is not present.
 
      - parameter object: An object.
-
-     - returns: The index of the given object, or `nil` if the object is not in the results collection.
      */
     public func indexOf(object: T) -> Int? {
         return notFoundToNil(rlmResults.indexOfObject(unsafeBitCast(object, RLMObject.self)))
     }
 
     /**
-     Returns the index of the first object matching the predicate.
+     Returns the index of the first object matching the predicate, or `nil` if no objects match.
 
      - parameter predicate: The predicate with which to filter the objects.
-
-     - returns: The index of the first object that matches, or `nil` if no objects match.
      */
     public func indexOf(predicate: NSPredicate) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWithPredicate(predicate))
     }
 
     /**
-     Returns the index of the first object matching the predicate.
+     Returns the index of the first object matching the predicate, or `nil` if no objects match.
 
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-
-     - returns: The index of the first object that matches, or `nil` if no objects match.
+     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.`
      */
     public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat,
@@ -187,9 +189,7 @@ public final class Results<T: Object>: ResultsBase {
      Returns an `Array` containing the results of invoking `valueForKey(_:)` with `key` on each of the results
      collection's objects.
 
-     - parameter key: The name of the property.
-
-     - returns: An `Array` containing the results.
+     - parameter key: The name of the property whose values are desired.
      */
     public override func valueForKey(key: String) -> AnyObject? {
         return rlmResults.valueForKey(key)
@@ -199,9 +199,7 @@ public final class Results<T: Object>: ResultsBase {
      Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` with `keyPath` on each of the results
      collection's objects.
 
-     - parameter keyPath: The key path to the property.
-
-     - returns: An `Array` containing the results.
+     - parameter keyPath: The key path to the property whose values are desired.
      */
     public override func valueForKeyPath(keyPath: String) -> AnyObject? {
         return rlmResults.valueForKeyPath(keyPath)
@@ -213,7 +211,7 @@ public final class Results<T: Object>: ResultsBase {
      - warning: This method may only be called during a write transaction.
 
      - parameter value: The object value.
-     - parameter key:   The name of the property.
+     - parameter key:   The name of the property whose value should be set on each object.
      */
     public override func setValue(value: AnyObject?, forKey key: String) {
         return rlmResults.setValue(value, forKey: key)
@@ -222,22 +220,18 @@ public final class Results<T: Object>: ResultsBase {
     // MARK: Filtering
 
     /**
-     Returns all objects matching the given predicate in the collection.
+     Returns a `Results` containing all objects matching the given predicate in the results collection.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-
-     - returns: A `Results` containing objects that match the given predicate.
      */
     public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T> {
         return Results<T>(rlmResults.objectsWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
     /**
-     Returns all objects matching the given predicate in the collection.
+     Returns a `Results` containing all objects matching the given predicate in the results collection.
 
      - parameter predicate: The predicate with which to filter the objects.
-
-     - returns: A `Results` containing objects that match the given predicate.
      */
     public func filter(predicate: NSPredicate) -> Results<T> {
         return Results<T>(rlmResults.objectsWithPredicate(predicate))
@@ -246,23 +240,30 @@ public final class Results<T: Object>: ResultsBase {
     // MARK: Sorting
 
     /**
-     Returns a sorted `Results` from the collection.
+     Returns a `Results` containing the objects in the results collection, but sorted.
 
-     - parameter property:  The property name to sort by.
+     Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+                point, integer, and string types.
+
+     - parameter property:  The name of the property to sort by.
      - parameter ascending: The direction to sort in.
-
-     - returns: A `Results` sorted by the specified property.
      */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
         return sorted([SortDescriptor(property: property, ascending: ascending)])
     }
 
     /**
-     Returns a sorted `Results` from the collection.
+     Returns a `Results` containing the objects in the results collection, but sorted.
+
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+     point, integer, and string types.
+
+     - see: `sorted(_:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
-
-     - returns: A `Results` sorted by the specified properties.
      */
     public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T> {
         return Results<T>(rlmResults.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
@@ -393,7 +394,7 @@ public final class Results<T: Object>: ResultsBase {
 extension Results: RealmCollectionType {
     // MARK: Sequence Support
 
-    /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
+    /// Returns a `RLMGenerator` that yields successive elements in the results.
     public func generate() -> RLMGenerator<T> {
         return RLMGenerator(collection: rlmResults)
     }

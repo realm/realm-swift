@@ -44,7 +44,7 @@ public final class Realm {
     /// The `Schema` used by the Realm.
     public var schema: Schema { return Schema(rlmRealm.schema) }
 
-    /// The `RealmConfiguration` object that was used to create this `Realm` instance.
+    /// The `Configuration` value that was used to create this `Realm` instance.
     public var configuration: Configuration { return Configuration.fromRLMRealmConfiguration(rlmRealm.configuration) }
 
     /// Indicates if this Realm contains any objects.
@@ -55,11 +55,11 @@ public final class Realm {
     /**
      Obtains an instance of the default Realm.
 
-     The default Realm is persisted as default.realm under the Documents directory of your Application on iOS, and in
-     your application's Application Support directory on OS X.
+     The default Realm is persisted as *default.realm* under the *Documents* directory of your Application on iOS, and
+     in your application's *Application Support* directory on OS X.
 
-     The default Realm is created using the default `Configuration`, which can be changed by setting a new
-     `Configuration` object on the `Realm.Configuration.defaultConfiguration` property.
+     The default Realm is created using the default `Configuration`, which can be changed by setting the
+     `Realm.Configuration.defaultConfiguration` property to a new value.
 
      - throws: An `NSError` if the Realm could not be initialized.
      */
@@ -251,7 +251,6 @@ public final class Realm {
                          an `Array` containing one element for each persisted property. An error will be
                          thrown if any required properties are not present and those properties were not defined with
                          default values.
-
                          When passing in an `Array`, all properties must be present,
                          valid and in the same order as the properties defined in the model.
      - parameter update: If `true`, the Realm will try to find an existing copy of the object (with the same primary
@@ -283,13 +282,12 @@ public final class Realm {
 
      - parameter className:  The class name of the object to create.
      - parameter value:      The value used to populate the object. This can be any key-value coding compliant
-     object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-     or an `Array` containing one element for each persisted property. An exception will be
-     thrown if any required properties are not present and those properties were not defined with
-     default values.
-
-     When passing in an `Array`, all properties must be present,
-     valid and in the same order as the properties defined in the model.
+                             object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                             or an `Array` containing one element for each persisted property. An exception will be
+                             thrown if any required properties are not present and those properties were not defined
+                             with default values.
+                             When passing in an `Array`, all properties must be present,
+                             valid and in the same order as the properties defined in the model.
      - parameter update:     If true will try to update existing objects with the same primary key.
 
      - returns: The created object.
@@ -442,27 +440,23 @@ public final class Realm {
     // MARK: Notifications
 
     /**
-     Adds a notification handler for changes in this Realm, and returns a notification token.
+     Adds a notification handler for changes made to this Realm, and returns a notification token.
 
-     Notification handlers are called after each write transaction is committed,
-     independent from the thread or process.
+     Notification handlers are called after each write transaction is committed, independent of the thread or process.
 
      Handler blocks are called on the same thread that they were added on, and may only be added on threads which are
      currently within a run loop. Unless you are specifically creating and running a run loop on a background thread,
      this will normally only be the main thread.
 
-     Notifications can't be delivered as long as the run loop is blocked by
-     other activity. When notifications can't be delivered instantly, multiple
-     notifications may be coalesced.
+     Notifications can't be delivered as long as the run loop is blocked by other activity. When notifications can't be
+     delivered instantly, multiple notifications may be coalesced.
 
-     You must retain the returned token for as long as you want updates to continue
-     to be sent to the block. To stop receiving updates, call `stop()` on the token.
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `stop()` on the token.
 
-     - parameter block: A block which is called to process Realm notifications.
-     It receives the following parameters:
-
-     - `Notification`: The incoming notification.
-     - `Realm`:        The Realm for which this notification occurred.
+     - parameter block: A block which is called to process Realm notifications. It receives the following parameters:
+                        `Notification`: the incoming notification; `Realm`: the Realm for which the notification
+                        occurred.
 
      - returns: A token which must be retained for as long as you wish to continue receiving change notifications.
      */
@@ -491,7 +485,7 @@ public final class Realm {
      will need to manually call `refresh()` in order to update to the latest version,
      even if `autorefresh` is set to `true`.
 
-     Even with this enabled, you can still call `refresh()` at any time to update the
+     Even with this property enabled, you can still call `refresh()` at any time to update the
      Realm before the automatic refresh would occur.
 
      Notifications are sent when a write transaction is committed whether or not
@@ -529,7 +523,7 @@ public final class Realm {
     // MARK: Invalidation
 
     /**
-     Invalidates all `Object`s and `Results` managed by the Realm.
+     Invalidates all `Object`s, `Results`, and `List`s managed by the Realm.
 
      A Realm holds a read lock on the version of the data accessed by it, so
      that changes made to the Realm on different threads do not modify or delete the

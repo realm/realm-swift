@@ -277,7 +277,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  will need to manually call `-refresh` in order to update to the latest version,
  even if `autorefresh` is set to `YES`.
 
- Even with this enabled, you can still call `-refresh` at any time to update the
+ Even with this property enabled, you can still call `-refresh` at any time to update the
  Realm before the automatic refresh would occur.
 
  Notifications are sent when a write transaction is committed whether or not
@@ -315,7 +315,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
 /**
- Invalidates all `RLMObject`s and `RLMResults` managed by the Realm.
+ Invalidates all `RLMObject`s, `RLMResults`, and `RLMArray`s managed by the Realm.
 
  A Realm holds a read lock on the version of the data accessed by it, so
  that changes made to the Realm on different threads do not modify or delete the

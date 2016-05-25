@@ -52,38 +52,39 @@ public final class RLMGenerator<T: Object>: GeneratorType {
  conventions, and can be passed as-is to a table view's batch update functions after being converted to index paths.
  For example, for a simple one-section table view, you can do the following:
 
-    self.notificationToken = results.addNotificationBlock { changes
-        switch changes {
-        case .Initial:
-            // Results are now populated and can be accessed without blocking the UI
-            self.tableView.reloadData()
-            break
-        case .Update(_, let deletions, let insertions, let modifications):
-            // Query results have changed, so apply them to the TableView
-            self.tableView.beginUpdates()
-            self.tableView.insertRowsAtIndexPaths(insertions.map { NSIndexPath(forRow: $0, inSection: 0) },
-                withRowAnimation: .Automatic)
-            self.tableView.deleteRowsAtIndexPaths(deletions.map { NSIndexPath(forRow: $0, inSection: 0) },
-                withRowAnimation: .Automatic)
-            self.tableView.reloadRowsAtIndexPaths(modifications.map { NSIndexPath(forRow: $0, inSection: 0) },
-                withRowAnimation: .Automatic)
-            self.tableView.endUpdates()
-            break
-        case .Error(let err):
-            // An error occurred while opening the Realm file on the background worker thread
-            fatalError("\(err)")
-            break
-        }
-    }
+ ```swift
+ self.notificationToken = results.addNotificationBlock { changes
+     switch changes {
+     case .Initial:
+         // Results are now populated and can be accessed without blocking the UI
+         self.tableView.reloadData()
+         break
+     case .Update(_, let deletions, let insertions, let modifications):
+         // Query results have changed, so apply them to the TableView
+         self.tableView.beginUpdates()
+         self.tableView.insertRowsAtIndexPaths(insertions.map { NSIndexPath(forRow: $0, inSection: 0) },
+             withRowAnimation: .Automatic)
+         self.tableView.deleteRowsAtIndexPaths(deletions.map { NSIndexPath(forRow: $0, inSection: 0) },
+             withRowAnimation: .Automatic)
+         self.tableView.reloadRowsAtIndexPaths(modifications.map { NSIndexPath(forRow: $0, inSection: 0) },
+             withRowAnimation: .Automatic)
+         self.tableView.endUpdates()
+         break
+     case .Error(let err):
+         // An error occurred while opening the Realm file on the background worker thread
+         fatalError("\(err)")
+         break
+     }
+ }
+ ```
  */
 public enum RealmCollectionChange<T> {
-    /// The initial run of the query has completed (if applicable), and the
+    /// `.Initial` indicates that the initial run of the query has completed (if applicable), and the
     /// collection can now be used without performing any blocking work.
     case Initial(T)
 
-    /// A write transaction has been committed which either changed which objects
-    /// are in the collection and/or modified one or more of the objects in the
-    /// collection.
+    /// `.Update` indicates that a write transaction has been committed which either changed which objects
+    /// are in the collection, and/or modified one or more of the objects in the collection.
     ///
     /// All three of the change arrays are always sorted in ascending order.
     ///
@@ -144,29 +145,23 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     // MARK: Index Retrieval
 
     /**
-     Returns the index of an object in the collection.
+     Returns the index of an object in the collection, or `nil` if the object is not present.
 
      - parameter object: An object.
-
-     - returns: The index of the given object, or `nil` if the object is not in the collection.
      */
     func indexOf(object: Element) -> Int?
 
     /**
-     Returns the index of the first object matching the predicate.
+     Returns the index of the first object matching the predicate, or `nil` if no objects match.
 
      - parameter predicate: The predicate to use to filter the objects.
-
-     - returns: The index of the first object that matches, or `nil` if no objects match.
      */
     func indexOf(predicate: NSPredicate) -> Int?
 
     /**
-     Returns the index of the first object matching the predicate.
+     Returns the index of the first object matching the predicate, or `nil` if no objects match.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-
-     - returns: The index of the first object that matches, or `nil` if no objects match.
      */
     func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int?
 
@@ -195,21 +190,28 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     // MARK: Sorting
 
     /**
-     Returns a sorted `Results` from the collection.
+     Returns a `Results` containing the objects in the collection, but sorted.
 
-     - parameter property:  The property name to sort by.
+     Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+                point, integer, and string types.
+
+     - parameter property:  The name of the property to sort by.
      - parameter ascending: The direction to sort in.
-
-     - returns: A `Results` sorted by the specified property.
      */
     func sorted(property: String, ascending: Bool) -> Results<Element>
 
     /**
-     Returns a sorted `Results` from the collection.
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+     point, integer, and string types.
+
+     - see: `sorted(_:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
-
-     - returns: A `Results` sorted by the specified properties.
      */
     func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<Element>
 
@@ -267,9 +269,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
      Returns an `Array` containing the results of invoking `valueForKey(_:)` with `key` on each of the collection's
      objects.
 
-     - parameter key: The name of the property.
-
-     - returns: An `Array` containing the results.
+     - parameter key: The name of the property whose values are desired.
      */
     func valueForKey(key: String) -> AnyObject?
 
@@ -277,9 +277,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
      Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` with `keyPath` on each of the
      collection's objects.
 
-     - parameter keyPath: The key path to the property.
-
-     - returns: An `Array` containing the results.
+     - parameter keyPath: The key path to the property whose values are desired.
      */
     func valueForKeyPath(keyPath: String) -> AnyObject?
 
@@ -289,7 +287,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
      - warning: This method may only be called during a write transaction.
 
      - parameter value: The object value.
-     - parameter key:   The name of the property.
+     - parameter key:   The name of the property whose value should be set on each object.
      */
     func setValue(value: AnyObject?, forKey key: String)
 
@@ -322,30 +320,32 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
      result, the initial notification will reflect the state of the Realm after
      the write transaction.
 
-         let results = realm.objects(Dog)
-         print("dogs.count: \(dogs?.count)") // => 0
-         let token = dogs.addNotificationBlock { (changes: RealmCollectionChange) in
-             switch changes {
-                 case .Initial(let dogs):
-                     // Will print "dogs.count: 1"
-                     print("dogs.count: \(dogs.count)")
-                     break
-                 case .Update:
-                     // Will not be hit in this example
-                     break
-                 case .Error:
-                     break
-             }
+     ```swift
+     let results = realm.objects(Dog)
+     print("dogs.count: \(dogs?.count)") // => 0
+     let token = dogs.addNotificationBlock { (changes: RealmCollectionChange) in
+         switch changes {
+             case .Initial(let dogs):
+                 // Will print "dogs.count: 1"
+                 print("dogs.count: \(dogs.count)")
+                 break
+             case .Update:
+                 // Will not be hit in this example
+                 break
+             case .Error:
+                 break
          }
-         try! realm.write {
-             let dog = Dog()
-             dog.name = "Rex"
-             person.dogs.append(dog)
-         }
-         // end of run loop execution context
+     }
+     try! realm.write {
+         let dog = Dog()
+         dog.name = "Rex"
+         person.dogs.append(dog)
+     }
+     // end of run loop execution context
+     ```
 
-     You must retain the returned token for as long as you want updates to continue
-     to be sent to the block. To stop receiving updates, call `stop()` on the token.
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `stop()` on the token.
 
      - warning: This method cannot be called during a write transaction, or when
                 the containing Realm is read-only.
@@ -422,29 +422,21 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     Returns the index of the given object, or `nil` if the object is not in the collection.
 
     - parameter object: The object whose index is being queried.
-
-    - returns: The index of the given object, or `nil` if the object is not in the collection.
     */
     override func indexOf(object: C.Element) -> Int? { return base.indexOf(object) }
 
     /**
-    Returns the index of the first object matching the given predicate,
-    or `nil` no objects match.
+    Returns the index of the first object matching the given predicate, or `nil` no objects match.
 
     - parameter predicate: The `NSPredicate` used to filter the objects.
-
-    - returns: The index of the first matching object, or `nil` if no objects match.
     */
     override func indexOf(predicate: NSPredicate) -> Int? { return base.indexOf(predicate) }
 
     /**
-    Returns the index of the first object matching the given predicate,
-    or `nil` if no objects match.
+    Returns the index of the first object matching the given predicate, or `nil` if no objects match.
 
     - parameter predicateFormat: A predicate format string, optionally followed by a variable number
                                  of arguments.
-
-    - returns: The index of the first matching object, or `nil` if no objects match.
     */
     override func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
         return base.indexOf(NSPredicate(format: predicateFormat, argumentArray: args))
@@ -477,24 +469,31 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     // MARK: Sorting
 
     /**
-    Returns a `Results` containing collection elements sorted by the given property.
+     Returns a `Results` containing the objects in the collection, but sorted.
 
-    - parameter property:  The property name to sort by.
-    - parameter ascending: The direction to sort by.
+     Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
 
-    - returns: `Results` containing collection elements sorted by the given property.
-    */
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+                point, integer, and string types.
+
+     - parameter property:  The name of the property to sort by.
+     - parameter ascending: The direction to sort in.
+     */
     override func sorted(property: String, ascending: Bool) -> Results<C.Element> {
         return base.sorted(property, ascending: ascending)
     }
 
     /**
-    Returns a `Results` with elements sorted by the given sort descriptors.
+     Returns a `Results` containing the objects in the collection, but sorted.
 
-    - parameter sortDescriptors: `SortDescriptor`s to sort by.
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+     point, integer, and string types.
 
-    - returns: `Results` with elements sorted by the given sort descriptors.
-    */
+     - see: `sorted(_:ascending:)`
+
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
+     */
     override func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>
                         (sortDescriptors: S) -> Results<C.Element> {
         return base.sorted(sortDescriptors)
@@ -565,7 +564,7 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
         return unsafeBitCast(base[index as! C.Index], C.Element.self)
     }
 
-    /// Returns a `GeneratorOf<Element>` that yields successive elements in the collection.
+    /// Returns a `RLMGenerator` that yields successive elements in the collection.
     override func generate() -> RLMGenerator<Element> {
         // FIXME: it should be possible to avoid this force-casting
         return base.generate() as! RLMGenerator<Element>
@@ -666,29 +665,23 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     // MARK: Index Retrieval
 
     /**
-     Returns the index of an object in the collection.
+     Returns the index of the given object, or `nil` if the object is not in the collection.
 
      - parameter object: An object.
-
-     - returns: The index of the given object, or `nil` if the object is not in the collection.
      */
     public func indexOf(object: Element) -> Int? { return base.indexOf(object) }
 
     /**
-     Returns the index of the first object matching the predicate.
+     Returns the index of the first object matching the given predicate, or `nil` if no objects match.
 
-     - parameter predicate: The predicate to use to filter the objects.
-
-     - returns: The index of the first object that matches, or `nil` if no objects match.
+     - parameter predicate: The predicate with which to filter the objects.
      */
     public func indexOf(predicate: NSPredicate) -> Int? { return base.indexOf(predicate) }
 
     /**
-     Returns the index of the first object matching the predicate.
+     Returns the index of the first object matching the given predicate, or `nil` if no objects match.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-
-     - returns: The index of the first object that matches, or `nil` if no objects match.
      */
     public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
         return base.indexOf(NSPredicate(format: predicateFormat, argumentArray: args))
@@ -697,20 +690,18 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     // MARK: Filtering
 
     /**
-     Returns all objects matching the given predicate in the collection.
+     Returns a `Results` containing all objects matching the given predicate in the collection.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-
-     - returns: A `Results` containing objects that match the given predicate.
      */
     public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<Element> {
         return base.filter(NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     /**
-     Returns all objects matching the given predicate in the collection.
+     Returns a `Results` containing all objects matching the given predicate in the collection.
 
-     - parameter predicate: The predicate to use to filter the objects.
+     - parameter predicate: The predicate with which to filter the objects.
 
      - returns: A `Results` containing objects that match the given predicate.
      */
@@ -720,23 +711,30 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     // MARK: Sorting
 
     /**
-     Returns a sorted `Results` from the collection.
+     Returns a `Results` containing the objects in the collection, but sorted.
 
-     - parameter property:  The property name to sort by.
+     Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+                point, integer, and string types.
+
+     - parameter property:  The name of the property to sort by.
      - parameter ascending: The direction to sort in.
-
-     - returns: A `Results` sorted by the specified property.
      */
     public func sorted(property: String, ascending: Bool) -> Results<Element> {
         return base.sorted(property, ascending: ascending)
     }
 
     /**
-     Returns a sorted `Results` from the collection.
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+     point, integer, and string types.
+
+     - see: `sorted(_:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
-
-     - returns: A `Results` sorted by the specified properties.
      */
     public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>
                       (sortDescriptors: S) -> Results<Element> {
@@ -802,7 +800,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     */
     public subscript(index: Int) -> T { return base[index] }
 
-    /// Returns a `GeneratorOf<T>` that yields successive elements in the collection.
+    /// Returns a `RLMGenerator` that yields successive elements in the collection.
     public func generate() -> RLMGenerator<T> { return base.generate() }
 
 
@@ -824,7 +822,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      Returns an `Array` containing the results of invoking `valueForKey(_:)` with `key` on each of the collection's
      objects.
 
-     - parameter key: The name of the property.
+     - parameter key: The name of the property whose values are desired.
 
      - returns: An `Array` containing the results.
      */
@@ -834,7 +832,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` with `keyPath` on each of the
      collection's objects.
 
-     - parameter keyPath: The key path to the property.
+     - parameter keyPath: The key path to the property whose values are desired.
 
      - returns: An `Array` containing the results.
      */
@@ -845,8 +843,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
 
      - warning: This method may only be called during a write transaction.
 
-     - parameter value: The object value.
-     - parameter key:   The name of the property.
+     - parameter value: The value to set the property to.
+     - parameter key:   The name of the property whose value should be set on each object.
      */
     public func setValue(value: AnyObject?, forKey key: String) { base.setValue(value, forKey: key) }
 
@@ -879,30 +877,32 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      result, the initial notification will reflect the state of the Realm after
      the write transaction.
 
-         let results = realm.objects(Dog)
-         print("dogs.count: \(dogs?.count)") // => 0
-         let token = dogs.addNotificationBlock { (changes: RealmCollectionChange) in
-             switch changes {
-                 case .Initial(let dogs):
-                     // Will print "dogs.count: 1"
-                     print("dogs.count: \(dogs.count)")
-                     break
-                 case .Update:
-                     // Will not be hit in this example
-                     break
-                 case .Error:
-                     break
-             }
+     ```swift
+     let results = realm.objects(Dog)
+     print("dogs.count: \(dogs?.count)") // => 0
+     let token = dogs.addNotificationBlock { (changes: RealmCollectionChange) in
+         switch changes {
+             case .Initial(let dogs):
+                 // Will print "dogs.count: 1"
+                 print("dogs.count: \(dogs.count)")
+                 break
+             case .Update:
+                 // Will not be hit in this example
+                 break
+             case .Error:
+                 break
          }
-         try! realm.write {
-             let dog = Dog()
-             dog.name = "Rex"
-             person.dogs.append(dog)
-         }
-         // end of run loop execution context
+     }
+     try! realm.write {
+         let dog = Dog()
+         dog.name = "Rex"
+         person.dogs.append(dog)
+     }
+     // end of run loop execution context
+     ```
 
-     You must retain the returned token for as long as you want updates to continue
-     to be sent to the block. To stop receiving updates, call `stop()` on the token.
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `stop()` on the token.
 
      - warning: This method cannot be called during a write transaction, or when
                 the containing Realm is read-only.
