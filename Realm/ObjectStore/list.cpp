@@ -72,7 +72,7 @@ bool List::is_valid() const
 void List::verify_attached() const
 {
     if (!is_valid()) {
-        throw InvalidatedException{};
+        throw InvalidatedException();
     }
 }
 

@@ -519,4 +519,4 @@ util::Optional<int> Realm::file_format_upgraded_from_version() const
 }
 
 MismatchedConfigException::MismatchedConfigException(StringData message, StringData path)
-: std::runtime_error(util::format(message.data(), path)) { }
+: std::logic_error(util::format(message.data(), path)) { }

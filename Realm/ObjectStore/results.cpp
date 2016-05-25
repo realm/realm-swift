@@ -529,7 +529,7 @@ Results::OutOfBoundsIndexException::OutOfBoundsIndexException(size_t r, size_t c
 , requested(r), valid_count(c) {}
 
 Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t column, const Table* table, const char* operation)
-: std::runtime_error(util::format("Cannot %1 property '%2': operation not supported for '%3' properties",
+: std::logic_error(util::format("Cannot %1 property '%2': operation not supported for '%3' properties",
                                   operation, table->get_column_name(column),
                                   string_for_property_type(static_cast<PropertyType>(table->get_column_type(column)))))
 , column_index(column)

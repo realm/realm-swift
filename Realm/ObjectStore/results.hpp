@@ -130,8 +130,8 @@ public:
 
     // The Results object has been invalidated (due to the Realm being invalidated)
     // All non-noexcept functions can throw this
-    struct InvalidatedException : public std::runtime_error {
-        InvalidatedException() : std::runtime_error("Access to invalidated Results objects") {}
+    struct InvalidatedException : public std::logic_error {
+        InvalidatedException() : std::logic_error("Access to invalidated Results objects") {}
     };
 
     // The input index parameter was out of bounds
@@ -142,20 +142,20 @@ public:
     };
 
     // The input Row object is not attached
-    struct DetatchedAccessorException : public std::runtime_error {
-        DetatchedAccessorException() : std::runtime_error("Atempting to access an invalid object") {}
+    struct DetatchedAccessorException : public std::logic_error {
+        DetatchedAccessorException() : std::logic_error("Atempting to access an invalid object") {}
     };
 
     // The input Row object belongs to a different table
-    struct IncorrectTableException : public std::runtime_error {
-        IncorrectTableException(StringData e, StringData a, const std::string &error)
-        : std::runtime_error(error), expected(e), actual(a) {}
+    struct IncorrectTableException : public std::logic_error {
+        IncorrectTableException(StringData e, StringData a, const std::string &error) :
+            std::logic_error(error), expected(e), actual(a) {}
         const StringData expected;
         const StringData actual;
     };
 
     // The requested aggregate operation is not supported for the column type
-    struct UnsupportedColumnTypeException : public std::runtime_error {
+    struct UnsupportedColumnTypeException : public std::logic_error {
         size_t column_index;
         StringData column_name;
         DataType column_type;

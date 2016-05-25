@@ -91,8 +91,8 @@ public:
     // The List object has been invalidated (due to the Realm being invalidated,
     // or the containing object being deleted)
     // All non-noexcept functions can throw this
-    struct InvalidatedException : public std::runtime_error {
-        InvalidatedException() : std::runtime_error("Access to invalidated List object") {}
+    struct InvalidatedException : public std::logic_error {
+        InvalidatedException() : std::logic_error("Access to invalidated List object") {}
     };
 
     // The input index parameter was out of bounds
