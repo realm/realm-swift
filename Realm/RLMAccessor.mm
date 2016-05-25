@@ -592,26 +592,14 @@ void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema) 
             cls = parent;
             parent = class_getSuperclass(cls);
         }
-        if (RLMIsGeneratedClass(cls)) {
+        const char *prefix = "RLM:";
+        if (strncmp(prefix, class_getName(cls), strlen(prefix)) == 0) {
             return schema;
         }
 
         return [RLMSchema sharedSchemaForClass:cls];
     });
     class_addMethod(metaClass, @selector(sharedSchema), imp, "@@:");
-}
-
-static NSMutableSet *s_generatedClasses = [NSMutableSet new];
-static void RLMMarkClassAsGenerated(Class cls) {
-    @synchronized (s_generatedClasses) {
-        [s_generatedClasses addObject:cls];
-    }
-}
-
-bool RLMIsGeneratedClass(Class cls) {
-    @synchronized (s_generatedClasses) {
-        return [s_generatedClasses containsObject:cls];
-    }
 }
 
 static Class RLMCreateAccessorClass(Class objectClass,
@@ -654,7 +642,6 @@ static Class RLMCreateAccessorClass(Class objectClass,
         }
     }
 
-    RLMMarkClassAsGenerated(accClass);
     objc_registerClassPair(accClass);
 
     return accClass;
@@ -665,7 +652,7 @@ Class RLMManagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *
 }
 
 Class RLMUnmanagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
-    return RLMCreateAccessorClass(objectClass, schema, [@"RLMUnmanaged_" stringByAppendingString:schema.className].UTF8String,
+    return RLMCreateAccessorClass(objectClass, schema, [@"RLM:Unmanaged " stringByAppendingString:schema.className].UTF8String,
                                   RLMAccessorUnmanagedGetter, RLMAccessorUnmanagedSetter);
 }
 

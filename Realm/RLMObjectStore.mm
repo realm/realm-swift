@@ -41,11 +41,11 @@
 using namespace realm;
 
 void RLMRealmCreateAccessors(RLMSchema *schema) {
-    const size_t bufferSize = sizeof("RLMAccessor__") // includes null terminator
+    const size_t bufferSize = sizeof("RLM:Managed  ") // includes null terminator
                             + std::numeric_limits<unsigned long long>::digits10
                             + realm::Group::max_table_name_length;
 
-    char className[bufferSize] = "RLMAccessor_";
+    char className[bufferSize] = "RLM:Managed ";
     char *const start = className + strlen(className);
 
     for (RLMObjectSchema *objectSchema in schema.objectSchema) {
@@ -54,7 +54,7 @@ void RLMRealmCreateAccessors(RLMSchema *schema) {
         }
 
         static unsigned long long count = 0;
-        sprintf(start, "%llu_%s", count++, objectSchema.className.UTF8String);
+        sprintf(start, "%llu %s", count++, objectSchema.className.UTF8String);
         objectSchema.accessorClass = RLMManagedAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, className);
     }
 }

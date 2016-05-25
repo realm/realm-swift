@@ -37,9 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
 Class RLMManagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema, const char *name);
 Class RLMUnmanagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
-// Check if a given class is a generated accessor class
-bool RLMIsGeneratedClass(Class cls);
-
 //
 // Dynamic getters/setters
 //
