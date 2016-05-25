@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.103.2 Release notes (2016-05-24)
 =============================================================
 
 ### API breaking changes
@@ -14,8 +14,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix an assertion failure which could occur when opening a Realm after opening
   that Realm failed previously in some specific ways in the same run of the
   application.
-* Reading optional integers, floats, and doubles from within a migration block now
-  correctly returns `nil` rather than 0 when the stored value is `nil`.
+* Reading optional integers, floats, and doubles from within a migration block
+  now correctly returns `nil` rather than 0 when the stored value is `nil`.
 
 0.103.1 Release notes (2016-05-19)
 =============================================================
