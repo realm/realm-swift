@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
  within a single iteration of the run loop will normally return the same
  `RLMRealm` object.
  
- If you specifically want to ensure a `RLMRealm` instance is
+ If you specifically want to ensure an `RLMRealm` instance is
  destroyed (for example, if you wish to open a Realm, check some property, and
  then possibly delete the Realm file and re-open it), place the code which uses
  the Realm within an `@autoreleasepool {}` and ensure you have no other
@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
  Obtains an instance of the default Realm.
 
  The default Realm is used by the `RLMObject` class methods
- which do not take a `RLMRealm` parameter, but is otherwise not special. The
+ which do not take an `RLMRealm` parameter, but is otherwise not special. The
  default Realm is persisted as default.realm under the Documents directory of
  your Application on iOS, and in your application's Application Support
  directory on OS X.
@@ -97,10 +97,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Indicates if the Realm is currently engaged in a write transaction.
 
- @warning Wrapping mutating operations in a write transaction if this property returns `NO`
-          may cause a large number of write transactions to be created, which could negatively
-          impact Realm's performance. Always prefer performing multiple mutations in a single
-          transaction when possible.
+ @warning   Do not simply check this property and then start a write transaction whenever an object needs to be
+            created, updated, or removed. Doing so might cause a large number of write transactions to be created,
+            degrading performance. Instead, always prefer performing multiple updates during a single transaction.
  */
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 
@@ -277,7 +276,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  will need to manually call `-refresh` in order to update to the latest version,
  even if `autorefresh` is set to `YES`.
 
- Even with this enabled, you can still call `-refresh` at any time to update the
+ Even with this property enabled, you can still call `-refresh` at any time to update the
  Realm before the automatic refresh would occur.
 
  Notifications are sent when a write transaction is committed whether or not
@@ -315,7 +314,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
 /**
- Invalidates all `RLMObject`s and `RLMResults` managed by the Realm.
+ Invalidates all `RLMObject`s, `RLMResults`, `RLMLinkingObjects`, and `RLMArray`s managed by the Realm.
 
  A Realm holds a read lock on the version of the data accessed by it, so
  that changes made to the Realm on different threads do not modify or delete the

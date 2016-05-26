@@ -46,7 +46,7 @@ import Realm.Private
  - `NSData`
  - `RealmOptional<T>` for optional numeric properties
  - `Object` subclasses, to model many-to-one relationships
- - `List<T: Object>`, to model many-to-many relationships
+ - `List<T>`, to model many-to-many relationships
 
  `String`, `NSString`, `NSDate`, `NSData` and `Object` subclass properties can be declared as optional. `Int`, `Int8`,
  Int16`, Int32`, `Int64`, `Float`, `Double`, `Bool`, and `List` properties cannot. To store an optional number, use
@@ -93,7 +93,6 @@ public class Object: RLMObjectBase {
                          an `Array` containing one element for each persisted property. An exception will be
                          thrown if any required properties are not present and those properties were not defined with
                          default values.
-
                          When passing in an `Array`, all properties must be present,
                          valid and in the same order as the properties defined in the model.
     */
