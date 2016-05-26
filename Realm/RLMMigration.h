@@ -82,7 +82,6 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
                     an `NSArray` containing one element for each persisted property. An exception will be
                     thrown if any required properties are not present and those properties were not defined with
                     default values.
-
                     When passing in an `NSArray`, all properties must be present,
                     valid and in the same order as the properties defined in the model.
  */
