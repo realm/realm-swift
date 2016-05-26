@@ -182,10 +182,9 @@ public final class Realm {
     /**
      Indicates whether this Realm is currently in a write transaction.
 
-     - warning:  Wrapping mutating operations in a write transaction if this property returns `false`
-                 may cause a large number of write transactions to be created, which could negatively
-                 impact Realm's performance. Always prefer performing multiple mutations in a single
-                 transaction when possible.
+     - warning: Do not simply check this property and then start a write transaction whenever an object needs to be
+                created, updated, or removed. Doing so might cause a large number of write transactions to be created,
+                degrading performance. Instead, always prefer performing multiple updates during a single transaction.
      */
     public var inWriteTransaction: Bool {
         return rlmRealm.inWriteTransaction

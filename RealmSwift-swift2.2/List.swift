@@ -44,12 +44,12 @@ public class ListBase: RLMListBase {
  `List` is the container type in Realm used to define to-many relationships.
 
  Like Swift's `Array`, `List` is a generic type that is parameterized on the type of `Object` it stores.
- 
+
  Unlike Swift's native collections, `List`s are reference types, and are only immutable if the Realm that manages them
  is opened as read-only.
 
  Lists can be filtered and sorted with the same predicates as `Results<T>`.
- 
+
  Properties of `List` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
 */
 public final class List<T: Object>: ListBase {
@@ -170,7 +170,7 @@ public final class List<T: Object>: ListBase {
     /**
      Returns a `Results` containing all objects matching the given predicate in the list.
 
-    - parameter predicateFormat: A predicate format string; variable arguments are supported.
+     - parameter predicateFormat: A predicate format string; variable arguments are supported.
     */
     public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T> {
         return Results<T>(_rlmArray.objectsWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))

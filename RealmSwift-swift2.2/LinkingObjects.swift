@@ -228,10 +228,10 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
     /**
      Returns a `Results` containing the objects in the linking objects collection, but sorted.
-     
+
      Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
      youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
-     
+
      - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
                 point, integer, and string types.
 

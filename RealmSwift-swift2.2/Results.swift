@@ -21,9 +21,9 @@ import Realm
 
 // MARK: MinMaxType
 
-/** 
+/**
  Types of properties which can be used with the minimum and maximum value APIs.
- 
+
  - see: `min(_:)`, `max(_:)`
  */
 public protocol MinMaxType {}
@@ -40,7 +40,7 @@ extension NSDate: MinMaxType {}
 
 /**
  Types of properties which can be used with the sum and average value APIs.
- 
+
  - see: `sum(_:)`, `average(_:)`
  */
 public protocol AddableType {}
