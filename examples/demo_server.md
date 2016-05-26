@@ -12,8 +12,18 @@ To run the server  go to the server folder in your terminal and run the realm-se
 	  -k, --key               The public key (PEM file) used to verify identity
 	                          tokens sent by clients. Mandatory.
 ```
-Example: `./realm-server-noinst /tmp/server_folder 127.0.0.1 -k public.pem`
+
+
+Example:
+```
+mkdir /tmp/server_folder
+./realm-server-noinst /tmp/server_folder 127.0.0.1 -p 7800 -l 2 -k public.pem
+```
+
 Where 
 	`/tmp/server_folder` is a directory you have created for server-side Realm files.
 
-	`public.pem is the public key included in the server folder. The demo app already contains tokens valid for this key.
+	`public.pem` is the public key included in the server folder. The demo app already contains tokens valid for this key.
+    Use the ip your computer has in the local network instead of `127.0.0.1`.
+
+If you want to start from scratch, you should stop the server, empty the directory for server-side Realm files and start the server again.

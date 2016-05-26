@@ -1,31 +1,30 @@
-##The demo app is a OS X and iOS drawing app.
+##The demo app is an iOS drawing app.
 
-To see how the synchronization is done, you can either run in the same local network:**
-	
-	* the OS X app on 2 computers 
-	* the iOS app on 2 simulators
-	* the iOS app on the phone and in the simulator 
+This file describes the steps you have to take to run the demo app.
 
-The OS X app and the iOS app do not share the same schema, so you cannot run them together.
+demo_using_framework.md describes the steps you have to take to included synchronized Realms in your app.
+
+demo_server.md describes the steps needed to start the server on a OS X machine.
 
 **Run the demo:**
+For the demo you will need an iPhone and a OS X machine connected to the same local network.
+1. Find out the ip your computer has in the local network.
+2. Start the server, according to the run_demo_server.md document. Use the ip you have previously identified.
 
-1. Start the server, according to the run_demo_server.md document. Use the external ip if running the demo over the network.
+3. Run the app in the simulator.
 
-2. Run the app
-
-You need to set the correct server hostname and port.
-The default server port is 7800.
+You need to set the same server ip and port that you started the server with in the realm url: `"realm://serverip:port/draw"`
 eg of a realm url: `"realm://127.0.0.1:7800/draw"`. 
 
-For the OS X app, open the xcode project in `examples/osx/objc`. Edit the `Draw/DrawView.m` with the correct server hostname and port.
-Then run the "Draw" scheme.
-
-For the iOS app, open the xcode project in `examples/ios/objc`. Edit the `Draw/DrawView.m` with the correct server hostname and port.
+Open the xcode project in `examples/ios/objc`. Edit the `Draw/AppDelegate.m` with the correct realm url.
 Then run the "Draw" scheme. You can run it in a simulator, for the iPhone 6s Plus for example.
 
-The Realm frameworks should already be included in the projects, so if you keep the folder structure of the archive no change should be required.
+Click on the Realm.framework under Frameworks and update its path to the framwork in the archive, `framework/ios/Realm.framework` for the iOS app. The path was also added to the framework search path, so you should not need to do additional changes if you keep the folder structure of the archive.
 
-When you draw in one app, the other app will receive the changes in real time.
+After starting the app in the simulator, you can draw something and check that the server log changes.
 
-If you want to start from scratch, you should clean up the server file and "Reset the contents and settings" on the simulator.
+Then you can also load the app on an iPhone connected to the same network. When you draw something on one of them, the other will be updated in Real time.
+
+You can use the app on several devices, but be aware that combining an iPhone with an iPad was not tested.
+
+If you want to start from scratch, you should clean up the server folder( the one you gave as a parameter when you started the server ), restart the server and "Reset the contents and settings" on the simulator.
