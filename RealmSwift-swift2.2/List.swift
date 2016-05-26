@@ -425,7 +425,7 @@ public final class List<T: Object>: ListBase {
      ```swift
      let person = realm.objects(Person).first!
      print("dogs.count: \(person.dogs.count)") // => 0
-     let token = person.dogs.addNotificationBlock { (changes: RealmCollectionChange) in
+     let token = person.dogs.addNotificationBlock { changes in
          switch changes {
              case .Initial(let dogs):
                  // Will print "dogs.count: 1"

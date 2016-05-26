@@ -346,7 +346,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      let dog = realm.objects(Dog).first!
      let owners = dog.owners
      print("owners.count: \(owners.count)") // => 0
-     let token = owners.addNotificationBlock { (changes: RealmCollectionChange) in
+     let token = owners.addNotificationBlock { changes in
          switch changes {
              case .Initial(let owners):
                  // Will print "owners.count: 1"

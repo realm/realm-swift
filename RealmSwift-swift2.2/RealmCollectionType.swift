@@ -53,7 +53,7 @@ public final class RLMGenerator<T: Object>: GeneratorType {
  For example, for a simple one-section table view, you can do the following:
 
  ```swift
- self.notificationToken = results.addNotificationBlock { changes
+ self.notificationToken = results.addNotificationBlock { changes in
      switch changes {
      case .Initial:
          // Results are now populated and can be accessed without blocking the UI
@@ -207,7 +207,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
      Returns a `Results` containing the objects in the collection, but sorted.
 
      - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
-     point, integer, and string types.
+                point, integer, and string types.
 
      - see: `sorted(_:ascending:)`
 
@@ -323,7 +323,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
      ```swift
      let results = realm.objects(Dog)
      print("dogs.count: \(dogs?.count)") // => 0
-     let token = dogs.addNotificationBlock { (changes: RealmCollectionChange) in
+     let token = dogs.addNotificationBlock { changes in
          switch changes {
              case .Initial(let dogs):
                  // Will print "dogs.count: 1"
@@ -488,7 +488,7 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
      Returns a `Results` containing the objects in the collection, but sorted.
 
      - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
-     point, integer, and string types.
+                point, integer, and string types.
 
      - see: `sorted(_:ascending:)`
 
@@ -880,7 +880,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      ```swift
      let results = realm.objects(Dog)
      print("dogs.count: \(dogs?.count)") // => 0
-     let token = dogs.addNotificationBlock { (changes: RealmCollectionChange) in
+     let token = dogs.addNotificationBlock { changes in
          switch changes {
              case .Initial(let dogs):
                  // Will print "dogs.count: 1"

@@ -454,7 +454,7 @@ public final class Realm {
      updates, call `stop()` on the token.
 
      - parameter block: A block which is called to process Realm notifications. It receives the following parameters:
-                        `Notification`: the incoming notification; `Realm`: the Realm for which the notification
+                        `notification`: the incoming notification; `realm`: the Realm for which the notification
                         occurred.
 
      - returns: A token which must be retained for as long as you wish to continue receiving change notifications.
@@ -522,7 +522,7 @@ public final class Realm {
     // MARK: Invalidation
 
     /**
-     Invalidates all `Object`s, `Results`, and `List`s managed by the Realm.
+     Invalidates all `Object`s, `Results`, `LinkingObjects`, and `List`s managed by the Realm.
 
      A Realm holds a read lock on the version of the data accessed by it, so
      that changes made to the Realm on different threads do not modify or delete the

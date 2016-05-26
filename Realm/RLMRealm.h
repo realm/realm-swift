@@ -314,7 +314,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
 /**
- Invalidates all `RLMObject`s, `RLMResults`, and `RLMArray`s managed by the Realm.
+ Invalidates all `RLMObject`s, `RLMResults`, `RLMLinkingObjects`, and `RLMArray`s managed by the Realm.
 
  A Realm holds a read lock on the version of the data accessed by it, so
  that changes made to the Realm on different threads do not modify or delete the

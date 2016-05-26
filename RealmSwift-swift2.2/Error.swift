@@ -30,7 +30,7 @@ import Realm
  do {
      realm = try Realm()
  } catch RealmSwift.Error.IncompatibleLockFile() {
-     print("Incompatible lock file. Perhaps the Realm Browser app may be attached to a Realm on the device?")
+     print("Incompatible lock file. The Realm Browser app might be attached to a Realm on the device.")
  }
  ```
 */

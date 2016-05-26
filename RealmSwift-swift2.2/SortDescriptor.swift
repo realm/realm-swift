@@ -21,7 +21,7 @@ import Realm
 
 /**
  A `SortDescriptor` stores a property name and a sort order for use with
- `sorted(_:sortDescriptors:)`. It is similar to `NSSortDescriptor`, but supports
+ `sorted(sortDescriptors:)`. It is similar to `NSSortDescriptor`, but supports
  only the subset of functionality which can be efficiently run by Realm's query
  engine.
  */

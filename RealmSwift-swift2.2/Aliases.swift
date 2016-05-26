@@ -42,10 +42,10 @@ import Realm
  * `Data`
  * `Date`
 
- ### Relationships: `List` (array) and `Object` types
+ ### Relationships: Array (in Swift, `List`) and `Object` types
 
  * `Object`
- * `List`
+ * `Array`
 */
 public typealias PropertyType = RLMPropertyType
 
