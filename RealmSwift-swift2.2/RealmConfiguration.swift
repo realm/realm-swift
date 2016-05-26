@@ -62,7 +62,7 @@ extension Realm {
         - parameter migrationBlock:     The block which migrates the Realm to the current version.
         - parameter deleteRealmIfMigrationNeeded: If `true`, recreate the Realm file with the provided
                                                   schema if a migration is required.
-        - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
+        - parameter objectTypes:        The subset of `Object` subclasses managed by the Realm.
         */
         public init(fileURL: NSURL? = NSURL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
             inMemoryIdentifier: String? = nil,
@@ -143,7 +143,7 @@ extension Realm {
         */
         public var deleteRealmIfMigrationNeeded: Bool = false
 
-        /// The classes persisted in the Realm.
+        /// The classes managed by the Realm.
         public var objectTypes: [Object.Type]? {
             set {
                 self.customSchema = newValue.map { RLMSchema(objectClasses: $0) }

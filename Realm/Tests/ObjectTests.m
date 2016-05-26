@@ -497,7 +497,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
 - (void)testKeyedSubscripting
 {
-    // standalone
+    // unmanaged
     EmployeeObject *objs = [[EmployeeObject alloc] initWithValue:@{@"name" : @"Test0", @"age" : @23, @"hired": @NO}];
     XCTAssertEqualObjects(objs[@"name"], @"Test0",  @"Name should be Test0");
     XCTAssertEqualObjects(objs[@"age"], @23,  @"age should be 23");
@@ -849,8 +849,8 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
 
     [realm beginWriteTransaction];
-    RLMAssertThrowsWithReasonMatching([realm addObject:[[IntObject alloc] initWithValue:@[@1]]], @"Object type 'IntObject' is not persisted in the Realm.*custom `objectClasses`");
-    RLMAssertThrowsWithReasonMatching([IntObject createInRealm:realm withValue:@[@1]], @"Object type 'IntObject' is not persisted in the Realm.*custom `objectClasses`");
+    RLMAssertThrowsWithReasonMatching([realm addObject:[[IntObject alloc] initWithValue:@[@1]]], @"Object type 'IntObject' is not managed by the Realm.*custom `objectClasses`");
+    RLMAssertThrowsWithReasonMatching([IntObject createInRealm:realm withValue:@[@1]], @"Object type 'IntObject' is not managed by the Realm.*custom `objectClasses`");
     XCTAssertNoThrow([realm addObject:[[StringObject alloc] initWithValue:@[@"A"]]]);
     XCTAssertNoThrow([StringObject createInRealm:realm withValue:@[@"A"]]);
     [realm cancelWriteTransaction];
@@ -1263,7 +1263,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWithPredicate:nil] firstObject];
     XCTAssertNotNil(obj2, @"object with ignored property should still be stored and accessible through the realm");
     
-    XCTAssertEqualObjects(obj2.name, obj.name, @"persisted property should be the same");
+    XCTAssertEqualObjects(obj2.name, obj.name, @"managed property should be the same");
     XCTAssertNil(obj2.url, @"ignored property should be nil when getting from realm");
 }
 
@@ -1721,7 +1721,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
 {
     IntObject *obj = [[IntObject alloc] init];
 
-    // Standalone can be accessed from other threads
+    // Unmanaged object can be accessed from other threads
     [self dispatchAsyncAndWait:^{ XCTAssertNoThrow(obj.intCol = 5); }];
 
     [RLMRealm.defaultRealm beginWriteTransaction];

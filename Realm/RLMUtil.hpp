@@ -196,5 +196,5 @@ static inline NSUInteger RLMConvertNotFound(size_t index) {
 id RLMMixedToObjc(realm::Mixed const& value);
 
 // For unit testing purposes, allow an Objective-C class named FakeObject to also be used
-// as the base class of persisted objects. This allows for testing invalid schemas.
+// as the base class of managed objects. This allows for testing invalid schemas.
 void RLMSetTreatFakeObjectAsRLMObject(BOOL flag);

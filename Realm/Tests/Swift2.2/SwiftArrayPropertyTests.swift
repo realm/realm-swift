@@ -113,8 +113,8 @@ class SwiftArrayPropertyTests: RLMTestCase {
         XCTAssertEqual((children[1] as! SwiftStringObject).stringCol, "b", "Second child should be 'b'")
     }
 
-    // FIXME: Support standalone RLMArray's in Swift-defined models
-    //    func testStandalone() {
+    // FIXME: Support unmanaged RLMArray's in Swift-defined models
+    //    func testUnmanaged() {
     //        let realm = realmWithTestPath()
     //
     //        let array = SwiftArrayPropertyObject()
@@ -226,7 +226,7 @@ class SwiftArrayPropertyTests: RLMTestCase {
         XCTAssertEqual((children[1] as! StringObject).stringCol!, "b", "Second child should be 'b'")
     }
 
-    func testStandalone_objc() {
+    func testUnmanaged_objc() {
         let realm = realmWithTestPath()
 
         let array = ArrayPropertyObject()

@@ -65,7 +65,7 @@
 
     AllIntSizesObject *obj = [AllIntSizesObject new];
 
-    // Test standalone
+    // Test unmanaged
     obj[@"int16"] = @(v16);
     XCTAssertEqual([obj[@"int16"] shortValue], v16);
     obj[@"int16"] = @(v32);

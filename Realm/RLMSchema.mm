@@ -65,7 +65,7 @@ static RLMObjectSchema *RLMRegisterClass(Class cls) {
     s_sharedSchemaState = prevState;
 
     // set unmanaged class on shared shema for unmanaged object creation
-    schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(schema.objectClass, schema);
+    schema.unmanagedClass = RLMUnmanagedAccessorClassForObjectClass(schema.objectClass, schema);
 
     // override sharedSchema class methods for performance
     RLMReplaceSharedSchemaMethod(cls, schema);
@@ -145,7 +145,7 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 - (RLMObjectSchema *)objectForKeyedSubscript:(__unsafe_unretained id<NSCopying> const)className {
     RLMObjectSchema *schema = _objectSchemaByName[className];
     if (!schema) {
-        @throw RLMException(@"Object type '%@' not persisted in Realm", className);
+        @throw RLMException(@"Object type '%@' not managed by the Realm", className);
     }
     return schema;
 }
@@ -176,7 +176,7 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
                 continue;
             }
             if (!schema->_objectSchemaByName[prop.objectClassName]) {
-                [errors addObject:[NSString stringWithFormat:@"- '%@.%@' links to class '%@', which is missing from the list of classes to persist", objectSchema.className, prop.name, prop.objectClassName]];
+                [errors addObject:[NSString stringWithFormat:@"- '%@.%@' links to class '%@', which is missing from the list of classes managed by the Realm", objectSchema.className, prop.name, prop.objectClassName]];
             }
         }
     }];

@@ -309,7 +309,7 @@ void Realm::verify_thread() const
 void Realm::verify_in_write() const
 {
     if (!is_in_transaction()) {
-        throw InvalidTransactionException("Cannot modify persisted objects outside of a write transaction.");
+        throw InvalidTransactionException("Cannot modify managed objects outside of a write transaction.");
     }
 }
 

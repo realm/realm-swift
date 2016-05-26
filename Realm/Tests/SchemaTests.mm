@@ -264,7 +264,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     [super tearDown];
 }
 
-- (void)testNoSchemaForUnpersistedObjectClasses {
+- (void)testNoSchemaForUnmanagedObjectClasses {
     RLMSchema *schema = [RLMSchema sharedSchema];
     XCTAssertNil([schema schemaForClassName:@"RLMObject"]);
     XCTAssertNil([schema schemaForClassName:@"RLMObjectBase"]);
@@ -295,7 +295,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     auto checkSchema = ^(RLMSchema *schema, NSString *className, NSDictionary *properties) {
         RLMObjectSchema *objectSchema = schema[className];
         XCTAssertEqualObjects(className, objectSchema.className);
-        XCTAssertEqualObjects(className, [objectSchema.standaloneClass className]);
+        XCTAssertEqualObjects(className, [objectSchema.unmanagedClass className]);
         XCTAssertEqualObjects(className, [objectSchema.accessorClass className]);
 
         XCTAssertEqual(objectSchema.properties.count, properties.count);
@@ -327,7 +327,7 @@ RLM_ARRAY_TYPE(NotARealClass)
 
         for (RLMObjectSchema *objectSchema in objectSchemas) {
             objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, @"RLMAccessor_");
-            objectSchema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
+            objectSchema.unmanagedClass = RLMUnmanagedAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
         }
 
         for (Class cls : testClasses) {
@@ -700,7 +700,7 @@ RLM_ARRAY_TYPE(NotARealClass)
         for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
             const char *actualClassName = class_getName(objectSchema.objectClass);
             XCTAssertEqual(nullptr, strstr(actualClassName, "RLMAccessor"));
-            XCTAssertEqual(nullptr, strstr(actualClassName, "RLMStandalone"));
+            XCTAssertEqual(nullptr, strstr(actualClassName, "RLMUnmanaged"));
         }
 
         // Shared schema shouldn't have duplicate entries

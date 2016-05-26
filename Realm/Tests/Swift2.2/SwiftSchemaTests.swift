@@ -82,7 +82,7 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         }
     }
 
-    func testCreateStandaloneObjectWhichCreatesAnotherClassDuringSchemaInit() {
+    func testCreateUnmanagedObjectWhichCreatesAnotherClassDuringSchemaInit() {
         if isParent {
             XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
             return
@@ -93,7 +93,7 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         let _ = InitLinkedToClass()
     }
 
-    func testCreateStandaloneObjectWithLinkPropertyWithoutSharedSchemaInitialized() {
+    func testCreateUnmanagedObjectWithLinkPropertyWithoutSharedSchemaInitialized() {
         if isParent {
             XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
             return
@@ -104,7 +104,7 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         let _ = SwiftCompanyObject()
     }
 
-    func testInitStandaloneObjectNotInClassSubsetDuringSchemaInit() {
+    func testInitUnmanagedObjectNotInClassSubsetDuringSchemaInit() {
         if isParent {
             XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
             return

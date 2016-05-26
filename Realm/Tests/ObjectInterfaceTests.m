@@ -74,10 +74,10 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    CustomAccessorsObject *caStandalone = [[CustomAccessorsObject alloc] init];
-    caStandalone.name = @"name";
-    caStandalone.age = 99;
-    [CustomAccessorsObject createInRealm:realm withValue:caStandalone];
+    CustomAccessorsObject *caUnmanaged = [[CustomAccessorsObject alloc] init];
+    caUnmanaged.name = @"name";
+    caUnmanaged.age = 99;
+    [CustomAccessorsObject createInRealm:realm withValue:caUnmanaged];
     [realm commitWriteTransaction];
 
     CustomAccessorsObject *objectFromRealm = [CustomAccessorsObject allObjects][0];

@@ -157,7 +157,7 @@ void RLMObservationInfo::recordObserver(realm::Row& objectRow,
     ++observerCount;
 
     // add ourselves to the list of observed objects if this is the first time
-    // an observer is being added to a persisted object
+    // an observer is being added to a managed object
     if (objectRow && !row) {
         this->objectSchema = objectSchema;
         setRow(*objectRow.get_table(), objectRow.get_index());
@@ -166,7 +166,7 @@ void RLMObservationInfo::recordObserver(realm::Row& objectRow,
     if (!row) {
         // Arrays need a reference to their containing object to avoid having to
         // go through the awful proxy object from mutableArrayValueForKey.
-        // For persisted objects we do this when the object is added or created
+        // For managed objects we do this when the object is added or created
         // (and have to to support notifications from modifying an object which
         // was never observed), but for Swift classes (both RealmSwift and
         // RLMObject) we can't do it then because we don't know what the parent

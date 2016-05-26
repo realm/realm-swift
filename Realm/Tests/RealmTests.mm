@@ -324,7 +324,7 @@
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
-- (void)testRemoveNonpersistedObject {
+- (void)testRemoveUnmanagedObject {
     RLMRealm *realm = [self realmWithTestPath];
     StringObject *obj = [[StringObject alloc] initWithValue:@[@"a"]];
 
@@ -405,7 +405,7 @@
     XCTAssertEqual(obj.array.count, 0U, @"Expecting 0 objects");
 }
 
-- (void)testAddPersistedObjectToOtherRealm {
+- (void)testAddManagedObjectToOtherRealm {
     RLMRealm *realm1 = [self realmWithTestPath];
     RLMRealm *realm2 = [RLMRealm defaultRealm];
 
@@ -422,9 +422,9 @@
     [realm1 transactionWithBlock:^{ [realm1 addObject:co1]; }];
 
     [realm2 beginWriteTransaction];
-    XCTAssertThrows([realm2 addObject:co1], @"should reject already-persisted object");
-    XCTAssertThrows([realm2 addObject:co2], @"should reject linked persisted object");
-    XCTAssertThrows([realm2 addObject:cao], @"should reject array containing persisted object");
+    XCTAssertThrows([realm2 addObject:co1], @"should reject already-managed object");
+    XCTAssertThrows([realm2 addObject:co2], @"should reject linked managed object");
+    XCTAssertThrows([realm2 addObject:cao], @"should reject array containing managed object");
     [realm2 commitWriteTransaction];
 
     // The objects are left in an odd state if validation fails (since the
@@ -437,8 +437,10 @@
     [cao.circles addObject:co1];
 
     [realm1 beginWriteTransaction];
-    XCTAssertNoThrow([realm1 addObject:co2], @"should be able to add object which links to object persisted in target realm");
-    XCTAssertNoThrow([realm1 addObject:cao], @"should be able to add object with an array containing an object persisted in target realm");
+    XCTAssertNoThrow([realm1 addObject:co2],
+                     @"should be able to add object which links to object managed by target Realm");
+    XCTAssertNoThrow([realm1 addObject:cao],
+                     @"should be able to add object with an array containing an object managed by target Realm");
     [realm1 commitWriteTransaction];
 }
 
@@ -896,14 +898,14 @@
     CircleObject *obj2 = [CircleObject createInRealm:realm withValue:@[@"2", NSNull.null]];
     [realm commitWriteTransaction];
 
-    // Link to existing persisted
+    // Link to existing managed
     [realm beginWriteTransaction];
     obj1.next = obj2;
     [realm cancelWriteTransaction];
 
     XCTAssertNil(obj1.next);
 
-    // Link to standalone
+    // Link to unmanaged
     [realm beginWriteTransaction];
     CircleObject *obj3 = [[CircleObject alloc] init];
     obj3.data = @"3";
@@ -946,14 +948,14 @@
     ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[obj1]]];
     [realm commitWriteTransaction];
 
-    // Add existing persisted
+    // Add existing managed object
     [realm beginWriteTransaction];
     [array.intArray addObject:obj2];
     [realm cancelWriteTransaction];
 
     XCTAssertEqual(1U, array.intArray.count);
 
-    // Add standalone
+    // Add unmanaged object
     [realm beginWriteTransaction];
     [array.intArray addObject:[[IntObject alloc] init]];
     [realm cancelWriteTransaction];
