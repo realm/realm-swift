@@ -91,7 +91,7 @@
 - (RLMObject *)objectWithClassName:(NSString *)className forPrimaryKey:(id)primaryKey;
 
 /**
- Creates a `RLMObject` instance of type `className` in the Realm, and populates it using a given object.
+ Creates an `RLMObject` instance of type `className` in the Realm, and populates it using a given object.
 
  @warning This method is useful only in specialized circumstances, for example, when building components
           that integrate with Realm. If you are simply building an app on Realm, it is recommended to

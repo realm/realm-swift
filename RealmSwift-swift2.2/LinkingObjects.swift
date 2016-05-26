@@ -385,7 +385,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 extension LinkingObjects: RealmCollectionType {
     // MARK: Sequence Support
 
-    /// Returns a `RLMGenerator` that yields successive elements in the results.
+    /// Returns an `RLMGenerator` that yields successive elements in the results.
     public func generate() -> RLMGenerator<T> {
         return RLMGenerator(collection: rlmResults)
     }

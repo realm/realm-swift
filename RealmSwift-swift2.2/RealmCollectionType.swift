@@ -564,7 +564,7 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
         return unsafeBitCast(base[index as! C.Index], C.Element.self)
     }
 
-    /// Returns a `RLMGenerator` that yields successive elements in the collection.
+    /// Returns an `RLMGenerator` that yields successive elements in the collection.
     override func generate() -> RLMGenerator<Element> {
         // FIXME: it should be possible to avoid this force-casting
         return base.generate() as! RLMGenerator<Element>
@@ -730,7 +730,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      Returns a `Results` containing the objects in the collection, but sorted.
 
      - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
-     point, integer, and string types.
+                point, integer, and string types.
 
      - see: `sorted(_:ascending:)`
 
@@ -800,7 +800,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     */
     public subscript(index: Int) -> T { return base[index] }
 
-    /// Returns a `RLMGenerator` that yields successive elements in the collection.
+    /// Returns an `RLMGenerator` that yields successive elements in the collection.
     public func generate() -> RLMGenerator<T> { return base.generate() }
 
 

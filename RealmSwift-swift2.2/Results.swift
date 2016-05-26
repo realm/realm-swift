@@ -259,7 +259,7 @@ public final class Results<T: Object>: ResultsBase {
      Returns a `Results` containing the objects in the results collection, but sorted.
 
      - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
-     point, integer, and string types.
+                point, integer, and string types.
 
      - see: `sorted(_:ascending:)`
 
@@ -394,7 +394,7 @@ public final class Results<T: Object>: ResultsBase {
 extension Results: RealmCollectionType {
     // MARK: Sequence Support
 
-    /// Returns a `RLMGenerator` that yields successive elements in the results.
+    /// Returns an `RLMGenerator` that yields successive elements in the results.
     public func generate() -> RLMGenerator<T> {
         return RLMGenerator(collection: rlmResults)
     }

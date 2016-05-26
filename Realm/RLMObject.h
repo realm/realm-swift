@@ -98,7 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Initializes an unmanaged instance of a Realm object.
 
- Call `addObject:` on a `RLMRealm` instance to add an unmanaged object into that Realm.
+ Call `addObject:` on an `RLMRealm` instance to add an unmanaged object into that Realm.
  
  @see `[RLMRealm addObject:]`
  */
@@ -110,7 +110,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  Pass in an `NSArray` or `NSDictionary` instance to set the values of the object's properties.
 
- Call `addObject:` on a `RLMRealm` instance to add an unmanaged object into that Realm.
+ Call `addObject:` on an `RLMRealm` instance to add an unmanaged object into that Realm.
  
  @see `[RLMRealm addObject:]`
  */
