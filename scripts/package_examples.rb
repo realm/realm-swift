@@ -69,6 +69,14 @@ examples.each do |example|
   set_framework_search_path(project_path, framework_directory)
 end
 
+# Update Playground imports and instructions
+
+playground_file = 'examples/ios/swift-2.2/GettingStarted.playground/Contents.swift'
+replace_in_file(playground_file, 'choose RealmSwift', 'choose PlaygroundFrameworkWrapper')
+replace_in_file(playground_file,
+                "import Foundation\n",
+                "import Foundation\nimport PlaygroundFrameworkWrapper // only necessary to use a binary release of Realm Swift in this playground.\n")
+
 # Update RubyMotion sample
 
 replace_in_file('examples/ios/xcode-7/rubymotion/Simple/Rakefile', '/build/ios', '/ios/static/xcode-7')
