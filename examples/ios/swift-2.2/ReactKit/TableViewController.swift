@@ -88,8 +88,8 @@ class TableViewController: UITableViewController {
         tableView.registerClass(Cell.self, forCellReuseIdentifier: "cell")
 
         self.title = "ReactKit TableView"
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Add Group", style: .Plain, target: self, action: "addGroup")
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "addEntry")
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Add Group", style: .Plain, target: self, action: #selector(TableViewController.addGroup))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(TableViewController.addEntry))
 
         // Subscribe to changes to the list of groups, telling the TableView to
         // insert new sections when new groups are added to the list
