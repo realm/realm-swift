@@ -472,9 +472,9 @@ public final class List<T: Object>: ListBase {
 extension List: RealmCollection, RangeReplaceableCollection {
     // MARK: Sequence Support
 
-    /// Returns a `GeneratorOf<T>` that yields successive elements in the List.
-    public func generate() -> RLMGenerator<T> {
-        return RLMGenerator(collection: _rlmArray)
+    /// Returns a `RLMIterator` that yields successive elements in the `List`.
+    public func makeIterator() -> RLMIterator<T> {
+        return RLMIterator(collection: _rlmArray)
     }
 
     // MARK: RangeReplaceableCollection Support

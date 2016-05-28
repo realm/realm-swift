@@ -388,9 +388,9 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 extension LinkingObjects: RealmCollection {
     // MARK: Sequence Support
 
-    /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
-    public func generate() -> RLMGenerator<T> {
-        return RLMGenerator(collection: rlmResults)
+    /// Returns an `RLMIterator` that yields successive elements in the results.
+    public func makeIterator() -> RLMIterator<T> {
+        return RLMIterator(collection: rlmResults)
     }
 
     // MARK: Collection Support
