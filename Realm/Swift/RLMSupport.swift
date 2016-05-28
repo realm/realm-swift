@@ -29,7 +29,7 @@ extension RLMObject {
     }
 }
 
-public final class RLMGenerator: GeneratorType {
+public final class RLMIterator: IteratorProtocol {
     private let generatorBase: NSFastGenerator
 
     internal init(collection: RLMCollection) {
@@ -41,10 +41,10 @@ public final class RLMGenerator: GeneratorType {
     }
 }
 
-extension RLMArray: SequenceType {
+extension RLMArray: Sequence {
     // Support Sequence-style enumeration
-    public func generate() -> RLMGenerator {
-        return RLMGenerator(collection: self)
+    public func makeIterator() -> RLMIterator {
+        return RLMIterator(collection: self)
     }
 
     // Swift query convenience functions
@@ -57,10 +57,10 @@ extension RLMArray: SequenceType {
     }
 }
 
-extension RLMResults: SequenceType {
+extension RLMResults: Sequence {
     // Support Sequence-style enumeration
-    public func generate() -> RLMGenerator {
-        return RLMGenerator(collection: self)
+    public func makeIterator() -> RLMIterator {
+        return RLMIterator(collection: self)
     }
 
     // Swift query convenience functions
