@@ -381,9 +381,9 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 extension Results: RealmCollection {
     // MARK: Sequence Support
 
-    /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
-    public func generate() -> RLMGenerator<T> {
-        return RLMGenerator(collection: rlmResults)
+    /// Returns a `RLMIterator` that yields successive elements in the results.
+    public func makeIterator() -> RLMIterator<T> {
+        return RLMIterator(collection: rlmResults)
     }
 
     // MARK: Collection Support

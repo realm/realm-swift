@@ -20,24 +20,19 @@ import Foundation
 import Realm
 
 /**
-Encapsulates iteration state and interface for iteration over a
-`RealmCollection`.
+Encapsulates iteration state and interface for iteration over a `RealmCollection`.
 */
-public final class RLMGenerator<T: Object>: IteratorProtocol {
+public final class RLMIterator<T: Object>: IteratorProtocol {
     private var i: UInt = 0
-    private let collection: RLMCollection
+    private let generatorBase : NSFastEnumerationIterator
 
     init(collection: RLMCollection) {
-        self.collection = collection
+        generatorBase = NSFastEnumerationIterator(collection)
     }
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public func next() -> T? { // swiftlint:disable:this valid_docs
-        if i >= collection.count {
-            return .none
-        }
-        let accessor = collection[i] as? T
-        i += 1
+        let accessor = generatorBase.next() as! T?
         if let accessor = accessor {
             RLMInitializeSwiftAccessorGenerics(accessor)
         }
@@ -387,7 +382,7 @@ private class _AnyRealmCollectionBase<T: Object> {
     func sum<U: AddableType>(_ property: String) -> U { fatalError() }
     func average<U: AddableType>(_ property: String) -> U? { fatalError() }
     subscript(position: Int) -> Element { fatalError() }
-    func generate() -> RLMGenerator<T> { fatalError() }
+    func makeIterator() -> RLMIterator<T> { fatalError() }
     var startIndex: Int { fatalError() }
     var endIndex: Int { fatalError() }
     func value(forKey key: String) -> AnyObject? { fatalError() }
@@ -570,10 +565,10 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
         return unsafeBitCast(base[position as! C.Index], to: C.Element.self)
     }
 
-    /// Returns a `GeneratorOf<Element>` that yields successive elements in the collection.
-    override func generate() -> RLMGenerator<Element> {
+    /// Returns a `RLMIterator` that yields successive elements in the collection.
+    override func makeIterator() -> RLMIterator<Element> {
         // FIXME: it should be possible to avoid this force-casting
-        return base.makeIterator() as! RLMGenerator<Element>
+        return base.makeIterator() as! RLMIterator<Element>
     }
 
 
@@ -817,8 +812,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     */
     public subscript(position: Int) -> T { return base[position] }
 
-    /// Returns a `GeneratorOf<T>` that yields successive elements in the collection.
-    public func generate() -> RLMGenerator<T> { return base.generate() }
+    /// Returns a `RLMIterator` that yields successive elements in the collection.
+    public func makeIterator() -> RLMIterator<T> { return base.makeIterator() }
 
 
     // MARK: Collection Support

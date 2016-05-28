@@ -80,19 +80,19 @@ class ListTests: TestCase {
         }
     }
 
+    func testFastEnumerationWithMutation() {
+        array.appendContentsOf([str1, str2, str1, str2, str1, str2, str1, str2, str1,
+            str2, str1, str2, str1, str2, str1, str2, str1, str2, str1, str2])
+        var str = ""
+        for obj in array {
+            str += obj.stringCol
+            array.appendContentsOf([str1])
+        }
+
+        XCTAssertEqual(str, "12121212121212121212")
+    }
+
     /* disabled for Swift 3 conversion */
-//    func testFastEnumerationWithMutation() {
-//        array.appendContentsOf([str1, str2, str1, str2, str1, str2, str1, str2, str1,
-//            str2, str1, str2, str1, str2, str1, str2, str1, str2, str1, str2])
-//        var str = ""
-//        for obj in array {
-//            str += obj.stringCol
-//            array.appendContentsOf([str1])
-//        }
-//
-//        XCTAssertEqual(str, "12121212121212121212")
-//    }
-//
 //    func testAppendObject() {
 //        for str in [str1, str2, str1] {
 //            array.append(str!)
