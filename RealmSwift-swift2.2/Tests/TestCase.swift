@@ -23,12 +23,6 @@ import Realm.Dynamic
 import RealmSwift
 import XCTest
 
-#if REALM_XCODE_VERSION_0730
-    typealias TestLocationString = StaticString
-#else
-    typealias TestLocationString = String
-#endif
-
 func inMemoryRealm(inMememoryIdentifier: String) -> Realm {
     return try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: inMememoryIdentifier))
 }
@@ -122,7 +116,7 @@ class TestCase: XCTestCase {
         RLMAssertThrows(self, { _ = block() } as dispatch_block_t, named, message, fileName, lineNumber)
     }
 
-    func assertSucceeds(message: String? = nil, fileName: TestLocationString = #file,
+    func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
                         lineNumber: UInt = #line, @noescape block: () throws -> ()) {
         do {
             try block()
@@ -133,7 +127,7 @@ class TestCase: XCTestCase {
     }
 
     func assertFails<T>(expectedError: Error, _ message: String? = nil,
-                        fileName: TestLocationString = #file, lineNumber: UInt = #line,
+                        fileName: StaticString = #file, lineNumber: UInt = #line,
                         @noescape block: () throws -> T) {
         do {
             try block()
@@ -147,18 +141,8 @@ class TestCase: XCTestCase {
         }
     }
 
-    func assertNil<T>(@autoclosure block: () -> T?, _ message: String? = nil,
-                      fileName: TestLocationString = #file, lineNumber: UInt = #line) {
-        XCTAssert(block() == nil, message ?? "", file: fileName, line: lineNumber)
-    }
-
     private func realmFilePrefix() -> String {
-        let remove = NSCharacterSet(charactersInString: "-[]")
-#if REALM_XCODE_VERSION_0730
-        return name!.stringByTrimmingCharactersInSet(remove)
-#else
-        return name.stringByTrimmingCharactersInSet(remove)
-#endif
+        return name!.stringByTrimmingCharactersInSet(NSCharacterSet(charactersInString: "-[]"))
     }
 
     internal func testRealmURL() -> NSURL {
