@@ -294,7 +294,7 @@ static void RLMValidateValueForProperty(__unsafe_unretained id const obj,
         case RLMPropertyTypeArray: {
             if (obj != nil && obj != NSNull.null) {
                 if (![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
-                    @throw  RLMException(@"Array property value (%@) is not enumerable.", obj);
+                    @throw RLMException(@"Array property value (%@) is not enumerable.", obj);
                 }
                 if (validateNested) {
                     id<NSFastEnumeration> array = obj;
