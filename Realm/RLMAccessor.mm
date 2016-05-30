@@ -143,9 +143,6 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
 // date getter/setter
 static inline NSDate *RLMGetDate(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex) {
     RLMVerifyAttached(obj);
-    if (obj->_row.is_null(colIndex)) {
-        return nil;
-    }
     return RLMTimestampToNSDate(obj->_row.get_timestamp(colIndex));
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, __unsafe_unretained NSDate *const date) {
