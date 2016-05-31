@@ -33,14 +33,14 @@ import Realm
     }
 
     public final class RLMIterator: IteratorProtocol {
-        private let generatorBase: NSFastEnumerationIterator
+        private let iteratorBase: NSFastEnumerationIterator
 
         internal init(collection: RLMCollection) {
-            generatorBase = NSFastEnumerationIterator(collection)
+            iteratorBase = NSFastEnumerationIterator(collection)
         }
 
         public func next() -> RLMObject? {
-            return generatorBase.next() as! RLMObject?
+            return iteratorBase.next() as! RLMObject?
         }
     }
 
