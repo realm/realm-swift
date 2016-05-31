@@ -20,8 +20,8 @@ import XCTest
 import RealmSwift
 
 class ListTests: TestCase {
-    var str1: SwiftStringObject!
-    var str2: SwiftStringObject!
+    var str1: SwiftStringObject?
+    var str2: SwiftStringObject?
     var arrayObject: SwiftArrayPropertyObject!
     var array: List<SwiftStringObject>!
 
@@ -36,17 +36,21 @@ class ListTests: TestCase {
     override func setUp() {
         super.setUp()
 
-        str1 = SwiftStringObject()
+        let str1 = SwiftStringObject()
         str1.stringCol = "1"
-        str2 = SwiftStringObject()
+        self.str1 = str1
+
+        let str2 = SwiftStringObject()
         str2.stringCol = "2"
+        self.str2 = str2
+
         arrayObject = createArray()
         array = arrayObject.array
 
         let realm = realmWithTestPath()
         try! realm.write {
-            realm.add(self.str1)
-            realm.add(self.str2)
+            realm.add(str1)
+            realm.add(str2)
         }
 
         realm.beginWrite()
@@ -81,6 +85,10 @@ class ListTests: TestCase {
     }
 
     func testFastEnumerationWithMutation() {
+        guard let str1 = str1, str2 = str2 else {
+            fatalError("Test precondition failure")
+        }
+
         array.appendContentsOf([str1, str2, str1, str2, str1, str2, str1, str2, str1,
             str2, str1, str2, str1, str2, str1, str2, str1, str2, str1, str2])
         var str = ""
@@ -92,17 +100,21 @@ class ListTests: TestCase {
         XCTAssertEqual(str, "12121212121212121212")
     }
 
+    func testAppendObject() {
+        guard let str1 = str1, str2 = str2 else {
+            fatalError("Test precondition failure")
+        }
+
+        for str in [str1, str2, str1] {
+            array.append(str)
+        }
+        XCTAssertEqual(Int(3), array.count)
+        XCTAssertEqual(str1, array[0])
+        XCTAssertEqual(str2, array[1])
+        XCTAssertEqual(str1, array[2])
+    }
+
     /* disabled for Swift 3 conversion */
-//    func testAppendObject() {
-//        for str in [str1, str2, str1] {
-//            array.append(str!)
-//        }
-//        XCTAssertEqual(Int(3), array.count)
-//        XCTAssertEqual(str1, array[0])
-//        XCTAssertEqual(str2, array[1])
-//        XCTAssertEqual(str1, array[2])
-//    }
-//
 //    func testAppendArray() {
 //        array.appendContentsOf([str1, str2, str1])
 //        XCTAssertEqual(Int(3), array.count)
@@ -160,6 +172,9 @@ class ListTests: TestCase {
 //    }
 
     func testRemoveAll() {
+        guard let str1 = str1, str2 = str2 else {
+            fatalError("Test precondition failure")
+        }
         array.appendContentsOf([str1, str2])
 
         array.removeAll()
@@ -188,6 +203,9 @@ class ListTests: TestCase {
 //    }
 
     func testMove() {
+        guard let str1 = str1, str2 = str2 else {
+            fatalError("Test precondition failure")
+        }
         array.appendContentsOf([str1, str2])
 
         array.move(from: 1, to: 0)
@@ -257,6 +275,9 @@ class ListTests: TestCase {
 //    }
 
     func testChangesArePersisted() {
+        guard let str1 = str1, str2 = str2 else {
+            fatalError("Test precondition failure")
+        }
         if let realm = array.realm {
             array.appendContentsOf([str1, str2])
 
