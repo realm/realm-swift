@@ -40,10 +40,10 @@ public final class Property: CustomStringConvertible {
     public var type: PropertyType { return rlmProperty.type }
 
     /// Whether this property is indexed.
-    public var indexed: Bool { return rlmProperty.indexed }
+    public var isIndexed: Bool { return rlmProperty.indexed }
 
     /// Whether this property is optional (can contain `nil` values).
-    public var optional: Bool { return rlmProperty.optional }
+    public var isOptional: Bool { return rlmProperty.optional }
 
     /// Object class name - specify object types for `Object` and `List` properties.
     public var objectClassName: String? { return rlmProperty.objectClassName }
@@ -65,4 +65,14 @@ extension Property: Equatable {}
 /// Returns whether the two properties are equal.
 public func == (lhs: Property, rhs: Property) -> Bool { // swiftlint:disable:this valid_docs
     return lhs.rlmProperty.isEqual(to: rhs.rlmProperty)
+}
+
+// MARK: Unavailable
+
+extension Property {
+    @available(*, unavailable, renamed:"isIndexed")
+    public var indexed : Bool { fatalError() }
+
+    @available(*, unavailable, renamed:"isOptional")
+    public var optional : Bool { fatalError() }
 }

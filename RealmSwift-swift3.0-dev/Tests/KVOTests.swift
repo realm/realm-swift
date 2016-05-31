@@ -143,7 +143,7 @@ class KVOTests: TestCase {
             obj.arrayCol.append(obj)
         }
         observeListChange(obj, "arrayCol", .removal, NSIndexSet(index: 0)) {
-            obj.arrayCol.removeAll()
+            obj.arrayCol.removeAllObjects()
         }
 
         observeChange(obj, "optIntCol", NSNull(), 10) { obj.optIntCol.value = 10 }
@@ -187,7 +187,7 @@ class KVOTests: TestCase {
             obj.arrayCol.append(obj)
         }
         observeListChange(obj, "arrayCol", .removal, NSIndexSet(index: 0)) {
-            obj.arrayCol.removeAll()
+            obj.arrayCol.removeAllObjects()
         }
 
         observeChange(obj, "optIntCol", NSNull(), 10) { obj.optIntCol.value = 10 }
@@ -220,7 +220,7 @@ class KVOTests: TestCase {
     func testAllPropertyTypesMultipleAccessors() {
         let obj = KVOObject()
         realm.add(obj)
-        let obs = realm.objectForPrimaryKey(KVOObject.self, key: obj.pk as AnyObject)!
+        let obs = realm.object(ofType: KVOObject.self, forPrimaryKey: obj.pk as AnyObject)!
 
         observeChange(obs, "boolCol", false, true) { obj.boolCol = true }
         observeChange(obs, "int8Col", 1, 10) { obj.int8Col = 10 }
@@ -242,7 +242,7 @@ class KVOTests: TestCase {
             obj.arrayCol.append(obj)
         }
         observeListChange(obs, "arrayCol", .removal, NSIndexSet(index: 0)) {
-            obj.arrayCol.removeAll()
+            obj.arrayCol.removeAllObjects()
         }
 
         observeChange(obs, "optIntCol", NSNull(), 10) { obj.optIntCol.value = 10 }
@@ -267,7 +267,7 @@ class KVOTests: TestCase {
 
         let obj2 = KVOObject()
         realm.add(obj2)
-        let obs2 = realm.objectForPrimaryKey(KVOObject.self, key: obj2.pk as AnyObject)!
+        let obs2 = realm.object(ofType: KVOObject.self, forPrimaryKey: obj2.pk as AnyObject)!
         observeChange(obs2, "arrayCol.invalidated", false, true) {
             self.realm.delete(obj2)
         }

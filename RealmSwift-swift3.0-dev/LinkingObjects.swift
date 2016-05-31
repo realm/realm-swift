@@ -42,7 +42,7 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
                 self.object = nil
                 self.property = nil
             } else {
-                cachedRLMResults = .emptyDetached()
+                cachedRLMResults = RLMResults.emptyDetached()
             }
         }
         return cachedRLMResults!
@@ -55,9 +55,11 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
 
     // MARK: Fast Enumeration
     public func countByEnumerating(with state: UnsafeMutablePointer<NSFastEnumerationState>,
-                                   objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject>!,
+                                   objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject>,
                                    count len: Int) -> Int {
-        return Int(rlmResults.countByEnumerating(with: state, objects: buffer, count: UInt(len)))
+        return Int(rlmResults.countByEnumerating(with: state,
+                                                 objects: buffer,
+                                                 count: UInt(len)))
     }
 }
 
@@ -88,7 +90,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     /// Indicates if the linking objects can no longer be accessed.
     ///
     /// Linking objects can no longer be accessed if `invalidate` is called on the containing `Realm`.
-    public var invalidated: Bool { return rlmResults.isInvalidated }
+    public var isInvalidated: Bool { return rlmResults.isInvalidated }
 
     /// Returns the number of objects in these linking objects.
     public var count: Int { return Int(rlmResults.count) }
@@ -135,7 +137,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: The index of the first matching object, or `nil` if no objects match.
      */
-    public func index(of predicate: NSPredicate) -> Int? {
+    public func indexOfObject(for predicate: NSPredicate) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: predicate))
     }
 
@@ -147,7 +149,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: The index of the first matching object, or `nil` if no objects match.
      */
-    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? {
+    public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: NSPredicate(format: predicateFormat,
             argumentArray: args)))
     }
@@ -161,9 +163,11 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: The object at the given `index`.
      */
-    public subscript(position: Int) -> T {
-        throwForNegativeIndex(int: position)
-        return unsafeBitCast(rlmResults.object(at: UInt(position)), to: T.self)
+    public subscript(index: Int) -> T {
+        get {
+            throwForNegativeIndex(index)
+            return unsafeBitCast(rlmResults[UInt(index)], to: T.self)
+        }
     }
 
     /// Returns the first object in the collection, or `nil` if empty.
@@ -209,7 +213,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter key:   The name of the property.
      */
     public override func setValue(_ value: AnyObject?, forKey key: String) {
-        return setValue(value, forKeyPath: key)
+        return rlmResults.setValue(value, forKeyPath: key)
     }
 
     // MARK: Filtering
@@ -221,7 +225,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: Results containing objects that match the given predicate.
      */
-    public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> {
+    public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<T> {
         return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
@@ -232,7 +236,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: Results containing objects that match the given predicate.
      */
-    public func filter(_ predicate: NSPredicate) -> Results<T> {
+    public func filter(using predicate: NSPredicate) -> Results<T> {
         return Results<T>(rlmResults.objects(with: predicate))
     }
 
@@ -246,8 +250,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: `Results` with elements sorted by the given property name.
      */
-    public func sorted(_ property: String, ascending: Bool = true) -> Results<T> {
-        return sorted([SortDescriptor(property: property, ascending: ascending)])
+    public func sorted(onProperty property: String, ascending: Bool = true) -> Results<T> {
+        return sorted(with: [SortDescriptor(property: property, ascending: ascending)])
     }
 
     /**
@@ -257,7 +261,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: `Results` with elements sorted by the given sort descriptors.
      */
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<T> {
         return Results<T>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
@@ -273,7 +277,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The minimum value for the property amongst objects in the collection, or `nil` if the collection
        is empty.
      */
-    public func min<U: MinMaxType>(_ property: String) -> U? {
+    public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
         return rlmResults.min(ofProperty: property) as! U?
     }
 
@@ -287,7 +291,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The maximum value for the property amongst objects in the collection, or `nil` if the collection
        is empty.
      */
-    public func max<U: MinMaxType>(_ property: String) -> U? {
+    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
         return rlmResults.max(ofProperty: property) as! U?
     }
 
@@ -300,7 +304,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: The sum of the given property over all objects in the collection.
      */
-    public func sum<U: AddableType>(_ property: String) -> U {
+    public func sum<U: AddableType>(ofProperty property: String) -> U {
         return rlmResults.sum(ofProperty: property) as AnyObject as! U
     }
 
@@ -314,7 +318,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The average of the given property over all objects in the collection, or `nil` if the collection
        is empty.
      */
-    public func average<U: AddableType>(_ property: String) -> U? {
+    public func average<U: AddableType>(ofProperty property: String) -> U? {
         return rlmResults.average(ofProperty: property) as! U?
     }
 
@@ -378,6 +382,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter block: The block to be called with the evaluated linking objects and change information.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
+    @warn_unused_result(message:"You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: ((RealmCollectionChange<LinkingObjects>) -> Void)) -> NotificationToken {
         return rlmResults.addNotificationBlock { results, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
@@ -385,10 +390,10 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     }
 }
 
-extension LinkingObjects: RealmCollection {
+extension LinkingObjects : RealmCollection {
     // MARK: Sequence Support
 
-    /// Returns an `RLMIterator` that yields successive elements in the results.
+    /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
     public func makeIterator() -> RLMIterator<T> {
         return RLMIterator(collection: rlmResults)
     }
@@ -404,7 +409,13 @@ extension LinkingObjects: RealmCollection {
     /// zero or more applications of successor().
     public var endIndex: Int { return count }
 
-    public func index(after i: Int) -> Int { return i + 1 }
+    public func index(after: Int) -> Int {
+      return after + 1
+    }
+
+    public func index(before: Int) -> Int {
+      return before - 1
+    }
 
     /// :nodoc:
     public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
@@ -414,4 +425,43 @@ extension LinkingObjects: RealmCollection {
                 block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
             }
     }
+}
+
+// MARK: Unavailable
+
+extension LinkingObjects {
+    @available(*, unavailable, renamed:"isInvalidated")
+    public var invalidated : Bool { fatalError() }
+
+    @available(*, unavailable, renamed:"indexOfObject(for:)")
+    public func index(of predicate: NSPredicate) -> Int? { fatalError() }
+
+    @available(*, unavailable, renamed:"indexOfObject(for:_:)")
+    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
+
+    @available(*, unavailable, renamed:"filter(using:)")
+    public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"filter(using:_:)")
+    public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"sorted(onProperty:ascending:)")
+    public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"sorted(with:)")
+    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+        fatalError()
+    }
+
+    @available(*, unavailable, renamed:"minimumValue(ofProperty:)")
+    public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+
+    @available(*, unavailable, renamed:"maximumValue(ofProperty:)")
+    public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+
+    @available(*, unavailable, renamed:"sum(ofProperty:)")
+    public func sum<U: AddableType>(_ property: String) -> U { fatalError() }
+
+    @available(*, unavailable, renamed:"average(ofProperty:)")
+    public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
 }

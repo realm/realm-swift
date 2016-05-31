@@ -28,10 +28,10 @@ public class ListBase: RLMListBase {
     // generic class.
     /// Returns a human-readable description of the objects contained in the List.
     @objc public override var description: String {
-        return descriptionWithMaxDepth(depth: RLMDescriptionMaxDepth)
+        return descriptionWithMaxDepth(RLMDescriptionMaxDepth)
     }
 
-    @objc private func descriptionWithMaxDepth(depth: UInt) -> String {
+    @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
         let type = "List<\(_rlmArray.objectClassName)>"
         return gsub(pattern: "RLMArray <0x[a-z0-9]+>", template: type, string: _rlmArray.description(withMaxDepth: depth)) ?? type
     }
@@ -63,7 +63,7 @@ public final class List<T: Object>: ListBase {
     }
 
     /// Indicates if the List can no longer be accessed.
-    public var invalidated: Bool { return _rlmArray.isInvalidated }
+    public var isInvalidated: Bool { return _rlmArray.isInvalidated }
 
     // MARK: Initializers
 
@@ -93,7 +93,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func index(of predicate: NSPredicate) -> Int? {
+    public func indexOfObject(for predicate: NSPredicate) -> Int? {
         return notFoundToNil(index: _rlmArray.indexOfObject(with: predicate))
     }
 
@@ -106,8 +106,8 @@ public final class List<T: Object>: ListBase {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? {
-        return index(of: NSPredicate(format: predicateFormat, argumentArray: args))
+    public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
+        return indexOfObject(for: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     // MARK: Object Retrieval
@@ -124,11 +124,11 @@ public final class List<T: Object>: ListBase {
     */
     public subscript(position: Int) -> T {
         get {
-            throwForNegativeIndex(int: position)
+            throwForNegativeIndex(position)
             return unsafeBitCast(_rlmArray.object(at: UInt(position)), to: T.self)
         }
         set {
-            throwForNegativeIndex(int: position)
+            throwForNegativeIndex(position)
             _rlmArray.replaceObject(at: UInt(position), with: unsafeBitCast(newValue, to: RLMObject.self))
         }
     }
@@ -186,7 +186,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: `Results` containing elements that match the given predicate.
     */
-    public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> {
+    public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<T> {
         return Results<T>(_rlmArray.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
@@ -197,7 +197,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: `Results` containing elements that match the given predicate.
     */
-    public func filter(_ predicate: NSPredicate) -> Results<T> {
+    public func filter(using predicate: NSPredicate) -> Results<T> {
         return Results<T>(_rlmArray.objects(with: predicate))
     }
 
@@ -211,8 +211,8 @@ public final class List<T: Object>: ListBase {
 
     - returns: `Results` containing elements sorted by the given property.
     */
-    public func sorted(_ property: String, ascending: Bool = true) -> Results<T> {
-        return sorted([SortDescriptor(property: property, ascending: ascending)])
+    public func sorted(onProperty property: String, ascending: Bool = true) -> Results<T> {
+        return sorted(with: [SortDescriptor(property: property, ascending: ascending)])
     }
 
     /**
@@ -222,7 +222,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<T> {
         return Results<T>(_rlmArray.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
@@ -237,8 +237,8 @@ public final class List<T: Object>: ListBase {
 
     - returns: The minimum value for the property amongst objects in the List, or `nil` if the List is empty.
     */
-    public func min<U: MinMaxType>(_ property: String) -> U? {
-        return filter(NSPredicate(value: true)).min(property)
+    public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+        return filter(using: NSPredicate(value: true)).minimumValue(ofProperty: property)
     }
 
     /**
@@ -250,8 +250,8 @@ public final class List<T: Object>: ListBase {
 
     - returns: The maximum value for the property amongst objects in the List, or `nil` if the List is empty.
     */
-    public func max<U: MinMaxType>(_ property: String) -> U? {
-        return filter(NSPredicate(value: true)).max(property)
+    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+        return filter(using: NSPredicate(value: true)).maximumValue(ofProperty: property)
     }
 
     /**
@@ -263,8 +263,8 @@ public final class List<T: Object>: ListBase {
 
     - returns: The sum of the given property over all objects in the List.
     */
-    public func sum<U: AddableType>(_ property: String) -> U {
-        return filter(NSPredicate(value: true)).sum(property)
+    public func sum<U: AddableType>(ofProperty property: String) -> U {
+        return filter(using: NSPredicate(value: true)).sum(ofProperty: property)
     }
 
     /**
@@ -276,8 +276,8 @@ public final class List<T: Object>: ListBase {
 
     - returns: The average of the given property over all objects in the List, or `nil` if the List is empty.
     */
-    public func average<U: AddableType>(_ property: String) -> U? {
-        return filter(NSPredicate(value: true)).average(property)
+    public func average<U: AddableType>(ofProperty property: String) -> U? {
+        return filter(using: NSPredicate(value: true)).average(ofProperty: property)
     }
 
     // MARK: Mutation
@@ -301,7 +301,7 @@ public final class List<T: Object>: ListBase {
 
     - parameter objects: A sequence of objects.
     */
-    public func appendContentsOf<S: Sequence where S.Iterator.Element == T>(_ objects: S) {
+    public func append<S: Sequence where S.Iterator.Element == T>(objectsIn objects: S) {
         for obj in objects {
             _rlmArray.add(unsafeBitCast(obj, to: RLMObject.self))
         }
@@ -318,7 +318,7 @@ public final class List<T: Object>: ListBase {
     - parameter index:  The index at which to insert the object.
     */
     public func insert(_ object: T, at index: Int) {
-        throwForNegativeIndex(int: index)
+        throwForNegativeIndex(index)
         _rlmArray.insert(unsafeBitCast(object, to: RLMObject.self), at: UInt(index))
     }
 
@@ -331,8 +331,8 @@ public final class List<T: Object>: ListBase {
 
     - parameter index: The index at which to remove the object.
     */
-    public func remove(at index: Int) {
-        throwForNegativeIndex(int: index)
+    public func remove(objectAtIndex index: Int) {
+        throwForNegativeIndex(index)
         _rlmArray.removeObject(at: UInt(index))
     }
 
@@ -341,7 +341,7 @@ public final class List<T: Object>: ListBase {
 
     - warning: This method can only be called during a write transaction.
     */
-    public func removeLast() {
+    public func removeLastObject() {
         _rlmArray.removeLastObject()
     }
 
@@ -350,7 +350,7 @@ public final class List<T: Object>: ListBase {
 
     - warning: This method can only be called during a write transaction.
     */
-    public func removeAll() {
+    public func removeAllObjects() {
         _rlmArray.removeAllObjects()
     }
 
@@ -365,7 +365,7 @@ public final class List<T: Object>: ListBase {
     - parameter object: An object to replace at the specified index.
     */
     public func replace(index: Int, object: T) {
-        throwForNegativeIndex(int: index)
+        throwForNegativeIndex(index)
         _rlmArray.replaceObject(at: UInt(index), with: unsafeBitCast(object, to: RLMObject.self))
     }
 
@@ -380,8 +380,8 @@ public final class List<T: Object>: ListBase {
     - parameter to:    index to which the object at `from` should be moved.
     */
     public func move(from: Int, to: Int) { // swiftlint:disable:this variable_name
-        throwForNegativeIndex(int: from)
-        throwForNegativeIndex(int: to)
+        throwForNegativeIndex(from)
+        throwForNegativeIndex(to)
         _rlmArray.moveObject(at: UInt(from), to: UInt(to))
     }
 
@@ -395,8 +395,8 @@ public final class List<T: Object>: ListBase {
     - parameter index2: The index of the object with which to replace the object at index `index1`.
     */
     public func swap(index1: Int, _ index2: Int) {
-        throwForNegativeIndex(int: index1, parameterName: "index1")
-        throwForNegativeIndex(int: index2, parameterName: "index2")
+        throwForNegativeIndex(index1, parameterName: "index1")
+        throwForNegativeIndex(index2, parameterName: "index2")
         _rlmArray.exchangeObject(at: UInt(index1), withObjectAt: UInt(index2))
     }
 
@@ -469,7 +469,7 @@ public final class List<T: Object>: ListBase {
     }
 }
 
-extension List: RealmCollection, RangeReplaceableCollection {
+extension List : RealmCollection, RangeReplaceableCollection {
     // MARK: Sequence Support
 
     /// Returns a `RLMIterator` that yields successive elements in the `List`.
@@ -488,7 +488,7 @@ extension List: RealmCollection, RangeReplaceableCollection {
     public func replaceSubrange<C : Collection where C.Iterator.Element == T>(_ subrange: Range<Int>,
                                                                               with newElements: C) {
         for _ in subrange.lowerBound..<subrange.upperBound {
-            remove(at: subrange.lowerBound)
+            remove(objectAtIndex: subrange.lowerBound)
         }
         for x in newElements.reversed() {
             insert(x, at: subrange.lowerBound)
@@ -505,6 +505,7 @@ extension List: RealmCollection, RangeReplaceableCollection {
     public var endIndex: Int { return count }
 
     public func index(after i: Int) -> Int { return i + 1 }
+    public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
     public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
@@ -514,4 +515,55 @@ extension List: RealmCollection, RangeReplaceableCollection {
             block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
         }
     }
+}
+
+// MARK: Unavailable
+
+extension List {
+    @available(*, unavailable, renamed:"append(objectsIn:)")
+    public func appendContentsOf<S: Sequence where S.Iterator.Element == T>(_ objects: S) { fatalError() }
+
+    @available(*, unavailable, renamed:"removeAllObjects()")
+    public func removeAll() { }
+
+    @available(*, unavailable, renamed:"removeLastObject()")
+    public func removeLast() { }
+
+    @available(*, unavailable, renamed: "remove(objectAtIndex:)")
+    public func remove(at index: Int) { }
+
+    @available(*, unavailable, renamed:"isInvalidated")
+    public var invalidated : Bool { fatalError() }
+
+    @available(*, unavailable, renamed:"indexOfObject(for:)")
+    public func index(of predicate: NSPredicate) -> Int? { fatalError() }
+
+    @available(*, unavailable, renamed:"indexOfObject(for:_:)")
+    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
+
+    @available(*, unavailable, renamed:"filter(using:)")
+    public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"filter(using:_:)")
+    public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"sorted(onProperty:ascending:)")
+    public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"sorted(with:)")
+    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+        fatalError()
+    }
+
+    @available(*, unavailable, renamed:"minimumValue(ofProperty:)")
+    public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+
+    @available(*, unavailable, renamed:"maximumValue(ofProperty:)")
+    public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+
+    @available(*, unavailable, renamed:"sum(ofProperty:)")
+    public func sum<U: AddableType>(_ property: String) -> U { fatalError() }
+
+    @available(*, unavailable, renamed:"average(ofProperty:)")
+    public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
 }

@@ -100,7 +100,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     /// Indicates if the results can no longer be accessed.
     ///
     /// Results can no longer be accessed if `invalidate` is called on the containing `Realm`.
-    public var invalidated: Bool { return rlmResults.isInvalidated }
+    public var isInvalidated: Bool { return rlmResults.isInvalidated }
 
     /// Returns the number of objects in these results.
     public var count: Int { return Int(rlmResults.count) }
@@ -132,7 +132,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func index(of predicate: NSPredicate) -> Int? {
+    public func indexOfObject(for predicate: NSPredicate) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: predicate))
     }
 
@@ -144,7 +144,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? {
+    public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: NSPredicate(format: predicateFormat,
                                                                                argumentArray: args)))
     }
@@ -159,7 +159,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The object at the given `index`.
     */
     public subscript(position: Int) -> T {
-        throwForNegativeIndex(int: position)
+        throwForNegativeIndex(position)
         return unsafeBitCast(rlmResults.object(at: UInt(position)), to: T.self)
     }
 
@@ -216,7 +216,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: Results containing objects that match the given predicate.
     */
-    public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> {
+    public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<T> {
         return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
@@ -227,7 +227,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: Results containing objects that match the given predicate.
     */
-    public func filter(_ predicate: NSPredicate) -> Results<T> {
+    public func filter(using predicate: NSPredicate) -> Results<T> {
         return Results<T>(rlmResults.objects(with: predicate))
     }
 
@@ -241,8 +241,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: `Results` with elements sorted by the given property name.
     */
-    public func sorted(_ property: String, ascending: Bool = true) -> Results<T> {
-        return sorted([SortDescriptor(property: property, ascending: ascending)])
+    public func sorted(onProperty property: String, ascending: Bool = true) -> Results<T> {
+        return sorted(with: [SortDescriptor(property: property, ascending: ascending)])
     }
 
     /**
@@ -252,7 +252,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<T> {
         return Results<T>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
@@ -267,7 +267,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: The minimum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
-    public func min<U: MinMaxType>(_ property: String) -> U? {
+    public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
         return rlmResults.min(ofProperty: property) as! U?
     }
 
@@ -280,7 +280,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: The maximum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
-    public func max<U: MinMaxType>(_ property: String) -> U? {
+    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
         return rlmResults.max(ofProperty: property) as! U?
     }
 
@@ -293,7 +293,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: The sum of the given property over all objects in the Results.
     */
-    public func sum<U: AddableType>(_ property: String) -> U {
+    public func sum<U: AddableType>(ofProperty property: String) -> U {
         return rlmResults.sum(ofProperty: property) as AnyObject as! U
     }
 
@@ -306,7 +306,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: The average of the given property over all objects in the Results, or `nil` if the Results is empty.
     */
-    public func average<U: AddableType>(_ property: String) -> U? {
+    public func average<U: AddableType>(ofProperty property: String) -> U? {
         return rlmResults.average(ofProperty: property) as! U?
     }
 
@@ -398,6 +398,7 @@ extension Results: RealmCollection {
     public var endIndex: Int { return count }
 
     public func index(after i: Int) -> Int { return i + 1 }
+    public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
     public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
@@ -407,4 +408,43 @@ extension Results: RealmCollection {
             block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
         }
     }
+}
+
+// MARK: Unavailable
+
+extension Results {
+    @available(*, unavailable, renamed:"isInvalidated")
+    public var invalidated : Bool { fatalError() }
+
+    @available(*, unavailable, renamed:"indexOfObject(for:)")
+    public func index(of predicate: NSPredicate) -> Int? { fatalError() }
+
+    @available(*, unavailable, renamed:"indexOfObject(for:_:)")
+    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
+
+    @available(*, unavailable, renamed:"filter(using:)")
+    public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"filter(using:_:)")
+    public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"sorted(onProperty:ascending:)")
+    public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"sorted(with:)")
+    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+        fatalError()
+    }
+
+    @available(*, unavailable, renamed:"minimumValue(ofProperty:)")
+    public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+
+    @available(*, unavailable, renamed:"maximumValue(ofProperty:)")
+    public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+
+    @available(*, unavailable, renamed:"sum(ofProperty:)")
+    public func sum<U: AddableType>(_ property: String) -> U { fatalError() }
+
+    @available(*, unavailable, renamed:"average(ofProperty:)")
+    public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
 }

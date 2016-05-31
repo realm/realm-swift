@@ -32,7 +32,7 @@ internal func throwRealmException(_ message: String, userInfo: [String:AnyObject
     NSException(name: RLMExceptionName, reason: message, userInfo: userInfo).raise()
 }
 
-internal func throwForNegativeIndex(int: Int, parameterName: String = "index") {
+internal func throwForNegativeIndex(_ int: Int, parameterName: String = "index") {
     if int < 0 {
         throwRealmException("Cannot pass a negative value for '\(parameterName)'.")
     }

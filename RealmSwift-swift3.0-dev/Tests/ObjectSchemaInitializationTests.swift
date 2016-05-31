@@ -34,80 +34,80 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertNotNil(boolCol)
         XCTAssertEqual(boolCol!.name, "boolCol")
         XCTAssertEqual(boolCol!.type, PropertyType.bool)
-        XCTAssertFalse(boolCol!.indexed)
-        XCTAssertFalse(boolCol!.optional)
+        XCTAssertFalse(boolCol!.isIndexed)
+        XCTAssertFalse(boolCol!.isOptional)
         XCTAssertNil(boolCol!.objectClassName)
 
         let intCol = objectSchema["intCol"]
         XCTAssertNotNil(intCol)
         XCTAssertEqual(intCol!.name, "intCol")
         XCTAssertEqual(intCol!.type, PropertyType.int)
-        XCTAssertFalse(intCol!.indexed)
-        XCTAssertFalse(intCol!.optional)
+        XCTAssertFalse(intCol!.isIndexed)
+        XCTAssertFalse(intCol!.isOptional)
         XCTAssertNil(intCol!.objectClassName)
 
         let floatCol = objectSchema["floatCol"]
         XCTAssertNotNil(floatCol)
         XCTAssertEqual(floatCol!.name, "floatCol")
         XCTAssertEqual(floatCol!.type, PropertyType.float)
-        XCTAssertFalse(floatCol!.indexed)
-        XCTAssertFalse(floatCol!.optional)
+        XCTAssertFalse(floatCol!.isIndexed)
+        XCTAssertFalse(floatCol!.isOptional)
         XCTAssertNil(floatCol!.objectClassName)
 
         let doubleCol = objectSchema["doubleCol"]
         XCTAssertNotNil(doubleCol)
         XCTAssertEqual(doubleCol!.name, "doubleCol")
         XCTAssertEqual(doubleCol!.type, PropertyType.double)
-        XCTAssertFalse(doubleCol!.indexed)
-        XCTAssertFalse(doubleCol!.optional)
+        XCTAssertFalse(doubleCol!.isIndexed)
+        XCTAssertFalse(doubleCol!.isOptional)
         XCTAssertNil(doubleCol!.objectClassName)
 
         let stringCol = objectSchema["stringCol"]
         XCTAssertNotNil(stringCol)
         XCTAssertEqual(stringCol!.name, "stringCol")
         XCTAssertEqual(stringCol!.type, PropertyType.string)
-        XCTAssertFalse(stringCol!.indexed)
-        XCTAssertFalse(stringCol!.optional)
+        XCTAssertFalse(stringCol!.isIndexed)
+        XCTAssertFalse(stringCol!.isOptional)
         XCTAssertNil(stringCol!.objectClassName)
 
         let binaryCol = objectSchema["binaryCol"]
         XCTAssertNotNil(binaryCol)
         XCTAssertEqual(binaryCol!.name, "binaryCol")
         XCTAssertEqual(binaryCol!.type, PropertyType.data)
-        XCTAssertFalse(binaryCol!.indexed)
-        XCTAssertFalse(binaryCol!.optional)
+        XCTAssertFalse(binaryCol!.isIndexed)
+        XCTAssertFalse(binaryCol!.isOptional)
         XCTAssertNil(binaryCol!.objectClassName)
 
         let dateCol = objectSchema["dateCol"]
         XCTAssertNotNil(dateCol)
         XCTAssertEqual(dateCol!.name, "dateCol")
         XCTAssertEqual(dateCol!.type, PropertyType.date)
-        XCTAssertFalse(dateCol!.indexed)
-        XCTAssertFalse(dateCol!.optional)
+        XCTAssertFalse(dateCol!.isIndexed)
+        XCTAssertFalse(dateCol!.isOptional)
         XCTAssertNil(dateCol!.objectClassName)
 
         let objectCol = objectSchema["objectCol"]
         XCTAssertNotNil(objectCol)
         XCTAssertEqual(objectCol!.name, "objectCol")
         XCTAssertEqual(objectCol!.type, PropertyType.object)
-        XCTAssertFalse(objectCol!.indexed)
-        XCTAssertTrue(objectCol!.optional)
+        XCTAssertFalse(objectCol!.isIndexed)
+        XCTAssertTrue(objectCol!.isOptional)
         XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
 
         let arrayCol = objectSchema["arrayCol"]
         XCTAssertNotNil(arrayCol)
         XCTAssertEqual(arrayCol!.name, "arrayCol")
         XCTAssertEqual(arrayCol!.type, PropertyType.array)
-        XCTAssertFalse(arrayCol!.indexed)
-        XCTAssertFalse(arrayCol!.optional)
+        XCTAssertFalse(arrayCol!.isIndexed)
+        XCTAssertFalse(arrayCol!.isOptional)
         XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
 
         let dynamicArrayCol = SwiftCompanyObject().objectSchema["employees"]
         XCTAssertNotNil(dynamicArrayCol)
         XCTAssertEqual(dynamicArrayCol!.name, "employees")
         XCTAssertEqual(dynamicArrayCol!.type, PropertyType.array)
-        XCTAssertFalse(dynamicArrayCol!.indexed)
-        XCTAssertFalse(arrayCol!.optional)
+        XCTAssertFalse(dynamicArrayCol!.isIndexed)
+        XCTAssertFalse(arrayCol!.isOptional)
         XCTAssertEqual(dynamicArrayCol!.objectClassName!, "SwiftEmployeeObject")
     }
 
@@ -150,18 +150,18 @@ class ObjectSchemaInitializationTests: TestCase {
     }
 
     func testIndexedProperties() {
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["stringCol"]!.indexed)
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["intCol"]!.indexed)
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["int8Col"]!.indexed)
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["int16Col"]!.indexed)
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["int32Col"]!.indexed)
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["int64Col"]!.indexed)
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["boolCol"]!.indexed)
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["dateCol"]!.indexed)
+        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["stringCol"]!.isIndexed)
+        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["intCol"]!.isIndexed)
+        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["int8Col"]!.isIndexed)
+        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["int16Col"]!.isIndexed)
+        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["int32Col"]!.isIndexed)
+        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["int64Col"]!.isIndexed)
+        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["boolCol"]!.isIndexed)
+        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["dateCol"]!.isIndexed)
 
-        XCTAssertFalse(SwiftIndexedPropertiesObject().objectSchema["floatCol"]!.indexed)
-        XCTAssertFalse(SwiftIndexedPropertiesObject().objectSchema["doubleCol"]!.indexed)
-        XCTAssertFalse(SwiftIndexedPropertiesObject().objectSchema["dataCol"]!.indexed)
+        XCTAssertFalse(SwiftIndexedPropertiesObject().objectSchema["floatCol"]!.isIndexed)
+        XCTAssertFalse(SwiftIndexedPropertiesObject().objectSchema["doubleCol"]!.isIndexed)
+        XCTAssertFalse(SwiftIndexedPropertiesObject().objectSchema["dataCol"]!.isIndexed)
 
         let unindexibleSchema = RLMObjectSchema(forObjectClass: SwiftObjectWithUnindexibleProperties.self)
         for propName in SwiftObjectWithUnindexibleProperties.indexedProperties() {
@@ -180,16 +180,6 @@ class ObjectSchemaInitializationTests: TestCase {
         let types = Set(schema.properties.map { $0.type })
         XCTAssertEqual(types, Set([.string, .string, .data, .date, .object, .int, .float, .double, .bool]))
     }
-
-    /* disabled for Swift 3 conversion */
-//    func testImplicitlyUnwrappedOptionalsAreParsedAsOptionals() {
-//        let schema = SwiftImplicitlyUnwrappedOptionalObject().objectSchema
-//        XCTAssertTrue(schema["optObjectCol"]!.optional)
-//        XCTAssertTrue(schema["optNSStringCol"]!.optional)
-//        XCTAssertTrue(schema["optStringCol"]!.optional)
-//        XCTAssertTrue(schema["optBinaryCol"]!.optional)
-//        XCTAssertTrue(schema["optDateCol"]!.optional)
-//    }
 
     func testNonRealmOptionalTypesDeclaredAsRealmOptional() {
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonRealmOptionalType.self))

@@ -77,8 +77,8 @@ class ObjectAccessorTests: TestCase {
     func testPersistedAccessors() {
         let realm = try! Realm()
         realm.beginWrite()
-        let object = realm.create(SwiftObject)
-        let optionalObject = realm.create(SwiftOptionalObject)
+        let object = realm.createObject(ofType: SwiftObject.self)
+        let optionalObject = realm.createObject(ofType: SwiftOptionalObject.self)
         setAndTestAllProperties(object)
         setAndTestAllOptionalProperties(optionalObject)
         try! realm.commitWrite()
@@ -137,7 +137,7 @@ class ObjectAccessorTests: TestCase {
             testObject()
         }
 
-        let obj = realm.objects(SwiftAllIntSizesObject).first!
+        let obj = realm.allObjects(ofType: SwiftAllIntSizesObject.self).first!
         XCTAssertEqual(obj.int8, v8)
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
@@ -153,12 +153,12 @@ class ObjectAccessorTests: TestCase {
         let realm = realmWithTestPath()
 
         realm.beginWrite()
-        realm.create(SwiftLongObject.self, value: [NSNumber(value: longNumber)])
-        realm.create(SwiftLongObject.self, value: [NSNumber(value: intNumber)])
-        realm.create(SwiftLongObject.self, value: [NSNumber(value: negativeLongNumber)])
+        realm.createObject(ofType: SwiftLongObject.self, populatedWith: [NSNumber(value: longNumber)])
+        realm.createObject(ofType: SwiftLongObject.self, populatedWith: [NSNumber(value: intNumber)])
+        realm.createObject(ofType: SwiftLongObject.self, populatedWith: [NSNumber(value: negativeLongNumber)])
         try! realm.commitWrite()
 
-        let objects = realm.objects(SwiftLongObject)
+        let objects = realm.allObjects(ofType: SwiftLongObject.self)
         XCTAssertEqual(objects.count, Int(3), "3 rows expected")
         XCTAssertEqual(objects[0].longCol, longNumber, "2 ^ 34 expected")
         XCTAssertEqual(objects[1].longCol, intNumber, "2 ^ 31 - 1 expected")
@@ -194,7 +194,7 @@ class ObjectAccessorTests: TestCase {
             realm.add(object2)
         }
 
-        let objects = realm.objects(SwiftObject)
+        let objects = realm.allObjects(ofType: SwiftObject.self)
 
         let firstObject = objects.first
         XCTAssertEqual(2, firstObject!.arrayCol.count)
@@ -202,9 +202,9 @@ class ObjectAccessorTests: TestCase {
         let lastObject = objects.last
         XCTAssertEqual(2, lastObject!.arrayCol.count)
 
-//        let iterator = objects.makeIterator()
-//        let next = iterator.next()!
-//        XCTAssertEqual(next.arrayCol.count, 2)
+        let iterator = objects.makeIterator()
+        let next = iterator.next()!
+        XCTAssertEqual(next.arrayCol.count, 2)
 
         for obj in objects {
             XCTAssertEqual(2, obj.arrayCol.count)
@@ -214,8 +214,8 @@ class ObjectAccessorTests: TestCase {
     func testSettingOptionalPropertyOnDeletedObjectsThrows() {
         let realm = try! Realm()
         try! realm.write {
-            let obj = realm.create(SwiftOptionalObject)
-            let copy = realm.objects(SwiftOptionalObject).first!
+            let obj = realm.createObject(ofType: SwiftOptionalObject.self)
+            let copy = realm.allObjects(ofType: SwiftOptionalObject.self).first!
             realm.delete(obj)
 
             self.assertThrows(copy.optIntCol.value = 1)

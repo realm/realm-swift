@@ -189,7 +189,7 @@ public final class Realm {
                impact Realm's performance. Always prefer performing multiple mutations in a single
                transaction when possible.
     */
-    public var inWriteTransaction: Bool {
+    public var isInWriteTransaction: Bool {
         return rlmRealm.inWriteTransaction
     }
 
@@ -260,12 +260,13 @@ public final class Realm {
 
     - returns: The created object.
     */
-    public func create<T: Object>(_ type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
-        let className = (type as Object.Type).className()
-        if update && schema[className]?.primaryKeyProperty == nil {
-            throwRealmException("'\(className)' does not have a primary key and can not be updated")
+    @discardableResult
+    public func createObject<T: Object>(ofType type: T.Type, populatedWith value: AnyObject = [:], update: Bool = false) -> T {
+        let typeName = (type as Object.Type).className()
+        if update && schema[typeName]?.primaryKeyProperty == nil {
+            throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
         }
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), to: T.self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, typeName, value, update), to: T.self)
     }
 
     /**
@@ -296,11 +297,12 @@ public final class Realm {
 
     :nodoc:
     */
-    public func dynamicCreate(_ className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
-        if update && schema[className]?.primaryKeyProperty == nil {
-            throwRealmException("'\(className)' does not have a primary key and can not be updated")
+    @discardableResult
+    public func createDynamicObject(ofType typeName: String, populatedWith value: AnyObject = [:], update: Bool = false) -> DynamicObject {
+        if update && schema[typeName]?.primaryKeyProperty == nil {
+            throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
         }
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), to: DynamicObject.self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, typeName, value, update), to: DynamicObject.self)
     }
 
     // MARK: Deleting objects
@@ -339,7 +341,7 @@ public final class Realm {
 
     :nodoc:
     */
-    public func delete<T: Object>(objects: List<T>) {
+    public func delete<T: Object>(_ objects: List<T>) {
         rlmRealm.deleteObjects(objects._rlmArray)
     }
 
@@ -352,7 +354,7 @@ public final class Realm {
 
     :nodoc:
     */
-    public func delete<T: Object>(objects: Results<T>) {
+    public func delete<T: Object>(_ objects: Results<T>) {
         rlmRealm.deleteObjects(objects.rlmResults)
     }
 
@@ -361,7 +363,7 @@ public final class Realm {
 
     - warning: This method can only be called during a write transaction.
     */
-    public func deleteAll() {
+    public func deleteAllObjects() {
         RLMDeleteAllObjectsFromRealm(rlmRealm)
     }
 
@@ -374,7 +376,7 @@ public final class Realm {
 
     - returns: All objects of the given type in Realm.
     */
-    public func objects<T: Object>(_ type: T.Type) -> Results<T> {
+    public func allObjects<T: Object>(ofType type: T.Type) -> Results<T> {
         return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
     }
 
@@ -393,8 +395,8 @@ public final class Realm {
 
     :nodoc:
     */
-    public func dynamicObjects(_ className: String) -> Results<DynamicObject> {
-        return Results<DynamicObject>(RLMGetObjects(rlmRealm, className, nil))
+    public func allDynamicObjects(ofType typeName: String) -> Results<DynamicObject> {
+        return Results<DynamicObject>(RLMGetObjects(rlmRealm, typeName, nil))
     }
 
     /**
@@ -411,7 +413,7 @@ public final class Realm {
 
     - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
-    public func objectForPrimaryKey<T: Object>(_ type: T.Type, key: AnyObject) -> T? {
+    public func object<T: Object>(ofType type: T.Type, forPrimaryKey key: AnyObject) -> T? {
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), to: Optional<T>.self)
     }
 
@@ -437,8 +439,8 @@ public final class Realm {
 
     :nodoc:
     */
-    public func dynamicObjectForPrimaryKey(_ className: String, key: AnyObject) -> DynamicObject? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, className, key), to: Optional<DynamicObject>.self)
+    public func dynamicObject(ofType typeName: String, forPrimaryKey key: AnyObject) -> DynamicObject? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, typeName, key), to: Optional<DynamicObject>.self)
     }
 
     // MARK: Notifications
@@ -510,7 +512,7 @@ public final class Realm {
 
     Defaults to true.
     */
-    public var autorefresh: Bool {
+    public var shouldAutorefresh: Bool {
         get {
             return rlmRealm.autorefresh
         }
@@ -526,6 +528,7 @@ public final class Realm {
     - returns: Whether the realm had any updates.
                Note that this may return true even if no data has actually changed.
     */
+    @discardableResult
     public func refresh() -> Bool {
         return rlmRealm.refresh()
     }
@@ -571,8 +574,8 @@ public final class Realm {
 
     - throws: An NSError if the copy could not be written.
     */
-    public func writeCopyToURL(_ fileURL: NSURL, encryptionKey: NSData? = nil) throws {
-        try rlmRealm.writeCopy(to: fileURL, encryptionKey: encryptionKey)
+    public func writeCopy(toFileURL url: NSURL, encryptionKey: NSData? = nil) throws {
+        try rlmRealm.writeCopy(to: url, encryptionKey: encryptionKey)
     }
 
     // MARK: Internal
@@ -621,3 +624,47 @@ public enum Notification: String {
 
 /// Closure to run when the data in a Realm was modified.
 public typealias NotificationBlock = (notification: Notification, realm: Realm) -> Void
+
+
+// MARK: Unavailable
+
+extension Realm {
+
+    @available(*, unavailable, renamed:"isInWriteTransaction")
+    public var inWriteTransaction : Bool { fatalError() }
+
+    @available(*, unavailable, renamed:"createObject(ofType:populatedWith:update:)")
+    public func create<T: Object>(_ type: T.Type, value: AnyObject = [:], update: Bool = false) -> T { fatalError() }
+
+    @available(*, unavailable, renamed:"createDynamicObject(ofType:populatedWith:update:)")
+    public func dynamicCreate(_ className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
+        fatalError()
+    }
+
+    @available(*, unavailable, renamed:"delete(_:)")
+    public func delete<T: Object>(objects: List<T>) { }
+
+    @available(*, unavailable, renamed:"delete(_:)")
+    public func delete<T: Object>(objects: Results<T>) { }
+
+    @available(*, unavailable, renamed:"deleteAllObjects()")
+    public func deleteAll() { }
+
+    @available(*, unavailable, renamed:"allObjects(ofType:)")
+    public func objects<T: Object>(_ type: T.Type) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"allDynamicObjects(ofType:)")
+    public func dynamicObjects(_ className: String) -> Results<DynamicObject> { fatalError() }
+
+    @available(*, unavailable, renamed:"object(ofType:forPrimaryKey:)")
+    public func objectForPrimaryKey<T: Object>(_ type: T.Type, key: AnyObject) -> T? { fatalError() }
+
+    @available(*, unavailable, renamed:"dynamicObject(ofType:forPrimaryKey:)")
+    public func dynamicObjectForPrimaryKey(_ className: String, key: AnyObject) -> DynamicObject? { fatalError() }
+
+    @available(*, unavailable, renamed:"shouldAutorefresh")
+    public var autorefresh : Bool { get { fatalError() } set { fatalError() } }
+
+    @available(*, unavailable, renamed:"writeCopy(toFileURL:encryptionKey:)")
+    public func writeCopyToURL(_ fileURL: NSURL, encryptionKey: NSData? = nil) throws { fatalError() }
+}

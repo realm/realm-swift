@@ -223,7 +223,7 @@ public class Object: RLMObjectBase {
 
     - parameter object: Object to compare for equality.
     */
-    public override func isEqual(to object: AnyObject?) -> Bool {
+    public override func isEqual(_ object: AnyObject?) -> Bool {
         return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
 

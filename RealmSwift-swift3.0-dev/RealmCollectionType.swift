@@ -117,7 +117,7 @@ public enum RealmCollectionChange<T> {
 A homogenous collection of `Object`s which can be retrieved, filtered, sorted,
 and operated upon.
 */
-public protocol RealmCollection: Collection, CustomStringConvertible {
+public protocol RealmCollection: RandomAccessCollection, CustomStringConvertible {
 
     /// Element type contained in this collection.
     associatedtype Element: Object
@@ -133,7 +133,7 @@ public protocol RealmCollection: Collection, CustomStringConvertible {
     /// Indicates if the collection can no longer be accessed.
     ///
     /// The collection can no longer be accessed if `invalidate` is called on the containing `Realm`.
-    var invalidated: Bool { get }
+    var isInvalidated: Bool { get }
 
     /// Returns the number of objects in this collection.
     var count: Int { get }
@@ -161,7 +161,7 @@ public protocol RealmCollection: Collection, CustomStringConvertible {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    func index(of predicate: NSPredicate) -> Int?
+    func indexOfObject(for predicate: NSPredicate) -> Int?
 
     /**
     Returns the index of the first object matching the given predicate,
@@ -172,7 +172,7 @@ public protocol RealmCollection: Collection, CustomStringConvertible {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    func index(of predicateFormat: String, _ args: AnyObject...) -> Int?
+    func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int?
 
 
     // MARK: Filtering
@@ -184,7 +184,7 @@ public protocol RealmCollection: Collection, CustomStringConvertible {
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<Element>
+    func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<Element>
 
     /**
     Returns `Results` containing collection elements that match the given predicate.
@@ -193,7 +193,7 @@ public protocol RealmCollection: Collection, CustomStringConvertible {
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    func filter(_ predicate: NSPredicate) -> Results<Element>
+    func filter(using predicate: NSPredicate) -> Results<Element>
 
 
     // MARK: Sorting
@@ -206,7 +206,7 @@ public protocol RealmCollection: Collection, CustomStringConvertible {
 
     - returns: `Results` containing collection elements sorted by the given property.
     */
-    func sorted(_ property: String, ascending: Bool) -> Results<Element>
+    func sorted(onProperty property: String, ascending: Bool) -> Results<Element>
 
     /**
     Returns `Results` with elements sorted by the given sort descriptors.
@@ -215,7 +215,7 @@ public protocol RealmCollection: Collection, CustomStringConvertible {
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<Element>
+    func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<Element>
 
 
     // MARK: Aggregate Operations
@@ -230,7 +230,7 @@ public protocol RealmCollection: Collection, CustomStringConvertible {
     - returns: The minimum value for the property amongst objects in the collection, or `nil` if the
                collection is empty.
     */
-    func min<U: MinMaxType>(_ property: String) -> U?
+    func minimumValue<U: MinMaxType>(ofProperty property: String) -> U?
 
     /**
     Returns the maximum value of the given property.
@@ -242,7 +242,7 @@ public protocol RealmCollection: Collection, CustomStringConvertible {
     - returns: The maximum value for the property amongst objects in the collection, or `nil` if the
                collection is empty.
     */
-    func max<U: MinMaxType>(_ property: String) -> U?
+    func maximumValue<U: MinMaxType>(ofProperty property: String) -> U?
 
     /**
     Returns the sum of the given property for objects in the collection.
@@ -253,7 +253,7 @@ public protocol RealmCollection: Collection, CustomStringConvertible {
 
     - returns: The sum of the given property over all objects in the collection.
     */
-    func sum<U: AddableType>(_ property: String) -> U
+    func sum<U: AddableType>(ofProperty property: String) -> U
 
     /**
     Returns the average of the given property for objects in the collection.
@@ -265,7 +265,7 @@ public protocol RealmCollection: Collection, CustomStringConvertible {
     - returns: The average of the given property over all objects in the collection, or `nil` if the
                collection is empty.
     */
-    func average<U: AddableType>(_ property: String) -> U?
+    func average<U: AddableType>(ofProperty property: String) -> U?
 
 
     // MARK: Key-Value Coding
@@ -365,22 +365,22 @@ private class _AnyRealmCollectionBase<T: Object> {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
     var realm: Realm? { fatalError() }
-    var invalidated: Bool { fatalError() }
+    var isInvalidated: Bool { fatalError() }
     var count: Int { fatalError() }
     var description: String { fatalError() }
     func index(of object: Element) -> Int? { fatalError() }
-    func index(of predicate: NSPredicate) -> Int? { fatalError() }
-    func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
-    func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<Element> { fatalError() }
-    func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
-    func sorted(_ property: String, ascending: Bool) -> Results<Element> { fatalError() }
-    func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<Element> {
+    func indexOfObject(for predicate: NSPredicate) -> Int? { fatalError() }
+    func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
+    func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<Element> { fatalError() }
+    func filter(using predicate: NSPredicate) -> Results<Element> { fatalError() }
+    func sorted(onProperty property: String, ascending: Bool) -> Results<Element> { fatalError() }
+    func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<Element> {
         fatalError()
     }
-    func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
-    func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
-    func sum<U: AddableType>(_ property: String) -> U { fatalError() }
-    func average<U: AddableType>(_ property: String) -> U? { fatalError() }
+    func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
+    func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
+    func sum<U: AddableType>(ofProperty property: String) -> U { fatalError() }
+    func average<U: AddableType>(ofProperty property: String) -> U? { fatalError() }
     subscript(position: Int) -> Element { fatalError() }
     func makeIterator() -> RLMIterator<T> { fatalError() }
     var startIndex: Int { fatalError() }
@@ -408,7 +408,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     /// Indicates if the collection can no longer be accessed.
     ///
     /// The collection can no longer be accessed if `invalidate` is called on the containing `Realm`.
-    override var invalidated: Bool { return base.invalidated }
+    override var isInvalidated: Bool { return base.isInvalidated }
 
     /// Returns the number of objects in this collection.
     override var count: Int { return base.count }
@@ -436,7 +436,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    override func index(of predicate: NSPredicate) -> Int? { return base.index(of: predicate) }
+    override func indexOfObject(for predicate: NSPredicate) -> Int? { return base.indexOfObject(for: predicate) }
 
     /**
     Returns the index of the first object matching the given predicate,
@@ -447,8 +447,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    override func index(of predicateFormat: String, _ args: AnyObject...) -> Int? {
-        return base.index(of: NSPredicate(format: predicateFormat, argumentArray: args))
+    override func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
+        return base.indexOfObject(for: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     // MARK: Filtering
@@ -460,8 +460,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    override func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<C.Element> {
-        return base.filter(NSPredicate(format: predicateFormat, argumentArray: args))
+    override func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<C.Element> {
+        return base.filter(using: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     /**
@@ -471,7 +471,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
+    override func filter(using predicate: NSPredicate) -> Results<C.Element> { return base.filter(using: predicate) }
 
 
     // MARK: Sorting
@@ -484,8 +484,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: `Results` containing collection elements sorted by the given property.
     */
-    override func sorted(_ property: String, ascending: Bool) -> Results<C.Element> {
-        return base.sorted(property, ascending: ascending)
+    override func sorted(onProperty property: String, ascending: Bool) -> Results<C.Element> {
+        return base.sorted(onProperty: property, ascending: ascending)
     }
 
     /**
@@ -496,8 +496,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
     override func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>
-                        (_ sortDescriptors: S) -> Results<C.Element> {
-        return base.sorted(sortDescriptors)
+                        (with sortDescriptors: S) -> Results<C.Element> {
+        return base.sorted(with: sortDescriptors)
     }
 
 
@@ -513,7 +513,9 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     - returns: The minimum value for the property amongst objects in the collection, or `nil` if the
                collection is empty.
     */
-    override func min<U: MinMaxType>(_ property: String) -> U? { return base.min(property) }
+    override func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+        return base.minimumValue(ofProperty: property)
+    }
 
     /**
     Returns the maximum value of the given property.
@@ -525,7 +527,9 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     - returns: The maximum value for the property amongst objects in the collection, or `nil` if the
                collection is empty.
     */
-    override func max<U: MinMaxType>(_ property: String) -> U? { return base.max(property) }
+    override func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+        return base.maximumValue(ofProperty: property)
+    }
 
     /**
     Returns the sum of the given property for objects in the collection.
@@ -536,7 +540,9 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: The sum of the given property over all objects in the collection.
     */
-    override func sum<U: AddableType>(_ property: String) -> U { return base.sum(property) }
+    override func sum<U: AddableType>(ofProperty property: String) -> U {
+        return base.sum(ofProperty: property)
+    }
 
     /**
     Returns the average of the given property for objects in the collection.
@@ -548,7 +554,9 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     - returns: The average of the given property over all objects in the collection, or `nil` if the
                collection is empty.
     */
-    override func average<U: AddableType>(_ property: String) -> U? { return base.average(property) }
+    override func average<U: AddableType>(ofProperty property: String) -> U? {
+        return base.average(ofProperty: property)
+    }
 
 
     // MARK: Sequence Support
@@ -638,6 +646,7 @@ Element type, hiding the specifics of the underlying `RealmCollection`.
 public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     public func index(after i: Int) -> Int { return i + 1 }
+    public func index(before i: Int) -> Int { return i - 1 }
 
     /// Element type contained in this collection.
     public typealias Element = T
@@ -658,7 +667,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     /// Indicates if the collection can no longer be accessed.
     ///
     /// The collection can no longer be accessed if `invalidate` is called on the containing `Realm`.
-    public var invalidated: Bool { return base.invalidated }
+    public var isInvalidated: Bool { return base.isInvalidated }
 
     /// Returns the number of objects in this collection.
     public var count: Int { return base.count }
@@ -686,7 +695,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func index(of predicate: NSPredicate) -> Int? { return base.index(of: predicate) }
+    public func indexOfObject(for predicate: NSPredicate) -> Int? { return base.indexOfObject(for: predicate) }
 
     /**
     Returns the index of the first object matching the given predicate,
@@ -697,8 +706,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? {
-        return base.index(of: NSPredicate(format: predicateFormat, argumentArray: args))
+    public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
+        return base.indexOfObject(for: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     // MARK: Filtering
@@ -710,8 +719,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<Element> {
-        return base.filter(NSPredicate(format: predicateFormat, argumentArray: args))
+    public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<Element> {
+        return base.filter(using: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     /**
@@ -721,7 +730,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    public func filter(_ predicate: NSPredicate) -> Results<Element> { return base.filter(predicate) }
+    public func filter(using predicate: NSPredicate) -> Results<Element> { return base.filter(using: predicate) }
 
 
     // MARK: Sorting
@@ -734,8 +743,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: `Results` containing collection elements sorted by the given property.
     */
-    public func sorted(_ property: String, ascending: Bool) -> Results<Element> {
-        return base.sorted(property, ascending: ascending)
+    public func sorted(onProperty property: String, ascending: Bool) -> Results<Element> {
+        return base.sorted(onProperty: property, ascending: ascending)
     }
 
     /**
@@ -746,8 +755,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
     public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>
-                      (_ sortDescriptors: S) -> Results<Element> {
-        return base.sorted(sortDescriptors)
+                      (with sortDescriptors: S) -> Results<Element> {
+        return base.sorted(with: sortDescriptors)
     }
 
 
@@ -763,7 +772,9 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     - returns: The minimum value for the property amongst objects in the collection, or `nil` if the
                collection is empty.
     */
-    public func min<U: MinMaxType>(_ property: String) -> U? { return base.min(property) }
+    public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+        return base.minimumValue(ofProperty: property)
+    }
 
     /**
     Returns the maximum value of the given property.
@@ -775,7 +786,9 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     - returns: The maximum value for the property amongst objects in the collection, or `nil` if the
                collection is empty.
     */
-    public func max<U: MinMaxType>(_ property: String) -> U? { return base.max(property) }
+    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+        return base.maximumValue(ofProperty: property)
+    }
 
     /**
     Returns the sum of the given property for objects in the collection.
@@ -786,7 +799,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: The sum of the given property over all objects in the collection.
     */
-    public func sum<U: AddableType>(_ property: String) -> U { return base.sum(property) }
+    public func sum<U: AddableType>(ofProperty property: String) -> U { return base.sum(ofProperty: property) }
 
     /**
     Returns the average of the given property for objects in the collection.
@@ -798,7 +811,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     - returns: The average of the given property over all objects in the collection, or `nil` if the
                collection is empty.
     */
-    public func average<U: AddableType>(_ property: String) -> U? { return base.average(property) }
+    public func average<U: AddableType>(ofProperty property: String) -> U? { return base.average(ofProperty: property) }
 
 
     // MARK: Sequence Support
@@ -921,4 +934,44 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     /// :nodoc:
     public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
         -> NotificationToken { return base._addNotificationBlock(block: block) }
+}
+
+
+// MARK: Unavailable
+
+extension AnyRealmCollection {
+    @available(*, unavailable, renamed:"isInvalidated")
+    public var invalidated : Bool { fatalError() }
+
+    @available(*, unavailable, renamed:"indexOfObject(for:)")
+    public func index(of predicate: NSPredicate) -> Int? { fatalError() }
+
+    @available(*, unavailable, renamed:"indexOfObject(for:_:)")
+    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
+
+    @available(*, unavailable, renamed:"filter(using:)")
+    public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"filter(using:_:)")
+    public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"sorted(onProperty:ascending:)")
+    public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
+
+    @available(*, unavailable, renamed:"sorted(with:)")
+    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+        fatalError()
+    }
+
+    @available(*, unavailable, renamed:"minimumValue(ofProperty:)")
+    public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+
+    @available(*, unavailable, renamed:"maximumValue(ofProperty:)")
+    public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+
+    @available(*, unavailable, renamed:"sum(ofProperty:)")
+    public func sum<U: AddableType>(_ property: String) -> U { fatalError() }
+
+    @available(*, unavailable, renamed:"average(ofProperty:)")
+    public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
 }
