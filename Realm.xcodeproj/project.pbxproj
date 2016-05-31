@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
+		1A55A2DA1CFE11CF006F50FD /* Set Swift Support Version */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 1A55A2DC1CFE11CF006F50FD /* Build configuration list for PBXAggregateTarget "Set Swift Support Version" */;
+			buildPhases = (
+				1A55A2DB1CFE11CF006F50FD /* Set RLMSupport.swift Version */,
+			);
+			dependencies = (
+			);
+			name = "Set Swift Support Version";
+			productName = "Swift Version";
+		};
 		5D0A40841C62ACCC00BBB612 /* Check For Supported Swift Version */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 5D0A40851C62ACCC00BBB612 /* Build configuration list for PBXAggregateTarget "Check For Supported Swift Version" */;
@@ -369,6 +380,34 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1A55A2DF1CFE11EF006F50FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1A55A2DA1CFE11CF006F50FD;
+			remoteInfo = "Set Swift Support Version";
+		};
+		1A55A2E11CFE1225006F50FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1A55A2DA1CFE11CF006F50FD;
+			remoteInfo = "Set Swift Support Version";
+		};
+		1A55A2E31CFE1233006F50FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1A55A2DA1CFE11CF006F50FD;
+			remoteInfo = "Set Swift Support Version";
+		};
+		1A55A2E51CFE1237006F50FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1A55A2DA1CFE11CF006F50FD;
+			remoteInfo = "Set Swift Support Version";
+		};
 		5D0A40891C62ACE100BBB612 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -1279,6 +1318,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				1A55A2E01CFE11EF006F50FD /* PBXTargetDependency */,
 			);
 			name = Realm;
 			productName = Realm;
@@ -1339,6 +1379,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				1A55A2E21CFE1225006F50FD /* PBXTargetDependency */,
 			);
 			name = "Realm iOS static";
 			productName = iOS;
@@ -1358,6 +1399,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				1A55A2E61CFE1237006F50FD /* PBXTargetDependency */,
 				C04B4BDD1B55C51500FAE58E /* PBXTargetDependency */,
 				5DD755D41BE0582A002800DA /* PBXTargetDependency */,
 			);
@@ -1380,6 +1422,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				1A55A2E41CFE1233006F50FD /* PBXTargetDependency */,
 				5DD755DF1BE05B26002800DA /* PBXTargetDependency */,
 				5DD755D21BE05828002800DA /* PBXTargetDependency */,
 				5D6157021BE0A3A100A4BD3F /* PBXTargetDependency */,
@@ -1447,6 +1490,7 @@
 				E856D1DE195614A400FB2FCF /* iOS static tests */,
 				3F1A5E711992EB7400F45F4C /* TestHost */,
 				C04B4BD71B55C47600FAE58E /* Set Swift Version */,
+				1A55A2DA1CFE11CF006F50FD /* Set Swift Support Version */,
 				5D0A40841C62ACCC00BBB612 /* Check For Supported Swift Version */,
 				5D660FCB1BE98C560021E04F /* RealmSwift */,
 				5D660FD71BE98C7C0021E04F /* RealmSwift Tests */,
@@ -1504,6 +1548,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		1A55A2DB1CFE11CF006F50FD /* Set RLMSupport.swift Version */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Set RLMSupport.swift Version";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh build.sh set-swift-support-version";
+		};
 		5D0A40881C62ACD500BBB612 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1959,6 +2017,26 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1A55A2E01CFE11EF006F50FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1A55A2DA1CFE11CF006F50FD /* Set Swift Support Version */;
+			targetProxy = 1A55A2DF1CFE11EF006F50FD /* PBXContainerItemProxy */;
+		};
+		1A55A2E21CFE1225006F50FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1A55A2DA1CFE11CF006F50FD /* Set Swift Support Version */;
+			targetProxy = 1A55A2E11CFE1225006F50FD /* PBXContainerItemProxy */;
+		};
+		1A55A2E41CFE1233006F50FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1A55A2DA1CFE11CF006F50FD /* Set Swift Support Version */;
+			targetProxy = 1A55A2E31CFE1233006F50FD /* PBXContainerItemProxy */;
+		};
+		1A55A2E61CFE1237006F50FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1A55A2DA1CFE11CF006F50FD /* Set Swift Support Version */;
+			targetProxy = 1A55A2E51CFE1237006F50FD /* PBXContainerItemProxy */;
+		};
 		5D0A408A1C62ACE100BBB612 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;
@@ -2012,6 +2090,24 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		1A55A2DD1CFE11CF006F50FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+			};
+			name = Debug;
+		};
+		1A55A2DE1CFE11CF006F50FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+			};
+			name = Release;
+		};
 		3F1A5E8F1992EB7400F45F4C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */;
@@ -2179,6 +2275,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1A55A2DC1CFE11CF006F50FD /* Build configuration list for PBXAggregateTarget "Set Swift Support Version" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A55A2DD1CFE11CF006F50FD /* Debug */,
+				1A55A2DE1CFE11CF006F50FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		3F1A5E931992EB7400F45F4C /* Build configuration list for PBXNativeTarget "TestHost" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

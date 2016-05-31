@@ -145,6 +145,9 @@ build_combined() {
     local simulator_path="$build_products_path/$config-$simulator$scope_suffix/$product_name"
     local out_path="build/$os_name$scope_suffix$version_suffix"
 
+    # Update RLMSupport
+    sh build.sh set-swift-support-version
+
     # Build for each platform
     xc "-scheme '$scheme' -configuration $config -sdk $os"
     xc "-scheme '$scheme' -configuration $config -sdk $simulator -destination 'name=$destination' ONLY_ACTIVE_ARCH=NO"
@@ -398,6 +401,23 @@ case "$COMMAND" in
         fi
 
         git -C $path format-patch --stdout $commit..HEAD src | git am -p 2 --directory Realm/ObjectStore --exclude='*CMake*' --reject
+        ;;
+
+    ######################################
+    # RLMSupport versioning
+    ######################################
+    "set-swift-support-version")
+        version="$2"
+        if [[ -z "$version" ]]; then
+            version="$REALM_SWIFT_VERSION"
+        fi
+
+        # Update the symlink for the Swift support file in Realm/Swift
+        cd Realm/Swift
+        rm -f RLMSupport.swift
+        ln -s "RLMSupport-swift$version.swift" RLMSupport.swift
+        echo "RLMSupport-swift$version.swift"
+        cd ../..
         ;;
 
     ######################################
