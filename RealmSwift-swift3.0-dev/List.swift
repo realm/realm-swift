@@ -28,10 +28,10 @@ public class ListBase: RLMListBase {
     // generic class.
     /// Returns a human-readable description of the objects contained in the List.
     @objc public override var description: String {
-        return descriptionWithMaxDepth(depth: RLMDescriptionMaxDepth)
+        return descriptionWithMaxDepth(RLMDescriptionMaxDepth)
     }
 
-    @objc(descriptionWithMaxDepth:) private func descriptionWithMaxDepth(depth: UInt) -> String {
+    @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
         let type = "List<\(_rlmArray.objectClassName)>"
         return gsub(pattern: "RLMArray <0x[a-z0-9]+>", template: type, string: _rlmArray.description(withMaxDepth: depth)) ?? type
     }
