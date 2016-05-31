@@ -31,7 +31,7 @@ public class ListBase: RLMListBase {
         return descriptionWithMaxDepth(depth: RLMDescriptionMaxDepth)
     }
 
-    @objc private func descriptionWithMaxDepth(depth: UInt) -> String {
+    @objc(descriptionWithMaxDepth:) private func descriptionWithMaxDepth(depth: UInt) -> String {
         let type = "List<\(_rlmArray.objectClassName)>"
         return gsub(pattern: "RLMArray <0x[a-z0-9]+>", template: type, string: _rlmArray.description(withMaxDepth: depth)) ?? type
     }
@@ -505,6 +505,7 @@ extension List: RealmCollection, RangeReplaceableCollection {
     public var endIndex: Int { return count }
 
     public func index(after i: Int) -> Int { return i + 1 }
+    public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
     public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->

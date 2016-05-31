@@ -34,8 +34,7 @@ class SwiftUnicodeTests: TestCase {
         XCTAssertEqual(obj1.stringCol, utf8TestString)
 
         let obj2 = realm.objects(SwiftStringObject).filter("stringCol == %@", utf8TestString as AnyObject).first!
-        /* disabled for Swift 3 conversion */
-        // XCTAssertEqual(obj1, obj2)
+        XCTAssertEqual(obj1, obj2)
         XCTAssertEqual(obj2.stringCol, utf8TestString)
 
         XCTAssertEqual(Int(0), realm.objects(SwiftStringObject).filter("stringCol != %@", utf8TestString as AnyObject).count)

@@ -391,35 +391,34 @@ class RealmTests: TestCase {
         }
     }
 
-    /* disabled for Swift 3 conversion */
-//    func testDeleteListOfObjects() {
-//        let realm = try! Realm()
-//        XCTAssertEqual(0, realm.objects(SwiftCompanyObject).count)
-//        try! realm.write {
-//            let obj = SwiftCompanyObject()
-//            obj.employees.append(SwiftEmployeeObject())
-//            realm.add(obj)
-//            XCTAssertEqual(1, realm.objects(SwiftEmployeeObject).count)
-//            realm.delete(obj.employees)
-//            XCTAssertEqual(0, obj.employees.count)
-//            XCTAssertEqual(0, realm.objects(SwiftEmployeeObject).count)
-//        }
-//        XCTAssertEqual(0, realm.objects(SwiftEmployeeObject).count)
-//    }
-//
-//    func testDeleteResults() {
-//        let realm = try! Realm(fileURL: testRealmURL())
-//        XCTAssertEqual(0, realm.objects(SwiftCompanyObject).count)
-//        try! realm.write {
-//            realm.add(SwiftIntObject(value: [1]))
-//            realm.add(SwiftIntObject(value: [1]))
-//            realm.add(SwiftIntObject(value: [2]))
-//            XCTAssertEqual(3, realm.objects(SwiftIntObject).count)
-//            realm.delete(realm.objects(SwiftIntObject).filter("intCol = 1"))
-//            XCTAssertEqual(1, realm.objects(SwiftIntObject).count)
-//        }
-//        XCTAssertEqual(1, realm.objects(SwiftIntObject).count)
-//    }
+    func testDeleteListOfObjects() {
+        let realm = try! Realm()
+        XCTAssertEqual(0, realm.objects(SwiftCompanyObject).count)
+        try! realm.write {
+            let obj = SwiftCompanyObject()
+            obj.employees.append(SwiftEmployeeObject())
+            realm.add(obj)
+            XCTAssertEqual(1, realm.objects(SwiftEmployeeObject).count)
+            realm.delete(obj.employees)
+            XCTAssertEqual(0, obj.employees.count)
+            XCTAssertEqual(0, realm.objects(SwiftEmployeeObject).count)
+        }
+        XCTAssertEqual(0, realm.objects(SwiftEmployeeObject).count)
+    }
+
+    func testDeleteResults() {
+        let realm = try! Realm(fileURL: testRealmURL())
+        XCTAssertEqual(0, realm.objects(SwiftCompanyObject).count)
+        try! realm.write {
+            realm.add(SwiftIntObject(value: [1]))
+            realm.add(SwiftIntObject(value: [1]))
+            realm.add(SwiftIntObject(value: [2]))
+            XCTAssertEqual(3, realm.objects(SwiftIntObject).count)
+            realm.delete(realm.objects(SwiftIntObject).filter("intCol = 1"))
+            XCTAssertEqual(1, realm.objects(SwiftIntObject).count)
+        }
+        XCTAssertEqual(1, realm.objects(SwiftIntObject).count)
+    }
 
     func testDeleteAll() {
         let realm = try! Realm()

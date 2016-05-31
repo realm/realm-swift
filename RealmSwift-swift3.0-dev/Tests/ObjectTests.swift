@@ -84,17 +84,16 @@ class ObjectTests: TestCase {
         XCTAssertTrue(object.isInvalidated)
     }
 
-    /* disabled for Swift 3 conversion */
-//    func testDescription() {
-//        let object = SwiftObject()
-//        // swiftlint:disable line_length
-//        XCTAssertEqual(object.description, "SwiftObject {\n\tboolCol = 0;\n\tintCol = 123;\n\tfloatCol = 1.23;\n\tdoubleCol = 12.3;\n\tstringCol = a;\n\tbinaryCol = <61 — 1 total bytes>;\n\tdateCol = 1970-01-01 00:00:01 +0000;\n\tobjectCol = SwiftBoolObject {\n\t\tboolCol = 0;\n\t};\n\tarrayCol = List<SwiftBoolObject> (\n\t\n\t);\n}")
-//
-//        let recursiveObject = SwiftRecursiveObject()
-//        recursiveObject.objects.append(recursiveObject)
-//        XCTAssertEqual(recursiveObject.description, "SwiftRecursiveObject {\n\tobjects = List<SwiftRecursiveObject> (\n\t\t[0] SwiftRecursiveObject {\n\t\t\tobjects = List<SwiftRecursiveObject> (\n\t\t\t\t[0] SwiftRecursiveObject {\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t}\n\t\t\t);\n\t\t}\n\t);\n}")
-//        // swiftlint:enable line_length
-//    }
+    func testDescription() {
+        let object = SwiftObject()
+        // swiftlint:disable line_length
+        XCTAssertEqual(object.description, "SwiftObject {\n\tboolCol = 0;\n\tintCol = 123;\n\tfloatCol = 1.23;\n\tdoubleCol = 12.3;\n\tstringCol = a;\n\tbinaryCol = <61 — 1 total bytes>;\n\tdateCol = 1970-01-01 00:00:01 +0000;\n\tobjectCol = SwiftBoolObject {\n\t\tboolCol = 0;\n\t};\n\tarrayCol = List<SwiftBoolObject> (\n\t\n\t);\n}")
+
+        let recursiveObject = SwiftRecursiveObject()
+        recursiveObject.objects.append(recursiveObject)
+        XCTAssertEqual(recursiveObject.description, "SwiftRecursiveObject {\n\tobjects = List<SwiftRecursiveObject> (\n\t\t[0] SwiftRecursiveObject {\n\t\t\tobjects = List<SwiftRecursiveObject> (\n\t\t\t\t[0] SwiftRecursiveObject {\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t}\n\t\t\t);\n\t\t}\n\t);\n}")
+        // swiftlint:enable line_length
+    }
 
     func testPrimaryKey() {
         XCTAssertNil(Object.primaryKey(), "primary key should default to nil")
@@ -192,16 +191,14 @@ class ObjectTests: TestCase {
 
         let boolObject = SwiftBoolObject(value: [true])
         setter(object, boolObject, "objectCol")
-        /* disabled for Swift 3 conversion */
-        // XCTAssertEqual(getter(object, "objectCol") as? SwiftBoolObject, boolObject)
+        XCTAssertEqual(getter(object, "objectCol") as? SwiftBoolObject, boolObject)
         XCTAssertEqual((getter(object, "objectCol") as! SwiftBoolObject).boolCol, true)
 
         let list = List<SwiftBoolObject>()
         list.append(boolObject)
         setter(object, list, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
-        /* disabled for Swift 3 conversion */
-        // XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
 
         list.removeAll()
         setter(object, list, "arrayCol")
@@ -209,8 +206,7 @@ class ObjectTests: TestCase {
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
-        /* disabled for Swift 3 conversion */
-        // XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
     }
 
     func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, AnyObject?, String) -> (),
@@ -238,14 +234,12 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "dateCol") as! NSDate), NSDate(timeIntervalSince1970: 333))
 
         setter(object, boolObject, "objectCol")
-        /* disabled for Swift 3 conversion */
-        // XCTAssertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)
+        XCTAssertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)
         XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! NSNumber), true as NSNumber)
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
-        /* disabled for Swift 3 conversion */
-        // XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
 
         let list = getter(object, "arrayCol") as! List<DynamicObject>
         list.removeAll()
@@ -254,8 +248,7 @@ class ObjectTests: TestCase {
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
-        /* disabled for Swift 3 conversion */
-        // XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
+        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
     }
 
     // Yields a read-write migration `SwiftObject` to the given block
@@ -334,9 +327,8 @@ class ObjectTests: TestCase {
         }
         let dynamicArray = arrayObject.dynamicList("array")
         XCTAssertEqual(dynamicArray.count, 2)
-        /* disabled for Swift 3 conversion */
-        // XCTAssertEqual(dynamicArray[0], str1)
-        // XCTAssertEqual(dynamicArray[1], str2)
+        XCTAssertEqual(dynamicArray[0], str1)
+        XCTAssertEqual(dynamicArray[1], str2)
         XCTAssertEqual(arrayObject.dynamicList("intArray").count, 0)
         assertThrows(arrayObject.dynamicList("noSuchList"))
     }
