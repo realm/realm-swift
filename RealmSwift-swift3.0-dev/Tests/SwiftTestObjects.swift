@@ -22,13 +22,6 @@ import Realm
 
 class SwiftStringObject: Object {
     dynamic var stringCol = ""
-
-    override func isEqual(_ object: AnyObject?) -> Bool {
-        if let object = object as? SwiftStringObject {
-            return object.stringCol == stringCol
-        }
-        return false
-    }
 }
 
 class SwiftBoolObject: Object {
