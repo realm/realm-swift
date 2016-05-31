@@ -25,8 +25,10 @@ import Realm
             return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
         }
 
-        public class func objectsInRealm(realm: RLMRealm, _ predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
-            return objects(in: realm, with:NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+        public class func objectsInRealm(realm: RLMRealm,
+                                         _ predicateFormat: String,
+                                         _ args: CVarArg...) -> RLMResults<RLMObject> {
+            return objects(in: realm, with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
         }
     }
 
@@ -80,8 +82,11 @@ import Realm
             return objectsWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
         }
 
-        public class func objectsInRealm(realm: RLMRealm, _ predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
-            return objectsInRealm(realm, withPredicate:NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+        public class func objectsInRealm(realm: RLMRealm,
+                                         _ predicateFormat: String,
+                                         _ args: CVarArgType...) -> RLMResults {
+            return objectsInRealm(realm,
+                                  withPredicate: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
         }
     }
 
