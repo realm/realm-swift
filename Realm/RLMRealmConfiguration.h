@@ -58,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`.
 @property (nonatomic, copy, nullable) NSURL *fileURL;
 
-/// A string used to identify a particular in-memory Realm. Mutually exclusive with `path`.
+/// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL`.
 @property (nonatomic, copy, nullable) NSString *inMemoryIdentifier;
 
 /// A 64-byte key to use to encrypt the data, or `nil` if encryption is not enabled.
