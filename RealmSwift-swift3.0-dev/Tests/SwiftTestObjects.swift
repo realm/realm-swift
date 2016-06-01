@@ -74,7 +74,6 @@ class SwiftOptionalObject: Object {
     let optDoubleCol = RealmOptional<Double>()
     let optBoolCol = RealmOptional<Bool>()
     dynamic var optObjectCol: SwiftBoolObject?
-    //    let arrayCol = List<SwiftBoolObject?>()
 }
 
 class SwiftImplicitlyUnwrappedOptionalObject: Object {
@@ -82,9 +81,6 @@ class SwiftImplicitlyUnwrappedOptionalObject: Object {
     dynamic var optStringCol: String!
     dynamic var optBinaryCol: NSData!
     dynamic var optDateCol: NSDate!
-    /* disabled for Swift 3 conversion */
-    //    dynamic var optObjectCol: SwiftBoolObject!
-    //    let arrayCol = List<SwiftBoolObject!>()
 }
 
 class SwiftOptionalDefaultValuesObject: Object {
