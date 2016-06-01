@@ -105,7 +105,7 @@ extension Realm {
 
         private var _path: String?
 
-        /// A string used to identify a particular in-memory Realm. Mutually exclusive with `path`.
+        /// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL`.
         public var inMemoryIdentifier: String? {
             set {
                 _path = nil

@@ -71,11 +71,9 @@
 @end
 
 //
-// Getters and setters for RLMObjectBase ivars for realm and objectSchema
+// Getters for RLMObjectBase ivars for realm and objectSchema
 //
-FOUNDATION_EXTERN void RLMObjectBaseSetRealm(RLMObjectBase *object, RLMRealm *realm);
 FOUNDATION_EXTERN RLMRealm *RLMObjectBaseRealm(RLMObjectBase *object);
-FOUNDATION_EXTERN void RLMObjectBaseSetObjectSchema(RLMObjectBase *object, RLMObjectSchema *objectSchema);
 FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *object);
 
 // Dynamic access to RLMObjectBase properties

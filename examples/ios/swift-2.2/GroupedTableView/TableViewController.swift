@@ -67,8 +67,8 @@ class TableViewController: UITableViewController {
         tableView.registerClass(Cell.self, forCellReuseIdentifier: "cell")
 
         self.title = "GroupedTableView"
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "BG Add", style: .Plain, target: self, action: "backgroundAdd")
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "add")
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "BG Add", style: .Plain, target: self, action: #selector(TableViewController.backgroundAdd))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(TableViewController.add))
     }
 
     // Table view data source

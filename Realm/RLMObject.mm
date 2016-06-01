@@ -58,34 +58,18 @@
     return [super initWithValue:value schema:schema];
 }
 
-- (instancetype)initWithObject:(id)object {
-    return [self initWithValue:object];
-}
-
 #pragma mark - Class-based Object Creation
 
 + (instancetype)createInDefaultRealmWithValue:(id)value {
     return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], value, false);
 }
 
-+ (instancetype)createInDefaultRealmWithObject:(id)object {
-    return [self createInDefaultRealmWithValue:object];
-}
-
 + (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, false);
 }
 
-+ (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object {
-    return [self createInRealm:realm withValue:object];
-}
-
 + (instancetype)createOrUpdateInDefaultRealmWithValue:(id)value {
     return [self createOrUpdateInRealm:[RLMRealm defaultRealm] withValue:value];
-}
-
-+ (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object {
-    return [self createOrUpdateInDefaultRealmWithValue:object];
 }
 
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value {
@@ -96,10 +80,6 @@
         @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
     }
     return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, true);
-}
-
-+ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object {
-    return [self createOrUpdateInRealm:realm withValue:object];
 }
 
 #pragma mark - Subscripting
