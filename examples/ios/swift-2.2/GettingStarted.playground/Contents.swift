@@ -1,7 +1,7 @@
 //: To get this Playground running do the following:
 //:
 //: 1) In the scheme selector choose RealmSwift > iPhone 6s
-//: 2) Press Cmd + B to build RealmSwift
+//: 2) Press Cmd + B
 //: 3) If the Playground didn't already run press the ▶︎ button at the bottom
 
 import Foundation
@@ -9,19 +9,16 @@ import RealmSwift
 
 //: I. Define the data entities
 
-class Person: Object, CustomStringConvertible {
-
+class Person: Object {
     dynamic var name = ""
     dynamic var age = 0
     dynamic var spouse: Person?
-
     let cars = List<Car>()
 
     override var description: String { return "Person {\(name), \(age), \(spouse?.name)}" }
 }
 
-class Car: Object, CustomStringConvertible {
-
+class Car: Object {
     dynamic var brand = ""
     dynamic var name: String?
     dynamic var year = 0
@@ -95,4 +92,4 @@ try! realm.write {
 }
 
 realm.objects(Person).count
-//: Thanks! To learn more about Realm go to http://www.realm.io
+//: Thanks! To learn more about Realm go to https://realm.io
