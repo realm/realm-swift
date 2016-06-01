@@ -13,6 +13,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Swift: Fix an error thrown when trying to create or update `Object` instances via
   `add(:_update:)` with a primary key property of type `RealmOptional`.
+* Xcode playground in Swift release zip now runs successfully.
 
 1.0.0 Release notes (2016-05-25)
 =============================================================
