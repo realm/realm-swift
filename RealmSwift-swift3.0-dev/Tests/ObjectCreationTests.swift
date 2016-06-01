@@ -463,8 +463,7 @@ class ObjectCreationTests: TestCase {
 
         XCTAssertNotNil(object.realm)
 
-        /* disabled for Swift 3 conversion */
-        // XCTAssertEqual(object.objectCol, existingObject)
+        XCTAssertEqual(object.objectCol, existingObject)
     }
 
     func testAddAndUpdateWithExisingNestedObjects() {

@@ -181,16 +181,6 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(types, Set([.string, .string, .data, .date, .object, .int, .float, .double, .bool]))
     }
 
-    /* disabled for Swift 3 conversion */
-//    func testImplicitlyUnwrappedOptionalsAreParsedAsOptionals() {
-//        let schema = SwiftImplicitlyUnwrappedOptionalObject().objectSchema
-//        XCTAssertTrue(schema["optObjectCol"]!.optional)
-//        XCTAssertTrue(schema["optNSStringCol"]!.optional)
-//        XCTAssertTrue(schema["optStringCol"]!.optional)
-//        XCTAssertTrue(schema["optBinaryCol"]!.optional)
-//        XCTAssertTrue(schema["optDateCol"]!.optional)
-//    }
-
     func testNonRealmOptionalTypesDeclaredAsRealmOptional() {
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonRealmOptionalType.self))
     }

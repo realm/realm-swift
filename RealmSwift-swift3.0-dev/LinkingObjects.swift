@@ -405,6 +405,7 @@ extension LinkingObjects: RealmCollection {
     public var endIndex: Int { return count }
 
     public func index(after i: Int) -> Int { return i + 1 }
+    public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
     public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->

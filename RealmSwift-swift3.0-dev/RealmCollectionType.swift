@@ -117,7 +117,7 @@ public enum RealmCollectionChange<T> {
 A homogenous collection of `Object`s which can be retrieved, filtered, sorted,
 and operated upon.
 */
-public protocol RealmCollection: Collection, CustomStringConvertible {
+public protocol RealmCollection: RandomAccessCollection, CustomStringConvertible {
 
     /// Element type contained in this collection.
     associatedtype Element: Object
@@ -638,6 +638,7 @@ Element type, hiding the specifics of the underlying `RealmCollection`.
 public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     public func index(after i: Int) -> Int { return i + 1 }
+    public func index(before i: Int) -> Int { return i - 1 }
 
     /// Element type contained in this collection.
     public typealias Element = T
