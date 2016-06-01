@@ -51,9 +51,7 @@ class SwiftUnicodeTests: TestCase {
         XCTAssertEqual(obj1.柱колоéнǢкƱаم👍, utf8TestString,
             "Storing and retrieving a string with UTF8 content should work")
 
-        // Test fails because of rdar://17735684
-        /* disabled for Swift 3 conversion */
-        // let obj2 = realm.objects(SwiftUTF8Object).filter("%K == %@", "柱колоéнǢкƱаم👍", utf8TestString).first!
-        // XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
+        let obj2 = realm.objects(SwiftUTF8Object).filter("%K == %@", "柱колоéнǢкƱаم👍", utf8TestString as AnyObject).first!
+        XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
     }
 }
