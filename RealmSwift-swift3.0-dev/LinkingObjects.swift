@@ -209,7 +209,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter key:   The name of the property.
      */
     public override func setValue(_ value: AnyObject?, forKey key: String) {
-        return setValue(value, forKeyPath: key)
+        return rlmResults.setValue(value, forKeyPath: key)
     }
 
     // MARK: Filtering
