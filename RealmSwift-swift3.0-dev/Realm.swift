@@ -260,6 +260,7 @@ public final class Realm {
 
     - returns: The created object.
     */
+    @discardableResult
     public func create<T: Object>(_ type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
         let className = (type as Object.Type).className()
         if update && schema[className]?.primaryKeyProperty == nil {
@@ -296,6 +297,7 @@ public final class Realm {
 
     :nodoc:
     */
+    @discardableResult
     public func dynamicCreate(_ className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
         if update && schema[className]?.primaryKeyProperty == nil {
             throwRealmException("'\(className)' does not have a primary key and can not be updated")
@@ -526,6 +528,7 @@ public final class Realm {
     - returns: Whether the realm had any updates.
                Note that this may return true even if no data has actually changed.
     */
+    @discardableResult
     public func refresh() -> Bool {
         return rlmRealm.refresh()
     }

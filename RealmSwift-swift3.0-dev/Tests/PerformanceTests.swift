@@ -288,7 +288,7 @@ class SwiftPerformanceTests: TestCase {
         }
         measure {
             for i in 0..<1000 {
-                realm.objects(SwiftStringObject).filter("stringCol = %@", i.description as AnyObject).first
+                _ = realm.objects(SwiftStringObject).filter("stringCol = %@", i.description as AnyObject).first
             }
         }
     }
@@ -302,7 +302,7 @@ class SwiftPerformanceTests: TestCase {
         }
         measure {
             for i in 0..<1000 {
-                realm.objects(SwiftIndexedPropertiesObject).filter("stringCol = %@", i.description as AnyObject).first
+                _ = realm.objects(SwiftIndexedPropertiesObject).filter("stringCol = %@", i.description as AnyObject).first
             }
         }
     }

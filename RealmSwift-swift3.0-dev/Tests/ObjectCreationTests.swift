@@ -550,22 +550,22 @@ class ObjectCreationTests: TestCase {
         let persistedObject = try! Realm().create(SwiftBoolObject.self, value: [true])
         try! Realm().commitWrite()
         switch type {
-            case .Bool:     return [true, NSNumber(value: 0 as Int), NSNumber(value: 1 as Int)]
-            case .Int:      return [NSNumber(value: 1 as Int)]
-            case .Float:    return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
-            case .Double:   return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
-            case .String:   return ["b"]
-            case .Data:     return ["b".data(using: NSUTF8StringEncoding, allowLossyConversion: false)! as NSData]
-            case .Date:     return [NSDate(timeIntervalSince1970: 2) as AnyObject]
-            case .Object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
-            case .Array:    return [
+            case .bool:     return [true, NSNumber(value: 0 as Int), NSNumber(value: 1 as Int)]
+            case .int:      return [NSNumber(value: 1 as Int)]
+            case .float:    return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
+            case .double:   return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
+            case .string:   return ["b"]
+            case .data:     return ["b".data(using: NSUTF8StringEncoding, allowLossyConversion: false)! as NSData]
+            case .date:     return [NSDate(timeIntervalSince1970: 2) as AnyObject]
+            case .object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
+            case .array:    return [
                 [[true], [false]],
                 [["boolCol": true], ["boolCol": false]],
                 [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])],
                 [persistedObject, [false]]
             ]
-            case .Any: XCTFail("not supported")
-            case .LinkingObjects: XCTFail("not supported")
+            case .any: XCTFail("not supported")
+            case .linkingObjects: XCTFail("not supported")
         }
         return []
     }
@@ -576,18 +576,18 @@ class ObjectCreationTests: TestCase {
         let persistedObject = try! Realm().create(SwiftIntObject)
         try! Realm().commitWrite()
         switch type {
-            case .Bool:     return ["invalid", NSNumber(value: 2 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
-            case .Int:      return ["invalid", NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
-            case .Float:    return ["invalid", true, false]
-            case .Double:   return ["invalid", true, false]
-            case .String:   return [0x197A71D, true, false]
-            case .Data:     return ["invalid"]
-            case .Date:     return ["invalid"]
-            case .Object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
-            case .Array:    return ["invalid", [["a"]], [["boolCol" : "a"]], [[SwiftIntObject()]], [[persistedObject]]]
+            case .bool:     return ["invalid", NSNumber(value: 2 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
+            case .int:      return ["invalid", NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
+            case .float:    return ["invalid", true, false]
+            case .double:   return ["invalid", true, false]
+            case .string:   return [0x197A71D, true, false]
+            case .data:     return ["invalid"]
+            case .date:     return ["invalid"]
+            case .object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
+            case .array:    return ["invalid", [["a"]], [["boolCol" : "a"]], [[SwiftIntObject()]], [[persistedObject]]]
 
-            case .Any: XCTFail("not supported")
-            case .LinkingObjects: XCTFail("not supported")
+            case .any: XCTFail("not supported")
+            case .linkingObjects: XCTFail("not supported")
         }
         return []
     }
