@@ -480,6 +480,24 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(existingObject.intCol, 2)
     }
 
+    func testAddWithNumericOptionalPrimaryKeyProperty() {
+        let realm = try! Realm()
+        realm.beginWrite()
+
+        let object = SwiftPrimaryOptionalIntObject()
+        object.intCol.value = 1
+        realm.add(object, update: true)
+
+        let nilObject = SwiftPrimaryOptionalIntObject()
+        nilObject.intCol.value = nil
+        realm.add(nilObject, update: true)
+
+        try! realm.commitWrite()
+
+        XCTAssertNotNil(object.realm)
+        XCTAssertNotNil(nilObject.realm)
+    }
+
     // MARK: Private utilities
     private func verifySwiftObjectWithArrayLiteral(object: SwiftObject, array: [AnyObject], boolObjectValue: Bool,
                                                    boolObjectListValues: [Bool]) {

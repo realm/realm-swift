@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Swift: Fix an error thrown when trying to create or update `Object` instances via
+  `add(:_update:)` with a primary key property of type `RealmOptional`.
 
 1.0.0 Release notes (2016-05-25)
 =============================================================
