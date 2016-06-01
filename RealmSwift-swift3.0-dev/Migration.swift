@@ -76,8 +76,11 @@ exactly when and how migrations are performed.
 - returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
            that occurred otherwise.
 */
-public func migrateRealm(_ configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) -> NSError? {
-    return RLMRealm.migrateRealm(configuration.rlmConfiguration)
+@discardableResult
+public func migrateRealm(_ configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) throws {
+    if let error = RLMRealm.migrateRealm(configuration.rlmConfiguration) {
+        throw error
+    }
 }
 
 
@@ -127,6 +130,7 @@ public final class Migration {
 
     - returns: The created object.
     */
+    @discardableResult
     public func create(_ className: String, value: AnyObject = [:]) -> MigrationObject {
         return unsafeBitCast(rlmMigration.createObject(className, withValue: value), to: MigrationObject.self)
     }
@@ -150,6 +154,7 @@ public final class Migration {
 
     - returns: `true` if there was any data to delete.
     */
+    @discardableResult
     public func deleteData(_ objectClassName: String) -> Bool {
         return rlmMigration.deleteData(forClassName: objectClassName)
     }

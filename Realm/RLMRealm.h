@@ -458,7 +458,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
  @see                 RLMMigration
  */
-+ (NSError *)migrateRealm:(RLMRealmConfiguration *)configuration;
++ (nullable NSError *)migrateRealm:(RLMRealmConfiguration *)configuration;
 
 @end
 

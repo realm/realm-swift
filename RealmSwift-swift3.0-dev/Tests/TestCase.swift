@@ -31,6 +31,7 @@ class TestCase: XCTestCase {
     var exceptionThrown = false
     var testDir: String! = nil
 
+    @discardableResult
     func realmWithTestPath(configuration: Realm.Configuration = Realm.Configuration()) -> Realm {
         var configuration = configuration
         configuration.fileURL = testRealmURL()
@@ -130,7 +131,7 @@ class TestCase: XCTestCase {
                         fileName: StaticString = #file, lineNumber: UInt = #line,
                         block: @noescape () throws -> T) {
         do {
-            try block()
+            _ = try block()
             XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
                 file: fileName, line: lineNumber)
         } catch expectedError {

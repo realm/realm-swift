@@ -398,7 +398,7 @@ class RealmCollectionTypeTests: TestCase {
         let collection = getAggregateableCollection()
 
         // Should not throw a type error.
-        collection.filter("ANY stringListCol == %@", CTTStringObjectWithLink())
+        _ = collection.filter("ANY stringListCol == %@", CTTStringObjectWithLink())
     }
 
     func testAddNotificationBlock() {
@@ -584,7 +584,7 @@ class ResultsFromTableTests: ResultsTests {
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
-        makeAggregateableObjects()
+        _ = makeAggregateableObjects()
         return AnyRealmCollection(realmWithTestPath().objects(CTTAggregateObject))
     }
 }
@@ -596,7 +596,7 @@ class ResultsFromTableViewTests: ResultsTests {
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
-        makeAggregateableObjects()
+        _ = makeAggregateableObjects()
         return AnyRealmCollection(realmWithTestPath().objects(CTTAggregateObject).filter("trueCol == true"))
     }
 }

@@ -23,6 +23,7 @@ import Realm.Private
 import Realm.Dynamic
 import Foundation
 
+@discardableResult
 private func realmWithSingleClassProperties(_ fileURL: NSURL, className: String, properties: [AnyObject]) -> RLMRealm {
     let schema = RLMSchema()
     let objectSchema = RLMObjectSchema(className: className, objectClass: MigrationObject.self, properties: properties)
@@ -72,7 +73,7 @@ class MigrationTests: TestCase {
                 _ = try! Realm(configuration: config)
             }
         } else {
-            migrateRealm(config)
+            try! migrateRealm(config)
         }
 
         XCTAssertEqual(didRun, shouldRun)
@@ -95,7 +96,7 @@ class MigrationTests: TestCase {
                                          migrationBlock: { _, _ in didRun = true })
         Realm.Configuration.defaultConfiguration = config
 
-        migrateRealm()
+        try! migrateRealm()
 
         XCTAssertEqual(didRun, true)
         XCTAssertEqual(1, try! schemaVersionAtURL(defaultRealmURL()))
@@ -138,7 +139,7 @@ class MigrationTests: TestCase {
     func testMigrationProperties() {
         let prop = RLMProperty(name: "stringCol", type: RLMPropertyType.int, objectClassName: nil,
                                linkOriginPropertyName: nil, indexed: false, optional: false)
-        autoreleasepool {
+        _ = autoreleasepool {
             realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftStringObject", properties: [prop!])
         }
 
@@ -445,7 +446,7 @@ class MigrationTests: TestCase {
     func testFailOnSchemaMismatch() {
         let prop = RLMProperty(name: "name", type: RLMPropertyType.string, objectClassName: nil,
                                linkOriginPropertyName: nil, indexed: false, optional: false)
-        autoreleasepool {
+        _ = autoreleasepool {
             realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop!])
         }
 
@@ -460,7 +461,7 @@ class MigrationTests: TestCase {
     func testDeleteRealmIfMigrationNeededWithSetCustomSchema() {
         let prop = RLMProperty(name: "name", type: RLMPropertyType.string, objectClassName: nil,
                                linkOriginPropertyName: nil, indexed: false, optional: false)
-        autoreleasepool {
+        _ = autoreleasepool {
             realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop!])
         }
 
