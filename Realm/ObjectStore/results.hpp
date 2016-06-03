@@ -21,6 +21,7 @@
 
 #include "collection_notifications.hpp"
 #include "shared_realm.hpp"
+#include "impl/collection_notifier.hpp"
 
 #include <realm/table_view.hpp>
 #include <realm/util/optional.hpp>
@@ -46,7 +47,7 @@ public:
     // Results can be either be backed by nothing, a thin wrapper around a table,
     // or a wrapper around a query and a sort order which creates and updates
     // the tableview as needed
-    Results() = default;
+    Results();
     Results(SharedRealm r, SortOrder s, TableView tv);
     Results(SharedRealm r, Table& table);
     Results(SharedRealm r, Query q, SortOrder s = {});
@@ -54,10 +55,10 @@ public:
     ~Results();
 
     // Results is copyable and moveable
-    Results(Results const&) = default;
-    Results(Results&&) = default;
-    Results& operator=(Results const&) = default;
-    Results& operator=(Results&&) = default;
+    Results(Results const&);
+    Results(Results&&);
+    Results& operator=(Results const&);
+    Results& operator=(Results&&);
 
     // Get a query which will match the same rows as is contained in this Results
     // Returned query will not be valid if the current mode is Empty
@@ -183,7 +184,7 @@ private:
     Table* m_table = nullptr;
     SortOrder m_sort;
 
-    std::shared_ptr<_impl::ResultsNotifier> m_notifier;
+    _impl::CollectionNotifier::Handle<_impl::ResultsNotifier> m_notifier;
 
     Mode m_mode = Mode::Empty;
     bool m_has_used_table_view = false;

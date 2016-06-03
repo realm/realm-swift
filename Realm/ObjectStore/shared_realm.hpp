@@ -135,6 +135,8 @@ namespace realm {
         // Realm after closing it will produce undefined behavior.
         void close();
 
+        bool is_closed() { return !m_read_only_group && !m_shared_group; }
+
         ~Realm();
 
         void init(std::shared_ptr<_impl::RealmCoordinator> coordinator);
