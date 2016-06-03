@@ -130,7 +130,7 @@ NSString *operatorName(NSPredicateOperatorType operatorType)
         case NSContainsPredicateOperatorType:
             return @"CONTAINS";
         case NSBetweenPredicateOperatorType:
-            return @"BETWEENS";
+            return @"BETWEEN";
         case NSCustomSelectorPredicateOperatorType:
             return @"custom selector";
     }
