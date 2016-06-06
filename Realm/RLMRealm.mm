@@ -74,7 +74,7 @@ void RLMDisableSyncToDisk() {
     if (_realm || _block) {
         NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "
               @"on to the RLMNotificationToken returned from addNotificationBlock and call "
-              @"-[RLMNotificationToken stop] when you no longer wish to recieve RLMRealm notifications.");
+              @"-[RLMNotificationToken stop] when you no longer wish to receive RLMRealm notifications.");
     }
 }
 @end
