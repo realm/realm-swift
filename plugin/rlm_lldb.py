@@ -200,13 +200,28 @@ def RLMArray_SummaryProvider(obj, _):
     count = frame.EvaluateExpression('(NSUInteger)[(RLMArray *){} count]'.format(obj.GetAddress())).GetValueAsUnsigned()
     return "({}[{}])".format(class_name, count)
 
+results_mode_offset = None
+mode_type = None
+mode_query_value = None
+def is_results_evaluated(obj):
+    global results_mode_offset, mode_type, mode_query_value
+    if not results_mode_offset:
+        results_offset, _, _ = get_ivar_info(obj, 'RLMResults._results')
+        mode_offset, mode_type, _ = get_ivar_info(obj, 'Results.m_mode')
+        results_mode_offset = results_offset + mode_offset
+        mode_query_value = [m for m in mode_type.enum_members if m.name == 'Query'][0].GetValueAsUnsigned()
+
+    addr = int(str(obj.GetAddress()), 16)
+    mode = obj.GetProcess().ReadUnsignedFromMemory(addr + results_mode_offset, mode_type.size, lldb.SBError())
+    return mode != mode_query_value
+
+
 def RLMResults_SummaryProvider(obj, _):
     frame = obj.GetThread().GetSelectedFrame()
-    addr = int(str(obj.GetAddress()), 16)
-    class_name = get_object_class_name(frame, obj, addr, 'RLMResults._objectClassName')
+    utf8_addr = frame.EvaluateExpression('(const char *)[[(RLMResults *){} objectClassName] UTF8String]'.format(obj.GetAddress())).GetValueAsUnsigned()
+    class_name = obj.GetProcess().ReadCStringFromMemory(utf8_addr, 1024, lldb.SBError())
 
-    view_created = get_ivar(obj, addr, 'RLMResults._viewCreated')
-    if not view_created:
+    if not is_results_evaluated(obj):
         return 'Unevaluated query on ' + class_name
 
     count = frame.EvaluateExpression('(NSUInteger)[(RLMResults *){} count]'.format(obj.GetAddress())).GetValueAsUnsigned()
