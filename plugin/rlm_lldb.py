@@ -216,15 +216,17 @@ def is_results_evaluated(obj):
     mode = obj.GetProcess().ReadUnsignedFromMemory(addr + results_mode_offset, mode_type.size, lldb.SBError())
     return mode != mode_query_value
 
+def results_object_class_name(obj):
+    object_schema = get_ivar(obj, obj.GetAddress(), 'RLMResults._objectSchema')
+    return get_object_class_name(obj.GetThread().GetSelectedFrame(), obj, object_schema, 'RLMObjectSchema._className')
 
 def RLMResults_SummaryProvider(obj, _):
-    frame = obj.GetThread().GetSelectedFrame()
-    utf8_addr = frame.EvaluateExpression('(const char *)[[(RLMResults *){} objectClassName] UTF8String]'.format(obj.GetAddress())).GetValueAsUnsigned()
-    class_name = obj.GetProcess().ReadCStringFromMemory(utf8_addr, 1024, lldb.SBError())
+    class_name = results_object_class_name(obj)
 
     if not is_results_evaluated(obj):
         return 'Unevaluated query on ' + class_name
 
+    frame = obj.GetThread().GetSelectedFrame()
     count = frame.EvaluateExpression('(NSUInteger)[(RLMResults *){} count]'.format(obj.GetAddress())).GetValueAsUnsigned()
     return "({}[{}])".format(class_name, count)
 
