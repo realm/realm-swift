@@ -274,7 +274,9 @@ size_t Results::index_of(Row const& row)
     if (m_table && row.get_table() != m_table) {
         throw IncorrectTableException{
             ObjectStore::object_type_for_table_name(m_table->get_name()),
-            ObjectStore::object_type_for_table_name(row.get_table()->get_name())};
+            ObjectStore::object_type_for_table_name(row.get_table()->get_name()),
+            "Attempting to get the index of a Row of the wrong type"
+        };
     }
     return index_of(row.get_index());
 }
@@ -530,8 +532,9 @@ void Results::Internal::set_table_view(Results& results, realm::TableView &&tv)
 }
 
 Results::UnsupportedColumnTypeException::UnsupportedColumnTypeException(size_t column, const Table* table)
+: std::runtime_error((std::string)"Operation not supported on '" + table->get_column_name(column).data() + "' columns")
+, column_index(column)
+, column_name(table->get_column_name(column))
+, column_type(table->get_column_type(column))
 {
-    column_index = column;
-    column_name = table->get_column_name(column);
-    column_type = table->get_column_type(column);
 }

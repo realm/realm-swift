@@ -25,6 +25,7 @@
 
 #include <realm/table_view.hpp>
 #include <realm/util/optional.hpp>
+#include <realm/util/to_string.hpp>
 
 namespace realm {
 template<typename T> class BasicRowExpr;
@@ -130,25 +131,35 @@ public:
 
     // The Results object has been invalidated (due to the Realm being invalidated)
     // All non-noexcept functions can throw this
-    struct InvalidatedException {};
+    struct InvalidatedException : public std::runtime_error {
+        InvalidatedException() : std::runtime_error("Access to invalidated Results objects") {}
+    };
 
     // The input index parameter was out of bounds
-    struct OutOfBoundsIndexException {
-        size_t requested;
-        size_t valid_count;
+    struct OutOfBoundsIndexException : public std::out_of_range {
+        OutOfBoundsIndexException(size_t r, size_t c) :
+        std::out_of_range((std::string)"Requested index " + util::to_string(r) +
+                          " greater than max " + util::to_string(c)),
+        requested(r), valid_count(c) {}
+        const size_t requested;
+        const size_t valid_count;
     };
 
     // The input Row object is not attached
-    struct DetatchedAccessorException { };
+    struct DetatchedAccessorException : public std::runtime_error {
+        DetatchedAccessorException() : std::runtime_error("Atempting to access an invalid object") {}
+    };
 
     // The input Row object belongs to a different table
-    struct IncorrectTableException {
-        StringData expected;
-        StringData actual;
+    struct IncorrectTableException : public std::runtime_error {
+        IncorrectTableException(StringData e, StringData a, const std::string &error)
+        : std::runtime_error(error), expected(e), actual(a) {}
+        const StringData expected;
+        const StringData actual;
     };
 
     // The requested aggregate operation is not supported for the column type
-    struct UnsupportedColumnTypeException {
+    struct UnsupportedColumnTypeException : public std::runtime_error {
         size_t column_index;
         StringData column_name;
         DataType column_type;
