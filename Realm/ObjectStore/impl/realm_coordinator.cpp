@@ -121,14 +121,14 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
         sync::Client::LogLevel log_level = sync::Client::LogLevel::normal;
         if (config.log_everything)
             log_level = sync::Client::LogLevel::everything;
-        m_sync_client = std::make_unique<sync::Client>(*config.sync_user_token, config.logger, log_level);
+        m_sync_client = std::make_unique<sync::Client>(config.logger, log_level);
 
         m_sync_session = std::make_unique<sync::Session>(*m_sync_client, config.path);
         m_sync_session->set_sync_transact_callback([this] (sync::Session::version_type) {
             if (m_notifier)
                 m_notifier->notify_others();
         });
-        m_sync_session->bind(*config.sync_server_url);
+        m_sync_session->bind(*config.sync_server_url, *config.sync_user_token);
 
         m_sync_thread = std::thread(&sync::Client::run, m_sync_client.get());
     }
