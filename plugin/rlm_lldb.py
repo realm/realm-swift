@@ -144,10 +144,6 @@ class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
 
         object_schema = self._get_ivar(self.obj.GetAddress(), 'RLMObject._objectSchema')
 
-        self.bool_type = obj.GetTarget().FindFirstType('BOOL')
-        self.realm_type = obj.GetTarget().FindFirstType('RLMRealm')
-        self.object_schema_type = obj.GetTarget().FindFirstType('RLMObjectSchema')
-
         def get_schema(object_schema):
             properties = self._get_ivar(object_schema, 'RLMObjectSchema._properties')
             if not properties:
