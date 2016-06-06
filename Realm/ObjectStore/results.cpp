@@ -425,7 +425,7 @@ Query Results::get_query() const
             // The TableView has no associated query so create one with no conditions that is restricted
             // to the rows in the TableView.
             m_table_view.sync_if_needed();
-            return Query(*m_table, std::make_unique<TableView>(m_table_view));
+            return Query(*m_table, std::unique_ptr<TableViewBase>(new TableView(m_table_view)));
         }
         case Mode::LinkView:
             return m_table->where(m_link_view);
