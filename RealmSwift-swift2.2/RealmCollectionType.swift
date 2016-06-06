@@ -321,7 +321,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
      the write transaction.
 
      ```swift
-     let results = realm.objects(Dog)
+     let results = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.addNotificationBlock { changes in
          switch changes {
@@ -878,7 +878,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      the write transaction.
 
      ```swift
-     let results = realm.objects(Dog)
+     let results = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.addNotificationBlock { changes in
          switch changes {

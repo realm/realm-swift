@@ -343,7 +343,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      the write transaction.
 
      ```swift
-     let dog = realm.objects(Dog).first!
+     let dog = realm.objects(Dog.self).first!
      let owners = dog.owners
      print("owners.count: \(owners.count)") // => 0
      let token = owners.addNotificationBlock { changes in

@@ -423,7 +423,7 @@ public final class List<T: Object>: ListBase {
      after the write transaction, and will not include change information.
 
      ```swift
-     let person = realm.objects(Person).first!
+     let person = realm.objects(Person.self).first!
      print("dogs.count: \(person.dogs.count)") // => 0
      let token = person.dogs.addNotificationBlock { changes in
          switch changes {

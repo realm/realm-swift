@@ -224,7 +224,7 @@ class RealmCollectionTypeTests: TestCase {
         try! realm.write {
             realm.add(outerArray)
         }
-        XCTAssertEqual(1, outerArray.array.filter("ANY array IN %@", realm.objects(SwiftObject)).count)
+        XCTAssertEqual(1, outerArray.array.filter("ANY array IN %@", realm.objects(SwiftObject.self)).count)
     }
 
     func testFilterResults() {
@@ -235,7 +235,7 @@ class RealmCollectionTypeTests: TestCase {
             realm.add(array)
         }
         XCTAssertEqual(1,
-            realm.objects(SwiftListOfSwiftObject).filter("ANY array IN %@", realm.objects(SwiftObject)).count)
+            realm.objects(SwiftListOfSwiftObject.self).filter("ANY array IN %@", realm.objects(SwiftObject.self)).count)
     }
 
     func testFilterPredicate() {
@@ -504,7 +504,7 @@ class ResultsWithCustomInitializerTest: TestCase {
             realm.add(SwiftCustomInitializerObject(stringVal: "A"))
         }
 
-        let collection = realm.objects(SwiftCustomInitializerObject)
+        let collection = realm.objects(SwiftCustomInitializerObject.self)
         let expected = collection.map { $0.stringCol }
         let actual = collection.valueForKey("stringCol") as! [String]!
         XCTAssertEqual(expected, actual)
@@ -515,23 +515,23 @@ class ResultsWithCustomInitializerTest: TestCase {
 
 class ResultsFromTableTests: ResultsTests {
     override func collectionBaseInWriteTransaction() -> Results<CTTStringObjectWithLink> {
-        return realmWithTestPath().objects(CTTStringObjectWithLink)
+        return realmWithTestPath().objects(CTTStringObjectWithLink.self)
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
         makeAggregateableObjects()
-        return AnyRealmCollection(realmWithTestPath().objects(CTTAggregateObject))
+        return AnyRealmCollection(realmWithTestPath().objects(CTTAggregateObject.self))
     }
 }
 
 class ResultsFromTableViewTests: ResultsTests {
     override func collectionBaseInWriteTransaction() -> Results<CTTStringObjectWithLink> {
-        return realmWithTestPath().objects(CTTStringObjectWithLink).filter("stringCol != ''")
+        return realmWithTestPath().objects(CTTStringObjectWithLink.self).filter("stringCol != ''")
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
         makeAggregateableObjects()
-        return AnyRealmCollection(realmWithTestPath().objects(CTTAggregateObject).filter("trueCol == true"))
+        return AnyRealmCollection(realmWithTestPath().objects(CTTAggregateObject.self).filter("trueCol == true"))
     }
 }
 
@@ -554,7 +554,7 @@ class ResultsFromLinkViewTests: ResultsTests {
     override func addObjectToResults() {
         let realm = realmWithTestPath()
         try! realm.write {
-            let array = realm.objects(CTTStringList).last!
+            let array = realm.objects(CTTStringList.self).last!
             array.array.append(realm.create(CTTStringObjectWithLink.self, value: ["a"]))
         }
     }
@@ -761,7 +761,7 @@ class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
         realmWithTestPath().create(CTTStringList.self, value: [[str1, str2]])
-        let array = realmWithTestPath().objects(CTTStringList).first!
+        let array = realmWithTestPath().objects(CTTStringList.self).first!
         return array.array
     }
 
@@ -779,7 +779,7 @@ class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 class LinkingObjectsCollectionTypeTests: RealmCollectionTypeTests {
     func collectionBaseInWriteTransaction() -> LinkingObjects<CTTStringObjectWithLink> {
         let target = realmWithTestPath().create(CTTLinkTarget.self, value: [0])
-        for object in realmWithTestPath().objects(CTTStringObjectWithLink) {
+        for object in realmWithTestPath().objects(CTTStringObjectWithLink.self) {
             object.linkCol = target
         }
         return target.stringObjects

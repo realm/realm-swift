@@ -55,7 +55,7 @@ class PlacesViewController: UITableViewController, UITextFieldDelegate {
 
     func reloadData() {
         let realm = try! Realm()
-        results = realm.objects(Place)
+        results = realm.objects(Place.self)
         if let text = searchField.text where !text.isEmpty {
             results = results?.filter("postalCode beginswith %@", text)
         }

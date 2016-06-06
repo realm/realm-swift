@@ -137,7 +137,7 @@ class ObjectAccessorTests: TestCase {
             testObject()
         }
 
-        let obj = realm.objects(SwiftAllIntSizesObject).first!
+        let obj = realm.objects(SwiftAllIntSizesObject.self).first!
         XCTAssertEqual(obj.int8, v8)
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
@@ -158,7 +158,7 @@ class ObjectAccessorTests: TestCase {
         realm.create(SwiftLongObject.self, value: [NSNumber(longLong: negativeLongNumber)])
         try! realm.commitWrite()
 
-        let objects = realm.objects(SwiftLongObject)
+        let objects = realm.objects(SwiftLongObject.self)
         XCTAssertEqual(objects.count, Int(3), "3 rows expected")
         XCTAssertEqual(objects[0].longCol, longNumber, "2 ^ 34 expected")
         XCTAssertEqual(objects[1].longCol, intNumber, "2 ^ 31 - 1 expected")
@@ -194,7 +194,7 @@ class ObjectAccessorTests: TestCase {
             realm.add(object2)
         }
 
-        let objects = realm.objects(SwiftObject)
+        let objects = realm.objects(SwiftObject.self)
 
         let firstObject = objects.first
         XCTAssertEqual(2, firstObject!.arrayCol.count)
@@ -215,7 +215,7 @@ class ObjectAccessorTests: TestCase {
         let realm = try! Realm()
         try! realm.write {
             let obj = realm.create(SwiftOptionalObject)
-            let copy = realm.objects(SwiftOptionalObject).first!
+            let copy = realm.objects(SwiftOptionalObject.self).first!
             realm.delete(obj)
 
             self.assertThrows(copy.optIntCol.value = 1)
