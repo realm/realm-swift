@@ -35,7 +35,7 @@ using namespace realm::_impl;
 
 namespace {
 // Write a byte to a pipe to notify anyone waiting for data on the pipe
-void notify_fd(int fd)
+void notify_fd(int fd, int read_fd)
 {
     while (true) {
         char c = 0;
@@ -50,7 +50,7 @@ void notify_fd(int fd)
         // write.
         assert(ret == -1 && errno == EAGAIN);
         char buff[1024];
-        read(fd, buff, sizeof buff);
+        read(read_fd, buff, sizeof buff);
     }
 }
 } // anonymous namespace
@@ -173,7 +173,7 @@ ExternalCommitHelper::ExternalCommitHelper(RealmCoordinator& parent)
 
 ExternalCommitHelper::~ExternalCommitHelper()
 {
-    notify_fd(m_shutdown_write_fd);
+    notify_fd(m_shutdown_write_fd, m_shutdown_read_fd);
     m_thread.wait(); // Wait for the thread to exit
 }
 
@@ -218,9 +218,9 @@ void ExternalCommitHelper::listen()
 void ExternalCommitHelper::notify_others()
 {
     if (m_notify_fd_write != -1) {
-        notify_fd(m_notify_fd_write);
+        notify_fd(m_notify_fd_write, m_notify_fd);
     }
     else {
-        notify_fd(m_notify_fd);
+        notify_fd(m_notify_fd, m_notify_fd);
     }
 }

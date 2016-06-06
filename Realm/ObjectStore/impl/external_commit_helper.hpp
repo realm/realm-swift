@@ -23,6 +23,8 @@
 
 #if REALM_PLATFORM_APPLE
 #include "impl/apple/external_commit_helper.hpp"
+#elif REALM_ANDROID
+#include "impl/android/external_commit_helper.hpp"
 #else
 #include "impl/generic/external_commit_helper.hpp"
 #endif

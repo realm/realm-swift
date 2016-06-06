@@ -548,8 +548,11 @@ class RealmTests: TestCase {
             let object1 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: NSNull())
             XCTAssertNotNil(object1)
 
-            let object2 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: "b")
-            XCTAssertNotNil(object2)
+            let object2 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: nil)
+            XCTAssertEqual(object1, object2)
+
+            let object3 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: "b")
+            XCTAssertNotNil(object3)
 
             let missingObject = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: "z")
             XCTAssertNil(missingObject)
@@ -567,8 +570,11 @@ class RealmTests: TestCase {
             let object1 = realm.objectForPrimaryKey(objectType, key: NSNull())
             XCTAssertNotNil(object1)
 
-            let object2 = realm.objectForPrimaryKey(objectType, key: 2)
-            XCTAssertNotNil(object2)
+            let object2 = realm.objectForPrimaryKey(objectType, key: nil)
+            XCTAssertEqual(object1, object2)
+
+            let object3 = realm.objectForPrimaryKey(objectType, key: 2)
+            XCTAssertNotNil(object3)
 
             let missingObject = realm.objectForPrimaryKey(objectType, key: 0)
             XCTAssertNil(missingObject)
@@ -584,14 +590,73 @@ class RealmTests: TestCase {
     }
 
     func testDynamicObjectForPrimaryKey() {
+        let intTypes: [Object.Type] = [SwiftPrimaryIntObject.self,
+                                       SwiftPrimaryInt8Object.self,
+                                       SwiftPrimaryInt16Object.self,
+                                       SwiftPrimaryInt32Object.self,
+                                       SwiftPrimaryInt64Object.self]
+        let optionalIntTypes: [Object.Type] = [SwiftPrimaryOptionalIntObject.self,
+                                               SwiftPrimaryOptionalInt8Object.self,
+                                               SwiftPrimaryOptionalInt16Object.self,
+                                               SwiftPrimaryOptionalInt32Object.self,
+                                               SwiftPrimaryOptionalInt64Object.self]
+
         let realm = try! Realm()
         try! realm.write {
             realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
             realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
+
+            realm.create(SwiftPrimaryOptionalStringObject.self, value: [NSNull(), 1])
+            realm.create(SwiftPrimaryOptionalStringObject.self, value: ["b", 2])
+
+            func createIntObject(objectType: Object.Type) {
+                realm.create(objectType, value: ["a", 1])
+                realm.create(objectType, value: ["b", 2])
+            }
+
+            func createOptionalIntObject(objectType: Object.Type) {
+                realm.create(objectType, value: ["a", NSNull()])
+                realm.create(objectType, value: ["b", 2])
+            }
+
+            for type in intTypes {
+                createIntObject(type)
+            }
+
+            for type in optionalIntTypes {
+                createOptionalIntObject(type)
+            }
         }
 
-        XCTAssertNotNil(realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "a"))
-        XCTAssertNil(realm.dynamicObjectForPrimaryKey("SwiftPrimaryStringObject", key: "z"))
+        XCTAssertNotNil(realm.dynamicObjectForPrimaryKey(String(SwiftPrimaryStringObject), key: "a"))
+        XCTAssertNil(realm.dynamicObjectForPrimaryKey(String(SwiftPrimaryStringObject), key: "z"))
+
+        XCTAssertNotNil(realm.dynamicObjectForPrimaryKey(String(SwiftPrimaryOptionalStringObject), key: NSNull()))
+        XCTAssertEqual(realm.dynamicObjectForPrimaryKey(String(SwiftPrimaryOptionalStringObject), key: NSNull()),
+                       realm.dynamicObjectForPrimaryKey(String(SwiftPrimaryOptionalStringObject), key: nil))
+        XCTAssertNotNil(realm.dynamicObjectForPrimaryKey(String(SwiftPrimaryOptionalStringObject), key: "b"))
+        XCTAssertNil(realm.dynamicObjectForPrimaryKey(String(SwiftPrimaryOptionalStringObject), key: "z"))
+
+        func assertIntObject(objectType: Object.Type) {
+            XCTAssertNotNil(realm.dynamicObjectForPrimaryKey(String(objectType), key: 1))
+            XCTAssertNil(realm.dynamicObjectForPrimaryKey(String(objectType), key: 0))
+        }
+
+        func assertOptionalIntObject(objectType: Object.Type) {
+            XCTAssertNotNil(realm.dynamicObjectForPrimaryKey(String(objectType), key: NSNull()))
+            XCTAssertEqual(realm.dynamicObjectForPrimaryKey(String(objectType), key: NSNull()),
+                           realm.dynamicObjectForPrimaryKey(String(objectType), key: nil))
+            XCTAssertNotNil(realm.dynamicObjectForPrimaryKey(String(objectType), key: 2))
+            XCTAssertNil(realm.dynamicObjectForPrimaryKey(String(objectType), key: 0))
+        }
+
+        for type in intTypes {
+            assertIntObject(type)
+        }
+
+        for type in optionalIntTypes {
+            assertOptionalIntObject(type)
+        }
     }
 
     func testDynamicObjectForPrimaryKeySubscripting() {
