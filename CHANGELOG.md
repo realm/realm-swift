@@ -20,6 +20,8 @@ x.x.x Release notes (yyyy-MM-dd)
   opened on multiple threads which are running in active run loops.
 * Fix notifications breaking on tvOS after a very large number of write
   transactions have been committed.
+* Fix a "Destruction of mutex in use" assertion failure after an error while
+  opening a file.
 
 1.0.0 Release notes (2016-05-25)
 =============================================================
