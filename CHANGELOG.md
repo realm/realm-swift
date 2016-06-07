@@ -27,6 +27,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
+* Prohibit creating or adding objects of a class with no properties to a Realm. This previously
+  would have silently failed to persist the object beyond the current transaction.
 * Swift: Fix an error thrown when trying to create or update `Object` instances via
   `add(:_update:)` with a primary key property of type `RealmOptional`.
 * Xcode playground in Swift release zip now runs successfully.
