@@ -34,6 +34,7 @@
 @end
 
 @interface LinkChain3 : RLMObject
+@property NSString *string;
 @property (readonly) RLMLinkingObjects *prev;
 @end
 
@@ -1321,8 +1322,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    LinkChain1 *root1 = [LinkChain1 createInRealm:realm withValue:@{@"value": @1, @"next": @[@[]]}];
-    LinkChain1 *root2 = [LinkChain1 createInRealm:realm withValue:@{@"value": @2, @"next": @[@[]]}];
+    LinkChain1 *root1 = [LinkChain1 createInRealm:realm withValue:@{@"value": @1, @"next": @[@{}]}];
+    LinkChain1 *root2 = [LinkChain1 createInRealm:realm withValue:@{@"value": @2, @"next": @[@{}]}];
     [realm commitWriteTransaction];
 
     RLMResults *results = [LinkChain3 objectsInRealm:realm where:@"ANY prev.prev.value = 1"];

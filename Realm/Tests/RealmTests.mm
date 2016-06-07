@@ -1349,18 +1349,18 @@
 
 - (void)testReadOnlyRealmWithMissingColumns
 {
-    // create a realm with only a zero-column StringObject table
+    // create a realm with only a RequiredPropertiesObject table with only a string column
     @autoreleasepool {
-        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:RequiredPropertiesObject.class];
         objectSchema.objectClass = RLMObject.class;
-        objectSchema.properties = @[];
+        objectSchema.properties = @[objectSchema[@"stringCol"]];
 
         RLMSchema *schema = [[RLMSchema alloc] init];
         schema.objectSchema = @[objectSchema];
         RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
 
         [realm beginWriteTransaction];
-        [realm createObject:StringObject.className withValue:@[]];
+        [realm createObject:RequiredPropertiesObject.className withValue:@[@"test"]];
         [realm commitWriteTransaction];
     }
 

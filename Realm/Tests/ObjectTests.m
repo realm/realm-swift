@@ -856,6 +856,15 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     [realm cancelWriteTransaction];
 }
 
+- (void)testAddingObjectWithoutAnyPropertiesThrows {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    RLMAssertThrowsWithReasonMatching([realm addObject:[[AbstractObject alloc] initWithValue:@[]]], @"Can't add objects of type 'AbstractObject' to the Realm as the class doesn't define any managed properties.");
+    RLMAssertThrowsWithReasonMatching([AbstractObject createInRealm:realm withValue:@[]], @"Can't add objects of type 'AbstractObject' to the Realm as the class doesn't define any managed properties.");
+    [realm cancelWriteTransaction];
+}
+
 - (void)testNSNumberProperties {
     NumberObject *obj = [NumberObject new];
     obj.intObj = @20;
