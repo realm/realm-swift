@@ -95,10 +95,20 @@ ExternalCommitHelper::ExternalCommitHelper(RealmCoordinator& parent)
     }
 
 #if !TARGET_OS_TV
-    auto path = parent.get_path() + ".note";
+    auto dir_path = parent.get_path() + ".management/";
+    auto path = dir_path + ".note";
 
     // Create and open the named pipe
-    int ret = mkfifo(path.c_str(), 0600);
+    int ret = mkdir(dir_path.c_str(), 0766);
+    if (ret == -1) {
+        int err = errno;
+        // the management directory already existing isn't an error
+        if (errno != EEXIST) {
+            throw std::system_error(err, std::system_category());
+        }
+    }
+
+    ret = mkfifo(path.c_str(), 0600);
     if (ret == -1) {
         int err = errno;
         if (err == ENOTSUP) {
