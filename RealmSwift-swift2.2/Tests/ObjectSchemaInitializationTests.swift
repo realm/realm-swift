@@ -122,6 +122,8 @@ class ObjectSchemaInitializationTests: TestCase {
                      "Should throw when not ignoring a property of a type we can't persist")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithOptionalStringArray.self),
                      "Should throw when not ignoring a property of a type we can't persist")
+        assertThrows(RLMObjectSchema(forObjectClass: RealmObjectWithLazyVar.self),
+                     "Should throw when not ignoring a property marked as 'dynamic lazy var'")
 
         // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
         _ = RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)
@@ -147,6 +149,10 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertNil(schema["runtimeProperty"], "The object schema shouldn't contain ignored properties")
         XCTAssertNil(schema["runtimeDefaultProperty"], "The object schema shouldn't contain ignored properties")
         XCTAssertNil(schema["readOnlyProperty"], "The object schema shouldn't contain read-only properties")
+
+        assertSucceeds("Should not throw when ignoring a lazy property.") {
+            _ = RLMObjectSchema(forObjectClass: RealmObjectWithIgnoredLazyVar.self)
+        }
     }
 
     func testIndexedProperties() {
@@ -271,4 +277,13 @@ extension Set: RealmOptionalType { }
 
 class SwiftObjectWithNonRealmOptionalType: SwiftFakeObject {
     let set = RealmOptional<Set<Int>>()
+}
+
+class RealmObjectWithLazyVar: SwiftFakeObject {
+    dynamic lazy var someVar = ""
+}
+
+class RealmObjectWithIgnoredLazyVar: Object {
+    dynamic lazy var ignoredVar = ""
+    dynamic override class func ignoredProperties() -> [String] { return ["ignoredVar"] }
 }
