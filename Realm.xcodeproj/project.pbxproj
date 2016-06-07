@@ -982,7 +982,9 @@
 				5D660FD91BE98C7C0021E04F /* RealmSwift Tests */,
 				E81A1FB31955FCE000FDED82 /* CHANGELOG.md */,
 			);
+			indentWidth = 4;
 			sourceTree = "<group>";
+			tabWidth = 4;
 		};
 		E8D89B991955FC6D00CF2B9A /* Products */ = {
 			isa = PBXGroup;
