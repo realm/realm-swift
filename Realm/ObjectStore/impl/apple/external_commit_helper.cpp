@@ -96,7 +96,7 @@ ExternalCommitHelper::ExternalCommitHelper(RealmCoordinator& parent)
 
 #if !TARGET_OS_TV
     auto dir_path = parent.get_path() + ".management/";
-    auto path = dir_path + ".note";
+    auto path = dir_path + "notification_pipe.note";
 
     // Create and open the named pipe
     int ret = mkdir(dir_path.c_str(), 0766);

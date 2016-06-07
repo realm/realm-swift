@@ -1557,7 +1557,8 @@
 
     // Create the expected fifo URL and create a directory.
     // Note that creating a file when a directory with the same name exists produces a different errno, which is good.
-    NSURL *fifoURL = [[testURL URLByAppendingPathExtension:@"management"] URLByAppendingPathComponent:@".note"];
+    NSURL *fifoURL = [[testURL URLByAppendingPathExtension:@"management"]
+                      URLByAppendingPathComponent:@"notification_pipe.note"];
     [manager removeItemAtPath:fifoURL.path error:nil];
     assert(![manager fileExistsAtPath:fifoURL.path]);
     NSError *error = nil;
