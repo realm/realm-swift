@@ -749,7 +749,7 @@ MismatchedPropertiesException::MismatchedPropertiesException(std::string const& 
     ObjectSchemaValidationException(object_type), m_old_property(old_property), m_new_property(new_property)
 {
     if (new_property.type != old_property.type) {
-        m_what = util::format("Property types for '%1' property doe not match. Old type '%2', new type '%3'.",
+        m_what = util::format("Property types for '%1' property do not match. Old type '%2', new type '%3'.",
                               old_property.name,
                               string_for_property_type(old_property.type),
                               string_for_property_type(new_property.type));
