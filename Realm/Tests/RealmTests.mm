@@ -116,7 +116,7 @@
 
     // Delete `*.lock` and `.note` files to simulate opening Realm in an app bundle
     [[NSFileManager defaultManager] removeItemAtURL:[RLMTestRealmURL() URLByAppendingPathExtension:@"lock"] error:nil];
-    [[NSFileManager defaultManager] removeItemAtURL:[RLMTestRealmURL() URLByAppendingPathExtension:@"note"] error:nil];
+    [[NSFileManager defaultManager] removeItemAtURL:RLMNoteURLForBasePath(RLMTestRealmURL()) error:nil];
 
     // Make parent directory immutable to simulate opening Realm in an app bundle
     NSURL *parentDirectoryOfTestRealmURL = [RLMTestRealmURL() URLByDeletingLastPathComponent];
@@ -1557,8 +1557,7 @@
 
     // Create the expected fifo URL and create a directory.
     // Note that creating a file when a directory with the same name exists produces a different errno, which is good.
-    NSURL *fifoURL = [[testURL URLByAppendingPathExtension:@"management"]
-                      URLByAppendingPathComponent:@"notification_pipe.note"];
+    NSURL *fifoURL = RLMNoteURLForBasePath(testURL);
     [manager removeItemAtPath:fifoURL.path error:nil];
     assert(![manager fileExistsAtPath:fifoURL.path]);
     NSError *error = nil;
