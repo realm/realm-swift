@@ -23,6 +23,7 @@
 #include "impl/transact_log_handler.hpp"
 #include "object_store.hpp"
 #include "schema.hpp"
+#include "util/format.hpp"
 
 #include <realm/commit_log.hpp>
 #include <realm/group_shared.hpp>
@@ -76,19 +77,18 @@ REALM_NOINLINE static void translate_file_exception(StringData path, bool read_o
     }
     catch (util::File::PermissionDenied const& ex) {
         throw RealmFileException(RealmFileException::Kind::PermissionDenied, ex.get_path(),
-                                 "Unable to open a realm at path '" + ex.get_path() +
-                                 "'. Please use a path where your app has " + (read_only ? "read" : "read-write") + " permissions.",
+                                 util::format("Unable to open a realm at path '%1'. Please use a path where your app has %2 permissions.",
+                                              ex.get_path(), read_only ? "read" : "read-write"),
                                  ex.what());
     }
     catch (util::File::Exists const& ex) {
         throw RealmFileException(RealmFileException::Kind::Exists, ex.get_path(),
-                                 "File at path '" + ex.get_path() + "' already exists.",
+                                 util::format("File at path '%1' already exists.", ex.get_path()),
                                  ex.what());
     }
     catch (util::File::NotFound const& ex) {
         throw RealmFileException(RealmFileException::Kind::NotFound, ex.get_path(),
-                                 "Directory at path '" + ex.get_path() + "' does not exist.",
-                                 ex.what());
+                                 util::format("Directory at path '%1' does not exist.", ex.get_path()), ex.what());
     }
     catch (util::File::AccessError const& ex) {
         // Errors for `open()` include the path, but other errors don't. We
@@ -101,13 +101,13 @@ REALM_NOINLINE static void translate_file_exception(StringData path, bool read_o
             underlying.replace(pos - 1, ex.get_path().size() + 2, "");
         }
         throw RealmFileException(RealmFileException::Kind::AccessError, ex.get_path(),
-                                 "Unable to open a realm at path '" + ex.get_path() + "': " + underlying,
-                                 ex.what());
+                                 util::format("Unable to open a realm at path '%1': %2.", ex.get_path(), underlying), ex.what());
     }
     catch (IncompatibleLockFile const& ex) {
         throw RealmFileException(RealmFileException::Kind::IncompatibleLockFile, path,
                                  "Realm file is currently open in another process "
-                                 "which cannot share access with this process. All processes sharing a single file must be the same architecture.",
+                                 "which cannot share access with this process. "
+                                 "All processes sharing a single file must be the same architecture.",
                                  ex.what());
     }
     catch (FileFormatUpgradeRequired const& ex) {
