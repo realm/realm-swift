@@ -130,30 +130,37 @@ public:
 
     // The Results object has been invalidated (due to the Realm being invalidated)
     // All non-noexcept functions can throw this
-    struct InvalidatedException {};
+    struct InvalidatedException : public std::runtime_error {
+        InvalidatedException() : std::runtime_error("Access to invalidated Results objects") {}
+    };
 
     // The input index parameter was out of bounds
-    struct OutOfBoundsIndexException {
-        size_t requested;
-        size_t valid_count;
+    struct OutOfBoundsIndexException : public std::out_of_range {
+        OutOfBoundsIndexException(size_t r, size_t c);
+        const size_t requested;
+        const size_t valid_count;
     };
 
     // The input Row object is not attached
-    struct DetatchedAccessorException { };
+    struct DetatchedAccessorException : public std::runtime_error {
+        DetatchedAccessorException() : std::runtime_error("Atempting to access an invalid object") {}
+    };
 
     // The input Row object belongs to a different table
-    struct IncorrectTableException {
-        StringData expected;
-        StringData actual;
+    struct IncorrectTableException : public std::runtime_error {
+        IncorrectTableException(StringData e, StringData a, const std::string &error)
+        : std::runtime_error(error), expected(e), actual(a) {}
+        const StringData expected;
+        const StringData actual;
     };
 
     // The requested aggregate operation is not supported for the column type
-    struct UnsupportedColumnTypeException {
+    struct UnsupportedColumnTypeException : public std::runtime_error {
         size_t column_index;
         StringData column_name;
         DataType column_type;
 
-        UnsupportedColumnTypeException(size_t column, const Table* table);
+        UnsupportedColumnTypeException(size_t column, const Table* table, const char* operation);
     };
 
     SharedRealm get_realm() const { return m_realm; }
@@ -198,10 +205,11 @@ private:
 
     void prepare_async();
 
-    template<typename Int, typename Float, typename Double, typename DateTime>
+    template<typename Int, typename Float, typename Double, typename Timestamp>
     util::Optional<Mixed> aggregate(size_t column, bool return_none_for_empty,
+                                    const char* name,
                                     Int agg_int, Float agg_float,
-                                    Double agg_double, DateTime agg_datetime);
+                                    Double agg_double, Timestamp agg_timestamp);
 
     void set_table_view(TableView&& tv);
 };

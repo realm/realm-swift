@@ -19,6 +19,7 @@
 #include "object_store.hpp"
 
 #include "schema.hpp"
+#include "util/format.hpp"
 
 #include <realm/group.hpp>
 #include <realm/table.hpp>
@@ -171,8 +172,8 @@ void ObjectStore::verify_schema(Schema const& actual_schema, Schema& target_sche
         auto matching_schema = actual_schema.find(object_schema);
         if (matching_schema == actual_schema.end()) {
             if (!allow_missing_tables) {
-                errors.emplace_back(ObjectSchemaValidationException(object_schema.name,
-                                    "Missing table for object type '" + object_schema.name + "'."));
+                errors.emplace_back(object_schema.name,
+                                    util::format("Missing table for object type '%1'.", object_schema.name));
             }
             continue;
         }
@@ -609,65 +610,72 @@ bool ObjectStore::is_empty(const Group *group) {
 PropertyRenameException::PropertyRenameException(std::string old_property_name, std::string new_property_name) :
     m_old_property_name(old_property_name), m_new_property_name(new_property_name)
 {
-    m_what = "Old property '" + old_property_name + "' cannot be renamed to property '" + new_property_name + "'.";
+    m_what = util::format("Old property '%1' cannot be renamed to property '%2'.",
+                          old_property_name, new_property_name);
 }
 
 PropertyRenameMissingObjectTypeException::PropertyRenameMissingObjectTypeException(std::string object_type) :
     m_object_type(object_type)
 {
-    m_what = "Cannot rename properties on type '" + object_type + "'.";
+    m_what = util::format("Cannot rename properties on type '%1'.", object_type);
 }
 
 PropertyRenameMissingOldObjectTypeException::PropertyRenameMissingOldObjectTypeException(std::string object_type) :
     PropertyRenameMissingObjectTypeException(object_type)
 {
-    m_what = "Cannot rename properties on type '" + object_type + "' because it is missing from the Realm file.";
+    m_what = util::format("Cannot rename properties on type '%1' because it is missing from the Realm file.",
+                          object_type);
 }
 
 PropertyRenameMissingNewObjectTypeException::PropertyRenameMissingNewObjectTypeException(std::string object_type) :
     PropertyRenameMissingObjectTypeException(object_type)
 {
-    m_what = "Cannot rename properties on type '" + object_type + "' because it is missing from the specified schema.";
+    m_what = util::format("Cannot rename properties on type '%1' because it is missing from the specified schema.",
+                          object_type);
 }
 
 PropertyRenameMissingOldPropertyException::PropertyRenameMissingOldPropertyException(std::string old_property_name, std::string new_property_name) :
     PropertyRenameException(old_property_name, new_property_name)
 {
-    m_what = "Old property '" + old_property_name + "' is missing from the Realm file so it cannot be renamed to '" + new_property_name + "'.";
+    m_what = util::format("Old property '%1' is missing from the Realm file so it cannot be renamed to '%2'.",
+                          old_property_name, new_property_name);
 }
 
 PropertyRenameMissingNewPropertyException::PropertyRenameMissingNewPropertyException(std::string new_property_name) :
     m_new_property_name(new_property_name)
 {
-    m_what = "Renamed property '" + new_property_name + "' is not in the latest model.";
+    m_what = util::format("Renamed property '%1' is not in the latest model.", new_property_name);
 }
 
 PropertyRenameOldStillExistsException::PropertyRenameOldStillExistsException(std::string old_property_name, std::string new_property_name) :
     PropertyRenameException(old_property_name, new_property_name)
 {
-    m_what = "Old property '" + old_property_name + "' cannot be renamed to '" + new_property_name + "' because the old property is still present in the specified schema.";
+    m_what = util::format("Old property '%1' cannot be renamed to '%2' because the old property is still present "
+                          "in the specified schema.", old_property_name, new_property_name);
 }
 
 PropertyRenameTypeMismatchException::PropertyRenameTypeMismatchException(Property const& old_property, Property const& new_property) :
     m_old_property(old_property), m_new_property(new_property)
 {
-    m_what = "Old property '" + old_property.name + "' of type '" + old_property.type_string() + "' cannot be renamed to property '" + new_property.name + "' of type '" + new_property.type_string() + "'.";
+    m_what = util::format("Old property '%1' of type '%2' cannot be renamed to property '%3' of type '%4'.",
+                          old_property.name, old_property.type_string(),
+                          new_property.name, new_property.type_string());
 }
 
 InvalidSchemaVersionException::InvalidSchemaVersionException(uint64_t old_version, uint64_t new_version) :
     m_old_version(old_version), m_new_version(new_version)
 {
-    m_what = "Provided schema version " + std::to_string(new_version) + " is less than last set version " + std::to_string(old_version) + ".";
+    m_what = util::format("Provided schema version %1 is less than last set version %2.", new_version, old_version);
 }
 
 DuplicatePrimaryKeyValueException::DuplicatePrimaryKeyValueException(std::string const& object_type, Property const& property) :
     m_object_type(object_type), m_property(property)
 {
-    m_what = "Primary key property '" + property.name + "' has duplicate values after migration.";
+    m_what = util::format("Primary key property '%1' has duplicate values after migration.", property.name);
 }
 
-SchemaValidationException::SchemaValidationException(std::vector<ObjectSchemaValidationException> const& errors) :
-    m_validation_errors(errors)
+SchemaValidationException::SchemaValidationException(std::vector<ObjectSchemaValidationException> const& errors)
+: m_validation_errors(errors)
 {
     m_what = "Schema validation failed due to the following errors:";
     for (auto const& error : errors) {
@@ -678,28 +686,30 @@ SchemaValidationException::SchemaValidationException(std::vector<ObjectSchemaVal
 SchemaMismatchException::SchemaMismatchException(std::vector<ObjectSchemaValidationException> const& errors) :
     m_validation_errors(errors)
 {
-    m_what ="Migration is required due to the following errors:";
+    m_what = "Migration is required due to the following errors:";
     for (auto const& error : errors) {
         m_what += std::string("\n- ") + error.what();
     }
 }
 
-PropertyTypeNotIndexableException::PropertyTypeNotIndexableException(std::string const& object_type, Property const& property) :
-    ObjectSchemaPropertyException(object_type, property)
+PropertyTypeNotIndexableException::PropertyTypeNotIndexableException(std::string const& object_type,
+                                                                     Property const& property)
+: ObjectSchemaPropertyException(object_type, property)
 {
-    m_what = "Can't index property " + object_type + "." + property.name + ": indexing a property of type '" + string_for_property_type(property.type) + "' is currently not supported";
+    m_what = util::format("Can't index property %1.%2: indexing a property of type '%3' is currently not supported.",
+                          object_type, property.name, string_for_property_type(property.type));
 }
 
 ExtraPropertyException::ExtraPropertyException(std::string const& object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
-    m_what = "Property '" + property.name + "' has been added to latest object model.";
+    m_what = util::format("Property '%1' has been added to latest object model.", property.name);
 }
 
 MissingPropertyException::MissingPropertyException(std::string const& object_type, Property const& property) :
     ObjectSchemaPropertyException(object_type, property)
 {
-    m_what = "Property '" + property.name + "' is missing from latest object model.";
+    m_what = util::format("Property '%1' is missing from latest object model.", property.name);
 }
 
 InvalidNullabilityException::InvalidNullabilityException(std::string const& object_type, Property const& property) :
@@ -707,12 +717,13 @@ InvalidNullabilityException::InvalidNullabilityException(std::string const& obje
 {
     switch (property.type) {
         case PropertyType::Object:
-            m_what = "'Object' property '" + property.name + "' must be nullable.";
+            m_what = util::format("'Object' property '%1' must be nullable.", property.name);
             break;
         case PropertyType::Any:
         case PropertyType::Array:
         case PropertyType::LinkingObjects:
-            m_what = "Property '" + property.name + "' of type '" + string_for_property_type(property.type) + "' cannot be nullable";
+            m_what = util::format("Property '%1' of type '%2' cannot be nullable.",
+                                  property.name, string_for_property_type(property.type));
             break;
         case PropertyType::Int:
         case PropertyType::Bool:
@@ -725,46 +736,57 @@ InvalidNullabilityException::InvalidNullabilityException(std::string const& obje
     }
 }
 
-MissingObjectTypeException::MissingObjectTypeException(std::string const& object_type, Property const& property) :
-    ObjectSchemaPropertyException(object_type, property)
+MissingObjectTypeException::MissingObjectTypeException(std::string const& object_type, Property const& property)
+: ObjectSchemaPropertyException(object_type, property)
 {
-    m_what = "Target type '" + property.object_type + "' doesn't exist for property '" + property.name + "'.";
+    m_what = util::format("Target type '%1' doesn't exist for property '%2'.",
+                          property.object_type, property.name);
 }
 
-MismatchedPropertiesException::MismatchedPropertiesException(std::string const& object_type, Property const& old_property, Property const& new_property) :
+MismatchedPropertiesException::MismatchedPropertiesException(std::string const& object_type,
+                                                             Property const& old_property,
+                                                             Property const& new_property) :
     ObjectSchemaValidationException(object_type), m_old_property(old_property), m_new_property(new_property)
 {
     if (new_property.type != old_property.type) {
-        m_what = "Property types for '" + old_property.name + "' property do not match. Old type '" + string_for_property_type(old_property.type) +
-        "', new type '" + string_for_property_type(new_property.type) + "'";
+        m_what = util::format("Property types for '%1' property do not match. Old type '%2', new type '%3'.",
+                              old_property.name,
+                              string_for_property_type(old_property.type),
+                              string_for_property_type(new_property.type));
     }
     else if (new_property.object_type != old_property.object_type) {
-        m_what = "Target object type for property '" + old_property.name + "' do not match. Old type '" + old_property.object_type + "', new type '" + new_property.object_type + "'";
+        m_what = util::format("Target object type for property '%1' do not match. Old type '%2', new type '%3'.",
+                              old_property.name, old_property.object_type, new_property.object_type);
     }
     else if (new_property.is_nullable != old_property.is_nullable) {
-        m_what = "Nullability for property '" + old_property.name + "' has changed from '" + std::to_string(old_property.is_nullable) + "' to '" + std::to_string(new_property.is_nullable) + "'.";
+        m_what = util::format("Nullability for property '%1' has been changed from %2 to %3.",
+                              old_property.name,
+                              old_property.is_nullable, new_property.is_nullable);
     }
 }
 
-ChangedPrimaryKeyException::ChangedPrimaryKeyException(std::string const& object_type, std::string const& old_primary, std::string const& new_primary) : ObjectSchemaValidationException(object_type), m_old_primary(old_primary), m_new_primary(new_primary)
+ChangedPrimaryKeyException::ChangedPrimaryKeyException(std::string const& object_type,
+                                                       std::string const& old_primary,
+                                                       std::string const& new_primary)
+: ObjectSchemaValidationException(object_type), m_old_primary(old_primary), m_new_primary(new_primary)
 {
     if (old_primary.size()) {
-        m_what = "Property '" + old_primary + "' is no longer a primary key.";
+        m_what = util::format("Property '%1' is no longer a primary key.", old_primary);
     }
     else {
-        m_what = "Property '" + new_primary + "' has been made a primary key.";
+        m_what = util::format("Property '%1' has been made a primary key.", new_primary);
     }
 }
 
 InvalidPrimaryKeyException::InvalidPrimaryKeyException(std::string const& object_type, std::string const& primary) :
     ObjectSchemaValidationException(object_type), m_primary_key(primary)
 {
-    m_what = "Specified primary key property '" + primary + "' does not exist.";
+    m_what = util::format("Specified primary key property '%1' does not exist.", primary);
 }
 
 DuplicatePrimaryKeysException::DuplicatePrimaryKeysException(std::string const& object_type) : ObjectSchemaValidationException(object_type)
 {
-    m_what = "Duplicate primary keys for object '" + object_type + "'.";
+    m_what = util::format("Duplicate primary keys for object '%1'.", object_type);
 }
 
 InvalidLinkingObjectsPropertyException::InvalidLinkingObjectsPropertyException(Type error_type, std::string const& object_type, Property const& property)
@@ -772,13 +794,17 @@ InvalidLinkingObjectsPropertyException::InvalidLinkingObjectsPropertyException(T
 {
     switch (error_type) {
         case Type::OriginPropertyDoesNotExist:
-            m_what = "Property '" + property.link_origin_property_name + "' declared as origin of linking objects property '" + property.name + "' does not exist.";
+            m_what = util::format("Property '%1' declared as origin of linking objects property '%2' does not exist.",
+                                  property.link_origin_property_name, property.name);
             break;
         case Type::OriginPropertyIsNotALink:
-            m_what = "Property '" + property.link_origin_property_name + "' declared as origin of linking objects property '" + property.name + "' is not a link.";
+            m_what = util::format("Property '%1' declared as origin of linking objects property '%2' is not a link.",
+                                  property.link_origin_property_name, property.name);
             break;
         case Type::OriginPropertyInvalidLinkTarget:
-            m_what = "Property '" + property.link_origin_property_name + "' declared as origin of linking objects property '" + property.name + "' does not link to class '" + object_type + "'.";
+            m_what = util::format("Property '%1' declared as origin of linking objects property '%2' does not link "
+                                  "to class '%3'.",
+                                  property.link_origin_property_name, property.name, object_type);
             break;
     }
 }

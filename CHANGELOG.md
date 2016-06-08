@@ -22,6 +22,8 @@ x.x.x Release notes (yyyy-MM-dd)
   transactions have been committed.
 * Fix a "Destruction of mutex in use" assertion failure after an error while
   opening a file.
+* Realm now throws an exception if an `Object` subclass is defined with a managed Swift `lazy` property.
+  Objects with ignored `lazy` properties should now work correctly.
 * Update the LLDB script to work with recent changes to the implementation of `RLMResults`.
 
 1.0.0 Release notes (2016-05-25)

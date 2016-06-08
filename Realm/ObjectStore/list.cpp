@@ -22,6 +22,7 @@
 #include "impl/realm_coordinator.hpp"
 #include "results.hpp"
 #include "shared_realm.hpp"
+#include "util/format.hpp"
 
 #include <realm/link_view.hpp>
 
@@ -201,3 +202,7 @@ NotificationToken List::add_notification_callback(CollectionChangeCallback cb)
     }
     return {m_notifier, m_notifier->add_callback(std::move(cb))};
 }
+
+List::OutOfBoundsIndexException::OutOfBoundsIndexException(size_t r, size_t c)
+: std::out_of_range(util::format("Requested index %1 greater than max %2", r, c))
+, requested(r), valid_count(c) {}
