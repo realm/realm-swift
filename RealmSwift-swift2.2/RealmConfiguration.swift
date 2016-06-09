@@ -115,7 +115,16 @@ extension Realm {
         /// A 64-byte key to use to encrypt the data, or `nil` if encryption is not enabled.
         public var encryptionKey: NSData? = nil
 
-        /// Whether the Realm is read-only (must be `true` for read-only files).
+        /// Whether to open the Realm in read-only mode.
+        ///
+        /// This is required to be able to open Realm files which are not
+        /// writeable or are in a directory which is not writeable. This should
+        /// only be used on files which will not be modified by anyone while
+        /// they are open, and not just to get a read-only view of a file which
+        /// may be written to by another thread or process. Opening in read-only
+        /// mode requires disabling Realm's reader/writer coordination, so
+        /// committing a write transaction from another process will result in
+        /// crashes.
         public var readOnly: Bool = false
 
         /// The current schema version.
