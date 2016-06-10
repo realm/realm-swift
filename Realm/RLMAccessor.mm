@@ -486,46 +486,6 @@ static id RLMAccessorUnmanagedSetter(RLMProperty *prop, RLMAccessorCode accessor
     return nil;
 }
 
-// macros/helpers to generate objc type strings for registering methods
-#define GETTER_TYPES(C) C "@:"
-#define SETTER_TYPES(C) "v@:" C
-
-// getter type strings
-// NOTE: this typecode is really the the first character of the objc/runtime.h type
-//       the @ type maps to multiple core types (string, date, array, mixed, any which are id in objc)
-static const char *getterTypeStringForObjcCode(char code) {
-    switch (code) {
-        case 's': return GETTER_TYPES("s");
-        case 'i': return GETTER_TYPES("i");
-        case 'l': return GETTER_TYPES("l");
-        case 'q': return GETTER_TYPES("q");
-        case 'f': return GETTER_TYPES("f");
-        case 'd': return GETTER_TYPES("d");
-        case 'B': return GETTER_TYPES("B");
-        case 'c': return GETTER_TYPES("c");
-        case '@': return GETTER_TYPES("@");
-        default: @throw RLMException(@"Invalid accessor code");
-    }
-}
-
-// setter type strings
-// NOTE: this typecode is really the the first character of the objc/runtime.h type
-//       the @ type maps to multiple core types (string, date, array, mixed, any which are id in objc)
-static const char *setterTypeStringForObjcCode(char code) {
-    switch (code) {
-        case 's': return SETTER_TYPES("s");
-        case 'i': return SETTER_TYPES("i");
-        case 'l': return SETTER_TYPES("l");
-        case 'q': return SETTER_TYPES("q");
-        case 'f': return SETTER_TYPES("f");
-        case 'd': return SETTER_TYPES("d");
-        case 'B': return SETTER_TYPES("B");
-        case 'c': return SETTER_TYPES("c");
-        case '@': return SETTER_TYPES("@");
-        default: @throw RLMException(@"Invalid accessor code");
-    }
-}
-
 // get accessor lookup code based on objc type and rlm type
 static RLMAccessorCode accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
     switch (objcTypeCode) {
@@ -602,6 +562,14 @@ void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema) 
     class_addMethod(metaClass, @selector(sharedSchema), imp, "@@:");
 }
 
+static void addMethod(Class cls, SEL sel, id block) {
+    if (block) {
+        IMP impl = imp_implementationWithBlock(block);
+        class_addMethod(cls, sel, impl,
+                        method_getTypeEncoding(class_getInstanceMethod(cls, sel)));
+    }
+}
+
 static Class RLMCreateAccessorClass(Class objectClass,
                                     RLMObjectSchema *schema,
                                     const char *accessorClassName,
@@ -621,24 +589,16 @@ static Class RLMCreateAccessorClass(Class objectClass,
     for (RLMProperty *prop in schema.properties) {
         RLMAccessorCode accessorCode = accessorCodeForType(prop.objcType, prop.type);
         if (prop.getterSel && getterGetter) {
-            if (id getter = getterGetter(prop, accessorCode)) {
-                IMP getterImp = imp_implementationWithBlock(getter);
-                class_addMethod(accClass, prop.getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
-            }
+            addMethod(accClass, prop.getterSel, getterGetter(prop, accessorCode));
         }
         if (prop.setterSel && setterGetter) {
-            if (id setter = setterGetter(prop, accessorCode)) {
-                IMP setterImp = imp_implementationWithBlock(setter);
-                class_addMethod(accClass, prop.setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
-            }
+            addMethod(accClass, prop.setterSel, setterGetter(prop, accessorCode));
         }
     }
     for (RLMProperty *prop in schema.computedProperties) {
         if (prop.getterSel && getterGetter) {
-            if (id getter = getterGetter(prop, accessorCodeForType(prop.objcType, prop.type))) {
-                IMP getterImp = imp_implementationWithBlock(getter);
-                class_addMethod(accClass, prop.getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
-            }
+            RLMAccessorCode accessorCode = accessorCodeForType(prop.objcType, prop.type);
+            addMethod(accClass, prop.getterSel, getterGetter(prop, accessorCode));
         }
     }
 
