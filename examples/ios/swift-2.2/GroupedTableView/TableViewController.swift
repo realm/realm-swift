@@ -54,7 +54,7 @@ class TableViewController: UITableViewController {
             self.tableView.reloadData()
         }
         for section in sectionTitles {
-            let unsortedObjects = realm.objects(DemoObject).filter("sectionTitle == '\(section)'")
+            let unsortedObjects = realm.objects(DemoObject.self).filter("sectionTitle == '\(section)'")
             let sortedObjects = unsortedObjects.sorted("date", ascending: true)
             objectsBySection.append(sortedObjects)
         }

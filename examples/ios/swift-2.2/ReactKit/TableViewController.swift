@@ -65,7 +65,7 @@ class TableViewController: UITableViewController {
         // would be supplied as the data source by whatever is displaying this
         // table view
         let realm = try! Realm()
-        let obj = realm.objects(GroupParent).first
+        let obj = realm.objects(GroupParent.self).first
         if obj != nil {
             return obj!
         }
@@ -204,7 +204,7 @@ class TableViewController: UITableViewController {
     func modifyInBackground(block: (List<Group>) -> Void) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             let realm = try! Realm()
-            let parent = realm.objects(GroupParent).first!
+            let parent = realm.objects(GroupParent.self).first!
             try! realm.write {
                 block(parent.groups)
             }

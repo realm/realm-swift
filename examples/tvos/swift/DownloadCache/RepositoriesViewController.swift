@@ -100,7 +100,7 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
 
     func reloadData() {
         let realm = try! Realm()
-        results = realm.objects(Repository)
+        results = realm.objects(Repository.self)
         if let text = searchField.text where !text.isEmpty {
             results = results?.filter("name contains[c] %@", text)
         }

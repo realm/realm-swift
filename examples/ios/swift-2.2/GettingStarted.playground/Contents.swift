@@ -63,7 +63,7 @@ try! realm.write {
 
 let favorites = ["Jennifer"]
 
-let favoritePeopleWithSpousesAndCars = realm.objects(Person)
+let favoritePeopleWithSpousesAndCars = realm.objects(Person.self)
     .filter("cars.@count > 1 && spouse != nil && name IN %@", favorites)
     .sorted("age")
 
@@ -91,5 +91,5 @@ try! realm.write {
     realm.deleteAll()
 }
 
-realm.objects(Person).count
+realm.objects(Person.self).count
 //: Thanks! To learn more about Realm go to https://realm.io
