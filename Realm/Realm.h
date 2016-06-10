@@ -28,3 +28,4 @@
 #import <Realm/RLMRealmConfiguration.h>
 #import <Realm/RLMResults.h>
 #import <Realm/RLMSchema.h>
+#import <Realm/RLMRealm+Sync.h>

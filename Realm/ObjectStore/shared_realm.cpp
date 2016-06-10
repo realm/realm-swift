@@ -491,6 +491,10 @@ void Realm::notify_others() const
     m_coordinator->notify_others();
 }
 
+void Realm::refresh_sync_access_token(std::string access_token) {
+    m_coordinator->refresh_sync_access_token(std::move(access_token));
+}
+
 uint64_t Realm::get_schema_version(const realm::Realm::Config &config)
 {
     auto coordinator = RealmCoordinator::get_existing_coordinator(config.path);

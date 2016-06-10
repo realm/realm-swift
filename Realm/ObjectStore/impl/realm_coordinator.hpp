@@ -99,6 +99,9 @@ public:
 
     void notify_others();
 
+    // FIXME: Consider whether this function should live here
+    void refresh_sync_access_token(std::string access_token);
+
 private:
     Realm::Config m_config;
 
@@ -126,6 +129,8 @@ private:
     std::unique_ptr<sync::Client> m_sync_client;
     std::unique_ptr<sync::Session> m_sync_session;
     std::thread m_sync_thread;
+    bool m_sync_awaits_user_token = false;
+    util::Optional<int_fast64_t> m_sync_deferred_commit_notification;
 
     // must be called with m_notifier_mutex locked
     void pin_version(uint_fast64_t version, uint_fast32_t index);

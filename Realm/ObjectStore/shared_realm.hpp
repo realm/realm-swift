@@ -150,6 +150,9 @@ namespace realm {
 
         void notify_others() const;
 
+        // FIXME: Consider whether this method should exist here.
+        void refresh_sync_access_token(std::string access_token);
+
         ~Realm();
 
         void init(std::shared_ptr<_impl::RealmCoordinator> coordinator);
