@@ -64,7 +64,15 @@ NS_ASSUME_NONNULL_BEGIN
 /// A 64-byte key to use to encrypt the data, or `nil` if encryption is not enabled.
 @property (nonatomic, copy, nullable) NSData *encryptionKey;
 
-/// Whether the Realm is read-only (must be `YES` for read-only files).
+/// Whether to open the Realm in read-only mode.
+///
+/// This is required to be able to open Realm files which are not writeable or
+/// are in a directory which is not writeable. This should only be used on files
+/// which will not be modified by anyone while they are open, and not just to
+/// get a read-only view of a file which may be written to by another thread or
+/// process. Opening in read-only mode requires disabling Realm's reader/writer
+/// coordination, so committing a write transaction from another process will
+/// result in crashes.
 @property (nonatomic) BOOL readOnly;
 
 /// The current schema version.
