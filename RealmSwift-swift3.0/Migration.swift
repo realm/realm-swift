@@ -54,7 +54,7 @@ Get the schema version for a Realm at a given local URL.
 */
 public func schemaVersionAtURL(_ fileURL: URL, encryptionKey: Data? = nil) throws -> UInt64 {
     var error: NSError? = nil
-    let version = RLMRealm.schemaVersion(at: fileURL as URL, encryptionKey: encryptionKey, error: &error)
+    let version = RLMRealm.schemaVersion(at: fileURL, encryptionKey: encryptionKey, error: &error)
     if let error = error {
         throw error
     }
