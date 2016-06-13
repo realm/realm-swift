@@ -209,6 +209,12 @@
 }
 @end
 
+@implementation RequiredNumberObject
++ (NSArray *)requiredProperties {
+    return @[@"intObj", @"floatObj", @"doubleObj", @"boolObj"];
+}
+@end
+
 #pragma mark CustomInitializerObject
 
 @implementation CustomInitializerObject

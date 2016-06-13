@@ -43,7 +43,7 @@
 {
     NSString *binaryString = @"binary";
     NSData *binaryData = [binaryString dataUsingEncoding:NSUTF8StringEncoding];
-    
+
     return @{@"intCol" : @12,
              @"floatCol" : @88.9f,
              @"doubleCol" : @1002.892,
@@ -321,32 +321,32 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 - (void)testObjectInit
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     [realm beginWriteTransaction];
-    
+
     // Init object before adding to realm
     EmployeeObject *soInit = [[EmployeeObject alloc] init];
     soInit.name = @"Peter";
     soInit.age = 30;
     soInit.hired = YES;
     [realm addObject:soInit];
-    
+
     // Create object while adding to realm using NSArray
     EmployeeObject *soUsingArray = [EmployeeObject createInRealm:realm withValue:@[@"John", @40, @NO]];
-    
+
     // Create object while adding to realm using NSDictionary
     EmployeeObject *soUsingDictionary = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Susi", @"age": @25, @"hired": @YES}];
-    
+
     [realm commitWriteTransaction];
-    
+
     XCTAssertEqualObjects(soInit.name, @"Peter", @"Name should be Peter");
     XCTAssertEqual(soInit.age, 30, @"Age should be 30");
     XCTAssertEqual(soInit.hired, YES, @"Hired should YES");
-    
+
     XCTAssertEqualObjects(soUsingArray.name, @"John", @"Name should be John");
     XCTAssertEqual(soUsingArray.age, 40, @"Age should be 40");
     XCTAssertEqual(soUsingArray.hired, NO, @"Hired should NO");
-    
+
     XCTAssertEqualObjects(soUsingDictionary.name, @"Susi", @"Name should be Susi");
     XCTAssertEqual(soUsingDictionary.age, 25, @"Age should be 25");
     XCTAssertEqual(soUsingDictionary.hired, YES, @"Hired should YES");
@@ -375,24 +375,24 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 -(void)testObjectInitWithObjectTypeArray
 {
     EmployeeObject *obj1 = [[EmployeeObject alloc] initWithValue:@[@"Peter", @30, @YES]];
-    
+
     XCTAssertEqualObjects(obj1.name, @"Peter", @"Names should be equal");
     XCTAssertEqual(obj1.age, 30, @"Age should be equal");
     XCTAssertEqual(obj1.hired, YES, @"Hired should be equal");
-    
+
     // Add to realm
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     [realm addObject:obj1];
     [realm commitWriteTransaction];
-    
+
     RLMResults *all = [EmployeeObject allObjects];
     EmployeeObject *fromRealm = all.firstObject;
-    
+
     XCTAssertEqualObjects(fromRealm.name, @"Peter", @"Names should be equal");
     XCTAssertEqual(fromRealm.age, 30, @"Age should be equal");
     XCTAssertEqual(fromRealm.hired, YES, @"Hired should be equal");
-    
+
     XCTAssertThrows(([[EmployeeObject alloc] initWithValue:@[@"Peter", @30]]), @"To few arguments");
     XCTAssertThrows(([[EmployeeObject alloc] initWithValue:@[@YES, @"Peter", @30]]), @"Wrong arguments");
     XCTAssertThrows(([[EmployeeObject alloc] initWithValue:@[]]), @"empty arguments");
@@ -401,24 +401,24 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 -(void)testObjectInitWithObjectTypeDictionary
 {
     EmployeeObject *obj1 = [[EmployeeObject alloc] initWithValue:@{@"name": @"Susi", @"age": @25, @"hired": @YES}];
-    
+
     XCTAssertEqualObjects(obj1.name, @"Susi", @"Names should be equal");
     XCTAssertEqual(obj1.age, 25, @"Age should be equal");
     XCTAssertEqual(obj1.hired, YES, @"Hired should be equal");
-    
+
     // Add to realm
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     [realm addObject:obj1];
     [realm commitWriteTransaction];
-    
+
     RLMResults *all = [EmployeeObject allObjects];
     EmployeeObject *fromRealm = all.firstObject;
-    
+
     XCTAssertEqualObjects(fromRealm.name, @"Susi", @"Names should be equal");
     XCTAssertEqual(fromRealm.age, 25, @"Age should be equal");
     XCTAssertEqual(fromRealm.hired, YES, @"Hired should be equal");
-    
+
     XCTAssertNoThrow([[EmployeeObject alloc] initWithValue:@{}], @"Initialization with missing values should not throw");
     XCTAssertNoThrow([[DefaultObject alloc] initWithValue:@{@"intCol": @1}],
                      "Overriding some default values at initialization should not throw");
@@ -541,14 +541,14 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     EmployeeObject *obj0 = [EmployeeObject createInRealm:realm withValue:@{@"name" : @"Test1", @"age" : @24, @"hired": @NO}];
     EmployeeObject *obj1 = [EmployeeObject createInRealm:realm withValue:@{@"name" : @"Test2", @"age" : @25, @"hired": @YES}];
     [realm commitWriteTransaction];
-    
+
     XCTAssertEqualObjects(obj0[@"name"], @"Test1",  @"Name should be Test1");
     XCTAssertEqualObjects(obj1[@"name"], @"Test2", @"Name should be Test1");
-    
+
     [realm beginWriteTransaction];
     obj0[@"name"] = @"newName";
     [realm commitWriteTransaction];
-    
+
     XCTAssertEqualObjects(obj0[@"name"], @"newName",  @"Name should be newName");
 
     [realm beginWriteTransaction];
@@ -587,7 +587,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    
+
     const char bin[4] = { 0, 1, 2, 3 };
     NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
@@ -595,7 +595,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
 
     AllTypesObject *c = [[AllTypesObject alloc] init];
-    
+
     c.boolCol   = NO;
     c.intCol  = 54;
     c.floatCol = 0.7f;
@@ -607,13 +607,13 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     c.longCol = 99;
     c.objectCol = [[StringObject alloc] init];
     c.objectCol.stringCol = @"c";
-    
+
     [realm addObject:c];
 
     [AllTypesObject createInRealm:realm withValue:@[@YES, @506, @7.7f, @8.8, @"banach", bin2,
                                                      timeNow, @YES, @(-20), NSNull.null]];
     [realm commitWriteTransaction];
-    
+
     AllTypesObject *row1 = [AllTypesObject allObjects][0];
     AllTypesObject *row2 = [AllTypesObject allObjects][1];
 
@@ -1094,6 +1094,28 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     assertNonNullProperties(no);
 }
 
+- (void)testRequiredNumberProperties {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    RequiredNumberObject *obj = [RequiredNumberObject createInRealm:realm withValue:@[@0, @0, @0, @0]];
+
+    XCTAssertThrows(obj.intObj = nil);
+    XCTAssertThrows(obj.floatObj = nil);
+    XCTAssertThrows(obj.doubleObj = nil);
+    XCTAssertThrows(obj.boolObj = nil);
+
+    obj.intObj = @1;
+    XCTAssertEqualObjects(obj.intObj, @1);
+    obj.floatObj = @2.2f;
+    XCTAssertEqualObjects(obj.floatObj, @2.2f);
+    obj.doubleObj = @3.3;
+    XCTAssertEqualObjects(obj.doubleObj, @3.3);
+    obj.boolObj = @YES;
+    XCTAssertEqualObjects(obj.boolObj, @YES);
+
+    [realm cancelWriteTransaction];
+}
+
 - (void)testSettingNonOptionalPropertiesToNil {
     RequiredPropertiesObject *ro = [[RequiredPropertiesObject alloc] init];
 
@@ -1114,18 +1136,22 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     [realm cancelWriteTransaction];
 }
 
+static void addProperty(Class cls, const char *name, const char *type, size_t size, size_t align, id getter) {
+    objc_property_attribute_t objectColAttrs[] = {
+        {"T", type},
+    };
+    class_addIvar(cls, name, size, align, type);
+    class_addProperty(cls, name, objectColAttrs, sizeof(objectColAttrs) / sizeof(objc_property_attribute_t));
+
+    char encoding[4] = " @:";
+    encoding[0] = *type;
+    class_addMethod(cls, sel_registerName(name), imp_implementationWithBlock(getter), encoding);
+}
+
 - (void)testObjectSubclassAddedAtRuntime {
     Class objectClass = objc_allocateClassPair(RLMObject.class, "RuntimeGeneratedObject", 0);
-    objc_property_attribute_t objectColAttrs[] = {
-        { "T", "@\"RuntimeGeneratedObject\"" },
-    };
-    class_addIvar(objectClass, "objectCol", sizeof(id), alignof(id), "@\"RuntimeGeneratedObject\"");
-    class_addProperty(objectClass, "objectCol", objectColAttrs, sizeof(objectColAttrs) / sizeof(objc_property_attribute_t));
-    objc_property_attribute_t intColAttrs[] = {
-        { "T", "i" },
-    };
-    class_addIvar(objectClass, "intCol", sizeof(int), alignof(int), "i");
-    class_addProperty(objectClass, "intCol", intColAttrs, sizeof(intColAttrs) / sizeof(objc_property_attribute_t));
+    addProperty(objectClass, "objectCol", "@\"RuntimeGeneratedObject\"", sizeof(id), alignof(id), ^(__unused id obj) { return nil; });
+    addProperty(objectClass, "intCol", "i", sizeof(int), alignof(int), ^int(__unused id obj) { return 0; });
     objc_registerClassPair(objectClass);
     XCTAssertEqualObjects([objectClass className], @"RuntimeGeneratedObject");
 
@@ -1155,7 +1181,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
 - (void)testNoDefaultAdd
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     [realm beginWriteTransaction];
 
     // Test #1
@@ -1166,7 +1192,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     dateObject = [[DateObject alloc] init];
     dateObject.dateCol = [NSDate date];
     XCTAssertNoThrow(([realm addObject:dateObject]), @"Having values in all NSObject properties should not throw exception when being added to realm");
-    
+
     // Test #3
     IntObject *intObj = [[IntObject alloc] init];
     XCTAssertNoThrow(([realm addObject:intObj]), @"Having no NSObject properties should not throw exception when being added to realm");
@@ -1295,7 +1321,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
 - (void)testIgnoredUnsupportedProperty
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     [realm beginWriteTransaction];
     XCTAssertNoThrow([IgnoredURLObject new], @"Creating a new object with an (ignored) unsupported \
                                                property type should not throw");
@@ -1305,22 +1331,22 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
 {
     NSURL *url = [NSURL URLWithString:@"http://realm.io"];
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     [realm beginWriteTransaction];
-    
+
     IgnoredURLObject *obj = [IgnoredURLObject new];
     obj.name = @"Realm";
     obj.url = url;
     [realm addObject:obj];
     XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable inside a write block");
-    
+
     [realm commitWriteTransaction];
-    
+
     XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable outside a write block");
-    
+
     IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWithPredicate:nil] firstObject];
     XCTAssertNotNil(obj2, @"object with ignored property should still be stored and accessible through the realm");
-    
+
     XCTAssertEqualObjects(obj2.name, obj.name, @"managed property should be the same");
     XCTAssertNil(obj2.url, @"ignored property should be nil when getting from realm");
 }
@@ -1342,7 +1368,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
 - (void)testCreateInRealmValidationForDictionary
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     const char bin[4] = { 0, 1, 2, 3 };
     NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
@@ -1356,65 +1382,65 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
                                                @"cBoolCol"  : @NO,
                                                @"longCol"   : @(99),
                                                @"objectCol" : NSNull.null};
-    
+
     [realm beginWriteTransaction];
-    
+
     // Test NSDictonary
     XCTAssertNoThrow(([AllTypesObject createInRealm:realm withValue:dictValidAllTypes]),
                      @"Creating object with valid value types should not throw exception");
-    
+
     for (NSString *keyToInvalidate in dictValidAllTypes.allKeys) {
         NSMutableDictionary *invalidInput = [dictValidAllTypes mutableCopy];
         id obj = @"invalid";
         if ([keyToInvalidate isEqualToString:@"stringCol"]) {
             obj = @1;
         }
-        
+
         invalidInput[keyToInvalidate] = obj;
-        
+
         XCTAssertThrows(([AllTypesObject createInRealm:realm withValue:invalidInput]),
                         @"Creating object with invalid value types should throw exception");
     }
-    
-    
+
+
     [realm commitWriteTransaction];
 }
 
 - (void)testCreateInRealmValidationForArray
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     // add test/link object to realm
     [realm beginWriteTransaction];
     StringObject *to = [StringObject createInRealm:realm withValue:@[@"c"]];
     [realm commitWriteTransaction];
-    
+
     const char bin[4] = { 0, 1, 2, 3 };
     NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
     NSArray *const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), to];
-    
+
     [realm beginWriteTransaction];
-    
+
     // Test NSArray
     XCTAssertNoThrow(([AllTypesObject createInRealm:realm withValue:arrayValidAllTypes]),
                      @"Creating object with valid value types should not throw exception");
-    
+
     const NSInteger stringColIndex = 4;
     for (NSUInteger i = 0; i < arrayValidAllTypes.count; i++) {
         NSMutableArray *invalidInput = [arrayValidAllTypes mutableCopy];
-        
+
         id obj = @"invalid";
         if (i == stringColIndex) {
             obj = @1;
         }
-        
+
         invalidInput[i] = obj;
-        
+
         XCTAssertThrows(([AllTypesObject createInRealm:realm withValue:invalidInput]),
                         @"Creating object with invalid value types should throw exception");
     }
-    
+
     [realm commitWriteTransaction];
 }
 
@@ -1577,9 +1603,9 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
 - (void)testCreateInRealmWithMissingValue
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     [realm beginWriteTransaction];
-    
+
     // This exception only gets thrown when there is no default vaule and it is for an NSObject property
     XCTAssertThrows(([AggregateObject createInRealm:realm withValue:@{@"boolCol" : @YES}]), @"Missing values in NSDictionary should throw default value exception");
     EmployeeObject *eo = nil;
@@ -1587,43 +1613,43 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     XCTAssertNil(eo.name);
     eo = [EmployeeObject createInRealm:realm withValue:@{@"name":NSNull.null, @"age":@20, @"hired": @YES}];
     XCTAssertNil(eo.name);
-    
+
     // This exception gets thrown when count of array does not match with object schema
     XCTAssertThrows(([EmployeeObject createInRealm:realm withValue:@[@27, @YES]]), @"Missing values in NSDictionary should throw default value exception");
-    
+
     [realm commitWriteTransaction];
 }
 
 - (void)testObjectDescription
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     [realm beginWriteTransaction];
-    
+
     // Init object before adding to realm
     EmployeeObject *soInit = [[EmployeeObject alloc] init];
     soInit.name = @"Peter";
     soInit.age = 30;
     soInit.hired = YES;
     [realm addObject:soInit];
-    
+
     // description asserts block
     void (^descriptionAsserts)(NSString *) = ^(NSString *description) {
         XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
         XCTAssertTrue([description rangeOfString:@"Peter"].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
-        
+
         XCTAssertTrue([description rangeOfString:@"age"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
         XCTAssertTrue([description rangeOfString:[@30 description]].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
-        
+
         XCTAssertTrue([description rangeOfString:@"hired"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
         XCTAssertTrue([description rangeOfString:[@YES description]].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
     };
-    
+
     // Test description in write block
     descriptionAsserts(soInit.description);
-    
+
     [realm commitWriteTransaction];
-    
+
     // Test description in read block
     NSString *objDescription = [[[EmployeeObject objectsWithPredicate:nil] firstObject] description];
     descriptionAsserts(objDescription);
@@ -1700,7 +1726,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
 
     RLMProperty *optionalBoolProperty = schema[IndexedObject.className][@"optionalBoolCol"];
     XCTAssertTrue(optionalBoolProperty.indexed, @"indexed property should have an index");
-    
+
     RLMProperty *floatProperty = schema[IndexedObject.className][@"floatCol"];
     XCTAssertFalse(floatProperty.indexed, @"non-indexed property shouldn't have an index");
 

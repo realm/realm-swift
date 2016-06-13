@@ -70,11 +70,7 @@ void RLMValidateSwiftPropertyName(NSString *name) {
 }
 
 static bool rawTypeIsComputedProperty(NSString *rawType) {
-    if ([rawType isEqualToString:@"@\"RLMLinkingObjects\""] || [rawType hasPrefix:@"@\"RLMLinkingObjects<"]) {
-        return true;
-    }
-
-    return false;
+    return [rawType isEqualToString:@"@\"RLMLinkingObjects\""] || [rawType hasPrefix:@"@\"RLMLinkingObjects<"];
 }
 
 @implementation RLMProperty
@@ -102,7 +98,6 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         _linkOriginPropertyName = linkOriginPropertyName;
         _indexed = indexed;
         _optional = optional;
-        [self setObjcCodeFromType];
         [self updateAccessors];
     }
 
@@ -132,43 +127,10 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _setterSel = NSSelectorFromString(_setterName);
 }
 
--(void)setObjcCodeFromType {
-    if (_optional) {
-        _objcType = '@';
-        return;
-    }
-    switch (_type) {
-        case RLMPropertyTypeInt:
-            _objcType = 'q';
-            break;
-        case RLMPropertyTypeBool:
-            _objcType = 'c';
-            break;
-        case RLMPropertyTypeDouble:
-            _objcType = 'd';
-            break;
-        case RLMPropertyTypeFloat:
-            _objcType = 'f';
-            break;
-        case RLMPropertyTypeAny:
-        case RLMPropertyTypeArray:
-        case RLMPropertyTypeData:
-        case RLMPropertyTypeDate:
-        case RLMPropertyTypeObject:
-        case RLMPropertyTypeString:
-        case RLMPropertyTypeLinkingObjects:
-            _objcType = '@';
-            break;
-    }
-}
-
 // determine RLMPropertyType from objc code - returns true if valid type was found/set
-- (BOOL)setTypeFromRawType {
-    const char *code = _objcRawType.UTF8String;
-    _objcType = *code;    // first char of type attr
-
-    // map to RLMPropertyType
-    switch (self.objcType) {
+- (BOOL)setTypeFromRawType:(NSString *)rawType {
+    const char *code = rawType.UTF8String;
+    switch (*code) {
         case 's':   // short
         case 'i':   // int
         case 'l':   // long
@@ -185,135 +147,135 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         case 'B':
             _type = RLMPropertyTypeBool;
             return YES;
-        case '@': {
-            _optional = true;
-            static const char arrayPrefix[] = "@\"RLMArray<";
-            static const int arrayPrefixLen = sizeof(arrayPrefix) - 1;
-
-            static const char numberPrefix[] = "@\"NSNumber<";
-            static const int numberPrefixLen = sizeof(numberPrefix) - 1;
-
-            static const char linkingObjectsPrefix[] = "@\"RLMLinkingObjects";
-            static const int linkingObjectsPrefixLen = sizeof(linkingObjectsPrefix) - 1;
-
-            if (strcmp(code, "@\"NSString\"") == 0) {
-                _type = RLMPropertyTypeString;
-            }
-            else if (strcmp(code, "@\"NSDate\"") == 0) {
-                _type = RLMPropertyTypeDate;
-            }
-            else if (strcmp(code, "@\"NSData\"") == 0) {
-                _type = RLMPropertyTypeData;
-            }
-            else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
-                _optional = false;
-                // get object class from type string - @"RLMArray<objectClassName>"
-                _type = RLMPropertyTypeArray;
-                _objectClassName = [[NSString alloc] initWithBytes:code + arrayPrefixLen
-                                                            length:strlen(code + arrayPrefixLen) - 2 // drop trailing >"
-                                                          encoding:NSUTF8StringEncoding];
-
-                Class cls = [RLMSchema classForString:_objectClassName];
-                if (!cls) {
-                    @throw RLMException(@"Property '%@' is of type 'RLMArray<%@>' which is not a supported RLMArray object type. "
-                                        @"RLMArrays can only contain instances of RLMObject subclasses. "
-                                        @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
-                }
-            }
-            else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
-                // get number type from type string - @"NSNumber<objectClassName>"
-                NSString *numberType = [[NSString alloc] initWithBytes:code + numberPrefixLen
-                                                                length:strlen(code + numberPrefixLen) - 2 // drop trailing >"
-                                                              encoding:NSUTF8StringEncoding];
-
-                if ([numberType isEqualToString:@"RLMInt"]) {
-                    _type = RLMPropertyTypeInt;
-                }
-                else if ([numberType isEqualToString:@"RLMFloat"]) {
-                    _type = RLMPropertyTypeFloat;
-                }
-                else if ([numberType isEqualToString:@"RLMDouble"]) {
-                    _type = RLMPropertyTypeDouble;
-                }
-                else if ([numberType isEqualToString:@"RLMBool"]) {
-                    _type = RLMPropertyTypeBool;
-                }
-                else {
-                    @throw RLMException(@"Property '%@' is of type 'NSNumber<%@>' which is not a supported NSNumber object type. "
-                                        @"NSNumbers can only be RLMInt, RLMFloat, RLMDouble, and RLMBool at the moment. "
-                                        @"See https://realm.io/docs/objc/latest for more information.", _name, numberType);
-                }
-            }
-            else if (strncmp(code, linkingObjectsPrefix, linkingObjectsPrefixLen) == 0 &&
-                     (code[linkingObjectsPrefixLen] == '"' || code[linkingObjectsPrefixLen] == '<')) {
-                _type = RLMPropertyTypeLinkingObjects;
-                _optional = false;
-
-                if (!_objectClassName || !_linkOriginPropertyName) {
-                    @throw RLMException(@"Property '%@' is of type RLMLinkingObjects but +linkingObjectsProperties did not specify the class "
-                                        "or property that is the origin of the link.", _name);
-                }
-
-                // If the property was declared with a protocol indicating the contained type, validate that it matches
-                // the class from the dictionary returned by +linkingObjectsProperties.
-                if (code[linkingObjectsPrefixLen] == '<') {
-                    NSString *classNameFromProtocol = [[NSString alloc] initWithBytes:code + linkingObjectsPrefixLen + 1
-                                                                               length:strlen(code + linkingObjectsPrefixLen) - 3 // drop trailing >"
-                                                                             encoding:NSUTF8StringEncoding];
-                    if (![_objectClassName isEqualToString:classNameFromProtocol]) {
-                        @throw RLMException(@"Property '%@' was declared with type RLMLinkingObjects<%@>, but a conflicting "
-                                            "class name of '%@' was returned by +linkingObjectsProperties.", _name,
-                                            classNameFromProtocol, _objectClassName);
-                    }
-                }
-            }
-            else if (strcmp(code, "@\"NSNumber\"") == 0) {
-                @throw RLMException(@"Property '%@' requires a protocol defining the contained type - example: NSNumber<RLMInt>.", _name);
-            }
-            else if (strcmp(code, "@\"RLMArray\"") == 0) {
-                @throw RLMException(@"Property '%@' requires a protocol defining the contained type - example: RLMArray<Person>.", _name);
-            }
-            else {
-                NSString *className;
-                Class cls = nil;
-                if (code[1] == '\0') {
-                    className = @"id";
-                }
-                else {
-                    // for objects strip the quotes and @
-                    className = [_objcRawType substringWithRange:NSMakeRange(2, _objcRawType.length-3)];
-                    cls = [RLMSchema classForString:className];
-                }
-
-                if (!cls) {
-                    @throw RLMException(@"Property '%@' is declared as '%@', which is not a supported RLMObject property type. "
-                                        @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, RLMLinkingObjects, or subclasses of RLMObject. "
-                                        @"See https://realm.io/docs/objc/latest/api/Classes/RLMObject.html for more information.", _name, className);
-                }
-
-                _type = RLMPropertyTypeObject;
-                _optional = true;
-                _objectClassName = [cls className] ?: className;
-            }
-            return YES;
-        }
+        case '@':
+            break;
         default:
             return NO;
     }
+
+    _optional = true;
+    static const char arrayPrefix[] = "@\"RLMArray<";
+    static const int arrayPrefixLen = sizeof(arrayPrefix) - 1;
+
+    static const char numberPrefix[] = "@\"NSNumber<";
+    static const int numberPrefixLen = sizeof(numberPrefix) - 1;
+
+    static const char linkingObjectsPrefix[] = "@\"RLMLinkingObjects";
+    static const int linkingObjectsPrefixLen = sizeof(linkingObjectsPrefix) - 1;
+
+    if (strcmp(code, "@\"NSString\"") == 0) {
+        _type = RLMPropertyTypeString;
+    }
+    else if (strcmp(code, "@\"NSDate\"") == 0) {
+        _type = RLMPropertyTypeDate;
+    }
+    else if (strcmp(code, "@\"NSData\"") == 0) {
+        _type = RLMPropertyTypeData;
+    }
+    else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
+        _optional = false;
+        // get object class from type string - @"RLMArray<objectClassName>"
+        _type = RLMPropertyTypeArray;
+        _objectClassName = [[NSString alloc] initWithBytes:code + arrayPrefixLen
+                                                    length:strlen(code + arrayPrefixLen) - 2 // drop trailing >"
+                                                  encoding:NSUTF8StringEncoding];
+
+        Class cls = [RLMSchema classForString:_objectClassName];
+        if (!cls) {
+            @throw RLMException(@"Property '%@' is of type 'RLMArray<%@>' which is not a supported RLMArray object type. "
+                                @"RLMArrays can only contain instances of RLMObject subclasses. "
+                                @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
+        }
+    }
+    else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
+        // get number type from type string - @"NSNumber<objectClassName>"
+        NSString *numberType = [[NSString alloc] initWithBytes:code + numberPrefixLen
+                                                        length:strlen(code + numberPrefixLen) - 2 // drop trailing >"
+                                                      encoding:NSUTF8StringEncoding];
+
+        if ([numberType isEqualToString:@"RLMInt"]) {
+            _type = RLMPropertyTypeInt;
+        }
+        else if ([numberType isEqualToString:@"RLMFloat"]) {
+            _type = RLMPropertyTypeFloat;
+        }
+        else if ([numberType isEqualToString:@"RLMDouble"]) {
+            _type = RLMPropertyTypeDouble;
+        }
+        else if ([numberType isEqualToString:@"RLMBool"]) {
+            _type = RLMPropertyTypeBool;
+        }
+        else {
+            @throw RLMException(@"Property '%@' is of type 'NSNumber<%@>' which is not a supported NSNumber object type. "
+                                @"NSNumbers can only be RLMInt, RLMFloat, RLMDouble, and RLMBool at the moment. "
+                                @"See https://realm.io/docs/objc/latest for more information.", _name, numberType);
+        }
+    }
+    else if (strncmp(code, linkingObjectsPrefix, linkingObjectsPrefixLen) == 0 &&
+             (code[linkingObjectsPrefixLen] == '"' || code[linkingObjectsPrefixLen] == '<')) {
+        _type = RLMPropertyTypeLinkingObjects;
+        _optional = false;
+
+        if (!_objectClassName || !_linkOriginPropertyName) {
+            @throw RLMException(@"Property '%@' is of type RLMLinkingObjects but +linkingObjectsProperties did not specify the class "
+                                "or property that is the origin of the link.", _name);
+        }
+
+        // If the property was declared with a protocol indicating the contained type, validate that it matches
+        // the class from the dictionary returned by +linkingObjectsProperties.
+        if (code[linkingObjectsPrefixLen] == '<') {
+            NSString *classNameFromProtocol = [[NSString alloc] initWithBytes:code + linkingObjectsPrefixLen + 1
+                                                                       length:strlen(code + linkingObjectsPrefixLen) - 3 // drop trailing >"
+                                                                     encoding:NSUTF8StringEncoding];
+            if (![_objectClassName isEqualToString:classNameFromProtocol]) {
+                @throw RLMException(@"Property '%@' was declared with type RLMLinkingObjects<%@>, but a conflicting "
+                                    "class name of '%@' was returned by +linkingObjectsProperties.", _name,
+                                    classNameFromProtocol, _objectClassName);
+            }
+        }
+    }
+    else if (strcmp(code, "@\"NSNumber\"") == 0) {
+        @throw RLMException(@"Property '%@' requires a protocol defining the contained type - example: NSNumber<RLMInt>.", _name);
+    }
+    else if (strcmp(code, "@\"RLMArray\"") == 0) {
+        @throw RLMException(@"Property '%@' requires a protocol defining the contained type - example: RLMArray<Person>.", _name);
+    }
+    else {
+        NSString *className;
+        Class cls = nil;
+        if (code[1] == '\0') {
+            className = @"id";
+        }
+        else {
+            // for objects strip the quotes and @
+            className = [rawType substringWithRange:NSMakeRange(2, rawType.length-3)];
+            cls = [RLMSchema classForString:className];
+        }
+
+        if (!cls) {
+            @throw RLMException(@"Property '%@' is declared as '%@', which is not a supported RLMObject property type. "
+                                @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, RLMLinkingObjects, or subclasses of RLMObject. "
+                                @"See https://realm.io/docs/objc/latest/api/Classes/RLMObject.html for more information.", _name, className);
+        }
+
+        _type = RLMPropertyTypeObject;
+        _optional = true;
+        _objectClassName = [cls className] ?: className;
+    }
+    return YES;
 }
 
-- (bool)parseObjcProperty:(objc_property_t)property {
+- (void)parseObjcProperty:(objc_property_t)property readOnly:(bool *)readOnly rawType:(NSString **)rawType {
     unsigned int count;
     objc_property_attribute_t *attrs = property_copyAttributeList(property, &count);
 
-    bool isReadOnly = false;
     for (size_t i = 0; i < count; ++i) {
         switch (*attrs[i].name) {
             case 'T':
-                _objcRawType = @(attrs[i].value);
+                *rawType = @(attrs[i].value);
                 break;
             case 'R':
-                isReadOnly = true;
+                *readOnly = true;
                 break;
             case 'N':
                 // nonatomic
@@ -332,8 +294,6 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         }
     }
     free(attrs);
-
-    return isReadOnly;
 }
 
 - (instancetype)initSwiftPropertyWithName:(NSString *)name
@@ -356,7 +316,10 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         _linkOriginPropertyName = linkPropertyDescriptor.propertyName;
     }
 
-    if ([self parseObjcProperty:property]) {
+    NSString *rawType;
+    bool readOnly = false;
+    [self parseObjcProperty:property readOnly:&readOnly rawType:&rawType];
+    if (readOnly) {
         return nil;
     }
 
@@ -368,20 +331,20 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     //        * if the Realm Objective-C Swift tests pass with this removed, it's been fixed
     //        * once it has been fixed, remove this entire conditional block (contents included) entirely
     //        * Bug Report: SR-2031 https://bugs.swift.org/browse/SR-2031
-    if ([_objcRawType isEqualToString:@"@"]) {
+    if ([rawType isEqualToString:@"@"]) {
         if (propertyValue) {
-            _objcRawType = [NSString stringWithFormat:@"@\"%@\"", [propertyValue class]];
+            rawType = [NSString stringWithFormat:@"@\"%@\"", [propertyValue class]];
         } else if (linkPropertyDescriptor) {
             // we're going to naively assume that the user used the correct type since we can't check it
-            _objcRawType = @"@\"RLMLinkingObjects\"";
+            rawType = @"@\"RLMLinkingObjects\"";
         }
     }
 
     // convert array types to objc variant
-    if ([_objcRawType isEqualToString:@"@\"RLMArray\""]) {
-        _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [propertyValue objectClassName]];
+    if ([rawType isEqualToString:@"@\"RLMArray\""]) {
+        rawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [propertyValue objectClassName]];
     }
-    else if ([_objcRawType isEqualToString:@"@\"NSNumber\""]) {
+    else if ([rawType isEqualToString:@"@\"NSNumber\""]) {
         const char *numberType = [propertyValue objCType];
         if (!numberType) {
             @throw RLMException(@"Can't persist NSNumber without default value: use a Swift-native number type or provide a default value.");
@@ -390,17 +353,17 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
             case 'i':
             case 'l':
             case 'q':
-                _objcRawType = @"@\"NSNumber<RLMInt>\"";
+                rawType = @"@\"NSNumber<RLMInt>\"";
                 break;
             case 'f':
-                _objcRawType = @"@\"NSNumber<RLMFloat>\"";
+                rawType = @"@\"NSNumber<RLMFloat>\"";
                 break;
             case 'd':
-                _objcRawType = @"@\"NSNumber<RLMDouble>\"";
+                rawType = @"@\"NSNumber<RLMDouble>\"";
                 break;
             case 'B':
             case 'c':
-                _objcRawType = @"@\"NSNumber<RLMBool>\"";
+                rawType = @"@\"NSNumber<RLMBool>\"";
                 break;
             default:
                 @throw RLMException(@"Can't persist NSNumber of type '%s': only integers, floats, doubles, and bools are currently supported.", numberType);
@@ -413,11 +376,11 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
                             propertyName);
     };
 
-    if (![self setTypeFromRawType]) {
+    if (![self setTypeFromRawType:rawType]) {
         throwForPropertyName(self.name);
     }
 
-    if (_objcType == 'c') {
+    if ([rawType isEqualToString:@"c"]) {
         // Check if it's a BOOL or Int8 by trying to set it to 2 and seeing if
         // it actually sets it to 1.
         [obj setValue:@2 forKey:name];
@@ -449,13 +412,15 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         _linkOriginPropertyName = linkPropertyDescriptor.propertyName;
     }
 
-    bool isReadOnly = [self parseObjcProperty:property];
-    bool isComputedProperty = rawTypeIsComputedProperty(_objcRawType);
+    NSString *rawType;
+    bool isReadOnly = false;
+    [self parseObjcProperty:property readOnly:&isReadOnly rawType:&rawType];
+    bool isComputedProperty = rawTypeIsComputedProperty(rawType);
     if (isReadOnly && !isComputedProperty) {
         return nil;
     }
 
-    if (![self setTypeFromRawType]) {
+    if (![self setTypeFromRawType:rawType]) {
         @throw RLMException(@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", self.name);
     }
@@ -482,7 +447,6 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _name = name;
     _type = RLMPropertyTypeArray;
     _objectClassName = objectClassName;
-    _objcType = 't';
     _swiftIvar = ivar;
 
     // no obj-c property for generic lists, and thus no getter/setter names
@@ -502,7 +466,6 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _name = name;
     _type = propertyType;
     _indexed = indexed;
-    _objcType = '@';
     _swiftIvar = ivar;
     _optional = true;
 
@@ -524,7 +487,6 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _type = RLMPropertyTypeLinkingObjects;
     _objectClassName = objectClassName;
     _linkOriginPropertyName = linkOriginPropertyName;
-    _objcType = '@';
     _swiftIvar = ivar;
 
     // no obj-c property for generic linking objects properties, and thus no getter/setter names
@@ -536,7 +498,6 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     RLMProperty *prop = [[RLMProperty allocWithZone:zone] init];
     prop->_name = _name;
     prop->_type = _type;
-    prop->_objcType = _objcType;
     prop->_objectClassName = _objectClassName;
     prop->_indexed = _indexed;
     prop->_getterName = _getterName;
