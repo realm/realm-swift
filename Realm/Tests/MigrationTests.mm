@@ -479,24 +479,12 @@ RLM_ARRAY_TYPE(MigrationObject);
     RLMObjectSchema *from = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
 
     RLMObjectSchema *to = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
+    to.objectClass = RLMObject.class;
     RLMProperty *prop = to.properties[0];
     RLMProperty *strProp = to.properties[1];
     prop.type = strProp.type;
-    prop.objcRawType = strProp.objcRawType;
-    prop.objcType = strProp.objcType;
 
     [self assertMigrationRequiredForChangeFrom:@[from] to:@[to]];
-}
-
-- (void)testChangingIntSizeDoesNotRequireMigration {
-    RLMObjectSchema *from = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
-
-    RLMObjectSchema *to = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
-    RLMProperty *prop = to.properties[0];
-    prop.objcRawType = @"q"; // 'long long' rather than 'int'
-    prop.objcType = 'q';
-
-    [self assertNoMigrationRequiredForChangeFrom:@[from] to:@[to]];
 }
 
 - (void)testDeleteRealmIfMigrationNeededWithSetCustomSchema {
@@ -535,9 +523,9 @@ RLM_ARRAY_TYPE(MigrationObject);
         }
 
         // Change string to int, requiring a migration
+        objectSchema.objectClass = RLMObject.class;
         RLMProperty *stringCol = objectSchema.properties[1];
         stringCol.type = RLMPropertyTypeInt;
-        stringCol.objcType = 'i';
         stringCol.optional = NO;
         objectSchema.properties = @[stringCol];
 
@@ -814,9 +802,9 @@ RLM_ARRAY_TYPE(MigrationObject);
 - (void)testChangePropertyType {
     // make string an int
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
+    objectSchema.objectClass = RLMObject.class;
     RLMProperty *stringCol = objectSchema.properties[1];
     stringCol.type = RLMPropertyTypeInt;
-    stringCol.objcType = 'i';
     stringCol.optional = NO;
 
     // create realm with old schema and populate
@@ -829,7 +817,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     RLMRealm *realm = [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
         [migration enumerateObjects:MigrationObject.className
-                                       block:^(RLMObject *oldObject, RLMObject *newObject) {
+                              block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertEqualObjects(newObject[@"intCol"], oldObject[@"intCol"]);
             NSNumber *intObj = oldObject[@"stringCol"];
             XCTAssert([intObj isKindOfClass:NSNumber.class], @"Old stringCol should be int");
@@ -1050,6 +1038,7 @@ RLM_ARRAY_TYPE(MigrationObject);
                                                           [NSDate dateWithTimeIntervalSince1970:2]]];
     }];
 
+    objectSchema.objectClass = RLMObject.class;
     [objectSchema.properties setValue:@NO forKey:@"optional"];
 
     RLMRealm *realm;
@@ -1068,22 +1057,22 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqual(2U, allObjects.count);
 
     AllOptionalTypes *obj = allObjects[0];
-    XCTAssertEqualObjects(@0, obj.intObj);
-    XCTAssertEqualObjects(@0, obj.floatObj);
-    XCTAssertEqualObjects(@0, obj.doubleObj);
-    XCTAssertEqualObjects(@0, obj.boolObj);
-    XCTAssertEqualObjects(@"", obj.string);
-    XCTAssertEqualObjects(NSData.data, obj.data);
-    XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:0], obj.date);
+    XCTAssertEqualObjects(@0, obj[@"intObj"]);
+    XCTAssertEqualObjects(@0, obj[@"floatObj"]);
+    XCTAssertEqualObjects(@0, obj[@"doubleObj"]);
+    XCTAssertEqualObjects(@0, obj[@"boolObj"]);
+    XCTAssertEqualObjects(@"", obj[@"string"]);
+    XCTAssertEqualObjects(NSData.data, obj[@"data"]);
+    XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:0], obj[@"date"]);
 
     obj = allObjects[1];
-    XCTAssertEqualObjects(@0, obj.intObj);
-    XCTAssertEqualObjects(@0, obj.floatObj);
-    XCTAssertEqualObjects(@0, obj.doubleObj);
-    XCTAssertEqualObjects(@0, obj.boolObj);
-    XCTAssertEqualObjects(@"", obj.string);
-    XCTAssertEqualObjects(NSData.data, obj.data);
-    XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:0], obj.date);
+    XCTAssertEqualObjects(@0, obj[@"intObj"]);
+    XCTAssertEqualObjects(@0, obj[@"floatObj"]);
+    XCTAssertEqualObjects(@0, obj[@"doubleObj"]);
+    XCTAssertEqualObjects(@0, obj[@"boolObj"]);
+    XCTAssertEqualObjects(@"", obj[@"string"]);
+    XCTAssertEqualObjects(NSData.data, obj[@"data"]);
+    XCTAssertEqualObjects([NSDate dateWithTimeIntervalSince1970:0], obj[@"date"]);
 }
 
 - (void)testMigrationAfterReorderingProperties {

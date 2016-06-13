@@ -304,6 +304,13 @@ RLM_ARRAY_TYPE(CircleObject);
 @interface NumberDefaultsObject : NumberObject
 @end
 
+@interface RequiredNumberObject : RLMObject
+@property NSNumber<RLMInt> *intObj;
+@property NSNumber<RLMFloat> *floatObj;
+@property NSNumber<RLMDouble> *doubleObj;
+@property NSNumber<RLMBool> *boolObj;
+@end
+
 #pragma mark CustomInitializerObject
 
 @interface CustomInitializerObject : RLMObject

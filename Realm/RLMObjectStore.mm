@@ -205,7 +205,7 @@ static NSUInteger createRowForObjectWithPrimaryKey(RLMClassInfo const& info, id 
                     row.set_null(primaryColumnIndex); // FIXME: Use `set_null_unique` once Core supports it
                 }
                 break;
-                
+
             default:
                 REALM_UNREACHABLE();
         }
@@ -269,7 +269,7 @@ static NSUInteger createOrGetRowForObject(RLMClassInfo const& info, F valueForPr
 }
 
 void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
-                         __unsafe_unretained RLMRealm *const realm, 
+                         __unsafe_unretained RLMRealm *const realm,
                          bool createOrUpdate) {
     RLMVerifyInWriteTransaction(realm);
 
