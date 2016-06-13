@@ -48,7 +48,7 @@ class RealmTests: TestCase {
 
     func testOpeningInvalidPathThrows() {
         assertFails(Error.FileAccess) {
-            try Realm(configuration: Realm.Configuration(fileURL: NSURL(fileURLWithPath: "/dev/null/foo")))
+            try Realm(configuration: Realm.Configuration(fileURL: URL(fileURLWithPath: "/dev/null/foo")))
         }
     }
 
@@ -60,8 +60,8 @@ class RealmTests: TestCase {
             }
         }
 
-        let fileManager = NSFileManager.default()
-        try! fileManager.setAttributes([ NSFileImmutable: true ], ofItemAtPath: testRealmURL().path!)
+        let fileManager = FileManager.default()
+        try! fileManager.setAttributes([ FileAttributeKey.immutable.rawValue: true ], ofItemAtPath: testRealmURL().path!)
 
         // Should not be able to open read-write
         assertFails(Error.FileAccess) {
@@ -74,7 +74,7 @@ class RealmTests: TestCase {
             XCTAssertEqual(1, realm.allObjects(ofType: SwiftStringObject.self).count)
         }
 
-        try! fileManager.setAttributes([ NSFileImmutable: false ], ofItemAtPath: testRealmURL().path!)
+        try! fileManager.setAttributes([ FileAttributeKey.immutable.rawValue: false ], ofItemAtPath: testRealmURL().path!)
     }
 
     func testReadOnlyRealmMustExist() {
@@ -90,17 +90,17 @@ class RealmTests: TestCase {
         }
 
         // Make Realm at test path temporarily unreadable
-        let fileManager = NSFileManager.default()
+        let fileManager = FileManager.default()
         let permissions = try! fileManager
-            .attributesOfItem(atPath: testRealmURL().path!)[NSFilePosixPermissions] as! NSNumber
-        try! fileManager.setAttributes([ NSFilePosixPermissions: 0000 ],
+            .attributesOfItem(atPath: testRealmURL().path!)[FileAttributeKey.posixPermissions.rawValue] as! NSNumber
+        try! fileManager.setAttributes([ FileAttributeKey.posixPermissions.rawValue: 0000 ],
                                        ofItemAtPath: testRealmURL().path!)
 
         assertFails(Error.FilePermissionDenied) {
             try Realm(fileURL: testRealmURL())
         }
 
-        try! fileManager.setAttributes([ NSFilePosixPermissions: permissions ], ofItemAtPath: testRealmURL().path!)
+        try! fileManager.setAttributes([FileAttributeKey.posixPermissions.rawValue: permissions], ofItemAtPath: testRealmURL().path!)
     }
 
     #if DEBUG
@@ -150,8 +150,8 @@ class RealmTests: TestCase {
             _ = try! Realm()
         }
 
-        NSFileManager.default().createFile(atPath: defaultRealmURL().path!,
-            contents:"a".data(using: NSUTF8StringEncoding, allowLossyConversion: false),
+        FileManager.default().createFile(atPath: defaultRealmURL().path!,
+            contents:"a".data(using: String.Encoding.utf8, allowLossyConversion: false),
             attributes: nil)
 
         assertFails(Error.FileAccess) {
@@ -720,8 +720,7 @@ class RealmTests: TestCase {
         try! realm.write {
             realm.add(SwiftObject())
         }
-        let fileURL = defaultRealmURL().deletingLastPathComponent!
-            .appendingPathComponent("copy.realm")
+        let fileURL = try! defaultRealmURL().deletingLastPathComponent().appendingPathComponent("copy.realm")
         do {
             try realm.writeCopy(toFileURL: fileURL)
         } catch {
@@ -731,7 +730,7 @@ class RealmTests: TestCase {
             let copy = try! Realm(fileURL: fileURL)
             XCTAssertEqual(1, copy.allObjects(ofType: SwiftObject.self).count)
         }
-        try! NSFileManager.default().removeItem(at: fileURL)
+        try! FileManager.default().removeItem(at: fileURL)
     }
 
     func testEquals() {

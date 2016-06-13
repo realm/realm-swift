@@ -81,7 +81,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     // MARK: Fast Enumeration
 
     public func countByEnumerating(with state: UnsafeMutablePointer<NSFastEnumerationState>,
-                   objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject>!,
+                   objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>!,
                    count len: Int) -> Int {
         return Int(rlmResults.countByEnumerating(with: state, objects: buffer, count: UInt(len)))
     }
@@ -132,7 +132,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func indexOfObject(for predicate: NSPredicate) -> Int? {
+    public func indexOfObject(for predicate: Predicate) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: predicate))
     }
 
@@ -145,8 +145,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
     public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
-        return notFoundToNil(index: rlmResults.indexOfObject(with: NSPredicate(format: predicateFormat,
-                                                                               argumentArray: args)))
+        return notFoundToNil(index: rlmResults.indexOfObject(with: Predicate(format: predicateFormat,
+                                                                             argumentArray: args)))
     }
 
     // MARK: Object Retrieval
@@ -217,7 +217,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: Results containing objects that match the given predicate.
     */
     public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<T> {
-        return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
+        return Results<T>(rlmResults.objects(with: Predicate(format: predicateFormat, argumentArray: args)))
     }
 
     /**
@@ -227,7 +227,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: Results containing objects that match the given predicate.
     */
-    public func filter(using predicate: NSPredicate) -> Results<T> {
+    public func filter(using predicate: Predicate) -> Results<T> {
         return Results<T>(rlmResults.objects(with: predicate))
     }
 
@@ -417,13 +417,13 @@ extension Results {
     public var invalidated : Bool { fatalError() }
 
     @available(*, unavailable, renamed:"indexOfObject(for:)")
-    public func index(of predicate: NSPredicate) -> Int? { fatalError() }
+    public func index(of predicate: Predicate) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed:"indexOfObject(for:_:)")
     public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed:"filter(using:)")
-    public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
+    public func filter(_ predicate: Predicate) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"filter(using:_:)")
     public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> { fatalError() }

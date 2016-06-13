@@ -42,7 +42,7 @@ class SwiftObject: Object {
     dynamic var floatCol = 1.23 as Float
     dynamic var doubleCol = 12.3
     dynamic var stringCol = "a"
-    dynamic var binaryCol = "a".data(using: NSUTF8StringEncoding)!
+    dynamic var binaryCol = "a".data(using: String.Encoding.utf8)!
     dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
     dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
     let arrayCol = List<SwiftBoolObject>()
@@ -53,7 +53,7 @@ class SwiftObject: Object {
             "floatCol": 1.23 as AnyObject,
             "doubleCol": 12.3 as AnyObject,
             "stringCol": "a" as AnyObject,
-            "binaryCol":  "a".data(using: NSUTF8StringEncoding)!,
+            "binaryCol":  "a".data(using: String.Encoding.utf8)!,
             "dateCol": NSDate(timeIntervalSince1970: 1),
             "objectCol": [false],
             "arrayCol": [] as NSArray]
@@ -86,7 +86,7 @@ class SwiftImplicitlyUnwrappedOptionalObject: Object {
 class SwiftOptionalDefaultValuesObject: Object {
     dynamic var optNSStringCol: NSString? = "A"
     dynamic var optStringCol: String? = "B"
-    dynamic var optBinaryCol: NSData? = "C".data(using: NSUTF8StringEncoding)
+    dynamic var optBinaryCol: NSData? = "C".data(using: String.Encoding.utf8)
     dynamic var optDateCol: NSDate? = NSDate(timeIntervalSince1970: 10)
     let optIntCol = RealmOptional<Int>(1)
     let optInt8Col = RealmOptional<Int8>(1)
@@ -103,7 +103,7 @@ class SwiftOptionalDefaultValuesObject: Object {
         return [
             "optNSStringCol" : "A",
             "optStringCol" : "B",
-            "optBinaryCol" : "C".data(using: NSUTF8StringEncoding)!,
+            "optBinaryCol" : "C".data(using: String.Encoding.utf8)!,
             "optDateCol" : NSDate(timeIntervalSince1970: 10),
             "optIntCol" : 1,
             "optInt8Col" : 1,
@@ -120,7 +120,7 @@ class SwiftOptionalDefaultValuesObject: Object {
 class SwiftOptionalIgnoredPropertiesObject: Object {
     dynamic var optNSStringCol: NSString? = "A"
     dynamic var optStringCol: String? = "B"
-    dynamic var optBinaryCol: NSData? = "C".data(using: NSUTF8StringEncoding)
+    dynamic var optBinaryCol: NSData? = "C".data(using: String.Encoding.utf8)
     dynamic var optDateCol: NSDate? = NSDate(timeIntervalSince1970: 10)
     dynamic var optObjectCol: SwiftBoolObject? = SwiftBoolObject(value: [true])
 

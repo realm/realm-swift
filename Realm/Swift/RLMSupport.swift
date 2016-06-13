@@ -22,13 +22,13 @@ import Realm
     extension RLMObject {
         // Swift query convenience functions
         public class func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
-            return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+            return objects(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
 
         public class func objectsInRealm(realm: RLMRealm,
                                          _ predicateFormat: String,
                                          _ args: CVarArg...) -> RLMResults<RLMObject> {
-            return objects(in: realm, with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+            return objects(in: realm, with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
     }
 
@@ -52,15 +52,15 @@ import Realm
 
         // Swift query convenience functions
         public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArg...) -> UInt {
-            return indexOfObject(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+            return indexOfObject(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
 
         public func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObjectType> {
-            return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+            return objects(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
     }
 
-    extension RLMResults: Sequence {
+    extension RLMResults : Sequence {
         // Support Sequence-style enumeration
         public func makeIterator() -> RLMIterator {
             return RLMIterator(collection: self)
@@ -68,11 +68,11 @@ import Realm
 
         // Swift query convenience functions
         public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArg...) -> UInt {
-            return indexOfObject(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+            return indexOfObject(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
 
         public func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMResults {
-            return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+            return objects(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
     }
 #else

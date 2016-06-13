@@ -71,9 +71,12 @@ class KVOTests: TestCase {
         super.tearDown()
     }
 
-    var changeDictionary: [String: AnyObject]?
+    var changeDictionary: [NSKeyValueChangeKey: AnyObject]?
+
+
+
     override func observeValue(forKeyPath keyPath: String?, of object: AnyObject?,
-                               change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>?) {
+                               change: [NSKeyValueChangeKey : AnyObject]?, context: UnsafeMutablePointer<Void>?) {
         changeDictionary = change
     }
 
@@ -88,8 +91,8 @@ class KVOTests: TestCase {
             return
         }
 
-        let actualOld: AnyObject = changeDictionary![NSKeyValueChangeOldKey]!
-        let actualNew: AnyObject = changeDictionary![NSKeyValueChangeNewKey]!
+        let actualOld: AnyObject = (changeDictionary?[NSKeyValueChangeKey.oldKey]!)!
+        let actualNew: AnyObject = (changeDictionary?[NSKeyValueChangeKey.newKey]!)!
         XCTAssert(actualOld.isEqual(old), "Old value: expected \(old), got \(actualOld)", file: fileName,
             line: lineNumber)
         XCTAssert(actualNew.isEqual(new), "New value: expected \(new), got \(actualNew)", file: fileName,
@@ -109,8 +112,8 @@ class KVOTests: TestCase {
             return
         }
 
-        let actualKind = NSKeyValueChange(rawValue: (changeDictionary![NSKeyValueChangeKindKey] as! NSNumber).uintValue)!
-        let actualIndexes = changeDictionary![NSKeyValueChangeIndexesKey]! as! NSIndexSet
+        let actualKind = NSKeyValueChange(rawValue: (changeDictionary?[NSKeyValueChangeKey.kindKey] as! NSNumber).uintValue)!
+        let actualIndexes = changeDictionary?[NSKeyValueChangeKey.indexesKey]! as! NSIndexSet
         XCTAssert(actualKind == kind, "Change kind: expected \(kind), got \(actualKind)", file: fileName,
             line: lineNumber)
         XCTAssert(actualIndexes.isEqual(indexes), "Changed indexes: expected \(indexes), got \(actualIndexes)",
@@ -133,7 +136,7 @@ class KVOTests: TestCase {
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obj, "objectCol", NSNull(), obj) { obj.objectCol = obj }
 
-        let data = "abc".data(using: NSUTF8StringEncoding, allowLossyConversion: false)!
+        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!
         observeChange(obj, "binaryCol", NSData(), data) { obj.binaryCol = data }
 
         let date = NSDate(timeIntervalSince1970: 1)
@@ -177,7 +180,7 @@ class KVOTests: TestCase {
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obj, "objectCol", NSNull(), obj) { obj.objectCol = obj }
 
-        let data = "abc".data(using: NSUTF8StringEncoding, allowLossyConversion: false)!
+        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!
         observeChange(obj, "binaryCol", NSData(), data) { obj.binaryCol = data }
 
         let date = NSDate(timeIntervalSince1970: 1)
@@ -232,7 +235,7 @@ class KVOTests: TestCase {
         observeChange(obs, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obs, "objectCol", NSNull(), obj) { obj.objectCol = obj }
 
-        let data = "abc".data(using: NSUTF8StringEncoding, allowLossyConversion: false)!
+        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!
         observeChange(obs, "binaryCol", NSData(), data) { obj.binaryCol = data }
 
         let date = NSDate(timeIntervalSince1970: 1)

@@ -239,7 +239,7 @@ class SwiftObjectWithUnindexibleProperties: SwiftFakeObject {
     dynamic var intCol = 123
     dynamic var floatCol = 1.23 as Float
     dynamic var doubleCol = 12.3
-    dynamic var binaryCol = "a".data(using: NSUTF8StringEncoding)!
+    dynamic var binaryCol = "a".data(using: String.Encoding.utf8)!
     dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
     dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
     let arrayCol = List<SwiftBoolObject>()

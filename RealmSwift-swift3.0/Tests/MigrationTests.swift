@@ -24,7 +24,7 @@ import Realm.Dynamic
 import Foundation
 
 @discardableResult
-private func realmWithSingleClassProperties(_ fileURL: NSURL, className: String, properties: [AnyObject]) -> RLMRealm {
+private func realmWithSingleClassProperties(_ fileURL: URL, className: String, properties: [AnyObject]) -> RLMRealm {
     let schema = RLMSchema()
     let objectSchema = RLMObjectSchema(className: className, objectClass: MigrationObject.self, properties: properties)
     schema.objectSchema = [objectSchema]
@@ -35,7 +35,7 @@ private func realmWithSingleClassProperties(_ fileURL: NSURL, className: String,
     return try! RLMRealm(configuration: config)
 }
 
-private func dynamicRealm(_ fileURL: NSURL) -> RLMRealm {
+private func dynamicRealm(_ fileURL: URL) -> RLMRealm {
     let config = RLMRealmConfiguration()
     config.fileURL = fileURL
     config.dynamic = true
@@ -47,7 +47,7 @@ class MigrationTests: TestCase {
     // MARK Utility methods
 
     // create realm at path and test version is 0
-    private func createAndTestRealmAtURL(_ fileURL: NSURL) {
+    private func createAndTestRealmAtURL(_ fileURL: URL) {
         autoreleasepool {
             _ = try! Realm(fileURL: fileURL)
             return
@@ -56,7 +56,7 @@ class MigrationTests: TestCase {
     }
 
     // migrate realm at path and ensure migration
-    private func migrateAndTestRealm(_ fileURL: NSURL, shouldRun: Bool = true, schemaVersion: UInt64 = 1,
+    private func migrateAndTestRealm(_ fileURL: URL, shouldRun: Bool = true, schemaVersion: UInt64 = 1,
                                      autoMigration: Bool = false, block: MigrationBlock? = nil) {
         var didRun = false
         let config = Realm.Configuration(fileURL: fileURL, schemaVersion: schemaVersion,
@@ -119,7 +119,7 @@ class MigrationTests: TestCase {
         XCTAssertEqual(0, try! schemaVersionAtURL(defaultRealmURL()),
                        "Initial version should be 0")
         assertFails(.Fail) {
-            try schemaVersionAtURL(NSURL(fileURLWithPath: "/dev/null"))
+            try schemaVersionAtURL(URL(fileURLWithPath: "/dev/null"))
         }
     }
 
@@ -371,7 +371,7 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((oldObj!["doubleCol"] as! Double), 12.3 as Double)
                 XCTAssertEqual((newObj!["doubleCol"] as! Double), 12.3 as Double)
 
-                let binaryCol = "a".data(using: NSUTF8StringEncoding)!
+                let binaryCol = "a".data(using: String.Encoding.utf8)!
                 XCTAssertEqual((oldObj!["binaryCol"] as! NSData), binaryCol)
                 XCTAssertEqual((newObj!["binaryCol"] as! NSData), binaryCol)
 

@@ -93,7 +93,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func indexOfObject(for predicate: NSPredicate) -> Int? {
+    public func indexOfObject(for predicate: Predicate) -> Int? {
         return notFoundToNil(index: _rlmArray.indexOfObject(with: predicate))
     }
 
@@ -107,7 +107,7 @@ public final class List<T: Object>: ListBase {
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
     public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
-        return indexOfObject(for: NSPredicate(format: predicateFormat, argumentArray: args))
+        return indexOfObject(for: Predicate(format: predicateFormat, argumentArray: args))
     }
 
     // MARK: Object Retrieval
@@ -187,7 +187,7 @@ public final class List<T: Object>: ListBase {
     - returns: `Results` containing elements that match the given predicate.
     */
     public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<T> {
-        return Results<T>(_rlmArray.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
+        return Results<T>(_rlmArray.objects(with: Predicate(format: predicateFormat, argumentArray: args)))
     }
 
     /**
@@ -197,7 +197,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: `Results` containing elements that match the given predicate.
     */
-    public func filter(using predicate: NSPredicate) -> Results<T> {
+    public func filter(using predicate: Predicate) -> Results<T> {
         return Results<T>(_rlmArray.objects(with: predicate))
     }
 
@@ -238,7 +238,7 @@ public final class List<T: Object>: ListBase {
     - returns: The minimum value for the property amongst objects in the List, or `nil` if the List is empty.
     */
     public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return filter(using: NSPredicate(value: true)).minimumValue(ofProperty: property)
+        return filter(using: Predicate(value: true)).minimumValue(ofProperty: property)
     }
 
     /**
@@ -251,7 +251,7 @@ public final class List<T: Object>: ListBase {
     - returns: The maximum value for the property amongst objects in the List, or `nil` if the List is empty.
     */
     public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return filter(using: NSPredicate(value: true)).maximumValue(ofProperty: property)
+        return filter(using: Predicate(value: true)).maximumValue(ofProperty: property)
     }
 
     /**
@@ -264,7 +264,7 @@ public final class List<T: Object>: ListBase {
     - returns: The sum of the given property over all objects in the List.
     */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
-        return filter(using: NSPredicate(value: true)).sum(ofProperty: property)
+        return filter(using: Predicate(value: true)).sum(ofProperty: property)
     }
 
     /**
@@ -277,7 +277,7 @@ public final class List<T: Object>: ListBase {
     - returns: The average of the given property over all objects in the List, or `nil` if the List is empty.
     */
     public func average<U: AddableType>(ofProperty property: String) -> U? {
-        return filter(using: NSPredicate(value: true)).average(ofProperty: property)
+        return filter(using: Predicate(value: true)).average(ofProperty: property)
     }
 
     // MARK: Mutation
@@ -536,13 +536,13 @@ extension List {
     public var invalidated : Bool { fatalError() }
 
     @available(*, unavailable, renamed:"indexOfObject(for:)")
-    public func index(of predicate: NSPredicate) -> Int? { fatalError() }
+    public func index(of predicate: Predicate) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed:"indexOfObject(for:_:)")
     public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed:"filter(using:)")
-    public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
+    public func filter(_ predicate: Predicate) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"filter(using:_:)")
     public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> { fatalError() }

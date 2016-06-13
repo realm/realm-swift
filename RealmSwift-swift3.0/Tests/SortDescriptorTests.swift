@@ -39,7 +39,7 @@ class SortDescriptorTests: TestCase {
     }
 
     func testStringLiteralConvertible() {
-        let literalSortDescriptor: SortDescriptor = "property"
+        let literalSortDescriptor : RealmSwift.SortDescriptor = "property"
         XCTAssertEqual(sortDescriptor, literalSortDescriptor,
             "SortDescriptor should conform to StringLiteralConvertible")
     }

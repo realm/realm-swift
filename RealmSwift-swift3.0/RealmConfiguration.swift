@@ -62,9 +62,9 @@ extension Realm {
                                                   schema if a migration is required.
         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
         */
-        public init(fileURL: NSURL? = NSURL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
+        public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
             inMemoryIdentifier: String? = nil,
-            encryptionKey: NSData? = nil,
+            encryptionKey: Data? = nil,
             readOnly: Bool = false,
             schemaVersion: UInt64 = 0,
             migrationBlock: MigrationBlock? = nil,
@@ -86,13 +86,13 @@ extension Realm {
 
         /// The local URL to the realm file.
         /// Mutually exclusive with `inMemoryIdentifier`.
-        public var fileURL: NSURL? {
+        public var fileURL: URL? {
             set {
                 _inMemoryIdentifier = nil
                 _path = newValue?.path
             }
             get {
-                return _path.map { NSURL(fileURLWithPath: $0) }
+                return _path.map { URL(fileURLWithPath: $0) }
             }
         }
 
@@ -113,7 +113,7 @@ extension Realm {
         private var _inMemoryIdentifier: String? = nil
 
         /// 64-byte key to use to encrypt the data.
-        public var encryptionKey: NSData? = nil
+        public var encryptionKey: Data? = nil
 
         /// Whether the Realm is read-only (must be true for read-only files).
         public var readOnly: Bool = false
@@ -154,10 +154,10 @@ extension Realm {
 
         internal var rlmConfiguration: RLMRealmConfiguration {
             let configuration = RLMRealmConfiguration()
-            if fileURL != nil {
-                configuration.fileURL = self.fileURL
-            } else if inMemoryIdentifier != nil {
-                configuration.inMemoryIdentifier = self.inMemoryIdentifier
+            if let fileURL = fileURL {
+                configuration.fileURL = fileURL
+            } else if let inMemoryIdentifier = inMemoryIdentifier {
+                configuration.inMemoryIdentifier = inMemoryIdentifier
             } else {
                 fatalError("A Realm Configuration must specify a path or an in-memory identifier.")
             }

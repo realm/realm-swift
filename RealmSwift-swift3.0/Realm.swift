@@ -87,7 +87,7 @@ public final class Realm {
 
     - throws: An NSError if the Realm could not be initialized.
     */
-    public convenience init(fileURL: NSURL) throws {
+    public convenience init(fileURL: URL) throws {
         var configuration = Configuration.defaultConfiguration
         configuration.fileURL = fileURL
         try self.init(configuration: configuration)
@@ -473,9 +473,9 @@ public final class Realm {
     */
     public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
-            if rlmNotification == RLMRealmDidChangeNotification {
+            if rlmNotification == NSNotification.Name.RLMRealmDidChange.rawValue {
                 block(notification: Notification.DidChange, realm: self)
-            } else if rlmNotification == RLMRealmRefreshRequiredNotification {
+            } else if rlmNotification == NSNotification.Name.RLMRealmRefreshRequired.rawValue {
                 block(notification: Notification.RefreshRequired, realm: self)
             }
         }
@@ -574,7 +574,7 @@ public final class Realm {
 
     - throws: An NSError if the copy could not be written.
     */
-    public func writeCopy(toFileURL url: NSURL, encryptionKey: NSData? = nil) throws {
+    public func writeCopy(toFileURL url: URL, encryptionKey: Data? = nil) throws {
         try rlmRealm.writeCopy(to: url, encryptionKey: encryptionKey)
     }
 

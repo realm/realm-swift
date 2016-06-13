@@ -90,7 +90,7 @@ class SwiftPerformanceTests: TestCase {
 
     private func copyRealmToTestPath(_ realm: Realm) -> Realm {
         do {
-            try NSFileManager.default().removeItem(at: testRealmURL())
+            try FileManager.default().removeItem(at: testRealmURL())
         } catch let error as NSError {
             XCTAssertTrue(error.domain == NSCocoaErrorDomain && error.code == 4)
         } catch {
@@ -402,40 +402,41 @@ class SwiftPerformanceTests: TestCase {
             let object = realm.createObject(ofType: SwiftIntObject.self)
             try! realm.commitWrite()
 
-            let queue = dispatch_queue_create("background", nil)
-            let semaphore = dispatch_semaphore_create(0)
-            dispatch_async(queue!) {
+            let queue = DispatchQueue(label: "background")
+            let semaphore = DispatchSemaphore(value: 0)
+            queue.async {
                 autoreleasepool {
                     let realm = inMemoryRealm("test")
                     let object = realm.allObjects(ofType: SwiftIntObject.self).first!
                     var token: NotificationToken! = nil
-                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) {
+                    // AZ: TODO: is this right?
+                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), CFRunLoopMode.defaultMode as! CFTypeRef) {
                         token = realm.addNotificationBlock { _, _ in
                             if object.intCol == stopValue {
                                 CFRunLoopStop(CFRunLoopGetCurrent())
                             }
                         }
-                        dispatch_semaphore_signal(semaphore!)
+                        semaphore.signal()
                     }
                     CFRunLoopRun()
                     token.stop()
                 }
             }
 
-            dispatch_semaphore_wait(semaphore!, DISPATCH_TIME_FOREVER)
+            _ = semaphore.wait(timeout: DispatchTime.distantFuture)
             self.startMeasuring()
             while object.intCol < stopValue {
                 try! realm.write { object.intCol += 1 }
             }
-            dispatch_sync(queue!) {}
+            queue.sync { }
             self.stopMeasuring()
         }
     }
 
     func testCrossThreadSyncLatency() {
         let stopValue = 500
-        let queue = dispatch_queue_create("background", nil)
-        let semaphore = dispatch_semaphore_create(0)
+        let queue = DispatchQueue(label: "background")
+        let semaphore = DispatchSemaphore(value: 0)
 
         inMeasureBlock {
             let realm = inMemoryRealm("test")
@@ -443,12 +444,13 @@ class SwiftPerformanceTests: TestCase {
             let object = realm.createObject(ofType: SwiftIntObject.self)
             try! realm.commitWrite()
 
-            dispatch_async(queue!) {
+            queue.async {
                 autoreleasepool {
                     let realm = inMemoryRealm("test")
                     let object = realm.allObjects(ofType: SwiftIntObject.self).first!
                     var token: NotificationToken! = nil
-                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) {
+                    // AZ: TODO: is this right?
+                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), CFRunLoopMode.defaultMode as! CFTypeRef) {
                         token = realm.addNotificationBlock { _, _ in
                             if object.intCol == stopValue {
                                 CFRunLoopStop(CFRunLoopGetCurrent())
@@ -456,7 +458,7 @@ class SwiftPerformanceTests: TestCase {
                                 try! realm.write { object.intCol += 1 }
                             }
                         }
-                        dispatch_semaphore_signal(semaphore!)
+                        semaphore.signal()
                     }
                     CFRunLoopRun()
                     token.stop()
@@ -469,14 +471,14 @@ class SwiftPerformanceTests: TestCase {
                 }
             }
 
-            dispatch_semaphore_wait(semaphore!, DISPATCH_TIME_FOREVER)
+            _ = semaphore.wait(timeout: DispatchTime.distantFuture)
 
             self.startMeasuring()
             try! realm.write { object.intCol += 1 }
             while object.intCol < stopValue {
-                NSRunLoop.current().run(mode: NSDefaultRunLoopMode, before: NSDate.distantFuture())
+                RunLoop.current().run(mode: RunLoopMode.defaultRunLoopMode, before: NSDate.distantFuture())
             }
-            dispatch_sync(queue!) {}
+            queue.sync() {}
             self.stopMeasuring()
             token.stop()
         }
