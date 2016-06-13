@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+1.0.1 Release notes (2016-06-12)
 =============================================================
 
 ### API breaking changes
@@ -7,7 +7,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Significantly improve performance of opening Realm files, and slightly
+  improve performance of committing write transactions.
 
 ### Bugfixes
 
@@ -25,6 +26,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Realm now throws an exception if an `Object` subclass is defined with a managed Swift `lazy` property.
   Objects with ignored `lazy` properties should now work correctly.
 * Update the LLDB script to work with recent changes to the implementation of `RLMResults`.
+* Fix an assertion failure when a Realm file is deleted while it is still open,
+  and then a new Realm is opened at the same path. Note that this is still not
+  a supported scenario, and may break in other ways.
 
 1.0.0 Release notes (2016-05-25)
 =============================================================

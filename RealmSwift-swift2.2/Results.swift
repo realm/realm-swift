@@ -352,7 +352,7 @@ public final class Results<T: Object>: ResultsBase {
      result, the initial notification will reflect the state of the Realm after
      the write transaction.
 
-         let dogs = realm.objects(Dog)
+         let dogs = realm.objects(Dog.self)
          print("dogs.count: \(dogs?.count)") // => 0
          let token = dogs.addNotificationBlock { (changes: RealmCollectionChange) in
              switch changes {
