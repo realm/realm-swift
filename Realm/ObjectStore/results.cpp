@@ -82,7 +82,7 @@ Results::Results(SharedRealm r, SortOrder s, TableView tv)
     REALM_ASSERT(m_sort.column_indices.size() == m_sort.ascending.size());
 }
 
-Results::Results(const Results& other) = default;
+Results::Results(const Results&) = default;
 
 // Cannot be defaulted as TableViewBase::operator= is missing from the core static library.
 // Delegate to the copy constructor and move-assignment operators instead.
@@ -516,6 +516,7 @@ bool Results::is_in_table_order() const
         case Mode::TableView:
             return m_table_view.is_in_table_order();
     }
+    REALM_UNREACHABLE(); // keep gcc happy
 }
 
 void Results::Internal::set_table_view(Results& results, realm::TableView &&tv)
