@@ -401,7 +401,7 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
 
     /// The Realm the objects in this collection belong to, or `nil` if the
     /// collection's owning object does not belong to a realm (the collection is
-    /// standalone).
+    /// unmanaged).
     override var realm: Realm? { return base.realm }
 
     /// Indicates if the collection can no longer be accessed.

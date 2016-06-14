@@ -95,7 +95,8 @@ class SwiftLinkTests: TestCase {
         owner.dog = SwiftDogObject()
         owner.dog!.dogName = "Harvie"
 
-        XCTAssertEqual(0, owner.dog!.owners.count, "Linking objects are not available until the object is persisted")
+        XCTAssertEqual(0, owner.dog!.owners.count,
+                       "Linking objects are not available until the object is added to a Realm")
 
         try! realm.write {
             realm.add(owner)

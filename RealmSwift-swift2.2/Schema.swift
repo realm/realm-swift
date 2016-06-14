@@ -20,7 +20,7 @@ import Foundation
 import Realm
 
 /**
- `Schema` instances represent collections of model object schemas persisted to a Realm.
+ `Schema` instances represent collections of model object schemas managed by a Realm.
 
  When using Realm, `Schema` instances allow performing migrations and
  introspecting the database's schema.

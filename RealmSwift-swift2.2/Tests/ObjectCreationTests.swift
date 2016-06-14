@@ -33,7 +33,7 @@ class ObjectCreationTests: TestCase {
         verifySwiftObjectWithDictionaryLiteral(object, dictionary: SwiftObject.defaultValues(), boolObjectValue: false,
             boolObjectListValues: [])
 
-        // test realm properties are nil for standalone
+        // ensure realm properties are nil for unmanaged object
         XCTAssertNil(object.realm)
         XCTAssertNil(object.objectCol!.realm)
         XCTAssertNil(object.arrayCol.realm)
@@ -309,31 +309,31 @@ class ObjectCreationTests: TestCase {
     }
 
     func testCreateWithNestedObjects() {
-        let standalone = SwiftPrimaryStringObject(value: ["p0", 11])
+        let unmanaged = SwiftPrimaryStringObject(value: ["p0", 11])
 
         try! Realm().beginWrite()
         let objectWithNestedObjects = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p1", ["p1", 11],
-            [standalone]])
+            [unmanaged]])
         try! Realm().commitWrite()
 
         let stringObjects = try! Realm().objects(SwiftPrimaryStringObject.self)
         XCTAssertEqual(stringObjects.count, 2)
-        let persistedObject = stringObjects.first!
+        let managedObject = stringObjects.first!
 
-        // standalone object should be copied into the realm, not added directly
-        XCTAssertNotEqual(standalone, persistedObject)
-        XCTAssertEqual(objectWithNestedObjects.object!, persistedObject)
+        // unmanaged object should be copied into the Realm, not added directly
+        XCTAssertNotEqual(unmanaged, managedObject)
+        XCTAssertEqual(objectWithNestedObjects.object!, managedObject)
         XCTAssertEqual(objectWithNestedObjects.objects.first!, stringObjects.last!)
 
-        let standalone1 = SwiftPrimaryStringObject(value: ["p3", 11])
+        let unmanaged1 = SwiftPrimaryStringObject(value: ["p3", 11])
         try! Realm().beginWrite()
-        assertThrows(try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p3", ["p3", 11], [standalone1]]),
+        assertThrows(try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p3", ["p3", 11], [unmanaged1]]),
             "Should throw with duplicate primary key")
         try! Realm().commitWrite()
     }
 
     func testUpdateWithNestedObjects() {
-        let standalone = SwiftPrimaryStringObject(value: ["primary", 11])
+        let unmanaged = SwiftPrimaryStringObject(value: ["primary", 11])
         try! Realm().beginWrite()
         let object = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["otherPrimary", ["primary", 12],
             [["primary", 12]]], update: true)
@@ -341,12 +341,12 @@ class ObjectCreationTests: TestCase {
 
         let stringObjects = try! Realm().objects(SwiftPrimaryStringObject.self)
         XCTAssertEqual(stringObjects.count, 1)
-        let persistedObject = object.object!
+        let managedObject = object.object!
 
-        XCTAssertEqual(persistedObject.intCol, 12)
-        XCTAssertNil(standalone.realm) // the standalone object should be copied, rather than added, to the realm
-        XCTAssertEqual(object.object!, persistedObject)
-        XCTAssertEqual(object.objects.first!, persistedObject)
+        XCTAssertEqual(managedObject.intCol, 12)
+        XCTAssertNil(unmanaged.realm) // the unmanaged object should be copied, rather than added, to the realm
+        XCTAssertEqual(object.object!, managedObject)
+        XCTAssertEqual(object.objects.first!, managedObject)
     }
 
     func testCreateWithObjectsFromAnotherRealm() {
@@ -564,7 +564,7 @@ class ObjectCreationTests: TestCase {
     // swiftlint:disable:next cyclomatic_complexity
     private func validValuesForSwiftObjectType(type: PropertyType) -> [AnyObject] {
         try! Realm().beginWrite()
-        let persistedObject = try! Realm().create(SwiftBoolObject.self, value: [true])
+        let managedObject = try! Realm().create(SwiftBoolObject.self, value: [true])
         try! Realm().commitWrite()
         switch type {
             case .Bool:     return [true, 0 as Int, 1 as Int]
@@ -574,12 +574,12 @@ class ObjectCreationTests: TestCase {
             case .String:   return ["b"]
             case .Data:     return ["b".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)! as NSData]
             case .Date:     return [NSDate(timeIntervalSince1970: 2) as AnyObject]
-            case .Object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
+            case .Object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), managedObject]
             case .Array:    return [
                 [[true], [false]],
                 [["boolCol": true], ["boolCol": false]],
                 [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])],
-                [persistedObject, [false]]
+                [managedObject, [false]]
             ]
             case .Any: XCTFail("not supported")
             case .LinkingObjects: XCTFail("not supported")
@@ -590,7 +590,7 @@ class ObjectCreationTests: TestCase {
     // swiftlint:disable:next cyclomatic_complexity
     private func invalidValuesForSwiftObjectType(type: PropertyType) -> [AnyObject] {
         try! Realm().beginWrite()
-        let persistedObject = try! Realm().create(SwiftIntObject)
+        let managedObject = try! Realm().create(SwiftIntObject)
         try! Realm().commitWrite()
         switch type {
             case .Bool:     return ["invalid", 2 as Int, 1.1 as Float, 11.1 as Double]
@@ -601,7 +601,7 @@ class ObjectCreationTests: TestCase {
             case .Data:     return ["invalid"]
             case .Date:     return ["invalid"]
             case .Object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
-            case .Array:    return ["invalid", [["a"]], [["boolCol" : "a"]], [[SwiftIntObject()]], [[persistedObject]]]
+            case .Array:    return ["invalid", [["a"]], [["boolCol" : "a"]], [[SwiftIntObject()]], [[managedObject]]]
 
             case .Any: XCTFail("not supported")
             case .LinkingObjects: XCTFail("not supported")

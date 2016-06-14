@@ -57,8 +57,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  The default Realm is used by the `RLMObject` class methods
  which do not take an `RLMRealm` parameter, but is otherwise not special. The
- default Realm is persisted as default.realm under the Documents directory of
- your Application on iOS, and in your application's Application Support
+ default Realm is persisted as *default.realm* under the *Documents* directory of
+ your Application on iOS, and in your application's *Application Support*
  directory on OS X.
  
  The default Realm is created using the default `RLMRealmConfiguration`, which
@@ -285,7 +285,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Disabling `autorefresh` on a Realm without any strong references to it will not
  have any effect, and `autorefresh` will revert back to `YES` the next time the Realm is created.
  This is normally irrelevant as it means that there is
- nothing to refresh (as persisted `RLMObject`s, `RLMArray`s, and `RLMResults` have strong
+ nothing to refresh (as managed `RLMObject`s, `RLMArray`s, and `RLMResults` have strong
  references to the Realm that manages them), but it means that setting
  `RLMRealm.defaultRealm.autorefresh = NO` in
  `application:didFinishLaunchingWithOptions:` and only later storing Realm
