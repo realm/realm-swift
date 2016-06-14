@@ -895,7 +895,7 @@
     }];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [(RLMNotificationToken *)token stop];
 }
 
 - (void)testNotificationSentAfterCommit {
@@ -925,7 +925,7 @@
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    [token stop];
+    [(RLMNotificationToken *)token stop];
 }
 
 - (void)testNotificationNotSentForUnrelatedChange {
@@ -952,7 +952,7 @@
             }];
         }];
     }];
-    [token stop];
+    [(RLMNotificationToken *)token stop];
 }
 
 - (void)testNotificationSentOnlyForActualRefresh {
@@ -990,7 +990,7 @@
     [realm refresh];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    [token stop];
+    [(RLMNotificationToken *)token stop];
 }
 
 - (void)testDeletingObjectWithNotificationsRegistered {
@@ -1011,7 +1011,7 @@
     [realm deleteObject:array];
     [realm commitWriteTransaction];
 
-    [token stop];
+    [(RLMNotificationToken *)token stop];
 }
 
 - (void)testAllMethodsCheckThread {

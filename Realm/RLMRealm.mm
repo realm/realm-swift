@@ -699,7 +699,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 
     @autoreleasepool {
-        NSError *error;
+        NSError *error = nil;
         [RLMRealm realmWithConfiguration:configuration error:&error];
         return error;
     }
