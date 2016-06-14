@@ -44,37 +44,39 @@ import Realm
         }
     }
 
-    extension RLMArray: Sequence {
+    // TODO: Figure out why this causes the Swift 3 compiler to segfault.
+//    extension RLMArray: Sequence  {
+//        // Support Sequence-style enumeration
+//        public func makeIterator() -> RLMIterator {
+//            return RLMIterator(collection: self)
+//        }
+//    }
+//
+//    extension RLMResults: Sequence {
+//        // Support Sequence-style enumeration
+//        public func makeIterator() -> RLMIterator {
+//            return RLMIterator(collection: self)
+//        }
+//    }
+
+    extension RLMCollection {
         // Support Sequence-style enumeration
         public func makeIterator() -> RLMIterator {
             return RLMIterator(collection: self)
         }
+    }
 
+    extension RLMCollection {
         // Swift query convenience functions
         public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArg...) -> UInt {
             return indexOfObject(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
 
-        public func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObjectType> {
+        public func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
             return objects(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
     }
 
-    extension RLMResults : Sequence {
-        // Support Sequence-style enumeration
-        public func makeIterator() -> RLMIterator {
-            return RLMIterator(collection: self)
-        }
-
-        // Swift query convenience functions
-        public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArg...) -> UInt {
-            return indexOfObject(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
-        }
-
-        public func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMResults {
-            return objects(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
-        }
-    }
 #else
     extension RLMObject {
         // Swift query convenience functions
