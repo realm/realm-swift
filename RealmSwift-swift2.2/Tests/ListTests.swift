@@ -301,7 +301,7 @@ class ListTests: TestCase {
     }
 }
 
-class ListStandaloneTests: ListTests {
+class ListUnmanagedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let array = SwiftArrayPropertyObject()
         XCTAssertNil(array.realm)

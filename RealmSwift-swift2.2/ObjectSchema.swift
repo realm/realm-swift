@@ -34,7 +34,7 @@ public final class ObjectSchema: CustomStringConvertible {
     internal let rlmObjectSchema: RLMObjectSchema
 
     /**
-     An array of `Property` instances representing the persisted properties of a class described by the schema.
+     An array of `Property` instances representing the managed properties of a class described by the schema.
 
      - see: `Property`
      */

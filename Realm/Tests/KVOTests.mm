@@ -1026,10 +1026,10 @@ public:
 //}
 @end
 
-// Run tests on a standalone RLMObject instance
-@interface KVOStandaloneObjectTests : KVOTests
+// Run tests on an unmanaged RLMObject instance
+@interface KVOUnmanagedObjectTests : KVOTests
 @end
-@implementation KVOStandaloneObjectTests
+@implementation KVOUnmanagedObjectTests
 - (id)createObject {
     static int pk = 0;
     KVOObject *obj = [KVOObject new];
@@ -1085,13 +1085,13 @@ public:
 
 @end
 
-// Run tests on a persisted object, modifying the actual object instance being
+// Run tests on a managed object, modifying the actual object instance being
 // observed
-@interface KVOPersistedObjectTests : KVOTests
+@interface KVOManagedObjectTests : KVOTests
 @property (nonatomic, strong) RLMRealm *realm;
 @end
 
-@implementation KVOPersistedObjectTests
+@implementation KVOManagedObjectTests
 - (void)setUp {
     [super setUp];
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
@@ -1310,7 +1310,7 @@ public:
 @end
 
 // Mutate a different accessor backed by the same row as the accessor being observed
-@interface KVOMultipleAccessorsTests : KVOPersistedObjectTests
+@interface KVOMultipleAccessorsTests : KVOManagedObjectTests
 @end
 @implementation KVOMultipleAccessorsTests
 - (id)observableForObject:(id)value {
@@ -1545,8 +1545,8 @@ public:
 @end
 
 // Observing an object from a different RLMRealm instance backed by the same
-// row as the persisted object being mutated
-@interface KVOMultipleRealmsTests : KVOPersistedObjectTests
+// row as the managed object being mutated
+@interface KVOMultipleRealmsTests : KVOManagedObjectTests
 @property RLMRealm *secondaryRealm;
 @end
 

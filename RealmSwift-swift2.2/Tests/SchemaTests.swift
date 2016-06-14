@@ -47,7 +47,7 @@ class SchemaTests: TestCase {
         XCTAssertTrue(try! schema == Realm().schema)
     }
 
-    func testNoSchemaForUnpersistedObjectClasses() {
+    func testNoSchemaForUnmanagedObjectClasses() {
         XCTAssertNil(schema["RLMObject"])
         XCTAssertNil(schema["RLMObjectBase"])
         XCTAssertNil(schema["RLMDynamicObject"])

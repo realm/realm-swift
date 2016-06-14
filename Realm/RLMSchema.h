@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMObjectSchema;
 
 /**
- `RLMSchema` instances represent collections of model object schemas persisted to a Realm.
+ `RLMSchema` instances represent collections of model object schemas managed by a Realm.
 
  When using Realm, `RLMSchema` instances allow performing migrations and
  introspecting the database's schema.

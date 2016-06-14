@@ -242,16 +242,18 @@ public final class Realm {
      the Realm with the same primary key value, the object is inserted. Otherwise,
      the existing object is updated with any changed values.
 
+     The `value` argument can be a key-value coding compliant object, an array or dictionary returned from the methods
+     in `NSJSONSerialization`, or an `Array` containing one element for each managed property. An exception will be
+     thrown if any required properties are not present and those properties were not defined with default values. Do not
+     pass in a `LinkingObjects` instance, either by itself or as a member of a collection.
+
+     When passing in an `Array` as the `value` argument, all properties must be present, valid and in the same order as
+     the properties defined in the model.
+
      - warning: This method may only be called during a write transaction.
 
      - parameter type:   The type of the object to create.
-     - parameter value:  The value used to populate the object. This can be any key-value coding compliant
-                         object, or an array or dictionary returned from the methods in `NSJSONSerialization`, or
-                         an `Array` containing one element for each persisted property. An error will be
-                         thrown if any required properties are not present and those properties were not defined with
-                         default values.
-                         When passing in an `Array`, all properties must be present,
-                         valid and in the same order as the properties defined in the model.
+     - parameter value:  The value used to populate the object.
      - parameter update: If `true`, the Realm will try to find an existing copy of the object (with the same primary
                          key), and update it. Otherwise, the object will be added.
 
@@ -277,16 +279,18 @@ public final class Realm {
      the Realm instance with the same primary key value, the object is inserted. Otherwise,
      the existing object is updated with any changed values.
 
+     The `value` argument is used to populate the object. It can be a key-value coding compliant object, an array or
+     dictionary returned from the methods in `NSJSONSerialization`, or an `Array` containing one element for each
+     managed property. An exception will be thrown if any required properties are not present and those properties were
+     not defined with default values.
+
+     When passing in an `Array` as the `value` argument, all properties must be present, valid and in the same order as
+     the properties defined in the model.
+
      - warning: This method can only be called during a write transaction.
 
      - parameter className:  The class name of the object to create.
-     - parameter value:      The value used to populate the object. This can be any key-value coding compliant
-                             object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-                             or an `Array` containing one element for each persisted property. An exception will be
-                             thrown if any required properties are not present and those properties were not defined
-                             with default values.
-                             When passing in an `Array`, all properties must be present,
-                             valid and in the same order as the properties defined in the model.
+     - parameter value:      The value used to populate the object.
      - parameter update:     If true will try to update existing objects with the same primary key.
 
      - returns: The created object.
@@ -492,7 +496,7 @@ public final class Realm {
 
      Disabling `autorefresh` on a `Realm` without any strong references to it will not
      have any effect, and `autorefresh` will revert back to `true` the next time the Realm is created. This is normally
-     irrelevant as it means that there is nothing to refresh (as persisted `Object`s, `List`s, and `Results` have strong
+     irrelevant as it means that there is nothing to refresh (as managed `Object`s, `List`s, and `Results` have strong
      references to the `Realm` that manages them), but it means that setting
      `Realm().autorefresh = false` in
      `application(_:didFinishLaunchingWithOptions:)` and only later storing Realm

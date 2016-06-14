@@ -66,7 +66,7 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(object.objectCol!.boolCol, true)
     }
 
-    func testStandaloneAccessors() {
+    func testUnmanagedAccessors() {
         let object = SwiftObject()
         setAndTestAllProperties(object)
 
@@ -74,7 +74,7 @@ class ObjectAccessorTests: TestCase {
         setAndTestAllOptionalProperties(optionalObject)
     }
 
-    func testPersistedAccessors() {
+    func testManagedAccessors() {
         let realm = try! Realm()
         realm.beginWrite()
         let object = realm.create(SwiftObject)

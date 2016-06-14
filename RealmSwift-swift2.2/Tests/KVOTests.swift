@@ -122,7 +122,7 @@ class KVOTests: TestCase {
 
     // Actual tests follow
 
-    func testAllPropertyTypesStandalone() {
+    func testAllPropertyTypesForUnmanagedObject() {
         let obj = KVOObject()
         observeChange(obj, "boolCol", false, true) { obj.boolCol = true }
         observeChange(obj, "int8Col", 1, 10) { obj.int8Col = 10 }

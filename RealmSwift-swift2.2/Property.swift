@@ -20,7 +20,8 @@ import Foundation
 import Realm
 
 /**
- `Property` instances represent properties persisted to Realm in the context of an object schema.
+ `Property` instances represent properties managed by a Realm in the context of an object schema. Such properties may be
+ persisted to a Realm file or computed from other data from the Realm.
 
  When using Realm, `Property` instances allow performing migrations and introspecting the database's schema.
 

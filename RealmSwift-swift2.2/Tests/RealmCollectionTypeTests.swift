@@ -624,7 +624,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
     }
 }
 
-class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
+class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
         return CTTStringList(value: [[str1, str2]]).array
     }
@@ -654,7 +654,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     }
 
     override func testFastEnumerationWithMutation() {
-        // No standalone removal interface provided on RealmCollectionType
+        // No removal interface provided for unmanaged RealmCollectionType instances
     }
 
     override func testFirst() {
@@ -665,7 +665,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         XCTAssertEqual(str2, collection.last!)
     }
 
-    // MARK: Things not implemented in standalone
+    // MARK: Things not implemented for unmanaged instances
 
     override func testSortWithProperty() {
         assertThrows(self.collection.sorted("stringCol", ascending: true))
