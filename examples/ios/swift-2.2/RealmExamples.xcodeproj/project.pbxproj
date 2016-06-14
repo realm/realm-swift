@@ -15,6 +15,15 @@
 		227D20F71CB609A1008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.xib */; };
 		227D20F81CB609A1008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.xib */; };
 		27F824B119611EFF4A9EE8A0 /* Pods_ReactKitTableView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D00630224166C0631FC7AD2B /* Pods_ReactKitTableView.framework */; };
+		2962FD5C1D10856900DC696D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2962FD5B1D10856900DC696D /* AppDelegate.swift */; };
+		2962FD5E1D10856900DC696D /* CollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2962FD5D1D10856900DC696D /* CollectionViewController.swift */; };
+		2962FD631D10856900DC696D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2962FD621D10856900DC696D /* Images.xcassets */; };
+		2962FD6B1D10859F00DC696D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.xib */; };
+		2962FD6D1D108E0800DC696D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2962FD6C1D108E0800DC696D /* Main.storyboard */; };
+		2962FD761D10989200DC696D /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2962FD771D10989200DC696D /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2962FD7A1D10A38200DC696D /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
+		2962FD7B1D10A38200DC696D /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; };
 		3FC898FF1A1414110067CBEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FE1A1414110067CBEC /* ViewController.swift */; };
 		5D8DD54D1C62C5A4005077F2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8DD5491C62C5A4005077F2 /* AppDelegate.swift */; };
 		5D8DD54E1C62C5A4005077F2 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D8DD54A1C62C5A4005077F2 /* Images.xcassets */; };
@@ -68,6 +77,18 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		2962FD731D10986800DC696D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				2962FD761D10989200DC696D /* Realm.framework in Embed Frameworks */,
+				2962FD771D10989200DC696D /* RealmSwift.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5D8DD55D1C62C655005077F2 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -162,6 +183,12 @@
 /* Begin PBXFileReference section */
 		0A73D4411B1443A700E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
 		227D20F11CB609A1008F641B /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		2962FD591D10856900DC696D /* CollectionView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CollectionView.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2962FD5B1D10856900DC696D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		2962FD5D1D10856900DC696D /* CollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewController.swift; sourceTree = "<group>"; };
+		2962FD621D10856900DC696D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		2962FD671D10856900DC696D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2962FD6C1D108E0800DC696D /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		5D8DD5361C62C572005077F2 /* ReactKitTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReactKitTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D8DD5491C62C5A4005077F2 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -205,6 +232,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		2962FD561D10856900DC696D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2962FD7A1D10A38200DC696D /* Realm.framework in Frameworks */,
+				2962FD7B1D10A38200DC696D /* RealmSwift.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5D8DD5331C62C572005077F2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -298,6 +334,18 @@
 			path = Common;
 			sourceTree = "<group>";
 		};
+		2962FD5A1D10856900DC696D /* CollectionView */ = {
+			isa = PBXGroup;
+			children = (
+				2962FD5B1D10856900DC696D /* AppDelegate.swift */,
+				2962FD5D1D10856900DC696D /* CollectionViewController.swift */,
+				2962FD621D10856900DC696D /* Images.xcassets */,
+				2962FD671D10856900DC696D /* Info.plist */,
+				2962FD6C1D108E0800DC696D /* Main.storyboard */,
+			);
+			path = CollectionView;
+			sourceTree = "<group>";
+		};
 		2E5A12793BFB7BE6066D95F3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -333,6 +381,7 @@
 				0A73D4411B1443A700E1E8EE /* README.md */,
 				E8D3F2751A11766A00620884 /* Backlink */,
 				227D20F01CB609A1008F641B /* Common */,
+				2962FD5A1D10856900DC696D /* CollectionView */,
 				E8CB087F19BA6AEE0018434A /* Encryption */,
 				E886FB621A12A73E00CB2D0B /* GroupedTableView */,
 				E8CB088419BA6AF70018434A /* Migration */,
@@ -358,6 +407,7 @@
 				E8CB083919BA6AC60018434A /* TableView.app */,
 				5D8DD5361C62C572005077F2 /* ReactKitTableView.app */,
 				E8F14D0A1CF8FD0C00564AF5 /* PlaygroundFrameworkWrapper.framework */,
+				2962FD591D10856900DC696D /* CollectionView.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -436,6 +486,25 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		2962FD581D10856900DC696D /* CollectionView */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2962FD6A1D10856900DC696D /* Build configuration list for PBXNativeTarget "CollectionView" */;
+			buildPhases = (
+				2962FD551D10856900DC696D /* Sources */,
+				2962FD561D10856900DC696D /* Frameworks */,
+				2962FD731D10986800DC696D /* Embed Frameworks */,
+				2962FD6E1D10982200DC696D /* Strip Framework Architectures */,
+				2962FD571D10856900DC696D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CollectionView;
+			productName = CollectionView;
+			productReference = 2962FD591D10856900DC696D /* CollectionView.app */;
+			productType = "com.apple.product-type.application";
+		};
 		5D8DD5351C62C572005077F2 /* ReactKitTableView */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5D8DD5471C62C572005077F2 /* Build configuration list for PBXNativeTarget "ReactKitTableView" */;
@@ -599,6 +668,9 @@
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
+					2962FD581D10856900DC696D = {
+						CreatedOnToolsVersion = 7.3;
+					};
 					5D8DD5351C62C572005077F2 = {
 						CreatedOnToolsVersion = 7.2.1;
 					};
@@ -636,6 +708,7 @@
 			projectRoot = "";
 			targets = (
 				E8D3F2521A11765200620884 /* Backlink */,
+				2962FD581D10856900DC696D /* CollectionView */,
 				E8CB07EE19BA6AB60018434A /* Encryption */,
 				E886FB511A12A6FC00CB2D0B /* GroupedTableView */,
 				E8CB081319BA6ABD0018434A /* Migration */,
@@ -669,6 +742,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				227D20F61CB609A1008F641B /* LaunchScreen.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2962FD571D10856900DC696D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2962FD6D1D108E0800DC696D /* Main.storyboard in Resources */,
+				2962FD6B1D10859F00DC696D /* LaunchScreen.xib in Resources */,
+				2962FD631D10856900DC696D /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -727,6 +810,20 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ReactKitTableView/Pods-ReactKitTableView-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		2962FD6E1D10982200DC696D /* Strip Framework Architectures */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Strip Framework Architectures";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"\n";
 		};
 		5D8DD5621C62C835005077F2 /* Strip Framework Architectures */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -791,6 +888,15 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		2962FD551D10856900DC696D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2962FD5E1D10856900DC696D /* CollectionViewController.swift in Sources */,
+				2962FD5C1D10856900DC696D /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5D8DD5321C62C572005077F2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -862,6 +968,37 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		2962FD681D10856900DC696D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = CollectionView/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CollectionView;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2962FD691D10856900DC696D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = CollectionView/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CollectionView;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		5D8DD5451C62C572005077F2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CBC0988E1843A2BB42BC405F /* Pods-ReactKitTableView.debug.xcconfig */;
@@ -1190,6 +1327,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2962FD6A1D10856900DC696D /* Build configuration list for PBXNativeTarget "CollectionView" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2962FD681D10856900DC696D /* Debug */,
+				2962FD691D10856900DC696D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		5D8DD5471C62C572005077F2 /* Build configuration list for PBXNativeTarget "ReactKitTableView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
