@@ -311,7 +311,7 @@ RLMNotificationToken *RLMAddNotificationBlock(id objcCollection,
                 rethrow_exception(err);
             }
             catch (...) {
-                NSError *error;
+                NSError *error = nil;
                 RLMRealmTranslateException(&error);
                 block(nil, nil, error);
                 return;
