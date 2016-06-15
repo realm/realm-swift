@@ -29,17 +29,17 @@ extension Realm {
 
      Creating configuration values for class subsets (by setting the `objectClasses` property) can be expensive. Because
      of this, it is generally preferable to cache and reuse a single configuration value for each distinct configuration
-     rather than creating a new value each time you open a Realm.
+     rather than creating a new value each time a Realm is opened.
      */
     public struct Configuration {
 
         // MARK: Default Configuration
 
-        /// Returns the default configuration used to create Realms when no other
-        /// configuration is explicitly specified (i.e. `Realm()`).
+        /// Returns the default configuration used to create Realms when no other configuration is explicitly specified
+        /// (for example, when using the default initializer: `Realm()`).
         public static var defaultConfiguration: Configuration {
             get {
-                return fromRLMRealmConfiguration(rlmConfiguration: RLMRealmConfiguration.default())
+                return fromRLMRealmConfiguration(RLMRealmConfiguration.default())
             }
             set {
                 RLMRealmConfiguration.setDefault(newValue.rlmConfiguration)
@@ -49,14 +49,14 @@ extension Realm {
         // MARK: Initialization
 
         /**
-         Initializes a `Realm.Configuration`, suitable for creating new `Realm` instances.
+         Creates a `Realm.Configuration` value suitable for creating new `Realm` instances.
 
-         - parameter fileURL:            The local URL to the Realm file.
+         - parameter fileURL:            The path to a file on disk where a persisted Realm should be saved.
          - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
-         - parameter encryptionKey:      An optional 64-byte key to use to encrypt the data.
-         - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
+         - parameter encryptionKey:      A 64-byte key to use to encrypt the data, or `nil` for no encryption.
+         - parameter readOnly:           Whether the Realm is read-only (must be `true` for read-only files).
          - parameter schemaVersion:      The current schema version.
-         - parameter migrationBlock:     The block which migrates the Realm to the current version.
+         - parameter migrationBlock:     A block which can be used to migrate the Realm to the current version.
          - parameter deleteRealmIfMigrationNeeded:   If `true`, recreate the Realm file with the provided schema if a
                                                      migration is required.
          - parameter objectTypes:        The subset of `Object` subclasses managed by the Realm.
@@ -77,13 +77,14 @@ extension Realm {
                 self.readOnly = readOnly
                 self.schemaVersion = schemaVersion
                 self.migrationBlock = migrationBlock
-                self.deleteRealmIfMigrationNeeded = deleteRealmIfMigrationNeeded
+                self.shouldDeleteRealmIfMigrationNeeded = deleteRealmIfMigrationNeeded
                 self.objectTypes = objectTypes
         }
 
         // MARK: Configuration Properties
 
-        /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`.
+        /// The path to a file on disk where a persisted Realm should be saved. Mutually exclusive with
+        /// `inMemoryIdentifier`.
         public var fileURL: URL? {
             set {
                 _inMemoryIdentifier = nil
@@ -127,18 +128,22 @@ extension Realm {
         /// The current schema version.
         public var schemaVersion: UInt64 = 0
 
-        /// The block which migrates the Realm to the current version.
+        /// A block which can be used to migrate the Realm to the current version.
         public var migrationBlock: MigrationBlock? = nil
 
         /**
          Whether to recreate the Realm file with the provided schema if a migration is required.
-         This is the case when the stored schema differs from the provided schema or
-         the stored schema version differs from the version on this configuration.
+         
+         Realm considers a migration to be necessary in the following cases:
+         
+         * The stored schema differs from the provided schema.
+         * The stored schema version differs from the version set on this configuration.
+
          Setting this property to `true` deletes the file if a migration would otherwise be required or executed.
 
          - note: Setting this property to `true` doesn't disable file format migrations.
          */
-        public var deleteRealmIfMigrationNeeded: Bool = false
+        public var shouldDeleteRealmIfMigrationNeeded: Bool = false
 
         /// The classes managed by the Realm.
         public var objectTypes: [Object.Type]? {
@@ -171,13 +176,13 @@ extension Realm {
             configuration.readOnly = self.readOnly
             configuration.schemaVersion = self.schemaVersion
             configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
-            configuration.deleteRealmIfMigrationNeeded = self.deleteRealmIfMigrationNeeded
+            configuration.deleteRealmIfMigrationNeeded = self.shouldDeleteRealmIfMigrationNeeded
             configuration.customSchema = self.customSchema
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             return configuration
         }
 
-        internal static func fromRLMRealmConfiguration(rlmConfiguration: RLMRealmConfiguration) -> Configuration {
+        internal static func fromRLMRealmConfiguration(_ rlmConfiguration: RLMRealmConfiguration) -> Configuration {
             var configuration = Configuration()
             configuration._path = rlmConfiguration.fileURL?.path
             configuration._inMemoryIdentifier = rlmConfiguration.inMemoryIdentifier
@@ -189,7 +194,7 @@ extension Realm {
                     rlmMigration(migration.rlmMigration, schemaVersion)
                 }
             }
-            configuration.deleteRealmIfMigrationNeeded = rlmConfiguration.deleteRealmIfMigrationNeeded
+            configuration.shouldDeleteRealmIfMigrationNeeded = rlmConfiguration.deleteRealmIfMigrationNeeded
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
             return configuration
@@ -205,4 +210,11 @@ extension Realm.Configuration: CustomStringConvertible {
                     template: "Realm.Configuration",
                     string: rlmConfiguration.description) ?? ""
     }
+}
+
+// MARK: Unavailable
+
+extension Realm.Configuration {
+    @available(*, unavailable, renamed:"shouldDeleteRealmIfMigrationNeeded")
+    public var deleteRealmIfMigrationNeeded : Bool { get { fatalError() } set { fatalError() } }
 }

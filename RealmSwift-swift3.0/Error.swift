@@ -28,9 +28,9 @@ import Realm
  ```swift
  let realm: Realm?
  do {
- realm = try Realm()
+     realm = try Realm()
  } catch RealmSwift.Error.IncompatibleLockFile() {
- print("Incompatible lock file. The Realm Browser app might be attached to a Realm on the device.")
+     print("Incompatible lock file. The Realm Browser app might be attached to a Realm on the device.")
  }
  ```
  */
@@ -50,49 +50,49 @@ public enum Error: ErrorProtocol {
     /// The `RLMError` value, which can be used to derive the error code.
     private var rlmError: RLMError {
         switch self {
-        case .Fail:
+        case .fail:
             return .fail
-        case .FileAccess:
+        case .fileAccess:
             return .fileAccess
-        case .FilePermissionDenied:
+        case .filePermissionDenied:
             return .filePermissionDenied
-        case .FileExists:
+        case .fileExists:
             return .fileExists
-        case .FileNotFound:
+        case .fileNotFound:
             return .fileNotFound
-        case .IncompatibleLockFile:
+        case .incompatibleLockFile:
             return .incompatibleLockFile
-        case .FileFormatUpgradeRequired:
+        case .fileFormatUpgradeRequired:
             return .fileFormatUpgradeRequired
-        case .AddressSpaceExhausted:
+        case .addressSpaceExhausted:
             return .addressSpaceExhausted
-        case .SchemaMismatch:
+        case .schemaMismatch:
             return .schemaMismatch
         }
     }
 
     /// Denotes a general error that occurred when trying to open a Realm.
-    case Fail
+    case fail
 
     /// Denotes a file I/O error that occurred when trying to open a Realm.
-    case FileAccess
+    case fileAccess
 
     /// Denotes a file permission error that ocurred when trying to open a Realm.
     ///
     /// This error can occur if the user does not have permission to open or create
     /// the specified file in the specified access mode when opening a Realm.
-    case FilePermissionDenied
+    case filePermissionDenied
 
     /// Denotes an error where a file was to be written to disk, but another file with the same name
     /// already exists.
-    case FileExists
+    case fileExists
 
     /// Denotes an error that occurs if a file could not be found.
     ///
     /// This error may occur if a Realm file could not be found on disk when trying to open a
     /// Realm as read-only, or if the directory part of the specified path was not found when
     /// trying to write a copy.
-    case FileNotFound
+    case fileNotFound
 
     /// Denotes an error that occurs if the database file is currently open in another
     /// process which cannot share with the current process due to an
@@ -101,24 +101,24 @@ public enum Error: ErrorProtocol {
     /// This error may occur if trying to share a Realm file between an i386 (32-bit) iOS
     /// Simulator and the Realm Browser application. In this case, please use the 64-bit
     /// version of the iOS Simulator.
-    case IncompatibleLockFile
+    case incompatibleLockFile
 
     /// Denotes an error that occurs if a file format upgrade is required to open the file,
     /// but upgrades were explicitly disabled.
-    case FileFormatUpgradeRequired
+    case fileFormatUpgradeRequired
 
     /// Denotes an error that occurs when there is insufficient available address space.
-    case AddressSpaceExhausted
+    case addressSpaceExhausted
 
     /// Denotes an error that occurs if there is a schema version mismatch, so that a migration is required.
-    case SchemaMismatch
+    case schemaMismatch
 }
 
 // MARK: Equatable
 
 extension Error: Equatable {}
 
-/// Returns a Boolean indicating whether the errors are identical.
+/// Returns whether the errors are identical.
 public func == (lhs: ErrorProtocol, rhs: ErrorProtocol) -> Bool { // swiftlint:disable:this valid_docs
     return lhs._code == rhs._code
         && lhs._domain == rhs._domain

@@ -65,7 +65,7 @@ public final class Schema: CustomStringConvertible {
 
 extension Schema: Equatable {}
 
-/// Returns a Boolean value that indicates whether two `Schema` instances are equivalent.
+/// Returns whether two `Schema` instances are equivalent.
 public func == (lhs: Schema, rhs: Schema) -> Bool { // swiftlint:disable:this valid_docs
     return lhs.rlmSchema.isEqual(to: rhs.rlmSchema)
 }

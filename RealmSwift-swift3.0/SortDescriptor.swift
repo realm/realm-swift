@@ -19,11 +19,11 @@
 import Foundation
 import Realm
 
+// TODO: rename this type to avoid Swift 3 naming conflicts?
 /**
- A `SortDescriptor` stores a property name and a sort order for use with
- `sorted(sortDescriptors:)`. It is similar to `NSSortDescriptor`, but supports
- only the subset of functionality which can be efficiently run by Realm's query
- engine.
+ A `SortDescriptor` stores a property name and a sort order for use with the `sorted(with:)` APIs. It is similar to
+ the Foundation `SortDescriptor`, but supports only the subset of functionality which can be efficiently run by Realm's
+ query engine.
  */
 public struct SortDescriptor {
 
@@ -75,7 +75,7 @@ extension SortDescriptor: CustomStringConvertible {
 
 extension SortDescriptor: Equatable {}
 
-/// Returns whether the two sort descriptors are equal.
+/// Returns whether the two sort descriptors are equivalent.
 public func == (lhs: SortDescriptor, rhs: SortDescriptor) -> Bool {
     // swiftlint:disable:previous valid_docs
     return lhs.property == rhs.property &&

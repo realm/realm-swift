@@ -22,8 +22,7 @@ import Realm
 /**
  This class represents Realm model object schemas.
 
- When using Realm, `ObjectSchema` instances allow performing migrations and
- introspecting the database's schema.
+ When using Realm, `ObjectSchema` instances allow performing migrations and introspecting the database's schema.
 
  Object schemas map to tables in the core database.
  */
@@ -77,7 +76,7 @@ public final class ObjectSchema: CustomStringConvertible {
 
 extension ObjectSchema: Equatable {}
 
-/// Returns whether the two object schemas are equal.
+/// Returns whether the two object schemas are equivalent.
 public func == (lhs: ObjectSchema, rhs: ObjectSchema) -> Bool { // swiftlint:disable:this valid_docs
     return lhs.rlmObjectSchema.isEqual(to: rhs.rlmObjectSchema)
 }

@@ -64,19 +64,18 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
 }
 
 /**
- `LinkingObjects` is an auto-updating container type. It represents a collection of objects that
- link to its parent object.
+ `LinkingObjects` is an auto-updating container type. It represents a collection of objects that link to its parent
+ object.
 
  `LinkingObjects` can be queried with the same predicates as `List<T>` and `Results<T>`.
 
- `LinkingObjects` always reflects the current state of the Realm on the current thread,
- including during write transactions on the current thread. The one exception to
- this is when using `for...in` enumeration, which will always enumerate over the
- linking objects that were present when the enumeration is begun, even if some of them
- are deleted or modified to no longer link to the target object during the enumeration.
+ `LinkingObjects` always reflects the current state of the Realm on the current thread, including during write
+ transactions on the current thread. The one exception to this is when using `for...in` enumeration, which will always
+ enumerate over the linking objects that were present when the enumeration is begun, even if some of them are deleted or
+ modified to no longer link to the target object during the enumeration.
 
- `LinkingObjects` can only be used as a property on `Object` models. Properties of this type must
- be declared as `let` and cannot be `dynamic`.
+ `LinkingObjects` can only be used as a property on `Object` models. Properties of this type must be declared as `let`
+ and cannot be `dynamic`.
  */
 public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     /// The element type contained in this collection.
@@ -89,7 +88,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
     /// Indicates if the linking objects collection is no longer valid.
     ///
-    /// The linking objects collection becomes invalid if `invalidate` is called on the containing `realm`.
+    /// The linking objects collection becomes invalid if `invalidate()` is called on the containing `realm`.
     ///
     /// An invalidated linking objects can be accessed, but will always be empty.
     public var isInvalidated: Bool { return rlmResults.isInvalidated }
@@ -100,8 +99,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: Initializers
 
     /**
-     Creates an instance of a `LinkingObjects`. This initializer should only be called when
-     declaring a property on a Realm model.
+     Creates an instance of a `LinkingObjects`. This initializer should only be called when declaring a property on a
+     Realm model.
 
      - parameter type:         The type of the object owning the property this `LinkingObjects` should refer to.
      - parameter propertyName: The property name of the property this `LinkingObjects` should refer to.
@@ -150,11 +149,9 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: Object Retrieval
 
     /**
-     Returns the object at the given `index`.
+     Returns the object at the given index.
 
      - parameter index: The index.
-
-     - returns: The object at the given `index`.
      */
     public subscript(index: Int) -> T {
         get {
@@ -172,8 +169,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: KVC
 
     /**
-     Returns an `Array` containing the results of invoking `valueForKey(_:)` with `key` on each of the linking objects
-     collection's objects.
+     Returns an `Array` containing the results of invoking `value(forKey:)` with `key` on each of the objects
+     represented by the linking objects.
 
      - parameter key: The name of the property whose values are desired.
      */
@@ -182,8 +179,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     }
 
     /**
-     Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` with `keyPath` on each of the linking
-     objects collection's objects.
+     Returns an `Array` containing the results of invoking `value(forKeyPath:)` with `keyPath` on each of the objects
+     represented by the linking objects.
 
      - parameter keyPath: The key path to the property whose values are desired.
      */
@@ -227,10 +224,11 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: Sorting
 
     /**
-     Returns a `Results` containing the objects in the linking objects collection, but sorted.
+     Returns a `Results` containing all the objects represented by the linking objects, but sorted.
 
      Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
-     youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(onProperty: "age", ascending: true)`.
 
      - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
                 point, integer, and string types.
@@ -243,12 +241,12 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     }
 
     /**
-     Returns a `Results` containing the objects in the linking objects collection, but sorted.
+     Returns a `Results` containing all the objects represented by the linking objects, but sorted.
 
      - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
                 point, integer, and string types.
 
-     - see: `sorted(_:ascending:)`
+     - see: `sorted(onProperty:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
@@ -259,55 +257,47 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: Aggregate Operations
 
     /**
-     Returns the minimum (lowest) value of the given property among all the objects represented by the linking objects
-     collection.
+     Returns the minimum (lowest) value of the given property among all the objects represented by the linking objects,
+     or `nil` if the linking objects is empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
      - parameter property: The name of a property whose minimum value is desired.
-
-     - returns: The minimum value of the property, or `nil` if the collection is empty.
      */
     public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
         return rlmResults.min(ofProperty: property) as! U?
     }
 
     /**
-     Returns the maximum (highest) value of the given property among all the objects represented by the linking objects
-     collection.
+     Returns the maximum (highest) value of the given property among all the objects represented by the linking objects,
+     or `nil` if the linking objects is empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
      - parameter property: The name of a property whose minimum value is desired.
-
-     - returns: The maximum value of the property, or `nil` if the collection is empty.
      */
     public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
         return rlmResults.max(ofProperty: property) as! U?
     }
 
     /**
-     Returns the sum of the values of a given property over all the objects represented by the linking objects
-     collection.
+     Returns the sum of the values of a given property over all the objects represented by the linking objects.
 
      - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
      - parameter property: The name of a property whose values should be summed.
-
-     - returns: The sum of the given property.
      */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
         return rlmResults.sum(ofProperty: property) as AnyObject as! U
     }
 
     /**
-     Returns the average value of a given property over all the objects represented by the linking objects collection.
+     Returns the average value of a given property over all the objects represented by the linking objects, or `nil` if
+     the linking objects is empty.
 
      - warning: Only the name of a property whose type conforms to the `AddableType` protocol can be specified.
 
      - parameter property: The name of a property whose average value should be calculated.
-
-     - returns: The average value of the given property, or `nil` if the collection is empty.
      */
     public func average<U: AddableType>(ofProperty property: String) -> U? {
         return rlmResults.average(ofProperty: property) as! U?
@@ -329,7 +319,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      At the time when the block is called, the linking objects collection will be fully
      evaluated and up-to-date, and as long as you do not perform a write transaction
-     on the same thread or explicitly call `realm.refresh()`, accessing it will never
+     on the same thread or explicitly call `refresh()` on the Realm, accessing it will never
      perform blocking work.
 
      Notifications are delivered via the standard run loop, and so can't be
@@ -348,14 +338,14 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      print("owners.count: \(owners.count)") // => 0
      let token = owners.addNotificationBlock { changes in
          switch changes {
-             case .Initial(let owners):
+             case .initial(let owners):
                  // Will print "owners.count: 1"
                  print("owners.count: \(owners.count)")
                  break
-             case .Update:
+             case .update:
                  // Will not be hit in this example
                  break
-             case .Error:
+             case .error:
                  break
          }
      }
@@ -384,29 +374,16 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 extension LinkingObjects : RealmCollection {
     // MARK: Sequence Support
 
-    /// Returns an `RLMGenerator` that yields successive elements in the results.
     public func makeIterator() -> RLMIterator<T> {
         return RLMIterator(collection: rlmResults)
     }
 
     // MARK: Collection Support
 
-    /// The position of the first element in a non-empty collection.
-    /// Identical to `endIndex` in an empty collection.
     public var startIndex: Int { return 0 }
-
-    /// The collection's "past the end" position.
-    /// `endIndex` is not a valid argument to subscript, and is always reachable from `startIndex` by
-    /// zero or more applications of `successor()`.
     public var endIndex: Int { return count }
-
-    public func index(after: Int) -> Int {
-      return after + 1
-    }
-
-    public func index(before: Int) -> Int {
-      return before - 1
-    }
+    public func index(after: Int) -> Int { return after + 1 }
+    public func index(before: Int) -> Int { return before - 1 }
 
     /// :nodoc:
     public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->

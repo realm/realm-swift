@@ -22,9 +22,9 @@ import Realm
 // MARK: MinMaxType
 
 /**
- Types of properties which can be used with the minimum and maximum value APIs.
+ A protocol describing types of properties which can be used with the minimum and maximum value APIs.
 
- - see: `min(_:)`, `max(_:)`
+ - see: `minimumValue(ofProperty:)`, `maximumValue(ofProperty:)`
  */
 public protocol MinMaxType {}
 extension Double: MinMaxType {}
@@ -39,9 +39,9 @@ extension NSDate: MinMaxType {}
 // MARK: AddableType
 
 /**
- Types of properties which can be used with the sum and average value APIs.
+ A protocol describing types of properties which can be used with the sum and average value APIs.
 
- - see: `sum(_:)`, `average(_:)`
+ - see: `sum(ofProperty:)`, `average(ofProperty:)`
  */
 public protocol AddableType {}
 extension Double: AddableType {}
@@ -55,22 +55,22 @@ extension Int64: AddableType {}
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
 
- `Results` can be queried with the same predicates as `List<T>`, and you can chain queries to further filter query
+ `Results` can be queried with the same predicates as `List<T>`, and queries can be chained to further filter query
  results.
 
- `Results` always reflect the current state of the Realm on the current thread, including during write transactions on
- the current thread. The one exception to this is when using `for...in` enumeration, which will always enumerate over
- the objects which matched the query when the enumeration is begun, even if some of them are deleted or modified to be
- excluded by the filter during the enumeration.
+ The contents of a `Results` object always reflect the current state of the Realm on the current thread, including
+ during write transactions on the current thread. The one exception to this is when using `for...in` enumeration, which
+ will always enumerate over the objects which matched the query when the enumeration is begun, even if some of them are
+ deleted or modified to be excluded by the filter during the enumeration.
 
- `Results` are lazily evaluated the first time they are accessed; they only run queries when the result of the query is
- requested. This means that chaining several temporary `Results` to sort and filter your data does not perform any
- unnecessary work processing the intermediate state.
+ `Results` objects are lazily evaluated the first time they are accessed: they only run queries when the result of the
+ query is requested. This means that chaining several temporary `Results` to sort and filter your data does not perform
+ any unnecessary work processing the intermediate state.
 
- Once the results have been evaluated or a notification block has been added, the results are eagerly kept up-to-date,
- with the work done to keep them up-to-date done on a background thread whenever possible.
+ Once the `Results` object has been evaluated or a notification block has been added, the results are eagerly kept
+ up-to-date, with the necessary work done on a background thread whenever possible.
 
- `Results` cannot be directly instantiated.
+ `Results` objects cannot be directly instantiated.
  */
 public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
@@ -89,13 +89,13 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
         return Int(rlmResults.countByEnumerating(with: state, objects: buffer, count: UInt(len)))
     }
 
-    /// Element type contained in this collection.
+    /// The type of the elements contained within the results collection.
     public typealias Element = T
 
     // MARK: Properties
 
     /**
-     The Realm which manages this results collection. 
+     The Realm which manages the results collection.
      
      - note: Despite being marked as a value of optional type, this property will never return `nil`.
     */
@@ -104,12 +104,12 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     /**
      Indicates if the results collection is no longer valid.
 
-     The results collection becomes invalid if `invalidate()` is called on the containing `realm`. An invalidated
+     The results collection becomes invalid if `invalidate()` is called on the Realm managing it. An invalidated
      results collection can be accessed, but will always be empty.
      */
     public var isInvalidated: Bool { return rlmResults.isInvalidated }
 
-    /// The number of objects in the results collection.
+    /// The number of objects represented by the results collection.
     public var count: Int { return Int(rlmResults.count) }
 
     // MARK: Initializers
@@ -130,7 +130,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     }
 
     /**
-     Returns the index of the first object matching the predicate, or `nil` if no objects match.
+     Returns the index of the first object in the results collection matching the predicate, or `nil` if no objects
+     match.
 
      - parameter predicate: The predicate with which to filter the objects.
      */
@@ -139,7 +140,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     }
 
     /**
-     Returns the index of the first object matching the predicate, or `nil` if no objects match.
+     Returns the index of the first object in the results collection matching the predicate, or `nil` if no objects
+     match.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.`
      */
@@ -150,13 +152,6 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     // MARK: Object Retrieval
 
-    /**
-     Returns the object at the given `index`.
-
-     - parameter index: An index.
-
-     - returns: The object at the given `index`.
-     */
     public subscript(position: Int) -> T {
         throwForNegativeIndex(position)
         return unsafeBitCast(rlmResults.object(at: UInt(position)), to: T.self)
@@ -171,8 +166,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     // MARK: KVC
 
     /**
-     Returns an `Array` containing the results of invoking `valueForKey(_:)` with `key` on each of the results
-     collection's objects.
+     Returns an `Array` containing the results of invoking `value(forKey:)` with `key` on each of the objects
+     represented by the results collection.
 
      - parameter key: The name of the property whose values are desired.
      */
@@ -181,8 +176,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     }
 
     /**
-     Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` with `keyPath` on each of the results
-     collection's objects.
+     Returns an `Array` containing the results of invoking `value(forKeyPath:)` with `keyPath` on each of the objects
+     represented by the results collection.
 
      - parameter keyPath: The key path to the property whose values are desired.
      */
@@ -191,7 +186,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     }
 
     /**
-     Invokes `setValue(_:forKey:)` on each of the results collection's objects using the specified `value` and `key`.
+     Invokes `setValue(_:forKey:)` on each of the objects represented by the results collection using the specified
+     `value` and `key`.
 
      - warning: This method may only be called during a write transaction.
 
@@ -205,7 +201,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     // MARK: Filtering
 
     /**
-     Returns a `Results` containing all objects matching the given predicate in the results collection.
+     Returns a `Results` containing all objects in the results collection matching the given predicate.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
@@ -214,7 +210,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     }
 
     /**
-     Returns a `Results` containing all objects matching the given predicate in the results collection.
+     Returns a `Results` containing all objects in the results collection matching the given predicate.
 
      - parameter predicate: The predicate with which to filter the objects.
      */
@@ -225,10 +221,11 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     // MARK: Sorting
 
     /**
-     Returns a `Results` containing the objects in the results collection, but sorted.
+     Returns a `Results` containing all the objects represented by the results collection, but sorted.
 
      Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
-     youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(onProperty: "age", ascending: true)`.
 
      - warning:  Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
                  point, integer, and string types.
@@ -241,12 +238,12 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     }
 
     /**
-     Returns a `Results` containing the objects in the results collection, but sorted.
+     Returns a `Results` containing all the objects represented by the results collection, but sorted.
 
      - warning:  Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
                  point, integer, and string types.
 
-     - see: `sorted(_:ascending:)`
+     - see: `sorted(onProperty:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
@@ -257,20 +254,20 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     // MARK: Aggregate Operations
 
     /**
-     Returns the minimum (lowest) value of the given property among all the objects represented by the collection.
+     Returns the minimum (lowest) value of the given property among all the objects represented by the results
+     collection, or `nil` if the results collection is empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
      - parameter property: The name of a property whose minimum value is desired.
-
-     - returns: The minimum value of the property, or `nil` if the collection is empty.
      */
     public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
         return rlmResults.min(ofProperty: property) as! U?
     }
 
     /**
-     Returns the maximum (highest) value of the given property among all the objects represented by the collection.
+     Returns the maximum (highest) value of the given property among all the objects represented by the results
+     collection, or `nil` if the results collection is empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
@@ -283,7 +280,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     }
 
     /**
-     Returns the sum of the values of a given property over all the objects represented by the collection.
+     Returns the sum of the values of a given property over all the objects represented by the results collection.
 
      - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
@@ -296,7 +293,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     }
 
     /**
-     Returns the average value of a given property over all the objects represented by the collection.
+     Returns the average value of a given property over all the objects represented by the results collection, or `nil`
+     if the results collection is empty.
 
      - warning: Only the name of a property whose type conforms to the `AddableType` protocol can be specified.
 
@@ -313,42 +311,38 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     /**
      Registers a block to be called each time the results collection changes.
 
-     The block will be asynchronously called with the initial results, and then
-     called again after each write transaction which changes either any of the
-     objects in the collection, or which objects are in the collection.
+     The block will be asynchronously called with the initial results, and then called again after each write
+     transaction which changes either any of the objects in the collection, or which objects are in the collection.
 
-     The `change` parameter that is passed to the block reports, in the form of indices within the
-     collection, which of the objects were added, removed, or modified during each write transaction. See the
-     `RealmCollectionChange` documentation for more information on the change information supplied and an example of how
-     to use it to update a `UITableView`.
+     The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of 
+     the objects were added, removed, or modified during each write transaction. See the `RealmCollectionChange` 
+     documentation for more information on the change information supplied and an example of how to use it to update a
+     `UITableView`.
 
-     At the time when the block is called, the collection will be fully
-     evaluated and up-to-date, and as long as you do not perform a write
-     transaction on the same thread or explicitly call `realm.refresh()`,
-     accessing it will never perform blocking work.
+     At the time when the block is called, the collection will be fully evaluated and up-to-date. As long as you do not 
+     perform a write transaction on the same thread or explicitly call `refresh()` on the Realm, accessing it will never
+     perform blocking work.
 
-     Notifications are delivered via the standard run loop, and so can't be
-     delivered while the run loop is blocked by other activity. When
-     notifications can't be delivered instantly, multiple notifications may be
-     coalesced into a single notification. This can include the notification
-     with the initial collection. For example, the following code performs a write
-     transaction immediately after adding the notification block, so there is no
-     opportunity for the initial notification to be delivered first. As a
-     result, the initial notification will reflect the state of the Realm after
-     the write transaction.
+     Notifications are delivered via the standard run loop, and so can't be delivered while the run loop is blocked by
+     other activity. When notifications can't be delivered instantly, multiple notifications may be coalesced into a
+     single notification. This can include the notification with the initial collection. For example, the following code
+     performs a write transaction immediately after adding the notification block, so there is no opportunity for the
+     initial notification to be delivered first. As a result, the initial notification will reflect the state of the
+     Realm after the write transaction.
 
+     ```swift
      let dogs = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.addNotificationBlock { (changes: RealmCollectionChange) in
          switch changes {
-         case .Initial(let dogs):
+         case .initial(let dogs):
              // Will print "dogs.count: 1"
              print("dogs.count: \(dogs.count)")
              break
-         case .Update:
+         case .update:
              // Will not be hit in this example
              break
-         case .Error:
+         case .error:
              break
          }
      }
@@ -358,6 +352,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
          person.dogs.append(dog)
      }
      // end of run loop execution context
+     ```
 
      You must retain the returned token for as long as you want updates to continue to be sent to the block. To stop
      receiving updates, call `stop()` on the token.

@@ -59,7 +59,7 @@ import Realm.Private
 
  ### Querying
 
- You can retrieve all objects of a given type from a Realm by calling the `objects(_:)` instance method.
+ You can retrieve all objects of a given type from a Realm by calling the `allObjects(ofType:)` instance method.
 
  ### Relationships
 
@@ -71,7 +71,7 @@ public class Object: RLMObjectBase {
     // MARK: Initializers
 
     /**
-     Initializes an unmanaged instance of a Realm object.
+     Creates an unmanaged instance of a Realm object.
 
      Call `add(_:)` on a `Realm` instance to add an unmanaged object into that Realm.
 
@@ -82,14 +82,14 @@ public class Object: RLMObjectBase {
     }
 
     /**
-     Initializes an unmanaged instance of a Realm object.
+     Creates an unmanaged instance of a Realm object.
 
      The `value` argument is used to populate the object. It can be a key-value coding compliant object, an array or
-     dictionary returned from the methods in `NSJSONSerialization`, or an `Array` containing one element for each
-     managed property. An exception will be thrown if any required properties are not present and those properties were
-     not defined with default values.
+     dictionary returned from the methods in `NSJSONSerialization`, or an array containing one element for each managed
+     property. An exception will be thrown if any required properties are not present and those properties were not
+     defined with default values.
 
-     When passing in an `Array` as the `value` argument, all properties must be present, valid and in the same order as
+     When passing in an array as the `value` argument, all properties must be present, valid and in the same order as
      the properties defined in the model.
 
      Call `add(_:)` on a `Realm` instance to add an unmanaged object into that Realm.

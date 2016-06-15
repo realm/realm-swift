@@ -46,7 +46,7 @@ public final class Property: CustomStringConvertible {
     /// `RealmOptional` instance in order to be declared as optional.)
     public var isOptional: Bool { return rlmProperty.optional }
 
-    /// For `Object` and `List` properties, the name of the class of object stored in the property.
+    /// For `Object` and `List` properties, the name of the class of object stored in the property's collection.
     public var objectClassName: String? { return rlmProperty.objectClassName }
 
     /// Returns a human-readable description of this property.
@@ -63,7 +63,7 @@ public final class Property: CustomStringConvertible {
 
 extension Property: Equatable {}
 
-/// Returns whether the two property objects are equal.
+/// Returns whether two property objects are equivalent.
 public func == (lhs: Property, rhs: Property) -> Bool { // swiftlint:disable:this valid_docs
     return lhs.rlmProperty.isEqual(to: rhs.rlmProperty)
 }

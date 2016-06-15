@@ -26,7 +26,7 @@ public class ListBase: RLMListBase {
     // Printable requires a description property defined in Swift (and not obj-c),
     // and it has to be defined as @objc override, which can't be done in a
     // generic class.
-    /// Returns a human-readable description of the objects contained in the List.
+
     @objc public override var description: String {
         return descriptionWithMaxDepth(RLMDescriptionMaxDepth)
     }
@@ -108,11 +108,9 @@ public final class List<T: Object>: ListBase {
     /**
      Returns the object at the given index (get), or replaces the object at the given index (set).
 
-     - warning: You can only set an object during a write transaction.
+     - warning: An object can only be set during a write transaction.
 
      - parameter index: The index of the object to retrieve or replace.
-
-     - returns: The object at the given index.
      */
     public subscript(position: Int) -> T {
         get {
@@ -134,8 +132,7 @@ public final class List<T: Object>: ListBase {
     // MARK: KVC
 
     /**
-     Returns an `Array` containing the results of invoking `valueForKey(_:)` using `key` on each of the collection's
-     objects.
+     Returns an `Array` containing the results of invoking `value(forKey:)` using `key` on each of the list's objects.
 
      - parameter key: The name of the property whose values are desired.
      */
@@ -144,8 +141,8 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
-     Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` using `keyPath` on each of the
-     collection's objects.
+     Returns an `Array` containing the results of invoking `value(forKeyPath:)` using `keyPath` on each of the list's
+     objects.
 
      - parameter keyPath: The key path to the property whose values are desired.
      */
@@ -154,7 +151,7 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
-     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified `value` and `key`.
+     Invokes `setValue(_:forKey:)` on each of the list's objects using the specified `value` and `key`.
 
      - warning: This method can only be called during a write transaction.
 
@@ -188,13 +185,14 @@ public final class List<T: Object>: ListBase {
     // MARK: Sorting
 
     /**
-     Returns a `Results` containing the objects in the list, but sorted.
+     Returns a `Results` containing all the objects in the list, but sorted.
 
      Objects are sorted based on the values of the given property. For example, to sort a list of `Student`s from
-     youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(onProperty: "age", ascending: true)`.
 
      - warning: Lists may only be sorted by properties of boolean, `NSDate`, single and double-precision floating point,
-     integer, and string types.
+                integer, and string types.
 
      - parameter property:  The name of the property to sort by.
      - parameter ascending: The direction to sort in.
@@ -204,12 +202,12 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
-     Returns a `Results` containing the objects in the list, but sorted.
+     Returns a `Results` containing all the objects in the list, but sorted.
 
      - warning: Lists may only be sorted by properties of boolean, `NSDate`, single and double-precision floating point,
-     integer, and string types.
+                integer, and string types.
 
-     - see: `sorted(_:ascending:)`
+     - see: `sorted(onProperty:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
@@ -220,26 +218,24 @@ public final class List<T: Object>: ListBase {
     // MARK: Aggregate Operations
 
     /**
-     Returns the minimum (lowest) value of the given property among all the objects in the list.
+     Returns the minimum (lowest) value of the given property among all the objects in the list, or `nil` if the list is
+     empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
      - parameter property: The name of a property whose minimum value is desired.
-
-     - returns: The minimum value of the property, or `nil` if the list is empty.
      */
     public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
         return filter(using: Predicate(value: true)).minimumValue(ofProperty: property)
     }
 
     /**
-     Returns the maximum (highest) value of the given property among all the objects in the list.
+     Returns the maximum (highest) value of the given property among all the objects in the list, or `nil` if the list
+     is empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
      - parameter property: The name of a property whose maximum value is desired.
-
-     - returns: The maximum value of the property, or `nil` if the list is empty.
      */
     public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
         return filter(using: Predicate(value: true)).maximumValue(ofProperty: property)
@@ -251,21 +247,17 @@ public final class List<T: Object>: ListBase {
      - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
      - parameter property: The name of a property whose values should be summed.
-
-     - returns: The sum of the given property.
      */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
         return filter(using: Predicate(value: true)).sum(ofProperty: property)
     }
 
     /**
-     Returns the average value of a given property over all the objects in the list.
+     Returns the average value of a given property over all the objects in the list, or `nil` if the list is empty.
 
      - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
      - parameter property: The name of a property whose average value should be calculated.
-
-     - returns: The average value of the given property, or `nil` if the list is empty.
      */
     public func average<U: AddableType>(ofProperty property: String) -> U? {
         return filter(using: Predicate(value: true)).average(ofProperty: property)
@@ -281,7 +273,7 @@ public final class List<T: Object>: ListBase {
 
      - warning: This method may only be called during a write transaction.
 
-     - parameter object: An object.
+     - parameter object: An object to be appended to the list.
      */
     public func append(_ object: T) {
         _rlmArray.add(unsafeBitCast(object, to: RLMObject.self))
@@ -301,7 +293,7 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
-     Inserts an object at the given index.
+     Inserts an object into the list at the given index.
 
      - warning: This method may only be called during a write transaction.
 
@@ -316,7 +308,7 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
-     Removes an object at the given index. The object is not removed from the Realm that manages it.
+     Removes an object at the given index from the list. The object is not removed from the Realm that manages it.
 
      - warning: This method may only be called during a write transaction.
 
@@ -427,14 +419,14 @@ public final class List<T: Object>: ListBase {
      print("dogs.count: \(person.dogs.count)") // => 0
      let token = person.dogs.addNotificationBlock { changes in
          switch changes {
-             case .Initial(let dogs):
+             case .initial(let dogs):
                  // Will print "dogs.count: 1"
                  print("dogs.count: \(dogs.count)")
                  break
-             case .Update:
+             case .update:
                  // Will not be hit in this example
                  break
-             case .Error:
+             case .error:
                  break
          }
      }
@@ -465,19 +457,12 @@ public final class List<T: Object>: ListBase {
 extension List : RealmCollection, RangeReplaceableCollection {
     // MARK: Sequence Support
 
-    /// Returns a `RLMIterator` that yields successive elements in the `List`.
     public func makeIterator() -> RLMIterator<T> {
         return RLMIterator(collection: _rlmArray)
     }
 
     // MARK: RangeReplaceableCollection Support
 
-    /**
-     Replace the given `subRange` of elements with `newElements`.
-
-     - parameter subRange:    The range of elements to be replaced.
-     - parameter newElements: The new elements to be inserted into the list.
-     */
     public func replaceSubrange<C : Collection where C.Iterator.Element == T>(_ subrange: Range<Int>,
                                                                               with newElements: C) {
         for _ in subrange.lowerBound..<subrange.upperBound {

@@ -29,6 +29,7 @@ extension Float: RealmOptionalType {}
 extension Double: RealmOptionalType {}
 extension Bool: RealmOptionalType {}
 
+// TODO: Should this be a protocol extension method instead?
 // Not all RealmOptionalType's can be cast to AnyObject, so handle casting logic here.
 private func realmOptionalToAnyObject<T: RealmOptionalType>(value: T?) -> AnyObject? {
     if let anyObjectValue: AnyObject = value as? AnyObject {
@@ -45,6 +46,7 @@ private func realmOptionalToAnyObject<T: RealmOptionalType>(value: T?) -> AnyObj
     return nil
 }
 
+// TODO: Should this be a protocol extension method instead?
 // Not all RealmOptionalType's can be cast from AnyObject, so handle casting logic here.
 private func anyObjectToRealmOptional<T: RealmOptionalType>(anyObject: AnyObject?) -> T? {
     if T.self is Int8.Type {
@@ -63,14 +65,10 @@ private func anyObjectToRealmOptional<T: RealmOptionalType>(anyObject: AnyObject
  A `RealmOptional` instance represents a optional value for types that can't be directly declared as `dynamic` in Swift,
  such as `Int`, `Float`, `Double`, and `Bool`.
 
- To change the underlying value stored by a `RealmOptional` instance, mutate the instance's `value` property.
+ To change the underlying value stored by a `RealmOptional` instance, set the instance's `value` property.
  */
 public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
-    /**
-     Creates a `RealmOptional` instance encapsulating the given default value.
-
-     - parameter value: The value to store in the optional, or `nil` if not specified.
-     */
+    /// The value this optional represents.
     public var value: T? {
         get {
             return anyObjectToRealmOptional(anyObject: underlyingValue)
@@ -81,10 +79,10 @@ public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
     }
 
     /**
-    Creates a `RealmOptional` with the given default value (defaults to `nil`).
+     Creates a `RealmOptional` instance encapsulating the given default value.
 
-    - parameter value: The default value for this optional.
-    */
+     - parameter value: The value to store in the optional, or `nil` if not specified.
+     */
     public init(_ value: T? = nil) {
         super.init()
         self.value = value

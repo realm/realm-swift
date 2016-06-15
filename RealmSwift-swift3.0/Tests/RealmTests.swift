@@ -47,7 +47,7 @@ class RealmTests: TestCase {
     }
 
     func testOpeningInvalidPathThrows() {
-        assertFails(Error.FileAccess) {
+        assertFails(.fileAccess) {
             try Realm(configuration: Realm.Configuration(fileURL: URL(fileURLWithPath: "/dev/null/foo")))
         }
     }
@@ -64,7 +64,7 @@ class RealmTests: TestCase {
         try! fileManager.setAttributes([ FileAttributeKey.immutable.rawValue: true ], ofItemAtPath: testRealmURL().path!)
 
         // Should not be able to open read-write
-        assertFails(Error.FileAccess) {
+        assertFails(.fileAccess) {
             try Realm(fileURL: testRealmURL())
         }
 
@@ -78,7 +78,7 @@ class RealmTests: TestCase {
     }
 
     func testReadOnlyRealmMustExist() {
-        assertFails(Error.FileNotFound) {
+        assertFails(.fileNotFound) {
             try Realm(configuration:
                 Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true))
         }
@@ -96,7 +96,7 @@ class RealmTests: TestCase {
         try! fileManager.setAttributes([ FileAttributeKey.posixPermissions.rawValue: 0000 ],
                                        ofItemAtPath: testRealmURL().path!)
 
-        assertFails(Error.FilePermissionDenied) {
+        assertFails(.filePermissionDenied) {
             try Realm(fileURL: testRealmURL())
         }
 
@@ -154,7 +154,7 @@ class RealmTests: TestCase {
             contents:"a".data(using: String.Encoding.utf8, allowLossyConversion: false),
             attributes: nil)
 
-        assertFails(Error.FileAccess) {
+        assertFails(.fileAccess) {
             _ = try Realm()
             XCTFail("Realm creation should have failed")
         }
