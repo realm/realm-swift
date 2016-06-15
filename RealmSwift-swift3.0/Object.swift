@@ -21,75 +21,81 @@ import Realm
 import Realm.Private
 
 /**
-In Realm you define your model classes by subclassing `Object` and adding properties to be persisted.
-You then instantiate and use your custom subclasses instead of using the Object class directly.
+ `Object` is a class used to define Realm model objects.
 
-```swift
-class Dog: Object {
-    dynamic var name: String = ""
-    dynamic var adopted: Bool = false
-    let siblings = List<Dog>()
-}
-```
+ In Realm you define your model classes by subclassing `Object` and adding properties to be managed.
+ You then instantiate and use your custom subclasses instead of using the `Object` class directly.
 
-### Supported property types
+ ```swift
+ class Dog: Object {
+     dynamic var name: String = ""
+     dynamic var adopted: Bool = false
+     let siblings = List<Dog>()
+ }
+ ```
 
-- `String`, `NSString`
-- `Int`
-- `Int8`, `Int16`, `Int32`, `Int64`
-- `Float`
-- `Double`
-- `Bool`
-- `NSDate`
-- `NSData`
-- `RealmOptional<T>` for optional numeric properties
-- `Object` subclasses for to-one relationships
-- `List<T: Object>` for to-many relationships
+ ### Supported property types
 
-`String`, `NSString`, `NSDate`, `NSData` and `Object` subclass properties can be
-optional. `Int`, `Int8`, Int16`, Int32`, `Int64`, `Float`, `Double`, `Bool`
-and `List` properties cannot. To store an optional number, instead use
-`RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or
-`RealmOptional<Bool>` instead, which wraps an optional value of the generic type.
+ - `String`, `NSString`
+ - `Int`
+ - `Int8`, `Int16`, `Int32`, `Int64`
+ - `Float`
+ - `Double`
+ - `Bool`
+ - `NSDate`
+ - `NSData`
+ - `RealmOptional<T>` for optional numeric properties
+ - `Object` subclasses, to model many-to-one relationships
+ - `List<T>`, to model many-to-many relationships
 
-All property types except for `List` and `RealmOptional` *must* be declared as
-`dynamic var`. `List` and `RealmOptional` properties must be declared as
-non-dynamic `let` properties.
+ `String`, `NSString`, `NSDate`, `NSData` and `Object` subclass properties can be declared as optional. `Int`, `Int8`,
+ Int16`, Int32`, `Int64`, `Float`, `Double`, `Bool`, and `List` properties cannot. To store an optional number, use
+ `RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or `RealmOptional<Bool>` instead, which wraps an
+ optional numeric value.
 
-### Querying
+ All property types except for `List` and `RealmOptional` *must* be declared as `dynamic var`. `List` and
+ `RealmOptional` properties must be declared as non-dynamic `let` properties. Swift `lazy` properties are not allowed,
+ unless they are added to the ignored properties list.
 
-You can gets `Results` of an Object subclass via the `objects(_:)` instance
-method on `Realm`.
+ ### Querying
 
-### Relationships
+ You can retrieve all objects of a given type from a Realm by calling the `objects(_:)` instance method.
 
-See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
-*/
+ ### Relationships
+
+ See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
+ */
 @objc(RealmSwiftObject)
 public class Object: RLMObjectBase {
 
     // MARK: Initializers
 
     /**
-    Initialize a standalone (unpersisted) `Object`.
-    Call `add(_:)` on a `Realm` to add standalone objects to a realm.
+     Initializes an unmanaged instance of a Realm object.
 
-    - see: Realm().add(_:)
-    */
+     Call `add(_:)` on a `Realm` instance to add an unmanaged object into that Realm.
+
+     - see: `Realm().add(_:)`
+     */
     public override required init() {
         super.init()
     }
 
     /**
-    Initialize a standalone (unpersisted) `Object` with values from an `Array<AnyObject>` or
-    `Dictionary<String, AnyObject>`.
-    Call `add(_:)` on a `Realm` to add standalone objects to a realm.
+     Initializes an unmanaged instance of a Realm object.
 
-    - parameter value: The value used to populate the object. This can be any key/value coding compliant
-                       object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-                       or an `Array` with one object for each persisted property. An exception will be
-                       thrown if any required properties are not present and no default is set.
-    */
+     The `value` argument is used to populate the object. It can be a key-value coding compliant object, an array or
+     dictionary returned from the methods in `NSJSONSerialization`, or an `Array` containing one element for each
+     managed property. An exception will be thrown if any required properties are not present and those properties were
+     not defined with default values.
+
+     When passing in an `Array` as the `value` argument, all properties must be present, valid and in the same order as
+     the properties defined in the model.
+
+     Call `add(_:)` on a `Realm` instance to add an unmanaged object into that Realm.
+
+     - parameter value:  The value used to populate the object.
+     */
     public init(value: AnyObject) {
         self.dynamicType.sharedSchema() // ensure this class' objectSchema is loaded in the partialSharedSchema
         super.init(value: value, schema: RLMSchema.partialShared())
@@ -98,8 +104,7 @@ public class Object: RLMObjectBase {
 
     // MARK: Properties
 
-    /// The `Realm` this object belongs to, or `nil` if the object
-    /// does not belong to a realm (the object is standalone).
+    /// The Realm which manages the object, or `nil` if the object is unmanaged.
     public var realm: Realm? {
         if let rlmReam = RLMObjectBaseRealm(self) {
             return Realm(rlmReam)
@@ -107,25 +112,25 @@ public class Object: RLMObjectBase {
         return nil
     }
 
-    /// The `ObjectSchema` which lists the persisted properties for this object.
+    /// The object schema which lists the managed properties for the object.
     public var objectSchema: ObjectSchema {
         return ObjectSchema(RLMObjectBaseObjectSchema(self))
     }
 
-    /// Indicates if an object can no longer be accessed.
+    /// Indicates if the object can no longer be accessed because it is now invalid.
     ///
-    /// An object can no longer be accessed if the object has been deleted from the containing
-    /// `realm` or if `invalidate` is called on the containing `realm`.
+    /// An object can no longer be accessed if the object has been deleted from the Realm that manages it, or if
+    /// `invalidate()` is called on that Realm.
     public override var isInvalidated: Bool { return super.isInvalidated }
 
-    /// Returns a human-readable description of this object.
+    /// Returns a human-readable description of the object.
     public override var description: String { return super.description }
 
     #if os(OSX)
-    /// Helper to return the class name for an Object subclass.
+    /// A helper property that returns the class name for an `Object` subclass.
     public final override var className: String { return "" }
     #else
-    /// Helper to return the class name for an Object subclass.
+    /// A helper property that returns the class name for an `Object` subclass.
     public final var className: String { return "" }
     #endif
 
@@ -141,29 +146,31 @@ public class Object: RLMObjectBase {
     // MARK: Object Customization
 
     /**
-    Override to designate a property as the primary key for an `Object` subclass. Only properties of
-    type String and Int can be designated as the primary key. Primary key
-    properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
-    Indexes are created automatically for primary key properties.
+     Override this method to specify the name of a property to be used as the primary key.
 
-    - returns: Name of the property designated as the primary key, or `nil` if the model has no primary key.
-    */
+     Only properties of types `String` and `Int` can be designated as the primary key. Primary key properties enforce
+     uniqueness for each value whenever the property is set, which incurs minor overhead. Indexes are created
+     automatically for primary key properties.
+
+     - returns: The name of the property designated as the primary key, or `nil` if the model has no primary key.
+     */
     public class func primaryKey() -> String? { return nil }
 
     /**
-    Override to return an array of property names to ignore. These properties will not be persisted
-    and are treated as transient.
+     Override this method to specify the names of properties to ignore. These properties will not be managed by
+     the Realm that manages the object.
 
-    - returns: `Array` of property names to ignore.
-    */
+     - returns: An array of property names to ignore.
+     */
     public class func ignoredProperties() -> [String] { return [] }
 
     /**
-    Return an array of property names for properties which should be indexed.
-    Only supported for string, integer, boolean and NSDate properties.
+     Returns an array of property names for properties which should be indexed.
 
-    - returns: `Array` of property names to index.
-    */
+     Only string, integer, boolean, and `NSDate` properties are supported.
+
+     - returns: An array of property names.
+     */
     public class func indexedProperties() -> [String] { return [] }
 
 
@@ -195,34 +202,33 @@ public class Object: RLMObjectBase {
     // MARK: Dynamic list
 
     /**
-    This method is useful only in specialized circumstances, for example, when building
-    components that integrate with Realm. If you are simply building an app on Realm, it is
-    recommended to use instance variables or cast the KVC returns.
+     Returns a list of `DynamicObject`s for a given property name.
 
-    Returns a List of DynamicObjects for a property name
+     - warning:  This method is useful only in specialized circumstances, for example, when building
+                 components that integrate with Realm. If you are simply building an app on Realm, it is
+                 recommended to use instance variables or cast the values returned from key-value coding.
 
-    - warning: This method is useful only in specialized circumstances
+     - parameter propertyName: The name of the property.
 
-    - parameter propertyName: The name of the property to get a List<DynamicObject>
+     - returns: A list of `DynamicObject`s.
 
-    - returns: A List of DynamicObjects
-
-    :nodoc:
-    */
+     :nodoc:
+     */
     public func dynamicList(_ propertyName: String) -> List<DynamicObject> {
-        return unsafeBitCast(listForProperty(prop: RLMValidatedGetProperty(self, propertyName)), to: List<DynamicObject>.self)
+        return unsafeBitCast(listForProperty(prop: RLMValidatedGetProperty(self, propertyName)),
+                             to: List<DynamicObject>.self)
     }
 
     // MARK: Equatable
 
     /**
-    Returns whether both objects are equal.
+     Returns whether two Realm objects are equal.
 
-    Objects are considered equal when they are both from the same Realm and point to the same
-    underlying object in the database.
+     Objects are considered equal if and only if they are both managed by the same Realm and point to the same
+     underlying object in the database.
 
-    - parameter object: Object to compare for equality.
-    */
+     - parameter object: The object to compare the receiver to.
+     */
     public override func isEqual(_ object: AnyObject?) -> Bool {
         return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }

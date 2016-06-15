@@ -132,7 +132,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
 
     /// Indicates if the collection can no longer be accessed.
     ///
-    /// The collection can no longer be accessed if `invalidate` is called on the `Realm` that manages the collection.
+    /// The collection can no longer be accessed if `invalidate()` is called on the `Realm` that manages the collection.
     var invalidated: Bool { get }
 
     /// The number of objects in the collection.
@@ -652,7 +652,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
 
     /// Indicates if the collection can no longer be accessed.
     ///
-    /// The collection can no longer be accessed if `invalidate` is called on the containing `realm`.
+    /// The collection can no longer be accessed if `invalidate()` is called on the containing `realm`.
     public var invalidated: Bool { return base.invalidated }
 
     /// The number of objects in the collection.

@@ -94,7 +94,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     /// An invalidated linking objects can be accessed, but will always be empty.
     public var invalidated: Bool { return rlmResults.invalidated }
 
-    /// The number of objects in the linking objects.
+    /// The number of objects represented by the linking objects.
     public var count: Int { return Int(rlmResults.count) }
 
     // MARK: Initializers
@@ -111,7 +111,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
         super.init(fromClassName: className, property: propertyName)
     }
 
-    /// Returns a description of the objects contained within the linking objects.
+    /// Returns a description of the objects represented by the linking objects.
     public override var description: String {
         let type = "LinkingObjects<\(rlmResults.objectClassName)>"
         return gsub("RLMResults <0x[a-z0-9]+>", template: type, string: rlmResults.description) ?? type

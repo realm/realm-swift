@@ -54,7 +54,8 @@ import Realm.Private
  optional numeric value.
 
  All property types except for `List` and `RealmOptional` *must* be declared as `dynamic var`. `List` and
- `RealmOptional` properties must be declared as non-dynamic `let` properties.
+ `RealmOptional` properties must be declared as non-dynamic `let` properties. Swift `lazy` properties are not allowed,
+ unless they are added to the ignored properties list.
 
  ### Querying
 
@@ -119,7 +120,7 @@ public class Object: RLMObjectBase {
     /// Indicates if the object can no longer be accessed because it is now invalid.
     ///
     /// An object can no longer be accessed if the object has been deleted from the Realm that manages it, or if
-    /// `invalidate` is called on that Realm.
+    /// `invalidate()` is called on that Realm.
     public override var invalidated: Bool { return super.invalidated }
 
     /// Returns a human-readable description of the object.

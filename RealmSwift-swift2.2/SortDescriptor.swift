@@ -43,7 +43,7 @@ public struct SortDescriptor {
     // MARK: Initializers
 
     /**
-     Initializes a sort descriptor with the given property and sort order values.
+     Creates a sort descriptor with the given property and sort order values.
 
     - parameter property:  The name of the property which the sort descriptor orders results by.
     - parameter ascending: Whether the descriptor sorts in ascending or descending order.

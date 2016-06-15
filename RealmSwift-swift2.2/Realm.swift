@@ -607,7 +607,7 @@ public enum Notification: String {
 
      Realms with autorefresh disabled should normally install a handler for this notification which calls `refresh()`
      after doing some work. Refreshing the Realm is optional, but not refreshing the Realm may lead to large Realm
-     files. This is because Realm must keep an extra copy of the data for the stale Realm.
+     files. This is because an extra copy of the data must be kept for the stale Realm.
     */
     case RefreshRequired = "RLMRealmRefreshRequiredNotification"
 }
