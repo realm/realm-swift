@@ -11,7 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix a crash when reading the shared schema from an observed Swift object.
 
 1.0.1 Release notes (2016-06-12)
 =============================================================
