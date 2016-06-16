@@ -54,8 +54,9 @@ import Realm.Private
  optional numeric value.
 
  All property types except for `List` and `RealmOptional` *must* be declared as `dynamic var`. `List` and
- `RealmOptional` properties must be declared as non-dynamic `let` properties. Swift `lazy` properties are not allowed,
- unless they are added to the ignored properties list.
+ `RealmOptional` properties must be declared as non-dynamic `let` properties. Swift `lazy` properties are not allowed.
+ 
+ Note that none of the above restrictions apply to properties that are configured to be ignored by Realm.
 
  ### Querying
 

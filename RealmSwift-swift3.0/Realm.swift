@@ -321,12 +321,12 @@ public final class Realm {
     }
 
     /**
-     Deletes one or more objects from the Realm.
+     Deletes zero or more objects from the Realm.
 
      - warning: This method may only be called during a write transaction.
 
      - parameter objects:   The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
-     or any other enumerable `SequenceType` whose elements are `Object`s.
+                            or any other enumerable `SequenceType` whose elements are `Object`s.
      */
     public func delete<S: Sequence where S.Iterator.Element: Object>(_ objects: S) {
         for obj in objects {
@@ -335,7 +335,7 @@ public final class Realm {
     }
 
     /**
-     Deletes one or more objects from the Realm.
+     Deletes zero or more objects from the Realm.
 
      - warning: This method may only be called during a write transaction.
 
@@ -348,7 +348,7 @@ public final class Realm {
     }
 
     /**
-     Deletes one or more objects from the Realm.
+     Deletes zero or more objects from the Realm.
 
      - warning: This method may only be called during a write transaction.
 

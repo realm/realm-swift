@@ -127,7 +127,7 @@ public func == (lhs: ErrorProtocol, rhs: ErrorProtocol) -> Bool { // swiftlint:d
 // MARK: Pattern Matching
 
 /**
- Pattern matching matching for `Realm.Error`, so that the instances can be used with Swift's
+ Implements pattern matching for `Realm.Error`, so that the instances can be used with Swift's
  `do { ... } catch { ... }` syntax.
  */
 public func ~= (lhs: Error, rhs: ErrorProtocol) -> Bool { // swiftlint:disable:this valid_docs

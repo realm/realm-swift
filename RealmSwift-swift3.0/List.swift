@@ -221,11 +221,11 @@ public final class List<T: Object>: ListBase {
      Returns the minimum (lowest) value of the given property among all the objects in the list, or `nil` if the list is
      empty.
 
-     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+     - warning: Only a property whose type conforms to the `RealmMinMaxable` protocol can be specified.
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func minimumValue<U: RealmMinMaxable>(ofProperty property: String) -> U? {
         return filter(using: Predicate(value: true)).minimumValue(ofProperty: property)
     }
 
@@ -233,33 +233,33 @@ public final class List<T: Object>: ListBase {
      Returns the maximum (highest) value of the given property among all the objects in the list, or `nil` if the list
      is empty.
 
-     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+     - warning: Only a property whose type conforms to the `RealmMinMaxable` protocol can be specified.
 
      - parameter property: The name of a property whose maximum value is desired.
      */
-    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func maximumValue<U: RealmMinMaxable>(ofProperty property: String) -> U? {
         return filter(using: Predicate(value: true)).maximumValue(ofProperty: property)
     }
 
     /**
      Returns the sum of the values of a given property over all the objects in the list.
 
-     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
+     - warning: Only a property whose type conforms to the `RealmAddable` protocol can be specified.
 
      - parameter property: The name of a property whose values should be summed.
      */
-    public func sum<U: AddableType>(ofProperty property: String) -> U {
+    public func sum<U: RealmAddable>(ofProperty property: String) -> U {
         return filter(using: Predicate(value: true)).sum(ofProperty: property)
     }
 
     /**
      Returns the average value of a given property over all the objects in the list, or `nil` if the list is empty.
 
-     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
+     - warning: Only a property whose type conforms to the `RealmAddable` protocol can be specified.
 
      - parameter property: The name of a property whose average value should be calculated.
      */
-    public func average<U: AddableType>(ofProperty property: String) -> U? {
+    public func average<U: RealmAddable>(ofProperty property: String) -> U? {
         return filter(using: Predicate(value: true)).average(ofProperty: property)
     }
 
@@ -527,14 +527,14 @@ extension List {
     }
 
     @available(*, unavailable, renamed:"minimumValue(ofProperty:)")
-    public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+    public func min<U: RealmMinMaxable>(_ property: String) -> U? { fatalError() }
 
     @available(*, unavailable, renamed:"maximumValue(ofProperty:)")
-    public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+    public func max<U: RealmMinMaxable>(_ property: String) -> U? { fatalError() }
 
     @available(*, unavailable, renamed:"sum(ofProperty:)")
-    public func sum<U: AddableType>(_ property: String) -> U { fatalError() }
+    public func sum<U: RealmAddable>(_ property: String) -> U { fatalError() }
 
     @available(*, unavailable, renamed:"average(ofProperty:)")
-    public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
+    public func average<U: RealmAddable>(_ property: String) -> U? { fatalError() }
 }

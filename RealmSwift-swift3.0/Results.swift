@@ -26,15 +26,15 @@ import Realm
 
  - see: `minimumValue(ofProperty:)`, `maximumValue(ofProperty:)`
  */
-public protocol MinMaxType {}
-extension Double: MinMaxType {}
-extension Float: MinMaxType {}
-extension Int: MinMaxType {}
-extension Int8: MinMaxType {}
-extension Int16: MinMaxType {}
-extension Int32: MinMaxType {}
-extension Int64: MinMaxType {}
-extension NSDate: MinMaxType {}
+public protocol RealmMinMaxable {}
+extension Double: RealmMinMaxable {}
+extension Float: RealmMinMaxable {}
+extension Int: RealmMinMaxable {}
+extension Int8: RealmMinMaxable {}
+extension Int16: RealmMinMaxable {}
+extension Int32: RealmMinMaxable {}
+extension Int64: RealmMinMaxable {}
+extension NSDate: RealmMinMaxable {}
 
 // MARK: AddableType
 
@@ -43,14 +43,14 @@ extension NSDate: MinMaxType {}
 
  - see: `sum(ofProperty:)`, `average(ofProperty:)`
  */
-public protocol AddableType {}
-extension Double: AddableType {}
-extension Float: AddableType {}
-extension Int: AddableType {}
-extension Int8: AddableType {}
-extension Int16: AddableType {}
-extension Int32: AddableType {}
-extension Int64: AddableType {}
+public protocol RealmAddable {}
+extension Double: RealmAddable {}
+extension Float: RealmAddable {}
+extension Int: RealmAddable {}
+extension Int8: RealmAddable {}
+extension Int16: RealmAddable {}
+extension Int32: RealmAddable {}
+extension Int64: RealmAddable {}
 
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
@@ -257,11 +257,11 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      Returns the minimum (lowest) value of the given property among all the objects represented by the results
      collection, or `nil` if the results collection is empty.
 
-     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+     - warning: Only a property whose type conforms to the `RealmMinMaxable` protocol can be specified.
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func minimumValue<U: RealmMinMaxable>(ofProperty property: String) -> U? {
         return rlmResults.min(ofProperty: property) as! U?
     }
 
@@ -269,26 +269,26 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      Returns the maximum (highest) value of the given property among all the objects represented by the results
      collection, or `nil` if the results collection is empty.
 
-     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+     - warning: Only a property whose type conforms to the `RealmMinMaxable` protocol can be specified.
 
      - parameter property: The name of a property whose minimum value is desired.
 
      - returns: The maximum value of the property, or `nil` if the collection is empty.
      */
-    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func maximumValue<U: RealmMinMaxable>(ofProperty property: String) -> U? {
         return rlmResults.max(ofProperty: property) as! U?
     }
 
     /**
      Returns the sum of the values of a given property over all the objects represented by the results collection.
 
-     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
+     - warning: Only a property whose type conforms to the `RealmAddable` protocol can be specified.
 
      - parameter property: The name of a property whose values should be summed.
 
      - returns: The sum of the given property.
      */
-    public func sum<U: AddableType>(ofProperty property: String) -> U {
+    public func sum<U: RealmAddable>(ofProperty property: String) -> U {
         return rlmResults.sum(ofProperty: property) as AnyObject as! U
     }
 
@@ -296,13 +296,13 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      Returns the average value of a given property over all the objects represented by the results collection, or `nil`
      if the results collection is empty.
 
-     - warning: Only the name of a property whose type conforms to the `AddableType` protocol can be specified.
+     - warning: Only the name of a property whose type conforms to the `RealmAddable` protocol can be specified.
 
      - parameter property: The name of a property whose average value should be calculated.
 
      - returns: The average value of the given property, or `nil` if the collection is empty.
      */
-    public func average<U: AddableType>(ofProperty property: String) -> U? {
+    public func average<U: RealmAddable>(ofProperty property: String) -> U? {
         return rlmResults.average(ofProperty: property) as! U?
     }
 
@@ -421,14 +421,14 @@ extension Results {
     }
 
     @available(*, unavailable, renamed:"minimumValue(ofProperty:)")
-    public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+    public func min<U: RealmMinMaxable>(_ property: String) -> U? { fatalError() }
 
     @available(*, unavailable, renamed:"maximumValue(ofProperty:)")
-    public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
+    public func max<U: RealmMinMaxable>(_ property: String) -> U? { fatalError() }
 
     @available(*, unavailable, renamed:"sum(ofProperty:)")
-    public func sum<U: AddableType>(_ property: String) -> U { fatalError() }
+    public func sum<U: RealmAddable>(_ property: String) -> U { fatalError() }
 
     @available(*, unavailable, renamed:"average(ofProperty:)")
-    public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
+    public func average<U: RealmAddable>(_ property: String) -> U? { fatalError() }
 }

@@ -232,7 +232,7 @@
 		5D660FF61BE98D670021E04F /* Optional.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FE81BE98D670021E04F /* Optional.swift */; };
 		5D660FF71BE98D670021E04F /* Property.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FE91BE98D670021E04F /* Property.swift */; };
 		5D660FF81BE98D670021E04F /* Realm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FEA1BE98D670021E04F /* Realm.swift */; };
-		5D660FF91BE98D670021E04F /* RealmCollectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FEB1BE98D670021E04F /* RealmCollectionType.swift */; };
+		5D660FF91BE98D670021E04F /* RealmCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FEB1BE98D670021E04F /* RealmCollection.swift */; };
 		5D660FFA1BE98D670021E04F /* RealmConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FEC1BE98D670021E04F /* RealmConfiguration.swift */; };
 		5D660FFB1BE98D670021E04F /* Results.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FED1BE98D670021E04F /* Results.swift */; };
 		5D660FFC1BE98D670021E04F /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FEE1BE98D670021E04F /* Schema.swift */; };
@@ -590,7 +590,7 @@
 		5D660FE81BE98D670021E04F /* Optional.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Optional.swift; sourceTree = "<group>"; };
 		5D660FE91BE98D670021E04F /* Property.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Property.swift; sourceTree = "<group>"; };
 		5D660FEA1BE98D670021E04F /* Realm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Realm.swift; sourceTree = "<group>"; };
-		5D660FEB1BE98D670021E04F /* RealmCollectionType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmCollectionType.swift; sourceTree = "<group>"; };
+		5D660FEB1BE98D670021E04F /* RealmCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmCollection.swift; sourceTree = "<group>"; };
 		5D660FEC1BE98D670021E04F /* RealmConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmConfiguration.swift; sourceTree = "<group>"; };
 		5D660FED1BE98D670021E04F /* Results.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Results.swift; sourceTree = "<group>"; };
 		5D660FEE1BE98D670021E04F /* Schema.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Schema.swift; sourceTree = "<group>"; };
@@ -861,7 +861,7 @@
 				5D660FE81BE98D670021E04F /* Optional.swift */,
 				5D660FE91BE98D670021E04F /* Property.swift */,
 				5D660FEA1BE98D670021E04F /* Realm.swift */,
-				5D660FEB1BE98D670021E04F /* RealmCollectionType.swift */,
+				5D660FEB1BE98D670021E04F /* RealmCollection.swift */,
 				5D660FEC1BE98D670021E04F /* RealmConfiguration.swift */,
 				5D660FED1BE98D670021E04F /* Results.swift */,
 				5D660FEE1BE98D670021E04F /* Schema.swift */,
@@ -1803,7 +1803,7 @@
 				5D660FF61BE98D670021E04F /* Optional.swift in Sources */,
 				5D660FF71BE98D670021E04F /* Property.swift in Sources */,
 				5D660FF81BE98D670021E04F /* Realm.swift in Sources */,
-				5D660FF91BE98D670021E04F /* RealmCollectionType.swift in Sources */,
+				5D660FF91BE98D670021E04F /* RealmCollection.swift in Sources */,
 				5D660FFA1BE98D670021E04F /* RealmConfiguration.swift in Sources */,
 				5D660FFB1BE98D670021E04F /* Results.swift in Sources */,
 				5D660FFC1BE98D670021E04F /* Schema.swift in Sources */,

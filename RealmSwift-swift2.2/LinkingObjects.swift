@@ -84,17 +84,17 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
     // MARK: Properties
 
-    /// The Realm which manages this linking objects collection, or `nil` if the collection is unmanaged.
+    /// The Realm which manages the linking objects, or `nil` if the linking objects are unmanaged.
     public var realm: Realm? { return rlmResults.attached ? Realm(rlmResults.realm) : nil }
 
-    /// Indicates if the linking objects collection is no longer valid.
+    /// Indicates if the linking objects are no longer valid.
     ///
     /// The linking objects collection becomes invalid if `invalidate` is called on the containing `realm`.
     ///
     /// An invalidated linking objects can be accessed, but will always be empty.
     public var invalidated: Bool { return rlmResults.invalidated }
 
-    /// The number of objects represented by the linking objects.
+    /// The number of linking objects.
     public var count: Int { return Int(rlmResults.count) }
 
     // MARK: Initializers
@@ -111,7 +111,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
         super.init(fromClassName: className, property: propertyName)
     }
 
-    /// Returns a description of the objects represented by the linking objects.
+    /// Returns a description of the linking objects.
     public override var description: String {
         let type = "LinkingObjects<\(rlmResults.objectClassName)>"
         return gsub("RLMResults <0x[a-z0-9]+>", template: type, string: rlmResults.description) ?? type
@@ -120,7 +120,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: Index Retrieval
 
     /**
-     Returns the index of an object in the linking objects collection, or `nil` if the object is not present.
+     Returns the index of an object in the linking objects, or `nil` if the object is not present.
 
      - parameter object: The object whose index is being queried.
      */
@@ -163,17 +163,16 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
         }
     }
 
-    /// Returns the first object in the linking objects collection, or `nil` if the collection is empty.
+    /// Returns the first object in the linking objects, or `nil` if the linking objects are empty.
     public var first: T? { return unsafeBitCast(rlmResults.firstObject(), Optional<T>.self) }
 
-    /// Returns the last object in the linking objects collection, or `nil` if collection is empty.
+    /// Returns the last object in the linking objects, or `nil` if the linking objects are empty.
     public var last: T? { return unsafeBitCast(rlmResults.lastObject(), Optional<T>.self) }
 
     // MARK: KVC
 
     /**
-     Returns an `Array` containing the results of invoking `valueForKey(_:)` with `key` on each of the linking objects
-     collection's objects.
+     Returns an `Array` containing the results of invoking `valueForKey(_:)` with `key` on each of the linking objects.
 
      - parameter key: The name of the property whose values are desired.
      */
@@ -183,7 +182,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
     /**
      Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` with `keyPath` on each of the linking
-     objects collection's objects.
+     objects.
 
      - parameter keyPath: The key path to the property whose values are desired.
      */
@@ -192,8 +191,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     }
 
     /**
-     Invokes `setValue(_:forKey:)` on each of the linking objects collection's objects using the specified `value` and
-     `key`.
+     Invokes `setValue(_:forKey:)` on each of the linking objects using the specified `value` and `key`.
 
      - warning: This method may only be called during a write transaction.
 
@@ -207,7 +205,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: Filtering
 
     /**
-     Returns a `Results` containing all objects matching the given predicate in the linking objects collection.
+     Returns a `Results` containing all objects matching the given predicate in the linking objects.
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
@@ -216,7 +214,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     }
 
     /**
-     Returns a `Results` containing all objects matching the given predicate in the linking objects collection.
+     Returns a `Results` containing all objects matching the given predicate in the linking objects.
 
      - parameter predicate: The predicate with which to filter the objects.
      */
@@ -227,7 +225,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: Sorting
 
     /**
-     Returns a `Results` containing the objects in the linking objects collection, but sorted.
+     Returns a `Results` containing all the linking objects, but sorted.
 
      Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
      youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
@@ -243,7 +241,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     }
 
     /**
-     Returns a `Results` containing the objects in the linking objects collection, but sorted.
+     Returns a `Results` containing all the linking objects, but sorted.
 
      - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
                 point, integer, and string types.
@@ -259,55 +257,48 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     // MARK: Aggregate Operations
 
     /**
-     Returns the minimum (lowest) value of the given property among all the objects represented by the linking objects
-     collection.
+     Returns the minimum (lowest) value of the given property among all the linking objects, or `nil` if the linking
+     objects are empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
      - parameter property: The name of a property whose minimum value is desired.
-
-     - returns: The minimum value of the property, or `nil` if the collection is empty.
      */
     public func min<U: MinMaxType>(property: String) -> U? {
         return rlmResults.minOfProperty(property) as! U?
     }
 
     /**
-     Returns the maximum (highest) value of the given property among all the objects represented by the linking objects
-     collection.
+     Returns the maximum (highest) value of the given property among all the linking objects, or `nil` if the linking
+     objects are empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
      - parameter property: The name of a property whose minimum value is desired.
-
-     - returns: The maximum value of the property, or `nil` if the collection is empty.
      */
     public func max<U: MinMaxType>(property: String) -> U? {
         return rlmResults.maxOfProperty(property) as! U?
     }
 
     /**
-     Returns the sum of the values of a given property over all the objects represented by the linking objects
+     Returns the sum of the values of a given property over all the linking objects
      collection.
 
      - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
      - parameter property: The name of a property whose values should be summed.
-
-     - returns: The sum of the given property.
      */
     public func sum<U: AddableType>(property: String) -> U {
         return rlmResults.sumOfProperty(property) as AnyObject as! U
     }
 
     /**
-     Returns the average value of a given property over all the objects represented by the linking objects collection.
+     Returns the average value of a given property over all the linking objects, or `nil` if the linking objects are
+     empty.
 
      - warning: Only the name of a property whose type conforms to the `AddableType` protocol can be specified.
 
      - parameter property: The name of a property whose average value should be calculated.
-
-     - returns: The average value of the given property, or `nil` if the collection is empty.
      */
     public func average<U: AddableType>(property: String) -> U? {
         return rlmResults.averageOfProperty(property) as! U?
@@ -385,20 +376,13 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 extension LinkingObjects: RealmCollectionType {
     // MARK: Sequence Support
 
-    /// Returns an `RLMGenerator` that yields successive elements in the results.
     public func generate() -> RLMGenerator<T> {
         return RLMGenerator(collection: rlmResults)
     }
 
     // MARK: Collection Support
 
-    /// The position of the first element in a non-empty collection.
-    /// Identical to `endIndex` in an empty collection.
     public var startIndex: Int { return 0 }
-
-    /// The collection's "past the end" position.
-    /// `endIndex` is not a valid argument to subscript, and is always reachable from `startIndex` by
-    /// zero or more applications of `successor()`.
     public var endIndex: Int { return count }
 
     /// :nodoc:
