@@ -1893,7 +1893,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
 
         RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
         [realm beginWriteTransaction];
-        [PrimaryStringObject createOrUpdateInRealm:realm withValue:@[@"a", @5]];
+        [PrimaryStringObject createOrUpdateInRealm:realm withValue:@[@5, @"a"]];
         [realm commitWriteTransaction];
     }
 

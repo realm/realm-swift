@@ -174,9 +174,6 @@ static void RLMCopyColumnMapping(RLMObjectSchema *targetSchema, const ObjectSche
         RLMProperty *targetProp = targetSchema[@(prop.name.c_str())];
         targetProp.column = prop.table_column;
     }
-
-    // re-order properties
-    [targetSchema sortPropertiesByColumn];
 }
 
 static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) {

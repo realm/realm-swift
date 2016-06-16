@@ -587,15 +587,17 @@ RLM_ARRAY_TYPE(MigrationObject);
 
     RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
     [realm beginWriteTransaction];
-    [realm createObject:CircleObject.className withValue:@[@"data", NSNull.null]];
 
-    // -createObject:withValue: takes values in the order the properties were declared.
-    RLMAssertThrowsWithReasonMatching(([realm createObject:CircleObject.className withValue:@[NSNull.null, @"data"]]), @"object of type 'CircleObject'");
+    // -createObject:withValue: takes values in the order the properties appear in the array
+    [realm createObject:CircleObject.className withValue:@[NSNull.null, @"data"]];
+    RLMAssertThrowsWithReasonMatching(([realm createObject:CircleObject.className withValue:@[@"data", NSNull.null]]),
+                                      @"Invalid value 'data' to initialize object of type 'CircleObject'");
     [realm commitWriteTransaction];
 
     // accessors should work
     CircleObject *obj = [[CircleObject allObjectsInRealm:realm] firstObject];
     XCTAssertEqualObjects(@"data", obj.data);
+    XCTAssertNil(obj.next);
     [realm beginWriteTransaction];
     XCTAssertNoThrow(obj.data = @"new data");
     XCTAssertNoThrow(obj.next = obj);
@@ -604,9 +606,6 @@ RLM_ARRAY_TYPE(MigrationObject);
     // open the default Realm and make sure accessors with alternate ordering work
     CircleObject *defaultObj = [[CircleObject allObjects] firstObject];
     XCTAssertEqualObjects(defaultObj.data, @"data");
-
-    // test object from other realm still works
-    XCTAssertEqualObjects(obj.data, @"new data");
 
     RLMAssertRealmSchemaMatchesTable(self, realm);
 
@@ -620,11 +619,13 @@ RLM_ARRAY_TYPE(MigrationObject);
         XCTAssertEqual([properties[i] column], i);
     }
 
-    [realm beginWriteTransaction];
-    [realm createObject:CircleObject.className withValue:@[@"data", NSNull.null]];
+    // re-check that things still work for the realm with the swapped order
+    XCTAssertEqualObjects(obj.data, @"new data");
 
-    // -createObject:withValue: takes values in the order the properties were declared.
-    RLMAssertThrowsWithReasonMatching(([realm createObject:CircleObject.className withValue:@[NSNull.null, @"data"]]), @"object of type 'CircleObject'");
+    [realm beginWriteTransaction];
+    [realm createObject:CircleObject.className withValue:@[NSNull.null, @"data"]];
+    RLMAssertThrowsWithReasonMatching(([realm createObject:CircleObject.className withValue:@[@"data", NSNull.null]]),
+                                      @"Invalid value 'data' to initialize object of type 'CircleObject'");
     [realm commitWriteTransaction];
 }
 
@@ -790,7 +791,6 @@ RLM_ARRAY_TYPE(MigrationObject);
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
     RLMProperty *thirdProperty = [[RLMProperty alloc] initWithName:@"deletedCol" type:RLMPropertyTypeBool objectClassName:nil linkOriginPropertyName:nil indexed:NO optional:NO];
     thirdProperty.column = 2;
-    thirdProperty.declarationIndex = 2;
     objectSchema.properties = [objectSchema.properties arrayByAddingObject:thirdProperty];
 
     // create realm with old schema and populate

@@ -41,8 +41,8 @@ using namespace realm;
 @implementation RLMObjectSchema {
     // table accessor optimization
     realm::TableRef _table;
-    NSArray *_propertiesInDeclaredOrder;
     NSArray *_swiftGenericProperties;
+    std::vector<RLMProperty *> _propertiesInTableColOrder;
 }
 
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
@@ -63,7 +63,7 @@ using namespace realm;
 // create property map when setting property array
 -(void)setProperties:(NSArray *)properties {
     _properties = properties;
-    _propertiesInDeclaredOrder = nil;
+    _propertiesInTableColOrder.clear();
     [self _propertiesDidChange];
 }
 
@@ -119,10 +119,6 @@ using namespace realm;
     NSArray *persistedProperties = [allProperties filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(RLMProperty *property, NSDictionary *) {
         return !RLMPropertyTypeIsComputed(property.type);
     }]];
-    NSUInteger index = 0;
-    for (RLMProperty *prop in persistedProperties) {
-        prop.declarationIndex = index++;
-    }
     schema.properties = persistedProperties;
 
     NSArray *computedProperties = [allProperties filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(RLMProperty *property, NSDictionary *) {
@@ -353,6 +349,7 @@ using namespace realm;
     schema->_allPropertiesByName = _allPropertiesByName;
     schema->_primaryKeyProperty = _primaryKeyProperty;
     schema->_swiftGenericProperties = _swiftGenericProperties;
+    schema->_propertiesInTableColOrder = _propertiesInTableColOrder;
 
     // _table not copied as it's realm::Group-specific
     return schema;
@@ -446,24 +443,19 @@ using namespace realm;
     return schema;
 }
 
-- (void)sortPropertiesByColumn {
-    _properties = [_properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
-        if (p1.column < p2.column) return NSOrderedAscending;
-        if (p1.column > p2.column) return NSOrderedDescending;
-        return NSOrderedSame;
-    }];
-    // No need to update the dictionary
-}
-
-- (NSArray *)propertiesInDeclaredOrder {
-    if (!_propertiesInDeclaredOrder) {
-        _propertiesInDeclaredOrder = [_properties sortedArrayUsingComparator:^NSComparisonResult(RLMProperty *p1, RLMProperty *p2) {
-            if (p1.declarationIndex < p2.declarationIndex) return NSOrderedAscending;
-            if (p1.declarationIndex > p2.declarationIndex) return NSOrderedDescending;
-            return NSOrderedSame;
-        }];
+- (RLMProperty *)propertyForTableColumn:(size_t)tableCol {
+    if (_propertiesInTableColOrder.empty()) {
+        _propertiesInTableColOrder.resize(_properties.count, nil);
+        for (RLMProperty *property in _properties) {
+            auto col = property.column;
+            if (col >= _propertiesInTableColOrder.size()) {
+                _propertiesInTableColOrder.resize(col + 1, nil);
+            }
+            _propertiesInTableColOrder[col] = property;
+        }
     }
-    return _propertiesInDeclaredOrder;
+
+    return tableCol < _propertiesInTableColOrder.size() ? _propertiesInTableColOrder[tableCol] : nil;
 }
 
 - (NSArray *)swiftGenericProperties {

@@ -39,7 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readwrite, nullable) RLMProperty *primaryKeyProperty;
 
-@property (nonatomic, readonly) NSArray<RLMProperty *> *propertiesInDeclaredOrder;
 @property (nonatomic, copy) NSArray<RLMProperty *> *computedProperties;
 @property (nonatomic, readonly) NSArray<RLMProperty *> *swiftGenericProperties;
 
@@ -48,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 // returns a cached or new schema for a given object class
 + (instancetype)schemaForObjectClass:(Class)objectClass;
 
-- (void)sortPropertiesByColumn;
+- (RLMProperty *)propertyForTableColumn:(size_t)tableCol;
 
 @end
 
