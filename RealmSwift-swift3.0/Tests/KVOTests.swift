@@ -275,4 +275,11 @@ class KVOTests: TestCase {
             self.realm.delete(obj2)
         }
     }
+
+    func testReadSharedSchemaFromObservedObject() {
+        let obj = KVOObject()
+        obj.addObserver(self, forKeyPath: "boolCol", options: [.old, .new], context: nil)
+        XCTAssertEqual(obj.dynamicType.sharedSchema(), KVOObject.sharedSchema())
+        obj.removeObserver(self, forKeyPath: "boolCol")
+    }
 }

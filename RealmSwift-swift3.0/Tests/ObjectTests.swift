@@ -67,6 +67,16 @@ class ObjectTests: TestCase {
         XCTAssertEqual(schema.properties.map { $0.name }, ["stringCol"])
     }
 
+    func testSharedSchemaUnmanaged() {
+        let object = SwiftObject()
+        XCTAssertEqual(object.dynamicType.sharedSchema(), SwiftObject.sharedSchema())
+    }
+
+    func testSharedSchemaManaged() {
+        let object = SwiftObject()
+        XCTAssertEqual(object.dynamicType.sharedSchema(), SwiftObject.sharedSchema())
+    }
+
     func testInvalidated() {
         let object = SwiftObject()
         XCTAssertFalse(object.isInvalidated)
