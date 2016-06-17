@@ -19,8 +19,6 @@
 import Foundation
 import Realm
 
-#if swift(>=3.0)
-
 // MARK: Internal Helpers
 
 internal func notFoundToNil(index: UInt) -> Int? {
@@ -29,6 +27,8 @@ internal func notFoundToNil(index: UInt) -> Int? {
     }
     return Int(index)
 }
+
+#if swift(>=3.0)
 
 internal func throwRealmException(_ message: String, userInfo: [String:AnyObject] = [:]) {
     NSException(name: NSExceptionName(rawValue: RLMExceptionName), reason: message, userInfo: userInfo).raise()
@@ -48,15 +48,6 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
 }
 
 #else
-
-// MARK: Internal Helpers
-
-internal func notFoundToNil(index: UInt) -> Int? {
-    if index == UInt(NSNotFound) {
-        return nil
-    }
-    return Int(index)
-}
 
 internal func throwRealmException(message: String, userInfo: [String:AnyObject] = [:]) {
     NSException(name: RLMExceptionName, reason: message, userInfo: userInfo).raise()
