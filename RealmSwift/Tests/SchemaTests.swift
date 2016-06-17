@@ -19,6 +19,48 @@
 import XCTest
 import RealmSwift
 
+#if swift(>=3.0)
+
+class SchemaTests: TestCase {
+    var schema: Schema!
+
+    override func setUp() {
+        super.setUp()
+        autoreleasepool {
+            self.schema = try! Realm().schema
+        }
+    }
+
+    func testObjectSchema() {
+        let objectSchema = schema.objectSchema
+        XCTAssertTrue(objectSchema.count > 0)
+    }
+
+    func testDescription() {
+        XCTAssert(schema.description as Any is String)
+    }
+
+    func testSubscript() {
+        XCTAssertEqual(schema["SwiftObject"]!.className, "SwiftObject")
+        XCTAssertNil(schema["NoSuchClass"])
+    }
+
+    func testEquals() {
+        XCTAssertTrue(try! schema == Realm().schema)
+    }
+
+    func testNoSchemaForUnpersistedObjectClasses() {
+        XCTAssertNil(schema["RLMObject"])
+        XCTAssertNil(schema["RLMObjectBase"])
+        XCTAssertNil(schema["RLMDynamicObject"])
+        XCTAssertNil(schema["Object"])
+        XCTAssertNil(schema["DynamicObject"])
+        XCTAssertNil(schema["MigrationObject"])
+    }
+}
+
+#else
+
 class SchemaTests: TestCase {
     var schema: Schema!
 
@@ -56,3 +98,5 @@ class SchemaTests: TestCase {
         XCTAssertNil(schema["MigrationObject"])
     }
 }
+
+#endif

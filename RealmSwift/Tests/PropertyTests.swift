@@ -19,6 +19,62 @@
 import XCTest
 import RealmSwift
 
+#if swift(>=3.0)
+
+class PropertyTests: TestCase {
+    var primitiveProperty: Property!
+    var linkProperty: Property!
+    var primaryProperty: Property!
+    var optionalProperty: Property!
+
+    override func setUp() {
+        super.setUp()
+        autoreleasepool {
+            let schema = try! Realm().schema
+            self.primitiveProperty = schema["SwiftObject"]!["intCol"]!
+            self.linkProperty = schema["SwiftOptionalObject"]!["optObjectCol"]!
+            self.primaryProperty = schema["SwiftPrimaryStringObject"]!["stringCol"]!
+            self.optionalProperty = schema["SwiftOptionalObject"]!["optObjectCol"]!
+        }
+    }
+
+    func testName() {
+        XCTAssertEqual(primitiveProperty.name, "intCol")
+        XCTAssertEqual(linkProperty.name, "optObjectCol")
+        XCTAssertEqual(primaryProperty.name, "stringCol")
+    }
+
+    func testType() {
+        XCTAssertEqual(primitiveProperty.type, PropertyType.int)
+        XCTAssertEqual(linkProperty.type, PropertyType.object)
+        XCTAssertEqual(primaryProperty.type, PropertyType.string)
+    }
+
+    func testIndexed() {
+        XCTAssertFalse(primitiveProperty.isIndexed)
+        XCTAssertFalse(linkProperty.isIndexed)
+        XCTAssertTrue(primaryProperty.isIndexed)
+    }
+
+    func testOptional() {
+        XCTAssertFalse(primitiveProperty.isOptional)
+        XCTAssertTrue(optionalProperty.isOptional)
+    }
+
+    func testObjectClassName() {
+        XCTAssertNil(primitiveProperty.objectClassName)
+        XCTAssertEqual(linkProperty.objectClassName!, "SwiftBoolObject")
+        XCTAssertNil(primaryProperty.objectClassName)
+    }
+
+    func testEquals() {
+        XCTAssert(try! primitiveProperty == Realm().schema["SwiftObject"]!["intCol"]!)
+        XCTAssert(primitiveProperty != linkProperty)
+    }
+}
+
+#else
+
 class PropertyTests: TestCase {
     var primitiveProperty: Property!
     var linkProperty: Property!
@@ -70,3 +126,5 @@ class PropertyTests: TestCase {
         XCTAssert(primitiveProperty != linkProperty)
     }
 }
+
+#endif

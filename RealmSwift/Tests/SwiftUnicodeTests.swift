@@ -19,6 +19,47 @@
 import XCTest
 import RealmSwift
 
+#if swift(>=3.0)
+
+let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+
+class SwiftUnicodeTests: TestCase {
+    func testUTF8StringContents() {
+        let realm = realmWithTestPath()
+
+        try! realm.write {
+            realm.createObject(ofType: SwiftStringObject.self, populatedWith: [utf8TestString] as AnyObject)
+            return
+        }
+
+        let obj1 = realm.allObjects(ofType: SwiftStringObject.self).first!
+        XCTAssertEqual(obj1.stringCol, utf8TestString)
+
+        let obj2 = realm.allObjects(ofType: SwiftStringObject.self).filter(using: "stringCol == %@", utf8TestString as AnyObject).first!
+        XCTAssertEqual(obj1, obj2)
+        XCTAssertEqual(obj2.stringCol, utf8TestString)
+
+        XCTAssertEqual(Int(0), realm.allObjects(ofType: SwiftStringObject.self).filter(using: "stringCol != %@", utf8TestString as AnyObject).count)
+    }
+
+    func testUTF8PropertyWithUTF8StringContents() {
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.createObject(ofType: SwiftUTF8Object.self, populatedWith: [utf8TestString] as AnyObject)
+            return
+        }
+
+        let obj1 = realm.allObjects(ofType: SwiftUTF8Object.self).first!
+        XCTAssertEqual(obj1.柱колоéнǢкƱаم👍, utf8TestString,
+            "Storing and retrieving a string with UTF8 content should work")
+
+        let obj2 = realm.allObjects(ofType: SwiftUTF8Object.self).filter(using: "%K == %@", "柱колоéнǢкƱаم👍", utf8TestString as AnyObject).first!
+        XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
+    }
+}
+
+#else
+
 let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 
 class SwiftUnicodeTests: TestCase {
@@ -56,3 +97,5 @@ class SwiftUnicodeTests: TestCase {
         XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
     }
 }
+
+#endif

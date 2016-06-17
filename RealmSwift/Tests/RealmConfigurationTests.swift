@@ -20,6 +20,31 @@ import XCTest
 import RealmSwift
 import class Realm.Private.RLMRealmConfiguration
 
+#if swift(>=3.0)
+
+class RealmConfigurationTests: TestCase {
+    func testDefaultConfiguration() {
+        let defaultConfiguration = Realm.Configuration.defaultConfiguration
+
+        XCTAssertEqual(defaultConfiguration.fileURL, try! Realm().configuration.fileURL)
+        XCTAssertNil(defaultConfiguration.inMemoryIdentifier)
+        XCTAssertNil(defaultConfiguration.encryptionKey)
+        XCTAssertFalse(defaultConfiguration.readOnly)
+        XCTAssertEqual(defaultConfiguration.schemaVersion, 0)
+        XCTAssert(defaultConfiguration.migrationBlock == nil)
+    }
+
+    func testSetDefaultConfiguration() {
+        let fileURL = Realm.Configuration.defaultConfiguration.fileURL
+        let configuration = Realm.Configuration(fileURL: URL(fileURLWithPath: "/dev/null"))
+        Realm.Configuration.defaultConfiguration = configuration
+        XCTAssertEqual(Realm.Configuration.defaultConfiguration.fileURL, NSURL(fileURLWithPath: "/dev/null"))
+        Realm.Configuration.defaultConfiguration.fileURL = fileURL
+    }
+}
+
+#else
+
 class RealmConfigurationTests: TestCase {
     func testDefaultConfiguration() {
         let defaultConfiguration = Realm.Configuration.defaultConfiguration
@@ -40,3 +65,5 @@ class RealmConfigurationTests: TestCase {
         Realm.Configuration.defaultConfiguration.fileURL = fileURL
     }
 }
+
+#endif
