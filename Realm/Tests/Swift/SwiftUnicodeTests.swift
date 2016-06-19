@@ -19,6 +19,9 @@
 import XCTest
 import Realm
 
+#if swift(>=3.0)
+#else
+
 let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 
 class SwiftUnicodeTests: RLMTestCase {
@@ -81,3 +84,5 @@ class SwiftUnicodeTests: RLMTestCase {
 //        XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
     }
 }
+
+#endif

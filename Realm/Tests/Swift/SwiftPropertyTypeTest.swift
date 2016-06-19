@@ -19,6 +19,9 @@
 import XCTest
 import Realm
 
+#if swift(>=3.0)
+#else
+
 class SwiftPropertyTypeTest: RLMTestCase {
     
     func testLongType() {
@@ -120,3 +123,5 @@ class SwiftPropertyTypeTest: RLMTestCase {
         XCTAssertNotNil(succeeded, "Writing an object with an ignored lazy property should work.")
     }
 }
+
+#endif

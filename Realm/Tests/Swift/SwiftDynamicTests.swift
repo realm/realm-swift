@@ -21,6 +21,9 @@ import Foundation
 import Realm.Private
 import Realm.Dynamic
 
+#if swift(>=3.0)
+#else
+
 class SwiftDynamicTests: RLMTestCase {
 
     // Swift models
@@ -177,3 +180,5 @@ class SwiftDynamicTests: RLMTestCase {
         XCTAssertTrue((robj2["objectCol"] as! RLMObject)["stringCol"] as! String == "string")
     }
 }
+
+#endif

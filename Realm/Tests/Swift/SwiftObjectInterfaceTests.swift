@@ -20,6 +20,9 @@ import XCTest
 import Realm
 import Foundation
 
+#if swift(>=3.0)
+#else
+
 class OuterClass {
     class InnerClass {
 
@@ -284,3 +287,5 @@ class SwiftObjectInterfaceTests: RLMTestCase {
     }
 
 }
+
+#endif

@@ -19,6 +19,9 @@
 import XCTest
 import Realm
 
+#if swift(>=3.0)
+#else
+
 class SwiftLinkTests: RLMTestCase {
 
     // Swift models
@@ -231,3 +234,5 @@ class SwiftLinkTests: RLMTestCase {
 //        XCTAssertEqual(obj2.data, obj2.next.data, "objects should be equal")
 //    }
 }
+
+#endif

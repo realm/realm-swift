@@ -20,6 +20,9 @@ import XCTest
 import Realm
 import Foundation
 
+#if swift(>=3.0)
+#else
+
 class SwiftArrayTests: RLMTestCase {
 
     // Swift models
@@ -510,3 +513,5 @@ class SwiftArrayTests: RLMTestCase {
         XCTAssertEqual(Int32(40), (sortedByName[0] as! EmployeeObject).age)
     }
 }
+
+#endif

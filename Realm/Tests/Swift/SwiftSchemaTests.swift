@@ -20,6 +20,9 @@ import XCTest
 import Realm
 import Realm.Private
 
+#if swift(>=3.0)
+#else
+
 class InitLinkedToClass: RLMObject {
     dynamic var value = SwiftIntObject(value: [0])
 }
@@ -143,3 +146,5 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
     }
 
 }
+
+#endif

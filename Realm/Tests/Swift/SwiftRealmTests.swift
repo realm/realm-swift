@@ -19,6 +19,9 @@
 import XCTest
 import Realm
 
+#if swift(>=3.0)
+#else
+
 class SwiftRealmTests: RLMTestCase {
 
     // No models
@@ -255,3 +258,5 @@ class SwiftRealmTests: RLMTestCase {
         XCTAssertEqual((objects[0] as! StringObject).stringCol!, "string", "Value of first column should be 'string'")
     }
 }
+
+#endif

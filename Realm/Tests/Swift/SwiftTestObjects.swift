@@ -18,6 +18,9 @@
 
 import Realm
 
+#if swift(>=3.0)
+#else
+
 class SwiftStringObject: RLMObject {
     dynamic var stringCol = ""
 }
@@ -150,3 +153,5 @@ class SwiftIgnoredLazyVarObject : RLMObject {
     dynamic lazy var ignoredVar : String = "hello world"
     override class func ignoredProperties() -> [String] { return ["ignoredVar"] }
 }
+
+#endif

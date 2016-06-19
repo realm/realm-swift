@@ -19,6 +19,9 @@
 import XCTest
 import Realm
 
+#if swift(>=3.0)
+#else
+
 class SwiftArrayPropertyTests: RLMTestCase {
 
     // Swift models
@@ -247,3 +250,5 @@ class SwiftArrayPropertyTests: RLMTestCase {
         XCTAssertEqual((array.array[1] as! StringObject).stringCol!, "a", "Second element should have property value 'a'")
     }
 }
+
+#endif
