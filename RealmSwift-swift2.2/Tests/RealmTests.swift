@@ -25,6 +25,10 @@ import XCTest
 import Foundation
 
 class RealmTests: TestCase {
+    enum TestError: ErrorType {
+        case intentional
+    }
+
     func testFileURL() {
         XCTAssertEqual(try! Realm(fileURL: testRealmURL()).configuration.fileURL,
                        testRealmURL())
@@ -254,6 +258,20 @@ class RealmTests: TestCase {
             XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 0)
         }
         XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 0)
+    }
+
+    func testThrowsWrite() {
+        assertFails(TestError.intentional) {
+            try Realm().write {
+                throw TestError.intentional
+            }
+        }
+        assertFails(TestError.intentional) {
+            try Realm().write {
+                try! Realm().create(SwiftStringObject.self, value: ["1"])
+                throw TestError.intentional
+            }
+        }
     }
 
     func testInWriteTransaction() {
