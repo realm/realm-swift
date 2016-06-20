@@ -483,6 +483,16 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(existingObject.intCol, 2)
     }
 
+    func testCreateObjectWithRemappedName() {
+        let realm = try! Realm()
+        try! realm.write {
+            let obj = realm.createObject(ofType: SwiftTranslatedGetterObject.self, populatedWith: ["true": true])
+            XCTAssertTrue(obj.isTrue)
+            obj.isTrue = false
+            XCTAssertFalse(obj.isTrue)
+        }
+    }
+
     // MARK: Private utilities
     private func verifySwiftObjectWithArrayLiteral(_ object: SwiftObject, array: [AnyObject], boolObjectValue: Bool,
                                                    boolObjectListValues: [Bool]) {
@@ -1072,6 +1082,16 @@ class ObjectCreationTests: TestCase {
 
         XCTAssertNotNil(object.realm)
         XCTAssertNotNil(nilObject.realm)
+    }
+
+    func testCreateObjectWithRemappedName() {
+        let realm = try! Realm()
+        try! realm.write {
+            let obj = realm.create(SwiftTranslatedGetterObject.self, value: ["isTrue": true])
+            XCTAssertTrue(obj.isTrue)
+            obj.isTrue = false
+            XCTAssertFalse(obj.isTrue)
+        }
     }
 
     // MARK: Private utilities
