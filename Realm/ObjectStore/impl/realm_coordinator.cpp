@@ -32,6 +32,7 @@
 #include <realm/string_data.hpp>
 
 #include <unordered_map>
+#include <algorithm>
 
 using namespace realm;
 using namespace realm::_impl;
