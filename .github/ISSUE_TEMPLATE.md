@@ -23,8 +23,10 @@ What did you expected to happen?
 
 ## Actual Results
 
+<details open>
 What did happened instead?  
 e.g. the stack trace of a crash
+</details>
 
 ## Steps to Reproduce
 
