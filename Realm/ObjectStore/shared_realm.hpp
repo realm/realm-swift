@@ -218,7 +218,7 @@ namespace realm {
 
     class MismatchedConfigException : public std::runtime_error {
     public:
-        MismatchedConfigException(std::string message) : std::runtime_error(move(message)) {}
+        MismatchedConfigException(StringData message, StringData path);
     };
 
     class InvalidTransactionException : public std::runtime_error {
@@ -234,6 +234,11 @@ namespace realm {
     class UninitializedRealmException : public std::runtime_error {
     public:
         UninitializedRealmException(std::string message) : std::runtime_error(move(message)) {}
+    };
+
+    class InvalidEncryptionKeyException : public std::runtime_error {
+    public:
+        InvalidEncryptionKeyException() : std::runtime_error("Encryption key must be 64 bytes.") {}
     };
 }
 

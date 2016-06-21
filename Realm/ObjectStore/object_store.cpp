@@ -18,6 +18,7 @@
 
 #include "object_store.hpp"
 
+#include "object_schema.hpp"
 #include "schema.hpp"
 #include "util/format.hpp"
 
@@ -784,7 +785,8 @@ InvalidPrimaryKeyException::InvalidPrimaryKeyException(std::string const& object
     m_what = util::format("Specified primary key property '%1' does not exist.", primary);
 }
 
-DuplicatePrimaryKeysException::DuplicatePrimaryKeysException(std::string const& object_type) : ObjectSchemaValidationException(object_type)
+DuplicatePrimaryKeysException::DuplicatePrimaryKeysException(std::string const& object_type)
+: ObjectSchemaValidationException(object_type)
 {
     m_what = util::format("Duplicate primary keys for object '%1'.", object_type);
 }
@@ -794,17 +796,19 @@ InvalidLinkingObjectsPropertyException::InvalidLinkingObjectsPropertyException(T
 {
     switch (error_type) {
         case Type::OriginPropertyDoesNotExist:
-            m_what = util::format("Property '%1' declared as origin of linking objects property '%2' does not exist.",
-                                  property.link_origin_property_name, property.name);
+            m_what = util::format("Property '%1.%2' declared as origin of linking objects property '%3.%4' does not exist.",
+                                  property.object_type, property.link_origin_property_name,
+                                  object_type, property.name);
             break;
         case Type::OriginPropertyIsNotALink:
-            m_what = util::format("Property '%1' declared as origin of linking objects property '%2' is not a link.",
-                                  property.link_origin_property_name, property.name);
+            m_what = util::format("Property '%1.%2' declared as origin of linking objects property '%3.%4' is not a link.",
+                                  property.object_type, property.link_origin_property_name,
+                                  object_type, property.name);
             break;
         case Type::OriginPropertyInvalidLinkTarget:
-            m_what = util::format("Property '%1' declared as origin of linking objects property '%2' does not link "
-                                  "to class '%3'.",
-                                  property.link_origin_property_name, property.name, object_type);
+            m_what = util::format("Property '%1.%2' declared as origin of linking objects property '%3.%4' links to a different class.",
+                                  property.object_type, property.link_origin_property_name,
+                                  object_type, property.name);
             break;
     }
 }

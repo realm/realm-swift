@@ -21,6 +21,7 @@
 #include "binding_context.hpp"
 #include "impl/realm_coordinator.hpp"
 #include "impl/transact_log_handler.hpp"
+#include "object_schema.hpp"
 #include "object_store.hpp"
 #include "schema.hpp"
 #include "util/format.hpp"
@@ -123,6 +124,9 @@ void Realm::open_with_config(const Config& config,
                              std::unique_ptr<SharedGroup>& shared_group,
                              std::unique_ptr<Group>& read_only_group)
 {
+    if (config.encryption_key.data() && config.encryption_key.size() != 64) {
+        throw InvalidEncryptionKeyException();
+    }
     try {
         if (config.read_only) {
             read_only_group = std::make_unique<Group>(config.path, config.encryption_key.data(), Group::mode_ReadOnly);
@@ -497,3 +501,6 @@ void Realm::close()
     m_binding_context = nullptr;
     m_coordinator = nullptr;
 }
+
+MismatchedConfigException::MismatchedConfigException(StringData message, StringData path)
+: std::runtime_error(util::format(message.data(), path)) { }
