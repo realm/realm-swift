@@ -637,7 +637,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                      @"Property 'nosuchproperty' .* origin of linking objects property 'linkingObjects' does not exist");
+                                      @"Property '.*nosuchproperty' .* origin of linking objects property '.*linkingObjects' does not exist");
 }
 
 - (void)testClassWithInvalidLinkingObjectsPropertySourcePropertyNotALink {
@@ -645,7 +645,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyNotALink.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                      @"Property 'integer' .* origin of linking objects property 'linkingObjects' is not a link");
+                                      @"Property '.*integer' .* origin of linking objects property '.*linkingObjects' is not a link");
 }
 
 - (void)testClassWithInvalidLinkingObjectsPropertySourcePropertysLinkElsewhere {
@@ -653,8 +653,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere.class, IntObject.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                      @"Property 'link' .* origin of linking objects property 'linkingObjects' does "
-                                      "not link to class 'InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere'");
+                                      @"Property '.*link' .* origin of linking objects property '.*linkingObjects' links to a different class");
 }
 
 - (void)testMixedIsRejected {

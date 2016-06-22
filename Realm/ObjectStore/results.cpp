@@ -49,6 +49,7 @@ Results::Results(SharedRealm r, Query q, SortOrder s)
 , m_sort(std::move(s))
 , m_mode(Mode::Query)
 {
+    REALM_ASSERT(m_sort.column_indices.size() == m_sort.ascending.size());
 }
 
 Results::Results(SharedRealm r, Table& table)
@@ -82,7 +83,7 @@ Results::Results(SharedRealm r, SortOrder s, TableView tv)
     REALM_ASSERT(m_sort.column_indices.size() == m_sort.ascending.size());
 }
 
-Results::Results(const Results& other) = default;
+Results::Results(const Results&) = default;
 
 // Cannot be defaulted as TableViewBase::operator= is missing from the core static library.
 // Delegate to the copy constructor and move-assignment operators instead.
@@ -323,7 +324,7 @@ util::Optional<Mixed> Results::aggregate(size_t column, bool return_none_for_emp
                     return none;
                 return util::Optional<Mixed>(getter(*m_table));
             case Mode::LinkView:
-                m_query = get_query();
+                m_query = this->get_query();
                 m_mode = Mode::Query;
                 REALM_FALLTHROUGH;
             case Mode::Query:
@@ -516,6 +517,7 @@ bool Results::is_in_table_order() const
         case Mode::TableView:
             return m_table_view.is_in_table_order();
     }
+    REALM_UNREACHABLE(); // keep gcc happy
 }
 
 void Results::Internal::set_table_view(Results& results, realm::TableView &&tv)

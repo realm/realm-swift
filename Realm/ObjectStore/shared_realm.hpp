@@ -43,6 +43,10 @@ namespace realm {
         class ResultsNotifier;
     }
 
+    namespace util {
+        template<typename T> class Optional;
+    }
+
     class Realm : public std::enable_shared_from_this<Realm> {
       public:
         typedef std::function<void(SharedRealm old_realm, SharedRealm realm)> MigrationFunction;
@@ -137,6 +141,9 @@ namespace realm {
 
         bool is_closed() { return !m_read_only_group && !m_shared_group; }
 
+        // returns the file format version upgraded from if an upgrade took place
+        util::Optional<int> file_format_upgraded_from_version() const;
+
         ~Realm();
 
         void init(std::shared_ptr<_impl::RealmCoordinator> coordinator);
@@ -163,7 +170,8 @@ namespace realm {
         static void open_with_config(const Config& config,
                                      std::unique_ptr<Replication>& history,
                                      std::unique_ptr<SharedGroup>& shared_group,
-                                     std::unique_ptr<Group>& read_only_group);
+                                     std::unique_ptr<Group>& read_only_group,
+                                     Realm *realm = nullptr);
 
       private:
         Config m_config;
@@ -177,6 +185,9 @@ namespace realm {
         Group *m_group = nullptr;
 
         std::shared_ptr<_impl::RealmCoordinator> m_coordinator;
+
+        // File format versions populated when a file format upgrade takes place during realm opening
+        int upgrade_initial_version = 0, upgrade_final_version = 0;
 
       public:
         std::unique_ptr<BindingContext> m_binding_context;
@@ -218,7 +229,7 @@ namespace realm {
 
     class MismatchedConfigException : public std::runtime_error {
     public:
-        MismatchedConfigException(std::string message) : std::runtime_error(move(message)) {}
+        MismatchedConfigException(StringData message, StringData path);
     };
 
     class InvalidTransactionException : public std::runtime_error {
@@ -234,6 +245,11 @@ namespace realm {
     class UninitializedRealmException : public std::runtime_error {
     public:
         UninitializedRealmException(std::string message) : std::runtime_error(move(message)) {}
+    };
+
+    class InvalidEncryptionKeyException : public std::runtime_error {
+    public:
+        InvalidEncryptionKeyException() : std::runtime_error("Encryption key must be 64 bytes.") {}
     };
 }
 
