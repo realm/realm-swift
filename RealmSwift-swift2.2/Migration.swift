@@ -101,7 +101,7 @@ public final class Migration {
 
     /**
      Enumerates all the objects of a given type in this Realm, providing both the old and new versions of
-     each object. Object properties can be accessed using subscripting.
+     each object. Properties on each object can be accessed using subscripting.
 
      - parameter objectClassName: The name of the `Object` class to enumerate.
      - parameter block:           The block providing both the old and new versions of an object in this Realm.

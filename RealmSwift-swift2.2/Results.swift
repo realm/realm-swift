@@ -96,7 +96,7 @@ public class ResultsBase: NSObject, NSFastEnumeration {
  `Results` are lazily evaluated the first time they are accessed; they only
  run queries when the result of the query is requested. This means that
  chaining several temporary `Results` to sort and filter your data does not
- perform any extra work processing the intermediate state.
+ perform any unnecessary work processing the intermediate state.
 
  Once the results have been evaluated or a notification block has been added,
  the results are eagerly kept up-to-date, with the work done to keep them
@@ -117,7 +117,7 @@ public final class Results<T: Object>: ResultsBase {
     /**
      Indicates if the results collection is no longer valid.
 
-     The results collection becomes invalid if `invalidate` is called on the containing `realm`.
+     The results collection becomes invalid if `invalidate()` is called on the containing `realm`.
      An invalidated results collection can be accessed, but will always be empty.
      */
     public var invalidated: Bool { return rlmResults.invalidated }
@@ -352,27 +352,29 @@ public final class Results<T: Object>: ResultsBase {
      result, the initial notification will reflect the state of the Realm after
      the write transaction.
 
-         let dogs = realm.objects(Dog.self)
-         print("dogs.count: \(dogs?.count)") // => 0
-         let token = dogs.addNotificationBlock { (changes: RealmCollectionChange) in
-             switch changes {
-                 case .Initial(let dogs):
-                     // Will print "dogs.count: 1"
-                     print("dogs.count: \(dogs.count)")
-                     break
-                 case .Update:
-                     // Will not be hit in this example
-                     break
-                 case .Error:
-                     break
-             }
+     ```swift
+     let dogs = realm.objects(Dog.self)
+     print("dogs.count: \(dogs?.count)") // => 0
+     let token = dogs.addNotificationBlock { (changes: RealmCollectionChange) in
+         switch changes {
+             case .Initial(let dogs):
+                 // Will print "dogs.count: 1"
+                 print("dogs.count: \(dogs.count)")
+                 break
+             case .Update:
+                 // Will not be hit in this example
+                 break
+             case .Error:
+                 break
          }
-         try! realm.write {
-             let dog = Dog()
-             dog.name = "Rex"
-             person.dogs.append(dog)
-         }
-         // end of run loop execution context
+     }
+     try! realm.write {
+         let dog = Dog()
+         dog.name = "Rex"
+         person.dogs.append(dog)
+     }
+     // end of run loop execution context
+     ```swift
 
      You must retain the returned token for as long as you want updates to continue
      to be sent to the block. To stop receiving updates, call `stop()` on the token.
