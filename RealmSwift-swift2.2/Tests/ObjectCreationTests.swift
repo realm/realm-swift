@@ -104,6 +104,7 @@ class ObjectCreationTests: TestCase {
     }
 
     func testInitWithArray() {
+
         // array with all values specified
         let baselineValues = [true, 1, 1.1, 11.1, "b", "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
             NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject]
@@ -150,6 +151,23 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(obj1.boolCol, obj2.boolCol,
             "object created via generic initializer should equal object created by calling initializer directly")
     }
+
+    func testInitWithStringDateDictionary() {
+
+        var formatter = NSDateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        let theDate = NSDate(timeIntervalSince1970: 2) as NSDate
+
+        let dateValue1 = [ "dateCol": formatter.stringFromDate(theDate) ]
+        let dateValue2 = [ "dateCol": theDate ]
+        let dateValue3 = [ "dateCol": "1971-02-03" ]
+
+        XCTAssertEqual(SwiftObject(value:dateValue1).dateCol, theDate)
+        XCTAssertEqual(SwiftObject(value:dateValue2).dateCol, theDate)
+        assertThrows(SwiftObject(value:dateValue3), "Date field should throw exception")
+
+    }
+
 
     // MARK: Creation tests
 

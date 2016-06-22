@@ -77,6 +77,29 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
         return obj;
     }
 
+    if (prop.type == RLMPropertyTypeDate) {
+        static NSDateFormatter* dateFormatter = nil; 
+        if (!dateFormatter) {
+            // map dates according to Javascript Date Time Format as per Javascript JSON convention aligning to ISO8601
+            // e.g. Only "2014-01-01T23:28:56.782Z"
+            //
+            // Apps using Realm can target: iOS 7 or later, OS X 10.9 or later & WatchKit.
+            //
+            // On iOS 7 and later NSDateFormatter is thread safe.
+            // On OS X 10.9 and later NSDateFormatter is thread safe so long as you are using the modern behavior in a 64-bit app.
+
+            dateFormatter = [[NSDateFormatter alloc] init]; 
+            [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"]; 
+        }
+        NSDate *date = [dateFormatter dateFromString:obj]; 
+        if (date) {
+            return date; 
+        } else {
+            // if not convertible to prop throw
+            @throw RLMException(@"Invalid date value '%@' for property '%@' which should be either date or string in format [yyyy-MM-dd'T'HH:mm:ss.SSS'Z']", obj, prop.name);
+        }
+    }
+
     // check for object or array of properties
     if (prop.type == RLMPropertyTypeObject) {
         // for object create and try to initialize with obj
