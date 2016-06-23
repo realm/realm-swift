@@ -54,7 +54,7 @@ using namespace realm;
 using util::File;
 
 namespace {
-struct SyncLogger : public util::Logger {
+struct SyncLogger : public util::RootLogger {
     void do_log(std::string message) override {
         NSLog(@"RealmSync: %@", RLMStringDataToNSString(message));
     }

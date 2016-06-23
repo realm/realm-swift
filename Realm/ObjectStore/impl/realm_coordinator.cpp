@@ -91,10 +91,10 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
             throw MismatchedConfigException("Realm at path '%1' already opened with different schema version.", config.path);
         }
         if (m_config.sync_user_token != config.sync_user_token) {
-            throw MismatchedConfigException("Realm at path already opened with different user token.");
+            throw MismatchedConfigException("Realm at path already opened with different user token.", config.path);
         }
         if (m_config.sync_server_url != config.sync_server_url) {
-            throw MismatchedConfigException("Realm at path already opened with different server url.");
+            throw MismatchedConfigException("Realm at path already opened with different server url.", config.path);
         }
         // FIXME: verify that schema is compatible
         // Needs to verify that all tables present in both are identical, and
@@ -120,17 +120,25 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
     }
 
     if (config.sync_server_url && config.sync_user_token && !m_sync_session) {
-        sync::Client::LogLevel log_level = sync::Client::LogLevel::normal;
-        if (config.log_everything)
-            log_level = sync::Client::LogLevel::everything;
-        m_sync_client = std::make_unique<sync::Client>(*config.sync_user_token, config.logger, log_level);
+        sync::Client::Config client_config;
+
+        if (config.logger != NULL) {
+            util::Logger::Level log_level = util::Logger::Level::info;
+            if (config.log_everything) {
+                log_level = util::Logger::Level::all;
+            }
+            config.logger->set_level_threshold(log_level);
+            client_config.logger = config.logger;
+        }
+
+        m_sync_client = std::make_unique<sync::Client>(client_config);
 
         m_sync_session = std::make_unique<sync::Session>(*m_sync_client, config.path);
         m_sync_session->set_sync_transact_callback([this] (sync::Session::version_type) {
             if (m_notifier)
                 m_notifier->notify_others();
         });
-        m_sync_session->bind(*config.sync_server_url);
+        m_sync_session->bind(*config.sync_server_url, *config.sync_user_token);
 
         m_sync_thread = std::thread(&sync::Client::run, m_sync_client.get());
     }

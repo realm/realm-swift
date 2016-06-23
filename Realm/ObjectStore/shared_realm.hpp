@@ -41,6 +41,7 @@ namespace realm {
 
     namespace util {
         class Logger;
+        class RootLogger;
     }
 
     namespace _impl {
@@ -65,7 +66,7 @@ namespace realm {
             util::Optional<std::string> sync_server_url;
             util::Optional<std::string> sync_user_token;
 
-            util::Logger* logger = nullptr;
+            util::RootLogger *logger = nullptr;
 
             // Optional schema for the file. If nullptr, the existing schema
             // from the file opened will be used. If present, the file will be
