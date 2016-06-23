@@ -39,6 +39,50 @@
 using namespace realm;
 using namespace realm::_impl;
 
+namespace realm {
+namespace _impl {
+
+struct SyncClient {
+    sync::Client client;
+
+    SyncClient(sync::Client client)
+    : client(std::move(client))
+    , m_thread([this]{ this->client.run(); })
+    {
+    }
+
+    ~SyncClient()
+    {
+        client.stop();
+        m_thread.join();
+    }
+
+private:
+    std::thread m_thread;
+};
+
+}
+}
+
+std::mutex s_sync_client_mutex;
+
+static std::shared_ptr<SyncClient> get_sync_client(Realm::Config const& config)
+{
+    static std::weak_ptr<SyncClient> weak_client;
+
+    std::lock_guard<std::mutex> lock(s_sync_client_mutex);
+
+    if (auto client = weak_client.lock()) {
+        return client;
+    }
+
+    sync::Client::Config client_config;
+    client_config.logger = config.logger;
+    auto client = std::make_shared<SyncClient>(sync::Client(client_config));
+    weak_client = client;
+    return client;
+}
+
 static std::mutex s_coordinator_mutex;
 static std::unordered_map<std::string, std::weak_ptr<RealmCoordinator>> s_coordinators_per_path;
 
@@ -120,18 +164,15 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
     }
 
     if (config.sync_server_url && config.sync_user_token && !m_sync_session) {
-        sync::Client::Config client_config;
-        client_config.logger = config.logger;
-        m_sync_client = std::make_unique<sync::Client>(client_config);
+        m_sync_client = get_sync_client(config);
 
-        m_sync_session = std::make_unique<sync::Session>(*m_sync_client, config.path);
+        m_sync_session = std::make_unique<sync::Session>(m_sync_client->client, config.path);
         m_sync_session->set_sync_transact_callback([this] (sync::Session::version_type) {
             if (m_notifier)
                 m_notifier->notify_others();
         });
-        m_sync_session->bind(*config.sync_server_url, *config.sync_user_token);
 
-        m_sync_thread = std::thread(&sync::Client::run, m_sync_client.get());
+        m_sync_session->bind(*config.sync_server_url, *config.sync_user_token);
     }
 
     auto realm = std::make_shared<Realm>(std::move(config));
@@ -161,11 +202,6 @@ RealmCoordinator::RealmCoordinator() = default;
 
 RealmCoordinator::~RealmCoordinator()
 {
-    if (m_sync_client) {
-        m_sync_client->stop();
-        m_sync_thread.join();
-    }
-
     std::lock_guard<std::mutex> coordinator_lock(s_coordinator_mutex);
     for (auto it = s_coordinators_per_path.begin(); it != s_coordinators_per_path.end(); ) {
         if (it->second.expired()) {
