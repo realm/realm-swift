@@ -48,6 +48,7 @@ Realm::Config::Config(const Config& c)
 , automatic_change_notifications(c.automatic_change_notifications)
 , sync_server_url(c.sync_server_url)
 , sync_user_token(c.sync_user_token)
+, logger(c.logger)
 {
     if (c.schema) {
         schema = std::make_unique<Schema>(*c.schema);

@@ -60,7 +60,6 @@ struct SyncLogger : public util::RootLogger {
     }
 } s_syncLogger;
 
-std::atomic<bool> s_syncLogEverything;
 } // anonymous namespace
 
 
@@ -313,7 +312,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
     configuration = [configuration copy];
     Realm::Config& config = configuration.config;
-    config.log_everything = s_syncLogEverything;
     config.logger = &s_syncLogger;
 
     RLMRealm *realm = [RLMRealm new];
@@ -772,7 +770,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 + (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level {
-    s_syncLogEverything = level == RLMSyncLogLevelVerbose;
+    using Level = realm::util::Logger::Level;
+
+    Level logger_level = (level == RLMSyncLogLevelVerbose) ? Level::all : Level::info;
+    s_syncLogger.set_level_threshold(logger_level);
 }
 
 @end

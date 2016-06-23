@@ -80,8 +80,6 @@ namespace realm {
             bool read_only = false;
             bool in_memory = false;
 
-            bool log_everything = false;
-
             // The following are intended for internal/testing purposes and
             // should not be publicly exposed in binding APIs
 

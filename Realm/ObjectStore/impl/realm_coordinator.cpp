@@ -121,16 +121,7 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
 
     if (config.sync_server_url && config.sync_user_token && !m_sync_session) {
         sync::Client::Config client_config;
-
-        if (config.logger != NULL) {
-            util::Logger::Level log_level = util::Logger::Level::info;
-            if (config.log_everything) {
-                log_level = util::Logger::Level::all;
-            }
-            config.logger->set_level_threshold(log_level);
-            client_config.logger = config.logger;
-        }
-
+        client_config.logger = config.logger;
         m_sync_client = std::make_unique<sync::Client>(client_config);
 
         m_sync_session = std::make_unique<sync::Session>(*m_sync_client, config.path);
