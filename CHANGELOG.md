@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Swift: A `write` block may now `throw`, reverting any changes already made in the transaction.
 
 ### Bugfixes
 

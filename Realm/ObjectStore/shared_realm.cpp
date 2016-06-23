@@ -21,6 +21,7 @@
 #include "binding_context.hpp"
 #include "impl/realm_coordinator.hpp"
 #include "impl/transact_log_handler.hpp"
+#include "object_schema.hpp"
 #include "object_store.hpp"
 #include "schema.hpp"
 #include "util/format.hpp"
@@ -68,7 +69,7 @@ Realm::Config& Realm::Config::operator=(realm::Realm::Config const& c)
 Realm::Realm(Config config)
 : m_config(std::move(config))
 {
-    open_with_config(m_config, m_history, m_shared_group, m_read_only_group);
+    open_with_config(m_config, m_history, m_shared_group, m_read_only_group, this);
 
     if (m_read_only_group) {
         m_group = m_read_only_group.get();
@@ -126,8 +127,12 @@ REALM_NOINLINE static void translate_file_exception(StringData path, bool read_o
 void Realm::open_with_config(const Config& config,
                              std::unique_ptr<Replication>& history,
                              std::unique_ptr<SharedGroup>& shared_group,
-                             std::unique_ptr<Group>& read_only_group)
+                             std::unique_ptr<Group>& read_only_group,
+                             Realm *realm)
 {
+    if (config.encryption_key.data() && config.encryption_key.size() != 64) {
+        throw InvalidEncryptionKeyException();
+    }
     try {
         if (config.read_only) {
             read_only_group = std::make_unique<Group>(config.path, config.encryption_key.data(), Group::mode_ReadOnly);
@@ -146,7 +151,13 @@ void Realm::open_with_config(const Config& config,
             }
             SharedGroup::DurabilityLevel durability = config.in_memory ? SharedGroup::durability_MemOnly :
                                                                            SharedGroup::durability_Full;
-            shared_group = std::make_unique<SharedGroup>(*history, durability, config.encryption_key.data(), !config.disable_format_upgrade);
+            shared_group = std::make_unique<SharedGroup>(*history, durability, config.encryption_key.data(), !config.disable_format_upgrade,
+                                                         [&](int from_version, int to_version) {
+                if (realm) {
+                    realm->upgrade_initial_version = from_version;
+                    realm->upgrade_final_version = to_version;
+                }
+            });
         }
     }
     catch (...) {
@@ -287,6 +298,7 @@ void Realm::update_schema(std::unique_ptr<Schema> schema, uint64_t version)
         if (m_config.migration_function) {
             m_config.migration_function(old_realm, shared_from_this());
         }
+        m_config.migration_function = nullptr;
     };
 
     try {
@@ -517,3 +529,14 @@ void Realm::close()
     m_binding_context = nullptr;
     m_coordinator = nullptr;
 }
+
+util::Optional<int> Realm::file_format_upgraded_from_version() const
+{
+    if (upgrade_initial_version != upgrade_final_version) {
+        return upgrade_initial_version;
+    }
+    return util::Optional<int>();
+}
+
+MismatchedConfigException::MismatchedConfigException(StringData message, StringData path)
+: std::runtime_error(util::format(message.data(), path)) { }

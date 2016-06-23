@@ -19,6 +19,7 @@
 #include "impl/collection_change_builder.hpp"
 
 #include <realm/util/assert.hpp>
+#include <algorithm>
 
 #include <algorithm>
 

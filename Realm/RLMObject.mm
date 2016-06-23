@@ -175,7 +175,7 @@
 }
 
 + (NSArray *)requiredProperties {
-    return nil;
+    return @[];
 }
 
 @end
