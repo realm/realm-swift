@@ -64,11 +64,10 @@ private:
 }
 }
 
-std::mutex s_sync_client_mutex;
-
 static std::shared_ptr<SyncClient> get_sync_client(Realm::Config const& config)
 {
     static std::weak_ptr<SyncClient> weak_client;
+    static std::mutex s_sync_client_mutex;
 
     std::lock_guard<std::mutex> lock(s_sync_client_mutex);
 
