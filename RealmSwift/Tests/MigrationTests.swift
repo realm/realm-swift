@@ -301,10 +301,12 @@ class MigrationTests: TestCase {
 
     func testDeleteData() {
         autoreleasepool {
+            let prop = RLMProperty(name: "value", type: .Bool, objectClassName: nil,
+                linkOriginPropertyName: nil, indexed: false, optional: false)
             let realm = realmWithSingleClassProperties(defaultRealmURL(),
-                className: "DeletedClass", properties: [])
+                className: "DeletedClass", properties: [prop])
             try! realm.transaction {
-                realm.createObject("DeletedClass", withValue: [])
+                realm.createObject("DeletedClass", withValue: [true])
             }
         }
 
@@ -794,10 +796,12 @@ class MigrationTests: TestCase {
 
     func testDeleteData() {
         autoreleasepool {
+            let prop = RLMProperty(name: "value", type: .Bool, objectClassName: nil,
+                linkOriginPropertyName: nil, indexed: false, optional: false)
             let realm = realmWithSingleClassProperties(defaultRealmURL(),
-                className: "DeletedClass", properties: [])
+                className: "DeletedClass", properties: [prop])
             try! realm.transactionWithBlock {
-                realm.createObject("DeletedClass", withValue: [])
+                realm.createObject("DeletedClass", withValue: [true])
             }
         }
 

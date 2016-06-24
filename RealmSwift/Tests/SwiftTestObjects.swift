@@ -124,6 +124,8 @@ class SwiftOptionalDefaultValuesObject: Object {
 }
 
 class SwiftOptionalIgnoredPropertiesObject: Object {
+    dynamic var value = 0
+
     dynamic var optNSStringCol: NSString? = "A"
     dynamic var optStringCol: String? = "B"
     dynamic var optBinaryCol: NSData? = "C".data(using: String.Encoding.utf8)
@@ -517,6 +519,8 @@ class SwiftOptionalDefaultValuesObject: Object {
 }
 
 class SwiftOptionalIgnoredPropertiesObject: Object {
+    dynamic var value = 0
+
     dynamic var optNSStringCol: NSString? = "A"
     dynamic var optStringCol: String? = "B"
     dynamic var optBinaryCol: NSData? = "C".dataUsingEncoding(NSUTF8StringEncoding)

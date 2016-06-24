@@ -91,6 +91,23 @@ static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *con
     }
 }
 
+static inline RLMObjectSchema *RLMGetVerifiedObjectSchema(__unsafe_unretained RLMRealm *const realm,
+                                                          NSString *const objectClassName) {
+    RLMObjectSchema *schema = [realm.schema schemaForClassName:objectClassName];
+    if (!schema) {
+        @throw RLMException(@"Object type '%@' is not managed by the Realm. "
+                            @"If using a custom `objectClasses` / `objectTypes` array in your configuration, "
+                            @"add `%@` to the list of `objectClasses` / `objectTypes`.",
+                            objectClassName, objectClassName);
+    }
+    if (schema.properties.count == 0) {
+        @throw RLMException(@"Can't add objects of type '%@' to the Realm as the class doesn't "
+                            @"define any managed properties.",
+                            objectClassName);
+    }
+    return schema;
+}
+
 void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const object) {
     if (!object || !object->_row || !object->_objectSchema->_isSwiftClass) {
         return;
@@ -170,13 +187,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
 
     // set the realm and schema
     NSString *objectClassName = object->_objectSchema.className;
-    RLMObjectSchema *schema = [realm.schema schemaForClassName:objectClassName];
-    if (!schema) {
-        @throw RLMException(@"Object type '%@' is not managed by the Realm. "
-                            @"If using a custom `objectClasses` / `objectTypes` array in your configuration, "
-                            @"add `%@` to the list of `objectClasses` / `objectTypes`.",
-                            objectClassName, objectClassName);
-    }
+    RLMObjectSchema *schema = RLMGetVerifiedObjectSchema(realm, objectClassName);
     object->_objectSchema = schema;
     object->_realm = realm;
 
@@ -359,13 +370,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 
     // create the object
     RLMSchema *schema = realm.schema;
-    RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:className];
-    if (!objectSchema) {
-        @throw RLMException(@"Object type '%@' is not managed by the Realm. "
-                             @"If using a custom `objectClasses` / `objectTypes` array in your configuration, "
-                             @"add `%@` to the list of `objectClasses` / `objectTypes`.",
-                             className, className);
-    }
+    RLMObjectSchema *objectSchema = RLMGetVerifiedObjectSchema(realm, className);
     RLMObjectBase *object = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
 
     RLMCreationOptions creationOptions = createOrUpdate ? RLMCreationOptionsCreateOrUpdate : RLMCreationOptionsNone;

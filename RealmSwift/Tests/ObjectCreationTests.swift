@@ -200,7 +200,8 @@ class ObjectCreationTests: TestCase {
         try! realm.write {
             let object = realm.createObject(ofType: SwiftOptionalIgnoredPropertiesObject.self)
             let properties = object.objectSchema.properties
-            XCTAssertEqual(properties, [])
+            let valueProperty = object.objectSchema["value"]!
+            XCTAssertEqual(properties, [valueProperty])
         }
     }
 
@@ -784,7 +785,8 @@ class ObjectCreationTests: TestCase {
         try! realm.write {
             let object = realm.create(SwiftOptionalIgnoredPropertiesObject)
             let properties = object.objectSchema.properties
-            XCTAssertEqual(properties, [])
+            let valueProperty = object.objectSchema["value"]!
+            XCTAssertEqual(properties, [valueProperty])
         }
     }
 
