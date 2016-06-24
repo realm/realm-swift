@@ -1431,9 +1431,11 @@
 					};
 					5D660FCB1BE98C560021E04F = {
 						CreatedOnToolsVersion = 7.1;
+						LastSwiftMigration = 0800;
 					};
 					5D660FD71BE98C7C0021E04F = {
 						CreatedOnToolsVersion = 7.1;
+						LastSwiftMigration = 0800;
 					};
 					C04B4BD71B55C47600FAE58E = {
 						CreatedOnToolsVersion = 6.4;
@@ -1446,6 +1448,7 @@
 					};
 					E8D89BA21955FC6D00CF2B9A = {
 						CreatedOnToolsVersion = 6.0;
+						LastSwiftMigration = 0800;
 						TestTargetID = E8D89B971955FC6D00CF2B9A;
 					};
 				};
