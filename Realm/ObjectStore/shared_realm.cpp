@@ -30,14 +30,15 @@
 #include <realm/commit_log.hpp>
 #include <realm/sync/history.hpp>
 
-#include <mutex>
-
 using namespace realm;
 using namespace realm::_impl;
 
 Realm::Config::Config(const Config& c)
 : path(c.path)
 , encryption_key(c.encryption_key)
+, sync_server_url(c.sync_server_url)
+, sync_user_token(c.sync_user_token)
+, logger(c.logger)
 , schema_version(c.schema_version)
 , migration_function(c.migration_function)
 , delete_realm_if_migration_needed(c.delete_realm_if_migration_needed)
@@ -46,8 +47,6 @@ Realm::Config::Config(const Config& c)
 , cache(c.cache)
 , disable_format_upgrade(c.disable_format_upgrade)
 , automatic_change_notifications(c.automatic_change_notifications)
-, sync_server_url(c.sync_server_url)
-, sync_user_token(c.sync_user_token)
 {
     if (c.schema) {
         schema = std::make_unique<Schema>(*c.schema);

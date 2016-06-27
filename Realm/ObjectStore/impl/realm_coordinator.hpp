@@ -29,12 +29,7 @@ class Schema;
 class SharedGroup;
 class StringData;
 
-namespace util {
-class Logger;
-}
-
 namespace sync {
-class Client;
 class Session;
 }
 
@@ -42,6 +37,7 @@ namespace _impl {
 class CollectionNotifier;
 class ExternalCommitHelper;
 class WeakRealmNotifier;
+struct SyncClient;
 
 // RealmCoordinator manages the weak cache of Realm instances and communication
 // between per-thread Realm instances for a given file
@@ -123,9 +119,8 @@ private:
 
     std::unique_ptr<_impl::ExternalCommitHelper> m_notifier;
 
-    std::unique_ptr<sync::Client> m_sync_client;
+    std::shared_ptr<SyncClient> m_sync_client;
     std::unique_ptr<sync::Session> m_sync_session;
-    std::thread m_sync_thread;
 
     // must be called with m_notifier_mutex locked
     void pin_version(uint_fast64_t version, uint_fast32_t index);
