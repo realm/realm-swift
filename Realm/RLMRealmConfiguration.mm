@@ -269,14 +269,20 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     _config.cache = cache;
 }
 
-- (void)setDisableFormatUpgrade:(bool)disableFormatUpgrade
-{
+- (bool)disableFormatUpgrade {
+    return _config.disable_format_upgrade;
+}
+
+- (void)setDisableFormatUpgrade:(bool)disableFormatUpgrade {
     _config.disable_format_upgrade = disableFormatUpgrade;
 }
 
-- (bool)disableFormatUpgrade
-{
-    return _config.disable_format_upgrade;
+- (realm::SchemaMode)schemaMode {
+    return _config.schema_mode;
+}
+
+- (void)setSchemaMode:(realm::SchemaMode)mode {
+    _config.schema_mode = mode;
 }
 
 @end

@@ -180,6 +180,7 @@ public:
     RLMProperty *property() const { return m_property; }
     size_t index() const { return m_index; }
     RLMPropertyType type() const { return property().type; }
+    Group& group() const { return *m_group; }
 
     RLMObjectSchema *link_target_object_schema() const
     {
@@ -665,11 +666,6 @@ void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
     RLMPrecondition(operatorType == NSEqualToPredicateOperatorType || operatorType == NSNotEqualToPredicateOperatorType,
                     @"Invalid operator type", @"Only 'Equal' and 'Not Equal' operators supported for object comparison");
 
-    // NOTE: This precondition assumes that the argument `obj` will be always originating from the
-    // queried table as verified before by `validate_property_value`
-    RLMPrecondition(column.link_target_object_schema() == obj.objectSchema || !obj->_row.is_attached(),
-                    @"Invalid value origin", @"Object must be from the Realm being queried");
-
     if (operatorType == NSEqualToPredicateOperatorType) {
         m_query.and_query(column.resolve<Link>() == obj->_row);
     }
@@ -909,6 +905,10 @@ void validate_property_value(const ColumnReference& column,
     else {
         RLMPrecondition(RLMIsObjectValidForProperty(value, prop),
                         @"Invalid value", err, RLMTypeToString(prop.type), keyPath, objectSchema.className, value);
+    }
+    if (RLMObjectBase *obj = RLMDynamicCast<RLMObjectBase>(value)) {
+        RLMPrecondition(!obj->_row.is_attached() || &column.group() == &obj->_realm.group,
+                        @"Invalid value origin", @"Object must be from the Realm being queried");
     }
 }
 

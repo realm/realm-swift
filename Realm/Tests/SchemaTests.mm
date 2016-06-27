@@ -22,11 +22,16 @@
 
 #import "RLMAccessor.h"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMObject_Private.h"
 #import "RLMProperty_Private.h"
-#import "RLMRealmConfiguration_Private.h"
+#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.hpp"
+#import "RLMUtil.hpp"
 #import "schema.hpp"
+
+#import <realm/table.hpp>
 
 #import <algorithm>
 #import <objc/runtime.h>
@@ -921,6 +926,59 @@ RLM_ARRAY_TYPE(NotARealClass)
 
     // Should have been left in a sensible state after the errors
     XCTAssertEqual(1, [[IntObject allObjectsInRealm:realm].firstObject intCol]);
+}
+
+- (void)testInsertingColumnsInBackgroundProcess {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.schemaMode = realm::SchemaMode::Additive;
+    if (!self.isParent) {
+        config.dynamic = true;
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        [realm beginWriteTransaction];
+        realm->_info[@"IntObject"].table()->insert_column(0, realm::type_String, "col");
+        [realm commitWriteTransaction];
+        return;
+    }
+
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withValue:@[@5]];
+    }];
+
+    RLMRunChildAndWait();
+    XCTAssertEqual(5, [[IntObject allObjectsInRealm:realm].firstObject intCol]);
+    XCTAssertEqual(1U, [IntObject objectsInRealm:realm where:@"intCol = 5"].count);
+
+    __block IntObject *io = [IntObject new];
+    io.intCol = 6;
+    [realm transactionWithBlock:^{ [realm addObject:io]; }];
+    XCTAssertEqual(io.intCol, 6);
+    XCTAssertEqualObjects(io[@"intCol"], @6);
+
+    [realm transactionWithBlock:^{ io = [IntObject createInRealm:realm withValue:@[@7]]; }];
+    XCTAssertEqual(io.intCol, 7);
+
+    [realm transactionWithBlock:^{ io = [IntObject createInRealm:realm withValue:@{@"intCol": @8}]; }];
+    XCTAssertEqual(io.intCol, 8);
+
+    [realm transactionWithBlock:^{ io.intCol = 9; }];
+    XCTAssertEqual(io.intCol, 9);
+
+    [realm transactionWithBlock:^{ io[@"intCol"] = @10; }];
+    XCTAssertEqual(io.intCol, 10);
+
+#if 0 // https://github.com/realm/realm-core/issues/1900
+    // Create query, add column, run query
+    RLMResults *query = [IntObject objectsInRealm:realm where:@"intCol > 5"];
+    RLMRunChildAndWait();
+    XCTAssertEqual(query.count, 2U);
+
+    // Create query, create TV, add column, reevaluate query
+    query = [IntObject objectsInRealm:realm where:@"intCol > 5"];
+    (void)[query lastObject];
+    RLMRunChildAndWait();
+    XCTAssertEqual(query.count, 2U);
+#endif
 }
 #endif
 

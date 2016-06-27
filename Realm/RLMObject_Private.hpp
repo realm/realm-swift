@@ -19,6 +19,7 @@
 #import "RLMObject_Private.h"
 
 #import "RLMRealm_Private.hpp"
+#import "RLMUtil.hpp"
 
 #import <realm/link_view.hpp> // required by row.hpp
 #import <realm/row.hpp>
