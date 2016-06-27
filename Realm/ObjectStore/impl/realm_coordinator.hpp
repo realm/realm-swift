@@ -29,10 +29,6 @@ class Schema;
 class SharedGroup;
 class StringData;
 
-namespace util {
-class Logger;
-}
-
 namespace sync {
 class Session;
 }

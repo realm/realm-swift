@@ -30,8 +30,6 @@
 #include <realm/commit_log.hpp>
 #include <realm/sync/history.hpp>
 
-#include <mutex>
-
 using namespace realm;
 using namespace realm::_impl;
 

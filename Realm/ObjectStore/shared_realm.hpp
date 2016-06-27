@@ -40,7 +40,6 @@ namespace realm {
     typedef std::weak_ptr<Realm> WeakRealm;
 
     namespace util {
-        class Logger;
         class RootLogger;
     }
 
