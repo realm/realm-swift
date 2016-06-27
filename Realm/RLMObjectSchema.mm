@@ -477,7 +477,7 @@ using namespace realm;
 
     NSMutableArray *genericProperties = [NSMutableArray new];
     for (RLMProperty *prop in _properties) {
-        if (prop->_swiftIvar || prop->_type == RLMPropertyTypeArray) {
+        if (prop->_swiftIvar) {
             [genericProperties addObject:prop];
         }
     }

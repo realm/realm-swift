@@ -626,6 +626,10 @@ public final class List<T: Object>: ListBase {
         super.init(array: RLMArray(objectClassName: (T.self as Object.Type).className()))
     }
 
+    internal init(rlmArray: RLMArray) {
+        super.init(array: rlmArray)
+    }
+
     // MARK: Index Retrieval
 
     /**

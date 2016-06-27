@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMObject.h>
+#import <Realm/RLMObjectBase_Dynamic.h>
 
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
@@ -70,16 +70,6 @@
 
 @end
 
-//
-// Getters for RLMObjectBase ivars for realm and objectSchema
-//
-FOUNDATION_EXTERN RLMRealm *RLMObjectBaseRealm(RLMObjectBase *object);
-FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *object);
-
-// Dynamic access to RLMObjectBase properties
-FOUNDATION_EXTERN id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key);
-FOUNDATION_EXTERN void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *object, NSString *key, id obj);
-
 // Calls valueForKey: and re-raises NSUndefinedKeyExceptions
 FOUNDATION_EXTERN id RLMValidatedValueForProperty(id object, NSString *key, NSString *className);
 
@@ -100,10 +90,6 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 
 + (NSArray<NSString *> *)getGenericListPropertyNames:(id)obj;
 + (NSDictionary<NSString *, NSString *> *)getLinkingObjectsProperties:(id)object;
-
-+ (void)initializeListProperty:(RLMObjectBase *)object property:(RLMProperty *)property array:(RLMArray *)array;
-+ (void)initializeOptionalProperty:(RLMObjectBase *)object property:(RLMProperty *)property;
-+ (void)initializeLinkingObjectsProperty:(RLMObjectBase *)object property:(RLMProperty *)property;
 
 + (NSDictionary<NSString *, NSNumber *> *)getOptionalProperties:(id)obj;
 + (NSArray<NSString *> *)requiredPropertiesForClass:(Class)cls;

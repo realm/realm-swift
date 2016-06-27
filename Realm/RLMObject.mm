@@ -187,7 +187,7 @@
 }
 
 - (id)valueForUndefinedKey:(NSString *)key {
-    return RLMDynamicGet(self, RLMValidatedGetProperty(self, key));
+    return RLMDynamicGetByName(self, key, false);
 }
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
