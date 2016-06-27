@@ -772,7 +772,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 + (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level {
     using Level = realm::util::Logger::Level;
 
-    Level logger_level = (level == RLMSyncLogLevelVerbose) ? Level::all : Level::info;
+    Level logger_level = (level == RLMSyncLogLevelVerbose) ? Level::detail : Level::info;
     s_syncLogger.set_level_threshold(logger_level);
 }
 
