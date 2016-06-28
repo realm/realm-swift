@@ -662,7 +662,6 @@ void RealmCoordinator::notify_others()
 void RealmCoordinator::refresh_sync_access_token(std::string access_token)
 {
     if (m_sync_awaits_user_token) {
-        std::cout << "RealmCoordinator: Deferred BIND\n";
         m_sync_awaits_user_token = false;
 
         // Since the sync session was previously unbound, it's safe to do this from the
@@ -675,7 +674,6 @@ void RealmCoordinator::refresh_sync_access_token(std::string access_token)
         }
     }
     else {
-        std::cout << "RealmCoordinator: Deferred REFRESH\n";
         m_sync_client->post([this,token=std::move(access_token)] {
             m_sync_session->refresh(std::move(token));
         });
