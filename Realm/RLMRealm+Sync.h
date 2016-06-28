@@ -25,7 +25,7 @@ typedef NS_ENUM(NSUInteger, RLMRealmSyncIdentityProvider) {
 
  FIXME: Maybe the token should be NSData instead of NSString.
  */
--(void)refreshCredendialsWithProvider:(RLMRealmSyncIdentityProvider)provider andToken:(NSString *)token withAppID:(NSString *)appID;
+-(void)refreshCredentialsWithProvider:(RLMRealmSyncIdentityProvider)provider andToken:(NSString *)token withAppID:(NSString *)appID;
 
 /**
  FIXME: Implement this.

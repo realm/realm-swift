@@ -21,7 +21,7 @@ static NSString* getProviderName(RLMRealmSyncIdentityProvider provider) {
 
 @implementation RLMRealm (Sync)
 
--(void)refreshCredendialsWithProvider:(RLMRealmSyncIdentityProvider)provider andToken:(NSString *)token withAppID:(NSString *)appID {
+-(void)refreshCredentialsWithProvider:(RLMRealmSyncIdentityProvider)provider andToken:(NSString *)token withAppID:(NSString *)appID {
     // FIXME: Discover the Auth Server URL in a better way.
     NSURL *syncURL = self.configuration.syncServerURL;
     NSURL *authURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:3000/sessions", syncURL.host]];

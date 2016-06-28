@@ -12,6 +12,6 @@ import Foundation
 
 public extension Realm {
     func refreshCredentialsWithProvider(provider: RLMRealmSyncIdentityProvider, token: String, appID: String) {
-        self.rlmRealm.refreshCredendialsWithProvider(provider, andToken: token, withAppID: appID)
+        self.rlmRealm.refreshCredentialsWithProvider(provider, andToken: token, withAppID: appID)
     }
 }
