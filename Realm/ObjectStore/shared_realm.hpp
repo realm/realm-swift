@@ -40,7 +40,7 @@ namespace realm {
     typedef std::weak_ptr<Realm> WeakRealm;
 
     namespace util {
-        class Logger;
+        class RootLogger;
     }
 
     namespace _impl {
@@ -48,6 +48,10 @@ namespace realm {
         class ListNotifier;
         class RealmCoordinator;
         class ResultsNotifier;
+    }
+
+    namespace util {
+        template<typename T> class Optional;
     }
 
     class Realm : public std::enable_shared_from_this<Realm> {
@@ -61,7 +65,7 @@ namespace realm {
             util::Optional<std::string> sync_server_url;
             util::Optional<std::string> sync_user_token;
 
-            util::Logger* logger = nullptr;
+            util::RootLogger *logger = nullptr;
 
             // Optional schema for the file. If nullptr, the existing schema
             // from the file opened will be used. If present, the file will be
@@ -74,8 +78,6 @@ namespace realm {
 
             bool read_only = false;
             bool in_memory = false;
-
-            bool log_everything = false;
 
             // The following are intended for internal/testing purposes and
             // should not be publicly exposed in binding APIs
@@ -148,6 +150,11 @@ namespace realm {
         // Realm after closing it will produce undefined behavior.
         void close();
 
+        bool is_closed() { return !m_read_only_group && !m_shared_group; }
+
+        // returns the file format version upgraded from if an upgrade took place
+        util::Optional<int> file_format_upgraded_from_version() const;
+
         void notify_others() const;
 
         // FIXME: Consider whether this method should exist here.
@@ -179,7 +186,8 @@ namespace realm {
         static void open_with_config(const Config& config,
                                      std::unique_ptr<Replication>& history,
                                      std::unique_ptr<SharedGroup>& shared_group,
-                                     std::unique_ptr<Group>& read_only_group);
+                                     std::unique_ptr<Group>& read_only_group,
+                                     Realm *realm = nullptr);
 
       private:
         Config m_config;
@@ -193,6 +201,9 @@ namespace realm {
         Group *m_group = nullptr;
 
         std::shared_ptr<_impl::RealmCoordinator> m_coordinator;
+
+        // File format versions populated when a file format upgrade takes place during realm opening
+        int upgrade_initial_version = 0, upgrade_final_version = 0;
 
       public:
         std::unique_ptr<BindingContext> m_binding_context;
@@ -234,12 +245,12 @@ namespace realm {
 
     class MismatchedConfigException : public std::runtime_error {
     public:
-        MismatchedConfigException(std::string message) : std::runtime_error(message) {}
+        MismatchedConfigException(StringData message, StringData path);
     };
 
     class InvalidTransactionException : public std::runtime_error {
     public:
-        InvalidTransactionException(std::string message) : std::runtime_error(message) {}
+        InvalidTransactionException(std::string message) : std::runtime_error(move(message)) {}
     };
 
     class IncorrectThreadException : public std::runtime_error {
@@ -249,7 +260,12 @@ namespace realm {
 
     class UninitializedRealmException : public std::runtime_error {
     public:
-        UninitializedRealmException(std::string message) : std::runtime_error(message) {}
+        UninitializedRealmException(std::string message) : std::runtime_error(move(message)) {}
+    };
+
+    class InvalidEncryptionKeyException : public std::runtime_error {
+    public:
+        InvalidEncryptionKeyException() : std::runtime_error("Encryption key must be 64 bytes.") {}
     };
 }
 

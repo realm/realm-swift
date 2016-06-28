@@ -14,7 +14,7 @@ set -o pipefail
 set -e
 
 # You can override the version of the core library
-: ${REALM_CORE_VERSION:=1.0.1} # set to "current" to always use the current build
+: ${REALM_CORE_VERSION:=1.1.1} # set to "current" to always use the current build
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
@@ -409,26 +409,12 @@ case "$COMMAND" in
             version="$REALM_SWIFT_VERSION"
         fi
 
-        # Update the symlinks to point to the correct verion of the source, and
-        # then tell git to ignore the fact that we just changed a tracked file so
-        # that the new symlink doesn't accidentally get committed
-        rm -rf RealmSwift
-        ln -s "RealmSwift-swift$version" RealmSwift
-        git update-index --assume-unchanged RealmSwift || true
-
-        # Only write SwiftVersion.swift if RealmSwift supports the given version of Swift.
-        if [[ -e "RealmSwift-swift$version" ]]; then
-            SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
-            CONTENTS="let swiftLanguageVersion = \"$version\""
-            if [ ! -f "$SWIFT_VERSION_FILE" ] || ! grep -q "$CONTENTS" "$SWIFT_VERSION_FILE"; then
-                echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
-            fi
+        SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
+        CONTENTS="let swiftLanguageVersion = \"$version\""
+        if [ ! -f "$SWIFT_VERSION_FILE" ] || ! grep -q "$CONTENTS" "$SWIFT_VERSION_FILE"; then
+            echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
         fi
 
-        cd Realm/Tests
-        rm -rf Swift
-        ln -s "Swift$version" Swift
-        git update-index --assume-unchanged Swift || true
         exit 0
         ;;
 
@@ -892,16 +878,9 @@ case "$COMMAND" in
     "cocoapods-setup")
         if [ ! -d core ]; then
           sh build.sh download-core
+          rm core
+          mv core-* core
         fi
-
-        # CocoaPods won't automatically preserve files referenced via symlinks
-        for symlink in $(find . -not -path "./.git/*" -type l); do
-          if [[ -L "$symlink" ]]; then
-            link="$(dirname "$symlink")/$(readlink "$symlink")"
-            rm "$symlink"
-            cp -RH "$link" "$symlink"
-          fi
-        done
 
         if [[ "$2" != "swift" ]]; then
           rm -rf include
@@ -930,7 +909,7 @@ case "$COMMAND" in
             cp Realm/*.h include/Realm
           fi
         else
-          echo "let swiftLanguageVersion = \"$(get_swift_version)\"" > RealmSwift/SwiftVersion.swift
+          sh build.sh set-swift-version
         fi
         ;;
 

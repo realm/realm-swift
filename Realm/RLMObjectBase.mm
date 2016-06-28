@@ -50,7 +50,7 @@ static bool RLMInitializedObjectSchema(RLMObjectBase *obj) {
     }
 
     // set unmanaged accessor class
-    object_setClass(obj, obj->_objectSchema.standaloneClass);
+    object_setClass(obj, obj->_objectSchema.unmanagedClass);
     return true;
 }
 

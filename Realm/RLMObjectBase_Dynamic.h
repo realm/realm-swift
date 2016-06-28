@@ -34,7 +34,7 @@
 FOUNDATION_EXTERN RLMRealm *RLMObjectBaseRealm(RLMObjectBase *object);
 
 /**
- Returns an `RLMObjectSchema` which describes the persisted properties of the object.
+ Returns an `RLMObjectSchema` which describes the managed properties of the object.
  
  @warning  This function is useful only in specialized circumstances, for example, when building components
            that integrate with Realm. If you are simply building an app on Realm, it is
@@ -42,7 +42,7 @@ FOUNDATION_EXTERN RLMRealm *RLMObjectBaseRealm(RLMObjectBase *object);
 
  @param object	An `RLMObjectBase` obtained via a Swift `Object` or `RLMObject`.
  
- @return The object schema which lists the persisted properties for the object.
+ @return The object schema which lists the managed properties for the object.
  */
 FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *object);
 

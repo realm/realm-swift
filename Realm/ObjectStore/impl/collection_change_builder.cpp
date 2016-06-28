@@ -19,6 +19,9 @@
 #include "impl/collection_change_builder.hpp"
 
 #include <realm/util/assert.hpp>
+#include <algorithm>
+
+#include <algorithm>
 
 using namespace realm;
 using namespace realm::_impl;
@@ -49,7 +52,7 @@ void CollectionChangeBuilder::merge(CollectionChangeBuilder&& c)
 
     // First update any old moves
     if (!c.moves.empty() || !c.deletions.empty() || !c.insertions.empty()) {
-        auto it = remove_if(begin(moves), end(moves), [&](auto& old) {
+        auto it = std::remove_if(begin(moves), end(moves), [&](auto& old) {
             // Check if the moved row was moved again, and if so just update the destination
             auto it = find_if(begin(c.moves), end(c.moves), [&](auto const& m) {
                 return old.to == m.from;
@@ -79,7 +82,7 @@ void CollectionChangeBuilder::merge(CollectionChangeBuilder&& c)
     // Ignore new moves of rows which were previously inserted (the implicit
     // delete from the move will remove the insert)
     if (!insertions.empty() && !c.moves.empty()) {
-        c.moves.erase(remove_if(begin(c.moves), end(c.moves),
+        c.moves.erase(std::remove_if(begin(c.moves), end(c.moves),
                               [&](auto const& m) { return insertions.contains(m.from); }),
                     end(c.moves));
     }
@@ -124,7 +127,7 @@ void CollectionChangeBuilder::clean_up_stale_moves()
     // Look for moves which are now no-ops, and remove them plus the associated
     // insert+delete. Note that this isn't just checking for from == to due to
     // that rows can also be shifted by other inserts and deletes
-    moves.erase(remove_if(begin(moves), end(moves), [&](auto const& move) {
+    moves.erase(std::remove_if(begin(moves), end(moves), [&](auto const& move) {
         if (move.from - deletions.count(0, move.from) != move.to - insertions.count(0, move.to))
             return false;
         deletions.remove(move.from);

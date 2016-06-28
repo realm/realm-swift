@@ -56,7 +56,7 @@ static void deleteOrThrow(NSURL *fileURL) {
 
 NSData *RLMGenerateKey() {
     uint8_t buffer[64];
-    SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
+    (void)SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
     return [[NSData alloc] initWithBytes:buffer length:sizeof(buffer)];
 }
 

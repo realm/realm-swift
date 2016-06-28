@@ -162,7 +162,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
             return;
         }
         // for differing realms users must explicitly create the object in the second realm
-        @throw RLMException(@"Object is already persisted in a Realm");
+        @throw RLMException(@"Object is already managed by another Realm");
     }
     if (object->_observationInfo && object->_observationInfo->hasObservers()) {
         @throw RLMException(@"Cannot add an object with observers to a Realm");
@@ -172,7 +172,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     NSString *objectClassName = object->_objectSchema.className;
     RLMObjectSchema *schema = [realm.schema schemaForClassName:objectClassName];
     if (!schema) {
-        @throw RLMException(@"Object type '%@' is not persisted in the Realm. "
+        @throw RLMException(@"Object type '%@' is not managed by the Realm. "
                             @"If using a custom `objectClasses` / `objectTypes` array in your configuration, "
                             @"add `%@` to the list of `objectClasses` / `objectTypes`.",
                             objectClassName, objectClassName);
@@ -185,7 +185,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     auto primaryGetter = [=](__unsafe_unretained RLMProperty *const p) { return [object valueForKey:p.name]; };
     object->_row = (*schema.table)[RLMCreateOrGetRowForObject(schema, primaryGetter, createOrUpdate, created)];
 
-    RLMCreationOptions creationOptions = RLMCreationOptionsPromoteStandalone;
+    RLMCreationOptions creationOptions = RLMCreationOptionsPromoteUnmanaged;
     if (createOrUpdate) {
         creationOptions |= RLMCreationOptionsCreateOrUpdate;
     }
@@ -361,7 +361,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     RLMSchema *schema = realm.schema;
     RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:className];
     if (!objectSchema) {
-        @throw RLMException(@"Object type '%@' is not persisted in the Realm. "
+        @throw RLMException(@"Object type '%@' is not managed by the Realm. "
                              @"If using a custom `objectClasses` / `objectTypes` array in your configuration, "
                              @"add `%@` to the list of `objectClasses` / `objectTypes`.",
                              className, className);

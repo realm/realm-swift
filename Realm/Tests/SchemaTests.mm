@@ -264,7 +264,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     [super tearDown];
 }
 
-- (void)testNoSchemaForUnpersistedObjectClasses {
+- (void)testNoSchemaForUnmanagedObjectClasses {
     RLMSchema *schema = [RLMSchema sharedSchema];
     XCTAssertNil([schema schemaForClassName:@"RLMObject"]);
     XCTAssertNil([schema schemaForClassName:@"RLMObjectBase"]);
@@ -295,7 +295,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     auto checkSchema = ^(RLMSchema *schema, NSString *className, NSDictionary *properties) {
         RLMObjectSchema *objectSchema = schema[className];
         XCTAssertEqualObjects(className, objectSchema.className);
-        XCTAssertEqualObjects(className, [objectSchema.standaloneClass className]);
+        XCTAssertEqualObjects(className, [objectSchema.unmanagedClass className]);
         XCTAssertEqualObjects(className, [objectSchema.accessorClass className]);
 
         XCTAssertEqual(objectSchema.properties.count, properties.count);
@@ -327,7 +327,7 @@ RLM_ARRAY_TYPE(NotARealClass)
 
         for (RLMObjectSchema *objectSchema in objectSchemas) {
             objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, @"RLMAccessor_");
-            objectSchema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
+            objectSchema.unmanagedClass = RLMUnmanagedAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
         }
 
         for (Class cls : testClasses) {
@@ -637,7 +637,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                      @"Property 'nosuchproperty' .* origin of linking objects property 'linkingObjects' does not exist");
+                                      @"Property '.*nosuchproperty' .* origin of linking objects property '.*linkingObjects' does not exist");
 }
 
 - (void)testClassWithInvalidLinkingObjectsPropertySourcePropertyNotALink {
@@ -645,7 +645,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyNotALink.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                      @"Property 'integer' .* origin of linking objects property 'linkingObjects' is not a link");
+                                      @"Property '.*integer' .* origin of linking objects property '.*linkingObjects' is not a link");
 }
 
 - (void)testClassWithInvalidLinkingObjectsPropertySourcePropertysLinkElsewhere {
@@ -653,8 +653,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere.class, IntObject.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                      @"Property 'link' .* origin of linking objects property 'linkingObjects' does "
-                                      "not link to class 'InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere'");
+                                      @"Property '.*link' .* origin of linking objects property '.*linkingObjects' links to a different class");
 }
 
 - (void)testMixedIsRejected {
@@ -700,7 +699,7 @@ RLM_ARRAY_TYPE(NotARealClass)
         for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
             const char *actualClassName = class_getName(objectSchema.objectClass);
             XCTAssertEqual(nullptr, strstr(actualClassName, "RLMAccessor"));
-            XCTAssertEqual(nullptr, strstr(actualClassName, "RLMStandalone"));
+            XCTAssertEqual(nullptr, strstr(actualClassName, "RLMUnmanaged"));
         }
 
         // Shared schema shouldn't have duplicate entries

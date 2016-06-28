@@ -54,13 +54,12 @@ using namespace realm;
 using util::File;
 
 namespace {
-struct SyncLogger : public util::Logger {
+struct SyncLogger : public util::RootLogger {
     void do_log(std::string message) override {
         NSLog(@"RealmSync: %@", RLMStringDataToNSString(message));
     }
 } s_syncLogger;
 
-std::atomic<bool> s_syncLogEverything;
 } // anonymous namespace
 
 
@@ -95,7 +94,7 @@ void RLMDisableSyncToDisk() {
     if (_realm || _block) {
         NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "
               @"on to the RLMNotificationToken returned from addNotificationBlock and call "
-              @"-[RLMNotificationToken stop] when you no longer wish to recieve RLMRealm notifications.");
+              @"-[RLMNotificationToken stop] when you no longer wish to receive RLMRealm notifications.");
     }
 }
 @end
@@ -313,7 +312,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
     configuration = [configuration copy];
     Realm::Config& config = configuration.config;
-    config.log_everything = s_syncLogEverything;
     config.logger = &s_syncLogger;
 
     RLMRealm *realm = [RLMRealm new];
@@ -722,7 +720,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 
     @autoreleasepool {
-        NSError *error;
+        NSError *error = nil;
         [RLMRealm realmWithConfiguration:configuration error:&error];
         return error;
     }
@@ -772,7 +770,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 + (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level {
-    s_syncLogEverything = level == RLMSyncLogLevelVerbose;
+    using Level = realm::util::Logger::Level;
+
+    Level logger_level = (level == RLMSyncLogLevelVerbose) ? Level::detail : Level::info;
+    s_syncLogger.set_level_threshold(logger_level);
 }
 
 @end

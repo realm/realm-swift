@@ -7,13 +7,43 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
+* Swift: A `write` block may now `throw`, reverting any changes already made in the transaction.
+
+### Bugfixes
+
+* Fix a crash when reading the shared schema from an observed Swift object.
+
+1.0.1 Release notes (2016-06-12)
+=============================================================
+
+### API breaking changes
+
 * None.
+
+### Enhancements
+
+* Significantly improve performance of opening Realm files, and slightly
+  improve performance of committing write transactions.
 
 ### Bugfixes
 
 * Swift: Fix an error thrown when trying to create or update `Object` instances via
   `add(:_update:)` with a primary key property of type `RealmOptional`.
 * Xcode playground in Swift release zip now runs successfully.
+* The `key` parameter of `Realm.objectForPrimaryKey(_:key:)`/ `Realm.dynamicObjectForPrimaryKey(_:key:)`
+ is now marked as optional.
+* Fix a potential memory leak when closing Realms after a Realm file has been
+  opened on multiple threads which are running in active run loops.
+* Fix notifications breaking on tvOS after a very large number of write
+  transactions have been committed.
+* Fix a "Destruction of mutex in use" assertion failure after an error while
+  opening a file.
+* Realm now throws an exception if an `Object` subclass is defined with a managed Swift `lazy` property.
+  Objects with ignored `lazy` properties should now work correctly.
+* Update the LLDB script to work with recent changes to the implementation of `RLMResults`.
+* Fix an assertion failure when a Realm file is deleted while it is still open,
+  and then a new Realm is opened at the same path. Note that this is still not
+  a supported scenario, and may break in other ways.
 
 1.0.0 Release notes (2016-05-25)
 =============================================================

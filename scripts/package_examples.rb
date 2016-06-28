@@ -8,12 +8,12 @@ require 'xcodeproj'
 
 def remove_reference_to_realm_xcode_project(workspace_path)
   old_workspace = Xcodeproj::Workspace.new_from_xcworkspace(workspace_path)
-  file_references = old_workspace.file_references.reject do |file_reference|
-    file_reference.path  == "../../../Realm.xcodeproj"
+  old_workspace.file_references.reject! do |file_reference|
+    file_reference.path == "../../../Realm.xcodeproj"
   end
 
   File.open("#{workspace_path}/contents.xcworkspacedata", "w") do |file|
-    file.puts Xcodeproj::Workspace.new(file_references).to_s
+    file.puts old_workspace
   end
 end
 

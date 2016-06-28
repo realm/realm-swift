@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Properties
 
 /**
- An array of `RLMProperty` instances representing the persisted properties of a class described by the schema.
+ An array of `RLMProperty` instances representing the managed properties of a class described by the schema.
  
  @see `RLMProperty`
  */

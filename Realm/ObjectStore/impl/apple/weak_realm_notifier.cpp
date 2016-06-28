@@ -69,6 +69,8 @@ WeakRealmNotifier::WeakRealmNotifier(WeakRealmNotifier&& rgt)
 WeakRealmNotifier& WeakRealmNotifier::operator=(WeakRealmNotifier&& rgt)
 {
     WeakRealmNotifierBase::operator=(std::move(rgt));
+
+    invalidate();
     m_runloop = rgt.m_runloop;
     m_signal = rgt.m_signal;
     rgt.m_runloop = nullptr;
@@ -78,6 +80,11 @@ WeakRealmNotifier& WeakRealmNotifier::operator=(WeakRealmNotifier&& rgt)
 }
 
 WeakRealmNotifier::~WeakRealmNotifier()
+{
+    invalidate();
+}
+
+void WeakRealmNotifier::invalidate()
 {
     if (m_signal) {
         CFRunLoopSourceInvalidate(m_signal);

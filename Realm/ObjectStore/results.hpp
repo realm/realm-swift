@@ -21,6 +21,7 @@
 
 #include "collection_notifications.hpp"
 #include "shared_realm.hpp"
+#include "impl/collection_notifier.hpp"
 
 #include <realm/table_view.hpp>
 #include <realm/util/optional.hpp>
@@ -46,7 +47,7 @@ public:
     // Results can be either be backed by nothing, a thin wrapper around a table,
     // or a wrapper around a query and a sort order which creates and updates
     // the tableview as needed
-    Results() = default;
+    Results();
     Results(SharedRealm r, SortOrder s, TableView tv);
     Results(SharedRealm r, Table& table);
     Results(SharedRealm r, Query q, SortOrder s = {});
@@ -54,10 +55,10 @@ public:
     ~Results();
 
     // Results is copyable and moveable
-    Results(Results const&) = default;
-    Results(Results&&) = default;
-    Results& operator=(Results const&) = default;
-    Results& operator=(Results&&) = default;
+    Results(Results const&);
+    Results(Results&&);
+    Results& operator=(Results const&);
+    Results& operator=(Results&&);
 
     // Get a query which will match the same rows as is contained in this Results
     // Returned query will not be valid if the current mode is Empty
@@ -106,7 +107,7 @@ public:
     // Get the min/max/average/sum of the given column
     // All but sum() returns none when there are zero matching rows
     // sum() returns 0, except for when it returns none
-    // Throws UnsupportedColumnTypeException for sum/average on datetime or non-numeric column
+    // Throws UnsupportedColumnTypeException for sum/average on timestamp or non-numeric column
     // Throws OutOfBoundsIndexException for an out-of-bounds column
     util::Optional<Mixed> max(size_t column);
     util::Optional<Mixed> min(size_t column);
@@ -129,30 +130,37 @@ public:
 
     // The Results object has been invalidated (due to the Realm being invalidated)
     // All non-noexcept functions can throw this
-    struct InvalidatedException {};
+    struct InvalidatedException : public std::runtime_error {
+        InvalidatedException() : std::runtime_error("Access to invalidated Results objects") {}
+    };
 
     // The input index parameter was out of bounds
-    struct OutOfBoundsIndexException {
-        size_t requested;
-        size_t valid_count;
+    struct OutOfBoundsIndexException : public std::out_of_range {
+        OutOfBoundsIndexException(size_t r, size_t c);
+        const size_t requested;
+        const size_t valid_count;
     };
 
     // The input Row object is not attached
-    struct DetatchedAccessorException { };
+    struct DetatchedAccessorException : public std::runtime_error {
+        DetatchedAccessorException() : std::runtime_error("Atempting to access an invalid object") {}
+    };
 
     // The input Row object belongs to a different table
-    struct IncorrectTableException {
-        StringData expected;
-        StringData actual;
+    struct IncorrectTableException : public std::runtime_error {
+        IncorrectTableException(StringData e, StringData a, const std::string &error)
+        : std::runtime_error(error), expected(e), actual(a) {}
+        const StringData expected;
+        const StringData actual;
     };
 
     // The requested aggregate operation is not supported for the column type
-    struct UnsupportedColumnTypeException {
+    struct UnsupportedColumnTypeException : public std::runtime_error {
         size_t column_index;
         StringData column_name;
         DataType column_type;
 
-        UnsupportedColumnTypeException(size_t column, const Table* table);
+        UnsupportedColumnTypeException(size_t column, const Table* table, const char* operation);
     };
 
     SharedRealm get_realm() const { return m_realm; }
@@ -183,7 +191,7 @@ private:
     Table* m_table = nullptr;
     SortOrder m_sort;
 
-    std::shared_ptr<_impl::ResultsNotifier> m_notifier;
+    _impl::CollectionNotifier::Handle<_impl::ResultsNotifier> m_notifier;
 
     Mode m_mode = Mode::Empty;
     bool m_has_used_table_view = false;
@@ -197,10 +205,11 @@ private:
 
     void prepare_async();
 
-    template<typename Int, typename Float, typename Double, typename DateTime>
+    template<typename Int, typename Float, typename Double, typename Timestamp>
     util::Optional<Mixed> aggregate(size_t column, bool return_none_for_empty,
+                                    const char* name,
                                     Int agg_int, Float agg_float,
-                                    Double agg_double, DateTime agg_datetime);
+                                    Double agg_double, Timestamp agg_timestamp);
 
     void set_table_view(TableView&& tv);
 };

@@ -22,6 +22,7 @@
 #include "impl/external_commit_helper.hpp"
 #include "impl/transact_log_handler.hpp"
 #include "impl/weak_realm_notifier.hpp"
+#include "object_schema.hpp"
 #include "object_store.hpp"
 #include "schema.hpp"
 
@@ -33,9 +34,53 @@
 #include <realm/sync/history.hpp>
 
 #include <unordered_map>
+#include <algorithm>
 
 using namespace realm;
 using namespace realm::_impl;
+
+namespace realm {
+namespace _impl {
+
+struct SyncClient {
+    sync::Client client;
+
+    SyncClient(sync::Client client)
+    : client(std::move(client))
+    , m_thread([this]{ this->client.run(); })
+    {
+    }
+
+    ~SyncClient()
+    {
+        client.stop();
+        m_thread.join();
+    }
+
+private:
+    std::thread m_thread;
+};
+
+}
+}
+
+static std::shared_ptr<SyncClient> get_sync_client(Realm::Config const& config)
+{
+    static std::weak_ptr<SyncClient> weak_client;
+    static std::mutex s_sync_client_mutex;
+
+    std::lock_guard<std::mutex> lock(s_sync_client_mutex);
+
+    if (auto client = weak_client.lock()) {
+        return client;
+    }
+
+    sync::Client::Config client_config;
+    client_config.logger = config.logger;
+    auto client = std::make_shared<SyncClient>(sync::Client(client_config));
+    weak_client = client;
+    return client;
+}
 
 static std::mutex s_coordinator_mutex;
 static std::unordered_map<std::string, std::weak_ptr<RealmCoordinator>> s_coordinators_per_path;
@@ -77,22 +122,22 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
     }
     else {
         if (m_config.read_only != config.read_only) {
-            throw MismatchedConfigException("Realm at path already opened with different read permissions.");
+            throw MismatchedConfigException("Realm at path '%1' already opened with different read permissions.", config.path);
         }
         if (m_config.in_memory != config.in_memory) {
-            throw MismatchedConfigException("Realm at path already opened with different inMemory settings.");
+            throw MismatchedConfigException("Realm at path '%1' already opened with different inMemory settings.", config.path);
         }
         if (m_config.encryption_key != config.encryption_key) {
-            throw MismatchedConfigException("Realm at path already opened with a different encryption key.");
+            throw MismatchedConfigException("Realm at path '%1' already opened with a different encryption key.", config.path);
         }
         if (m_config.schema_version != config.schema_version && config.schema_version != ObjectStore::NotVersioned) {
-            throw MismatchedConfigException("Realm at path already opened with different schema version.");
+            throw MismatchedConfigException("Realm at path '%1' already opened with different schema version.", config.path);
         }
         if (m_config.sync_user_token != config.sync_user_token) {
-            throw MismatchedConfigException("Realm at path already opened with different user token.");
+            throw MismatchedConfigException("Realm at path already opened with different user token.", config.path);
         }
         if (m_config.sync_server_url != config.sync_server_url) {
-            throw MismatchedConfigException("Realm at path already opened with different server url.");
+            throw MismatchedConfigException("Realm at path already opened with different server url.", config.path);
         }
         // FIXME: verify that schema is compatible
         // Needs to verify that all tables present in both are identical, and
@@ -101,7 +146,7 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
         // Public API currently doesn't make it possible to have non-matching
         // schemata so it's not a huge issue
         if ((false) && m_config.schema != config.schema) {
-            throw MismatchedConfigException("Realm at path already opened with different schema");
+            throw MismatchedConfigException("Realm at path '%1' already opened with different schema", config.path);
         }
     }
 
@@ -118,12 +163,9 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
     }
 
     if (config.sync_server_url && !m_sync_session) {
-        sync::Client::LogLevel log_level = sync::Client::LogLevel::normal;
-        if (config.log_everything)
-            log_level = sync::Client::LogLevel::everything;
-        m_sync_client = std::make_unique<sync::Client>(config.logger, log_level);
+        m_sync_client = get_sync_client(config);
 
-        m_sync_session = std::make_unique<sync::Session>(*m_sync_client, config.path);
+        m_sync_session = std::make_unique<sync::Session>(m_sync_client->client, config.path);
         m_sync_session->set_sync_transact_callback([this] (sync::Session::version_type) {
             if (m_notifier)
                 m_notifier->notify_others();
@@ -137,8 +179,6 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
             // No user token yet, so just register the URL
             m_sync_awaits_user_token = true;
         }
-
-        m_sync_thread = std::thread(&sync::Client::run, m_sync_client.get());
     }
 
     auto realm = std::make_shared<Realm>(std::move(config));
@@ -168,11 +208,6 @@ RealmCoordinator::RealmCoordinator() = default;
 
 RealmCoordinator::~RealmCoordinator()
 {
-    if (m_sync_client) {
-        m_sync_client->stop();
-        m_sync_thread.join();
-    }
-
     std::lock_guard<std::mutex> coordinator_lock(s_coordinator_mutex);
     for (auto it = s_coordinators_per_path.begin(); it != s_coordinators_per_path.end(); ) {
         if (it->second.expired()) {
@@ -187,17 +222,9 @@ RealmCoordinator::~RealmCoordinator()
 void RealmCoordinator::unregister_realm(Realm* realm)
 {
     std::lock_guard<std::mutex> lock(m_realm_mutex);
-    for (size_t i = 0; i < m_weak_realm_notifiers.size(); ++i) {
-        auto& weak_realm_notifier = m_weak_realm_notifiers[i];
-        if (!weak_realm_notifier.expired() && !weak_realm_notifier.is_for_realm(realm)) {
-            continue;
-        }
-
-        if (i + 1 < m_weak_realm_notifiers.size()) {
-            weak_realm_notifier = std::move(m_weak_realm_notifiers.back());
-        }
-        m_weak_realm_notifiers.pop_back();
-    }
+    auto new_end = remove_if(begin(m_weak_realm_notifiers), end(m_weak_realm_notifiers),
+                             [=](auto& notifier) { return notifier.expired() || notifier.is_for_realm(realm); });
+    m_weak_realm_notifiers.erase(new_end, end(m_weak_realm_notifiers));
 }
 
 void RealmCoordinator::clear_cache()

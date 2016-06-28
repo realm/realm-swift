@@ -209,7 +209,7 @@ static RLMCollectionChange *getChange(RLMTestCase<ChangesetTestCase> *self, void
         }];
     }];
 
-    [token stop];
+    [(RLMNotificationToken *)token stop];
     token = nil;
 
     return changes;

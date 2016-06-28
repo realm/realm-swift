@@ -2495,7 +2495,7 @@ struct NullTestData {
         CFRunLoopStop(CFRunLoopGetCurrent());
     }];
     CFRunLoopRun();
-    [token stop];
+    [(RLMNotificationToken *)token stop];
     return results;
 }
 @end

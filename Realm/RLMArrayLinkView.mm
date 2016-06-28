@@ -98,9 +98,6 @@ static void throwError() {
     catch (realm::List::InvalidatedException const&) {
         @throw RLMException(@"RLMArray has been invalidated or the containing object has been deleted");
     }
-    catch (realm::List::DetatchedAccessorException const&) {
-        @throw RLMException(@"Object has been deleted or invalidated");
-    }
     catch (realm::List::OutOfBoundsIndexException const& e) {
         @throw RLMException(@"Index %zu is out of bounds (must be less than %zu)",
                             e.requested, e.valid_count);

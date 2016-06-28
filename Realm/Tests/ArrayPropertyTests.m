@@ -77,7 +77,7 @@
     RLMAssertThrowsWithReasonMatching([array addObject:obj], @"write transaction");
 }
 
-- (void)testDeleteStandaloneObjectWithArrayProperty {
+- (void)testDeleteUnmanagedObjectWithArrayProperty {
     ArrayPropertyObject *arObj = [[ArrayPropertyObject alloc] initWithValue:@[@"arrayObject", @[@[@"a"]], @[]]];
     RLMArray *stringArray = arObj.array;
     XCTAssertFalse(stringArray.isInvalidated, @"stringArray should be valid after creation.");
@@ -219,7 +219,7 @@
     RLMAssertThrowsWithReasonMatching([company.employees addObject:self.nonLiteralNil], @"nil");
 }
 
--(void)testStandalone {
+-(void)testUnmanaged {
     RLMRealm *realm = [self realmWithTestPath];
 
     ArrayPropertyObject *array = [[ArrayPropertyObject alloc] init];
@@ -269,9 +269,9 @@
     RLMAssertThrowsWithReasonMatching([intArray.array addObject:(id)intObj], @"IntObject.*StringObject");
     [intArray.intArray addObject:intObj];
 
-    XCTAssertThrows([intArray.intArray objectsWhere:@"intCol == 1"], @"Should throw on standalone RLMArray");
-    XCTAssertThrows(([intArray.intArray objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.intArray sortedResultsUsingProperty:@"intCol" ascending:YES], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.intArray objectsWhere:@"intCol == 1"], @"Should throw on unmanaged RLMArray");
+    XCTAssertThrows(([intArray.intArray objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on unmanaged RLMArray");
+    XCTAssertThrows([intArray.intArray sortedResultsUsingProperty:@"intCol" ascending:YES], @"Should throw on unmanaged RLMArray");
 
     XCTAssertEqual(0U, [intArray.intArray indexOfObjectWhere:@"intCol == 1"]);
     XCTAssertEqual(0U, ([intArray.intArray indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]));
@@ -279,11 +279,11 @@
     XCTAssertEqual([intArray.intArray indexOfObject:intObj], 0U, @"Should be first element");
     XCTAssertEqual([intArray.intArray indexOfObject:intObj], 0U, @"Should be first element");
 
-    // test standalone with literals
+    // test unmanaged with literals
     __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithValue:@[@"n", @[], @[[[IntObject alloc] initWithValue:@[@1]]]]];
 }
 
-- (void)testReplaceObjectAtIndexInStandaloneArray {
+- (void)testReplaceObjectAtIndexInUnmanagedArray {
     ArrayPropertyObject *array = [[ArrayPropertyObject alloc] init];
     array.name = @"name";
 
@@ -337,7 +337,7 @@
                                       @"StringObject.*IntObject");
 }
 
-- (void)testDeleteObjectInStandaloneArray {
+- (void)testDeleteObjectInUnmanagedArray {
     ArrayPropertyObject *array = [[ArrayPropertyObject alloc] init];
     array.name = @"name";
 
@@ -439,7 +439,7 @@
     [company.employees addObjects:[EmployeeObject allObjects]];
     [company.employees removeObjectAtIndex:1];
 
-    // test standalone
+    // test unmanaged
     XCTAssertEqual(0U, [company.employees indexOfObject:po1]);
     XCTAssertEqual(1U, [company.employees indexOfObject:po3]);
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:po2]);
@@ -482,7 +482,7 @@
     company.name = @"name";
     [company.employees addObjects:@[po3, po1, po4]];
 
-    // test standalone
+    // test unmanaged
     XCTAssertEqual(0U, [company.employees indexOfObjectWhere:@"name = 'Jill'"]);
     XCTAssertEqual(1U, [company.employees indexOfObjectWhere:@"name = 'Joe'"]);
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObjectWhere:@"name = 'John'"]);
@@ -578,7 +578,7 @@
 
     [realm cancelWriteTransaction];
 
-    // Standalone array
+    // Unmanaged array
     company = [[CompanyObject alloc] init];
     for (size_t i = 0; i < totalCount; ++i) {
         [company.employees addObject:[[EmployeeObject alloc] initWithValue:@[@"name", @(i), @NO]]];
@@ -627,7 +627,7 @@
 
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], @[]);
 
-    // persisted
+    // managed
     NSMutableArray *ages = [NSMutableArray array];
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
@@ -651,7 +651,7 @@
 
     RLMAssertThrowsWithReasonMatching([company.employees valueForKeyPath:@"@sum.dogs.@sum.age"], @"Nested key paths.*not supported");
     
-    // standalone
+    // unmanaged object
     company = [[CompanyObject alloc] init];
     ages = [NSMutableArray array];
     for (int i = 0; i < 30; ++i) {
@@ -691,7 +691,7 @@
     XCTAssertThrows([company.employees setValue:@10 forKey:@"age"]);
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], @[]);
 
-    // persisted
+    // managed
     NSMutableArray *ages = [NSMutableArray array];
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
@@ -705,7 +705,7 @@
 
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
 
-    // standalone
+    // unmanaged object
     company = [[CompanyObject alloc] init];
     ages = [NSMutableArray array];
     for (int i = 0; i < 30; ++i) {
@@ -731,7 +731,7 @@
     [company.employees addObject:eo];
     RLMArray *employees = company.employees;
 
-    // Standalone can be accessed from other threads
+    // Unmanaged object can be accessed from other threads
     [self dispatchAsyncAndWait:^{
         XCTAssertNoThrow(company.employees);
         XCTAssertNoThrow([employees lastObject]);
@@ -895,7 +895,7 @@
     }];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [(RLMNotificationToken *)token stop];
 }
 
 - (void)testNotificationSentAfterCommit {
@@ -925,7 +925,7 @@
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    [token stop];
+    [(RLMNotificationToken *)token stop];
 }
 
 - (void)testNotificationNotSentForUnrelatedChange {
@@ -952,7 +952,7 @@
             }];
         }];
     }];
-    [token stop];
+    [(RLMNotificationToken *)token stop];
 }
 
 - (void)testNotificationSentOnlyForActualRefresh {
@@ -990,7 +990,7 @@
     [realm refresh];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    [token stop];
+    [(RLMNotificationToken *)token stop];
 }
 
 - (void)testDeletingObjectWithNotificationsRegistered {
@@ -1011,7 +1011,7 @@
     [realm deleteObject:array];
     [realm commitWriteTransaction];
 
-    [token stop];
+    [(RLMNotificationToken *)token stop];
 }
 
 - (void)testAllMethodsCheckThread {

@@ -42,7 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- `RLMProperty` instances represent properties persisted to Realm in the context of an object schema.
+ `RLMProperty` instances represent properties managed by a Realm in the context of an object schema. Such properties may
+ be persisted to a Realm file or computed from other data from the Realm.
  
  When using Realm, `RLMProperty` instances allow performing migrations and introspecting the database's schema.
  
