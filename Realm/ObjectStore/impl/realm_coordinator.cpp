@@ -674,8 +674,6 @@ void RealmCoordinator::refresh_sync_access_token(std::string access_token)
         }
     }
     else {
-        m_sync_client->post([this,token=std::move(access_token)] {
-            m_sync_session->refresh(std::move(token));
-        });
+        m_sync_session->refresh(std::move(token));
     }
 }
