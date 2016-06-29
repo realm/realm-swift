@@ -8,7 +8,13 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* Swift: A `write` block may now `throw`, reverting any changes already made in the transaction.
+* Swift: A `write` block may now `throw`, reverting any changes already made in
+  the transaction.
+* Reduce address space used when committing write transactions.
+* Significantly reduce the download size of prebuilt binaries and slightly
+  reduce the final size contribution of Realm to applications.
+* Improve performance of accessing RLMArray properties and creating objects
+  with List properties.
 
 ### Bugfixes
 
@@ -18,6 +24,10 @@ x.x.x Release notes (yyyy-MM-dd)
 * Ensure that the initial call of a Results notification block is always passed
   .Initial even if there is a write transaction between when the notification
   is added and when the first notification is delivered.
+* Fix a crash when deleting all objects in a Realm while fast-enumerating query
+  results from that Realm.
+* Handle EINTR from flock() rather than crashing.
+* Fix incorrect behavior following a call to `[RLMRealm compact]`.
 
 1.0.1 Release notes (2016-06-12)
 =============================================================
