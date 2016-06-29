@@ -401,17 +401,10 @@ void add_bool_constraint_to_query(realm::Query &query, NSPredicateOperatorType o
     }
 }
 
-template <typename T>
-void add_string_constraint_to_query(realm::Query &query,
-                                    NSPredicateOperatorType operatorType,
-                                    NSComparisonPredicateOptions predicateOptions,
-                                    Columns<String> &&column,
-                                    T value) {
-    bool caseSensitive = !(predicateOptions & NSCaseInsensitivePredicateOption);
-    bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
-    RLMPrecondition(!diacriticInsensitive, @"Invalid predicate option",
-                    @"NSDiacriticInsensitivePredicateOption not supported for string type");
 
+template <typename T>
+void add_substring_constraint_without_empty_string_checks_to_query(Query& query, NSPredicateOperatorType operatorType, bool caseSensitive, Columns<String> column, T value)
+{
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
             query.and_query(column.begins_with(value, caseSensitive));
@@ -422,12 +415,59 @@ void add_string_constraint_to_query(realm::Query &query,
         case NSContainsPredicateOperatorType:
             query.and_query(column.contains(value, caseSensitive));
             break;
+        default:
+            // It is our caller's responsibility to ensure this is not reached.
+            REALM_ASSERT(false);
+    }
+}
+
+void add_substring_constraint_to_query(Query& query, NSPredicateOperatorType operatorType, bool caseSensitive, Columns<String> column, StringData value)
+{
+    if (!value.size()) {
+        // Foundation always returns false for substring operations with a RHS of null or "".
+        query.and_query(std::unique_ptr<Expression>(new FalseExpression));
+        return;
+    }
+
+    add_substring_constraint_without_empty_string_checks_to_query(query, operatorType, caseSensitive, std::move(column), value);
+}
+
+void add_substring_constraint_to_query(Query& query, NSPredicateOperatorType operatorType, bool caseSensitive, Columns<String> column1, Columns<String> column2)
+{
+    // Foundation always returns false for substring operations with a RHS of null or "".
+    // We don't need to concern ourselves with the possiblity of column2 traversing a link list
+    // and producing multiple values per row as such expressions will have been rejected.
+    query.group();
+    query.and_query(column2 != null() && column2 != "");
+    add_substring_constraint_without_empty_string_checks_to_query(query, operatorType, caseSensitive, std::move(column1), std::move(column2));
+    query.end_group();
+}
+
+template <typename T>
+void add_string_constraint_to_query(realm::Query &query,
+                                    NSPredicateOperatorType operatorType,
+                                    NSComparisonPredicateOptions predicateOptions,
+                                    Columns<String> column,
+                                    T&& value) {
+    bool caseSensitive = !(predicateOptions & NSCaseInsensitivePredicateOption);
+    bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
+    RLMPrecondition(!diacriticInsensitive, @"Invalid predicate option",
+                    @"NSDiacriticInsensitivePredicateOption not supported for string type");
+
+    switch (operatorType) {
         case NSEqualToPredicateOperatorType:
             query.and_query(column.equal(value, caseSensitive));
             break;
         case NSNotEqualToPredicateOperatorType:
             query.and_query(column.not_equal(value, caseSensitive));
             break;
+
+        case NSBeginsWithPredicateOperatorType:
+        case NSEndsWithPredicateOperatorType:
+        case NSContainsPredicateOperatorType:
+            add_substring_constraint_to_query(query, operatorType, caseSensitive, std::move(column), std::forward<T>(value));
+            break;
+
         default:
             @throw RLMPredicateException(@"Invalid operator type",
                                          @"Operator '%@' not supported for string type", operatorName(operatorType));
