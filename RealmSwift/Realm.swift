@@ -475,10 +475,13 @@ public final class Realm {
     */
     public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
-            if rlmNotification == NSNotification.Name.RLMRealmDidChange.rawValue {
-                block(notification: Notification.DidChange, realm: self)
-            } else if rlmNotification == NSNotification.Name.RLMRealmRefreshRequired.rawValue {
-                block(notification: Notification.RefreshRequired, realm: self)
+            switch rlmNotification {
+            case RLMNotification.DidChange:
+                block(notification: .DidChange, realm: self)
+            case RLMNotification.RefreshRequired:
+                block(notification: .RefreshRequired, realm: self)
+            default:
+                fatalError("Unhandled notification type: \(rlmNotification)")
             }
         }
     }
@@ -1130,10 +1133,13 @@ public final class Realm {
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
-            if rlmNotification == RLMRealmDidChangeNotification {
-                block(notification: Notification.DidChange, realm: self)
-            } else if rlmNotification == RLMRealmRefreshRequiredNotification {
-                block(notification: Notification.RefreshRequired, realm: self)
+            switch rlmNotification {
+            case RLMRealmDidChangeNotification:
+                block(notification: .DidChange, realm: self)
+            case RLMRealmRefreshRequiredNotification:
+                block(notification: .RefreshRequired, realm: self)
+            default:
+                fatalError("Unhandled notification type: \(rlmNotification)")
             }
         }
     }

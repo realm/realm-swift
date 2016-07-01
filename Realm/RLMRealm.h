@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import "RLMConstants.h"
 
 @class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
@@ -120,7 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @see `-[RLMRealm addNotificationBlock:]`
  */
-typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
+typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *realm);
 
 #pragma mark - Receiving Notification when a Realm Changes
 
@@ -136,7 +137,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  The block has the following definition:
 
-     typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
+     typedef void(^RLMNotificationBlock)(RLMNotification notification, RLMRealm *realm);
 
  It receives the following parameters:
 
