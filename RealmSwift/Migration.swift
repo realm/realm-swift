@@ -275,10 +275,10 @@ public func schemaVersionAtURL(fileURL: NSURL, encryptionKey: NSData? = nil) thr
 
  - parameter configuration: The Realm configuration used to open and migrate the Realm.
 
- - returns: An `NSError` that describes an error that occurred while applying the migration, if any.
+ - throws: An `NSError` that describes an error that occurred while applying the migration, if any.
 */
-public func migrateRealm(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) -> NSError? {
-    return RLMRealm.migrateRealm(configuration.rlmConfiguration)
+public func migrateRealm(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) throws {
+    return try RLMRealm.migrateRealm(configuration.rlmConfiguration)
 }
 
 

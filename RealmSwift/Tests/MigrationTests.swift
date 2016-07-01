@@ -569,7 +569,7 @@ class MigrationTests: TestCase {
                 _ = try! Realm(configuration: config)
             }
         } else {
-            migrateRealm(config)
+            try! migrateRealm(config)
         }
 
         XCTAssertEqual(didRun, shouldRun)
@@ -592,7 +592,7 @@ class MigrationTests: TestCase {
                                          migrationBlock: { _, _ in didRun = true })
         Realm.Configuration.defaultConfiguration = config
 
-        migrateRealm()
+        try! migrateRealm()
 
         XCTAssertEqual(didRun, true)
         XCTAssertEqual(1, try! schemaVersionAtURL(defaultRealmURL()))
