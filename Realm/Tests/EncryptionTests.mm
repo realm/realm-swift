@@ -207,11 +207,11 @@
         migrationRan = YES;
     };
 
-    XCTAssertFalse([RLMRealm migrateRealm:configuration error:nil]);
+    XCTAssertFalse([RLMRealm performMigrationForConfiguration:configuration error:nil]);
     XCTAssertFalse(migrationRan);
 
     configuration.encryptionKey = key;
-    XCTAssertTrue([RLMRealm migrateRealm:configuration error:nil]);
+    XCTAssertTrue([RLMRealm performMigrationForConfiguration:configuration error:nil]);
     XCTAssertTrue(migrationRan);
 }
 

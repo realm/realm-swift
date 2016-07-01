@@ -171,7 +171,7 @@ RLM_ARRAY_TYPE(MigrationObject);
         config.fileURL = RLMTestRealmURL();
         config.schemaVersion = 1;
         config.migrationBlock = block;
-        XCTAssertTrue([RLMRealm migrateRealm:config error:nil]);
+        XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
 
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         RLMAssertRealmSchemaMatchesTable(self, realm);
@@ -185,7 +185,7 @@ RLM_ARRAY_TYPE(MigrationObject);
         config.fileURL = RLMTestRealmURL();
         config.schemaVersion = 1;
         config.migrationBlock = block;
-        XCTAssertFalse([RLMRealm migrateRealm:config error:nil]);
+        XCTAssertFalse([RLMRealm performMigrationForConfiguration:config error:nil]);
     }
 }
 
@@ -253,7 +253,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     RLMRealmConfiguration *config = [self renameConfigurationWithObjectSchemas:objectSchemas className:className
                                                                        oldName:oldName newName:newName];
     NSError *error;
-    [RLMRealm migrateRealm:config error:&error];
+    [RLMRealm performMigrationForConfiguration:config error:&error];
     XCTAssertTrue([[error localizedDescription] rangeOfString:errorMessage].location != NSNotFound);
 }
 
@@ -280,10 +280,10 @@ RLM_ARRAY_TYPE(MigrationObject);
 
     if (errorMessage) {
         NSError *error;
-        [RLMRealm migrateRealm:config error:&error];
+        [RLMRealm performMigrationForConfiguration:config error:&error];
         XCTAssertEqualObjects([error localizedDescription], errorMessage);
     } else {
-        XCTAssertTrue([RLMRealm migrateRealm:config error:nil]);
+        XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
         XCTAssertEqualObjects(@"0", [[[StringObject allObjectsInRealm:[RLMRealm realmWithConfiguration:config error:nil]] firstObject] stringCol]);
     }
 }
@@ -685,7 +685,7 @@ RLM_ARRAY_TYPE(MigrationObject);
         XCTFail(@"Migration block should not have been called");
     };
     @autoreleasepool { XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]); }
-    @autoreleasepool { XCTAssertTrue([RLMRealm migrateRealm:config error:nil]); }
+    @autoreleasepool { XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]); }
 }
 
 - (void)testMigrationBlockCalledWhenSchemaVersionHasChanged {
@@ -703,7 +703,7 @@ RLM_ARRAY_TYPE(MigrationObject);
 
     migrationCalled = false;
     config.schemaVersion = 3;
-    @autoreleasepool { XCTAssertTrue([RLMRealm migrateRealm:config error:nil]); }
+    @autoreleasepool { XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]); }
     XCTAssertTrue(migrationCalled);
 }
 
@@ -1097,7 +1097,7 @@ RLM_ARRAY_TYPE(MigrationObject);
         config.fileURL = RLMTestRealmURL();
         config.customSchema = [self schemaWithObjects:@[ objectSchema ]];
         config.schemaVersion = 1;
-        XCTAssertTrue([RLMRealm migrateRealm:config error:nil]);
+        XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
 
         realm = [RLMRealm realmWithConfiguration:config error:nil];
         RLMAssertRealmSchemaMatchesTable(self, realm);
@@ -1145,7 +1145,7 @@ RLM_ARRAY_TYPE(MigrationObject);
         [migration createObject:RequiredPropertiesObject.className withValue:@[@"World", [NSData data], [NSDate date]]];
     };
 
-    XCTAssertTrue([RLMRealm migrateRealm:config error:nil]);
+    XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
 
     RLMResults *allObjects = [RequiredPropertiesObject allObjectsInRealm:realm];
@@ -1284,7 +1284,7 @@ RLM_ARRAY_TYPE(MigrationObject);
         }];
         migrationCalled = true;
     };
-    XCTAssertTrue([RLMRealm migrateRealm:config error:nil]);
+    XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
     XCTAssertTrue(migrationCalled);
 #endif
 }
@@ -1328,7 +1328,7 @@ RLM_ARRAY_TYPE(MigrationObject);
             XCTAssertEqualObjects([oldObject.description stringByReplacingOccurrencesOfString:@"before_" withString:@""], newObject.description);
         }];
     }];
-    XCTAssertTrue([RLMRealm migrateRealm:config error:nil]);
+    XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
 
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     RLMAssertRealmSchemaMatchesTable(self, realm);
@@ -1390,7 +1390,7 @@ RLM_ARRAY_TYPE(MigrationObject);
         }
     };
 
-    XCTAssertTrue([RLMRealm migrateRealm:config error:nil]);
+    XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
     XCTAssertTrue(migrationCalled);
     XCTAssertEqualObjects(@"0", [[[StringObject allObjectsInRealm:[RLMRealm realmWithConfiguration:config error:nil]] firstObject] stringCol]);
 }

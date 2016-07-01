@@ -1625,7 +1625,7 @@
 
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = realm.configuration.fileURL;
-    XCTAssertThrows([RLMRealm migrateRealm:configuration error:nil]);
+    XCTAssertThrows([RLMRealm performMigrationForConfiguration:configuration error:nil]);
 }
 
 - (void)testNotificationPipeBufferOverfull {
