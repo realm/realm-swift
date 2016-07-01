@@ -55,10 +55,10 @@ Get the schema version for a Realm at a given local URL.
 - returns: The version of the Realm at `fileURL`.
 */
 public func schemaVersionAtURL(_ fileURL: URL, encryptionKey: Data? = nil) throws -> UInt64 {
-    var error: NSError? = nil
-    let version = RLMRealm.schemaVersion(at: fileURL, encryptionKey: encryptionKey, error: &error)
-    if let error = error {
-        throw error
+    var error: NSError?
+    let version = RLMRealm.__schemaVersion(at: fileURL, encryptionKey: encryptionKey, error: &error)
+    guard version != RLMNotVersioned else {
+        throw error!
     }
     return version
 }
@@ -258,10 +258,10 @@ public typealias MigrationObjectEnumerateBlock = (oldObject: MigrationObject?, n
  - returns: The version of the Realm at `fileURL`.
 */
 public func schemaVersionAtURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws -> UInt64 {
-    var error: NSError? = nil
-    let version = RLMRealm.schemaVersionAtURL(fileURL, encryptionKey: encryptionKey, error: &error)
-    if let error = error {
-        throw error
+    var error: NSError?
+    let version = RLMRealm.__schemaVersionAtURL(fileURL, encryptionKey: encryptionKey, error: &error)
+    guard version != RLMNotVersioned else {
+        throw error!
     }
     return version
 }
