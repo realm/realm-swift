@@ -1458,7 +1458,7 @@ class RealmTests: TestCase {
             notificationFired.fulfill()
         }
 
-        dispatchSyncNewThread {
+        dispatchAsyncAndWait {
             let realm = try! Realm()
             try! realm.write {
                 realm.create(SwiftStringObject.self, value: ["string"])
@@ -1488,7 +1488,7 @@ class RealmTests: TestCase {
         let results = realm.objects(SwiftStringObject.self)
         XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
 
-        dispatchSyncNewThread {
+        dispatchAsyncAndWait {
             try! Realm().write {
                 try! Realm().create(SwiftStringObject.self, value: ["string"])
                 return
@@ -1553,7 +1553,7 @@ class RealmTests: TestCase {
         let testRealm = realmWithTestPath()
         XCTAssertFalse(realm == testRealm)
 
-        dispatchSyncNewThread {
+        dispatchAsyncAndWait {
             let otherThreadRealm = try! Realm()
             XCTAssertFalse(realm == otherThreadRealm)
         }
@@ -1566,9 +1566,9 @@ class RealmTests: TestCase {
             realm.add(object)
         }
         XCTAssertEqual(false, object.boolCol)
-        dispatchSync { queue in
+        performBlockAndWait { queue in
             realm.async(onQueue: queue, handingOver: [object]) { realm, objects in
-                let object = objects[0] as! SwiftObject
+                let object = objects[0] as! SwiftBoolObject
                 try! realm.write {
                     object.boolCol = true
                 }

@@ -373,7 +373,7 @@ class ObjectTests: TestCase {
         XCTAssertNotNil(managed.realm)
         XCTAssertEqual(realm, managed.realm!)
 
-        dispatchSyncNewThread {
+        dispatchAsyncAndWait {
             autoreleasepool {
                 XCTAssertNotEqual(try! Realm(), managed.realm!)
             }

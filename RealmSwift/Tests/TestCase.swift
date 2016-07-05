@@ -252,14 +252,14 @@ class TestCase: XCTestCase {
         RLMRealm.resetRealmState()
     }
 
-    func dispatchSync(block: dispatch_queue_t -> ()) {
+    func performBlockAndWait(block: dispatch_queue_t -> ()) {
         let queue = dispatch_queue_create("background", nil)
         block(queue)
         dispatch_sync(queue) {}
     }
 
-    func dispatchSyncNewThread(block: dispatch_block_t) {
-        dispatchSync { queue in
+    func dispatchAsyncAndWait(block: dispatch_block_t) {
+        performBlockAndWait { queue in
             dispatch_async(queue) {
                 autoreleasepool {
                     block()
