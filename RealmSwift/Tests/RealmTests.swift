@@ -1561,11 +1561,11 @@ class RealmTests: TestCase {
 
     func testHandover() {
         let realm = try! Realm()
-        let object = SwiftObject()
+        let object = SwiftBoolObject()
         try! realm.write {
             realm.add(object)
         }
-
+        XCTAssertEqual(false, object.boolCol)
         dispatchSync { queue in
             realm.async(onQueue: queue, handingOver: [object]) { realm, objects in
                 let object = objects[0] as! SwiftObject

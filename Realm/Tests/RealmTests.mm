@@ -1686,6 +1686,27 @@
     [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
+- (void)testHandover {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    BoolObject *object = [[BoolObject alloc] init];
+    [realm transactionWithBlock:^{
+        [realm addObject:object];
+    }];
+    XCTAssertEqual(false, object.boolCol);
+    [self performBlockAndWait:^(dispatch_queue_t queue) {
+        [realm dispatchAsync:queue handingOver:@[object] withBlock:^(RLMRealm * _Nonnull realm,
+                                                                     NSArray<RLMObject *> * _Nonnull objects) {
+            BoolObject *object = (BoolObject *)objects[0];
+            [realm transactionWithBlock:^{
+                object.boolCol = YES;
+            }];
+        }];
+    }];
+    XCTAssertEqual(false, object.boolCol);
+    [realm refresh];
+    XCTAssertEqual(true, object.boolCol);
+}
+
 - (void)runBlock:(void (^)())block {
     block();
 }
