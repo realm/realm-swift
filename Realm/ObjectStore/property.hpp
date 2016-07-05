@@ -22,7 +22,7 @@
 #include <string>
 
 namespace realm {
-    enum class PropertyType {
+    enum class PropertyType : unsigned char {
         Int    = 0,
         Bool   = 1,
         Float  = 9,
