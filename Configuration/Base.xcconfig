@@ -39,6 +39,8 @@ WARNING_CFLAGS = -Wmismatched-tags -Wunused-private-field;
 OTHER_CPLUSPLUSFLAGS = $(OTHER_CPLUSPLUSFLAGS) -isystem core/include -IRealm/ObjectStore;
 
 CODE_SIGN_IDENTITY[sdk=iphone*] = iPhone Developer;
+CODE_SIGNING_REQUIRED[sdk=macosx] = NO;
+
 MACOSX_DEPLOYMENT_TARGET = 10.9;
 IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 WATCHOS_DEPLOYMENT_TARGET = 2.0;
