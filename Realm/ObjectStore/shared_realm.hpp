@@ -149,7 +149,12 @@ namespace realm {
         util::Optional<int> file_format_upgraded_from_version() const;
 
         struct HandoverPackage;
+
+        // Pins the current version and exports each object for handover.
         std::shared_ptr<HandoverPackage> package_for_handover(std::vector<Row> objects_to_hand_over);
+
+        // Unpins the handover version, ending the current read transaction and beginning a new one at this version,
+        // importing each object for handover.
         std::vector<std::unique_ptr<Row>> accept_handover(HandoverPackage& handover);
 
         ~Realm();
