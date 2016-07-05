@@ -495,7 +495,8 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
  */
 + (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
-- (void)dispatchAsync:(dispatch_queue_t)queue handingOver:(NSArray<RLMObject *> *)objectsToHandOver withBlock:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block;
+- (void)dispatchAsync:(dispatch_queue_t)queue handingOver:(NSArray<RLMObject *> *)objectsToHandOver
+        withBlock:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block;
 
 @end
 
