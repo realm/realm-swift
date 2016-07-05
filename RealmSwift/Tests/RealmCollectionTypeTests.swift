@@ -480,13 +480,13 @@ class RealmCollectionTypeTests: TestCase {
         let theExpectation = expectation(description: "")
         let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
-            case .Initial(let collection):
+            case .initial(let collection):
                 XCTAssertEqual(collection.count, 2)
                 break
-            case .Update:
+            case .update:
                 XCTFail("Shouldn't happen")
                 break
-            case .Error:
+            case .error:
                 XCTFail("Shouldn't happen")
                 break
             }
@@ -573,15 +573,15 @@ class ResultsTests: RealmCollectionTypeTests {
         var calls = 0
         let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
-            case .Initial(let results):
+            case .initial(let results):
                 XCTAssertEqual(results.count, calls + 2)
                 XCTAssertEqual(results, collection)
                 break
-            case .Update(let results, _, _, _):
+            case .update(let results, _, _, _):
                 XCTAssertEqual(results.count, calls + 2)
                 XCTAssertEqual(results, collection)
                 break
-            case .Error:
+            case .error:
                 XCTFail("Shouldn't happen")
                 break
             }
@@ -604,18 +604,18 @@ class ResultsTests: RealmCollectionTypeTests {
         var calls = 0
         let token = collection.addNotificationBlock { (change: RealmCollectionChange) in
             switch change {
-            case .Initial(let results):
+            case .initial(let results):
                 XCTAssertEqual(calls, 0)
                 XCTAssertEqual(results.count, 2)
                 break
-            case .Update(let results, let deletions, let insertions, let modifications):
+            case .update(let results, let deletions, let insertions, let modifications):
                 XCTAssertEqual(calls, 1)
                 XCTAssertEqual(results.count, 3)
                 XCTAssertEqual(deletions, [])
                 XCTAssertEqual(insertions, [2])
                 XCTAssertEqual(modifications, [])
                 break
-            case .Error(let error):
+            case .error(let error):
                 XCTFail(String(describing: error))
                 break
             }
@@ -750,13 +750,13 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         let theExpectation = expectation(description: "")
         let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
-            case .Initial(let list):
+            case .initial(let list):
                 XCTAssertEqual(list.count, 2)
                 break
-            case .Update:
+            case .update:
                 XCTFail("Shouldn't happen")
                 break
-            case .Error:
+            case .error:
                 XCTFail("Shouldn't happen")
                 break
             }
