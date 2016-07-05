@@ -388,8 +388,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
     }
 
     if (predicate) {
-        realm::Query query = objectSchema.table->where();
-        RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
+        realm::Query query = RLMPredicateToQuery(predicate, objectSchema, realm.schema);
 
         // create and populate array
         return [RLMResults resultsWithObjectSchema:objectSchema

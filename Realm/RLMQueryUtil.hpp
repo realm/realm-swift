@@ -33,9 +33,8 @@ namespace realm {
 extern NSString * const RLMPropertiesComparisonTypeMismatchException;
 extern NSString * const RLMUnsupportedTypesFoundInPropertyComparisonException;
 
-// apply the given predicate to the passed in query, returning the updated query
-void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RLMSchema *schema,
-                                 RLMObjectSchema *objectSchema);
+realm::Query RLMPredicateToQuery(NSPredicate *predicate, RLMObjectSchema *objectSchema,
+                                 RLMSchema *schema);
 
 // return property - throw for invalid column name
 RLMProperty *RLMValidatedProperty(RLMObjectSchema *objectSchema, NSString *columnName);
