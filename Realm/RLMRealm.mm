@@ -693,16 +693,27 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-+ (NSError *)migrateRealm:(RLMRealmConfiguration *)configuration {
++ (nullable NSError *)migrateRealm:(RLMRealmConfiguration *)configuration {
+    // Preserves backwards compatibility
+    NSError *error;
+    [self performMigrationForConfiguration:configuration error:&error];
+    return error;
+}
+
++ (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
     if (RLMGetAnyCachedRealmForPath(configuration.config.path)) {
         @throw RLMException(@"Cannot migrate Realms that are already open.");
     }
 
+    NSError *localError; // Prevents autorelease
+    BOOL success;
     @autoreleasepool {
-        NSError *error = nil;
-        [RLMRealm realmWithConfiguration:configuration error:&error];
-        return error;
+        success = [RLMRealm realmWithConfiguration:configuration error:&localError] != nil;
     }
+    if (!success && error) {
+        *error = localError; // Must set outside pool otherwise will free anyway
+    }
+    return success;
 }
 
 - (RLMObject *)createObject:(NSString *)className withValue:(id)value {

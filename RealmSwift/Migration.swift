@@ -63,28 +63,22 @@ public func schemaVersionAtURL(_ fileURL: URL, encryptionKey: Data? = nil) throw
     return version
 }
 
-/**
-Performs the configuration's migration block on the Realm created by the given
-configuration.
+extension Realm {
+    /**
+     Performs the given Realm configuration's migration block on a Realm at the given path.
 
-This method is called automatically when opening a Realm for the first time and does
-not need to be called explicitly. You can choose to call this method to control
-exactly when and how migrations are performed.
+     This method is called automatically when opening a Realm for the first time and does
+     not need to be called explicitly. You can choose to call this method to control
+     exactly when and how migrations are performed.
 
-- parameter configuration: The Realm.Configuration used to create the Realm to be
-                           migrated, and containing the schema version and migration
-                           block used to perform the migration.
+     - parameter configuration: The Realm configuration used to open and migrate the Realm.
 
-- returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
-           that occurred otherwise.
-*/
-@discardableResult
-public func migrateRealm(_ configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) throws {
-    if let error = RLMRealm.migrateRealm(configuration.rlmConfiguration) {
-        throw error
+     - throws: An `NSError` that describes an error that occurred while applying the migration, if any.
+     */
+    public static func performMigration(for configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) throws {
+        try RLMRealm.performMigration(for: configuration.rlmConfiguration)
     }
 }
-
 
 /**
 `Migration` is the object passed into a user-defined `MigrationBlock` when updating the version
@@ -277,10 +271,33 @@ public func schemaVersionAtURL(fileURL: NSURL, encryptionKey: NSData? = nil) thr
 
  - returns: An `NSError` that describes an error that occurred while applying the migration, if any.
 */
+@available(*, deprecated=1.0.2, renamed="Realm.performMigration(for:)")
 public func migrateRealm(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) -> NSError? {
-    return RLMRealm.migrateRealm(configuration.rlmConfiguration)
+    // Preserves backwards compatibility
+    do {
+        try Realm.performMigration(for: configuration)
+        return nil
+    } catch let error as NSError {
+        return error
+    }
 }
 
+extension Realm {
+    /**
+     Performs the given Realm configuration's migration block on a Realm at the given path.
+
+     This method is called automatically when opening a Realm for the first time and does
+     not need to be called explicitly. You can choose to call this method to control
+     exactly when and how migrations are performed.
+
+     - parameter configuration: The Realm configuration used to open and migrate the Realm.
+
+     - throws: An `NSError` that describes an error that occurred while applying the migration, if any.
+     */
+    public static func performMigration(for configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) throws {
+        try RLMRealm.performMigrationForConfiguration(configuration.rlmConfiguration)
+    }
+}
 
 /**
  `Migration` instances encapsulate information intended to facilitate a schema migration.
