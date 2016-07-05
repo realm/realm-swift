@@ -12,6 +12,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Fix a crash when reading the shared schema from an observed Swift object.
+* Fix crashes or incorrect results when passing an array of values to
+  `createOrUpdate` after reordering the class's properties.
 
 1.0.1 Release notes (2016-06-12)
 =============================================================
