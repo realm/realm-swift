@@ -252,14 +252,20 @@ class TestCase: XCTestCase {
         RLMRealm.resetRealmState()
     }
 
-    func dispatchSyncNewThread(block: dispatch_block_t) {
+    func dispatchSync(block: dispatch_queue_t -> ()) {
         let queue = dispatch_queue_create("background", nil)
-        dispatch_async(queue) {
-            autoreleasepool {
-                block()
+        block(queue)
+        dispatch_sync(queue) {}
+    }
+
+    func dispatchSyncNewThread(block: dispatch_block_t) {
+        dispatchSync { queue in
+            dispatch_async(queue) {
+                autoreleasepool {
+                    block()
+                }
             }
         }
-        dispatch_sync(queue) {}
     }
 
     func assertThrows<T>(@autoclosure(escaping) block: () -> T, named: String? = RLMExceptionName,

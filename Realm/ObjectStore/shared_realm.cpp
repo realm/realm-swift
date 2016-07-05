@@ -28,6 +28,7 @@
 
 #include <realm/commit_log.hpp>
 #include <realm/group_shared.hpp>
+#include <realm/row.hpp>
 
 using namespace realm;
 using namespace realm::_impl;
@@ -516,6 +517,52 @@ util::Optional<int> Realm::file_format_upgraded_from_version() const
         return upgrade_initial_version;
     }
     return util::Optional<int>();
+}
+
+struct Realm::HandoverPackage {
+    SharedGroup::VersionID version;
+    std::vector<std::unique_ptr<SharedGroup::Handover<Row>>> objects;
+
+    bool is_awaiting_import() {
+        return version != SharedGroup::VersionID();
+    }
+
+    ~HandoverPackage() {
+        if (is_awaiting_import()) {
+            REALM_TERMINATE("Handover package not imported, leaking pinned version");
+        }
+    }
+};
+
+std::shared_ptr<Realm::HandoverPackage> Realm::package_for_handover(std::vector<Row> objects_to_hand_over) {
+    std::shared_ptr<Realm::HandoverPackage> handover = std::make_shared<Realm::HandoverPackage>();
+    handover->version = m_shared_group->pin_version();
+
+    handover->objects.reserve(objects_to_hand_over.size());
+    for (auto &object : objects_to_hand_over) {
+        handover->objects.push_back(m_shared_group->export_for_handover(object)); // <--- Export each object
+    }
+
+    return handover;
+}
+
+std::vector<std::unique_ptr<realm::Row>> Realm::accept_handover(Realm::HandoverPackage& handover) {
+    if (!handover.is_awaiting_import()) {
+        REALM_TERMINATE("Handover package imported multiple times");
+    }
+
+    m_shared_group->end_read();
+    m_group = &const_cast<Group&>(m_shared_group->begin_read(handover.version));
+    m_shared_group->unpin_version(handover.version);
+    handover.version = SharedGroup::VersionID();
+
+    std::vector<std::unique_ptr<realm::Row>> objects;
+    objects.reserve(handover.objects.size());
+    for (auto &object : handover.objects) {
+        objects.push_back(m_shared_group->import_from_handover(std::move(object)));
+    }
+
+    return objects;
 }
 
 MismatchedConfigException::MismatchedConfigException(StringData message, StringData path)

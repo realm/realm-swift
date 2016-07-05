@@ -1241,6 +1241,15 @@ public final class Realm {
         try rlmRealm.writeCopyToURL(fileURL, encryptionKey: encryptionKey)
     }
 
+    // MARK: Handover
+
+    public func async(onQueue queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
+                      handingOver objects: [Object], execute block: (Realm, [Object]) -> ()) {
+        rlmRealm.dispatchAsync(queue, handingOver: unsafeBitCast(objects, [RLMObject].self)) { realm, objects in
+            block(Realm(realm), unsafeBitCast(objects, [Object].self))
+        }
+    }
+
     // MARK: Internal
 
     internal var rlmRealm: RLMRealm

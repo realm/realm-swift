@@ -712,6 +712,35 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return success;
 }
 
+- (void)dispatchAsync:(dispatch_queue_t)queue handingOver:(NSArray<RLMObject *> *)objectsToHandOver withBlock:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block {
+    std::vector<realm::Row> rowsToHandOver;
+    rowsToHandOver.reserve(objectsToHandOver.count);
+    NSMutableArray<NSString *> *classNames = [NSMutableArray arrayWithCapacity:objectsToHandOver.count];
+    for (RLMObject *object in objectsToHandOver) {
+        if (self != object.realm) {
+            @throw RLMException(@"Can only hand over objects from the Realm they belong to.");
+        }
+        rowsToHandOver.push_back(object->_row);
+        [classNames addObject: object.objectSchema.className];
+    }
+    std::shared_ptr<Realm::HandoverPackage> package = _realm->package_for_handover(rowsToHandOver);
+
+    RLMRealmConfiguration *config = self.configuration;
+    dispatch_async(queue, ^{
+        @autoreleasepool {
+            RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+            std::vector<std::unique_ptr<realm::Row>> acceptedRows = realm->_realm->accept_handover(*package);
+
+            NSMutableArray<RLMObject *> *acceptedObjects = [NSMutableArray arrayWithCapacity:classNames.count];
+            for (NSUInteger i = 0; i < classNames.count; i++) {
+                RLMObjectSchema *schema = [realm.schema schemaForClassName:classNames[i]];
+                [acceptedObjects addObject: (RLMObject *)RLMCreateObjectAccessor(realm, schema, acceptedRows[i]->get_index())];
+            }
+            block(realm, acceptedObjects);
+        }
+    });
+}
+
 - (RLMObject *)createObject:(NSString *)className withValue:(id)value {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, value, false);
 }
