@@ -410,7 +410,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMCollectionChange *, NSError *))block {
     [_realm verifyNotificationsAreSupported];
-    return RLMAddNotificationBlock(self, _results, block, false);
+    return RLMAddNotificationBlock(self, _results, block, true);
 }
 #pragma clang diagnostic pop
 

@@ -304,8 +304,10 @@ RLMNotificationToken *RLMAddNotificationBlock(id objcCollection,
             return true;
         }
     };
+
+    auto skip = suppressInitialChange ? std::make_shared<bool>(true) : nullptr;
     auto cb = [=, &collection](realm::CollectionChangeSet const& changes,
-                               std::exception_ptr err) mutable {
+                               std::exception_ptr err) {
         if (err) {
             try {
                 rethrow_exception(err);
@@ -322,9 +324,12 @@ RLMNotificationToken *RLMAddNotificationBlock(id objcCollection,
             return;
         }
 
-        if (changes.empty() || suppressInitialChange) {
+        if (skip && *skip) {
+            *skip = false;
             block(objcCollection, nil, nil);
-            suppressInitialChange = false;
+        }
+        else if (changes.empty()) {
+            block(objcCollection, nil, nil);
         }
         else {
             block(objcCollection, [[RLMCollectionChange alloc] initWithChanges:changes], nil);

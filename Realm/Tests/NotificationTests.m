@@ -196,7 +196,7 @@ static RLMCollectionChange *getChange(RLMTestCase<ChangesetTestCase> *self, void
         XCTAssertNotNil(results);
         XCTAssertNil(error);
         changes = c;
-        XCTAssertTrue(first || changes);
+        XCTAssertTrue(first == !changes);
         first = false;
         CFRunLoopStop(CFRunLoopGetCurrent());
     }];

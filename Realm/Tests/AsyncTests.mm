@@ -947,4 +947,41 @@
     [token2 stop];
 }
 
+- (void)testInitialResultDiscardsChanges {
+    // Set up a notification block on the main thread which will let us block
+    // the background thread until async notifications are ready after the commit
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    RLMNotificationToken *outerToken = [self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *) {
+        dispatch_semaphore_signal(sema);
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    }];
+
+    [self dispatchAsync:^{
+        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+            // Add the notification block, but don't run the local runloop until
+            // the other thread gets the commit notification, to ensure that
+            // the notification block can't be called until it is one that would
+            // have changes
+            auto token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *changes, NSError *) {
+                XCTAssertEqual(results.count, 1U);
+                XCTAssertNil(changes);
+                CFRunLoopStop(CFRunLoopGetCurrent());
+            }];
+
+            [RLMRealm.defaultRealm transactionWithBlock:^{
+                [IntObject createInDefaultRealmWithValue:@[@0]];
+            }];
+
+            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+            CFRunLoopRun();
+            [token stop];
+            CFRunLoopStop(CFRunLoopGetCurrent());
+        });
+        CFRunLoopRun();
+    }];
+
+    CFRunLoopRun();
+    [outerToken stop];
+}
+
 @end
