@@ -49,7 +49,7 @@ using util::File;
 
 @interface RLMRealm ()
 @property (nonatomic, strong) NSHashTable *notificationHandlers;
-- (void)sendNotifications:(NSString *)notification;
+- (void)sendNotifications:(RLMNotification)notification;
 @end
 
 void RLMDisableSyncToDisk() {
@@ -443,7 +443,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return token;
 }
 
-- (void)sendNotifications:(NSString *)notification {
+- (void)sendNotifications:(RLMNotification)notification {
     NSAssert(!_realm->config().read_only, @"Read-only realms do not have notifications");
 
     NSUInteger count = _notificationHandlers.count;

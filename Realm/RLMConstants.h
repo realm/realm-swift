@@ -18,6 +18,14 @@
 
 #import <Foundation/Foundation.h>
 
+// For compatibility with Xcode 7, before extensible string enums were introduced,
+#ifdef NS_EXTENSIBLE_STRING_ENUM
+#define RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(_, extensible_string_enum) NS_SWIFT_NAME(extensible_string_enum)
+#else
+#define NS_EXTENSIBLE_STRING_ENUM
+#define RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(fully_qualified, _) NS_SWIFT_NAME(fully_qualified)
+#endif
+
 #pragma mark - Enums
 
 /**
@@ -125,6 +133,11 @@ typedef NS_ENUM(NSInteger, RLMError) {
 #pragma mark - Notification Constants
 
 /**
+ A notification indicating that changes were made to a Realm.
+*/
+typedef NSString * RLMNotification NS_EXTENSIBLE_STRING_ENUM;
+
+/**
  This notification is posted by a Realm when the data in that Realm has changed.
 
  More specifically, this notification is posted after a Realm has been refreshed to
@@ -132,12 +145,13 @@ typedef NS_ENUM(NSInteger, RLMError) {
  `-[RLMRealm refresh]` is called, after an implicit refresh from `-[RLMRealm beginWriteTransaction]`,
  or after a local write transaction is completed.
  */
-extern NSString * const RLMRealmRefreshRequiredNotification;
+extern RLMNotification const RLMRealmRefreshRequiredNotification
+RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(RLMRealmRefreshRequiredNotification, RefreshRequired);
 
 /**
  This notification is posted by a Realm when a write transaction has been
  committed to a Realm on a different thread for the same file.
- 
+
  It is not posted if `-[RLMRealm autorefresh]` is enabled, or if the Realm is
  refreshed before the notification has a chance to run.
 
@@ -147,7 +161,8 @@ extern NSString * const RLMRealmRefreshRequiredNotification;
  files. This is because Realm must keep an extra copy of the data for the stale
  Realm.
  */
-extern NSString * const RLMRealmDidChangeNotification;
+extern RLMNotification const RLMRealmDidChangeNotification
+RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(RLMRealmDidChangeNotification, DidChange);
 
 #pragma mark - Other Constants
 

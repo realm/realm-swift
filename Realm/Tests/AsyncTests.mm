@@ -326,7 +326,7 @@
         @autoreleasepool {
             __block RLMNotificationToken *token;
             CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
-                token = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+                token = [RLMRealm.defaultRealm addNotificationBlock:^(RLMNotification notification, RLMRealm *realm) {
                     CFRunLoopStop(CFRunLoopGetCurrent());
                     dispatch_semaphore_signal(sema);
                     [token stop];
@@ -775,7 +775,7 @@
 - (void)testAddingNewQueryWithinRealmNotificationBlock {
     __block RLMNotificationToken *queryToken;
     __block XCTestExpectation *exp;
-    auto realmToken = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+    auto realmToken = [RLMRealm.defaultRealm addNotificationBlock:^(RLMNotification notification, RLMRealm *realm) {
         CFRunLoopStop(CFRunLoopGetCurrent());
         exp = [self expectationWithDescription:@"query notification"];
         queryToken = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *e) {
