@@ -62,8 +62,8 @@ class RealmTests: TestCase {
             }
         }
 
-        let fileManager = FileManager.default()
-        try! fileManager.setAttributes([ FileAttributeKey.immutable.rawValue: true ], ofItemAtPath: testRealmURL().path!)
+        let fileManager = FileManager.default
+        try! fileManager.setAttributes([ FileAttributeKey.immutable: true ], ofItemAtPath: testRealmURL().path!)
 
         // Should not be able to open read-write
         assertFails(Error.FileAccess) {
@@ -76,7 +76,7 @@ class RealmTests: TestCase {
             XCTAssertEqual(1, realm.allObjects(ofType: SwiftStringObject.self).count)
         }
 
-        try! fileManager.setAttributes([ FileAttributeKey.immutable.rawValue: false ], ofItemAtPath: testRealmURL().path!)
+        try! fileManager.setAttributes([ FileAttributeKey.immutable: false ], ofItemAtPath: testRealmURL().path!)
     }
 
     func testReadOnlyRealmMustExist() {
@@ -92,17 +92,17 @@ class RealmTests: TestCase {
         }
 
         // Make Realm at test path temporarily unreadable
-        let fileManager = FileManager.default()
+        let fileManager = FileManager.default
         let permissions = try! fileManager
-            .attributesOfItem(atPath: testRealmURL().path!)[FileAttributeKey.posixPermissions.rawValue] as! NSNumber
-        try! fileManager.setAttributes([ FileAttributeKey.posixPermissions.rawValue: 0000 ],
+            .attributesOfItem(atPath: testRealmURL().path!)[FileAttributeKey.posixPermissions] as! NSNumber
+        try! fileManager.setAttributes([ FileAttributeKey.posixPermissions: 0000 ],
                                        ofItemAtPath: testRealmURL().path!)
 
         assertFails(Error.FilePermissionDenied) {
             try Realm(fileURL: testRealmURL())
         }
 
-        try! fileManager.setAttributes([FileAttributeKey.posixPermissions.rawValue: permissions], ofItemAtPath: testRealmURL().path!)
+        try! fileManager.setAttributes([FileAttributeKey.posixPermissions: permissions], ofItemAtPath: testRealmURL().path!)
     }
 
     #if DEBUG
@@ -152,7 +152,7 @@ class RealmTests: TestCase {
             _ = try! Realm()
         }
 
-        FileManager.default().createFile(atPath: defaultRealmURL().path!,
+        FileManager.default.createFile(atPath: defaultRealmURL().path!,
             contents:"a".data(using: String.Encoding.utf8, allowLossyConversion: false),
             attributes: nil)
 
@@ -472,7 +472,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(object["stringCol"] as! String?, dictionary["stringCol"] as! String?)
         XCTAssertEqual(object["binaryCol"] as! NSData?, dictionary["binaryCol"] as! NSData?)
         XCTAssertEqual(object["dateCol"] as! NSDate?, dictionary["dateCol"] as! NSDate?)
-        XCTAssertEqual(object["objectCol"]?.boolCol, false)
+        XCTAssertEqual((object["objectCol"] as? SwiftBoolObject)?.boolCol, false)
     }
 
     func testDynamicObjectOptionalProperties() {
@@ -494,7 +494,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(object["optNSStringCol"] as! String?, dictionary["optNSStringCol"] as! String?)
         XCTAssertEqual(object["optBinaryCol"] as! NSData?, dictionary["optBinaryCol"] as! NSData?)
         XCTAssertEqual(object["optDateCol"] as! NSDate?, dictionary["optDateCol"] as! NSDate?)
-        XCTAssertEqual(object["optObjectCol"]?.boolCol, true)
+        XCTAssertEqual((object["optObjectCol"] as? SwiftBoolObject)?.boolCol, true)
     }
 
     func testObjectForPrimaryKey() {
@@ -732,7 +732,7 @@ class RealmTests: TestCase {
             let copy = try! Realm(fileURL: fileURL)
             XCTAssertEqual(1, copy.allObjects(ofType: SwiftObject.self).count)
         }
-        try! FileManager.default().removeItem(at: fileURL)
+        try! FileManager.default.removeItem(at: fileURL)
     }
 
     func testEquals() {

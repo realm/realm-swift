@@ -92,7 +92,7 @@ class SwiftPerformanceTests: TestCase {
 
     private func copyRealmToTestPath(_ realm: Realm) -> Realm {
         do {
-            try FileManager.default().removeItem(at: testRealmURL())
+            try FileManager.default.removeItem(at: testRealmURL())
         } catch let error as NSError {
             XCTAssertTrue(error.domain == NSCocoaErrorDomain && error.code == 4)
         } catch {
@@ -478,7 +478,7 @@ class SwiftPerformanceTests: TestCase {
             self.startMeasuring()
             try! realm.write { object.intCol += 1 }
             while object.intCol < stopValue {
-                RunLoop.current().run(mode: RunLoopMode.defaultRunLoopMode, before: NSDate.distantFuture())
+                RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: NSDate.distantFuture)
             }
             queue.sync() {}
             self.stopMeasuring()

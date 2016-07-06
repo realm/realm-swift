@@ -52,7 +52,7 @@ class TestCase: XCTestCase {
 #endif
         do {
             // Clean up any potentially lingering Realm files from previous runs
-            try FileManager.default().removeItem(atPath: RLMRealmPathForFile(""))
+            try FileManager.default.removeItem(atPath: RLMRealmPathForFile(""))
         } catch {
             // The directory might not actually already exist, so not an error
         }
@@ -67,11 +67,11 @@ class TestCase: XCTestCase {
         testDir = RLMRealmPathForFile(realmFilePrefix())
 
         do {
-            try FileManager.default().removeItem(atPath: testDir)
+            try FileManager.default.removeItem(atPath: testDir)
         } catch {
             // The directory shouldn't actually already exist, so not an error
         }
-        try! FileManager.default().createDirectory(at: URL(fileURLWithPath: testDir, isDirectory: true),
+        try! FileManager.default.createDirectory(at: URL(fileURLWithPath: testDir, isDirectory: true),
                                                      withIntermediateDirectories: true, attributes: nil)
 
         let config = Realm.Configuration(fileURL: defaultRealmURL())
@@ -88,7 +88,7 @@ class TestCase: XCTestCase {
         resetRealmState()
 
         do {
-            try FileManager.default().removeItem(atPath: testDir)
+            try FileManager.default.removeItem(atPath: testDir)
         } catch {
             XCTFail("Unable to delete realm files")
         }
