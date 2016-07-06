@@ -1250,6 +1250,18 @@ public final class Realm {
         }
     }
 
+    public func async<C: RangeReplaceableCollectionType where C.Generator.Element: Object>(
+        onQueue queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
+                handingOver objects: C, execute block: (Realm, C) -> ()) {
+        async(handingOver: Array(objects)) { realm, rawObjects in
+            var objects = C()
+            for object in rawObjects {
+                objects.append(object)
+            }
+            block(realm, objects)
+        }
+    }
+
     // MARK: Internal
 
     internal var rlmRealm: RLMRealm
