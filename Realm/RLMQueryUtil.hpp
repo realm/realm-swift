@@ -17,27 +17,26 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+
 #import <vector>
 
 namespace realm {
+    class Group;
     class Query;
-    struct SortOrder;
     class Table;
-    class TableView;
+    struct SortOrder;
 }
 
-@class RLMObjectSchema;
-@class RLMProperty;
-@class RLMSchema;
+@class RLMObjectSchema, RLMProperty, RLMSchema, RLMSortDescriptor;
 
 extern NSString * const RLMPropertiesComparisonTypeMismatchException;
 extern NSString * const RLMUnsupportedTypesFoundInPropertyComparisonException;
 
 realm::Query RLMPredicateToQuery(NSPredicate *predicate, RLMObjectSchema *objectSchema,
-                                 RLMSchema *schema);
+                                 RLMSchema *schema, realm::Group &group);
 
 // return property - throw for invalid column name
 RLMProperty *RLMValidatedProperty(RLMObjectSchema *objectSchema, NSString *columnName);
 
 // validate the array of RLMSortDescriptors and convert it to a realm::SortOrder
-realm::SortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *objectSchema, NSArray *descriptors);
+realm::SortOrder RLMSortOrderFromDescriptors(realm::Table& table, NSArray<RLMSortDescriptor *> *descriptors);
