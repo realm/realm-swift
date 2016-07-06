@@ -1686,7 +1686,22 @@
     [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
-- (void)testHandover {
+- (void)testHandoverNoObject {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertEqual(0u, [BoolObject allObjects].count);
+    [self performBlockAndWait:^(dispatch_queue_t queue) {
+        [realm dispatchAsync:queue withBlock:^(RLMRealm * _Nonnull realm) {
+            [realm transactionWithBlock:^{
+                [realm addObject:[[BoolObject alloc] init]];
+            }];
+        }];
+    }];
+    XCTAssertEqual(0u, [BoolObject allObjects].count);
+    [realm refresh];
+    XCTAssertEqual(1u, [BoolObject allObjects].count);
+}
+
+- (void)testHandoverSingleObject {
     RLMRealm *realm = [RLMRealm defaultRealm];
     BoolObject *object = [[BoolObject alloc] init];
     [realm transactionWithBlock:^{
@@ -1694,17 +1709,45 @@
     }];
     XCTAssertEqual(false, object.boolCol);
     [self performBlockAndWait:^(dispatch_queue_t queue) {
-        [realm dispatchAsync:queue handingOver:@[object] withBlock:^(RLMRealm * _Nonnull realm,
-                                                                     NSArray<RLMObject *> * _Nonnull objects) {
-            BoolObject *object = (BoolObject *)objects[0];
+        [realm dispatchAsync:queue handingOverObject:object withBlock:^(RLMRealm * _Nonnull realm,
+                                                                        RLMObject * _Nonnull object) {
             [realm transactionWithBlock:^{
-                object.boolCol = YES;
+                ((BoolObject *)object).boolCol = YES;
             }];
         }];
     }];
     XCTAssertEqual(false, object.boolCol);
     [realm refresh];
     XCTAssertEqual(true, object.boolCol);
+}
+
+- (void)testHandoverMultipleObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    StringObject *stringObject = [[StringObject alloc] init];
+    IntObject *intObject = [[IntObject alloc] init];
+    [realm transactionWithBlock:^{
+        [realm addObject:stringObject];
+        [realm addObject:intObject];
+    }];
+    XCTAssertEqualObjects(nil, stringObject.stringCol);
+    XCTAssertEqual(0, intObject.intCol);
+    NSArray<RLMObject *> *objects = @[stringObject, intObject];
+    [self performBlockAndWait:^(dispatch_queue_t queue) {
+        [realm dispatchAsync:queue handingOverObjects:objects withBlock:^(RLMRealm * _Nonnull realm,
+                                                                          NSArray<RLMObject *> * _Nonnull objects) {
+            StringObject *stringObject = (StringObject *)objects[0];
+            IntObject *intObject = (IntObject *)objects[1];
+            [realm transactionWithBlock:^{
+                stringObject.stringCol = @"the meaning of life";
+                intObject.intCol = 42;
+            }];
+        }];
+    }];
+    XCTAssertEqualObjects(nil, stringObject.stringCol);
+    XCTAssertEqual(0, intObject.intCol);
+    [realm refresh];
+    XCTAssertEqualObjects(@"the meaning of life", stringObject.stringCol);
+    XCTAssertEqual(42, intObject.intCol);
 }
 
 - (void)runBlock:(void (^)())block {

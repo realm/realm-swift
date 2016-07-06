@@ -1244,21 +1244,23 @@ public final class Realm {
     // MARK: Handover
 
     public func async(onQueue queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
-                      handingOver objects: [Object], execute block: (Realm, [Object]) -> ()) {
-        rlmRealm.dispatchAsync(queue, handingOver: unsafeBitCast(objects, [RLMObject].self)) { realm, objects in
-            block(Realm(realm), unsafeBitCast(objects, [Object].self))
+                      execute block: (Realm) -> ()) {
+        rlmRealm.dispatchAsync(queue) { realm in
+            block(Realm(realm))
         }
     }
 
-    public func async<C: RangeReplaceableCollectionType where C.Generator.Element: Object>(
-        onQueue queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
-                handingOver objects: C, execute block: (Realm, C) -> ()) {
-        async(handingOver: Array(objects)) { realm, rawObjects in
-            var objects = C()
-            for object in rawObjects {
-                objects.append(object)
-            }
-            block(realm, objects)
+    public func async<O: Object>(onQueue queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
+                               handingOver object: O, execute block: (Realm, O) -> ()) {
+        rlmRealm.dispatchAsync(queue, handingOverObject: unsafeBitCast(object, RLMObject.self)) { realm, objects in
+            block(Realm(realm), unsafeBitCast(objects, O.self))
+        }
+    }
+
+    public func async<O: Object>(onQueue queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
+                      handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
+        rlmRealm.dispatchAsync(queue, handingOverObjects: unsafeBitCast(objects, [RLMObject].self)) { realm, objects in
+            block(Realm(realm), unsafeBitCast(objects, [O].self))
         }
     }
 

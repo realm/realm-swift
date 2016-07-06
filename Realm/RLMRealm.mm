@@ -712,7 +712,22 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return success;
 }
 
-- (void)dispatchAsync:(dispatch_queue_t)queue handingOver:(NSArray<RLMObject *> *)objectsToHandOver
+- (void)dispatchAsync:(dispatch_queue_t)queue withBlock:(void(^)(RLMRealm *))block {
+    [self dispatchAsync:queue handingOverObjects:@[] withBlock:^(RLMRealm * _Nonnull realm,
+                                                                 NSArray<RLMObject *> * _Nonnull) {
+        block(realm);
+    }];
+}
+
+- (void)dispatchAsync:(dispatch_queue_t)queue handingOverObject:(RLMObject *)objectToHandOver
+            withBlock:(void(^)(RLMRealm *, RLMObject *))block {
+    [self dispatchAsync:queue handingOverObjects:@[objectToHandOver] withBlock:^(RLMRealm * realm,
+                                                                                 NSArray<RLMObject *> *objects) {
+        block(realm, objects[0]);
+    }];
+}
+
+- (void)dispatchAsync:(dispatch_queue_t)queue handingOverObjects:(NSArray<RLMObject *> *)objectsToHandOver
         withBlock:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block {
     std::vector<realm::Row> rowsToHandOver;
     rowsToHandOver.reserve(objectsToHandOver.count);
