@@ -1079,9 +1079,7 @@ void update_query_with_subquery_count_expression(RLMSchema *schema, RLMObjectSch
     NSPredicate *subqueryPredicate = [subqueryExpression.predicate predicateWithSubstitutionVariables:@{ subqueryExpression.variable : [NSExpression expressionForEvaluatedObject] }];
     subqueryPredicate = transformPredicate(subqueryPredicate, simplify_self_value_for_key_path_function_expression);
 
-    Query subquery = collectionMemberObjectSchema.table->where();
-    RLMUpdateQueryWithPredicate(&subquery, subqueryPredicate, schema, collectionMemberObjectSchema);
-
+    Query subquery = RLMPredicateToQuery(subqueryPredicate, collectionMemberObjectSchema, schema);
     add_numeric_constraint_to_query(query, RLMPropertyTypeInt, operatorType, collectionColumn.resolve_with_subquery<LinkList>(query, std::move(subquery)).count(), value);
 }
 
@@ -1255,23 +1253,23 @@ RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *prop
 
 } // namespace
 
-void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RLMSchema *schema,
-                                 RLMObjectSchema *objectSchema)
+realm::Query RLMPredicateToQuery(NSPredicate *predicate, RLMObjectSchema *objectSchema,
+                                 RLMSchema *schema)
 {
+    auto query = objectSchema.table->where();
+
     // passing a nil predicate is a no-op
     if (!predicate) {
-        return;
+        return query;
     }
 
-    RLMPrecondition([predicate isKindOfClass:NSPredicate.class], @"Invalid argument",
-                    @"predicate must be an NSPredicate object");
-
-    update_query_with_predicate(predicate, schema, objectSchema, *query);
+    update_query_with_predicate(predicate, schema, objectSchema, query);
 
     // Test the constructed query in core
-    std::string validateMessage = query->validate();
+    std::string validateMessage = query.validate();
     RLMPrecondition(validateMessage.empty(), @"Invalid query", @"%.*s",
                     (int)validateMessage.size(), validateMessage.c_str());
+    return query;
 }
 
 realm::SortOrder RLMSortOrderFromDescriptors(RLMObjectSchema *objectSchema, NSArray *descriptors) {
