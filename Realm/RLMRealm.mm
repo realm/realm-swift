@@ -599,7 +599,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     RLMAddObjectToRealm(object, self, false);
 }
 
-- (void)addObjects:(id<NSFastEnumeration>)array {
+- (void)addObjects:(NSObject<NSFastEnumeration> *)array {
     for (RLMObject *obj in array) {
         if (![obj isKindOfClass:[RLMObject class]]) {
             @throw RLMException(@"Cannot insert objects of type %@ with addObjects:. Only RLMObjects are supported.",
@@ -618,7 +618,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     RLMAddObjectToRealm(object, self, true);
 }
 
-- (void)addOrUpdateObjectsFromArray:(id)array {
+- (void)addOrUpdateObjects:(NSObject<NSFastEnumeration> *)array {
     for (RLMObject *obj in array) {
         [self addOrUpdateObject:obj];
     }
@@ -628,22 +628,19 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     RLMDeleteObjectFromRealm(object, self);
 }
 
-- (void)deleteObjects:(id)array {
+- (void)deleteObjects:(NSObject<NSFastEnumeration> *)array {
     if ([array respondsToSelector:@selector(realm)] && [array respondsToSelector:@selector(deleteObjectsFromRealm)]) {
-        if (self != (RLMRealm *)[array realm]) {
+        if (self != (RLMRealm *)[array performSelector:@selector(realm)]) {
             @throw RLMException(@"Can only delete objects from the Realm they belong to.");
         }
-        [array deleteObjectsFromRealm];
+        [array performSelector:@selector(deleteObjectsFromRealm)];
     }
-    else if ([array conformsToProtocol:@protocol(NSFastEnumeration)]) {
+    else {
         for (id obj in array) {
             if ([obj isKindOfClass:RLMObjectBase.class]) {
                 RLMDeleteObjectFromRealm(obj, self);
             }
         }
-    }
-    else {
-        @throw RLMException(@"Invalid array type - container must be an RLMArray, RLMArray, or NSArray of RLMObjects");
     }
 }
 
