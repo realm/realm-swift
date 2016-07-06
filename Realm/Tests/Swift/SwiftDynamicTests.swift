@@ -192,10 +192,10 @@ class SwiftDynamicTests: RLMTestCase {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
             let realm = RLMRealm(URL: RLMTestRealmURL())
-            realm.beginWriteTransaction()
+            realm.beginWrite()
             SwiftDynamicObject.createInRealm(realm, withValue: ["column1", 1])
             SwiftDynamicObject.createInRealm(realm, withValue: ["column2", 2])
-            try! realm.commitWriteTransaction()
+            try! realm.commitWrite()
         }
         let dyrealm = realmWithTestPathAndSchema(nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
@@ -218,10 +218,10 @@ class SwiftDynamicTests: RLMTestCase {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
             let realm = RLMRealm(URL: RLMTestRealmURL())
-            realm.beginWriteTransaction()
+            realm.beginWrite()
             SwiftDynamicObject.createInRealm(realm, withValue: ["column1", 1])
             SwiftDynamicObject.createInRealm(realm, withValue: ["column2", 2])
-            try! realm.commitWriteTransaction()
+            try! realm.commitWrite()
         }
 
         // verify properties
@@ -238,10 +238,10 @@ class SwiftDynamicTests: RLMTestCase {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
             let realm = RLMRealm(URL: RLMTestRealmURL())
-            realm.beginWriteTransaction()
+            realm.beginWrite()
             DynamicObject.createInRealm(realm, withValue: ["column1", 1])
             DynamicObject.createInRealm(realm, withValue: ["column2", 2])
-            try! realm.commitWriteTransaction()
+            try! realm.commitWrite()
         }
         let dyrealm = realmWithTestPathAndSchema(nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
@@ -264,10 +264,10 @@ class SwiftDynamicTests: RLMTestCase {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
             let realm = RLMRealm(URL: RLMTestRealmURL())
-            realm.beginWriteTransaction()
+            realm.beginWrite()
             DynamicObject.createInRealm(realm, withValue: ["column1", 1])
             DynamicObject.createInRealm(realm, withValue: ["column2", 2])
-            try! realm.commitWriteTransaction()
+            try! realm.commitWrite()
         }
 
         // verify properties
@@ -312,10 +312,10 @@ class SwiftDynamicTests: RLMTestCase {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
             let realm = self.realmWithTestPath()
-            realm.beginWriteTransaction()
+            realm.beginWrite()
             AllTypesObject.createInRealm(realm, withValue: obj1)
             AllTypesObject.createInRealm(realm, withValue: obj2)
-            try! realm.commitWriteTransaction()
+            try! realm.commitWrite()
         }
 
         // verify properties

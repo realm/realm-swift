@@ -164,7 +164,7 @@ class IgnoredLinkPropertyObject : RLMObject {
 class SwiftRecursingSchemaTestObject : RLMObject {
     dynamic var propertyWithIllegalDefaultValue: SwiftIntObject? = {
         if mayAccessSchema {
-            let realm = RLMRealm.defaultRealm()
+            let realm = try! RLMRealm()
             return SwiftIntObject.allObjects().firstObject() as! SwiftIntObject?
         } else {
             return nil
@@ -205,7 +205,7 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         config.objectClasses = [IgnoredLinkPropertyObject.self]
         config.inMemoryIdentifier = #function
         let r = try! RLMRealm(configuration: config)
-        try! r.transactionWithBlock {
+        try! r.write {
             IgnoredLinkPropertyObject.createInRealm(r, withValue: [1])
         }
     }
@@ -243,7 +243,7 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         config.inMemoryIdentifier = #function
         let _ = try! RLMRealm(configuration: config)
         let r = try! RLMRealm(configuration: RLMRealmConfiguration.defaultConfiguration())
-        try! r.transactionWithBlock {
+        try! r.write {
             IgnoredLinkPropertyObject.createInRealm(r, withValue: [1])
         }
     }

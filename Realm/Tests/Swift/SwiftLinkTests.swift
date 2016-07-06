@@ -128,10 +128,10 @@ class SwiftLinkTests: RLMTestCase {
 //        obj.data = "a"
 //        obj.next = obj
 //
-//        realm.beginWriteTransaction()
+//        realm.beginWrite()
 //        realm.addObject(obj)
 //        obj.next.data = "b"
-//        try! realm.commitWriteTransaction()
+//        try! realm.commitWrite()
 //
 //        let obj2 = SwiftCircleObject.allObjectsInRealm(realm).firstObject() as SwiftCircleObject
 //        XCTAssertEqual(obj2.data, "b", "data should be 'b'")
@@ -223,10 +223,10 @@ class SwiftLinkTests: RLMTestCase {
 //        obj.data = "a"
 //        obj.next = obj
 //
-//        realm.beginWriteTransaction()
+//        realm.beginWrite()
 //        realm.addObject(obj)
 //        obj.next.data = "b"
-//        try! realm.commitWriteTransaction()
+//        try! realm.commitWrite()
 //
 //        let obj2 = CircleObject.allObjectsInRealm(realm).firstObject() as CircleObject
 //        XCTAssertEqual(obj2.data, "b", "data should be 'b'")
@@ -248,9 +248,9 @@ class SwiftLinkTests: RLMTestCase {
         owner.dog = SwiftDogObject()
         owner.dog!.dogName = "Harvie"
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         realm.addObject(owner)
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         let owners = SwiftOwnerObject.allObjectsInRealm(realm)
         let dogs = SwiftDogObject.allObjectsInRealm(realm)
@@ -271,17 +271,17 @@ class SwiftLinkTests: RLMTestCase {
         owner.dog = SwiftDogObject()
         owner.dog!.dogName = "Harvie"
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         realm.addObject(owner)
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         XCTAssertEqual(SwiftOwnerObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 owner")
         XCTAssertEqual(SwiftDogObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 dog")
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         let fiel = SwiftOwnerObject.createInRealm(realm, withValue: ["Fiel", NSNull()])
         fiel.dog = owner.dog
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         XCTAssertEqual(SwiftOwnerObject.allObjectsInRealm(realm).count, UInt(2), "Expecting 2 owners")
         XCTAssertEqual(SwiftDogObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 dog")
@@ -295,16 +295,16 @@ class SwiftLinkTests: RLMTestCase {
         owner.dog = SwiftDogObject()
         owner.dog!.dogName = "Harvie"
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         realm.addObject(owner)
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         XCTAssertEqual(SwiftOwnerObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 owner")
         XCTAssertEqual(SwiftDogObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 dog")
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         realm.deleteObject(owner.dog!)
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
 
@@ -327,9 +327,9 @@ class SwiftLinkTests: RLMTestCase {
 
         XCTAssertEqual(0, target.backlinks!.count)
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         realm.addObject(source)
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         XCTAssertEqual(1, target.backlinks!.count)
         XCTAssertEqual(1234, (target.backlinks!.firstObject() as! SwiftLinkSourceObject).id)
@@ -363,9 +363,9 @@ class SwiftLinkTests: RLMTestCase {
         owner.dog = DogObject()
         owner.dog.dogName = "Harvie"
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         realm.addObject(owner)
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         let owners = OwnerObject.allObjectsInRealm(realm)
         let dogs = DogObject.allObjectsInRealm(realm)
@@ -386,17 +386,17 @@ class SwiftLinkTests: RLMTestCase {
         owner.dog = DogObject()
         owner.dog.dogName = "Harvie"
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         realm.addObject(owner)
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         XCTAssertEqual(OwnerObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 owner")
         XCTAssertEqual(DogObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 dog")
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         let fiel = OwnerObject.createInRealm(realm, withValue: ["Fiel", NSNull()])
         fiel.dog = owner.dog
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         XCTAssertEqual(OwnerObject.allObjectsInRealm(realm).count, UInt(2), "Expecting 2 owners")
         XCTAssertEqual(DogObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 dog")
@@ -410,16 +410,16 @@ class SwiftLinkTests: RLMTestCase {
         owner.dog = DogObject()
         owner.dog.dogName = "Harvie"
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         realm.addObject(owner)
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         XCTAssertEqual(OwnerObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 owner")
         XCTAssertEqual(DogObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 dog")
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         realm.deleteObject(owner.dog)
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
 
