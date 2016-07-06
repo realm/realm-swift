@@ -42,7 +42,7 @@ using namespace realm;
     // table accessor optimization
     realm::TableRef _table;
     NSArray *_swiftGenericProperties;
-    std::vector<RLMProperty *> _propertiesInTableColOrder;
+    std::vector<RLMProperty *> _propertiesInTableOrder;
 }
 
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
@@ -63,7 +63,7 @@ using namespace realm;
 // create property map when setting property array
 -(void)setProperties:(NSArray *)properties {
     _properties = properties;
-    _propertiesInTableColOrder.clear();
+    _propertiesInTableOrder.clear();
     [self _propertiesDidChange];
 }
 
@@ -349,7 +349,7 @@ using namespace realm;
     schema->_allPropertiesByName = _allPropertiesByName;
     schema->_primaryKeyProperty = _primaryKeyProperty;
     schema->_swiftGenericProperties = _swiftGenericProperties;
-    schema->_propertiesInTableColOrder = _propertiesInTableColOrder;
+    schema->_propertiesInTableOrder = _propertiesInTableOrder;
 
     // _table not copied as it's realm::Group-specific
     return schema;
@@ -444,18 +444,18 @@ using namespace realm;
 }
 
 - (RLMProperty *)propertyForTableColumn:(size_t)tableCol {
-    if (_propertiesInTableColOrder.empty()) {
-        _propertiesInTableColOrder.resize(_properties.count, nil);
+    if (_propertiesInTableOrder.empty()) {
+        _propertiesInTableOrder.resize(_properties.count, nil);
         for (RLMProperty *property in _properties) {
             auto col = property.column;
-            if (col >= _propertiesInTableColOrder.size()) {
-                _propertiesInTableColOrder.resize(col + 1, nil);
+            if (col >= _propertiesInTableOrder.size()) {
+                _propertiesInTableOrder.resize(col + 1, nil);
             }
-            _propertiesInTableColOrder[col] = property;
+            _propertiesInTableOrder[col] = property;
         }
     }
 
-    return tableCol < _propertiesInTableColOrder.size() ? _propertiesInTableColOrder[tableCol] : nil;
+    return tableCol < _propertiesInTableOrder.size() ? _propertiesInTableOrder[tableCol] : nil;
 }
 
 - (NSArray *)swiftGenericProperties {
