@@ -170,10 +170,10 @@ public:
         static_assert(sizeof...(SubQuery) < 2, "resolve() takes at most one subquery");
         set_link_chain_on_table();
         if (type() != RLMPropertyTypeLinkingObjects) {
-            return m_table->template column<T>(index(), std::forward<SubQuery...>(subquery)...);
+            return m_table->template column<T>(index(), std::forward<SubQuery>(subquery)...);
         }
         else {
-            return resolve_backlink<T>(std::is_same<T, Link>(), std::forward<SubQuery...>(subquery)...);
+            return resolve_backlink<T>(std::forward<SubQuery>(subquery)...);
         }
     }
 
@@ -212,16 +212,26 @@ public:
 
 private:
     template <typename T, typename... SubQuery>
-    auto resolve_backlink(std::true_type, SubQuery&&... subquery) const
+    auto resolve_backlink(SubQuery&&... subquery) const
+    {
+        // We actually just want `if constexpr (std::is_same<T, Link>::value) { ... }`,
+        // so fake it by tag-dispatching on the conditional
+        return do_resolve_backlink<T>(std::is_same<T, Link>(), std::forward<SubQuery>(subquery)...);
+    }
+
+    template <typename T, typename... SubQuery>
+    auto do_resolve_backlink(std::true_type, SubQuery&&... subquery) const
     {
         return with_link_origin(m_property, [&](Table& table, size_t col) {
-            return m_table->template column<T>(table, col, std::forward<SubQuery...>(subquery)...);
+            return m_table->template column<T>(table, col, std::forward<SubQuery>(subquery)...);
         });
     }
 
     template <typename T, typename... SubQuery>
-    Columns<T> resolve_backlink(std::false_type, SubQuery&&...) const
+    Columns<T> do_resolve_backlink(std::false_type, SubQuery&&...) const
     {
+        // This can't actually happen as we only call resolve_backlink() if
+        // it's RLMPropertyTypeLinkingObjects
         __builtin_unreachable();
     }
 
