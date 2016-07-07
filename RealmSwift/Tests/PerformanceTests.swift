@@ -411,8 +411,7 @@ class SwiftPerformanceTests: TestCase {
                     let realm = inMemoryRealm("test")
                     let object = realm.allObjects(ofType: SwiftIntObject.self).first!
                     var token: NotificationToken! = nil
-                    // AZ: TODO: is this right?
-                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), CFRunLoopMode.defaultMode as! CFTypeRef) {
+                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), CFRunLoopMode.defaultMode.rawValue) {
                         token = realm.addNotificationBlock { _, _ in
                             if object.intCol == stopValue {
                                 CFRunLoopStop(CFRunLoopGetCurrent())
@@ -451,8 +450,7 @@ class SwiftPerformanceTests: TestCase {
                     let realm = inMemoryRealm("test")
                     let object = realm.allObjects(ofType: SwiftIntObject.self).first!
                     var token: NotificationToken! = nil
-                    // AZ: TODO: is this right?
-                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), CFRunLoopMode.defaultMode as! CFTypeRef) {
+                    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), CFRunLoopMode.defaultMode.rawValue) {
                         token = realm.addNotificationBlock { _, _ in
                             if object.intCol == stopValue {
                                 CFRunLoopStop(CFRunLoopGetCurrent())
