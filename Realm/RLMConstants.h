@@ -20,9 +20,10 @@
 
 // For compatibility with Xcode 7, before extensible string enums were introduced,
 #ifdef NS_EXTENSIBLE_STRING_ENUM
+#define RLM_EXTENSIBLE_STRING_ENUM NS_EXTENSIBLE_STRING_ENUM
 #define RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(_, extensible_string_enum) NS_SWIFT_NAME(extensible_string_enum)
 #else
-#define NS_EXTENSIBLE_STRING_ENUM
+#define RLM_EXTENSIBLE_STRING_ENUM
 #define RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(fully_qualified, _) NS_SWIFT_NAME(fully_qualified)
 #endif
 
@@ -135,7 +136,7 @@ typedef NS_ENUM(NSInteger, RLMError) {
 /**
  A notification indicating that changes were made to a Realm.
 */
-typedef NSString * RLMNotification NS_EXTENSIBLE_STRING_ENUM;
+typedef NSString * RLMNotification RLM_EXTENSIBLE_STRING_ENUM;
 
 /**
  This notification is posted by a Realm when the data in that Realm has changed.
