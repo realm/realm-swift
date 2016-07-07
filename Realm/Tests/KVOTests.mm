@@ -1094,9 +1094,7 @@ public:
 @implementation KVOManagedObjectTests
 - (void)setUp {
     [super setUp];
-    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    configuration.inMemoryIdentifier = @"test";
-    _realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    _realm = [self getRealm];
     [_realm beginWriteTransaction];
 }
 
@@ -1104,6 +1102,12 @@ public:
     [self.realm cancelWriteTransaction];
     self.realm = nil;
     [super tearDown];
+}
+
+- (RLMRealm *)getRealm {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    configuration.inMemoryIdentifier = @"test";
+    return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
 - (id)createObject {
@@ -1700,3 +1704,35 @@ public:
 }
 @end
 
+// Test with the table column order not matching the order of the properties
+@interface KVOManagedObjectWithReorderedPropertiesTests : KVOManagedObjectTests
+@end
+
+@implementation KVOManagedObjectWithReorderedPropertiesTests
+- (RLMRealm *)getRealm {
+    // Initialize the file with the properties in reverse order, then re-open
+    // with it in the normal order while the reversed one is still open (as
+    // otherwise it'll recreate the file due to being in-memory)
+    RLMSchema *schema = [RLMSchema new];
+    schema.objectSchema = @[[self reverseProperties:KVOObject.sharedSchema],
+                            [self reverseProperties:KVOLinkObject1.sharedSchema],
+                            [self reverseProperties:KVOLinkObject2.sharedSchema]];
+
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    configuration.cache = false;
+    configuration.inMemoryIdentifier = @"test";
+    configuration.customSchema = schema;
+    RLMRealm *reversedRealm = [RLMRealm realmWithConfiguration:configuration error:nil];
+
+    configuration.customSchema = nil;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    XCTAssertNotEqualObjects(realm.schema, reversedRealm.schema);
+    return realm;
+}
+
+- (RLMObjectSchema *)reverseProperties:(RLMObjectSchema *)source {
+    RLMObjectSchema *objectSchema = [source copy];
+    objectSchema.properties = objectSchema.properties.reverseObjectEnumerator.allObjects;
+    return objectSchema;
+}
+@end

@@ -228,9 +228,9 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
         // make sure it is the correct type
         RLMObjectSchema *valSchema = val->_objectSchema;
         RLMObjectSchema *objSchema = obj->_objectSchema;
-        if (![[objSchema.properties[colIndex] objectClassName] isEqualToString:valSchema.className]) {
+        if (![[objSchema propertyForTableColumn:colIndex].objectClassName isEqualToString:valSchema.className]) {
             @throw RLMException(@"Can't set object of type '%@' to property of type '%@'",
-                                valSchema.className, [objSchema.properties[colIndex] objectClassName]);
+                                valSchema.className, [objSchema propertyForTableColumn:colIndex].objectClassName);
         }
         RLMObjectBase *link = RLMGetLinkedObjectForValue(obj->_realm, valSchema.className, val, RLMCreationOptionsPromoteUnmanaged);
         obj->_row.set_link(colIndex, link->_row.get_index());

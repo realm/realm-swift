@@ -332,7 +332,7 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
                     continue;
                 }
 
-                RLMProperty *prop = observer->getObjectSchema().properties[link.origin_col_ndx];
+                RLMProperty *prop = [observer->getObjectSchema() propertyForTableColumn:link.origin_col_ndx];
                 NSString *name = prop.name;
                 if (prop.type != RLMPropertyTypeArray) {
                     changes.push_back({observer, name});
@@ -466,8 +466,8 @@ void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& obse
         NSMutableIndexSet *indexes = [NSMutableIndexSet new];
         for (auto const& o : observed) {
             forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
-                info->willChange([info->getObjectSchema().properties[i] name],
-                                 convert(change.kind), convert(change.indices, indexes));
+                auto property = [info->getObjectSchema() propertyForTableColumn:i];
+                info->willChange(property.name, convert(change.kind), convert(change.indices, indexes));
             });
         }
     }
@@ -483,8 +483,8 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
         NSMutableIndexSet *indexes = [NSMutableIndexSet new];
         for (auto const& o : reverse(observed)) {
             forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
-                info->didChange([info->getObjectSchema().properties[i] name],
-                                convert(change.kind), convert(change.indices, indexes));
+                auto property = [info->getObjectSchema() propertyForTableColumn:i];
+                info->didChange(property.name, convert(change.kind), convert(change.indices, indexes));
             });
         }
     }

@@ -293,7 +293,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // get or create our accessor
         bool created;
-        NSArray *props = objectSchema.propertiesInDeclaredOrder;
+        NSArray *props = objectSchema.properties;
         auto primaryGetter = [=](__unsafe_unretained RLMProperty *const p) {
             return array[[props indexOfObject:p]];
         };
