@@ -14,7 +14,7 @@ set -o pipefail
 set -e
 
 # You can override the version of the core library
-: ${REALM_CORE_VERSION:=1.1.1} # set to "current" to always use the current build
+: ${REALM_CORE_VERSION:=1.3.0} # set to "current" to always use the current build
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
@@ -287,10 +287,10 @@ download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
     TMP_DIR="$TMPDIR/core_bin"
     mkdir -p "${TMP_DIR}"
-    CORE_TMP_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2.tmp"
-    CORE_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.bz2"
+    CORE_TMP_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.xz.tmp"
+    CORE_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.xz"
     if [ ! -f "${CORE_TAR}" ]; then
-        local CORE_URL="https://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.bz2"
+        local CORE_URL="https://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.xz"
         set +e # temporarily disable immediate exit
         local ERROR # sweeps the exit code unless declared separately
         ERROR=$(curl --fail --silent --show-error --location "$CORE_URL" --output "${CORE_TMP_TAR}" 2>&1 >/dev/null)
@@ -305,7 +305,7 @@ download_core() {
     (
         cd "${TMP_DIR}"
         rm -rf core
-        tar xjf "${CORE_TAR}"
+        tar xf "${CORE_TAR}" --xz
         mv core core-${REALM_CORE_VERSION}
     )
 
