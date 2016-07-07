@@ -170,10 +170,10 @@ public:
         static_assert(sizeof...(SubQuery) < 2, "resolve() takes at most one subquery");
         set_link_chain_on_table();
         if (type() != RLMPropertyTypeLinkingObjects) {
-            return m_table->template column<T>(index(), std::move(subquery)...);
+            return m_table->template column<T>(index(), std::forward<SubQuery...>(subquery)...);
         }
         else {
-            return resolve_backlink<T>(std::is_same<T, Link>(), std::move(subquery)...);
+            return resolve_backlink<T>(std::is_same<T, Link>(), std::forward<SubQuery...>(subquery)...);
         }
     }
 
@@ -215,7 +215,7 @@ private:
     auto resolve_backlink(std::true_type, SubQuery&&... subquery) const
     {
         return with_link_origin(m_property, [&](Table& table, size_t col) {
-            return m_table->template column<T>(table, col, std::move(subquery)...);
+            return m_table->template column<T>(table, col, std::forward<SubQuery...>(subquery)...);
         });
     }
 
