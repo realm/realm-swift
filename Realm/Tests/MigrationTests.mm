@@ -610,13 +610,13 @@ RLM_ARRAY_TYPE(MigrationObject);
     RLMAssertRealmSchemaMatchesTable(self, realm);
 
     // verify schema for both objects
-    NSArray *properties = defaultObj.objectSchema.properties;
+    NSArray<RLMProperty *> *properties = defaultObj.objectSchema.properties;
     for (NSUInteger i = 0; i < properties.count; i++) {
-        XCTAssertEqual([properties[i] column], i);
+        XCTAssertEqual(properties[i].column, i);
     }
     properties = obj.objectSchema.properties;
     for (NSUInteger i = 0; i < properties.count; i++) {
-        XCTAssertEqual([properties[i] column], i);
+        XCTAssertEqual(properties[i].column, i);
     }
 
     // re-check that things still work for the realm with the swapped order
