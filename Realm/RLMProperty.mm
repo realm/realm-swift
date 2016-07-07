@@ -331,6 +331,11 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
     id propertyValue = [obj valueForKey:_name];
 
+    // temporarily workaround since Objective-C generics used in Swift show up as `@`
+    if ([_objcRawType isEqualToString:@"@"]) {
+        _objcRawType = [NSString stringWithFormat:@"@\"%@\"", [propertyValue class]];
+    }
+
     // convert array types to objc variant
     if ([_objcRawType isEqualToString:@"@\"RLMArray\""]) {
         _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [propertyValue objectClassName]];
