@@ -32,13 +32,13 @@ import Realm
 
     extension RLMObject {
         // Swift query convenience functions
-        public class func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
+        public class func objects(where predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
             return objects(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
 
-        public class func objectsInRealm(realm: RLMRealm,
-                                         _ predicateFormat: String,
-                                         _ args: CVarArg...) -> RLMResults<RLMObject> {
+        public class func objects(in realm: RLMRealm,
+                                  where predicateFormat: String,
+                                  _ args: CVarArg...) -> RLMResults<RLMObject> {
             return objects(in: realm, with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
     }
@@ -79,11 +79,11 @@ import Realm
 
     extension RLMCollection {
         // Swift query convenience functions
-        public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArg...) -> UInt {
+        public func indexOfObject(where predicateFormat: String, _ args: CVarArg...) -> UInt {
             return indexOfObject(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
 
-        public func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
+        public func objects(where predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
             return objects(with: Predicate(format: predicateFormat, arguments: getVaList(args)))
         }
     }
