@@ -114,7 +114,7 @@ public final class Realm {
     - throws: An NSError if the transaction could not be written.
     */
     public func write(block: @noescape () -> Void) throws {
-        try rlmRealm.transaction(block)
+        try rlmRealm.write(block)
     }
 
     /**
@@ -137,7 +137,7 @@ public final class Realm {
     is committed.
     */
     public func beginWrite() {
-        rlmRealm.beginWriteTransaction()
+        rlmRealm.beginWrite()
     }
 
     /**
@@ -149,7 +149,7 @@ public final class Realm {
     - throws: An NSError if the transaction could not be written.
     */
     public func commitWrite() throws {
-        try rlmRealm.commitWriteTransaction()
+        try rlmRealm.commitWrite()
     }
 
     /**
@@ -180,7 +180,7 @@ public final class Realm {
     Calling this when not in a write transaction will throw an exception.
     */
     public func cancelWrite() {
-        rlmRealm.cancelWriteTransaction()
+        rlmRealm.cancelWrite()
     }
 
     /**
@@ -192,7 +192,7 @@ public final class Realm {
                transaction when possible.
     */
     public var isInWriteTransaction: Bool {
-        return rlmRealm.inWriteTransaction
+        return rlmRealm.isInWriteTransaction
     }
 
     // MARK: Adding and Creating objects
@@ -519,10 +519,10 @@ public final class Realm {
     */
     public var shouldAutorefresh: Bool {
         get {
-            return rlmRealm.autorefresh
+            return rlmRealm.shouldAutorefresh
         }
         set {
-            rlmRealm.autorefresh = newValue
+            rlmRealm.shouldAutorefresh = newValue
         }
     }
 
@@ -580,7 +580,7 @@ public final class Realm {
     - throws: An NSError if the copy could not be written.
     */
     public func writeCopy(toFileURL url: URL, encryptionKey: Data? = nil) throws {
-        try rlmRealm.writeCopy(to: url, encryptionKey: encryptionKey)
+        try rlmRealm.writeCopy(toFile: url, withEncryptionKey: encryptionKey)
     }
 
     // MARK: Internal
@@ -801,7 +801,7 @@ public final class Realm {
      is committed.
      */
     public func beginWrite() {
-        rlmRealm.beginWriteTransaction()
+        rlmRealm.beginWrite()
     }
 
     /**
@@ -812,7 +812,7 @@ public final class Realm {
      - throws: An `NSError` if the transaction could not be written.
      */
     public func commitWrite() throws {
-        try rlmRealm.commitWriteTransaction()
+        try rlmRealm.commitWrite()
     }
 
     /**
@@ -843,7 +843,7 @@ public final class Realm {
      - warning: This method may only be called during a write transaction.
      */
     public func cancelWrite() {
-        rlmRealm.cancelWriteTransaction()
+        rlmRealm.cancelWrite()
     }
 
     /**
@@ -854,7 +854,7 @@ public final class Realm {
                 degrading performance. Instead, always prefer performing multiple updates during a single transaction.
      */
     public var inWriteTransaction: Bool {
-        return rlmRealm.inWriteTransaction
+        return rlmRealm.isInWriteTransaction
     }
 
     // MARK: Adding and Creating objects
@@ -1176,10 +1176,10 @@ public final class Realm {
      */
     public var autorefresh: Bool {
         get {
-            return rlmRealm.autorefresh
+            return rlmRealm.shouldAutorefresh
         }
         set {
-            rlmRealm.autorefresh = newValue
+            rlmRealm.shouldAutorefresh = newValue
         }
     }
 
@@ -1234,7 +1234,7 @@ public final class Realm {
      - throws: An `NSError` if the copy could not be written.
      */
     public func writeCopyToURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws {
-        try rlmRealm.writeCopyToURL(fileURL, encryptionKey: encryptionKey)
+        try rlmRealm.writeCopy(toFile: fileURL, withEncryptionKey: encryptionKey)
     }
 
     // MARK: Internal

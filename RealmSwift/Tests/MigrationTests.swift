@@ -303,7 +303,7 @@ class MigrationTests: TestCase {
         autoreleasepool {
             let realm = realmWithSingleClassProperties(defaultRealmURL(),
                 className: "DeletedClass", properties: [])
-            try! realm.transaction {
+            try! realm.write {
                 realm.createObject("DeletedClass", withValue: [])
             }
         }
@@ -330,7 +330,7 @@ class MigrationTests: TestCase {
             autoreleasepool {
                 let realm = realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftStringObject",
                     properties: [prop!])
-                try! realm.transaction {
+                try! realm.write {
                     realm.createObject("SwiftStringObject", withValue: ["a"])
                 }
             }
@@ -796,7 +796,7 @@ class MigrationTests: TestCase {
         autoreleasepool {
             let realm = realmWithSingleClassProperties(defaultRealmURL(),
                 className: "DeletedClass", properties: [])
-            try! realm.transactionWithBlock {
+            try! realm.write {
                 realm.createObject("DeletedClass", withValue: [])
             }
         }
@@ -823,7 +823,7 @@ class MigrationTests: TestCase {
             autoreleasepool {
                 let realm = realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftStringObject",
                     properties: [prop])
-                try! realm.transactionWithBlock {
+                try! realm.write {
                     realm.createObject("SwiftStringObject", withValue: ["a"])
                 }
             }

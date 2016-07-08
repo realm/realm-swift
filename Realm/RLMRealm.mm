@@ -150,7 +150,11 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 }
 
 + (instancetype)defaultRealm {
-    return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration rawDefaultConfiguration] error:nil];
+    return [RLMRealm defaultRealmWithError:nil];
+}
+
++ (nullable instancetype)defaultRealmWithError:(NSError **)error {
+    return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration rawDefaultConfiguration] error:error];
 }
 
 + (instancetype)realmWithURL:(NSURL *)fileURL {

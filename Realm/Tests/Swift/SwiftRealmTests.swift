@@ -272,31 +272,31 @@ class SwiftRealmTests: RLMTestCase {
 
     func testEmptyWriteTransaction() {
         let realm = realmWithTestPath()
-        realm.beginWriteTransaction()
-        try! realm.commitWriteTransaction()
+        realm.beginWrite()
+        try! realm.commitWrite()
     }
 
     // Swift models
 
     func testRealmAddAndRemoveObjects() {
         let realm = realmWithTestPath()
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         SwiftStringObject.createInRealm(realm, withValue: ["a"])
         SwiftStringObject.createInRealm(realm, withValue: ["b"])
         SwiftStringObject.createInRealm(realm, withValue: ["c"])
         XCTAssertEqual(SwiftStringObject.allObjectsInRealm(realm).count, UInt(3), "Expecting 3 objects")
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         // test again after write transaction
         var objects = SwiftStringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, UInt(3), "Expecting 3 objects")
         XCTAssertEqual((objects[0] as! SwiftStringObject).stringCol, "a", "Expecting column to be 'a'")
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         realm.deleteObject(objects[2] as! SwiftStringObject)
         realm.deleteObject(objects[0] as! SwiftStringObject)
         XCTAssertEqual(SwiftStringObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 object")
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         objects = SwiftStringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, UInt(1), "Expecting 1 object")
@@ -315,9 +315,9 @@ class SwiftRealmTests: RLMTestCase {
 
         dispatchAsync {
             let realm = self.realmWithTestPath()
-            realm.beginWriteTransaction()
+            realm.beginWrite()
             SwiftStringObject.createInRealm(realm, withValue: ["string"])
-            try! realm.commitWriteTransaction()
+            try! realm.commitWrite()
         }
         waitForExpectationsWithTimeout(2.0, handler: nil)
         token.stop()
@@ -332,16 +332,16 @@ class SwiftRealmTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         let object = SwiftIgnoredPropertiesObject()
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         object.name = "@fz"
         object.age = 31
         realm.addObject(object)
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         // This shouldn't do anything.
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         object.runtimeProperty = NSObject()
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         let objects = SwiftIgnoredPropertiesObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type SwiftIgnoredPropertiesObject")
@@ -366,7 +366,7 @@ class SwiftRealmTests: RLMTestCase {
 
         dispatchAsync {
             let realm = self.realmWithTestPath()
-            try! realm.transactionWithBlock() {
+            try! realm.write {
                 var obj = SwiftIntObject()
                 obj.intCol = 2;
                 realm.addObject(obj)
@@ -393,9 +393,9 @@ class SwiftRealmTests: RLMTestCase {
         dispatchAsync {
             let realm = self.realmWithTestPath()
             let obj = SwiftStringObject(value: ["string"])
-            realm.beginWriteTransaction()
+            realm.beginWrite()
             realm.addObject(obj)
-            try! realm.commitWriteTransaction()
+            try! realm.commitWrite()
 
             let objects = SwiftStringObject.allObjectsInRealm(realm)
             XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type StringObject")
@@ -415,23 +415,23 @@ class SwiftRealmTests: RLMTestCase {
 
     func testRealmAddAndRemoveObjects_objc() {
         let realm = realmWithTestPath()
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         StringObject.createInRealm(realm, withValue: ["a"])
         StringObject.createInRealm(realm, withValue: ["b"])
         StringObject.createInRealm(realm, withValue: ["c"])
         XCTAssertEqual(StringObject.allObjectsInRealm(realm).count, UInt(3), "Expecting 3 objects")
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         // test again after write transaction
         var objects = StringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, UInt(3), "Expecting 3 objects")
         XCTAssertEqual((objects[0] as! StringObject).stringCol!, "a", "Expecting column to be 'a'")
 
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         realm.deleteObject(objects[2] as! StringObject)
         realm.deleteObject(objects[0] as! StringObject)
         XCTAssertEqual(StringObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 object")
-        try! realm.commitWriteTransaction()
+        try! realm.commitWrite()
 
         objects = StringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, UInt(1), "Expecting 1 object")
@@ -452,9 +452,9 @@ class SwiftRealmTests: RLMTestCase {
 
         dispatchAsync {
             let realm = self.realmWithTestPath()
-            realm.beginWriteTransaction()
+            realm.beginWrite()
             StringObject.createInRealm(realm, withValue: ["string"])
-            try! realm.commitWriteTransaction()
+            try! realm.commitWrite()
         }
         waitForExpectationsWithTimeout(2.0, handler: nil)
         token.stop()
@@ -478,7 +478,7 @@ class SwiftRealmTests: RLMTestCase {
         dispatchAsync {
             let realm = self.realmWithTestPath()
             let obj = StringObject(value: ["string"])
-            try! realm.transactionWithBlock() {
+            try! realm.write {
                 realm.addObject(obj)
             }
 

@@ -53,6 +53,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Creating & Initializing a Realm
 
+- (instancetype)init
+NS_UNAVAILABLE;
+
 /**
  Obtains an instance of the default Realm.
 
@@ -67,7 +70,29 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return The default `RLMRealm` instance for the current thread.
  */
-+ (instancetype)defaultRealm;
++ (instancetype)defaultRealm
+NS_REFINED_FOR_SWIFT;
+
+/**
+ Obtains an instance of the default Realm.
+
+ The default Realm is used by the `RLMObject` class methods
+ which do not take an `RLMRealm` parameter, but is otherwise not special. The
+ default Realm is persisted as *default.realm* under the *Documents* directory of
+ your Application on iOS, and in your application's *Application Support*
+ directory on OS X.
+
+ The default Realm is created using the default `RLMRealmConfiguration`, which
+ can be changed via `+[RLMRealmConfiguration setDefaultConfiguration:]`.
+
+ @param error         If an error occurs, upon return contains an `NSError` object
+                      that describes the problem. If you are not interested in
+                      possible errors, pass in `NULL`.
+
+ @return The default `RLMRealm` instance for the current thread.
+ */
++ (nullable instancetype)defaultRealmWithError:(NSError **)error
+NS_SWIFT_NAME(init());
 
 /**
  Obtains an `RLMRealm` instance with the given configuration.
@@ -102,7 +127,8 @@ NS_ASSUME_NONNULL_BEGIN
             created, updated, or removed. Doing so might cause a large number of write transactions to be created,
             degrading performance. Instead, always prefer performing multiple updates during a single transaction.
  */
-@property (nonatomic, readonly) BOOL inWriteTransaction;
+@property (nonatomic, readonly) BOOL inWriteTransaction
+NS_SWIFT_NAME(isInWriteTransaction);
 
 /**
  The `RLMRealmConfiguration` object that was used to create this `RLMRealm` instance.
@@ -177,7 +203,8 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  Realm participating in the write transaction is kept alive until the write transaction
  is committed.
  */
-- (void)beginWriteTransaction;
+- (void)beginWriteTransaction
+NS_SWIFT_NAME(beginWrite());
 
 /**
  Commits all write operations in the current write transaction, and ends the 
@@ -185,7 +212,8 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @warning This method may only be called during a write transaction.
  */
-- (void)commitWriteTransaction NS_SWIFT_UNAVAILABLE("");
+- (void)commitWriteTransaction
+NS_REFINED_FOR_SWIFT;
 
 /**
  Commits all write operations in the current write transaction, and ends the
@@ -199,7 +227,8 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @return Whether the transaction succeeded.
  */
-- (BOOL)commitWriteTransaction:(NSError **)error;
+- (BOOL)commitWriteTransaction:(NSError **)error
+NS_SWIFT_NAME(commitWrite());
 
 /**
  Reverts all writes made during the current write transaction and ends the transaction.
@@ -226,14 +255,16 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @warning This method may only be called during a write transaction.
  */
-- (void)cancelWriteTransaction;
+- (void)cancelWriteTransaction
+NS_SWIFT_NAME(cancelWrite());
 
 /**
  Performs actions contained within the given block inside a write transaction.
  
  @see `[RLMRealm transactionWithBlock:error:]`
  */
-- (void)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block NS_SWIFT_UNAVAILABLE("");
+- (void)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block
+NS_REFINED_FOR_SWIFT;
 
 /**
  Performs actions contained within the given block inside a write transaction.
@@ -255,7 +286,8 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @return Whether the transaction succeeded.
  */
-- (BOOL)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
+- (BOOL)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error
+NS_SWIFT_NAME(write(_:));
 
 /**
  Updates the Realm and outstanding objects managed by the Realm to point to the most recent data.
@@ -294,7 +326,8 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  Defaults to `YES`.
  */
-@property (nonatomic) BOOL autorefresh;
+@property (nonatomic) BOOL autorefresh
+NS_SWIFT_NAME(shouldAutorefresh);
 
 /**
  Writes a compacted and optionally encrypted copy of the Realm to the given local URL.
@@ -312,7 +345,8 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
 */
-- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
+- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error
+NS_SWIFT_NAME(writeCopy(toFile:withEncryptionKey:));
 
 /**
  Invalidates all `RLMObject`s, `RLMResults`, `RLMLinkingObjects`, and `RLMArray`s managed by the Realm.
