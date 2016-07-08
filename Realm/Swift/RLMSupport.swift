@@ -96,10 +96,6 @@ import Realm
         }
     }
 
-    func test() {
-        RLMRealm.schemaVersionAtURL(NSURL(), encryptionKey: nil, error: nil)
-    }
-
     extension RLMObject {
         // Swift query convenience functions
         public class func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
