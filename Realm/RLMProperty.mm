@@ -333,7 +333,12 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
     // temporarily workaround since Objective-C generics used in Swift show up as `@`
     if ([_objcRawType isEqualToString:@"@"]) {
-        _objcRawType = [NSString stringWithFormat:@"@\"%@\"", [propertyValue class]];
+        if (propertyValue) {
+            _objcRawType = [NSString stringWithFormat:@"@\"%@\"", [propertyValue class]];
+        } else if (linkPropertyDescriptor) {
+            // we're going to naively assume that the user used the correct type since we can't check it
+            _objcRawType = @"@\"RLMLinkingObjects\"";
+        }
     }
 
     // convert array types to objc variant
