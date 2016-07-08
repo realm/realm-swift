@@ -293,11 +293,13 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // get or create our accessor
         bool created;
-        auto primaryGetter = [=](__unsafe_unretained RLMProperty *const p) { return array[p.column]; };
+        NSArray *props = objectSchema.properties;
+        auto primaryGetter = [=](__unsafe_unretained RLMProperty *const p) {
+            return array[[props indexOfObject:p]];
+        };
         object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, createOrUpdate, created)];
 
         // populate
-        NSArray *props = objectSchema.propertiesInDeclaredOrder;
         for (NSUInteger i = 0; i < array.count; i++) {
             RLMProperty *prop = props[i];
             // skip primary key when updating since it doesn't change
@@ -386,8 +388,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
     }
 
     if (predicate) {
-        realm::Query query = objectSchema.table->where();
-        RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
+        realm::Query query = RLMPredicateToQuery(predicate, objectSchema, realm.schema);
 
         // create and populate array
         return [RLMResults resultsWithObjectSchema:objectSchema

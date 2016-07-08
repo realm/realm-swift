@@ -41,7 +41,7 @@ void RLMRealmTranslateException(NSError **error);
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator;
 - (void)detachAllEnumerators;
 
-- (void)sendNotifications:(NSString *)notification;
+- (void)sendNotifications:(RLMNotification)notification;
 - (void)verifyThread;
 - (void)verifyNotificationsAreSupported;
 

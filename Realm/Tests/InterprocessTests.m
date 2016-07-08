@@ -126,7 +126,7 @@
 
 - (void)testBackgroundProcessDoesNotTriggerSpuriousNotifications {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *notification, __unused RLMRealm *realm) {
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused RLMNotification notification, __unused RLMRealm *realm) {
         XCTFail(@"Notification should not have been triggered");
     }];
 

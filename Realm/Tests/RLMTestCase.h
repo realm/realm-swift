@@ -42,7 +42,7 @@ NSData *RLMGenerateKey(void);
 - (void)deleteFiles;
 - (void)deleteRealmFileAtURL:(NSURL *)fileURL;
 
-- (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block;
+- (void)waitForNotification:(RLMNotification)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block;
 
 - (id)nonLiteralNil;
 

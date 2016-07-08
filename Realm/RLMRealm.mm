@@ -69,7 +69,7 @@ struct SyncLogger : public util::RootLogger {
 
 @interface RLMRealm ()
 @property (nonatomic, strong) NSHashTable *notificationHandlers;
-- (void)sendNotifications:(NSString *)notification;
+- (void)sendNotifications:(RLMNotification)notification;
 @end
 
 void RLMDisableSyncToDisk() {
@@ -194,9 +194,6 @@ static void RLMCopyColumnMapping(RLMObjectSchema *targetSchema, const ObjectSche
         RLMProperty *targetProp = targetSchema[@(prop.name.c_str())];
         targetProp.column = prop.table_column;
     }
-
-    // re-order properties
-    [targetSchema sortPropertiesByColumn];
 }
 
 static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) {
@@ -464,7 +461,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return token;
 }
 
-- (void)sendNotifications:(NSString *)notification {
+- (void)sendNotifications:(RLMNotification)notification {
     NSAssert(!_realm->config().read_only, @"Read-only realms do not have notifications");
 
     NSUInteger count = _notificationHandlers.count;
@@ -714,16 +711,27 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-+ (NSError *)migrateRealm:(RLMRealmConfiguration *)configuration {
++ (nullable NSError *)migrateRealm:(RLMRealmConfiguration *)configuration {
+    // Preserves backwards compatibility
+    NSError *error;
+    [self performMigrationForConfiguration:configuration error:&error];
+    return error;
+}
+
++ (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
     if (RLMGetAnyCachedRealmForPath(configuration.config.path)) {
         @throw RLMException(@"Cannot migrate Realms that are already open.");
     }
 
+    NSError *localError; // Prevents autorelease
+    BOOL success;
     @autoreleasepool {
-        NSError *error = nil;
-        [RLMRealm realmWithConfiguration:configuration error:&error];
-        return error;
+        success = [RLMRealm realmWithConfiguration:configuration error:&localError] != nil;
     }
+    if (!success && error) {
+        *error = localError; // Must set outside pool otherwise will free anyway
+    }
+    return success;
 }
 
 - (RLMObject *)createObject:(NSString *)className withValue:(id)value {
