@@ -31,17 +31,6 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
     return propertyType != RLMPropertyTypeArray && propertyType != RLMPropertyTypeLinkingObjects;
 }
 
-BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
-    switch (propertyType) {
-        case RLMPropertyTypeInt:
-        case RLMPropertyTypeFloat:
-        case RLMPropertyTypeDouble:
-            return YES;
-        default:
-            return NO;
-    }
-}
-
 BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType) {
     return propertyType == RLMPropertyTypeLinkingObjects;
 }
