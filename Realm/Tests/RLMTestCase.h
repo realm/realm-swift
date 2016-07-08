@@ -20,6 +20,8 @@
 #import "RLMAssertions.h"
 #import "RLMTestObjects.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,7 +36,7 @@ NSData *RLMGenerateKey(void);
 @interface RLMTestCase : XCTestCase
 
 - (RLMRealm *)realmWithTestPath;
-- (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
+- (RLMRealm *)realmWithTestPathAndSchema:(nullable RLMSchema *)schema;
 
 - (RLMRealm *)inMemoryRealmWithIdentifier:(NSString *)identifier;
 - (RLMRealm *)readOnlyRealmWithURL:(NSURL *)fileURL error:(NSError **)error;
@@ -44,9 +46,11 @@ NSData *RLMGenerateKey(void);
 
 - (void)waitForNotification:(RLMNotification)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block;
 
-- (id)nonLiteralNil;
+- (nullable id)nonLiteralNil;
 
 - (void)dispatchAsync:(dispatch_block_t)block;
 - (void)dispatchAsyncAndWait:(dispatch_block_t)block;
 
 @end
+
+NS_ASSUME_NONNULL_END
