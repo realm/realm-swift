@@ -40,7 +40,6 @@ class SwiftDynamicTests: RLMTestCase {
         }
         let dyrealm = realm(withTestPathAndSchema: nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
-        XCTAssertTrue(dyrealm is RLMRealm, "realm should be of class RLMDynamicRealm")
 
         // verify schema
         let dynSchema = dyrealm.schema[SwiftDynamicObject.className()]
@@ -86,7 +85,6 @@ class SwiftDynamicTests: RLMTestCase {
         }
         let dyrealm = realm(withTestPathAndSchema: nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
-        XCTAssertTrue(dyrealm is RLMRealm, "realm should be of class RLMDynamicRealm")
 
         // verify schema
         let dynSchema = dyrealm.schema[DynamicObject.className()]
@@ -245,7 +243,6 @@ class SwiftDynamicTests: RLMTestCase {
         }
         let dyrealm = realmWithTestPathAndSchema(nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
-        XCTAssertTrue(dyrealm.isKindOfClass(RLMRealm), "realm should be of class RLMDynamicRealm")
 
         // verify schema
         let dynSchema = dyrealm.schema[DynamicObject.className()]
