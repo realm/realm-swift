@@ -331,7 +331,12 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
     id propertyValue = [obj valueForKey:_name];
 
-    // temporarily workaround since Objective-C generics used in Swift show up as `@`
+    // FIXME: temporarily workaround added since Objective-C generics used in Swift show up as `@`
+    //        * broken starting in Swift 3.0 Xcode 8 b1
+    //        * tested to still be broken in Swift 3.0 Xcode 8 b2
+    //        * if the Realm Objective-C Swift tests pass with this removed, it's been fixed
+    //        * once it has been fixed, remove this entire conditional block (contents included) entirely
+    //        * Bug Report: SR-2031 https://bugs.swift.org/browse/SR-2031
     if ([_objcRawType isEqualToString:@"@"]) {
         if (propertyValue) {
             _objcRawType = [NSString stringWithFormat:@"@\"%@\"", [propertyValue class]];
