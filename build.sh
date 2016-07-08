@@ -176,7 +176,6 @@ xc_work_around_rdar_23055637() {
     ( REALM_EXIT_AFTER_BUILDING_TESTS=YES xc "$1" ) || true
     # Xcode 7.2.1 fails to run tests in the iOS simulator for unknown reasons. Resetting the simulator here works
     # around this issue.
-    sh build.sh prelaunch-simulator
     xc "$1"
 }
 
@@ -416,10 +415,6 @@ case "$COMMAND" in
         fi
 
         exit 0
-        ;;
-
-    "prelaunch-simulator")
-        sh $(dirname $0)/scripts/reset-simulators.sh
         ;;
 
     ######################################
@@ -762,7 +757,6 @@ case "$COMMAND" in
         ;;
 
     "examples-ios")
-        sh build.sh prelaunch-simulator
         if [[ -d "examples/ios/objc" ]]; then
             workspace="examples/ios/objc/RealmExamples.xcworkspace"
         else
@@ -785,7 +779,6 @@ case "$COMMAND" in
         ;;
 
     "examples-ios-swift")
-        sh build.sh prelaunch-simulator
         workspace="examples/ios/swift-$REALM_SWIFT_VERSION/RealmExamples.xcworkspace"
         pod install --project-directory="$workspace/.." --no-repo-update
         xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
@@ -930,7 +923,6 @@ case "$COMMAND" in
             export REALM_SWIFT_VERSION=$swift_version
             export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
-            sh build.sh prelaunch-simulator
             # Verify that no Realm files still exist
             ! find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .
 
@@ -984,7 +976,6 @@ case "$COMMAND" in
     "package-ios-static")
         cd tightdb_objc
 
-        sh build.sh prelaunch-simulator
         sh build.sh test-ios-static
         sh build.sh ios-static
         move_to_clean_dir build/ios-static/Realm.framework xcode-7
@@ -995,7 +986,6 @@ case "$COMMAND" in
     "package-ios-dynamic")
         cd tightdb_objc
 
-        sh build.sh prelaunch-simulator
         sh build.sh ios-dynamic
         move_to_clean_dir build/ios/Realm.framework xcode-7
 
@@ -1013,7 +1003,6 @@ case "$COMMAND" in
     "package-ios-swift")
         cd tightdb_objc
         rm -rf build/ios/Realm.framework
-        sh build.sh prelaunch-simulator
         sh build.sh ios-swift
 
         cd build/ios

@@ -54,9 +54,6 @@ xctest() {
     DIRECTORY="$PLATFORM/$LANG/$NAME"
     PROJECT="$DIRECTORY/$NAME.xcodeproj"
     WORKSPACE="$DIRECTORY/$NAME.xcworkspace"
-    if [[ $PLATFORM == ios ]]; then
-        sh "$(dirname "$0")/../../scripts/reset-simulators.sh"
-    fi
     if [[ $NAME == CocoaPods* ]]; then
         pod install --project-directory="$DIRECTORY"
     elif [[ $NAME == Carthage* ]]; then
