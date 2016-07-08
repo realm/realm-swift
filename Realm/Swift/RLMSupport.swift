@@ -19,6 +19,17 @@
 import Realm
 
 #if swift(>=3.0)
+    extension RLMRealm {
+        public class func schemaVersion(at url: URL, usingEncryptionKey key: Data? = nil) throws -> UInt64 {
+            var error: NSError?
+            let version = __schemaVersion(at: url, encryptionKey: key, error: &error)
+            guard version != RLMNotVersioned else {
+                throw error!
+            }
+            return version
+        }
+    }
+
     extension RLMObject {
         // Swift query convenience functions
         public class func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
@@ -78,6 +89,17 @@ import Realm
     }
 
 #else
+    extension RLMRealm {
+        @nonobjc public class func schemaVersionAtURL(url: NSURL, encryptionKey key: NSData? = nil,
+                                                      error: NSErrorPointer) -> UInt64 {
+            return __schemaVersionAtURL(url, encryptionKey: key, error: error)
+        }
+    }
+
+    func test() {
+        RLMRealm.schemaVersionAtURL(NSURL(), encryptionKey: nil, error: nil)
+    }
+
     extension RLMObject {
         // Swift query convenience functions
         public class func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMResults {

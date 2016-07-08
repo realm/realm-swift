@@ -71,7 +71,7 @@ class ListTests: TestCase {
 
     override class func defaultTestSuite() -> XCTestSuite {
         // Don't run tests for the base class
-        if isEqual(ListTests) {
+        if isEqual(ListTests.self) {
             return XCTestSuite(name: "empty")
         }
         return super.defaultTestSuite()

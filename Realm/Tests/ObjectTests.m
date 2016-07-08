@@ -18,6 +18,9 @@
 
 #import "RLMTestCase.h"
 
+#import "RLMObjectSchema_Private.h"
+#import "RLMSchema_Private.h"
+
 #import <libkern/OSAtomic.h>
 #import <math.h>
 #import <objc/runtime.h>
@@ -1880,6 +1883,33 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     [realm commitWriteTransaction];
 }
 
+- (void)testCreateOrUpdateWithReorderedColumns {
+    @autoreleasepool {
+        // Create a Realm file with the properties in reverse order
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:PrimaryStringObject.class];
+        objectSchema.properties = @[objectSchema.properties[1], objectSchema.properties[0]];
+        RLMSchema *schema = [RLMSchema new];
+        schema.objectSchema = @[objectSchema];
+
+        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
+        [realm beginWriteTransaction];
+        [PrimaryStringObject createOrUpdateInRealm:realm withValue:@[@5, @"a"]];
+        [realm commitWriteTransaction];
+    }
+
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+
+    XCTAssertEqual([PrimaryStringObject objectInRealm:realm forPrimaryKey:@"a"].intCol, 5);
+
+    // Values in array are used in property declaration order, not table column order
+    [PrimaryStringObject createOrUpdateInRealm:realm withValue:@[@"a", @6]];
+    XCTAssertEqual([PrimaryStringObject objectInRealm:realm forPrimaryKey:@"a"].intCol, 6);
+
+    [PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"stringCol": @"a", @"intCol": @7}];
+    XCTAssertEqual([PrimaryStringObject objectInRealm:realm forPrimaryKey:@"a"].intCol, 7);
+    [realm commitWriteTransaction];
+}
 
 - (void)testObjectInSet {
     [[RLMRealm defaultRealm] beginWriteTransaction];

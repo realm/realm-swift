@@ -17,7 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+
+#import "RLMObjectSchema_Private.h"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMRealm_Dynamic.h"
+#import "RLMSchema_Private.h"
 
 #pragma mark - Test Objects
 
@@ -388,9 +392,13 @@
     return results;
 }
 
+- (RLMRealm *)realm {
+    return [RLMRealm defaultRealm];
+}
+
 - (void)testBasicQuery
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [PersonObject createInRealm:realm withValue:@[@"Fiel", @27]];
@@ -412,7 +420,7 @@
 
 -(void)testQueryBetween
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     NSDate *date1 = [NSDate date];
     NSDate *date2 = [date1 dateByAddingTimeInterval:1];
@@ -451,7 +459,7 @@
 
 - (void)testQueryWithDates
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     NSDate *date1 = [NSDate date];
     NSDate *date2 = [date1 dateByAddingTimeInterval:1];
@@ -476,7 +484,7 @@
 
 - (void)testDefaultRealmQuery
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [PersonObject createInRealm:realm withValue:@[@"Fiel", @27]];
@@ -496,7 +504,7 @@
 
 - (void)testArrayQuery
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [PersonObject createInRealm:realm withValue:@[@"Fiel", @27]];
@@ -541,7 +549,7 @@
 
 - (void)testQuerySorting
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     NSDate *date1 = [NSDate date];
     NSDate *date2 = [date1 dateByAddingTimeInterval:1];
@@ -598,7 +606,7 @@
 }
 
 - (void)testSortByMultipleColumns {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
     DogObject *a1 = [DogObject createInDefaultRealmWithValue:@[@"a", @1]];
     DogObject *a2 = [DogObject createInDefaultRealmWithValue:@[@"a", @2]];
@@ -628,7 +636,7 @@
 }
 
 - (void)testSortedLinkViewWithDeletion {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     NSDate *date1 = [NSDate date];
     NSDate *date2 = [date1 dateByAddingTimeInterval:1];
@@ -669,7 +677,7 @@
 }
 
 - (void)testQueryingSortedQueryPreservesOrder {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     for (int i = 0; i < 5; ++i) {
@@ -700,7 +708,7 @@
 
 - (void)testTwoColumnComparison
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
 
@@ -804,7 +812,7 @@
 
 - (void)testStringBeginsWith
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
@@ -834,7 +842,7 @@
 
 - (void)testStringEndsWith
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
@@ -864,7 +872,7 @@
 
 - (void)testStringContains
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
@@ -898,7 +906,7 @@
 
 - (void)testStringEquality
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
@@ -927,7 +935,7 @@
 
 - (void)testFloatQuery
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [FloatObject createInRealm:realm withValue:@[@1.7f]];
@@ -950,7 +958,7 @@
 
 - (void)testLiveQueriesInsideTransaction
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     {
@@ -992,7 +1000,7 @@
 
 - (void)testLiveQueriesBetweenTransactions
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [self.queryObjectClass createInRealm:realm withValue:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
@@ -1043,7 +1051,7 @@
 }
 
 - (void)makeDogWithName:(NSString *)name owner:(NSString *)ownerName {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     OwnerObject *owner = [[OwnerObject alloc] init];
     owner.name = ownerName;
@@ -1056,7 +1064,7 @@
 }
 
 - (void)makeDogWithAge:(int)age owner:(NSString *)ownerName {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     OwnerObject *owner = [[OwnerObject alloc] init];
     owner.name = ownerName;
@@ -1081,7 +1089,7 @@
     RLMRealm *testRealm = [self realmWithTestPath];
     [self makeDogWithName:@"Harvie" owner:@"Tim"];
 
-    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    RLMRealm *defaultRealm = [self realm];
     DogObject *dog = [[DogObject alloc] init];
     dog.dogName = @"Fido";
     [defaultRealm beginWriteTransaction];
@@ -1093,7 +1101,7 @@
 
 - (void)testLinkQueryString
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [self makeDogWithName:@"Harvie" owner:@"Tim"];
     RLMAssertCount(OwnerObject, 1U, @"dog.dogName  = 'Harvie'");
@@ -1169,7 +1177,7 @@
 
 - (void)testLinkQueryAllTypes
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     NSDate *now = [NSDate dateWithTimeIntervalSince1970:100000];
 
@@ -1216,7 +1224,7 @@
 
 - (void)testLinkQueryMany
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     ArrayPropertyObject *arrPropObj1 = [[ArrayPropertyObject alloc] init];
     arrPropObj1.name = @"Test";
@@ -1261,7 +1269,7 @@
 
 - (void)testMultiLevelLinkQuery
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     CircleObject *circle = nil;
@@ -1286,7 +1294,7 @@
 
 - (void)testArrayMultiLevelLinkQuery
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     CircleObject *circle = nil;
@@ -1318,7 +1326,7 @@
 
 - (void)testMultiLevelBackLinkQuery
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     LinkChain1 *root1 = [LinkChain1 createInRealm:realm withValue:@{@"value": @1, @"next": @[@[]]}];
@@ -1339,7 +1347,7 @@
 
 - (void)testQueryWithObjects
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     NSDate *date1 = [NSDate date];
     NSDate *date2 = [date1 dateByAddingTimeInterval:1];
@@ -1385,7 +1393,7 @@
 }
 
 - (void)testCompoundOrQuery {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [PersonObject createInRealm:realm withValue:@[@"Tim", @29]];
@@ -1397,7 +1405,7 @@
 }
 
 - (void)testCompoundAndQuery {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [PersonObject createInRealm:realm withValue:@[@"Tim", @29]];
@@ -1426,7 +1434,7 @@
 
 - (void)testINPredicate
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
@@ -1550,7 +1558,7 @@
 
 - (void)testArrayIn
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
 
     ArrayPropertyObject *arr = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[], @[]]];
@@ -1575,7 +1583,7 @@
 }
 
 - (void)testQueryChaining {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [PersonObject createInRealm:realm withValue:@[@"Tim", @29]];
@@ -1588,7 +1596,7 @@
 }
 
 - (void)testLinkViewQuery {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [CompanyObject createInRealm:realm
@@ -1607,7 +1615,7 @@
 }
 
 - (void)testLinkViewQueryLifetime {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [CompanyObject createInRealm:realm
@@ -1635,7 +1643,7 @@
 }
 
 - (void)testLinkViewQueryLiveUpdate {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [CompanyObject createInRealm:realm
@@ -1675,7 +1683,7 @@
 
 - (void)testConstantPredicates
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [PersonObject createInRealm:realm withValue:@[@"Fiel", @27]];
@@ -1692,7 +1700,7 @@
 
 - (void)testEmptyCompoundPredicates
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [PersonObject createInRealm:realm withValue:@[@"Fiel", @27]];
@@ -1709,7 +1717,7 @@
 
 - (void)testComparisonsWithKeyPathOnRHS
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
 
@@ -1760,7 +1768,7 @@
 
 - (void)testLinksToDeletedOrMovedObject
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
 
     DogObject *fido = [DogObject createInRealm:realm withValue:@[ @"Fido", @3 ]];
@@ -1796,7 +1804,7 @@
 
 - (void)testQueryOnDeletedArrayProperty
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
     IntObject *io = [IntObject createInRealm:realm withValue:@[@0]];
     ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[io]]];
@@ -1815,7 +1823,7 @@
 
 - (void)testSubqueries
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     CompanyObject *first = [CompanyObject createInRealm:realm
@@ -1839,7 +1847,7 @@
 }
 
 - (void)testLinkingObjects {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
 
@@ -1980,7 +1988,7 @@
 
 - (void)testQueryOnNullableStringColumn {
     void (^testWithStringClass)(Class) = ^(Class stringObjectClass) {
-        RLMRealm *realm = [RLMRealm defaultRealm];
+        RLMRealm *realm = [self realm];
         [realm transactionWithBlock:^{
             [stringObjectClass createInRealm:realm withValue:@[@"a"]];
             [stringObjectClass createInRealm:realm withValue:@[NSNull.null]];
@@ -2037,7 +2045,7 @@
 
 - (void)testQueryingOnLinkToNullableStringColumn {
     void (^testWithStringClass)(Class, Class) = ^(Class stringLinkClass, Class stringObjectClass) {
-        RLMRealm *realm = [RLMRealm defaultRealm];
+        RLMRealm *realm = [self realm];
         [realm transactionWithBlock:^{
             [stringLinkClass createInRealm:realm withValue:@[[stringObjectClass createInRealm:realm withValue:@[@"a"]]]];
             [stringLinkClass createInRealm:realm withValue:@[[stringObjectClass createInRealm:realm withValue:@[NSNull.null]]]];
@@ -2070,7 +2078,7 @@
 }
 
 - (void)testSortingColumnsWithNull {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
 
     {
@@ -2118,7 +2126,7 @@
 }
 
 - (void)testCountOnCollection {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
 
     IntegerArrayPropertyObject *arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @1, @[]]];
@@ -2157,7 +2165,7 @@
 }
 
 - (void)testAggregateCollectionOperators {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
 
     IntegerArrayPropertyObject *arr = [IntegerArrayPropertyObject createInRealm:realm withValue:@[ @1111, @[] ]];
@@ -2228,7 +2236,7 @@ struct NullTestData {
 };
 
 - (void)testPrimitiveOperatorsOnAllNullablePropertyTypes {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     // nil on LHS is currently not supported by core
     XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = boolObj"]);
@@ -2337,7 +2345,7 @@ struct NullTestData {
 
 - (void)testINPredicateOnNullWithNonNullValues
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [AllOptionalTypes createInRealm:realm withValue:@[@YES, @1, @1, @1, @"abc",
@@ -2410,7 +2418,7 @@ struct NullTestData {
 
 - (void)testINPredicateOnNullWithNullValues
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
     [AllOptionalTypes createInRealm:realm withValue:@[NSNull.null, NSNull.null,
@@ -2497,5 +2505,33 @@ struct NullTestData {
     CFRunLoopRun();
     [(RLMNotificationToken *)token stop];
     return results;
+}
+@end
+
+@interface QueryWithReversedColumnOrderTests : QueryTests
+@end
+
+@implementation QueryWithReversedColumnOrderTests
+- (RLMRealm *)realm {
+    @autoreleasepool {
+        NSArray *classNames = @[@"AllTypesObject", @"QueryObject",
+                                @"PersonObject", @"DogObject",
+                                @"EmployeeObject", @"CompanyObject"];
+        RLMSchema *schema = [RLMSchema.sharedSchema copy];
+        for (NSString *className in classNames) {
+            [self reverseProperties:schema[className]];
+        }
+        RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+        config.customSchema = schema;
+        [RLMRealm realmWithConfiguration:config error:nil];
+    }
+
+    return RLMRealm.defaultRealm;
+}
+
+- (RLMObjectSchema *)reverseProperties:(RLMObjectSchema *)source {
+    RLMObjectSchema *objectSchema = [source copy];
+    objectSchema.properties = objectSchema.properties.reverseObjectEnumerator.allObjects;
+    return objectSchema;
 }
 @end

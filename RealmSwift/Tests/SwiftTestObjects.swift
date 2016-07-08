@@ -87,6 +87,7 @@ class SwiftImplicitlyUnwrappedOptionalObject: Object {
     dynamic var optStringCol: String!
     dynamic var optBinaryCol: NSData!
     dynamic var optDateCol: NSDate!
+    dynamic var optObjectCol: SwiftBoolObject!
 }
 
 class SwiftOptionalDefaultValuesObject: Object {

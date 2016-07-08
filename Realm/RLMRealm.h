@@ -121,7 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @see `-[RLMRealm addNotificationBlock:]`
  */
-typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
+typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *realm);
 
 #pragma mark - Receiving Notification when a Realm Changes
 
@@ -137,7 +137,7 @@ typedef void (^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  The block has the following definition:
 
-     typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
+     typedef void(^RLMNotificationBlock)(RLMNotification notification, RLMRealm *realm);
 
  It receives the following parameters:
 
@@ -463,7 +463,8 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
  @return The version of the Realm at `fileURL`, or `RLMNotVersioned` if the version cannot be read.
  */
-+ (uint64_t)schemaVersionAtURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
++ (uint64_t)schemaVersionAtURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error
+NS_REFINED_FOR_SWIFT;
 
 /**
  Performs the given Realm configuration's migration block on a Realm at the given path.
@@ -477,7 +478,22 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
 
  @see                 RLMMigration
  */
-+ (nullable NSError *)migrateRealm:(RLMRealmConfiguration *)configuration;
++ (nullable NSError *)migrateRealm:(RLMRealmConfiguration *)configuration
+__deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR_SWIFT;
+
+/**
+ Performs the given Realm configuration's migration block on a Realm at the given path.
+
+ This method is called automatically when opening a Realm for the first time and does
+ not need to be called explicitly. You can choose to call this method to control
+ exactly when and how migrations are performed.
+
+ @param configuration The Realm configuration used to open and migrate the Realm.
+ @return              The error that occurred while applying the migration, if any.
+
+ @see                 RLMMigration
+ */
++ (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
 #pragma mark - Synchronization
 

@@ -128,7 +128,7 @@ class RealmCollectionTypeTests: TestCase {
 
     override class func defaultTestSuite() -> XCTestSuite {
         // Don't run tests for the base class
-        if isEqual(RealmCollectionTypeTests) {
+        if isEqual(RealmCollectionTypeTests.self) {
             return XCTestSuite(name: "empty")
         }
         return super.defaultTestSuite()
@@ -459,7 +459,7 @@ class RealmCollectionTypeTests: TestCase {
 class ResultsTests: RealmCollectionTypeTests {
     override class func defaultTestSuite() -> XCTestSuite {
         // Don't run tests for the base class
-        if isEqual(ResultsTests) {
+        if isEqual(ResultsTests.self) {
             return XCTestSuite(name: "empty")
         }
         return super.defaultTestSuite()
@@ -636,7 +636,7 @@ class ResultsFromLinkViewTests: ResultsTests {
 class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
     override class func defaultTestSuite() -> XCTestSuite {
         // Don't run tests for the base class
-        if isEqual(ListRealmCollectionTypeTests) {
+        if isEqual(ListRealmCollectionTypeTests.self) {
             return XCTestSuite(name: "empty")
         }
         return super.defaultTestSuite()

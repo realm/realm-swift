@@ -508,7 +508,6 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     prop->_isPrimary = _isPrimary;
     prop->_swiftIvar = _swiftIvar;
     prop->_optional = _optional;
-    prop->_declarationIndex = _declarationIndex;
     prop->_linkOriginPropertyName = _linkOriginPropertyName;
 
     return prop;
