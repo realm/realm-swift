@@ -66,7 +66,7 @@ class SwiftDynamicTests: RLMTestCase {
 
         // verify properties
         let dyrealm = realm(withTestPathAndSchema: nil)
-        let array = dyrealm.allObjects("SwiftDynamicObject")!
+        let array = dyrealm.allObjects("SwiftDynamicObject")
 
         XCTAssertTrue(array[0]["intCol"] as! NSNumber == 1)
         XCTAssertTrue(array[1]["stringCol"] as! String == "column2")
@@ -111,7 +111,7 @@ class SwiftDynamicTests: RLMTestCase {
 
         // verify properties
         let dyrealm = realm(withTestPathAndSchema: nil)
-        let array = dyrealm.allObjects("DynamicObject")!
+        let array = dyrealm.allObjects("DynamicObject")
 
         XCTAssertTrue(array[0]["intCol"] as! NSNumber == 1)
         XCTAssertTrue(array[1]["stringCol"] as! String == "column2")
@@ -159,7 +159,7 @@ class SwiftDynamicTests: RLMTestCase {
 
         // verify properties
         let dyrealm = realm(withTestPathAndSchema: nil)
-        let results = dyrealm.allObjects(AllTypesObject.className())!
+        let results = dyrealm.allObjects(AllTypesObject.className())
         XCTAssertEqual(results.count, UInt(2))
         let robj1 = results[0]
         let robj2 = results[1]

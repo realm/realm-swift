@@ -23,6 +23,8 @@
 
 @class RLMResults;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface RLMRealm (Dynamic)
 
 #pragma mark - Getting Objects from a Realm
@@ -112,3 +114,5 @@
 -(RLMObject *)createObject:(NSString *)className withValue:(id)value;
 
 @end
+
+NS_ASSUME_NONNULL_END
