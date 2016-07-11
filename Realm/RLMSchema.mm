@@ -55,6 +55,7 @@ static enum class SharedSchemaState {
 
 @implementation RLMSchema {
     NSArray *_objectSchema;
+    realm::Schema _objectStoreSchema;
 }
 
 // Caller must @synchronize on s_localNameToClass
@@ -316,12 +317,15 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 }
 
 - (Schema)objectStoreCopy {
-    std::vector<realm::ObjectSchema> schema;
-    schema.reserve(_objectSchemaByName.count);
-    [_objectSchemaByName enumerateKeysAndObjectsUsingBlock:[&](NSString *, RLMObjectSchema *objectSchema, BOOL *) {
-        schema.push_back(objectSchema.objectStoreCopy);
-    }];
-    return schema;
+    if (_objectStoreSchema.size() == 0) {
+        std::vector<realm::ObjectSchema> schema;
+        schema.reserve(_objectSchemaByName.count);
+        [_objectSchemaByName enumerateKeysAndObjectsUsingBlock:[&](NSString *, RLMObjectSchema *objectSchema, BOOL *) {
+            schema.push_back(objectSchema.objectStoreCopy);
+        }];
+        _objectStoreSchema = std::move(schema);
+    }
+    return _objectStoreSchema;
 }
 
 @end
