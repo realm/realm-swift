@@ -20,6 +20,71 @@ import XCTest
 import Realm
 
 #if swift(>=3.0)
+
+let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+
+class SwiftUnicodeTests: RLMTestCase {
+
+    // Swift models
+
+    func testUTF8StringContents() {
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        _ = SwiftStringObject.create(in: realm, withValue: [utf8TestString])
+        try! realm.commitWriteTransaction()
+
+        let obj1 = SwiftStringObject.allObjects(in: realm).firstObject() as! SwiftStringObject
+        XCTAssertEqual(obj1.stringCol, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
+
+        let obj2 = SwiftStringObject.objects(in: realm, where: "stringCol == %@", utf8TestString).firstObject() as! SwiftStringObject
+        XCTAssertTrue(obj1.isEqual(to: obj2), "Querying a realm searching for a string with UTF8 content should work")
+    }
+
+    func testUTF8PropertyWithUTF8StringContents() {
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        _ = SwiftUTF8Object.create(in: realm, withValue: [utf8TestString])
+        try! realm.commitWriteTransaction()
+
+        let obj1 = SwiftUTF8Object.allObjects(in: realm).firstObject() as! SwiftUTF8Object
+        XCTAssertEqual(obj1.柱колоéнǢкƱаم👍, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
+
+        // Test fails because of rdar://17735684
+//        let obj2 = SwiftUTF8Object.objectsInRealm(realm, "柱колоéнǢкƱаم👍 == %@", utf8TestString).firstObject() as SwiftUTF8Object
+//        XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
+    }
+
+    // Objective-C models
+
+    func testUTF8StringContents_objc() {
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        _ = StringObject.create(in: realm, withValue: [utf8TestString])
+        try! realm.commitWriteTransaction()
+
+        let obj1 = StringObject.allObjects(in: realm).firstObject() as! StringObject
+        XCTAssertEqual(obj1.stringCol, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
+
+        // Temporarily commented out because variadic import seems broken
+        let obj2 = StringObject.objects(in: realm, where: "stringCol == %@", utf8TestString).firstObject() as! StringObject
+        XCTAssertTrue(obj1.isEqual(to: obj2), "Querying a realm searching for a string with UTF8 content should work")
+    }
+
+    func testUTF8PropertyWithUTF8StringContents_objc() {
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        _ = UTF8Object.create(in: realm, withValue: [utf8TestString])
+        try! realm.commitWriteTransaction()
+
+        let obj1 = UTF8Object.allObjects(in: realm).firstObject() as! UTF8Object
+        XCTAssertEqual(obj1.柱колоéнǢкƱаم, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
+
+        // Test fails because of rdar://17735684
+//        let obj2 = UTF8Object.objectsInRealm(realm, "柱колоéнǢкƱаم == %@", utf8TestString).firstObject() as UTF8Object
+//        XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
+    }
+}
+
 #else
 
 let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
