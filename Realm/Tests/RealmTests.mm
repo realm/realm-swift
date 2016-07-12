@@ -1686,42 +1686,7 @@
     [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
-- (void)testHandoverNoObject {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    XCTAssertEqual(0u, [BoolObject allObjects].count);
-    [self performBlockAndWait:^(dispatch_queue_t queue) {
-        [realm dispatchAsync:queue withBlock:^(RLMRealm * _Nonnull realm) {
-            [realm transactionWithBlock:^{
-                [realm addObject:[[BoolObject alloc] init]];
-            }];
-        }];
-    }];
-    XCTAssertEqual(0u, [BoolObject allObjects].count);
-    [realm refresh];
-    XCTAssertEqual(1u, [BoolObject allObjects].count);
-}
-
-- (void)testHandoverSingleObject {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    BoolObject *object = [[BoolObject alloc] init];
-    [realm transactionWithBlock:^{
-        [realm addObject:object];
-    }];
-    XCTAssertEqual(false, object.boolCol);
-    [self performBlockAndWait:^(dispatch_queue_t queue) {
-        [realm dispatchAsync:queue handingOverObject:object withBlock:^(RLMRealm * _Nonnull realm,
-                                                                        RLMObject * _Nonnull object) {
-            [realm transactionWithBlock:^{
-                ((BoolObject *)object).boolCol = YES;
-            }];
-        }];
-    }];
-    XCTAssertEqual(false, object.boolCol);
-    [realm refresh];
-    XCTAssertEqual(true, object.boolCol);
-}
-
-- (void)testHandoverMultipleObjects {
+- (void)testHandover {
     RLMRealm *realm = [RLMRealm defaultRealm];
     StringObject *stringObject = [[StringObject alloc] init];
     IntObject *intObject = [[IntObject alloc] init];
@@ -1733,8 +1698,8 @@
     XCTAssertEqual(0, intObject.intCol);
     NSArray<RLMObject *> *objects = @[stringObject, intObject];
     [self performBlockAndWait:^(dispatch_queue_t queue) {
-        [realm dispatchAsync:queue handingOverObjects:objects withBlock:^(RLMRealm * _Nonnull realm,
-                                                                          NSArray<RLMObject *> * _Nonnull objects) {
+        [realm dispatchAsyncOnQueue:queue withObjects:objects block:^(RLMRealm * _Nonnull realm,
+                                                                      NSArray<RLMObject *> * _Nonnull objects) {
             StringObject *stringObject = (StringObject *)objects[0];
             IntObject *intObject = (IntObject *)objects[1];
             [realm transactionWithBlock:^{

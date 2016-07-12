@@ -712,23 +712,29 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return success;
 }
 
-- (void)dispatchAsync:(dispatch_queue_t)queue withBlock:(void(^)(RLMRealm *))block {
-    [self dispatchAsync:queue handingOverObjects:@[] withBlock:^(RLMRealm * _Nonnull realm,
-                                                                 NSArray<RLMObject *> * _Nonnull) {
+- (void)dispatchAsyncWithBlock:(void(^)(RLMRealm *))block {
+    [self dispatchAsyncWithObjects:@[] block:^(RLMRealm * _Nonnull realm, NSArray<RLMObject *> * _Nonnull) {
         block(realm);
     }];
 }
 
-- (void)dispatchAsync:(dispatch_queue_t)queue handingOverObject:(RLMObject *)objectToHandOver
-            withBlock:(void(^)(RLMRealm *, RLMObject *))block {
-    [self dispatchAsync:queue handingOverObjects:@[objectToHandOver] withBlock:^(RLMRealm * realm,
-                                                                                 NSArray<RLMObject *> *objects) {
-        block(realm, objects[0]);
+- (void)dispatchAsyncWithObject:(RLMObject *)objectToHandOver block:(void(^)(RLMRealm *, RLMObject *))block {
+    [self dispatchAsyncWithObjects:@[objectToHandOver] block:^(RLMRealm * _Nonnull realm,
+                                                               NSArray<RLMObject *> * _Nonnull singleObjectArray) {
+        block(realm, singleObjectArray[0]);
     }];
 }
 
-- (void)dispatchAsync:(dispatch_queue_t)queue handingOverObjects:(NSArray<RLMObject *> *)objectsToHandOver
-        withBlock:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block {
+- (void)dispatchAsyncWithObjects:(NSArray<RLMObject *> *)objectsToHandOver
+                           block:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block {
+    [self dispatchAsyncOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)
+                   withObjects:objectsToHandOver
+                         block:block];
+}
+
+- (void)dispatchAsyncOnQueue:(dispatch_queue_t)queue
+                 withObjects:(NSArray<RLMObject *> *)objectsToHandOver
+                       block:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block {
     std::vector<realm::Row> rowsToHandOver;
     rowsToHandOver.reserve(objectsToHandOver.count);
     NSMutableArray<NSString *> *classNames = [NSMutableArray arrayWithCapacity:objectsToHandOver.count];

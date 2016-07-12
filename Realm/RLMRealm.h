@@ -495,11 +495,21 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
  */
 + (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
-- (void)dispatchAsync:(dispatch_queue_t)queue withBlock:(void(^)(RLMRealm *))block;
-- (void)dispatchAsync:(dispatch_queue_t)queue handingOverObject:(RLMObject *)objectToHandOver
-            withBlock:(void(^)(RLMRealm *, RLMObject *))block;
-- (void)dispatchAsync:(dispatch_queue_t)queue handingOverObjects:(NSArray<RLMObject *> *)objectsToHandOver
-            withBlock:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block;
+- (void)dispatchAsyncWithBlock:(void(^)(RLMRealm *))block
+NS_SWIFT_NAME(async(execute:));
+
+- (void)dispatchAsyncWithObject:(RLMObject *)objectToHandOver
+                          block:(void(^)(RLMRealm *, RLMObject *))block
+NS_SWIFT_NAME(async(handingOver:execute:));
+
+- (void)dispatchAsyncWithObjects:(NSArray<RLMObject *> *)objectsToHandOver
+                           block:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block
+NS_SWIFT_NAME(async(handingOver:execute:));
+
+- (void)dispatchAsyncOnQueue:(dispatch_queue_t)queue
+                 withObjects:(NSArray<RLMObject *> *)objectsToHandOver
+                       block:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block
+NS_SWIFT_NAME(async(onQueue:handingOver:execute:));
 
 @end
 
