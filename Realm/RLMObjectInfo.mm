@@ -62,6 +62,17 @@ NSUInteger RLMObjectInfo::tableColumn(RLMProperty *property) const {
     return objectSchema->persisted_properties[property.index].table_column;
 }
 
+RLMObjectInfo &RLMObjectInfo::linkTargetType(size_t index) {
+    if (index < m_linkTargets.size() && m_linkTargets[index]) {
+        return *m_linkTargets[index];
+    }
+    if (m_linkTargets.size() <= index) {
+        m_linkTargets.resize(index + 1);
+    }
+    m_linkTargets[index] = &realm->_info[rlmObjectSchema.properties[index].objectClassName];
+    return *m_linkTargets[index];
+}
+
 RLMSchemaInfo::impl::iterator RLMSchemaInfo::begin() noexcept { return m_objects.begin(); }
 RLMSchemaInfo::impl::iterator RLMSchemaInfo::end() noexcept { return m_objects.end(); }
 RLMSchemaInfo::impl::const_iterator RLMSchemaInfo::begin() const noexcept { return m_objects.begin(); }

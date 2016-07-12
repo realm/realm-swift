@@ -52,7 +52,7 @@
     if (self) {
         _realm = parentObject->_realm;
         _backingList = realm::List(_realm->_realm, parentObject->_row.get_linklist(parentObject->_info->tableColumn(property)));
-        _objectInfo = &_realm->_info[_objectClassName];
+        _objectInfo = &parentObject->_info->linkTargetType(property.index);
         _ownerInfo = parentObject->_info;
         _key = property.name;
     }

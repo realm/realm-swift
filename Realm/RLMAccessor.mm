@@ -214,7 +214,7 @@ static inline RLMObjectBase *RLMGetLink(__unsafe_unretained RLMObjectBase *const
         return nil;
     }
     NSUInteger index = obj->_row.get_link(col);
-    return RLMCreateObjectAccessor(obj->_realm, obj->_realm->_info[obj->_objectSchema.properties[colIndex].objectClassName], index);
+    return RLMCreateObjectAccessor(obj->_realm, obj->_info->linkTargetType(colIndex), index);
 }
 
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,

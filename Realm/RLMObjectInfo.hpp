@@ -73,10 +73,13 @@ public:
     NSUInteger tableColumn(NSString *propertyName) const;
     NSUInteger tableColumn(RLMProperty *property) const;
 
+    RLMObjectInfo &linkTargetType(size_t index);
+
     void releaseTable() { m_table = nullptr; }
 
 private:
     mutable realm::Table *_Nullable m_table = nullptr;
+    std::vector<RLMObjectInfo *> m_linkTargets;
 };
 
 // A per-RLMRealm object schema map which stores RLMObjectInfo keyed on the name
