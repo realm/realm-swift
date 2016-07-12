@@ -18,11 +18,25 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMRealm+Sync.h"
-
-@class RLMSyncSession;
+#import "RLMSyncUtil.h"
 
 @interface RLMSyncManager : NSObject
+
+/**
+ Whether or not the Realm Sync manager has been configured.
+ */
+@property (nonatomic, readonly) BOOL configured;
+
+/**
+ The Realm Sync application ID for the current application.
+ */
+@property (nonatomic, readonly) RLMSyncAppID appID;
+
+/**
+ Configure the Realm Sync manager with application-wide configuration options. Call this method before calling any other
+ Realm Sync APIs. Do not call this method if `configured` is `YES`.
+ */
++ (void)configureWithAppID:(RLMSyncAppID)appID;
 
 + (instancetype)sharedManager;
 

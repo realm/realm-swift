@@ -35,6 +35,9 @@
         case RLMSyncServerEndpointSessions:
             pathComponent = @"sessions";
             break;
+        case RLMSyncServerEndpointRefresh:
+            pathComponent = @"refresh";
+            break;
     }
     NSAssert(pathComponent != nil, @"Unrecognized value for RLmSyncServerEndpoint enum");
     return [serverURL URLByAppendingPathComponent:pathComponent];

@@ -18,13 +18,14 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMRealm+Sync.h"
+#import "RLMSyncUtil.h"
 
 /**
  An enum describing all possible endpoints on the Realm Sync server.
  */
 typedef NS_ENUM(NSUInteger, RLMSyncServerEndpoint) {
     RLMSyncServerEndpointSessions,
+    RLMSyncServerEndpointRefresh,
 };
 
 /**
@@ -32,6 +33,10 @@ typedef NS_ENUM(NSUInteger, RLMSyncServerEndpoint) {
  */
 @interface RLMSyncNetworkClient : NSObject
 
+/**
+ Post some JSON data to a Realm Sync server, and asynchronously call a completion block with a JSON response and/or
+ error.
+ */
 + (void)postSyncRequestToEndpoint:(RLMSyncServerEndpoint)endpoint
                              host:(NSString *)host
                              JSON:(NSDictionary *)jsonDictionary

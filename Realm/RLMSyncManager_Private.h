@@ -18,6 +18,8 @@
 
 #import "RLMSyncManager.h"
 
+@class RLMSyncSession;
+
 @interface RLMSyncManager ()
 
 /**
@@ -26,6 +28,6 @@
  */
 - (RLMSyncSession *)syncSessionForRealm:(RLMSyncRealmPath)realmPath;
 
-@property (nonatomic, readonly) NSMutableDictionary<RLMSyncRealmPath, RLMSyncSession *> *sessions;
+@property (nonatomic) NSMutableDictionary<RLMSyncRealmPath, RLMSyncSession *> *sessions;
 
 @end

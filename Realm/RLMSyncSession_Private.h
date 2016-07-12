@@ -27,22 +27,29 @@
 @property (nonatomic, readwrite) RLMSyncAccountID account;
 @property (nonatomic, readwrite) BOOL valid;
 @property (nonatomic, readwrite) NSString *host;
-@property (nonatomic, readwrite) RLMSyncRealmPath path;
 
-@property (nonatomic) RLMSyncToken token;
-@property (nonatomic) NSMutableDictionary<NSString *, RLMSyncCredential> *credentials;
+@property (nonatomic, readwrite) RLMSyncRealmPath path;
+@property (nonatomic, readwrite) NSString *remoteURL;
+@property (nonatomic, readwrite) NSString *realmID;
+
+@property (nonatomic) RLMSyncToken accessToken;
+
+@property (nonatomic) RLMSyncToken refreshToken;
 
 /**
  Given a newly-created session object, configure all fields which are not expected to change between requests (except
- for `path`, which is configured by the sync manager when it retrieves the object from its dictionary. This method
- should only be called once.
- */
-- (void)configureWithHost:(NSString *)host account:(RLMSyncAccountID)account;
+ for `path`, which is configured by the sync manager when it retrieves the object from its dictionary. Also sets the
+ validity flag to YES.
 
-/**
- Given a JSON response, update fields of the session object which aren't constant. 'Updating' might include updating the
- refresh token, the list of credentials, and any other fields that might change between requests.
+ This method should only be called once.
  */
-- (void)updateWithJSON:(NSDictionary *)json;
+- (void)configureWithHost:(NSString *)host
+                  account:(RLMSyncAccountID)account
+                  realmID:(NSString *)realmID
+                 realmURL:(NSString *)realmURL;
+
+- (void)updateWithAccessToken:(RLMSyncToken)accessToken
+                   expiration:(NSTimeInterval)expiration
+                 refreshToken:(RLMSyncToken)refreshToken;
 
 @end

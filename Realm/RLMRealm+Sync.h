@@ -18,32 +18,7 @@
 
 #import <Realm/RLMRealm.h>
 
-@class RLMSyncSession;
-
-typedef NS_ENUM(NSUInteger, RLMSyncIdentityProvider) {
-    RLMRealmSyncIdentityProviderRealm,
-    RLMRealmSyncIdentityProviderFacebook,
-    RLMRealmSyncIdentityProviderTwitter,
-    RLMRealmSyncIdentityProviderGoogle,
-    RLMRealmSyncIdentityProviderICloud,
-    RLMRealmSyncIdentityProviderDebug,
-    // FIXME: add more providers as necessary...
-};
-
-typedef NSString* RLMSyncAccountID;
-typedef NSString* RLMSyncToken;
-typedef NSString* RLMSyncCredential;
-typedef NSString* RLMSyncRealmPath;
-typedef NSString* RLMSyncAppID;
-typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
-
-static NSString * _Nonnull const RLMSyncErrorDomain = @"io.realm.sync";
-
-typedef NS_ENUM(NSInteger, RLMSyncError) {
-    RLMSyncErrorBadResponse         = 1,
-    RLMSyncErrorBadRealmPath        = 2,
-};
-
+#import "RLMSyncUtil.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -54,16 +29,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)createSessionForToken:(RLMSyncToken)token
                      provider:(RLMSyncIdentityProvider)provider
-                        appID:(RLMSyncAppID)appID
                      userInfo:(NSDictionary *)userInfo
-             shouldCreateUser:(BOOL)shouldCreateUser
                         error:(NSError **)error
                  onCompletion:(RLMSyncCompletionBlock)completionBlock;
 
-/**
- FIXME: Implement this.
- */
--(void)scheduleRefreshAccessToken:(NSString *)refreshToken inRunLoop:(NSRunLoop *)runloop;
 @end
 
 NS_ASSUME_NONNULL_END

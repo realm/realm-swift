@@ -35,42 +35,11 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
     assert(false); // Invalid identity provider
 }
 
-static NSString *const kRLMSyncProviderKey = @"provider";
-static NSString *const kRLMSyncDataKey = @"data";
-static NSString *const kRLMSyncAppIDKey = @"app_id";
-static NSString *const kRLMSyncPathKey = @"path";
-
-static RLMSyncToken accessTokenForJSON(NSDictionary *json) {
-    id token = json[@"token"];
-    if (![token isKindOfClass:[NSString class]]) {
-        return nil;
-    }
-    return token;
-}
-
-static RLMSyncToken refreshTokenForJSON(NSDictionary *json) {
-    id token = json[@"renew"][@"token"];
-    if (![token isKindOfClass:[NSString class]]) {
-        return nil;
-    }
-    return token;
-}
-
-static RLMSyncAccountID accountForJSON(NSDictionary *json) {
-    id accountID = json[@"account"];
-    if (![accountID isKindOfClass:[NSString class]]) {
-        return nil;
-    }
-    return accountID;
-}
-
 @implementation RLMRealm (Sync)
 
 - (void)createSessionForToken:(RLMSyncToken)token
                      provider:(RLMSyncIdentityProvider)provider
-                        appID:(RLMSyncAppID)appID
                      userInfo:(NSDictionary *)userInfo
-             shouldCreateUser:(BOOL)shouldCreateUser
                         error:(NSError **)error
                  onCompletion:(RLMSyncCompletionBlock)completionBlock {
 
@@ -80,22 +49,20 @@ static RLMSyncAccountID accountForJSON(NSDictionary *json) {
         }
         return;
     }
+    RLMSYNC_CHECK_MANAGER(error);
+
     RLMSyncRealmPath path = self.configuration.fileURL.path;
     NSString *host = self.configuration.syncServerURL.host;
 
     NSMutableDictionary *json = [@{
                                    kRLMSyncProviderKey: getProviderName(provider),
                                    kRLMSyncDataKey: token,
-                                   kRLMSyncAppIDKey: appID,
+                                   kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                                    kRLMSyncPathKey: path,
                                    } mutableCopy];
-    if (shouldCreateUser) {
-        // FIXME: fix this key
-//        json[@"should_create"] = @(shouldCreateUser);
-    }
     if (userInfo) {
-        // FIXME: fix this key
-//        json[@"user_info"] = userInfo;
+        // Munge user info into the JSON request.
+        json[@"user_info"] = userInfo;
     }
 
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointSessions
@@ -104,10 +71,17 @@ static RLMSyncAccountID accountForJSON(NSDictionary *json) {
                                               error:error
                                          completion:^(NSError *error, NSDictionary *data) {
                                              if (data && !error) {
-                                                 RLMSyncToken accessToken = accessTokenForJSON(data);
-                                                 RLMSyncToken refreshToken = refreshTokenForJSON(data);
-                                                 RLMSyncAccountID accountID = accountForJSON(data);
-                                                 if (!accessToken || !refreshToken || !accountID) {
+                                                 RLMSyncToken accessToken = RLM_accessTokenForJSON(data);
+                                                 RLMSyncToken refreshToken = RLM_refreshTokenForJSON(data);
+                                                 RLMSyncAccountID accountID = RLM_accountForJSON(data);
+                                                 NSString *realmID = RLM_realmIDForJSON(data);
+                                                 NSString *remoteRealmURL = RLM_realmURLForJSON(data);
+                                                 NSTimeInterval expiry = RLM_accessExpirationForJSON(data);
+                                                 if (!accessToken
+                                                     || !refreshToken
+                                                     || !accountID
+                                                     || !realmID
+                                                     || !remoteRealmURL) {
                                                      error = [NSError errorWithDomain:RLMSyncErrorDomain
                                                                                  code:RLMSyncErrorBadResponse
                                                                              userInfo:nil];
@@ -118,8 +92,13 @@ static RLMSyncAccountID accountForJSON(NSDictionary *json) {
 
                                                  // Prepare the session object for the newly-created session
                                                  RLMSyncSession *session = [[RLMSyncManager sharedManager] syncSessionForRealm:path];
-                                                 [session configureWithHost:host account:accountID];
-                                                 [session updateWithJSON:data];
+                                                 [session configureWithHost:host
+                                                                    account:accountID
+                                                                    realmID:realmID
+                                                                   realmURL:remoteRealmURL];
+                                                 [session updateWithAccessToken:accessToken
+                                                                     expiration:expiry
+                                                                   refreshToken:refreshToken];
 
                                                  // Inform the client
                                                  completionBlock(nil, data);

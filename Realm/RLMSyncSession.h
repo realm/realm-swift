@@ -17,11 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMRealm+Sync.h"
+#import "RLMSyncUtil.h"
 
 /**
  A `RLMSyncSession` instance is an opaque object representing a single user's Realm Sync session on the device for a
- single Realm.
+ single Realm Sync server and one (or more) synchronized Realms.
  */
 @interface RLMSyncSession : NSObject
 
@@ -37,10 +37,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) NSString *host;
 
+// TODO: support multiple paths?
 /**
- The path of the Realm linked to this session.
+ The local path of the Realm linked to this session.
  */
 @property (nonatomic, readonly) RLMSyncRealmPath path;
+
+@property (nonatomic, readonly) NSString *remoteURL;
+@property (nonatomic, readonly) NSString *realmID;
 
 /**
  Whether this session object is still valid.
@@ -50,12 +54,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Validate and refresh a session.
  */
-- (void)refreshSession:(RLMSyncCompletionBlock)completionBlock;
+- (void)refreshSessionWithError:(NSError **)error completion:(nullable RLMSyncCompletionBlock)completionBlock;
 
 /**
  Destroy a session, logging a user out of their session for the linked Realm on this device.
  */
-- (void)destroySession:(RLMSyncCompletionBlock)completionBlock;
+- (void)destroySessionWithError:(NSError **)error completion:(RLMSyncCompletionBlock)completionBlock;
 
 /**
  Attempt to add a new set of login credentials for a given user.
@@ -63,6 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addLoginForProvider:(RLMSyncIdentityProvider)provider
                  credential:(RLMSyncCredential)credential
                    userInfo:(nullable NSDictionary *)userInfo
+                      error:(NSError **)error
                onCompletion:(RLMSyncCompletionBlock)completionBlock;
 
 NS_ASSUME_NONNULL_END

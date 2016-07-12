@@ -16,16 +16,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager.h"
+#import "RLMSyncManager_Private.h"
 
-#import "RLMRealm+Sync.h"
+#import "RLMSyncUtil.h"
 #import "RLMSyncSession_Private.h"
 
 static RLMSyncManager *_sharedManager;
 
 @interface RLMSyncManager ()
 
-@property (nonatomic, readwrite) NSMutableDictionary<RLMSyncRealmPath, RLMSyncSession *> *sessions;
+@property (nonatomic, readwrite) BOOL configured;
+
+@property (nonatomic, readwrite) RLMSyncAppID appID;
 
 @end
 
@@ -37,6 +39,16 @@ static RLMSyncManager *_sharedManager;
         _sharedManager = [[RLMSyncManager alloc] init];
     });
     return _sharedManager;
+}
+
++ (void)configureWithAppID:(RLMSyncAppID)appID {
+    RLMSyncManager *sharedManager = [RLMSyncManager sharedManager];
+    if (sharedManager.configured) {
+        // TODO: throw an exception?
+        return;
+    }
+    sharedManager.appID = appID;
+    sharedManager.configured = YES;
 }
 
 - (instancetype)init {
