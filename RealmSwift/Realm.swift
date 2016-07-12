@@ -22,6 +22,16 @@ import Realm.Private
 
 #if swift(>=3.0)
 
+private let defaultQueue: DispatchQueue = {
+    let attributes: DispatchQueue.GlobalAttributes
+    if #available(OSXApplicationExtension 10.10, *) {
+        attributes = DispatchQueue.GlobalAttributes.qosBackground
+    } else {
+        attributes = DispatchQueue.GlobalAttributes.priorityBackground
+    }
+    return DispatchQueue.global(attributes: attributes)
+}()
+
 /**
 A Realm instance (also referred to as "a realm") represents a Realm
 database.
@@ -583,6 +593,29 @@ public final class Realm {
         try rlmRealm.writeCopy(to: url, encryptionKey: encryptionKey)
     }
 
+    // MARK: Handover
+
+    public func async(onQueue queue: DispatchQueue = defaultQueue,
+                      execute block: (Realm) -> ()) {
+        async(onQueue: queue, handingOver: []) { realm, _ in
+            block(realm)
+        }
+    }
+
+    public func async<O: Object>(onQueue queue: DispatchQueue = defaultQueue,
+                                 handingOver object: O, execute block: (Realm, O) -> ()) {
+        async(onQueue: queue, handingOver: [object]) { realm, singleObjectArray in
+            block(realm, singleObjectArray[0])
+        }
+    }
+
+    public func async<O: Object>(onQueue queue: DispatchQueue = defaultQueue,
+                                 handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
+        rlmRealm.async(onQueue: queue, handingOver: unsafeBitCast(objects, to: [RLMObject].self)) { realm, objects in
+            block(Realm(realm), unsafeBitCast(objects, to: [O].self))
+        }
+    }
+
     // MARK: Internal
 
     internal var rlmRealm: RLMRealm
@@ -675,6 +708,8 @@ extension Realm {
 }
 
 #else
+
+private let defaultQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)
 
 /**
  A `Realm` instance (also referred to as "a Realm") represents a Realm database.
@@ -1243,22 +1278,21 @@ public final class Realm {
 
     // MARK: Handover
 
-    public func async(onQueue queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
-                      execute block: (Realm) -> ()) {
+    public func async(onQueue queue: dispatch_queue_t = defaultQueue, execute block: (Realm) -> ()) {
         async(onQueue: queue, handingOver: []) { realm, _ in
             block(realm)
         }
     }
 
-    public func async<O: Object>(onQueue queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
-                               handingOver object: O, execute block: (Realm, O) -> ()) {
+    public func async<O: Object>(onQueue queue: dispatch_queue_t = defaultQueue,
+                                 handingOver object: O, execute block: (Realm, O) -> ()) {
         async(onQueue: queue, handingOver: [object]) { realm, singleObjectArray in
             block(realm, singleObjectArray[0])
         }
     }
 
-    public func async<O: Object>(onQueue queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
-                      handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
+    public func async<O: Object>(onQueue queue: dispatch_queue_t = defaultQueue,
+                                 handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
         rlmRealm.async(onQueue: queue, handingOver: unsafeBitCast(objects, [RLMObject].self)) { realm, objects in
             block(Realm(realm), unsafeBitCast(objects, [O].self))
         }

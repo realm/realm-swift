@@ -650,7 +650,7 @@ class RealmTests: TestCase {
             notificationFired.fulfill()
         }
 
-        dispatchSyncNewThread {
+        dispatchAsyncAndWait {
             let realm = try! Realm()
             try! realm.write {
                 realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["string"])
@@ -681,7 +681,7 @@ class RealmTests: TestCase {
         let results = realm.allObjects(ofType: SwiftStringObject.self)
         XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
 
-        dispatchSyncNewThread {
+        dispatchAsyncAndWait {
             try! Realm().write {
                 try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["string"])
                 return
@@ -742,10 +742,94 @@ class RealmTests: TestCase {
         let testRealm = realmWithTestPath()
         XCTAssertFalse(realm == testRealm)
 
-        dispatchSyncNewThread {
+        dispatchAsyncAndWait {
             let otherThreadRealm = try! Realm()
             XCTAssertFalse(realm == otherThreadRealm)
         }
+    }
+
+    func testHandoverNoObject() {
+        let realm = try! Realm()
+        XCTAssertEqual(0, realm.allObjects(ofType: SwiftBoolObject.self).count)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue) { realm in
+                try! realm.write {
+                    realm.add(SwiftBoolObject())
+                }
+            }
+        }
+        XCTAssertEqual(0, realm.allObjects(ofType: SwiftBoolObject.self).count)
+        realm.refresh()
+        XCTAssertEqual(1, realm.allObjects(ofType: SwiftBoolObject.self).count)
+    }
+
+    func testHandoverSingleObject() {
+        let realm = try! Realm()
+        let object = SwiftBoolObject()
+        try! realm.write {
+            realm.add(object)
+        }
+        XCTAssertEqual(false, object.boolCol)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: object) { realm, object in
+                try! realm.write {
+                    object.boolCol = true
+                }
+            }
+        }
+        XCTAssertEqual(false, object.boolCol)
+        realm.refresh()
+        XCTAssertEqual(true, object.boolCol)
+    }
+
+    func testHandoverMultipleObjectsSameTypes() {
+        let realm = try! Realm()
+        let (objectA, objectB) = (SwiftStringObject(), SwiftStringObject())
+        try! realm.write {
+            realm.add(objectA)
+            realm.add(objectB)
+        }
+        XCTAssertEqual("", objectA.stringCol)
+        XCTAssertEqual("", objectB.stringCol)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: [objectA, objectB]) { realm, objects in
+                let (objectA, objectB) = (objects[0], objects[1])
+                try! realm.write {
+                    objectA.stringCol = "A"
+                    objectB.stringCol = "B"
+                }
+            }
+        }
+        XCTAssertEqual("", objectA.stringCol)
+        XCTAssertEqual("", objectB.stringCol)
+        realm.refresh()
+        XCTAssertEqual("A", objectA.stringCol)
+        XCTAssertEqual("B", objectB.stringCol)
+    }
+
+    func testHandoverMultipleObjectsDifferentTypes() {
+        let realm = try! Realm()
+        let (stringObject, intObject) = (SwiftStringObject(), SwiftIntObject())
+        try! realm.write {
+            realm.add(stringObject)
+            realm.add(intObject)
+        }
+        XCTAssertEqual("", stringObject.stringCol)
+        XCTAssertEqual(0, intObject.intCol)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: [stringObject, intObject]) { realm, objects in
+                let (stringObject, intObject) = (objects[0] as! SwiftStringObject, objects[1] as! SwiftIntObject)
+                try! realm.write {
+                    stringObject.stringCol = "the meaning of life"
+                    intObject.intCol = 42
+                }
+            }
+        }
+        XCTAssertEqual("", stringObject.stringCol)
+        XCTAssertEqual(0, intObject.intCol)
+        realm.refresh()
+        XCTAssertEqual("the meaning of life", stringObject.stringCol)
+        XCTAssertEqual(42, intObject.intCol)
     }
 }
 
