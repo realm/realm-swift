@@ -139,7 +139,12 @@ static inline NSUInteger RLMCreateOrGetRowForObject(__unsafe_unretained RLMObjec
     // if no existing, create row
     created = NO;
     if (rowIndex == realm::not_found) {
-        rowIndex = table.add_empty_row();
+        try {
+            rowIndex = table.add_empty_row();
+        }
+        catch (std::exception const& e) {
+            @throw RLMException(e);
+        }
         created = YES;
     }
 

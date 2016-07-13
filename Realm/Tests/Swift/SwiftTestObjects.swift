@@ -149,6 +149,7 @@ class SwiftLazyVarObject : RLMObject {
 }
 
 class SwiftIgnoredLazyVarObject : RLMObject {
+    dynamic var id = 0
     dynamic lazy var ignoredVar : String = "hello world"
     override class func ignoredProperties() -> [String] { return ["ignoredVar"] }
 }
@@ -284,6 +285,7 @@ class SwiftLazyVarObject : RLMObject {
 }
 
 class SwiftIgnoredLazyVarObject : RLMObject {
+    dynamic var id = 0
     dynamic lazy var ignoredVar : String = "hello world"
     override class func ignoredProperties() -> [String] { return ["ignoredVar"] }
 }

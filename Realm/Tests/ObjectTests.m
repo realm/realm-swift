@@ -859,6 +859,15 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     [realm cancelWriteTransaction];
 }
 
+- (void)testAddingObjectWithoutAnyPropertiesThrows {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    RLMAssertThrows([realm addObject:[[AbstractObject alloc] initWithValue:@[]]]);
+    RLMAssertThrows([AbstractObject createInRealm:realm withValue:@[]]);
+    [realm cancelWriteTransaction];
+}
+
 - (void)testNSNumberProperties {
     NumberObject *obj = [NumberObject new];
     obj.intObj = @20;
