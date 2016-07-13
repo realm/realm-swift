@@ -20,12 +20,12 @@
 #define REALM_UTIL_COMPILER_HPP
 
 #ifdef __has_cpp_attribute
-#define REALM_HAS_CCP_ATTRIBUTE(attr) __has_cpp_attribute(attr)
+#define REALM_HAS_CPP_ATTRIBUTE(attr) __has_cpp_attribute(attr)
 #else
-#define REALM_HAS_CCP_ATTRIBUTE(attr) 0
+#define REALM_HAS_CPP_ATTRIBUTE(attr) 0
 #endif
 
-#if REALM_HAS_CCP_ATTRIBUTE(clang::fallthrough)
+#if REALM_HAS_CPP_ATTRIBUTE(clang::fallthrough)
 #define REALM_FALLTHROUGH [[clang::fallthrough]]
 #else
 #define REALM_FALLTHROUGH
