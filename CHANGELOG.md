@@ -5,6 +5,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Deprecated `migrateRealm:` in favor of new `performMigrationForConfiguration:error:` method
   that follows Cocoa's' NSError conventions.
+* Attempting to add an object with no properties to a Realm now throws.
 
 ### Enhancements
 
@@ -28,6 +29,9 @@ x.x.x Release notes (yyyy-MM-dd)
   results from that Realm.
 * Handle EINTR from flock() rather than crashing.
 * Fix incorrect behavior following a call to `[RLMRealm compact]`.
+* Fix live updating and notifications for Results created from a predicate involving
+  an inverse relationship to be triggered when an object at the other end of the relationship
+  is modified.
 
 1.0.1 Release notes (2016-06-12)
 =============================================================
