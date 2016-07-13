@@ -36,7 +36,7 @@
  Configure the Realm Sync manager with application-wide configuration options. Call this method before calling any other
  Realm Sync APIs. Do not call this method if `configured` is `YES`.
  */
-+ (void)configureWithAppID:(RLMSyncAppID)appID;
+- (void)configureWithAppID:(RLMSyncAppID)appID;
 
 + (instancetype)sharedManager;
 

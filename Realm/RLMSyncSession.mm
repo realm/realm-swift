@@ -16,7 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncSession_Private.h"
+#import "RLMSyncSession_Private.hpp"
+
+#import "realm_coordinator.hpp"
+#import "RLMUtil.hpp"
 
 #import "RLMSyncNetworkClient.h"
 #import "RLMSyncManager_Private.h"
@@ -47,7 +50,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 
 // MARK: Public API
 
-- (void)refreshSessionWithError:(NSError **)error completion:(RLMSyncCompletionBlock)completionBlock {
+- (void)refreshWithError:(NSError **)error completion:(RLMSyncCompletionBlock)completionBlock {
     RLMSYNC_CHECK_MANAGER(error);
     if (!self.valid) {
         if (error) {
@@ -68,19 +71,20 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
                                                         __attribute__((unused)) NSDictionary *json){ };
 
     NSDictionary *json = @{
+                           kRLMSyncProviderKey: @"realm",
                            kRLMSyncDataKey: self.refreshToken,
                            kRLMSyncRealmIDKey: self.realmID,
                            kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                            };
 
-    __weak typeof(self) weakSelf = self;
+    __weak RLMSyncSession *weakSelf = self;
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointRefresh
                                              server:self.serverURL
                                                JSON:json
                                               error:error
                                          completion:^(NSError *error, NSDictionary *json) {
                                              // Extract and save the updated tokens.
-                                             typeof(self) __self = weakSelf;
+                                             RLMSyncSession *__self = weakSelf;
                                              if (!__self) {
                                                  return;
                                              }
@@ -103,12 +107,8 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
                                          }];
 }
 
-- (void)destroySessionWithError:(NSError **)error completion:(RLMSyncCompletionBlock)completionBlock {
-    RLMSYNC_CHECK_MANAGER(error);
+- (void)destroy {
     if (!self.valid) {
-        if (error) {
-            *error = [NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil];
-        }
         return;
     }
 
@@ -116,11 +116,11 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     NSAssert(NO, @"Implement me!");
 }
 
-- (void)addLoginForProvider:(RLMSyncIdentityProvider)provider
-                 credential:(RLMSyncCredential)credential
-                   userInfo:(nullable NSDictionary *)userInfo
-                      error:(NSError **)error
-               onCompletion:(RLMSyncCompletionBlock)completionBlock {
+- (void)addCredential:(RLMSyncCredential)credential
+             userInfo:(NSDictionary *)userInfo
+          forProvider:(RLMSyncIdentityProvider)provider
+                error:(NSError **)error
+         onCompletion:(RLMSyncCompletionBlock)completionBlock {
     RLMSYNC_CHECK_MANAGER(error);
     if (!self.valid) {
         if (error) {
@@ -150,6 +150,16 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 
 - (void)refreshWithModel:(RLMSyncRefreshDataModel *)model {
     self.accessToken = model.accessToken;
+
+    // Pass the updated access token to the Realm.
+    auto coordinator = realm::_impl::RealmCoordinator::get_existing_coordinator(RLMStringDataWithNSString(self.path));
+    if (coordinator) {
+        std::string new_token{self.accessToken.UTF8String};
+        coordinator->refresh_sync_access_token(std::move(new_token));
+    } else {
+        self.valid = NO;
+        return;
+    }
 
     [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:model.accessTokenExpiry];
 }
@@ -185,7 +195,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     }
 
     // Force a refresh
-    [self refreshSessionWithError:nil completion:nil];
+    [self refreshWithError:nil completion:nil];
 }
 
 - (instancetype)init {

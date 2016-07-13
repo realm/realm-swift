@@ -21,7 +21,7 @@
 #import "RLMRealmConfiguration.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncNetworkClient.h"
-#import "RLMSyncSession_Private.h"
+#import "RLMSyncSession_Private.hpp"
 #import "RLMSyncSessionDataModel.h"
 
 static NSString* getProviderName(RLMSyncIdentityProvider provider) {
@@ -42,7 +42,7 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
                      provider:(RLMSyncIdentityProvider)provider
                      userInfo:(NSDictionary *)userInfo
                         error:(NSError **)error
-                 onCompletion:(RLMSyncCompletionBlock)completionBlock {
+                 onCompletion:(RLMSyncLoginCompletionBlock)completionBlock {
 
     if (!self.configuration.fileURL) {
         if (error) {
@@ -77,7 +77,7 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
                                                      error = [NSError errorWithDomain:RLMSyncErrorDomain
                                                                                  code:RLMSyncErrorBadResponse
                                                                              userInfo:nil];
-                                                     completionBlock(error, nil);
+                                                     completionBlock(error, nil, nil);
                                                  }
                                                  // Pass the token to the underlying Realm
                                                  [self passAccessTokenToRealm:model.accessToken];
@@ -88,10 +88,10 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
                                                                 sessionDataModel:model];
 
                                                  // Inform the client
-                                                 completionBlock(nil, data);
+                                                 completionBlock(nil, data, session);
                                              } else {
                                                  // Something went wrong
-                                                 completionBlock(error, nil);
+                                                 completionBlock(error, nil, nil);
                                              }
                                          }];
 }

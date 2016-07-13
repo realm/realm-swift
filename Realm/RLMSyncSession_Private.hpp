@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncSession.h"
+#import "RLMSyncSession.hpp"
 
 @class RLMSyncSessionDataModel;
 
@@ -33,9 +33,5 @@
  */
 - (void)configureWithServerURL:(NSURL *)serverURL
               sessionDataModel:(RLMSyncSessionDataModel *)model;
-
-- (void)updateWithAccessToken:(RLMSyncToken)accessToken
-                   expiration:(NSTimeInterval)expiration
-                 refreshToken:(RLMSyncToken)refreshToken;
 
 @end

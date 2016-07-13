@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
                      provider:(RLMSyncIdentityProvider)provider
                      userInfo:(NSDictionary *)userInfo
                         error:(NSError **)error
-                 onCompletion:(RLMSyncCompletionBlock)completionBlock;
+                 onCompletion:(RLMSyncLoginCompletionBlock)completionBlock;
 
 @end
 

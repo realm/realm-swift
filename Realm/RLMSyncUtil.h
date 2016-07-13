@@ -18,11 +18,14 @@
 
 #import <Foundation/Foundation.h>
 
+@class RLMSyncSession;
+
 typedef NSString* RLMSyncAccountID;
 typedef NSString* RLMSyncToken;
 typedef NSString* RLMSyncCredential;
 typedef NSString* RLMSyncRealmPath;
 typedef NSString* RLMSyncAppID;
+typedef void(^RLMSyncLoginCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable, RLMSyncSession * _Nullable);
 typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
 
 typedef NS_ENUM(NSInteger, RLMSyncError) {

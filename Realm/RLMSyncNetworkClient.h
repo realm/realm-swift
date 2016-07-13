@@ -33,6 +33,8 @@ typedef NS_ENUM(NSUInteger, RLMSyncServerEndpoint) {
  */
 @interface RLMSyncNetworkClient : NSObject
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  Post some JSON data to a Realm Sync server, and asynchronously call a completion block with a JSON response and/or
  error.
@@ -42,5 +44,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncServerEndpoint) {
                              JSON:(NSDictionary *)jsonDictionary
                             error:(NSError **)error
                        completion:(RLMSyncCompletionBlock)completionBlock;
+
+NS_ASSUME_NONNULL_END
 
 @end

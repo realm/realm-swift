@@ -19,7 +19,7 @@
 #import "RLMSyncManager_Private.h"
 
 #import "RLMSyncUtil.h"
-#import "RLMSyncSession_Private.h"
+#import "RLMSyncSession_Private.hpp"
 
 static RLMSyncManager *_sharedManager;
 
@@ -41,14 +41,13 @@ static RLMSyncManager *_sharedManager;
     return _sharedManager;
 }
 
-+ (void)configureWithAppID:(RLMSyncAppID)appID {
-    RLMSyncManager *sharedManager = [RLMSyncManager sharedManager];
-    if (sharedManager.configured) {
+- (void)configureWithAppID:(RLMSyncAppID)appID {
+    if (self.configured) {
         // TODO: throw an exception?
         return;
     }
-    sharedManager.appID = appID;
-    sharedManager.configured = YES;
+    self.appID = appID;
+    self.configured = YES;
 }
 
 - (instancetype)init {
