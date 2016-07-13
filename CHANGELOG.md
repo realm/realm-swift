@@ -3,8 +3,6 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* Deprecated `migrateRealm:` in favor of new `performMigrationForConfiguration:error:` method
-  that follows Cocoa's' NSError conventions.
 * Attempting to add an object with no properties to a Realm now throws rather than silently
   doing nothing.
 

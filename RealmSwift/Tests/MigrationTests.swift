@@ -75,7 +75,7 @@ class MigrationTests: TestCase {
                 _ = try! Realm(configuration: config)
             }
         } else {
-            try! Realm.performMigration(for: config)
+            try! migrateRealm(config)
         }
 
         XCTAssertEqual(didRun, shouldRun)
@@ -98,7 +98,7 @@ class MigrationTests: TestCase {
                                          migrationBlock: { _, _ in didRun = true })
         Realm.Configuration.defaultConfiguration = config
 
-        try! Realm.performMigration()
+        try! migrateRealm()
 
         XCTAssertEqual(didRun, true)
         XCTAssertEqual(1, try! schemaVersionAtURL(defaultRealmURL()))
@@ -571,7 +571,7 @@ class MigrationTests: TestCase {
                 _ = try! Realm(configuration: config)
             }
         } else {
-            try! Realm.performMigration(for: config)
+            migrateRealm(config)
         }
 
         XCTAssertEqual(didRun, shouldRun)
@@ -594,7 +594,7 @@ class MigrationTests: TestCase {
                                          migrationBlock: { _, _ in didRun = true })
         Realm.Configuration.defaultConfiguration = config
 
-        try! Realm.performMigration()
+        migrateRealm()
 
         XCTAssertEqual(didRun, true)
         XCTAssertEqual(1, try! schemaVersionAtURL(defaultRealmURL()))
