@@ -68,8 +68,8 @@ class SwiftDynamicTests: RLMTestCase {
         let dyrealm = realm(withTestPathAndSchema: nil)
         let array = dyrealm.allObjects("SwiftDynamicObject")!
 
-        XCTAssertTrue(array[0]["intCol"] as! NSNumber == 1)
-        XCTAssertTrue(array[1]["stringCol"] as! String == "column2")
+        XCTAssertTrue((array[0] as! RLMObject)["intCol"] as! NSNumber == 1)
+        XCTAssertTrue((array[1] as! RLMObject)["stringCol"] as! String == "column2")
     }
 
     // Objective-C models
@@ -113,8 +113,8 @@ class SwiftDynamicTests: RLMTestCase {
         let dyrealm = realm(withTestPathAndSchema: nil)
         let array = dyrealm.allObjects("DynamicObject")!
 
-        XCTAssertTrue(array[0]["intCol"] as! NSNumber == 1)
-        XCTAssertTrue(array[1]["stringCol"] as! String == "column2")
+        XCTAssertTrue((array[0] as! RLMObject)["intCol"] as! NSNumber == 1)
+        XCTAssertTrue((array[1] as! RLMObject)["stringCol"] as! String == "column2")
     }
 
     // these helper functions make the below test not take five minutes to compile
@@ -161,8 +161,8 @@ class SwiftDynamicTests: RLMTestCase {
         let dyrealm = realm(withTestPathAndSchema: nil)
         let results = dyrealm.allObjects(AllTypesObject.className())!
         XCTAssertEqual(results.count, UInt(2))
-        let robj1 = results[0]
-        let robj2 = results[1]
+        let robj1 = results[0] as! RLMObject
+        let robj2 = results[1] as! RLMObject
 
         let schema = dyrealm.schema[AllTypesObject.className()]
         for idx in 0..<obj1.count - 1 {
@@ -226,8 +226,8 @@ class SwiftDynamicTests: RLMTestCase {
         let dyrealm = realmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects("SwiftDynamicObject")
 
-        XCTAssertTrue(array[0]["intCol"] as! NSNumber == 1)
-        XCTAssertTrue(array[1]["stringCol"] as! String == "column2")
+        XCTAssertTrue((array[0] as! RLMObject)["intCol"] as! NSNumber == 1)
+        XCTAssertTrue((array[1] as! RLMObject)["stringCol"] as! String == "column2")
     }
 
     // Objective-C models
@@ -271,8 +271,8 @@ class SwiftDynamicTests: RLMTestCase {
         let dyrealm = realmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects("DynamicObject")
 
-        XCTAssertTrue(array[0]["intCol"] as! NSNumber == 1)
-        XCTAssertTrue(array[1]["stringCol"] as! String == "column2")
+        XCTAssertTrue((array[0] as! RLMObject)["intCol"] as! NSNumber == 1)
+        XCTAssertTrue((array[1] as! RLMObject)["stringCol"] as! String == "column2")
     }
 
     // these helper functions make the below test not take five minutes to compile
@@ -319,8 +319,8 @@ class SwiftDynamicTests: RLMTestCase {
         let dyrealm = realmWithTestPathAndSchema(nil)
         let results = dyrealm.allObjects(AllTypesObject.className())
         XCTAssertEqual(results.count, UInt(2))
-        let robj1 = results[0]
-        let robj2 = results[1]
+        let robj1 = results[0] as! RLMObject
+        let robj2 = results[1] as! RLMObject
 
         let schema = dyrealm.schema[AllTypesObject.className()]
         for idx in 0..<obj1.count - 1 {
