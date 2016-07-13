@@ -17,8 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncSession_Private.h"
+
 #import "RLMSyncNetworkClient.h"
 #import "RLMSyncManager_Private.h"
+#import "RLMSyncRefreshDataModel.h"
+#import "RLMSyncSessionDataModel.h"
 
 // How many seconds before the access token expires to attempt a refresh.
 static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
@@ -26,6 +29,17 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 @interface RLMSyncSession ()
 
 @property (nonatomic) NSTimer *refreshTimer;
+
+@property (nonatomic, readwrite) RLMSyncAccountID account;
+@property (nonatomic, readwrite) BOOL valid;
+@property (nonatomic, readwrite) NSURL *serverURL;
+
+@property (nonatomic, readwrite) NSString *remoteURL;
+@property (nonatomic, readwrite) NSString *realmID;
+
+@property (nonatomic) RLMSyncToken accessToken;
+
+@property (nonatomic) RLMSyncToken refreshToken;
 
 @end
 
@@ -61,7 +75,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 
     __weak typeof(self) weakSelf = self;
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointRefresh
-                                               host:self.host
+                                             server:self.serverURL
                                                JSON:json
                                               error:error
                                          completion:^(NSError *error, NSDictionary *json) {
@@ -76,19 +90,15 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
                                                  block(error, nil);
                                                  return;
                                              }
-                                             RLMSyncToken accessToken = RLM_accessTokenForJSON(json);
-                                             RLMSyncToken refreshToken = RLM_refreshTokenForJSON(json);
-                                             NSTimeInterval expiry = RLM_accessExpirationForJSON(json);
-                                             if (!accessToken || !refreshToken) {
+                                             RLMSyncRefreshDataModel *model = [[RLMSyncRefreshDataModel alloc] initWithJSON:json];
+                                             if (!model) {
                                                  error = [NSError errorWithDomain:RLMSyncErrorDomain
                                                                              code:RLMSyncErrorBadResponse
                                                                          userInfo:nil];
                                                  block(error, nil);
                                                  return;
                                              }
-                                             [__self updateWithAccessToken:accessToken
-                                                                expiration:expiry
-                                                              refreshToken:refreshToken];
+                                             [__self refreshWithModel:model];
                                              block(error, json);
                                          }];
 }
@@ -123,13 +133,32 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     NSAssert(NO, @"Implement me!");
 }
 
+// MARK: Private API
+
+- (void)configureWithServerURL:(NSURL *)serverURL
+              sessionDataModel:(RLMSyncSessionDataModel *)model {
+    self.serverURL = serverURL;
+    self.account = model.accountID;
+    self.remoteURL = model.realmURL;
+    self.realmID = model.realmID;
+    self.accessToken = model.accessToken;
+
+    [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:model.accessTokenExpiry];
+
+    self.valid = YES;
+}
+
+- (void)refreshWithModel:(RLMSyncRefreshDataModel *)model {
+    self.accessToken = model.accessToken;
+
+    [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:model.accessTokenExpiry];
+}
+
 // MARK: Other
 
-- (void)updateWithAccessToken:(RLMSyncToken)accessToken
-                   expiration:(NSTimeInterval)expiration
-                 refreshToken:(RLMSyncToken)refreshToken {
-    self.accessToken = accessToken;
-    self.refreshToken = refreshToken;
+- (void)scheduleRefreshWithToken:(RLMSyncRenewalTokenModel *)token
+          currentTokenExpiration:(NSTimeInterval)expiration {
+    self.refreshToken = token.renewalToken;
 
     // Schedule next refresh
     NSTimeInterval timeToRefresh = expiration - [NSDate date].timeIntervalSince1970 - RLMRefreshExpiryBuffer;
@@ -157,17 +186,6 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 
     // Force a refresh
     [self refreshSessionWithError:nil completion:nil];
-}
-
-- (void)configureWithHost:(NSString *)host
-                  account:(RLMSyncAccountID)account
-                  realmID:(NSString *)realmID
-                 realmURL:(NSString *)realmURL {
-    self.host = host;
-    self.account = account;
-    self.remoteURL = realmURL;
-    self.realmID = realmID;
-    self.valid = YES;
 }
 
 - (instancetype)init {

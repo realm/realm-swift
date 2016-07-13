@@ -22,6 +22,7 @@
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncNetworkClient.h"
 #import "RLMSyncSession_Private.h"
+#import "RLMSyncSessionDataModel.h"
 
 static NSString* getProviderName(RLMSyncIdentityProvider provider) {
     switch (provider) {
@@ -52,7 +53,7 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
     RLMSYNC_CHECK_MANAGER(error);
 
     RLMSyncRealmPath path = self.configuration.fileURL.path;
-    NSString *host = self.configuration.syncServerURL.host;
+    NSURL *serverURL = self.configuration.syncServerURL;
 
     NSMutableDictionary *json = [@{
                                    kRLMSyncProviderKey: getProviderName(provider),
@@ -66,39 +67,25 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
     }
 
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointSessions
-                                               host:host
+                                             server:serverURL
                                                JSON:json
                                               error:error
                                          completion:^(NSError *error, NSDictionary *data) {
                                              if (data && !error) {
-                                                 RLMSyncToken accessToken = RLM_accessTokenForJSON(data);
-                                                 RLMSyncToken refreshToken = RLM_refreshTokenForJSON(data);
-                                                 RLMSyncAccountID accountID = RLM_accountForJSON(data);
-                                                 NSString *realmID = RLM_realmIDForJSON(data);
-                                                 NSString *remoteRealmURL = RLM_realmURLForJSON(data);
-                                                 NSTimeInterval expiry = RLM_accessExpirationForJSON(data);
-                                                 if (!accessToken
-                                                     || !refreshToken
-                                                     || !accountID
-                                                     || !realmID
-                                                     || !remoteRealmURL) {
+                                                 RLMSyncSessionDataModel *model = [[RLMSyncSessionDataModel alloc] initWithJSON:data];
+                                                 if (!model) {
                                                      error = [NSError errorWithDomain:RLMSyncErrorDomain
                                                                                  code:RLMSyncErrorBadResponse
                                                                              userInfo:nil];
                                                      completionBlock(error, nil);
                                                  }
                                                  // Pass the token to the underlying Realm
-                                                 [self passAccessTokenToRealm:accessToken];
+                                                 [self passAccessTokenToRealm:model.accessToken];
 
                                                  // Prepare the session object for the newly-created session
                                                  RLMSyncSession *session = [[RLMSyncManager sharedManager] syncSessionForRealm:path];
-                                                 [session configureWithHost:host
-                                                                    account:accountID
-                                                                    realmID:realmID
-                                                                   realmURL:remoteRealmURL];
-                                                 [session updateWithAccessToken:accessToken
-                                                                     expiration:expiry
-                                                                   refreshToken:refreshToken];
+                                                 [session configureWithServerURL:serverURL
+                                                                sessionDataModel:model];
 
                                                  // Inform the client
                                                  completionBlock(nil, data);

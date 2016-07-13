@@ -28,6 +28,4 @@
  */
 - (RLMSyncSession *)syncSessionForRealm:(RLMSyncRealmPath)realmPath;
 
-@property (nonatomic) NSMutableDictionary<RLMSyncRealmPath, RLMSyncSession *> *sessions;
-
 @end

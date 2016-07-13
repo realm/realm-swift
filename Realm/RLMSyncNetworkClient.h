@@ -38,7 +38,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncServerEndpoint) {
  error.
  */
 + (void)postSyncRequestToEndpoint:(RLMSyncServerEndpoint)endpoint
-                             host:(NSString *)host
+                           server:(NSURL *)serverURL
                              JSON:(NSDictionary *)jsonDictionary
                             error:(NSError **)error
                        completion:(RLMSyncCompletionBlock)completionBlock;

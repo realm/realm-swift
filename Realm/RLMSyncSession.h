@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The host of the URL of the server that the remote Realm resides upon.
  */
-@property (nonatomic, readonly) NSString *host;
+@property (nonatomic, readonly) NSURL *serverURL;
 
 // TODO: support multiple paths?
 /**

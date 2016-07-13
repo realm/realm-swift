@@ -45,12 +45,11 @@
 
 // FIXME: should completion argument also pass back the NSURLResponse and/or the raw data?
 + (void)postSyncRequestToEndpoint:(RLMSyncServerEndpoint)endpoint
-                             host:(NSString *)host
+                           server:(NSURL *)serverURL
                              JSON:(NSDictionary *)jsonDictionary
                             error:(NSError **)error
                        completion:(RLMSyncCompletionBlock)completionBlock {
 
-    NSURL *serverURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:3000", host]];
     NSError *localError = nil;
 
     // Attempt to convert the JSON

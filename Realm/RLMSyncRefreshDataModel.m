@@ -16,26 +16,25 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncSession.h"
+#import "RLMSyncRefreshDataModel.h"
 
-@class RLMSyncSessionDataModel;
+@interface RLMSyncRefreshDataModel ()
 
-@interface RLMSyncSession ()
+@property (nonatomic, readwrite) RLMSyncToken accessToken;
+@property (nonatomic, readwrite) NSTimeInterval accessTokenExpiry;
+@property (nonatomic, readwrite) RLMSyncRenewalTokenModel *renewalTokenModel;
 
-@property (nonatomic, readwrite) RLMSyncRealmPath path;
+@end
 
-/**
- Given a newly-created session object, configure all fields which are not expected to change between requests (except
- for `path`, which is configured by the sync manager when it retrieves the object from its dictionary. Also sets the
- validity flag to YES.
+@implementation RLMSyncRefreshDataModel
 
- This method should only be called once.
- */
-- (void)configureWithServerURL:(NSURL *)serverURL
-              sessionDataModel:(RLMSyncSessionDataModel *)model;
-
-- (void)updateWithAccessToken:(RLMSyncToken)accessToken
-                   expiration:(NSTimeInterval)expiration
-                 refreshToken:(RLMSyncToken)refreshToken;
+- (instancetype)initWithJSON:(NSDictionary *)json {
+    if (self = [super init]) {
+        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, accessToken);
+        RLMSYNC_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, accessTokenExpiry);
+        RLMSYNC_PARSE_MODEL_OR_ABORT(json, @"renew", RLMSyncRenewalTokenModel, renewalTokenModel);
+    }
+    return self;
+}
 
 @end

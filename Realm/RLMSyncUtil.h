@@ -52,17 +52,14 @@ static NSString *const kRLMSyncAppIDKey         = @"app_id";
 static NSString *const kRLMSyncRealmIDKey       = @"realm_id";
 static NSString *const kRLMSyncRealmURLKey      = @"realm_url";
 static NSString *const kRLMSyncPathKey          = @"path";
+static NSString *const kRLMSyncTokenKey         = @"token";
+static NSString *const kRLMSyncExpiresKey       = @"expires";
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-_Nullable RLMSyncToken RLM_accessTokenForJSON(NSDictionary *json);
-_Nullable RLMSyncToken RLM_refreshTokenForJSON(NSDictionary *json);
-_Nullable RLMSyncAccountID RLM_accountForJSON(NSDictionary *json);
-NSString * _Nullable RLM_realmIDForJSON(NSDictionary *json);
-NSString * _Nullable RLM_realmURLForJSON(NSDictionary *json);
-NSTimeInterval RLM_accessExpirationForJSON(NSDictionary *json);
+    // Free helper functions go here.
 
 #ifdef __cplusplus
 }
@@ -76,4 +73,30 @@ if (![RLMSyncManager sharedManager].configured) { \
     *__error = [NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured userInfo:nil]; \
   } \
   return;\
+} \
+
+/// A macro to parse a string out of a JSON dictionary, or return nil.
+#define RLMSYNC_PARSE_STRING_OR_ABORT(__json, __key, __prop) \
+{ \
+  id data = __json[__key]; \
+  if (![data isKindOfClass:[NSString class]]) { return nil; } \
+  self.__prop = data; \
+} \
+
+/// A macro to parse a double out of a JSON dictionary, or return nil.
+#define RLMSYNC_PARSE_DOUBLE_OR_ABORT(__json, __key, __prop) \
+{ \
+  id data = __json[__key]; \
+  if (![data isKindOfClass:[NSNumber class]]) { return nil; } \
+  self.__prop = [data doubleValue]; \
+} \
+
+/// A macro to build a sub-model out of a JSON dictionary, or return nil.
+#define RLMSYNC_PARSE_MODEL_OR_ABORT(__json, __key, __class, __prop) \
+{ \
+  id raw = __json[__key]; \
+  if (![raw isKindOfClass:[NSDictionary class]]) { return nil; } \
+  id model = [[__class alloc] initWithJSON:raw]; \
+  if (!model) { return nil; } \
+  self.__prop = model; \
 } \

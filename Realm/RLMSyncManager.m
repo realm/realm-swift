@@ -25,8 +25,8 @@ static RLMSyncManager *_sharedManager;
 
 @interface RLMSyncManager ()
 
+@property (nonatomic) NSMutableDictionary<RLMSyncRealmPath, RLMSyncSession *> *sessions;
 @property (nonatomic, readwrite) BOOL configured;
-
 @property (nonatomic, readwrite) RLMSyncAppID appID;
 
 @end
