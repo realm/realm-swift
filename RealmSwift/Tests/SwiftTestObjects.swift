@@ -411,6 +411,18 @@ class SwiftConvenienceInitializerObject: Object {
     }
 }
 
+class SwiftComputedPropertyNotExplicitlyIgnoredObject: Object {
+    dynamic var _urlBacking = ""
+    var url: NSURL? {
+        get {
+            return NSURL(string: _urlBacking)
+        }
+        set {
+            _urlBacking = newValue?.absoluteString ?? ""
+        }
+    }
+}
+
 #else
 
 class SwiftStringObject: Object {
@@ -801,6 +813,19 @@ class SwiftConvenienceInitializerObject: Object {
     convenience init(stringCol: String) {
         self.init()
         self.stringCol = stringCol
+    }
+}
+
+
+class SwiftComputedPropertyNotExplicitlyIgnoredObject: Object {
+    dynamic var _urlBacking = ""
+    var url: NSURL? {
+        get {
+            return NSURL(string: _urlBacking)
+        }
+        set {
+            _urlBacking = newValue?.absoluteString ?? ""
+        }
     }
 }
 

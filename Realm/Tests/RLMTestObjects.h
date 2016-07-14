@@ -322,6 +322,13 @@ RLM_ARRAY_TYPE(PersonObject);
 @property (readonly) RLMLinkingObjects *parents;
 @end
 
+#pragma mark ComputedPropertyNotExplicitlyIgnoredObject
+
+@interface ComputedPropertyNotExplicitlyIgnoredObject : RLMObject
+@property NSString *_URLBacking;
+@property NSURL *URL;
+@end
+
 #pragma mark FakeObject
 
 @interface FakeObject : NSObject

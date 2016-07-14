@@ -153,6 +153,18 @@ class SwiftIgnoredLazyVarObject : RLMObject {
     override class func ignoredProperties() -> [String] { return ["ignoredVar"] }
 }
 
+class SwiftComputedPropertyNotExplicitlyIgnoredObject: RLMObject {
+    dynamic var _urlBacking = ""
+    var url: NSURL? {
+        get {
+            return NSURL(string: _urlBacking)
+        }
+        set {
+            _urlBacking = newValue?.absoluteString ?? ""
+        }
+    }
+}
+
 #else
 
 class SwiftStringObject: RLMObject {
@@ -286,6 +298,18 @@ class SwiftLazyVarObject : RLMObject {
 class SwiftIgnoredLazyVarObject : RLMObject {
     dynamic lazy var ignoredVar : String = "hello world"
     override class func ignoredProperties() -> [String] { return ["ignoredVar"] }
+}
+
+class SwiftComputedPropertyNotExplicitlyIgnoredObject: RLMObject {
+    dynamic var _urlBacking = ""
+    var url: NSURL? {
+        get {
+            return NSURL(string: _urlBacking)
+        }
+        set {
+            _urlBacking = newValue?.absoluteString ?? ""
+        }
+    }
 }
 
 #endif
