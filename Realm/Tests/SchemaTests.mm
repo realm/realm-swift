@@ -65,39 +65,6 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @implementation SchemaTestClassLink
 @end
 
-@interface SchemaTestClassWithSingleDuplicatePropertyBase : FakeObject
-@property NSString *string;
-@end
-
-@implementation SchemaTestClassWithSingleDuplicatePropertyBase
-@end
-
-@interface SchemaTestClassWithSingleDuplicateProperty : SchemaTestClassWithSingleDuplicatePropertyBase
-@property NSString *string;
-@end
-
-@implementation SchemaTestClassWithSingleDuplicateProperty
-@dynamic string;
-@end
-
-@interface SchemaTestClassWithMultipleDuplicatePropertiesBase : FakeObject
-@property NSString *string;
-@property int integer;
-@end
-
-@implementation SchemaTestClassWithMultipleDuplicatePropertiesBase
-@end
-
-@interface SchemaTestClassWithMultipleDuplicateProperties : SchemaTestClassWithMultipleDuplicatePropertiesBase
-@property NSString *string;
-@property int integer;
-@end
-
-@implementation SchemaTestClassWithMultipleDuplicateProperties
-@dynamic string;
-@dynamic integer;
-@end
-
 @interface UnindexableProperty : FakeObject
 @property double unindexable;
 @end
@@ -573,12 +540,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t}\n"
                                               @"}");
 
-}
-
-- (void)testClassWithDuplicateProperties
-{
-    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithSingleDuplicateProperty.class], @"'string' .* multiple times .* 'SchemaTestClassWithSingleDuplicateProperty'");
-    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithMultipleDuplicateProperties.class], @"'SchemaTestClassWithMultipleDuplicateProperties' .* declared multiple times");
 }
 
 - (void)testClassWithInvalidPrimaryKey {

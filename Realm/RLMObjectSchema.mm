@@ -126,20 +126,6 @@ using namespace realm;
     }]];
     schema.computedProperties = computedProperties;
 
-    // verify that we didn't add any properties twice due to inheritance
-    if (allProperties.count != [NSSet setWithArray:[allProperties valueForKey:@"name"]].count) {
-        NSCountedSet *countedPropertyNames = [NSCountedSet setWithArray:[allProperties valueForKey:@"name"]];
-        NSSet *duplicatePropertyNames = [countedPropertyNames filteredSetUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id object, NSDictionary *) {
-            return [countedPropertyNames countForObject:object] > 1;
-        }]];
-
-        if (duplicatePropertyNames.count == 1) {
-            @throw RLMException(@"Property '%@' is declared multiple times in the class hierarchy of '%@'", duplicatePropertyNames.allObjects.firstObject, className);
-        } else {
-            @throw RLMException(@"Object '%@' has properties that are declared multiple times in its class hierarchy: '%@'", className, [duplicatePropertyNames.allObjects componentsJoinedByString:@"', '"]);
-        }
-    }
-
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
             if ([primaryKey isEqualToString:prop.name]) {
