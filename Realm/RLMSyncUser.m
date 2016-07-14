@@ -16,21 +16,27 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMRealm.h>
+#import "RLMSyncUser.h"
 
-#import "RLMSyncUtil.h"
+@interface RLMSyncUser ()
 
-@class RLMSyncUser;
-
-NS_ASSUME_NONNULL_BEGIN
-
-@interface RLMRealm (Sync)
-
-- (void)openRealmForUser:(RLMSyncUser *)user
-            onCompletion:(RLMSyncLoginCompletionBlock)completionBlock;
-
-- (void)openRealmWithToken:(RLMSyncToken)token;
+@property (nonatomic, readwrite) RLMSyncCredential credential;
+@property (nonatomic, readwrite) RLMSyncIdentityProvider provider;
+@property (nonatomic, readwrite) NSDictionary *userInfo;
 
 @end
 
-NS_ASSUME_NONNULL_END
+@implementation RLMSyncUser
+
+- (instancetype)initWithCredential:(RLMSyncCredential)credential
+                          provider:(RLMSyncIdentityProvider)provider
+                          userInfo:(nullable NSDictionary *)userInfo {
+    if (self = [super init]) {
+        self.credential = credential;
+        self.provider = provider;
+        self.userInfo = userInfo;
+    }
+    return self;
+}
+
+@end

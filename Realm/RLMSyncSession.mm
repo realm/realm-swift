@@ -50,19 +50,19 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 
 // MARK: Public API
 
-- (void)refreshWithError:(NSError **)error completion:(RLMSyncCompletionBlock)completionBlock {
-    RLMSYNC_CHECK_MANAGER(error);
+- (void)refreshWithCompletion:(RLMSyncCompletionBlock)completionBlock {
+    if (![RLMSyncManager sharedManager].configured) {
+        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured userInfo:nil],
+                        nil);
+        return;
+    }
     if (!self.valid) {
-        if (error) {
-            *error = [NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil];
-        }
+        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil], nil);
         return;
     }
     if (!self.refreshToken) {
         // Ensure correct internal state
-        if (error) {
-            *error = [NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil];
-        }
+        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil], nil);
         self.valid = NO;
         return;
     }
@@ -81,7 +81,6 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointRefresh
                                              server:self.serverURL
                                                JSON:json
-                                              error:error
                                          completion:^(NSError *error, NSDictionary *json) {
                                              // Extract and save the updated tokens.
                                              RLMSyncSession *__self = weakSelf;
@@ -119,13 +118,14 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 - (void)addCredential:(RLMSyncCredential)credential
              userInfo:(NSDictionary *)userInfo
           forProvider:(RLMSyncIdentityProvider)provider
-                error:(NSError **)error
          onCompletion:(RLMSyncCompletionBlock)completionBlock {
-    RLMSYNC_CHECK_MANAGER(error);
+    if (![RLMSyncManager sharedManager].configured) {
+        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured userInfo:nil],
+                        nil);
+        return;
+    }
     if (!self.valid) {
-        if (error) {
-            *error = [NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil];
-        }
+        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil], nil);
         return;
     }
 
@@ -195,7 +195,9 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     }
 
     // Force a refresh
-    [self refreshWithError:nil completion:nil];
+    // TODO: pass in a completion block that'll inform the app if something goes wrong (through the general
+    //  purpose callback)
+    [self refreshWithCompletion:nil];
 }
 
 - (instancetype)init {

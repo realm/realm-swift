@@ -25,7 +25,7 @@ typedef NSString* RLMSyncToken;
 typedef NSString* RLMSyncCredential;
 typedef NSString* RLMSyncRealmPath;
 typedef NSString* RLMSyncAppID;
-typedef void(^RLMSyncLoginCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable, RLMSyncSession * _Nullable);
+typedef void(^RLMSyncLoginCompletionBlock)(NSError * _Nullable, RLMSyncSession * _Nullable);
 typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
 
 typedef NS_ENUM(NSInteger, RLMSyncError) {
@@ -69,14 +69,6 @@ extern "C" {
 #endif
 
 NS_ASSUME_NONNULL_END
-
-#define RLMSYNC_CHECK_MANAGER(__error) \
-if (![RLMSyncManager sharedManager].configured) { \
-  if (__error) { \
-    *__error = [NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured userInfo:nil]; \
-  } \
-  return;\
-} \
 
 /// A macro to parse a string out of a JSON dictionary, or return nil.
 #define RLMSYNC_PARSE_STRING_OR_ABORT(__json, __key, __prop) \

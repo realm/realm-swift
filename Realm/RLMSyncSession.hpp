@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Validate and refresh a session.
  */
-- (void)refreshWithError:(NSError **)error completion:(nullable RLMSyncCompletionBlock)completionBlock;
+- (void)refreshWithCompletion:(nullable RLMSyncCompletionBlock)completionBlock;
 
 /**
  Destroy a session, logging a user out of their session for the linked Realm on this device.
@@ -67,7 +67,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addCredential:(RLMSyncCredential)credential
              userInfo:(NSDictionary *)userInfo
           forProvider:(RLMSyncIdentityProvider)provider
-                error:(NSError **)error
          onCompletion:(RLMSyncCompletionBlock)completionBlock;
 
 NS_ASSUME_NONNULL_END

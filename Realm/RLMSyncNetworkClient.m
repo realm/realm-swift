@@ -48,7 +48,6 @@
 + (void)postSyncRequestToEndpoint:(RLMSyncServerEndpoint)endpoint
                            server:(NSURL *)serverURL
                              JSON:(NSDictionary *)jsonDictionary
-                            error:(NSError **)error
                        completion:(RLMSyncCompletionBlock)completionBlock {
 
     NSError *localError = nil;
@@ -58,9 +57,7 @@
                                                        options:NSJSONWritingPrettyPrinted
                                                          error:&localError];
     if (!jsonData) {
-        if (error) {
-            *error = localError;
-        }
+        completionBlock(localError, nil);
         return;
     }
 

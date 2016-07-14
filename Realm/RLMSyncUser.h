@@ -20,30 +20,24 @@
 
 #import "RLMSyncUtil.h"
 
-/**
- An enum describing all possible endpoints on the Realm Sync server.
- */
-typedef NS_ENUM(NSUInteger, RLMSyncServerEndpoint) {
-    RLMSyncServerEndpointSessions,
-    RLMSyncServerEndpointRefresh,
-};
-
-/**
- A simple Realm Sync network client that wraps `NSURLSession`.
- */
-@interface RLMSyncNetworkClient : NSObject
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- Post some JSON data to a Realm Sync server, and asynchronously call a completion block with a JSON response and/or
- error.
- */
-+ (void)postSyncRequestToEndpoint:(RLMSyncServerEndpoint)endpoint
-                           server:(NSURL *)serverURL
-                             JSON:(NSDictionary *)jsonDictionary
-                       completion:(RLMSyncCompletionBlock)completionBlock;
+ `RLMSyncUser` encapsulates login information for a single user and auth provider.
 
-NS_ASSUME_NONNULL_END
+ The host application or helper library should create one of these objects once a user has successfully received a
+ credential from an auth provider, and pass it into the appropriate API functions to open a Realm.
+ */
+@interface RLMSyncUser : NSObject
+
+@property (nonatomic, readonly) RLMSyncCredential credential;
+@property (nonatomic, readonly) RLMSyncIdentityProvider provider;
+@property (nullable, nonatomic, readonly) NSDictionary *userInfo;
+
+- (instancetype)initWithCredential:(RLMSyncCredential)credential
+                          provider:(RLMSyncIdentityProvider)provider
+                          userInfo:(nullable NSDictionary *)userInfo;
 
 @end
+
+NS_ASSUME_NONNULL_END
