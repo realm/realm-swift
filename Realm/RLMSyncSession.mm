@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncSession_Private.hpp"
+#import "RLMSyncSession_Private.h"
 
 #import "realm_coordinator.hpp"
 #import "RLMUtil.hpp"
@@ -41,8 +41,10 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 @property (nonatomic, readwrite) NSString *realmID;
 
 @property (nonatomic) RLMSyncToken accessToken;
+@property (nonatomic) NSTimeInterval accessTokenExpiry;
 
 @property (nonatomic) RLMSyncToken refreshToken;
+@property (nonatomic) NSTimeInterval refreshTokenExpiry;
 
 @end
 
@@ -51,24 +53,19 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 // MARK: Public API
 
 - (void)refreshWithCompletion:(RLMSyncCompletionBlock)completionBlock {
-    if (![RLMSyncManager sharedManager].configured) {
-        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured userInfo:nil],
-                        nil);
+    if (![self canMakeAPICallWithCompletionBlock:completionBlock]) {
         return;
     }
-    if (!self.valid) {
-        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil], nil);
-        return;
-    }
-    if (!self.refreshToken) {
-        // Ensure correct internal state
-        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil], nil);
+    RLMSyncCompletionBlock block = completionBlock ?: ^(__attribute__((unused)) NSError *error,
+                                                        __attribute__((unused)) NSDictionary *json){ };
+
+    // Make sure refresh token hasn't yet expired
+    NSTimeInterval now = [NSDate date].timeIntervalSince1970;
+    if (now > self.refreshTokenExpiry) {
+        block([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil], nil);
         self.valid = NO;
         return;
     }
-
-    RLMSyncCompletionBlock block = completionBlock ?: ^(__attribute__((unused)) NSError *error,
-                                                        __attribute__((unused)) NSDictionary *json){ };
 
     NSDictionary *json = @{
                            kRLMSyncProviderKey: @"realm",
@@ -101,13 +98,13 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
                                                  block(error, nil);
                                                  return;
                                              }
-                                             [__self refreshWithModel:model];
+                                             [__self updateTokenStateWithModel:model];
                                              block(error, json);
                                          }];
 }
 
 - (void)destroy {
-    if (!self.valid) {
+    if (![self canMakeAPICallWithCompletionBlock:nil]) {
         return;
     }
 
@@ -119,13 +116,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
              userInfo:(NSDictionary *)userInfo
           forProvider:(RLMSyncIdentityProvider)provider
          onCompletion:(RLMSyncCompletionBlock)completionBlock {
-    if (![RLMSyncManager sharedManager].configured) {
-        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured userInfo:nil],
-                        nil);
-        return;
-    }
-    if (!self.valid) {
-        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil], nil);
+    if (![self canMakeAPICallWithCompletionBlock:completionBlock]) {
         return;
     }
 
@@ -142,14 +133,16 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     self.remoteURL = model.realmURL;
     self.realmID = model.realmID;
     self.accessToken = model.accessToken;
+    self.accessTokenExpiry = model.accessTokenExpiry;
 
     [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:model.accessTokenExpiry];
 
     self.valid = YES;
 }
 
-- (void)refreshWithModel:(RLMSyncRefreshDataModel *)model {
+- (void)updateTokenStateWithModel:(RLMSyncRefreshDataModel *)model {
     self.accessToken = model.accessToken;
+    self.accessTokenExpiry = model.accessTokenExpiry;
 
     // Pass the updated access token to the Realm.
     auto coordinator = realm::_impl::RealmCoordinator::get_existing_coordinator(RLMStringDataWithNSString(self.path));
@@ -164,11 +157,31 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:model.accessTokenExpiry];
 }
 
+/**
+ Check whether the session object is in a state where it should be allowed to make an API call to the server.
+ */
+- (BOOL)canMakeAPICallWithCompletionBlock:(RLMSyncCompletionBlock)completionBlock {
+    RLMSyncCompletionBlock block = completionBlock ?: ^(__attribute__((unused)) NSError *error,
+                                                        __attribute__((unused)) NSDictionary *json){ };
+
+    if (![RLMSyncManager sharedManager].configured) {
+        block([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured userInfo:nil],
+              nil);
+        return NO;
+    }
+    if (!self.valid) {
+        block([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil], nil);
+        return NO;
+    }
+    return YES;
+}
+
 // MARK: Other
 
 - (void)scheduleRefreshWithToken:(RLMSyncRenewalTokenModel *)token
           currentTokenExpiration:(NSTimeInterval)expiration {
     self.refreshToken = token.renewalToken;
+    self.refreshTokenExpiry = token.tokenExpiry;
 
     // Schedule next refresh
     NSTimeInterval timeToRefresh = expiration - [NSDate date].timeIntervalSince1970 - RLMRefreshExpiryBuffer;
@@ -180,13 +193,13 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     }
     NSTimer *timer = [NSTimer timerWithTimeInterval:timeToRefresh
                                              target:self
-                                           selector:@selector(refreshTimerFired:)
+                                           selector:@selector(performTokenRefresh:)
                                            userInfo:nil
                                             repeats:NO];
     [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
 }
 
-- (void)refreshTimerFired:(__attribute__((unused)) NSTimer *)timer {
+- (void)performTokenRefresh:(__attribute__((unused)) NSTimer *)timer {
     [self.refreshTimer invalidate];
     self.refreshTimer = nil;
 

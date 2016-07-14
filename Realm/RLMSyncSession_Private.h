@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncSession.hpp"
+#import "RLMSyncSession.h"
 
 @class RLMSyncSessionDataModel;
 

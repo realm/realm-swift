@@ -19,7 +19,7 @@
 #import "RLMSyncManager_Private.h"
 
 #import "RLMSyncUtil.h"
-#import "RLMSyncSession_Private.hpp"
+#import "RLMSyncSession_Private.h"
 
 static RLMSyncManager *_sharedManager;
 

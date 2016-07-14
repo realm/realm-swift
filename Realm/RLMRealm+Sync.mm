@@ -22,7 +22,7 @@
 #import "RLMRealmConfiguration.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncNetworkClient.h"
-#import "RLMSyncSession_Private.hpp"
+#import "RLMSyncSession_Private.h"
 #import "RLMSyncSessionDataModel.h"
 #import "RLMSyncUser.h"
 
