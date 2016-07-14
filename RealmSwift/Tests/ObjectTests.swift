@@ -35,7 +35,7 @@ class ObjectTests: TestCase {
         let realm = try! Realm()
         var persisted: SwiftStringObject!
         try! realm.write {
-            persisted = realm.createObject(ofType: SwiftStringObject.self, populatedWith: [:])
+            persisted = realm.createObject(SwiftStringObject.self, from: [:])
             XCTAssertNotNil(persisted.realm)
             XCTAssertEqual(realm, persisted.realm!)
         }
@@ -176,7 +176,7 @@ class ObjectTests: TestCase {
 
         test(SwiftObject())
         try! Realm().write {
-            let persistedObject = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: [:])
+            let persistedObject = try! Realm().createObject(SwiftObject.self, from: [:])
             test(persistedObject)
         }
     }
@@ -273,7 +273,7 @@ class ObjectTests: TestCase {
         autoreleasepool {
             let realm = self.realmWithTestPath()
             try! realm.write {
-                _ = realm.createObject(ofType: SwiftObject.self)
+                _ = realm.createObject(SwiftObject.self)
             }
         }
         autoreleasepool {
@@ -301,13 +301,13 @@ class ObjectTests: TestCase {
         }
 
         withMigrationObject { migrationObject, migration in
-            let boolObject = migration.createObject(ofType: "SwiftBoolObject", populatedWith: [true])
+            let boolObject = migration.createObject("SwiftBoolObject", from: [true])
             self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
         try! Realm().write {
-            let persistedObject = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: [:])
+            let persistedObject = try! Realm().createObject(SwiftObject.self, from: [:])
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
     }
@@ -322,13 +322,13 @@ class ObjectTests: TestCase {
         }
 
         withMigrationObject { migrationObject, migration in
-            let boolObject = migration.createObject(ofType: "SwiftBoolObject", populatedWith: [true])
+            let boolObject = migration.createObject("SwiftBoolObject", from: [true])
             self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
         try! Realm().write {
-            let persistedObject = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: [:])
+            let persistedObject = try! Realm().createObject(SwiftObject.self, from: [:])
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
     }

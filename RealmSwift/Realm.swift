@@ -263,7 +263,7 @@ public final class Realm {
     - returns: The created object.
     */
     @discardableResult
-    public func createObject<T: Object>(ofType type: T.Type, populatedWith value: AnyObject = [:], update: Bool = false) -> T {
+    public func create<T: Object>(_ type: T.Type, from value: AnyObject = [:], update: Bool = false) -> T {
         let typeName = (type as Object.Type).className()
         if update && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
@@ -300,7 +300,7 @@ public final class Realm {
     :nodoc:
     */
     @discardableResult
-    public func createDynamicObject(ofType typeName: String, populatedWith value: AnyObject = [:], update: Bool = false) -> DynamicObject {
+    public func createDynamicObject(ofType typeName: String, from value: AnyObject = [:], update: Bool = false) -> DynamicObject {
         if update && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
         }
@@ -378,7 +378,7 @@ public final class Realm {
 
     - returns: All objects of the given type in Realm.
     */
-    public func allObjects<T: Object>(ofType type: T.Type) -> Results<T> {
+    public func objects<T: Object>(ofType type: T.Type) -> Results<T> {
         return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
     }
 
@@ -397,7 +397,7 @@ public final class Realm {
 
     :nodoc:
     */
-    public func allDynamicObjects(ofType typeName: String) -> Results<DynamicObject> {
+    public func dynamicObjects(ofType typeName: String) -> Results<DynamicObject> {
         return Results<DynamicObject>(RLMGetObjects(rlmRealm, typeName, nil))
     }
 
@@ -638,10 +638,10 @@ extension Realm {
     @available(*, unavailable, renamed:"isInWriteTransaction")
     public var inWriteTransaction : Bool { fatalError() }
 
-    @available(*, unavailable, renamed:"createObject(ofType:populatedWith:update:)")
+    @available(*, unavailable, renamed:"create(_:from:update:)")
     public func create<T: Object>(_ type: T.Type, value: AnyObject = [:], update: Bool = false) -> T { fatalError() }
 
-    @available(*, unavailable, renamed:"createDynamicObject(ofType:populatedWith:update:)")
+    @available(*, unavailable, renamed:"createDynamicObject(ofType:from:update:)")
     public func dynamicCreate(_ className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
         fatalError()
     }
@@ -655,10 +655,10 @@ extension Realm {
     @available(*, unavailable, renamed:"deleteAllObjects()")
     public func deleteAll() { }
 
-    @available(*, unavailable, renamed:"allObjects(ofType:)")
+    @available(*, unavailable, renamed:"objects(ofType:)")
     public func objects<T: Object>(_ type: T.Type) -> Results<T> { fatalError() }
 
-    @available(*, unavailable, renamed:"allDynamicObjects(ofType:)")
+    @available(*, unavailable, renamed:"dynamicObjects(ofType:)")
     public func dynamicObjects(_ className: String) -> Results<DynamicObject> { fatalError() }
 
     @available(*, unavailable, renamed:"object(ofType:forPrimaryKey:)")
