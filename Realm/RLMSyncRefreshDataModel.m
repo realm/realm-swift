@@ -18,6 +18,8 @@
 
 #import "RLMSyncRefreshDataModel.h"
 
+#import "RLMSyncRenewalTokenModel.h"
+
 @interface RLMSyncRefreshDataModel ()
 
 @property (nonatomic, readwrite) RLMSyncToken accessToken;

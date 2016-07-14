@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMRealm.h>
+#import "RLMRealm.h"
 
 #import "RLMSyncUtil.h"
 
@@ -26,10 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMRealm (Sync)
 
-- (void)openRealmForUser:(RLMSyncUser *)user
-            onCompletion:(RLMSyncLoginCompletionBlock)completionBlock;
+- (void)openForSyncUser:(RLMSyncUser *)user
+           onCompletion:(RLMSyncLoginCompletionBlock)completionBlock;
 
-- (void)openRealmWithToken:(RLMSyncToken)token;
+- (void)openWithSyncToken:(RLMSyncToken)token;
 
 @end
 

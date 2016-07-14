@@ -20,8 +20,7 @@
 
 #import "RLMRealmConfiguration.h"
 
-@interface RLMSyncNetworkClient ()
-@end
+typedef void(^RLMSyncURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
 
 @implementation RLMSyncNetworkClient
 
@@ -68,35 +67,37 @@
     [request addValue:@"application/json;charset=utf-8" forHTTPHeaderField:@"Content-Type"];
     [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
 
+    RLMSyncURLSessionCompletionBlock handler = ^(NSData *data,
+                                                 __unused NSURLResponse *response,
+                                                 NSError *error) {
+        // Parse out the JSON
+        NSError *localError = nil;
+        if (data && !error) {
+            id json = [NSJSONSerialization JSONObjectWithData:data
+                                                      options:(NSJSONReadingOptions)0
+                                                        error:&localError];
+            if (!json || localError) {
+                // JSON parsing error
+                completionBlock(localError, nil);
+            } else if (![json isKindOfClass:[NSDictionary class]]) {
+                // JSON response malformed
+                localError = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                 code:RLMSyncErrorBadResponse
+                                             userInfo:nil];
+                completionBlock(localError, nil);
+            } else {
+                // JSON parsed successfully
+                completionBlock(nil, (NSDictionary *)json);
+            }
+        } else {
+            // Network error
+            completionBlock(error, nil);
+        }
+    };
+
     // Add the request to a task and start it
     NSURLSessionTask *task = [self.session dataTaskWithRequest:request
-                                             completionHandler:^(NSData *data,
-                                                                 __attribute__((unused)) NSURLResponse *response,
-                                                                 NSError *error) {
-                                                 // Parse out the JSON
-                                                 NSError *localError = nil;
-                                                 if (data && !error) {
-                                                     id json = [NSJSONSerialization JSONObjectWithData:data
-                                                                                               options:(NSJSONReadingOptions)0
-                                                                                                 error:&localError];
-                                                     if (!json || localError) {
-                                                         // JSON parsing error
-                                                         completionBlock(localError, nil);
-                                                     } else if (![json isKindOfClass:[NSDictionary class]]) {
-                                                         // JSON response malformed
-                                                         localError = [NSError errorWithDomain:RLMSyncErrorDomain
-                                                                                          code:RLMSyncErrorBadResponse
-                                                                                      userInfo:nil];
-                                                         completionBlock(localError, nil);
-                                                     } else {
-                                                         // JSON parsed successfully
-                                                         completionBlock(nil, (NSDictionary *)json);
-                                                     }
-                                                 } else {
-                                                     // Network error
-                                                     completionBlock(error, nil);
-                                                 }
-                                             }];
+                                             completionHandler:handler];
     [task resume];
 }
 

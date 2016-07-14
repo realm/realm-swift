@@ -29,3 +29,7 @@
 #import <Realm/RLMResults.h>
 #import <Realm/RLMSchema.h>
 #import <Realm/RLMRealm+Sync.h>
+#import <Realm/RLMSyncSession.h>
+#import <Realm/RLMSyncManager.h>
+#import <Realm/RLMSyncUser.h>
+#import <Realm/RLMSyncUtil.h>

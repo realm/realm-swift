@@ -21,7 +21,11 @@ import Realm.Private
 import Foundation
 
 public extension Realm {
-    func refreshCredentialsWithProvider(provider: RLMRealmSyncIdentityProvider, token: String, appID: String) {
-        self.rlmRealm.refreshCredentialsWithProvider(provider, andToken: token, withAppID: appID)
+    func open(for user: RLMSyncUser, onCompletion completion: (NSError?, RLMSyncSession?) -> Void) {
+        self.rlmRealm.open(for: user, onCompletion: completion)
+    }
+
+    func open(with token: String) {
+        self.rlmRealm.open(withSyncToken: token)
     }
 }

@@ -40,10 +40,11 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
 
 @implementation RLMRealm (Sync)
 
-- (void)openRealmForUser:(RLMSyncUser *)user
-            onCompletion:(RLMSyncLoginCompletionBlock)completionBlock {
+- (void)openForSyncUser:(RLMSyncUser *)user
+           onCompletion:(RLMSyncLoginCompletionBlock)completionBlock {
+    RLMRealmConfiguration *configuration = self.configuration;
 
-    if (!self.configuration.fileURL) {
+    if (!configuration.fileURL) {
         completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadRealmPath userInfo:nil], nil);
         return;
     }
@@ -53,8 +54,8 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
         return;
     }
 
-    RLMSyncRealmPath path = self.configuration.fileURL.path;
-    NSURL *serverURL = self.configuration.syncServerURL;
+    RLMSyncRealmPath path = configuration.fileURL.path;
+    NSURL *serverURL = configuration.syncServerURL;
 
     NSMutableDictionary *json = [@{
                                    kRLMSyncProviderKey: getProviderName(user.provider),
@@ -67,45 +68,39 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
         json[@"user_info"] = user.userInfo;
     }
 
+    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
+        if (json && !error) {
+            RLMSyncSessionDataModel *model = [[RLMSyncSessionDataModel alloc] initWithJSON:json];
+            if (!model) {
+                error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                            code:RLMSyncErrorBadResponse
+                                        userInfo:nil];
+                completionBlock(error, nil);
+            }
+            // Pass the token to the underlying Realm
+            self->_realm->refresh_sync_access_token(model.accessToken.UTF8String);
+
+            // Prepare the session object for the newly-created session
+            RLMSyncSession *session = [[RLMSyncManager sharedManager] syncSessionForRealm:path];
+            [session configureWithServerURL:serverURL
+                           sessionDataModel:model];
+
+            // Inform the client
+            completionBlock(nil, session);
+        } else {
+            // Something went wrong
+            completionBlock(error, nil);
+        }
+    };
+
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointSessions
                                              server:serverURL
                                                JSON:json
-                                         completion:^(NSError *error, NSDictionary *data) {
-                                             if (data && !error) {
-                                                 RLMSyncSessionDataModel *model = [[RLMSyncSessionDataModel alloc] initWithJSON:data];
-                                                 if (!model) {
-                                                     error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                                                                 code:RLMSyncErrorBadResponse
-                                                                             userInfo:nil];
-                                                     completionBlock(error, nil);
-                                                 }
-                                                 // Pass the token to the underlying Realm
-                                                 [self passAccessTokenToRealm:model.accessToken];
-
-                                                 // Prepare the session object for the newly-created session
-                                                 RLMSyncSession *session = [[RLMSyncManager sharedManager] syncSessionForRealm:path];
-                                                 [session configureWithServerURL:serverURL
-                                                                sessionDataModel:model];
-
-                                                 // Inform the client
-                                                 completionBlock(nil, session);
-                                             } else {
-                                                 // Something went wrong
-                                                 completionBlock(error, nil);
-                                             }
-                                         }];
+                                         completion:handler];
 }
 
-- (void)openRealmWithToken:(RLMSyncToken)token {
-    [self passAccessTokenToRealm:token];
-}
-
-// MARK: Helpers
-
-- (void)passAccessTokenToRealm:(RLMSyncToken)token {
-    realm::SharedRealm shared_realm = self->_realm;
-    std::string access_token{token.UTF8String};
-    shared_realm->refresh_sync_access_token(std::move(access_token));
+- (void)openWithSyncToken:(RLMSyncToken)token {
+    self->_realm->refresh_sync_access_token(token.UTF8String);
 }
 
 @end

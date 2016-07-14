@@ -18,8 +18,9 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncRenewalTokenModel.h"
 #import "RLMSyncUtil.h"
+
+@class RLMSyncRenewalTokenModel;
 
 @interface RLMSyncSessionDataModel : NSObject
 

@@ -115,6 +115,8 @@ namespace realm {
         // the the existing Realm.
         static SharedRealm get_shared_realm(Config config);
 
+        static bool refresh_sync_access_token(std::string access_token, StringData path);
+
         // Updates a Realm to a given target schema/version creating tables and
         // updating indexes as necessary. Uses the existing migration function
         // on the Config, and the resulting Schema and version with updated

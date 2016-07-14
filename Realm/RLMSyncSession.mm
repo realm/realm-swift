@@ -18,12 +18,13 @@
 
 #import "RLMSyncSession_Private.h"
 
-#import "realm_coordinator.hpp"
+#import "shared_realm.hpp"
 #import "RLMUtil.hpp"
 
 #import "RLMSyncNetworkClient.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncRefreshDataModel.h"
+#import "RLMSyncRenewalTokenModel.h"
 #import "RLMSyncSessionDataModel.h"
 
 // How many seconds before the access token expires to attempt a refresh.
@@ -56,8 +57,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     if (![self canMakeAPICallWithCompletionBlock:completionBlock]) {
         return;
     }
-    RLMSyncCompletionBlock block = completionBlock ?: ^(__attribute__((unused)) NSError *error,
-                                                        __attribute__((unused)) NSDictionary *json){ };
+    RLMSyncCompletionBlock block = completionBlock ?: ^(NSError *, NSDictionary *){ };
 
     // Make sure refresh token hasn't yet expired
     NSTimeInterval now = [NSDate date].timeIntervalSince1970;
@@ -75,32 +75,34 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
                            };
 
     __weak RLMSyncSession *weakSelf = self;
+    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
+        // Extract and save the updated tokens.
+        RLMSyncSession *strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        if (error) {
+            // Bad response
+            strongSelf.valid = NO;
+            block(error, nil);
+            return;
+        }
+        RLMSyncRefreshDataModel *model = [[RLMSyncRefreshDataModel alloc] initWithJSON:json];
+        if (!model) {
+            error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                        code:RLMSyncErrorBadResponse
+                                    userInfo:nil];
+            block(error, nil);
+            return;
+        }
+        [strongSelf updateTokenStateWithModel:model];
+        block(error, json);
+    };
+
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointRefresh
                                              server:self.serverURL
                                                JSON:json
-                                         completion:^(NSError *error, NSDictionary *json) {
-                                             // Extract and save the updated tokens.
-                                             RLMSyncSession *__self = weakSelf;
-                                             if (!__self) {
-                                                 return;
-                                             }
-                                             if (error) {
-                                                 // Bad response
-                                                 __self.valid = NO;
-                                                 block(error, nil);
-                                                 return;
-                                             }
-                                             RLMSyncRefreshDataModel *model = [[RLMSyncRefreshDataModel alloc] initWithJSON:json];
-                                             if (!model) {
-                                                 error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                                                             code:RLMSyncErrorBadResponse
-                                                                         userInfo:nil];
-                                                 block(error, nil);
-                                                 return;
-                                             }
-                                             [__self updateTokenStateWithModel:model];
-                                             block(error, json);
-                                         }];
+                                         completion:handler];
 }
 
 - (void)destroy {
@@ -145,11 +147,10 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     self.accessTokenExpiry = model.accessTokenExpiry;
 
     // Pass the updated access token to the Realm.
-    auto coordinator = realm::_impl::RealmCoordinator::get_existing_coordinator(RLMStringDataWithNSString(self.path));
-    if (coordinator) {
-        std::string new_token{self.accessToken.UTF8String};
-        coordinator->refresh_sync_access_token(std::move(new_token));
-    } else {
+    std::string new_token{self.accessToken.UTF8String};
+    bool wasRefreshed = realm::Realm::refresh_sync_access_token(std::move(new_token),
+                                                                RLMStringDataWithNSString(self.path));
+    if (!wasRefreshed) {
         self.valid = NO;
         return;
     }
@@ -161,8 +162,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
  Check whether the session object is in a state where it should be allowed to make an API call to the server.
  */
 - (BOOL)canMakeAPICallWithCompletionBlock:(RLMSyncCompletionBlock)completionBlock {
-    RLMSyncCompletionBlock block = completionBlock ?: ^(__attribute__((unused)) NSError *error,
-                                                        __attribute__((unused)) NSDictionary *json){ };
+    RLMSyncCompletionBlock block = completionBlock ?: ^(NSError *, NSDictionary *){ };
 
     if (![RLMSyncManager sharedManager].configured) {
         block([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured userInfo:nil],

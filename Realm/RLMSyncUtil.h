@@ -71,27 +71,27 @@ extern "C" {
 NS_ASSUME_NONNULL_END
 
 /// A macro to parse a string out of a JSON dictionary, or return nil.
-#define RLMSYNC_PARSE_STRING_OR_ABORT(__json, __key, __prop) \
+#define RLMSYNC_PARSE_STRING_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
 { \
-  id data = __json[__key]; \
+  id data = json_macro_val[key_macro_val]; \
   if (![data isKindOfClass:[NSString class]]) { return nil; } \
-  self.__prop = data; \
+  self.prop_macro_val = data; \
 } \
 
 /// A macro to parse a double out of a JSON dictionary, or return nil.
-#define RLMSYNC_PARSE_DOUBLE_OR_ABORT(__json, __key, __prop) \
+#define RLMSYNC_PARSE_DOUBLE_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
 { \
-  id data = __json[__key]; \
+  id data = json_macro_val[key_macro_val]; \
   if (![data isKindOfClass:[NSNumber class]]) { return nil; } \
-  self.__prop = [data doubleValue]; \
+  self.prop_macro_val = [data doubleValue]; \
 } \
 
 /// A macro to build a sub-model out of a JSON dictionary, or return nil.
-#define RLMSYNC_PARSE_MODEL_OR_ABORT(__json, __key, __class, __prop) \
+#define RLMSYNC_PARSE_MODEL_OR_ABORT(json_macro_val, key_macro_val, class_macro_val, prop_macro_val) \
 { \
-  id raw = __json[__key]; \
+  id raw = json_macro_val[key_macro_val]; \
   if (![raw isKindOfClass:[NSDictionary class]]) { return nil; } \
-  id model = [[__class alloc] initWithJSON:raw]; \
+  id model = [[class_macro_val alloc] initWithJSON:raw]; \
   if (!model) { return nil; } \
-  self.__prop = model; \
+  self.prop_macro_val = model; \
 } \
