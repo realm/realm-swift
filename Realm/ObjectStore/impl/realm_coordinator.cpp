@@ -162,7 +162,7 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
         }
     }
 
-    if (config.sync_server_url && config.sync_user_token && !m_sync_session) {
+    if (config.sync_server_url && !m_sync_session) {
         m_sync_client = get_sync_client(config);
 
         m_sync_session = std::make_unique<sync::Session>(m_sync_client->client, config.path);
@@ -171,7 +171,14 @@ std::shared_ptr<Realm> RealmCoordinator::get_realm(Realm::Config config)
                 m_notifier->notify_others();
         });
 
-        m_sync_session->bind(*config.sync_server_url, *config.sync_user_token);
+        if (config.sync_user_token) {
+            // We already have a user token, so BIND immediately
+            m_sync_session->bind(*config.sync_server_url, *config.sync_user_token);
+        }
+        else {
+            // No user token yet, so just register the URL
+            m_sync_awaits_user_token = true;
+        }
     }
 
     auto realm = std::make_shared<Realm>(std::move(config));
@@ -279,7 +286,14 @@ void RealmCoordinator::send_commit_notifications(Realm& source_realm)
     if (m_sync_session) {
         auto& sg = Realm::Internal::get_shared_group(source_realm);
         auto version = LangBindHelper::get_version_of_latest_snapshot(sg);
-        m_sync_session->nonsync_transact_notify(version);
+        if (!m_sync_awaits_user_token) {
+            // Fully ready sync session, notify immediately.
+            m_sync_session->nonsync_transact_notify(version);
+        }
+        else {
+            // FIXME: This deference might be moved into the sync::Session object.
+            m_sync_deferred_commit_notification = version;
+        }
     }
 }
 
@@ -670,4 +684,23 @@ void RealmCoordinator::process_available_async(Realm& realm)
 void RealmCoordinator::notify_others()
 {
     m_notifier->notify_others();
+}
+
+void RealmCoordinator::refresh_sync_access_token(std::string access_token)
+{
+    if (m_sync_awaits_user_token) {
+        m_sync_awaits_user_token = false;
+
+        // Since the sync session was previously unbound, it's safe to do this from the
+        // calling thread.
+        m_sync_session->bind(*m_config.sync_server_url, std::move(access_token));
+
+        if (m_sync_deferred_commit_notification) {
+            m_sync_session->nonsync_transact_notify(*m_sync_deferred_commit_notification);
+            m_sync_deferred_commit_notification = util::none;
+        }
+    }
+    else {
+        m_sync_session->refresh(std::move(access_token));
+    }
 }
