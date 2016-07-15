@@ -10,7 +10,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Improve error message when using NSNumber incorrectly in Swift models.
 
 ### Bugfixes
 

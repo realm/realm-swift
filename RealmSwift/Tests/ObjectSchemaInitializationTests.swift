@@ -136,6 +136,15 @@ class ObjectSchemaInitializationTests: TestCase {
             "Should throw when not ignoring a property of a type we can't persist")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonOptionalLinkProperty.self),
             "Should throw when not marking a link property as optional")
+
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSNumber.self),
+                     reason: "Can't persist NSNumber without default value: use a Swift-native number type " +
+                             "or provide a default value.",
+                     "Should throw when using not providing default value for NSNumber property on Swift model")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithOptionalNSNumber.self),
+                     reason: "Can't persist NSNumber without default value: use a Swift-native number type " +
+                             "or provide a default value.",
+                     "Should throw when using not providing default value for NSNumber property on Swift model")
     }
 
     func testPrimaryKey() {
@@ -243,6 +252,14 @@ class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {
     dynamic override class func primaryKey() -> String? {
         return "date"
     }
+}
+
+class SwiftObjectWithNSNumber: SwiftFakeObject {
+    dynamic var number = NSNumber()
+}
+
+class SwiftObjectWithOptionalNSNumber: SwiftFakeObject {
+    dynamic var number: NSNumber? = NSNumber()
 }
 
 class SwiftFakeObjectSubclass: SwiftFakeObject {
@@ -395,6 +412,15 @@ class ObjectSchemaInitializationTests: TestCase {
             "Should throw when not ignoring a property of a type we can't manage")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonOptionalLinkProperty.self),
             "Should throw when not marking a link property as optional")
+
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSNumber.self),
+                     reason: "Can't persist NSNumber without default value: use a Swift-native number type " +
+                             "or provide a default value.",
+                     "Should throw when using not providing default value for NSNumber property on Swift model")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithOptionalNSNumber.self),
+                     reason: "Can't persist NSNumber without default value: use a Swift-native number type " +
+                             "or provide a default value.",
+                     "Should throw when using not providing default value for NSNumber property on Swift model")
     }
 
     func testPrimaryKey() {
@@ -506,6 +532,14 @@ class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {
     dynamic override class func primaryKey() -> String? {
         return "date"
     }
+}
+
+class SwiftObjectWithNSNumber: SwiftFakeObject {
+    dynamic var number = NSNumber()
+}
+
+class SwiftObjectWithOptionalNSNumber: SwiftFakeObject {
+    dynamic var number: NSNumber? = NSNumber()
 }
 
 class SwiftFakeObjectSubclass: SwiftFakeObject {
