@@ -1133,6 +1133,10 @@ public final class Realm {
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
+            #if swift(>=2.3)
+                let RLMRealmDidChangeNotification = DidChange
+                let RLMRealmRefreshRequiredNotification = RefreshRequired
+            #endif
             switch rlmNotification {
             case RLMRealmDidChangeNotification:
                 block(notification: .DidChange, realm: self)

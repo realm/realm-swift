@@ -11,6 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Improve error message when using NSNumber incorrectly in Swift models.
+* Fix compilation with Swift 2.3 using Xcode 8 beta 2.
 
 ### Bugfixes
 
