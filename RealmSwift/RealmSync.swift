@@ -20,6 +20,8 @@ import Realm
 import Realm.Private
 import Foundation
 
+#if swift(>=3.0)
+
 public extension Realm {
     func open(for user: RLMSyncUser, onCompletion completion: (NSError?, RLMSyncSession?) -> Void) {
         self.rlmRealm.open(for: user, onCompletion: completion)
@@ -29,3 +31,17 @@ public extension Realm {
         self.rlmRealm.open(withSyncToken: token)
     }
 }
+
+#else
+
+public extension Realm {
+    func open(for user: RLMSyncUser, onCompletion completion: (NSError?, RLMSyncSession?) -> Void) {
+        self.rlmRealm.openForSyncUser(user, onCompletion: completion)
+    }
+
+    func open(with token: String) {
+        self.rlmRealm.openWithSyncToken(token)
+    }
+}
+
+#endif
