@@ -30,6 +30,7 @@ namespace realm {
 template<typename T> class BasicRowExpr;
 using RowExpr = BasicRowExpr<Table>;
 class Mixed;
+class ObjectSchema;
 
 namespace _impl {
     class ResultsNotifier;
@@ -59,6 +60,12 @@ public:
     Results(Results&&);
     Results& operator=(Results const&);
     Results& operator=(Results&&);
+
+    // Get the Realm
+    SharedRealm get_realm() const { return m_realm; }
+
+    // Object schema describing the vendored object type
+    const ObjectSchema &get_object_schema() const;
 
     // Get a query which will match the same rows as is contained in this Results
     // Returned query will not be valid if the current mode is Empty
@@ -163,8 +170,6 @@ public:
         UnsupportedColumnTypeException(size_t column, const Table* table, const char* operation);
     };
 
-    SharedRealm get_realm() const { return m_realm; }
-
     // Create an async query from this Results
     // The query will be run on a background thread and delivered to the callback,
     // and then rerun after each commit (if needed) and redelivered if it changed
@@ -185,6 +190,7 @@ public:
 
 private:
     SharedRealm m_realm;
+    mutable const ObjectSchema *m_object_schema = nullptr;
     Query m_query;
     TableView m_table_view;
     LinkViewRef m_link_view;

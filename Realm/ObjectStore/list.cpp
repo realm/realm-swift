@@ -20,7 +20,9 @@
 
 #include "impl/list_notifier.hpp"
 #include "impl/realm_coordinator.hpp"
+#include "object_store.hpp"
 #include "results.hpp"
+#include "schema.hpp"
 #include "shared_realm.hpp"
 #include "util/format.hpp"
 
@@ -41,6 +43,19 @@ List::List(std::shared_ptr<Realm> r, LinkViewRef l) noexcept
 : m_realm(std::move(r))
 , m_link_view(std::move(l))
 {
+}
+
+const ObjectSchema& List::get_object_schema() const
+{
+    verify_attached();
+
+    if (!m_object_schema) {
+        auto object_type = ObjectStore::object_type_for_table_name(m_link_view->get_target_table().get_name());
+        auto it = m_realm->config().schema->find(object_type);
+        REALM_ASSERT(it != m_realm->config().schema->end());
+        m_object_schema = &*it;
+    }
+    return *m_object_schema;
 }
 
 Query List::get_query() const

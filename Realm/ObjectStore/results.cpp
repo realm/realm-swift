@@ -20,7 +20,9 @@
 
 #include "impl/realm_coordinator.hpp"
 #include "impl/results_notifier.hpp"
+#include "object_schema.hpp"
 #include "object_store.hpp"
+#include "schema.hpp"
 #include "util/compiler.hpp"
 #include "util/format.hpp"
 
@@ -77,6 +79,7 @@ Results& Results::operator=(const Results&) = default;
 
 Results::Results(Results&& other)
 : m_realm(std::move(other.m_realm))
+, m_object_schema(std::move(other.m_object_schema))
 , m_query(std::move(other.m_query))
 , m_table_view(std::move(other.m_table_view))
 , m_link_view(std::move(other.m_link_view))
@@ -139,6 +142,30 @@ size_t Results::size()
             return m_table_view.size();
     }
     REALM_UNREACHABLE();
+}
+
+const ObjectSchema& Results::get_object_schema() const
+{
+    validate_read();
+
+    if (!m_object_schema) {
+        REALM_ASSERT(m_realm);
+        auto it = m_realm->config().schema->find(get_object_type());
+        REALM_ASSERT(it != m_realm->config().schema->end());
+        m_object_schema = &*it;
+    }
+
+    return *m_object_schema;
+}
+
+
+StringData Results::get_object_type() const noexcept
+{
+    if (!m_table) {
+        return StringData();
+    }
+
+    return ObjectStore::object_type_for_table_name(m_table->get_name());
 }
 
 RowExpr Results::get(size_t row_ndx)
@@ -433,15 +460,6 @@ TableView Results::get_tableview()
             return m_table->where().find_all();
     }
     REALM_UNREACHABLE();
-}
-
-StringData Results::get_object_type() const noexcept
-{
-    if (!m_table) {
-        return StringData();
-    }
-
-    return ObjectStore::object_type_for_table_name(m_table->get_name());
 }
 
 Results Results::sort(realm::SortOrder&& sort) const

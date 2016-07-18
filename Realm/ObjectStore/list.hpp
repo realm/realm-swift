@@ -50,6 +50,7 @@ public:
 
     const std::shared_ptr<Realm>& get_realm() const { return m_realm; }
     Query get_query() const;
+    const ObjectSchema& get_object_schema() const;
     size_t get_origin_row_index() const;
 
     bool is_valid() const;
@@ -104,6 +105,7 @@ public:
 
 private:
     std::shared_ptr<Realm> m_realm;
+    mutable const ObjectSchema* m_object_schema = nullptr;
     LinkViewRef m_link_view;
     _impl::CollectionNotifier::Handle<_impl::CollectionNotifier> m_notifier;
 
