@@ -22,7 +22,7 @@
 
 @interface RLMSyncSession ()
 
-@property (nonatomic, readwrite) RLMSyncRealmPath path;
+@property (nonatomic, readwrite) NSString *localIdentifier;
 
 /**
  Given a newly-created session object, configure all fields which are not expected to change between requests (except
@@ -32,6 +32,7 @@
  This method should only be called once.
  */
 - (void)configureWithServerURL:(NSURL *)serverURL
+                    remotePath:(RLMSyncRealmPath)path
               sessionDataModel:(RLMSyncSessionDataModel *)model;
 
 @end

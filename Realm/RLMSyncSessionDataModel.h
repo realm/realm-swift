@@ -26,10 +26,7 @@
 
 @property (nonatomic, readonly) RLMSyncToken accessToken;
 @property (nonatomic, readonly) NSTimeInterval accessTokenExpiry;
-@property (nonatomic, readonly) RLMSyncAccountID accountID;
-
-@property (nonatomic, readonly) NSString *realmID;
-@property (nonatomic, readonly) NSString *realmURL;
+@property (nonatomic, readonly) RLMSyncIdentity identity;
 
 @property (nonatomic, readonly) RLMSyncRenewalTokenModel *renewalTokenModel;
 

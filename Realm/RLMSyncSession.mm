@@ -34,12 +34,10 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 
 @property (nonatomic) NSTimer *refreshTimer;
 
-@property (nonatomic, readwrite) RLMSyncAccountID account;
+@property (nonatomic, readwrite) RLMSyncIdentity identity;
 @property (nonatomic, readwrite) BOOL valid;
 @property (nonatomic, readwrite) NSURL *serverURL;
-
-@property (nonatomic, readwrite) NSString *remoteURL;
-@property (nonatomic, readwrite) NSString *realmID;
+@property (nonatomic, readwrite) RLMSyncRealmPath remotePath;
 
 @property (nonatomic) RLMSyncToken accessToken;
 @property (nonatomic) NSTimeInterval accessTokenExpiry;
@@ -52,6 +50,16 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 @implementation RLMSyncSession
 
 // MARK: Public API
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<RLMSyncSession: %p> valid?: %@, identity: %@, serverURL: %@, access token expiry: %@, refresh token expiry: %@",
+            self,
+            self.valid ? @"YES" : @"NO",
+            self.identity,
+            self.serverURL,
+            [NSDate dateWithTimeIntervalSince1970:self.accessTokenExpiry],
+            [NSDate dateWithTimeIntervalSince1970:self.refreshTokenExpiry]];
+}
 
 - (void)refreshWithCompletion:(RLMSyncCompletionBlock)completionBlock {
     if (![self canMakeAPICallWithCompletionBlock:completionBlock]) {
@@ -70,8 +78,8 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     NSDictionary *json = @{
                            kRLMSyncProviderKey: @"realm",
                            kRLMSyncDataKey: self.refreshToken,
-                           kRLMSyncRealmIDKey: self.realmID,
                            kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
+                           kRLMSyncPathKey: self.remotePath,
                            };
 
     __weak RLMSyncSession *weakSelf = self;
@@ -96,7 +104,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
             return;
         }
         [strongSelf updateTokenStateWithModel:model];
-        block(error, json);
+        block(nil, json);
     };
 
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointRefresh
@@ -129,15 +137,16 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 // MARK: Private API
 
 - (void)configureWithServerURL:(NSURL *)serverURL
+                    remotePath:(RLMSyncRealmPath)path
               sessionDataModel:(RLMSyncSessionDataModel *)model {
     self.serverURL = serverURL;
-    self.account = model.accountID;
-    self.remoteURL = model.realmURL;
-    self.realmID = model.realmID;
+    self.identity = model.identity;
     self.accessToken = model.accessToken;
     self.accessTokenExpiry = model.accessTokenExpiry;
+    self.remotePath = path;
 
-    [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:model.accessTokenExpiry];
+    NSTimeInterval expiry = MIN(model.accessTokenExpiry, model.renewalTokenModel.tokenExpiry);
+    [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:expiry];
 
     self.valid = YES;
 }
@@ -149,13 +158,13 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     // Pass the updated access token to the Realm.
     std::string new_token{self.accessToken.UTF8String};
     bool wasRefreshed = realm::Realm::refresh_sync_access_token(std::move(new_token),
-                                                                RLMStringDataWithNSString(self.path));
+                                                                RLMStringDataWithNSString(self.localIdentifier));
     if (!wasRefreshed) {
         self.valid = NO;
         return;
     }
-
-    [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:model.accessTokenExpiry];
+    NSTimeInterval expiry = MIN(model.accessTokenExpiry, model.renewalTokenModel.tokenExpiry);
+    [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:expiry];
 }
 
 /**

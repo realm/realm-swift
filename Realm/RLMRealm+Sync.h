@@ -24,6 +24,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+NSString *RLM_getProviderName(RLMSyncIdentityProvider provider);
+
+#ifdef __cplusplus
+}
+#endif
+
 @interface RLMRealm (Sync)
 
 - (void)openForSyncUser:(RLMSyncUser *)user

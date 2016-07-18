@@ -20,7 +20,7 @@
 
 @class RLMSyncSession;
 
-typedef NSString* RLMSyncAccountID;
+typedef NSString* RLMSyncIdentity;
 typedef NSString* RLMSyncToken;
 typedef NSString* RLMSyncCredential;
 typedef NSString* RLMSyncRealmPath;
@@ -30,10 +30,11 @@ typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nulla
 
 typedef NS_ENUM(NSInteger, RLMSyncError) {
     RLMSyncErrorBadResponse             = 1,
-    RLMSyncErrorBadRealmPath            = 2,
-    RLMSyncErrorInvalidSession          = 3,
-    RLMSyncErrorManagerNotConfigured    = 4,
-    RLMSyncErrorHTTPStatusCodeError     = 5,
+    RLMSyncErrorBadRemoteRealmPath      = 2,
+    RLMSyncErrorBadLocalRealmPath       = 3,
+    RLMSyncErrorInvalidSession          = 4,
+    RLMSyncErrorManagerNotConfigured    = 5,
+    RLMSyncErrorHTTPStatusCodeError     = 6,
 };
 
 typedef NS_ENUM(NSUInteger, RLMSyncIdentityProvider) {
@@ -57,6 +58,7 @@ static NSString *const kRLMSyncRealmIDKey       = @"realm_id";
 static NSString *const kRLMSyncRealmURLKey      = @"realm_url";
 static NSString *const kRLMSyncPathKey          = @"path";
 static NSString *const kRLMSyncTokenKey         = @"token";
+static NSString *const kRLMSyncIdentityKey      = @"identity";
 static NSString *const kRLMSyncExpiresKey       = @"expires";
 
 static NSString *const kRLMSyncErrorJSONKey     = @"json";

@@ -23,9 +23,9 @@
 @interface RLMSyncManager ()
 
 /**
- Given the path of a local Realm, retrieve (or create) a session object corresponding to that Realm. This object can be
+ Given the local path of a Realm, retrieve (or create) a session object corresponding to that Realm. This object can be
  used to store session-specific data and perform certain operations only valid if logged in.
  */
-- (RLMSyncSession *)syncSessionForRealm:(RLMSyncRealmPath)realmPath;
+- (RLMSyncSession *)syncSessionForRealm:(NSString *)localIdentifier;
 
 @end
