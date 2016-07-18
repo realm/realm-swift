@@ -32,11 +32,11 @@ typedef void(^RLMSyncURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSErr
     NSString *pathComponent = nil;
     switch (endpoint) {
         case RLMSyncServerEndpointSessions:
-            pathComponent = @"sessions";
+            pathComponent = @"auth";
             break;
         case RLMSyncServerEndpointRefresh:
             // TODO: change this once the server-side API changes
-            pathComponent = @"sessions"; //@"refresh";
+            pathComponent = @"auth";
             break;
     }
     NSAssert(pathComponent != nil, @"Unrecognized value for RLmSyncServerEndpoint enum");
