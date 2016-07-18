@@ -97,6 +97,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
         }
         [strongSelf updateTokenStateWithModel:model];
         block(error, json);
+        return;
     };
 
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointRefresh
