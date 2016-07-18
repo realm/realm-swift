@@ -310,6 +310,11 @@ RLM_ARRAY_TYPE(CircleObject);
 @property NSString *stringCol;
 @end
 
+#pragma mark AbstractObject
+
+@interface AbstractObject : RLMObject
+@end
+
 #pragma mark PersonObject
 
 @class PersonObject;

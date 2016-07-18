@@ -957,4 +957,38 @@ static vm_size_t get_resident_size() {
     XCTAssertEqualObjects(nil, unevaluatedResults.firstObject);
 }
 
+- (void)testResultsDependingOnLinkingObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block DogObject *dog;
+    __block OwnerObject *owner;
+    [realm transactionWithBlock:^{
+        dog = [DogObject createInDefaultRealmWithValue:@[ @"Fido", @3 ]];
+        owner = [OwnerObject createInDefaultRealmWithValue:@[ @"John", dog ]];
+    }];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    RLMResults *results = [DogObject objectsWhere:@"ANY owners.name == 'James'"];
+    id token = [results addNotificationBlock:^(__unused RLMResults *results, RLMCollectionChange *change, __unused NSError *error) {
+        if (change != nil) {
+            [expectation fulfill];
+        }
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    }];
+    // Consume the initial notification.
+    CFRunLoopRun();
+
+    XCTAssertEqual(0u, results.count);
+    XCTAssertNil(results.firstObject);
+
+    [realm transactionWithBlock:^{
+        owner.name = @"James";
+    }];
+
+    XCTAssertEqual(1u, results.count);
+    XCTAssertEqualObjects(dog.dogName, [results.firstObject dogName]);
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    token = nil;
+}
+
 @end

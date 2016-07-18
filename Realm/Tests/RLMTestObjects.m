@@ -217,6 +217,11 @@
 
 @end
 
+#pragma mark AbstractObject
+
+@implementation AbstractObject
+@end
+
 #pragma mark PersonObject
 
 @implementation PersonObject

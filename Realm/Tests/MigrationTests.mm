@@ -711,9 +711,15 @@ RLM_ARRAY_TYPE(MigrationObject);
 #pragma mark - Migration Correctness
 
 - (void)testRemovingSubclass {
-    RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"DeletedClass" objectClass:RLMObject.class properties:@[]];
+    RLMProperty *prop = [[RLMProperty alloc] initWithName:@"id"
+                                                     type:RLMPropertyTypeInt
+                                          objectClassName:nil
+                                   linkOriginPropertyName:nil
+                                                  indexed:NO
+                                                 optional:NO];
+    RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"DeletedClass" objectClass:RLMObject.class properties:@[prop]];
     [self createTestRealmWithSchema:@[objectSchema] block:^(RLMRealm *realm) {
-        [realm createObject:@"DeletedClass" withValue:@[]];
+        [realm createObject:@"DeletedClass" withValue:@[@0]];
     }];
 
     // apply migration

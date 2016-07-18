@@ -1357,11 +1357,7 @@
 
         RLMSchema *schema = [[RLMSchema alloc] init];
         schema.objectSchema = @[objectSchema];
-        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
-
-        [realm beginWriteTransaction];
-        [realm createObject:StringObject.className withValue:@[]];
-        [realm commitWriteTransaction];
+        [self realmWithTestPathAndSchema:schema];
     }
 
     XCTAssertThrows([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil],

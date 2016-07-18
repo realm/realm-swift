@@ -114,10 +114,15 @@ class TestCase: XCTestCase {
         queue.sync { }
     }
 
-    func assertThrows<T>(_ block: @autoclosure(escaping)() -> T, _ message: String? = nil,
-                         named: String? = RLMExceptionName, fileName: String = #file, lineNumber: UInt = #line) {
+    func assertThrows<T>(_ block: @autoclosure(escaping)() -> T, named: String? = RLMExceptionName,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
-        RLMAssertThrows(self, { _ = block() }, named, message, fileName, lineNumber)
+        RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)
+    }
+
+    func assertThrows<T>(_ block: @autoclosure(escaping) () -> T, reason regexString: String,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
     }
 
     func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
@@ -257,10 +262,15 @@ class TestCase: XCTestCase {
         dispatch_sync(queue) {}
     }
 
-    func assertThrows<T>(@autoclosure(escaping) block: () -> T, _ message: String? = nil,
-                         named: String? = RLMExceptionName, fileName: String = #file, lineNumber: UInt = #line) {
+    func assertThrows<T>(@autoclosure(escaping) block: () -> T, named: String? = RLMExceptionName,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
-        RLMAssertThrows(self, { _ = block() } as dispatch_block_t, named, message, fileName, lineNumber)
+        RLMAssertThrowsWithName(self, { _ = block() } as dispatch_block_t, named, message, fileName, lineNumber)
+    }
+
+    func assertThrows<T>(@autoclosure(escaping) block: () -> T, reason regexString: String,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        RLMAssertThrowsWithReasonMatching(self, { _ = block() } as dispatch_block_t, regexString, message, fileName, lineNumber)
     }
 
     func assertSucceeds(message: String? = nil, fileName: StaticString = #file,

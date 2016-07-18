@@ -3,8 +3,26 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* Deprecated `migrateRealm:` in favor of new `performMigrationForConfiguration:error:` method
+* Deprecate `migrateRealm:` in favor of new `performMigrationForConfiguration:error:` method
   that follows Cocoa's' NSError conventions.
+* Fix issue where `RLMResults` used `id `instead of its generic type type as the return
+  type of subscript.
+
+### Enhancements
+
+* Improve error message when using NSNumber incorrectly in Swift models.
+
+### Bugfixes
+
+* None.
+
+1.0.2 Release notes (2016-07-13)
+=============================================================
+
+### API breaking changes
+
+* Attempting to add an object with no properties to a Realm now throws rather than silently
+  doing nothing.
 
 ### Enhancements
 
@@ -28,6 +46,9 @@ x.x.x Release notes (yyyy-MM-dd)
   results from that Realm.
 * Handle EINTR from flock() rather than crashing.
 * Fix incorrect behavior following a call to `[RLMRealm compact]`.
+* Fix live updating and notifications for Results created from a predicate involving
+  an inverse relationship to be triggered when an object at the other end of the relationship
+  is modified.
 
 1.0.1 Release notes (2016-06-12)
 =============================================================
