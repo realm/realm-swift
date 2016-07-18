@@ -1529,8 +1529,11 @@ class RealmTests: TestCase {
         try! realm.write {
             realm.add(SwiftObject())
         }
-        let fileURL = defaultRealmURL().URLByDeletingLastPathComponent!
-            .URLByAppendingPathComponent("copy.realm")
+        #if swift(>=2.3)
+            let fileURL = defaultRealmURL().URLByDeletingLastPathComponent!.URLByAppendingPathComponent("copy.realm")!
+        #else
+            let fileURL = defaultRealmURL().URLByDeletingLastPathComponent!.URLByAppendingPathComponent("copy.realm")
+        #endif
         do {
             try realm.writeCopyToURL(fileURL)
         } catch {
