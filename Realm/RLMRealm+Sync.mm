@@ -76,6 +76,7 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
                                             code:RLMSyncErrorBadResponse
                                         userInfo:nil];
                 completionBlock(error, nil);
+                return;
             }
             // Pass the token to the underlying Realm
             self->_realm->refresh_sync_access_token(model.accessToken.UTF8String);
@@ -87,9 +88,11 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
 
             // Inform the client
             completionBlock(nil, session);
+            return;
         } else {
             // Something went wrong
             completionBlock(error, nil);
+            return;
         }
     };
 
