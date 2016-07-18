@@ -33,6 +33,7 @@ typedef NS_ENUM(NSInteger, RLMSyncError) {
     RLMSyncErrorBadRealmPath            = 2,
     RLMSyncErrorInvalidSession          = 3,
     RLMSyncErrorManagerNotConfigured    = 4,
+    RLMSyncErrorHTTPStatusCodeError     = 5,
 };
 
 typedef NS_ENUM(NSUInteger, RLMSyncIdentityProvider) {
@@ -57,6 +58,8 @@ static NSString *const kRLMSyncRealmURLKey      = @"realm_url";
 static NSString *const kRLMSyncPathKey          = @"path";
 static NSString *const kRLMSyncTokenKey         = @"token";
 static NSString *const kRLMSyncExpiresKey       = @"expires";
+
+static NSString *const kRLMSyncErrorJSONKey     = @"json";
 
 #ifdef __cplusplus
 extern "C" {

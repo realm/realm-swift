@@ -22,6 +22,20 @@
 
 typedef void(^RLMSyncURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
 
+static NSUInteger const kHTTPCodeRange = 100;
+
+typedef enum : NSUInteger {
+    Informational       = 1, // 1XX
+    Success             = 2, // 2XX
+    Redirection         = 3, // 3XX
+    ClientError         = 4, // 4XX
+    ServerError         = 5, // 5XX
+} RLMSyncHTTPErrorCodeType;
+
+static NSRange RLM_rangeForErrorType(RLMSyncHTTPErrorCodeType type) {
+    return NSMakeRange(type*100, kHTTPCodeRange);
+}
+
 @implementation RLMSyncNetworkClient
 
 + (NSURLSession *)session {
@@ -68,10 +82,25 @@ typedef void(^RLMSyncURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSErr
     [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
 
     RLMSyncURLSessionCompletionBlock handler = ^(NSData *data,
-                                                 __unused NSURLResponse *response,
+                                                 NSURLResponse *response,
                                                  NSError *error) {
-        // Parse out the JSON
         NSError *localError = nil;
+
+        if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSHTTPURLResponse *actualResponse = (NSHTTPURLResponse *)response;
+            BOOL badResponse = (NSLocationInRange(actualResponse.statusCode, RLM_rangeForErrorType(ClientError))
+                                || NSLocationInRange(actualResponse.statusCode, RLM_rangeForErrorType(ServerError)));
+            if (badResponse) {
+                // Client or server error
+                localError = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                 code:RLMSyncErrorHTTPStatusCodeError
+                                             userInfo:@{@"statusCode": @(actualResponse.statusCode)}];
+                completionBlock(localError, nil);
+                return;
+            }
+        }
+
+        // Parse out the JSON
         if (data && !error) {
             id json = [NSJSONSerialization JSONObjectWithData:data
                                                       options:(NSJSONReadingOptions)0
@@ -83,7 +112,7 @@ typedef void(^RLMSyncURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSErr
                 // JSON response malformed
                 localError = [NSError errorWithDomain:RLMSyncErrorDomain
                                                  code:RLMSyncErrorBadResponse
-                                             userInfo:nil];
+                                             userInfo:@{kRLMSyncErrorJSONKey: json}];
                 completionBlock(localError, nil);
             } else {
                 // JSON parsed successfully

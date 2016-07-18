@@ -99,12 +99,20 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The synchronization server URL.
 
- The URL must be of the form `realm://realm.foo.com:7800/my_realm`, where
- `my_realm` is the name of the Realm as known to the server.
+ The URL must be of the form `realm://realm.foo.com:7800`.
 
  When `nil`, synchronization is disabled. Defaults to `nil`.
 */
 @property (nonatomic, copy, nullable) NSURL *syncServerURL;
+
+/**
+ When synchronization is desired, the on-server path to the Realm.
+ 
+ The URL must be of the form `path/to/realm`, relative to the server URL defined in `syncServerURL`.
+
+ Does nothing if synchronization is disabled. Defaults to `nil`.
+ */
+@property (nonatomic, copy, nullable) NSURL *syncRealmPath;
 
 /**
  The user identity token used for synchronization.
