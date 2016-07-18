@@ -33,10 +33,9 @@ namespace realm {
     class Schema;
     class SharedGroup;
     class StringData;
-    template <typename T> class BasicRow;
-    class Table;
+    class AnyHandoverable;
+    class HandoverPackage;
 
-    typedef BasicRow<Table> Row;
     typedef std::shared_ptr<Realm> SharedRealm;
     typedef std::weak_ptr<Realm> WeakRealm;
 
@@ -148,14 +147,15 @@ namespace realm {
         // returns the file format version upgraded from if an upgrade took place
         util::Optional<int> file_format_upgraded_from_version() const;
 
+        // Opaque type representing a vector of packaged objects for handover
         struct HandoverPackage;
 
         // Pins the current version and exports each object for handover.
-        std::shared_ptr<HandoverPackage> package_for_handover(std::vector<Row> objects_to_hand_over);
+        std::shared_ptr<HandoverPackage> package_for_handover(std::vector<AnyHandoverable> objects_to_hand_over);
 
         // Unpins the handover version, ending the current read transaction and beginning a new one at this version,
         // importing each object for handover.
-        std::vector<std::unique_ptr<Row>> accept_handover(HandoverPackage& handover);
+        std::vector<AnyHandoverable> accept_handover(HandoverPackage& handover);
 
         ~Realm();
 

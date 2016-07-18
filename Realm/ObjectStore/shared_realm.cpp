@@ -24,11 +24,10 @@
 #include "object_schema.hpp"
 #include "object_store.hpp"
 #include "schema.hpp"
+#include "handover.hpp"
 #include "util/format.hpp"
 
 #include <realm/commit_log.hpp>
-#include <realm/group_shared.hpp>
-#include <realm/row.hpp>
 
 using namespace realm;
 using namespace realm::_impl;
@@ -521,7 +520,7 @@ util::Optional<int> Realm::file_format_upgraded_from_version() const
 
 struct Realm::HandoverPackage {
     SharedGroup::VersionID version;
-    std::vector<std::unique_ptr<SharedGroup::Handover<Row>>> objects;
+    std::vector<AnyHandover> objects;
 
     bool is_awaiting_import() {
         return version != SharedGroup::VersionID();
@@ -534,19 +533,19 @@ struct Realm::HandoverPackage {
     }
 };
 
-std::shared_ptr<Realm::HandoverPackage> Realm::package_for_handover(std::vector<Row> objects_to_hand_over) {
-    std::shared_ptr<Realm::HandoverPackage> handover = std::make_shared<Realm::HandoverPackage>();
+std::shared_ptr<Realm::HandoverPackage> Realm::package_for_handover(std::vector<AnyHandoverable> objects_to_hand_over) {
+    std::shared_ptr<Realm::HandoverPackage> handover = std::make_shared<HandoverPackage>();
     handover->version = m_shared_group->pin_version();
 
     handover->objects.reserve(objects_to_hand_over.size());
     for (auto &object : objects_to_hand_over) {
-        handover->objects.push_back(m_shared_group->export_for_handover(object)); // <--- Export each object
+        handover->objects.push_back(object.export_for_handover(*m_shared_group));
     }
 
     return handover;
 }
 
-std::vector<std::unique_ptr<realm::Row>> Realm::accept_handover(Realm::HandoverPackage& handover) {
+std::vector<AnyHandoverable> Realm::accept_handover(Realm::HandoverPackage& handover) {
     if (!handover.is_awaiting_import()) {
         REALM_TERMINATE("Handover package imported multiple times");
     }
@@ -556,12 +555,11 @@ std::vector<std::unique_ptr<realm::Row>> Realm::accept_handover(Realm::HandoverP
     m_shared_group->unpin_version(handover.version);
     handover.version = SharedGroup::VersionID();
 
-    std::vector<std::unique_ptr<realm::Row>> objects;
+    std::vector<AnyHandoverable> objects;
     objects.reserve(handover.objects.size());
     for (auto &object : handover.objects) {
-        objects.push_back(m_shared_group->import_from_handover(std::move(object)));
+        objects.push_back(std::move(object).import_from_handover(*m_shared_group));
     }
-
     return objects;
 }
 
