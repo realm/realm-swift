@@ -73,17 +73,7 @@ Results::Results(SharedRealm r, SortOrder s, TableView tv)
 }
 
 Results::Results(const Results&) = default;
-
-// Cannot be defaulted as TableViewBase::operator= is missing from the core static library.
-// Delegate to the copy constructor and move-assignment operators instead.
-Results& Results::operator=(const Results& other)
-{
-    if (this != &other) {
-        *this = Results(other);
-    }
-
-    return *this;
-}
+Results& Results::operator=(const Results&) = default;
 
 Results::Results(Results&& other)
 : m_realm(std::move(other.m_realm))
