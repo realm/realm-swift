@@ -91,13 +91,12 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
         if (!model) {
             error = [NSError errorWithDomain:RLMSyncErrorDomain
                                         code:RLMSyncErrorBadResponse
-                                    userInfo:nil];
+                                    userInfo:@{kRLMSyncErrorJSONKey: json}];
             block(error, nil);
             return;
         }
         [strongSelf updateTokenStateWithModel:model];
         block(error, json);
-        return;
     };
 
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointRefresh

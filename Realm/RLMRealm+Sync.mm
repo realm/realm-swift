@@ -44,7 +44,7 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
            onCompletion:(RLMSyncLoginCompletionBlock)completionBlock {
     RLMRealmConfiguration *configuration = self.configuration;
 
-    if (!configuration.fileURL) {
+    if (!configuration.syncRealmPath) {
         completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadRealmPath userInfo:nil], nil);
         return;
     }
@@ -54,7 +54,7 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
         return;
     }
 
-    RLMSyncRealmPath path = configuration.fileURL.path;
+    RLMSyncRealmPath path = configuration.syncRealmPath.absoluteString;
     NSURL *serverURL = configuration.syncServerURL;
 
     NSMutableDictionary *json = [@{
@@ -74,7 +74,7 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
             if (!model) {
                 error = [NSError errorWithDomain:RLMSyncErrorDomain
                                             code:RLMSyncErrorBadResponse
-                                        userInfo:nil];
+                                        userInfo:@{kRLMSyncErrorJSONKey: json}];
                 completionBlock(error, nil);
                 return;
             }
@@ -88,11 +88,9 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
 
             // Inform the client
             completionBlock(nil, session);
-            return;
         } else {
             // Something went wrong
             completionBlock(error, nil);
-            return;
         }
     };
 
