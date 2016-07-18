@@ -75,6 +75,9 @@ public:
     Results sort(SortOrder order);
     Results filter(Query q);
 
+    // Return a Results representing a snapshot of this List.
+    Results snapshot() const;
+
     bool operator==(List const& rgt) const noexcept;
 
     NotificationToken add_notification_callback(CollectionChangeCallback cb);

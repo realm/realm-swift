@@ -195,6 +195,12 @@ Results List::filter(Query q)
     return Results(m_realm, m_link_view, get_query().and_query(std::move(q)));
 }
 
+Results List::snapshot() const
+{
+    verify_attached();
+    return Results(m_realm, m_link_view).snapshot();
+}
+
 // These definitions rely on that LinkViews are interned by core
 bool List::operator==(List const& rgt) const noexcept
 {

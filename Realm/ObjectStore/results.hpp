@@ -49,17 +49,17 @@ public:
     // or a wrapper around a query and a sort order which creates and updates
     // the tableview as needed
     Results();
-    Results(SharedRealm r, SortOrder s, TableView tv);
     Results(SharedRealm r, Table& table);
     Results(SharedRealm r, Query q, SortOrder s = {});
+    Results(SharedRealm r, TableView tv, SortOrder s = {});
     Results(SharedRealm r, LinkViewRef lv, util::Optional<Query> q = {}, SortOrder s = {});
     ~Results();
 
     // Results is copyable and moveable
-    Results(Results const&);
     Results(Results&&);
-    Results& operator=(Results const&);
     Results& operator=(Results&&);
+    Results(const Results&);
+    Results& operator=(const Results&);
 
     // Get the Realm
     SharedRealm get_realm() const { return m_realm; }
@@ -111,6 +111,10 @@ public:
     Results filter(Query&& q) const;
     Results sort(SortOrder&& sort) const;
 
+    // Return a snapshot of this Results that never updates to reflect changes in the underlying data.
+    Results snapshot() const &;
+    Results snapshot() &&;
+
     // Get the min/max/average/sum of the given column
     // All but sum() returns none when there are zero matching rows
     // sum() returns 0, except for when it returns none
@@ -125,8 +129,8 @@ public:
         Empty, // Backed by nothing (for missing tables)
         Table, // Backed directly by a Table
         Query, // Backed by a query that has not yet been turned into a TableView
-        LinkView, // Backed directly by a LinkView
-        TableView // Backed by a TableView created from a Query
+        LinkView,  // Backed directly by a LinkView
+        TableView, // Backed by a TableView created from a Query
     };
     // Get the currrent mode of the Results
     // Ideally this would not be public but it's needed for some KVO stuff
@@ -187,8 +191,13 @@ public:
         friend class _impl::ResultsNotifier;
         static void set_table_view(Results& results, TableView&& tv);
     };
-
+    
 private:
+    enum class UpdatePolicy {
+        Auto,  // Update automatically to reflect changes in the underlying data.
+        Never, // Never update.
+    };
+
     SharedRealm m_realm;
     mutable const ObjectSchema *m_object_schema = nullptr;
     Query m_query;
@@ -200,10 +209,11 @@ private:
     _impl::CollectionNotifier::Handle<_impl::ResultsNotifier> m_notifier;
 
     Mode m_mode = Mode::Empty;
+    UpdatePolicy m_update_policy = UpdatePolicy::Auto;
     bool m_has_used_table_view = false;
     bool m_wants_background_updates = true;
 
-    void update_tableview();
+    void update_tableview(bool wants_notifications = true);
     bool update_linkview();
 
     void validate_read() const;
