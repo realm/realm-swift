@@ -1090,11 +1090,13 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     Class objectClass = objc_allocateClassPair(RLMObject.class, "RuntimeGeneratedObject", 0);
     objc_property_attribute_t objectColAttrs[] = {
         { "T", "@\"RuntimeGeneratedObject\"" },
+        { "V", "objectCol" },
     };
     class_addIvar(objectClass, "objectCol", sizeof(id), alignof(id), "@\"RuntimeGeneratedObject\"");
     class_addProperty(objectClass, "objectCol", objectColAttrs, sizeof(objectColAttrs) / sizeof(objc_property_attribute_t));
     objc_property_attribute_t intColAttrs[] = {
         { "T", "i" },
+        { "V", "intCol" },
     };
     class_addIvar(objectClass, "intCol", sizeof(int), alignof(int), "i");
     class_addProperty(objectClass, "intCol", intColAttrs, sizeof(intColAttrs) / sizeof(objc_property_attribute_t));

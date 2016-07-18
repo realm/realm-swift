@@ -35,7 +35,7 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType) {
     return propertyType == RLMPropertyTypeLinkingObjects;
 }
 
-static bool rawTypeIsComputedProperty(NSString *rawType) {
+static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
     if ([rawType isEqualToString:@"@\"RLMLinkingObjects\""] || [rawType hasPrefix:@"@\"RLMLinkingObjects<"]) {
         return true;
     }
@@ -268,18 +268,23 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     }
 }
 
-- (bool)parseObjcProperty:(objc_property_t)property isSwift:(bool)isSwift {
+typedef NS_OPTIONS(short, RLMPropertyAttributes) {
+    RLMPropertyAttributeReadOnly = 1 << 0,
+    RLMPropertyAttributeComputed = 1 << 1
+};
+
+- (RLMPropertyAttributes)parseObjcProperty:(objc_property_t)property isSwift:(bool)isSwift {
     unsigned int count;
     objc_property_attribute_t *attrs = property_copyAttributeList(property, &count);
 
-    bool isReadOnly = false;
+    RLMPropertyAttributes attributes = RLMPropertyAttributeComputed;
     for (size_t i = 0; i < count; ++i) {
         switch (*attrs[i].name) {
             case 'T':
                 _objcRawType = @(attrs[i].value);
                 break;
             case 'R':
-                isReadOnly = true;
+                attributes |= RLMPropertyAttributeReadOnly;
                 break;
             case 'N':
                 // nonatomic
@@ -294,6 +299,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
                 _setterName = @(attrs[i].value);
                 break;
             case 'V': // backing ivar name
+                attributes &= ~RLMPropertyAttributeComputed;
                 if (isSwift) {
                     _getterName = @(attrs[i].value);
                 }
@@ -304,7 +310,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     }
     free(attrs);
 
-    return isReadOnly;
+    return attributes;
 }
 
 - (instancetype)initSwiftPropertyWithName:(NSString *)name
@@ -418,9 +424,9 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         _linkOriginPropertyName = linkPropertyDescriptor.propertyName;
     }
 
-    bool isReadOnly = [self parseObjcProperty:property isSwift:false];
-    bool isComputedProperty = rawTypeIsComputedProperty(_objcRawType);
-    if (isReadOnly && !isComputedProperty) {
+    RLMPropertyAttributes attributes = [self parseObjcProperty:property isSwift:false];
+    bool shouldBeTreatedAsComputedProperty = rawTypeShouldBeTreatedAsComputedProperty(_objcRawType);
+    if (attributes && !shouldBeTreatedAsComputedProperty) {
         return nil;
     }
 
@@ -429,7 +435,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
                              "Add to ignoredPropertyNames: method to ignore.", self.name);
     }
 
-    if (!isReadOnly && isComputedProperty) {
+    if (!(attributes & RLMPropertyAttributeReadOnly) && shouldBeTreatedAsComputedProperty) {
         @throw RLMException(@"Property '%@' must be declared as readonly as %@ properties cannot be written to.",
                             self.name, RLMTypeToString(_type));
     }
