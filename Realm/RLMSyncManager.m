@@ -25,7 +25,7 @@ static RLMSyncManager *_sharedManager;
 
 @interface RLMSyncManager ()
 
-@property (nonatomic) NSMutableDictionary<RLMSyncRealmPath, RLMSyncSession *> *sessions;
+@property (nonatomic) NSMutableDictionary<NSString *, RLMSyncSession *> *sessions;
 @property (nonatomic, readwrite) BOOL configured;
 @property (nonatomic, readwrite) RLMSyncAppID appID;
 
@@ -57,13 +57,13 @@ static RLMSyncManager *_sharedManager;
     return self;
 }
 
-- (RLMSyncSession *)syncSessionForRealm:(RLMSyncRealmPath)realmPath {
-    RLMSyncSession *session = self.sessions[realmPath];
+- (RLMSyncSession *)syncSessionForRealm:(NSString *)localIdentifier {
+    RLMSyncSession *session = self.sessions[localIdentifier];
     if (!session) {
         // Create a new session
         session = [[RLMSyncSession alloc] init];
-        session.path = realmPath;
-        self.sessions[realmPath] = session;
+        session.localIdentifier = localIdentifier;
+        self.sessions[localIdentifier] = session;
     }
     return session;
 }

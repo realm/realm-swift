@@ -30,21 +30,22 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The unique Realm Sync account identifier attached to the user this session belongs to.
  */
-@property (nonatomic, readonly) RLMSyncAccountID account;
+@property (nonatomic, readonly) RLMSyncIdentity identity;
 
 /**
  The host of the URL of the server that the remote Realm resides upon.
  */
 @property (nonatomic, readonly) NSURL *serverURL;
 
-// TODO: support multiple paths?
+/**
+ The remote (server-side) path of the Realm linked to this session.
+ */
+@property (nonatomic, readonly) RLMSyncRealmPath remotePath;
+
 /**
  The local path of the Realm linked to this session.
  */
-@property (nonatomic, readonly) RLMSyncRealmPath path;
-
-@property (nonatomic, readonly) NSString *remoteURL;
-@property (nonatomic, readonly) NSString *realmID;
+@property (nonatomic, readonly) RLMSyncRealmPath localIdentifier;
 
 /**
  Whether this session object is still valid.

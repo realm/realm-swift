@@ -24,10 +24,7 @@
 
 @property (nonatomic, readwrite) RLMSyncToken accessToken;
 @property (nonatomic, readwrite) NSTimeInterval accessTokenExpiry;
-@property (nonatomic, readwrite) RLMSyncAccountID accountID;
-
-@property (nonatomic, readwrite) NSString *realmID;
-@property (nonatomic, readwrite) NSString *realmURL;
+@property (nonatomic, readwrite) RLMSyncIdentity identity;
 
 @property (nonatomic, readwrite) RLMSyncRenewalTokenModel *renewalTokenModel;
 
@@ -41,10 +38,8 @@
     if (self = [super init]) {
         RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, accessToken);
         RLMSYNC_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, accessTokenExpiry);
-        RLMSYNC_PARSE_STRING_OR_ABORT(json, @"account", accountID);
-        RLMSYNC_PARSE_STRING_OR_ABORT(json, @"realm_id", realmID);
-        RLMSYNC_PARSE_STRING_OR_ABORT(json, @"realm_url", realmURL);
-        RLMSYNC_PARSE_MODEL_OR_ABORT(json, @"renew", RLMSyncRenewalTokenModel, renewalTokenModel);
+        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncIdentityKey, identity);
+        RLMSYNC_PARSE_MODEL_OR_ABORT(json, @"refresh", RLMSyncRenewalTokenModel, renewalTokenModel);
     }
     return self;
 }

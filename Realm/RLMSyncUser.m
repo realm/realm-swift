@@ -18,6 +18,8 @@
 
 #import "RLMSyncUser.h"
 
+#import "RLMRealm+Sync.h"
+
 @interface RLMSyncUser ()
 
 @property (nonatomic, readwrite) RLMSyncCredential credential;
@@ -27,6 +29,14 @@
 @end
 
 @implementation RLMSyncUser
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<RLMSyncUser: %p> credential: %@, provider: %@, userInfo: %@",
+            self,
+            self.credential,
+            RLM_getProviderName(self.provider),
+            self.userInfo];
+}
 
 - (instancetype)initWithCredential:(RLMSyncCredential)credential
                           provider:(RLMSyncIdentityProvider)provider

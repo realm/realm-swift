@@ -26,7 +26,7 @@
 #import "RLMSyncSessionDataModel.h"
 #import "RLMSyncUser.h"
 
-static NSString* getProviderName(RLMSyncIdentityProvider provider) {
+NSString *RLM_getProviderName(RLMSyncIdentityProvider provider) {
     switch (provider) {
         case RLMRealmSyncIdentityProviderDebug:        return @"debug";
         case RLMRealmSyncIdentityProviderRealm:        return @"realm";
@@ -38,30 +38,53 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
     assert(false); // Invalid identity provider
 }
 
+static RLMSyncRealmPath pathForServerURL(NSURL *serverURL) {
+    NSMutableArray<NSString *> *components = [serverURL.pathComponents mutableCopy];
+    if ([[components firstObject] isEqualToString:@"/"]) {
+        // Strip leading slash, if one exists
+        [components removeObjectAtIndex:0];
+    }
+    // Add trailing slash
+    return [NSString stringWithFormat:@"%@/", [components componentsJoinedByString:@"/"]];
+}
+
 @implementation RLMRealm (Sync)
 
 - (void)openForSyncUser:(RLMSyncUser *)user
            onCompletion:(RLMSyncLoginCompletionBlock)completionBlock {
     RLMRealmConfiguration *configuration = self.configuration;
 
-    if (!configuration.syncRealmPath) {
-        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadRealmPath userInfo:nil], nil);
+    if (!configuration.syncServerURL) {
+        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadRemoteRealmPath
+                                        userInfo:nil], nil);
         return;
     }
     if (![RLMSyncManager sharedManager].configured) {
-        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured userInfo:nil],
-                        nil);
+        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured
+                                        userInfo:nil], nil);
         return;
     }
 
-    RLMSyncRealmPath path = configuration.syncRealmPath.absoluteString;
-    NSURL *serverURL = configuration.syncServerURL;
+    NSString *localIdentifier = [configuration.fileURL path];
+    if (!localIdentifier) {
+        // Realm Sync only supports on-disk Realms.
+        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadLocalRealmPath
+                                        userInfo:nil], nil);
+        return;
+    }
+
+    RLMSyncRealmPath remotePath = pathForServerURL(configuration.syncServerURL);
+    NSURL *baseURL = configuration.syncServerURL;
+    NSURL *serverURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@",
+                                             baseURL.scheme,
+                                             baseURL.host,
+                                             baseURL.port]];
 
     NSMutableDictionary *json = [@{
-                                   kRLMSyncProviderKey: getProviderName(user.provider),
+                                   kRLMSyncProviderKey: RLM_getProviderName(user.provider),
                                    kRLMSyncDataKey: user.credential,
                                    kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
-                                   kRLMSyncPathKey: path,
+                                   kRLMSyncPathKey: remotePath,
                                    } mutableCopy];
     if (user.userInfo) {
         // Munge user info into the JSON request.
@@ -82,8 +105,9 @@ static NSString* getProviderName(RLMSyncIdentityProvider provider) {
             self->_realm->refresh_sync_access_token(model.accessToken.UTF8String);
 
             // Prepare the session object for the newly-created session
-            RLMSyncSession *session = [[RLMSyncManager sharedManager] syncSessionForRealm:path];
+            RLMSyncSession *session = [[RLMSyncManager sharedManager] syncSessionForRealm:localIdentifier];
             [session configureWithServerURL:serverURL
+                                 remotePath:remotePath
                            sessionDataModel:model];
 
             // Inform the client
