@@ -4,9 +4,9 @@
 branch = ENV['sha']
 
 target 'CocoaPodsExample' do
-  pod 'Realm', git: 'git@github.com:realm/realm-cocoa.git', branch: branch
+  pod 'Realm', git: 'git@github.com:realm/realm-cocoa.git', branch: branch, submodules: true
 end
 
 target 'CocoaPodsExampleTests' do
-  pod 'Realm/Headers', git: 'git@github.com:realm/realm-cocoa.git', branch: branch
+  pod 'Realm/Headers', git: 'git@github.com:realm/realm-cocoa.git', branch: branch, submodules: true
 end
