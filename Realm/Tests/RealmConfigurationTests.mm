@@ -102,7 +102,7 @@
     XCTAssertEqualObjects(RLMRealmConfiguration.defaultConfiguration.fileURL.path, @"/dev/null");
 }
 
-- (void)testDefaultConfiugrationUsesValueSemantics {
+- (void)testDefaultConfigurationUsesValueSemantics {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.fileURL = [NSURL fileURLWithPath:@"/dev/null"];
     XCTAssertNotEqualObjects(config.fileURL, RLMRealmConfiguration.defaultConfiguration.fileURL);
