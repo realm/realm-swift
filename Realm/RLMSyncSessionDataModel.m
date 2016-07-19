@@ -39,7 +39,7 @@
         RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, accessToken);
         RLMSYNC_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, accessTokenExpiry);
         RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncIdentityKey, identity);
-        RLMSYNC_PARSE_MODEL_OR_ABORT(json, @"refresh", RLMSyncRenewalTokenModel, renewalTokenModel);
+        RLMSYNC_PARSE_MODEL_OR_ABORT(json, kRLMSyncRefreshKey, RLMSyncRenewalTokenModel, renewalTokenModel);
     }
     return self;
 }

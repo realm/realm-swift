@@ -40,12 +40,41 @@ NSString *RLM_getProviderName(RLMSyncIdentityProvider provider) {
 
 static RLMSyncRealmPath pathForServerURL(NSURL *serverURL) {
     NSMutableArray<NSString *> *components = [serverURL.pathComponents mutableCopy];
-    if ([[components firstObject] isEqualToString:@"/"]) {
-        // Strip leading slash, if one exists
+    assert(components.count >= 3);
+    if ([components[0] isEqualToString:@"/"] && [components[1] isEqualToString:@"private"]) {
+        // Private paths are interpreted as relative; public ones as absolute.
         [components removeObjectAtIndex:0];
     }
     // Add trailing slash
     return [NSString stringWithFormat:@"%@/", [components componentsJoinedByString:@"/"]];
+}
+
+/// Given a server URL (e.g. `realms://example.com:7800/private/blah`), return the corresponding auth URL (e.g.
+/// `https://example.com:3001/`.
+static NSURL *authURLForServerURL(NSURL *serverURL) {
+    BOOL isSSL = [serverURL.scheme isEqualToString:@"realms"];
+    NSString *scheme = (isSSL ? @"https" : @"http");
+    // FIXME: should this be customizable eventually?
+    NSInteger port = (isSSL ? 3001 : 3000);
+    NSString *raw = [NSString stringWithFormat:@"%@://%@:%@", scheme, serverURL.host, @(port)];
+    return [NSURL URLWithString:raw];
+}
+
+/// Return whether or not the server URL is valid (proper scheme and path structure)
+static BOOL serverURLIsValid(NSURL *serverURL) {
+    NSString *scheme = serverURL.scheme;
+    if (![scheme isEqualToString:@"realm"] && ![scheme isEqualToString:@"realms"]) {
+        return NO;
+    }
+    NSArray<NSString *> *pathComponents = serverURL.pathComponents;
+    if (pathComponents.count < 3) {
+        return NO;
+    }
+    NSString *accessLevel = pathComponents[1];
+    if (![accessLevel isEqualToString:@"public"] && ![accessLevel isEqualToString:@"private"]) {
+        return NO;
+    }
+    return YES;
 }
 
 @implementation RLMRealm (Sync)
@@ -54,7 +83,7 @@ static RLMSyncRealmPath pathForServerURL(NSURL *serverURL) {
            onCompletion:(RLMSyncLoginCompletionBlock)completionBlock {
     RLMRealmConfiguration *configuration = self.configuration;
 
-    if (!configuration.syncServerURL) {
+    if (!configuration.syncServerURL || !serverURLIsValid(configuration.syncServerURL)) {
         completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadRemoteRealmPath
                                         userInfo:nil], nil);
         return;
@@ -73,12 +102,9 @@ static RLMSyncRealmPath pathForServerURL(NSURL *serverURL) {
         return;
     }
 
-    RLMSyncRealmPath remotePath = pathForServerURL(configuration.syncServerURL);
-    NSURL *baseURL = configuration.syncServerURL;
-    NSURL *serverURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@",
-                                             baseURL.scheme,
-                                             baseURL.host,
-                                             baseURL.port]];
+    NSURL *serverURL = configuration.syncServerURL;
+    NSURL *authURL = authURLForServerURL(serverURL);
+    RLMSyncRealmPath remotePath = pathForServerURL(serverURL);
 
     NSMutableDictionary *json = [@{
                                    kRLMSyncProviderKey: RLM_getProviderName(user.provider),
@@ -106,9 +132,9 @@ static RLMSyncRealmPath pathForServerURL(NSURL *serverURL) {
 
             // Prepare the session object for the newly-created session
             RLMSyncSession *session = [[RLMSyncManager sharedManager] syncSessionForRealm:localIdentifier];
-            [session configureWithServerURL:serverURL
-                                 remotePath:remotePath
-                           sessionDataModel:model];
+            [session configureWithAuthServerURL:authURL
+                                     remotePath:remotePath
+                               sessionDataModel:model];
 
             // Inform the client
             completionBlock(nil, session);
@@ -119,7 +145,7 @@ static RLMSyncRealmPath pathForServerURL(NSURL *serverURL) {
     };
 
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointSessions
-                                             server:serverURL
+                                             server:authURL
                                                JSON:json
                                          completion:handler];
 }

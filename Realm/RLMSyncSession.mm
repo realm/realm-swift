@@ -36,7 +36,6 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 
 @property (nonatomic, readwrite) RLMSyncIdentity identity;
 @property (nonatomic, readwrite) BOOL valid;
-@property (nonatomic, readwrite) NSURL *serverURL;
 @property (nonatomic, readwrite) RLMSyncRealmPath remotePath;
 
 @property (nonatomic) RLMSyncToken accessToken;
@@ -45,6 +44,8 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 @property (nonatomic) RLMSyncToken refreshToken;
 @property (nonatomic) NSTimeInterval refreshTokenExpiry;
 
+@property (nonatomic) NSURL *authServerURL;
+
 @end
 
 @implementation RLMSyncSession
@@ -52,11 +53,11 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 // MARK: Public API
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<RLMSyncSession: %p> valid?: %@, identity: %@, serverURL: %@, access token expiry: %@, refresh token expiry: %@",
+    return [NSString stringWithFormat:@"<RLMSyncSession: %p> valid?: %@, identity: %@, auth: %@, access token expiry: %@, refresh token expiry: %@",
             self,
             self.valid ? @"YES" : @"NO",
             self.identity,
-            self.serverURL,
+            self.authServerURL,
             [NSDate dateWithTimeIntervalSince1970:self.accessTokenExpiry],
             [NSDate dateWithTimeIntervalSince1970:self.refreshTokenExpiry]];
 }
@@ -108,7 +109,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     };
 
     [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointRefresh
-                                             server:self.serverURL
+                                             server:self.authServerURL
                                                JSON:json
                                          completion:handler];
 }
@@ -136,15 +137,16 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 
 // MARK: Private API
 
-- (void)configureWithServerURL:(NSURL *)serverURL
-                    remotePath:(RLMSyncRealmPath)path
-              sessionDataModel:(RLMSyncSessionDataModel *)model {
-    self.serverURL = serverURL;
+- (void)configureWithAuthServerURL:(NSURL *)authServer
+                        remotePath:(RLMSyncRealmPath)path
+                  sessionDataModel:(RLMSyncSessionDataModel *)model {
+    self.authServerURL = authServer;
     self.identity = model.identity;
     self.accessToken = model.accessToken;
     self.accessTokenExpiry = model.accessTokenExpiry;
     self.remotePath = path;
 
+    // FIXME: see if there is a better way to choose the expiry time
     NSTimeInterval expiry = MIN(model.accessTokenExpiry, model.renewalTokenModel.tokenExpiry);
     [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:expiry];
 
@@ -163,6 +165,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
         self.valid = NO;
         return;
     }
+    // FIXME: see if there is a better way to choose the expiry time
     NSTimeInterval expiry = MIN(model.accessTokenExpiry, model.renewalTokenModel.tokenExpiry);
     [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:expiry];
 }
