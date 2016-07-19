@@ -31,8 +31,8 @@
 
  This method should only be called once.
  */
-- (void)configureWithServerURL:(NSURL *)serverURL
-                    remotePath:(RLMSyncRealmPath)path
-              sessionDataModel:(RLMSyncSessionDataModel *)model;
+- (void)configureWithAuthServerURL:(NSURL *)authServer
+                        remotePath:(RLMSyncRealmPath)path
+                  sessionDataModel:(RLMSyncSessionDataModel *)model;
 
 @end

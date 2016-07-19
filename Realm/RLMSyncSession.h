@@ -33,11 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) RLMSyncIdentity identity;
 
 /**
- The host of the URL of the server that the remote Realm resides upon.
- */
-@property (nonatomic, readonly) NSURL *serverURL;
-
-/**
  The remote (server-side) path of the Realm linked to this session.
  */
 @property (nonatomic, readonly) RLMSyncRealmPath remotePath;
