@@ -875,6 +875,20 @@ case "$COMMAND" in
         fi
 
         if [[ "$2" != "swift" ]]; then
+          if [ ! -d Realm/ObjectStore/src ]; then
+            cat >&2 <<EOM
+
+
+ERROR: One of Realm's submodules is missing!
+
+If you're using Realm and/or RealmSwift from a git branch, please add 'submodules: true' to
+their entries in your Podfile.
+
+
+EOM
+            exit 1
+          fi
+
           rm -rf include
           mkdir -p include
           mv core/include include/core
