@@ -926,7 +926,7 @@ case "$COMMAND" in
         elif [ "$target" = "swiftlint" ]; then
             sh build.sh verify-swiftlint
         else
-            export sha=$ghprbSourceBranch
+            export sha=$GITHUB_PR_SOURCE_BRANCH
             export REALM_SWIFT_VERSION=$swift_version
             export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
