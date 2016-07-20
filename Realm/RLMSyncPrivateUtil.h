@@ -30,6 +30,7 @@ static NSString *const kRLMSyncTokenKey         = @"token";
 static NSString *const kRLMSyncIdentityKey      = @"identity";
 static NSString *const kRLMSyncExpiresKey       = @"expires";
 static NSString *const kRLMSyncRefreshKey       = @"refresh";
+static NSString *const kRLMSyncPasswordKey      = @"password";
 
 static NSString *const kRLMSyncErrorJSONKey     = @"json";
 

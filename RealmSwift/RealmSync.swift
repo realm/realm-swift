@@ -20,11 +20,17 @@ import Realm
 import Realm.Private
 import Foundation
 
+public typealias SyncCompletionBlock = (NSError?, RLMSyncSession?) -> Void
+
 #if swift(>=3.0)
 
 public extension Realm {
-    func open(for user: RLMSyncUser, onCompletion completion: (NSError?, RLMSyncSession?) -> Void) {
+    func open(for user: RLMSyncUser, onCompletion completion: SyncCompletionBlock) {
         self.rlmRealm.open(for: user, onCompletion: completion)
+    }
+
+    func open(for username: String, password: String, onCompletion completion: SyncCompletionBlock) {
+        self.rlmRealm.open(forUsername: username, password: password, onCompletion: completion)
     }
 
     func open(with token: String) {
@@ -35,8 +41,12 @@ public extension Realm {
 #else
 
 public extension Realm {
-    func open(for user: RLMSyncUser, onCompletion completion: (NSError?, RLMSyncSession?) -> Void) {
+    func open(for user: RLMSyncUser, onCompletion completion: SyncCompletionBlock) {
         self.rlmRealm.openForSyncUser(user, onCompletion: completion)
+    }
+
+    func open(for username: String, password: String, onCompletion completion: SyncCompletionBlock) {
+        self.rlmRealm.openForUsername(username, password: password, onCompletion: completion)
     }
 
     func open(with token: String) {
