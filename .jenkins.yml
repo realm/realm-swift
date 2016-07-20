@@ -1,0 +1,37 @@
+# Yaml Axis Plugin
+# https://wiki.jenkins-ci.org/display/JENKINS/Yaml+Axis+Plugin
+
+swift_version:
+  - 2.2
+target:
+  - osx
+  - ios-device-objc
+  - ios-device-swift
+  - docs
+  - ios-static
+  - ios-dynamic
+  - ios-swift
+  - osx-swift
+  - watchos
+  - cocoapods
+  - swiftlint
+  - tvos
+  - tvos-device
+  - osx-encryption
+configuration:
+  - Debug
+  - Release
+
+exclude:
+  - target: ios-device-objc
+    configuration: Debug
+  - target: ios-device-swift
+    configuration: Debug
+  - target: docs
+    configuration: Debug
+  - target: cocoapods
+    configuration: Debug
+  - target: swiftlint
+    configuration: Debug
+  - target: tvos-device
+    configuration: Debug
