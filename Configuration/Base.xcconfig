@@ -45,3 +45,7 @@ MACOSX_DEPLOYMENT_TARGET = 10.9;
 IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 WATCHOS_DEPLOYMENT_TARGET = 2.0;
 TVOS_DEPLOYMENT_TARGET = 9.0;
+
+// SWIFT_VERSION is only recognized by Xcode 8 and higher.
+// Prior versions of Xcode support only one Swift version.
+SWIFT_VERSION = 3.0;

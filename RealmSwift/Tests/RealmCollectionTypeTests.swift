@@ -160,7 +160,7 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testIndexOfObject() {
-        guard let collection = collection, str1 = str1, str2 = str2 else {
+        guard let collection = collection, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failed")
         }
         XCTAssertEqual(0, collection.index(of: str1)!)
@@ -407,7 +407,7 @@ class RealmCollectionTypeTests: TestCase {
             fatalError("Test precondition failed")
         }
 
-        let theExpectation = expectation(withDescription: "")
+        let theExpectation = expectation(description: "")
         let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
             case .Initial(let collection):
@@ -423,7 +423,7 @@ class RealmCollectionTypeTests: TestCase {
 
             theExpectation.fulfill()
         }
-        waitForExpectations(withTimeout: 1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
 
         token.stop()
     }
@@ -499,7 +499,7 @@ class ResultsTests: RealmCollectionTypeTests {
     func testNotificationBlockUpdating() {
         let collection = collectionBase()
 
-        var theExpectation = expectation(withDescription: "")
+        var theExpectation = expectation(description: "")
         var calls = 0
         let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
@@ -518,11 +518,11 @@ class ResultsTests: RealmCollectionTypeTests {
             calls += 1
             theExpectation.fulfill()
         }
-        waitForExpectations(withTimeout: 1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
 
-        theExpectation = expectation(withDescription: "")
+        theExpectation = expectation(description: "")
         addObjectToResults()
-        waitForExpectations(withTimeout: 1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
 
         token.stop()
     }
@@ -530,7 +530,7 @@ class ResultsTests: RealmCollectionTypeTests {
     func testNotificationBlockChangeIndices() {
         let collection = collectionBase()
 
-        var theExpectation = expectation(withDescription: "")
+        var theExpectation = expectation(description: "")
         var calls = 0
         let token = collection.addNotificationBlock { (change: RealmCollectionChange) in
             switch change {
@@ -553,11 +553,11 @@ class ResultsTests: RealmCollectionTypeTests {
             calls += 1
             theExpectation.fulfill()
         }
-        waitForExpectations(withTimeout: 1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
 
-        theExpectation = expectation(withDescription: "")
+        theExpectation = expectation(description: "")
         addObjectToResults()
-        waitForExpectations(withTimeout: 1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
 
         token.stop()
     }
@@ -605,7 +605,7 @@ class ResultsFromTableViewTests: ResultsTests {
 class ResultsFromLinkViewTests: ResultsTests {
 
     override func collectionBaseInWriteTransaction() -> Results<CTTStringObjectWithLink> {
-        guard let str1 = str1, str2 = str2 else {
+        guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failed")
         }
         let array = realmWithTestPath().createObject(ofType: CTTStringList.self, populatedWith: [[str1, str2]])
@@ -677,7 +677,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
     func testAddNotificationBlockDirect() {
         let collection = collectionBase()
 
-        let theExpectation = expectation(withDescription: "")
+        let theExpectation = expectation(description: "")
         let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
             case .Initial(let list):
@@ -692,7 +692,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
             }
             theExpectation.fulfill()
         }
-        waitForExpectations(withTimeout: 1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
 
         token.stop()
     }
@@ -700,7 +700,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
 
 class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
-        guard let str1 = str1, str2 = str2 else {
+        guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failed")
         }
         return CTTStringList(value: [[str1, str2]]).array
@@ -725,7 +725,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     }
 
     override func testIndexOfObject() {
-        guard let collection = collection, str1 = str1, str2 = str2 else {
+        guard let collection = collection, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failed")
         }
         XCTAssertEqual(0, collection.index(of: str1)!)
@@ -846,7 +846,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
 class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
-        guard let str1 = str1, str2 = str2 else {
+        guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
         let array = CTTStringList(value: [[str1, str2] as AnyObject])
@@ -866,7 +866,7 @@ class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
 class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
-        guard let str1 = str1, str2 = str2 else {
+        guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
         let array = realmWithTestPath().createObject(ofType: CTTStringList.self, populatedWith: [[str1, str2] as AnyObject])
@@ -885,7 +885,7 @@ class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
 class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
-        guard let str1 = str1, str2 = str2 else {
+        guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
         _ = realmWithTestPath().createObject(ofType: CTTStringList.self, populatedWith: [[str1, str2] as AnyObject])
