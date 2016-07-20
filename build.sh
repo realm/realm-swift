@@ -181,14 +181,6 @@ move_to_clean_dir() {
     mv "$1" "$2"
 }
 
-shutdown_simulators() {
-    # Shut down simulators until there's no booted ones left
-    # Only do one at a time because devices sometimes show up multiple times
-    while xcrun simctl list | grep -q Booted; do
-      xcrun simctl list | grep Booted | sed 's/.* (\(.*\)) (Booted)/\1/' | head -n 1 | xargs xcrun simctl shutdown
-    done
-}
-
 ######################################
 # Device Test Helper
 ######################################
@@ -517,30 +509,30 @@ case "$COMMAND" in
         ;;
 
     "test-ios-static")
+        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
+        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test VALID_ARCHS=i386"
         xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        shutdown_simulators
-        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
         exit 0
         ;;
 
     "test-ios7-static")
+        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' build"
+        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' test VALID_ARCHS=i386"
         xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' test"
-        shutdown_simulators
-        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s,OS=7.1' test"
         exit 0
         ;;
 
     "test-ios-dynamic")
+        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
+        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test VALID_ARCHS=i386"
         xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        shutdown_simulators
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' test"
         exit 0
         ;;
 
     "test-ios-swift")
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build test"
-        shutdown_simulators
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4s' build test"
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test VALID_ARCHS=i386"
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
