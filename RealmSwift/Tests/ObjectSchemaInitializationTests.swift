@@ -204,10 +204,6 @@ class ObjectSchemaInitializationTests: TestCase {
     func testNonRealmOptionalTypesDeclaredAsRealmOptional() {
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonRealmOptionalType.self))
     }
-
-    func testBoolPropertyStartingWithIs() {
-        XCTAssertEqual(SwiftTranslatedGetterObject().objectSchema.properties[0].name, "true")
-    }
 }
 
 class SwiftFakeObject: NSObject {
@@ -483,10 +479,6 @@ class ObjectSchemaInitializationTests: TestCase {
 
     func testNonRealmOptionalTypesDeclaredAsRealmOptional() {
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonRealmOptionalType.self))
-    }
-
-    func testBoolPropertyStartingWithIs() {
-        XCTAssertEqual(SwiftTranslatedGetterObject().objectSchema.properties[0].name, "isTrue")
     }
 }
 
