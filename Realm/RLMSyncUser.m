@@ -34,7 +34,7 @@
     return [NSString stringWithFormat:@"<RLMSyncUser: %p> credential: %@, provider: %@, userInfo: %@",
             self,
             self.credential,
-            RLM_getProviderName(self.provider),
+            self.provider,
             self.userInfo];
 }
 
