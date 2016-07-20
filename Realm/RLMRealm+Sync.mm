@@ -40,13 +40,17 @@ NSString *RLM_getProviderName(RLMSyncIdentityProvider provider) {
 
 static RLMSyncRealmPath pathForServerURL(NSURL *serverURL) {
     NSMutableArray<NSString *> *components = [serverURL.pathComponents mutableCopy];
+    // Path must contain at least 3 components: beginning slash, 'public'/'private', and path to Realm.
     assert(components.count >= 3);
-    if ([components[0] isEqualToString:@"/"] && [components[1] isEqualToString:@"private"]) {
+    assert([components[0] isEqualToString:@"/"]);
+    BOOL isPrivate = [components[1] isEqualToString:@"private"];
+    // Remove the 'public'/'private' modifier
+    [components removeObjectAtIndex:1];
+    if (isPrivate) {
         // Private paths are interpreted as relative; public ones as absolute.
         [components removeObjectAtIndex:0];
     }
-    // Add trailing slash
-    return [NSString stringWithFormat:@"%@/", [components componentsJoinedByString:@"/"]];
+    return [components componentsJoinedByString:@"/"];
 }
 
 /// Given a server URL (e.g. `realms://example.com:7800/private/blah`), return the corresponding auth URL (e.g.
