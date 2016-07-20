@@ -27,15 +27,22 @@
 #import "RLMSyncRenewalTokenModel.h"
 #import "RLMSyncSessionDataModel.h"
 
+typedef enum : NSUInteger {
+    RLMSyncSessionStateInvalid,
+    RLMSyncSessionStateValid,
+    RLMSyncSessionStateNeedLogin,
+} RLMSyncSessionState;
+
 // How many seconds before the access token expires to attempt a refresh.
 static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 
 @interface RLMSyncSession ()
 
+@property (nonatomic) RLMSyncSessionState state;
+
 @property (nonatomic) NSTimer *refreshTimer;
 
 @property (nonatomic, readwrite) RLMSyncIdentity identity;
-@property (nonatomic, readwrite) BOOL valid;
 @property (nonatomic, readwrite) RLMSyncRealmPath remotePath;
 
 @property (nonatomic) RLMSyncToken accessToken;
@@ -72,7 +79,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     NSTimeInterval now = [NSDate date].timeIntervalSince1970;
     if (now > self.refreshTokenExpiry) {
         block([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorInvalidSession userInfo:nil], nil);
-        self.valid = NO;
+        self.state = RLMSyncSessionStateNeedLogin;
         return;
     }
 
@@ -92,7 +99,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
         }
         if (error) {
             // Bad response
-            strongSelf.valid = NO;
+            strongSelf.state = RLMSyncSessionStateInvalid;
             block(error, nil);
             return;
         }
@@ -150,7 +157,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     NSTimeInterval expiry = MIN(model.accessTokenExpiry, model.renewalTokenModel.tokenExpiry);
     [self scheduleRefreshWithToken:model.renewalTokenModel currentTokenExpiration:expiry];
 
-    self.valid = YES;
+    self.state = RLMSyncSessionStateValid;
 }
 
 - (void)updateTokenStateWithModel:(RLMSyncRefreshDataModel *)model {
@@ -162,7 +169,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     bool wasRefreshed = realm::Realm::refresh_sync_access_token(std::move(new_token),
                                                                 RLMStringDataWithNSString(self.localIdentifier));
     if (!wasRefreshed) {
-        self.valid = NO;
+        self.state = RLMSyncSessionStateNeedLogin;
         return;
     }
     // FIXME: see if there is a better way to choose the expiry time
@@ -227,9 +234,13 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
 
 - (instancetype)init {
     if (self = [super init]) {
-        self.valid = NO;
+        self.state = RLMSyncSessionStateInvalid;
     }
     return self;
+}
+
+- (BOOL)valid {
+    return self.state == RLMSyncSessionStateValid;
 }
 
 @end

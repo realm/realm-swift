@@ -24,19 +24,8 @@
 #import "RLMSyncNetworkClient.h"
 #import "RLMSyncSession_Private.h"
 #import "RLMSyncSessionDataModel.h"
+#import "RLMSyncPrivateUtil.h"
 #import "RLMSyncUser.h"
-
-NSString *RLM_getProviderName(RLMSyncIdentityProvider provider) {
-    switch (provider) {
-        case RLMRealmSyncIdentityProviderDebug:        return @"debug";
-        case RLMRealmSyncIdentityProviderRealm:        return @"realm";
-        case RLMRealmSyncIdentityProviderFacebook:     return @"facebook";
-        case RLMRealmSyncIdentityProviderTwitter:      return @"twitter";
-        case RLMRealmSyncIdentityProviderGoogle:       return @"google";
-        case RLMRealmSyncIdentityProviderICloud:       return @"icloud";
-    }
-    assert(false); // Invalid identity provider
-}
 
 static RLMSyncRealmPath pathForServerURL(NSURL *serverURL) {
     NSMutableArray<NSString *> *components = [serverURL.pathComponents mutableCopy];
@@ -111,7 +100,7 @@ static BOOL serverURLIsValid(NSURL *serverURL) {
     RLMSyncRealmPath remotePath = pathForServerURL(serverURL);
 
     NSMutableDictionary *json = [@{
-                                   kRLMSyncProviderKey: RLM_getProviderName(user.provider),
+                                   kRLMSyncProviderKey: user.provider,
                                    kRLMSyncDataKey: user.credential,
                                    kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                                    kRLMSyncPathKey: remotePath,

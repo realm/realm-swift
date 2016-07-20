@@ -19,6 +19,7 @@
 #import "RLMSyncNetworkClient.h"
 
 #import "RLMRealmConfiguration.h"
+#import "RLMSyncPrivateUtil.h"
 
 typedef void(^RLMSyncURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
 
