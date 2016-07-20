@@ -135,7 +135,7 @@ class MigrationTests: TestCase {
         migrateAndTestRealm(testRealmURL(), shouldRun: false, autoMigration: false)
 
         // test auto-migration
-        migrateAndTestRealm(testRealmURL(), schemaVersion: 2, shouldRun: true, autoMigration: true)
+        migrateAndTestRealm(testRealmURL(), shouldRun: true, schemaVersion: 2, autoMigration: true)
     }
 
     func testMigrationProperties() {

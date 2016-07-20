@@ -90,7 +90,7 @@ class ListTests: TestCase {
     }
 
     func testFastEnumerationWithMutation() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
@@ -106,7 +106,7 @@ class ListTests: TestCase {
     }
 
     func testAppendObject() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
         for str in [str1, str2, str1] {
@@ -119,7 +119,7 @@ class ListTests: TestCase {
     }
 
     func testAppendArray() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
         array.append(objectsIn: [str1, str2, str1])
@@ -130,7 +130,7 @@ class ListTests: TestCase {
     }
 
     func testAppendResults() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
         array.append(objectsIn: realmWithTestPath().allObjects(ofType: SwiftStringObject.self))
@@ -140,7 +140,7 @@ class ListTests: TestCase {
     }
 
     func testInsert() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
@@ -160,7 +160,7 @@ class ListTests: TestCase {
     }
 
     func testRemoveAtIndex() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
@@ -175,7 +175,7 @@ class ListTests: TestCase {
     }
 
     func testRemoveLast() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
@@ -193,7 +193,7 @@ class ListTests: TestCase {
     }
 
     func testRemoveAll() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
@@ -207,7 +207,7 @@ class ListTests: TestCase {
     }
 
     func testReplace() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
@@ -228,7 +228,7 @@ class ListTests: TestCase {
     }
 
     func testMove() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
@@ -254,7 +254,7 @@ class ListTests: TestCase {
     }
 
     func testReplaceRange() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
@@ -285,7 +285,7 @@ class ListTests: TestCase {
     }
 
     func testSwap() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
@@ -308,7 +308,7 @@ class ListTests: TestCase {
     }
 
     func testChangesArePersisted() {
-        guard let array = array, str1 = str1, str2 = str2 else {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
         if let realm = array.realm {
