@@ -227,19 +227,19 @@ namespace realm {
         std::string m_underlying;
     };
 
-    class MismatchedConfigException : public std::runtime_error {
+    class MismatchedConfigException : public std::logic_error {
     public:
         MismatchedConfigException(StringData message, StringData path);
     };
 
-    class InvalidTransactionException : public std::runtime_error {
+    class InvalidTransactionException : public std::logic_error {
     public:
-        InvalidTransactionException(std::string message) : std::runtime_error(move(message)) {}
+        InvalidTransactionException(std::string message) : std::logic_error(move(message)) {}
     };
 
-    class IncorrectThreadException : public std::runtime_error {
+    class IncorrectThreadException : public std::logic_error {
     public:
-        IncorrectThreadException() : std::runtime_error("Realm accessed from incorrect thread.") {}
+        IncorrectThreadException() : std::logic_error("Realm accessed from incorrect thread.") {}
     };
 
     class UninitializedRealmException : public std::runtime_error {
@@ -247,9 +247,9 @@ namespace realm {
         UninitializedRealmException(std::string message) : std::runtime_error(move(message)) {}
     };
 
-    class InvalidEncryptionKeyException : public std::runtime_error {
+    class InvalidEncryptionKeyException : public std::logic_error {
     public:
-        InvalidEncryptionKeyException() : std::runtime_error("Encryption key must be 64 bytes.") {}
+        InvalidEncryptionKeyException() : std::logic_error("Encryption key must be 64 bytes.") {}
     };
 }
 

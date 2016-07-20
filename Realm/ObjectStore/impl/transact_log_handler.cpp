@@ -64,7 +64,7 @@ class TransactLogValidationMixin {
     REALM_NOINLINE
     void schema_error()
     {
-        throw std::runtime_error("Schema mismatch detected: another process has modified the Realm file's schema in an incompatible way");
+        throw std::logic_error("Schema mismatch detected: another process has modified the Realm file's schema in an incompatible way");
     }
 
     // Throw an exception if the currently modified table already existed before
