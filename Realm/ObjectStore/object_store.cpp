@@ -124,7 +124,7 @@ StringData ObjectStore::object_type_for_table_name(StringData table_name) {
 }
 
 std::string ObjectStore::table_name_for_object_type(StringData object_type) {
-    return std::string(c_object_table_prefix) + object_type.data();
+    return std::string(c_object_table_prefix) + static_cast<std::string>(object_type);
 }
 
 TableRef ObjectStore::table_for_object_type(Group *group, StringData object_type) {

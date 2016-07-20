@@ -378,7 +378,7 @@ static inline RLMLinkingObjects *RLMGetLinkingObjects(__unsafe_unretained RLMObj
     RLMObjectSchema *objectSchema = obj->_realm.schema[property.objectClassName];
     RLMProperty *linkingProperty = objectSchema[property.linkOriginPropertyName];
     auto backlinkView = obj->_row.get_table()->get_backlink_view(obj->_row.get_index(), objectSchema.table, linkingProperty.column);
-    realm::Results results(obj->_realm->_realm, {}, std::move(backlinkView));
+    realm::Results results(obj->_realm->_realm, std::move(backlinkView));
     return [RLMLinkingObjects resultsWithObjectSchema:objectSchema results:std::move(results)];
 }
 
