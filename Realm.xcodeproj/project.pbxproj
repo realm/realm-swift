@@ -1437,14 +1437,10 @@
 						CreatedOnToolsVersion = 7.2;
 					};
 					5D659E7D1BE04556006515A0 = {
-						DevelopmentTeam = QX5CR2FTN2;
-						DevelopmentTeamName = "Realm ApS";
 						ProvisioningStyle = Automatic;
 					};
 					5D660FCB1BE98C560021E04F = {
 						CreatedOnToolsVersion = 7.1;
-						DevelopmentTeam = QX5CR2FTN2;
-						DevelopmentTeamName = "Realm ApS";
 						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
 					};
@@ -1456,8 +1452,6 @@
 						ProvisioningStyle = Automatic;
 					};
 					5DD7557B1BE056DE002800DA = {
-						DevelopmentTeam = QX5CR2FTN2;
-						DevelopmentTeamName = "Realm ApS";
 						ProvisioningStyle = Automatic;
 					};
 					C04B4BD71B55C47600FAE58E = {
