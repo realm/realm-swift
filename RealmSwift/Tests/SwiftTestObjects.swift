@@ -38,10 +38,6 @@ class SwiftLongObject: Object {
     dynamic var longCol: Int64 = 0
 }
 
-class SwiftTranslatedGetterObject: Object {
-    dynamic var isTrue: Bool = false
-}
-
 class SwiftObject: Object {
     dynamic var boolCol = false
     dynamic var intCol = 123
@@ -429,10 +425,6 @@ class SwiftIntObject: Object {
 
 class SwiftLongObject: Object {
     dynamic var longCol: Int64 = 0
-}
-
-class SwiftTranslatedGetterObject: Object {
-    dynamic var isTrue: Bool = false
 }
 
 class SwiftObject: Object {
