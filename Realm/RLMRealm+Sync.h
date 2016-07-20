@@ -26,9 +26,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMRealm (Sync)
 
+/**
+ Open a Realm on behalf of a Realm Sync user.
+ 
+ @param user A `RLMSyncUser` object encapsulating information about the user and their credentials.
+ @param completionBlock A block run once the login is complete, containing either an error or a session object.
+ */
 - (void)openForSyncUser:(RLMSyncUser *)user
            onCompletion:(RLMSyncLoginCompletionBlock)completionBlock;
 
+/**
+ Open a Realm on behalf of a Realm Sync user account, using username and password credentials.
+
+ @param username The account's username, as a string.
+ @param password The account's password, as a string.
+ @param completionBlock A block run once the login is complete, containing either an error or a session object.
+ */
+- (void)openForUsername:(NSString *)username
+               password:(NSString *)password
+           onCompletion:(RLMSyncLoginCompletionBlock)completionBlock;
+
+/**
+ Open a Realm directly using a Realm Sync token.
+
+ @param token A Realm Sync token; this is usually a token shipped with the application.
+ */
 - (void)openWithSyncToken:(RLMSyncToken)token;
 
 @end

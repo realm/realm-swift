@@ -143,6 +143,16 @@ static BOOL serverURLIsValid(NSURL *serverURL) {
                                          completion:handler];
 }
 
+- (void)openForUsername:(NSString *)username
+               password:(NSString *)password
+           onCompletion:(RLMSyncLoginCompletionBlock)completionBlock {
+    NSDictionary *userInfo = @{kRLMSyncPasswordKey: password};
+    RLMSyncUser *user = [[RLMSyncUser alloc] initWithCredential:username
+                                                       provider:RLMSyncIdentityProviderUsernamePassword
+                                                       userInfo:userInfo];
+    [self openForSyncUser:user onCompletion:completionBlock];
+}
+
 - (void)openWithSyncToken:(RLMSyncToken)token {
     self->_realm->refresh_sync_access_token(token.UTF8String);
 }
