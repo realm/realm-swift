@@ -644,7 +644,7 @@ class RealmTests: TestCase {
 
         // test that autoreresh is applied
         // we have two notifications, one for opening the realm, and a second when performing our transaction
-        let notificationFired = expectation(withDescription: "notification fired")
+        let notificationFired = expectation(description: "notification fired")
         let token = realm.addNotificationBlock { _, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
             notificationFired.fulfill()
@@ -656,7 +656,7 @@ class RealmTests: TestCase {
                 realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["string"])
             }
         }
-        waitForExpectations(withTimeout: 1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
         token.stop()
 
         // get object
@@ -672,7 +672,7 @@ class RealmTests: TestCase {
 
         // test that autoreresh is not applied
         // we have two notifications, one for opening the realm, and a second when performing our transaction
-        let notificationFired = expectation(withDescription: "notification fired")
+        let notificationFired = expectation(description: "notification fired")
         let token = realm.addNotificationBlock { _, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
             notificationFired.fulfill()
@@ -687,7 +687,7 @@ class RealmTests: TestCase {
                 return
             }
         }
-        waitForExpectations(withTimeout: 1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
         token.stop()
 
         XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")

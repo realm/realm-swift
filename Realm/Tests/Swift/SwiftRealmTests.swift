@@ -68,7 +68,7 @@ class SwiftRealmTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         // we have two notifications, one for opening the realm, and a second when performing our transaction
-        let notificationFired = expectation(withDescription: "notification fired")
+        let notificationFired = expectation(description: "notification fired")
         let token = realm.addNotificationBlock { note, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
             notificationFired.fulfill()
@@ -80,7 +80,7 @@ class SwiftRealmTests: RLMTestCase {
             _ = SwiftStringObject.create(in: realm, withValue: ["string"])
             try! realm.commitWriteTransaction()
         }
-        waitForExpectations(withTimeout: 2.0, handler: nil)
+        waitForExpectations(timeout: 2.0, handler: nil)
         token.stop()
 
         // get object
@@ -116,7 +116,7 @@ class SwiftRealmTests: RLMTestCase {
         let realm = realmWithTestPath()
         let objs = SwiftIntObject.allObjects(in: realm)
         let objects = SwiftIntObject.allObjects(in: realm).sortedResults(usingProperty: "intCol", ascending: true)
-        let updateComplete = expectation(withDescription: "background update complete")
+        let updateComplete = expectation(description: "background update complete")
 
         let token = realm.addNotificationBlock() { (_, _) in
             XCTAssertEqual(objs.count, UInt(2))
@@ -138,14 +138,14 @@ class SwiftRealmTests: RLMTestCase {
             }
         }
 
-        waitForExpectations(withTimeout: 2.0, handler: nil)
+        waitForExpectations(timeout: 2.0, handler: nil)
         token.stop()
     }
 
     func testRealmIsUpdatedImmediatelyAfterBackgroundUpdate() {
         let realm = realmWithTestPath()
 
-        let notificationFired = expectation(withDescription: "notification fired")
+        let notificationFired = expectation(description: "notification fired")
         let token = realm.addNotificationBlock { note, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
             notificationFired.fulfill()
@@ -163,7 +163,7 @@ class SwiftRealmTests: RLMTestCase {
             XCTAssertEqual((objects[0] as! SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
         }
 
-        waitForExpectations(withTimeout: 2.0, handler: nil)
+        waitForExpectations(timeout: 2.0, handler: nil)
         token.stop()
 
         // get object
@@ -203,7 +203,7 @@ class SwiftRealmTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         // we have two notifications, one for opening the realm, and a second when performing our transaction
-        let notificationFired = expectation(withDescription: "notification fired")
+        let notificationFired = expectation(description: "notification fired")
         let token = realm.addNotificationBlock { note, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
             if note == RLMNotification.DidChange {
@@ -217,7 +217,7 @@ class SwiftRealmTests: RLMTestCase {
             _ = StringObject.create(in: realm, withValue: ["string"])
             try! realm.commitWriteTransaction()
         }
-        waitForExpectations(withTimeout: 2.0, handler: nil)
+        waitForExpectations(timeout: 2.0, handler: nil)
         token.stop()
 
         // get object
@@ -230,7 +230,7 @@ class SwiftRealmTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         // we have two notifications, one for opening the realm, and a second when performing our transaction
-        let notificationFired = expectation(withDescription: "notification fired")
+        let notificationFired = expectation(description: "notification fired")
         let token = realm.addNotificationBlock { note, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
             notificationFired.fulfill()
@@ -248,7 +248,7 @@ class SwiftRealmTests: RLMTestCase {
             XCTAssertEqual((objects[0] as! StringObject).stringCol!, "string", "Value of first column should be 'string'")
         }
 
-        waitForExpectations(withTimeout: 2.0, handler: nil)
+        waitForExpectations(timeout: 2.0, handler: nil)
         token.stop()
 
         // get object
