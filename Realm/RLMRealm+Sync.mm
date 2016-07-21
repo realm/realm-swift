@@ -75,23 +75,24 @@ static BOOL serverURLIsValid(NSURL *serverURL) {
 - (void)openForSyncUser:(RLMSyncUser *)user
            onCompletion:(RLMSyncLoginCompletionBlock)completionBlock {
     RLMRealmConfiguration *configuration = self.configuration;
+    RLMSyncLoginCompletionBlock block = completionBlock ?: ^(NSError *, RLMSyncSession *){ };
 
     if (!configuration.syncServerURL || !serverURLIsValid(configuration.syncServerURL)) {
-        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadRemoteRealmPath
-                                        userInfo:nil], nil);
+        block([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadRemoteRealmPath
+                              userInfo:nil], nil);
         return;
     }
     if (![RLMSyncManager sharedManager].configured) {
-        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured
-                                        userInfo:nil], nil);
+        block([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorManagerNotConfigured
+                              userInfo:nil], nil);
         return;
     }
 
     NSString *localIdentifier = [configuration.fileURL path];
     if (!localIdentifier) {
         // Realm Sync only supports on-disk Realms.
-        completionBlock([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadLocalRealmPath
-                                        userInfo:nil], nil);
+        block([NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadLocalRealmPath
+                              userInfo:nil], nil);
         return;
     }
 
@@ -117,7 +118,7 @@ static BOOL serverURLIsValid(NSURL *serverURL) {
                 error = [NSError errorWithDomain:RLMSyncErrorDomain
                                             code:RLMSyncErrorBadResponse
                                         userInfo:@{kRLMSyncErrorJSONKey: json}];
-                completionBlock(error, nil);
+                block(error, nil);
                 return;
             }
             // Pass the token to the underlying Realm
@@ -130,10 +131,10 @@ static BOOL serverURLIsValid(NSURL *serverURL) {
                                sessionDataModel:model];
 
             // Inform the client
-            completionBlock(nil, session);
+            block(nil, session);
         } else {
             // Something went wrong
-            completionBlock(error, nil);
+            block(error, nil);
         }
     };
 
@@ -145,8 +146,10 @@ static BOOL serverURLIsValid(NSURL *serverURL) {
 
 - (void)openForUsername:(NSString *)username
                password:(NSString *)password
+           isNewAccount:(BOOL)isNewAccount
            onCompletion:(RLMSyncLoginCompletionBlock)completionBlock {
-    NSDictionary *userInfo = @{kRLMSyncPasswordKey: password};
+    NSDictionary *userInfo = @{kRLMSyncPasswordKey: password,
+                               kRLMSyncRegisterKey: @(isNewAccount)};
     RLMSyncUser *user = [[RLMSyncUser alloc] initWithCredential:username
                                                        provider:RLMSyncIdentityProviderUsernamePassword
                                                        userInfo:userInfo];

@@ -20,17 +20,25 @@ import Realm
 import Realm.Private
 import Foundation
 
-public typealias SyncCompletionBlock = (NSError?, RLMSyncSession?) -> Void
+public typealias SyncManager = RLMSyncManager
+
+public typealias User = RLMSyncUser
+
+public typealias Session = RLMSyncSession
+
+public typealias SyncLoginCompletionBlock = (NSError?, Session?) -> Void
+
+public typealias Provider = RLMSyncIdentityProvider
 
 #if swift(>=3.0)
 
 public extension Realm {
-    func open(for user: RLMSyncUser, onCompletion completion: SyncCompletionBlock) {
-        self.rlmRealm.open(for: user, onCompletion: completion)
+    func open(for user: User, onCompletion block: SyncLoginCompletionBlock) {
+        self.rlmRealm.open(for: user, onCompletion: block)
     }
 
-    func open(for username: String, password: String, onCompletion completion: SyncCompletionBlock) {
-        self.rlmRealm.open(forUsername: username, password: password, onCompletion: completion)
+    func open(for username: String, password: String, newAccount: Bool, onCompletion block: SyncLoginCompletionBlock) {
+        self.rlmRealm.open(forUsername: username, password: password, isNewAccount: newAccount, onCompletion: block)
     }
 
     func open(with token: String) {
@@ -41,12 +49,12 @@ public extension Realm {
 #else
 
 public extension Realm {
-    func open(for user: RLMSyncUser, onCompletion completion: SyncCompletionBlock) {
-        self.rlmRealm.openForSyncUser(user, onCompletion: completion)
+    func open(for user: User, onCompletion block: SyncLoginCompletionBlock) {
+        self.rlmRealm.openForSyncUser(user, onCompletion: block)
     }
 
-    func open(for username: String, password: String, onCompletion completion: SyncCompletionBlock) {
-        self.rlmRealm.openForUsername(username, password: password, onCompletion: completion)
+    func open(for username: String, password: String, newAccount: Bool, onCompletion block: SyncLoginCompletionBlock) {
+        self.rlmRealm.openForUsername(username, password: password, isNewAccount: newAccount, onCompletion: block)
     }
 
     func open(with token: String) {

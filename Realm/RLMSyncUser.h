@@ -36,7 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithCredential:(RLMSyncCredential)credential
                           provider:(RLMSyncIdentityProvider)provider
-                          userInfo:(nullable NSDictionary *)userInfo;
+                          userInfo:(nullable NSDictionary *)userInfo NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 

@@ -33,18 +33,20 @@ NS_ASSUME_NONNULL_BEGIN
  @param completionBlock A block run once the login is complete, containing either an error or a session object.
  */
 - (void)openForSyncUser:(RLMSyncUser *)user
-           onCompletion:(RLMSyncLoginCompletionBlock)completionBlock;
+           onCompletion:(nullable RLMSyncLoginCompletionBlock)completionBlock;
 
 /**
  Open a Realm on behalf of a Realm Sync user account, using username and password credentials.
 
  @param username The account's username, as a string.
  @param password The account's password, as a string.
+ @param isNewAccount Whether or not the server should create a new account, or log into an existing account.
  @param completionBlock A block run once the login is complete, containing either an error or a session object.
  */
 - (void)openForUsername:(NSString *)username
                password:(NSString *)password
-           onCompletion:(RLMSyncLoginCompletionBlock)completionBlock;
+           isNewAccount:(BOOL)isNewAccount
+           onCompletion:(nullable RLMSyncLoginCompletionBlock)completionBlock;
 
 /**
  Open a Realm directly using a Realm Sync token.

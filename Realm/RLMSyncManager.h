@@ -22,6 +22,8 @@
 
 @interface RLMSyncManager : NSObject
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  Whether or not the Realm Sync manager has been configured.
  */
@@ -30,7 +32,7 @@
 /**
  The Realm Sync application ID for the current application.
  */
-@property (nonatomic, readonly) RLMSyncAppID appID;
+@property (nullable, nonatomic, readonly) RLMSyncAppID appID;
 
 /**
  Configure the Realm Sync manager with application-wide configuration options. Call this method before calling any other
@@ -38,6 +40,10 @@
  */
 - (void)configureWithAppID:(RLMSyncAppID)appID;
 
+- (instancetype)init NS_UNAVAILABLE;
+
 + (instancetype)sharedManager;
+
+NS_ASSUME_NONNULL_END
 
 @end

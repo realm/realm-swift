@@ -35,4 +35,6 @@
                         remotePath:(RLMSyncRealmPath)path
                   sessionDataModel:(RLMSyncSessionDataModel *)model;
 
+- (instancetype)initPrivate NS_DESIGNATED_INITIALIZER;
+
 @end

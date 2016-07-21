@@ -63,7 +63,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addCredential:(RLMSyncCredential)credential
              userInfo:(NSDictionary *)userInfo
           forProvider:(RLMSyncIdentityProvider)provider
-         onCompletion:(RLMSyncCompletionBlock)completionBlock;
+         onCompletion:(nullable RLMSyncCompletionBlock)completionBlock;
+
+- (instancetype)init NS_UNAVAILABLE;
 
 NS_ASSUME_NONNULL_END
 
