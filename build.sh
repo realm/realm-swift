@@ -12,6 +12,7 @@
 #          to be run with zsh.
 set -o pipefail
 set -e
+set -x
 
 # You can override the version of the core library
 : ${REALM_CORE_VERSION:=1.3.1} # set to "current" to always use the current build
