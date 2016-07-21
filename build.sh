@@ -181,6 +181,20 @@ move_to_clean_dir() {
     mv "$1" "$2"
 }
 
+test_ios_static() {
+    destination="$1"
+    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' build"
+    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+
+    # Xcode's depending tracking is lacking and it doesn't realize that the Realm static framework's static library
+    # needs to be recreated when the active architectures change. Help Xcode out by removing the static library.
+    settings=$(xcode "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' -showBuildSettings")
+    path=$(echo "$settings" | awk '/CONFIGURATION_BUILD_DIR/ { cbd = $3; } /EXECUTABLE_PATH/ { ep = $3; } END { printf "%s/%s\n", cbd, ep; }')
+    rm "$path"
+
+    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test"
+}
+
 ######################################
 # Device Test Helper
 ######################################
@@ -509,16 +523,12 @@ case "$COMMAND" in
         ;;
 
     "test-ios-static")
-        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
-        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
-        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        test_ios_static "name=iPhone 6"
         exit 0
         ;;
 
     "test-ios7-static")
-        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' build"
-        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
-        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 5S,OS=7.1' test"
+        test_ios_static "name=iPhone 5S,OS=7.1"
         exit 0
         ;;
 
