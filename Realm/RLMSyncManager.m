@@ -36,7 +36,7 @@ static RLMSyncManager *_sharedManager;
 + (instancetype)sharedManager {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _sharedManager = [[RLMSyncManager alloc] init];
+        _sharedManager = [[RLMSyncManager alloc] initPrivate];
     });
     return _sharedManager;
 }
@@ -50,7 +50,7 @@ static RLMSyncManager *_sharedManager;
     self.configured = YES;
 }
 
-- (instancetype)init {
+- (instancetype)initPrivate {
     if (self = [super init]) {
         _sessions = [NSMutableDictionary dictionary];
     }
@@ -61,7 +61,7 @@ static RLMSyncManager *_sharedManager;
     RLMSyncSession *session = self.sessions[localIdentifier];
     if (!session) {
         // Create a new session
-        session = [[RLMSyncSession alloc] init];
+        session = [[RLMSyncSession alloc] initPrivate];
         session.localIdentifier = localIdentifier;
         self.sessions[localIdentifier] = session;
     }

@@ -137,6 +137,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     if (![self canMakeAPICallWithCompletionBlock:completionBlock]) {
         return;
     }
+    RLMSyncCompletionBlock block = completionBlock ?: ^(NSError *, NSDictionary *){ };
 
     // TODO
     NSAssert(NO, @"Implement me!");
@@ -232,7 +233,7 @@ static NSTimeInterval const RLMRefreshExpiryBuffer = 10;
     [self refreshWithCompletion:nil];
 }
 
-- (instancetype)init {
+- (instancetype)initPrivate {
     if (self = [super init]) {
         self.state = RLMSyncSessionStateInvalid;
     }
