@@ -423,6 +423,26 @@ public class ObjectUtil: NSObject {
     }
 }
 
+// MARK: Handoverable
+
+private func unsafeBitCastTrampoline<T, U>(_ x: T) -> U {
+    return unsafeBitCast(x, to: U.self)
+}
+
+extension Object: Handoverable, _Handoverable {
+    var bridgedHandoverable: RLMHandoverable {
+        return unsafeBitCast(self, to: RLMObject.self)
+    }
+
+    var bridgedMetadata: Any? {
+        return nil
+    }
+
+    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Self {
+        return unsafeBitCastTrampoline(handoverable)
+    }
+}
+
 #else
 
 /**
@@ -827,6 +847,26 @@ public class ObjectUtil: NSObject {
     @objc private class func initializeLinkingObjectsProperty(object: RLMObjectBase, property: RLMProperty) {
         guard let linkingObjects = (object as! Object).linkingObjectsForProperty(property) else { return }
         linkingObjects.attachTo(object: object, property: property)
+    }
+}
+
+// MARK: Handoverable
+
+private func unsafeBitCastTrampoline<T, U>(x: T) -> U {
+    return unsafeBitCast(x, U.self)
+}
+
+extension Object: Handoverable, _Handoverable {
+    var bridgedHandoverable: RLMHandoverable {
+        return unsafeBitCast(self, RLMObject.self)
+    }
+
+    var bridgedMetadata: Any? {
+        return nil
+    }
+
+    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Self {
+        return unsafeBitCastTrampoline(handoverable)
     }
 }
 

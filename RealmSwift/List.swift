@@ -51,7 +51,8 @@ Lists can be filtered and sorted with the same predicates as `Results<T>`.
 
 When added as a property on `Object` models, the property must be declared as `let` and cannot be `dynamic`.
 */
-public final class List<T: Object>: ListBase {
+// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
+public final class List<T: Object>: ListBase, Handoverable {
 
     /// Element type contained in this collection.
     public typealias Element = T
@@ -68,6 +69,10 @@ public final class List<T: Object>: ListBase {
     public var isInvalidated: Bool { return _rlmArray.isInvalidated }
 
     // MARK: Initializers
+
+    private override init!(array: RLMArray<RLMObject>!) {
+        super.init(array: array)
+    }
 
     /// Creates a `List` that holds objects of type `T`.
     public override init() {
@@ -471,7 +476,7 @@ public final class List<T: Object>: ListBase {
     }
 }
 
-extension List : RealmCollection, RangeReplaceableCollection {
+extension List: RealmCollection, RangeReplaceableCollection {
     // MARK: Sequence Support
 
     /// Returns a `RLMIterator` that yields successive elements in the `List`.
@@ -570,6 +575,20 @@ extension List {
     public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
 }
 
+extension List: _Handoverable {
+    var bridgedHandoverable: RLMHandoverable {
+        return _rlmArray
+    }
+
+    var bridgedMetadata: Any? {
+        return nil
+    }
+
+    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> List {
+        return List(array: handoverable as! RLMArray)
+    }
+}
+
 #else
 
 /// :nodoc:
@@ -604,7 +623,8 @@ public class ListBase: RLMListBase {
 
  Properties of `List` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
 */
-public final class List<T: Object>: ListBase {
+// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
+public final class List<T: Object>: ListBase, Handoverable {
 
     /// The type of the elements contained within the collection.
     public typealias Element = T
@@ -620,6 +640,10 @@ public final class List<T: Object>: ListBase {
     public var invalidated: Bool { return _rlmArray.invalidated }
 
     // MARK: Initializers
+
+    private override init!(array: RLMArray) {
+        super.init(array: array)
+    }
 
     /// Creates a `List` that holds Realm model objects of type `T`.
     public override init() {
@@ -1058,6 +1082,20 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
         return _rlmArray.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(anyCollection, change: change, error: error))
         }
+    }
+}
+
+extension List: _Handoverable {
+    var bridgedHandoverable: RLMHandoverable {
+        return _rlmArray
+    }
+
+    var bridgedMetadata: Any? {
+        return nil
+    }
+
+    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> List {
+        return List(array: handoverable as! RLMArray)
     }
 }
 

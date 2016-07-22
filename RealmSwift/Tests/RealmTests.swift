@@ -831,6 +831,196 @@ class RealmTests: TestCase {
         XCTAssertEqual("the meaning of life", stringObject.stringCol)
         XCTAssertEqual(42, intObject.intCol)
     }
+
+    func testHandoverMultipleHandoverableTypes() {
+        let realm = try! Realm()
+        let results = realm.allObjects(ofType: SwiftStringObject.self)
+            .filter(using: "stringCol != 'C'")
+            .sorted(onProperty: "stringCol", ascending: false)
+        let string = SwiftStringObject(value: ["hello world"])
+        try! realm.write {
+            realm.add(string)
+        }
+        XCTAssertEqual(1, results.count)
+        XCTAssertEqual("hello world", results[0].stringCol)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: [string, results] as [Handoverable]) { realm, objects in
+                let string = objects[0] as! SwiftStringObject
+                let results = objects[1] as! Results<SwiftStringObject>
+                XCTAssertEqual(1, results.count)
+                XCTAssertEqual("hello world", results[0].stringCol)
+
+                try! realm.write {
+                    string.stringCol = "sup world"
+                }
+                XCTAssertEqual(1, results.count)
+                XCTAssertEqual("sup world", results[0].stringCol)
+            }
+        }
+        XCTAssertEqual(1, results.count)
+        XCTAssertEqual("hello world", results[0].stringCol)
+        realm.refresh()
+        XCTAssertEqual(1, results.count)
+        XCTAssertEqual("sup world", results[0].stringCol)
+    }
+
+    func testHandoverList() {
+        let realm = try! Realm()
+        let company = SwiftCompanyObject()
+        try! realm.write {
+            realm.add(company)
+            company.employees.append(SwiftEmployeeObject(value: ["name" : "jg"]))
+        }
+        XCTAssertEqual(1, company.employees.count)
+        XCTAssertEqual("jg", company.employees[0].name)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: company.employees) { realm, employees in
+                XCTAssertEqual(1, employees.count)
+                XCTAssertEqual("jg", employees[0].name)
+
+                try! realm.write {
+                    employees.removeAllObjects()
+                    employees.append(SwiftEmployeeObject(value: ["name" : "jp"]))
+                    employees.append(SwiftEmployeeObject(value: ["name" : "az"]))
+                }
+                XCTAssertEqual(2, employees.count)
+                XCTAssertEqual("jp", employees[0].name)
+                XCTAssertEqual("az", employees[1].name)
+            }
+        }
+        XCTAssertEqual(1, company.employees.count)
+        XCTAssertEqual("jg", company.employees[0].name)
+        realm.refresh()
+        XCTAssertEqual(2, company.employees.count)
+        XCTAssertEqual("jp", company.employees[0].name)
+        XCTAssertEqual("az", company.employees[1].name)
+    }
+
+    func testHandoverResults() {
+        let realm = try! Realm()
+        let results = realm.allObjects(ofType: SwiftStringObject.self)
+            .filter(using: "stringCol != 'C'")
+            .sorted(onProperty: "stringCol", ascending: false)
+        try! realm.write {
+            realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["A"])
+            realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["B"])
+            realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["C"])
+            realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["D"])
+        }
+        XCTAssertEqual(4, realm.allObjects(ofType: SwiftStringObject.self).count)
+        XCTAssertEqual(3, results.count)
+        XCTAssertEqual("D", results[0].stringCol)
+        XCTAssertEqual("B", results[1].stringCol)
+        XCTAssertEqual("A", results[2].stringCol)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: results) { realm, results in
+                XCTAssertEqual(4, realm.allObjects(ofType: SwiftStringObject.self).count)
+                XCTAssertEqual(3, results.count)
+                XCTAssertEqual("D", results[0].stringCol)
+                XCTAssertEqual("B", results[1].stringCol)
+                XCTAssertEqual("A", results[2].stringCol)
+                try! realm.write {
+                    realm.delete(results[2])
+                    realm.delete(results[0])
+                    realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["E"])
+                }
+                XCTAssertEqual(3, realm.allObjects(ofType: SwiftStringObject.self).count)
+                XCTAssertEqual(2, results.count)
+                XCTAssertEqual("E", results[0].stringCol)
+                XCTAssertEqual("B", results[1].stringCol)
+            }
+        }
+        XCTAssertEqual(4, realm.allObjects(ofType: SwiftStringObject.self).count)
+        XCTAssertEqual(3, results.count)
+        XCTAssertEqual("D", results[0].stringCol)
+        XCTAssertEqual("B", results[1].stringCol)
+        XCTAssertEqual("A", results[2].stringCol)
+        realm.refresh()
+        XCTAssertEqual(3, realm.allObjects(ofType: SwiftStringObject.self).count)
+        XCTAssertEqual(2, results.count)
+        XCTAssertEqual("E", results[0].stringCol)
+        XCTAssertEqual("B", results[1].stringCol)
+    }
+
+    func testHandoverLinkingObjects() {
+        let realm = try! Realm()
+        let dogA = SwiftDogObject(value: ["dogName" : "Cookie", "age" : 10])
+        let unaccessedDogB = SwiftDogObject(value: ["dogName" : "Skipper", "age" : 7])
+        // Ensures that a `LinkingObjects` without cached results can be handed over
+
+        try! realm.write {
+            realm.add(SwiftOwnerObject(value: ["name" : "Andrea", "dog" : dogA]))
+            realm.add(SwiftOwnerObject(value: ["name" : "Mike", "dog" : unaccessedDogB]))
+        }
+        XCTAssertEqual(1, dogA.owners.count)
+        XCTAssertEqual("Andrea", dogA.owners[0].name)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: [dogA.owners, unaccessedDogB.owners]) { realm, owners in
+                let (ownersA, ownersB) = (owners[0], owners[1])
+                XCTAssertEqual(1, ownersA.count)
+                XCTAssertEqual("Andrea", ownersA[0].name)
+                XCTAssertEqual(1, ownersB.count)
+                XCTAssertEqual("Mike", ownersB[0].name)
+
+                try! realm.write {
+                    (ownersA[0].dog, ownersB[0].dog) = (ownersB[0].dog, ownersA[0].dog)
+                }
+                XCTAssertEqual(1, ownersA.count)
+                XCTAssertEqual("Mike", ownersA[0].name)
+                XCTAssertEqual(1, ownersB.count)
+                XCTAssertEqual("Andrea", ownersB[0].name)
+            }
+        }
+        XCTAssertEqual(1, dogA.owners.count)
+        XCTAssertEqual("Andrea", dogA.owners[0].name)
+        XCTAssertEqual(1, unaccessedDogB.owners.count)
+        XCTAssertEqual("Mike", unaccessedDogB.owners[0].name)
+        realm.refresh()
+        XCTAssertEqual(1, dogA.owners.count)
+        XCTAssertEqual("Mike", dogA.owners[0].name)
+        XCTAssertEqual(1, unaccessedDogB.owners.count)
+        XCTAssertEqual("Andrea", unaccessedDogB.owners[0].name)
+    }
+
+    func testHandoverAnyRealmCollection() {
+        let realm = try! Realm()
+        let company = SwiftCompanyObject()
+        try! realm.write {
+            realm.add(company)
+            company.employees.append(SwiftEmployeeObject(value: ["name" : "A"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name" : "B"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name" : "C"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name" : "D"]))
+        }
+        let results = AnyRealmCollection(realm.allObjects(ofType: SwiftEmployeeObject.self)
+            .filter(using: "name != 'C'")
+            .sorted(onProperty: "name", ascending: false))
+        let list = AnyRealmCollection(company.employees)
+        XCTAssertEqual(3, results.count)
+        XCTAssertEqual("D", results[0].name)
+        XCTAssertEqual("B", results[1].name)
+        XCTAssertEqual("A", results[2].name)
+        XCTAssertEqual(4, list.count)
+        XCTAssertEqual("A", list[0].name)
+        XCTAssertEqual("B", list[1].name)
+        XCTAssertEqual("C", list[2].name)
+        XCTAssertEqual("D", list[3].name)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: [results, list]) { realm, objects in
+                let results = objects[0]
+                let list = objects[1]
+                XCTAssertEqual(3, results.count)
+                XCTAssertEqual("D", results[0].name)
+                XCTAssertEqual("B", results[1].name)
+                XCTAssertEqual("A", results[2].name)
+                XCTAssertEqual(4, list.count)
+                XCTAssertEqual("A", list[0].name)
+                XCTAssertEqual("B", list[1].name)
+                XCTAssertEqual("C", list[2].name)
+                XCTAssertEqual("D", list[3].name)
+            }
+        }
+    }
 }
 
 #else
@@ -1725,6 +1915,196 @@ class RealmTests: TestCase {
         realm.refresh()
         XCTAssertEqual("the meaning of life", stringObject.stringCol)
         XCTAssertEqual(42, intObject.intCol)
+    }
+
+    func testHandoverMultipleHandoverableTypes() {
+        let realm = try! Realm()
+        let results = realm.objects(SwiftStringObject.self)
+            .filter("stringCol != 'C'")
+            .sorted("stringCol", ascending: false)
+        let string = SwiftStringObject(value: ["hello world"])
+        try! realm.write {
+            realm.add(string)
+        }
+        XCTAssertEqual(1, results.count)
+        XCTAssertEqual("hello world", results[0].stringCol)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: [string, results] as [Handoverable]) { realm, objects in
+                let string = objects[0] as! SwiftStringObject
+                let results = objects[1] as! Results<SwiftStringObject>
+                XCTAssertEqual(1, results.count)
+                XCTAssertEqual("hello world", results[0].stringCol)
+
+                try! realm.write {
+                    string.stringCol = "sup world"
+                }
+                XCTAssertEqual(1, results.count)
+                XCTAssertEqual("sup world", results[0].stringCol)
+            }
+        }
+        XCTAssertEqual(1, results.count)
+        XCTAssertEqual("hello world", results[0].stringCol)
+        realm.refresh()
+        XCTAssertEqual(1, results.count)
+        XCTAssertEqual("sup world", results[0].stringCol)
+    }
+
+    func testHandoverList() {
+        let realm = try! Realm()
+        let company = SwiftCompanyObject()
+        try! realm.write {
+            realm.add(company)
+            company.employees.append(SwiftEmployeeObject(value: ["name" : "jg"]))
+        }
+        XCTAssertEqual(1, company.employees.count)
+        XCTAssertEqual("jg", company.employees[0].name)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: company.employees) { realm, employees in
+                XCTAssertEqual(1, employees.count)
+                XCTAssertEqual("jg", employees[0].name)
+
+                try! realm.write {
+                    employees.removeAll()
+                    employees.append(SwiftEmployeeObject(value: ["name" : "jp"]))
+                    employees.append(SwiftEmployeeObject(value: ["name" : "az"]))
+                }
+                XCTAssertEqual(2, employees.count)
+                XCTAssertEqual("jp", employees[0].name)
+                XCTAssertEqual("az", employees[1].name)
+            }
+        }
+        XCTAssertEqual(1, company.employees.count)
+        XCTAssertEqual("jg", company.employees[0].name)
+        realm.refresh()
+        XCTAssertEqual(2, company.employees.count)
+        XCTAssertEqual("jp", company.employees[0].name)
+        XCTAssertEqual("az", company.employees[1].name)
+    }
+
+    func testHandoverResults() {
+        let realm = try! Realm()
+        let results = realm.objects(SwiftStringObject.self)
+            .filter("stringCol != 'C'")
+            .sorted("stringCol", ascending: false)
+        try! realm.write {
+            realm.create(SwiftStringObject.self, value: ["A"])
+            realm.create(SwiftStringObject.self, value: ["B"])
+            realm.create(SwiftStringObject.self, value: ["C"])
+            realm.create(SwiftStringObject.self, value: ["D"])
+        }
+        XCTAssertEqual(4, realm.objects(SwiftStringObject).count)
+        XCTAssertEqual(3, results.count)
+        XCTAssertEqual("D", results[0].stringCol)
+        XCTAssertEqual("B", results[1].stringCol)
+        XCTAssertEqual("A", results[2].stringCol)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: results) { realm, results in
+                XCTAssertEqual(4, realm.objects(SwiftStringObject).count)
+                XCTAssertEqual(3, results.count)
+                XCTAssertEqual("D", results[0].stringCol)
+                XCTAssertEqual("B", results[1].stringCol)
+                XCTAssertEqual("A", results[2].stringCol)
+                try! realm.write {
+                    realm.delete(results[2])
+                    realm.delete(results[0])
+                    realm.create(SwiftStringObject.self, value: ["E"])
+                }
+                XCTAssertEqual(3, realm.objects(SwiftStringObject).count)
+                XCTAssertEqual(2, results.count)
+                XCTAssertEqual("E", results[0].stringCol)
+                XCTAssertEqual("B", results[1].stringCol)
+            }
+        }
+        XCTAssertEqual(4, realm.objects(SwiftStringObject).count)
+        XCTAssertEqual(3, results.count)
+        XCTAssertEqual("D", results[0].stringCol)
+        XCTAssertEqual("B", results[1].stringCol)
+        XCTAssertEqual("A", results[2].stringCol)
+        realm.refresh()
+        XCTAssertEqual(3, realm.objects(SwiftStringObject).count)
+        XCTAssertEqual(2, results.count)
+        XCTAssertEqual("E", results[0].stringCol)
+        XCTAssertEqual("B", results[1].stringCol)
+    }
+
+    func testHandoverLinkingObjects() {
+        let realm = try! Realm()
+        let dogA = SwiftDogObject(value: ["dogName" : "Cookie", "age" : 10])
+        let unaccessedDogB = SwiftDogObject(value: ["dogName" : "Skipper", "age" : 7])
+        // Ensures that a `LinkingObjects` without cached results can be handed over
+
+        try! realm.write {
+            realm.add(SwiftOwnerObject(value: ["name" : "Andrea", "dog" : dogA]))
+            realm.add(SwiftOwnerObject(value: ["name" : "Mike", "dog" : unaccessedDogB]))
+        }
+        XCTAssertEqual(1, dogA.owners.count)
+        XCTAssertEqual("Andrea", dogA.owners[0].name)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: [dogA.owners, unaccessedDogB.owners]) { realm, owners in
+                let (ownersA, ownersB) = (owners[0], owners[1])
+                XCTAssertEqual(1, ownersA.count)
+                XCTAssertEqual("Andrea", ownersA[0].name)
+                XCTAssertEqual(1, ownersB.count)
+                XCTAssertEqual("Mike", ownersB[0].name)
+
+                try! realm.write {
+                    (ownersA[0].dog, ownersB[0].dog) = (ownersB[0].dog, ownersA[0].dog)
+                }
+                XCTAssertEqual(1, ownersA.count)
+                XCTAssertEqual("Mike", ownersA[0].name)
+                XCTAssertEqual(1, ownersB.count)
+                XCTAssertEqual("Andrea", ownersB[0].name)
+            }
+        }
+        XCTAssertEqual(1, dogA.owners.count)
+        XCTAssertEqual("Andrea", dogA.owners[0].name)
+        XCTAssertEqual(1, unaccessedDogB.owners.count)
+        XCTAssertEqual("Mike", unaccessedDogB.owners[0].name)
+        realm.refresh()
+        XCTAssertEqual(1, dogA.owners.count)
+        XCTAssertEqual("Mike", dogA.owners[0].name)
+        XCTAssertEqual(1, unaccessedDogB.owners.count)
+        XCTAssertEqual("Andrea", unaccessedDogB.owners[0].name)
+    }
+
+    func testHandoverAnyRealmCollection() {
+        let realm = try! Realm()
+        let company = SwiftCompanyObject()
+        try! realm.write {
+            realm.add(company)
+            company.employees.append(SwiftEmployeeObject(value: ["name" : "A"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name" : "B"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name" : "C"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name" : "D"]))
+        }
+        let results = AnyRealmCollection(realm.objects(SwiftEmployeeObject.self)
+            .filter("name != 'C'")
+            .sorted("name", ascending: false))
+        let list = AnyRealmCollection(company.employees)
+        XCTAssertEqual(3, results.count)
+        XCTAssertEqual("D", results[0].name)
+        XCTAssertEqual("B", results[1].name)
+        XCTAssertEqual("A", results[2].name)
+        XCTAssertEqual(4, list.count)
+        XCTAssertEqual("A", list[0].name)
+        XCTAssertEqual("B", list[1].name)
+        XCTAssertEqual("C", list[2].name)
+        XCTAssertEqual("D", list[3].name)
+        performBlockAndWait { queue in
+            realm.async(onQueue: queue, handingOver: [results, list]) { realm, objects in
+                let results = objects[0]
+                let list = objects[1]
+                XCTAssertEqual(3, results.count)
+                XCTAssertEqual("D", results[0].name)
+                XCTAssertEqual("B", results[1].name)
+                XCTAssertEqual("A", results[2].name)
+                XCTAssertEqual(4, list.count)
+                XCTAssertEqual("A", list[0].name)
+                XCTAssertEqual("B", list[1].name)
+                XCTAssertEqual("C", list[2].name)
+                XCTAssertEqual("D", list[3].name)
+            }
+        }
     }
 }
 

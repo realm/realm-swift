@@ -70,7 +70,8 @@ up-to-date done on a background thread whenever possible.
 
 Results cannot be created directly.
 */
-public final class Results<T: Object>: NSObject, NSFastEnumeration {
+// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
+public final class Results<T: Object>: NSObject, NSFastEnumeration, Handoverable {
 
     internal let rlmResults: RLMResults<RLMObject>
 
@@ -380,6 +381,22 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     }
 }
 
+// MARK: Handoverable
+
+extension Results: _Handoverable {
+    var bridgedHandoverable: RLMHandoverable {
+        return rlmResults
+    }
+
+    var bridgedMetadata: Any? {
+        return nil
+    }
+
+    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Results {
+        return Results(handoverable as! RLMResults)
+    }
+}
+
 extension Results: RealmCollection {
     // MARK: Sequence Support
 
@@ -538,7 +555,9 @@ public class ResultsBase: NSObject, NSFastEnumeration {
 
  `Results` cannot be directly instantiated.
 */
-public final class Results<T: Object>: ResultsBase {
+// FIXME: Move `RealmCollectionType` conformance to extension once bug SR-2078 is fixed.
+// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
+public final class Results<T: Object>: ResultsBase, Handoverable {
 
     /// The type of the objects contained in the collection.
     public typealias Element = T
@@ -825,7 +844,7 @@ public final class Results<T: Object>: ResultsBase {
     }
 }
 
-extension Results: RealmCollectionType {
+    extension Results: RealmCollectionType {
     // MARK: Sequence Support
 
     /// Returns an `RLMGenerator` that yields successive elements in the results.
@@ -851,6 +870,22 @@ extension Results: RealmCollectionType {
         return rlmResults.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(anyCollection, change: change, error: error))
         }
+    }
+}
+
+// MARK: Handoverable
+
+extension Results: _Handoverable {
+    var bridgedHandoverable: RLMHandoverable {
+        return rlmResults
+    }
+
+    var bridgedMetadata: Any? {
+        return nil
+    }
+
+    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Results {
+        return Results(handoverable as! RLMResults)
     }
 }
 

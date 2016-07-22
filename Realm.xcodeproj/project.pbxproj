@@ -345,6 +345,7 @@
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
+		D4003AF01D382D7C0040CA7B /* Handoverable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4003AEF1D382D7C0040CA7B /* Handoverable.swift */; };
 		D48F1C9E1D3D69C900EED280 /* handover.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D48F1C9C1D3D69C900EED280 /* handover.cpp */; };
 		D48F1C9F1D3D69C900EED280 /* handover.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D48F1C9C1D3D69C900EED280 /* handover.cpp */; };
 		D48F1CA01D3D69C900EED280 /* handover.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D48F1C9D1D3D69C900EED280 /* handover.hpp */; };
@@ -645,6 +646,7 @@
 		C0D2DD061B6BDEA1004E8919 /* RLMRealmConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMRealmConfiguration.mm; sourceTree = "<group>"; };
 		C0D2DD0F1B6BE0DD004E8919 /* RLMRealmConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration_Private.h; sourceTree = "<group>"; };
 		C0D6E4101AFBFAF7001F3027 /* RLMAssertions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAssertions.h; sourceTree = "<group>"; };
+		D4003AEF1D382D7C0040CA7B /* Handoverable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Handoverable.swift; sourceTree = "<group>"; };
 		D48F1C9C1D3D69C900EED280 /* handover.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = handover.cpp; sourceTree = "<group>"; };
 		D48F1C9D1D3D69C900EED280 /* handover.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = handover.hpp; sourceTree = "<group>"; };
 		D48F1CA21D3DAAA500EED280 /* RLMHandoverable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMHandoverable.h; sourceTree = "<group>"; };
@@ -872,6 +874,7 @@
 			children = (
 				5D660FE31BE98D670021E04F /* Aliases.swift */,
 				29B7FDF51C0DA6560023224E /* Error.swift */,
+				D4003AEF1D382D7C0040CA7B /* Handoverable.swift */,
 				5D1534B71CCFF545008976D7 /* LinkingObjects.swift */,
 				5D660FE41BE98D670021E04F /* List.swift */,
 				5D660FE51BE98D670021E04F /* Migration.swift */,

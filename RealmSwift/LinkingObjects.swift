@@ -80,7 +80,8 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
  LinkingObjects can only be used as a property on `Object` models. The property must
  be declared as `let` and cannot be `dynamic`.
  */
-public final class LinkingObjects<T: Object>: LinkingObjectsBase {
+// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
+public final class LinkingObjects<T: Object>: LinkingObjectsBase, Handoverable {
     /// Element type contained in this collection.
     public typealias Element = T
 
@@ -98,6 +99,11 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     public var count: Int { return Int(rlmResults.count) }
 
     // MARK: Initializers
+
+    private init(property propertyName: String) {
+        let className = (T.self as Object.Type).className()
+        super.init(fromClassName: className, property: propertyName)
+    }
 
     /**
      Creates a LinkingObjects. This initializer should only be called when
@@ -391,7 +397,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     }
 }
 
-extension LinkingObjects : RealmCollection {
+extension LinkingObjects: RealmCollection {
     // MARK: Sequence Support
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
@@ -425,6 +431,38 @@ extension LinkingObjects : RealmCollection {
             return rlmResults.addNotificationBlock { _, change, error in
                 block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
             }
+    }
+}
+
+private struct LinkingObjectsHandoverMetadata {
+    var propertyName: String
+    var property: RLMProperty?
+}
+
+extension LinkingObjects: _Handoverable {
+    var bridgedHandoverable: RLMHandoverable {
+        return cachedRLMResults ?? unsafeBitCast(object!.objectWithoutConsumingRow, to: Object.self).bridgedHandoverable
+    }
+
+    var bridgedMetadata: Any? {
+        return LinkingObjectsHandoverMetadata(
+            propertyName: propertyName,
+            property: property
+        )
+    }
+
+    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> LinkingObjects {
+        let metadata = metadata as! LinkingObjectsHandoverMetadata
+        let bridged = LinkingObjects(property: metadata.propertyName)
+        switch handoverable {
+        case let results as RLMResults<RLMObject>:
+            bridged.cachedRLMResults = results
+        case let object as RLMObjectBase:
+            bridged.attachTo(object: object, property: metadata.property!)
+        default:
+            fatalError("Unexpected handoverable type \(handoverable.dynamicType)")
+        }
+        return bridged
     }
 }
 
@@ -528,7 +566,8 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
  `LinkingObjects` can only be used as a property on `Object` models. Properties of this type must
  be declared as `let` and cannot be `dynamic`.
  */
-public final class LinkingObjects<T: Object>: LinkingObjectsBase {
+// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
+public final class LinkingObjects<T: Object>: LinkingObjectsBase, Handoverable {
     /// The element type contained in this collection.
     public typealias Element = T
 
@@ -548,6 +587,11 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
     public var count: Int { return Int(rlmResults.count) }
 
     // MARK: Initializers
+
+    private init(property propertyName: String) {
+        let className = (T.self as Object.Type).className()
+        super.init(fromClassName: className, property: propertyName)
+    }
 
     /**
      Creates an instance of a `LinkingObjects`. This initializer should only be called when
@@ -858,6 +902,38 @@ extension LinkingObjects: RealmCollectionType {
             return rlmResults.addNotificationBlock { _, change, error in
                 block(RealmCollectionChange.fromObjc(anyCollection, change: change, error: error))
             }
+    }
+}
+
+private struct LinkingObjectsHandoverMetadata {
+    var propertyName: String
+    var property: RLMProperty?
+}
+
+extension LinkingObjects: _Handoverable {
+    var bridgedHandoverable: RLMHandoverable {
+        return cachedRLMResults ?? unsafeBitCast(object!.objectWithoutConsumingRow, Object.self).bridgedHandoverable
+    }
+
+    var bridgedMetadata: Any? {
+        return LinkingObjectsHandoverMetadata(
+            propertyName: propertyName,
+            property: property
+        )
+    }
+
+    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> LinkingObjects {
+        let metadata = metadata as! LinkingObjectsHandoverMetadata
+        let bridged = LinkingObjects(property: metadata.propertyName)
+        switch handoverable {
+        case let results as RLMResults:
+            bridged.cachedRLMResults = results
+        case let object as RLMObjectBase:
+            bridged.attachTo(object: object, property: metadata.property!)
+        default:
+            fatalError("Unexpected handoverable type \(handoverable.dynamicType)")
+        }
+        return bridged
     }
 }
 

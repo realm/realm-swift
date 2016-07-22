@@ -119,7 +119,8 @@ public enum RealmCollectionChange<T> {
 A homogenous collection of `Object`s which can be retrieved, filtered, sorted,
 and operated upon.
 */
-public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible {
+// Note conforming types must explicitly restate `Handoverable` conformance due to bug SR-2146.
+public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, Handoverable {
 
     /// Element type contained in this collection.
     associatedtype Element: Object
@@ -363,7 +364,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
     func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
-private class _AnyRealmCollectionBase<T: Object> {
+private class _AnyRealmCollectionBase<T: Object>: _Handoverable {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
     var realm: Realm? { fatalError() }
@@ -392,6 +393,9 @@ private class _AnyRealmCollectionBase<T: Object> {
     func setValue(_ value: AnyObject?, forKey key: String) { fatalError() }
     func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
+    var bridgedHandoverable: RLMHandoverable { fatalError() }
+    var bridgedMetadata: Any? { fatalError() }
+    class func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Self { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.Element> {
@@ -637,6 +641,21 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     /// :nodoc:
     override func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block: block) }
+
+    // MARK: Handover
+
+    override var bridgedHandoverable: RLMHandoverable {
+        return base._handoverable.bridgedHandoverable
+    }
+
+    override var bridgedMetadata: Any? {
+        return base._handoverable.bridgedMetadata
+    }
+
+    static override func bridge(handoverable: RLMHandoverable, metadata: Any?) -> _AnyRealmCollection {
+        let bridgedBase = C._handoverable.bridge(handoverable: handoverable, metadata: metadata)
+        return _AnyRealmCollection(base: bridgedBase as! C)
+    }
 }
 
 /**
@@ -653,6 +672,12 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     /// Element type contained in this collection.
     public typealias Element = T
     private let base: _AnyRealmCollectionBase<T>
+
+    // MARK: Initializers
+
+    private init(base: _AnyRealmCollectionBase<T>) {
+        self.base = base
+    }
 
     /// Creates an AnyRealmCollection wrapping `base`.
     public init<C: RealmCollection where C.Element == T>(_ base: C) {
@@ -938,6 +963,31 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
         -> NotificationToken { return base._addNotificationBlock(block: block) }
 }
 
+// MARK: Handoverable
+
+private struct AnyRealmCollectionHandoverableMetadata<T: Object> {
+    var baseMetadata: Any?
+    var baseType: _AnyRealmCollectionBase<T>.Type
+}
+
+extension AnyRealmCollection: _Handoverable {
+    var bridgedHandoverable: RLMHandoverable {
+        return base.bridgedHandoverable
+    }
+
+    var bridgedMetadata: Any? {
+        return AnyRealmCollectionHandoverableMetadata(
+            baseMetadata: base.bridgedMetadata,
+            baseType: base.dynamicType
+        )
+    }
+
+    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> AnyRealmCollection {
+        let metadata = metadata as! AnyRealmCollectionHandoverableMetadata<T>
+        let bridgedBase = metadata.baseType.bridge(handoverable: handoverable, metadata: metadata.baseMetadata)
+        return AnyRealmCollection(base: bridgedBase)
+    }
+}
 
 // MARK: Unavailable
 
@@ -1080,7 +1130,8 @@ public enum RealmCollectionChange<T> {
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted,
  and operated upon.
 */
-public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
+// Note conforming types must explicitly restate `Handoverable` conformance due to bug SR-2146.
+public protocol RealmCollectionType: CollectionType, CustomStringConvertible, Handoverable {
 
     /// The type of the objects contained in the collection.
     associatedtype Element: Object
@@ -1320,7 +1371,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
-private class _AnyRealmCollectionBase<T: Object> {
+private class _AnyRealmCollectionBase<T: Object>: _Handoverable {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
     var realm: Realm? { fatalError() }
@@ -1349,6 +1400,9 @@ private class _AnyRealmCollectionBase<T: Object> {
     func setValue(value: AnyObject?, forKey key: String) { fatalError() }
     func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
+    var bridgedHandoverable: RLMHandoverable { fatalError() }
+    var bridgedMetadata: Any? { fatalError() }
+    class func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Self { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBase<C.Element> {
@@ -1587,6 +1641,21 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     /// :nodoc:
     override func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
+
+    // MAKR: Handover
+
+    override var bridgedHandoverable: RLMHandoverable {
+        return base._handoverable.bridgedHandoverable
+    }
+
+    override var bridgedMetadata: Any? {
+        return base._handoverable.bridgedMetadata
+    }
+
+    static override func bridge(handoverable: RLMHandoverable, metadata: Any?) -> _AnyRealmCollection {
+        let bridgedBase = C._handoverable.bridge(handoverable, metadata: metadata)
+        return _AnyRealmCollection(base: bridgedBase as! C)
+    }
 }
 
 /**
@@ -1595,11 +1664,18 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
  Instances of `RealmCollectionType` forward operations to an opaque underlying collection having the same `Element`
  type.
  */
-public final class AnyRealmCollection<T: Object>: RealmCollectionType {
+// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
+public final class AnyRealmCollection<T: Object>: RealmCollectionType, Handoverable {
 
     /// The type of the objects contained in the collection.
     public typealias Element = T
     private let base: _AnyRealmCollectionBase<T>
+
+    // MARK: Initializers
+
+    private init(base: _AnyRealmCollectionBase<T>) {
+        self.base = base
+    }
 
     /// Creates an `AnyRealmCollection` wrapping `base`.
     public init<C: RealmCollectionType where C.Element == T>(_ base: C) {
@@ -1877,6 +1953,32 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     /// :nodoc:
     public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
         -> NotificationToken { return base._addNotificationBlock(block) }
+}
+
+// MARK: Handoverable
+
+private struct AnyRealmCollectionHandoverableMetadata<T: Object> {
+    var baseMetadata: Any?
+    var baseType: _AnyRealmCollectionBase<T>.Type
+}
+
+extension AnyRealmCollection: _Handoverable {
+    var bridgedHandoverable: RLMHandoverable {
+        return base.bridgedHandoverable
+    }
+
+    var bridgedMetadata: Any? {
+        return AnyRealmCollectionHandoverableMetadata(
+            baseMetadata: base.bridgedMetadata,
+            baseType: base.dynamicType
+        )
+    }
+
+    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> AnyRealmCollection {
+        let metadata = metadata as! AnyRealmCollectionHandoverableMetadata<T>
+        let bridgedBase = metadata.baseType.bridge(handoverable, metadata: metadata.baseMetadata)
+        return AnyRealmCollection(base: bridgedBase)
+    }
 }
 
 #endif
