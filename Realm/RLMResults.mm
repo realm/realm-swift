@@ -29,6 +29,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
+#import "RLMHandoverable_Private.hpp"
 
 #import "results.hpp"
 
@@ -422,3 +423,38 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 @implementation RLMLinkingObjects
 @end
+
+@interface RLMResultsHandoverMetadata : NSObject
+
+@property (nonatomic) NSString *className;
+@property (nonatomic) realm::SortOrder sortOrder;
+
+@end
+
+@implementation RLMResultsHandoverMetadata
+@end
+
+@interface RLMResults (Handover) <RLMHandoverable_Private>
+@end
+
+@implementation RLMResults (Handover)
+
+- (realm::AnyHandoverable)rlm_handoverable {
+    return translateErrors([&] { return AnyHandoverable(_results.get_query()); });
+}
+
+- (RLMResultsHandoverMetadata *)rlm_handoverMetadata {
+    RLMResultsHandoverMetadata *metadata = [[RLMResultsHandoverMetadata alloc] init];
+    metadata.className = self.objectSchema.className;
+    metadata.sortOrder = _results.get_sort();
+    return metadata;
+}
+
++ (instancetype)rlm_objectWithHandoverable:(realm::AnyHandoverable &)handoverable
+                                  metadata:(RLMResultsHandoverMetadata *)metadata inRealm:(RLMRealm *)realm {
+    return [RLMResults resultsWithObjectSchema:[realm.schema schemaForClassName:metadata.className]
+                                       results:realm::Results(realm->_realm, handoverable.query(), metadata.sortOrder)];
+}
+
+@end
+

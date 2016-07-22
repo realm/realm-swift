@@ -1,3 +1,4 @@
+
 ////////////////////////////////////////////////////////////////////////////
 //
 // Copyright 2014 Realm Inc.
@@ -1686,7 +1687,34 @@
     [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
-- (void)testHandover {
+- (void)testHandoverInvalid {
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.cache = false;
+
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    StringObject *stringObject = [[StringObject alloc] init];
+    IntObject *intObject = [[IntObject alloc] init];
+    NSArray<RLMObject *> *objects = @[stringObject, intObject];
+    RLMAssertThrowsWithReasonMatching([realm dispatchAsyncWithObjects:objects
+                                                                block:^(RLMRealm * _Nonnull,
+                                                                        NSArray<id<RLMHandoverable>> * _Nonnull) {
+        XCTFail("Unexpected successful execution of block");
+    }], @"Can only hand over objects that are mangaged by a Realm");
+
+    [realm transactionWithBlock:^{
+        [realm addObject:stringObject];
+        [realm addObject:intObject];
+    }];
+
+    RLMRealm *otherRealm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    RLMAssertThrowsWithReasonMatching([otherRealm dispatchAsyncWithObjects:objects
+                                                                     block:^(RLMRealm * _Nonnull,
+                                                                             NSArray<id<RLMHandoverable>> * _Nonnull) {
+        XCTFail("Unexpected successful execution of block");
+    }], @"Can only hand over objects from the Realm they belong");
+}
+
+- (void)testHandoverObjects {
     RLMRealm *realm = [RLMRealm defaultRealm];
     StringObject *stringObject = [[StringObject alloc] init];
     IntObject *intObject = [[IntObject alloc] init];
@@ -1698,8 +1726,9 @@
     XCTAssertEqual(0, intObject.intCol);
     NSArray<RLMObject *> *objects = @[stringObject, intObject];
     [self performBlockAndWait:^(dispatch_queue_t queue) {
-        [realm dispatchAsyncOnQueue:queue withObjects:objects block:^(RLMRealm * _Nonnull realm,
-                                                                      NSArray<RLMObject *> * _Nonnull objects) {
+        [realm dispatchAsyncOnQueue:queue withObjects:objects
+                              block:^(RLMRealm * _Nonnull realm,
+                                      NSArray<id<RLMHandoverable>> * _Nonnull objects) {
             StringObject *stringObject = (StringObject *)objects[0];
             IntObject *intObject = (IntObject *)objects[1];
             [realm transactionWithBlock:^{
@@ -1715,8 +1744,120 @@
     XCTAssertEqual(42, intObject.intCol);
 }
 
-- (void)runBlock:(void (^)())block {
-    block();
+- (void)testHandoverArray {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    DogArrayObject *object = [[DogArrayObject alloc] init];
+    [realm transactionWithBlock:^{
+        [realm addObject:object];
+        DogObject *friday = [DogObject createInDefaultRealmWithValue:@{@"dogName": @"Friday", @"age": @15}];
+        [object.dogs addObject:friday];
+    }];
+    XCTAssertEqual(1ul, object.dogs.count);
+    XCTAssertEqualObjects(@"Friday", object.dogs[0].dogName);
+    [self performBlockAndWait:^(dispatch_queue_t queue) {
+        [realm dispatchAsyncOnQueue:queue withObjects:@[object.dogs]
+                              block:^(RLMRealm * _Nonnull realm,
+                                      NSArray<id<RLMHandoverable>> * _Nonnull objects) {
+            RLMArray<DogObject *> *dogs = (RLMArray<DogObject *> *)objects[0];
+            XCTAssertEqual(1ul, dogs.count);
+            XCTAssertEqualObjects(@"Friday", dogs[0].dogName);
+
+            [realm transactionWithBlock:^{
+                [dogs removeAllObjects];
+                DogObject *cookie = [DogObject createInDefaultRealmWithValue:@{@"dogName": @"Cookie", @"age": @8}];
+                DogObject *breezy = [DogObject createInDefaultRealmWithValue:@{@"dogName": @"Breezy", @"age": @6}];
+                [dogs addObjects: @[cookie, breezy]];
+            }];
+            XCTAssertEqual(2ul, dogs.count);
+            XCTAssertEqualObjects(@"Cookie", dogs[0].dogName);
+            XCTAssertEqualObjects(@"Breezy", dogs[1].dogName);
+        }];
+    }];
+    XCTAssertEqual(1ul, object.dogs.count);
+    XCTAssertEqualObjects(@"Friday", object.dogs[0].dogName);
+    [realm refresh];
+    XCTAssertEqual(2ul, object.dogs.count);
+    XCTAssertEqualObjects(@"Cookie", object.dogs[0].dogName);
+    XCTAssertEqualObjects(@"Breezy", object.dogs[1].dogName);
+}
+
+- (void)testHandoverResults {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMResults<StringObject *> *results = [[StringObject objectsWhere:@"stringCol != 'C'"]
+                                           sortedResultsUsingProperty:@"stringCol" ascending:NO];
+    [realm transactionWithBlock:^{
+        [StringObject createInDefaultRealmWithValue:@[@"A"]];
+        [StringObject createInDefaultRealmWithValue:@[@"B"]];
+        [StringObject createInDefaultRealmWithValue:@[@"C"]];
+        [StringObject createInDefaultRealmWithValue:@[@"D"]];
+    }];
+    XCTAssertEqual(4ul, [StringObject allObjects].count);
+    XCTAssertEqual(3ul, results.count);
+    XCTAssertEqualObjects(@"D", results[0].stringCol);
+    XCTAssertEqualObjects(@"B", results[1].stringCol);
+    XCTAssertEqualObjects(@"A", results[2].stringCol);
+    [self performBlockAndWait:^(dispatch_queue_t queue) {
+        [realm dispatchAsyncOnQueue:queue withObjects:@[results]
+                              block:^(RLMRealm * _Nonnull realm,
+                                      NSArray<id<RLMHandoverable>> * _Nonnull objects) {
+            RLMResults<StringObject *> *results = (RLMResults<StringObject *> *)objects[0];
+            XCTAssertEqual(4ul, [StringObject allObjects].count);
+            XCTAssertEqual(3ul, results.count);
+            XCTAssertEqualObjects(@"D", results[0].stringCol);
+            XCTAssertEqualObjects(@"B", results[1].stringCol);
+            XCTAssertEqualObjects(@"A", results[2].stringCol);
+            [realm transactionWithBlock:^{
+                [realm deleteObject:results[2]];
+                [realm deleteObject:results[0]];
+                [StringObject createInDefaultRealmWithValue:@[@"E"]];
+            }];
+            XCTAssertEqual(3ul, [StringObject allObjects].count);
+            XCTAssertEqual(2ul, results.count);
+            XCTAssertEqualObjects(@"E", results[0].stringCol);
+            XCTAssertEqualObjects(@"B", results[1].stringCol);
+        }];
+    }];
+    XCTAssertEqual(3ul, results.count);
+    XCTAssertEqualObjects(@"D", results[0].stringCol);
+    XCTAssertEqualObjects(@"B", results[1].stringCol);
+    XCTAssertEqualObjects(@"A", results[2].stringCol);
+    [realm refresh];
+    XCTAssertEqual(3ul, [StringObject allObjects].count);
+    XCTAssertEqual(2ul, results.count);
+    XCTAssertEqualObjects(@"E", results[0].stringCol);
+    XCTAssertEqualObjects(@"B", results[1].stringCol);
+}
+
+- (void)testHandoverLinkingObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    DogObject *dog = [[DogObject alloc] initWithValue:@{@"dogName": @"Cookie", @"age": @10,}];
+    [realm transactionWithBlock:^{
+        [realm addObject:[[OwnerObject alloc] initWithValue:@{@"name": @"Jaden", @"dog": dog}]];
+    }];
+    XCTAssertEqual(1ul, dog.owners.count);
+    XCTAssertEqualObjects(@"Jaden", ((OwnerObject *)dog.owners[0]).name);
+    [self performBlockAndWait:^(dispatch_queue_t queue) {
+        [realm dispatchAsyncOnQueue:queue withObjects:@[dog.owners]
+                              block:^(RLMRealm * _Nonnull realm,
+                                      NSArray<id<RLMHandoverable>> * _Nonnull objects) {
+            RLMLinkingObjects<OwnerObject *> *owners = (RLMLinkingObjects<OwnerObject *> *)objects[0];
+            XCTAssertEqual(1ul, owners.count);
+            XCTAssertEqualObjects(@"Jaden", ((OwnerObject *)owners[0]).name);
+
+            [realm transactionWithBlock:^{
+                OwnerObject *oldOwner = (OwnerObject *)owners[0];
+                [realm addObject: [[OwnerObject alloc] initWithValue:@{@"name": @"Andrea", @"dog": oldOwner.dog}]];
+                [realm deleteObject:oldOwner];
+            }];
+            XCTAssertEqual(1ul, owners.count);
+            XCTAssertEqualObjects(@"Andrea", ((OwnerObject *)owners[0]).name);
+        }];
+    }];
+    XCTAssertEqual(1ul, dog.owners.count);
+    XCTAssertEqualObjects(@"Jaden", ((OwnerObject *)dog.owners[0]).name);
+    [realm refresh];
+    XCTAssertEqual(1ul, dog.owners.count);
+    XCTAssertEqualObjects(@"Andrea", ((OwnerObject *)dog.owners[0]).name);
 }
 
 @end

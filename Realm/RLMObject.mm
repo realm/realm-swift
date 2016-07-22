@@ -222,4 +222,10 @@
     return object;
 }
 
+- (RLMObjectBase *)objectWithoutConsumingRow {
+    RLMObjectBase *object = [[_objectClass alloc] initWithRealm:_realm schema:_objectSchema];
+    object->_row = _row;
+    return object;
+}
+
 @end

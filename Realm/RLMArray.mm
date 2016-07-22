@@ -24,6 +24,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
+#import "RLMHandoverable_Private.hpp"
 
 #import <realm/link_view.hpp>
 
@@ -433,6 +434,25 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (instancetype)reversedSortDescriptor {
     return [self.class sortDescriptorWithProperty:_property ascending:!_ascending];
+}
+
+@end
+
+@interface RLMArray (Handover) <RLMHandoverable_Private>
+@end
+
+@implementation RLMArray (Handover)
+
+- (realm::AnyHandoverable)rlm_handoverable {
+    @throw RLMException(@"Unexpected handover of unmanaged `RLMArray`");
+}
+
+- (id)rlm_handoverMetadata {
+    @throw RLMException(@"Unexpected handover of unmanaged `RLMArray`");
+}
+
++ (instancetype)rlm_objectWithHandoverable:(__unused realm::AnyHandoverable&)handoverable metadata:(nullable __unused id)metadata inRealm:(__unused RLMRealm *)realm {
+    @throw RLMException(@"Unexpected handover of unmanaged `RLMArray`");
 }
 
 @end

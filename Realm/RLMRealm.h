@@ -18,8 +18,9 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMConstants.h"
+#import "RLMHandoverable.h"
 
-@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
+@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMRealm;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -498,17 +499,17 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
 - (void)dispatchAsyncWithBlock:(void(^)(RLMRealm *))block
 NS_SWIFT_NAME(async(execute:));
 
-- (void)dispatchAsyncWithObject:(RLMObject *)objectToHandOver
-                          block:(void(^)(RLMRealm *, RLMObject *))block
+- (void)dispatchAsyncWithObject:(id<RLMHandoverable>)objectToHandOver
+                          block:(void(^)(RLMRealm *, id<RLMHandoverable>))block
 NS_SWIFT_NAME(async(handingOver:execute:));
 
-- (void)dispatchAsyncWithObjects:(NSArray<RLMObject *> *)objectsToHandOver
-                           block:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block
+- (void)dispatchAsyncWithObjects:(NSArray<id<RLMHandoverable>> *)objectsToHandOver
+                           block:(void(^)(RLMRealm *, NSArray<id<RLMHandoverable>> *))block
 NS_SWIFT_NAME(async(handingOver:execute:));
 
 - (void)dispatchAsyncOnQueue:(dispatch_queue_t)queue
-                 withObjects:(NSArray<RLMObject *> *)objectsToHandOver
-                       block:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block
+                 withObjects:(NSArray<id<RLMHandoverable>> *)objectsToHandOver
+                       block:(void(^)(RLMRealm *, NSArray<id<RLMHandoverable>> *))block
 NS_SWIFT_NAME(async(onQueue:handingOver:execute:));
 
 @end

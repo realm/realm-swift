@@ -30,6 +30,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
+#import "RLMHandoverable_Private.hpp"
 
 using namespace realm;
 
@@ -442,6 +443,27 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 
 + (NSArray *)requiredPropertiesForClass:(Class)cls {
     return [cls requiredProperties];
+}
+
+@end
+
+@interface RLMObjectBase (Handover) <RLMHandoverable_Private>
+@end
+
+@implementation RLMObjectBase (Handover)
+
+- (realm::AnyHandoverable)rlm_handoverable {
+    return AnyHandoverable(_row);
+}
+
+- (NSString *)rlm_handoverMetadata {
+    return self.objectSchema.className;
+}
+
++ (instancetype)rlm_objectWithHandoverable:(realm::AnyHandoverable&)handoverable
+                                  metadata:(NSString *)metadata inRealm:(RLMRealm *)realm {
+    RLMObjectSchema *schema = [realm.schema schemaForClassName:metadata];
+    return RLMCreateObjectAccessor(realm, schema, handoverable.row().get_index());
 }
 
 @end

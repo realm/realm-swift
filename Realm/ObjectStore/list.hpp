@@ -106,6 +106,8 @@ public:
         size_t valid_count;
     };
 
+    LinkViewRef get_linkview() const { return m_link_view; }
+
 private:
     std::shared_ptr<Realm> m_realm;
     mutable const ObjectSchema* m_object_schema = nullptr;

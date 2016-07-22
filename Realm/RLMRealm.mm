@@ -33,6 +33,7 @@
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
 #import "RLMUpdateChecker.hpp"
+#import "RLMHandoverable_Private.hpp"
 #import "RLMUtil.hpp"
 
 #include "impl/realm_coordinator.hpp"
@@ -713,51 +714,61 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (void)dispatchAsyncWithBlock:(void(^)(RLMRealm *))block {
-    [self dispatchAsyncWithObjects:@[] block:^(RLMRealm * _Nonnull realm, NSArray<RLMObject *> * _Nonnull) {
+    [self dispatchAsyncWithObjects:@[] block:^(RLMRealm * _Nonnull realm, NSArray<id<RLMHandoverable>> * _Nonnull) {
         block(realm);
     }];
 }
 
-- (void)dispatchAsyncWithObject:(RLMObject *)objectToHandOver block:(void(^)(RLMRealm *, RLMObject *))block {
+- (void)dispatchAsyncWithObject:(id<RLMHandoverable>)objectToHandOver block:(void(^)(RLMRealm *, id<RLMHandoverable>))block {
     [self dispatchAsyncWithObjects:@[objectToHandOver] block:^(RLMRealm * _Nonnull realm,
-                                                               NSArray<RLMObject *> * _Nonnull singleObjectArray) {
+                                                               NSArray<id<RLMHandoverable>> * _Nonnull singleObjectArray) {
         block(realm, singleObjectArray[0]);
     }];
 }
 
-- (void)dispatchAsyncWithObjects:(NSArray<RLMObject *> *)objectsToHandOver
-                           block:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block {
+- (void)dispatchAsyncWithObjects:(NSArray<id<RLMHandoverable>> *)objectsToHandOver
+                           block:(void(^)(RLMRealm *, NSArray<id<RLMHandoverable>> *))block {
     [self dispatchAsyncOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)
                    withObjects:objectsToHandOver
                          block:block];
 }
 
 - (void)dispatchAsyncOnQueue:(dispatch_queue_t)queue
-                 withObjects:(NSArray<RLMObject *> *)objectsToHandOver
-                       block:(void(^)(RLMRealm *, NSArray<RLMObject *> *))block {
-    std::vector<realm::Row> rowsToHandOver;
-    rowsToHandOver.reserve(objectsToHandOver.count);
-    NSMutableArray<NSString *> *classNames = [NSMutableArray arrayWithCapacity:objectsToHandOver.count];
-    for (RLMObject *object in objectsToHandOver) {
-        if (self != object.realm) {
-            @throw RLMException(@"Can only hand over objects from the Realm they belong to.");
+                 withObjects:(NSArray<id<RLMHandoverable>> *)objectsToHandOver
+                       block:(void(^)(RLMRealm *, NSArray<id<RLMHandoverable>> *))block {
+    
+    std::vector<realm::AnyHandoverable> outbound;
+    outbound.reserve(objectsToHandOver.count);
+    NSMutableArray<id> *metadata = [NSMutableArray arrayWithCapacity:objectsToHandOver.count];
+    NSMutableArray<Class> *classes = [NSMutableArray arrayWithCapacity:objectsToHandOver.count];
+    for (id<RLMHandoverable, RLMHandoverable_Private> object in objectsToHandOver) {
+        if (![object conformsToProtocol: @protocol(RLMHandoverable_Private)]) {
+            @throw RLMException(@"Illegal custom conformances to `RLMHandoverable` by %@", [object class]);
         }
-        rowsToHandOver.push_back(object->_row);
-        [classNames addObject: object.objectSchema.className];
+        if (self != object.realm) {
+            if (object.realm == nil) {
+                @throw RLMException(@"Can only hand over objects that are mangaged by a Realm");
+            } else {
+                @throw RLMException(@"Can only hand over objects from the Realm they belong");
+            }
+        }
+        outbound.push_back(object.rlm_handoverable);
+        [metadata addObject:[object rlm_handoverMetadata]];
+        [classes addObject:[object class]];
     }
-    std::shared_ptr<Realm::HandoverPackage> package = _realm->package_for_handover(rowsToHandOver);
+    std::shared_ptr<Realm::HandoverPackage> package = _realm->package_for_handover(outbound);
 
     RLMRealmConfiguration *config = self.configuration;
     dispatch_async(queue, ^{
         @autoreleasepool {
             RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-            std::vector<std::unique_ptr<realm::Row>> acceptedRows = realm->_realm->accept_handover(*package);
+            std::vector<AnyHandoverable> inbound = realm->_realm->accept_handover(*package);
 
-            NSMutableArray<RLMObject *> *acceptedObjects = [NSMutableArray arrayWithCapacity:classNames.count];
-            for (NSUInteger i = 0; i < classNames.count; i++) {
-                RLMObjectSchema *schema = [realm.schema schemaForClassName:classNames[i]];
-                [acceptedObjects addObject: (RLMObject *)RLMCreateObjectAccessor(realm, schema,
-                                                                                 acceptedRows[i]->get_index())];
+            NSMutableArray<id<RLMHandoverable>> *acceptedObjects = [NSMutableArray arrayWithCapacity:inbound.size()];
+            for (NSUInteger i = 0; i < inbound.size(); i++) {
+                [acceptedObjects addObject:[classes[i] rlm_objectWithHandoverable:inbound[i]
+                                                                         metadata:metadata[i]
+                                                                          inRealm:realm]];
             }
             block(realm, acceptedObjects);
         }

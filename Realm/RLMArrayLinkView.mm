@@ -27,6 +27,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema.h"
 #import "RLMUtil.hpp"
+#import "RLMHandoverable_Private.hpp"
 
 #import "list.hpp"
 #import "results.hpp"
@@ -407,5 +408,41 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     return RLMAddNotificationBlock(self, _backingList, block);
 }
 #pragma clang diagnostic pop
+
+@end
+
+@interface RLMArrayLinkViewHandoverMetadata : NSObject
+
+@property (nonatomic) NSString *key;
+@property (nonatomic) NSString *className;
+@property (nonatomic) NSString *parentClassName;
+
+@end
+
+@implementation RLMArrayLinkViewHandoverMetadata
+@end
+
+@interface RLMArrayLinkView (Handover) <RLMHandoverable_Private>
+@end
+
+@implementation RLMArrayLinkView (Handover)
+
+- (realm::AnyHandoverable)rlm_handoverable {
+    return realm::AnyHandoverable(_backingList.get_linkview());
+}
+
+- (RLMArrayLinkViewHandoverMetadata *)rlm_handoverMetadata {
+    RLMArrayLinkViewHandoverMetadata *metadata = [[RLMArrayLinkViewHandoverMetadata alloc] init];
+    metadata.key = _key;
+    metadata.className = self.objectSchema.className;
+    metadata.parentClassName = _containingObjectSchema.className;
+    return metadata;
+}
+
++ (instancetype)rlm_objectWithHandoverable:(realm::AnyHandoverable&)handoverable metadata:(RLMArrayLinkViewHandoverMetadata *)metadata inRealm:(RLMRealm *)realm {
+    return [RLMArrayLinkView arrayWithObjectClassName:metadata.className view:handoverable.link_view_ref()
+                                                realm:realm key:metadata.key
+                                         parentSchema:[realm.schema schemaForClassName:metadata.parentClassName]];
+}
 
 @end
