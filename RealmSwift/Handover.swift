@@ -46,9 +46,39 @@ extension Handoverable {
         return _handoverable.realm
     }
 }
-    
+
+public class HandoverPackage<T: Handoverable> {
+    private var metadata: [Any?]
+    private var types: [Handoverable.Type]
+    private let package: RLMHandoverPackage
+
+    internal init(realm: Realm, objects: [T]) {
+        self.metadata = objects.map { $0._handoverable.bridgedMetadata }
+        self.types = objects.map { $0.dynamicType }
+        self.package = realm.rlmRealm.packageObjects(forHandover: objects.map { $0._handoverable.bridgedHandoverable })
+    }
+
+    public func importOnCurrentThead() throws -> (Realm, [T]) {
+        defer {
+            metadata = []
+            types = []
+        }
+
+        let handoverImport = try package.importOnCurrentThread()
+        // Swift Arrays must be properly typed on index access, and `Object` does not conform to `RLMHandoverable`
+        let handoverables = unsafeBitCast(handoverImport.objects, to: [AnyObject].self)
+
+        let objects: [T] = zip(types, zip(handoverables, metadata)).map { type, arguments in
+            let handoverable = unsafeBitCast(arguments.0, to: RLMHandoverable.self)
+            let metadata = arguments.1
+            return type._handoverable.bridge(handoverable: handoverable, metadata: metadata) as! T
+        }
+        return (Realm(handoverImport.realm), objects)
+    }
+}
+
 #else
-    
+
 /// An object that can be handed over between threads
 @objc public protocol Handoverable {
     // Runtime-enforced requirement that type also conforms to `_Handoverable`
@@ -83,6 +113,36 @@ extension Handoverable {
     // Note: cannot be a protocol requirement since `Realm` is not an Objective-C type.
     public var realm: Realm? {
         return _handoverable.realm
+    }
+}
+
+public class HandoverPackage<T: Handoverable> {
+    private var metadata: [Any?]
+    private var types: [Handoverable.Type]
+    private let package: RLMHandoverPackage
+
+    internal init(realm: Realm, objects: [T]) {
+        self.metadata = objects.map { $0._handoverable.bridgedMetadata }
+        self.types = objects.map { $0.dynamicType }
+        self.package = realm.rlmRealm.packageObjectsForHandover(objects.map { $0._handoverable.bridgedHandoverable })
+    }
+
+    public func importOnCurrentThead() throws -> (Realm, [T]) {
+        defer {
+            metadata = []
+            types = []
+        }
+
+        let handoverImport = try package.importOnCurrentThread()
+        // Swift Arrays must be properly typed on index access, and `Object` does not conform to `RLMHandoverable`
+        let handoverables = unsafeBitCast(handoverImport.objects, [AnyObject].self)
+
+        let objects: [T] = zip(types, zip(handoverables, metadata)).map { type, arguments in
+            let handoverable = unsafeBitCast(arguments.0, RLMHandoverable.self)
+            let metadata = arguments.1
+            return type._handoverable.bridge(handoverable, metadata: metadata) as! T
+        }
+        return (Realm(handoverImport.realm), objects)
     }
 }
 

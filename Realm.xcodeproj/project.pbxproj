@@ -345,7 +345,7 @@
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
-		D4003AF01D382D7C0040CA7B /* Handoverable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4003AEF1D382D7C0040CA7B /* Handoverable.swift */; };
+		D4003AF01D382D7C0040CA7B /* Handover.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4003AEF1D382D7C0040CA7B /* Handover.swift */; };
 		D45D19891D42BF030066B4F1 /* RLMHandover.h in Headers */ = {isa = PBXBuildFile; fileRef = D45D19871D42BF030066B4F1 /* RLMHandover.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D45D198A1D42BF030066B4F1 /* RLMHandover.h in Headers */ = {isa = PBXBuildFile; fileRef = D45D19871D42BF030066B4F1 /* RLMHandover.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D45D198B1D42BF030066B4F1 /* RLMHandover.mm in Sources */ = {isa = PBXBuildFile; fileRef = D45D19881D42BF030066B4F1 /* RLMHandover.mm */; };
@@ -646,7 +646,7 @@
 		C0D2DD061B6BDEA1004E8919 /* RLMRealmConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMRealmConfiguration.mm; sourceTree = "<group>"; };
 		C0D2DD0F1B6BE0DD004E8919 /* RLMRealmConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration_Private.h; sourceTree = "<group>"; };
 		C0D6E4101AFBFAF7001F3027 /* RLMAssertions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAssertions.h; sourceTree = "<group>"; };
-		D4003AEF1D382D7C0040CA7B /* Handoverable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Handoverable.swift; sourceTree = "<group>"; };
+		D4003AEF1D382D7C0040CA7B /* Handover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Handover.swift; sourceTree = "<group>"; };
 		D45D19871D42BF030066B4F1 /* RLMHandover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMHandover.h; sourceTree = "<group>"; };
 		D45D19881D42BF030066B4F1 /* RLMHandover.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMHandover.mm; sourceTree = "<group>"; };
 		D45D198D1D42C6480066B4F1 /* RLMHandover_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMHandover_Private.hpp; sourceTree = "<group>"; };
@@ -875,7 +875,7 @@
 			children = (
 				5D660FE31BE98D670021E04F /* Aliases.swift */,
 				29B7FDF51C0DA6560023224E /* Error.swift */,
-				D4003AEF1D382D7C0040CA7B /* Handoverable.swift */,
+				D4003AEF1D382D7C0040CA7B /* Handover.swift */,
 				5D1534B71CCFF545008976D7 /* LinkingObjects.swift */,
 				5D660FE41BE98D670021E04F /* List.swift */,
 				5D660FE51BE98D670021E04F /* Migration.swift */,
@@ -1809,7 +1809,7 @@
 				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
 				5D1534B81CCFF545008976D7 /* LinkingObjects.swift in Sources */,
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
-				D4003AF01D382D7C0040CA7B /* Handoverable.swift in Sources */,
+				D4003AF01D382D7C0040CA7B /* Handover.swift in Sources */,
 				5D660FF31BE98D670021E04F /* Migration.swift in Sources */,
 				5D660FF41BE98D670021E04F /* Object.swift in Sources */,
 				5D660FF51BE98D670021E04F /* ObjectSchema.swift in Sources */,

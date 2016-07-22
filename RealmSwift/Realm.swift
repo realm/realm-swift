@@ -596,6 +596,10 @@ public final class Realm {
 
     // MARK: Handover
 
+    public func packageForHandover<T: Handoverable>(_ objects: [T]) -> HandoverPackage<T> {
+        return HandoverPackage(realm: self, objects: objects)
+    }
+
     public func async(onQueue queue: DispatchQueue = defaultQueue, execute block: (Realm) -> ()) {
         async(onQueue: queue, handingOver: [] as [Handoverable]) { realm, _ in
             block(realm)
@@ -611,19 +615,12 @@ public final class Realm {
 
     public func async<O: Handoverable>(onQueue queue: DispatchQueue = defaultQueue,
                       handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
-        let handoverables = objects.map { $0._handoverable.bridgedHandoverable }
-        let metadata = objects.map { $0._handoverable.bridgedMetadata }
-        let types = objects.map { $0.dynamicType }
-        rlmRealm.async(onQueue: queue, handingOver: handoverables) { realm, handoverables in
-            // Swift Arrays must be properly typed on index access, and `Object` does not conform to `RLMHandoverable`
-            let handoverables = unsafeBitCast(handoverables, to: [AnyObject].self)
-
-            let objects: [O] = zip(types, zip(handoverables, metadata)).map { type, arguments in
-                let handoverable = unsafeBitCast(arguments.0, to: RLMHandoverable.self)
-                let metadata = arguments.1
-                return type._handoverable.bridge(handoverable: handoverable, metadata: metadata) as! O
+        let package = packageForHandover(objects)
+        queue.async {
+            autoreleasepool {
+                let (realm, objects) = try! package.importOnCurrentThead()
+                block(realm, objects)
             }
-            block(Realm(realm), objects)
         }
     }
 
@@ -1288,6 +1285,10 @@ public final class Realm {
 
     // MARK: Handover
 
+    public func packageForHandover<T: Handoverable>(objects: [T]) -> HandoverPackage<T> {
+        return HandoverPackage(realm: self, objects: objects)
+    }
+
     public func async(onQueue queue: dispatch_queue_t = defaultQueue, execute block: (Realm) -> ()) {
         async(onQueue: queue, handingOver: [] as [Handoverable]) { realm, _ in
             block(realm)
@@ -1303,20 +1304,13 @@ public final class Realm {
 
     public func async<O: Handoverable>(onQueue queue: dispatch_queue_t = defaultQueue,
                                  handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
-        let handoverables = objects.map { $0._handoverable.bridgedHandoverable }
-        let metadata = objects.map { $0._handoverable.bridgedMetadata }
-        let types = objects.map { $0.dynamicType }
-        rlmRealm.async(onQueue: queue, handingOver: handoverables) { realm, handoverables in
-            // Swift Arrays must be properly typed on index access, and `Object` does not conform to `RLMHandoverable`
-            let handoverables = unsafeBitCast(handoverables, [AnyObject].self)
-
-            let objects: [O] = zip(types, zip(handoverables, metadata)).map { type, arguments in
-                let handoverable = unsafeBitCast(arguments.0, RLMHandoverable.self)
-                let metadata = arguments.1
-                return type._handoverable.bridge(handoverable, metadata: metadata) as! O
+        let package = packageForHandover(objects)
+        dispatch_async(queue, { 
+            autoreleasepool {
+                let (realm, objects) = try! package.importOnCurrentThead()
+                block(realm, objects)
             }
-            block(Realm(realm), objects)
-        }
+        })
     }
 
     // MARK: Internal
