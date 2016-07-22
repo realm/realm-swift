@@ -8,7 +8,7 @@
 
 #import <XCTest/XCTest.h>
 #import <objc/runtime.h>
-#import "RLMHandoverable_Private.hpp"
+#import "RLMHandover_Private.hpp"
 
 @interface ConformanceTests : XCTestCase
 

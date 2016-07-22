@@ -30,7 +30,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
-#import "RLMHandoverable_Private.hpp"
+#import "RLMHandover_Private.hpp"
 
 using namespace realm;
 

@@ -29,7 +29,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
-#import "RLMHandoverable_Private.hpp"
+#import "RLMHandover_Private.hpp"
 
 #import "results.hpp"
 

@@ -33,7 +33,7 @@
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
 #import "RLMUpdateChecker.hpp"
-#import "RLMHandoverable_Private.hpp"
+#import "RLMHandover_Private.hpp"
 #import "RLMUtil.hpp"
 
 #include "impl/realm_coordinator.hpp"
@@ -713,6 +713,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return success;
 }
 
+- (RLMHandoverPackage *)packageObjectsForHandover:(NSArray<id<RLMHandoverable>> *)objectsToHandOver {
+    return [[RLMHandoverPackage alloc] initWithRealm:self objects:objectsToHandOver];
+}
+
 - (void)dispatchAsyncWithBlock:(void(^)(RLMRealm *))block {
     [self dispatchAsyncWithObjects:@[] block:^(RLMRealm * _Nonnull realm, NSArray<id<RLMHandoverable>> * _Nonnull) {
         block(realm);
@@ -736,41 +740,12 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 - (void)dispatchAsyncOnQueue:(dispatch_queue_t)queue
                  withObjects:(NSArray<id<RLMHandoverable>> *)objectsToHandOver
                        block:(void(^)(RLMRealm *, NSArray<id<RLMHandoverable>> *))block {
-    
-    std::vector<realm::AnyHandoverable> outbound;
-    outbound.reserve(objectsToHandOver.count);
-    NSMutableArray<id> *metadata = [NSMutableArray arrayWithCapacity:objectsToHandOver.count];
-    NSMutableArray<Class> *classes = [NSMutableArray arrayWithCapacity:objectsToHandOver.count];
-    for (id<RLMHandoverable, RLMHandoverable_Private> object in objectsToHandOver) {
-        if (![object conformsToProtocol: @protocol(RLMHandoverable_Private)]) {
-            @throw RLMException(@"Illegal custom conformances to `RLMHandoverable` by %@", [object class]);
-        }
-        if (self != object.realm) {
-            if (object.realm == nil) {
-                @throw RLMException(@"Can only hand over objects that are mangaged by a Realm");
-            } else {
-                @throw RLMException(@"Can only hand over objects from the Realm they belong");
-            }
-        }
-        outbound.push_back(object.rlm_handoverable);
-        [metadata addObject:[object rlm_handoverMetadata]];
-        [classes addObject:[object class]];
-    }
-    std::shared_ptr<Realm::HandoverPackage> package = _realm->package_for_handover(outbound);
 
-    RLMRealmConfiguration *config = self.configuration;
+    RLMHandoverPackage *package = [self packageObjectsForHandover:objectsToHandOver];
     dispatch_async(queue, ^{
         @autoreleasepool {
-            RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-            std::vector<AnyHandoverable> inbound = realm->_realm->accept_handover(*package);
-
-            NSMutableArray<id<RLMHandoverable>> *acceptedObjects = [NSMutableArray arrayWithCapacity:inbound.size()];
-            for (NSUInteger i = 0; i < inbound.size(); i++) {
-                [acceptedObjects addObject:[classes[i] rlm_objectWithHandoverable:inbound[i]
-                                                                         metadata:metadata[i]
-                                                                          inRealm:realm]];
-            }
-            block(realm, acceptedObjects);
+            RLMHandoverImport *import = [package importOnCurrentThreadWithError:nil];
+            block(import.realm, import.objects);
         }
     });
 }

@@ -24,7 +24,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
-#import "RLMHandoverable_Private.hpp"
+#import "RLMHandover_Private.hpp"
 
 #import <realm/link_view.hpp>
 
