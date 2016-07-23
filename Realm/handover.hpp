@@ -21,8 +21,8 @@ namespace realm {
 
     class AnyHandover;
 
-    // Type-erased wrapper for any type which can be handed over between threads
-    class AnyHandoverable {
+    // Type-erased wrapper for any type which must be exported to be handed between threads
+    class AnyThreadConfined {
     public:
         enum class Type {
             Row,
@@ -44,15 +44,15 @@ namespace realm {
 
     public:
         // Constructors
-        AnyHandoverable(Row row)                   : m_type(Type::Row),         m_row(row)                     { }
-        AnyHandoverable(Query query)               : m_type(Type::Query),       m_query(query)                 { }
-        AnyHandoverable(TableRef table_ref)        : m_type(Type::TableRef),    m_table_ref(table_ref)         { }
-        AnyHandoverable(TableView table_view)      : m_type(Type::TableView),   m_table_view(table_view)       { }
-        AnyHandoverable(LinkViewRef link_view_ref) : m_type(Type::LinkViewRef), m_link_view_ref(link_view_ref) { }
+        AnyThreadConfined(Row row)                   : m_type(Type::Row),         m_row(row)                     { }
+        AnyThreadConfined(Query query)               : m_type(Type::Query),       m_query(query)                 { }
+        AnyThreadConfined(TableRef table_ref)        : m_type(Type::TableRef),    m_table_ref(table_ref)         { }
+        AnyThreadConfined(TableView table_view)      : m_type(Type::TableView),   m_table_view(table_view)       { }
+        AnyThreadConfined(LinkViewRef link_view_ref) : m_type(Type::LinkViewRef), m_link_view_ref(link_view_ref) { }
 
-        AnyHandoverable(const AnyHandoverable& handover);
-        AnyHandoverable(AnyHandoverable&& handover);
-        ~AnyHandoverable();
+        AnyThreadConfined(const AnyThreadConfined& thread_confined);
+        AnyThreadConfined(AnyThreadConfined&& thread_confined);
+        ~AnyThreadConfined();
 
         inline Type type() const { return m_type; }
 
@@ -66,7 +66,7 @@ namespace realm {
         AnyHandover export_for_handover(SharedGroup &shared_group) const;
     };
 
-    // Type-erased wrapper for a `Handover` of for any type which can be handed between threads
+    // Type-erased wrapper for a `Handover` of an `AnyThreadConfined` value
     class AnyHandover {
     private:
         enum class Type {
@@ -103,7 +103,7 @@ namespace realm {
         AnyHandover(AnyHandover&& handover);
         ~AnyHandover();
 
-        AnyHandoverable import_from_handover(SharedGroup &shared_group) &&;
+        AnyThreadConfined import_from_handover(SharedGroup &shared_group) &&;
     };
 }
 

@@ -452,18 +452,18 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 
 @implementation RLMObjectBase (Handover)
 
-- (realm::AnyHandoverable)rlm_handoverable {
-    return AnyHandoverable(_row);
+- (realm::AnyThreadConfined)rlm_handoverData {
+    return AnyThreadConfined(_row);
 }
 
 - (NSString *)rlm_handoverMetadata {
     return self.objectSchema.className;
 }
 
-+ (instancetype)rlm_objectWithHandoverable:(realm::AnyHandoverable&)handoverable
++ (instancetype)rlm_objectWithHandoverData:(realm::AnyThreadConfined&)data
                                   metadata:(NSString *)metadata inRealm:(RLMRealm *)realm {
     RLMObjectSchema *schema = [realm.schema schemaForClassName:metadata];
-    return RLMCreateObjectAccessor(realm, schema, handoverable.row().get_index());
+    return RLMCreateObjectAccessor(realm, schema, data.row().get_index());
 }
 
 @end

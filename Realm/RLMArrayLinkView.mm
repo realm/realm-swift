@@ -427,8 +427,8 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 
 @implementation RLMArrayLinkView (Handover)
 
-- (realm::AnyHandoverable)rlm_handoverable {
-    return realm::AnyHandoverable(_backingList.get_linkview());
+- (realm::AnyThreadConfined)rlm_handoverData {
+    return realm::AnyThreadConfined(_backingList.get_linkview());
 }
 
 - (RLMArrayLinkViewHandoverMetadata *)rlm_handoverMetadata {
@@ -439,8 +439,9 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     return metadata;
 }
 
-+ (instancetype)rlm_objectWithHandoverable:(realm::AnyHandoverable&)handoverable metadata:(RLMArrayLinkViewHandoverMetadata *)metadata inRealm:(RLMRealm *)realm {
-    return [RLMArrayLinkView arrayWithObjectClassName:metadata.className view:handoverable.link_view_ref()
++ (instancetype)rlm_objectWithHandoverData:(realm::AnyThreadConfined&)data
+                                  metadata:(RLMArrayLinkViewHandoverMetadata *)metadata inRealm:(RLMRealm *)realm {
+    return [RLMArrayLinkView arrayWithObjectClassName:metadata.className view:data.link_view_ref()
                                                 realm:realm key:metadata.key
                                          parentSchema:[realm.schema schemaForClassName:metadata.parentClassName]];
 }

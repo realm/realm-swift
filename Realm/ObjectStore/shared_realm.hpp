@@ -33,7 +33,7 @@ namespace realm {
     class Schema;
     class SharedGroup;
     class StringData;
-    class AnyHandoverable;
+    class AnyThreadConfined;
     class HandoverPackage;
 
     typedef std::shared_ptr<Realm> SharedRealm;
@@ -151,11 +151,11 @@ namespace realm {
         struct HandoverPackage;
 
         // Pins the current version and exports each object for handover.
-        std::shared_ptr<HandoverPackage> package_for_handover(std::vector<AnyHandoverable> objects_to_hand_over);
+        std::shared_ptr<HandoverPackage> package_for_handover(std::vector<AnyThreadConfined> objects_to_hand_over);
 
         // Unpins the handover version, ending the current read transaction and beginning a new one at this version,
         // importing each object for handover.
-        std::vector<AnyHandoverable> accept_handover(HandoverPackage& handover);
+        std::vector<AnyThreadConfined> accept_handover(HandoverPackage& handover);
 
         ~Realm();
 

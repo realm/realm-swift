@@ -439,8 +439,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 @implementation RLMResults (Handover)
 
-- (realm::AnyHandoverable)rlm_handoverable {
-    return translateErrors([&] { return AnyHandoverable(_results.get_query()); });
+- (realm::AnyThreadConfined)rlm_handoverData {
+    return translateErrors([&] { return AnyThreadConfined(_results.get_query()); });
 }
 
 - (RLMResultsHandoverMetadata *)rlm_handoverMetadata {
@@ -450,10 +450,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return metadata;
 }
 
-+ (instancetype)rlm_objectWithHandoverable:(realm::AnyHandoverable &)handoverable
++ (instancetype)rlm_objectWithHandoverData:(realm::AnyThreadConfined &)data
                                   metadata:(RLMResultsHandoverMetadata *)metadata inRealm:(RLMRealm *)realm {
     return [RLMResults resultsWithObjectSchema:[realm.schema schemaForClassName:metadata.className]
-                                       results:realm::Results(realm->_realm, handoverable.query(), metadata.sortOrder)];
+                                       results:realm::Results(realm->_realm, data.query(), metadata.sortOrder)];
 }
 
 @end

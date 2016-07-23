@@ -6,19 +6,18 @@
 //  Copyright © 2016 Realm. All rights reserved.
 //
 
-#import "RLMHandover.h"
+#import "RLMHandoverPackage.h"
 #import "handover.hpp"
 
 @class RLMRealm;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol RLMHandoverable_Private
+@protocol RLMThreadConfined_Private
 
-@property (readonly) realm::AnyThreadConfined rlm_handoverData;
+@property (readonly) realm::AnyThreadConfined rlm_;
 @property (readonly) id rlm_handoverMetadata;
-+ (instancetype)rlm_objectWithHandoverData:(realm::AnyThreadConfined&)data
-                                  metadata:(nullable id)metadata inRealm:(RLMRealm *)realm;
++ (instancetype)rlm_objectWithHandoverable:(realm::AnyHandoverable&)handoverable metadata:(nullable id)metadata inRealm:(RLMRealm *)realm;
 
 @end
 

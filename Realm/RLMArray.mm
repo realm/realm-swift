@@ -443,7 +443,7 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 @implementation RLMArray (Handover)
 
-- (realm::AnyHandoverable)rlm_handoverable {
+- (realm::AnyThreadConfined)rlm_handoverData {
     @throw RLMException(@"Unexpected handover of unmanaged `RLMArray`");
 }
 
@@ -451,7 +451,8 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
     @throw RLMException(@"Unexpected handover of unmanaged `RLMArray`");
 }
 
-+ (instancetype)rlm_objectWithHandoverable:(__unused realm::AnyHandoverable&)handoverable metadata:(nullable __unused id)metadata inRealm:(__unused RLMRealm *)realm {
++ (instancetype)rlm_objectWithHandoverData:(__unused realm::AnyThreadConfined&)data
+                                  metadata:(nullable __unused id)metadata inRealm:(__unused RLMRealm *)realm {
     @throw RLMException(@"Unexpected handover of unmanaged `RLMArray`");
 }
 

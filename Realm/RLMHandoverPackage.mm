@@ -45,7 +45,7 @@ using namespace realm;
         _metadata = [NSMutableArray arrayWithCapacity:objectsToHandOver.count];
         _classes = [NSMutableArray arrayWithCapacity:objectsToHandOver.count];
 
-        std::vector<realm::AnyThreadConfined> handoverables;
+        std::vector<realm::AnyHandoverable> handoverables;
         handoverables.reserve(objectsToHandOver.count);
         for (id<RLMHandoverable, RLMHandoverable_Private> object in objectsToHandOver) {
             if (![object conformsToProtocol: @protocol(RLMHandoverable_Private)]) {
@@ -58,7 +58,7 @@ using namespace realm;
                     @throw RLMException(@"Can only hand over objects from the Realm they belong");
                 }
             }
-            handoverables.push_back(object.rlm_handoverData);
+            handoverables.push_back(object.rlm_handoverable);
             [_metadata addObject:[object rlm_handoverMetadata]];
             [_classes addObject:[object class]];
         }
@@ -83,12 +83,11 @@ using namespace realm;
         return nil;
     }
 
-    std::vector<AnyThreadConfined> handoverables = realm->_realm->accept_handover(*_package);
+    std::vector<AnyHandoverable> handoverables = realm->_realm->accept_handover(*_package);
 
     NSMutableArray<id<RLMHandoverable>> *objects = [NSMutableArray arrayWithCapacity:handoverables.size()];
     for (NSUInteger i = 0; i < handoverables.size(); i++) {
-        [objects addObject:[_classes[i] rlm_objectWithHandoverData:handoverables[i]
-                                                          metadata:_metadata[i] inRealm:realm]];
+        [objects addObject:[_classes[i] rlm_objectWithHandoverable:handoverables[i] metadata:_metadata[i] inRealm:realm]];
     }
 
     _metadata = nil;

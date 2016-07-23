@@ -533,7 +533,7 @@ struct Realm::HandoverPackage {
     }
 };
 
-std::shared_ptr<Realm::HandoverPackage> Realm::package_for_handover(std::vector<AnyHandoverable> objects_to_hand_over) {
+std::shared_ptr<Realm::HandoverPackage> Realm::package_for_handover(std::vector<AnyThreadConfined> objects_to_hand_over) {
     std::shared_ptr<Realm::HandoverPackage> handover = std::make_shared<HandoverPackage>();
     handover->version = m_shared_group->pin_version();
 
@@ -545,7 +545,7 @@ std::shared_ptr<Realm::HandoverPackage> Realm::package_for_handover(std::vector<
     return handover;
 }
 
-std::vector<AnyHandoverable> Realm::accept_handover(Realm::HandoverPackage& handover) {
+std::vector<AnyThreadConfined> Realm::accept_handover(Realm::HandoverPackage& handover) {
     if (!handover.is_awaiting_import()) {
         REALM_TERMINATE("Handover package imported multiple times");
     }
@@ -555,7 +555,7 @@ std::vector<AnyHandoverable> Realm::accept_handover(Realm::HandoverPackage& hand
     m_shared_group->unpin_version(handover.version);
     handover.version = SharedGroup::VersionID();
 
-    std::vector<AnyHandoverable> objects;
+    std::vector<AnyThreadConfined> objects;
     objects.reserve(handover.objects.size());
     for (auto &object : handover.objects) {
         objects.push_back(std::move(object).import_from_handover(*m_shared_group));
