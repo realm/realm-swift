@@ -423,14 +423,14 @@ public class ObjectUtil: NSObject {
     }
 }
 
-// MARK: Handoverable
+// MARK: ThreadConfined
 
 private func unsafeBitCastTrampoline<T, U>(_ x: T) -> U {
     return unsafeBitCast(x, to: U.self)
 }
 
-extension Object: Handoverable, _Handoverable {
-    var bridgedHandoverable: RLMThreadConfined {
+extension Object: ThreadConfined, _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
         return unsafeBitCast(self, to: RLMObject.self)
     }
 
@@ -438,8 +438,8 @@ extension Object: Handoverable, _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Self {
-        return unsafeBitCastTrampoline(handoverable)
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> Self {
+        return unsafeBitCastTrampoline(data)
     }
 }
 
@@ -850,14 +850,14 @@ public class ObjectUtil: NSObject {
     }
 }
 
-// MARK: Handoverable
+// MARK: ThreadConfined
 
 private func unsafeBitCastTrampoline<T, U>(x: T) -> U {
     return unsafeBitCast(x, U.self)
 }
 
-extension Object: Handoverable, _Handoverable {
-    var bridgedHandoverable: RLMThreadConfined {
+extension Object: ThreadConfined, _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
         return unsafeBitCast(self, RLMObject.self)
     }
 
@@ -865,8 +865,8 @@ extension Object: Handoverable, _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Self {
-        return unsafeBitCastTrampoline(handoverable)
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> Self {
+        return unsafeBitCastTrampoline(data)
     }
 }
 

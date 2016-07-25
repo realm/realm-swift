@@ -51,8 +51,8 @@ Lists can be filtered and sorted with the same predicates as `Results<T>`.
 
 When added as a property on `Object` models, the property must be declared as `let` and cannot be `dynamic`.
 */
-// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
-public final class List<T: Object>: ListBase, Handoverable {
+// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
+public final class List<T: Object>: ListBase, ThreadConfined {
 
     /// Element type contained in this collection.
     public typealias Element = T
@@ -575,8 +575,8 @@ extension List {
     public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
 }
 
-extension List: _Handoverable {
-    var bridgedHandoverable: RLMThreadConfined {
+extension List: _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
         return _rlmArray
     }
 
@@ -584,8 +584,8 @@ extension List: _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> List {
-        return List(array: handoverable as! RLMArray)
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> List {
+        return List(array: data as! RLMArray)
     }
 }
 
@@ -623,8 +623,8 @@ public class ListBase: RLMListBase {
 
  Properties of `List` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
 */
-// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
-public final class List<T: Object>: ListBase, Handoverable {
+// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
+public final class List<T: Object>: ListBase, ThreadConfined {
 
     /// The type of the elements contained within the collection.
     public typealias Element = T
@@ -1085,8 +1085,8 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
     }
 }
 
-extension List: _Handoverable {
-    var bridgedHandoverable: RLMThreadConfined {
+extension List: _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
         return _rlmArray
     }
 
@@ -1094,8 +1094,8 @@ extension List: _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> List {
-        return List(array: handoverable as! RLMArray)
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> List {
+        return List(array: data as! RLMArray)
     }
 }
 

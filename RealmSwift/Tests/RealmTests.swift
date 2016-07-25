@@ -832,7 +832,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(42, intObject.intCol)
     }
 
-    func testHandoverMultipleHandoverableTypes() {
+    func testHandoverMultipleThreadConfinedTypes() {
         let realm = try! Realm()
         let results = realm.allObjects(ofType: SwiftStringObject.self)
             .filter(using: "stringCol != 'C'")
@@ -844,7 +844,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(1, results.count)
         XCTAssertEqual("hello world", results[0].stringCol)
         performBlockAndWait { queue in
-            realm.async(onQueue: queue, handingOver: [string, results] as [Handoverable]) { realm, objects in
+            realm.async(onQueue: queue, handingOver: [string, results] as [ThreadConfined]) { realm, objects in
                 let string = objects[0] as! SwiftStringObject
                 let results = objects[1] as! Results<SwiftStringObject>
                 XCTAssertEqual(1, results.count)
@@ -1917,7 +1917,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(42, intObject.intCol)
     }
 
-    func testHandoverMultipleHandoverableTypes() {
+    func testHandoverMultipleThreadConfinedTypes() {
         let realm = try! Realm()
         let results = realm.objects(SwiftStringObject.self)
             .filter("stringCol != 'C'")
@@ -1929,7 +1929,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(1, results.count)
         XCTAssertEqual("hello world", results[0].stringCol)
         performBlockAndWait { queue in
-            realm.async(onQueue: queue, handingOver: [string, results] as [Handoverable]) { realm, objects in
+            realm.async(onQueue: queue, handingOver: [string, results] as [ThreadConfined]) { realm, objects in
                 let string = objects[0] as! SwiftStringObject
                 let results = objects[1] as! Results<SwiftStringObject>
                 XCTAssertEqual(1, results.count)

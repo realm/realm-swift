@@ -80,8 +80,8 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
  LinkingObjects can only be used as a property on `Object` models. The property must
  be declared as `let` and cannot be `dynamic`.
  */
-// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
-public final class LinkingObjects<T: Object>: LinkingObjectsBase, Handoverable {
+// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
+public final class LinkingObjects<T: Object>: LinkingObjectsBase, ThreadConfined {
     /// Element type contained in this collection.
     public typealias Element = T
 
@@ -439,9 +439,9 @@ private struct LinkingObjectsHandoverMetadata {
     var property: RLMProperty?
 }
 
-extension LinkingObjects: _Handoverable {
-    var bridgedHandoverable: RLMThreadConfined {
-        return cachedRLMResults ?? unsafeBitCast(object!.objectWithoutConsumingRow, to: Object.self).bridgedHandoverable
+extension LinkingObjects: _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
+        return cachedRLMResults ?? unsafeBitCast(object!.objectWithoutConsumingRow, to: Object.self).bridgedData
     }
 
     var bridgedMetadata: Any? {
@@ -451,16 +451,16 @@ extension LinkingObjects: _Handoverable {
         )
     }
 
-    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> LinkingObjects {
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> LinkingObjects {
         let metadata = metadata as! LinkingObjectsHandoverMetadata
         let bridged = LinkingObjects(property: metadata.propertyName)
-        switch handoverable {
+        switch data {
         case let results as RLMResults<RLMObject>:
             bridged.cachedRLMResults = results
         case let object as RLMObjectBase:
             bridged.attachTo(object: object, property: metadata.property!)
         default:
-            fatalError("Unexpected handoverable type \(handoverable.dynamicType)")
+            fatalError("Unexpected handoff type \(data.dynamicType)")
         }
         return bridged
     }
@@ -566,8 +566,8 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
  `LinkingObjects` can only be used as a property on `Object` models. Properties of this type must
  be declared as `let` and cannot be `dynamic`.
  */
-// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
-public final class LinkingObjects<T: Object>: LinkingObjectsBase, Handoverable {
+// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
+public final class LinkingObjects<T: Object>: LinkingObjectsBase, ThreadConfined {
     /// The element type contained in this collection.
     public typealias Element = T
 
@@ -910,9 +910,9 @@ private struct LinkingObjectsHandoverMetadata {
     var property: RLMProperty?
 }
 
-extension LinkingObjects: _Handoverable {
-    var bridgedHandoverable: RLMThreadConfined {
-        return cachedRLMResults ?? unsafeBitCast(object!.objectWithoutConsumingRow, Object.self).bridgedHandoverable
+extension LinkingObjects: _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
+        return cachedRLMResults ?? unsafeBitCast(object!.objectWithoutConsumingRow, Object.self).bridgedData
     }
 
     var bridgedMetadata: Any? {
@@ -922,16 +922,16 @@ extension LinkingObjects: _Handoverable {
         )
     }
 
-    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> LinkingObjects {
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> LinkingObjects {
         let metadata = metadata as! LinkingObjectsHandoverMetadata
         let bridged = LinkingObjects(property: metadata.propertyName)
-        switch handoverable {
+        switch data {
         case let results as RLMResults:
             bridged.cachedRLMResults = results
         case let object as RLMObjectBase:
             bridged.attachTo(object: object, property: metadata.property!)
         default:
-            fatalError("Unexpected handoverable type \(handoverable.dynamicType)")
+            fatalError("Unexpected handoff type \(data.dynamicType)")
         }
         return bridged
     }

@@ -11,29 +11,29 @@ import Realm
 #if swift(>=3.0)
     
 /// An object that can be handed over between threads
-@objc public protocol Handoverable {
-    // Runtime-enforced requirement that type also conforms to `_Handoverable`
+@objc public protocol ThreadConfined {
+    // Runtime-enforced requirement that type also conforms to `_ThreadConfined`
 }
 
-// Conformance to `_Handoverable` by `Handoverable` types cannot be verified by the typechecker or tests
-internal protocol _Handoverable {
+// Conformance to `_ThreadConfined` by `ThreadConfined` types cannot be verified by the typechecker or tests
+internal protocol _ThreadConfined {
     var realm: Realm? { get }
-    var bridgedHandoverable: RLMThreadConfined { get }
+    var bridgedData: RLMThreadConfined { get }
     var bridgedMetadata: Any? { get }
-    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Self
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> Self
 }
 
-extension Handoverable {
-    internal var _handoverable: _Handoverable {
-        if let object = self as? _Handoverable {
+extension ThreadConfined {
+    internal var _private: _ThreadConfined {
+        if let object = self as? _ThreadConfined {
             return object
         } else {
             fatalError("Illegal custom conformances to `RLMThreadConfined` by \(self.dynamicType)")
         }
     }
 
-    static internal var _handoverable: _Handoverable.Type {
-        if let type = self as? _Handoverable.Type {
+    static internal var _private: _ThreadConfined.Type {
+        if let type = self as? _ThreadConfined.Type {
             return type
         } else {
             fatalError("Illegal custom conformances to `RLMThreadConfined` by \(self)")
@@ -43,19 +43,19 @@ extension Handoverable {
     /// The `Realm` the object is associated with
     // Note: cannot be a protocol requirement since `Realm` is not an Objective-C type.
     public var realm: Realm? {
-        return _handoverable.realm
+        return _private.realm
     }
 }
 
-public class HandoverPackage<T: Handoverable> {
+public class HandoverPackage<T: ThreadConfined> {
     private var metadata: [Any?]
-    private var types: [Handoverable.Type]
+    private var types: [ThreadConfined.Type]
     private let package: RLMHandoverPackage
 
     internal init(realm: Realm, objects: [T]) {
-        self.metadata = objects.map { $0._handoverable.bridgedMetadata }
+        self.metadata = objects.map { $0._private.bridgedMetadata }
         self.types = objects.map { $0.dynamicType }
-        self.package = realm.rlmRealm.packageObjects(forHandover: objects.map { $0._handoverable.bridgedHandoverable })
+        self.package = realm.rlmRealm.exportObjects(forThreadHandoff: objects.map { $0._private.bridgedData })
     }
 
     public func importOnCurrentThead() throws -> (Realm, [T]) {
@@ -71,7 +71,7 @@ public class HandoverPackage<T: Handoverable> {
         let objects: [T] = zip(types, zip(handoverables, metadata)).map { type, arguments in
             let handoverable = unsafeBitCast(arguments.0, to: RLMThreadConfined.self)
             let metadata = arguments.1
-            return type._handoverable.bridge(handoverable: handoverable, metadata: metadata) as! T
+            return type._private.bridge(data: handoverable, metadata: metadata) as! T
         }
         return (Realm(handoverImport.realm), objects)
     }
@@ -80,29 +80,29 @@ public class HandoverPackage<T: Handoverable> {
 #else
 
 /// An object that can be handed over between threads
-@objc public protocol Handoverable {
-    // Runtime-enforced requirement that type also conforms to `_Handoverable`
+@objc public protocol ThreadConfined {
+    // Runtime-enforced requirement that type also conforms to `_ThreadConfined`
 }
 
-// Conformance to `_Handoverable` by `Handoverable` types cannot be verified by the typechecker or tests
-internal protocol _Handoverable {
+// Conformance to `_ThreadConfined` by `ThreadConfined` types cannot be verified by the typechecker or tests
+internal protocol _ThreadConfined {
     var realm: Realm? { get }
-    var bridgedHandoverable: RLMThreadConfined { get }
+    var bridgedData: RLMThreadConfined { get }
     var bridgedMetadata: Any? { get }
-    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Self
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> Self
 }
 
-extension Handoverable {
-    internal var _handoverable: _Handoverable {
-        if let object = self as? _Handoverable {
+extension ThreadConfined {
+    internal var _private: _ThreadConfined {
+        if let object = self as? _ThreadConfined {
             return object
         } else {
             fatalError("Illegal custom conformances to `RLMThreadConfined` by \(self.dynamicType)")
         }
     }
 
-    static internal var _handoverable: _Handoverable.Type {
-        if let type = self as? _Handoverable.Type {
+    static internal var _private: _ThreadConfined.Type {
+        if let type = self as? _ThreadConfined.Type {
             return type
         } else {
             fatalError("Illegal custom conformances to `RLMThreadConfined` by \(self)")
@@ -112,19 +112,21 @@ extension Handoverable {
     /// The `Realm` the object is associated with
     // Note: cannot be a protocol requirement since `Realm` is not an Objective-C type.
     public var realm: Realm? {
-        return _handoverable.realm
+        return _private.realm
     }
 }
 
-public class HandoverPackage<T: Handoverable> {
+public class HandoverPackage<T: ThreadConfined> {
     private var metadata: [Any?]
-    private var types: [Handoverable.Type]
+    private var types: [ThreadConfined.Type]
     private let package: RLMHandoverPackage
 
     internal init(realm: Realm, objects: [T]) {
-        self.metadata = objects.map { $0._handoverable.bridgedMetadata }
+        self.metadata = objects.map { $0._private.bridgedMetadata }
         self.types = objects.map { $0.dynamicType }
-        self.package = realm.rlmRealm.packageObjectsForHandover(objects.map { $0._handoverable.bridgedHandoverable })
+        self.package = realm.rlmRealm.exportObjectsForThreadHandoff(objects.map {
+            $0._private.bridgedData
+        })
     }
 
     public func importOnCurrentThead() throws -> (Realm, [T]) {
@@ -140,7 +142,7 @@ public class HandoverPackage<T: Handoverable> {
         let objects: [T] = zip(types, zip(handoverables, metadata)).map { type, arguments in
             let handoverable = unsafeBitCast(arguments.0, RLMThreadConfined.self)
             let metadata = arguments.1
-            return type._handoverable.bridge(handoverable, metadata: metadata) as! T
+            return type._private.bridge(handoverable, metadata: metadata) as! T
         }
         return (Realm(handoverImport.realm), objects)
     }

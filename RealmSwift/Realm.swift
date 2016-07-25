@@ -596,26 +596,26 @@ public final class Realm {
 
     // MARK: Handover
 
-    public func packageForHandover<T: Handoverable>(_ objects: [T]) -> HandoverPackage<T> {
+    public func exportForThreadHandoff<T: ThreadConfined>(_ objects: [T]) -> HandoverPackage<T> {
         return HandoverPackage(realm: self, objects: objects)
     }
 
     public func async(onQueue queue: DispatchQueue = defaultQueue, execute block: (Realm) -> ()) {
-        async(onQueue: queue, handingOver: [] as [Handoverable]) { realm, _ in
+        async(onQueue: queue, handingOver: [] as [ThreadConfined]) { realm, _ in
             block(realm)
         }
     }
 
-    public func async<O: Handoverable>(onQueue queue: DispatchQueue = defaultQueue,
+    public func async<O: ThreadConfined>(onQueue queue: DispatchQueue = defaultQueue,
                       handingOver object: O, execute block: (Realm, O) -> ()) {
         async(onQueue: queue, handingOver: [object]) { realm, singleObjectArray in
             block(realm, singleObjectArray[0])
         }
     }
 
-    public func async<O: Handoverable>(onQueue queue: DispatchQueue = defaultQueue,
+    public func async<O: ThreadConfined>(onQueue queue: DispatchQueue = defaultQueue,
                       handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
-        let package = packageForHandover(objects)
+        let package = exportForThreadHandoff(objects)
         queue.async {
             autoreleasepool {
                 let (realm, objects) = try! package.importOnCurrentThead()
@@ -1285,26 +1285,26 @@ public final class Realm {
 
     // MARK: Handover
 
-    public func packageForHandover<T: Handoverable>(objects: [T]) -> HandoverPackage<T> {
+    public func exportForThreadHandoff<T: ThreadConfined>(objects: [T]) -> HandoverPackage<T> {
         return HandoverPackage(realm: self, objects: objects)
     }
 
     public func async(onQueue queue: dispatch_queue_t = defaultQueue, execute block: (Realm) -> ()) {
-        async(onQueue: queue, handingOver: [] as [Handoverable]) { realm, _ in
+        async(onQueue: queue, handingOver: [] as [ThreadConfined]) { realm, _ in
             block(realm)
         }
     }
 
-    public func async<O: Handoverable>(onQueue queue: dispatch_queue_t = defaultQueue,
+    public func async<O: ThreadConfined>(onQueue queue: dispatch_queue_t = defaultQueue,
                                  handingOver object: O, execute block: (Realm, O) -> ()) {
         async(onQueue: queue, handingOver: [object]) { realm, singleObjectArray in
             block(realm, singleObjectArray[0])
         }
     }
 
-    public func async<O: Handoverable>(onQueue queue: dispatch_queue_t = defaultQueue,
+    public func async<O: ThreadConfined>(onQueue queue: dispatch_queue_t = defaultQueue,
                                  handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
-        let package = packageForHandover(objects)
+        let package = exportForThreadHandoff(objects)
         dispatch_async(queue, { 
             autoreleasepool {
                 let (realm, objects) = try! package.importOnCurrentThead()

@@ -70,8 +70,8 @@ up-to-date done on a background thread whenever possible.
 
 Results cannot be created directly.
 */
-// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
-public final class Results<T: Object>: NSObject, NSFastEnumeration, Handoverable {
+// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
+public final class Results<T: Object>: NSObject, NSFastEnumeration, ThreadConfined {
 
     internal let rlmResults: RLMResults<RLMObject>
 
@@ -381,10 +381,10 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration, Handoverable
     }
 }
 
-// MARK: Handoverable
+// MARK: ThreadConfined
 
-extension Results: _Handoverable {
-    var bridgedHandoverable: RLMThreadConfined {
+extension Results: _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
         return rlmResults
     }
 
@@ -392,8 +392,8 @@ extension Results: _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Results {
-        return Results(handoverable as! RLMResults)
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> Results {
+        return Results(data as! RLMResults)
     }
 }
 
@@ -556,8 +556,8 @@ public class ResultsBase: NSObject, NSFastEnumeration {
  `Results` cannot be directly instantiated.
 */
 // FIXME: Move `RealmCollectionType` conformance to extension once bug SR-2078 is fixed.
-// FIXME: Remove redundant conformance to `Handoverable` once bug SR-2146 is fixed.
-public final class Results<T: Object>: ResultsBase, Handoverable {
+// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
+public final class Results<T: Object>: ResultsBase, ThreadConfined {
 
     /// The type of the objects contained in the collection.
     public typealias Element = T
@@ -873,10 +873,10 @@ public final class Results<T: Object>: ResultsBase, Handoverable {
     }
 }
 
-// MARK: Handoverable
+// MARK: ThreadConfined
 
-extension Results: _Handoverable {
-    var bridgedHandoverable: RLMThreadConfined {
+extension Results: _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
         return rlmResults
     }
 
@@ -884,8 +884,8 @@ extension Results: _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Results {
-        return Results(handoverable as! RLMResults)
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> Results {
+        return Results(data as! RLMResults)
     }
 }
 

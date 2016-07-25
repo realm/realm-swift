@@ -35,7 +35,7 @@ static BOOL classOrSuperclass_conformsToProtocol(Class cls, Protocol *protocol) 
     free(_classList);
 }
 
-- (void)testHandoverablePrivateConformance {
+- (void)testThreadConfinedPrivateConformance {
     // Ensure that conformance to `RLMThreadConfined` implies conformance to `RLMThreadConfined_Private`
     Protocol *publicProtocol = @protocol(RLMThreadConfined);
     Protocol *privateProtocol = @protocol(RLMThreadConfined_Private);
