@@ -59,7 +59,12 @@ using namespace realm;
         handoverables.reserve(objects.count);
         for (id<RLMThreadConfined, RLMThreadConfined_Private> object in objects) {
             if (![object conformsToProtocol: @protocol(RLMThreadConfined_Private)]) {
-                @throw RLMException(@"Illegal custom conformances to `RLMThreadConfined` by %@", [object class]);
+                if ([object conformsToProtocol: @protocol(RLMThreadConfined)]) {
+                    @throw RLMException(@"Illegal custom conformances to `RLMThreadConfined` by `%@`", [object class]);
+                }
+                else {
+                    @throw RLMException(@"Unexpected `%@` in array of expected `RLMThreadConfined` objects", [object class]);
+                }
             }
             if (realm != object.realm) {
                 if (object.realm == nil) {
