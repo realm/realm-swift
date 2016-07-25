@@ -1285,6 +1285,19 @@ public final class Realm {
 
     // MARK: Handover
 
+    /**
+     Creates a `HandoverPackage` from the passed in objects that can be safely imported on a separate thread.
+
+     Used to pass objects between threads in a thread-safe manner.
+     
+     - warning: Note that the returned `HandoverPackage` must be imported at most once, and that the current version of the
+     Realm will remain pinned until this package is imported or deallocated.
+
+     - parameter objects: The objects to pass between threads.
+     - returns: A package that can be imported on a separate thread.
+
+     - seealso: HandoverPackage
+     */
     public func exportForThreadHandover<T: ThreadConfined>(objects: [T]) -> HandoverPackage<T> {
         return HandoverPackage(realm: self, objects: objects)
     }

@@ -20,7 +20,7 @@ import Realm
 
 #if swift(>=3.0)
     
-/// An object that can be handed over between threads
+/// A Realm-bound object that can only be passed between threads by exporting for handover
 @objc public protocol ThreadConfined {
     // Runtime-enforced requirement that type also conforms to `_ThreadConfined`
 }
@@ -57,6 +57,7 @@ extension ThreadConfined {
     }
 }
 
+/// An object intended to be passed between threads containing information about objects being handed over
 public class HandoverPackage<T: ThreadConfined> {
     private var metadata: [Any?]
     private var types: [ThreadConfined.Type]
@@ -68,6 +69,16 @@ public class HandoverPackage<T: ThreadConfined> {
         self.package = realm.rlmRealm.exportForThreadHandover(objects.map { $0._private.bridgedData })
     }
 
+    /**
+     Imports the handover package, creating an instance of the realm and objects on the current thread.
+
+     - warning: This method may be not be called more than once on a given handover package. The realm version will
+              remain pinned until this method is called or the object is deinitialized.
+
+     - throws: An `NSError` if the Realm could not be initialized.
+
+     - returns: A tuple containing a `Realm` instance and an `Array` of handed over objects associated with that `Realm`.
+     */
     public func importOnCurrentThead() throws -> (Realm, [T]) {
         defer {
             metadata = []
@@ -89,7 +100,7 @@ public class HandoverPackage<T: ThreadConfined> {
 
 #else
 
-/// An object that can be handed over between threads
+/// A Realm-bound object that can only be passed between threads by exporting for handover
 @objc public protocol ThreadConfined {
     // Runtime-enforced requirement that type also conforms to `_ThreadConfined`
 }
@@ -126,6 +137,7 @@ extension ThreadConfined {
     }
 }
 
+/// An object intended to be passed between threads containing information about objects being handed over
 public class HandoverPackage<T: ThreadConfined> {
     private var metadata: [Any?]
     private var types: [ThreadConfined.Type]
@@ -137,6 +149,16 @@ public class HandoverPackage<T: ThreadConfined> {
         self.package = realm.rlmRealm.exportForThreadHandover(objects.map { $0._private.bridgedData })
     }
 
+    /**
+     Imports the handover package, creating an instance of the realm and objects on the current thread.
+
+     - warning: This method may be not be called more than once on a given handover package. The realm version will
+     remain pinned until this method is called or the object is deinitialized.
+
+     - throws: An `NSError` if the Realm could not be initialized.
+
+     - returns: A tuple containing a `Realm` instance and an `Array` of handed over objects associated with that `Realm`.
+     */
     public func importOnCurrentThead() throws -> (Realm, [T]) {
         defer {
             metadata = []

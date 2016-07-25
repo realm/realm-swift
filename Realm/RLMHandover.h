@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// An Realm-bound object that can only be passed between threads by exporting for handover
+/// A Realm-bound object that can only be passed between threads by exporting for handover
 @protocol RLMThreadConfined <NSObject>
 
 /// The `RLMRealm` the object is associated with
@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/// An object containing the data imported from handover
 @interface RLMHandoverImport : NSObject
 
 /// The `RLMRealm` from which the `objects` were handed over
@@ -42,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/// An object intended to be passed between threads containing information about objects being handed over
 @interface RLMHandoverPackage : NSObject
 
 /**

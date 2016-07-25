@@ -499,14 +499,15 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
 /**
  Creates a `RLMHandoverPackage` from the passed in objects that can be safely imported on a separate thread.
 
- Used to pass objects between threads in a thread-safe manner. Note that the returned `RLMHandoverPackage`
- must be imported at most once, and that the current version of the Realm will remain pinned until this
- package is imported or deallocated.
+ Used to pass objects between threads in a thread-safe manner.
+
+ @warning Note that the returned `HandoverPackage` must be imported at most once, and that the current version of the
+ Realm will remain pinned until this package is imported or deallocated.
 
  @param objects The objects to pass between threads.
- @return                  A package that can be imported on a separate thread.
+ @return A package that can be imported on a separate thread.
 
- @see                     RLMHandoverPackage
+ @see RLMHandoverPackage
  */
 - (RLMHandoverPackage *)exportObjectsForThreadHandover:(NSArray<id<RLMThreadConfined>> *)objects
 NS_SWIFT_NAME(exportForThreadHandover(_:));
