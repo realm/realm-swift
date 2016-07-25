@@ -618,7 +618,7 @@ public final class Realm {
         let package = exportForThreadHandover(objects)
         queue.async {
             autoreleasepool {
-                let (realm, objects) = try! package.importOnCurrentThead()
+                let (realm, objects) = try! package.importOnCurrentThread()
                 block(realm, objects)
             }
         }
@@ -1320,8 +1320,8 @@ public final class Realm {
         let package = exportForThreadHandover(objects)
         dispatch_async(queue, { 
             autoreleasepool {
-                let (realm, objects) = try! package.importOnCurrentThead()
                 block(realm, objects)
+                let (realm, objects) = try! package.importOnCurrentThread()
             }
         })
     }

@@ -79,7 +79,7 @@ public class HandoverPackage<T: ThreadConfined> {
 
      - returns: A tuple containing a `Realm` instance and an `Array` of handed over objects associated with that `Realm`.
      */
-    public func importOnCurrentThead() throws -> (Realm, [T]) {
+    public func importOnCurrentThread() throws -> (Realm, [T]) {
         defer {
             metadata = []
             types = []
@@ -159,7 +159,7 @@ public class HandoverPackage<T: ThreadConfined> {
 
      - returns: A tuple containing a `Realm` instance and an `Array` of handed over objects associated with that `Realm`.
      */
-    public func importOnCurrentThead() throws -> (Realm, [T]) {
+    public func importOnCurrentThread() throws -> (Realm, [T]) {
         defer {
             metadata = []
             types = []
