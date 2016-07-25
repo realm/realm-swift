@@ -18,9 +18,9 @@ import Realm
 // Conformance to `_Handoverable` by `Handoverable` types cannot be verified by the typechecker or tests
 internal protocol _Handoverable {
     var realm: Realm? { get }
-    var bridgedHandoverable: RLMHandoverable { get }
+    var bridgedHandoverable: RLMThreadConfined { get }
     var bridgedMetadata: Any? { get }
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Self
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Self
 }
 
 extension Handoverable {
@@ -28,7 +28,7 @@ extension Handoverable {
         if let object = self as? _Handoverable {
             return object
         } else {
-            fatalError("Illegal custom conformances to `RLMHandoverable` by \(self.dynamicType)")
+            fatalError("Illegal custom conformances to `RLMThreadConfined` by \(self.dynamicType)")
         }
     }
 
@@ -36,7 +36,7 @@ extension Handoverable {
         if let type = self as? _Handoverable.Type {
             return type
         } else {
-            fatalError("Illegal custom conformances to `RLMHandoverable` by \(self)")
+            fatalError("Illegal custom conformances to `RLMThreadConfined` by \(self)")
         }
     }
 
@@ -65,11 +65,11 @@ public class HandoverPackage<T: Handoverable> {
         }
 
         let handoverImport = try package.importOnCurrentThread()
-        // Swift Arrays must be properly typed on index access, and `Object` does not conform to `RLMHandoverable`
+        // Swift Arrays must be properly typed on index access, and `Object` does not conform to `RLMThreadConfined`
         let handoverables = unsafeBitCast(handoverImport.objects, to: [AnyObject].self)
 
         let objects: [T] = zip(types, zip(handoverables, metadata)).map { type, arguments in
-            let handoverable = unsafeBitCast(arguments.0, to: RLMHandoverable.self)
+            let handoverable = unsafeBitCast(arguments.0, to: RLMThreadConfined.self)
             let metadata = arguments.1
             return type._handoverable.bridge(handoverable: handoverable, metadata: metadata) as! T
         }
@@ -87,9 +87,9 @@ public class HandoverPackage<T: Handoverable> {
 // Conformance to `_Handoverable` by `Handoverable` types cannot be verified by the typechecker or tests
 internal protocol _Handoverable {
     var realm: Realm? { get }
-    var bridgedHandoverable: RLMHandoverable { get }
+    var bridgedHandoverable: RLMThreadConfined { get }
     var bridgedMetadata: Any? { get }
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Self
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Self
 }
 
 extension Handoverable {
@@ -97,7 +97,7 @@ extension Handoverable {
         if let object = self as? _Handoverable {
             return object
         } else {
-            fatalError("Illegal custom conformances to `RLMHandoverable` by \(self.dynamicType)")
+            fatalError("Illegal custom conformances to `RLMThreadConfined` by \(self.dynamicType)")
         }
     }
 
@@ -105,7 +105,7 @@ extension Handoverable {
         if let type = self as? _Handoverable.Type {
             return type
         } else {
-            fatalError("Illegal custom conformances to `RLMHandoverable` by \(self)")
+            fatalError("Illegal custom conformances to `RLMThreadConfined` by \(self)")
         }
     }
 
@@ -134,11 +134,11 @@ public class HandoverPackage<T: Handoverable> {
         }
 
         let handoverImport = try package.importOnCurrentThread()
-        // Swift Arrays must be properly typed on index access, and `Object` does not conform to `RLMHandoverable`
+        // Swift Arrays must be properly typed on index access, and `Object` does not conform to `RLMThreadConfined`
         let handoverables = unsafeBitCast(handoverImport.objects, [AnyObject].self)
 
         let objects: [T] = zip(types, zip(handoverables, metadata)).map { type, arguments in
-            let handoverable = unsafeBitCast(arguments.0, RLMHandoverable.self)
+            let handoverable = unsafeBitCast(arguments.0, RLMThreadConfined.self)
             let metadata = arguments.1
             return type._handoverable.bridge(handoverable, metadata: metadata) as! T
         }

@@ -447,7 +447,7 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 
 @end
 
-@interface RLMObjectBase (Handover) <RLMHandoverable_Private>
+@interface RLMObjectBase (Handover) <RLMThreadConfined_Private>
 @end
 
 @implementation RLMObjectBase (Handover)

@@ -1697,7 +1697,7 @@
     NSArray<RLMObject *> *objects = @[stringObject, intObject];
     RLMAssertThrowsWithReasonMatching([realm dispatchAsyncWithObjects:objects
                                                                 block:^(RLMRealm * _Nonnull,
-                                                                        NSArray<id<RLMHandoverable>> * _Nonnull) {
+                                                                        NSArray<id<RLMThreadConfined>> * _Nonnull) {
         XCTFail("Unexpected successful execution of block");
     }], @"Can only hand over objects that are mangaged by a Realm");
 
@@ -1709,7 +1709,7 @@
     RLMRealm *otherRealm = [RLMRealm realmWithConfiguration:configuration error:nil];
     RLMAssertThrowsWithReasonMatching([otherRealm dispatchAsyncWithObjects:objects
                                                                      block:^(RLMRealm * _Nonnull,
-                                                                             NSArray<id<RLMHandoverable>> * _Nonnull) {
+                                                                             NSArray<id<RLMThreadConfined>> * _Nonnull) {
         XCTFail("Unexpected successful execution of block");
     }], @"Can only hand over objects from the Realm they belong");
 }
@@ -1728,7 +1728,7 @@
     [self performBlockAndWait:^(dispatch_queue_t queue) {
         [realm dispatchAsyncOnQueue:queue withObjects:objects
                               block:^(RLMRealm * _Nonnull realm,
-                                      NSArray<id<RLMHandoverable>> * _Nonnull objects) {
+                                      NSArray<id<RLMThreadConfined>> * _Nonnull objects) {
             StringObject *stringObject = (StringObject *)objects[0];
             IntObject *intObject = (IntObject *)objects[1];
             [realm transactionWithBlock:^{
@@ -1757,7 +1757,7 @@
     [self performBlockAndWait:^(dispatch_queue_t queue) {
         [realm dispatchAsyncOnQueue:queue withObjects:@[object.dogs]
                               block:^(RLMRealm * _Nonnull realm,
-                                      NSArray<id<RLMHandoverable>> * _Nonnull objects) {
+                                      NSArray<id<RLMThreadConfined>> * _Nonnull objects) {
             RLMArray<DogObject *> *dogs = (RLMArray<DogObject *> *)objects[0];
             XCTAssertEqual(1ul, dogs.count);
             XCTAssertEqualObjects(@"Friday", dogs[0].dogName);
@@ -1799,7 +1799,7 @@
     [self performBlockAndWait:^(dispatch_queue_t queue) {
         [realm dispatchAsyncOnQueue:queue withObjects:@[results]
                               block:^(RLMRealm * _Nonnull realm,
-                                      NSArray<id<RLMHandoverable>> * _Nonnull objects) {
+                                      NSArray<id<RLMThreadConfined>> * _Nonnull objects) {
             RLMResults<StringObject *> *results = (RLMResults<StringObject *> *)objects[0];
             XCTAssertEqual(4ul, [StringObject allObjects].count);
             XCTAssertEqual(3ul, results.count);
@@ -1839,7 +1839,7 @@
     [self performBlockAndWait:^(dispatch_queue_t queue) {
         [realm dispatchAsyncOnQueue:queue withObjects:@[dog.owners]
                               block:^(RLMRealm * _Nonnull realm,
-                                      NSArray<id<RLMHandoverable>> * _Nonnull objects) {
+                                      NSArray<id<RLMThreadConfined>> * _Nonnull objects) {
             RLMLinkingObjects<OwnerObject *> *owners = (RLMLinkingObjects<OwnerObject *> *)objects[0];
             XCTAssertEqual(1ul, owners.count);
             XCTAssertEqualObjects(@"Jaden", ((OwnerObject *)owners[0]).name);

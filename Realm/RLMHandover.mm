@@ -16,13 +16,13 @@ using namespace realm;
 
 @interface RLMHandoverImport ()
 
-- (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMHandoverable>> *)objects;
+- (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)objects;
 
 @end
 
 @implementation RLMHandoverImport
 
-- (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMHandoverable>> *)objects {
+- (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)objects {
     if (self = [super init]) {
         _realm = realm;
         _objects = objects;
@@ -40,16 +40,16 @@ using namespace realm;
     RLMRealmConfiguration *_configuration;
 }
 
-- (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMHandoverable>> *)objectsToHandOver {
+- (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)handoffObjects {
     if (self = [super init]) {
-        _metadata = [NSMutableArray arrayWithCapacity:objectsToHandOver.count];
-        _classes = [NSMutableArray arrayWithCapacity:objectsToHandOver.count];
+        _metadata = [NSMutableArray arrayWithCapacity:handoffObjects.count];
+        _classes = [NSMutableArray arrayWithCapacity:handoffObjects.count];
 
         std::vector<realm::AnyThreadConfined> handoverables;
-        handoverables.reserve(objectsToHandOver.count);
-        for (id<RLMHandoverable, RLMHandoverable_Private> object in objectsToHandOver) {
-            if (![object conformsToProtocol: @protocol(RLMHandoverable_Private)]) {
-                @throw RLMException(@"Illegal custom conformances to `RLMHandoverable` by %@", [object class]);
+        handoverables.reserve(handoffObjects.count);
+        for (id<RLMThreadConfined, RLMThreadConfined_Private> object in handoffObjects) {
+            if (![object conformsToProtocol: @protocol(RLMThreadConfined_Private)]) {
+                @throw RLMException(@"Illegal custom conformances to `RLMThreadConfined` by %@", [object class]);
             }
             if (realm != object.realm) {
                 if (object.realm == nil) {
@@ -85,7 +85,7 @@ using namespace realm;
 
     std::vector<AnyThreadConfined> handoverables = realm->_realm->accept_handover(*_package);
 
-    NSMutableArray<id<RLMHandoverable>> *objects = [NSMutableArray arrayWithCapacity:handoverables.size()];
+    NSMutableArray<id<RLMThreadConfined>> *objects = [NSMutableArray arrayWithCapacity:handoverables.size()];
     for (NSUInteger i = 0; i < handoverables.size(); i++) {
         [objects addObject:[_classes[i] rlm_objectWithHandoverData:handoverables[i]
                                                           metadata:_metadata[i] inRealm:realm]];

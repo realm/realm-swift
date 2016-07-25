@@ -434,7 +434,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 @implementation RLMResultsHandoverMetadata
 @end
 
-@interface RLMResults (Handover) <RLMHandoverable_Private>
+@interface RLMResults (Handover) <RLMThreadConfined_Private>
 @end
 
 @implementation RLMResults (Handover)

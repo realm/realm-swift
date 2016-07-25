@@ -13,7 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol RLMHandoverable_Private
+@protocol RLMThreadConfined_Private
 
 @property (readonly) realm::AnyThreadConfined rlm_handoverData;
 @property (readonly) id rlm_handoverMetadata;
@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMHandoverPackage ()
 
-- (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMHandoverable>> *)objectsToHandOver;
+- (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)handoffObjects;
 
 @end
 

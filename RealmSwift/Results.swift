@@ -384,7 +384,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration, Handoverable
 // MARK: Handoverable
 
 extension Results: _Handoverable {
-    var bridgedHandoverable: RLMHandoverable {
+    var bridgedHandoverable: RLMThreadConfined {
         return rlmResults
     }
 
@@ -392,7 +392,7 @@ extension Results: _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Results {
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Results {
         return Results(handoverable as! RLMResults)
     }
 }
@@ -876,7 +876,7 @@ public final class Results<T: Object>: ResultsBase, Handoverable {
 // MARK: Handoverable
 
 extension Results: _Handoverable {
-    var bridgedHandoverable: RLMHandoverable {
+    var bridgedHandoverable: RLMThreadConfined {
         return rlmResults
     }
 
@@ -884,7 +884,7 @@ extension Results: _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Results {
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Results {
         return Results(handoverable as! RLMResults)
     }
 }

@@ -438,7 +438,7 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 @end
 
-@interface RLMArray (Handover) <RLMHandoverable_Private>
+@interface RLMArray (Handover) <RLMThreadConfined_Private>
 @end
 
 @implementation RLMArray (Handover)

@@ -393,9 +393,9 @@ private class _AnyRealmCollectionBase<T: Object>: _Handoverable {
     func setValue(_ value: AnyObject?, forKey key: String) { fatalError() }
     func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
-    var bridgedHandoverable: RLMHandoverable { fatalError() }
+    var bridgedHandoverable: RLMThreadConfined { fatalError() }
     var bridgedMetadata: Any? { fatalError() }
-    class func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Self { fatalError() }
+    class func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Self { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.Element> {
@@ -644,7 +644,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     // MARK: Handover
 
-    override var bridgedHandoverable: RLMHandoverable {
+    override var bridgedHandoverable: RLMThreadConfined {
         return base._handoverable.bridgedHandoverable
     }
 
@@ -652,7 +652,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
         return base._handoverable.bridgedMetadata
     }
 
-    static override func bridge(handoverable: RLMHandoverable, metadata: Any?) -> _AnyRealmCollection {
+    static override func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> _AnyRealmCollection {
         let bridgedBase = C._handoverable.bridge(handoverable: handoverable, metadata: metadata)
         return _AnyRealmCollection(base: bridgedBase as! C)
     }
@@ -971,7 +971,7 @@ private struct AnyRealmCollectionHandoverableMetadata<T: Object> {
 }
 
 extension AnyRealmCollection: _Handoverable {
-    var bridgedHandoverable: RLMHandoverable {
+    var bridgedHandoverable: RLMThreadConfined {
         return base.bridgedHandoverable
     }
 
@@ -982,7 +982,7 @@ extension AnyRealmCollection: _Handoverable {
         )
     }
 
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> AnyRealmCollection {
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> AnyRealmCollection {
         let metadata = metadata as! AnyRealmCollectionHandoverableMetadata<T>
         let bridgedBase = metadata.baseType.bridge(handoverable: handoverable, metadata: metadata.baseMetadata)
         return AnyRealmCollection(base: bridgedBase)
@@ -1400,9 +1400,9 @@ private class _AnyRealmCollectionBase<T: Object>: _Handoverable {
     func setValue(value: AnyObject?, forKey key: String) { fatalError() }
     func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
-    var bridgedHandoverable: RLMHandoverable { fatalError() }
+    var bridgedHandoverable: RLMThreadConfined { fatalError() }
     var bridgedMetadata: Any? { fatalError() }
-    class func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Self { fatalError() }
+    class func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Self { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBase<C.Element> {
@@ -1644,7 +1644,7 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
 
     // MAKR: Handover
 
-    override var bridgedHandoverable: RLMHandoverable {
+    override var bridgedHandoverable: RLMThreadConfined {
         return base._handoverable.bridgedHandoverable
     }
 
@@ -1652,7 +1652,7 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
         return base._handoverable.bridgedMetadata
     }
 
-    static override func bridge(handoverable: RLMHandoverable, metadata: Any?) -> _AnyRealmCollection {
+    static override func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> _AnyRealmCollection {
         let bridgedBase = C._handoverable.bridge(handoverable, metadata: metadata)
         return _AnyRealmCollection(base: bridgedBase as! C)
     }
@@ -1963,7 +1963,7 @@ private struct AnyRealmCollectionHandoverableMetadata<T: Object> {
 }
 
 extension AnyRealmCollection: _Handoverable {
-    var bridgedHandoverable: RLMHandoverable {
+    var bridgedHandoverable: RLMThreadConfined {
         return base.bridgedHandoverable
     }
 
@@ -1974,7 +1974,7 @@ extension AnyRealmCollection: _Handoverable {
         )
     }
 
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> AnyRealmCollection {
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> AnyRealmCollection {
         let metadata = metadata as! AnyRealmCollectionHandoverableMetadata<T>
         let bridgedBase = metadata.baseType.bridge(handoverable, metadata: metadata.baseMetadata)
         return AnyRealmCollection(base: bridgedBase)

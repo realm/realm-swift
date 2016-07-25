@@ -430,7 +430,7 @@ private func unsafeBitCastTrampoline<T, U>(_ x: T) -> U {
 }
 
 extension Object: Handoverable, _Handoverable {
-    var bridgedHandoverable: RLMHandoverable {
+    var bridgedHandoverable: RLMThreadConfined {
         return unsafeBitCast(self, to: RLMObject.self)
     }
 
@@ -438,7 +438,7 @@ extension Object: Handoverable, _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Self {
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Self {
         return unsafeBitCastTrampoline(handoverable)
     }
 }
@@ -857,7 +857,7 @@ private func unsafeBitCastTrampoline<T, U>(x: T) -> U {
 }
 
 extension Object: Handoverable, _Handoverable {
-    var bridgedHandoverable: RLMHandoverable {
+    var bridgedHandoverable: RLMThreadConfined {
         return unsafeBitCast(self, RLMObject.self)
     }
 
@@ -865,7 +865,7 @@ extension Object: Handoverable, _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> Self {
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> Self {
         return unsafeBitCastTrampoline(handoverable)
     }
 }

@@ -36,13 +36,13 @@ static BOOL classOrSuperclass_conformsToProtocol(Class cls, Protocol *protocol) 
 }
 
 - (void)testHandoverablePrivateConformance {
-    // Ensure that conformance to `RLMHandoverable` implies conformance to `RLMHandoverable_Private`
-    Protocol *publicProtocol = @protocol(RLMHandoverable);
-    Protocol *privateProtocol = @protocol(RLMHandoverable_Private);
+    // Ensure that conformance to `RLMThreadConfined` implies conformance to `RLMThreadConfined_Private`
+    Protocol *publicProtocol = @protocol(RLMThreadConfined);
+    Protocol *privateProtocol = @protocol(RLMThreadConfined_Private);
     for (Class *c = self.classList; c < self.classList + self.count; c++) {
         if (classOrSuperclass_conformsToProtocol(*c, publicProtocol)) {
             XCTAssertTrue(classOrSuperclass_conformsToProtocol(*c, privateProtocol),
-                          "%@ conforms to `RLMHandoverable` but not `RLMHandoverable_Private`", *c);
+                          "%@ conforms to `RLMThreadConfined` but not `RLMThreadConfined_Private`", *c);
         }
     }
 }

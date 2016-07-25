@@ -576,7 +576,7 @@ extension List {
 }
 
 extension List: _Handoverable {
-    var bridgedHandoverable: RLMHandoverable {
+    var bridgedHandoverable: RLMThreadConfined {
         return _rlmArray
     }
 
@@ -584,7 +584,7 @@ extension List: _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> List {
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> List {
         return List(array: handoverable as! RLMArray)
     }
 }
@@ -1086,7 +1086,7 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
 }
 
 extension List: _Handoverable {
-    var bridgedHandoverable: RLMHandoverable {
+    var bridgedHandoverable: RLMThreadConfined {
         return _rlmArray
     }
 
@@ -1094,7 +1094,7 @@ extension List: _Handoverable {
         return nil
     }
 
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> List {
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> List {
         return List(array: handoverable as! RLMArray)
     }
 }

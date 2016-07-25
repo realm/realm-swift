@@ -440,7 +440,7 @@ private struct LinkingObjectsHandoverMetadata {
 }
 
 extension LinkingObjects: _Handoverable {
-    var bridgedHandoverable: RLMHandoverable {
+    var bridgedHandoverable: RLMThreadConfined {
         return cachedRLMResults ?? unsafeBitCast(object!.objectWithoutConsumingRow, to: Object.self).bridgedHandoverable
     }
 
@@ -451,7 +451,7 @@ extension LinkingObjects: _Handoverable {
         )
     }
 
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> LinkingObjects {
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> LinkingObjects {
         let metadata = metadata as! LinkingObjectsHandoverMetadata
         let bridged = LinkingObjects(property: metadata.propertyName)
         switch handoverable {
@@ -911,7 +911,7 @@ private struct LinkingObjectsHandoverMetadata {
 }
 
 extension LinkingObjects: _Handoverable {
-    var bridgedHandoverable: RLMHandoverable {
+    var bridgedHandoverable: RLMThreadConfined {
         return cachedRLMResults ?? unsafeBitCast(object!.objectWithoutConsumingRow, Object.self).bridgedHandoverable
     }
 
@@ -922,7 +922,7 @@ extension LinkingObjects: _Handoverable {
         )
     }
 
-    static func bridge(handoverable: RLMHandoverable, metadata: Any?) -> LinkingObjects {
+    static func bridge(handoverable: RLMThreadConfined, metadata: Any?) -> LinkingObjects {
         let metadata = metadata as! LinkingObjectsHandoverMetadata
         let bridged = LinkingObjects(property: metadata.propertyName)
         switch handoverable {

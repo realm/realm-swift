@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
  A homogenous collection of `RLMObject` instances. Examples of conforming types include `RLMArray`,
  `RLMResults`, and `RLMLinkingObjects`.
  */
-@protocol RLMCollection <NSFastEnumeration, RLMHandoverable>
+@protocol RLMCollection <NSFastEnumeration, RLMThreadConfined>
 
 @required
 

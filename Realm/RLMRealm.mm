@@ -713,35 +713,37 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return success;
 }
 
-- (RLMHandoverPackage *)packageObjectsForHandover:(NSArray<id<RLMHandoverable>> *)objectsToHandOver {
-    return [[RLMHandoverPackage alloc] initWithRealm:self objects:objectsToHandOver];
+- (RLMHandoverPackage *)exportObjectsForThreadHandoff:(NSArray<id<RLMThreadConfined>> *)handoffObjects {
+    return [[RLMHandoverPackage alloc] initWithRealm:self objects:handoffObjects];
 }
 
 - (void)dispatchAsyncWithBlock:(void(^)(RLMRealm *))block {
-    [self dispatchAsyncWithObjects:@[] block:^(RLMRealm * _Nonnull realm, NSArray<id<RLMHandoverable>> * _Nonnull) {
+    [self dispatchAsyncWithObjects:@[] block:^(RLMRealm * _Nonnull realm, NSArray<id<RLMThreadConfined>> * _Nonnull) {
         block(realm);
     }];
 }
 
-- (void)dispatchAsyncWithObject:(id<RLMHandoverable>)objectToHandOver block:(void(^)(RLMRealm *, id<RLMHandoverable>))block {
-    [self dispatchAsyncWithObjects:@[objectToHandOver] block:^(RLMRealm * _Nonnull realm,
-                                                               NSArray<id<RLMHandoverable>> * _Nonnull singleObjectArray) {
+- (void)dispatchAsyncWithObject:(id<RLMThreadConfined>)objectToHandOver block:(void(^)(RLMRealm *,
+                                                                                       id<RLMThreadConfined>))block {
+    [self dispatchAsyncWithObjects:@[objectToHandOver]
+                             block:^(RLMRealm * _Nonnull realm,
+                                     NSArray<id<RLMThreadConfined>> * _Nonnull singleObjectArray) {
         block(realm, singleObjectArray[0]);
     }];
 }
 
-- (void)dispatchAsyncWithObjects:(NSArray<id<RLMHandoverable>> *)objectsToHandOver
-                           block:(void(^)(RLMRealm *, NSArray<id<RLMHandoverable>> *))block {
+- (void)dispatchAsyncWithObjects:(NSArray<id<RLMThreadConfined>> *)handoffObjects
+                           block:(void(^)(RLMRealm *, NSArray<id<RLMThreadConfined>> *))block {
     [self dispatchAsyncOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)
-                   withObjects:objectsToHandOver
+                   withObjects:handoffObjects
                          block:block];
 }
 
 - (void)dispatchAsyncOnQueue:(dispatch_queue_t)queue
-                 withObjects:(NSArray<id<RLMHandoverable>> *)objectsToHandOver
-                       block:(void(^)(RLMRealm *, NSArray<id<RLMHandoverable>> *))block {
+                 withObjects:(NSArray<id<RLMThreadConfined>> *)handoffObjects
+                       block:(void(^)(RLMRealm *, NSArray<id<RLMThreadConfined>> *))block {
 
-    RLMHandoverPackage *package = [self packageObjectsForHandover:objectsToHandOver];
+    RLMHandoverPackage *package = [self exportObjectsForThreadHandoff:handoffObjects];
     dispatch_async(queue, ^{
         @autoreleasepool {
             RLMHandoverImport *import = [package importOnCurrentThreadWithError:nil];

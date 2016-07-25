@@ -422,7 +422,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 @implementation RLMArrayLinkViewHandoverMetadata
 @end
 
-@interface RLMArrayLinkView (Handover) <RLMHandoverable_Private>
+@interface RLMArrayLinkView (Handover) <RLMThreadConfined_Private>
 @end
 
 @implementation RLMArrayLinkView (Handover)

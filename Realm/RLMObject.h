@@ -92,7 +92,7 @@ NS_ASSUME_NONNULL_BEGIN
     times when you *cannot* begin a write transaction.
  */
 
-@interface RLMObject : RLMObjectBase <RLMHandoverable>
+@interface RLMObject : RLMObjectBase <RLMThreadConfined>
 
 #pragma mark - Creating & Initializing Objects
 
