@@ -460,7 +460,7 @@ extension LinkingObjects: _ThreadConfined {
         case let object as RLMObjectBase:
             bridged.attachTo(object: object, property: metadata.property!)
         default:
-            fatalError("Unexpected handoff type \(data.dynamicType)")
+            fatalError("Unexpected handover type \(data.dynamicType)")
         }
         return bridged
     }
@@ -931,7 +931,7 @@ extension LinkingObjects: _ThreadConfined {
         case let object as RLMObjectBase:
             bridged.attachTo(object: object, property: metadata.property!)
         default:
-            fatalError("Unexpected handoff type \(data.dynamicType)")
+            fatalError("Unexpected handover type \(data.dynamicType)")
         }
         return bridged
     }

@@ -50,14 +50,14 @@ using namespace realm;
     RLMRealmConfiguration *_configuration;
 }
 
-- (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)handoffObjects {
+- (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)objects {
     if (self = [super init]) {
-        _metadata = [NSMutableArray arrayWithCapacity:handoffObjects.count];
-        _classes = [NSMutableArray arrayWithCapacity:handoffObjects.count];
+        _metadata = [NSMutableArray arrayWithCapacity:objects.count];
+        _classes = [NSMutableArray arrayWithCapacity:objects.count];
 
         std::vector<realm::AnyThreadConfined> handoverables;
-        handoverables.reserve(handoffObjects.count);
-        for (id<RLMThreadConfined, RLMThreadConfined_Private> object in handoffObjects) {
+        handoverables.reserve(objects.count);
+        for (id<RLMThreadConfined, RLMThreadConfined_Private> object in objects) {
             if (![object conformsToProtocol: @protocol(RLMThreadConfined_Private)]) {
                 @throw RLMException(@"Illegal custom conformances to `RLMThreadConfined` by %@", [object class]);
             }

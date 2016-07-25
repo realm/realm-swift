@@ -596,7 +596,7 @@ public final class Realm {
 
     // MARK: Handover
 
-    public func exportForThreadHandoff<T: ThreadConfined>(_ objects: [T]) -> HandoverPackage<T> {
+    public func exportForThreadHandover<T: ThreadConfined>(_ objects: [T]) -> HandoverPackage<T> {
         return HandoverPackage(realm: self, objects: objects)
     }
 
@@ -615,7 +615,7 @@ public final class Realm {
 
     public func async<O: ThreadConfined>(onQueue queue: DispatchQueue = defaultQueue,
                       handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
-        let package = exportForThreadHandoff(objects)
+        let package = exportForThreadHandover(objects)
         queue.async {
             autoreleasepool {
                 let (realm, objects) = try! package.importOnCurrentThead()
@@ -1285,7 +1285,7 @@ public final class Realm {
 
     // MARK: Handover
 
-    public func exportForThreadHandoff<T: ThreadConfined>(objects: [T]) -> HandoverPackage<T> {
+    public func exportForThreadHandover<T: ThreadConfined>(objects: [T]) -> HandoverPackage<T> {
         return HandoverPackage(realm: self, objects: objects)
     }
 
@@ -1304,7 +1304,7 @@ public final class Realm {
 
     public func async<O: ThreadConfined>(onQueue queue: dispatch_queue_t = defaultQueue,
                                  handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
-        let package = exportForThreadHandoff(objects)
+        let package = exportForThreadHandover(objects)
         dispatch_async(queue, { 
             autoreleasepool {
                 let (realm, objects) = try! package.importOnCurrentThead()

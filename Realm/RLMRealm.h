@@ -503,13 +503,13 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
  must be imported at most once, and that the current version of the Realm will remain pinned until this
  package is imported or deallocated.
 
- @param handoffObjects The objects to pass between threads.
+ @param objects The objects to pass between threads.
  @return                  A package that can be imported on a separate thread.
 
  @see                     RLMHandoverPackage
  */
-- (RLMHandoverPackage *)exportObjectsForThreadHandoff:(NSArray<id<RLMThreadConfined>> *)handoffObjects
-NS_SWIFT_NAME(exportForThreadHandoff(_:));
+- (RLMHandoverPackage *)exportObjectsForThreadHandover:(NSArray<id<RLMThreadConfined>> *)objects
+NS_SWIFT_NAME(exportForThreadHandover(_:));
 
 - (void)dispatchAsyncWithBlock:(void(^)(RLMRealm *))block
 NS_SWIFT_NAME(async(execute:));
@@ -518,12 +518,12 @@ NS_SWIFT_NAME(async(execute:));
                           block:(void(^)(RLMRealm *, id<RLMThreadConfined>))block
 NS_SWIFT_NAME(async(handingOver:execute:));
 
-- (void)dispatchAsyncWithObjects:(NSArray<id<RLMThreadConfined>> *)handoffObjects
+- (void)dispatchAsyncWithObjects:(NSArray<id<RLMThreadConfined>> *)objects
                            block:(void(^)(RLMRealm *, NSArray<id<RLMThreadConfined>> *))block
 NS_SWIFT_NAME(async(handingOver:execute:));
 
 - (void)dispatchAsyncOnQueue:(dispatch_queue_t)queue
-                 withObjects:(NSArray<id<RLMThreadConfined>> *)handoffObjects
+                 withObjects:(NSArray<id<RLMThreadConfined>> *)objects
                        block:(void(^)(RLMRealm *, NSArray<id<RLMThreadConfined>> *))block
 NS_SWIFT_NAME(async(onQueue:handingOver:execute:));
 
