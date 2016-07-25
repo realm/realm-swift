@@ -22,17 +22,6 @@ import Realm.Private
 
 #if swift(>=3.0)
 
-private let defaultQueue: DispatchQueue = {
-    let attributes: DispatchQueue.GlobalAttributes
-    if #available(OSXApplicationExtension 10.10, *) {
-        attributes = DispatchQueue.GlobalAttributes.qosBackground
-    } else {
-        // FIXME: Replace with `priorityBackground` once SR-2153 is fixed
-        attributes = DispatchQueue.GlobalAttributes(rawValue: 1<<8)
-    }
-    return DispatchQueue.global(attributes: attributes)
-}()
-
 /**
 A Realm instance (also referred to as "a realm") represents a Realm
 database.
@@ -600,23 +589,21 @@ public final class Realm {
         return HandoverPackage(realm: self, objects: objects)
     }
 
-    public func async(onQueue queue: DispatchQueue = defaultQueue, execute block: (Realm) -> ()) {
-        async(onQueue: queue, handingOver: [] as [ThreadConfined]) { realm, _ in
+    public func asyncWrite(_ block: (Realm) -> ()) {
+        asyncWrite(handingOver: [] as [ThreadConfined]) { realm, _ in
             block(realm)
         }
     }
 
-    public func async<O: ThreadConfined>(onQueue queue: DispatchQueue = defaultQueue,
-                      handingOver object: O, execute block: (Realm, O) -> ()) {
-        async(onQueue: queue, handingOver: [object]) { realm, singleObjectArray in
+    public func asyncWrite<O: ThreadConfined>(handingOver object: O, execute block: (Realm, O) -> ()) {
+        asyncWrite(handingOver: [object]) { realm, singleObjectArray in
             block(realm, singleObjectArray[0])
         }
     }
 
-    public func async<O: ThreadConfined>(onQueue queue: DispatchQueue = defaultQueue,
-                      handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
+    public func asyncWrite<O: ThreadConfined>(handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
         let package = exportForThreadHandover(objects)
-        queue.async {
+        DispatchQueue.global().async {
             autoreleasepool {
                 let (realm, objects) = try! package.importOnCurrentThread()
                 block(realm, objects)
@@ -715,8 +702,6 @@ extension Realm {
 }
 
 #else
-
-private let defaultQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)
 
 /**
  A `Realm` instance (also referred to as "a Realm") represents a Realm database.
@@ -1302,26 +1287,26 @@ public final class Realm {
         return HandoverPackage(realm: self, objects: objects)
     }
 
-    public func async(onQueue queue: dispatch_queue_t = defaultQueue, execute block: (Realm) -> ()) {
-        async(onQueue: queue, handingOver: [] as [ThreadConfined]) { realm, _ in
+    public func asyncWrite(block: (Realm) -> ()) {
+        asyncWrite(handingOver: [] as [ThreadConfined]) { realm, _ in
             block(realm)
         }
     }
 
-    public func async<O: ThreadConfined>(onQueue queue: dispatch_queue_t = defaultQueue,
-                                 handingOver object: O, execute block: (Realm, O) -> ()) {
-        async(onQueue: queue, handingOver: [object]) { realm, singleObjectArray in
-            block(realm, singleObjectArray[0])
+    public func asyncWrite<O: ThreadConfined>(handingOver object: O, _ block: (Realm, O) -> ()) {
+        asyncWrite(handingOver: [object]) { realm, objects in
+            block(realm, objects[0])
         }
     }
 
-    public func async<O: ThreadConfined>(onQueue queue: dispatch_queue_t = defaultQueue,
-                                 handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
+    public func asyncWrite<O: ThreadConfined>(handingOver objects: [O], _ block: (Realm, [O]) -> ()) {
         let package = exportForThreadHandover(objects)
-        dispatch_async(queue, { 
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
             autoreleasepool {
-                block(realm, objects)
                 let (realm, objects) = try! package.importOnCurrentThread()
+                try! realm.write {
+                     block(realm, objects)
+                }
             }
         })
     }
