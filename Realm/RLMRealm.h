@@ -508,7 +508,8 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
 
  @see                     RLMHandoverPackage
  */
-- (RLMHandoverPackage *)exportObjectsForThreadHandoff:(NSArray<id<RLMThreadConfined>> *)handoffObjects;
+- (RLMHandoverPackage *)exportObjectsForThreadHandoff:(NSArray<id<RLMThreadConfined>> *)handoffObjects
+NS_SWIFT_NAME(exportForThreadHandoff(_:));
 
 - (void)dispatchAsyncWithBlock:(void(^)(RLMRealm *))block
 NS_SWIFT_NAME(async(execute:));

@@ -55,7 +55,7 @@ public class HandoverPackage<T: ThreadConfined> {
     internal init(realm: Realm, objects: [T]) {
         self.metadata = objects.map { $0._private.bridgedMetadata }
         self.types = objects.map { $0.dynamicType }
-        self.package = realm.rlmRealm.exportObjects(forThreadHandoff: objects.map { $0._private.bridgedData })
+        self.package = realm.rlmRealm.exportForThreadHandoff(objects.map { $0._private.bridgedData })
     }
 
     public func importOnCurrentThead() throws -> (Realm, [T]) {
@@ -124,9 +124,7 @@ public class HandoverPackage<T: ThreadConfined> {
     internal init(realm: Realm, objects: [T]) {
         self.metadata = objects.map { $0._private.bridgedMetadata }
         self.types = objects.map { $0.dynamicType }
-        self.package = realm.rlmRealm.exportObjectsForThreadHandoff(objects.map {
-            $0._private.bridgedData
-        })
+        self.package = realm.rlmRealm.exportForThreadHandoff(objects.map { $0._private.bridgedData })
     }
 
     public func importOnCurrentThead() throws -> (Realm, [T]) {
