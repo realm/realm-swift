@@ -512,21 +512,57 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
 - (RLMHandoverPackage *)exportObjectsForThreadHandover:(NSArray<id<RLMThreadConfined>> *)objects
 NS_SWIFT_NAME(exportForThreadHandover(_:));
 
-- (void)dispatchAsyncWithBlock:(void(^)(RLMRealm *))block
-NS_SWIFT_NAME(async(execute:));
+/**
+ Performs actions contained within the given block inside a write transaction on a background queue.
 
-- (void)dispatchAsyncWithObject:(id<RLMThreadConfined>)objectToHandOver
-                          block:(void(^)(RLMRealm *, id<RLMThreadConfined>))block
-NS_SWIFT_NAME(async(handingOver:execute:));
+ @warning You may not access `RLMThreadConfined` objects from within the block without querying for them again.
+          Use `[RLMRealm asyncTransactionWithObjects:block:]` if you'd like to pass objects into the block.
 
-- (void)dispatchAsyncWithObjects:(NSArray<id<RLMThreadConfined>> *)objects
-                           block:(void(^)(RLMRealm *, NSArray<id<RLMThreadConfined>> *))block
-NS_SWIFT_NAME(async(handingOver:execute:));
+ @warning Any errors that occur while opening the Realm or committing the transaction cannot be recovered from.
+          Use `exportObjectsForThreadHandover:` if you'd like to handle failures.
 
-- (void)dispatchAsyncOnQueue:(dispatch_queue_t)queue
-                 withObjects:(NSArray<id<RLMThreadConfined>> *)objects
-                       block:(void(^)(RLMRealm *, NSArray<id<RLMThreadConfined>> *))block
-NS_SWIFT_NAME(async(onQueue:handingOver:execute:));
+ @parameter object The `RLMThreadConfined` object to copy into the `block`.
+
+ @see `[RLMRealm transactionWithBlock:error:]`
+ @see `[RLMRealm transactionAsyncWithBlock:objects:]`
+ @see `[RLMRealm exportObjectsForThreadHandover:]`
+ */
+- (void)transactionAsyncWithBlock:(void(^)(RLMRealm *))block;
+
+/**
+ Performs actions contained within the given block inside a write transaction on a background queue.
+
+ @warning You may not access external `RLMThreadConfined` objects from within the block without querying for them again.
+          The object passed as argument to the function will be made available as an argument of the block.
+
+ @warning Any errors that occur while opening the Realm or committing the transaction cannot be recovered from.
+          Use `exportObjectsForThreadHandover:` if you'd like to handle failures.
+
+ @parameter object The `RLMThreadConfined` object to copy into the `block`.
+
+ @see `[RLMRealm transactionWithBlock:error:]`
+ @see `[RLMRealm transactionAsyncWithBlock:objects:]`
+ @see `[RLMRealm exportObjectsForThreadHandover:]`
+ */
+- (void)transactionAsyncWithObject:(id<RLMThreadConfined>)object
+                             block:(void(^)(RLMRealm *, id<RLMThreadConfined>))block;
+
+/**
+ Performs actions contained within the given block inside a write transaction on a background queue.
+
+ @warning You may not access external `RLMThreadConfined` objects from within the block without querying for them again.
+          Objects passed as argument to the function will be made available as an argument of the block.
+
+ @warning Any errors that occur while opening the Realm or committing the transaction cannot be recovered from.
+          Use `exportObjectsForThreadHandover:` if you'd like to handle failures.
+ 
+ @parameter objects The `RLMThreadConfined` objects to copy into the `block`.
+
+ @see `[RLMRealm transactionWithBlock:error:]`
+ @see `[RLMRealm exportObjectsForThreadHandover:]`
+ */
+- (void)transactionAsyncWithObjects:(NSArray<id<RLMThreadConfined>> *)objects
+                              block:(void(^)(RLMRealm *, NSArray<id<RLMThreadConfined>> *))block;
 
 @end
 
