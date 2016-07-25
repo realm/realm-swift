@@ -58,15 +58,15 @@ extension ThreadConfined {
 }
 
 /// An object intended to be passed between threads containing information about objects being handed over
-public class HandoverPackage<T: ThreadConfined> {
+public class ThreadHandover<T: ThreadConfined> {
     private var metadata: [Any?]
     private var types: [ThreadConfined.Type]
-    private let package: RLMHandoverPackage
+    private let package: RLMThreadHandover
 
     internal init(realm: Realm, objects: [T]) {
         self.metadata = objects.map { $0._private.bridgedMetadata }
         self.types = objects.map { $0.dynamicType }
-        self.package = realm.rlmRealm.exportForThreadHandover(objects.map { $0._private.bridgedData })
+        self.package = realm.rlmRealm.exportThreadHandover(containing: objects.map { $0._private.bridgedData })
     }
 
     /**
@@ -138,15 +138,15 @@ extension ThreadConfined {
 }
 
 /// An object intended to be passed between threads containing information about objects being handed over
-public class HandoverPackage<T: ThreadConfined> {
+public class ThreadHandover<T: ThreadConfined> {
     private var metadata: [Any?]
     private var types: [ThreadConfined.Type]
-    private let package: RLMHandoverPackage
+    private let package: RLMThreadHandover
 
     internal init(realm: Realm, objects: [T]) {
         self.metadata = objects.map { $0._private.bridgedMetadata }
         self.types = objects.map { $0.dynamicType }
-        self.package = realm.rlmRealm.exportForThreadHandover(objects.map { $0._private.bridgedData })
+        self.package = realm.rlmRealm.exportThreadHandover(containing: objects.map { $0._private.bridgedData })
     }
 
     /**

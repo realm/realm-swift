@@ -1695,7 +1695,7 @@
     StringObject *stringObject = [[StringObject alloc] init];
     IntObject *intObject = [[IntObject alloc] init];
     NSArray<RLMObject *> *objects = @[stringObject, intObject];
-    RLMAssertThrowsWithReasonMatching([realm exportObjectsForThreadHandover:objects],
+    RLMAssertThrowsWithReasonMatching([realm exportThreadHandoverWithObjects:objects],
                                       @"Can only hand over objects that are mangaged by a Realm");
     [realm transactionWithBlock:^{
         [realm addObject:stringObject];
@@ -1703,7 +1703,7 @@
     }];
 
     RLMRealm *otherRealm = [RLMRealm realmWithConfiguration:configuration error:nil];
-    RLMAssertThrowsWithReasonMatching([otherRealm exportObjectsForThreadHandover:objects],
+    RLMAssertThrowsWithReasonMatching([otherRealm exportThreadHandoverWithObjects:objects],
                                       @"Can only hand over objects from the Realm they belong");
 }
 
@@ -1718,9 +1718,9 @@
     XCTAssertEqualObjects(nil, stringObject.stringCol);
     XCTAssertEqual(0, intObject.intCol);
     [self performBlockAndWait:^(dispatch_queue_t queue) {
-        RLMHandoverPackage *package = [realm exportObjectsForThreadHandover:@[stringObject, intObject]];
+        RLMThreadHandover *package = [realm exportThreadHandoverWithObjects:@[stringObject, intObject]];
         dispatch_async(queue, ^{
-            RLMHandoverImport *import = [package importOnCurrentThreadWithError:nil];
+            RLMThreadImport *import = [package importOnCurrentThreadWithError:nil];
             RLMRealm *realm = import.realm;
             StringObject *stringObject = (StringObject *)import.objects[0];
             IntObject *intObject = (IntObject *)import.objects[1];
@@ -1748,9 +1748,9 @@
     XCTAssertEqual(1ul, object.dogs.count);
     XCTAssertEqualObjects(@"Friday", object.dogs[0].dogName);
     [self performBlockAndWait:^(dispatch_queue_t queue) {
-        RLMHandoverPackage *package = [realm exportObjectsForThreadHandover:@[object.dogs]];
+        RLMThreadHandover *package = [realm exportThreadHandoverWithObjects:@[object.dogs]];
         dispatch_async(queue, ^{
-            RLMHandoverImport *import = [package importOnCurrentThreadWithError:nil];
+            RLMThreadImport *import = [package importOnCurrentThreadWithError:nil];
             RLMRealm *realm = import.realm;
             RLMArray<DogObject *> *dogs = (RLMArray<DogObject *> *)import.objects[0];
             XCTAssertEqual(1ul, dogs.count);
@@ -1791,9 +1791,9 @@
     XCTAssertEqualObjects(@"B", results[1].stringCol);
     XCTAssertEqualObjects(@"A", results[2].stringCol);
     [self performBlockAndWait:^(dispatch_queue_t queue) {
-        RLMHandoverPackage *package = [realm exportObjectsForThreadHandover:@[results]];
+        RLMThreadHandover *package = [realm exportThreadHandoverWithObjects:@[results]];
         dispatch_async(queue, ^{
-            RLMHandoverImport *import = [package importOnCurrentThreadWithError:nil];
+            RLMThreadImport *import = [package importOnCurrentThreadWithError:nil];
             RLMRealm *realm = import.realm;
             RLMResults<StringObject *> *results = (RLMResults<StringObject *> *)import.objects[0];
             XCTAssertEqual(4ul, [StringObject allObjects].count);
@@ -1832,9 +1832,9 @@
     XCTAssertEqual(1ul, dog.owners.count);
     XCTAssertEqualObjects(@"Jaden", ((OwnerObject *)dog.owners[0]).name);
     [self performBlockAndWait:^(dispatch_queue_t queue) {
-        RLMHandoverPackage *package = [realm exportObjectsForThreadHandover:@[dog.owners]];
+        RLMThreadHandover *package = [realm exportThreadHandoverWithObjects:@[dog.owners]];
         dispatch_async(queue, ^{
-            RLMHandoverImport *import = [package importOnCurrentThreadWithError:nil];
+            RLMThreadImport *import = [package importOnCurrentThreadWithError:nil];
             RLMRealm *realm = import.realm;
             RLMLinkingObjects<OwnerObject *> *owners = (RLMLinkingObjects<OwnerObject *> *)import.objects[0];
             XCTAssertEqual(1ul, owners.count);

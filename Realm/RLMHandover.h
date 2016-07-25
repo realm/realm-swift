@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /// An object containing the data imported from handover
-@interface RLMHandoverImport : NSObject
+@interface RLMThreadImport : NSObject
 
 /// The `RLMRealm` from which the `objects` were handed over
 @property (nonatomic, readonly) RLMRealm *realm;
@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /// An object intended to be passed between threads containing information about objects being handed over
-@interface RLMHandoverPackage : NSObject
+@interface RLMThreadHandover : NSObject
 
 /**
  Imports the handover package, creating an instance of the realm and objects on the current thread.
@@ -55,11 +55,11 @@ NS_ASSUME_NONNULL_BEGIN
  @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
               If you are not interested in possible errors, pass in `NULL`.
  
- @return A `RLMHandoverImport` instance with the imported `objects` and their associated `realm`.
+ @return A `RLMThreadImport` instance with the imported `objects` and their associated `realm`.
 
- @see RLMHandoverPackage
+ @see RLMThreadHandover
  */
-- (nullable RLMHandoverImport *)importOnCurrentThreadWithError:(NSError **)error;
+- (nullable RLMThreadImport *)importOnCurrentThreadWithError:(NSError **)error;
 
 @end
 

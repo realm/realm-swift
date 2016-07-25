@@ -585,8 +585,8 @@ public final class Realm {
 
     // MARK: Handover
 
-    public func exportForThreadHandover<T: ThreadConfined>(_ objects: [T]) -> HandoverPackage<T> {
-        return HandoverPackage(realm: self, objects: objects)
+    public func exportThreadHandover<T: ThreadConfined>(containing objects: [T]) -> ThreadHandover<T> {
+        return ThreadHandover(realm: self, objects: objects)
     }
 
     public func asyncWrite(_ block: (Realm) -> ()) {
@@ -602,7 +602,7 @@ public final class Realm {
     }
 
     public func asyncWrite<O: ThreadConfined>(handingOver objects: [O], execute block: (Realm, [O]) -> ()) {
-        let package = exportForThreadHandover(objects)
+        let package = exportThreadHandover(containing: objects)
         DispatchQueue.global().async {
             autoreleasepool {
                 let (realm, objects) = try! package.importOnCurrentThread()
@@ -1271,20 +1271,20 @@ public final class Realm {
     // MARK: Handover
 
     /**
-     Creates a `HandoverPackage` from the passed in objects that can be safely imported on a separate thread.
+     Creates a `ThreadHandover` from the passed in objects that can be safely imported on a separate thread.
 
      Used to pass objects between threads in a thread-safe manner.
      
-     - warning: Note that the returned `HandoverPackage` must be imported at most once, and that the current version of the
+     - warning: Note that the returned `ThreadHandover` must be imported at most once, and that the current version of the
      Realm will remain pinned until this package is imported or deallocated.
 
      - parameter objects: The objects to pass between threads.
      - returns: A package that can be imported on a separate thread.
 
-     - seealso: HandoverPackage
+     - seealso: ThreadHandover
      */
-    public func exportForThreadHandover<T: ThreadConfined>(objects: [T]) -> HandoverPackage<T> {
-        return HandoverPackage(realm: self, objects: objects)
+    public func exportThreadHandover<T: ThreadConfined>(containing objects: [T]) -> ThreadHandover<T> {
+        return ThreadHandover(realm: self, objects: objects)
     }
 
     public func asyncWrite(block: (Realm) -> ()) {
@@ -1300,7 +1300,7 @@ public final class Realm {
     }
 
     public func asyncWrite<O: ThreadConfined>(handingOver objects: [O], _ block: (Realm, [O]) -> ()) {
-        let package = exportForThreadHandover(objects)
+        let package = exportThreadHandover(containing: objects)
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
             autoreleasepool {
                 let (realm, objects) = try! package.importOnCurrentThread()

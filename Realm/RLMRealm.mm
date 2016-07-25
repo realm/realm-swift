@@ -713,8 +713,8 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     return success;
 }
 
-- (RLMHandoverPackage *)exportObjectsForThreadHandover:(NSArray<id<RLMThreadConfined>> *)objects {
-    return [[RLMHandoverPackage alloc] initWithRealm:self objects:objects];
+- (RLMThreadHandover *)exportThreadHandoverWithObjects:(NSArray<id<RLMThreadConfined>> *)objects {
+    return [[RLMThreadHandover alloc] initWithRealm:self objects:objects];
 }
 
 - (void)transactionAsyncWithBlock:(void(^)(RLMRealm *))block {
@@ -736,10 +736,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
 - (void)transactionAsyncWithObjects:(NSArray<id<RLMThreadConfined>> *)objects
                               block:(void(^)(RLMRealm *, NSArray<id<RLMThreadConfined>> *))block {
-    RLMHandoverPackage *package = [self exportObjectsForThreadHandover:objects];
+    RLMThreadHandover *package = [self exportThreadHandoverWithObjects:objects];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         @autoreleasepool {
-            RLMHandoverImport *import = [package importOnCurrentThreadWithError:nil];
+            RLMThreadImport *import = [package importOnCurrentThreadWithError:nil];
             [import.realm transactionWithBlock:^{
                 block(import.realm, import.objects);
             }];

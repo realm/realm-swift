@@ -24,13 +24,13 @@
 
 using namespace realm;
 
-@interface RLMHandoverImport ()
+@interface RLMThreadImport ()
 
 - (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)objects;
 
 @end
 
-@implementation RLMHandoverImport
+@implementation RLMThreadImport
 
 - (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)objects {
     if (self = [super init]) {
@@ -42,7 +42,7 @@ using namespace realm;
 
 @end
 
-@implementation RLMHandoverPackage {
+@implementation RLMThreadHandover {
     bool _already_imported;
     NSMutableArray<id> *_metadata;
     NSMutableArray<Class> *_classes;
@@ -83,7 +83,7 @@ using namespace realm;
     return self;
 }
 
-- (RLMHandoverImport *)importOnCurrentThreadWithError:(NSError **)error {
+- (RLMThreadImport *)importOnCurrentThreadWithError:(NSError **)error {
     if (_already_imported) {
         @throw RLMException(@"Illegal to import a handover package more than once");
     }
@@ -110,7 +110,7 @@ using namespace realm;
     _classes = nil;
     _package = nil;
     _configuration = nil;
-    return [[RLMHandoverImport alloc] initWithRealm:realm objects:[NSArray arrayWithArray:objects]];
+    return [[RLMThreadImport alloc] initWithRealm:realm objects:[NSArray arrayWithArray:objects]];
 }
 
 @end

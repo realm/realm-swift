@@ -752,7 +752,7 @@ class RealmTests: TestCase {
         let realm = try! Realm()
         XCTAssertEqual(0, realm.allObjects(ofType: SwiftBoolObject.self).count)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([] as [ThreadConfined])
+            let package = realm.exportThreadHandover(containing: [] as [ThreadConfined])
             queue.async {
                 autoreleasepool {
                     let (realm, _) = try! package.importOnCurrentThread()
@@ -775,7 +775,7 @@ class RealmTests: TestCase {
         }
         XCTAssertEqual(false, object.boolCol)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([object])
+            let package = realm.exportThreadHandover(containing: [object])
             queue.async {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -801,7 +801,7 @@ class RealmTests: TestCase {
         XCTAssertEqual("", objectA.stringCol)
         XCTAssertEqual("", objectB.stringCol)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([objectA, objectB])
+            let package = realm.exportThreadHandover(containing: [objectA, objectB])
             queue.async {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -830,7 +830,7 @@ class RealmTests: TestCase {
         XCTAssertEqual("", stringObject.stringCol)
         XCTAssertEqual(0, intObject.intCol)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([stringObject, intObject])
+            let package = realm.exportThreadHandover(containing: [stringObject, intObject])
             queue.async {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -861,7 +861,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(1, results.count)
         XCTAssertEqual("hello world", results[0].stringCol)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([string, results] as [ThreadConfined])
+            let package = realm.exportThreadHandover(containing: [string, results] as [ThreadConfined])
             queue.async {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -895,7 +895,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(1, company.employees.count)
         XCTAssertEqual("jg", company.employees[0].name)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([company.employees])
+            let package = realm.exportThreadHandover(containing: [company.employees])
             queue.async {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -939,7 +939,7 @@ class RealmTests: TestCase {
         XCTAssertEqual("B", results[1].stringCol)
         XCTAssertEqual("A", results[2].stringCol)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([results])
+            let package = realm.exportThreadHandover(containing: [results])
             queue.async {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -986,7 +986,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(1, dogA.owners.count)
         XCTAssertEqual("Andrea", dogA.owners[0].name)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([dogA.owners, unaccessedDogB.owners])
+            let package = realm.exportThreadHandover(containing: [dogA.owners, unaccessedDogB.owners])
             queue.async {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -1041,7 +1041,7 @@ class RealmTests: TestCase {
         XCTAssertEqual("C", list[2].name)
         XCTAssertEqual("D", list[3].name)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([results, list])
+            let package = realm.exportThreadHandover(containing: [results, list])
             queue.async {
                 autoreleasepool {
                     let (_, objects) = try! package.importOnCurrentThread()
@@ -1876,7 +1876,7 @@ class RealmTests: TestCase {
         let realm = try! Realm()
         XCTAssertEqual(0, realm.objects(SwiftBoolObject.self).count)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([] as [ThreadConfined])
+            let package = realm.exportThreadHandover(containing: [] as [ThreadConfined])
             dispatch_async(queue) {
                 autoreleasepool {
                     let (realm, _) = try! package.importOnCurrentThread()
@@ -1899,7 +1899,7 @@ class RealmTests: TestCase {
         }
         XCTAssertEqual(false, object.boolCol)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([object])
+            let package = realm.exportThreadHandover(containing: [object])
             dispatch_async(queue) {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -1925,7 +1925,7 @@ class RealmTests: TestCase {
         XCTAssertEqual("", objectA.stringCol)
         XCTAssertEqual("", objectB.stringCol)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([objectA, objectB])
+            let package = realm.exportThreadHandover(containing: [objectA, objectB])
             dispatch_async(queue) {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -1954,7 +1954,7 @@ class RealmTests: TestCase {
         XCTAssertEqual("", stringObject.stringCol)
         XCTAssertEqual(0, intObject.intCol)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([stringObject, intObject])
+            let package = realm.exportThreadHandover(containing: [stringObject, intObject])
             dispatch_async(queue) {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -1985,7 +1985,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(1, results.count)
         XCTAssertEqual("hello world", results[0].stringCol)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([string, results] as [ThreadConfined])
+            let package = realm.exportThreadHandover(containing: [string, results] as [ThreadConfined])
             dispatch_async(queue) {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -2019,7 +2019,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(1, company.employees.count)
         XCTAssertEqual("jg", company.employees[0].name)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([company.employees])
+            let package = realm.exportThreadHandover(containing: [company.employees])
             dispatch_async(queue) {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -2063,7 +2063,7 @@ class RealmTests: TestCase {
         XCTAssertEqual("B", results[1].stringCol)
         XCTAssertEqual("A", results[2].stringCol)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([results])
+            let package = realm.exportThreadHandover(containing: [results])
             dispatch_async(queue) {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -2110,7 +2110,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(1, dogA.owners.count)
         XCTAssertEqual("Andrea", dogA.owners[0].name)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([dogA.owners, unaccessedDogB.owners])
+            let package = realm.exportThreadHandover(containing: [dogA.owners, unaccessedDogB.owners])
             dispatch_async(queue) {
                 autoreleasepool {
                     let (realm, objects) = try! package.importOnCurrentThread()
@@ -2165,7 +2165,7 @@ class RealmTests: TestCase {
         XCTAssertEqual("C", list[2].name)
         XCTAssertEqual("D", list[3].name)
         performBlockAndWait { queue in
-            let package = realm.exportForThreadHandover([results, list])
+            let package = realm.exportThreadHandover(containing: [results, list])
             dispatch_async(queue) {
                 autoreleasepool {
                     let (_, objects) = try! package.importOnCurrentThread()

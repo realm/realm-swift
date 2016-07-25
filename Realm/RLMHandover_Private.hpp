@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface RLMHandoverPackage ()
+@interface RLMThreadHandover ()
 
 - (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)objects;
 
