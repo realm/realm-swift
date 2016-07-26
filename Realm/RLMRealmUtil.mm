@@ -64,27 +64,6 @@ void RLMClearRealmCache() {
     s_realmsPerPath.clear();
 }
 
-void RLMInstallUncaughtExceptionHandler() {
-    static auto previousHandler = NSGetUncaughtExceptionHandler();
-
-    NSSetUncaughtExceptionHandler([](NSException *exception) {
-        NSNumber *threadID = @(pthread_mach_thread_np(pthread_self()));
-        {
-            std::lock_guard<std::mutex> lock(s_realmCacheMutex);
-            for (auto const& realmsPerThread : s_realmsPerPath) {
-                if (RLMRealm *realm = [realmsPerThread.second objectForKey:threadID]) {
-                    if (realm.inWriteTransaction) {
-                        [realm cancelWriteTransaction];
-                    }
-                }
-            }
-        }
-        if (previousHandler) {
-            previousHandler(exception);
-        }
-    });
-}
-
 namespace {
 class RLMNotificationHelper : public realm::BindingContext {
 public:

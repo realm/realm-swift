@@ -117,7 +117,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     initialized = true;
 
     RLMCheckForUpdates();
-    RLMInstallUncaughtExceptionHandler();
     RLMSendAnalytics();
 }
 
