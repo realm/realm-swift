@@ -602,7 +602,7 @@
     // upsert with array of 2 objects. One is to update the existing value, another is added
     NSArray *array = @[[[PrimaryStringObject alloc] initWithValue:@[@"string2", @4]],
                        [[PrimaryStringObject alloc] initWithValue:@[@"string4", @5]]];
-    [realm addOrUpdateObjectsFromArray:array];
+    [realm addOrUpdateObjects:array];
     XCTAssertEqual([objects count], 4U, @"Should have 4 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
     XCTAssertEqual([(PrimaryStringObject *)objects[1] intCol], 4, @"Value should be 4");

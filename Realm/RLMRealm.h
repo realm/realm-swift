@@ -375,7 +375,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @see   `addObject:`
  */
-- (void)addObjects:(id<NSFastEnumeration>)array;
+- (void)addObjects:(NSObject<NSFastEnumeration> *)array;
 
 /**
  Adds or updates an existing object into the Realm.
@@ -401,11 +401,11 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @warning This method may only be called during a write transaction.
 
- @param array  An `NSArray`, `RLMArray`, or `RLMResults` of `RLMObject`s (or subclasses) to be added to the Realm.
+ @param array  An enumerable object such as `NSArray` or `RLMResults` which contains objects to be added to the Realm.
 
  @see   `addOrUpdateObject:`
  */
-- (void)addOrUpdateObjectsFromArray:(id)array;
+- (void)addOrUpdateObjects:(NSObject<NSFastEnumeration> *)array;
 
 /**
  Deletes an object from the Realm. Once the object is deleted it is considered invalidated.
@@ -423,11 +423,11 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @warning This method may only be called during a write transaction.
 
- @param array  An `RLMArray`, `NSArray`, or `RLMResults` of `RLMObject`s (or subclasses) to be deleted.
- 
+ @param array  An enumerable object such as `NSArray` or `RLMResults` which contains objects to be deleted.
+
  @see `deleteObject:`
  */
-- (void)deleteObjects:(id)array;
+- (void)deleteObjects:(NSObject<NSFastEnumeration> *)array;
 
 /**
  Deletes all objects from the Realm.
