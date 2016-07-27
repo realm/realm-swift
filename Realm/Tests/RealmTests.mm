@@ -116,7 +116,7 @@
 
     // Delete `*.lock` and `.note` files to simulate opening Realm in an app bundle
     [[NSFileManager defaultManager] removeItemAtURL:[RLMTestRealmURL() URLByAppendingPathExtension:@"lock"] error:nil];
-    [[NSFileManager defaultManager] removeItemAtURL:[RLMTestRealmURL() URLByAppendingPathExtension:@"note"] error:nil];
+    [[NSFileManager defaultManager] removeItemAtURL:RLMNoteURLForBasePath(RLMTestRealmURL()) error:nil];
 
     // Make parent directory immutable to simulate opening Realm in an app bundle
     NSURL *parentDirectoryOfTestRealmURL = [RLMTestRealmURL() URLByDeletingLastPathComponent];
@@ -1557,14 +1557,17 @@
 
     // Create the expected fifo URL and create a directory.
     // Note that creating a file when a directory with the same name exists produces a different errno, which is good.
-    NSURL *fifoURL = [[testURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"realm.note"];
+    NSURL *fifoURL = RLMNoteURLForBasePath(testURL);
+    [manager removeItemAtPath:fifoURL.path error:nil];
     assert(![manager fileExistsAtPath:fifoURL.path]);
-    [manager createDirectoryAtPath:fifoURL.path withIntermediateDirectories:YES attributes:nil error:nil];
+    NSError *error = nil;
+    [manager createDirectoryAtPath:fifoURL.path withIntermediateDirectories:YES attributes:nil error:&error];
+    assert(error == nil);
 
-    NSError *error;
     XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Should not have been able to open FIFO");
     XCTAssertNotNil(error);
     RLMValidateRealmError(error, RLMErrorFileAccess, @"Is a directory", nil);
+    [manager removeItemAtPath:fifoURL.path error:nil];
 }
 #endif
 

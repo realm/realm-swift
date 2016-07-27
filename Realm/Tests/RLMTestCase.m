@@ -43,6 +43,10 @@ NSURL *RLMTestRealmURL() {
     return [NSURL fileURLWithPath:RLMRealmPathForFileAndBundleIdentifier(@"test.realm", parentProcessBundleIdentifier())];
 }
 
+NSURL *RLMNoteURLForBasePath(NSURL *basePath) {
+    return [[basePath URLByAppendingPathExtension:@"management"] URLByAppendingPathComponent:@"notification_pipe.note"];
+}
+
 static void deleteOrThrow(NSURL *fileURL) {
     NSError *error;
     if (![[NSFileManager defaultManager] removeItemAtURL:fileURL error:&error]) {
@@ -121,7 +125,7 @@ static BOOL encryptTests() {
 {
     deleteOrThrow(fileURL);
     deleteOrThrow([fileURL URLByAppendingPathExtension:@"lock"]);
-    deleteOrThrow([fileURL URLByAppendingPathExtension:@"note"]);
+    deleteOrThrow(RLMNoteURLForBasePath(fileURL));
 }
 
 - (void)invokeTest {
