@@ -51,8 +51,8 @@ Lists can be filtered and sorted with the same predicates as `Results<T>`.
 
 When added as a property on `Object` models, the property must be declared as `let` and cannot be `dynamic`.
 */
-// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 public final class List<T: Object>: ListBase, ThreadConfined {
+    // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 
     /// Element type contained in this collection.
     public typealias Element = T
@@ -623,8 +623,8 @@ public class ListBase: RLMListBase {
 
  Properties of `List` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
 */
-// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 public final class List<T: Object>: ListBase, ThreadConfined {
+    // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 
     /// The type of the elements contained within the collection.
     public typealias Element = T

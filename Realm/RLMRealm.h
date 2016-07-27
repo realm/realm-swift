@@ -521,7 +521,7 @@ NS_SWIFT_NAME(exportThreadHandover(containing:));
  @warning Any errors that occur while opening the Realm or committing the transaction cannot be recovered from.
           Use `exportObjectsForThreadHandover:` if you'd like to handle failures.
 
- @parameter object The `RLMThreadConfined` object to copy into the `block`.
+ @param block The block containing actions to perform.
 
  @see `[RLMRealm transactionWithBlock:error:]`
  @see `[RLMRealm transactionAsyncWithBlock:objects:]`
@@ -540,6 +540,8 @@ NS_SWIFT_NAME(exportThreadHandover(containing:));
 
  @parameter object The `RLMThreadConfined` object to copy into the `block`.
 
+ @param block The block containing actions to perform.
+
  @see `[RLMRealm transactionWithBlock:error:]`
  @see `[RLMRealm transactionAsyncWithBlock:objects:]`
  @see `[RLMRealm exportObjectsForThreadHandover:]`
@@ -557,6 +559,8 @@ NS_SWIFT_NAME(exportThreadHandover(containing:));
           Use `exportObjectsForThreadHandover:` if you'd like to handle failures.
  
  @parameter objects The `RLMThreadConfined` objects to copy into the `block`.
+
+ @param block The block containing actions to perform.
 
  @see `[RLMRealm transactionWithBlock:error:]`
  @see `[RLMRealm exportObjectsForThreadHandover:]`

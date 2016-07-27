@@ -80,8 +80,9 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
  LinkingObjects can only be used as a property on `Object` models. The property must
  be declared as `let` and cannot be `dynamic`.
  */
-// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 public final class LinkingObjects<T: Object>: LinkingObjectsBase, ThreadConfined {
+    // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
+
     /// Element type contained in this collection.
     public typealias Element = T
 
@@ -566,8 +567,9 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
  `LinkingObjects` can only be used as a property on `Object` models. Properties of this type must
  be declared as `let` and cannot be `dynamic`.
  */
-// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 public final class LinkingObjects<T: Object>: LinkingObjectsBase, ThreadConfined {
+    // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
+
     /// The element type contained in this collection.
     public typealias Element = T
 

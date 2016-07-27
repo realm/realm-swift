@@ -119,8 +119,8 @@ public enum RealmCollectionChange<T> {
 A homogenous collection of `Object`s which can be retrieved, filtered, sorted,
 and operated upon.
 */
-// Note conforming types must explicitly restate `Handoverable` conformance due to bug SR-2146.
 public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined {
+    // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 
     /// Element type contained in this collection.
     associatedtype Element: Object
@@ -1130,8 +1130,8 @@ public enum RealmCollectionChange<T> {
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted,
  and operated upon.
 */
-// Note conforming types must explicitly restate `ThreadConfined` conformance due to bug SR-2146.
 public protocol RealmCollectionType: CollectionType, CustomStringConvertible, ThreadConfined {
+    // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 
     /// The type of the objects contained in the collection.
     associatedtype Element: Object
@@ -1664,8 +1664,8 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
  Instances of `RealmCollectionType` forward operations to an opaque underlying collection having the same `Element`
  type.
  */
-// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 public final class AnyRealmCollection<T: Object>: RealmCollectionType, ThreadConfined {
+    // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 
     /// The type of the objects contained in the collection.
     public typealias Element = T

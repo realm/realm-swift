@@ -70,8 +70,8 @@ up-to-date done on a background thread whenever possible.
 
 Results cannot be created directly.
 */
-// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 public final class Results<T: Object>: NSObject, NSFastEnumeration, ThreadConfined {
+    // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 
     internal let rlmResults: RLMResults<RLMObject>
 
@@ -555,9 +555,8 @@ public class ResultsBase: NSObject, NSFastEnumeration {
 
  `Results` cannot be directly instantiated.
 */
-// FIXME: Move `RealmCollectionType` conformance to extension once bug SR-2078 is fixed.
-// FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 public final class Results<T: Object>: ResultsBase, ThreadConfined {
+    // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 
     /// The type of the objects contained in the collection.
     public typealias Element = T

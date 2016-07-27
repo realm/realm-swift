@@ -130,8 +130,8 @@ extension ThreadConfined {
         }
     }
 
-    /// The `Realm` the object is associated with
     // Note: cannot be a protocol requirement since `Realm` is not an Objective-C type.
+    /// The `Realm` the object is associated with
     public var realm: Realm? {
         return _private.realm
     }
