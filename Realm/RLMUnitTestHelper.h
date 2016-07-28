@@ -37,9 +37,11 @@
  Obtain this special Realm for test use simply by calling `[RLMRealm defaultRealm]`. You may also obtain Realms with
  other configurations explicitly, as usual.
 
- Instead of using GDC functions directly, use the `-dispatch:` and `dispatchAndWait:` methods instead.
+ Instead of using GCD functions directly, use the `-dispatch:` and `dispatchAndWait:` methods instead.
  */
 @interface RLMUnitTestHelper : NSObject
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  An on-disk test Realm for your unit test to use. The Realm is cleaned up and properly destroyed after each test suite.
@@ -69,5 +71,7 @@
  Prefer this method to using GCD directly.
  */
 - (void)dispatchAndWait:(dispatch_block_t)block;
+
+NS_ASSUME_NONNULL_END
 
 @end

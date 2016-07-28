@@ -55,5 +55,3 @@ public typealias PropertyType = RLMPropertyType
  - see: `addNotificationBlock(_:)`
  */
 public typealias NotificationToken = RLMNotificationToken
-
-public typealias UnitTestHelper = RLMUnitTestHelper

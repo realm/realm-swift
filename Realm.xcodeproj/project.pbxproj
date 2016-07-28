@@ -132,6 +132,7 @@
 		1AFEF8431D52D2C900495005 /* Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7DE7021D38460B0029F0AE /* Sync.swift */; };
 		1A30CBB21D088521003989E6 /* RLMUnitTestHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A30CBB01D088521003989E6 /* RLMUnitTestHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1A30CBB31D088521003989E6 /* RLMUnitTestHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A30CBB11D088521003989E6 /* RLMUnitTestHelper.m */; };
+		1AB605D51D495F4D007F53DE /* UnitTestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB605D41D495F4D007F53DE /* UnitTestHelper.swift */; };
 		2973CCF91C175AB400FEA0FA /* fileformat-pre-null.realm in Resources */ = {isa = PBXBuildFile; fileRef = 29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */; };
 		297FBEFB1C19F696009D1118 /* RLMTestCaseUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297FBEFA1C19F696009D1118 /* RLMTestCaseUtils.swift */; };
 		297FBEFF1C19F844009D1118 /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 297FBEFE1C19F844009D1118 /* TestUtils.mm */; };
@@ -656,6 +657,7 @@
 		1AF7EA9A1D340E700001A9B5 /* RLMNetworkClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMNetworkClient.m; sourceTree = "<group>"; };
 		1A30CBB01D088521003989E6 /* RLMUnitTestHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMUnitTestHelper.h; sourceTree = "<group>"; };
 		1A30CBB11D088521003989E6 /* RLMUnitTestHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMUnitTestHelper.m; sourceTree = "<group>"; };
+		1AB605D41D495F4D007F53DE /* UnitTestHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnitTestHelper.swift; sourceTree = "<group>"; };
 		26F3CA681986CC86004623E1 /* SwiftPropertyTypeTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPropertyTypeTest.swift; sourceTree = "<group>"; };
 		297FBEFA1C19F696009D1118 /* RLMTestCaseUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RLMTestCaseUtils.swift; sourceTree = "<group>"; };
 		297FBEFD1C19F844009D1118 /* TestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtils.h; path = Realm/Tests/TestUtils.h; sourceTree = SOURCE_ROOT; };
@@ -1206,6 +1208,7 @@
 				E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */,
 				1A7DE7021D38460B0029F0AE /* Sync.swift */,
 				3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */,
+				1AB605D41D495F4D007F53DE /* UnitTestHelper.swift */,
 				5D660FF01BE98D670021E04F /* Util.swift */,
 			);
 			path = RealmSwift;
@@ -2201,6 +2204,7 @@
 				5D1534B81CCFF545008976D7 /* LinkingObjects.swift in Sources */,
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
 				5D660FF31BE98D670021E04F /* Migration.swift in Sources */,
+				1AB605D51D495F4D007F53DE /* UnitTestHelper.swift in Sources */,
 				5D660FF41BE98D670021E04F /* Object.swift in Sources */,
 				5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */,
 				5D660FF51BE98D670021E04F /* ObjectSchema.swift in Sources */,
