@@ -346,6 +346,7 @@ void Realm::begin_transaction()
     read_group();
 
     transaction::begin(*m_shared_group, m_binding_context.get());
+    m_coordinator->process_async(*this); // flush notifiers
 }
 
 void Realm::commit_transaction()
