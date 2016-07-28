@@ -90,7 +90,7 @@ EOF
 
 xcode() {
     mkdir -p build/DerivedData
-    CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@ $REALM_EXTRA_BUILD_ARGUMENTS"
+    CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@"
     echo "Building with command:" $CMD
     eval "$CMD"
 }
@@ -98,16 +98,17 @@ xcode() {
 xc() {
     # Logs xcodebuild output in realtime
     : ${NSUnbufferedIO:=YES}
+    args="$@ SWIFT_VERSION=$REALM_SWIFT_VERSION $REALM_EXTRA_BUILD_ARGUMENTS"
     if [[ "$XCMODE" == "xcodebuild" ]]; then
-        xcode "$@"
+        xcode "$args"
     elif [[ "$XCMODE" == "xcpretty" ]]; then
         mkdir -p build
-        xcode "$@" | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS} || {
+        xcode "$args" | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS} || {
             echo "The raw xcodebuild output is available in build/build.log"
             exit 1
         }
     elif [[ "$XCMODE" == "xctool" ]]; then
-        xctool "$@"
+        xctool "$args"
     fi
 }
 

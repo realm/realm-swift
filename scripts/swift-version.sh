@@ -1,10 +1,11 @@
 get_swift_version() {
-    xcrun swift --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p'
+    swift_command=$@
+    $swift_command --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p'
 }
 
 find_xcode_for_swift() {
     # First check if the currently active one is fine
-    version="$(get_swift_version || true)"
+    version="$(get_swift_version xcrun swift || true)"
     if [[ "$version" = "$1" ]]; then
         return 0
     fi
@@ -18,12 +19,14 @@ find_xcode_for_swift() {
         [[ -d "$dir" && -n "$(ls -A "$dir/$dev_dir")" ]] && xcodes+=("$dir/$dev_dir")
     done
 
-    for dir in "${xcodes[@]}"; do
-        export DEVELOPER_DIR="$dir"
-        version="$(get_swift_version)"
-        if [[ "$version" = "$1" ]]; then
-            return 0
-        fi
+    for xcode in "${xcodes[@]}"; do
+        for swift in "$xcode"/Toolchains/*.xctoolchain/usr/bin/swift; do
+            version="$(get_swift_version $swift)"
+            if [[ "$version" = "$1" ]]; then
+                export DEVELOPER_DIR="$xcode"
+                return 0
+            fi
+        done
     done
 
     >&2 echo "No version of Xcode found that supports Swift $1"
@@ -33,7 +36,7 @@ find_xcode_for_swift() {
 if [[ "$REALM_SWIFT_VERSION" ]]; then
     find_xcode_for_swift $REALM_SWIFT_VERSION
 else
-    REALM_SWIFT_VERSION=$(get_swift_version)
+    REALM_SWIFT_VERSION=$(get_swift_version xcrun swift)
     if [[ -z "$DEVELOPER_DIR" ]]; then
         export DEVELOPER_DIR="$(xcode-select -p)"
     fi
