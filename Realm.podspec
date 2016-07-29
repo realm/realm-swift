@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
                               Realm is a mobile database: a replacement for Core Data & SQLite. You can use it on iOS & OS X. Realm is not an ORM on top SQLite: instead it uses its own persistence engine, built for simplicity (& speed). Learn more and get help at https://realm.io
                               DESC
   s.homepage                = "https://realm.io"
-  s.source                  = { :git => 'https://github.com/realm/realm-cocoa.git', :tag => "v#{s.version}" }
+  s.source                  = { :git => 'https://github.com/realm/realm-cocoa.git', :tag => "v#{s.version}", :submodules => true }
   s.author                  = { 'Realm' => 'help@realm.io' }
   s.library                 = 'c++'
   s.requires_arc            = true
@@ -45,10 +45,10 @@ Pod::Spec.new do |s|
                               'include/**/RLMOptionalBase.h'
 
   source_files              = 'Realm/*.{m,mm}',
-                              'Realm/ObjectStore/*.cpp',
-                              'Realm/ObjectStore/impl/*.cpp',
-                              'Realm/ObjectStore/impl/apple/*.cpp',
-                              'Realm/ObjectStore/util/*.cpp'
+                              'Realm/ObjectStore/src/*.cpp',
+                              'Realm/ObjectStore/src/impl/*.cpp',
+                              'Realm/ObjectStore/src/impl/apple/*.cpp',
+                              'Realm/ObjectStore/src/util/*.cpp'
 
   s.module_map              = 'Realm/module.modulemap'
   s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__"

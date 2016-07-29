@@ -367,36 +367,6 @@ case "$COMMAND" in
         ;;
 
     ######################################
-    # Object Store
-    ######################################
-    "push-object-store-changes")
-        commit="$2"
-        path="$3"
-        if [ -z "$commit" -o -z "$path" ]; then
-            echo "usage: sh build.sh push-object-store-changes [base commit] [path to objectore repo]"
-            exit 1
-        fi
-
-        # List all commits since $commit which touched the objecstore, generate
-        # patches for each of them, and then apply those patches to the
-        # objectstore repo
-        git rev-list --reverse $commit..HEAD -- Realm/ObjectStore \
-            | xargs -I@ git format-patch --stdout @^! Realm/ObjectStore \
-            | git -C $path am -p 3 --directory src
-        ;;
-
-    "pull-object-store-changes")
-        commit="$2"
-        path="$3"
-        if [ -z "$commit" -o -z "$path" ]; then
-            echo "usage: sh build.sh pull-object-store-changes [base commit] [path to objectore repo]"
-            exit 1
-        fi
-
-        git -C $path format-patch --stdout $commit..HEAD src | git am -p 2 --directory Realm/ObjectStore --exclude='*CMake*' --reject
-        ;;
-
-    ######################################
     # Swift versioning
     ######################################
     "set-swift-version")
@@ -875,6 +845,20 @@ case "$COMMAND" in
         fi
 
         if [[ "$2" != "swift" ]]; then
+          if [ ! -d Realm/ObjectStore/src ]; then
+            cat >&2 <<EOM
+
+
+ERROR: One of Realm's submodules is missing!
+
+If you're using Realm and/or RealmSwift from a git branch, please add 'submodules: true' to
+their entries in your Podfile.
+
+
+EOM
+            exit 1
+          fi
+
           rm -rf include
           mkdir -p include
           mv core/include include/core
@@ -882,10 +866,10 @@ case "$COMMAND" in
           mkdir -p include/impl/apple
           mkdir -p include/util
           cp Realm/*.hpp include
-          cp Realm/ObjectStore/*.hpp include
-          cp Realm/ObjectStore/impl/*.hpp include/impl
-          cp Realm/ObjectStore/impl/apple/*.hpp include/impl/apple
-          cp Realm/ObjectStore/util/*.hpp include/util
+          cp Realm/ObjectStore/src/*.hpp include
+          cp Realm/ObjectStore/src/impl/*.hpp include/impl
+          cp Realm/ObjectStore/src/impl/apple/*.hpp include/impl/apple
+          cp Realm/ObjectStore/src/util/*.hpp include/util
 
           touch Realm/RLMPlatform.h
           if [ -n "$COCOAPODS_VERSION" ]; then
