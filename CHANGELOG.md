@@ -7,11 +7,14 @@ x.x.x Release notes (yyyy-MM-dd)
   that follows Cocoa's' NSError conventions.
 * Fix issue where `RLMResults` used `id `instead of its generic type type as the return
   type of subscript.
+* Fix incorrect truncation of the constant value for queries of the form
+  `column < value` for `float` and `double` columns.
 
 ### Enhancements
 
 * Improve error message when using NSNumber incorrectly in Swift models.
 * Fix compilation with Swift 2.3 using Xcode 8 beta 2.
+* Further reduce the download size of the prebuilt static libraries.
 
 ### Bugfixes
 
