@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2015 Realm Inc.
+// Copyright 2016 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-// This is lets our internals access AnyHandover's private constructors.
-#define private public
 #include "handover.hpp"
-#undef private
 
 using namespace realm;
 
-#pragma mark AnyThreadConfined
-
-AnyThreadConfined::AnyThreadConfined(const AnyThreadConfined& thread_confined) {
+AnyThreadConfined::AnyThreadConfined(const AnyThreadConfined& thread_confined)
+{
     switch (thread_confined.m_type) {
         case Type::Row:
             new (&m_row) Row(thread_confined.m_row);
@@ -50,7 +46,8 @@ AnyThreadConfined::AnyThreadConfined(const AnyThreadConfined& thread_confined) {
     new (&m_type) Type(thread_confined.m_type);
 }
 
-AnyThreadConfined::AnyThreadConfined(AnyThreadConfined&& thread_confined) {
+AnyThreadConfined::AnyThreadConfined(AnyThreadConfined&& thread_confined)
+{
     switch (thread_confined.m_type) {
         case Type::Row:
             new (&m_row) Row(std::move(thread_confined.m_row));
@@ -75,7 +72,8 @@ AnyThreadConfined::AnyThreadConfined(AnyThreadConfined&& thread_confined) {
     new (&m_type) Type(std::move(thread_confined.m_type));
 }
 
-AnyThreadConfined::~AnyThreadConfined() {
+AnyThreadConfined::~AnyThreadConfined()
+{
     switch (m_type) {
         case Type::Row:
             m_row.~Row();
@@ -99,28 +97,28 @@ AnyThreadConfined::~AnyThreadConfined() {
     }
 }
 
-AnyHandover AnyThreadConfined::export_for_handover(SharedGroup &shared_group) const {
+AnyHandover AnyThreadConfined::export_for_handover(SharedGroup &shared_group) const
+{
     switch (m_type) {
         case AnyThreadConfined::Type::Row:
-            return AnyHandover (shared_group.export_for_handover(m_row));
+            return AnyHandover(shared_group.export_for_handover(m_row));
 
         case AnyThreadConfined::Type::Query:
-            return AnyHandover (shared_group.export_for_handover(m_query, ConstSourcePayload::Copy));
+            return AnyHandover(shared_group.export_for_handover(m_query, ConstSourcePayload::Copy));
 
         case AnyThreadConfined::Type::TableRef:
-            return AnyHandover (shared_group.export_table_for_handover(m_table_ref));
+            return AnyHandover(shared_group.export_table_for_handover(m_table_ref));
 
         case AnyThreadConfined::Type::TableView:
-            return AnyHandover (shared_group.export_for_handover(m_table_view, ConstSourcePayload::Copy));
+            return AnyHandover(shared_group.export_for_handover(m_table_view, ConstSourcePayload::Copy));
 
         case AnyThreadConfined::Type::LinkViewRef:
-            return AnyHandover (shared_group.export_linkview_for_handover(m_link_view_ref));
+            return AnyHandover(shared_group.export_linkview_for_handover(m_link_view_ref));
     }
 }
 
-#pragma mark AnyHandover
-
-AnyHandover::AnyHandover(AnyHandover&& handover) {
+AnyHandover::AnyHandover(AnyHandover&& handover)
+{
     switch (handover.m_type) {
         case Type::Row:
             new (&m_row) RowHandover(std::move(handover.m_row));
@@ -145,7 +143,8 @@ AnyHandover::AnyHandover(AnyHandover&& handover) {
     new (&m_type) Type(handover.m_type);
 }
 
-AnyHandover::~AnyHandover() {
+AnyHandover::~AnyHandover()
+{
     switch (m_type) {
         case Type::Row:
             m_row.~unique_ptr();
@@ -169,22 +168,22 @@ AnyHandover::~AnyHandover() {
     }
 }
 
-AnyThreadConfined AnyHandover::import_from_handover(SharedGroup &shared_group) &&{
+AnyThreadConfined AnyHandover::import_from_handover(SharedGroup &shared_group) &&
+{
     switch (m_type) {
         case Type::Row:
-            return AnyThreadConfined (*shared_group.import_from_handover(std::move(m_row)));
+            return AnyThreadConfined(*shared_group.import_from_handover(std::move(m_row)));
 
         case Type::Query:
-            return AnyThreadConfined (*shared_group.import_from_handover(std::move(m_query)));
+            return AnyThreadConfined(*shared_group.import_from_handover(std::move(m_query)));
 
         case Type::Table:
-            return AnyThreadConfined (shared_group.import_table_from_handover(std::move(m_table)));
+            return AnyThreadConfined(shared_group.import_table_from_handover(std::move(m_table)));
 
         case Type::TableView:
-            return AnyThreadConfined (*shared_group.import_from_handover(std::move(m_table_view)));
+            return AnyThreadConfined(*shared_group.import_from_handover(std::move(m_table_view)));
             
         case Type::LinkView:
-            return AnyThreadConfined (shared_group.import_linkview_from_handover(std::move(m_link_view)));
+            return AnyThreadConfined(shared_group.import_linkview_from_handover(std::move(m_link_view)));
     }
 }
-
