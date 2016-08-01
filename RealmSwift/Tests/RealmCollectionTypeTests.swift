@@ -227,7 +227,7 @@ class RealmCollectionTypeTests: TestCase {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        let expected = collection.map { $0.stringCol }
+        let expected = Array(collection.map { $0.stringCol })
         let actual = collection.value(forKey: "stringCol") as! [String]!
         XCTAssertEqual(expected, actual!)
 
@@ -241,8 +241,8 @@ class RealmCollectionTypeTests: TestCase {
         try! realmWithTestPath().write {
             collection.setValue("hi there!", forKey: "stringCol")
         }
-        let expected = (0..<collection.count).map { _ in "hi there!" }
-        let actual = collection.map { $0.stringCol }
+        let expected = Array((0..<collection.count).map { _ in "hi there!" })
+        let actual = Array(collection.map { $0.stringCol })
         XCTAssertEqual(expected, actual)
     }
 
@@ -571,7 +571,7 @@ class ResultsWithCustomInitializerTest: TestCase {
         }
 
         let collection = realm.allObjects(ofType: SwiftCustomInitializerObject.self)
-        let expected = collection.map { $0.stringCol }
+        let expected = Array(collection.map { $0.stringCol })
         let actual = collection.value(forKey: "stringCol") as! [String]!
         XCTAssertEqual(expected, actual!)
         XCTAssertEqual(collection.map { $0 }, collection.value(forKey: "self") as! [CTTStringObjectWithLink])

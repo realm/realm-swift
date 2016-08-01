@@ -14,7 +14,7 @@ set -o pipefail
 set -e
 
 # You can override the version of the core library
-: ${REALM_CORE_VERSION:=1.3.1} # set to "current" to always use the current build
+: ${REALM_CORE_VERSION:=1.4.1} # set to "current" to always use the current build
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
@@ -90,7 +90,7 @@ EOF
 
 xcode() {
     mkdir -p build/DerivedData
-    CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@ $REALM_EXTRA_BUILD_ARGUMENTS"
+    CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@"
     echo "Building with command:" $CMD
     eval "$CMD"
 }
@@ -98,16 +98,17 @@ xcode() {
 xc() {
     # Logs xcodebuild output in realtime
     : ${NSUnbufferedIO:=YES}
+    args="$@ SWIFT_VERSION=$REALM_SWIFT_VERSION $REALM_EXTRA_BUILD_ARGUMENTS"
     if [[ "$XCMODE" == "xcodebuild" ]]; then
-        xcode "$@"
+        xcode "$args"
     elif [[ "$XCMODE" == "xcpretty" ]]; then
         mkdir -p build
-        xcode "$@" | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS} || {
+        xcode "$args" | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS} || {
             echo "The raw xcodebuild output is available in build/build.log"
             exit 1
         }
     elif [[ "$XCMODE" == "xctool" ]]; then
-        xctool "$@"
+        xctool "$args"
     fi
 }
 
@@ -363,36 +364,6 @@ case "$COMMAND" in
             echo "The core library seems to be up to date."
         fi
         exit 0
-        ;;
-
-    ######################################
-    # Object Store
-    ######################################
-    "push-object-store-changes")
-        commit="$2"
-        path="$3"
-        if [ -z "$commit" -o -z "$path" ]; then
-            echo "usage: sh build.sh push-object-store-changes [base commit] [path to objectore repo]"
-            exit 1
-        fi
-
-        # List all commits since $commit which touched the objecstore, generate
-        # patches for each of them, and then apply those patches to the
-        # objectstore repo
-        git rev-list --reverse $commit..HEAD -- Realm/ObjectStore \
-            | xargs -I@ git format-patch --stdout @^! Realm/ObjectStore \
-            | git -C $path am -p 3 --directory src
-        ;;
-
-    "pull-object-store-changes")
-        commit="$2"
-        path="$3"
-        if [ -z "$commit" -o -z "$path" ]; then
-            echo "usage: sh build.sh pull-object-store-changes [base commit] [path to objectore repo]"
-            exit 1
-        fi
-
-        git -C $path format-patch --stdout $commit..HEAD src | git am -p 2 --directory Realm/ObjectStore --exclude='*CMake*' --reject
         ;;
 
     ######################################
@@ -874,6 +845,20 @@ case "$COMMAND" in
         fi
 
         if [[ "$2" != "swift" ]]; then
+          if [ ! -d Realm/ObjectStore/src ]; then
+            cat >&2 <<EOM
+
+
+ERROR: One of Realm's submodules is missing!
+
+If you're using Realm and/or RealmSwift from a git branch, please add 'submodules: true' to
+their entries in your Podfile.
+
+
+EOM
+            exit 1
+          fi
+
           rm -rf include
           mkdir -p include
           mv core/include include/core
@@ -881,10 +866,10 @@ case "$COMMAND" in
           mkdir -p include/impl/apple
           mkdir -p include/util
           cp Realm/*.hpp include
-          cp Realm/ObjectStore/*.hpp include
-          cp Realm/ObjectStore/impl/*.hpp include/impl
-          cp Realm/ObjectStore/impl/apple/*.hpp include/impl/apple
-          cp Realm/ObjectStore/util/*.hpp include/util
+          cp Realm/ObjectStore/src/*.hpp include
+          cp Realm/ObjectStore/src/impl/*.hpp include/impl
+          cp Realm/ObjectStore/src/impl/apple/*.hpp include/impl/apple
+          cp Realm/ObjectStore/src/util/*.hpp include/util
 
           touch Realm/RLMPlatform.h
           if [ -n "$COCOAPODS_VERSION" ]; then

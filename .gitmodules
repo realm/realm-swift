@@ -1,0 +1,4 @@
+[submodule "Realm/ObjectStore"]
+	path = Realm/ObjectStore
+	url = git@github.com:realm/realm-object-store-private.git
+	branch = cocoa-sync
