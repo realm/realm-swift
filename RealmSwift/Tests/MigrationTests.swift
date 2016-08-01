@@ -112,7 +112,7 @@ class MigrationTests: TestCase {
     }
 
     func testSchemaVersionAtURL() {
-        assertFails(.Fail) {
+        assertFails(.fail) {
             // Version should throw before Realm creation
             try schemaVersionAtURL(defaultRealmURL())
         }
@@ -120,7 +120,7 @@ class MigrationTests: TestCase {
         _ = try! Realm()
         XCTAssertEqual(0, try! schemaVersionAtURL(defaultRealmURL()),
                        "Initial version should be 0")
-        assertFails(.Fail) {
+        assertFails(.fail) {
             try schemaVersionAtURL(URL(fileURLWithPath: "/dev/null"))
         }
     }
@@ -457,7 +457,7 @@ class MigrationTests: TestCase {
 
         let config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
         autoreleasepool {
-            assertFails(.SchemaMismatch) {
+            assertFails(.schemaMismatch) {
                 try Realm(configuration: config)
             }
         }
@@ -500,7 +500,7 @@ class MigrationTests: TestCase {
         class_replaceMethod(metaClass, #selector(RLMObjectBase.sharedSchema), imp, "@@:")
 
         autoreleasepool {
-            assertFails(.SchemaMismatch) {
+            assertFails(.schemaMismatch) {
                 try Realm()
             }
         }
