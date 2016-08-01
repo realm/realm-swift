@@ -49,7 +49,7 @@ class RealmTests: TestCase {
     }
 
     func testOpeningInvalidPathThrows() {
-        assertFails(Error.FileAccess) {
+        assertFails(.fileAccess) {
             try Realm(configuration: Realm.Configuration(fileURL: URL(fileURLWithPath: "/dev/null/foo")))
         }
     }
@@ -63,10 +63,10 @@ class RealmTests: TestCase {
         }
 
         let fileManager = FileManager.default
-        try! fileManager.setAttributes([ FileAttributeKey.immutable: true ], ofItemAtPath: testRealmURL().path!)
+        try! fileManager.setAttributes([ FileAttributeKey.immutable: true ], ofItemAtPath: testRealmURL().path)
 
         // Should not be able to open read-write
-        assertFails(Error.FileAccess) {
+        assertFails(.fileAccess) {
             try Realm(fileURL: testRealmURL())
         }
 
@@ -76,11 +76,11 @@ class RealmTests: TestCase {
             XCTAssertEqual(1, realm.allObjects(ofType: SwiftStringObject.self).count)
         }
 
-        try! fileManager.setAttributes([ FileAttributeKey.immutable: false ], ofItemAtPath: testRealmURL().path!)
+        try! fileManager.setAttributes([ FileAttributeKey.immutable: false ], ofItemAtPath: testRealmURL().path)
     }
 
     func testReadOnlyRealmMustExist() {
-        assertFails(Error.FileNotFound) {
+        assertFails(.fileNotFound) {
             try Realm(configuration:
                 Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true))
         }
@@ -94,15 +94,15 @@ class RealmTests: TestCase {
         // Make Realm at test path temporarily unreadable
         let fileManager = FileManager.default
         let permissions = try! fileManager
-            .attributesOfItem(atPath: testRealmURL().path!)[FileAttributeKey.posixPermissions] as! NSNumber
+            .attributesOfItem(atPath: testRealmURL().path)[FileAttributeKey.posixPermissions] as! NSNumber
         try! fileManager.setAttributes([ FileAttributeKey.posixPermissions: 0000 ],
-                                       ofItemAtPath: testRealmURL().path!)
+                                       ofItemAtPath: testRealmURL().path)
 
-        assertFails(Error.FilePermissionDenied) {
+        assertFails(.filePermissionDenied) {
             try Realm(fileURL: testRealmURL())
         }
 
-        try! fileManager.setAttributes([FileAttributeKey.posixPermissions: permissions], ofItemAtPath: testRealmURL().path!)
+        try! fileManager.setAttributes([FileAttributeKey.posixPermissions: permissions], ofItemAtPath: testRealmURL().path)
     }
 
     #if DEBUG
@@ -152,11 +152,11 @@ class RealmTests: TestCase {
             _ = try! Realm()
         }
 
-        FileManager.default.createFile(atPath: defaultRealmURL().path!,
+        FileManager.default.createFile(atPath: defaultRealmURL().path,
             contents:"a".data(using: String.Encoding.utf8, allowLossyConversion: false),
             attributes: nil)
 
-        assertFails(Error.FileAccess) {
+        assertFails(.fileAccess) {
             _ = try Realm()
             XCTFail("Realm creation should have failed")
         }
@@ -722,7 +722,7 @@ class RealmTests: TestCase {
         try! realm.write {
             realm.add(SwiftObject())
         }
-        let fileURL = try! defaultRealmURL().deletingLastPathComponent().appendingPathComponent("copy.realm")
+        let fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("copy.realm")
         do {
             try realm.writeCopy(toFileURL: fileURL)
         } catch {
