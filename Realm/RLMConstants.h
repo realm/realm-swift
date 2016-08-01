@@ -29,8 +29,10 @@
 
 #if __has_attribute(ns_error_domain)
 #define RLM_ERROR_ENUM(type, name, domain) \
-    enum name : type name; \
-    enum __attribute__((ns_error_domain(domain))) name : type
+    _Pragma("clang diagnostic push") \
+    _Pragma("clang diagnostic ignored \"-Wignored-attributes\"") \
+    NS_ENUM(type, __attribute__((ns_error_domain(domain))) name) \
+    _Pragma("clang diagnostic pop")
 #else
 #define RLM_ERROR_ENUM(type, name, domain) NS_ENUM(type, name)
 #endif
