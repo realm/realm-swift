@@ -749,8 +749,8 @@
 		02D9AFB61B22487E00A1BD87 /* ObjectStore */ = {
 			isa = PBXGroup;
 			children = (
-				5DB591A51D063DE5001D8F93 /* util */,
 				3FF0B0A31BA861F200E74157 /* impl */,
+				5DB591A51D063DE5001D8F93 /* util */,
 				3F62BA9E1BA0AB9000A4CEB2 /* binding_context.hpp */,
 				3F9801A91C8E4F6B000A8B07 /* collection_notifications.cpp */,
 				3F9801A81C8E4F6B000A8B07 /* collection_notifications.hpp */,
@@ -1146,12 +1146,15 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5DB591A91D063DF8001D8F93 /* atomic_shared_ptr.hpp in Headers */,
 				5D659EA61BE04556006515A0 /* binding_context.hpp in Headers */,
 				3F7A3FB01CC6EB7300301A17 /* collection_change_builder.hpp in Headers */,
 				3F9801AA1C8E4F6B000A8B07 /* collection_notifications.hpp in Headers */,
 				3F9801A01C8E4F55000A8B07 /* collection_notifier.hpp in Headers */,
+				5D5AF7FD1D3D8F9C003036AB /* compiler.hpp in Headers */,
 				5D659EA01BE04556006515A0 /* external_commit_helper.hpp in Headers */,
 				3F0543F81C56F78300AA5322 /* external_commit_helper.hpp in Headers */,
+				5DB591AB1D063DF8001D8F93 /* format.hpp in Headers */,
 				5D659EA11BE04556006515A0 /* index_set.hpp in Headers */,
 				3F9026121C625C5D006AE98E /* list.hpp in Headers */,
 				3F9801A11C8E4F55000A8B07 /* list_notifier.hpp in Headers */,
@@ -1162,9 +1165,7 @@
 				3F0543EB1C56F71500AA5322 /* realm_coordinator.hpp in Headers */,
 				3F75566C1BE94CCC0058BC7E /* results.hpp in Headers */,
 				3F9801AF1C90FD2D000A8B07 /* results_notifier.hpp in Headers */,
-				5DB591A91D063DF8001D8F93 /* atomic_shared_ptr.hpp in Headers */,
 				5D659EA71BE04556006515A0 /* RLMAccessor.h in Headers */,
-				5D5AF7FD1D3D8F9C003036AB /* compiler.hpp in Headers */,
 				5D659EA81BE04556006515A0 /* RLMAnalytics.hpp in Headers */,
 				5D659EA91BE04556006515A0 /* RLMArray.h in Headers */,
 				5D659EAA1BE04556006515A0 /* RLMArray_Private.h in Headers */,
@@ -1206,7 +1207,6 @@
 				5D659ECC1BE04556006515A0 /* schema.hpp in Headers */,
 				5D659ECD1BE04556006515A0 /* shared_realm.hpp in Headers */,
 				3F9801A31C8E4F55000A8B07 /* weak_realm_notifier.hpp in Headers */,
-				5DB591AB1D063DF8001D8F93 /* format.hpp in Headers */,
 				3F9801971C8E4F3F000A8B07 /* weak_realm_notifier.hpp in Headers */,
 				3F9801A21C8E4F55000A8B07 /* weak_realm_notifier_base.hpp in Headers */,
 			);
@@ -1731,6 +1731,7 @@
 				3F9801AB1C8E4F6B000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A41C8E4F55000A8B07 /* collection_notifier.cpp in Sources */,
 				5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */,
+				5DB591AA1D063DF8001D8F93 /* format.cpp in Sources */,
 				5D659E821BE04556006515A0 /* index_set.cpp in Sources */,
 				3F9026111C625C5D006AE98E /* list.cpp in Sources */,
 				3F9801A51C8E4F55000A8B07 /* list_notifier.cpp in Sources */,
@@ -1743,7 +1744,6 @@
 				5D659E861BE04556006515A0 /* RLMAnalytics.mm in Sources */,
 				5D659E871BE04556006515A0 /* RLMArray.mm in Sources */,
 				5D659E881BE04556006515A0 /* RLMArrayLinkView.mm in Sources */,
-				5DB591AA1D063DF8001D8F93 /* format.cpp in Sources */,
 				3FBEF67B1C63D66100F6935B /* RLMCollection.mm in Sources */,
 				5D659E891BE04556006515A0 /* RLMConstants.m in Sources */,
 				5D659E8A1BE04556006515A0 /* RLMListBase.mm in Sources */,
@@ -1831,6 +1831,7 @@
 				3F9801AC1C8E4F6F000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A61C8E4F5A000A8B07 /* collection_notifier.cpp in Sources */,
 				5DD7557F1BE056DE002800DA /* external_commit_helper.cpp in Sources */,
+				5DB591AC1D0775D2001D8F93 /* format.cpp in Sources */,
 				5DD755801BE056DE002800DA /* index_set.cpp in Sources */,
 				3F9026131C625C63006AE98E /* list.cpp in Sources */,
 				3F9801A71C8E4F5A000A8B07 /* list_notifier.cpp in Sources */,
@@ -1843,7 +1844,6 @@
 				5DD755841BE056DE002800DA /* RLMAnalytics.mm in Sources */,
 				5DD755851BE056DE002800DA /* RLMArray.mm in Sources */,
 				5DD755861BE056DE002800DA /* RLMArrayLinkView.mm in Sources */,
-				5DB591AC1D0775D2001D8F93 /* format.cpp in Sources */,
 				3FBEF67C1C63D66400F6935B /* RLMCollection.mm in Sources */,
 				5DD755871BE056DE002800DA /* RLMConstants.m in Sources */,
 				5DD755881BE056DE002800DA /* RLMListBase.mm in Sources */,

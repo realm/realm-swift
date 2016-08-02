@@ -34,5 +34,5 @@ namespace realm {
 }
 
 // FIXME - group should not be exposed
-@property (nonatomic, readonly) realm::Group *group;
+@property (nonatomic, readonly) realm::Group &group;
 @end

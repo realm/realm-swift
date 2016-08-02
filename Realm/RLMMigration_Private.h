@@ -20,14 +20,16 @@
 #import <Realm/RLMObjectBase.h>
 #import <Realm/RLMRealm.h>
 
-typedef void (^RLMObjectBaseMigrationBlock)(RLMObjectBase *oldObject, RLMObjectBase *newObject);
+namespace realm {
+    class Schema;
+}
 
 @interface RLMMigration ()
 
 @property (nonatomic, strong) RLMRealm *oldRealm;
 @property (nonatomic, strong) RLMRealm *realm;
 
-- (instancetype)initWithRealm:(RLMRealm *)realm oldRealm:(RLMRealm *)oldRealm;
+- (instancetype)initWithRealm:(RLMRealm *)realm oldRealm:(RLMRealm *)oldRealm schema:(realm::Schema &)schema;
 
 - (void)execute:(RLMMigrationBlock)block;
 
