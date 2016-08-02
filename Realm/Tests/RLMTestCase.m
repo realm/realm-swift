@@ -153,8 +153,10 @@ static BOOL encryptTests() {
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = RLMTestRealmURL();
-    configuration.dynamic = true;
-    configuration.customSchema = schema;
+    if (schema)
+        configuration.customSchema = schema;
+    else
+        configuration.dynamic = true;
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 

@@ -26,6 +26,6 @@ namespace realm {
 }
 
 @interface RLMSchema ()
-+ (instancetype)dynamicSchemaFromObjectStoreSchema:(realm::Schema &)objectStoreSchema;
-- (std::unique_ptr<realm::Schema>)objectStoreCopy;
++ (instancetype)dynamicSchemaFromObjectStoreSchema:(realm::Schema const&)objectStoreSchema;
+- (realm::Schema)objectStoreCopy;
 @end

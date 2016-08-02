@@ -32,7 +32,6 @@ private func realmWithSingleClassProperties(_ fileURL: URL, className: String, p
     schema.objectSchema = [objectSchema]
     let config = RLMRealmConfiguration()
     config.fileURL = fileURL
-    config.dynamic = true
     config.customSchema = schema
     return try! RLMRealm(configuration: config)
 }
@@ -528,7 +527,6 @@ private func realmWithSingleClassProperties(fileURL: NSURL, className: String, p
     schema.objectSchema = [objectSchema]
     let config = RLMRealmConfiguration()
     config.fileURL = fileURL
-    config.dynamic = true
     config.customSchema = schema
     return try! RLMRealm(configuration: config)
 }

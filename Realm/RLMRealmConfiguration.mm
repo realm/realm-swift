@@ -212,11 +212,16 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 }
 
 - (BOOL)readOnly {
-    return _config.read_only;
+    return _config.read_only();
 }
 
 - (void)setReadOnly:(BOOL)readOnly {
-    _config.read_only = readOnly;
+    if (readOnly) {
+        _config.schema_mode = realm::SchemaMode::ReadOnly;
+    }
+    else if (_config.schema_mode == realm::SchemaMode::ReadOnly) {
+        _config.schema_mode = realm::SchemaMode::Automatic;
+    }
 }
 
 - (uint64_t)schemaVersion {
@@ -231,11 +236,16 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 }
 
 - (BOOL)deleteRealmIfMigrationNeeded {
-    return _config.delete_realm_if_migration_needed;
+    return _config.schema_mode == realm::SchemaMode::ResetFile;
 }
 
 - (void)setDeleteRealmIfMigrationNeeded:(BOOL)deleteRealmIfMigrationNeeded {
-    _config.delete_realm_if_migration_needed = deleteRealmIfMigrationNeeded;
+    if (deleteRealmIfMigrationNeeded) {
+        _config.schema_mode = realm::SchemaMode::ResetFile;
+    }
+    else if (_config.schema_mode == realm::SchemaMode::ResetFile) {
+        _config.schema_mode = realm::SchemaMode::Automatic;
+    }
 }
 
 - (NSArray *)objectClasses {
@@ -257,11 +267,6 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 
 - (void)setCache:(bool)cache {
     _config.cache = cache;
-}
-
-- (void)setCustomSchema:(RLMSchema *)customSchema {
-    _customSchema = customSchema;
-    _config.schema = [_customSchema objectStoreCopy];
 }
 
 - (void)setDisableFormatUpgrade:(bool)disableFormatUpgrade

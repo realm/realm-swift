@@ -173,7 +173,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     }
 
     Query query = translateErrors([&] { return _results.get_query(); });
-    query.and_query(RLMPredicateToQuery(predicate, _objectSchema, _realm.schema, *_realm.group));
+    query.and_query(RLMPredicateToQuery(predicate, _objectSchema, _realm.schema, _realm.group));
 
     query.sync_view_if_needed();
 
@@ -327,7 +327,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         if (_results.get_mode() == Results::Mode::Empty) {
             return self;
         }
-        auto query = RLMPredicateToQuery(predicate, _objectSchema, _realm.schema, *_realm.group);
+        auto query = RLMPredicateToQuery(predicate, _objectSchema, _realm.schema, _realm.group);
         return [RLMResults resultsWithObjectSchema:_objectSchema
                                            results:_results.filter(std::move(query))];
     });

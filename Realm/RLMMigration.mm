@@ -50,14 +50,16 @@ using namespace realm;
 }
 @end
 
-@implementation RLMMigration
+@implementation RLMMigration {
+    realm::Schema *_schema;
+}
 
-- (instancetype)initWithRealm:(RLMRealm *)realm oldRealm:(RLMRealm *)oldRealm {
+- (instancetype)initWithRealm:(RLMRealm *)realm oldRealm:(RLMRealm *)oldRealm schema:(realm::Schema &)schema {
     self = [super init];
     if (self) {
-        // create rw realm to migrate with current on disk table
         _realm = realm;
         _oldRealm = oldRealm;
+        _schema = &schema;
         object_setClass(_oldRealm, RLMMigrationRealm.class);
     }
     return self;
@@ -107,7 +109,7 @@ using namespace realm;
         }
 
         // apply block and set new schema version
-        uint64_t oldVersion = _oldRealm->_realm->config().schema_version;
+        uint64_t oldVersion = _oldRealm->_realm->schema_version();
         block(self, oldVersion);
 
         _oldRealm = nil;
@@ -148,7 +150,7 @@ using namespace realm;
 }
 
 - (void)renamePropertyForClass:(NSString *)className oldName:(NSString *)oldName newName:(NSString *)newName {
-    realm::ObjectStore::rename_property(_realm.group, *_realm->_realm->config().schema, className.UTF8String, oldName.UTF8String, newName.UTF8String);
+    realm::ObjectStore::rename_property(_realm.group, *_schema, className.UTF8String, oldName.UTF8String, newName.UTF8String);
     ObjectSchema objectStoreSchema(_realm.group, className.UTF8String);
     RLMObjectSchema *objectSchema = [RLMObjectSchema objectSchemaForObjectStoreSchema:objectStoreSchema];
     NSMutableArray *mutableObjectSchemas = [NSMutableArray arrayWithArray:_realm.schema.objectSchema];

@@ -132,7 +132,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     return _realm->is_in_transaction();
 }
 
-- (realm::Group *)group {
+- (realm::Group &)group {
     return _realm->read_group();
 }
 
@@ -177,7 +177,7 @@ static void RLMCopyColumnMapping(RLMObjectSchema *targetSchema, const ObjectSche
 
 static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) {
     realm.schema = targetSchema;
-    for (auto const& aligned : *realm->_realm->config().schema) {
+    for (auto const& aligned : realm->_realm->schema()) {
         if (RLMObjectSchema *objectSchema = [targetSchema schemaForClassName:@(aligned.name.c_str())]) {
             objectSchema.realm = realm;
             RLMCopyColumnMapping(objectSchema, aligned);
@@ -244,20 +244,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-+ (SharedRealm)openSharedRealm:(Realm::Config const&)config error:(NSError **)outError {
-    try {
-        return Realm::get_shared_realm(config);
-    }
-    catch (...) {
-        if (config.delete_realm_if_migration_needed) {
-            throw;
-        } else {
-            RLMRealmTranslateException(outError);
-        }
-    }
-    return nullptr;
-}
-
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
     bool dynamic = configuration.dynamic;
     bool readOnly = configuration.readOnly;
@@ -269,7 +255,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         if (config.cache || dynamic) {
             if (RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path)) {
                 auto const& old_config = realm->_realm->config();
-                if (old_config.read_only != config.read_only) {
+                if (old_config.read_only() != config.read_only()) {
                     @throw RLMException(@"Realm at path '%s' already opened with different read permissions", config.path.c_str());
                 }
                 if (old_config.in_memory != config.in_memory) {
@@ -292,112 +278,75 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     RLMRealm *realm = [RLMRealm new];
     realm->_dynamic = dynamic;
 
-    auto migrationBlock = configuration.migrationBlock;
-    if (migrationBlock && config.schema_version > 0) {
-        auto customSchema = configuration.customSchema;
-        config.migration_function = [=](SharedRealm old_realm, SharedRealm realm) {
-            RLMSchema *oldSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:*old_realm->config().schema];
-            RLMRealm *oldRealm = [RLMRealm realmWithSharedRealm:old_realm schema:oldSchema];
+    // protects the realm cache and accessors cache
+    static std::mutex initLock;
+    std::lock_guard<std::mutex> lock(initLock);
 
-            // The destination RLMRealm can't just use the schema from the
-            // SharedRealm because it doesn't have information about whether or
-            // not a class was defined in Swift, which effects how new objects
-            // are created
-            RLMSchema *newSchema = [customSchema ?: RLMSchema.sharedSchema copy];
-            RLMRealm *newRealm = [RLMRealm realmWithSharedRealm:realm schema:newSchema];
+    try {
+        realm->_realm = Realm::get_shared_realm(config);
+    }
+    catch (...) {
+        RLMRealmTranslateException(error);
+        return nil;
+    }
 
-            [[[RLMMigration alloc] initWithRealm:newRealm oldRealm:oldRealm] execute:migrationBlock];
-
-            oldRealm->_realm = nullptr;
-            newRealm->_realm = nullptr;
-        };
+    // if we have a cached realm on another thread, copy without a transaction
+    if (RLMRealm *cachedRealm = RLMGetAnyCachedRealmForPath(config.path)) {
+        realm.schema = [cachedRealm.schema shallowCopy];
+        for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+            objectSchema.realm = realm;
+        }
+    }
+    else if (dynamic) {
+        RLMRealmSetSchemaAndAlign(realm, [RLMSchema dynamicSchemaFromObjectStoreSchema:realm->_realm->schema()]);
     }
     else {
-        config.migration_function = [](SharedRealm, SharedRealm) { };
-    }
+        // set/align schema or perform migration if needed
+        RLMSchema *schema = [configuration.customSchema ?: RLMSchema.sharedSchema copy];
 
-    bool beganReadTransaction = false;
+        Realm::MigrationFunction migrationFunction;
+        auto migrationBlock = configuration.migrationBlock;
+        if (migrationBlock && configuration.schemaVersion > 0) {
+            migrationFunction = [=](SharedRealm old_realm, SharedRealm realm, Schema& mutableSchema) {
+                RLMSchema *oldSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:old_realm->schema()];
+                RLMRealm *oldRealm = [RLMRealm realmWithSharedRealm:old_realm schema:oldSchema];
 
-    // protects the realm cache and accessors cache
-    static id initLock = [NSObject new];
-    @synchronized(initLock) {
+                // The destination RLMRealm can't just use the schema from the
+                // SharedRealm because it doesn't have information about whether or
+                // not a class was defined in Swift, which effects how new objects
+                // are created
+                RLMRealm *newRealm = [RLMRealm realmWithSharedRealm:realm schema:schema.copy];
+
+                [[[RLMMigration alloc] initWithRealm:newRealm oldRealm:oldRealm schema:mutableSchema] execute:migrationBlock];
+
+                oldRealm->_realm = nullptr;
+                newRealm->_realm = nullptr;
+            };
+        }
+
         try {
-            realm->_realm = [self openSharedRealm:config error:error];
+            realm->_realm->update_schema(schema.objectStoreCopy, config.schema_version,
+                                         std::move(migrationFunction));
         }
-        catch (SchemaMismatchException const& ex) {
-            if (configuration.deleteRealmIfMigrationNeeded) {
-                BOOL success = [[NSFileManager defaultManager] removeItemAtURL:configuration.fileURL error:nil];
-                if (success) {
-                    realm->_realm = [self openSharedRealm:config error:error];
-                } else {
-                    RLMSetErrorOrThrow(RLMMakeError(RLMErrorSchemaMismatch, ex), error);
-                    return nil;
-                }
-            } else {
-                RLMSetErrorOrThrow(RLMMakeError(RLMErrorSchemaMismatch, ex), error);
-                return nil;
-            }
-        }
-        if (!realm->_realm) {
+        catch (...) {
+            RLMRealmTranslateException(error);
             return nil;
         }
 
-        // if we have a cached realm on another thread, copy without a transaction
-        if (RLMRealm *cachedRealm = RLMGetAnyCachedRealmForPath(config.path)) {
-            realm.schema = [cachedRealm.schema shallowCopy];
-            for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-                objectSchema.realm = realm;
-            }
-        }
-        else {
-            beganReadTransaction = !realm->_realm->is_in_read_transaction();
+        RLMRealmSetSchemaAndAlign(realm, schema);
+        RLMRealmCreateAccessors(realm.schema);
 
-            try {
-                // set/align schema or perform migration if needed
-                RLMSchema *schema = [configuration.customSchema copy];
-                if (!schema) {
-                    if (dynamic) {
-                        schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:*realm->_realm->config().schema];
-                    }
-                    else {
-                        schema = [RLMSchema.sharedSchema copy];
-                        realm->_realm->update_schema(schema.objectStoreCopy, config.schema_version);
-                    }
-                }
-
-                RLMRealmSetSchemaAndAlign(realm, schema);
-            } catch (SchemaMismatchException const& ex) {
-                if (configuration.deleteRealmIfMigrationNeeded) {
-                    BOOL success = [[NSFileManager defaultManager] removeItemAtURL:configuration.fileURL error:nil];
-                    if (success) {
-                        realm->_realm->close();
-                        realm = nil;
-                        return [self realmWithConfiguration:configuration error:error];
-                    }
-                }
-
-                RLMSetErrorOrThrow(RLMMakeError(RLMErrorSchemaMismatch, ex), error);
-                return nil;
-            } catch (std::exception const& exception) {
-                RLMSetErrorOrThrow(RLMMakeError(RLMException(exception)), error);
-                return nil;
-            }
-
-            if (!dynamic || configuration.customSchema) {
-                RLMRealmCreateAccessors(realm.schema);
-            }
-        }
-
-        if (config.cache) {
-            RLMCacheRealm(config.path, realm);
+        if (!readOnly) {
+            // initializing the schema started a read transaction, so end it
+            [realm invalidate];
         }
     }
 
+    if (config.cache) {
+        RLMCacheRealm(config.path, realm);
+    }
+
     if (!readOnly) {
-        // initializing the schema started a read transaction, so end it
-        if (beganReadTransaction) {
-            [realm invalidate];
-        }
         realm->_realm->m_binding_context = RLMCreateBindingContext(realm);
     }
 
@@ -412,7 +361,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
 - (void)verifyNotificationsAreSupported {
     [self verifyThread];
-    if (_realm->config().read_only) {
+    if (_realm->config().read_only()) {
         @throw RLMException(@"Read-only Realms do not change and do not have change notifications");
     }
     if (!_realm->can_deliver_notifications()) {
@@ -440,7 +389,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (void)sendNotifications:(RLMNotification)notification {
-    NSAssert(!_realm->config().read_only, @"Read-only realms do not have notifications");
+    NSAssert(!_realm->config().read_only(), @"Read-only realms do not have notifications");
 
     NSUInteger count = _notificationHandlers.count;
     if (count == 0) {

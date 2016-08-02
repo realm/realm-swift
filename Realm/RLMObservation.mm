@@ -319,7 +319,7 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
 
     // This callback is called by core with a list of row deletions and
     // resulting link nullifications immediately before things are deleted and nullified
-    realm.group->set_cascade_notification_handler([&](realm::Group::CascadeNotification const& cs) {
+    realm.group.set_cascade_notification_handler([&](realm::Group::CascadeNotification const& cs) {
         for (auto const& link : cs.links) {
             size_t table_ndx = link.origin_table->get_index_in_group();
             if (table_ndx >= observers.size() || !observers[table_ndx]) {
@@ -389,7 +389,7 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
         block();
     }
     catch (...) {
-        realm.group->set_cascade_notification_handler(nullptr);
+        realm.group.set_cascade_notification_handler(nullptr);
         throw;
     }
 
@@ -400,14 +400,14 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
         info->didChange(RLMInvalidatedKey);
     }
 
-    realm.group->set_cascade_notification_handler(nullptr);
+    realm.group.set_cascade_notification_handler(nullptr);
 }
 
 namespace {
 template<typename Func>
 void forEach(realm::BindingContext::ObserverState const& state, Func&& func) {
     for (size_t i = 0, size = state.changes.size(); i < size; ++i) {
-        if (state.changes[i].changed) {
+        if (state.changes[i].kind != realm::BindingContext::ColumnInfo::Kind::None) {
             func(i, state.changes[i], static_cast<RLMObservationInfo *>(state.info));
         }
     }
@@ -465,8 +465,8 @@ void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& obse
     if (!observed.empty()) {
         NSMutableIndexSet *indexes = [NSMutableIndexSet new];
         for (auto const& o : observed) {
-            forEach(o, [&](size_t i, auto const& change, RLMObservationInfo *info) {
-                auto property = [info->getObjectSchema() propertyForTableColumn:i];
+            forEach(o, [&](size_t, auto const& change, RLMObservationInfo *info) {
+                auto property = [info->getObjectSchema() propertyForTableColumn:change.initial_column_index];
                 info->willChange(property.name, convert(change.kind), convert(change.indices, indexes));
             });
         }

@@ -169,7 +169,6 @@
     @autoreleasepool {
         RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
         config.encryptionKey = key;
-        config.dynamic = YES;
         config.customSchema = schema;
         [RLMRealm realmWithConfiguration:config error:nil];
     }
