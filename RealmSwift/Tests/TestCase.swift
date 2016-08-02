@@ -142,7 +142,7 @@ class TestCase: XCTestCase {
             _ = try block()
             XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
                 file: fileName, line: lineNumber)
-        } catch expectedError {
+        } catch let e as RealmSwift.Error where e.code == expectedError {
             // Success!
         } catch {
             XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.",

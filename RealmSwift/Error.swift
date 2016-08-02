@@ -33,8 +33,113 @@ happening when initializing a Realm instance.
     }
 
 */
+public struct Error {
+    public enum Code : Int {
+        /// Error thrown by Realm if no other specific error is returned when a realm is opened.
+        case fail
 
-public typealias Error = RLMError
+        /// Error thrown by Realm for any I/O related exception scenarios when a realm is opened.
+        case fileAccess
+
+        /// Error thrown by Realm if the user does not have permission to open or create
+        /// the specified file in the specified access mode when the realm is opened.
+        case filePermissionDenied
+
+        /// Error thrown by Realm if the file already exists when a copy should be written.
+        case fileExists
+
+        /// Error thrown by Realm if no file was found when a realm was opened as
+        /// read-only or if the directory part of the specified path was not found
+        /// when a copy should be written.
+        case fileNotFound
+
+        /// Error thrown by Realm if the database file is currently open in another process which
+        /// cannot share with the current process due to an architecture mismatch.
+        case incompatibleLockFile
+
+        /// Error thrown by Realm if a file format upgrade is required to open the file,
+        /// but upgrades were explicitly disabled.
+        case fileFormatUpgradeRequired
+
+        /// Error thrown by Realm if there is insufficient available address space.
+        case addressSpaceExhausted
+
+        /// Error thrown by Realm if there is a schema version mismatch, so that a migration is required.
+        case schemaMismatch
+    }
+
+    /// - see: `Error.Code.fail`
+    public static let fail: Code = .fail
+
+    /// - see: `Error.Code.fileAccess`
+    public static let fileAccess: Code = .fileAccess
+
+    /// - see: `Error.Code.filePermissionDenied`
+    public static let filePermissionDenied: Code = .filePermissionDenied
+
+    /// - see: `Error.Code.fileExists`
+    public static let fileExists: Code = .fileExists
+
+    /// - see: `Error.Code.fileNotFound`
+    public static let fileNotFound: Code = .fileNotFound
+
+    /// - see: `Error.Code.incompatibleLockFile`
+    public static let incompatibleLockFile: Code = .incompatibleLockFile
+
+    /// - see: `Error.Code.fileFormatUpgradeRequired`
+    public static let fileFormatUpgradeRequired: Code = .fileFormatUpgradeRequired
+
+    /// - see: `Error.Code.addressSpaceExhausted`
+    public static let addressSpaceExhausted: Code = .addressSpaceExhausted
+
+    /// - see: `Error.Code.schemaMismatch`
+    public static let schemaMismatch: Code = .schemaMismatch
+
+    public var code: Code {
+        let rlmError = _nsError as! RLMError
+        switch rlmError.code {
+        case .fail:
+            return .fail
+        case .fileAccess:
+            return .fileAccess
+        case .filePermissionDenied:
+            return .filePermissionDenied
+        case .fileExists:
+            return .fileExists
+        case .fileNotFound:
+            return .fileNotFound
+        case .incompatibleLockFile:
+            return .incompatibleLockFile
+        case .fileFormatUpgradeRequired:
+            return .fileFormatUpgradeRequired
+        case .addressSpaceExhausted:
+            return .addressSpaceExhausted
+        case .schemaMismatch:
+            return .schemaMismatch
+        }
+    }
+
+    /// :nodoc:
+    public var _nsError: NSError
+
+    /// :nodoc:
+    public init(_nsError error: NSError) {
+        _nsError = error
+    }
+}
+
+/// :nodoc:
+// Provide bridging from errors with domain RLMErrorDomain to Error.
+extension Error : _BridgedStoredNSError {
+    /// :nodoc:
+    public static var _nsErrorDomain = RLMErrorDomain
+}
+
+/// :nodoc:
+extension Error.Code : _ErrorCodeProtocol {
+    /// :nodoc:
+    public typealias _ErrorType = RLMError
+}
 
 #else
 
