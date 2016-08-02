@@ -163,7 +163,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    func indexOfObject(for predicate: Predicate) -> Int?
+    func indexOfObject(for predicate: NSPredicate) -> Int?
 
     /**
     Returns the index of the first object matching the given predicate,
@@ -195,7 +195,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    func filter(using predicate: Predicate) -> Results<Element>
+    func filter(using predicate: NSPredicate) -> Results<Element>
 
 
     // MARK: Sorting
@@ -371,10 +371,10 @@ private class _AnyRealmCollectionBase<T: Object> {
     var count: Int { fatalError() }
     var description: String { fatalError() }
     func index(of object: Element) -> Int? { fatalError() }
-    func indexOfObject(for predicate: Predicate) -> Int? { fatalError() }
+    func indexOfObject(for predicate: NSPredicate) -> Int? { fatalError() }
     func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
     func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<Element> { fatalError() }
-    func filter(using predicate: Predicate) -> Results<Element> { fatalError() }
+    func filter(using predicate: NSPredicate) -> Results<Element> { fatalError() }
     func sorted(onProperty property: String, ascending: Bool) -> Results<Element> { fatalError() }
     func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<Element> {
         fatalError()
@@ -438,7 +438,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    override func indexOfObject(for predicate: Predicate) -> Int? { return base.indexOfObject(for: predicate) }
+    override func indexOfObject(for predicate: NSPredicate) -> Int? { return base.indexOfObject(for: predicate) }
 
     /**
     Returns the index of the first object matching the given predicate,
@@ -450,7 +450,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
     override func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
-        return base.indexOfObject(for: Predicate(format: predicateFormat, argumentArray: args))
+        return base.indexOfObject(for: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     // MARK: Filtering
@@ -463,7 +463,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     - returns: `Results` containing collection elements that match the given predicate.
     */
     override func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<C.Element> {
-        return base.filter(using: Predicate(format: predicateFormat, argumentArray: args))
+        return base.filter(using: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     /**
@@ -473,7 +473,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    override func filter(using predicate: Predicate) -> Results<C.Element> { return base.filter(using: predicate) }
+    override func filter(using predicate: NSPredicate) -> Results<C.Element> { return base.filter(using: predicate) }
 
 
     // MARK: Sorting
@@ -697,7 +697,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func indexOfObject(for predicate: Predicate) -> Int? { return base.indexOfObject(for: predicate) }
+    public func indexOfObject(for predicate: NSPredicate) -> Int? { return base.indexOfObject(for: predicate) }
 
     /**
     Returns the index of the first object matching the given predicate,
@@ -709,7 +709,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
     public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
-        return base.indexOfObject(for: Predicate(format: predicateFormat, argumentArray: args))
+        return base.indexOfObject(for: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     // MARK: Filtering
@@ -722,7 +722,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     - returns: `Results` containing collection elements that match the given predicate.
     */
     public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<Element> {
-        return base.filter(using: Predicate(format: predicateFormat, argumentArray: args))
+        return base.filter(using: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     /**
@@ -732,7 +732,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    public func filter(using predicate: Predicate) -> Results<Element> { return base.filter(using: predicate) }
+    public func filter(using predicate: NSPredicate) -> Results<Element> { return base.filter(using: predicate) }
 
 
     // MARK: Sorting
@@ -946,13 +946,13 @@ extension AnyRealmCollection {
     public var invalidated : Bool { fatalError() }
 
     @available(*, unavailable, renamed:"indexOfObject(for:)")
-    public func index(of predicate: Predicate) -> Int? { fatalError() }
+    public func index(of predicate: NSPredicate) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed:"indexOfObject(for:_:)")
     public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed:"filter(using:)")
-    public func filter(_ predicate: Predicate) -> Results<T> { fatalError() }
+    public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"filter(using:_:)")
     public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> { fatalError() }
