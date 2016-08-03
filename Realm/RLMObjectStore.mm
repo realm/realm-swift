@@ -393,7 +393,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
     }
 
     if (predicate) {
-        realm::Query query = RLMPredicateToQuery(predicate, objectSchema, realm.schema, *realm.group);
+        realm::Query query = RLMPredicateToQuery(predicate, objectSchema, realm.schema, realm.group);
         return [RLMResults resultsWithObjectSchema:objectSchema
                                            results:realm::Results(realm->_realm, std::move(query))];
     }

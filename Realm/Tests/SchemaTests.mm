@@ -395,7 +395,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     schema.objectSchema = objectSchema;
 
     // create realm with schema
-    [self realmWithTestPathAndSchema:schema];
+    @autoreleasepool { [self realmWithTestPathAndSchema:schema]; }
 
     // get dynamic realm and extract schema
     RLMRealm *realm = [self realmWithTestPathAndSchema:nil];
@@ -590,7 +590,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
     RLMAssertThrowsWithReasonMatching([self realmWithTestPathAndSchema:schema],
-                                      @".*Can't index property.*double.*");
+                                      @"Property 'UnindexableProperty.unindexable' of type 'double' cannot be indexed");
 }
 
 - (void)testClassWithRequiredNullableProperties {
@@ -637,7 +637,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                      @"Property '.*nosuchproperty' .* origin of linking objects property '.*linkingObjects' does not exist");
+                                      @"Property 'InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink.nosuchproperty' declared as origin of linking objects property 'InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink.linkingObjects' does not exist");
 }
 
 - (void)testClassWithInvalidLinkingObjectsPropertySourcePropertyNotALink {
@@ -645,7 +645,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyNotALink.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                      @"Property '.*integer' .* origin of linking objects property '.*linkingObjects' is not a link");
+                                      @"Property 'InvalidLinkingObjectsPropertySourcePropertyNotALink.integer' declared as origin of linking objects property 'InvalidLinkingObjectsPropertySourcePropertyNotALink.linkingObjects' is not a link");
 }
 
 - (void)testClassWithInvalidLinkingObjectsPropertySourcePropertysLinkElsewhere {
@@ -653,7 +653,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere.class, IntObject.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
-                                      @"Property '.*link' .* origin of linking objects property '.*linkingObjects' links to a different class");
+                                      @"Property 'InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere.link' declared as origin of linking objects property 'InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere.linkingObjects' links to type 'IntObject'");
 }
 
 - (void)testMixedIsRejected {

@@ -175,9 +175,9 @@ class RealmCollectionTypeTests: TestCase {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        let pred1 = Predicate(format: "stringCol = '1'")
-        let pred2 = Predicate(format: "stringCol = '2'")
-        let pred3 = Predicate(format: "stringCol = '3'")
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "stringCol = '2'")
+        let pred3 = NSPredicate(format: "stringCol = '3'")
 
         XCTAssertEqual(0, collection.indexOfObject(for: pred1)!)
         XCTAssertEqual(1, collection.indexOfObject(for: pred2)!)
@@ -282,9 +282,9 @@ class RealmCollectionTypeTests: TestCase {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        let pred1 = Predicate(format: "stringCol = '1'")
-        let pred2 = Predicate(format: "stringCol = '2'")
-        let pred3 = Predicate(format: "stringCol = '3'")
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "stringCol = '2'")
+        let pred3 = NSPredicate(format: "stringCol = '3'")
 
         XCTAssertEqual(1, collection.filter(using: pred1).count)
         XCTAssertEqual(1, collection.filter(using: pred2).count)
@@ -609,7 +609,7 @@ class ResultsFromLinkViewTests: ResultsTests {
             fatalError("Test precondition failed")
         }
         let array = realmWithTestPath().createObject(ofType: CTTStringList.self, populatedWith: [[str1, str2]])
-        return array.array.filter(using: Predicate(value: true))
+        return array.array.filter(using: NSPredicate(value: true))
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
@@ -619,7 +619,7 @@ class ResultsFromLinkViewTests: ResultsTests {
             realmWithTestPath().add(list!)
             list!.list.append(objectsIn: makeAggregateableObjectsInWriteTransaction())
         }
-        return AnyRealmCollection(list!.list.filter(using: Predicate(value: true)))
+        return AnyRealmCollection(list!.list.filter(using: NSPredicate(value: true)))
     }
 
     override func addObjectToResults() {
@@ -779,8 +779,8 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        let pred1 = Predicate(format: "stringCol = '1'")
-        let pred2 = Predicate(format: "noSuchCol = '2'")
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "noSuchCol = '2'")
 
         assertThrows(collection.filter(using: pred1))
         assertThrows(collection.filter(using: pred2))

@@ -250,7 +250,7 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 }
 
 // schema based on tables in a realm
-+ (instancetype)dynamicSchemaFromObjectStoreSchema:(Schema &)objectStoreSchema {
++ (instancetype)dynamicSchemaFromObjectStoreSchema:(Schema const&)objectStoreSchema {
     // cache descriptors for all subclasses of RLMObject
     NSMutableArray *schemaArray = [NSMutableArray arrayWithCapacity:objectStoreSchema.size()];
     for (auto &objectSchema : objectStoreSchema) {
@@ -324,13 +324,13 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
     return [NSString stringWithFormat:@"Schema {\n%@}", objectSchemaString];
 }
 
-- (std::unique_ptr<Schema>)objectStoreCopy {
+- (Schema)objectStoreCopy {
     std::vector<realm::ObjectSchema> schema;
     schema.reserve(_objectSchemaByName.count);
     [_objectSchemaByName enumerateKeysAndObjectsUsingBlock:[&](NSString *, RLMObjectSchema *objectSchema, BOOL *) {
         schema.push_back(objectSchema.objectStoreCopy);
     }];
-    return std::make_unique<realm::Schema>(std::move(schema));
+    return schema;
 }
 
 @end

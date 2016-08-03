@@ -391,7 +391,7 @@ public class ObjectUtil: NSObject {
                 properties[name] = NSNumber(value: PropertyType.bool.rawValue)
             } else if prop.value as? RLMOptionalBase != nil {
                 throwRealmException("'\(type)' is not a a valid RealmOptional type.")
-            } else if mirror.displayStyle == .optional || type is NilLiteralConvertible.Type {
+            } else if mirror.displayStyle == .optional || type is ExpressibleByNilLiteral.Type {
                 properties[name] = NSNull()
             }
             return properties

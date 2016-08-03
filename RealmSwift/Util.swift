@@ -41,7 +41,7 @@ internal func throwForNegativeIndex(_ int: Int, parameterName: String = "index")
 }
 
 internal func gsub(pattern: String, template: String, string: String, error: NSErrorPointer = nil) -> String? {
-    let regex = try? RegularExpression(pattern: pattern, options: [])
+    let regex = try? NSRegularExpression(pattern: pattern, options: [])
     return regex?.stringByReplacingMatches(in: string, options: [],
                                            range: NSRange(location: 0, length: string.utf16.count),
                                            withTemplate: template)

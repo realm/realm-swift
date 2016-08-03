@@ -1692,9 +1692,9 @@ public:
         KVORecorder r(self, obj, @"boolCol");
 
         // Add tables before the observed one so that the observed one's index changes
-        realm::Group *group = self.realm->_realm->read_group();
-        realm::TableRef table1 = group->insert_table(5, "new table");
-        realm::TableRef table2 = group->insert_table(0, "new table 2");
+        realm::Group &group = self.realm->_realm->read_group();
+        realm::TableRef table1 = group.insert_table(5, "new table");
+        realm::TableRef table2 = group.insert_table(0, "new table 2");
         table1->add_column(realm::type_Int, "col");
         table2->add_column(realm::type_Int, "col");
 

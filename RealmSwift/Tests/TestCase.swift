@@ -81,8 +81,8 @@ class TestCase: XCTestCase {
         autoreleasepool { super.invokeTest() }
 
         if !exceptionThrown {
-            XCTAssertFalse(RLMHasCachedRealmForPath(defaultRealmURL().path!))
-            XCTAssertFalse(RLMHasCachedRealmForPath(testRealmURL().path!))
+            XCTAssertFalse(RLMHasCachedRealmForPath(defaultRealmURL().path))
+            XCTAssertFalse(RLMHasCachedRealmForPath(testRealmURL().path))
         }
 
         resetRealmState()
@@ -135,14 +135,14 @@ class TestCase: XCTestCase {
         }
     }
 
-    func assertFails<T>(_ expectedError: Error, _ message: String? = nil,
+    func assertFails<T>(_ expectedError: RealmSwift.Error.Code, _ message: String? = nil,
                         fileName: StaticString = #file, lineNumber: UInt = #line,
                         block: @noescape () throws -> T) {
         do {
             _ = try block()
             XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
                 file: fileName, line: lineNumber)
-        } catch expectedError {
+        } catch let e as RealmSwift.Error where e.code == expectedError {
             // Success!
         } catch {
             XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.",
@@ -169,7 +169,7 @@ class TestCase: XCTestCase {
 
     private func realmURLForFile(_ fileName: String) -> URL {
         let directory = URL(fileURLWithPath: testDir, isDirectory: true)
-        return try! directory.appendingPathComponent(fileName, isDirectory: false)
+        return directory.appendingPathComponent(fileName, isDirectory: false)
     }
 }
 
