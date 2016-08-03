@@ -124,20 +124,22 @@ def repackArchives(String objcArchiveName, String swiftArchiveName, String osxAr
 node('osx') {
     stage 'SCM'
     dir('realm-cocoa') {
-        checkout([
-              $class: 'GitSCM',
-              branches: [[name: GIT_REF]],
-              browser: [$class: 'GithubWeb',
-              repoUrl: 'https://github.com/realm/realm-cocoa'],
-              extensions: [[$class: 'CleanCheckout']],
-              gitTool: 'native git',
-              userRemoteConfigs: [[
-                credentialsId: '3e71241e-8920-4ecc-884b-418eb92b81ea',
-                name: 'origin',
-                refspec: '+refs/tags/*:refs/remotes/origin/tags/* +refs/heads/*:refs/remotes/origin/*',
-                url: 'https://github.com/realm/realm-cocoa-private.git'
-              ]]
-        ])
+        sshagent(['realm-ci-ssh']) {
+            checkout([
+                  $class: 'GitSCM',
+                  branches: [[name: GIT_REF]],
+                  browser: [$class: 'GithubWeb',
+                  repoUrl: 'https://github.com/realm/realm-cocoa'],
+                  extensions: [[$class: 'CleanCheckout']],
+                  gitTool: 'native git',
+                  userRemoteConfigs: [[
+                    credentialsId: '3e71241e-8920-4ecc-884b-418eb92b81ea',
+                    name: 'origin',
+                    refspec: '+refs/tags/*:refs/remotes/origin/tags/* +refs/heads/*:refs/remotes/origin/*',
+                    url: 'https://github.com/realm/realm-cocoa-private.git'
+                  ]]
+            ])
+        }
     }
     
     def depFile = readFile('realm-cocoa/dependencies.list')
