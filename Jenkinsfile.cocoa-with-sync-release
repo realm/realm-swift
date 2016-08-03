@@ -129,8 +129,10 @@ node('osx') {
                   $class: 'GitSCM',
                   branches: [[name: GIT_REF]],
                   browser: [$class: 'GithubWeb',
-                  repoUrl: 'https://github.com/realm/realm-cocoa'],
-                  extensions: [[$class: 'CleanCheckout']],
+                  repoUrl: 'https://github.com/realm/realm-cocoa-private'],
+                  extensions: [
+                    [$class: 'SubmoduleOption', disableSubmodules: false, recursiveSubmodules: true, reference: '', trackingSubmodules: false],
+                    [$class: 'CleanCheckout']],
                   gitTool: 'native git',
                   userRemoteConfigs: [[
                     credentialsId: '3e71241e-8920-4ecc-884b-418eb92b81ea',
