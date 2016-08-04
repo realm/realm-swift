@@ -32,5 +32,6 @@
 + (NSURL *)filePathForSyncServerURL:(NSURL *)serverURL user:(RLMUser *)user;
 
 - (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 @end

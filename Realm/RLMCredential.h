@@ -35,12 +35,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, readonly) NSDictionary *userInfo;
 
 @property (nullable, nonatomic) NSURL *syncServerURL;
+@property (nullable, nonatomic) NSNumber *authServerPort;
 
 + (void)setDefaultSyncServerURL:(NSURL *)url;
 
 - (instancetype)initWithCredentialToken:(RLMCredentialToken)credentialToken
                                provider:(RLMSyncIdentityProvider)provider
-                               userInfo:(nullable NSDictionary *)userInfo NS_DESIGNATED_INITIALIZER;
+                               userInfo:(nullable NSDictionary *)userInfo
+                              serverURL:(nullable NSURL *)serverURL NS_DESIGNATED_INITIALIZER;
 
 // Convenience factory methods
 
@@ -53,6 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Miscellaneous
 
 - (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 

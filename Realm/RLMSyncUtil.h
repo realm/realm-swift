@@ -21,7 +21,6 @@
 
 typedef void(^RLMErrorReportingBlock)(NSError * _Nullable);
 
-@class RLMSyncSession;
 @class RLMRealmConfiguration;
 
 typedef NSString* RLMSyncIdentity;
@@ -29,9 +28,7 @@ typedef NSString* RLMSyncToken;
 typedef NSString* RLMCredentialToken;
 typedef NSString* RLMSyncPath;
 typedef NSString* RLMSyncAppID;
-typedef void(^RLMSyncLoginCompletionBlock)(NSError * _Nullable, RLMSyncSession * _Nullable);
 typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
-
 typedef void(^RLMSyncFetchedRealmCompletionBlock)(NSError * _Nullable, RLMRealmConfiguration * _Nullable, BOOL * _Nonnull);
 
 typedef NS_ENUM(NSInteger, RLMSyncError) {
@@ -45,6 +42,9 @@ typedef NS_ENUM(NSInteger, RLMSyncError) {
     /// An error that indicates that the response received from the authentication server was an HTTP error code. The
     /// `userInfo` dictionary contains the actual error code value.
     RLMSyncErrorHTTPStatusCodeError     = 3,
+
+    /// An error that indicates an issue with the underlying Sync engine.
+    RLMSyncInternalError                = 4,
 };
 
 NS_ASSUME_NONNULL_BEGIN

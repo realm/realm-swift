@@ -81,31 +81,28 @@
                            kRLMSyncAppIDKey: [RLMSync appID],
                            };
 
-    __weak RLMSessionInfo *weakSelf = self;
     RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
-        RLMSessionInfo *strongSelf = weakSelf;
-        if (!strongSelf) { return; }
         if (json && !error) {
             RLMRefreshResponseModel *model = [[RLMRefreshResponseModel alloc] initWithJSON:json];
             if (!model) {
                 // Malformed JSON
-                [user _reportRefreshFailureForPath:strongSelf.path error:nil];
+                [user _reportRefreshFailureForPath:self.path error:nil];
                 // TODO: invalidate
                 return;
             } else {
                 // Success
                 NSString *accessToken = model.accessToken;
-                strongSelf.accessToken = accessToken;
-                strongSelf.accessTokenExpiry = model.accessTokenExpiry;
-                [strongSelf _scheduleRefreshTimer];
+                self.accessToken = accessToken;
+                self.accessTokenExpiry = model.accessTokenExpiry;
+                [self _scheduleRefreshTimer];
 
                 realm::Realm::refresh_sync_access_token(std::string([accessToken UTF8String]),
-                                                        RLMStringDataWithNSString([strongSelf.fileURL path]),
+                                                        RLMStringDataWithNSString([self.fileURL path]),
                                                         realm::util::none);
             }
         } else {
             // Something else went wrong
-            [user _reportRefreshFailureForPath:strongSelf.path error:error];
+            [user _reportRefreshFailureForPath:self.path error:error];
             // TODO: invalidate
         }
     };

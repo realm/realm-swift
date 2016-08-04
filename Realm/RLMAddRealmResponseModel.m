@@ -32,8 +32,7 @@
     if (self = [super init]) {
         RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, accessToken);
         RLMSYNC_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, accessTokenExpiry);
-        // TODO: activate this once it's been implemented
-//        RLMSYNC_PARSE_STRING_OR_ABORT(json, @"full_path", fullPath);
+        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncPathKey, fullPath);
     }
     return self;
 }

@@ -43,12 +43,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setSyncPath:(nullable RLMSyncPath)path forSyncUser:(nullable RLMUser *)user;
 
-/**
- The full URL of the Realm Sync remote Realm this Realm is synchronized with, if applicable.
-
- Note that it is only populated once the resolved path is verified and returned from the server.
- */
-@property (nonatomic, readonly, nullable) NSURL *syncServerURL;
+- (void)setSyncPath:(nullable RLMSyncPath)path
+        forSyncUser:(nullable RLMUser *)user
+       onCompletion:(nullable RLMErrorReportingBlock)completion;
 
 NS_ASSUME_NONNULL_END
 

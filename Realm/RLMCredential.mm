@@ -55,13 +55,15 @@ static BOOL syncServerURLIsValid(NSURL *url) {
     return [[RLMCredential alloc] initWithCredentialToken:username
                                                  provider:RLMSyncIdentityProviderUsernamePassword
                                                  userInfo:@{kRLMSyncPasswordKey: password,
-                                                            kRLMSyncRegisterKey: @(isNewAccount)}];
+                                                            kRLMSyncRegisterKey: @(isNewAccount)}
+                                                serverURL:nil];
 }
 
 + (instancetype)credentialWithFacebookToken:(NSString *)facebookToken {
     return [[RLMCredential alloc] initWithCredentialToken:facebookToken
                                                  provider:RLMSyncIdentityProviderFacebook
-                                                 userInfo:nil];
+                                                 userInfo:nil
+                                                serverURL:nil];
 }
 
 - (NSString *)description {
@@ -74,11 +76,17 @@ static BOOL syncServerURLIsValid(NSURL *url) {
 
 - (instancetype)initWithCredentialToken:(RLMCredentialToken)credentialToken
                                provider:(RLMSyncIdentityProvider)provider
-                               userInfo:(nullable NSDictionary *)userInfo {
+                               userInfo:(nullable NSDictionary *)userInfo
+                              serverURL:(nullable NSURL *)serverURL {
     if (self = [super init]) {
         self.credentialToken = credentialToken;
+        self.authServerPort = nil;
         self.provider = provider;
         self.userInfo = userInfo;
+        if (serverURL && !syncServerURLIsValid(serverURL)) {
+            @throw RLMException(@"The URL passed into '-initWithCredentialToken:...' was not a valid server URL.");
+        }
+        self.syncServerURL = serverURL;
     }
     return self;
 }

@@ -54,7 +54,7 @@
 }
 
 + (NSURL *)filePathForSyncServerURL:(NSURL *)serverURL user:(RLMUser *)user {
-    NSString *userID = user.userID;
+    NSString *userID = user.identity;
     if (!userID) {
         @throw RLMException(@"Realm Sync cannot open local disk files for users configured without a user ID.");
         return nil;

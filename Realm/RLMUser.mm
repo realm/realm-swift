@@ -54,7 +54,7 @@
     RLMUser *user = [[RLMUser alloc] init];
     user.isAnonymous = YES;
     // TODO
-    user.userID = @".anonymousUser";
+    user.identity = @".anonymousUser";
 
     return user;
 }
@@ -71,7 +71,7 @@
     if (!syncURL) {
         @throw RLMException(@"A sync server URL is required to log in, but was missing, and there is no default.");
     }
-    NSURL *authURL = authURLForSyncURL(syncURL);
+    NSURL *authURL = authURLForSyncURL(syncURL, credential.authServerPort);
     self.syncURL = syncURL;
     self.authURL = authURL;
 
@@ -87,10 +87,7 @@
 
     RLMErrorReportingBlock block = completion ?: ^(NSError *) { };
 
-    __weak RLMUser *weakSelf = self;
     RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
-        RLMUser *strongSelf = weakSelf;
-        if (!strongSelf) { return; }
         if (json && !error) {
             RLMLoginResponseModel *model = [[RLMLoginResponseModel alloc] initWithJSON:json];
             if (!model) {
@@ -102,10 +99,10 @@
                 return;
             } else {
                 // Success: store the tokens.
-                strongSelf.refreshToken = model.renewalTokenModel.renewalToken;
-                strongSelf.refreshTokenExpiry = model.renewalTokenModel.tokenExpiry;
-                strongSelf.userID = model.userID;
-                strongSelf.isLoggedIn = YES;
+                self.refreshToken = model.renewalTokenModel.renewalToken;
+                self.refreshTokenExpiry = model.renewalTokenModel.tokenExpiry;
+                self.identity = model.identity;
+                self.isLoggedIn = YES;
                 block(nil);
             }
         } else {
@@ -163,10 +160,7 @@
                            kRLMSyncDataKey: credential.credentialToken,
                            };
 
-    __weak RLMUser *weakSelf = self;
     RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *) {
-        RLMUser *strongSelf = weakSelf;
-        if (!strongSelf) { return; }
         // TODO: if user is anonymous, promote to normal user.
         // TODO: if anonymous user was promoted, bind any Realms that were associated.
         if (completion) {
@@ -190,10 +184,7 @@
                            kRLMSyncDataKey: credential.credentialToken,
                            };
 
-    __weak RLMUser *weakSelf = self;
     RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *) {
-        RLMUser *strongSelf = weakSelf;
-        if (!strongSelf) { return; }
         if (completion) {
             completion(error);
         }
@@ -218,7 +209,9 @@
 #pragma mark - Private
 
 // A callback handler for a Realm, used to get an updated access token which can then be used to bind the Realm.
-- (void)_bindRealmWithLocalFileURL:(const std::string&)fileURL remoteSyncURL:(NSURL *)remoteURL {
+- (void)_bindRealmWithLocalFileURL:(const std::string&)fileURL
+                     remoteSyncURL:(NSURL *)remoteURL
+                      onCompletion:(RLMErrorReportingBlock)completion {
     if (!self.isLoggedIn) {
         // TODO (az-sync): should this be more forgiving? Throwing an exception may be too extreme
         @throw RLMException(@"The user is no longer logged in. Cannot open the Realm");
@@ -238,10 +231,7 @@
                            kRLMSyncAppIDKey: [RLMSync appID],
                            };
 
-    __weak RLMUser *weakSelf = self;
     RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
-        RLMUser *strongSelf = weakSelf;
-        if (!strongSelf) { return; }
         if (json && !error) {
             RLMAddRealmResponseModel *model = [[RLMAddRealmResponseModel alloc] initWithJSON:json];
             if (!model) {
@@ -258,17 +248,27 @@
                 // Register the Realm as being linked to this User.
                 RLMSyncPath fullPath = model.fullPath;
                 RLMSessionInfo *info = [[RLMSessionInfo alloc] initWithFileURL:objcFileURL path:objcRemotePath];
-                [strongSelf.realms setValue:info forKey:objcRemotePath];
+                [self.realms setValue:info forKey:objcRemotePath];
 
                 // Per-Realm access token stuff
                 [info configureWithAccessToken:accessToken expiry:model.accessTokenExpiry user:self];
 
                 // Bind the Realm
-                NSURL *objcRealmURL = [NSURL URLWithString:fullPath relativeToURL:strongSelf.syncURL];
+                NSURL *objcRealmURL = [NSURL URLWithString:fullPath relativeToURL:self.syncURL];
                 auto full_realm_url = realm::util::Optional<std::string>([[objcRealmURL absoluteString] UTF8String]);
-                realm::Realm::refresh_sync_access_token(std::string([accessToken UTF8String]),
-                                                        fileURL,
-                                                        full_realm_url);
+                auto file_url = RLMStringDataWithNSString([objcFileURL path]);
+                bool success = realm::Realm::refresh_sync_access_token(std::string([accessToken UTF8String]),
+                                                                       file_url,
+                                                                       full_realm_url);
+                if (completion) {
+                    if (success) {
+                        completion(nil);
+                    } else {
+                        completion([NSError errorWithDomain:RLMSyncErrorDomain
+                                                       code:RLMSyncInternalError
+                                                   userInfo:nil]);
+                    }
+                }
             }
         } else {
             // Something else went wrong

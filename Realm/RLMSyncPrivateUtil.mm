@@ -20,11 +20,10 @@
 
 #import "RLMSyncPrivateUtil.h"
 
-NSURL *authURLForSyncURL(NSURL *syncURL) {
+NSURL *authURLForSyncURL(NSURL *syncURL, NSNumber *customPort) {
     BOOL isSSL = [syncURL.scheme isEqualToString:@"realms"];
     NSString *scheme = (isSSL ? @"https" : @"http");
-    // FIXME: should this be customizable eventually?
-    NSInteger port = (isSSL ? 3001 : 3000);
+    NSInteger port = customPort ? [customPort integerValue] : (isSSL ? 8081 : 8080);
     NSString *raw = [NSString stringWithFormat:@"%@://%@:%@", scheme, syncURL.host, @(port)];
     return [NSURL URLWithString:raw];
 }

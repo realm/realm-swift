@@ -22,11 +22,7 @@
 
 @interface RLMLoginResponseModel ()
 
-@property (nonatomic, readwrite) NSString *userID;
-@property (nonatomic, readwrite) RLMSyncToken accessToken;
-@property (nonatomic, readwrite) NSTimeInterval accessTokenExpiry;
 @property (nonatomic, readwrite) RLMSyncIdentity identity;
-
 @property (nonatomic, readwrite) RLMSyncRenewalTokenModel *renewalTokenModel;
 
 //@property (nonatomic, readwrite) NSArray *access;
@@ -37,12 +33,8 @@
 
 - (instancetype)initWithJSON:(NSDictionary *)json {
     if (self = [super init]) {
-        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, accessToken);
-        RLMSYNC_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, accessTokenExpiry);
         RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncIdentityKey, identity);
         RLMSYNC_PARSE_MODEL_OR_ABORT(json, kRLMSyncRefreshKey, RLMSyncRenewalTokenModel, renewalTokenModel);
-        // TODO: enable the following
-        //RLMSYNC_PARSE_STRING_OR_ABORT(json, @"userID", userID);
     }
     return self;
 }

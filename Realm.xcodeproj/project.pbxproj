@@ -1486,13 +1486,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5D659ED61BE04556006515A0 /* Build configuration list for PBXNativeTarget "Realm" */;
 			buildPhases = (
+				5D6156F41BE06FF500A4BD3F /* Generate RLMPlatform.h */,
 				5D659E7E1BE04556006515A0 /* Get Version Number */,
 				5D659E7F1BE04556006515A0 /* Download Core */,
 				5D659E801BE04556006515A0 /* Sources */,
 				5D659E9F1BE04556006515A0 /* Headers */,
 				1A7B82351D51235600750296 /* Frameworks */,
 				5D659ECE1BE04556006515A0 /* Resources */,
-				5D6156F41BE06FF500A4BD3F /* Generate RLMPlatform.h */,
 			);
 			buildRules = (
 			);
@@ -1547,11 +1547,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5DD755CC1BE056DE002800DA /* Build configuration list for PBXNativeTarget "Realm iOS static" */;
 			buildPhases = (
+				5D6156F91BE083C600A4BD3F /* Generate RLMPlatform.h */,
 				5DD7557C1BE056DE002800DA /* Get Version Number */,
 				5DD7557D1BE056DE002800DA /* Download Core */,
 				5DD7557E1BE056DE002800DA /* Sources */,
 				5DD7559D1BE056DE002800DA /* Headers */,
-				5D6156F91BE083C600A4BD3F /* Generate RLMPlatform.h */,
 			);
 			buildRules = (
 			);

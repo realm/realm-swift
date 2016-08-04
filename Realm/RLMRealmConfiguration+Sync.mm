@@ -24,6 +24,8 @@
 #import "RLMSyncFileManager.hpp"
 #import "RLMUtil.hpp"
 
+typedef void(^SyncLoginBlock)(const std::string&);
+
 @implementation RLMRealmConfiguration (Sync)
 
 - (void)setErrorHandler:(RLMErrorReportingBlock)errorHandler {
@@ -41,12 +43,18 @@
     self.config.sync_error_handler = handler;
 }
 
-- (void)setSyncPath:(RLMSyncPath)path forSyncUser:(RLMUser *)user {
-    auto config = self.config;
+- (void)setSyncPath:(RLMSyncPath)path
+        forSyncUser:(RLMUser *)user {
+    [self setSyncPath:path forSyncUser:user onCompletion:nil];
+}
+
+- (void)setSyncPath:(RLMSyncPath)path
+        forSyncUser:(RLMUser *)user
+       onCompletion:(nullable RLMErrorReportingBlock)completion {
     if (!path) {
         // Clear the sync state. User must explicitly set a file URL or in-memory identifier.
-        config.sync_user_id = realm::util::none;
-        config.sync_login_function = nullptr;
+        self.config.sync_user_id = realm::util::none;
+        self.config.sync_login_function = nullptr;
         self.fileURL = nil;
         self.inMemoryIdentifier = nil;
         return;
@@ -59,23 +67,15 @@
     }
     // Set the sync server URL and associated state
     NSURL *syncServerURL = [NSURL URLWithString:path relativeToURL:user.syncURL];
-    config.sync_user_id = std::string([user.userID UTF8String]);
-    config.sync_login_function = ^(const std::string& fileURL) {
-        [user _bindRealmWithLocalFileURL:fileURL remoteSyncURL:syncServerURL];
+    self.config.sync_user_id = std::string([user.identity UTF8String]);
+    self.config.sync_login_function = [user, syncServerURL, completion](const std::string& fileURL) {
+        [user _bindRealmWithLocalFileURL:fileURL remoteSyncURL:syncServerURL onCompletion:completion];
     };
 
     // Set the file URL
     NSURL *fileURL = [RLMSyncFileManager filePathForSyncServerURL:syncServerURL user:user];
-    config.path = std::string([[fileURL path] UTF8String]);
-    config.in_memory = false;
-}
-
-- (NSURL *)syncServerURL {
-    auto config = self.config;
-    if (config.sync_server_url == realm::util::none) {
-        return nil;
-    }
-    return [NSURL URLWithString:@(config.sync_server_url->c_str())];
+    self.config.path = std::string([[fileURL path] UTF8String]);
+    self.config.in_memory = false;
 }
 
 @end

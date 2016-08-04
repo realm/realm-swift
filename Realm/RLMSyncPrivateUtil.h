@@ -42,7 +42,7 @@ extern "C" {
 #endif
     // Free helper functions go here.
 
-    NSURL *authURLForSyncURL(NSURL *serverURL);
+    NSURL *authURLForSyncURL(NSURL *serverURL, NSNumber *customPort);
     RLMSyncPath realmPathForSyncURL(NSURL *syncURL);
 
 #ifdef __cplusplus

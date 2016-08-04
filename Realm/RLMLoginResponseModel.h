@@ -27,11 +27,7 @@
 
 @interface RLMLoginResponseModel : NSObject
 
-@property (nonatomic, readonly) NSString *userID;
-@property (nonatomic, readonly) RLMSyncToken accessToken;
-@property (nonatomic, readonly) NSTimeInterval accessTokenExpiry;
 @property (nonatomic, readonly) RLMSyncIdentity identity;
-
 @property (nonatomic, readonly) RLMSyncRenewalTokenModel *renewalTokenModel;
 
 //@property (nonatomic, readonly) NSArray *access;
