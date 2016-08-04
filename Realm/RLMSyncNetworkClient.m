@@ -46,12 +46,23 @@ static NSRange RLM_rangeForErrorType(RLMSyncHTTPErrorCodeType type) {
 + (NSURL *)urlForServer:(NSURL *)serverURL endpoint:(RLMSyncServerEndpoint)endpoint {
     NSString *pathComponent = nil;
     switch (endpoint) {
-        case RLMSyncServerEndpointSessions:
+        case RLMSyncServerEndpointAuth:
             pathComponent = @"auth";
             break;
-        case RLMSyncServerEndpointRefresh:
-            // TODO: change this once the server-side API changes
-            pathComponent = @"auth";
+        case RLMSyncServerEndpointLogout:
+            // TODO: fix this
+            pathComponent = @"logout";
+            NSAssert(NO, @"logout endpoint isn't implemented yet, don't use it");
+            break;
+        case RLMSyncServerEndpointAddCredential:
+            // TODO: fix this
+            pathComponent = @"addCredential";
+            NSAssert(NO, @"add credential endpoint isn't implemented yet, don't use it");
+            break;
+        case RLMSyncServerEndpointRemoveCredential:
+            // TODO: fix this
+            pathComponent = @"removeCredential";
+            NSAssert(NO, @"remove credential endpoint isn't implemented yet, don't use it");
             break;
     }
     NSAssert(pathComponent != nil, @"Unrecognized value for RLmSyncServerEndpoint enum");

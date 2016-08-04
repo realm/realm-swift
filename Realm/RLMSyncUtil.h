@@ -19,23 +19,32 @@
 #import <Foundation/Foundation.h>
 #import "RLMConstants.h"
 
+typedef void(^RLMErrorReportingBlock)(NSError * _Nullable);
+
 @class RLMSyncSession;
+@class RLMRealmConfiguration;
 
 typedef NSString* RLMSyncIdentity;
 typedef NSString* RLMSyncToken;
-typedef NSString* RLMSyncCredential;
-typedef NSString* RLMSyncRealmPath;
+typedef NSString* RLMCredentialToken;
+typedef NSString* RLMSyncPath;
 typedef NSString* RLMSyncAppID;
 typedef void(^RLMSyncLoginCompletionBlock)(NSError * _Nullable, RLMSyncSession * _Nullable);
 typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
 
+typedef void(^RLMSyncFetchedRealmCompletionBlock)(NSError * _Nullable, RLMRealmConfiguration * _Nullable, BOOL * _Nonnull);
+
 typedef NS_ENUM(NSInteger, RLMSyncError) {
+    /// An error that indicates that the response received from the authentication server was malformed.
     RLMSyncErrorBadResponse             = 1,
+
+    /// An error that indicates that the supplied Realm path was invalid, or could not be resolved by the authentication
+    /// server.
     RLMSyncErrorBadRemoteRealmPath      = 2,
-    RLMSyncErrorBadLocalRealmPath       = 3,
-    RLMSyncErrorInvalidSession          = 4,
-    RLMSyncErrorManagerNotConfigured    = 5,
-    RLMSyncErrorHTTPStatusCodeError     = 6,
+
+    /// An error that indicates that the response received from the authentication server was an HTTP error code. The
+    /// `userInfo` dictionary contains the actual error code value.
+    RLMSyncErrorHTTPStatusCodeError     = 3,
 };
 
 NS_ASSUME_NONNULL_BEGIN

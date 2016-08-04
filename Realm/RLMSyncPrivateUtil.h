@@ -20,6 +20,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class NSURL;
+
 static NSString *const kRLMSyncProviderKey      = @"provider";
 static NSString *const kRLMSyncDataKey          = @"data";
 static NSString *const kRLMSyncAppIDKey         = @"app_id";
@@ -38,8 +40,10 @@ static NSString *const kRLMSyncErrorJSONKey     = @"json";
 #ifdef __cplusplus
 extern "C" {
 #endif
-
     // Free helper functions go here.
+
+    NSURL *authURLForSyncURL(NSURL *serverURL);
+    RLMSyncPath realmPathForSyncURL(NSURL *syncURL);
 
 #ifdef __cplusplus
 }

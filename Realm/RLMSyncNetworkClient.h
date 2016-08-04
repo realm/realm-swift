@@ -24,8 +24,10 @@
  An enum describing all possible endpoints on the Realm Sync server.
  */
 typedef NS_ENUM(NSUInteger, RLMSyncServerEndpoint) {
-    RLMSyncServerEndpointSessions,
-    RLMSyncServerEndpointRefresh,
+    RLMSyncServerEndpointAuth,
+    RLMSyncServerEndpointLogout,
+    RLMSyncServerEndpointAddCredential,
+    RLMSyncServerEndpointRemoveCredential,
 };
 
 /**
