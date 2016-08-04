@@ -94,28 +94,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// The classes managed by the Realm.
 @property (nonatomic, copy, nullable) NSArray *objectClasses;
 
-#pragma mark - Synchronization
-
-/**
- The synchronization URL and path.
-
- The URL must be of the form `realm://realm.foo.com:7800/my_realm`, where
- `my_realm` is the name of the Realm as known to the server.
-
- When `nil`, synchronization is disabled. Defaults to `nil`.
-*/
-@property (nonatomic, copy, nullable) NSURL *syncServerURL;
-
-/**
- The user identity token used for synchronization.
- It has the form "syncIdentity:syncSignature"
- Where:
-    syncIdentity is a base64-encoded JSON document.
-    syncSignature is a base64-encoded cryptographic signature.
-        Must match the value of syncIdentity.
-*/
-@property (nonatomic, copy, nullable) NSString *syncUserToken;
-
 @end
 
 NS_ASSUME_NONNULL_END

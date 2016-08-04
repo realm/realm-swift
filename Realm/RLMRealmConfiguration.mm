@@ -248,39 +248,5 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     return _config.disable_format_upgrade;
 }
 
-#pragma mark - Synchronization
-
-- (NSURL *)syncServerURL {
-    if (!_config.sync_server_url) {
-        return nil;
-    }
-
-    return [NSURL URLWithString:@(_config.sync_server_url->c_str())];
-}
-
-- (void)setSyncServerURL:(NSURL *)syncServerURL {
-    if (!syncServerURL) {
-        _config.sync_server_url = realm::util::none;
-    } else {
-        _config.sync_server_url = std::string([[syncServerURL absoluteString] UTF8String]);
-    }
-}
-
-- (NSString *)syncUserToken {
-    if (!_config.sync_user_token) {
-        return nil;
-    }
-
-    return @(_config.sync_user_token->c_str());
-}
-
-- (void)setSyncUserToken:(NSString *)syncUserToken {
-    if (!syncUserToken) {
-        _config.sync_user_token = realm::util::none;
-    } else {
-        _config.sync_user_token = std::string(syncUserToken.UTF8String);
-    }
-}
-
 @end
 
