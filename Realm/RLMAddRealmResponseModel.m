@@ -16,22 +16,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMAddRealmResponseModel.h"
 
-#import "RLMSyncUtil.h"
+@interface RLMAddRealmResponseModel ()
 
-@class RLMSyncRenewalTokenModel;
+@property (nonatomic, readwrite) RLMSyncToken accessToken;
+@property (nonatomic, readwrite) NSTimeInterval accessTokenExpiry;
+@property (nonatomic, readwrite) NSString *fullPath;
 
-@interface RLMSyncSessionDataModel : NSObject
+@end
 
-@property (nonatomic, readonly) RLMSyncToken accessToken;
-@property (nonatomic, readonly) NSTimeInterval accessTokenExpiry;
-@property (nonatomic, readonly) RLMSyncIdentity identity;
+@implementation RLMAddRealmResponseModel
 
-@property (nonatomic, readonly) RLMSyncRenewalTokenModel *renewalTokenModel;
-
-//@property (nonatomic, readonly) NSArray *access;
-
-- (instancetype)initWithJSON:(NSDictionary *)json;
+- (instancetype)initWithJSON:(NSDictionary *)json {
+    if (self = [super init]) {
+        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, accessToken);
+        RLMSYNC_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, accessTokenExpiry);
+        // TODO: activate this once it's been implemented
+//        RLMSYNC_PARSE_STRING_OR_ABORT(json, @"full_path", fullPath);
+    }
+    return self;
+}
 
 @end
