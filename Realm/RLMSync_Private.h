@@ -16,16 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager.h"
+#import "RLMSync.h"
 
 @class RLMSyncSession;
 
-@interface RLMSyncManager ()
+@interface RLMSync ()
 
-/**
- Given the local path of a Realm, retrieve (or create) a session object corresponding to that Realm. This object can be
- used to store session-specific data and perform certain operations only valid if logged in.
- */
-- (RLMSyncSession *)syncSessionForRealm:(NSString *)localIdentifier;
+NS_ASSUME_NONNULL_BEGIN
+
++ (RLMSyncAppID)appID;
+
+NS_ASSUME_NONNULL_END
 
 @end

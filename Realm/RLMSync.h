@@ -16,25 +16,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncSession.h"
+#import <Foundation/Foundation.h>
 
-@class RLMSyncSessionDataModel;
+#import "RLMSyncUtil.h"
 
-@interface RLMSyncSession ()
+// TODO (az-sync): we need the singleton dictionary of logged-in users.
+//   --> used for unbinding Realms on global error
 
-@property (nonatomic, readwrite) NSString *localIdentifier;
+@interface RLMSync : NSObject
 
-/**
- Given a newly-created session object, configure all fields which are not expected to change between requests (except
- for `path`, which is configured by the sync manager when it retrieves the object from its dictionary. Also sets the
- validity flag to YES.
+NS_ASSUME_NONNULL_BEGIN
 
- This method should only be called once.
- */
-- (void)configureWithAuthServerURL:(NSURL *)authServer
-                        remotePath:(RLMSyncRealmPath)path
-                  sessionDataModel:(RLMSyncSessionDataModel *)model;
++ (void)setupWithAppID:(RLMSyncAppID)appID
+              logLevel:(NSUInteger)logLevel
+          errorHandler:(nullable RLMErrorReportingBlock)errorHandler;
 
-- (instancetype)initPrivate NS_DESIGNATED_INITIALIZER;
+NS_ASSUME_NONNULL_END
 
 @end

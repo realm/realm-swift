@@ -18,28 +18,19 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
-
-NS_ASSUME_NONNULL_BEGIN
+@class RLMUser;
 
 /**
- `RLMSyncUser` encapsulates login information for a single user and auth provider.
-
- The host application or helper library should create one of these objects once a user has successfully received a
- credential from an auth provider, and pass it into the appropriate API functions to open a Realm.
+ A thin wrapper around `NSFileManager` for use internally managing the file paths of Realms participating in Sync.
  */
-@interface RLMSyncUser : NSObject
+@interface RLMSyncFileManager : NSObject
 
-@property (nonatomic, readonly) RLMSyncCredential credential;
-@property (nonatomic, readonly) RLMSyncIdentityProvider provider;
-@property (nullable, nonatomic, readonly) NSDictionary *userInfo;
-
-- (instancetype)initWithCredential:(RLMSyncCredential)credential
-                          provider:(RLMSyncIdentityProvider)provider
-                          userInfo:(nullable NSDictionary *)userInfo NS_DESIGNATED_INITIALIZER;
+/**
+ Given a Realm Sync server path, and a Realm Sync user object, return a file URL that describes where the local copy of
+ the Realm should be stored. Used by the Realm Sync bindings to manage files in a way opaque to the consumer.
+ */
++ (NSURL *)filePathForSyncServerURL:(NSURL *)serverURL user:(RLMUser *)user;
 
 - (instancetype)init NS_UNAVAILABLE;
 
 @end
-
-NS_ASSUME_NONNULL_END

@@ -18,32 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
-
-@interface RLMSyncManager : NSObject
-
-NS_ASSUME_NONNULL_BEGIN
-
-/**
- Whether or not the Realm Sync manager has been configured.
- */
-@property (nonatomic, readonly) BOOL configured;
-
-/**
- The Realm Sync application ID for the current application.
- */
-@property (nullable, nonatomic, readonly) RLMSyncAppID appID;
-
-/**
- Configure the Realm Sync manager with application-wide configuration options. Call this method before calling any other
- Realm Sync APIs. Do not call this method if `configured` is `YES`.
- */
-- (void)configureWithAppID:(RLMSyncAppID)appID;
+@interface RLMSessionInfo : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
-
-+ (instancetype)sharedManager;
-
-NS_ASSUME_NONNULL_END
 
 @end
