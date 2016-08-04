@@ -20,46 +20,51 @@ import Realm
 import Realm.Private
 import Foundation
 
-public typealias SyncManager = RLMSyncManager
+public typealias Credential = RLMCredential
 
-public typealias User = RLMSyncUser
+public typealias User = RLMUser
 
-public typealias Session = RLMSyncSession
-
-public typealias SyncLoginCompletionBlock = (NSError?, Session?) -> Void
+public typealias SessionInfo = RLMSessionInfo
 
 public typealias Provider = RLMSyncIdentityProvider
 
+public typealias ErrorReportingBlock = ((NSError?) -> Void)
+
 #if swift(>=3.0)
 
-public extension Realm {
-    func open(for user: User, onCompletion block: SyncLoginCompletionBlock) {
-        self.rlmRealm.open(for: user, onCompletion: block)
-    }
-
-    func open(for username: String, password: String, newAccount: Bool, onCompletion block: SyncLoginCompletionBlock) {
-        self.rlmRealm.open(forUsername: username, password: password, isNewAccount: newAccount, onCompletion: block)
-    }
-
-    func open(with token: String) {
-        self.rlmRealm.open(withSyncToken: token)
-    }
-}
+    // TODO: implement Swift 3 API once we enter GM.
 
 #else
 
+public struct Sync {
+
+    static func setupWithAppID(appID: String,
+                               logLevel: UInt,
+                               globalErrorHandler: ErrorReportingBlock) {
+        RLMSync.setupWithAppID(appID, logLevel: logLevel, errorHandler: globalErrorHandler)
+    }
+
+    private init() { }
+}
+
+public extension Realm.Configuration {
+
+    func setErrorHandler(handler: ErrorReportingBlock?) {
+        rlmConfiguration.setErrorHandler(handler)
+    }
+
+    func setSyncPath(path: String?, for user: User) {
+        rlmConfiguration.setSyncPath(path, forSyncUser: user)
+    }
+
+    var syncServerURL : NSURL? {
+        return rlmConfiguration.syncServerURL
+    }
+}
+
 public extension Realm {
-    func open(for user: User, onCompletion block: SyncLoginCompletionBlock) {
-        self.rlmRealm.openForSyncUser(user, onCompletion: block)
-    }
+    // TODO: add APIs here as they are implemented.
 
-    func open(for username: String, password: String, newAccount: Bool, onCompletion block: SyncLoginCompletionBlock) {
-        self.rlmRealm.openForUsername(username, password: password, isNewAccount: newAccount, onCompletion: block)
-    }
-
-    func open(with token: String) {
-        self.rlmRealm.openWithSyncToken(token)
-    }
 }
 
 #endif

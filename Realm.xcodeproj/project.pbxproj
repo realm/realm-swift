@@ -80,7 +80,6 @@
 		1A7003131D52710D00FD9EE3 /* RLMUser_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A8413351D4C0B5B00C5326F /* RLMUser_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A7B823A1D51259F00750296 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A7B82391D51259F00750296 /* libz.tbd */; };
 		1A7B823B1D5126D200750296 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A7B82391D51259F00750296 /* libz.tbd */; };
-		1A7DE7031D38460B0029F0AE /* RealmSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7DE7021D38460B0029F0AE /* RealmSync.swift */; };
 		1A7DE7041D3847370029F0AE /* RLMRefreshResponseModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A36EE7F1D36C53F00C8B31F /* RLMRefreshResponseModel.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A7DE7061D3847460029F0AE /* RLMLoginResponseModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AF6EA451D36B1850014EB85 /* RLMLoginResponseModel.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A7DE7071D38474F0029F0AE /* RLMSync.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AF7EA941D340AF70001A9B5 /* RLMSync.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -114,6 +113,7 @@
 		1AF7EA9C1D340E700001A9B5 /* RLMSyncNetworkClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AF7EA9A1D340E700001A9B5 /* RLMSyncNetworkClient.m */; };
 		1AFEF8411D52CD8D00495005 /* RLMRealmConfiguration+Sync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ABF256E1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.mm */; };
 		1AFEF8421D52CD8F00495005 /* RLMRealmConfiguration+Sync.h in Headers */ = {isa = PBXBuildFile; fileRef = 1ABF256D1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1AFEF8431D52D2C900495005 /* RealmSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7DE7021D38460B0029F0AE /* RealmSync.swift */; };
 		2973CCF91C175AB400FEA0FA /* fileformat-pre-null.realm in Resources */ = {isa = PBXBuildFile; fileRef = 29B7FDF71C0DE76B0023224E /* fileformat-pre-null.realm */; };
 		297FBEFB1C19F696009D1118 /* RLMTestCaseUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297FBEFA1C19F696009D1118 /* RLMTestCaseUtils.swift */; };
 		297FBEFF1C19F844009D1118 /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 297FBEFE1C19F844009D1118 /* TestUtils.mm */; };

@@ -218,7 +218,7 @@
 #pragma mark - Private
 
 // A callback handler for a Realm, used to get an updated access token which can then be used to bind the Realm.
-- (void)_bindRealmWithLocalFileURL:(std::string&)fileURL remoteSyncURL:(NSURL *)remoteURL {
+- (void)_bindRealmWithLocalFileURL:(const std::string&)fileURL remoteSyncURL:(NSURL *)remoteURL {
     if (!self.isLoggedIn) {
         // TODO (az-sync): should this be more forgiving? Throwing an exception may be too extreme
         @throw RLMException(@"The user is no longer logged in. Cannot open the Realm");

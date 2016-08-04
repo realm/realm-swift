@@ -60,7 +60,7 @@
     // Set the sync server URL and associated state
     NSURL *syncServerURL = [NSURL URLWithString:path relativeToURL:user.syncURL];
     config.sync_user_id = std::string([user.userID UTF8String]);
-    config.sync_login_function = ^(std::string& fileURL) {
+    config.sync_login_function = ^(const std::string& fileURL) {
         [user _bindRealmWithLocalFileURL:fileURL remoteSyncURL:syncServerURL];
     };
 

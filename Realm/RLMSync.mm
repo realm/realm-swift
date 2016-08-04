@@ -60,7 +60,7 @@
         });
     };
 
-    realm::Realm::setup_sync_client(handler, nullptr);
+    realm::Realm::set_up_sync_client(handler, nullptr);
 }
 
 + (RLMSyncAppID)appID {
