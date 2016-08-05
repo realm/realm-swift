@@ -40,10 +40,9 @@ static NSString *const kRLMSyncErrorJSONKey     = @"json";
 #ifdef __cplusplus
 extern "C" {
 #endif
-    // Free helper functions go here.
 
-    NSURL *authURLForSyncURL(NSURL *serverURL, NSNumber *customPort);
-    RLMSyncPath realmPathForSyncURL(NSURL *syncURL);
+/// Given a sync server URL, derive the 'default' corresponding auth server URL from it.
+NSURL *RLMAuthURLForSyncURL(NSURL *serverURL, NSNumber *customPort);
 
 #ifdef __cplusplus
 }

@@ -20,25 +20,10 @@
 
 #import "RLMSyncPrivateUtil.h"
 
-NSURL *authURLForSyncURL(NSURL *syncURL, NSNumber *customPort) {
+NSURL *RLMAuthURLForSyncURL(NSURL *syncURL, NSNumber *customPort) {
     BOOL isSSL = [syncURL.scheme isEqualToString:@"realms"];
     NSString *scheme = (isSSL ? @"https" : @"http");
     NSInteger port = customPort ? [customPort integerValue] : (isSSL ? 8081 : 8080);
     NSString *raw = [NSString stringWithFormat:@"%@://%@:%@", scheme, syncURL.host, @(port)];
     return [NSURL URLWithString:raw];
-}
-
-RLMSyncPath realmPathForSyncURL(NSURL *syncURL) {
-    NSMutableArray<NSString *> *components = [syncURL.pathComponents mutableCopy];
-    // Path must contain at least 3 components: beginning slash, 'public'/'private', and path to Realm.
-    assert(components.count >= 3);
-    assert([components[0] isEqualToString:@"/"]);
-    BOOL isPrivate = [components[1] isEqualToString:@"private"];
-    // Remove the 'public'/'private' modifier
-    [components removeObjectAtIndex:1];
-    if (isPrivate) {
-        // Private paths are interpreted as relative; public ones as absolute.
-        [components removeObjectAtIndex:0];
-    }
-    return [components componentsJoinedByString:@"/"];
 }

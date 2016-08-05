@@ -21,21 +21,67 @@
 #import "RLMRealmConfiguration_Private.hpp"
 
 #import "RLMUser_Private.h"
-#import "RLMSyncFileManager.hpp"
+#import "RLMSyncPrivateUtil.h"
 #import "RLMUtil.hpp"
 
 typedef void(^SyncLoginBlock)(const std::string&);
 
 @implementation RLMRealmConfiguration (Sync)
 
+/**
+ The directory within which all Realm Sync related Realm database and support files are stored. This directory is a
+ subdirectory within the default directory within which normal on-disk Realms are stored.
+
+ The directory will be created if it does not already exist, and then verified. If there was an error setting it up an
+ exception will be thrown.
+ */
++(NSURL *)syncBaseDirectory {
+    static NSURL *s_syncBaseDirectory;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // Create the path.
+        NSFileManager *manager = [NSFileManager defaultManager];
+        NSURL *base = [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
+        s_syncBaseDirectory = [base URLByAppendingPathComponent:@".realm-sync" isDirectory:YES];
+
+        // If the directory does not already exist, create it.
+        [manager createDirectoryAtURL:s_syncBaseDirectory
+          withIntermediateDirectories:YES
+                           attributes:nil
+                                error:nil];
+        BOOL isDirectory;
+        BOOL fileExists = [manager fileExistsAtPath:[s_syncBaseDirectory path] isDirectory:&isDirectory];
+        if (!fileExists || !isDirectory) {
+            @throw RLMException(@"Realm Sync was not able to prepare its directory for storing Realm files.");
+        }
+    });
+    return s_syncBaseDirectory;
+}
+
++(NSURL *)filePathForSyncServerURL:(NSURL *)serverURL user:(RLMUser *)user {
+    NSString *userID = user.identity;
+    if (!userID) {
+        @throw RLMException(@"Realm Sync cannot open local disk files for users configured without a user ID.");
+        return nil;
+    }
+
+    NSCharacterSet *alpha = [NSCharacterSet alphanumericCharacterSet];
+    NSString *escapedPath = [[serverURL path] stringByAddingPercentEncodingWithAllowedCharacters:alpha];
+    NSString *escapedUserID = [userID stringByAddingPercentEncodingWithAllowedCharacters:alpha];
+    NSString *escapedHost = [[serverURL host] stringByAddingPercentEncodingWithAllowedCharacters:alpha];
+    NSString *realmFileName = [NSString stringWithFormat:@"%@-%@-%@.realm", escapedHost, escapedPath, escapedUserID];
+    return [[self syncBaseDirectory] URLByAppendingPathComponent:realmFileName];
+}
+
 - (void)setErrorHandler:(RLMErrorReportingBlock)errorHandler {
     RLMErrorReportingBlock callback = (errorHandler ?: ^(NSError *) { });
 
     auto handler = [=](int error_code, std::string message) {
         NSString *nativeMessage = @(message.c_str());
-        NSError *error = [NSError errorWithDomain:@"io.realm.sync.client"
-                                             code:error_code
-                                         userInfo:@{@"description": nativeMessage}];
+        NSError *error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                             code:RLMSyncInternalError
+                                         userInfo:@{@"description": nativeMessage,
+                                                    @"error": @(error_code)}];
         dispatch_async(dispatch_get_main_queue(), ^{
             callback(error);
         });
@@ -45,12 +91,12 @@ typedef void(^SyncLoginBlock)(const std::string&);
 
 - (void)setSyncPath:(RLMSyncPath)path
         forSyncUser:(RLMUser *)user {
-    [self setSyncPath:path forSyncUser:user onCompletion:nil];
+    [self setSyncPath:path forSyncUser:user callback:nil];
 }
 
 - (void)setSyncPath:(RLMSyncPath)path
         forSyncUser:(RLMUser *)user
-       onCompletion:(nullable RLMErrorReportingBlock)completion {
+           callback:(nullable RLMErrorReportingBlock)callback {
     if (!path) {
         // Clear the sync state. User must explicitly set a file URL or in-memory identifier.
         self.config.sync_user_id = realm::util::none;
@@ -68,13 +114,13 @@ typedef void(^SyncLoginBlock)(const std::string&);
     // Set the sync server URL and associated state
     NSURL *syncServerURL = [NSURL URLWithString:path relativeToURL:user.syncURL];
     self.config.sync_user_id = std::string([user.identity UTF8String]);
-    self.config.sync_login_function = [user, syncServerURL, completion](const std::string& fileURL) {
-        [user _bindRealmWithLocalFileURL:fileURL remoteSyncURL:syncServerURL onCompletion:completion];
+    self.config.sync_login_function = [user, syncServerURL, callback](const std::string& fileURL) {
+        [user _bindRealmWithLocalFileURL:fileURL remoteSyncURL:syncServerURL onCompletion:callback];
     };
 
     // Set the file URL
-    NSURL *fileURL = [RLMSyncFileManager filePathForSyncServerURL:syncServerURL user:user];
-    self.config.path = std::string([[fileURL path] UTF8String]);
+    NSURL *fileURL = [RLMRealmConfiguration filePathForSyncServerURL:syncServerURL user:user];
+    self.config.path = [[fileURL path] UTF8String];
     self.config.in_memory = false;
 }
 

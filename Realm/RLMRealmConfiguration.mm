@@ -45,12 +45,12 @@ static NSString *const c_defaultRealmFileName = @"default.realm";
 RLMRealmConfiguration *s_defaultConfiguration;
 
 NSString *RLMRealmPathForFileAndBundleIdentifier(NSString *fileName, NSString *bundleIdentifier) {
-    return [defaultDirectoryForBundleIdentifier(bundleIdentifier)
+    return [RLMDefaultDirectoryForBundleIdentifier(bundleIdentifier)
             stringByAppendingPathComponent:fileName];
 }
 
 NSString *RLMRealmPathForFile(NSString *fileName) {
-    static NSString *directory = defaultDirectoryForBundleIdentifier(nil);
+    static NSString *directory = RLMDefaultDirectoryForBundleIdentifier(nil);
     return [directory stringByAppendingPathComponent:fileName];
 }
 

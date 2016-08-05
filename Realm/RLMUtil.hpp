@@ -201,4 +201,4 @@ void RLMSetTreatFakeObjectAsRLMObject(BOOL flag);
 
 // Given a bundle identifier, return the base directory on the disk within which Realm database and support files should
 // be stored.
-NSString *defaultDirectoryForBundleIdentifier(NSString *bundleIdentifier);
+NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier);

@@ -42,20 +42,16 @@
 @synthesize isLoggedIn = _isLoggedIn;
 
 + (instancetype)defaultUser {
-    static RLMUser *s_default_user;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        s_default_user = [[RLMUser alloc] init];
-    });
+    static RLMUser *s_default_user = [[RLMUser alloc] init];
     return s_default_user;
 }
 
 + (instancetype)userForAnonymousAccount {
     RLMUser *user = [[RLMUser alloc] init];
     user.isAnonymous = YES;
-    // TODO
+    // FIXME: how exactly should the anonymous user be defined, and what should they be able to do?
+    // FIXME: should there be only one anonymous user?
     user.identity = @".anonymousUser";
-
     return user;
 }
 
@@ -71,7 +67,7 @@
     if (!syncURL) {
         @throw RLMException(@"A sync server URL is required to log in, but was missing, and there is no default.");
     }
-    NSURL *authURL = authURLForSyncURL(syncURL, credential.authServerPort);
+    NSURL *authURL = RLMAuthURLForSyncURL(syncURL, credential.authServerPort);
     self.syncURL = syncURL;
     self.authURL = authURL;
 

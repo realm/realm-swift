@@ -35,17 +35,26 @@ NS_ASSUME_NONNULL_BEGIN
  Set the configuration up to define a Realm that is synced with a Realm Sync server. Upon opening a Realm, a connection
  will automatically be established with the server (if necessary), and synchronization will begin.
 
- @param path The path on the Sync server to the remote Realm. This can be an unresolved path (e.g. `/~/path/to/realm`),
- or a resolved path (e.g. `/someuser/path/to/realm`). Do not try to resolve a path yourself. Set this to
- `nil` if the Realm should not be synced.
- @param user A `RLMUser` instance. This user must be the anonymous user, or it must be a properly configured user that
- has already successfully logged in.
+ @see `-setSyncPath:forSyncUser:callback:`
  */
 - (void)setSyncPath:(nullable RLMSyncPath)path forSyncUser:(nullable RLMUser *)user;
 
+/**
+ Set the configuration up to define a Realm that is synced with a Realm Sync server. Upon opening a Realm, a connection
+ will automatically be established with the server (if necessary), and synchronization will begin. Once the Realm is
+ connected to the Sync server, an optional callback can be executed.
+
+ @param path The path on the Sync server to the remote Realm. This can be an unresolved path (e.g. `/~/path/to/realm`),
+             or a resolved path (e.g. `/someuser/path/to/realm`). Do not try to resolve a path yourself. Set this to
+             `nil` if the Realm should not be synced.
+ @param user A `RLMUser` instance. This user must be the anonymous user, or it must be a properly configured user that
+             has already successfully logged in.
+ @param callback An optional block that will be invoked once the Realm has successfully connected to the Realm Sync
+                 server. It is passed in an `NSError` argument that is `nil` if the connection was successful.
+ */
 - (void)setSyncPath:(nullable RLMSyncPath)path
         forSyncUser:(nullable RLMUser *)user
-       onCompletion:(nullable RLMErrorReportingBlock)completion;
+           callback:(nullable RLMErrorReportingBlock)callback;
 
 NS_ASSUME_NONNULL_END
 

@@ -350,7 +350,7 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
     }
 }
 
-NSString *defaultDirectoryForBundleIdentifier(NSString *bundleIdentifier) {
+NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier) {
 #if TARGET_OS_TV
     (void)bundleIdentifier;
     // tvOS prohibits writing to the Documents directory, so we use the Library/Caches directory instead.

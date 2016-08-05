@@ -36,15 +36,10 @@ public typealias ErrorReportingBlock = ((NSError?) -> Void)
 
 #else
 
-public struct Sync {
-
-    static func setupWithAppID(appID: String,
-                               logLevel: UInt,
-                               globalErrorHandler: ErrorReportingBlock) {
-        RLMSync.setupWithAppID(appID, logLevel: logLevel, errorHandler: globalErrorHandler)
-    }
-
-    private init() { }
+func configureRealmSyncWithAppID(appID: String,
+                                 logLevel: UInt,
+                                 globalErrorHandler: ErrorReportingBlock) {
+    RLMSync.setupWithAppID(appID, logLevel: logLevel, errorHandler: globalErrorHandler)
 }
 
 public extension Realm.Configuration {
@@ -55,10 +50,6 @@ public extension Realm.Configuration {
 
     func setSyncPath(path: String?, for user: User) {
         rlmConfiguration.setSyncPath(path, forSyncUser: user)
-    }
-
-    var syncServerURL : NSURL? {
-        return rlmConfiguration.syncServerURL
     }
 }
 
