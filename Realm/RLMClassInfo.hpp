@@ -86,7 +86,8 @@ private:
 class RLMSchemaInfo {
     using impl = std::unordered_map<NSString *, RLMClassInfo>;
 public:
-    void init(RLMRealm *realm, RLMSchema *rlmSchema, realm::Schema const& schema);
+    RLMSchemaInfo() = default;
+    RLMSchemaInfo(RLMRealm *realm, RLMSchema *rlmSchema, realm::Schema const& schema);
 
     // Look up by name, throwing if it's not present
     RLMClassInfo& operator[](NSString *name);

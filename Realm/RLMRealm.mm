@@ -167,7 +167,7 @@ static id RLMAutorelease(id value) {
 
 static void RLMRealmSetSchemaAndAlign(RLMRealm *realm, RLMSchema *targetSchema) {
     realm.schema = targetSchema;
-    realm->_info.init(realm, targetSchema, realm->_realm->schema());
+    realm->_info = RLMSchemaInfo(realm, targetSchema, realm->_realm->schema());
 }
 
 + (instancetype)realmWithSharedRealm:(SharedRealm)sharedRealm schema:(RLMSchema *)schema {

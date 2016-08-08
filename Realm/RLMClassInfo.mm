@@ -89,7 +89,7 @@ RLMClassInfo& RLMSchemaInfo::operator[](NSString *name) {
     return *&it->second;
 }
 
-void RLMSchemaInfo::init(RLMRealm *realm, RLMSchema *rlmSchema, realm::Schema const& schema) {
+RLMSchemaInfo::RLMSchemaInfo(RLMRealm *realm, RLMSchema *rlmSchema, realm::Schema const& schema) {
     REALM_ASSERT(rlmSchema.objectSchema.count == schema.size());
     REALM_ASSERT(m_objects.empty());
 
