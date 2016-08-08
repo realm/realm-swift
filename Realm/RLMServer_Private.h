@@ -16,20 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMServer.h"
 
-#import "RLMSyncUtil.h"
-
-// TODO (az-sync): we need the singleton dictionary of logged-in users.
-//   --> used for unbinding Realms on global error
-
-@interface RLMSync : NSObject
+@interface RLMServer ()
 
 NS_ASSUME_NONNULL_BEGIN
 
-+ (void)setupWithAppID:(RLMSyncAppID)appID
-              logLevel:(NSUInteger)logLevel
-          errorHandler:(nullable RLMErrorReportingBlock)errorHandler;
++ (NSString *)appID;
 
 NS_ASSUME_NONNULL_END
 

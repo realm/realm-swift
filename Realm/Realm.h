@@ -30,8 +30,8 @@
 #import <Realm/RLMResults.h>
 #import <Realm/RLMSchema.h>
 #import <Realm/RLMSessionInfo.h>
-#import <Realm/RLMSync.h>
-#import <Realm/RLMRealm+Sync.h>
-#import <Realm/RLMRealmConfiguration+Sync.h>
-#import <Realm/RLMSyncUtil.h>
+#import <Realm/RLMServer.h>
+#import <Realm/RLMRealm+Server.h>
+#import <Realm/RLMRealmConfiguration+Server.h>
+#import <Realm/RLMServerUtil.h>
 #import <Realm/RLMUser.h>

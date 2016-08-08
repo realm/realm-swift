@@ -18,11 +18,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncPrivateUtil.h"
+#import "RLMServerUtil_Private.h"
 
 @interface RLMAddRealmResponseModel : NSObject
 
-@property (nonatomic, readonly) RLMSyncToken accessToken;
+@property (nonatomic, readonly) RLMServerToken accessToken;
 @property (nonatomic, readonly) NSTimeInterval accessTokenExpiry;
 @property (nonatomic, readonly) NSString *fullPath;
 

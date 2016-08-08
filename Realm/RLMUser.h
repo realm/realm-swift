@@ -18,21 +18,21 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
+#import "RLMServerUtil.h"
 
 @class RLMCredential, RLMSessionInfo;
 
 /**
- A `RLMUser` instance represents a single Realm Sync user account (or just user).
+ A `RLMUser` instance represents a single Realm Object Server user account (or just user).
 
  A user may have one or more credentials associated with it. These credentials uniquely identify the user to a
- third-party auth provider, and are used to sign into a Realm Sync user account.
+ third-party auth provider, and are used to sign into a Realm Object Server user account.
  */
 @interface RLMUser : NSObject
 
 NS_ASSUME_NONNULL_BEGIN
 
-@property (nonatomic, readonly) NSDictionary<RLMSyncPath, RLMSessionInfo *> *realms;
+@property (nonatomic, readonly) NSDictionary<RLMServerPath, RLMSessionInfo *> *realms;
 @property (nonatomic, readonly) BOOL isAnonymous;
 
 @property (nonatomic, readonly) BOOL isLoggedIn;

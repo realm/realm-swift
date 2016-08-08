@@ -18,17 +18,17 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
+#import "RLMServerUtil.h"
 
 /**
  An internal class representing a valid JSON response to a login request.
  */
-@class RLMSyncRenewalTokenModel;
+@class RLMRenewalTokenModel;
 
 @interface RLMLoginResponseModel : NSObject
 
-@property (nonatomic, readonly) RLMSyncIdentity identity;
-@property (nonatomic, readonly) RLMSyncRenewalTokenModel *renewalTokenModel;
+@property (nonatomic, readonly) RLMIdentity identity;
+@property (nonatomic, readonly) RLMRenewalTokenModel *renewalTokenModel;
 
 //@property (nonatomic, readonly) NSArray *access;
 
@@ -36,9 +36,9 @@
 
 @end
 
-@interface RLMSyncRenewalTokenModel : NSObject
+@interface RLMRenewalTokenModel : NSObject
 
-@property (nonatomic, readonly) RLMSyncToken renewalToken;
+@property (nonatomic, readonly) RLMServerToken renewalToken;
 @property (nonatomic, readonly) NSTimeInterval tokenExpiry;
 
 - (instancetype)initWithJSON:(NSDictionary *)json;

@@ -16,33 +16,32 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncUtil.h"
+#import "RLMServerUtil.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class NSURL;
 
-static NSString *const kRLMSyncProviderKey      = @"provider";
-static NSString *const kRLMSyncDataKey          = @"data";
-static NSString *const kRLMSyncAppIDKey         = @"app_id";
-static NSString *const kRLMSyncRealmIDKey       = @"realm_id";
-static NSString *const kRLMSyncRealmURLKey      = @"realm_url";
-static NSString *const kRLMSyncPathKey          = @"path";
-static NSString *const kRLMSyncTokenKey         = @"token";
-static NSString *const kRLMSyncIdentityKey      = @"identity";
-static NSString *const kRLMSyncExpiresKey       = @"expires";
-static NSString *const kRLMSyncRefreshKey       = @"refresh";
-static NSString *const kRLMSyncPasswordKey      = @"password";
-static NSString *const kRLMSyncRegisterKey      = @"register";
-
-static NSString *const kRLMSyncErrorJSONKey     = @"json";
+static NSString *const kRLMServerProviderKey      = @"provider";
+static NSString *const kRLMServerDataKey          = @"data";
+static NSString *const kRLMServerAppIDKey         = @"app_id";
+static NSString *const kRLMServerRealmIDKey       = @"realm_id";
+static NSString *const kRLMServerRealmURLKey      = @"realm_url";
+static NSString *const kRLMServerPathKey          = @"path";
+static NSString *const kRLMServerTokenKey         = @"token";
+static NSString *const kRLMServerIdentityKey      = @"identity";
+static NSString *const kRLMServerExpiresKey       = @"expires";
+static NSString *const kRLMServerRefreshKey       = @"refresh";
+static NSString *const kRLMServerPasswordKey      = @"password";
+static NSString *const kRLMServerRegisterKey      = @"register";
+static NSString *const kRLMServerErrorJSONKey     = @"json";
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/// Given a sync server URL, derive the 'default' corresponding auth server URL from it.
-NSURL *RLMAuthURLForSyncURL(NSURL *serverURL, NSNumber *customPort);
+/// Given an Realm Object Server URL, derive the 'default' corresponding auth server URL from it.
+NSURL *RLMAuthURLForObjectServerURL(NSURL *serverURL, NSNumber *customPort);
 
 #ifdef __cplusplus
 }
@@ -51,7 +50,7 @@ NSURL *RLMAuthURLForSyncURL(NSURL *serverURL, NSNumber *customPort);
 NS_ASSUME_NONNULL_END
 
 /// A macro to parse a string out of a JSON dictionary, or return nil.
-#define RLMSYNC_PARSE_STRING_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
+#define RLMSERVER_PARSE_STRING_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
 { \
 id data = json_macro_val[key_macro_val]; \
 if (![data isKindOfClass:[NSString class]]) { return nil; } \
@@ -59,7 +58,7 @@ self.prop_macro_val = data; \
 } \
 
 /// A macro to parse a double out of a JSON dictionary, or return nil.
-#define RLMSYNC_PARSE_DOUBLE_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
+#define RLMSERVER_PARSE_DOUBLE_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
 { \
 id data = json_macro_val[key_macro_val]; \
 if (![data isKindOfClass:[NSNumber class]]) { return nil; } \
@@ -67,7 +66,7 @@ self.prop_macro_val = [data doubleValue]; \
 } \
 
 /// A macro to build a sub-model out of a JSON dictionary, or return nil.
-#define RLMSYNC_PARSE_MODEL_OR_ABORT(json_macro_val, key_macro_val, class_macro_val, prop_macro_val) \
+#define RLMSERVER_PARSE_MODEL_OR_ABORT(json_macro_val, key_macro_val, class_macro_val, prop_macro_val) \
 { \
 id raw = json_macro_val[key_macro_val]; \
 if (![raw isKindOfClass:[NSDictionary class]]) { return nil; } \

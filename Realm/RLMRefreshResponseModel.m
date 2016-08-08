@@ -20,7 +20,7 @@
 
 @interface RLMRefreshResponseModel ()
 
-@property (nonatomic, readwrite) RLMSyncToken accessToken;
+@property (nonatomic, readwrite) RLMServerToken accessToken;
 @property (nonatomic, readwrite) NSTimeInterval accessTokenExpiry;
 
 @end
@@ -29,8 +29,8 @@
 
 - (instancetype)initWithJSON:(NSDictionary *)json {
     if (self = [super init]) {
-        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, accessToken);
-        RLMSYNC_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, accessTokenExpiry);
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerTokenKey, accessToken);
+        RLMSERVER_PARSE_DOUBLE_OR_ABORT(json, kRLMServerExpiresKey, accessTokenExpiry);
     }
     return self;
 }

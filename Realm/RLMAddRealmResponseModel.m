@@ -20,7 +20,7 @@
 
 @interface RLMAddRealmResponseModel ()
 
-@property (nonatomic, readwrite) RLMSyncToken accessToken;
+@property (nonatomic, readwrite) RLMServerToken accessToken;
 @property (nonatomic, readwrite) NSTimeInterval accessTokenExpiry;
 @property (nonatomic, readwrite) NSString *fullPath;
 
@@ -30,9 +30,9 @@
 
 - (instancetype)initWithJSON:(NSDictionary *)json {
     if (self = [super init]) {
-        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, accessToken);
-        RLMSYNC_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, accessTokenExpiry);
-        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncPathKey, fullPath);
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerTokenKey, accessToken);
+        RLMSERVER_PARSE_DOUBLE_OR_ABORT(json, kRLMServerExpiresKey, accessTokenExpiry);
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerPathKey, fullPath);
     }
     return self;
 }

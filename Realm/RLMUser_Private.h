@@ -22,18 +22,18 @@
 
 @interface RLMUser ()
 
-@property (nonatomic) RLMSyncIdentity identity;
+@property (nonatomic) RLMIdentity identity;
 
 @property (nonatomic) NSURL *authURL;
-@property (nonatomic) NSURL *syncURL;
+@property (nonatomic) NSURL *objectServerURL;
 
-@property (nonatomic) RLMSyncToken refreshToken;
+@property (nonatomic) RLMServerToken refreshToken;
 @property (nonatomic) NSTimeInterval refreshTokenExpiry;
 
 - (void)_bindRealmWithLocalFileURL:(const std::string&)fileURL
-                     remoteSyncURL:(NSURL *)remoteURL
+                   remoteServerURL:(NSURL *)remoteURL
                       onCompletion:(RLMErrorReportingBlock)completion;
 
-- (void)_reportRefreshFailureForPath:(RLMSyncPath)path error:(NSError *)error;
+- (void)_reportRefreshFailureForPath:(RLMServerPath)path error:(NSError *)error;
 
 @end

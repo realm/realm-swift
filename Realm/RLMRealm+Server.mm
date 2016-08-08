@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMRealm+Server.h"
 
-#import "RLMSyncPrivateUtil.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMRealmConfiguration.h"
+#import "RLMServerNetworkClient.h"
+#import "RLMServerUtil_Private.h"
+#import "RLMCredential.h"
+#import "RLMUser.h"
 
-NSURL *RLMAuthURLForSyncURL(NSURL *syncURL, NSNumber *customPort) {
-    BOOL isSSL = [syncURL.scheme isEqualToString:@"realms"];
-    NSString *scheme = (isSSL ? @"https" : @"http");
-    NSInteger port = customPort ? [customPort integerValue] : (isSSL ? 8081 : 8080);
-    NSString *raw = [NSString stringWithFormat:@"%@://%@:%@", scheme, syncURL.host, @(port)];
-    return [NSURL URLWithString:raw];
+@implementation RLMRealm (Server)
+
++ (void)fetchRealmAtPath:(RLMServerPath)objectServerPath
+                 forUser:(RLMUser *)user
+                readOnly:(BOOL)isReadOnly
+              completion:(RLMServerFetchedRealmCompletionBlock)completion {
+    NSAssert(NO, @"This method isn't implemented yet. Come back later!");
 }
+
+@end

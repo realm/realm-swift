@@ -16,34 +16,34 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSync_Private.h"
+#import "RLMServer_Private.h"
 
-#import "RLMSyncUtil.h"
+#import "RLMServerUtil.h"
 #import "RLMUtil.hpp"
 
 #import <shared_realm.hpp>
 
-@interface RLMSync ()
+@interface RLMServer ()
 
-@property (nonatomic) RLMSyncAppID appID;
+@property (nonatomic) NSString *appID;
 
 @end
 
-@implementation RLMSync
+@implementation RLMServer
 
 + (instancetype)sharedManager {
-    static RLMSync *s_sharedManager;
+    static RLMServer *s_sharedManager;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        s_sharedManager = [[RLMSync alloc] initPrivate];
+        s_sharedManager = [[RLMServer alloc] initPrivate];
     });
     return s_sharedManager;
 }
 
-+ (void)setupWithAppID:(RLMSyncAppID)appID
++ (void)setupWithAppID:(NSString *)appID
               logLevel:(NSUInteger)logLevel
           errorHandler:(nullable RLMErrorReportingBlock)errorHandler {
-    [RLMSync sharedManager].appID = appID;
+    [RLMServer sharedManager].appID = appID;
 
     // TODO: set up logger
     NSLog(@"Note that logger integration has not been finished yet, setting a log level will do nothing.");
@@ -52,9 +52,10 @@
 
     auto handler = [=](int error_code, std::string message) {
         NSString *nativeMessage = @(message.c_str());
-        NSError *error = [NSError errorWithDomain:@"io.realm.sync.client"
-                                             code:error_code
-                                         userInfo:@{@"description": nativeMessage}];
+        NSError *error = [NSError errorWithDomain:RLMServerErrorDomain
+                                             code:RLMServerInternalError
+                                         userInfo:@{@"description": nativeMessage,
+                                                    @"error": @(error_code)}];
         dispatch_async(dispatch_get_main_queue(), ^{
             callback(error);
         });
@@ -63,10 +64,10 @@
     realm::Realm::set_up_sync_client(handler, nullptr);
 }
 
-+ (RLMSyncAppID)appID {
-    RLMSyncAppID theAppID = [RLMSync sharedManager].appID;
++ (NSString *)appID {
+    NSString *theAppID = [RLMServer sharedManager].appID;
     if (!theAppID) {
-        @throw RLMException(@"RLMSync's setup method must be called before synced Realms can be opened.");
+        @throw RLMException(@"RLMServer's setup method must be called before Realms with a server URL can be opened.");
     }
     return theAppID;
 }

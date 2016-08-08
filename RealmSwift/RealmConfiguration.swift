@@ -86,6 +86,11 @@ extension Realm {
 
         // MARK: Configuration Properties
 
+        var serverErrorHandler: ErrorReportingBlock?
+        var serverBindCallback: ErrorReportingBlock?
+        var serverPath: String?
+        var serverUser: User?
+
         /// The local URL to the realm file.
         /// Mutually exclusive with `inMemoryIdentifier`.
         public var fileURL: URL? {
@@ -170,6 +175,8 @@ extension Realm {
             configuration.deleteRealmIfMigrationNeeded = self.deleteRealmIfMigrationNeeded
             configuration.customSchema = self.customSchema
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
+            configuration.set(errorHandler: serverErrorHandler)
+            configuration.set(objectServerPath: serverPath, for: serverUser, uponConnection: serverBindCallback)
             return configuration
         }
 
@@ -188,6 +195,7 @@ extension Realm {
             configuration.deleteRealmIfMigrationNeeded = rlmConfiguration.deleteRealmIfMigrationNeeded
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
+            // TODO (az-ros): retrieve the error handler and other miscellaneous data.
             return configuration
         }
     }
@@ -274,6 +282,10 @@ extension Realm {
         }
 
         // MARK: Configuration Properties
+        var serverErrorHandler: ErrorReportingBlock?
+        var serverBindCallback: ErrorReportingBlock?
+        var serverPath: String?
+        var serverUser: User?
 
         /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`.
         public var fileURL: NSURL? {
@@ -366,6 +378,8 @@ extension Realm {
             configuration.deleteRealmIfMigrationNeeded = self.deleteRealmIfMigrationNeeded
             configuration.customSchema = self.customSchema
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
+            configuration.setErrorHandler(serverErrorHandler)
+            configuration.setObjectServerPath(serverPath, forUser: serverUser, callback: serverBindCallback)
             return configuration
         }
 
@@ -384,6 +398,7 @@ extension Realm {
             configuration.deleteRealmIfMigrationNeeded = rlmConfiguration.deleteRealmIfMigrationNeeded
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
+            // TODO (az-ros): retrieve the error handler and other data
             return configuration
         }
     }

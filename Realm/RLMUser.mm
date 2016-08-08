@@ -23,14 +23,14 @@
 #import "RLMLoginResponseModel.h"
 #import "RLMRefreshResponseModel.h"
 #import "RLMSessionInfo_Private.h"
-#import "RLMSync_Private.h"
-#import "RLMSyncNetworkClient.h"
-#import "RLMSyncPrivateUtil.h"
+#import "RLMServer_Private.h"
+#import "RLMServerNetworkClient.h"
+#import "RLMServerUtil_Private.h"
 #import "RLMUtil.hpp"
 
 @interface RLMUser ()
 
-@property (nonnull, nonatomic, readwrite) NSMutableDictionary<RLMSyncPath, RLMSessionInfo *> *realms;
+@property (nonnull, nonatomic, readwrite) NSMutableDictionary<RLMServerPath, RLMSessionInfo *> *realms;
 
 @property (nonatomic, readwrite) BOOL isAnonymous;
 @property (nonatomic, readwrite) BOOL isLoggedIn;
@@ -63,18 +63,18 @@
     if (self.isLoggedIn) {
         @throw RLMException(@"The user is already logged in. Cannot log in again without logging out first.");
     }
-    NSURL *syncURL = credential.syncServerURL;
-    if (!syncURL) {
-        @throw RLMException(@"A sync server URL is required to log in, but was missing, and there is no default.");
+    NSURL *objectServerURL = credential.objectServerURL;
+    if (!objectServerURL) {
+        @throw RLMException(@"An Realm Object Server URL is required to log in, but was missing, and there is no default.");
     }
-    NSURL *authURL = RLMAuthURLForSyncURL(syncURL, credential.authServerPort);
-    self.syncURL = syncURL;
+    NSURL *authURL = RLMAuthURLForObjectServerURL(objectServerURL, credential.authServerPort);
+    self.objectServerURL = objectServerURL;
     self.authURL = authURL;
 
     NSMutableDictionary *json = [@{
-                                   kRLMSyncProviderKey: credential.provider,
-                                   kRLMSyncDataKey: credential.credentialToken,
-                                   kRLMSyncAppIDKey: [RLMSync appID],
+                                   kRLMServerProviderKey: credential.provider,
+                                   kRLMServerDataKey: credential.credentialToken,
+                                   kRLMServerAppIDKey: [RLMServer appID],
                                    } mutableCopy];
     if (credential.userInfo) {
         // Munge user info into the JSON request.
@@ -83,14 +83,14 @@
 
     RLMErrorReportingBlock block = completion ?: ^(NSError *) { };
 
-    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
+    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
             RLMLoginResponseModel *model = [[RLMLoginResponseModel alloc] initWithJSON:json];
             if (!model) {
                 // Malformed JSON
-                error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                            code:RLMSyncErrorBadResponse
-                                        userInfo:@{kRLMSyncErrorJSONKey: json}];
+                error = [NSError errorWithDomain:RLMServerErrorDomain
+                                            code:RLMServerErrorBadResponse
+                                        userInfo:@{kRLMServerErrorJSONKey: json}];
                 block(error);
                 return;
             } else {
@@ -106,17 +106,17 @@
             block(error);
         }
     };
-    [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointAuth
-                                             server:authURL
-                                               JSON:json
-                                         completion:handler];
+    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
+                                           server:authURL
+                                             JSON:json
+                                       completion:handler];
 }
 
 - (void)refresh {
     if (!self.isLoggedIn) {
         @throw RLMException(@"The user isn't logged in. The user must first log in before they can be refreshed.");
     }
-    for (RLMSyncPath path in self.realms) {
+    for (RLMServerPath path in self.realms) {
         RLMSessionInfo *info = self.realms[path];
         [info refresh];
     }
@@ -134,15 +134,15 @@
     self.isLoggedIn = NO;
     // TODO: unbind all associated Realms
 
-    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *) {
+    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *) {
         if (completion) {
             completion(error);
         }
     };
-    [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointLogout
-                                             server:self.authURL
-                                               JSON:json
-                                         completion:handler];
+    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointLogout
+                                           server:self.authURL
+                                             JSON:json
+                                       completion:handler];
 }
 
 - (void)addCredential:(RLMCredential *)credential
@@ -152,21 +152,21 @@
     }
     // TODO: api does not actually exist yet
     NSDictionary *json = @{
-                           kRLMSyncProviderKey: credential.provider,
-                           kRLMSyncDataKey: credential.credentialToken,
+                           kRLMServerProviderKey: credential.provider,
+                           kRLMServerDataKey: credential.credentialToken,
                            };
 
-    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *) {
+    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *) {
         // TODO: if user is anonymous, promote to normal user.
         // TODO: if anonymous user was promoted, bind any Realms that were associated.
         if (completion) {
             completion(error);
         }
     };
-    [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointLogout
-                                             server:self.authURL
-                                               JSON:json
-                                         completion:handler];
+    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointLogout
+                                           server:self.authURL
+                                             JSON:json
+                                       completion:handler];
 }
 
 - (void)removeCredential:(RLMCredential *)credential
@@ -176,19 +176,19 @@
     }
     // TODO: api does not actually exist yet
     NSDictionary *json = @{
-                           kRLMSyncProviderKey: credential.provider,
-                           kRLMSyncDataKey: credential.credentialToken,
+                           kRLMServerProviderKey: credential.provider,
+                           kRLMServerDataKey: credential.credentialToken,
                            };
 
-    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *) {
+    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *) {
         if (completion) {
             completion(error);
         }
     };
-    [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointLogout
-                                             server:self.authURL
-                                               JSON:json
-                                         completion:handler];
+    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointLogout
+                                           server:self.authURL
+                                             JSON:json
+                                       completion:handler];
 }
 
 - (instancetype)init {
@@ -206,10 +206,10 @@
 
 // A callback handler for a Realm, used to get an updated access token which can then be used to bind the Realm.
 - (void)_bindRealmWithLocalFileURL:(const std::string&)fileURL
-                     remoteSyncURL:(NSURL *)remoteURL
+                   remoteServerURL:(NSURL *)remoteURL
                       onCompletion:(RLMErrorReportingBlock)completion {
     if (!self.isLoggedIn) {
-        // TODO (az-sync): should this be more forgiving? Throwing an exception may be too extreme
+        // TODO (az-ros): should this be more forgiving? Throwing an exception may be too extreme
         @throw RLMException(@"The user is no longer logged in. Cannot open the Realm");
     }
     if (self.isAnonymous /* && 'user has not yet added a credential' */) {
@@ -221,28 +221,28 @@
     NSString *objcRemotePath = [remoteURL path];
 
     NSDictionary *json = @{
-                           kRLMSyncPathKey: objcRemotePath,
-                           kRLMSyncProviderKey: @"realm",
-                           kRLMSyncDataKey: self.refreshToken,
-                           kRLMSyncAppIDKey: [RLMSync appID],
+                           kRLMServerPathKey: objcRemotePath,
+                           kRLMServerProviderKey: @"realm",
+                           kRLMServerDataKey: self.refreshToken,
+                           kRLMServerAppIDKey: [RLMServer appID],
                            };
 
-    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
+    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
             RLMAddRealmResponseModel *model = [[RLMAddRealmResponseModel alloc] initWithJSON:json];
             if (!model) {
                 // Malformed JSON
-                error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                            code:RLMSyncErrorBadResponse
-                                        userInfo:@{kRLMSyncErrorJSONKey: json}];
-                // TODO (az-sync): report global error
+                error = [NSError errorWithDomain:RLMServerErrorDomain
+                                            code:RLMServerErrorBadResponse
+                                        userInfo:@{kRLMServerErrorJSONKey: json}];
+                // TODO (az-ros): report global error
                 return;
             } else {
                 // Success
                 NSString *accessToken = model.accessToken;
 
                 // Register the Realm as being linked to this User.
-                RLMSyncPath fullPath = model.fullPath;
+                RLMServerPath fullPath = model.fullPath;
                 RLMSessionInfo *info = [[RLMSessionInfo alloc] initWithFileURL:objcFileURL path:objcRemotePath];
                 [self.realms setValue:info forKey:objcRemotePath];
 
@@ -250,7 +250,7 @@
                 [info configureWithAccessToken:accessToken expiry:model.accessTokenExpiry user:self];
 
                 // Bind the Realm
-                NSURL *objcRealmURL = [NSURL URLWithString:fullPath relativeToURL:self.syncURL];
+                NSURL *objcRealmURL = [NSURL URLWithString:fullPath relativeToURL:self.objectServerURL];
                 auto full_realm_url = realm::util::Optional<std::string>([[objcRealmURL absoluteString] UTF8String]);
                 auto file_url = RLMStringDataWithNSString([objcFileURL path]);
                 bool success = realm::Realm::refresh_sync_access_token(std::string([accessToken UTF8String]),
@@ -260,24 +260,24 @@
                     if (success) {
                         completion(nil);
                     } else {
-                        completion([NSError errorWithDomain:RLMSyncErrorDomain
-                                                       code:RLMSyncInternalError
+                        completion([NSError errorWithDomain:RLMServerErrorDomain
+                                                       code:RLMServerInternalError
                                                    userInfo:nil]);
                     }
                 }
             }
         } else {
             // Something else went wrong
-            // TODO (az-sync): report global error, and update self state
+            // TODO (az-ros): report global error, and update self state
         }
     };
-    [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointAuth
-                                             server:self.authURL
-                                               JSON:json
-                                         completion:handler];
+    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
+                                           server:self.authURL
+                                             JSON:json
+                                       completion:handler];
 }
 
-- (void)_reportRefreshFailureForPath:(RLMSyncPath)path error:(NSError *)error {
+- (void)_reportRefreshFailureForPath:(RLMServerPath)path error:(NSError *)error {
     NSLog(@"Realm at path %@ could not be refreshed properly. Error: %@", path, error);
 }
 
@@ -285,7 +285,7 @@
     _isLoggedIn = isLoggedIn;
     if (!isLoggedIn) {
         self.authURL = nil;
-        self.syncURL = nil;
+        self.objectServerURL = nil;
         self.refreshToken = nil;
     }
 }

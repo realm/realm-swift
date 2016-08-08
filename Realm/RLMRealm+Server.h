@@ -16,16 +16,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSync.h"
+#import "RLMRealm.h"
 
-@class RLMSyncSession;
+#import "RLMServerUtil.h"
 
-@interface RLMSync ()
+@class RLMUser;
 
 NS_ASSUME_NONNULL_BEGIN
 
-+ (RLMSyncAppID)appID;
+@interface RLMRealm (Server)
 
-NS_ASSUME_NONNULL_END
++ (void)fetchRealmAtPath:(RLMServerPath)objectServerPath
+                 forUser:(RLMUser *)user
+                readOnly:(BOOL)isReadOnly
+              completion:(RLMServerFetchedRealmCompletionBlock)completion;
 
 @end
+
+NS_ASSUME_NONNULL_END

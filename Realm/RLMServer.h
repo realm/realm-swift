@@ -16,21 +16,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm.h"
+#import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
+#import "RLMServerUtil.h"
 
-@class RLMUser;
+
+// TODO (az-ros): we need the singleton dictionary of logged-in users.
+//   --> used for unbinding Realms on global error
+
+@interface RLMServer : NSObject
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMRealm (Sync)
-
-+ (void)fetchRealmAtPath:(RLMSyncPath)realmSyncPath
-                 forUser:(RLMUser *)user
-                readOnly:(BOOL)isReadOnly
-              completion:(RLMSyncFetchedRealmCompletionBlock)completion;
-
-@end
++ (void)setupWithAppID:(NSString *)appID
+              logLevel:(NSUInteger)logLevel
+          errorHandler:(nullable RLMErrorReportingBlock)errorHandler;
 
 NS_ASSUME_NONNULL_END
+
+@end

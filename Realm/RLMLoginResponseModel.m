@@ -18,12 +18,12 @@
 
 #import "RLMLoginResponseModel.h"
 
-#import "RLMSyncPrivateUtil.h"
+#import "RLMServerUtil_Private.h"
 
 @interface RLMLoginResponseModel ()
 
-@property (nonatomic, readwrite) RLMSyncIdentity identity;
-@property (nonatomic, readwrite) RLMSyncRenewalTokenModel *renewalTokenModel;
+@property (nonatomic, readwrite) RLMIdentity identity;
+@property (nonatomic, readwrite) RLMRenewalTokenModel *renewalTokenModel;
 
 //@property (nonatomic, readwrite) NSArray *access;
 
@@ -33,27 +33,27 @@
 
 - (instancetype)initWithJSON:(NSDictionary *)json {
     if (self = [super init]) {
-        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncIdentityKey, identity);
-        RLMSYNC_PARSE_MODEL_OR_ABORT(json, kRLMSyncRefreshKey, RLMSyncRenewalTokenModel, renewalTokenModel);
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerIdentityKey, identity);
+        RLMSERVER_PARSE_MODEL_OR_ABORT(json, kRLMServerRefreshKey, RLMRenewalTokenModel, renewalTokenModel);
     }
     return self;
 }
 
 @end
 
-@interface RLMSyncRenewalTokenModel ()
+@interface RLMRenewalTokenModel ()
 
-@property (nonatomic, readwrite) RLMSyncToken renewalToken;
+@property (nonatomic, readwrite) RLMServerToken renewalToken;
 @property (nonatomic, readwrite) NSTimeInterval tokenExpiry;
 
 @end
 
-@implementation RLMSyncRenewalTokenModel
+@implementation RLMRenewalTokenModel
 
 - (instancetype)initWithJSON:(NSDictionary *)json {
     if (self = [super init]) {
-        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, renewalToken);
-        RLMSYNC_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, tokenExpiry);
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerTokenKey, renewalToken);
+        RLMSERVER_PARSE_DOUBLE_OR_ABORT(json, kRLMServerExpiresKey, tokenExpiry);
     }
     return self;
 }

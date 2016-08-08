@@ -19,15 +19,15 @@
 #import "RLMSessionInfo_Private.h"
 
 #import "RLMUser_Private.h"
-#import "RLMSyncUtil.h"
-#import "RLMSyncNetworkClient.h"
-#import "RLMSync_Private.h"
+#import "RLMServerUtil.h"
+#import "RLMServerNetworkClient.h"
+#import "RLMServer_Private.h"
 #import "RLMUtil.hpp"
 #import "RLMRefreshResponseModel.h"
 
 @implementation RLMSessionInfo
 
-- (instancetype)initWithFileURL:(NSURL *)fileURL path:(RLMSyncPath)path {
+- (instancetype)initWithFileURL:(NSURL *)fileURL path:(RLMServerPath)path {
     if (self = [super init]) {
         self.fileURL = fileURL;
         self.path = path;
@@ -39,7 +39,7 @@
 #pragma mark - per-Realm access token API
 // NOTE: much of this may disappear once we get a single access token for a user that works with multiple Realms
 
-- (void)configureWithAccessToken:(RLMSyncToken)token expiry:(NSTimeInterval)expiry user:(RLMUser *)user {
+- (void)configureWithAccessToken:(RLMServerToken)token expiry:(NSTimeInterval)expiry user:(RLMUser *)user {
     self.parentUser = user;
     self.accessToken = token;
     self.accessTokenExpiry = expiry;
@@ -51,13 +51,12 @@
 
     [self.refreshTimer invalidate];
     NSTimeInterval refreshTime = self.accessTokenExpiry - refreshBuffer;
-    __weak RLMSessionInfo *weakSelf = self;
     NSTimer *timer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSince1970:refreshTime]
                                               interval:1
-                                               repeats:NO
-                                                 block:^(NSTimer *) {
-                                                     [weakSelf refresh];
-                                                 }];
+                                                target:self
+                                              selector:@selector(refresh)
+                                              userInfo:nil
+                                               repeats:NO];
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
     self.refreshTimer = timer;
 }
@@ -72,16 +71,16 @@
     }
     // TODO: what happens if the access token is expired, but the refresh token isn't?
 
-    RLMSyncToken refreshToken = user.refreshToken;
+    RLMServerToken refreshToken = user.refreshToken;
 
     NSDictionary *json = @{
-                           kRLMSyncProviderKey: @"realm",
-                           kRLMSyncPathKey: self.path,
-                           kRLMSyncDataKey: refreshToken,
-                           kRLMSyncAppIDKey: [RLMSync appID],
+                           kRLMServerProviderKey: @"realm",
+                           kRLMServerPathKey: self.path,
+                           kRLMServerDataKey: refreshToken,
+                           kRLMServerAppIDKey: [RLMServer appID],
                            };
 
-    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
+    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
             RLMRefreshResponseModel *model = [[RLMRefreshResponseModel alloc] initWithJSON:json];
             if (!model) {
@@ -106,10 +105,10 @@
             // TODO: invalidate
         }
     };
-    [RLMSyncNetworkClient postSyncRequestToEndpoint:RLMSyncServerEndpointAuth
-                                             server:user.authURL
-                                               JSON:json
-                                         completion:handler];
+    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
+                                           server:user.authURL
+                                             JSON:json
+                                       completion:handler];
 }
 
 @end

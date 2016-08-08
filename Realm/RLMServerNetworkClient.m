@@ -16,12 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncNetworkClient.h"
+#import "RLMServerNetworkClient.h"
 
 #import "RLMRealmConfiguration.h"
-#import "RLMSyncPrivateUtil.h"
+#import "RLMServerUtil_Private.h"
 
-typedef void(^RLMSyncURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
+typedef void(^RLMServerURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
 
 static NSUInteger const kHTTPCodeRange = 100;
 
@@ -31,49 +31,49 @@ typedef enum : NSUInteger {
     Redirection         = 3, // 3XX
     ClientError         = 4, // 4XX
     ServerError         = 5, // 5XX
-} RLMSyncHTTPErrorCodeType;
+} RLMServerHTTPErrorCodeType;
 
-static NSRange RLM_rangeForErrorType(RLMSyncHTTPErrorCodeType type) {
+static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return NSMakeRange(type*100, kHTTPCodeRange);
 }
 
-@implementation RLMSyncNetworkClient
+@implementation RLMServerNetworkClient
 
 + (NSURLSession *)session {
     return [NSURLSession sharedSession];
 }
 
-+ (NSURL *)urlForServer:(NSURL *)serverURL endpoint:(RLMSyncServerEndpoint)endpoint {
++ (NSURL *)urlForServer:(NSURL *)serverURL endpoint:(RLMServerEndpoint)endpoint {
     NSString *pathComponent = nil;
     switch (endpoint) {
-        case RLMSyncServerEndpointAuth:
+        case RLMServerEndpointAuth:
             pathComponent = @"auth";
             break;
-        case RLMSyncServerEndpointLogout:
+        case RLMServerEndpointLogout:
             // TODO: fix this
             pathComponent = @"logout";
             NSAssert(NO, @"logout endpoint isn't implemented yet, don't use it");
             break;
-        case RLMSyncServerEndpointAddCredential:
+        case RLMServerEndpointAddCredential:
             // TODO: fix this
             pathComponent = @"addCredential";
             NSAssert(NO, @"add credential endpoint isn't implemented yet, don't use it");
             break;
-        case RLMSyncServerEndpointRemoveCredential:
+        case RLMServerEndpointRemoveCredential:
             // TODO: fix this
             pathComponent = @"removeCredential";
             NSAssert(NO, @"remove credential endpoint isn't implemented yet, don't use it");
             break;
     }
-    NSAssert(pathComponent != nil, @"Unrecognized value for RLmSyncServerEndpoint enum");
+    NSAssert(pathComponent != nil, @"Unrecognized value for RLMServerEndpoint enum");
     return [serverURL URLByAppendingPathComponent:pathComponent];
 }
 
 // FIXME: should completion argument also pass back the NSURLResponse and/or the raw data?
-+ (void)postSyncRequestToEndpoint:(RLMSyncServerEndpoint)endpoint
-                           server:(NSURL *)serverURL
-                             JSON:(NSDictionary *)jsonDictionary
-                       completion:(RLMSyncCompletionBlock)completionBlock {
++ (void)postRequestToEndpoint:(RLMServerEndpoint)endpoint
+                       server:(NSURL *)serverURL
+                         JSON:(NSDictionary *)jsonDictionary
+                   completion:(RLMServerCompletionBlock)completionBlock {
 
     NSError *localError = nil;
 
@@ -93,9 +93,9 @@ static NSRange RLM_rangeForErrorType(RLMSyncHTTPErrorCodeType type) {
     [request addValue:@"application/json;charset=utf-8" forHTTPHeaderField:@"Content-Type"];
     [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
 
-    RLMSyncURLSessionCompletionBlock handler = ^(NSData *data,
-                                                 NSURLResponse *response,
-                                                 NSError *error) {
+    RLMServerURLSessionCompletionBlock handler = ^(NSData *data,
+                                                   NSURLResponse *response,
+                                                   NSError *error) {
         NSError *localError = nil;
 
         if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
@@ -104,8 +104,8 @@ static NSRange RLM_rangeForErrorType(RLMSyncHTTPErrorCodeType type) {
                                 || NSLocationInRange(actualResponse.statusCode, RLM_rangeForErrorType(ServerError)));
             if (badResponse) {
                 // Client or server error
-                localError = [NSError errorWithDomain:RLMSyncErrorDomain
-                                                 code:RLMSyncErrorHTTPStatusCodeError
+                localError = [NSError errorWithDomain:RLMServerErrorDomain
+                                                 code:RLMServerErrorHTTPStatusCodeError
                                              userInfo:@{@"statusCode": @(actualResponse.statusCode)}];
                 completionBlock(localError, nil);
                 return;
@@ -122,9 +122,9 @@ static NSRange RLM_rangeForErrorType(RLMSyncHTTPErrorCodeType type) {
                 completionBlock(localError, nil);
             } else if (![json isKindOfClass:[NSDictionary class]]) {
                 // JSON response malformed
-                localError = [NSError errorWithDomain:RLMSyncErrorDomain
-                                                 code:RLMSyncErrorBadResponse
-                                             userInfo:@{kRLMSyncErrorJSONKey: json}];
+                localError = [NSError errorWithDomain:RLMServerErrorDomain
+                                                 code:RLMServerErrorBadResponse
+                                             userInfo:@{kRLMServerErrorJSONKey: json}];
                 completionBlock(localError, nil);
             } else {
                 // JSON parsed successfully

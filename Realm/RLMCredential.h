@@ -18,12 +18,12 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
+#import "RLMServerUtil.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- `RLMSyncUser` encapsulates login information for a single user and auth provider.
+ `RLMCredential` encapsulates login information for a single user and auth provider.
 
  The host application or helper library should create one of these objects once a user has successfully received a
  credential from an auth provider, and pass it into the appropriate API functions to open a Realm.
@@ -31,16 +31,16 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMCredential : NSObject
 
 @property (nonatomic, readonly) RLMCredentialToken credentialToken;
-@property (nonatomic, readonly) RLMSyncIdentityProvider provider;
+@property (nonatomic, readonly) RLMIdentityProvider provider;
 @property (nullable, nonatomic, readonly) NSDictionary *userInfo;
 
-@property (nullable, nonatomic) NSURL *syncServerURL;
+@property (nullable, nonatomic) NSURL *objectServerURL;
 @property (nullable, nonatomic) NSNumber *authServerPort;
 
-+ (void)setDefaultSyncServerURL:(NSURL *)url;
++ (void)setDefaultObjectServerURL:(NSURL *)url;
 
 - (instancetype)initWithCredentialToken:(RLMCredentialToken)credentialToken
-                               provider:(RLMSyncIdentityProvider)provider
+                               provider:(RLMIdentityProvider)provider
                                userInfo:(nullable NSDictionary *)userInfo
                               serverURL:(nullable NSURL *)serverURL NS_DESIGNATED_INITIALIZER;
 

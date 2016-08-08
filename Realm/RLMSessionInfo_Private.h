@@ -18,7 +18,7 @@
 
 #import "RLMSessionInfo.h"
 
-#import "RLMSyncPrivateUtil.h"
+#import "RLMServerUtil_Private.h"
 
 @class RLMUser;
 
@@ -27,22 +27,22 @@
 /// The path on disk where the Realm file backing this synced Realm is stored.
 @property (nonatomic) NSURL *fileURL;
 
-@property (nonatomic) RLMSyncPath path;
+@property (nonatomic) RLMServerPath path;
 
-- (instancetype)initWithFileURL:(NSURL *)fileURL path:(RLMSyncPath)path;
+- (instancetype)initWithFileURL:(NSURL *)fileURL path:(RLMServerPath)path;
 
 
 #pragma mark - per-Realm access token API
 // NOTE: much of this may disappear once we get a single access token for a user that works with multiple Realms
 
-@property (nonatomic) RLMSyncToken accessToken;
+@property (nonatomic) RLMServerToken accessToken;
 @property (nonatomic) NSTimeInterval accessTokenExpiry;
 
 @property (nonatomic) NSTimer *refreshTimer;
 
 @property (nonatomic, weak) RLMUser *parentUser;
 
-- (void)configureWithAccessToken:(RLMSyncToken)token expiry:(NSTimeInterval)expiry user:(RLMUser *)user;
+- (void)configureWithAccessToken:(RLMServerToken)token expiry:(NSTimeInterval)expiry user:(RLMUser *)user;
 - (void)refresh;
 
 @end

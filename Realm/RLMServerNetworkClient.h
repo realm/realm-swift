@@ -18,33 +18,33 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
+#import "RLMServerUtil.h"
 
 /**
- An enum describing all possible endpoints on the Realm Sync server.
+ An enum describing all possible endpoints on the Realm Object Server.
  */
-typedef NS_ENUM(NSUInteger, RLMSyncServerEndpoint) {
-    RLMSyncServerEndpointAuth,
-    RLMSyncServerEndpointLogout,
-    RLMSyncServerEndpointAddCredential,
-    RLMSyncServerEndpointRemoveCredential,
+typedef NS_ENUM(NSUInteger, RLMServerEndpoint) {
+    RLMServerEndpointAuth,
+    RLMServerEndpointLogout,
+    RLMServerEndpointAddCredential,
+    RLMServerEndpointRemoveCredential,
 };
 
 /**
- A simple Realm Sync network client that wraps `NSURLSession`.
+ A simple Realm Object Server network client that wraps `NSURLSession`.
  */
-@interface RLMSyncNetworkClient : NSObject
+@interface RLMServerNetworkClient : NSObject
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- Post some JSON data to a Realm Sync server, and asynchronously call a completion block with a JSON response and/or
- error.
+ Post some JSON data to the authentication server, and asynchronously call a completion block with a JSON response
+ and/or error.
  */
-+ (void)postSyncRequestToEndpoint:(RLMSyncServerEndpoint)endpoint
-                           server:(NSURL *)serverURL
-                             JSON:(NSDictionary *)jsonDictionary
-                       completion:(RLMSyncCompletionBlock)completionBlock;
++ (void)postRequestToEndpoint:(RLMServerEndpoint)endpoint
+                       server:(NSURL *)serverURL
+                         JSON:(NSDictionary *)jsonDictionary
+                   completion:(RLMServerCompletionBlock)completionBlock;
 
 NS_ASSUME_NONNULL_END
 
