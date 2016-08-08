@@ -173,7 +173,6 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     }
 
     // populate all properties
-    size_t i = 0;
     for (RLMProperty *prop in info.rlmObjectSchema.properties) {
         // get object from ivar using key value coding
         id value = nil;
@@ -210,7 +209,6 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
                 ((void(*)(id, SEL, id))objc_msgSend)(object, prop.setterSel, nil);
             }
         }
-        ++i;
     }
 
     // set to proper accessor class
