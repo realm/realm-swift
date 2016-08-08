@@ -22,6 +22,18 @@
 
 @class RLMUser;
 
+@interface RLMRealmBindingPackage : NSObject
+
+@property (nonatomic, copy) RLMErrorReportingBlock block;
+@property (nonatomic) NSURL *fileURL;
+@property (nonatomic) NSString *remotePath;
+
+- (instancetype)initWithFileURL:(NSURL *)fileURL
+                     remotePath:(NSString *)remotePath
+                          block:(RLMErrorReportingBlock)block;
+
+@end
+
 @interface RLMSessionInfo ()
 
 /// The path on disk where the Realm file backing this synced Realm is stored.
@@ -29,8 +41,11 @@
 
 @property (nonatomic) RLMServerPath path;
 
+@property (nonatomic) BOOL isBound;
+
 - (instancetype)initWithFileURL:(NSURL *)fileURL path:(RLMServerPath)path;
 
+@property (nonatomic) RLMRealmBindingPackage *deferredBindingPackage;
 
 #pragma mark - per-Realm access token API
 // NOTE: much of this may disappear once we get a single access token for a user that works with multiple Realms

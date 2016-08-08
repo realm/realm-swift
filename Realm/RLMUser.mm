@@ -35,24 +35,23 @@
 @property (nonatomic, readwrite) BOOL isAnonymous;
 @property (nonatomic, readwrite) BOOL isLoggedIn;
 
+@property (nonatomic, readwrite) RLMLocalIdentity localIdentity;
+
 @end
 
 @implementation RLMUser
 
 @synthesize isLoggedIn = _isLoggedIn;
 
-+ (instancetype)defaultUser {
-    static RLMUser *s_default_user = [[RLMUser alloc] init];
-    return s_default_user;
-}
-
-+ (instancetype)userForAnonymousAccount {
-    RLMUser *user = [[RLMUser alloc] init];
-    user.isAnonymous = YES;
-    // FIXME: how exactly should the anonymous user be defined, and what should they be able to do?
-    // FIXME: should there be only one anonymous user?
-    user.identity = @".anonymousUser";
-    return user;
++ (instancetype)anonymousUser; {
+    static NSString *const s_anonymousUserID = @".realm-object-server-anonymous-user";
+    static RLMUser *s_user;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_user = [[RLMUser alloc] initWithLocalIdentity:s_anonymousUserID];
+        s_user.isAnonymous = YES;
+    });
+    return s_user;
 }
 
 - (void)loginWithCredential:(RLMCredential *)credential
@@ -99,6 +98,7 @@
                 self.refreshTokenExpiry = model.renewalTokenModel.tokenExpiry;
                 self.identity = model.identity;
                 self.isLoggedIn = YES;
+                [self _bindAllDeferredRealms];
                 block(nil);
             }
         } else {
@@ -117,8 +117,10 @@
         @throw RLMException(@"The user isn't logged in. The user must first log in before they can be refreshed.");
     }
     for (RLMServerPath path in self.realms) {
-        RLMSessionInfo *info = self.realms[path];
-        [info refresh];
+        RLMSessionInfo *info = [self.realms objectForKey:path];
+        if (info.isBound) {
+            [info refresh];
+        }
     }
 }
 
@@ -191,8 +193,9 @@
                                        completion:handler];
 }
 
-- (instancetype)init {
+- (instancetype)initWithLocalIdentity:(nullable RLMLocalIdentity)identity {
     if (self = [super init]) {
+        self.localIdentity = identity ?: [[NSUUID UUID] UUIDString];
         self.isAnonymous = NO;
         self.isLoggedIn = NO;
         self.refreshTokenExpiry = 0;
@@ -204,24 +207,24 @@
 
 #pragma mark - Private
 
-// A callback handler for a Realm, used to get an updated access token which can then be used to bind the Realm.
-- (void)_bindRealmWithLocalFileURL:(const std::string&)fileURL
-                   remoteServerURL:(NSURL *)remoteURL
+// Upon successfully logging in, bind any Realm which was opened and registered to the user previously.
+- (void)_bindAllDeferredRealms {
+    NSAssert(self.isLoggedIn, @"Logic error: _bindAllDeferredRealms can't be called unless the User is logged in.");
+    for (RLMServerPath key in self.realms) {
+        RLMSessionInfo *info = self.realms[key];
+        RLMRealmBindingPackage *package = info.deferredBindingPackage;
+        if (!info.isBound && package) {
+            [self _bindRealmWithLocalFileURL:package.fileURL remotePath:package.remotePath onCompletion:package.block];
+        }
+    }
+}
+
+// Immediately begin the handshake to get the resolved remote path and the access token.
+- (void)_bindRealmWithLocalFileURL:(NSURL *)fileURL
+                        remotePath:(NSString *)remotePath
                       onCompletion:(RLMErrorReportingBlock)completion {
-    if (!self.isLoggedIn) {
-        // TODO (az-ros): should this be more forgiving? Throwing an exception may be too extreme
-        @throw RLMException(@"The user is no longer logged in. Cannot open the Realm");
-    }
-    if (self.isAnonymous /* && 'user has not yet added a credential' */) {
-        // Anonymous accounts' Realms are not bound until they are converted to real accounts.
-        return;
-    }
-
-    NSURL *objcFileURL = [NSURL fileURLWithPath:@(fileURL.c_str())];
-    NSString *objcRemotePath = [remoteURL path];
-
     NSDictionary *json = @{
-                           kRLMServerPathKey: objcRemotePath,
+                           kRLMServerPathKey: remotePath,
                            kRLMServerProviderKey: @"realm",
                            kRLMServerDataKey: self.refreshToken,
                            kRLMServerAppIDKey: [RLMServer appID],
@@ -243,8 +246,8 @@
 
                 // Register the Realm as being linked to this User.
                 RLMServerPath fullPath = model.fullPath;
-                RLMSessionInfo *info = [[RLMSessionInfo alloc] initWithFileURL:objcFileURL path:objcRemotePath];
-                [self.realms setValue:info forKey:objcRemotePath];
+                RLMSessionInfo *info = [self.realms objectForKey:remotePath];
+                NSAssert(info, @"Could not get a session info object for the path '%@', this is an error", remotePath);
 
                 // Per-Realm access token stuff
                 [info configureWithAccessToken:accessToken expiry:model.accessTokenExpiry user:self];
@@ -252,10 +255,13 @@
                 // Bind the Realm
                 NSURL *objcRealmURL = [NSURL URLWithString:fullPath relativeToURL:self.objectServerURL];
                 auto full_realm_url = realm::util::Optional<std::string>([[objcRealmURL absoluteString] UTF8String]);
-                auto file_url = RLMStringDataWithNSString([objcFileURL path]);
+                auto file_url = RLMStringDataWithNSString([fileURL path]);
                 bool success = realm::Realm::refresh_sync_access_token(std::string([accessToken UTF8String]),
                                                                        file_url,
                                                                        full_realm_url);
+                info.isBound = success;
+                info.deferredBindingPackage = nil;
+                // TODO (az-ros): What to do about failed bindings? How can the user manually retry?
                 if (completion) {
                     if (success) {
                         completion(nil);
@@ -275,6 +281,38 @@
                                            server:self.authURL
                                              JSON:json
                                        completion:handler];
+}
+
+// A callback handler for a Realm, used to get an updated access token which can then be used to bind the Realm.
+- (void)_registerRealmForBindingWithFileURL:(const std::string&)fileURL
+                            remoteServerURL:(NSURL *)remoteURL
+                               onCompletion:(RLMErrorReportingBlock)completion {
+    if (self.isAnonymous /* && 'user has not yet added a credential' */) {
+        // Anonymous accounts' Realms are not bound until they are converted to real accounts.
+        return;
+    }
+
+    NSURL *objcFileURL = [NSURL fileURLWithPath:@(fileURL.c_str())];
+    NSString *objcRemotePath = [remoteURL path];
+
+    if ([self.realms objectForKey:objcRemotePath]) {
+        // The Realm at this particular path has already been registered to this user.
+        return;
+    }
+
+    RLMSessionInfo *info = [[RLMSessionInfo alloc] initWithFileURL:objcFileURL path:objcRemotePath];
+    [self.realms setValue:info forKey:objcRemotePath];
+    info.isBound = NO;
+
+    if (!self.isLoggedIn) {
+        // We will delay the path resolution/access token handshake until the user logs in
+        info.deferredBindingPackage = [[RLMRealmBindingPackage alloc] initWithFileURL:objcFileURL
+                                                                           remotePath:objcRemotePath
+                                                                                block:completion];
+    } else {
+        // User is logged in, start the handshake immediately.
+        [self _bindRealmWithLocalFileURL:objcFileURL remotePath:objcRemotePath onCompletion:completion];
+    }
 }
 
 - (void)_reportRefreshFailureForPath:(RLMServerPath)path error:(NSError *)error {

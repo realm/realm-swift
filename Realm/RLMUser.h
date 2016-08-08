@@ -37,9 +37,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) BOOL isLoggedIn;
 
-+ (instancetype)defaultUser;
+@property (nonatomic, readonly) RLMLocalIdentity localIdentity;
 
-+ (instancetype)userForAnonymousAccount;
+/**
+ Return the anonymous singleton user.
+ */
++ (instancetype)anonymousUser;
+
+- (instancetype)initWithLocalIdentity:(nullable RLMLocalIdentity)identity NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 - (void)loginWithCredential:(RLMCredential *)credential
                  completion:(nullable RLMErrorReportingBlock)completion;
