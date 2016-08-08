@@ -51,7 +51,7 @@ namespace {
     }
 }
 
-RLMObservationInfo::RLMObservationInfo(RLMObjectInfo &objectSchema, std::size_t row, id object)
+RLMObservationInfo::RLMObservationInfo(RLMClassInfo &objectSchema, std::size_t row, id object)
 : object(object)
 , objectSchema(&objectSchema)
 {
@@ -154,7 +154,7 @@ void RLMObservationInfo::setRow(realm::Table &table, size_t newRow) {
     objectSchema->observedObjects.push_back(this);
 }
 
-void RLMObservationInfo::recordObserver(realm::Row& objectRow, RLMObjectInfo *objectInfo,
+void RLMObservationInfo::recordObserver(realm::Row& objectRow, RLMClassInfo *objectInfo,
                                         __unsafe_unretained RLMObjectSchema *const objectSchema,
                                         __unsafe_unretained NSString *const keyPath) {
     ++observerCount;
@@ -260,7 +260,7 @@ id RLMObservationInfo::valueForKey(NSString *key) {
 }
 
 RLMObservationInfo *RLMGetObservationInfo(RLMObservationInfo *info, size_t row,
-                                          RLMObjectInfo& objectSchema) {
+                                          RLMClassInfo& objectSchema) {
     if (info) {
         return info;
     }
@@ -274,7 +274,7 @@ RLMObservationInfo *RLMGetObservationInfo(RLMObservationInfo *info, size_t row,
     return nullptr;
 }
 
-void RLMClearTable(RLMObjectInfo &objectSchema) {
+void RLMClearTable(RLMClassInfo &objectSchema) {
     for (auto info : objectSchema.observedObjects) {
         info->willChange(RLMInvalidatedKey);
     }

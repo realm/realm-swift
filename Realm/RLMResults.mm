@@ -50,7 +50,7 @@ using namespace realm;
 @implementation RLMResults {
     realm::Results _results;
     RLMRealm *_realm;
-    RLMObjectInfo *_info;
+    RLMClassInfo *_info;
 }
 
 - (instancetype)initPrivate {
@@ -108,7 +108,7 @@ static auto translateErrors(Function&& f, NSString *aggregateMethod=nil) {
     }
 }
 
-+ (instancetype)resultsWithObjectInfo:(RLMObjectInfo&)info
++ (instancetype)resultsWithObjectInfo:(RLMClassInfo&)info
                               results:(realm::Results)results {
     RLMResults *ar = [[self alloc] initPrivate];
     ar->_results = std::move(results);
@@ -142,7 +142,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return _info->rlmObjectSchema;
 }
 
-- (RLMObjectInfo *)objectInfo {
+- (RLMClassInfo *)objectInfo {
     return _info;
 }
 

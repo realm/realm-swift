@@ -48,9 +48,9 @@ template<> struct equal_to<NSString *> {
 
 // The per-RLMRealm object schema information which stores the cached table
 // reference, handles table column lookups, and tracks observed objects
-struct RLMObjectInfo {
+class RLMClassInfo {
 public:
-    RLMObjectInfo(RLMRealm *, RLMObjectSchema *, const realm::ObjectSchema *);
+    RLMClassInfo(RLMRealm *, RLMObjectSchema *, const realm::ObjectSchema *);
 
     __unsafe_unretained RLMRealm *const realm;
     __unsafe_unretained RLMObjectSchema *const rlmObjectSchema;
@@ -73,30 +73,30 @@ public:
     NSUInteger tableColumn(NSString *propertyName) const;
     NSUInteger tableColumn(RLMProperty *property) const;
 
-    RLMObjectInfo &linkTargetType(size_t index);
+    RLMClassInfo &linkTargetType(size_t index);
 
     void releaseTable() { m_table = nullptr; }
 
 private:
     mutable realm::Table *_Nullable m_table = nullptr;
-    std::vector<RLMObjectInfo *> m_linkTargets;
+    std::vector<RLMClassInfo *> m_linkTargets;
 };
 
-// A per-RLMRealm object schema map which stores RLMObjectInfo keyed on the name
+// A per-RLMRealm object schema map which stores RLMClassInfo keyed on the name
 class RLMSchemaInfo {
-    using impl = std::unordered_map<NSString *, RLMObjectInfo>;
+    using impl = std::unordered_map<NSString *, RLMClassInfo>;
 public:
     void init(RLMRealm *realm, RLMSchema *rlmSchema, realm::Schema const& schema);
 
     // Look up by name, throwing if it's not present
-    RLMObjectInfo& operator[](NSString *name);
+    RLMClassInfo& operator[](NSString *name);
 
     impl::iterator begin() noexcept;
     impl::iterator end() noexcept;
     impl::const_iterator begin() const noexcept;
     impl::const_iterator end() const noexcept;
 private:
-    std::unordered_map<NSString *, RLMObjectInfo> m_objects;
+    std::unordered_map<NSString *, RLMClassInfo> m_objects;
 };
 
 NS_ASSUME_NONNULL_END

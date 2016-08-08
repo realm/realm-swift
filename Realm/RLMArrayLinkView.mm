@@ -41,8 +41,8 @@
 @public
     realm::List _backingList;
     RLMRealm *_realm;
-    RLMObjectInfo *_objectInfo;
-    RLMObjectInfo *_ownerInfo;
+    RLMClassInfo *_objectInfo;
+    RLMClassInfo *_ownerInfo;
     std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
 
@@ -185,7 +185,7 @@ static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyVal
     return translateErrors([&] { return !_backingList.is_valid(); });
 }
 
-- (RLMObjectInfo *)objectInfo {
+- (RLMClassInfo *)objectInfo {
     return _objectInfo;
 }
 

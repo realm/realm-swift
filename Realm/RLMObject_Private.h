@@ -18,13 +18,10 @@
 
 #import <Realm/RLMObjectBase_Dynamic.h>
 
-typedef struct RLMObjectInfo RLMObjectInfo;
-
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
 @public
     RLMRealm *_realm;
-    RLMObjectInfo *_info;
     __unsafe_unretained RLMObjectSchema *_objectSchema;
 }
 
@@ -69,10 +66,6 @@ typedef struct RLMObjectInfo RLMObjectInfo;
 @property (nonatomic, readonly) RLMObjectBase *object;
 
 @end
-
-// FIXME-2.0: This should be folded into initWithRealm:schema:, but changing the
-// signature of that is a breaking change for Swift
-id RLMCreateManagedAccessor(Class cls, RLMRealm *realm, RLMObjectInfo *info) NS_RETURNS_RETAINED;
 
 // Calls valueForKey: and re-raises NSUndefinedKeyExceptions
 FOUNDATION_EXTERN id RLMValidatedValueForProperty(id object, NSString *key, NSString *className);

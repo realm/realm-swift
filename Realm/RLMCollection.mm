@@ -39,7 +39,7 @@ static const int RLMEnumerationBufferSize = 16;
     id _strongBuffer[RLMEnumerationBufferSize];
 
     RLMRealm *_realm;
-    RLMObjectInfo *_info;
+    RLMClassInfo *_info;
 
     // Collection being enumerated. Only one of these two will be valid: when
     // possible we enumerate the collection directly, but when in a write
@@ -49,7 +49,7 @@ static const int RLMEnumerationBufferSize = 16;
     realm::TableView _tableView;
 }
 
-- (instancetype)initWithCollection:(id<RLMFastEnumerable>)collection objectSchema:(RLMObjectInfo&)info {
+- (instancetype)initWithCollection:(id<RLMFastEnumerable>)collection objectSchema:(RLMClassInfo&)info {
     self = [super init];
     if (self) {
         _realm = collection.realm;
@@ -138,7 +138,7 @@ NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *ke
     }
 
     RLMRealm *realm = collection.realm;
-    RLMObjectInfo *info = collection.objectInfo;
+    RLMClassInfo *info = collection.objectInfo;
 
     NSMutableArray *results = [NSMutableArray arrayWithCapacity:count];
     if ([key isEqualToString:@"self"]) {
@@ -168,7 +168,7 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
     }
 
     RLMRealm *realm = collection.realm;
-    RLMObjectInfo *info = collection.objectInfo;
+    RLMClassInfo *info = collection.objectInfo;
     RLMObject *accessor = RLMCreateManagedAccessor(info->rlmObjectSchema.accessorClass, realm, info);
     for (size_t i = 0; i < tv.size(); i++) {
         accessor->_row = tv[i];

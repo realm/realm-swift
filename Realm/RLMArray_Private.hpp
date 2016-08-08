@@ -29,8 +29,8 @@ namespace realm {
 }
 
 @class RLMObjectBase, RLMObjectSchema, RLMProperty;
+class RLMClassInfo;
 class RLMObservationInfo;
-struct RLMObjectInfo;
 
 @interface RLMArray () {
 @protected
@@ -63,7 +63,7 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
 // RLMResults private methods
 //
 @interface RLMResults () <RLMFastEnumerable>
-+ (instancetype)resultsWithObjectInfo:(RLMObjectInfo&)info
++ (instancetype)resultsWithObjectInfo:(RLMClassInfo&)info
                               results:(realm::Results)results;
 
 - (void)deleteObjectsFromRealm;

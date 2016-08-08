@@ -198,7 +198,7 @@
 
 @implementation RLMWeakObjectHandle {
     realm::Row _row;
-    RLMObjectInfo *_info;
+    RLMClassInfo *_info;
     Class _objectClass;
 }
 

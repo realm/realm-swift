@@ -96,7 +96,7 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
 }
 
 template<typename F>
-static NSUInteger RLMCreateOrGetRowForObject(RLMObjectInfo const& info,
+static NSUInteger RLMCreateOrGetRowForObject(RLMClassInfo const& info,
                                              F primaryValueGetter, bool createOrUpdate, bool &created) {
     // try to get existing row if updating
     size_t rowIndex = realm::not_found;
@@ -358,7 +358,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
     RLMVerifyRealmRead(realm);
 
     // create view from table and predicate
-    RLMObjectInfo& info = realm->_info[objectClassName];
+    RLMClassInfo& info = realm->_info[objectClassName];
     if (!info.table()) {
         // read-only realms may be missing tables since we can't add any
         // missing ones on init
@@ -378,7 +378,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     RLMVerifyRealmRead(realm);
 
-    RLMObjectInfo& info = realm->_info[objectClassName];
+    RLMClassInfo& info = realm->_info[objectClassName];
     auto primaryProperty = info.objectSchema->primary_key_property();
     if (!primaryProperty) {
         @throw RLMException(@"%@ does not have a primary key", objectClassName);
@@ -424,14 +424,14 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
 }
 
 RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm,
-                                       RLMObjectInfo& info,
+                                       RLMClassInfo& info,
                                        NSUInteger index) {
     return RLMCreateObjectAccessor(realm, info, (*info.table())[index]);
 }
 
 // Create accessor and register with realm
 RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm,
-                                       RLMObjectInfo& info,
+                                       RLMClassInfo& info,
                                        realm::RowExpr row) {
     RLMObjectBase *accessor = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, realm, &info);
     accessor->_row = row;

@@ -139,7 +139,7 @@ static id validatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schem
     return self;
 }
 
-id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMObjectInfo *info) {
+id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMClassInfo *info) {
     RLMObjectBase *obj = [[cls alloc] initWithRealm:realm schema:info->rlmObjectSchema];
     obj->_info = info;
     return obj;

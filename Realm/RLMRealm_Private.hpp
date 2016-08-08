@@ -18,7 +18,7 @@
 
 #import "RLMRealm_Private.h"
 
-#import "RLMObjectInfo.hpp"
+#import "RLMClassInfo.hpp"
 
 namespace realm {
     class Group;

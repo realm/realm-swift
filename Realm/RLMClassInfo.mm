@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectInfo.hpp"
+#import "RLMClassInfo.hpp"
 
 #import "RLMRealm_Private.hpp"
 #import "RLMObjectSchema.h"
@@ -33,18 +33,18 @@
 
 using namespace realm;
 
-RLMObjectInfo::RLMObjectInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
+RLMClassInfo::RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
                              const realm::ObjectSchema *objectSchema)
 : realm(realm), rlmObjectSchema(rlmObjectSchema), objectSchema(objectSchema) { }
 
-realm::Table *RLMObjectInfo::table() const {
+realm::Table *RLMClassInfo::table() const {
     if (!m_table) {
         m_table = ObjectStore::table_for_object_type(realm.group, objectSchema->name).get();
     }
     return m_table;
 }
 
-RLMProperty *RLMObjectInfo::propertyForTableColumn(NSUInteger col) const noexcept {
+RLMProperty *RLMClassInfo::propertyForTableColumn(NSUInteger col) const noexcept {
     auto const& props = objectSchema->persisted_properties;
     for (size_t i = 0; i < props.size(); ++i) {
         if (props[i].table_column == col) {
@@ -54,15 +54,15 @@ RLMProperty *RLMObjectInfo::propertyForTableColumn(NSUInteger col) const noexcep
     return nil;
 }
 
-NSUInteger RLMObjectInfo::tableColumn(NSString *propertyName) const {
+NSUInteger RLMClassInfo::tableColumn(NSString *propertyName) const {
     return tableColumn(RLMValidatedProperty(rlmObjectSchema, propertyName));
 }
 
-NSUInteger RLMObjectInfo::tableColumn(RLMProperty *property) const {
+NSUInteger RLMClassInfo::tableColumn(RLMProperty *property) const {
     return objectSchema->persisted_properties[property.index].table_column;
 }
 
-RLMObjectInfo &RLMObjectInfo::linkTargetType(size_t index) {
+RLMClassInfo &RLMClassInfo::linkTargetType(size_t index) {
     if (index < m_linkTargets.size() && m_linkTargets[index]) {
         return *m_linkTargets[index];
     }
@@ -78,7 +78,7 @@ RLMSchemaInfo::impl::iterator RLMSchemaInfo::end() noexcept { return m_objects.e
 RLMSchemaInfo::impl::const_iterator RLMSchemaInfo::begin() const noexcept { return m_objects.begin(); }
 RLMSchemaInfo::impl::const_iterator RLMSchemaInfo::end() const noexcept { return m_objects.end(); }
 
-RLMObjectInfo& RLMSchemaInfo::operator[](NSString *name) {
+RLMClassInfo& RLMSchemaInfo::operator[](NSString *name) {
     auto it = m_objects.find(name);
     if (it == m_objects.end()) {
         @throw RLMException(@"Object type '%@' is not managed by the Realm. "
