@@ -29,6 +29,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
+#import "RLMHandover_Private.hpp"
 
 #import "results.hpp"
 
@@ -427,3 +428,25 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 @implementation RLMLinkingObjects
 @end
+
+@interface RLMResults (Handover) <RLMThreadConfined_Private>
+@end
+
+@implementation RLMResults (Handover)
+
+- (realm::AnyThreadConfined)rlm_handoverData {
+    return translateErrors([&] { return AnyThreadConfined(_results); }); // TODO: Do we need more translate errors thing?
+}
+
+- (NSString *)rlm_handoverMetadata {
+    return self.objectSchema.className;
+}
+
++ (instancetype)rlm_objectWithHandoverData:(realm::AnyThreadConfined &)data
+                                  metadata:(NSString *)className inRealm:(RLMRealm *)realm {
+    return [RLMResults resultsWithObjectInfo:realm->_info[className]
+                                     results:data.get_results()];
+}
+
+@end
+

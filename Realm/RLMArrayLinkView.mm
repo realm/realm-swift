@@ -27,6 +27,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema.h"
 #import "RLMUtil.hpp"
+#import "RLMHandover_Private.hpp"
 
 #import "list.hpp"
 #import "results.hpp"
@@ -46,17 +47,30 @@
     std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
 
-- (RLMArrayLinkView *)initWithParent:(__unsafe_unretained RLMObjectBase *const)parentObject
-                            property:(__unsafe_unretained RLMProperty *const)property {
+- (RLMArrayLinkView *)initWithList:(realm::List)list
+                             realm:(__unsafe_unretained RLMRealm *const)realm
+                        parentInfo:(RLMClassInfo *)parentInfo
+                          property:(__unsafe_unretained RLMProperty *const)property {
     self = [self initWithObjectClassName:property.objectClassName];
     if (self) {
-        _realm = parentObject->_realm;
-        _backingList = realm::List(_realm->_realm, parentObject->_row.get_linklist(parentObject->_info->tableColumn(property)));
-        _objectInfo = &parentObject->_info->linkTargetType(property.index);
-        _ownerInfo = parentObject->_info;
+        _realm = realm;
+        REALM_ASSERT_DEBUG(list.get_realm() == realm->_realm);
+        _backingList = std::move(list);
+        _objectInfo = &parentInfo->linkTargetType(property.index);
+        _ownerInfo = parentInfo;
         _key = property.name;
     }
     return self;
+}
+
+- (RLMArrayLinkView *)initWithParent:(__unsafe_unretained RLMObjectBase *const)parentObject
+                            property:(__unsafe_unretained RLMProperty *const)property {
+    __unsafe_unretained RLMRealm *const realm = parentObject->_realm;
+    realm::List list(realm->_realm, parentObject->_row.get_linklist(parentObject->_info->tableColumn(property)));
+    return [self initWithList:std::move(list)
+                        realm:realm
+                   parentInfo:parentObject->_info
+                     property:property];
 }
 
 void RLMValidateArrayObservationKey(__unsafe_unretained NSString *const keyPath,
@@ -411,5 +425,41 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     return RLMAddNotificationBlock(self, _backingList, block);
 }
 #pragma clang diagnostic pop
+
+@end
+
+@interface RLMArrayLinkViewHandoverMetadata : NSObject
+
+@property (nonatomic) NSString *parentClassName;
+@property (nonatomic) NSString *key;
+
+@end
+
+@implementation RLMArrayLinkViewHandoverMetadata
+@end
+
+@interface RLMArrayLinkView (Handover) <RLMThreadConfined_Private>
+@end
+
+@implementation RLMArrayLinkView (Handover)
+
+- (realm::AnyThreadConfined)rlm_handoverData {
+    return realm::AnyThreadConfined(_backingList);
+}
+
+- (RLMArrayLinkViewHandoverMetadata *)rlm_handoverMetadata {
+    RLMArrayLinkViewHandoverMetadata *metadata = [[RLMArrayLinkViewHandoverMetadata alloc] init];
+    metadata.parentClassName = @(_ownerInfo->objectSchema->name.c_str());
+    metadata.key = _key;
+    return metadata;
+}
+
++ (instancetype)rlm_objectWithHandoverData:(realm::AnyThreadConfined&)data
+                                  metadata:(RLMArrayLinkViewHandoverMetadata *)metadata inRealm:(RLMRealm *)realm {
+    return [[RLMArrayLinkView alloc] initWithList:std::move(data.get_list())
+                                            realm:realm
+                                       parentInfo:&realm->_info[metadata.parentClassName]
+                                         property:realm.schema[metadata.parentClassName][metadata.key]];
+}
 
 @end

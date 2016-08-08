@@ -33,6 +33,7 @@
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
 #import "RLMUpdateChecker.hpp"
+#import "RLMHandover_Private.hpp"
 #import "RLMUtil.hpp"
 
 #include "impl/realm_coordinator.hpp"
@@ -641,6 +642,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         *error = localError; // Must set outside pool otherwise will free anyway
     }
     return success;
+}
+
+- (RLMThreadHandover *)exportThreadHandoverWithObjects:(NSArray<id<RLMThreadConfined>> *)objects {
+    return [[RLMThreadHandover alloc] initWithRealm:self objects:objects];
 }
 
 - (RLMObject *)createObject:(NSString *)className withValue:(id)value {

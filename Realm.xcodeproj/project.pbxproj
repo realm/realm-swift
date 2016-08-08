@@ -78,12 +78,6 @@
 		3F2E66651CA0BA12004761D5 /* NotificationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F2E66611CA0B9D5004761D5 /* NotificationTests.m */; };
 		3F643BED1CEA655800F6D0C8 /* mixed-column.realm in Resources */ = {isa = PBXBuildFile; fileRef = 3F643BEB1CEA654D00F6D0C8 /* mixed-column.realm */; };
 		3F643BEE1CEA655800F6D0C8 /* mixed-column.realm in Resources */ = {isa = PBXBuildFile; fileRef = 3F643BEB1CEA654D00F6D0C8 /* mixed-column.realm */; };
-		3F6864E71D5B825E000024C3 /* handover.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F6864E51D5B825E000024C3 /* handover.cpp */; };
-		3F6864E81D5B825E000024C3 /* handover.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F6864E61D5B825E000024C3 /* handover.hpp */; };
-		3F6864E91D5B8262000024C3 /* handover.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F6864E51D5B825E000024C3 /* handover.cpp */; };
-		3F6864EC1D5B8272000024C3 /* thread_confined.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F6864EA1D5B8272000024C3 /* thread_confined.cpp */; };
-		3F6864ED1D5B8272000024C3 /* thread_confined.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F6864EB1D5B8272000024C3 /* thread_confined.hpp */; };
-		3F6864EE1D5B8275000024C3 /* thread_confined.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F6864EA1D5B8272000024C3 /* thread_confined.cpp */; };
 		3F75566B1BE94CCC0058BC7E /* results.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556691BE94CCC0058BC7E /* results.cpp */; };
 		3F75566C1BE94CCC0058BC7E /* results.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F75566A1BE94CCC0058BC7E /* results.hpp */; };
 		3F75566D1BE94CEA0058BC7E /* results.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556691BE94CCC0058BC7E /* results.cpp */; };
@@ -355,6 +349,21 @@
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
+		D4003AF01D382D7C0040CA7B /* Handover.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4003AEF1D382D7C0040CA7B /* Handover.swift */; };
+		D45D19891D42BF030066B4F1 /* RLMHandover.h in Headers */ = {isa = PBXBuildFile; fileRef = D45D19871D42BF030066B4F1 /* RLMHandover.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D45D198A1D42BF030066B4F1 /* RLMHandover.h in Headers */ = {isa = PBXBuildFile; fileRef = D45D19871D42BF030066B4F1 /* RLMHandover.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D45D198B1D42BF030066B4F1 /* RLMHandover.mm in Sources */ = {isa = PBXBuildFile; fileRef = D45D19881D42BF030066B4F1 /* RLMHandover.mm */; };
+		D45D198C1D42BF030066B4F1 /* RLMHandover.mm in Sources */ = {isa = PBXBuildFile; fileRef = D45D19881D42BF030066B4F1 /* RLMHandover.mm */; };
+		D48F1CAC1D3DE4ED00EED280 /* ConformanceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = D48F1CAB1D3DE4ED00EED280 /* ConformanceTests.mm */; };
+		D48F1CAD1D3DE4F100EED280 /* ConformanceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = D48F1CAB1D3DE4ED00EED280 /* ConformanceTests.mm */; };
+		D4CD5ECC1D59497500FA8415 /* handover.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4CD5ECA1D59497500FA8415 /* handover.cpp */; };
+		D4CD5ECD1D59497500FA8415 /* handover.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4CD5ECA1D59497500FA8415 /* handover.cpp */; };
+		D4CD5ECE1D59497500FA8415 /* handover.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D4CD5ECB1D59497500FA8415 /* handover.hpp */; };
+		D4CD5ED21D594A0400FA8415 /* thread_confined.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4CD5ED01D594A0400FA8415 /* thread_confined.cpp */; };
+		D4CD5ED31D594A0400FA8415 /* thread_confined.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4CD5ED01D594A0400FA8415 /* thread_confined.cpp */; };
+		D4CD5ED41D594A0400FA8415 /* thread_confined.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D4CD5ED11D594A0400FA8415 /* thread_confined.hpp */; };
+		D4CD5ED51D594A0400FA8415 /* thread_confined.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D4CD5ED11D594A0400FA8415 /* thread_confined.hpp */; };
+		D4CD5ED61D594A5900FA8415 /* handover.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D4CD5ECB1D59497500FA8415 /* handover.hpp */; };
 		E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
 		E81A1FDB1955FE0100FDED82 /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
 		E81A1FDD1955FE0100FDED82 /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBC1955FE0100FDED82 /* LinkTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
@@ -539,10 +548,6 @@
 		3F4E324B1B98C6C700183A69 /* RLMSchema_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSchema_Private.hpp; sourceTree = "<group>"; };
 		3F62BA9E1BA0AB9000A4CEB2 /* binding_context.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = binding_context.hpp; sourceTree = "<group>"; };
 		3F643BEB1CEA654D00F6D0C8 /* mixed-column.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mixed-column.realm"; sourceTree = "<group>"; };
-		3F6864E51D5B825E000024C3 /* handover.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = handover.cpp; sourceTree = "<group>"; };
-		3F6864E61D5B825E000024C3 /* handover.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = handover.hpp; sourceTree = "<group>"; };
-		3F6864EA1D5B8272000024C3 /* thread_confined.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_confined.cpp; sourceTree = "<group>"; };
-		3F6864EB1D5B8272000024C3 /* thread_confined.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = thread_confined.hpp; sourceTree = "<group>"; };
 		3F68BFCD1B558CA800D50FBD /* RLMPrefix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMPrefix.h; sourceTree = "<group>"; };
 		3F6B89AE19EF40BA004E8EA8 /* librealm-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "librealm-ios.a"; path = "../core/librealm-ios.a"; sourceTree = "<group>"; };
 		3F7556691BE94CCC0058BC7E /* results.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = results.cpp; sourceTree = "<group>"; };
@@ -565,8 +570,6 @@
 		3F9801A91C8E4F6B000A8B07 /* collection_notifications.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = collection_notifications.cpp; sourceTree = "<group>"; };
 		3F9801AD1C90FD2D000A8B07 /* results_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = results_notifier.hpp; sourceTree = "<group>"; };
 		3F9801AE1C90FD2D000A8B07 /* results_notifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = results_notifier.cpp; sourceTree = "<group>"; };
-		3F9863B91D36876B00641C98 /* RLMClassInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMClassInfo.mm; sourceTree = "<group>"; };
-		3F9863BA1D36876B00641C98 /* RLMClassInfo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMClassInfo.hpp; sourceTree = "<group>"; };
 		3FAE25511B8CEBBE00D01405 /* object_store.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object_store.cpp; sourceTree = "<group>"; };
 		3FAE25521B8CEBBE00D01405 /* object_store.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = object_store.hpp; sourceTree = "<group>"; };
 		3FAE25531B8CEBBE00D01405 /* shared_realm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = shared_realm.cpp; sourceTree = "<group>"; };
@@ -653,6 +656,15 @@
 		C0D2DD061B6BDEA1004E8919 /* RLMRealmConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMRealmConfiguration.mm; sourceTree = "<group>"; };
 		C0D2DD0F1B6BE0DD004E8919 /* RLMRealmConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration_Private.h; sourceTree = "<group>"; };
 		C0D6E4101AFBFAF7001F3027 /* RLMAssertions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAssertions.h; sourceTree = "<group>"; };
+		D4003AEF1D382D7C0040CA7B /* Handover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Handover.swift; sourceTree = "<group>"; };
+		D45D19871D42BF030066B4F1 /* RLMHandover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMHandover.h; sourceTree = "<group>"; };
+		D45D19881D42BF030066B4F1 /* RLMHandover.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMHandover.mm; sourceTree = "<group>"; };
+		D45D198D1D42C6480066B4F1 /* RLMHandover_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMHandover_Private.hpp; sourceTree = "<group>"; };
+		D48F1CAB1D3DE4ED00EED280 /* ConformanceTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ConformanceTests.mm; sourceTree = "<group>"; };
+		D4CD5ECA1D59497500FA8415 /* handover.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = handover.cpp; sourceTree = "<group>"; };
+		D4CD5ECB1D59497500FA8415 /* handover.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = handover.hpp; sourceTree = "<group>"; };
+		D4CD5ED01D594A0400FA8415 /* thread_confined.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_confined.cpp; sourceTree = "<group>"; };
+		D4CD5ED11D594A0400FA8415 /* thread_confined.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = thread_confined.hpp; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1F631955FC9300FDED82 /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccessor.h; sourceTree = "<group>"; };
 		E81A1F641955FC9300FDED82 /* RLMAccessor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAccessor.mm; sourceTree = "<group>"; };
@@ -787,8 +799,8 @@
 				3FE556431B9A43E5002A1129 /* schema.hpp */,
 				3FAE25531B8CEBBE00D01405 /* shared_realm.cpp */,
 				3FAE25541B8CEBBE00D01405 /* shared_realm.hpp */,
-				3F6864EA1D5B8272000024C3 /* thread_confined.cpp */,
-				3F6864EB1D5B8272000024C3 /* thread_confined.hpp */,
+				D4CD5ED01D594A0400FA8415 /* thread_confined.cpp */,
+				D4CD5ED11D594A0400FA8415 /* thread_confined.hpp */,
 			);
 			name = ObjectStore;
 			path = ObjectStore/src;
@@ -825,8 +837,8 @@
 				3F98019E1C8E4F55000A8B07 /* collection_notifier.cpp */,
 				3F98019A1C8E4F55000A8B07 /* collection_notifier.hpp */,
 				3F0543F61C56F78300AA5322 /* external_commit_helper.hpp */,
-				3F6864E51D5B825E000024C3 /* handover.cpp */,
-				3F6864E61D5B825E000024C3 /* handover.hpp */,
+				D4CD5ECA1D59497500FA8415 /* handover.cpp */,
+				D4CD5ECB1D59497500FA8415 /* handover.hpp */,
 				3F98019F1C8E4F55000A8B07 /* list_notifier.cpp */,
 				3F98019B1C8E4F55000A8B07 /* list_notifier.hpp */,
 				3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */,
@@ -879,6 +891,7 @@
 			children = (
 				5D660FE31BE98D670021E04F /* Aliases.swift */,
 				29B7FDF51C0DA6560023224E /* Error.swift */,
+				D4003AEF1D382D7C0040CA7B /* Handover.swift */,
 				5D1534B71CCFF545008976D7 /* LinkingObjects.swift */,
 				5D660FE41BE98D670021E04F /* List.swift */,
 				5D660FE51BE98D670021E04F /* Migration.swift */,
@@ -973,6 +986,7 @@
 			children = (
 				E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */,
 				3F7556731BE95A050058BC7E /* AsyncTests.mm */,
+				D48F1CAB1D3DE4ED00EED280 /* ConformanceTests.mm */,
 				E81A1FBA1955FE0100FDED82 /* DynamicTests.m */,
 				021A882F1AAFB5BE00EEAC84 /* EncryptionTests.mm */,
 				E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */,
@@ -1068,6 +1082,9 @@
 				3FBEF6781C63D66100F6935B /* RLMCollection_Private.hpp */,
 				E81A1F6B1955FC9300FDED82 /* RLMConstants.h */,
 				E81A1F6C1955FC9300FDED82 /* RLMConstants.m */,
+				D45D19871D42BF030066B4F1 /* RLMHandover.h */,
+				D45D198D1D42C6480066B4F1 /* RLMHandover_Private.hpp */,
+				D45D19881D42BF030066B4F1 /* RLMHandover.mm */,
 				023B19551A3BA90D0067FB81 /* RLMListBase.h */,
 				023B19561A3BA90D0067FB81 /* RLMListBase.mm */,
 				0207AB7D195DF9FB007EFB12 /* RLMMigration.h */,
@@ -1174,12 +1191,12 @@
 				5D659EA61BE04556006515A0 /* binding_context.hpp in Headers */,
 				3F7A3FB01CC6EB7300301A17 /* collection_change_builder.hpp in Headers */,
 				3F9801AA1C8E4F6B000A8B07 /* collection_notifications.hpp in Headers */,
+				D4CD5ED41D594A0400FA8415 /* thread_confined.hpp in Headers */,
 				3F9801A01C8E4F55000A8B07 /* collection_notifier.hpp in Headers */,
 				5D5AF7FD1D3D8F9C003036AB /* compiler.hpp in Headers */,
 				5D659EA01BE04556006515A0 /* external_commit_helper.hpp in Headers */,
 				3F0543F81C56F78300AA5322 /* external_commit_helper.hpp in Headers */,
 				5DB591AB1D063DF8001D8F93 /* format.hpp in Headers */,
-				3F6864E81D5B825E000024C3 /* handover.hpp in Headers */,
 				5D659EA11BE04556006515A0 /* index_set.hpp in Headers */,
 				3F9026121C625C5D006AE98E /* list.hpp in Headers */,
 				3F9801A11C8E4F55000A8B07 /* list_notifier.hpp in Headers */,
@@ -1204,6 +1221,8 @@
 				5D659EB11BE04556006515A0 /* RLMObject.h in Headers */,
 				5D659EB21BE04556006515A0 /* RLMObject_Private.h in Headers */,
 				5D659EB31BE04556006515A0 /* RLMObjectBase.h in Headers */,
+				D45D19891D42BF030066B4F1 /* RLMHandover.h in Headers */,
+				D4CD5ECE1D59497500FA8415 /* handover.hpp in Headers */,
 				5D659EB41BE04556006515A0 /* RLMObjectBase_Dynamic.h in Headers */,
 				5D659EB51BE04556006515A0 /* RLMObjectSchema.h in Headers */,
 				5D659EB61BE04556006515A0 /* RLMObjectSchema_Private.h in Headers */,
@@ -1232,7 +1251,6 @@
 				5D659ECB1BE04556006515A0 /* RLMUtil.hpp in Headers */,
 				5D659ECC1BE04556006515A0 /* schema.hpp in Headers */,
 				5D659ECD1BE04556006515A0 /* shared_realm.hpp in Headers */,
-				3F6864ED1D5B8272000024C3 /* thread_confined.hpp in Headers */,
 				3F9801A31C8E4F55000A8B07 /* weak_realm_notifier.hpp in Headers */,
 				3F9801971C8E4F3F000A8B07 /* weak_realm_notifier.hpp in Headers */,
 				3F9801A21C8E4F55000A8B07 /* weak_realm_notifier_base.hpp in Headers */,
@@ -1254,6 +1272,7 @@
 				3F7A3FB11CC6EB7300301A17 /* collection_change_builder.hpp in Headers */,
 				5DD7559E1BE056DE002800DA /* external_commit_helper.hpp in Headers */,
 				5DD7559F1BE056DE002800DA /* index_set.hpp in Headers */,
+				D4CD5ED61D594A5900FA8415 /* handover.hpp in Headers */,
 				5DD755A01BE056DE002800DA /* object_schema.hpp in Headers */,
 				5DD755A11BE056DE002800DA /* object_store.hpp in Headers */,
 				5DD755A21BE056DE002800DA /* property.hpp in Headers */,
@@ -1263,6 +1282,8 @@
 				5DD755A71BE056DE002800DA /* RLMArray.h in Headers */,
 				5DD755A81BE056DE002800DA /* RLMArray_Private.h in Headers */,
 				3F9863BE1D36876B00641C98 /* RLMClassInfo.hpp in Headers */,
+				D45D198A1D42BF030066B4F1 /* RLMHandover.h in Headers */,
+				D4CD5ED51D594A0400FA8415 /* thread_confined.hpp in Headers */,
 				5DD755A91BE056DE002800DA /* RLMCollection.h in Headers */,
 				5DD755AA1BE056DE002800DA /* RLMConstants.h in Headers */,
 				5DD755AC1BE056DE002800DA /* RLMListBase.h in Headers */,
@@ -1759,8 +1780,8 @@
 				3F9801AB1C8E4F6B000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A41C8E4F55000A8B07 /* collection_notifier.cpp in Sources */,
 				5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */,
+				D4CD5ECC1D59497500FA8415 /* handover.cpp in Sources */,
 				5DB591AA1D063DF8001D8F93 /* format.cpp in Sources */,
-				3F6864E71D5B825E000024C3 /* handover.cpp in Sources */,
 				5D659E821BE04556006515A0 /* index_set.cpp in Sources */,
 				3F9026111C625C5D006AE98E /* list.cpp in Sources */,
 				3F9801A51C8E4F55000A8B07 /* list_notifier.cpp in Sources */,
@@ -1783,6 +1804,8 @@
 				5D659E8E1BE04556006515A0 /* RLMObjectSchema.mm in Sources */,
 				5D659E8F1BE04556006515A0 /* RLMObjectStore.mm in Sources */,
 				5D659E901BE04556006515A0 /* RLMObservation.mm in Sources */,
+				D45D198B1D42BF030066B4F1 /* RLMHandover.mm in Sources */,
+				D4CD5ED21D594A0400FA8415 /* thread_confined.cpp in Sources */,
 				5D659E911BE04556006515A0 /* RLMOptionalBase.mm in Sources */,
 				5D3E1A2F1C1FC6D5002913BA /* RLMPredicateUtil.mm in Sources */,
 				5D659E921BE04556006515A0 /* RLMProperty.mm in Sources */,
@@ -1797,7 +1820,6 @@
 				5D659E9B1BE04556006515A0 /* RLMUtil.mm in Sources */,
 				5D659E9C1BE04556006515A0 /* schema.cpp in Sources */,
 				5D659E9D1BE04556006515A0 /* shared_realm.cpp in Sources */,
-				3F6864EC1D5B8272000024C3 /* thread_confined.cpp in Sources */,
 				5D659E9E1BE04556006515A0 /* transact_log_handler.cpp in Sources */,
 				3F9801981C8E4F3F000A8B07 /* weak_realm_notifier.cpp in Sources */,
 			);
@@ -1811,6 +1833,7 @@
 				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
 				5D1534B81CCFF545008976D7 /* LinkingObjects.swift in Sources */,
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
+				D4003AF01D382D7C0040CA7B /* Handover.swift in Sources */,
 				5D660FF31BE98D670021E04F /* Migration.swift in Sources */,
 				5D660FF41BE98D670021E04F /* Object.swift in Sources */,
 				5D660FF51BE98D670021E04F /* ObjectSchema.swift in Sources */,
@@ -1862,8 +1885,8 @@
 				3F9801AC1C8E4F6F000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A61C8E4F5A000A8B07 /* collection_notifier.cpp in Sources */,
 				5DD7557F1BE056DE002800DA /* external_commit_helper.cpp in Sources */,
+				D4CD5ECD1D59497500FA8415 /* handover.cpp in Sources */,
 				5DB591AC1D0775D2001D8F93 /* format.cpp in Sources */,
-				3F6864E91D5B8262000024C3 /* handover.cpp in Sources */,
 				5DD755801BE056DE002800DA /* index_set.cpp in Sources */,
 				3F9026131C625C63006AE98E /* list.cpp in Sources */,
 				3F9801A71C8E4F5A000A8B07 /* list_notifier.cpp in Sources */,
@@ -1886,6 +1909,8 @@
 				5DD7558C1BE056DE002800DA /* RLMObjectSchema.mm in Sources */,
 				5DD7558D1BE056DE002800DA /* RLMObjectStore.mm in Sources */,
 				5DD7558E1BE056DE002800DA /* RLMObservation.mm in Sources */,
+				D45D198C1D42BF030066B4F1 /* RLMHandover.mm in Sources */,
+				D4CD5ED31D594A0400FA8415 /* thread_confined.cpp in Sources */,
 				5DD7558F1BE056DE002800DA /* RLMOptionalBase.mm in Sources */,
 				5D3E1A301C1FD1CF002913BA /* RLMPredicateUtil.mm in Sources */,
 				5DD755901BE056DE002800DA /* RLMProperty.mm in Sources */,
@@ -1900,7 +1925,6 @@
 				5DD755991BE056DE002800DA /* RLMUtil.mm in Sources */,
 				5DD7559A1BE056DE002800DA /* schema.cpp in Sources */,
 				5DD7559B1BE056DE002800DA /* shared_realm.cpp in Sources */,
-				3F6864EE1D5B8275000024C3 /* thread_confined.cpp in Sources */,
 				5DD7559C1BE056DE002800DA /* transact_log_handler.cpp in Sources */,
 				3F9801991C8E4F42000A8B07 /* weak_realm_notifier.cpp in Sources */,
 			);
@@ -1939,6 +1963,7 @@
 				3F8DCA7719930FCB0008BD7F /* SwiftArrayTests.swift in Sources */,
 				3F8DCA7819930FCB0008BD7F /* SwiftDynamicTests.swift in Sources */,
 				3F8DCA7919930FCB0008BD7F /* SwiftLinkTests.swift in Sources */,
+				D48F1CAD1D3DE4F100EED280 /* ConformanceTests.mm in Sources */,
 				3F8DCA7B19930FCB0008BD7F /* SwiftObjectInterfaceTests.swift in Sources */,
 				3F8DCA7C19930FCB0008BD7F /* SwiftPropertyTypeTest.swift in Sources */,
 				3F8DCA7D19930FCB0008BD7F /* SwiftRealmTests.swift in Sources */,
@@ -1964,6 +1989,7 @@
 				5D432B8D1CC0713F00A610A9 /* LinkingObjectsTests.mm in Sources */,
 				E81A1FDD1955FE0100FDED82 /* LinkTests.m in Sources */,
 				0207AB87195DFA15007EFB12 /* MigrationTests.mm in Sources */,
+				D48F1CAC1D3DE4ED00EED280 /* ConformanceTests.mm in Sources */,
 				3F2E66641CA0BA11004761D5 /* NotificationTests.m in Sources */,
 				E81A1FE11955FE0100FDED82 /* ObjectInterfaceTests.m in Sources */,
 				021A88361AAFB5CD00EEAC84 /* ObjectSchemaTests.m in Sources */,

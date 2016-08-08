@@ -65,6 +65,9 @@
 // Consumes the row, so can only usefully be called once.
 @property (nonatomic, readonly) RLMObjectBase *object;
 
+// Cannot be called if `object` has already been called.
+@property (nonatomic, readonly) RLMObjectBase *objectWithoutConsumingRow;
+
 @end
 
 // Calls valueForKey: and re-raises NSUndefinedKeyExceptions

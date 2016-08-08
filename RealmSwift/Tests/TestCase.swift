@@ -106,7 +106,7 @@ class TestCase: XCTestCase {
         RLMRealm.resetRealmState()
     }
 
-    func dispatchSyncNewThread(block: @escaping () -> Void) {
+    func dispatchAsyncAndWait(block: () -> ()) {
         queue.async {
             autoreleasepool {
                 block()
@@ -184,6 +184,8 @@ class TestCase: XCTestCase {
     var exceptionThrown = false
     var testDir: String! = nil
 
+    let queue = dispatch_queue_create("background", nil)
+
     func realmWithTestPath(configuration: Realm.Configuration = Realm.Configuration()) -> Realm {
         var configuration = configuration
         configuration.fileURL = testRealmURL()
@@ -252,9 +254,8 @@ class TestCase: XCTestCase {
     func resetRealmState() {
         RLMRealm.resetRealmState()
     }
-
-    func dispatchSyncNewThread(block: dispatch_block_t) {
-        let queue = dispatch_queue_create("background", nil)
+    
+    func dispatchAsyncAndWait(block: dispatch_block_t) {
         dispatch_async(queue) {
             autoreleasepool {
                 block()

@@ -18,8 +18,9 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMConstants.h"
+#import "RLMHandover.h"
 
-@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
+@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMRealm;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -494,6 +495,22 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
  @see                 RLMMigration
  */
 + (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
+
+/**
+ Creates a `RLMThreadHandover` from the passed in objects that can be safely imported on a separate thread.
+
+ Used to pass objects between threads in a thread-safe manner.
+
+ @warning Note that the returned `ThreadHandover` must be imported at most once, and that the current version of the
+ Realm will remain pinned until this package is imported or deallocated.
+
+ @param objects The objects to pass between threads.
+ @return A package that can be imported on a separate thread.
+
+ @see RLMThreadHandover
+ */
+- (RLMThreadHandover *)exportThreadHandoverWithObjects:(NSArray<id<RLMThreadConfined>> *)objects
+NS_SWIFT_NAME(exportThreadHandover(containing:));
 
 @end
 
