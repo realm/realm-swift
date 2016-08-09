@@ -198,3 +198,7 @@ id RLMMixedToObjc(realm::Mixed const& value);
 // For unit testing purposes, allow an Objective-C class named FakeObject to also be used
 // as the base class of managed objects. This allows for testing invalid schemas.
 void RLMSetTreatFakeObjectAsRLMObject(BOOL flag);
+
+// Given a bundle identifier, return the base directory on the disk within which Realm database and support files should
+// be stored.
+NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier);

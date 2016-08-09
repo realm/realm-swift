@@ -18,15 +18,12 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
+#import "RLMServerUtil_Private.h"
 
-@class RLMSyncRenewalTokenModel;
+@interface RLMRefreshResponseModel : NSObject
 
-@interface RLMSyncRefreshDataModel : NSObject
-
-@property (nonatomic, readonly) RLMSyncToken accessToken;
+@property (nonatomic, readonly) RLMServerToken accessToken;
 @property (nonatomic, readonly) NSTimeInterval accessTokenExpiry;
-@property (nonatomic, readonly) RLMSyncRenewalTokenModel *renewalTokenModel;
 
 - (instancetype)initWithJSON:(NSDictionary *)json;
 

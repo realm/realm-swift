@@ -16,23 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncRenewalTokenModel.h"
+#import "RLMUser.h"
 
-@interface RLMSyncRenewalTokenModel ()
+#import "shared_realm.hpp"
 
-@property (nonatomic, readwrite) RLMSyncToken renewalToken;
-@property (nonatomic, readwrite) NSTimeInterval tokenExpiry;
+@interface RLMUser ()
 
-@end
+@property (nonatomic) RLMIdentity identity;
 
-@implementation RLMSyncRenewalTokenModel
+@property (nonatomic) NSURL *authURL;
+@property (nonatomic) NSURL *objectServerURL;
 
-- (instancetype)initWithJSON:(NSDictionary *)json {
-    if (self = [super init]) {
-        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, renewalToken);
-        RLMSYNC_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, tokenExpiry);
-    }
-    return self;
-}
+@property (nonatomic) RLMServerToken refreshToken;
+@property (nonatomic) NSTimeInterval refreshTokenExpiry;
+
+- (void)_bindRealmWithLocalFileURL:(const std::string&)fileURL
+                   remoteServerURL:(NSURL *)remoteURL
+                      onCompletion:(RLMErrorReportingBlock)completion;
+
+- (void)_reportRefreshFailureForPath:(RLMServerPath)path error:(NSError *)error;
 
 @end

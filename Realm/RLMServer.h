@@ -16,16 +16,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager.h"
+#import <Foundation/Foundation.h>
 
-@class RLMSyncSession;
+#import "RLMServerUtil.h"
 
-@interface RLMSyncManager ()
 
-/**
- Given the local path of a Realm, retrieve (or create) a session object corresponding to that Realm. This object can be
- used to store session-specific data and perform certain operations only valid if logged in.
- */
-- (RLMSyncSession *)syncSessionForRealm:(NSString *)localIdentifier;
+// TODO (az-ros): we need the singleton dictionary of logged-in users.
+//   --> used for unbinding Realms on global error
+
+@interface RLMServer : NSObject
+
+NS_ASSUME_NONNULL_BEGIN
+
++ (void)setupWithAppID:(NSString *)appID
+              logLevel:(NSUInteger)logLevel
+          errorHandler:(nullable RLMErrorReportingBlock)errorHandler;
+
+NS_ASSUME_NONNULL_END
 
 @end

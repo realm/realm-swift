@@ -16,22 +16,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMRealm.h"
 
-#import "RLMSyncUtil.h"
+#import "RLMServerUtil.h"
 
-@class RLMSyncRenewalTokenModel;
+@class RLMUser;
 
-@interface RLMSyncSessionDataModel : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-@property (nonatomic, readonly) RLMSyncToken accessToken;
-@property (nonatomic, readonly) NSTimeInterval accessTokenExpiry;
-@property (nonatomic, readonly) RLMSyncIdentity identity;
+@interface RLMRealm (Server)
 
-@property (nonatomic, readonly) RLMSyncRenewalTokenModel *renewalTokenModel;
-
-//@property (nonatomic, readonly) NSArray *access;
-
-- (instancetype)initWithJSON:(NSDictionary *)json;
++ (void)fetchRealmAtPath:(RLMServerPath)objectServerPath
+                 forUser:(RLMUser *)user
+                readOnly:(BOOL)isReadOnly
+              completion:(RLMServerFetchedRealmCompletionBlock)completion;
 
 @end
+
+NS_ASSUME_NONNULL_END

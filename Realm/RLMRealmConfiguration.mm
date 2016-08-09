@@ -44,47 +44,13 @@ static NSString *const c_RLMRealmConfigurationProperties[] = {
 static NSString *const c_defaultRealmFileName = @"default.realm";
 RLMRealmConfiguration *s_defaultConfiguration;
 
-static NSString *defaultDirectoryForBundleIdentifier(NSString *bundleIdentifier) {
-#if TARGET_OS_TV
-    (void)bundleIdentifier;
-    // tvOS prohibits writing to the Documents directory, so we use the Library/Caches directory instead.
-    return NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0];
-#elif TARGET_OS_IPHONE
-    (void)bundleIdentifier;
-    // On iOS the Documents directory isn't user-visible, so put files there
-    return NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
-#else
-    // On OS X it is, so put files in Application Support. If we aren't running
-    // in a sandbox, put it in a subdirectory based on the bundle identifier
-    // to avoid accidentally sharing files between applications
-    NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
-    if (![[NSProcessInfo processInfo] environment][@"APP_SANDBOX_CONTAINER_ID"]) {
-        if (!bundleIdentifier) {
-            bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
-        }
-        if (!bundleIdentifier) {
-            bundleIdentifier = [NSBundle mainBundle].executablePath.lastPathComponent;
-        }
-
-        path = [path stringByAppendingPathComponent:bundleIdentifier];
-
-        // create directory
-        [[NSFileManager defaultManager] createDirectoryAtPath:path
-                                  withIntermediateDirectories:YES
-                                                   attributes:nil
-                                                        error:nil];
-    }
-    return path;
-#endif
-}
-
 NSString *RLMRealmPathForFileAndBundleIdentifier(NSString *fileName, NSString *bundleIdentifier) {
-    return [defaultDirectoryForBundleIdentifier(bundleIdentifier)
+    return [RLMDefaultDirectoryForBundleIdentifier(bundleIdentifier)
             stringByAppendingPathComponent:fileName];
 }
 
 NSString *RLMRealmPathForFile(NSString *fileName) {
-    static NSString *directory = defaultDirectoryForBundleIdentifier(nil);
+    static NSString *directory = RLMDefaultDirectoryForBundleIdentifier(nil);
     return [directory stringByAppendingPathComponent:fileName];
 }
 
@@ -280,40 +246,6 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 - (bool)disableFormatUpgrade
 {
     return _config.disable_format_upgrade;
-}
-
-#pragma mark - Synchronization
-
-- (NSURL *)syncServerURL {
-    if (!_config.sync_server_url) {
-        return nil;
-    }
-
-    return [NSURL URLWithString:@(_config.sync_server_url->c_str())];
-}
-
-- (void)setSyncServerURL:(NSURL *)syncServerURL {
-    if (!syncServerURL) {
-        _config.sync_server_url = realm::util::none;
-    } else {
-        _config.sync_server_url = std::string([[syncServerURL absoluteString] UTF8String]);
-    }
-}
-
-- (NSString *)syncUserToken {
-    if (!_config.sync_user_token) {
-        return nil;
-    }
-
-    return @(_config.sync_user_token->c_str());
-}
-
-- (void)setSyncUserToken:(NSString *)syncUserToken {
-    if (!syncUserToken) {
-        _config.sync_user_token = realm::util::none;
-    } else {
-        _config.sync_user_token = std::string(syncUserToken.UTF8String);
-    }
 }
 
 @end

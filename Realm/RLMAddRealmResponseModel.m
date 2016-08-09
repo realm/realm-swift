@@ -16,34 +16,25 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMAddRealmResponseModel.h"
 
-#import "RLMSyncUtil.h"
+@interface RLMAddRealmResponseModel ()
 
-@interface RLMSyncManager : NSObject
+@property (nonatomic, readwrite) RLMServerToken accessToken;
+@property (nonatomic, readwrite) NSTimeInterval accessTokenExpiry;
+@property (nonatomic, readwrite) NSString *fullPath;
 
-NS_ASSUME_NONNULL_BEGIN
+@end
 
-/**
- Whether or not the Realm Sync manager has been configured.
- */
-@property (nonatomic, readonly) BOOL configured;
+@implementation RLMAddRealmResponseModel
 
-/**
- The Realm Sync application ID for the current application.
- */
-@property (nullable, nonatomic, readonly) RLMSyncAppID appID;
-
-/**
- Configure the Realm Sync manager with application-wide configuration options. Call this method before calling any other
- Realm Sync APIs. Do not call this method if `configured` is `YES`.
- */
-- (void)configureWithAppID:(RLMSyncAppID)appID;
-
-- (instancetype)init NS_UNAVAILABLE;
-
-+ (instancetype)sharedManager;
-
-NS_ASSUME_NONNULL_END
+- (instancetype)initWithJSON:(NSDictionary *)json {
+    if (self = [super init]) {
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerTokenKey, accessToken);
+        RLMSERVER_PARSE_DOUBLE_OR_ABORT(json, kRLMServerExpiresKey, accessTokenExpiry);
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerPathKey, fullPath);
+    }
+    return self;
+}
 
 @end

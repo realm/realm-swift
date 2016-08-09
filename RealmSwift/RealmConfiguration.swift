@@ -86,6 +86,11 @@ extension Realm {
 
         // MARK: Configuration Properties
 
+        var serverErrorHandler: ErrorReportingBlock?
+        var serverBindCallback: ErrorReportingBlock?
+        var serverPath: String?
+        var serverUser: User?
+
         /// The local URL to the realm file.
         /// Mutually exclusive with `inMemoryIdentifier`.
         public var fileURL: URL? {
@@ -170,6 +175,8 @@ extension Realm {
             configuration.deleteRealmIfMigrationNeeded = self.deleteRealmIfMigrationNeeded
             configuration.customSchema = self.customSchema
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
+            configuration.set(errorHandler: serverErrorHandler)
+            configuration.set(objectServerPath: serverPath, for: serverUser, uponConnection: serverBindCallback)
             return configuration
         }
 
@@ -188,6 +195,7 @@ extension Realm {
             configuration.deleteRealmIfMigrationNeeded = rlmConfiguration.deleteRealmIfMigrationNeeded
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
+            // TODO (az-ros): retrieve the error handler and other miscellaneous data.
             return configuration
         }
     }
@@ -259,9 +267,8 @@ extension Realm {
             schemaVersion: UInt64 = 0,
             migrationBlock: MigrationBlock? = nil,
             deleteRealmIfMigrationNeeded: Bool = false,
-            objectTypes: [Object.Type]? = nil,
-            syncServerURL: NSURL? = nil,
-            syncUserToken: String? = nil) {
+            objectTypes: [Object.Type]? = nil
+            ) {
                 self.fileURL = fileURL
                 if inMemoryIdentifier != nil {
                     self.inMemoryIdentifier = inMemoryIdentifier
@@ -272,11 +279,13 @@ extension Realm {
                 self.migrationBlock = migrationBlock
                 self.deleteRealmIfMigrationNeeded = deleteRealmIfMigrationNeeded
                 self.objectTypes = objectTypes
-                self.syncServerURL = syncServerURL
-                self.syncUserToken = syncUserToken
         }
 
         // MARK: Configuration Properties
+        var serverErrorHandler: ErrorReportingBlock?
+        var serverBindCallback: ErrorReportingBlock?
+        var serverPath: String?
+        var serverUser: User?
 
         /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`.
         public var fileURL: NSURL? {
@@ -345,28 +354,6 @@ extension Realm {
             }
         }
 
-        // MARK: Synchronization
-
-        /**
-        The synchronization server URL.
-
-        The URL must be of the form `realm://realm.foo.com:7800/my_realm`, where
-        `my_realm` is the name of the Realm as known to the server.
-
-        When `nil`, synchronization is disabled. Defaults to `nil`.
-        */
-        public var syncServerURL: NSURL? = nil
-
-        /**
-        The user token used for synchronization.
-        It has the form "syncIdentity:syncSignature"
-        Where:
-            syncIdentity is a base64-encoded JSON document.
-            syncSignature is a base64-encoded cryptographic signature.
-                Must match the value of syncIdentity..
-        */
-        public var syncUserToken: String? = nil;
-
         /// A custom schema to use for the Realm.
         private var customSchema: RLMSchema? = nil
 
@@ -391,8 +378,8 @@ extension Realm {
             configuration.deleteRealmIfMigrationNeeded = self.deleteRealmIfMigrationNeeded
             configuration.customSchema = self.customSchema
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
-            configuration.syncServerURL = self.syncServerURL
-            configuration.syncUserToken = self.syncUserToken
+            configuration.setErrorHandler(serverErrorHandler)
+            configuration.setObjectServerPath(serverPath, forUser: serverUser, callback: serverBindCallback)
             return configuration
         }
 
@@ -411,8 +398,7 @@ extension Realm {
             configuration.deleteRealmIfMigrationNeeded = rlmConfiguration.deleteRealmIfMigrationNeeded
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
-            configuration.syncServerURL = rlmConfiguration.syncServerURL
-            configuration.syncUserToken = rlmConfiguration.syncUserToken
+            // TODO (az-ros): retrieve the error handler and other data
             return configuration
         }
     }

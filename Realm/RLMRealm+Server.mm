@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,25 +16,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncSession.h"
+#import "RLMRealm+Server.h"
 
-@class RLMSyncSessionDataModel;
+#import "RLMRealm_Private.hpp"
+#import "RLMRealmConfiguration.h"
+#import "RLMServerNetworkClient.h"
+#import "RLMServerUtil_Private.h"
+#import "RLMCredential.h"
+#import "RLMUser.h"
 
-@interface RLMSyncSession ()
+@implementation RLMRealm (Server)
 
-@property (nonatomic, readwrite) NSString *localIdentifier;
-
-/**
- Given a newly-created session object, configure all fields which are not expected to change between requests (except
- for `path`, which is configured by the sync manager when it retrieves the object from its dictionary. Also sets the
- validity flag to YES.
-
- This method should only be called once.
- */
-- (void)configureWithAuthServerURL:(NSURL *)authServer
-                        remotePath:(RLMSyncRealmPath)path
-                  sessionDataModel:(RLMSyncSessionDataModel *)model;
-
-- (instancetype)initPrivate NS_DESIGNATED_INITIALIZER;
++ (void)fetchRealmAtPath:(RLMServerPath)objectServerPath
+                 forUser:(RLMUser *)user
+                readOnly:(BOOL)isReadOnly
+              completion:(RLMServerFetchedRealmCompletionBlock)completion {
+    NSAssert(NO, @"This method isn't implemented yet. Come back later!");
+}
 
 @end

@@ -16,15 +16,23 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMRefreshResponseModel.h"
 
-#import "RLMSyncPrivateUtil.h"
+@interface RLMRefreshResponseModel ()
 
-@interface RLMSyncRenewalTokenModel : NSObject
+@property (nonatomic, readwrite) RLMServerToken accessToken;
+@property (nonatomic, readwrite) NSTimeInterval accessTokenExpiry;
 
-@property (nonatomic, readonly) RLMSyncToken renewalToken;
-@property (nonatomic, readonly) NSTimeInterval tokenExpiry;
+@end
 
-- (instancetype)initWithJSON:(NSDictionary *)json;
+@implementation RLMRefreshResponseModel
+
+- (instancetype)initWithJSON:(NSDictionary *)json {
+    if (self = [super init]) {
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerTokenKey, accessToken);
+        RLMSERVER_PARSE_DOUBLE_OR_ABORT(json, kRLMServerExpiresKey, accessTokenExpiry);
+    }
+    return self;
+}
 
 @end

@@ -16,27 +16,31 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncRefreshDataModel.h"
+#import <Foundation/Foundation.h>
 
-#import "RLMSyncRenewalTokenModel.h"
+#import "RLMServerUtil.h"
 
-@interface RLMSyncRefreshDataModel ()
+/**
+ An internal class representing a valid JSON response to a login request.
+ */
+@class RLMRenewalTokenModel;
 
-@property (nonatomic, readwrite) RLMSyncToken accessToken;
-@property (nonatomic, readwrite) NSTimeInterval accessTokenExpiry;
-@property (nonatomic, readwrite) RLMSyncRenewalTokenModel *renewalTokenModel;
+@interface RLMLoginResponseModel : NSObject
+
+@property (nonatomic, readonly) RLMIdentity identity;
+@property (nonatomic, readonly) RLMRenewalTokenModel *renewalTokenModel;
+
+//@property (nonatomic, readonly) NSArray *access;
+
+- (instancetype)initWithJSON:(NSDictionary *)json;
 
 @end
 
-@implementation RLMSyncRefreshDataModel
+@interface RLMRenewalTokenModel : NSObject
 
-- (instancetype)initWithJSON:(NSDictionary *)json {
-    if (self = [super init]) {
-        RLMSYNC_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, accessToken);
-        RLMSYNC_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, accessTokenExpiry);
-        RLMSYNC_PARSE_MODEL_OR_ABORT(json, kRLMSyncRefreshKey, RLMSyncRenewalTokenModel, renewalTokenModel);
-    }
-    return self;
-}
+@property (nonatomic, readonly) RLMServerToken renewalToken;
+@property (nonatomic, readonly) NSTimeInterval tokenExpiry;
+
+- (instancetype)initWithJSON:(NSDictionary *)json;
 
 @end
