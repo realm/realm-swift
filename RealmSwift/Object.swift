@@ -252,7 +252,7 @@ public class Object: RLMObjectBase {
 public final class DynamicObject: Object {
     public override subscript(key: String) -> AnyObject? {
         get {
-            let value = RLMDynamicGetByName(self, key)
+            let value = RLMDynamicGetByName(self, key, false)
             if let array = value as? RLMArray {
                 return List<DynamicObject>(rlmArray: array)
             }
