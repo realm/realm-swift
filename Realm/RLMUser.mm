@@ -32,7 +32,6 @@
 
 @property (nonnull, nonatomic, readwrite) NSMutableDictionary<RLMServerPath, RLMSessionInfo *> *realms;
 
-@property (nonatomic, readwrite) BOOL isAnonymous;
 @property (nonatomic, readwrite) BOOL isLoggedIn;
 
 @property (nonatomic, readwrite) RLMLocalIdentity localIdentity;
@@ -43,22 +42,8 @@
 
 @synthesize isLoggedIn = _isLoggedIn;
 
-+ (instancetype)anonymousUser; {
-    static NSString *const s_anonymousUserID = @".realm-object-server-anonymous-user";
-    static RLMUser *s_user;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        s_user = [[RLMUser alloc] initWithLocalIdentity:s_anonymousUserID];
-        s_user.isAnonymous = YES;
-    });
-    return s_user;
-}
-
 - (void)loginWithCredential:(RLMCredential *)credential
                  completion:(RLMErrorReportingBlock)completion {
-    if (self.isAnonymous) {
-        @throw RLMException(@"An anonymous user cannot log in. Add a credential first.");
-    }
     if (self.isLoggedIn) {
         @throw RLMException(@"The user is already logged in. Cannot log in again without logging out first.");
     }
@@ -159,8 +144,6 @@
                            };
 
     RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *) {
-        // TODO: if user is anonymous, promote to normal user.
-        // TODO: if anonymous user was promoted, bind any Realms that were associated.
         if (completion) {
             completion(error);
         }
@@ -196,7 +179,6 @@
 - (instancetype)initWithLocalIdentity:(nullable RLMLocalIdentity)identity {
     if (self = [super init]) {
         self.localIdentity = identity ?: [[NSUUID UUID] UUIDString];
-        self.isAnonymous = NO;
         self.isLoggedIn = NO;
         self.refreshTokenExpiry = 0;
         self.realms = [NSMutableDictionary dictionary];
@@ -287,11 +269,6 @@
 - (void)_registerRealmForBindingWithFileURL:(const std::string&)fileURL
                             remoteServerURL:(NSURL *)remoteURL
                                onCompletion:(RLMErrorReportingBlock)completion {
-    if (self.isAnonymous /* && 'user has not yet added a credential' */) {
-        // Anonymous accounts' Realms are not bound until they are converted to real accounts.
-        return;
-    }
-
     NSURL *objcFileURL = [NSURL fileURLWithPath:@(fileURL.c_str())];
     NSString *objcRemotePath = [remoteURL path];
 

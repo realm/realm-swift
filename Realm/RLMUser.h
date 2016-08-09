@@ -33,16 +33,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSDictionary<RLMServerPath, RLMSessionInfo *> *realms;
-@property (nonatomic, readonly) BOOL isAnonymous;
 
 @property (nonatomic, readonly) BOOL isLoggedIn;
 
 @property (nonatomic, readonly) RLMLocalIdentity localIdentity;
-
-/**
- Return the anonymous singleton user.
- */
-+ (instancetype)anonymousUser;
 
 - (instancetype)initWithLocalIdentity:(nullable RLMLocalIdentity)identity NS_DESIGNATED_INITIALIZER;
 

@@ -47,8 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param path The path on the Realm Object Server to the remote Realm. This can be an unresolved path (e.g.
              `/~/path/to/realm`), or a resolved path (e.g. `/someuser/path/to/realm`). Do not try to resolve a path
              yourself. Set this to `nil` if the Realm should not be synced.
- @param user A `RLMUser` instance. This user must be the anonymous user, or it must be a properly configured user that
-             has already successfully logged in.
+ @param user A `RLMUser` instance. This must be a properly configured user that has already successfully logged in.
  @param callback An optional block that will be invoked once the Realm has successfully connected to the Realm Object
                  Server. It is passed in an `NSError` argument that is `nil` if the connection was successful.
  */
