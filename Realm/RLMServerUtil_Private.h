@@ -22,6 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class NSURL;
 
+/// An enum value that allows a Realm to be directly opened with a token.
+static RLMIdentityProvider const RLMIdentityProviderDirectToken = @"direct_token";
+
 static NSString *const kRLMServerProviderKey      = @"provider";
 static NSString *const kRLMServerDataKey          = @"data";
 static NSString *const kRLMServerAppIDKey         = @"app_id";

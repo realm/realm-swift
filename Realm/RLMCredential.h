@@ -52,6 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)credentialWithFacebookToken:(NSString *)facebookToken;
 
++ (instancetype)credentialWithAccessToken:(RLMServerToken)token serverURL:(nullable NSURL *)serverURL;
+
 // Miscellaneous
 
 - (instancetype)init NS_UNAVAILABLE;

@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) BOOL isLoggedIn;
 
+@property (nonatomic, readonly) RLMIdentity identity;
 @property (nonatomic, readonly) RLMLocalIdentity localIdentity;
 
 - (instancetype)initWithLocalIdentity:(nullable RLMLocalIdentity)identity NS_DESIGNATED_INITIALIZER;
@@ -55,6 +56,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)removeCredential:(RLMCredential *)credential
               completion:(nullable RLMErrorReportingBlock)completion;
+
+
+#pragma mark - Bootstrap API
+
+@property (nullable, nonatomic, readonly) RLMServerToken refreshToken;
+@property (nonatomic, readonly) NSTimeInterval refreshTokenExpiry;
+
+- (void)loginWithRefreshToken:(RLMServerToken)refreshToken
+                       expiry:(NSTimeInterval)expiry
+                     identity:(RLMIdentity)identity;
 
 NS_ASSUME_NONNULL_END
 
