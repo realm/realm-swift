@@ -59,17 +59,12 @@ typedef void(^RLMInternalLoginBlock)(const std::string&);
 }
 
 +(NSURL *)filePathForObjectServerURL:(NSURL *)serverURL user:(RLMUser *)user {
-    NSString *userID = user.identity;
-    if (!userID) {
-        @throw RLMException(@"Realm cannot open local disk files for users configured without a user ID.");
-        return nil;
-    }
-
+    NSString *localID = user.localIdentity;
     NSCharacterSet *alpha = [NSCharacterSet alphanumericCharacterSet];
     NSString *escapedPath = [[serverURL path] stringByAddingPercentEncodingWithAllowedCharacters:alpha];
-    NSString *escapedUserID = [userID stringByAddingPercentEncodingWithAllowedCharacters:alpha];
+    NSString *escapedLocalID = [localID stringByAddingPercentEncodingWithAllowedCharacters:alpha];
     NSString *escapedHost = [[serverURL host] stringByAddingPercentEncodingWithAllowedCharacters:alpha];
-    NSString *realmFileName = [NSString stringWithFormat:@"%@-%@-%@.realm", escapedHost, escapedPath, escapedUserID];
+    NSString *realmFileName = [NSString stringWithFormat:@"%@-%@-%@.realm", escapedHost, escapedPath, escapedLocalID];
     return [[self baseDirectory] URLByAppendingPathComponent:realmFileName];
 }
 
@@ -99,7 +94,6 @@ typedef void(^RLMInternalLoginBlock)(const std::string&);
                    callback:(nullable RLMErrorReportingBlock)callback {
     if (!path) {
         // Clear the object server state. User must explicitly set a file URL or in-memory identifier.
-        self.config.sync_user_id = realm::util::none;
         self.config.sync_login_function = nullptr;
         self.fileURL = nil;
         self.inMemoryIdentifier = nil;
@@ -108,14 +102,10 @@ typedef void(^RLMInternalLoginBlock)(const std::string&);
     if (!user) {
         @throw RLMException(@"If an Realm Object Server path is being set on a configuration, a valid user must also be specified.");
     }
-    if (!user.isLoggedIn) {
-        @throw RLMException(@"A configuration may only be configured with a logged-in user.");
-    }
     // Set the Realm Object Server URL and associated state
     NSURL *objectServerURL = [NSURL URLWithString:path relativeToURL:user.objectServerURL];
-    self.config.sync_user_id = std::string([user.identity UTF8String]);
     self.config.sync_login_function = [user, objectServerURL, callback](const std::string& fileURL) {
-        [user _bindRealmWithLocalFileURL:fileURL remoteServerURL:objectServerURL onCompletion:callback];
+        [user _registerRealmForBindingWithFileURL:fileURL remoteServerURL:objectServerURL onCompletion:callback];
     };
 
     // Set the file URL

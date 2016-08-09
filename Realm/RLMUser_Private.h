@@ -30,9 +30,9 @@
 @property (nonatomic) RLMServerToken refreshToken;
 @property (nonatomic) NSTimeInterval refreshTokenExpiry;
 
-- (void)_bindRealmWithLocalFileURL:(const std::string&)fileURL
-                   remoteServerURL:(NSURL *)remoteURL
-                      onCompletion:(RLMErrorReportingBlock)completion;
+- (void)_registerRealmForBindingWithFileURL:(const std::string&)fileURL
+                            remoteServerURL:(NSURL *)remoteURL
+                               onCompletion:(RLMErrorReportingBlock)completion;
 
 - (void)_reportRefreshFailureForPath:(RLMServerPath)path error:(NSError *)error;
 

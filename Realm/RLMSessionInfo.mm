@@ -31,6 +31,8 @@
     if (self = [super init]) {
         self.fileURL = fileURL;
         self.path = path;
+        self.deferredBindingPackage = nil;
+        self.isBound = NO;
         return self;
     }
     return nil;
@@ -109,6 +111,29 @@
                                            server:user.authURL
                                              JSON:json
                                        completion:handler];
+}
+
+- (void)setIsBound:(BOOL)isBound {
+    _isBound = isBound;
+    if (isBound) {
+        self.deferredBindingPackage = nil;
+    }
+}
+
+@end
+
+@implementation RLMRealmBindingPackage
+
+- (instancetype)initWithFileURL:(NSURL *)fileURL
+                     remotePath:(NSString *)remotePath
+                          block:(RLMErrorReportingBlock)block {
+    if (self = [super init]) {
+        self.fileURL = fileURL;
+        self.remotePath = remotePath;
+        self.block = block;
+        return self;
+    }
+    return nil;
 }
 
 @end

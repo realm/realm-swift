@@ -24,6 +24,7 @@ typedef void(^RLMErrorReportingBlock)(NSError * _Nullable);
 @class RLMRealmConfiguration;
 
 typedef NSString* RLMIdentity;
+typedef NSString* RLMLocalIdentity;
 typedef NSString* RLMServerToken;
 typedef NSString* RLMCredentialToken;
 typedef NSString* RLMServerPath;
