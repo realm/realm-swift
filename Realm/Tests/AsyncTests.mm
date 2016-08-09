@@ -23,6 +23,8 @@
 
 #import "impl/realm_coordinator.hpp"
 
+#import <realm/string_data.hpp>
+
 #import <sys/resource.h>
 
 // A whole bunch of blocks don't use their RLMResults parameter

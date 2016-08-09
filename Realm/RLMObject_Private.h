@@ -16,15 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMObject.h>
+#import <Realm/RLMObjectBase_Dynamic.h>
 
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
-  @public
+@public
     RLMRealm *_realm;
-    // objectSchema is a cached pointer to an object stored in the RLMSchema
-    // owned by _realm, so it's guaranteed to stay alive as long as this object
-    // without retaining it (and retaining it makes iteration slower)
     __unsafe_unretained RLMObjectSchema *_objectSchema;
 }
 
@@ -33,7 +30,7 @@
 
 // live accessor initializer
 - (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
-                       schema:(__unsafe_unretained RLMObjectSchema *const)schema NS_DESIGNATED_INITIALIZER;
+                       schema:(RLMObjectSchema *)schema NS_DESIGNATED_INITIALIZER;
 
 // shared schema for this class
 + (RLMObjectSchema *)sharedSchema;
@@ -50,7 +47,7 @@
 
 // live accessor initializer
 - (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
-                       schema:(__unsafe_unretained RLMObjectSchema *const)schema NS_DESIGNATED_INITIALIZER;
+                       schema:(RLMObjectSchema *)schema NS_DESIGNATED_INITIALIZER;
 
 @end
 
@@ -69,16 +66,6 @@
 @property (nonatomic, readonly) RLMObjectBase *object;
 
 @end
-
-//
-// Getters for RLMObjectBase ivars for realm and objectSchema
-//
-FOUNDATION_EXTERN RLMRealm *RLMObjectBaseRealm(RLMObjectBase *object);
-FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *object);
-
-// Dynamic access to RLMObjectBase properties
-FOUNDATION_EXTERN id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key);
-FOUNDATION_EXTERN void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *object, NSString *key, id obj);
 
 // Calls valueForKey: and re-raises NSUndefinedKeyExceptions
 FOUNDATION_EXTERN id RLMValidatedValueForProperty(id object, NSString *key, NSString *className);
@@ -100,10 +87,6 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 
 + (NSArray<NSString *> *)getGenericListPropertyNames:(id)obj;
 + (NSDictionary<NSString *, NSString *> *)getLinkingObjectsProperties:(id)object;
-
-+ (void)initializeListProperty:(RLMObjectBase *)object property:(RLMProperty *)property array:(RLMArray *)array;
-+ (void)initializeOptionalProperty:(RLMObjectBase *)object property:(RLMProperty *)property;
-+ (void)initializeLinkingObjectsProperty:(RLMObjectBase *)object property:(RLMProperty *)property;
 
 + (NSDictionary<NSString *, NSNumber *> *)getOptionalProperties:(id)obj;
 + (NSArray<NSString *> *)requiredPropertiesForClass:(Class)cls;

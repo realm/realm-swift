@@ -58,7 +58,6 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType);
                                  linkOriginPropertyName:(NSString *)linkOriginPropertyName;
 
 // private setters
-@property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, readwrite) NSString *name;
 @property (nonatomic, readwrite, assign) RLMPropertyType type;
 @property (nonatomic, readwrite) BOOL indexed;
@@ -66,6 +65,7 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType);
 @property (nonatomic, copy) NSString *objectClassName;
 
 // private properties
+@property (nonatomic, assign) NSUInteger index;
 @property (nonatomic, assign) char objcType;
 @property (nonatomic, copy) NSString *objcRawType;
 @property (nonatomic, assign) BOOL isPrimary;

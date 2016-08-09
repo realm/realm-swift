@@ -18,8 +18,9 @@
 
 #import "RLMRealmUtil.hpp"
 
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMObservation.hpp"
-#import "RLMRealm_Private.h"
+#import "RLMRealm_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import <Realm/RLMConstants.h>
@@ -96,9 +97,11 @@ public:
 
     std::vector<ObserverState> get_observed_rows() override {
         @autoreleasepool {
-            auto realm = _realm;
-            [realm detachAllEnumerators];
-            return RLMGetObservedRows(realm.schema.objectSchema);
+            if (auto realm = _realm) {
+                [realm detachAllEnumerators];
+                return RLMGetObservedRows(realm->_info);
+            }
+            return {};
         }
     }
 
