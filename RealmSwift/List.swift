@@ -74,6 +74,10 @@ public final class List<T: Object>: ListBase {
         super.init(array: RLMArray(objectClassName: (T.self as Object.Type).className()))
     }
 
+    internal init(rlmArray: RLMArray<RLMObject>) {
+        super.init(array: rlmArray)
+    }
+
     // MARK: Index Retrieval
 
     /**
@@ -624,6 +628,10 @@ public final class List<T: Object>: ListBase {
     /// Creates a `List` that holds Realm model objects of type `T`.
     public override init() {
         super.init(array: RLMArray(objectClassName: (T.self as Object.Type).className()))
+    }
+
+    internal init(rlmArray: RLMArray) {
+        super.init(array: rlmArray)
     }
 
     // MARK: Index Retrieval

@@ -27,10 +27,10 @@
 
 @implementation RLMRealm (Server)
 
-+ (void)fetchRealmAtPath:(RLMServerPath)objectServerPath
-                 forUser:(RLMUser *)user
-                readOnly:(BOOL)isReadOnly
-              completion:(RLMServerFetchedRealmCompletionBlock)completion {
++ (void)fetchRealmAtPath:(__unused RLMServerPath)objectServerPath
+                 forUser:(__unused RLMUser *)user
+                readOnly:(__unused BOOL)isReadOnly
+              completion:(__unused RLMServerFetchedRealmCompletionBlock)completion {
     NSAssert(NO, @"This method isn't implemented yet. Come back later!");
 }
 

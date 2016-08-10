@@ -28,14 +28,8 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
     internal let propertyName: String
 
     private var cachedRLMResults: RLMResults<RLMObject>?
-    private var object: RLMWeakObjectHandle?
-    private var property: RLMProperty?
-
-    internal func attachTo(object: RLMObjectBase, property: RLMProperty) {
-        self.object = RLMWeakObjectHandle(object: object)
-        self.property = property
-        self.cachedRLMResults = nil
-    }
+    @objc private var object: RLMWeakObjectHandle?
+    @objc private var property: RLMProperty?
 
     internal var rlmResults: RLMResults<RLMObject> {
         if cachedRLMResults == nil {
@@ -476,14 +470,8 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
     internal let propertyName: String
 
     private var cachedRLMResults: RLMResults?
-    private var object: RLMWeakObjectHandle?
-    private var property: RLMProperty?
-
-    internal func attachTo(object object: RLMObjectBase, property: RLMProperty) {
-        self.object = RLMWeakObjectHandle(object: object)
-        self.property = property
-        self.cachedRLMResults = nil
-    }
+    @objc private var object: RLMWeakObjectHandle?
+    @objc private var property: RLMProperty?
 
     internal var rlmResults: RLMResults {
         if cachedRLMResults == nil {

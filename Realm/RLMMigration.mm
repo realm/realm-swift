@@ -19,7 +19,7 @@
 #import "RLMMigration_Private.h"
 
 #import "RLMAccessor.h"
-#import "RLMObject.h"
+#import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMProperty_Private.h"
@@ -27,10 +27,13 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMResults_Private.h"
 #import "RLMSchema_Private.hpp"
+#import "RLMUtil.hpp"
 
 #import "object_store.hpp"
 #import "shared_realm.hpp"
 #import "schema.hpp"
+
+#import <realm/table.hpp>
 
 using namespace realm;
 
@@ -103,14 +106,16 @@ using namespace realm;
 
 - (void)execute:(RLMMigrationBlock)block {
     @autoreleasepool {
-        // disable all primary keys for migration
+        // disable all primary keys for migration and use DynamicObject for all types
         for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
+            objectSchema.accessorClass = RLMDynamicObject.class;
             objectSchema.primaryKeyProperty.isPrimary = NO;
         }
+        for (RLMObjectSchema *objectSchema in _oldRealm.schema.objectSchema) {
+            objectSchema.accessorClass = RLMDynamicObject.class;
+        }
 
-        // apply block and set new schema version
-        uint64_t oldVersion = _oldRealm->_realm->schema_version();
-        block(self, oldVersion);
+        block(self, _oldRealm->_realm->schema_version());
 
         _oldRealm = nil;
         _realm = nil;
@@ -150,17 +155,8 @@ using namespace realm;
 }
 
 - (void)renamePropertyForClass:(NSString *)className oldName:(NSString *)oldName newName:(NSString *)newName {
-    realm::ObjectStore::rename_property(_realm.group, *_schema, className.UTF8String, oldName.UTF8String, newName.UTF8String);
-    ObjectSchema objectStoreSchema(_realm.group, className.UTF8String);
-    RLMObjectSchema *objectSchema = [RLMObjectSchema objectSchemaForObjectStoreSchema:objectStoreSchema];
-    NSMutableArray *mutableObjectSchemas = [NSMutableArray arrayWithArray:_realm.schema.objectSchema];
-    [mutableObjectSchemas replaceObjectAtIndex:[mutableObjectSchemas indexOfObject:_realm.schema[className]]
-                                    withObject:objectSchema];
-    objectSchema.realm = _realm;
-    _realm.schema.objectSchema = [mutableObjectSchemas copy];
-    for (RLMProperty *property in objectSchema.properties) {
-        property.column = objectStoreSchema.property_for_name(property.name.UTF8String)->table_column;
-    }
+    const char *objectType = className.UTF8String;
+    realm::ObjectStore::rename_property(_realm.group, *_schema, objectType, oldName.UTF8String, newName.UTF8String);
 }
 
 @end

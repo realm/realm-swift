@@ -53,6 +53,11 @@ static enum class SharedSchemaState {
     Initialized
 } s_sharedSchemaState = SharedSchemaState::Uninitialized;
 
+@implementation RLMSchema {
+    NSArray *_objectSchema;
+    realm::Schema _objectStoreSchema;
+}
+
 // Caller must @synchronize on s_localNameToClass
 static RLMObjectSchema *RLMRegisterClass(Class cls) {
     if (RLMObjectSchema *schema = s_privateObjectSubclasses[[cls className]]) {
@@ -71,7 +76,7 @@ static RLMObjectSchema *RLMRegisterClass(Class cls) {
     RLMReplaceSharedSchemaMethod(cls, schema);
 
     s_privateObjectSubclasses[schema.className] = schema;
-    if ([cls shouldIncludeInDefaultSchema]) {
+    if ([cls shouldIncludeInDefaultSchema] && prevState != SharedSchemaState::Initialized) {
         s_sharedSchema.objectSchemaByName[schema.className] = schema;
     }
 
@@ -109,10 +114,6 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
         s_localNameToClass[className] = cls;
         RLMReplaceClassNameMethod(cls, className);
     }
-}
-
-@implementation RLMSchema {
-    NSArray *_objectSchema;
 }
 
 - (instancetype)init {
@@ -291,15 +292,6 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
     return schema;
 }
 
-- (instancetype)shallowCopy {
-    RLMSchema *schema = [[RLMSchema alloc] init];
-    schema->_objectSchemaByName = [[NSMutableDictionary alloc] initWithCapacity:_objectSchemaByName.count];
-    [_objectSchemaByName enumerateKeysAndObjectsUsingBlock:^(NSString *name, RLMObjectSchema *objectSchema, BOOL *) {
-        schema->_objectSchemaByName[name] = [objectSchema shallowCopy];
-    }];
-    return schema;
-}
-
 - (BOOL)isEqualToSchema:(RLMSchema *)schema {
     if (_objectSchemaByName.count != schema->_objectSchemaByName.count) {
         return NO;
@@ -325,12 +317,15 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 }
 
 - (Schema)objectStoreCopy {
-    std::vector<realm::ObjectSchema> schema;
-    schema.reserve(_objectSchemaByName.count);
-    [_objectSchemaByName enumerateKeysAndObjectsUsingBlock:[&](NSString *, RLMObjectSchema *objectSchema, BOOL *) {
-        schema.push_back(objectSchema.objectStoreCopy);
-    }];
-    return schema;
+    if (_objectStoreSchema.size() == 0) {
+        std::vector<realm::ObjectSchema> schema;
+        schema.reserve(_objectSchemaByName.count);
+        [_objectSchemaByName enumerateKeysAndObjectsUsingBlock:[&](NSString *, RLMObjectSchema *objectSchema, BOOL *) {
+            schema.push_back(objectSchema.objectStoreCopy);
+        }];
+        _objectStoreSchema = std::move(schema);
+    }
+    return _objectStoreSchema;
 }
 
 @end

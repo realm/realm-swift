@@ -32,11 +32,7 @@
 @implementation RLMServer
 
 + (instancetype)sharedManager {
-    static RLMServer *s_sharedManager;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        s_sharedManager = [[RLMServer alloc] initPrivate];
-    });
+    static RLMServer *s_sharedManager = [[RLMServer alloc] initPrivate];
     return s_sharedManager;
 }
 

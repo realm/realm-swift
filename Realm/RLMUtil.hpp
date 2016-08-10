@@ -159,11 +159,11 @@ static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSDat
 // Date convertion utilities
 // These use the reference date and shift the seconds rather than just getting
 // the time interval since the epoch directly to avoid losing sub-second precision
-static inline NSDate *RLMTimestampToNSDate(realm::Timestamp ts) {
+static inline NSDate *RLMTimestampToNSDate(realm::Timestamp ts) NS_RETURNS_RETAINED {
     if (ts.is_null())
         return nil;
     auto timeInterval = ts.get_seconds() - NSTimeIntervalSince1970 + ts.get_nanoseconds() / 1'000'000'000.0;
-    return [NSDate dateWithTimeIntervalSinceReferenceDate:timeInterval];
+    return [[NSDate alloc] initWithTimeIntervalSinceReferenceDate:timeInterval];
 }
 
 static inline realm::Timestamp RLMTimestampForNSDate(__unsafe_unretained NSDate *const date) {

@@ -35,7 +35,7 @@ typedef void(^RLMInternalLoginBlock)(const std::string&);
  The directory will be created if it does not already exist, and then verified. If there was an error setting it up an
  exception will be thrown.
  */
-+(NSURL *)baseDirectory {
++ (NSURL *)baseDirectory {
     static NSURL *s_baseDirectory;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -58,7 +58,7 @@ typedef void(^RLMInternalLoginBlock)(const std::string&);
     return s_baseDirectory;
 }
 
-+(NSURL *)filePathForObjectServerURL:(NSURL *)serverURL user:(RLMUser *)user {
++ (NSURL *)filePathForObjectServerURL:(NSURL *)serverURL user:(RLMUser *)user {
     NSString *localID = user.localIdentity;
     NSCharacterSet *alpha = [NSCharacterSet alphanumericCharacterSet];
     NSString *escapedPath = [[serverURL path] stringByAddingPercentEncodingWithAllowedCharacters:alpha];
@@ -97,6 +97,7 @@ typedef void(^RLMInternalLoginBlock)(const std::string&);
         self.config.sync_login_function = nullptr;
         self.fileURL = nil;
         self.inMemoryIdentifier = nil;
+        self.config.schema_mode = realm::SchemaMode::Automatic;
         return;
     }
     if (!user) {
@@ -112,6 +113,7 @@ typedef void(^RLMInternalLoginBlock)(const std::string&);
     NSURL *fileURL = [RLMRealmConfiguration filePathForObjectServerURL:objectServerURL user:user];
     self.config.path = [[fileURL path] UTF8String];
     self.config.in_memory = false;
+    self.config.schema_mode = realm::SchemaMode::Additive;
 }
 
 @end
