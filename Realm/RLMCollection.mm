@@ -21,7 +21,7 @@
 #import "RLMArray_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
-#import "RLMObject_Private.h"
+#import "RLMObject_Private.hpp"
 
 #import "collection_notifications.hpp"
 #import "list.hpp"
@@ -39,7 +39,7 @@ static const int RLMEnumerationBufferSize = 16;
     id _strongBuffer[RLMEnumerationBufferSize];
 
     RLMRealm *_realm;
-    RLMObjectSchema *_objectSchema;
+    RLMClassInfo *_info;
 
     // Collection being enumerated. Only one of these two will be valid: when
     // possible we enumerate the collection directly, but when in a write
@@ -49,11 +49,11 @@ static const int RLMEnumerationBufferSize = 16;
     realm::TableView _tableView;
 }
 
-- (instancetype)initWithCollection:(id<RLMFastEnumerable>)collection objectSchema:(RLMObjectSchema *)objectSchema {
+- (instancetype)initWithCollection:(id<RLMFastEnumerable>)collection objectSchema:(RLMClassInfo&)info {
     self = [super init];
     if (self) {
         _realm = collection.realm;
-        _objectSchema = objectSchema;
+        _info = &info;
 
         if (_realm.inWriteTransaction) {
             _tableView = [collection tableView];
@@ -92,14 +92,14 @@ static const int RLMEnumerationBufferSize = 16;
 
     NSUInteger batchCount = 0, count = state->extra[1];
 
-    Class accessorClass = _objectSchema.accessorClass;
+    Class accessorClass = _info->rlmObjectSchema.accessorClass;
     for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
-        RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:_objectSchema];
+        RLMObject *accessor = RLMCreateManagedAccessor(accessorClass, _realm, _info);
         if (_collection) {
-            accessor->_row = (*_objectSchema.table)[[_collection indexInSource:index]];
+            accessor->_row = (*_info->table())[[_collection indexInSource:index]];
         }
         else if (_tableView.is_row_attached(index)) {
-            accessor->_row = (*_objectSchema.table)[_tableView.get_source_ndx(index)];
+            accessor->_row = (*_info->table())[_tableView.get_source_ndx(index)];
         }
         RLMInitializeSwiftAccessorGenerics(accessor);
         _strongBuffer[batchCount] = accessor;
@@ -138,19 +138,19 @@ NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *ke
     }
 
     RLMRealm *realm = collection.realm;
-    RLMObjectSchema *objectSchema = collection.objectSchema;
+    RLMClassInfo *info = collection.objectInfo;
 
     NSMutableArray *results = [NSMutableArray arrayWithCapacity:count];
     if ([key isEqualToString:@"self"]) {
         for (size_t i = 0; i < count; i++) {
             size_t rowIndex = [collection indexInSource:i];
-            [results addObject:RLMCreateObjectAccessor(realm, objectSchema, rowIndex) ?: NSNull.null];
+            [results addObject:RLMCreateObjectAccessor(realm, *info, rowIndex) ?: NSNull.null];
         }
         return results;
     }
 
-    RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-    realm::Table *table = objectSchema.table;
+    RLMObject *accessor = RLMCreateManagedAccessor(info->rlmObjectSchema.accessorClass, realm, info);
+    realm::Table *table = info->table();
     for (size_t i = 0; i < count; i++) {
         size_t rowIndex = [collection indexInSource:i];
         accessor->_row = (*table)[rowIndex];
@@ -168,8 +168,8 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
     }
 
     RLMRealm *realm = collection.realm;
-    RLMObjectSchema *objectSchema = collection.objectSchema;
-    RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
+    RLMClassInfo *info = collection.objectInfo;
+    RLMObject *accessor = RLMCreateManagedAccessor(info->rlmObjectSchema.accessorClass, realm, info);
     for (size_t i = 0; i < tv.size(); i++) {
         accessor->_row = tv[i];
         RLMInitializeSwiftAccessorGenerics(accessor);

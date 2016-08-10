@@ -104,8 +104,6 @@
 
     obj[@"int16"] = @(v16);
     XCTAssertEqual([obj[@"int16"] shortValue], v16);
-    obj[@"int16"] = @(v32);
-    XCTAssertNotEqual([obj[@"int16"] intValue], v32, @"should truncate");
 
     obj.int16 = 0;
     obj.int16 = v16;
@@ -113,8 +111,6 @@
 
     obj[@"int32"] = @(v32);
     XCTAssertEqual([obj[@"int32"] intValue], v32);
-    obj[@"int32"] = @(v64);
-    XCTAssertNotEqual([obj[@"int32"] longLongValue], v64, @"should truncate");
 
     obj.int32 = 0;
     obj.int32 = v32;

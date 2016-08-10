@@ -20,11 +20,14 @@
 
 #import "binding_context.hpp"
 
-
-#import <realm/link_view.hpp> // required by row.hpp
 #import <realm/row.hpp>
+#import <realm/table.hpp>
 
-@class RLMObjectSchema, RLMObjectBase, RLMRealm, RLMSchema, RLMProperty;
+#import <unordered_map>
+
+@class RLMObjectBase, RLMRealm, RLMSchema, RLMProperty, RLMObjectSchema;
+class RLMClassInfo;
+class RLMSchemaInfo;
 
 namespace realm {
     class History;
@@ -36,7 +39,7 @@ namespace realm {
 // RLMObservationInfo instances, so it could be folded into RLMObjectBase, and
 // is a separate class mostly to avoid making all accessor objects far larger.
 //
-// RLMObjectSchema stores a vector of pointers to the first observation info
+// RLMClassInfo stores a vector of pointers to the first observation info
 // created for each row. If there are multiple observation infos for a single
 // row (such as if there are multiple observed objects backed by a single row,
 // or if both an object and an array property of that object are observed),
@@ -47,16 +50,14 @@ namespace realm {
 class RLMObservationInfo {
 public:
     RLMObservationInfo(id object);
-    RLMObservationInfo(RLMObjectSchema *objectSchema, std::size_t row, id object);
+    RLMObservationInfo(RLMClassInfo &objectSchema, std::size_t row, id object);
     ~RLMObservationInfo();
 
     realm::Row const& getRow() const {
         return row;
     }
 
-    RLMObjectSchema *getObjectSchema() const {
-        return objectSchema;
-    }
+    NSString *columnName(size_t col) const noexcept;
 
     // Send willChange/didChange notifications to all observers for this object/row
     // Sends the array versions if indexes is non-nil, normal versions otherwise
@@ -67,7 +68,7 @@ public:
         return row && row.get_index() == ndx;
     }
 
-    void recordObserver(realm::Row& row, RLMObjectSchema *objectSchema, NSString *keyPath);
+    void recordObserver(realm::Row& row, RLMClassInfo *objectInfo, RLMObjectSchema *objectSchema, NSString *keyPath);
     void removeObserver();
     bool hasObservers() const { return observerCount > 0; }
 
@@ -94,10 +95,10 @@ private:
 
     // Row being observed
     realm::Row row;
-    RLMObjectSchema *objectSchema;
+    RLMClassInfo *objectSchema = nullptr;
 
     // Object doing the observing
-    __unsafe_unretained id object;
+    __unsafe_unretained id object = nil;
 
     // valueForKey: hack
     bool invalidated = false;
@@ -130,14 +131,14 @@ private:
 // Get the the observation info chain for the given row
 // Will simply return info if it's non-null, and will search ojectSchema's array
 // for a matching one otherwise, and return null if there are none
-RLMObservationInfo *RLMGetObservationInfo(RLMObservationInfo *info, size_t row, RLMObjectSchema *objectSchema);
+RLMObservationInfo *RLMGetObservationInfo(RLMObservationInfo *info, size_t row, RLMClassInfo& objectSchema);
 
 // delete all objects from a single table with change notifications
-void RLMClearTable(RLMObjectSchema *realm);
+void RLMClearTable(RLMClassInfo &realm);
 
 // invoke the block, sending notifications for cascading deletes/link nullifications
 void RLMTrackDeletions(RLMRealm *realm, dispatch_block_t block);
 
-std::vector<realm::BindingContext::ObserverState> RLMGetObservedRows(NSArray<RLMObjectSchema *> *schema);
+std::vector<realm::BindingContext::ObserverState> RLMGetObservedRows(RLMSchemaInfo const& schema);
 void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& observed, std::vector<void *> const& invalidated);
 void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& observed, std::vector<void *> const& invalidated);

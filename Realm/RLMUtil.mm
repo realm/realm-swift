@@ -27,6 +27,8 @@
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 
+#import "shared_realm.hpp"
+
 #import <realm/mixed.hpp>
 #import <realm/table_view.hpp>
 

@@ -177,13 +177,7 @@ public class Object: RLMObjectBase {
             if realm == nil {
                 return value(forKey: key)
             }
-            let property = RLMValidatedGetProperty(self, key)
-            if property.type == .array {
-                return listForProperty(prop: property)
-            }
-            // No special logic is needed for optional numbers here because the NSNumber returned by RLMDynamicGet
-            // is better for callers than the RealmOptional that optionalForProperty would give us.
-            return RLMDynamicGet(self, property)
+            return RLMDynamicGetByName(self, key, true)
         }
         set(value) {
             if realm == nil {
@@ -212,7 +206,8 @@ public class Object: RLMObjectBase {
     :nodoc:
     */
     public func dynamicList(_ propertyName: String) -> List<DynamicObject> {
-        return unsafeBitCast(listForProperty(prop: RLMValidatedGetProperty(self, propertyName)), to: List<DynamicObject>.self)
+        return unsafeBitCast(RLMDynamicGetByName(self, propertyName, true),
+                             to: List<DynamicObject>.self)
     }
 
     // MARK: Equatable
@@ -248,21 +243,6 @@ public class Object: RLMObjectBase {
     public override required init(value: AnyObject, schema: RLMSchema) {
         super.init(value: value, schema: schema)
     }
-
-    // Helper for getting the list object for a property
-    internal func listForProperty(prop: RLMProperty) -> RLMListBase {
-        return object_getIvar(self, prop.swiftIvar) as! RLMListBase
-    }
-
-    // Helper for getting the optional object for a property
-    internal func optionalForProperty(prop: RLMProperty) -> RLMOptionalBase {
-        return object_getIvar(self, prop.swiftIvar) as! RLMOptionalBase
-    }
-
-    // Helper for getting the linking objects object for a property
-    internal func linkingObjectsForProperty(prop: RLMProperty) -> LinkingObjectsBase? {
-        return object_getIvar(self, prop.swiftIvar) as? LinkingObjectsBase
-    }
 }
 
 
@@ -270,33 +250,17 @@ public class Object: RLMObjectBase {
 /// Object interface which allows untyped getters and setters for Objects.
 /// :nodoc:
 public final class DynamicObject: Object {
-    private var listProperties = [String: List<DynamicObject>]()
-    private var optionalProperties = [String: RLMOptionalBase]()
-
-    // Override to create List<DynamicObject> on access
-    internal override func listForProperty(prop: RLMProperty) -> RLMListBase {
-        if let list = listProperties[prop.name] {
-            return list
+    public override subscript(key: String) -> AnyObject? {
+        get {
+            let value = RLMDynamicGetByName(self, key, false)
+            if let array = value as? RLMArray {
+                return List<DynamicObject>(rlmArray: array)
+            }
+            return value
         }
-        let list = List<DynamicObject>()
-        listProperties[prop.name] = list
-        return list
-    }
-
-    // Override to create RealmOptional on access
-    internal override func optionalForProperty(prop: RLMProperty) -> RLMOptionalBase {
-        if let optional = optionalProperties[prop.name] {
-            return optional
+        set(value) {
+            RLMDynamicValidatedSet(self, key, value)
         }
-        let optional = RLMOptionalBase()
-        optional?.property = prop
-        optionalProperties[prop.name] = optional
-        return optional!
-    }
-
-    // Dynamic objects never have linking objects properties
-    internal override func linkingObjectsForProperty(prop: RLMProperty) -> LinkingObjectsBase? {
-        return nil
     }
 
     /// :nodoc:
@@ -349,16 +313,6 @@ public class ObjectUtil: NSObject {
         }.flatMap { (prop: Mirror.Child) in
             return prop.label
         } as NSArray
-    }
-
-    @objc private class func initializeListProperty(_ object: RLMObjectBase, property: RLMProperty, array: RLMArray<RLMObject>) {
-        (object as! Object).listForProperty(prop: property)._rlmArray = array
-    }
-
-    @objc private class func initializeOptionalProperty(_ object: RLMObjectBase, property: RLMProperty) {
-        let optional = (object as! Object).optionalForProperty(prop: property)
-        optional.property = property
-        optional.object = object
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -415,11 +369,6 @@ public class ObjectUtil: NSObject {
             d[name] = ["class": results.objectClassName, "property": results.propertyName]
             return d
         } as NSDictionary
-    }
-
-    @objc private class func initializeLinkingObjectsProperty(_ object: RLMObjectBase, property: RLMProperty) {
-        guard let linkingObjects = (object as! Object).linkingObjectsForProperty(prop: property) else { return }
-        linkingObjects.attachTo(object: object, property: property)
     }
 }
 
@@ -586,13 +535,7 @@ public class Object: RLMObjectBase {
             if realm == nil {
                 return valueForKey(key)
             }
-            let property = RLMValidatedGetProperty(self, key)
-            if property.type == .Array {
-                return listForProperty(property)
-            }
-            // No special logic is needed for optional numbers here because the NSNumber returned by RLMDynamicGet
-            // is better for callers than the RealmOptional that optionalForProperty would give us.
-            return RLMDynamicGet(self, property)
+            return RLMDynamicGetByName(self, key, true)
         }
         set(value) {
             if realm == nil {
@@ -619,7 +562,8 @@ public class Object: RLMObjectBase {
     :nodoc:
     */
     public func dynamicList(propertyName: String) -> List<DynamicObject> {
-        return unsafeBitCast(listForProperty(RLMValidatedGetProperty(self, propertyName)), List<DynamicObject>.self)
+        return unsafeBitCast(RLMDynamicGetByName(self, propertyName, true),
+                             List<DynamicObject>.self)
     }
 
     // MARK: Equatable
@@ -655,21 +599,6 @@ public class Object: RLMObjectBase {
     public override required init(value: AnyObject, schema: RLMSchema) {
         super.init(value: value, schema: schema)
     }
-
-    // Helper for getting the list object for a property
-    internal func listForProperty(prop: RLMProperty) -> RLMListBase {
-        return object_getIvar(self, prop.swiftIvar) as! RLMListBase
-    }
-
-    // Helper for getting the optional object for a property
-    internal func optionalForProperty(prop: RLMProperty) -> RLMOptionalBase {
-        return object_getIvar(self, prop.swiftIvar) as! RLMOptionalBase
-    }
-
-    // Helper for getting the linking objects object for a property
-    internal func linkingObjectsForProperty(prop: RLMProperty) -> LinkingObjectsBase? {
-        return object_getIvar(self, prop.swiftIvar) as? LinkingObjectsBase
-    }
 }
 
 
@@ -677,33 +606,17 @@ public class Object: RLMObjectBase {
 /// Object interface which allows untyped getters and setters for Objects.
 /// :nodoc:
 public final class DynamicObject: Object {
-    private var listProperties = [String: List<DynamicObject>]()
-    private var optionalProperties = [String: RLMOptionalBase]()
-
-    // Override to create List<DynamicObject> on access
-    internal override func listForProperty(prop: RLMProperty) -> RLMListBase {
-        if let list = listProperties[prop.name] {
-            return list
+    public override subscript(key: String) -> AnyObject? {
+        get {
+            let value = RLMDynamicGetByName(self, key, false)
+            if let array = value as? RLMArray {
+                return List<DynamicObject>(rlmArray: array)
+            }
+            return value
         }
-        let list = List<DynamicObject>()
-        listProperties[prop.name] = list
-        return list
-    }
-
-    // Override to create RealmOptional on access
-    internal override func optionalForProperty(prop: RLMProperty) -> RLMOptionalBase {
-        if let optional = optionalProperties[prop.name] {
-            return optional
+        set(value) {
+            RLMDynamicValidatedSet(self, key, value)
         }
-        let optional = RLMOptionalBase()
-        optional.property = prop
-        optionalProperties[prop.name] = optional
-        return optional
-    }
-
-    // Dynamic objects never have linking objects properties
-    internal override func linkingObjectsForProperty(prop: RLMProperty) -> LinkingObjectsBase? {
-        return nil
     }
 
     /// :nodoc:
@@ -756,16 +669,6 @@ public class ObjectUtil: NSObject {
         }.flatMap { (prop: Mirror.Child) in
             return prop.label
         }
-    }
-
-    @objc private class func initializeListProperty(object: RLMObjectBase, property: RLMProperty, array: RLMArray) {
-        (object as! Object).listForProperty(property)._rlmArray = array
-    }
-
-    @objc private class func initializeOptionalProperty(object: RLMObjectBase, property: RLMProperty) {
-        let optional = (object as! Object).optionalForProperty(property)
-        optional.property = property
-        optional.object = object
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -822,11 +725,6 @@ public class ObjectUtil: NSObject {
             d[name] = ["class": results.objectClassName, "property": results.propertyName]
             return d
         }
-    }
-
-    @objc private class func initializeLinkingObjectsProperty(object: RLMObjectBase, property: RLMProperty) {
-        guard let linkingObjects = (object as! Object).linkingObjectsForProperty(property) else { return }
-        linkingObjects.attachTo(object: object, property: property)
     }
 }
 

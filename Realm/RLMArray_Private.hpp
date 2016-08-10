@@ -23,23 +23,19 @@
 #import <Realm/RLMResults.h>
 
 #import <realm/link_view_fwd.hpp>
-#import <vector>
 
 namespace realm {
-    class LinkView;
     class Results;
-    class TableView;
-    struct SortOrder;
 }
 
-@class RLMObjectBase;
-@class RLMObjectSchema;
+@class RLMObjectBase, RLMObjectSchema, RLMProperty;
+class RLMClassInfo;
 class RLMObservationInfo;
 
 @interface RLMArray () {
-  @protected
+@protected
     NSString *_objectClassName;
-  @public
+@public
     // The name of the property which this RLMArray represents
     NSString *_key;
     __weak RLMObjectBase *_parentObject;
@@ -50,13 +46,7 @@ class RLMObservationInfo;
 // LinkView backed RLMArray subclass
 //
 @interface RLMArrayLinkView : RLMArray <RLMFastEnumerable>
-@property (nonatomic, unsafe_unretained) RLMObjectSchema *objectSchema;
-
-+ (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
-                                          view:(realm::LinkViewRef)view
-                                         realm:(RLMRealm *)realm
-                                           key:(NSString *)key
-                                  parentSchema:(RLMObjectSchema *)parentSchema;
+- (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 
 // deletes all objects in the RLMArray from their containing realms
 - (void)deleteObjectsFromRealm;
@@ -73,8 +63,8 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
 // RLMResults private methods
 //
 @interface RLMResults () <RLMFastEnumerable>
-+ (instancetype)resultsWithObjectSchema:(RLMObjectSchema *)objectSchema
-                                   results:(realm::Results)results;
++ (instancetype)resultsWithObjectInfo:(RLMClassInfo&)info
+                              results:(realm::Results)results;
 
 - (void)deleteObjectsFromRealm;
 @end

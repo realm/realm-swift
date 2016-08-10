@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-@class RLMRealm, RLMSchema, RLMObjectSchema, RLMObjectBase, RLMResults, RLMProperty;
+@class RLMRealm, RLMSchema, RLMObjectBase, RLMResults, RLMProperty;
 
 //
 // Accessor Creation
@@ -30,9 +30,6 @@ extern "C" {
 
 // create or get cached accessors for the given schema
 void RLMRealmCreateAccessors(RLMSchema *schema);
-
-// Clear the cache of created accessor classes
-void RLMClearAccessorCache();
 
 
 //
@@ -89,11 +86,11 @@ namespace realm {
     template<typename T> class BasicRowExpr;
     using RowExpr = BasicRowExpr<Table>;
 }
+class RLMClassInfo;
+
 // Create accessors
-RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm,
-                                       RLMObjectSchema *objectSchema,
+RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm, RLMClassInfo& info,
                                        NSUInteger index) NS_RETURNS_RETAINED;
-RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm,
-                                       RLMObjectSchema *objectSchema,
+RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm, RLMClassInfo& info,
                                        realm::RowExpr row) NS_RETURNS_RETAINED;
 #endif

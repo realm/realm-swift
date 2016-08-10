@@ -531,7 +531,6 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
 - (BOOL)isEqualToProperty:(RLMProperty *)property {
     return _type == property->_type
-        && _column == property->_column
         && _indexed == property->_indexed
         && _isPrimary == property->_isPrimary
         && _optional == property->_optional
