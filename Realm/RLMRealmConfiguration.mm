@@ -36,9 +36,6 @@ static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"deleteRealmIfMigrationNeeded",
     @"dynamic",
     @"customSchema",
-    @"syncServerURL",
-    @"syncIdentity",
-    @"syncSignature",
 };
 
 static NSString *const c_defaultRealmFileName = @"default.realm";

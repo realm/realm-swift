@@ -39,7 +39,6 @@
 }
 
 #pragma mark - per-Realm access token API
-// NOTE: much of this may disappear once we get a single access token for a user that works with multiple Realms
 
 - (void)configureWithAccessToken:(RLMServerToken)token expiry:(NSTimeInterval)expiry user:(RLMUser *)user {
     self.parentUser = user;
@@ -71,8 +70,6 @@
     if (!user.isLoggedIn) {
         @throw RLMException(@"The user isn't logged in. The user must first log in before they can be refreshed.");
     }
-    // TODO: what happens if the access token is expired, but the refresh token isn't?
-
     RLMServerToken refreshToken = user.refreshToken;
 
     NSDictionary *json = @{
@@ -100,6 +97,7 @@
                 realm::Realm::refresh_sync_access_token(std::string([accessToken UTF8String]),
                                                         RLMStringDataWithNSString([self.fileURL path]),
                                                         realm::util::none);
+                self.isBound = YES;
             }
         } else {
             // Something else went wrong

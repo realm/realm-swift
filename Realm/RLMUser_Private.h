@@ -22,13 +22,8 @@
 
 @interface RLMUser ()
 
-@property (nonatomic) RLMIdentity identity;
-
 @property (nonatomic) NSURL *authURL;
 @property (nonatomic) NSURL *objectServerURL;
-
-@property (nonatomic) RLMServerToken refreshToken;
-@property (nonatomic) NSTimeInterval refreshTokenExpiry;
 
 - (void)_registerRealmForBindingWithFileURL:(const std::string&)fileURL
                             remoteServerURL:(NSURL *)remoteURL

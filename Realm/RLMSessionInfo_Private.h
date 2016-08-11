@@ -41,6 +41,8 @@
 
 @property (nonatomic) RLMServerPath path;
 
+/// Whether or not the Realm is currently bound to the Realm Object Server. A Realm that was unbound because its
+/// tokens expired can be rebound by calling `-refresh`.
 @property (nonatomic) BOOL isBound;
 
 - (instancetype)initWithFileURL:(NSURL *)fileURL path:(RLMServerPath)path;
@@ -48,7 +50,6 @@
 @property (nonatomic) RLMRealmBindingPackage *deferredBindingPackage;
 
 #pragma mark - per-Realm access token API
-// NOTE: much of this may disappear once we get a single access token for a user that works with multiple Realms
 
 @property (nonatomic) RLMServerToken accessToken;
 @property (nonatomic) NSTimeInterval accessTokenExpiry;

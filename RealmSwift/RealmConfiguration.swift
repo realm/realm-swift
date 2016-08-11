@@ -257,8 +257,6 @@ extension Realm {
         - parameter deleteRealmIfMigrationNeeded: If `true`, recreate the Realm file with the provided
                                                   schema if a migration is required.
         - parameter objectTypes:        The subset of `Object` subclasses managed by the Realm.
-        - parameter syncServerURL:      The synchronization server URL.
-        - parameter syncUserToken:       The user token used for synchronization.
         */
         public init(fileURL: NSURL? = NSURL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
             inMemoryIdentifier: String? = nil,

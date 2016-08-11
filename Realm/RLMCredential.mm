@@ -66,6 +66,13 @@ static BOOL objectServerURLIsValid(NSURL *url) {
                                                 serverURL:nil];
 }
 
++ (instancetype)credentialWithAccessToken:(RLMServerToken)token serverURL:(nullable NSURL *)serverURL {
+    return [[RLMCredential alloc] initWithCredentialToken:token
+                                                 provider:RLMIdentityProviderDirectToken
+                                                 userInfo:nil
+                                                serverURL:serverURL];
+}
+
 - (NSString *)description {
     return [NSString stringWithFormat:@"<RLMCredential: %p> data: %@, provider: %@, userInfo: %@",
             self,
