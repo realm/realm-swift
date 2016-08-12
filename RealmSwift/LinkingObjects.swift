@@ -274,8 +274,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
        is empty.
      */
     public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        guard let value = rlmResults.min(ofProperty: property) else { return nil }
-        return U.bridging(value)
+        return rlmResults.min(ofProperty: property).map(U.bridging)
     }
 
     /**
@@ -289,8 +288,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
        is empty.
      */
     public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        guard let value = rlmResults.max(ofProperty: property) else { return nil }
-        return U.bridging(value)
+        return rlmResults.max(ofProperty: property).map(U.bridging)
     }
 
     /**
@@ -303,8 +301,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The sum of the given property over all objects in the collection.
      */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
-        let value = rlmResults.sum(ofProperty: property)
-        return U.bridging(value)
+        return U.bridging(rlmResults.sum(ofProperty: property))
     }
 
     /**
@@ -318,8 +315,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
        is empty.
      */
     public func average<U: AddableType>(ofProperty property: String) -> U? {
-        guard let value = rlmResults.average(ofProperty: property) else { return nil }
-        return U.bridging(value)
+        return rlmResults.average(ofProperty: property).map(U.bridging)
     }
 
     // MARK: Notifications
@@ -711,8 +707,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The minimum value of the property, or `nil` if the collection is empty.
      */
     public func min<U: MinMaxType>(property: String) -> U? {
-        guard let value = rlmResults.minOfProperty(property) else { return nil }
-        return U.bridging(value)
+        return rlmResults.minOfProperty(property).map(U.bridging)
     }
 
     /**
@@ -726,8 +721,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The maximum value of the property, or `nil` if the collection is empty.
      */
     public func max<U: MinMaxType>(property: String) -> U? {
-        guard let value = rlmResults.maxOfProperty(property) else { return nil }
-        return U.bridging(value)
+        return rlmResults.maxOfProperty(property).map(U.bridging)
     }
 
     /**
@@ -741,8 +735,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The sum of the given property.
      */
     public func sum<U: AddableType>(property: String) -> U {
-        let value = rlmResults.sumOfProperty(property)
-        return U.bridging(value)
+        return U.bridging(rlmResults.sumOfProperty(property))
     }
 
     /**
@@ -755,8 +748,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The average value of the given property, or `nil` if the collection is empty.
      */
     public func average<U: AddableType>(property: String) -> U? {
-        guard let value = rlmResults.averageOfProperty(property) else { return nil }
-        return U.bridging(value)
+        return rlmResults.averageOfProperty(property).map(U.bridging)
     }
 
     // MARK: Notifications
