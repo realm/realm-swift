@@ -18,7 +18,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix crash when an aggregate is accessed as an `Int8`, `Int16`, `Int32`, or `Int64`.
 
 1.0.2 Release notes (2016-07-13)
 =============================================================
