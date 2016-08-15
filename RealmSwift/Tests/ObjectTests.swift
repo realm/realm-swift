@@ -71,12 +71,12 @@ class ObjectTests: TestCase {
 
     func testSharedSchemaUnmanaged() {
         let object = SwiftObject()
-        XCTAssertEqual(object.dynamicType.sharedSchema(), SwiftObject.sharedSchema())
+        XCTAssertEqual(type(of: object).sharedSchema(), SwiftObject.sharedSchema())
     }
 
     func testSharedSchemaManaged() {
         let object = SwiftObject()
-        XCTAssertEqual(object.dynamicType.sharedSchema(), SwiftObject.sharedSchema())
+        XCTAssertEqual(type(of: object).sharedSchema(), SwiftObject.sharedSchema())
     }
 
     func testInvalidated() {

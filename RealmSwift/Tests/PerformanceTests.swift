@@ -85,7 +85,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func inMeasureBlock(block: () -> ()) {
-        measureMetrics(self.dynamicType.defaultPerformanceMetrics(), automaticallyStartMeasuring: false) {
+        measureMetrics(type(of: self).defaultPerformanceMetrics(), automaticallyStartMeasuring: false) {
             _ = block()
         }
     }

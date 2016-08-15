@@ -93,7 +93,7 @@ public class Object: RLMObjectBase {
                        thrown if any required properties are not present and no default is set.
     */
     public init(value: AnyObject) {
-        self.dynamicType.sharedSchema() // ensure this class' objectSchema is loaded in the partialSharedSchema
+        type(of: self).sharedSchema() // ensure this class' objectSchema is loaded in the partialSharedSchema
         super.init(value: value, schema: RLMSchema.partialShared())
     }
 
@@ -309,7 +309,7 @@ public class ObjectUtil: NSObject {
     // Get the names of all properties in the object which are of type List<>.
     @objc private class func getGenericListPropertyNames(_ object: AnyObject) -> NSArray {
         return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
-            return prop.value.dynamicType is RLMListBase.Type
+            return type(of: prop.value) is RLMListBase.Type
         }.flatMap { (prop: Mirror.Child) in
             return prop.label
         } as NSArray
@@ -450,7 +450,7 @@ public class Object: RLMObjectBase {
      - parameter value:  The value used to populate the object.
     */
     public init(value: AnyObject) {
-        self.dynamicType.sharedSchema() // ensure this class' objectSchema is loaded in the partialSharedSchema
+    self.dynamicType.sharedSchema() // ensure this class' objectSchema is loaded in the partialSharedSchema
         super.init(value: value, schema: RLMSchema.partialSharedSchema())
     }
 
