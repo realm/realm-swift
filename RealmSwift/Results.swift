@@ -313,7 +313,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         return Results<T>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
@@ -493,7 +493,7 @@ extension Results {
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"sorted(with:)")
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
 

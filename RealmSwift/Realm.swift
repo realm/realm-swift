@@ -233,7 +233,7 @@ public final class Realm {
     - parameter objects: A sequence which contains objects to be added to this Realm.
     - parameter update: If true will try to update existing objects with the same primary key.
     */
-    public func add<S: Sequence where S.Iterator.Element: Object>(_ objects: S, update: Bool = false) {
+    public func add<S: Sequence>(_ objects: S, update: Bool = false) where S.Iterator.Element: Object {
         for obj in objects {
             add(obj, update: update)
         }
@@ -328,7 +328,7 @@ public final class Realm {
     - parameter objects: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
                          or any other enumerable SequenceType which generates Object.
     */
-    public func delete<S: Sequence where S.Iterator.Element: Object>(_ objects: S) {
+    public func delete<S: Sequence>(_ objects: S) where S.Iterator.Element: Object {
         for obj in objects {
             delete(obj)
         }

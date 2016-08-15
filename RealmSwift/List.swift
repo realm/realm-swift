@@ -228,7 +228,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         return Results<T>(_rlmArray.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
@@ -307,7 +307,7 @@ public final class List<T: Object>: ListBase {
 
     - parameter objects: A sequence of objects.
     */
-    public func append<S: Sequence where S.Iterator.Element == T>(objectsIn objects: S) {
+    public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == T {
         for obj in objects {
             _rlmArray.add(unsafeBitCast(obj, to: RLMObject.self))
         }
@@ -491,8 +491,8 @@ extension List : RealmCollection, RangeReplaceableCollection {
     - parameter subRange:    The range of elements to be replaced.
     - parameter newElements: The new elements to be inserted into the List.
     */
-    public func replaceSubrange<C : Collection where C.Iterator.Element == T>(_ subrange: Range<Int>,
-                                                                              with newElements: C) {
+    public func replaceSubrange<C : Collection>(_ subrange: Range<Int>,
+                                with newElements: C) where C.Iterator.Element == T {
         for _ in subrange.lowerBound..<subrange.upperBound {
             remove(objectAtIndex: subrange.lowerBound)
         }
@@ -527,7 +527,7 @@ extension List : RealmCollection, RangeReplaceableCollection {
 
 extension List {
     @available(*, unavailable, renamed:"append(objectsIn:)")
-    public func appendContentsOf<S: Sequence where S.Iterator.Element == T>(_ objects: S) { fatalError() }
+    public func appendContentsOf<S: Sequence>(_ objects: S) where S.Iterator.Element == T { fatalError() }
 
     @available(*, unavailable, renamed:"removeAllObjects()")
     public func removeAll() { }
@@ -557,7 +557,7 @@ extension List {
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"sorted(with:)")
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
 
