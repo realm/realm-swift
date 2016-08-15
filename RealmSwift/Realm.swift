@@ -477,9 +477,9 @@ public final class Realm {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
             switch rlmNotification {
             case RLMNotification.DidChange:
-                block(notification: .DidChange, realm: self)
+                block(/* notification: */ .DidChange, /* realm: */ self)
             case RLMNotification.RefreshRequired:
-                block(notification: .RefreshRequired, realm: self)
+                block(/* notification: */ .RefreshRequired, /* realm: */ self)
             default:
                 fatalError("Unhandled notification type: \(rlmNotification)")
             }
@@ -628,7 +628,7 @@ public enum Notification: String {
 }
 
 /// Closure to run when the data in a Realm was modified.
-public typealias NotificationBlock = (notification: Notification, realm: Realm) -> Void
+public typealias NotificationBlock = (_ notification: Notification, _ realm: Realm) -> Void
 
 
 // MARK: Unavailable

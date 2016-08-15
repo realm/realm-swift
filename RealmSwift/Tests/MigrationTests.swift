@@ -63,7 +63,7 @@ class MigrationTests: TestCase {
         let config = Realm.Configuration(fileURL: fileURL, schemaVersion: schemaVersion,
             migrationBlock: { migration, oldSchemaVersion in
                 if let block = block {
-                    block(migration: migration, oldSchemaVersion: oldSchemaVersion)
+                    block(/* migration: */ migration, /* oldSchemaVersion: */ oldSchemaVersion)
                 }
                 didRun = true
                 return

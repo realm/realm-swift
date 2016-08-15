@@ -30,7 +30,7 @@ Migration block used to migrate a Realm.
                        existing objects which require migration.
 - parameter oldSchemaVersion: The schema version of the `Realm` being migrated.
 */
-public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt64) -> Void
+public typealias MigrationBlock = (_ migration: Migration, _ oldSchemaVersion: UInt64) -> Void
 
 /// Object class used during migrations.
 public typealias MigrationObject = DynamicObject
@@ -42,7 +42,7 @@ accessed using subscripting.
 - parameter oldObject: Object in original `Realm` (read-only).
 - parameter newObject: Object in migrated `Realm` (read-write).
 */
-public typealias MigrationObjectEnumerateBlock = (oldObject: MigrationObject?, newObject: MigrationObject?) -> Void
+public typealias MigrationObjectEnumerateBlock = (_ oldObject: MigrationObject?, _ newObject: MigrationObject?) -> Void
 
 /**
 Get the schema version for a Realm at a given local URL.
@@ -109,8 +109,8 @@ public final class Migration {
     */
     public func enumerateObjects(ofType typeName: String, _ block: MigrationObjectEnumerateBlock) {
         rlmMigration.enumerateObjects(typeName) {
-            block(oldObject: unsafeBitCast($0, to: MigrationObject.self),
-                  newObject: unsafeBitCast($1, to: MigrationObject.self))
+            block(/* oldObject: */ unsafeBitCast($0, to: MigrationObject.self),
+                  /* newObject: */ unsafeBitCast($1, to: MigrationObject.self))
         }
     }
 
@@ -177,7 +177,8 @@ public final class Migration {
 
 // MARK: Private Helpers
 
-internal func accessorMigrationBlock(_ migrationBlock: MigrationBlock) -> RLMMigrationBlock {
+internal func accessorMigrationBlock(_ migrationBlock: MigrationBlock)
+    -> RLMMigrationBlock {
     return { migration, oldVersion in
         // set all accessor classes to MigrationObject
         for objectSchema in migration.oldSchema.objectSchema {
@@ -192,7 +193,7 @@ internal func accessorMigrationBlock(_ migrationBlock: MigrationBlock) -> RLMMig
         }
 
         // run migration
-        migrationBlock(migration: Migration(migration), oldSchemaVersion: oldVersion)
+        migrationBlock(/* migration: */ Migration(migration), /* oldSchemaVersion: */ oldVersion)
     }
 }
 
