@@ -577,8 +577,8 @@ class ResultsTests: RealmCollectionTypeTests {
                 XCTAssertEqual(insertions, [2])
                 XCTAssertEqual(modifications, [])
                 break
-            case .Error(let err):
-                XCTFail(err.description)
+            case .Error(let error):
+                XCTFail(String(describing: error))
                 break
             }
 
