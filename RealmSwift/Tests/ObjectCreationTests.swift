@@ -107,7 +107,7 @@ class ObjectCreationTests: TestCase {
 
     func testInitWithArray() {
         // array with all values specified
-        let baselineValues: [Any] = [true, 1, 1.1, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
+        let baselineValues: [Any] = [true, 1, 1.1 as Float, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
             NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
@@ -210,7 +210,7 @@ class ObjectCreationTests: TestCase {
         let baselineValues: [String: Any] = [
             "boolCol": true,
             "intCol": 1,
-            "floatCol": 1.1,
+            "floatCol": 1.1 as Float,
             "doubleCol": 11.1,
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
@@ -263,7 +263,7 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithArray() {
         // array with all values specified
-        let baselineValues: [Any] = [true, 1, 1.1, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
+        let baselineValues: [Any] = [true, 1, 1.1 as Float, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
             NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
