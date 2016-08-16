@@ -68,7 +68,7 @@ method on `Realm`.
 See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
 */
 @objc(RealmSwiftObject)
-public class Object: RLMObjectBase {
+open class Object: RLMObjectBase {
 
     // MARK: Initializers
 
@@ -118,10 +118,10 @@ public class Object: RLMObjectBase {
     ///
     /// An object can no longer be accessed if the object has been deleted from the containing
     /// `realm` or if `invalidate` is called on the containing `realm`.
-    public override var isInvalidated: Bool { return super.isInvalidated }
+    open override var isInvalidated: Bool { return super.isInvalidated }
 
     /// Returns a human-readable description of this object.
-    public override var description: String { return super.description }
+    open override var description: String { return super.description }
 
     #if os(OSX)
     /// Helper to return the class name for an Object subclass.
@@ -135,7 +135,7 @@ public class Object: RLMObjectBase {
     WARNING: This is an internal helper method not intended for public use.
     :nodoc:
     */
-    public override class func objectUtilClass(_ isSwift: Bool) -> AnyClass {
+    open override class func objectUtilClass(_ isSwift: Bool) -> AnyClass {
         return ObjectUtil.self
     }
 
@@ -150,7 +150,7 @@ public class Object: RLMObjectBase {
 
     - returns: Name of the property designated as the primary key, or `nil` if the model has no primary key.
     */
-    public class func primaryKey() -> String? { return nil }
+    open class func primaryKey() -> String? { return nil }
 
     /**
     Override to return an array of property names to ignore. These properties will not be persisted
@@ -158,7 +158,7 @@ public class Object: RLMObjectBase {
 
     - returns: `Array` of property names to ignore.
     */
-    public class func ignoredProperties() -> [String] { return [] }
+    open class func ignoredProperties() -> [String] { return [] }
 
     /**
     Return an array of property names for properties which should be indexed.
@@ -166,13 +166,13 @@ public class Object: RLMObjectBase {
 
     - returns: `Array` of property names to index.
     */
-    public class func indexedProperties() -> [String] { return [] }
+    open class func indexedProperties() -> [String] { return [] }
 
 
     // MARK: Key-Value Coding & Subscripting
 
     /// Returns or sets the value of the property with the given name.
-    public subscript(key: String) -> Any? {
+    open subscript(key: String) -> Any? {
         get {
             if realm == nil {
                 return value(forKey: key)
@@ -220,7 +220,7 @@ public class Object: RLMObjectBase {
 
     - parameter object: Object to compare for equality.
     */
-    public override func isEqual(_ object: Any?) -> Bool {
+    open override func isEqual(_ object: Any?) -> Bool {
         return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
 
