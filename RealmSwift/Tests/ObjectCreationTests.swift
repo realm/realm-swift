@@ -61,7 +61,7 @@ class ObjectCreationTests: TestCase {
 
     func testInitWithDictionary() {
         // dictionary with all values specified
-        let baselineValues =
+        let baselineValues: [String: Any] =
            ["boolCol": true as NSNumber,
             "intCol": 1 as NSNumber,
             "floatCol": 1.1 as NSNumber,
@@ -107,8 +107,8 @@ class ObjectCreationTests: TestCase {
 
     func testInitWithArray() {
         // array with all values specified
-        let baselineValues = [true, 1, 1.1, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
-            NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject]
+        let baselineValues: [Any] = [true, 1, 1.1, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
+            NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -207,7 +207,7 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithDictionary() {
         // dictionary with all values specified
-        let baselineValues: [String: AnyObject] = [
+        let baselineValues: [String: Any] = [
             "boolCol": true,
             "intCol": 1,
             "floatCol": 1.1,
@@ -263,8 +263,8 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithArray() {
         // array with all values specified
-        let baselineValues = [true, 1, 1.1, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
-            NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject]
+        let baselineValues: [Any] = [true, 1, 1.1, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
+            NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -353,7 +353,7 @@ class ObjectCreationTests: TestCase {
     }
 
     func testCreateWithObjectsFromAnotherRealm() {
-        let values = [
+        let values: [String: Any] = [
             "boolCol": true as NSNumber,
             "intCol": 1 as NSNumber,
             "floatCol": 1.1 as NSNumber,
@@ -379,7 +379,7 @@ class ObjectCreationTests: TestCase {
     }
 
     func testCreateWithDeeplyNestedObjectsFromAnotherRealm() {
-        let values = [
+        let values: [String: Any] = [
             "boolCol": true as NSNumber,
             "intCol": 1 as NSNumber,
             "floatCol": 1.1 as NSNumber,
@@ -430,7 +430,7 @@ class ObjectCreationTests: TestCase {
     }
 
     func testCreateWithNSNullLinks() {
-        let values = [
+        let values: [String: Any] = [
             "boolCol": true as NSNumber,
             "intCol": 1 as NSNumber,
             "floatCol": 1.1 as NSNumber,
