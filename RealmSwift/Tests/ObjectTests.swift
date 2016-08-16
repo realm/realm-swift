@@ -181,8 +181,8 @@ class ObjectTests: TestCase {
         }
     }
 
-    func setAndTestAllTypes(_ setter: (SwiftObject, AnyObject?, String) -> (),
-                            getter: (SwiftObject, String) -> (AnyObject?), object: SwiftObject) {
+    func setAndTestAllTypes(_ setter: (SwiftObject, Any?, String) -> (),
+                            getter: (SwiftObject, String) -> (Any?), object: SwiftObject) {
         setter(object, true, "boolCol")
         XCTAssertEqual(getter(object, "boolCol") as! Bool!, true)
 
@@ -225,8 +225,8 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
     }
 
-    func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, AnyObject?, String) -> (),
-                                   getter: (DynamicObject, String) -> (AnyObject?), object: DynamicObject,
+    func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, Any?, String) -> (),
+                                   getter: (DynamicObject, String) -> (Any?), object: DynamicObject,
                                    boolObject: DynamicObject) {
         setter(object, true, "boolCol")
         XCTAssertEqual((getter(object, "boolCol") as! Bool), true)
@@ -292,11 +292,11 @@ class ObjectTests: TestCase {
     }
 
     func testSetValueForKey() {
-        let setter: (Object, AnyObject?, String) -> () = { object, value, key in
+        let setter: (Object, Any?, String) -> () = { object, value, key in
             object.setValue(value, forKey: key)
             return
         }
-        let getter: (Object, String) -> (AnyObject?) = { object, key in
+        let getter: (Object, String) -> (Any?) = { object, key in
             object.value(forKey: key)
         }
 
@@ -313,11 +313,11 @@ class ObjectTests: TestCase {
     }
 
     func testSubscript() {
-        let setter: (Object, AnyObject?, String) -> () = { object, value, key in
+        let setter: (Object, Any?, String) -> () = { object, value, key in
             object[key] = value
             return
         }
-        let getter: (Object, String) -> (AnyObject?) = { object, key in
+        let getter: (Object, String) -> (Any?) = { object, key in
             object[key]
         }
 
