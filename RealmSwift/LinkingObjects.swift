@@ -378,7 +378,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter block: The block to be called with the evaluated linking objects and change information.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(block: ((RealmCollectionChange<LinkingObjects>) -> Void)) -> NotificationToken {
+    public func addNotificationBlock(block: @escaping (RealmCollectionChange<LinkingObjects>) -> Void) -> NotificationToken {
         return rlmResults.addNotificationBlock { results, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
@@ -413,7 +413,7 @@ extension LinkingObjects : RealmCollection {
     }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
         NotificationToken {
             let anyCollection = AnyRealmCollection(self)
             return rlmResults.addNotificationBlock { _, change, error in

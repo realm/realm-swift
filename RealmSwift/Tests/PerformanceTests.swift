@@ -76,7 +76,7 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
-    override func measureMetrics(_ metrics: [String], automaticallyStartMeasuring: Bool, for block: () -> Void) {
+    override func measureMetrics(_ metrics: [String], automaticallyStartMeasuring: Bool, for block: @escaping () -> Void) {
         super.measureMetrics(metrics, automaticallyStartMeasuring: automaticallyStartMeasuring) {
             autoreleasepool {
                 block()
@@ -84,7 +84,7 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
-    func inMeasureBlock(block: () -> ()) {
+    func inMeasureBlock(block: @escaping () -> ()) {
         measureMetrics(type(of: self).defaultPerformanceMetrics(), automaticallyStartMeasuring: false) {
             _ = block()
         }

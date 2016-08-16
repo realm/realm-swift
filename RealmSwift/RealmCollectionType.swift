@@ -357,10 +357,10 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
      - parameter block: The block to be called with the evaluated collection and change information.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    func addNotificationBlock(block: (RealmCollectionChange<Self>) -> Void) -> NotificationToken
+    func addNotificationBlock(block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
     /// :nodoc:
-    func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
+    func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
 private class _AnyRealmCollectionBase<T: Object> {
@@ -390,7 +390,7 @@ private class _AnyRealmCollectionBase<T: Object> {
     func value(forKey key: String) -> Any? { fatalError() }
     func value(forKeyPath keyPath: String) -> Any? { fatalError() }
     func setValue(_ value: Any?, forKey key: String) { fatalError() }
-    func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
+    func _addNotificationBlock(block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
 }
 
@@ -635,7 +635,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     // MARK: Notifications
 
     /// :nodoc:
-    override func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
+    override func _addNotificationBlock(block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block: block) }
 }
 
@@ -930,11 +930,11 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
      - parameter block: The block to be called with the evaluated collection and change information.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> ())
         -> NotificationToken { return base._addNotificationBlock(block: block) }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> ())
         -> NotificationToken { return base._addNotificationBlock(block: block) }
 }
 

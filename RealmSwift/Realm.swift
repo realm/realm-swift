@@ -113,7 +113,7 @@ public final class Realm {
 
     - throws: An NSError if the transaction could not be written.
     */
-    public func write(block: @noescape () -> Void) throws {
+    public func write(block: () -> Void) throws {
         try rlmRealm.transaction(block)
     }
 
@@ -628,7 +628,7 @@ public enum Notification: String {
 }
 
 /// Closure to run when the data in a Realm was modified.
-public typealias NotificationBlock = (_ notification: Notification, _ realm: Realm) -> Void
+public typealias NotificationBlock = @escaping (_ notification: Notification, _ realm: Realm) -> Void
 
 
 // MARK: Unavailable

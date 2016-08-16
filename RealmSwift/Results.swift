@@ -432,7 +432,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      - parameter block: The block to be called with the evaluated results and change information.
      - returns: A token which must be held for as long as you want query results to be delivered.
      */
-    public func addNotificationBlock(block: ((RealmCollectionChange<Results>) -> Void)) -> NotificationToken {
+    public func addNotificationBlock(block: @escaping (RealmCollectionChange<Results>) -> Void) -> NotificationToken {
         return rlmResults.addNotificationBlock { results, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
@@ -462,7 +462,7 @@ extension Results: RealmCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
         NotificationToken {
         let anyCollection = AnyRealmCollection(self)
         return rlmResults.addNotificationBlock { _, change, error in

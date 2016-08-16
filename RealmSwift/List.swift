@@ -468,7 +468,7 @@ public final class List<T: Object>: ListBase {
     - parameter block: The block to be called each time the list changes.
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
-    public func addNotificationBlock(block: (RealmCollectionChange<List>) -> ()) -> NotificationToken {
+    public func addNotificationBlock(block: @escaping (RealmCollectionChange<List>) -> ()) -> NotificationToken {
         return _rlmArray.addNotificationBlock { list, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
@@ -514,7 +514,7 @@ extension List : RealmCollection, RangeReplaceableCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
         NotificationToken {
         let anyCollection = AnyRealmCollection(self)
         return _rlmArray.addNotificationBlock { _, change, error in
