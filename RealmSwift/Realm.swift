@@ -416,7 +416,8 @@ public final class Realm {
     - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
     public func object<T: Object>(ofType type: T.Type, forPrimaryKey key: Any) -> T? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), to: Optional<T>.self)
+        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key) as! RLMObjectBase?,
+                             to: Optional<T>.self)
     }
 
     /**
@@ -442,7 +443,7 @@ public final class Realm {
     :nodoc:
     */
     public func dynamicObject(ofType typeName: String, forPrimaryKey key: Any) -> DynamicObject? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, typeName, key), to: Optional<DynamicObject>.self)
+        return unsafeBitCast(RLMGetObject(rlmRealm, typeName, key) as! RLMObjectBase?, to: Optional<DynamicObject>.self)
     }
 
     // MARK: Notifications
