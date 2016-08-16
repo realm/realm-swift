@@ -145,7 +145,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: The index of the first matching object, or `nil` if no objects match.
      */
-    public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
+    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: NSPredicate(format: predicateFormat,
                                                                                argumentArray: args)))
     }
@@ -183,7 +183,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the
        collection's objects.
      */
-    public override func value(forKey key: String) -> AnyObject? {
+    public override func value(forKey key: String) -> Any? {
         return value(forKeyPath: key)
     }
 
@@ -196,7 +196,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
        collection's objects.
      */
-    public override func value(forKeyPath keyPath: String) -> AnyObject? {
+    public override func value(forKeyPath keyPath: String) -> Any? {
         return rlmResults.value(forKeyPath: keyPath)
     }
 
@@ -208,7 +208,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter value: The object value.
      - parameter key:   The name of the property.
      */
-    public override func setValue(_ value: AnyObject?, forKey key: String) {
+    public override func setValue(_ value: Any?, forKey key: String) {
         return rlmResults.setValue(value, forKeyPath: key)
     }
 
@@ -221,7 +221,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: Results containing objects that match the given predicate.
      */
-    public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<T> {
+    public func filter(using predicateFormat: String, _ args: Any...) -> Results<T> {
         return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
@@ -257,7 +257,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: `Results` with elements sorted by the given sort descriptors.
      */
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         return Results<T>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
@@ -380,7 +380,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      */
     public func addNotificationBlock(block: ((RealmCollectionChange<LinkingObjects>) -> Void)) -> NotificationToken {
         return rlmResults.addNotificationBlock { results, change, error in
-            block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
+            block(RealmCollectionChange.fromObjc(value: self, change: change, error: error as NSError?))
         }
     }
 }
@@ -413,11 +413,11 @@ extension LinkingObjects : RealmCollection {
     }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
         NotificationToken {
             let anyCollection = AnyRealmCollection(self)
             return rlmResults.addNotificationBlock { _, change, error in
-                block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
+                block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error as NSError?))
             }
     }
 }
@@ -432,19 +432,19 @@ extension LinkingObjects {
     public func index(of predicate: NSPredicate) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed:"indexOfObject(for:_:)")
-    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
+    public func index(of predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed:"filter(using:)")
     public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"filter(using:_:)")
-    public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> { fatalError() }
+    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"sorted(onProperty:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"sorted(with:)")
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
 
@@ -580,7 +580,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
-    public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int? {
+    public func indexOf(predicateFormat: String, _ args: Any...) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat,
             argumentArray: args)))
     }
@@ -615,7 +615,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter key: The name of the property whose values are desired.
      */
-    public override func valueForKey(key: String) -> AnyObject? {
+    public override func valueForKey(key: String) -> Any? {
         return rlmResults.valueForKey(key)
     }
 
@@ -625,7 +625,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter keyPath: The key path to the property whose values are desired.
      */
-    public override func valueForKeyPath(keyPath: String) -> AnyObject? {
+    public override func valueForKeyPath(keyPath: String) -> Any? {
         return rlmResults.valueForKeyPath(keyPath)
     }
 
@@ -638,7 +638,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter value: The value to set the property to.
      - parameter key:   The name of the property whose value should be set on each object.
      */
-    public override func setValue(value: AnyObject?, forKey key: String) {
+    public override func setValue(value: Any?, forKey key: String) {
         return rlmResults.setValue(value, forKey: key)
     }
 
@@ -649,7 +649,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
-    public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T> {
+    public func filter(predicateFormat: String, _ args: Any...) -> Results<T> {
         return Results<T>(rlmResults.objectsWithPredicate(NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 

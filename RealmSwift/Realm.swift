@@ -113,7 +113,7 @@ public final class Realm {
 
     - throws: An NSError if the transaction could not be written.
     */
-    public func write(block: @noescape () -> Void) throws {
+    public func write(block: () -> Void) throws {
         try rlmRealm.transaction(block)
     }
 
@@ -233,7 +233,7 @@ public final class Realm {
     - parameter objects: A sequence which contains objects to be added to this Realm.
     - parameter update: If true will try to update existing objects with the same primary key.
     */
-    public func add<S: Sequence where S.Iterator.Element: Object>(_ objects: S, update: Bool = false) {
+    public func add<S: Sequence>(_ objects: S, update: Bool = false) where S.Iterator.Element: Object {
         for obj in objects {
             add(obj, update: update)
         }
@@ -263,7 +263,7 @@ public final class Realm {
     - returns: The created object.
     */
     @discardableResult
-    public func createObject<T: Object>(ofType type: T.Type, populatedWith value: AnyObject = [:], update: Bool = false) -> T {
+    public func createObject<T: Object>(ofType type: T.Type, populatedWith value: Any = [:], update: Bool = false) -> T {
         let typeName = (type as Object.Type).className()
         if update && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
@@ -300,7 +300,7 @@ public final class Realm {
     :nodoc:
     */
     @discardableResult
-    public func createDynamicObject(ofType typeName: String, populatedWith value: AnyObject = [:], update: Bool = false) -> DynamicObject {
+    public func createDynamicObject(ofType typeName: String, populatedWith value: Any = [:], update: Bool = false) -> DynamicObject {
         if update && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
         }
@@ -328,7 +328,7 @@ public final class Realm {
     - parameter objects: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
                          or any other enumerable SequenceType which generates Object.
     */
-    public func delete<S: Sequence where S.Iterator.Element: Object>(_ objects: S) {
+    public func delete<S: Sequence>(_ objects: S) where S.Iterator.Element: Object {
         for obj in objects {
             delete(obj)
         }
@@ -477,9 +477,9 @@ public final class Realm {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
             switch rlmNotification {
             case RLMNotification.DidChange:
-                block(notification: .DidChange, realm: self)
+                block(.DidChange, self)
             case RLMNotification.RefreshRequired:
-                block(notification: .RefreshRequired, realm: self)
+                block(.RefreshRequired, self)
             default:
                 fatalError("Unhandled notification type: \(rlmNotification)")
             }
@@ -628,7 +628,7 @@ public enum Notification: String {
 }
 
 /// Closure to run when the data in a Realm was modified.
-public typealias NotificationBlock = (notification: Notification, realm: Realm) -> Void
+public typealias NotificationBlock = (_ notification: Notification, _ realm: Realm) -> Void
 
 
 // MARK: Unavailable
@@ -639,10 +639,10 @@ extension Realm {
     public var inWriteTransaction : Bool { fatalError() }
 
     @available(*, unavailable, renamed:"createObject(ofType:populatedWith:update:)")
-    public func create<T: Object>(_ type: T.Type, value: AnyObject = [:], update: Bool = false) -> T { fatalError() }
+    public func create<T: Object>(_ type: T.Type, value: Any = [:], update: Bool = false) -> T { fatalError() }
 
     @available(*, unavailable, renamed:"createDynamicObject(ofType:populatedWith:update:)")
-    public func dynamicCreate(_ className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
+    public func dynamicCreate(_ className: String, value: Any = [:], update: Bool = false) -> DynamicObject {
         fatalError()
     }
 

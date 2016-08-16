@@ -112,7 +112,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
+    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int? {
         return indexOfObject(for: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
@@ -154,7 +154,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
-    public override func value(forKey key: String) -> AnyObject? {
+    public override func value(forKey key: String) -> Any? {
         return value(forKeyPath: key)
     }
 
@@ -167,7 +167,7 @@ public final class List<T: Object>: ListBase {
      - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
      collection's objects.
      */
-    public override func value(forKeyPath keyPath: String) -> AnyObject? {
+    public override func value(forKeyPath keyPath: String) -> Any? {
         return _rlmArray.value(forKeyPath: keyPath)
     }
 
@@ -179,7 +179,7 @@ public final class List<T: Object>: ListBase {
     - parameter value: The object value.
     - parameter key:   The name of the property.
     */
-    public override func setValue(_ value: AnyObject?, forKey key: String) {
+    public override func setValue(_ value: Any?, forKey key: String) {
         return _rlmArray.setValue(value, forKeyPath: key)
     }
 
@@ -228,7 +228,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor, S.Iterator.Element == SortDescriptor {
         return Results<T>(_rlmArray.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
@@ -307,7 +307,7 @@ public final class List<T: Object>: ListBase {
 
     - parameter objects: A sequence of objects.
     */
-    public func append<S: Sequence where S.Iterator.Element == T>(objectsIn objects: S) {
+    public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == T {
         for obj in objects {
             _rlmArray.add(unsafeBitCast(obj, to: RLMObject.self))
         }
@@ -468,9 +468,9 @@ public final class List<T: Object>: ListBase {
     - parameter block: The block to be called each time the list changes.
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
-    public func addNotificationBlock(block: (RealmCollectionChange<List>) -> ()) -> NotificationToken {
+    public func addNotificationBlock(block: @escaping (RealmCollectionChange<List>) -> ()) -> NotificationToken {
         return _rlmArray.addNotificationBlock { list, change, error in
-            block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
+            block(RealmCollectionChange.fromObjc(value: self, change: change, error: error as NSError?))
         }
     }
 }
@@ -491,8 +491,8 @@ extension List : RealmCollection, RangeReplaceableCollection {
     - parameter subRange:    The range of elements to be replaced.
     - parameter newElements: The new elements to be inserted into the List.
     */
-    public func replaceSubrange<C : Collection where C.Iterator.Element == T>(_ subrange: Range<Int>,
-                                                                              with newElements: C) {
+    public func replaceSubrange<C : Collection>(_ subrange: Range<Int>,
+                                with newElements: C) where C.Iterator.Element == T {
         for _ in subrange.lowerBound..<subrange.upperBound {
             remove(objectAtIndex: subrange.lowerBound)
         }
@@ -514,11 +514,11 @@ extension List : RealmCollection, RangeReplaceableCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
         NotificationToken {
         let anyCollection = AnyRealmCollection(self)
         return _rlmArray.addNotificationBlock { _, change, error in
-            block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
+            block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error as NSError?))
         }
     }
 }
@@ -527,7 +527,7 @@ extension List : RealmCollection, RangeReplaceableCollection {
 
 extension List {
     @available(*, unavailable, renamed:"append(objectsIn:)")
-    public func appendContentsOf<S: Sequence where S.Iterator.Element == T>(_ objects: S) { fatalError() }
+    public func appendContentsOf<S: Sequence>(_ objects: S) where S.Iterator.Element == T { fatalError() }
 
     @available(*, unavailable, renamed:"removeAllObjects()")
     public func removeAll() { }
@@ -545,19 +545,19 @@ extension List {
     public func index(of predicate: NSPredicate) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed:"indexOfObject(for:_:)")
-    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
+    public func index(of predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed:"filter(using:)")
     public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"filter(using:_:)")
-    public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> { fatalError() }
+    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"sorted(onProperty:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"sorted(with:)")
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
 
