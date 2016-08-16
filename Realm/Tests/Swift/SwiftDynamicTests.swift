@@ -167,8 +167,8 @@ class SwiftDynamicTests: RLMTestCase {
         let schema = dyrealm.schema[AllTypesObject.className()]
         for idx in 0..<obj1.count - 1 {
             let prop = schema.properties[idx]
-            XCTAssertTrue(obj1[idx].isEqual(robj1[prop.name]))
-            XCTAssertTrue(obj2[idx].isEqual(robj2[prop.name]))
+            XCTAssertTrue((obj1[idx] as AnyObject).isEqual(robj1[prop.name]))
+            XCTAssertTrue((obj2[idx] as AnyObject).isEqual(robj2[prop.name]))
         }
 
         // check sub object type

@@ -96,6 +96,7 @@ class TestCase: XCTestCase {
         // Verify that there are no remaining realm files after the test
         let parentDir = (testDir as NSString).deletingLastPathComponent
         for url in FileManager().enumerator(atPath: parentDir)! {
+            let url = url as! URL
             XCTAssertNotEqual(url.pathExtension, "realm", "Lingering realm file at \(parentDir)/\(url)")
             assert(url.pathExtension != "realm")
         }
