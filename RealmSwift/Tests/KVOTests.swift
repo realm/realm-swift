@@ -142,8 +142,8 @@ class KVOTests: TestCase {
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obj, "objectCol", nil, obj) { obj.objectCol = obj }
 
-        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!
-        observeChange(obj, "binaryCol", NSData(), data) { obj.binaryCol = data }
+        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
+        observeChange(obj, "binaryCol", NSData(), data) { obj.binaryCol = data as NSData }
 
         let date = NSDate(timeIntervalSince1970: 1)
         observeChange(obj, "dateCol", NSDate(timeIntervalSince1970: 0), date) { obj.dateCol = date }
@@ -160,7 +160,7 @@ class KVOTests: TestCase {
         observeChange(obj, "optDoubleCol", nil, 10) { obj.optDoubleCol.value = 10 }
         observeChange(obj, "optBoolCol", nil, true) { obj.optBoolCol.value = true }
         observeChange(obj, "optStringCol", nil, "abc") { obj.optStringCol = "abc" }
-        observeChange(obj, "optBinaryCol", nil, data) { obj.optBinaryCol = data }
+        observeChange(obj, "optBinaryCol", nil, data) { obj.optBinaryCol = data as NSData }
         observeChange(obj, "optDateCol", nil, date) { obj.optDateCol = date }
 
         observeChange(obj, "optIntCol", 10, nil) { obj.optIntCol.value = nil }
@@ -186,8 +186,8 @@ class KVOTests: TestCase {
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obj, "objectCol", nil, obj) { obj.objectCol = obj }
 
-        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!
-        observeChange(obj, "binaryCol", NSData(), data) { obj.binaryCol = data }
+        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
+        observeChange(obj, "binaryCol", NSData(), data) { obj.binaryCol = data as NSData }
 
         let date = NSDate(timeIntervalSince1970: 1)
         observeChange(obj, "dateCol", NSDate(timeIntervalSince1970: 0), date) { obj.dateCol = date }
@@ -204,7 +204,7 @@ class KVOTests: TestCase {
         observeChange(obj, "optDoubleCol", nil, 10) { obj.optDoubleCol.value = 10 }
         observeChange(obj, "optBoolCol", nil, true) { obj.optBoolCol.value = true }
         observeChange(obj, "optStringCol", nil, "abc") { obj.optStringCol = "abc" }
-        observeChange(obj, "optBinaryCol", nil, data) { obj.optBinaryCol = data }
+        observeChange(obj, "optBinaryCol", nil, data) { obj.optBinaryCol = data as NSData }
         observeChange(obj, "optDateCol", nil, date) { obj.optDateCol = date }
 
         observeChange(obj, "optIntCol", 10, nil) { obj.optIntCol.value = nil }
@@ -241,8 +241,8 @@ class KVOTests: TestCase {
         observeChange(obs, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obs, "objectCol", nil, obj) { obj.objectCol = obj }
 
-        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!
-        observeChange(obs, "binaryCol", NSData(), data) { obj.binaryCol = data }
+        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
+        observeChange(obs, "binaryCol", NSData(), data) { obj.binaryCol = data as NSData }
 
         let date = NSDate(timeIntervalSince1970: 1)
         observeChange(obs, "dateCol", NSDate(timeIntervalSince1970: 0), date) { obj.dateCol = date }
@@ -259,7 +259,7 @@ class KVOTests: TestCase {
         observeChange(obs, "optDoubleCol", nil, 10) { obj.optDoubleCol.value = 10 }
         observeChange(obs, "optBoolCol", nil, true) { obj.optBoolCol.value = true }
         observeChange(obs, "optStringCol", nil, "abc") { obj.optStringCol = "abc" }
-        observeChange(obs, "optBinaryCol", nil, data) { obj.optBinaryCol = data }
+        observeChange(obs, "optBinaryCol", nil, data) { obj.optBinaryCol = data as NSData }
         observeChange(obs, "optDateCol", nil, date) { obj.optDateCol = date }
 
         observeChange(obs, "optIntCol", 10, nil) { obj.optIntCol.value = nil }

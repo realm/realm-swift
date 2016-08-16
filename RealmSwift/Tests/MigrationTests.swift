@@ -375,8 +375,8 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((newObj!["doubleCol"] as! Double), 12.3 as Double)
 
                 let binaryCol = "a".data(using: String.Encoding.utf8)!
-                XCTAssertEqual((oldObj!["binaryCol"] as! NSData), binaryCol)
-                XCTAssertEqual((newObj!["binaryCol"] as! NSData), binaryCol)
+                XCTAssertEqual((oldObj!["binaryCol"] as! NSData), binaryCol as NSData)
+                XCTAssertEqual((newObj!["binaryCol"] as! NSData), binaryCol as NSData)
 
                 let dateCol = NSDate(timeIntervalSince1970: 1)
                 XCTAssertEqual((oldObj!["dateCol"] as! NSDate), dateCol)

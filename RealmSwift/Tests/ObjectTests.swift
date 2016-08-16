@@ -198,7 +198,7 @@ class ObjectTests: TestCase {
         setter(object, "z", "stringCol")
         XCTAssertEqual(getter(object, "stringCol") as! String!, "z")
 
-        setter(object, "z".data(using: String.Encoding.utf8), "binaryCol")
+        setter(object, "z".data(using: String.Encoding.utf8)! as Data as NSData, "binaryCol")
         let gotData = (getter(object, "binaryCol") as! NSData) as Data
         XCTAssertTrue(gotData == "z".data(using: String.Encoding.utf8)!)
 
@@ -243,7 +243,7 @@ class ObjectTests: TestCase {
         setter(object, "z", "stringCol")
         XCTAssertEqual((getter(object, "stringCol") as! String), "z")
 
-        setter(object, "z".data(using: String.Encoding.utf8), "binaryCol")
+        setter(object, "z".data(using: String.Encoding.utf8)! as Data as NSData, "binaryCol")
         let gotData = (getter(object, "binaryCol") as! NSData) as Data
         XCTAssertTrue(gotData == "z".data(using: String.Encoding.utf8)!)
 

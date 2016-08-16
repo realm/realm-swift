@@ -558,7 +558,7 @@ class ObjectCreationTests: TestCase {
             case .float:    return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
             case .double:   return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
             case .string:   return ["b"]
-            case .data:     return ["b".data(using: String.Encoding.utf8, allowLossyConversion: false)!]
+            case .data:     return ["b".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData]
             case .date:     return [NSDate(timeIntervalSince1970: 2) as AnyObject]
             case .object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
             case .array:    return [

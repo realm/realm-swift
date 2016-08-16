@@ -56,7 +56,7 @@ class ObjectAccessorTests: TestCase {
         object.stringCol = utf8TestString
         XCTAssertEqual(object.stringCol, utf8TestString)
 
-        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)!
+        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
         object.binaryCol = data
         XCTAssertEqual(object.binaryCol, data)
 
@@ -244,7 +244,7 @@ class ObjectAccessorTests: TestCase {
         object.optStringCol = nil
         XCTAssertNil(object.optStringCol)
 
-        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)!
+        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
         object.optBinaryCol = data
         XCTAssertEqual(object.optBinaryCol!, data)
         object.optBinaryCol = nil
