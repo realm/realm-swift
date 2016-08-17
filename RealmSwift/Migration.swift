@@ -193,7 +193,7 @@ internal func accessorMigrationBlock(_ migrationBlock: MigrationBlock)
         }
 
         // run migration
-        migrationBlock(/* migration: */ Migration(migration), /* oldSchemaVersion: */ oldVersion)
+        migrationBlock(Migration(migration), oldVersion)
     }
 }
 

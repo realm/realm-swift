@@ -478,9 +478,9 @@ public final class Realm {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
             switch rlmNotification {
             case RLMNotification.DidChange:
-                block(/* notification: */ .DidChange, /* realm: */ self)
+                block(.DidChange, self)
             case RLMNotification.RefreshRequired:
-                block(/* notification: */ .RefreshRequired, /* realm: */ self)
+                block(.RefreshRequired, self)
             default:
                 fatalError("Unhandled notification type: \(rlmNotification)")
             }
