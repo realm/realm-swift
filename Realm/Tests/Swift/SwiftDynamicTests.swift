@@ -117,36 +117,18 @@ class SwiftDynamicTests: RLMTestCase {
         XCTAssertTrue(array[1]["stringCol"] as! String == "column2")
     }
 
-    // these helper functions make the below test not take five minutes to compile
-    // I suspect a type inference bug
-    func Ni(_ x: Int) -> AnyObject {
-        return NSNumber(value: x)
-    }
-
-    func Nb(_ x: Bool) -> AnyObject {
-        return NSNumber(value: x)
-    }
-
-    func Nd(_ x: Double) -> AnyObject {
-        return NSNumber(value: x)
-    }
-
-    func Nf(_ x: Float) -> AnyObject {
-        return NSNumber(value: x)
-    }
-
     func testDynamicTypes_objc() {
         let date = NSDate(timeIntervalSince1970: 100000)
         let data = "a".data(using: String.Encoding.utf8)!
-        let obj1 = [Nb(true), Ni(1), Nf(1.1), Nd(1.11), "string" as NSString,
-            data as AnyObject, date, Nb(true), Ni(11), NSNull()] as NSArray
+        let obj1: [Any] = [true, 1, 1.1 as Float, 1.11, "string",
+            data, date, true, 11, NSNull()]
 
         let obj = StringObject()
         obj.stringCol = "string"
 
         let data2 = "b".data(using: String.Encoding.utf8)!
-        let obj2 = [Nb(false), Ni(2), Nf(2.2), Nd(2.22), "string2" as NSString,
-            data2 as AnyObject, date, Nb(false), Ni(22), obj] as NSArray
+        let obj2: [Any] = [false, 2, 2.2 as Float, 2.22, "string2",
+            data2, date, false, 22, obj]
 
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
