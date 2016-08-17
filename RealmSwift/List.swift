@@ -491,8 +491,8 @@ extension List : RealmCollection, RangeReplaceableCollection {
     - parameter subRange:    The range of elements to be replaced.
     - parameter newElements: The new elements to be inserted into the List.
     */
-    public func replaceSubrange<C : Collection>(_ subrange: Range<Int>,
-                                with newElements: C) where C.Iterator.Element == T {
+    public func replaceSubrange<C : Collection>(_ subrange: Range<Int>, with newElements: C)
+        where C.Iterator.Element == T {
         for _ in subrange.lowerBound..<subrange.upperBound {
             remove(objectAtIndex: subrange.lowerBound)
         }
