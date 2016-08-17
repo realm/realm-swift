@@ -49,7 +49,7 @@ class SwiftObject: Object {
     dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
     let arrayCol = List<SwiftBoolObject>()
 
-    class func defaultValues() -> [String: AnyObject] {
+    class func defaultValues() -> [String: Any] {
         return  ["boolCol": false as AnyObject,
             "intCol": 123 as AnyObject,
             "floatCol": 1.23 as AnyObject,
@@ -102,7 +102,7 @@ class SwiftOptionalDefaultValuesObject: Object {
     dynamic var optObjectCol: SwiftBoolObject? = SwiftBoolObject(value: [true])
     //    let arrayCol = List<SwiftBoolObject?>()
 
-    class func defaultValues() -> [String: AnyObject] {
+    class func defaultValues() -> [String: Any] {
         return [
             "optNSStringCol" : "A",
             "optStringCol" : "B",
@@ -394,7 +394,7 @@ class SwiftCustomInitializerObject: Object {
         super.init(realm: realm, schema: schema)
     }
 
-    required init(value: AnyObject, schema: RLMSchema) {
+    required init(value: Any, schema: RLMSchema) {
         stringCol = ""
         super.init(value: value, schema: schema)
     }

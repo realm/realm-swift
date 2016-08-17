@@ -263,7 +263,7 @@ public final class Realm {
     - returns: The created object.
     */
     @discardableResult
-    public func createObject<T: Object>(ofType type: T.Type, populatedWith value: AnyObject = [:], update: Bool = false) -> T {
+    public func createObject<T: Object>(ofType type: T.Type, populatedWith value: Any = [:], update: Bool = false) -> T {
         let typeName = (type as Object.Type).className()
         if update && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
@@ -300,7 +300,7 @@ public final class Realm {
     :nodoc:
     */
     @discardableResult
-    public func createDynamicObject(ofType typeName: String, populatedWith value: AnyObject = [:], update: Bool = false) -> DynamicObject {
+    public func createDynamicObject(ofType typeName: String, populatedWith value: Any = [:], update: Bool = false) -> DynamicObject {
         if update && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
         }
@@ -415,7 +415,7 @@ public final class Realm {
 
     - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
-    public func object<T: Object>(ofType type: T.Type, forPrimaryKey key: AnyObject) -> T? {
+    public func object<T: Object>(ofType type: T.Type, forPrimaryKey key: Any) -> T? {
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), to: Optional<T>.self)
     }
 
@@ -441,7 +441,7 @@ public final class Realm {
 
     :nodoc:
     */
-    public func dynamicObject(ofType typeName: String, forPrimaryKey key: AnyObject) -> DynamicObject? {
+    public func dynamicObject(ofType typeName: String, forPrimaryKey key: Any) -> DynamicObject? {
         return unsafeBitCast(RLMGetObject(rlmRealm, typeName, key), to: Optional<DynamicObject>.self)
     }
 
@@ -639,10 +639,10 @@ extension Realm {
     public var inWriteTransaction : Bool { fatalError() }
 
     @available(*, unavailable, renamed:"createObject(ofType:populatedWith:update:)")
-    public func create<T: Object>(_ type: T.Type, value: AnyObject = [:], update: Bool = false) -> T { fatalError() }
+    public func create<T: Object>(_ type: T.Type, value: AnyObject = [:] as NSDictionary, update: Bool = false) -> T { fatalError() }
 
     @available(*, unavailable, renamed:"createDynamicObject(ofType:populatedWith:update:)")
-    public func dynamicCreate(_ className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
+    public func dynamicCreate(_ className: String, value: AnyObject = [:] as NSDictionary, update: Bool = false) -> DynamicObject {
         fatalError()
     }
 

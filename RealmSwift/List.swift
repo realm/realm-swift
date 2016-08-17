@@ -112,7 +112,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
+    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int? {
         return indexOfObject(for: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
@@ -154,7 +154,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
-    public override func value(forKey key: String) -> AnyObject? {
+    public override func value(forKey key: String) -> Any? {
         return value(forKeyPath: key)
     }
 
@@ -167,7 +167,7 @@ public final class List<T: Object>: ListBase {
      - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
      collection's objects.
      */
-    public override func value(forKeyPath keyPath: String) -> AnyObject? {
+    public override func value(forKeyPath keyPath: String) -> Any? {
         return _rlmArray.value(forKeyPath: keyPath)
     }
 
@@ -179,7 +179,7 @@ public final class List<T: Object>: ListBase {
     - parameter value: The object value.
     - parameter key:   The name of the property.
     */
-    public override func setValue(_ value: AnyObject?, forKey key: String) {
+    public override func setValue(_ value: Any?, forKey key: String) {
         return _rlmArray.setValue(value, forKeyPath: key)
     }
 
@@ -192,7 +192,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: `Results` containing elements that match the given predicate.
     */
-    public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<T> {
+    public func filter(using predicateFormat: String, _ args: Any...) -> Results<T> {
         return Results<T>(_rlmArray.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 

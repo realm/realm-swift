@@ -41,7 +41,7 @@ class SwiftDefaultObject: RLMObject {
     dynamic var intCol = 1
     dynamic var boolCol = true
 
-    override class func defaultPropertyValues() -> [NSObject : AnyObject]? {
+    override class func defaultPropertyValues() -> [AnyHashable : Any]? {
         return ["intCol": 2]
     }
 }

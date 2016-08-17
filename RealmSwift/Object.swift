@@ -83,8 +83,8 @@ public class Object: RLMObjectBase {
     }
 
     /**
-    Initialize a standalone (unpersisted) `Object` with values from an `Array<AnyObject>` or
-    `Dictionary<String, AnyObject>`.
+    Initialize a standalone (unpersisted) `Object` with values from an `Array<Any>` or
+    `Dictionary<String, Any>`.
     Call `add(_:)` on a `Realm` to add standalone objects to a realm.
 
     - parameter value: The value used to populate the object. This can be any key/value coding compliant
@@ -92,7 +92,7 @@ public class Object: RLMObjectBase {
                        or an `Array` with one object for each persisted property. An exception will be
                        thrown if any required properties are not present and no default is set.
     */
-    public init(value: AnyObject) {
+    public init(value: Any) {
         type(of: self).sharedSchema() // ensure this class' objectSchema is loaded in the partialSharedSchema
         super.init(value: value, schema: RLMSchema.partialShared())
     }
@@ -172,7 +172,7 @@ public class Object: RLMObjectBase {
     // MARK: Key-Value Coding & Subscripting
 
     /// Returns or sets the value of the property with the given name.
-    public subscript(key: String) -> AnyObject? {
+    public subscript(key: String) -> Any? {
         get {
             if realm == nil {
                 return value(forKey: key)
@@ -220,7 +220,7 @@ public class Object: RLMObjectBase {
 
     - parameter object: Object to compare for equality.
     */
-    public override func isEqual(_ object: AnyObject?) -> Bool {
+    public override func isEqual(_ object: Any?) -> Bool {
         return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
 
@@ -240,7 +240,7 @@ public class Object: RLMObjectBase {
     WARNING: This is an internal initializer not intended for public use.
     :nodoc:
     */
-    public override required init(value: AnyObject, schema: RLMSchema) {
+    public override required init(value: Any, schema: RLMSchema) {
         super.init(value: value, schema: schema)
     }
 }
@@ -250,7 +250,7 @@ public class Object: RLMObjectBase {
 /// Object interface which allows untyped getters and setters for Objects.
 /// :nodoc:
 public final class DynamicObject: Object {
-    public override subscript(key: String) -> AnyObject? {
+    public override subscript(key: String) -> Any? {
         get {
             let value = RLMDynamicGetByName(self, key, false)
             if let array = value as? RLMArray {
@@ -264,12 +264,12 @@ public final class DynamicObject: Object {
     }
 
     /// :nodoc:
-    public override func value(forUndefinedKey key: String) -> AnyObject? {
+    public override func value(forUndefinedKey key: String) -> Any? {
         return self[key]
     }
 
     /// :nodoc:
-    public override func setValue(_ value: AnyObject?, forUndefinedKey key: String) {
+    public override func setValue(_ value: Any?, forUndefinedKey key: String) {
         self[key] = value
     }
 
@@ -307,7 +307,7 @@ public class ObjectUtil: NSObject {
     }
 
     // Get the names of all properties in the object which are of type List<>.
-    @objc private class func getGenericListPropertyNames(_ object: AnyObject) -> NSArray {
+    @objc private class func getGenericListPropertyNames(_ object: Any) -> NSArray {
         return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
             return type(of: prop.value) is RLMListBase.Type
         }.flatMap { (prop: Mirror.Child) in
@@ -316,9 +316,9 @@ public class ObjectUtil: NSObject {
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    @objc private class func getOptionalProperties(_ object: AnyObject) -> NSDictionary {
+    @objc private class func getOptionalProperties(_ object: Any) -> [String: Any] {
         let children = Mirror(reflecting: object).children
-        return children.reduce([String: AnyObject]()) { (properties: [String:AnyObject], prop: Mirror.Child) in
+        return children.reduce([:]) { (properties: [String: Any], prop: Mirror.Child) in
             guard let name = prop.label else { return properties }
             let mirror = Mirror(reflecting: prop.value)
             let type = mirror.subjectType
@@ -349,26 +349,26 @@ public class ObjectUtil: NSObject {
                 properties[name] = NSNull()
             }
             return properties
-        } as NSDictionary
+        }
     }
 
-    @objc private class func requiredPropertiesForClass(_: AnyClass) -> NSArray? {
-        return nil
+    @objc private class func requiredPropertiesForClass(_: Any) -> [String] {
+        return []
     }
 
     // Get information about each of the linking objects properties.
-    @objc private class func getLinkingObjectsProperties(_ object: AnyObject) -> NSDictionary {
+    @objc private class func getLinkingObjectsProperties(_ object: Any) -> [String: [String: String]] {
         let properties = Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
             return prop.value as? LinkingObjectsBase != nil
         }.flatMap { (prop: Mirror.Child) in
             (prop.label!, prop.value as! LinkingObjectsBase)
         }
-        return properties.reduce([String : [String: String ]]()) { (dictionary, property) in
+        return properties.reduce([:]) { (dictionary, property) in
             var d = dictionary
             let (name, results) = property
             d[name] = ["class": results.objectClassName, "property": results.propertyName]
             return d
-        } as NSDictionary
+        }
     }
 }
 

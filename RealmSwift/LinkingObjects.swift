@@ -145,7 +145,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: The index of the first matching object, or `nil` if no objects match.
      */
-    public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
+    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: NSPredicate(format: predicateFormat,
                                                                                argumentArray: args)))
     }
@@ -183,7 +183,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the
        collection's objects.
      */
-    public override func value(forKey key: String) -> AnyObject? {
+    public override func value(forKey key: String) -> Any? {
         return value(forKeyPath: key)
     }
 
@@ -196,7 +196,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
        collection's objects.
      */
-    public override func value(forKeyPath keyPath: String) -> AnyObject? {
+    public override func value(forKeyPath keyPath: String) -> Any? {
         return rlmResults.value(forKeyPath: keyPath)
     }
 
@@ -208,7 +208,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter value: The object value.
      - parameter key:   The name of the property.
      */
-    public override func setValue(_ value: AnyObject?, forKey key: String) {
+    public override func setValue(_ value: Any?, forKey key: String) {
         return rlmResults.setValue(value, forKeyPath: key)
     }
 
@@ -221,7 +221,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: Results containing objects that match the given predicate.
      */
-    public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<T> {
+    public func filter(using predicateFormat: String, _ args: Any...) -> Results<T> {
         return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 

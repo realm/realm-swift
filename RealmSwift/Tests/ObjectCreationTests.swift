@@ -485,7 +485,7 @@ class ObjectCreationTests: TestCase {
     }
 
     // MARK: Private utilities
-    private func verifySwiftObjectWithArrayLiteral(_ object: SwiftObject, array: [AnyObject], boolObjectValue: Bool,
+    private func verifySwiftObjectWithArrayLiteral(_ object: SwiftObject, array: [Any], boolObjectValue: Bool,
                                                    boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, (array[0] as! Bool))
         XCTAssertEqual(object.intCol, (array[1] as! Int))
@@ -501,7 +501,7 @@ class ObjectCreationTests: TestCase {
         }
     }
 
-    private func verifySwiftObjectWithDictionaryLiteral(_ object: SwiftObject, dictionary: [String:AnyObject],
+    private func verifySwiftObjectWithDictionaryLiteral(_ object: SwiftObject, dictionary: [String: Any],
                                                         boolObjectValue: Bool, boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, (dictionary["boolCol"] as! Bool))
         XCTAssertEqual(object.intCol, (dictionary["intCol"] as! Int))
@@ -518,7 +518,7 @@ class ObjectCreationTests: TestCase {
     }
 
     private func verifySwiftOptionalObjectWithDictionaryLiteral(_ object: SwiftOptionalDefaultValuesObject,
-                                                                dictionary: [String:AnyObject],
+                                                                dictionary: [String: Any],
                                                                 boolObjectValue: Bool?) {
         XCTAssertEqual(object.optBoolCol.value, (dictionary["optBoolCol"] as! Bool?))
         XCTAssertEqual(object.optIntCol.value, (dictionary["optIntCol"] as! Int?))
@@ -538,7 +538,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.optObjectCol?.boolCol, boolObjectValue)
     }
 
-    private func defaultSwiftObjectValuesWithReplacements(_ replace: [String: AnyObject]) -> [String: AnyObject] {
+    private func defaultSwiftObjectValuesWithReplacements(_ replace: [String: Any]) -> [String: Any] {
         var valueDict = SwiftObject.defaultValues()
         for (key, value) in replace {
             valueDict[key] = value
@@ -548,7 +548,7 @@ class ObjectCreationTests: TestCase {
 
     // return an array of valid values that can be used to initialize each type
     // swiftlint:disable:next cyclomatic_complexity
-    private func validValuesForSwiftObjectType(_ type: PropertyType) -> [AnyObject] {
+    private func validValuesForSwiftObjectType(_ type: PropertyType) -> [Any] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().createObject(ofType: SwiftBoolObject.self, populatedWith: [true])
         try! Realm().commitWrite()
@@ -574,7 +574,7 @@ class ObjectCreationTests: TestCase {
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    private func invalidValuesForSwiftObjectType(_ type: PropertyType) -> [AnyObject] {
+    private func invalidValuesForSwiftObjectType(_ type: PropertyType) -> [Any] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().createObject(ofType: SwiftIntObject.self)
         try! Realm().commitWrite()

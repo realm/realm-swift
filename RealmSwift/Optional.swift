@@ -31,11 +31,9 @@ extension Float: RealmOptionalType {}
 extension Double: RealmOptionalType {}
 extension Bool: RealmOptionalType {}
 
-// Not all RealmOptionalType's can be cast to AnyObject, so handle casting logic here.
-private func realmOptionalToAnyObject<T: RealmOptionalType>(value: T?) -> AnyObject? {
-    if let anyObjectValue: AnyObject = value as? AnyObject {
-        return anyObjectValue
-    } else if let int8Value = value as? Int8 {
+private func realmOptionalToAny<T: RealmOptionalType>(_ value: T) -> Any {
+    // FIXME: Use common protocol that defines bridging instead of special-case check with no exaustiveness guarentees.
+    if let int8Value = value as? Int8 {
         return NSNumber(value: int8Value)
     } else if let int16Value = value as? Int16 {
         return NSNumber(value: int16Value)
@@ -43,22 +41,23 @@ private func realmOptionalToAnyObject<T: RealmOptionalType>(value: T?) -> AnyObj
         return NSNumber(value: int32Value)
     } else if let int64Value = value as? Int64 {
         return NSNumber(value: int64Value)
+    } else {
+        return value
     }
-    return nil
 }
 
-// Not all RealmOptionalType's can be cast from AnyObject, so handle casting logic here.
-private func anyObjectToRealmOptional<T: RealmOptionalType>(anyObject: AnyObject?) -> T? {
+private func anyToRealmOptional<T: RealmOptionalType>(_ value: Any) -> T {
+    // FIXME: Use common protocol that defines bridging instead of special-case check with no exaustiveness guarentees.
     if T.self is Int8.Type {
-        return (anyObject as! NSNumber?)?.int8Value as! T?
+        return (value as! NSNumber).int8Value as! T
     } else if T.self is Int16.Type {
-        return (anyObject as! NSNumber?)?.int16Value as! T?
+        return (value as! NSNumber).int16Value as! T
     } else if T.self is Int32.Type {
-        return (anyObject as! NSNumber?)?.int32Value as! T?
+        return (value as! NSNumber).int32Value as! T
     } else if T.self is Int64.Type {
-        return (anyObject as! NSNumber?)?.int64Value as! T?
+        return (value as! NSNumber).int64Value as! T
     }
-    return anyObject as! T?
+    return value as! T
 }
 
 /**
@@ -72,10 +71,10 @@ public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
     /// The value this optional represents.
     public var value: T? {
         get {
-            return anyObjectToRealmOptional(anyObject: underlyingValue)
+            return underlyingValue.map(anyToRealmOptional)
         }
         set {
-            underlyingValue = realmOptionalToAnyObject(value: newValue)
+            underlyingValue = newValue.map(realmOptionalToAny)
         }
     }
 
