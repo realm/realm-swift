@@ -115,7 +115,7 @@ class SwiftOptionalDefaultValuesObject: Object {
             "optInt16Col" : 1,
             "optInt32Col" : 1,
             "optInt64Col" : 1,
-            "optFloatCol" : NSNumber(value: 2.2 as Float),
+            "optFloatCol" : 2.2 as Float,
             "optDoubleCol" : 3.3,
             "optBoolCol" : true,
         ]
