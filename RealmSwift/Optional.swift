@@ -32,7 +32,7 @@ extension Double: RealmOptionalType {}
 extension Bool: RealmOptionalType {}
 
 private func realmOptionalToAny<T: RealmOptionalType>(_ value: T) -> Any {
-    // FIXME: Use common protocol that defines bridging instead of special-case check with no exaustiveness guarentees.
+    // FIXME: Use common protocol that defines bridging instead of special-case check with no exhaustiveness guarentees.
     if let int8Value = value as? Int8 {
         return NSNumber(value: int8Value)
     } else if let int16Value = value as? Int16 {
@@ -47,7 +47,7 @@ private func realmOptionalToAny<T: RealmOptionalType>(_ value: T) -> Any {
 }
 
 private func anyToRealmOptional<T: RealmOptionalType>(_ value: Any) -> T {
-    // FIXME: Use common protocol that defines bridging instead of special-case check with no exaustiveness guarentees.
+    // FIXME: Use common protocol that defines bridging instead of special-case check with no exhaustiveness guarentees.
     if T.self is Int8.Type {
         return (value as! NSNumber).int8Value as! T
     } else if T.self is Int16.Type {
