@@ -62,15 +62,15 @@ class ObjectCreationTests: TestCase {
     func testInitWithDictionary() {
         // dictionary with all values specified
         let baselineValues: [String: Any] =
-           ["boolCol": true as NSNumber,
-            "intCol": 1 as NSNumber,
-            "floatCol": 1.1 as NSNumber,
-            "doubleCol": 11.1 as NSNumber,
-            "stringCol": "b" as NSString,
+           ["boolCol": true,
+            "intCol": 1,
+            "floatCol": 1.1 as Float,
+            "doubleCol": 11.1,
+            "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
-            "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
-            "objectCol": SwiftBoolObject(value: [true]) as AnyObject,
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]  as AnyObject
+            "dateCol": NSDate(timeIntervalSince1970: 2),
+            "objectCol": SwiftBoolObject(value: [true]),
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
            ]
 
         // test with valid dictionary literals
@@ -80,7 +80,7 @@ class ObjectCreationTests: TestCase {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[props[propNum].name] = validValue
-                let object = SwiftObject(value: values as AnyObject)
+                let object = SwiftObject(value: values)
                 verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true,
                     boolObjectListValues: [true, false])
             }
@@ -92,7 +92,7 @@ class ObjectCreationTests: TestCase {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[props[propNum].name] = invalidValue
-                assertThrows(SwiftObject(value: values as AnyObject), "Invalid property value")
+                assertThrows(SwiftObject(value: values), "Invalid property value")
             }
         }
     }
@@ -108,7 +108,7 @@ class ObjectCreationTests: TestCase {
     func testInitWithArray() {
         // array with all values specified
         let baselineValues: [Any] = [true, 1, 1.1 as Float, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
-            NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]]
+            NSDate(timeIntervalSince1970: 2), ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -117,7 +117,7 @@ class ObjectCreationTests: TestCase {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[propNum] = validValue
-                let object = SwiftObject(value: values as AnyObject)
+                let object = SwiftObject(value: values)
                 verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true,
                     boolObjectListValues: [true, false])
             }
@@ -129,7 +129,7 @@ class ObjectCreationTests: TestCase {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[propNum] = invalidValue
-                assertThrows(SwiftObject(value: values as AnyObject), "Invalid property value")
+                assertThrows(SwiftObject(value: values), "Invalid property value")
             }
         }
     }
@@ -227,7 +227,7 @@ class ObjectCreationTests: TestCase {
                 var values = baselineValues
                 values[props[propNum].name] = validValue
                 try! Realm().beginWrite()
-                let object = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: values as AnyObject)
+                let object = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: values)
                 verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true,
                     boolObjectListValues: [true, false])
                 try! Realm().commitWrite()
@@ -243,7 +243,7 @@ class ObjectCreationTests: TestCase {
                 var values = baselineValues
                 values[props[propNum].name] = invalidValue
                 try! Realm().beginWrite()
-                assertThrows(try! Realm().createObject(ofType: SwiftObject.self, populatedWith: values as AnyObject), "Invalid property value")
+                assertThrows(try! Realm().createObject(ofType: SwiftObject.self, populatedWith: values), "Invalid property value")
                 try! Realm().cancelWrite()
             }
         }
@@ -264,7 +264,7 @@ class ObjectCreationTests: TestCase {
     func testCreateWithArray() {
         // array with all values specified
         let baselineValues: [Any] = [true, 1, 1.1 as Float, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
-            NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]]
+            NSDate(timeIntervalSince1970: 2), ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -274,7 +274,7 @@ class ObjectCreationTests: TestCase {
                 var values = baselineValues
                 values[propNum] = validValue
                 try! Realm().beginWrite()
-                let object = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: values as AnyObject)
+                let object = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: values)
                 verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true,
                     boolObjectListValues: [true, false])
                 try! Realm().commitWrite()
@@ -291,7 +291,7 @@ class ObjectCreationTests: TestCase {
                 values[propNum] = invalidValue
 
                 try! Realm().beginWrite()
-                assertThrows(try! Realm().createObject(ofType: SwiftObject.self, populatedWith: values as AnyObject),
+                assertThrows(try! Realm().createObject(ofType: SwiftObject.self, populatedWith: values),
                     "Invalid property value '\(invalidValue)' for property number \(propNum)")
                 try! Realm().cancelWrite()
             }
@@ -354,19 +354,19 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithObjectsFromAnotherRealm() {
         let values: [String: Any] = [
-            "boolCol": true as NSNumber,
-            "intCol": 1 as NSNumber,
-            "floatCol": 1.1 as NSNumber,
-            "doubleCol": 11.1 as NSNumber,
-            "stringCol": "b" as NSString,
+            "boolCol": true,
+            "intCol": 1,
+            "floatCol": 1.1 as Float,
+            "doubleCol": 11.1,
+            "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
-            "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
-            "objectCol": SwiftBoolObject(value: [true]) as AnyObject,
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()] as AnyObject,
+            "dateCol": NSDate(timeIntervalSince1970: 2),
+            "objectCol": SwiftBoolObject(value: [true]),
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
         ]
 
         realmWithTestPath().beginWrite()
-        let otherRealmObject = realmWithTestPath().createObject(ofType: SwiftObject.self, populatedWith: values as AnyObject)
+        let otherRealmObject = realmWithTestPath().createObject(ofType: SwiftObject.self, populatedWith: values)
         try! realmWithTestPath().commitWrite()
 
         try! Realm().beginWrite()
@@ -380,15 +380,15 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithDeeplyNestedObjectsFromAnotherRealm() {
         let values: [String: Any] = [
-            "boolCol": true as NSNumber,
-            "intCol": 1 as NSNumber,
-            "floatCol": 1.1 as NSNumber,
-            "doubleCol": 11.1 as NSNumber,
-            "stringCol": "b" as NSString,
+            "boolCol": true,
+            "intCol": 1,
+            "floatCol": 1.1 as Float,
+            "doubleCol": 11.1,
+            "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
-            "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
-            "objectCol": SwiftBoolObject(value: [true]) as AnyObject,
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()] as AnyObject,
+            "dateCol": NSDate(timeIntervalSince1970: 2),
+            "objectCol": SwiftBoolObject(value: [true]),
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
         ]
 
         let realmA = realmWithTestPath()
@@ -396,8 +396,8 @@ class ObjectCreationTests: TestCase {
 
         var realmAObject: SwiftListOfSwiftObject!
         try! realmA.write {
-            let array = [SwiftObject(value: values as AnyObject), SwiftObject(value: values as AnyObject)]
-            realmAObject = realmA.createObject(ofType: SwiftListOfSwiftObject.self, populatedWith: ["array": array as AnyObject])
+            let array = [SwiftObject(value: values), SwiftObject(value: values)]
+            realmAObject = realmA.createObject(ofType: SwiftListOfSwiftObject.self, populatedWith: ["array": array])
         }
 
         var realmBObject: SwiftListOfSwiftObject!
@@ -431,19 +431,19 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithNSNullLinks() {
         let values: [String: Any] = [
-            "boolCol": true as NSNumber,
-            "intCol": 1 as NSNumber,
-            "floatCol": 1.1 as NSNumber,
-            "doubleCol": 11.1 as NSNumber,
-            "stringCol": "b" as NSString,
+            "boolCol": true,
+            "intCol": 1,
+            "floatCol": 1.1,
+            "doubleCol": 11.1,
+            "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
-            "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
+            "dateCol": NSDate(timeIntervalSince1970: 2),
             "objectCol": NSNull(),
             "arrayCol": NSNull(),
         ]
 
         realmWithTestPath().beginWrite()
-        let object = realmWithTestPath().createObject(ofType: SwiftObject.self, populatedWith: values as AnyObject)
+        let object = realmWithTestPath().createObject(ofType: SwiftObject.self, populatedWith: values)
         try! realmWithTestPath().commitWrite()
 
         XCTAssert(object.objectCol == nil) // XCTAssertNil caused a NULL deref inside _swift_getClass
@@ -559,7 +559,7 @@ class ObjectCreationTests: TestCase {
             case .double:   return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
             case .string:   return ["b"]
             case .data:     return ["b".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData]
-            case .date:     return [NSDate(timeIntervalSince1970: 2) as AnyObject]
+            case .date:     return [NSDate(timeIntervalSince1970: 2)]
             case .object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
             case .array:    return [
                 [[true], [false]],

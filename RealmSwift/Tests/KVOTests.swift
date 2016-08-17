@@ -229,7 +229,7 @@ class KVOTests: TestCase {
     func testAllPropertyTypesMultipleAccessors() {
         let obj = KVOObject()
         realm.add(obj)
-        let obs = realm.object(ofType: KVOObject.self, forPrimaryKey: obj.pk as AnyObject)!
+        let obs = realm.object(ofType: KVOObject.self, forPrimaryKey: obj.pk)!
 
         observeChange(obs, "boolCol", false, true) { obj.boolCol = true }
         observeChange(obs, "int8Col", 1, 10) { obj.int8Col = 10 }
@@ -276,7 +276,7 @@ class KVOTests: TestCase {
 
         let obj2 = KVOObject()
         realm.add(obj2)
-        let obs2 = realm.object(ofType: KVOObject.self, forPrimaryKey: obj2.pk as AnyObject)!
+        let obs2 = realm.object(ofType: KVOObject.self, forPrimaryKey: obj2.pk)!
         observeChange(obs2, "arrayCol.invalidated", false, true) {
             self.realm.delete(obj2)
         }

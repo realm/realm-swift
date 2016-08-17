@@ -50,15 +50,17 @@ class SwiftObject: Object {
     let arrayCol = List<SwiftBoolObject>()
 
     class func defaultValues() -> [String: Any] {
-        return  ["boolCol": false as AnyObject,
-            "intCol": 123 as AnyObject,
-            "floatCol": 1.23 as AnyObject,
-            "doubleCol": 12.3 as AnyObject,
-            "stringCol": "a" as AnyObject,
-            "binaryCol":  "a".data(using: String.Encoding.utf8)! as Data as NSData,
+        return  [
+            "boolCol": false,
+            "intCol": 123,
+            "floatCol": 1.23 as Float,
+            "doubleCol": 12.3,
+            "stringCol": "a",
+            "binaryCol":  "a".data(using: String.Encoding.utf8)!,
             "dateCol": NSDate(timeIntervalSince1970: 1),
             "objectCol": [false],
-            "arrayCol": [] as NSArray]
+            "arrayCol": []
+        ]
     }
 }
 

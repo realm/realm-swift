@@ -252,7 +252,7 @@ class ObjectTests: TestCase {
 
         setter(object, boolObject, "objectCol")
         XCTAssertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)
-        XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! NSNumber), true as NSNumber)
+        XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! Bool), true)
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)

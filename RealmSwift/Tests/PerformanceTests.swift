@@ -285,12 +285,12 @@ class SwiftPerformanceTests: TestCase {
         let realm = realmWithTestPath()
         try! realm.write {
             for i in 0..<1000 {
-                realm.createObject(ofType: SwiftStringObject.self, populatedWith: [i.description] as AnyObject)
+                realm.createObject(ofType: SwiftStringObject.self, populatedWith: [i.description])
             }
         }
         measure {
             for i in 0..<1000 {
-                _ = realm.allObjects(ofType: SwiftStringObject.self).filter(using: "stringCol = %@", i.description as AnyObject).first
+                _ = realm.allObjects(ofType: SwiftStringObject.self).filter(using: "stringCol = %@", i.description).first
             }
         }
     }
@@ -299,12 +299,12 @@ class SwiftPerformanceTests: TestCase {
         let realm = realmWithTestPath()
         try! realm.write {
             for i in 0..<1000 {
-                realm.createObject(ofType: SwiftIndexedPropertiesObject.self, populatedWith: [i.description as AnyObject, i as AnyObject])
+                realm.createObject(ofType: SwiftIndexedPropertiesObject.self, populatedWith: [i.description, i])
             }
         }
         measure {
             for i in 0..<1000 {
-                _ = realm.allObjects(ofType: SwiftIndexedPropertiesObject.self).filter(using: "stringCol = %@", i.description as AnyObject).first
+                _ = realm.allObjects(ofType: SwiftIndexedPropertiesObject.self).filter(using: "stringCol = %@", i.description).first
             }
         }
     }
@@ -314,14 +314,14 @@ class SwiftPerformanceTests: TestCase {
         realm.beginWrite()
         var ids = [Int]()
         for i in 0..<10000 {
-            realm.createObject(ofType: SwiftIntObject.self, populatedWith: [i as AnyObject])
+            realm.createObject(ofType: SwiftIntObject.self, populatedWith: [i])
             if i % 2 != 0 {
                 ids.append(i)
             }
         }
         try! realm.commitWrite()
         measure {
-            _ = realm.allObjects(ofType: SwiftIntObject.self).filter(using: "intCol IN %@", ids as AnyObject).first
+            _ = realm.allObjects(ofType: SwiftIntObject.self).filter(using: "intCol IN %@", ids).first
         }
     }
 
@@ -330,7 +330,7 @@ class SwiftPerformanceTests: TestCase {
         try! realm.write {
             for _ in 0..<8000 {
                 let randomNumber = Int(arc4random_uniform(UInt32(INT_MAX)))
-                realm.createObject(ofType: SwiftIntObject.self, populatedWith: [randomNumber as AnyObject])
+                realm.createObject(ofType: SwiftIntObject.self, populatedWith: [randomNumber])
             }
         }
         measure {
