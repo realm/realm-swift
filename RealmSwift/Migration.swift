@@ -204,7 +204,7 @@ extension Migration {
     public func enumerate(_ objectClassName: String, _ block: MigrationObjectEnumerateBlock) { }
 
     @available(*, unavailable, renamed:"createObject(ofType:populatedWith:)")
-    public func create(_ className: String, value: AnyObject = [:] as NSDictionary) -> MigrationObject {
+    public func create(_ className: String, value: Any = [:]) -> MigrationObject {
         fatalError()
     }
 
