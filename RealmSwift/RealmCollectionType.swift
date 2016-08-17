@@ -107,9 +107,9 @@ public enum RealmCollectionChange<T> {
         }
         if let change = change {
             return .Update(value,
-                deletions: change.deletions as! [Int],
-                insertions: change.insertions as! [Int],
-                modifications: change.modifications as! [Int])
+                deletions: change.deletions as [Int],
+                insertions: change.insertions as [Int],
+                modifications: change.modifications as [Int])
         }
         return .Initial(value)
     }
