@@ -30,7 +30,7 @@ Migration block used to migrate a Realm.
                        existing objects which require migration.
 - parameter oldSchemaVersion: The schema version of the `Realm` being migrated.
 */
-public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt64) -> Void
+public typealias MigrationBlock = (_ migration: Migration, _ oldSchemaVersion: UInt64) -> Void
 
 /// Object class used during migrations.
 public typealias MigrationObject = DynamicObject
@@ -42,7 +42,7 @@ accessed using subscripting.
 - parameter oldObject: Object in original `Realm` (read-only).
 - parameter newObject: Object in migrated `Realm` (read-write).
 */
-public typealias MigrationObjectEnumerateBlock = (oldObject: MigrationObject?, newObject: MigrationObject?) -> Void
+public typealias MigrationObjectEnumerateBlock = (_ oldObject: MigrationObject?, _ newObject: MigrationObject?) -> Void
 
 /**
 Get the schema version for a Realm at a given local URL.
@@ -109,8 +109,8 @@ public final class Migration {
     */
     public func enumerateObjects(ofType typeName: String, _ block: MigrationObjectEnumerateBlock) {
         rlmMigration.enumerateObjects(typeName) {
-            block(oldObject: unsafeBitCast($0, to: MigrationObject.self),
-                  newObject: unsafeBitCast($1, to: MigrationObject.self))
+            block(unsafeBitCast($0, to: MigrationObject.self),
+                  unsafeBitCast($1, to: MigrationObject.self))
         }
     }
 
@@ -127,7 +127,7 @@ public final class Migration {
     - returns: The created object.
     */
     @discardableResult
-    public func createObject(ofType typeName: String, populatedWith value: AnyObject = [:]) -> MigrationObject {
+    public func createObject(ofType typeName: String, populatedWith value: Any = [:]) -> MigrationObject {
         return unsafeBitCast(rlmMigration.createObject(typeName, withValue: value), to: MigrationObject.self)
     }
 
@@ -169,7 +169,7 @@ public final class Migration {
         rlmMigration.renameProperty(forClass: typeName, oldName: oldName, newName: newName)
     }
 
-    private init(_ rlmMigration: RLMMigration) {
+    fileprivate init(_ rlmMigration: RLMMigration) {
         self.rlmMigration = rlmMigration
     }
 }
@@ -192,7 +192,7 @@ internal func accessorMigrationBlock(_ migrationBlock: MigrationBlock) -> RLMMig
         }
 
         // run migration
-        migrationBlock(migration: Migration(migration), oldSchemaVersion: oldVersion)
+        migrationBlock(Migration(migration), oldVersion)
     }
 }
 
@@ -203,7 +203,7 @@ extension Migration {
     public func enumerate(_ objectClassName: String, _ block: MigrationObjectEnumerateBlock) { }
 
     @available(*, unavailable, renamed:"createObject(ofType:populatedWith:)")
-    public func create(_ className: String, value: AnyObject = [:]) -> MigrationObject {
+    public func create(_ className: String, value: Any = [:]) -> MigrationObject {
         fatalError()
     }
 
