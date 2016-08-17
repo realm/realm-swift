@@ -967,18 +967,16 @@ RLM_ARRAY_TYPE(NotARealClass)
     [realm transactionWithBlock:^{ io[@"intCol"] = @10; }];
     XCTAssertEqual(io.intCol, 10);
 
-#if 0 // https://github.com/realm/realm-core/issues/1900
     // Create query, add column, run query
     RLMResults *query = [IntObject objectsInRealm:realm where:@"intCol > 5"];
     RLMRunChildAndWait();
-    XCTAssertEqual(query.count, 2U);
+    XCTAssertEqual(query.count, 3U);
 
     // Create query, create TV, add column, reevaluate query
     query = [IntObject objectsInRealm:realm where:@"intCol > 5"];
     (void)[query lastObject];
     RLMRunChildAndWait();
-    XCTAssertEqual(query.count, 2U);
-#endif
+    XCTAssertEqual(query.count, 3U);
 }
 #endif
 

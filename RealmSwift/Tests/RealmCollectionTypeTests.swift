@@ -23,6 +23,10 @@ import RealmSwift
 
 class CTTAggregateObject: Object {
     dynamic var intCol = 0
+    dynamic var int8Col = 0
+    dynamic var int16Col = 0
+    dynamic var int32Col = 0
+    dynamic var int64Col = 0
     dynamic var floatCol = 0 as Float
     dynamic var doubleCol = 0.0
     dynamic var boolCol = false
@@ -67,6 +71,10 @@ class RealmCollectionTypeTests: TestCase {
     func makeAggregateableObjectsInWriteTransaction() -> [CTTAggregateObject] {
         let obj1 = CTTAggregateObject()
         obj1.intCol = 1
+        obj1.int8Col = 1
+        obj1.int16Col = 1
+        obj1.int32Col = 1
+        obj1.int64Col = 1
         obj1.floatCol = 1.1
         obj1.doubleCol = 1.11
         obj1.dateCol = NSDate(timeIntervalSince1970: 1)
@@ -74,6 +82,10 @@ class RealmCollectionTypeTests: TestCase {
 
         let obj2 = CTTAggregateObject()
         obj2.intCol = 2
+        obj2.int8Col = 2
+        obj2.int16Col = 2
+        obj2.int32Col = 2
+        obj2.int64Col = 2
         obj2.floatCol = 2.2
         obj2.doubleCol = 2.22
         obj2.dateCol = NSDate(timeIntervalSince1970: 2)
@@ -81,6 +93,10 @@ class RealmCollectionTypeTests: TestCase {
 
         let obj3 = CTTAggregateObject()
         obj3.intCol = 3
+        obj3.int8Col = 3
+        obj3.int16Col = 3
+        obj3.int32Col = 3
+        obj3.int64Col = 3
         obj3.floatCol = 2.2
         obj3.doubleCol = 2.22
         obj3.dateCol = NSDate(timeIntervalSince1970: 2)
@@ -327,6 +343,10 @@ class RealmCollectionTypeTests: TestCase {
     func testMin() {
         let collection = getAggregateableCollection()
         XCTAssertEqual(1, collection.minimumValue(ofProperty: "intCol") as Int!)
+        XCTAssertEqual(1, collection.minimumValue(ofProperty: "int8Col") as Int8!)
+        XCTAssertEqual(1, collection.minimumValue(ofProperty: "int16Col") as Int16!)
+        XCTAssertEqual(1, collection.minimumValue(ofProperty: "int32Col") as Int32!)
+        XCTAssertEqual(1, collection.minimumValue(ofProperty: "int64Col") as Int64!)
         XCTAssertEqual(Float(1.1), collection.minimumValue(ofProperty: "floatCol") as Float!)
         XCTAssertEqual(Double(1.11), collection.minimumValue(ofProperty: "doubleCol") as Double!)
         XCTAssertEqual(NSDate(timeIntervalSince1970: 1), collection.minimumValue(ofProperty: "dateCol") as NSDate!)
@@ -337,6 +357,10 @@ class RealmCollectionTypeTests: TestCase {
     func testMax() {
         let collection = getAggregateableCollection()
         XCTAssertEqual(3, collection.maximumValue(ofProperty: "intCol") as Int!)
+        XCTAssertEqual(3, collection.maximumValue(ofProperty: "int8Col") as Int8!)
+        XCTAssertEqual(3, collection.maximumValue(ofProperty: "int16Col") as Int16!)
+        XCTAssertEqual(3, collection.maximumValue(ofProperty: "int32Col") as Int32!)
+        XCTAssertEqual(3, collection.maximumValue(ofProperty: "int64Col") as Int64!)
         XCTAssertEqual(Float(2.2), collection.maximumValue(ofProperty: "floatCol") as Float!)
         XCTAssertEqual(Double(2.22), collection.maximumValue(ofProperty: "doubleCol") as Double!)
         XCTAssertEqual(NSDate(timeIntervalSince1970: 2), collection.maximumValue(ofProperty: "dateCol") as NSDate!)
@@ -347,6 +371,10 @@ class RealmCollectionTypeTests: TestCase {
     func testSum() {
         let collection = getAggregateableCollection()
         XCTAssertEqual(6, collection.sum(ofProperty: "intCol") as Int)
+        XCTAssertEqual(6, collection.sum(ofProperty: "int8Col") as Int8)
+        XCTAssertEqual(6, collection.sum(ofProperty: "int16Col") as Int16)
+        XCTAssertEqual(6, collection.sum(ofProperty: "int32Col") as Int32)
+        XCTAssertEqual(6, collection.sum(ofProperty: "int64Col") as Int64)
         XCTAssertEqualWithAccuracy(Float(5.5), collection.sum(ofProperty: "floatCol") as Float, accuracy: 0.001)
         XCTAssertEqualWithAccuracy(Double(5.55), collection.sum(ofProperty: "doubleCol") as Double, accuracy: 0.001)
 
@@ -356,6 +384,10 @@ class RealmCollectionTypeTests: TestCase {
     func testAverage() {
         let collection = getAggregateableCollection()
         XCTAssertEqual(2, collection.average(ofProperty: "intCol") as Int!)
+        XCTAssertEqual(2, collection.average(ofProperty: "int8Col") as Int8!)
+        XCTAssertEqual(2, collection.average(ofProperty: "int16Col") as Int16!)
+        XCTAssertEqual(2, collection.average(ofProperty: "int32Col") as Int32!)
+        XCTAssertEqual(2, collection.average(ofProperty: "int64Col") as Int64!)
         XCTAssertEqualWithAccuracy(Float(1.8333), collection.average(ofProperty: "floatCol") as Float!, accuracy: 0.001)
         XCTAssertEqualWithAccuracy(Double(1.85), collection.average(ofProperty: "doubleCol") as Double!, accuracy: 0.001)
 
@@ -798,6 +830,10 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
             fatalError("Test precondition failed")
         }
         assertThrows(collection.minimumValue(ofProperty: "intCol") as Int!)
+        assertThrows(collection.minimumValue(ofProperty: "int8Col") as Int8!)
+        assertThrows(collection.minimumValue(ofProperty: "int16Col") as Int16!)
+        assertThrows(collection.minimumValue(ofProperty: "int32Col") as Int32!)
+        assertThrows(collection.minimumValue(ofProperty: "int64Col") as Int64!)
         assertThrows(collection.minimumValue(ofProperty: "floatCol") as Float!)
         assertThrows(collection.minimumValue(ofProperty: "doubleCol") as Double!)
         assertThrows(collection.minimumValue(ofProperty: "dateCol") as NSDate!)
@@ -808,6 +844,10 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
             fatalError("Test precondition failed")
         }
         assertThrows(collection.maximumValue(ofProperty: "intCol") as Int!)
+        assertThrows(collection.maximumValue(ofProperty: "int8Col") as Int8!)
+        assertThrows(collection.maximumValue(ofProperty: "int16Col") as Int16!)
+        assertThrows(collection.maximumValue(ofProperty: "int32Col") as Int32!)
+        assertThrows(collection.maximumValue(ofProperty: "int64Col") as Int64!)
         assertThrows(collection.maximumValue(ofProperty: "floatCol") as Float!)
         assertThrows(collection.maximumValue(ofProperty: "doubleCol") as Double!)
         assertThrows(collection.maximumValue(ofProperty: "dateCol") as NSDate!)
@@ -818,6 +858,10 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
             fatalError("Test precondition failed")
         }
         assertThrows(collection.sum(ofProperty: "intCol") as Int)
+        assertThrows(collection.sum(ofProperty: "int8Col") as Int8)
+        assertThrows(collection.sum(ofProperty: "int16Col") as Int16)
+        assertThrows(collection.sum(ofProperty: "int32Col") as Int32)
+        assertThrows(collection.sum(ofProperty: "int64Col") as Int64)
         assertThrows(collection.sum(ofProperty: "floatCol") as Float)
         assertThrows(collection.sum(ofProperty: "doubleCol") as Double)
     }
@@ -827,6 +871,10 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
             fatalError("Test precondition failed")
         }
         assertThrows(collection.average(ofProperty: "intCol") as Int!)
+        assertThrows(collection.average(ofProperty: "int8Col") as Int8!)
+        assertThrows(collection.average(ofProperty: "int16Col") as Int16!)
+        assertThrows(collection.average(ofProperty: "int32Col") as Int32!)
+        assertThrows(collection.average(ofProperty: "int64Col") as Int64!)
         assertThrows(collection.average(ofProperty: "floatCol") as Float!)
         assertThrows(collection.average(ofProperty: "doubleCol") as Double!)
     }
@@ -958,6 +1006,10 @@ class LinkingObjectsCollectionTypeTests: RealmCollectionTypeTests {
 
 class CTTAggregateObject: Object {
     dynamic var intCol = 0
+    dynamic var int8Col = 0
+    dynamic var int16Col = 0
+    dynamic var int32Col = 0
+    dynamic var int64Col = 0
     dynamic var floatCol = 0 as Float
     dynamic var doubleCol = 0.0
     dynamic var boolCol = false
@@ -1002,6 +1054,10 @@ class RealmCollectionTypeTests: TestCase {
     func makeAggregateableObjectsInWriteTransaction() -> [CTTAggregateObject] {
         let obj1 = CTTAggregateObject()
         obj1.intCol = 1
+        obj1.int8Col = 1
+        obj1.int16Col = 1
+        obj1.int32Col = 1
+        obj1.int64Col = 1
         obj1.floatCol = 1.1
         obj1.doubleCol = 1.11
         obj1.dateCol = NSDate(timeIntervalSince1970: 1)
@@ -1009,6 +1065,10 @@ class RealmCollectionTypeTests: TestCase {
 
         let obj2 = CTTAggregateObject()
         obj2.intCol = 2
+        obj2.int8Col = 2
+        obj2.int16Col = 2
+        obj2.int32Col = 2
+        obj2.int64Col = 2
         obj2.floatCol = 2.2
         obj2.doubleCol = 2.22
         obj2.dateCol = NSDate(timeIntervalSince1970: 2)
@@ -1016,6 +1076,10 @@ class RealmCollectionTypeTests: TestCase {
 
         let obj3 = CTTAggregateObject()
         obj3.intCol = 3
+        obj3.int8Col = 3
+        obj3.int16Col = 3
+        obj3.int32Col = 3
+        obj3.int64Col = 3
         obj3.floatCol = 2.2
         obj3.doubleCol = 2.22
         obj3.dateCol = NSDate(timeIntervalSince1970: 2)
@@ -1218,6 +1282,10 @@ class RealmCollectionTypeTests: TestCase {
     func testMin() {
         let collection = getAggregateableCollection()
         XCTAssertEqual(1, collection.min("intCol") as Int!)
+        XCTAssertEqual(1, collection.min("int8Col") as Int8!)
+        XCTAssertEqual(1, collection.min("int16Col") as Int16!)
+        XCTAssertEqual(1, collection.min("int32Col") as Int32!)
+        XCTAssertEqual(1, collection.min("int64Col") as Int64!)
         XCTAssertEqual(Float(1.1), collection.min("floatCol") as Float!)
         XCTAssertEqual(Double(1.11), collection.min("doubleCol") as Double!)
         XCTAssertEqual(NSDate(timeIntervalSince1970: 1), collection.min("dateCol") as NSDate!)
@@ -1228,6 +1296,10 @@ class RealmCollectionTypeTests: TestCase {
     func testMax() {
         let collection = getAggregateableCollection()
         XCTAssertEqual(3, collection.max("intCol") as Int!)
+        XCTAssertEqual(3, collection.max("int8Col") as Int8!)
+        XCTAssertEqual(3, collection.max("int16Col") as Int16!)
+        XCTAssertEqual(3, collection.max("int32Col") as Int32!)
+        XCTAssertEqual(3, collection.max("int64Col") as Int64!)
         XCTAssertEqual(Float(2.2), collection.max("floatCol") as Float!)
         XCTAssertEqual(Double(2.22), collection.max("doubleCol") as Double!)
         XCTAssertEqual(NSDate(timeIntervalSince1970: 2), collection.max("dateCol") as NSDate!)
@@ -1238,6 +1310,10 @@ class RealmCollectionTypeTests: TestCase {
     func testSum() {
         let collection = getAggregateableCollection()
         XCTAssertEqual(6, collection.sum("intCol") as Int)
+        XCTAssertEqual(6, collection.sum("int8Col") as Int8)
+        XCTAssertEqual(6, collection.sum("int16Col") as Int16)
+        XCTAssertEqual(6, collection.sum("int32Col") as Int32)
+        XCTAssertEqual(6, collection.sum("int64Col") as Int64)
         XCTAssertEqualWithAccuracy(Float(5.5), collection.sum("floatCol") as Float, accuracy: 0.001)
         XCTAssertEqualWithAccuracy(Double(5.55), collection.sum("doubleCol") as Double, accuracy: 0.001)
 
@@ -1247,6 +1323,10 @@ class RealmCollectionTypeTests: TestCase {
     func testAverage() {
         let collection = getAggregateableCollection()
         XCTAssertEqual(2, collection.average("intCol") as Int!)
+        XCTAssertEqual(2, collection.average("int8Col") as Int8!)
+        XCTAssertEqual(2, collection.average("int16Col") as Int16!)
+        XCTAssertEqual(2, collection.average("int32Col") as Int32!)
+        XCTAssertEqual(2, collection.average("int64Col") as Int64!)
         XCTAssertEqualWithAccuracy(Float(1.8333), collection.average("floatCol") as Float!, accuracy: 0.001)
         XCTAssertEqualWithAccuracy(Double(1.85), collection.average("doubleCol") as Double!, accuracy: 0.001)
 
@@ -1628,6 +1708,10 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
     override func testMin() {
         assertThrows(self.collection.min("intCol") as Int!)
+        assertThrows(self.collection.min("int8Col") as Int8!)
+        assertThrows(self.collection.min("int16Col") as Int16!)
+        assertThrows(self.collection.min("int32Col") as Int32!)
+        assertThrows(self.collection.min("int64Col") as Int64!)
         assertThrows(self.collection.min("floatCol") as Float!)
         assertThrows(self.collection.min("doubleCol") as Double!)
         assertThrows(self.collection.min("dateCol") as NSDate!)
@@ -1635,6 +1719,10 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
     override func testMax() {
         assertThrows(self.collection.max("intCol") as Int!)
+        assertThrows(self.collection.max("int8Col") as Int8!)
+        assertThrows(self.collection.max("int16Col") as Int16!)
+        assertThrows(self.collection.max("int32Col") as Int32!)
+        assertThrows(self.collection.max("int64Col") as Int64!)
         assertThrows(self.collection.max("floatCol") as Float!)
         assertThrows(self.collection.max("doubleCol") as Double!)
         assertThrows(self.collection.max("dateCol") as NSDate!)
@@ -1642,12 +1730,20 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
     override func testSum() {
         assertThrows(self.collection.sum("intCol") as Int)
+        assertThrows(self.collection.sum("int8Col") as Int8)
+        assertThrows(self.collection.sum("int16Col") as Int16)
+        assertThrows(self.collection.sum("int32Col") as Int32)
+        assertThrows(self.collection.sum("int64Col") as Int64)
         assertThrows(self.collection.sum("floatCol") as Float)
         assertThrows(self.collection.sum("doubleCol") as Double)
     }
 
     override func testAverage() {
         assertThrows(self.collection.average("intCol") as Int!)
+        assertThrows(self.collection.average("int8Col") as Int8!)
+        assertThrows(self.collection.average("int16Col") as Int16!)
+        assertThrows(self.collection.average("int32Col") as Int32!)
+        assertThrows(self.collection.average("int64Col") as Int64!)
         assertThrows(self.collection.average("floatCol") as Float!)
         assertThrows(self.collection.average("doubleCol") as Double!)
     }

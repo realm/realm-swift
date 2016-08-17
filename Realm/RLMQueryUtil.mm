@@ -1363,15 +1363,16 @@ realm::Query RLMPredicateToQuery(NSPredicate *predicate, RLMObjectSchema *object
     return query;
 }
 
-realm::SortOrder RLMSortOrderFromDescriptors(realm::Table& table, NSArray<RLMSortDescriptor *> *descriptors) {
-    realm::SortOrder sort;
-    sort.column_indices.reserve(descriptors.count);
-    sort.ascending.reserve(descriptors.count);
+realm::SortDescriptor RLMSortDescriptorFromDescriptors(realm::Table& table, NSArray<RLMSortDescriptor *> *descriptors) {
+    std::vector<std::vector<size_t>> columnIndices;
+    std::vector<bool> ascending;
+    columnIndices.reserve(descriptors.count);
+    ascending.reserve(descriptors.count);
 
     for (RLMSortDescriptor *descriptor in descriptors) {
-        sort.column_indices.push_back(RLMValidatedColumnForSort(table, descriptor.property));
-        sort.ascending.push_back(descriptor.ascending);
+        columnIndices.push_back({RLMValidatedColumnForSort(table, descriptor.property)});
+        ascending.push_back(descriptor.ascending);
     }
 
-    return sort;
+    return {table, std::move(columnIndices), std::move(ascending)};
 }

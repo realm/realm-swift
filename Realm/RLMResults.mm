@@ -188,7 +188,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (const auto& sort = _results.get_sort()) {
         // A sort order is specified so we need to return the first match given that ordering.
         table_view = query.find_all();
-        table_view.sort(sort.column_indices, sort.ascending);
+        table_view.sort(sort);
     } else {
         // No sort order is specified so we only need to find a single match.
         // FIXME: We're only looking for a single object so we'd like to be able to use `Query::find`
@@ -349,7 +349,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
             return self;
         }
 
-        return [RLMResults resultsWithObjectInfo:*_info results:_results.sort(RLMSortOrderFromDescriptors(*_info->table(), properties))];
+        return [RLMResults resultsWithObjectInfo:*_info results:_results.sort(RLMSortDescriptorFromDescriptors(*_info->table(), properties))];
     });
 }
 

@@ -21,10 +21,59 @@ import Realm
 
 #if swift(>=3.0)
 
+// MARK: Bridgable
+
+// Used for conversion from Objective-C types to Swift types
+private protocol Bridgable  { static func bridging(_ value: AnyObject) -> Self }
+
+extension Double: Bridgable {
+    static func bridging(_ value: AnyObject) -> Double {
+        return (value as! NSNumber).doubleValue
+    }
+}
+extension Float: Bridgable {
+    static func bridging(_ value: AnyObject) -> Float {
+        return (value as! NSNumber).floatValue
+    }
+}
+extension Int: Bridgable {
+    static func bridging(_ value: AnyObject) -> Int {
+        return (value as! NSNumber).intValue
+    }
+}
+extension Int8: Bridgable {
+    static func bridging(_ value: AnyObject) -> Int8 {
+        return (value as! NSNumber).int8Value
+    }
+}
+extension Int16: Bridgable {
+    static func bridging(_ value: AnyObject) -> Int16 {
+        return (value as! NSNumber).int16Value
+    }
+}
+extension Int32: Bridgable {
+    static func bridging(_ value: AnyObject) -> Int32 {
+        return (value as! NSNumber).int32Value
+    }
+}
+extension Int64: Bridgable {
+    static func bridging(_ value: AnyObject) -> Int64 {
+        return (value as! NSNumber).int64Value
+    }
+}
+extension NSDate: Bridgable {
+    static func bridging(_ value: AnyObject) -> Self   {
+        func forceCastTrampoline<T, U>(_ x: T) -> U {
+            return x as! U
+        }
+        return forceCastTrampoline(value)
+    }
+}
+
 // MARK: MinMaxType
 
 /// Types which can be used for min()/max().
-public protocol MinMaxType {}
+public protocol MinMaxType /* : Bridgable */ {}
 extension Double: MinMaxType {}
 extension Float: MinMaxType {}
 extension Int: MinMaxType {}
@@ -33,11 +82,16 @@ extension Int16: MinMaxType {}
 extension Int32: MinMaxType {}
 extension Int64: MinMaxType {}
 extension NSDate: MinMaxType {}
-
+extension MinMaxType {
+    internal static func bridging(_ value: AnyObject) -> Self {
+        return (Self.self as! Bridgable.Type).bridging(value) as! Self
+    }
+}
+    
 // MARK: AddableType
 
 /// Types which can be used for average()/sum().
-public protocol AddableType {}
+public protocol AddableType /* : Bridgable */ {}
 extension Double: AddableType {}
 extension Float: AddableType {}
 extension Int: AddableType {}
@@ -45,6 +99,11 @@ extension Int8: AddableType {}
 extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
+extension AddableType {
+    internal static func bridging(_ value: AnyObject) -> Self {
+        return (Self.self as! Bridgable.Type).bridging(value) as! Self
+    }
+}
 
 /**
 Results is an auto-updating container type in Realm returned from object queries.
@@ -270,7 +329,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The minimum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
     public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return rlmResults.min(ofProperty: property) as! U?
+        return rlmResults.min(ofProperty: property).map(U.bridging)
     }
 
     /**
@@ -283,7 +342,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The maximum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
     public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return rlmResults.max(ofProperty: property) as! U?
+        return rlmResults.max(ofProperty: property).map(U.bridging)
     }
 
     /**
@@ -296,7 +355,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The sum of the given property over all objects in the Results.
     */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
-        return rlmResults.sum(ofProperty: property) as AnyObject as! U
+        return U.bridging(rlmResults.sum(ofProperty: property))
     }
 
     /**
@@ -309,7 +368,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The average of the given property over all objects in the Results, or `nil` if the Results is empty.
     */
     public func average<U: AddableType>(ofProperty property: String) -> U? {
-        return rlmResults.average(ofProperty: property) as! U?
+        return rlmResults.average(ofProperty: property).map(U.bridging)
     }
 
     // MARK: Notifications
@@ -453,6 +512,55 @@ extension Results {
 
 #else
 
+// MARK: Bridgable
+
+// Used for conversion from Objective-C types to Swift types
+private protocol Bridgable  { static func bridging(value: AnyObject) -> Self }
+
+extension Double: Bridgable {
+    static func bridging(value: AnyObject) -> Double {
+        return (value as! NSNumber).doubleValue
+    }
+}
+extension Float: Bridgable {
+    static func bridging(value: AnyObject) -> Float {
+        return (value as! NSNumber).floatValue
+    }
+}
+extension Int: Bridgable {
+    static func bridging(value: AnyObject) -> Int {
+        return (value as! NSNumber).integerValue
+    }
+}
+extension Int8: Bridgable {
+    static func bridging(value: AnyObject) -> Int8 {
+        return (value as! NSNumber).charValue
+    }
+}
+extension Int16: Bridgable {
+    static func bridging(value: AnyObject) -> Int16 {
+        return (value as! NSNumber).shortValue
+    }
+}
+extension Int32: Bridgable {
+    static func bridging(value: AnyObject) -> Int32 {
+        return (value as! NSNumber).intValue
+    }
+}
+extension Int64: Bridgable {
+    static func bridging(value: AnyObject) -> Int64 {
+        return (value as! NSNumber).longLongValue
+    }
+}
+extension NSDate: Bridgable {
+    static func bridging(value: AnyObject) -> Self   {
+        func forceCastTrampoline<T, U>(x: T) -> U {
+            return x as! U
+        }
+        return forceCastTrampoline(value)
+    }
+}
+
 // MARK: MinMaxType
 
 /**
@@ -469,6 +577,11 @@ extension Int16: MinMaxType {}
 extension Int32: MinMaxType {}
 extension Int64: MinMaxType {}
 extension NSDate: MinMaxType {}
+extension MinMaxType {
+    internal static func bridging(value: AnyObject) -> Self {
+        return (Self.self as! Bridgable.Type).bridging(value) as! Self
+    }
+}
 
 // MARK: AddableType
 
@@ -485,6 +598,11 @@ extension Int8: AddableType {}
 extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
+extension AddableType {
+    internal static func bridging(value: AnyObject) -> Self {
+        return (Self.self as! Bridgable.Type).bridging(value) as! Self
+    }
+}
 
 /// :nodoc:
 /// Internal class. Do not use directly.
@@ -715,7 +833,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The minimum value of the property, or `nil` if the collection is empty.
      */
     public func min<U: MinMaxType>(property: String) -> U? {
-        return rlmResults.minOfProperty(property) as! U?
+        return rlmResults.minOfProperty(property).map(U.bridging)
     }
 
     /**
@@ -728,7 +846,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The maximum value of the property, or `nil` if the collection is empty.
      */
     public func max<U: MinMaxType>(property: String) -> U? {
-        return rlmResults.maxOfProperty(property) as! U?
+        return rlmResults.maxOfProperty(property).map(U.bridging)
     }
 
     /**
@@ -741,7 +859,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The sum of the given property.
      */
     public func sum<U: AddableType>(property: String) -> U {
-        return rlmResults.sumOfProperty(property) as AnyObject as! U
+        return U.bridging(rlmResults.sumOfProperty(property))
     }
 
     /**
@@ -754,7 +872,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The average value of the given property, or `nil` if the collection is empty.
      */
     public func average<U: AddableType>(property: String) -> U? {
-        return rlmResults.averageOfProperty(property) as! U?
+        return rlmResults.averageOfProperty(property).map(U.bridging)
     }
 
     // MARK: Notifications
