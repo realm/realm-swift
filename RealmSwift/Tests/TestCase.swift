@@ -96,6 +96,7 @@ class TestCase: XCTestCase {
         // Verify that there are no remaining realm files after the test
         let parentDir = (testDir as NSString).deletingLastPathComponent
         for url in FileManager().enumerator(atPath: parentDir)! {
+            let url = url as! URL
             XCTAssertNotEqual(url.pathExtension, "realm", "Lingering realm file at \(parentDir)/\(url)")
             assert(url.pathExtension != "realm")
         }
@@ -105,7 +106,7 @@ class TestCase: XCTestCase {
         RLMRealm.resetRealmState()
     }
 
-    func dispatchSyncNewThread(block: () -> Void) {
+    func dispatchSyncNewThread(block: @escaping () -> Void) {
         queue.async {
             autoreleasepool {
                 block()
@@ -114,19 +115,19 @@ class TestCase: XCTestCase {
         queue.sync { }
     }
 
-    func assertThrows<T>(_ block: @autoclosure(escaping)() -> T, named: String? = RLMExceptionName,
+    func assertThrows<T>(_ block: @autoclosure @escaping() -> T, named: String? = RLMExceptionName,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)
     }
 
-    func assertThrows<T>(_ block: @autoclosure(escaping) () -> T, reason regexString: String,
+    func assertThrows<T>(_ block: @autoclosure @escaping () -> T, reason regexString: String,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
     }
 
     func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
-                        lineNumber: UInt = #line, block: @noescape () throws -> ()) {
+                        lineNumber: UInt = #line, block: () throws -> ()) {
         do {
             try block()
         } catch {
@@ -137,7 +138,7 @@ class TestCase: XCTestCase {
 
     func assertFails<T>(_ expectedError: RealmSwift.Error.Code, _ message: String? = nil,
                         fileName: StaticString = #file, lineNumber: UInt = #line,
-                        block: @noescape () throws -> T) {
+                        block: () throws -> T) {
         do {
             _ = try block()
             XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",

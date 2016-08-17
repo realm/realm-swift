@@ -71,12 +71,12 @@ class ObjectTests: TestCase {
 
     func testSharedSchemaUnmanaged() {
         let object = SwiftObject()
-        XCTAssertEqual(object.dynamicType.sharedSchema(), SwiftObject.sharedSchema())
+        XCTAssertEqual(type(of: object).sharedSchema(), SwiftObject.sharedSchema())
     }
 
     func testSharedSchemaManaged() {
         let object = SwiftObject()
-        XCTAssertEqual(object.dynamicType.sharedSchema(), SwiftObject.sharedSchema())
+        XCTAssertEqual(type(of: object).sharedSchema(), SwiftObject.sharedSchema())
     }
 
     func testInvalidated() {
@@ -181,8 +181,8 @@ class ObjectTests: TestCase {
         }
     }
 
-    func setAndTestAllTypes(_ setter: (SwiftObject, AnyObject?, String) -> (),
-                            getter: (SwiftObject, String) -> (AnyObject?), object: SwiftObject) {
+    func setAndTestAllTypes(_ setter: (SwiftObject, Any?, String) -> (),
+                            getter: (SwiftObject, String) -> (Any?), object: SwiftObject) {
         setter(object, true, "boolCol")
         XCTAssertEqual(getter(object, "boolCol") as! Bool!, true)
 
@@ -198,7 +198,7 @@ class ObjectTests: TestCase {
         setter(object, "z", "stringCol")
         XCTAssertEqual(getter(object, "stringCol") as! String!, "z")
 
-        setter(object, "z".data(using: String.Encoding.utf8), "binaryCol")
+        setter(object, "z".data(using: String.Encoding.utf8)! as Data as NSData, "binaryCol")
         let gotData = (getter(object, "binaryCol") as! NSData) as Data
         XCTAssertTrue(gotData == "z".data(using: String.Encoding.utf8)!)
 
@@ -225,8 +225,8 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
     }
 
-    func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, AnyObject?, String) -> (),
-                                   getter: (DynamicObject, String) -> (AnyObject?), object: DynamicObject,
+    func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, Any?, String) -> (),
+                                   getter: (DynamicObject, String) -> (Any?), object: DynamicObject,
                                    boolObject: DynamicObject) {
         setter(object, true, "boolCol")
         XCTAssertEqual((getter(object, "boolCol") as! Bool), true)
@@ -243,7 +243,7 @@ class ObjectTests: TestCase {
         setter(object, "z", "stringCol")
         XCTAssertEqual((getter(object, "stringCol") as! String), "z")
 
-        setter(object, "z".data(using: String.Encoding.utf8), "binaryCol")
+        setter(object, "z".data(using: String.Encoding.utf8)! as Data as NSData, "binaryCol")
         let gotData = (getter(object, "binaryCol") as! NSData) as Data
         XCTAssertTrue(gotData == "z".data(using: String.Encoding.utf8)!)
 
@@ -252,7 +252,7 @@ class ObjectTests: TestCase {
 
         setter(object, boolObject, "objectCol")
         XCTAssertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)
-        XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! NSNumber), true as NSNumber)
+        XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! Bool), true)
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
@@ -292,11 +292,11 @@ class ObjectTests: TestCase {
     }
 
     func testSetValueForKey() {
-        let setter: (Object, AnyObject?, String) -> () = { object, value, key in
+        let setter: (Object, Any?, String) -> () = { object, value, key in
             object.setValue(value, forKey: key)
             return
         }
-        let getter: (Object, String) -> (AnyObject?) = { object, key in
+        let getter: (Object, String) -> (Any?) = { object, key in
             object.value(forKey: key)
         }
 
@@ -313,11 +313,11 @@ class ObjectTests: TestCase {
     }
 
     func testSubscript() {
-        let setter: (Object, AnyObject?, String) -> () = { object, value, key in
+        let setter: (Object, Any?, String) -> () = { object, value, key in
             object[key] = value
             return
         }
-        let getter: (Object, String) -> (AnyObject?) = { object, key in
+        let getter: (Object, String) -> (Any?) = { object, key in
             object[key]
         }
 

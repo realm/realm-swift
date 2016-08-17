@@ -24,45 +24,45 @@ import Realm
 // MARK: Bridgable
 
 // Used for conversion from Objective-C types to Swift types
-private protocol Bridgable  { static func bridging(_ value: AnyObject) -> Self }
+private protocol Bridgable  { static func bridging(_ value: Any) -> Self }
 
 extension Double: Bridgable {
-    static func bridging(_ value: AnyObject) -> Double {
+    static func bridging(_ value: Any) -> Double {
         return (value as! NSNumber).doubleValue
     }
 }
 extension Float: Bridgable {
-    static func bridging(_ value: AnyObject) -> Float {
+    static func bridging(_ value: Any) -> Float {
         return (value as! NSNumber).floatValue
     }
 }
 extension Int: Bridgable {
-    static func bridging(_ value: AnyObject) -> Int {
+    static func bridging(_ value: Any) -> Int {
         return (value as! NSNumber).intValue
     }
 }
 extension Int8: Bridgable {
-    static func bridging(_ value: AnyObject) -> Int8 {
+    static func bridging(_ value: Any) -> Int8 {
         return (value as! NSNumber).int8Value
     }
 }
 extension Int16: Bridgable {
-    static func bridging(_ value: AnyObject) -> Int16 {
+    static func bridging(_ value: Any) -> Int16 {
         return (value as! NSNumber).int16Value
     }
 }
 extension Int32: Bridgable {
-    static func bridging(_ value: AnyObject) -> Int32 {
+    static func bridging(_ value: Any) -> Int32 {
         return (value as! NSNumber).int32Value
     }
 }
 extension Int64: Bridgable {
-    static func bridging(_ value: AnyObject) -> Int64 {
+    static func bridging(_ value: Any) -> Int64 {
         return (value as! NSNumber).int64Value
     }
 }
 extension NSDate: Bridgable {
-    static func bridging(_ value: AnyObject) -> Self   {
+    static func bridging(_ value: Any) -> Self   {
         func forceCastTrampoline<T, U>(_ x: T) -> U {
             return x as! U
         }
@@ -83,7 +83,7 @@ extension Int32: MinMaxType {}
 extension Int64: MinMaxType {}
 extension NSDate: MinMaxType {}
 extension MinMaxType {
-    internal static func bridging(_ value: AnyObject) -> Self {
+    internal static func bridging(_ value: Any) -> Self {
         return (Self.self as! Bridgable.Type).bridging(value) as! Self
     }
 }
@@ -100,7 +100,7 @@ extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension AddableType {
-    internal static func bridging(_ value: AnyObject) -> Self {
+    internal static func bridging(_ value: Any) -> Self {
         return (Self.self as! Bridgable.Type).bridging(value) as! Self
     }
 }
@@ -205,7 +205,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
+    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: NSPredicate(format: predicateFormat,
                                                                                argumentArray: args)))
     }
@@ -239,7 +239,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
-    public override func value(forKey key: String) -> AnyObject? {
+    public override func value(forKey key: String) -> Any? {
         return value(forKeyPath: key)
     }
 
@@ -252,7 +252,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
      collection's objects.
      */
-    public override func value(forKeyPath keyPath: String) -> AnyObject? {
+    public override func value(forKeyPath keyPath: String) -> Any? {
         return rlmResults.value(forKeyPath: keyPath)
     }
 
@@ -264,7 +264,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - parameter value: The object value.
     - parameter key:   The name of the property.
     */
-    public override func setValue(_ value: AnyObject?, forKey key: String) {
+    public override func setValue(_ value: Any?, forKey key: String) {
         return rlmResults.setValue(value, forKeyPath: key)
     }
 
@@ -277,7 +277,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: Results containing objects that match the given predicate.
     */
-    public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<T> {
+    public func filter(using predicateFormat: String, _ args: Any...) -> Results<T> {
         return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
@@ -313,7 +313,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         return Results<T>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
@@ -432,7 +432,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      - parameter block: The block to be called with the evaluated results and change information.
      - returns: A token which must be held for as long as you want query results to be delivered.
      */
-    public func addNotificationBlock(block: ((RealmCollectionChange<Results>) -> Void)) -> NotificationToken {
+    public func addNotificationBlock(block: @escaping (RealmCollectionChange<Results>) -> Void) -> NotificationToken {
         return rlmResults.addNotificationBlock { results, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
@@ -462,7 +462,7 @@ extension Results: RealmCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
         NotificationToken {
         let anyCollection = AnyRealmCollection(self)
         return rlmResults.addNotificationBlock { _, change, error in
@@ -493,7 +493,7 @@ extension Results {
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"sorted(with:)")
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
 

@@ -64,7 +64,7 @@ public final class ObjectSchema: CustomStringConvertible {
 
     /// Returns the property with the given name, if it exists.
     public subscript(propertyName: String) -> Property? {
-        if let rlmProperty = rlmObjectSchema[propertyName as NSString] {
+        if let rlmProperty = rlmObjectSchema[propertyName] {
             return Property(rlmProperty)
         }
         return nil

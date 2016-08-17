@@ -38,7 +38,7 @@ class RealmConfigurationTests: TestCase {
         let fileURL = Realm.Configuration.defaultConfiguration.fileURL
         let configuration = Realm.Configuration(fileURL: URL(fileURLWithPath: "/dev/null"))
         Realm.Configuration.defaultConfiguration = configuration
-        XCTAssertEqual(Realm.Configuration.defaultConfiguration.fileURL, NSURL(fileURLWithPath: "/dev/null"))
+        XCTAssertEqual(Realm.Configuration.defaultConfiguration.fileURL, URL(fileURLWithPath: "/dev/null"))
         Realm.Configuration.defaultConfiguration.fileURL = fileURL
     }
 }

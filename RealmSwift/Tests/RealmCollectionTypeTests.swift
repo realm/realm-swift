@@ -577,8 +577,8 @@ class ResultsTests: RealmCollectionTypeTests {
                 XCTAssertEqual(insertions, [2])
                 XCTAssertEqual(modifications, [])
                 break
-            case .Error(let err):
-                XCTFail(err.description)
+            case .Error(let error):
+                XCTFail(String(describing: error))
                 break
             }
 
@@ -739,7 +739,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
-        return AnyRealmCollection(CTTAggregateObjectList(value: [makeAggregateableObjects() as AnyObject]).list)
+        return AnyRealmCollection(CTTAggregateObjectList(value: [makeAggregateableObjects()]).list)
     }
 
     override func testRealm() {
@@ -897,7 +897,7 @@ class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
-        let array = CTTStringList(value: [[str1, str2] as AnyObject])
+        let array = CTTStringList(value: [[str1, str2]])
         realmWithTestPath().add(array)
         return array.array
     }
@@ -905,7 +905,7 @@ class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
         var list: CTTAggregateObjectList?
         try! realmWithTestPath().write {
-            list = CTTAggregateObjectList(value: [makeAggregateableObjectsInWriteTransaction() as AnyObject])
+            list = CTTAggregateObjectList(value: [makeAggregateableObjectsInWriteTransaction()])
             realmWithTestPath().add(list!)
         }
         return AnyRealmCollection(list!.list)
@@ -917,7 +917,7 @@ class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
-        let array = realmWithTestPath().createObject(ofType: CTTStringList.self, populatedWith: [[str1, str2] as AnyObject])
+        let array = realmWithTestPath().createObject(ofType: CTTStringList.self, populatedWith: [[str1, str2]])
         return array.array
     }
 
@@ -936,7 +936,7 @@ class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
-        _ = realmWithTestPath().createObject(ofType: CTTStringList.self, populatedWith: [[str1, str2] as AnyObject])
+        _ = realmWithTestPath().createObject(ofType: CTTStringList.self, populatedWith: [[str1, str2]])
         let array = realmWithTestPath().allObjects(ofType: CTTStringList.self).first!
         return array.array
     }

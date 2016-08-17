@@ -30,7 +30,7 @@ internal func notFoundToNil(index: UInt) -> Int? {
 
 #if swift(>=3.0)
 
-internal func throwRealmException(_ message: String, userInfo: [String:AnyObject] = [:]) {
+internal func throwRealmException(_ message: String, userInfo: [AnyHashable: Any]? = nil) {
     NSException(name: NSExceptionName(rawValue: RLMExceptionName), reason: message, userInfo: userInfo).raise()
 }
 
