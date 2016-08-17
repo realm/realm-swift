@@ -15,10 +15,13 @@ x.x.x Release notes (yyyy-MM-dd)
 * Improve error message when using NSNumber incorrectly in Swift models.
 * Fix compilation with Swift 2.3 using Xcode 8 beta 2.
 * Further reduce the download size of the prebuilt static libraries.
+* Improve sort performance, especially on non-nullable columns.
 
 ### Bugfixes
 
-* None.
+* Fix crash when an aggregate is accessed as an `Int8`, `Int16`, `Int32`, or `Int64`.
+* Fix a race condition that could lead to a crash if an RLMArray or List was
+  deallocated on a different thread than it was created on.
 
 1.0.2 Release notes (2016-07-13)
 =============================================================

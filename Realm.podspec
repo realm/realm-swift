@@ -56,9 +56,8 @@ Pod::Spec.new do |s|
   s.source_files            = source_files + private_header_files
   s.private_header_files    = private_header_files
   s.header_mappings_dir     = 'include'
-  s.pod_target_xcconfig     = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
-                                'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)',
-                                'APPLICATION_EXTENSION_API_ONLY' => 'YES',
+  s.pod_target_xcconfig     = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES',
+                                'CLANG_CXX_LANGUAGE_STANDARD' => 'c++14',
                                 'HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include/core"',
                                 'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"' }
   s.preserve_paths          = %w(build.sh include)
