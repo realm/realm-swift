@@ -20,70 +20,6 @@ import Foundation
 import Realm
 
 #if swift(>=3.0)
-
-// MARK: Bridgable
-
-// Used for conversion from Objective-C types to Swift types
-private protocol Bridgable  { static func bridging(_ value: Any) -> Self }
-
-// FIXME: Remove once Swift supports `as! Self` casts
-private func forceCastToInferred<T, U>(_ x: T) -> U {
-    return x as! U
-}
-
-extension NSNumber: Bridgable {
-    static func bridging(_ value: Any) -> Self {
-        // Unsafe if `Self` is a concrete subclass of `NSNumber`
-        return forceCastToInferred(value)
-    }
-}
-extension Double: Bridgable {
-    static func bridging(_ value: Any) -> Double {
-        return (value as! NSNumber).doubleValue
-    }
-}
-extension Float: Bridgable {
-    static func bridging(_ value: Any) -> Float {
-        return (value as! NSNumber).floatValue
-    }
-}
-extension Int: Bridgable {
-    static func bridging(_ value: Any) -> Int {
-        return (value as! NSNumber).intValue
-    }
-}
-extension Int8: Bridgable {
-    static func bridging(_ value: Any) -> Int8 {
-        return (value as! NSNumber).int8Value
-    }
-}
-extension Int16: Bridgable {
-    static func bridging(_ value: Any) -> Int16 {
-        return (value as! NSNumber).int16Value
-    }
-}
-extension Int32: Bridgable {
-    static func bridging(_ value: Any) -> Int32 {
-        return (value as! NSNumber).int32Value
-    }
-}
-extension Int64: Bridgable {
-    static func bridging(_ value: Any) -> Int64 {
-        return (value as! NSNumber).int64Value
-    }
-}
-extension Date: Bridgable {
-    static func bridging(_ value: Any) -> Date   {
-        return value as! Date
-    }
-}
-extension NSDate: Bridgable {
-    static func bridging(_ value: Any) -> Self   {
-        // Unsafe if `Self` is a concrete subclass of `NSDate`
-        return forceCastToInferred(value)
-    }
-}
-
 // MARK: MinMaxType
 
 /// Types which can be used for min()/max().
@@ -101,8 +37,8 @@ extension Int64: MinMaxType {}
 extension Date: MinMaxType {}
 extension NSDate: MinMaxType {}
 extension MinMaxType {
-    internal static func bridging(_ value: Any) -> Self {
-        return (Self.self as! Bridgable.Type).bridging(value) as! Self
+    internal static func bridging(objCValue: Any) -> Self {
+        return (Self.self as! Bridgable.Type).bridging(objCValue: objCValue) as! Self
     }
 }
     
@@ -121,8 +57,8 @@ extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension AddableType {
-    internal static func bridging(_ value: Any) -> Self {
-        return (Self.self as! Bridgable.Type).bridging(value) as! Self
+    internal static func bridging(objCValue: Any) -> Self {
+        return (Self.self as! Bridgable.Type).bridging(objCValue: objCValue) as! Self
     }
 }
 
@@ -376,7 +312,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The sum of the given property over all objects in the Results.
     */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
-        return U.bridging(rlmResults.sum(ofProperty: property))
+        return U.bridging(objCValue: rlmResults.sum(ofProperty: property))
     }
 
     /**
@@ -533,64 +469,6 @@ extension Results {
 
 #else
 
-// MARK: Bridgable
-
-// Used for conversion from Objective-C types to Swift types
-private protocol Bridgable  { static func bridging(value: AnyObject) -> Self }
-
-// FIXME: Remove once Swift supports `as! Self` casts
-private func forceCastToInferred<T, U>(x: T) -> U {
-    return x as! U
-}
-
-extension NSNumber: Bridgable {
-    static func bridging(value: AnyObject) -> Self {
-        // Unsafe if `Self` is a concrete subclass of `NSNumber`
-        return forceCastToInferred(value)
-    }
-}
-extension Double: Bridgable {
-    static func bridging(value: AnyObject) -> Double {
-        return (value as! NSNumber).doubleValue
-    }
-}
-extension Float: Bridgable {
-    static func bridging(value: AnyObject) -> Float {
-        return (value as! NSNumber).floatValue
-    }
-}
-extension Int: Bridgable {
-    static func bridging(value: AnyObject) -> Int {
-        return (value as! NSNumber).integerValue
-    }
-}
-extension Int8: Bridgable {
-    static func bridging(value: AnyObject) -> Int8 {
-        return (value as! NSNumber).charValue
-    }
-}
-extension Int16: Bridgable {
-    static func bridging(value: AnyObject) -> Int16 {
-        return (value as! NSNumber).shortValue
-    }
-}
-extension Int32: Bridgable {
-    static func bridging(value: AnyObject) -> Int32 {
-        return (value as! NSNumber).intValue
-    }
-}
-extension Int64: Bridgable {
-    static func bridging(value: AnyObject) -> Int64 {
-        return (value as! NSNumber).longLongValue
-    }
-}
-extension NSDate: Bridgable {
-    static func bridging(value: AnyObject) -> Self   {
-        // Unsafe if `Self` is a concrete subclass of `NSDate`
-        return forceCastToInferred(value)
-    }
-}
-
 // MARK: MinMaxType
 
 /**
@@ -611,8 +489,8 @@ extension Int32: MinMaxType {}
 extension Int64: MinMaxType {}
 extension NSDate: MinMaxType {}
 extension MinMaxType {
-    internal static func bridging(value: AnyObject) -> Self {
-        return (Self.self as! Bridgable.Type).bridging(value) as! Self
+    internal static func bridging(objCValue objCValue: AnyObject) -> Self {
+        return (Self.self as! Bridgable.Type).bridging(objCValue: objCValue) as! Self
     }
 }
 
@@ -635,8 +513,8 @@ extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension AddableType {
-    internal static func bridging(value: AnyObject) -> Self {
-        return (Self.self as! Bridgable.Type).bridging(value) as! Self
+    internal static func bridging(objCValue: AnyObject) -> Self {
+        return (Self.self as! Bridgable.Type).bridging(objCValue: objCValue) as! Self
     }
 }
 
