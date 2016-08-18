@@ -27,14 +27,14 @@ import Realm
 private protocol Bridgable  { static func bridging(_ value: Any) -> Self }
 
 // FIXME: Remove once Swift supports `as! Self` casts
-private func forceCastTrampoline<T, U>(_ x: T) -> U {
+private func forceCastToInferred<T, U>(_ x: T) -> U {
     return x as! U
 }
 
 extension NSNumber: Bridgable {
     static func bridging(_ value: Any) -> Self {
         // Unsafe if `Self` is a concrete subclass of `NSNumber`
-        return forceCastTrampoline(value)
+        return forceCastToInferred(value)
     }
 }
 extension Double: Bridgable {
@@ -80,7 +80,7 @@ extension Date: Bridgable {
 extension NSDate: Bridgable {
     static func bridging(_ value: Any) -> Self   {
         // Unsafe if `Self` is a concrete subclass of `NSDate`
-        return forceCastTrampoline(value)
+        return forceCastToInferred(value)
     }
 }
 
@@ -539,14 +539,14 @@ extension Results {
 private protocol Bridgable  { static func bridging(value: AnyObject) -> Self }
 
 // FIXME: Remove once Swift supports `as! Self` casts
-private func forceCastTrampoline<T, U>(x: T) -> U {
+private func forceCastToInferred<T, U>(x: T) -> U {
     return x as! U
 }
 
 extension NSNumber: Bridgable {
     static func bridging(value: AnyObject) -> Self {
         // Unsafe if `Self` is a concrete subclass of `NSNumber`
-        return forceCastTrampoline(value)
+        return forceCastToInferred(value)
     }
 }
 extension Double: Bridgable {
@@ -587,7 +587,7 @@ extension Int64: Bridgable {
 extension NSDate: Bridgable {
     static func bridging(value: AnyObject) -> Self   {
         // Unsafe if `Self` is a concrete subclass of `NSDate`
-        return forceCastTrampoline(value)
+        return forceCastToInferred(value)
     }
 }
 
