@@ -68,7 +68,7 @@ class ObjectCreationTests: TestCase {
             "doubleCol": 11.1,
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
-            "dateCol": NSDate(timeIntervalSince1970: 2),
+            "dateCol": Date(timeIntervalSince1970: 2),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
            ]
@@ -108,7 +108,7 @@ class ObjectCreationTests: TestCase {
     func testInitWithArray() {
         // array with all values specified
         let baselineValues: [Any] = [true, 1, 1.1 as Float, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
-            NSDate(timeIntervalSince1970: 2), ["boolCol": true], [[true], [false]]]
+            Date(timeIntervalSince1970: 2), ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -214,7 +214,7 @@ class ObjectCreationTests: TestCase {
             "doubleCol": 11.1,
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
-            "dateCol": NSDate(timeIntervalSince1970: 2),
+            "dateCol": Date(timeIntervalSince1970: 2),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
@@ -264,7 +264,7 @@ class ObjectCreationTests: TestCase {
     func testCreateWithArray() {
         // array with all values specified
         let baselineValues: [Any] = [true, 1, 1.1 as Float, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
-            NSDate(timeIntervalSince1970: 2), ["boolCol": true], [[true], [false]]]
+            Date(timeIntervalSince1970: 2), ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -360,7 +360,7 @@ class ObjectCreationTests: TestCase {
             "doubleCol": 11.1,
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
-            "dateCol": NSDate(timeIntervalSince1970: 2),
+            "dateCol": Date(timeIntervalSince1970: 2),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
         ]
@@ -386,7 +386,7 @@ class ObjectCreationTests: TestCase {
             "doubleCol": 11.1,
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
-            "dateCol": NSDate(timeIntervalSince1970: 2),
+            "dateCol": Date(timeIntervalSince1970: 2),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
         ]
@@ -437,7 +437,7 @@ class ObjectCreationTests: TestCase {
             "doubleCol": 11.1,
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
-            "dateCol": NSDate(timeIntervalSince1970: 2),
+            "dateCol": Date(timeIntervalSince1970: 2),
             "objectCol": NSNull(),
             "arrayCol": NSNull(),
         ]
@@ -492,8 +492,8 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.floatCol, (array[2] as! Float))
         XCTAssertEqual(object.doubleCol, (array[3] as! Double))
         XCTAssertEqual(object.stringCol, (array[4] as! String))
-        XCTAssertEqual(object.binaryCol, (array[5] as! NSData))
-        XCTAssertEqual(object.dateCol, (array[6] as! NSDate))
+        XCTAssertEqual(object.binaryCol, (array[5] as! Data))
+        XCTAssertEqual(object.dateCol, (array[6] as! Date))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {
@@ -508,8 +508,8 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.floatCol, (dictionary["floatCol"] as! Float))
         XCTAssertEqual(object.doubleCol, (dictionary["doubleCol"] as! Double))
         XCTAssertEqual(object.stringCol, (dictionary["stringCol"] as! String))
-        XCTAssertEqual(object.binaryCol, (dictionary["binaryCol"] as! NSData))
-        XCTAssertEqual(object.dateCol, (dictionary["dateCol"] as! NSDate))
+        XCTAssertEqual(object.binaryCol, (dictionary["binaryCol"] as! Data))
+        XCTAssertEqual(object.dateCol, (dictionary["dateCol"] as! Date))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {
@@ -533,8 +533,8 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.optDoubleCol.value, (dictionary["optDoubleCol"] as! Double?))
         XCTAssertEqual(object.optStringCol, (dictionary["optStringCol"] as! String?))
         XCTAssertEqual(object.optNSStringCol, (dictionary["optNSStringCol"] as! NSString))
-        XCTAssertEqual(object.optBinaryCol, (dictionary["optBinaryCol"] as! NSData?))
-        XCTAssertEqual(object.optDateCol, (dictionary["optDateCol"] as! NSDate?))
+        XCTAssertEqual(object.optBinaryCol, (dictionary["optBinaryCol"] as! Data?))
+        XCTAssertEqual(object.optDateCol, (dictionary["optDateCol"] as! Date?))
         XCTAssertEqual(object.optObjectCol?.boolCol, boolObjectValue)
     }
 
@@ -558,8 +558,8 @@ class ObjectCreationTests: TestCase {
             case .float:    return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
             case .double:   return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
             case .string:   return ["b"]
-            case .data:     return ["b".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData]
-            case .date:     return [NSDate(timeIntervalSince1970: 2)]
+            case .data:     return ["b".data(using: String.Encoding.utf8, allowLossyConversion: false)!]
+            case .date:     return [Date(timeIntervalSince1970: 2)]
             case .object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
             case .array:    return [
                 [[true], [false]],

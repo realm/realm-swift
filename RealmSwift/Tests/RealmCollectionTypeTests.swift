@@ -30,7 +30,7 @@ class CTTAggregateObject: Object {
     dynamic var floatCol = 0 as Float
     dynamic var doubleCol = 0.0
     dynamic var boolCol = false
-    dynamic var dateCol = NSDate()
+    dynamic var dateCol = Date()
     dynamic var trueCol = true
     let stringListCol = List<CTTStringObjectWithLink>()
     dynamic var linkCol: CTTLinkTarget?
@@ -77,7 +77,7 @@ class RealmCollectionTypeTests: TestCase {
         obj1.int64Col = 1
         obj1.floatCol = 1.1
         obj1.doubleCol = 1.11
-        obj1.dateCol = NSDate(timeIntervalSince1970: 1)
+        obj1.dateCol = Date(timeIntervalSince1970: 1)
         obj1.boolCol = false
 
         let obj2 = CTTAggregateObject()
@@ -88,7 +88,7 @@ class RealmCollectionTypeTests: TestCase {
         obj2.int64Col = 2
         obj2.floatCol = 2.2
         obj2.doubleCol = 2.22
-        obj2.dateCol = NSDate(timeIntervalSince1970: 2)
+        obj2.dateCol = Date(timeIntervalSince1970: 2)
         obj2.boolCol = false
 
         let obj3 = CTTAggregateObject()
@@ -99,7 +99,7 @@ class RealmCollectionTypeTests: TestCase {
         obj3.int64Col = 3
         obj3.floatCol = 2.2
         obj3.doubleCol = 2.22
-        obj3.dateCol = NSDate(timeIntervalSince1970: 2)
+        obj3.dateCol = Date(timeIntervalSince1970: 2)
         obj3.boolCol = false
 
         realmWithTestPath().add([obj1, obj2, obj3])
@@ -881,8 +881,8 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.minimumValue(ofProperty: "floatCol") as Float!)
         assertThrows(collection.minimumValue(ofProperty: "doubleCol") as NSNumber!)
         assertThrows(collection.minimumValue(ofProperty: "doubleCol") as Double!)
-        assertThrows(collection.minimumValue(ofProperty: "dateCol") as Date!)
         assertThrows(collection.minimumValue(ofProperty: "dateCol") as NSDate!)
+        assertThrows(collection.minimumValue(ofProperty: "dateCol") as Date!)
     }
 
     override func testMax() {
@@ -903,8 +903,8 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.maximumValue(ofProperty: "floatCol") as Float!)
         assertThrows(collection.maximumValue(ofProperty: "doubleCol") as NSNumber!)
         assertThrows(collection.maximumValue(ofProperty: "doubleCol") as Double!)
-        assertThrows(collection.maximumValue(ofProperty: "dateCol") as Date!)
         assertThrows(collection.maximumValue(ofProperty: "dateCol") as NSDate!)
+        assertThrows(collection.maximumValue(ofProperty: "dateCol") as Date!)
     }
 
     override func testSum() {

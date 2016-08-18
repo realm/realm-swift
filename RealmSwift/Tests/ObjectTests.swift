@@ -165,11 +165,11 @@ class ObjectTests: TestCase {
             XCTAssertEqual(object.value(forKey: "doubleCol") as! Double!, 12.3)
             XCTAssertEqual(object.value(forKey: "stringCol") as! String!, "a")
 
-            let expected = (object.value(forKey: "binaryCol") as! NSData) as Data
+            let expected = object.value(forKey: "binaryCol") as! Data
             let actual = "a".data(using: String.Encoding.utf8)!
             XCTAssertTrue(expected == actual)
 
-            XCTAssertEqual(object.value(forKey: "dateCol") as! NSDate!, NSDate(timeIntervalSince1970: 1))
+            XCTAssertEqual(object.value(forKey: "dateCol") as! Date!, Date(timeIntervalSince1970: 1))
             XCTAssertEqual((object.value(forKey: "objectCol")! as! SwiftBoolObject).boolCol, false)
             XCTAssert(object.value(forKey: "arrayCol")! is List<SwiftBoolObject>)
         }
@@ -198,12 +198,12 @@ class ObjectTests: TestCase {
         setter(object, "z", "stringCol")
         XCTAssertEqual(getter(object, "stringCol") as! String!, "z")
 
-        setter(object, "z".data(using: String.Encoding.utf8)! as Data as NSData, "binaryCol")
-        let gotData = (getter(object, "binaryCol") as! NSData) as Data
+        setter(object, "z".data(using: String.Encoding.utf8)! as Data, "binaryCol")
+        let gotData = getter(object, "binaryCol") as! Data
         XCTAssertTrue(gotData == "z".data(using: String.Encoding.utf8)!)
 
-        setter(object, NSDate(timeIntervalSince1970: 333), "dateCol")
-        XCTAssertEqual(getter(object, "dateCol") as! NSDate!, NSDate(timeIntervalSince1970: 333))
+        setter(object, Date(timeIntervalSince1970: 333), "dateCol")
+        XCTAssertEqual(getter(object, "dateCol") as! Date!, Date(timeIntervalSince1970: 333))
 
         let boolObject = SwiftBoolObject(value: [true])
         setter(object, boolObject, "objectCol")
@@ -243,12 +243,12 @@ class ObjectTests: TestCase {
         setter(object, "z", "stringCol")
         XCTAssertEqual((getter(object, "stringCol") as! String), "z")
 
-        setter(object, "z".data(using: String.Encoding.utf8)! as Data as NSData, "binaryCol")
-        let gotData = (getter(object, "binaryCol") as! NSData) as Data
+        setter(object, "z".data(using: String.Encoding.utf8)! as Data, "binaryCol")
+        let gotData = getter(object, "binaryCol") as! Data
         XCTAssertTrue(gotData == "z".data(using: String.Encoding.utf8)!)
 
-        setter(object, NSDate(timeIntervalSince1970: 333), "dateCol")
-        XCTAssertEqual((getter(object, "dateCol") as! NSDate), NSDate(timeIntervalSince1970: 333))
+        setter(object, Date(timeIntervalSince1970: 333), "dateCol")
+        XCTAssertEqual((getter(object, "dateCol") as! Date), Date(timeIntervalSince1970: 333))
 
         setter(object, boolObject, "objectCol")
         XCTAssertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)

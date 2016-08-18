@@ -209,8 +209,8 @@ class MigrationTests: TestCase {
                 let soo = SwiftOptionalObject()
                 soo.optNSStringCol = "NSString"
                 soo.optStringCol = "String"
-                soo.optBinaryCol = NSData()
-                soo.optDateCol = NSDate()
+                soo.optBinaryCol = Data()
+                soo.optDateCol = Date()
                 soo.optIntCol.value = 1
                 soo.optInt8Col.value = 2
                 soo.optInt16Col.value = 3
@@ -231,10 +231,10 @@ class MigrationTests: TestCase {
                 XCTAssertTrue(newObject!["optNSStringCol"]! is NSString)
                 XCTAssertTrue(oldObject!["optStringCol"]! is String)
                 XCTAssertTrue(newObject!["optStringCol"]! is String)
-                XCTAssertTrue(oldObject!["optBinaryCol"]! is NSData)
-                XCTAssertTrue(newObject!["optBinaryCol"]! is NSData)
-                XCTAssertTrue(oldObject!["optDateCol"]! is NSDate)
-                XCTAssertTrue(newObject!["optDateCol"]! is NSDate)
+                XCTAssertTrue(oldObject!["optBinaryCol"]! is Data)
+                XCTAssertTrue(newObject!["optBinaryCol"]! is Data)
+                XCTAssertTrue(oldObject!["optDateCol"]! is Date)
+                XCTAssertTrue(newObject!["optDateCol"]! is Date)
                 XCTAssertTrue(oldObject!["optIntCol"]! is Int)
                 XCTAssertTrue(newObject!["optIntCol"]! is Int)
                 XCTAssertTrue(oldObject!["optInt8Col"]! is Int)
@@ -375,12 +375,12 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((newObj!["doubleCol"] as! Double), 12.3 as Double)
 
                 let binaryCol = "a".data(using: String.Encoding.utf8)!
-                XCTAssertEqual((oldObj!["binaryCol"] as! NSData), binaryCol as NSData)
-                XCTAssertEqual((newObj!["binaryCol"] as! NSData), binaryCol as NSData)
+                XCTAssertEqual((oldObj!["binaryCol"] as! Data), binaryCol)
+                XCTAssertEqual((newObj!["binaryCol"] as! Data), binaryCol)
 
-                let dateCol = NSDate(timeIntervalSince1970: 1)
-                XCTAssertEqual((oldObj!["dateCol"] as! NSDate), dateCol)
-                XCTAssertEqual((newObj!["dateCol"] as! NSDate), dateCol)
+                let dateCol = Date(timeIntervalSince1970: 1)
+                XCTAssertEqual((oldObj!["dateCol"] as! Date), dateCol)
+                XCTAssertEqual((newObj!["dateCol"] as! Date), dateCol)
 
                 // FIXME - test that casting to SwiftBoolObject throws
                 XCTAssertEqual(((oldObj!["objectCol"] as! MigrationObject)["boolCol"] as! Bool), true)
@@ -396,8 +396,8 @@ class MigrationTests: TestCase {
                 newObj!["intCol"] = 1
                 newObj!["floatCol"] = 1.0
                 newObj!["doubleCol"] = 10.0
-                newObj!["binaryCol"] = NSData(bytes: "b", length: 1)
-                newObj!["dateCol"] = NSDate(timeIntervalSince1970: 2)
+                newObj!["binaryCol"] = Data(bytes: "b", count: 1)
+                newObj!["dateCol"] = Date(timeIntervalSince1970: 2)
 
                 let falseObj = SwiftBoolObject(value: [false])
                 newObj!["objectCol"] = falseObj
@@ -436,8 +436,8 @@ class MigrationTests: TestCase {
         XCTAssertEqual(object.intCol, 1)
         XCTAssertEqual(object.floatCol, 1.0 as Float)
         XCTAssertEqual(object.doubleCol, 10.0)
-        XCTAssertEqual(object.binaryCol, NSData(bytes: "b", length: 1))
-        XCTAssertEqual(object.dateCol, NSDate(timeIntervalSince1970: 2))
+        XCTAssertEqual(object.binaryCol, Data(bytes: "b", count: 1))
+        XCTAssertEqual(object.dateCol, Date(timeIntervalSince1970: 2))
         XCTAssertEqual(object.objectCol!.boolCol, false)
         XCTAssertEqual(object.arrayCol.count, 2)
         XCTAssertEqual(object.arrayCol[0].boolCol, false)

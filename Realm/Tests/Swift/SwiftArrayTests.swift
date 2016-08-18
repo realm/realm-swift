@@ -31,7 +31,7 @@ class SwiftArrayTests: RLMTestCase {
 
         realm.beginWriteTransaction()
 
-        let dateMinInput = NSDate()
+        let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
 
         _ = SwiftAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
@@ -69,7 +69,7 @@ class SwiftArrayTests: RLMTestCase {
 
         realm.beginWriteTransaction()
 
-        let dateMinInput = NSDate()
+        let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
 
         _ = SwiftAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
@@ -134,9 +134,9 @@ class SwiftArrayTests: RLMTestCase {
         XCTAssertEqualWithAccuracy(min.doubleValue, Double(0), accuracy: 0.1, "Minimum should be 0.0")
 
         // Test date min
-        var dateMinOutput = noArray.min(ofProperty: "dateCol") as! NSDate
+        var dateMinOutput = noArray.min(ofProperty: "dateCol") as! Date
         XCTAssertEqual(dateMinOutput, dateMaxInput, "Minimum should be dateMaxInput")
-        dateMinOutput = yesArray.min(ofProperty: "dateCol") as! NSDate
+        dateMinOutput = yesArray.min(ofProperty: "dateCol") as! Date
         XCTAssertEqual(dateMinOutput, dateMinInput, "Minimum should be dateMinInput")
 
         // MAX ::::::::::::::::::::::::::::::::::::::::::::::
@@ -159,9 +159,9 @@ class SwiftArrayTests: RLMTestCase {
         XCTAssertEqualWithAccuracy(max.doubleValue, Double(0), accuracy: 0.1, "Maximum should be 0.0")
 
         // Test date max
-        var dateMaxOutput = noArray.max(ofProperty: "dateCol") as! NSDate
+        var dateMaxOutput = noArray.max(ofProperty: "dateCol") as! Date
         XCTAssertEqual(dateMaxOutput, dateMaxInput, "Maximum should be dateMaxInput")
-        dateMaxOutput = yesArray.max(ofProperty: "dateCol") as! NSDate
+        dateMaxOutput = yesArray.max(ofProperty: "dateCol") as! Date
         XCTAssertEqual(dateMaxOutput, dateMinInput, "Maximum should be dateMinInput")
     }
 
@@ -261,7 +261,7 @@ class SwiftArrayTests: RLMTestCase {
 
         realm.beginWriteTransaction()
 
-        let dateMinInput = NSDate()
+        let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
 
         _ = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
@@ -299,7 +299,7 @@ class SwiftArrayTests: RLMTestCase {
 
         realm.beginWriteTransaction()
 
-        let dateMinInput = NSDate()
+        let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
 
         _ = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
@@ -364,9 +364,9 @@ class SwiftArrayTests: RLMTestCase {
         XCTAssertEqualWithAccuracy(min.doubleValue, Double(0), accuracy: 0.1, "Minimum should be 0.0")
 
         // Test date min
-        var dateMinOutput = noArray.min(ofProperty: "dateCol") as! NSDate
+        var dateMinOutput = noArray.min(ofProperty: "dateCol") as! Date
         XCTAssertEqual(dateMinOutput, dateMaxInput, "Minimum should be dateMaxInput")
-        dateMinOutput = yesArray.min(ofProperty: "dateCol") as! NSDate
+        dateMinOutput = yesArray.min(ofProperty: "dateCol") as! Date
         XCTAssertEqual(dateMinOutput, dateMinInput, "Minimum should be dateMinInput")
 
         // MAX ::::::::::::::::::::::::::::::::::::::::::::::
@@ -389,9 +389,9 @@ class SwiftArrayTests: RLMTestCase {
         XCTAssertEqualWithAccuracy(max.doubleValue, Double(0), accuracy: 0.1, "Maximum should be 0.0")
 
         // Test date max
-        var dateMaxOutput = noArray.max(ofProperty: "dateCol") as! NSDate
+        var dateMaxOutput = noArray.max(ofProperty: "dateCol") as! Date
         XCTAssertEqual(dateMaxOutput, dateMaxInput, "Maximum should be dateMaxInput")
-        dateMaxOutput = yesArray.max(ofProperty: "dateCol") as! NSDate
+        dateMaxOutput = yesArray.max(ofProperty: "dateCol") as! Date
         XCTAssertEqual(dateMaxOutput, dateMinInput, "Maximum should be dateMinInput")
     }
 
