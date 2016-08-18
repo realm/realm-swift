@@ -70,7 +70,7 @@ public final class List<T: Object>: ListBase, ThreadConfined {
 
     // MARK: Initializers
 
-    private override init!(array: RLMArray<RLMObject>!) {
+    fileprivate override init!(array: RLMArray<RLMObject>!) {
         super.init(array: array)
     }
 

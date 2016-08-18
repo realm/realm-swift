@@ -106,7 +106,7 @@ class TestCase: XCTestCase {
         RLMRealm.resetRealmState()
     }
 
-    func dispatchAsyncAndWait(block: () -> ()) {
+    func dispatchAsyncAndWait(block: @escaping () -> ()) {
         queue.async {
             autoreleasepool {
                 block()

@@ -38,7 +38,7 @@ extension ThreadConfined {
         if let object = self as? _ThreadConfined {
             return object
         } else {
-            fatalError("Illegal custom conformances to `RLMThreadConfined` by \(self.dynamicType)")
+            fatalError("Illegal custom conformances to `RLMThreadConfined` by \(type(of: self))")
         }
     }
 
@@ -65,7 +65,7 @@ public class ThreadHandover<T: ThreadConfined> {
 
     internal init(realm: Realm, objects: [T]) {
         self.metadata = objects.map { $0._private.bridgedMetadata }
-        self.types = objects.map { $0.dynamicType }
+        self.types = objects.map { type(of: $0) }
         self.package = realm.rlmRealm.exportThreadHandover(containing: objects.map { $0._private.bridgedData })
     }
 

@@ -27,9 +27,9 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
     internal let objectClassName: String
     internal let propertyName: String
 
-    private var cachedRLMResults: RLMResults<RLMObject>?
-    @objc private var object: RLMWeakObjectHandle?
-    @objc private var property: RLMProperty?
+    fileprivate var cachedRLMResults: RLMResults<RLMObject>?
+    @objc fileprivate var object: RLMWeakObjectHandle?
+    @objc fileprivate var property: RLMProperty?
 
     internal var rlmResults: RLMResults<RLMObject> {
         if cachedRLMResults == nil {
@@ -95,7 +95,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase, ThreadConfined
 
     // MARK: Initializers
 
-    private init(property propertyName: String) {
+    fileprivate init(property propertyName: String) {
         let className = (T.self as Object.Type).className()
         super.init(fromClassName: className, property: propertyName)
     }
@@ -456,7 +456,7 @@ extension LinkingObjects: _ThreadConfined {
             bridged.object = RLMWeakObjectHandle(object: object)
             bridged.property = metadata.property
         default:
-            fatalError("Unexpected handover type \(data.dynamicType)")
+            fatalError("Unexpected handover type \(type(of: data))")
         }
         return bridged
     }
@@ -509,7 +509,7 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
     internal let objectClassName: String
     internal let propertyName: String
 
-    private var cachedRLMResults: RLMResults?
+    fileprivate var cachedRLMResults: RLMResults?
     @objc private var object: RLMWeakObjectHandle?
     @objc private var property: RLMProperty?
 

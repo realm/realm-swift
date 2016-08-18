@@ -671,11 +671,11 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     /// Element type contained in this collection.
     public typealias Element = T
-    private let base: _AnyRealmCollectionBase<T>
+    fileprivate let base: _AnyRealmCollectionBase<T>
 
     // MARK: Initializers
 
-    private init(base: _AnyRealmCollectionBase<T>) {
+    fileprivate init(base: _AnyRealmCollectionBase<T>) {
         self.base = base
     }
 
@@ -978,7 +978,7 @@ extension AnyRealmCollection: _ThreadConfined {
     var bridgedMetadata: Any? {
         return AnyRealmCollectionThreadConfinedMetadata(
             baseMetadata: base.bridgedMetadata,
-            baseType: base.dynamicType
+            baseType: type(of: base)
         )
     }
 
