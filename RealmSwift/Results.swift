@@ -26,6 +26,7 @@ import Realm
 // Used for conversion from Objective-C types to Swift types
 private protocol Bridgable  { static func bridging(_ value: Any) -> Self }
 
+// FIXME: Remove once Swift supports `as! Self` casts
 private func forceCastTrampoline<T, U>(_ x: T) -> U {
     return x as! U
 }
@@ -537,6 +538,7 @@ extension Results {
 // Used for conversion from Objective-C types to Swift types
 private protocol Bridgable  { static func bridging(value: AnyObject) -> Self }
 
+// FIXME: Remove once Swift supports `as! Self` casts
 private func forceCastTrampoline<T, U>(x: T) -> U {
     return x as! U
 }
