@@ -26,6 +26,16 @@ import Realm
 // Used for conversion from Objective-C types to Swift types
 private protocol Bridgable  { static func bridging(_ value: Any) -> Self }
 
+private func forceCastTrampoline<T, U>(_ x: T) -> U {
+    return x as! U
+}
+
+extension NSNumber: Bridgable {
+    static func bridging(_ value: Any) -> Self {
+        // Unsafe if `Self` is a concrete subclass of `NSNumber`
+        return forceCastTrampoline(value)
+    }
+}
 extension Double: Bridgable {
     static func bridging(_ value: Any) -> Double {
         return (value as! NSNumber).doubleValue
@@ -61,11 +71,14 @@ extension Int64: Bridgable {
         return (value as! NSNumber).int64Value
     }
 }
+extension Date: Bridgable {
+    static func bridging(_ value: Any) -> Date   {
+        return value as! Date
+    }
+}
 extension NSDate: Bridgable {
     static func bridging(_ value: Any) -> Self   {
-        func forceCastTrampoline<T, U>(_ x: T) -> U {
-            return x as! U
-        }
+        // Unsafe if `Self` is a concrete subclass of `NSDate`
         return forceCastTrampoline(value)
     }
 }
@@ -73,7 +86,10 @@ extension NSDate: Bridgable {
 // MARK: MinMaxType
 
 /// Types which can be used for min()/max().
-public protocol MinMaxType /* : Bridgable */ {}
+public protocol MinMaxType {
+    // Must conform to `Bridgable`
+}
+extension NSNumber: MinMaxType {}
 extension Double: MinMaxType {}
 extension Float: MinMaxType {}
 extension Int: MinMaxType {}
@@ -81,6 +97,7 @@ extension Int8: MinMaxType {}
 extension Int16: MinMaxType {}
 extension Int32: MinMaxType {}
 extension Int64: MinMaxType {}
+extension Date: MinMaxType {}
 extension NSDate: MinMaxType {}
 extension MinMaxType {
     internal static func bridging(_ value: Any) -> Self {
@@ -91,7 +108,10 @@ extension MinMaxType {
 // MARK: AddableType
 
 /// Types which can be used for average()/sum().
-public protocol AddableType /* : Bridgable */ {}
+public protocol AddableType {
+    // Must conform to `Bridgable`
+}
+extension NSNumber: AddableType {}
 extension Double: AddableType {}
 extension Float: AddableType {}
 extension Int: AddableType {}
@@ -517,6 +537,16 @@ extension Results {
 // Used for conversion from Objective-C types to Swift types
 private protocol Bridgable  { static func bridging(value: AnyObject) -> Self }
 
+private func forceCastTrampoline<T, U>(x: T) -> U {
+    return x as! U
+}
+
+extension NSNumber: Bridgable {
+    static func bridging(value: AnyObject) -> Self {
+        // Unsafe if `Self` is a concrete subclass of `NSNumber`
+        return forceCastTrampoline(value)
+    }
+}
 extension Double: Bridgable {
     static func bridging(value: AnyObject) -> Double {
         return (value as! NSNumber).doubleValue
@@ -554,9 +584,7 @@ extension Int64: Bridgable {
 }
 extension NSDate: Bridgable {
     static func bridging(value: AnyObject) -> Self   {
-        func forceCastTrampoline<T, U>(x: T) -> U {
-            return x as! U
-        }
+        // Unsafe if `Self` is a concrete subclass of `NSDate`
         return forceCastTrampoline(value)
     }
 }
@@ -568,7 +596,10 @@ extension NSDate: Bridgable {
 
  - see: `min(_:)`, `max(_:)`
  */
-public protocol MinMaxType {}
+public protocol MinMaxType {
+    // Must conform to `Bridgable`
+}
+extension NSNumber: MinMaxType {}
 extension Double: MinMaxType {}
 extension Float: MinMaxType {}
 extension Int: MinMaxType {}
@@ -590,7 +621,10 @@ extension MinMaxType {
 
  - see: `sum(_:)`, `average(_:)`
  */
-public protocol AddableType {}
+public protocol AddableType {
+    // Must conform to `Bridgable`
+}
+extension NSNumber: AddableType {}
 extension Double: AddableType {}
 extension Float: AddableType {}
 extension Int: AddableType {}
