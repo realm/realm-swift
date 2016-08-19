@@ -509,7 +509,7 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
     internal let objectClassName: String
     internal let propertyName: String
 
-    fileprivate var cachedRLMResults: RLMResults?
+    private var cachedRLMResults: RLMResults?
     @objc private var object: RLMWeakObjectHandle?
     @objc private var property: RLMProperty?
 
