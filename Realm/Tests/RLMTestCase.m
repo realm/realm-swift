@@ -198,15 +198,11 @@ static BOOL encryptTests() {
     [token stop];
 }
 
-- (dispatch_queue_t)bgQueue {
+- (void)dispatchAsync:(dispatch_block_t)block {
     if (!_bgQueue) {
         _bgQueue = dispatch_queue_create("test background queue", 0);
     }
-    return _bgQueue;
-}
-
-- (void)dispatchAsync:(dispatch_block_t)block {
-    dispatch_async(self.bgQueue, ^{
+    dispatch_async(_bgQueue, ^{
         @autoreleasepool {
             block();
         }
@@ -215,7 +211,7 @@ static BOOL encryptTests() {
 
 - (void)dispatchAsyncAndWait:(dispatch_block_t)block {
     [self dispatchAsync:block];
-    dispatch_sync(self.bgQueue, ^{});
+    dispatch_sync(_bgQueue, ^{});
 }
 
 - (id)nonLiteralNil
