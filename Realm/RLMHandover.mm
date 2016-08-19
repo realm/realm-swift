@@ -49,6 +49,42 @@ using namespace realm;
     RLMRealmConfiguration *_configuration;
 }
 
+typedef NS_ENUM(bool, RLMErrorMode) {
+    RLMErrorModeImport,
+    RLMErrorModeExport
+};
+
+//
+// validation helpers
+//
+[[gnu::noinline]]
+[[noreturn]]
+static void throwError(RLMErrorMode mode) {
+    try {
+        throw;
+    }
+    catch (realm::InvalidTransactionException const& exception) {
+        @throw RLMException(@"Cannot %@ ThreadHandover inside of a write transaction",
+                            mode == RLMErrorModeExport ? @"export" : @"import");
+    }
+    catch (realm::IncorrectThreadException const&) {
+        @throw RLMException(@"Realm accessed from incorrect thread");
+    }
+    catch (std::exception const& ex) {
+        @throw RLMException(ex);
+    }
+}
+
+template<typename Function>
+static auto translateErrors(Function&& f, RLMErrorMode mode) {
+    try {
+        return f();
+    }
+    catch (...) {
+        throwExportError(mode);
+    }
+}
+
 - (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)objects {
     if (self = [super init]) {
         _metadata = [NSMutableArray arrayWithCapacity:objects.count];
@@ -76,7 +112,9 @@ using namespace realm;
             [_metadata addObject:[object rlm_handoverMetadata]];
             [_classes addObject:[object class]];
         }
-        _package = util::make_optional(realm->_realm->package_for_handover(handoverables));
+        _package = translateErrors([&] {
+            return util::make_optional(realm->_realm->package_for_handover(handoverables));
+        }, RLMErrorModeExport);
         _configuration = realm.configuration;
     }
     return self;
@@ -97,7 +135,9 @@ using namespace realm;
         return nil;
     }
 
-    std::vector<AnyThreadConfined> handoverables = realm->_realm->accept_handover(std::move(*_package));
+    std::vector<AnyThreadConfined> handoverables = translateErrors([&] {
+        return realm->_realm->accept_handover(std::move(*_package));
+    }, RLMErrorModeImport);
 
     NSMutableArray<id<RLMThreadConfined>> *objects = [NSMutableArray arrayWithCapacity:handoverables.size()];
     for (NSUInteger i = 0; i < handoverables.size(); i++) {
