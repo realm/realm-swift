@@ -411,6 +411,13 @@ class SwiftConvenienceInitializerObject: Object {
     }
 }
 
+class SwiftObjectiveCTypesObject: Object {
+    dynamic var stringCol: NSString?
+    dynamic var dateCol: NSDate?
+    dynamic var dataCol: NSData?
+    dynamic var numCol: NSNumber? = 0
+}
+
 #else
 
 class SwiftStringObject: Object {

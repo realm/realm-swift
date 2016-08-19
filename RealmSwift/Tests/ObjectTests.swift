@@ -349,6 +349,25 @@ class ObjectTests: TestCase {
         XCTAssertEqual(arrayObject.dynamicList("intArray").count, 0)
         assertThrows(arrayObject.dynamicList("noSuchList"))
     }
+
+    func testObjectiveCTypeProperties() {
+        let realm = try! Realm()
+        var object: SwiftObjectiveCTypesObject!
+        let now = NSDate()
+        let data = "fizzbuzz".data(using: .utf8)! as Data as NSData
+        try! realm.write {
+            object = SwiftObjectiveCTypesObject()
+            realm.add(object)
+            object.stringCol = "Hello world!"
+            object.dateCol = now
+            object.dataCol = data
+            object.numCol = 42
+        }
+        XCTAssertEqual("Hello world!", object.stringCol)
+        XCTAssertEqual(now, object.dateCol)
+        XCTAssertEqual(data, object.dataCol)
+        XCTAssertEqual(42, object.numCol)
+    }
 }
 
 #else
