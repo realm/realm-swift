@@ -438,14 +438,15 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return translateErrors([&] { return AnyThreadConfined(_results); }); // TODO: Do we need more translate errors thing?
 }
 
-- (NSString *)rlm_handoverMetadata {
-    return self.objectSchema.className;
+- (id)rlm_handoverMetadata {
+    return [NSNull null];
 }
 
 + (instancetype)rlm_objectWithHandoverData:(realm::AnyThreadConfined &)data
-                                  metadata:(NSString *)className inRealm:(RLMRealm *)realm {
-    return [RLMResults resultsWithObjectInfo:realm->_info[className]
-                                     results:data.get_results()];
+                                  metadata:(__unused id)metadata inRealm:(RLMRealm *)realm {
+    Results results = data.get_results();
+    return [RLMResults resultsWithObjectInfo:realm->_info[RLMStringDataToNSString(results.get_object_type())]
+                                     results:std::move(results)];
 }
 
 @end
