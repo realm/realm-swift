@@ -435,7 +435,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 @implementation RLMResults (Handover)
 
 - (realm::AnyThreadConfined)rlm_handoverData {
-    return translateErrors([&] { return AnyThreadConfined(_results); }); // TODO: Do we need more translate errors thing?
+    return AnyThreadConfined(_results);
 }
 
 - (id)rlm_handoverMetadata {
