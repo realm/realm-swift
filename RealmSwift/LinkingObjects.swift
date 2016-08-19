@@ -301,7 +301,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The sum of the given property over all objects in the collection.
      */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
-        return U.bridging(rlmResults.sum(ofProperty: property))
+        return U.bridging(objCValue: rlmResults.sum(ofProperty: property))
     }
 
     /**
