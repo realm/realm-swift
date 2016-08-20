@@ -81,7 +81,7 @@ static auto translateErrors(Function&& f, RLMErrorMode mode) {
         return f();
     }
     catch (...) {
-        throwExportError(mode);
+        throwError(mode);
     }
 }
 
