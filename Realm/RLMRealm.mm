@@ -43,6 +43,7 @@
 #include "object_store.hpp"
 #include "schema.hpp"
 #include "shared_realm.hpp"
+#include "sync_manager.hpp"
 
 #include <realm/util/memory_stream.hpp>
 #include <realm/util/logger.hpp>
@@ -54,11 +55,21 @@ using namespace realm;
 using util::File;
 
 namespace {
-struct SyncLogger : public util::RootLogger {
+struct CocoaSyncLogger : public util::RootLogger {
     void do_log(std::string message) override {
         NSLog(@"RealmSync: %@", RLMStringDataToNSString(message));
     }
-} s_syncLogger;
+};
+
+struct CocoaSyncLoggerFactory : public SyncLoggerFactory {
+    std::unique_ptr<util::Logger> make_logger(util::Logger::Level level) override
+    {
+        auto logger = std::make_unique<CocoaSyncLogger>();
+        logger->set_level_threshold(level);
+        return std::move(logger);
+    }
+
+} s_syncLoggerFactory;
 
 } // anonymous namespace
 
@@ -138,6 +149,8 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 
     RLMCheckForUpdates();
     RLMSendAnalytics();
+
+    SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
 }
 
 - (BOOL)isEmpty {
@@ -279,7 +292,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
     configuration = [configuration copy];
     Realm::Config& config = configuration.config;
-    config.logger = &s_syncLogger;
 
     RLMRealm *realm = [RLMRealm new];
     realm->_dynamic = dynamic;
@@ -711,7 +723,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     using Level = realm::util::Logger::Level;
 
     Level logger_level = (level == RLMSyncLogLevelVerbose) ? Level::detail : Level::info;
-    s_syncLogger.set_level_threshold(logger_level);
+    SyncManager::shared().set_log_level(logger_level);
 }
 
 @end
