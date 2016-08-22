@@ -165,6 +165,7 @@ node('osx') {
 
     sh 'ln -s "$(pwd)/temp/sync" realm-cocoa/core'
     sh 'ln -s "$(pwd)/realm-cocoa" tightdb_objc'
+    sh 'bash realm-cocoa/scripts/reset-simulators.sh'
     
     stage 'Build'
     buildComponent('package-ios-static', 'tightdb_objc/build/ios-static/realm-framework-ios.zip')
