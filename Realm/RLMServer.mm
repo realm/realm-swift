@@ -21,7 +21,8 @@
 #import "RLMServerUtil.h"
 #import "RLMUtil.hpp"
 
-#import <shared_realm.hpp>
+#import "sync_manager.hpp"
+
 
 @interface RLMServer ()
 
@@ -57,7 +58,7 @@
         });
     };
 
-    realm::Realm::set_up_sync_client(handler, nullptr);
+    realm::SyncManager::shared().set_error_handler(std::move(handler));
 }
 
 + (NSString *)appID {
