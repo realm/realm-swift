@@ -20,7 +20,7 @@
 #import "RLMConstants.h"
 #import "RLMHandover.h"
 
-@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMRealm;
+@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
 NS_ASSUME_NONNULL_BEGIN
 
