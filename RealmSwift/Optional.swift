@@ -22,7 +22,7 @@ import Realm
 
 /// Types that can be represented in a `RealmOptional`.
 public protocol RealmOptionalType {
-    // Must conform to ObjectiveCBridgeable
+    // Must conform to CustomObjectiveCBridgeable
 }
 extension Int: RealmOptionalType {}
 extension Int8: RealmOptionalType {}
@@ -34,10 +34,10 @@ extension Double: RealmOptionalType {}
 extension Bool: RealmOptionalType {}
 extension RealmOptionalType {
     internal static func bridging(objCValue value: Any) -> Self {
-        return (Self.self as! ObjectiveCBridgeable.Type).bridging(objCValue: value) as! Self
+        return (Self.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: value) as! Self
     }
     var objCValue: Any {
-        return (self as! ObjectiveCBridgeable).objCValue
+        return (self as! CustomObjectiveCBridgeable).objCValue
     }
 }
 
@@ -74,7 +74,7 @@ public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
 
 /// A protocol describing types that can parameterize a `RealmOptional`.
 public protocol RealmOptionalType {
-    // Must conform to ObjectiveCBridgeable
+    // Must conform to CustomObjectiveCBridgeable
 }
 extension Int: RealmOptionalType {}
 extension Int8: RealmOptionalType {}
@@ -86,10 +86,10 @@ extension Double: RealmOptionalType {}
 extension Bool: RealmOptionalType {}
 extension RealmOptionalType {
     internal static func bridging(objCValue objCValue: AnyObject) -> Self {
-        return (Self.self as! ObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
+        return (Self.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
     }
     var objCValue: AnyObject {
-        return (self as! ObjectiveCBridgeable).objCValue
+        return (self as! CustomObjectiveCBridgeable).objCValue
     }
 }
 

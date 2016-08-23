@@ -47,10 +47,10 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
                                            withTemplate: template)
 }
 
-// MARK: ObjectiveCBridgeable
+// MARK: CustomObjectiveCBridgeable
 
 // Used for conversion from Objective-C types to Swift types
-internal protocol ObjectiveCBridgeable  {
+internal protocol CustomObjectiveCBridgeable  {
     /* FIXME: Remove protocol once SR-2393 bridges all integer types to `NSNumber`
      *        Instead, use `as AnyObject` and `as! [SwiftType]` to cast between. */
     static func bridging(objCValue: Any) -> Self
@@ -62,7 +62,7 @@ private func forceCastToInferred<T, U>(_ x: T) -> U {
     return x as! U
 }
 
-extension NSNumber: ObjectiveCBridgeable {
+extension NSNumber: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> Self {
         return forceCastToInferred(objCValue)
     }
@@ -70,7 +70,7 @@ extension NSNumber: ObjectiveCBridgeable {
         return self
     }
 }
-extension Double: ObjectiveCBridgeable {
+extension Double: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> Double {
         return (objCValue as! NSNumber).doubleValue
     }
@@ -78,7 +78,7 @@ extension Double: ObjectiveCBridgeable {
         return NSNumber(value: self)
     }
 }
-extension Float: ObjectiveCBridgeable {
+extension Float: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> Float {
         return (objCValue as! NSNumber).floatValue
     }
@@ -86,7 +86,7 @@ extension Float: ObjectiveCBridgeable {
         return NSNumber(value: self)
     }
 }
-extension Int: ObjectiveCBridgeable {
+extension Int: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> Int {
         return (objCValue as! NSNumber).intValue
     }
@@ -94,7 +94,7 @@ extension Int: ObjectiveCBridgeable {
         return NSNumber(value: self)
     }
 }
-extension Int8: ObjectiveCBridgeable {
+extension Int8: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> Int8 {
         return (objCValue as! NSNumber).int8Value
     }
@@ -102,7 +102,7 @@ extension Int8: ObjectiveCBridgeable {
         return NSNumber(value: self)
     }
 }
-extension Int16: ObjectiveCBridgeable {
+extension Int16: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> Int16 {
         return (objCValue as! NSNumber).int16Value
     }
@@ -110,7 +110,7 @@ extension Int16: ObjectiveCBridgeable {
         return NSNumber(value: self)
     }
 }
-extension Int32: ObjectiveCBridgeable {
+extension Int32: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> Int32 {
         return (objCValue as! NSNumber).int32Value
     }
@@ -118,7 +118,7 @@ extension Int32: ObjectiveCBridgeable {
         return NSNumber(value: self)
     }
 }
-extension Int64: ObjectiveCBridgeable {
+extension Int64: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> Int64 {
         return (objCValue as! NSNumber).int64Value
     }
@@ -126,7 +126,7 @@ extension Int64: ObjectiveCBridgeable {
         return NSNumber(value: self)
     }
 }
-extension Bool: ObjectiveCBridgeable {
+extension Bool: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> Bool {
         return (objCValue as! NSNumber).boolValue
     }
@@ -134,7 +134,7 @@ extension Bool: ObjectiveCBridgeable {
         return NSNumber(value: self)
     }
 }
-extension Date: ObjectiveCBridgeable {
+extension Date: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> Date   {
         return objCValue as! Date
     }
@@ -142,7 +142,7 @@ extension Date: ObjectiveCBridgeable {
         return self
     }
 }
-extension NSDate: ObjectiveCBridgeable {
+extension NSDate: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> Self   {
         return forceCastToInferred(objCValue)
     }
@@ -170,10 +170,10 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
                                                    withTemplate: template)
 }
 
-// MARK: ObjectiveCBridgeable
+// MARK: CustomObjectiveCBridgeable
 
 // Used for conversion from Objective-C types to Swift types
-internal protocol ObjectiveCBridgeable  {
+internal protocol CustomObjectiveCBridgeable  {
     /* FIXME: Remove protocol once SR-2393 bridges all integer types to `NSNumber`
      *        Instead, use `as AnyObject` and `as! [SwiftType]` to cast between. */
     static func bridging(objCValue objCValue: AnyObject) -> Self
@@ -185,7 +185,7 @@ private func forceCastToInferred<T, U>(x: T) -> U {
     return x as! U
 }
 
-extension NSNumber: ObjectiveCBridgeable {
+extension NSNumber: CustomObjectiveCBridgeable {
     static func bridging(objCValue objCValue: AnyObject) -> Self {
         return forceCastToInferred(objCValue)
     }
@@ -193,7 +193,7 @@ extension NSNumber: ObjectiveCBridgeable {
         return self
     }
 }
-extension Double: ObjectiveCBridgeable {
+extension Double: CustomObjectiveCBridgeable {
     static func bridging(objCValue objCValue: AnyObject) -> Double {
         return (objCValue as! NSNumber).doubleValue
     }
@@ -201,7 +201,7 @@ extension Double: ObjectiveCBridgeable {
         return NSNumber(double: self)
     }
 }
-extension Float: ObjectiveCBridgeable {
+extension Float: CustomObjectiveCBridgeable {
     static func bridging(objCValue objCValue: AnyObject) -> Float {
         return (objCValue as! NSNumber).floatValue
     }
@@ -209,7 +209,7 @@ extension Float: ObjectiveCBridgeable {
         return NSNumber(float: self)
     }
 }
-extension Int: ObjectiveCBridgeable {
+extension Int: CustomObjectiveCBridgeable {
     static func bridging(objCValue objCValue: AnyObject) -> Int {
         return (objCValue as! NSNumber).integerValue
     }
@@ -217,7 +217,7 @@ extension Int: ObjectiveCBridgeable {
         return NSNumber(integer: self)
     }
 }
-extension Int8: ObjectiveCBridgeable {
+extension Int8: CustomObjectiveCBridgeable {
     static func bridging(objCValue objCValue: AnyObject) -> Int8 {
         return (objCValue as! NSNumber).charValue
     }
@@ -225,7 +225,7 @@ extension Int8: ObjectiveCBridgeable {
         return NSNumber(char: self)
     }
 }
-extension Int16: ObjectiveCBridgeable {
+extension Int16: CustomObjectiveCBridgeable {
     static func bridging(objCValue objCValue: AnyObject) -> Int16 {
         return (objCValue as! NSNumber).shortValue
     }
@@ -233,7 +233,7 @@ extension Int16: ObjectiveCBridgeable {
         return NSNumber(short: self)
     }
 }
-extension Int32: ObjectiveCBridgeable {
+extension Int32: CustomObjectiveCBridgeable {
     static func bridging(objCValue objCValue: AnyObject) -> Int32 {
         return (objCValue as! NSNumber).intValue
     }
@@ -241,7 +241,7 @@ extension Int32: ObjectiveCBridgeable {
         return NSNumber(int: self)
     }
 }
-extension Int64: ObjectiveCBridgeable {
+extension Int64: CustomObjectiveCBridgeable {
     static func bridging(objCValue objCValue: AnyObject) -> Int64 {
         return (objCValue as! NSNumber).longLongValue
     }
@@ -249,7 +249,7 @@ extension Int64: ObjectiveCBridgeable {
         return NSNumber(longLong: self)
     }
 }
-extension Bool: ObjectiveCBridgeable {
+extension Bool: CustomObjectiveCBridgeable {
     static func bridging(objCValue objCValue: AnyObject) -> Bool {
         return (objCValue as! NSNumber).boolValue
     }
@@ -257,7 +257,7 @@ extension Bool: ObjectiveCBridgeable {
         return NSNumber(bool: self)
     }
 }
-extension NSDate: ObjectiveCBridgeable {
+extension NSDate: CustomObjectiveCBridgeable {
     static func bridging(objCValue objCValue: AnyObject) -> Self   {
         func forceCastTrampoline<T, U>(x: T) -> U {
             return x as! U
