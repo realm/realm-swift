@@ -439,7 +439,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)rlm_handoverMetadata {
-    return [NSNull null];
+    return nil;
 }
 
 + (instancetype)rlm_objectWithHandoverData:(realm::AnyThreadConfined &)data

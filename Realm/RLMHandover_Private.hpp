@@ -26,9 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol RLMThreadConfined_Private
 
 @property (readonly) realm::AnyThreadConfined rlm_handoverData;
-@property (readonly) id rlm_handoverMetadata;
+@property (readonly, nullable) id rlm_handoverMetadata;
 + (instancetype)rlm_objectWithHandoverData:(realm::AnyThreadConfined&)data
-                                  metadata:(id)metadata inRealm:(RLMRealm *)realm;
+                                  metadata:(nullable id)metadata inRealm:(RLMRealm *)realm;
 
 @end
 

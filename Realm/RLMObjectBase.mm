@@ -454,12 +454,12 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     return AnyThreadConfined(Object(_realm->_realm, *_info->objectSchema, _row));
 }
 
-- (NSNull *)rlm_handoverMetadata {
-    return [NSNull null];
+- (id)rlm_handoverMetadata {
+    return nil;
 }
 
 + (instancetype)rlm_objectWithHandoverData:(realm::AnyThreadConfined&)data
-                                  metadata:(__unused NSNull *)metadata inRealm:(RLMRealm *)realm {
+                                  metadata:(__unused id *)metadata inRealm:(RLMRealm *)realm {
     Object object = data.get_object();
     NSString *objectClassName = @(object.get_object_schema().name.c_str());
     return RLMCreateObjectAccessor(realm, realm->_info[objectClassName], object.row().get_index());

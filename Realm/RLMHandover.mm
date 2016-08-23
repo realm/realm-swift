@@ -109,7 +109,7 @@ static auto translateErrors(Function&& f, RLMErrorMode mode) {
                 }
             }
             handoverables.push_back(object.rlm_handoverData);
-            [_metadata addObject:[object rlm_handoverMetadata]];
+            [_metadata addObject:[object rlm_handoverMetadata] ?: [NSNull null]];
             [_classes addObject:[object class]];
         }
         _package = translateErrors([&] {
@@ -142,7 +142,7 @@ static auto translateErrors(Function&& f, RLMErrorMode mode) {
     NSMutableArray<id<RLMThreadConfined>> *objects = [NSMutableArray arrayWithCapacity:handoverables.size()];
     for (NSUInteger i = 0; i < handoverables.size(); i++) {
         [objects addObject:[_classes[i] rlm_objectWithHandoverData:handoverables[i]
-                                                          metadata:_metadata[i] inRealm:realm]];
+                                                          metadata:RLMCoerceToNil(_metadata[i]) inRealm:realm]];
     }
 
     _package = {};
