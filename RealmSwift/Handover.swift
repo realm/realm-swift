@@ -20,7 +20,14 @@ import Realm
 
 #if swift(>=3.0)
     
-/// A Realm-bound object that can only be passed between threads by exporting for handover
+/**
+ An object which is bound to a thread-specific Realm instance, and so cannot be passed between threads.
+
+ Objects of classes conforming to this protocol can be packaged for transport between threads by calling
+ `Realm.exportThreadHandover(packaging:)`. Note that only types defined by Realm can meaningfully conform
+ to this protocol, and defining new classes which attempt to conform to it will not make them work with
+ `exportThreadHandover`.
+ */
 @objc public protocol ThreadConfined {
     // FIXME: Remove `@objc` from protocol once SR-55 allows Swift protocol existentials to conform to themselves
 
@@ -102,7 +109,14 @@ public class ThreadHandover<T: ThreadConfined> {
 
 #else
 
-/// A Realm-bound object that can only be passed between threads by exporting for handover
+/**
+ An object which is bound to a thread-specific Realm instance, and so cannot be passed between threads.
+
+ Objects of classes conforming to this protocol can be packaged for transport between threads by calling
+ `Realm.exportThreadHandover(packaging:)`. Note that only types defined by Realm can meaningfully conform
+ to this protocol, and defining new classes which attempt to conform to it will not make them work with
+ `exportThreadHandover`.
+ */
 @objc public protocol ThreadConfined {
     // FIXME: Remove `@objc` from protocol once SR-55 allows Swift protocol existentials to conform to themselves
 

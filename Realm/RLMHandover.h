@@ -22,7 +22,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// A Realm-bound object that can only be passed between threads by exporting for handover
+/**
+ An object which is bound to a thread-specific RLMRealm instance, and so cannot be passed between threads.
+
+ Objects of classes conforming to this protocol can be packaged for transport between threads by calling
+ `-[RLMRealm exportThreadHandoverWithObjects:]`. Note that only types defined by Realm can meaningfully conform
+ to this protocol, and defining new classes which attempt to conform to it will not make them work with
+ `exportThreadHandoverWithObjects`.
+ */
 @protocol RLMThreadConfined <NSObject>
 
 /// The Realm which manages the object, or `nil` if the object is unmanaged.
