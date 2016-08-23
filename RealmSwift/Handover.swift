@@ -22,6 +22,8 @@ import Realm
     
 /// A Realm-bound object that can only be passed between threads by exporting for handover
 @objc public protocol ThreadConfined {
+    // FIXME: Remove `@objc` from protocol once SR-55 allows Swift protocol existentials to conform to themselves
+
     // Runtime-enforced requirement that type also conforms to `_ThreadConfined`
 }
 
@@ -102,6 +104,8 @@ public class ThreadHandover<T: ThreadConfined> {
 
 /// A Realm-bound object that can only be passed between threads by exporting for handover
 @objc public protocol ThreadConfined {
+    // FIXME: Remove `@objc` from protocol once SR-55 allows Swift protocol existentials to conform to themselves
+
     // Runtime-enforced requirement that type also conforms to `_ThreadConfined`
 }
 
