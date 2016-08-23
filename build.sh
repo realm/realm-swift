@@ -864,12 +864,13 @@ EOM
           mv core/include include/core
 
           mkdir -p include/impl/apple
-          mkdir -p include/util
+          mkdir -p include/util/apple
           cp Realm/*.hpp include
           cp Realm/ObjectStore/src/*.hpp include
           cp Realm/ObjectStore/src/impl/*.hpp include/impl
           cp Realm/ObjectStore/src/impl/apple/*.hpp include/impl/apple
           cp Realm/ObjectStore/src/util/*.hpp include/util
+          cp Realm/ObjectStore/src/util/apple/*.hpp include/util/apple
 
           touch Realm/RLMPlatform.h
           if [ -n "$COCOAPODS_VERSION" ]; then
