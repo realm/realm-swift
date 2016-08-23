@@ -23,9 +23,7 @@ import Realm
 // MARK: MinMaxType
 
 /// Types which can be used for min()/max().
-public protocol MinMaxType {
-    // Must conform to `CustomObjectiveCBridgeable`
-}
+public protocol MinMaxType {}
 extension NSNumber: MinMaxType {}
 extension Double: MinMaxType {}
 extension Float: MinMaxType {}
@@ -36,18 +34,11 @@ extension Int32: MinMaxType {}
 extension Int64: MinMaxType {}
 extension Date: MinMaxType {}
 extension NSDate: MinMaxType {}
-extension MinMaxType {
-    internal static func bridging(objCValue: Any) -> Self {
-        return (Self.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
-    }
-}
-    
+
 // MARK: AddableType
 
 /// Types which can be used for average()/sum().
-public protocol AddableType {
-    // Must conform to `CustomObjectiveCBridgeable`
-}
+public protocol AddableType {}
 extension NSNumber: AddableType {}
 extension Double: AddableType {}
 extension Float: AddableType {}
@@ -56,11 +47,6 @@ extension Int8: AddableType {}
 extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
-extension AddableType {
-    internal static func bridging(objCValue: Any) -> Self {
-        return (Self.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
-    }
-}
 
 /**
 Results is an auto-updating container type in Realm returned from object queries.
@@ -286,7 +272,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The minimum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
     public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return rlmResults.min(ofProperty: property).map(U.bridging)
+        return rlmResults.min(ofProperty: property).map(forceSwiftBridgeCast)
     }
 
     /**
@@ -299,7 +285,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The maximum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
     public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return rlmResults.max(ofProperty: property).map(U.bridging)
+        return rlmResults.max(ofProperty: property).map(forceSwiftBridgeCast)
     }
 
     /**
@@ -312,7 +298,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The sum of the given property over all objects in the Results.
     */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
-        return U.bridging(objCValue: rlmResults.sum(ofProperty: property))
+        return forceSwiftBridgeCast(fromObjCValue: rlmResults.sum(ofProperty: property))
     }
 
     /**
@@ -325,7 +311,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The average of the given property over all objects in the Results, or `nil` if the Results is empty.
     */
     public func average<U: AddableType>(ofProperty property: String) -> U? {
-        return rlmResults.average(ofProperty: property).map(U.bridging)
+        return rlmResults.average(ofProperty: property).map(forceSwiftBridgeCast)
     }
 
     // MARK: Notifications
@@ -476,9 +462,7 @@ extension Results {
 
  - see: `min(_:)`, `max(_:)`
  */
-public protocol MinMaxType {
-    // Must conform to `CustomObjectiveCBridgeable`
-}
+public protocol MinMaxType {}
 extension NSNumber: MinMaxType {}
 extension Double: MinMaxType {}
 extension Float: MinMaxType {}
@@ -488,11 +472,6 @@ extension Int16: MinMaxType {}
 extension Int32: MinMaxType {}
 extension Int64: MinMaxType {}
 extension NSDate: MinMaxType {}
-extension MinMaxType {
-    internal static func bridging(objCValue objCValue: AnyObject) -> Self {
-        return (Self.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
-    }
-}
 
 // MARK: AddableType
 
@@ -501,9 +480,7 @@ extension MinMaxType {
 
  - see: `sum(_:)`, `average(_:)`
  */
-public protocol AddableType {
-    // Must conform to `CustomObjectiveCBridgeable`
-}
+public protocol AddableType {}
 extension NSNumber: AddableType {}
 extension Double: AddableType {}
 extension Float: AddableType {}
@@ -512,11 +489,6 @@ extension Int8: AddableType {}
 extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
-extension AddableType {
-    internal static func bridging(objCValue: AnyObject) -> Self {
-        return (Self.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
-    }
-}
 
 /// :nodoc:
 /// Internal class. Do not use directly.
@@ -747,7 +719,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The minimum value of the property, or `nil` if the collection is empty.
      */
     public func min<U: MinMaxType>(property: String) -> U? {
-        return rlmResults.minOfProperty(property).map(U.bridging)
+        return rlmResults.minOfProperty(property).map(forceSwiftBridgeCast)
     }
 
     /**
@@ -760,7 +732,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The maximum value of the property, or `nil` if the collection is empty.
      */
     public func max<U: MinMaxType>(property: String) -> U? {
-        return rlmResults.maxOfProperty(property).map(U.bridging)
+        return rlmResults.maxOfProperty(property).map(forceSwiftBridgeCast)
     }
 
     /**
@@ -773,7 +745,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The sum of the given property.
      */
     public func sum<U: AddableType>(property: String) -> U {
-        return U.bridging(rlmResults.sumOfProperty(property))
+        return forceSwiftBridgeCast(fromObjCValue: rlmResults.sumOfProperty(property))
     }
 
     /**
@@ -786,7 +758,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The average value of the given property, or `nil` if the collection is empty.
      */
     public func average<U: AddableType>(property: String) -> U? {
-        return rlmResults.averageOfProperty(property).map(U.bridging)
+        return rlmResults.averageOfProperty(property).map(forceSwiftBridgeCast)
     }
 
     // MARK: Notifications
