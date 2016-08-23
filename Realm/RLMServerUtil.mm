@@ -23,7 +23,7 @@
 NSURL *RLMAuthURLForObjectServerURL(NSURL *objectServerURL, NSNumber *customPort) {
     BOOL isSSL = [objectServerURL.scheme isEqualToString:@"realms"];
     NSString *scheme = (isSSL ? @"https" : @"http");
-    NSInteger port = customPort ? [customPort integerValue] : (isSSL ? 8081 : 8080);
+    NSInteger port = customPort ? [customPort integerValue] : (isSSL ? 443 : 8080);
     NSString *raw = [NSString stringWithFormat:@"%@://%@:%@", scheme, objectServerURL.host, @(port)];
     return [NSURL URLWithString:raw];
 }
