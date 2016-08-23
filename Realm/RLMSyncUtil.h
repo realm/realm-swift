@@ -24,42 +24,33 @@ typedef void(^RLMErrorReportingBlock)(NSError * _Nullable);
 @class RLMRealmConfiguration;
 
 typedef NSString* RLMIdentity;
-typedef NSString* RLMLocalIdentity;
 typedef NSString* RLMServerToken;
 typedef NSString* RLMCredentialToken;
 typedef NSString* RLMServerPath;
 typedef void(^RLMServerCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
-typedef void(^RLMServerFetchedRealmCompletionBlock)(NSError * _Nullable, RLMRealmConfiguration * _Nullable, BOOL * _Nonnull);
 
 NS_ASSUME_NONNULL_BEGIN
 
-static NSString *const RLMServerErrorDomain = @"io.realm.server";
+extern NSString *const RLMSyncErrorDomain;
 
-typedef RLM_ERROR_ENUM(NSInteger, RLMServerError, RLMServerErrorDomain) {
+typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
     /// An error that indicates that the response received from the authentication server was malformed.
-    RLMServerErrorBadResponse             = 1,
+    RLMSyncErrorBadResponse             = 1,
 
     /// An error that indicates that the supplied Realm path was invalid, or could not be resolved by the authentication
     /// server.
-    RLMServerErrorBadRemoteRealmPath      = 2,
+    RLMSyncErrorBadRemoteRealmPath      = 2,
 
     /// An error that indicates that the response received from the authentication server was an HTTP error code. The
     /// `userInfo` dictionary contains the actual error code value.
-    RLMServerErrorHTTPStatusCodeError     = 3,
+    RLMSyncErrorHTTPStatusCodeError     = 3,
 
     /// An error that indicates an issue with the underlying Realm Object Server engine.
-    RLMServerInternalError                = 4,
+    RLMSyncInternalError                = 4,
 };
 
-typedef NSString *RLMIdentityProvider RLM_EXTENSIBLE_STRING_ENUM;
-
-static RLMIdentityProvider const RLMIdentityProviderDebug                  = @"debug";
-static RLMIdentityProvider const RLMIdentityProviderRealm                  = @"realm";
-static RLMIdentityProvider const RLMIdentityProviderUsernamePassword       = @"password";
-static RLMIdentityProvider const RLMIdentityProviderFacebook               = @"facebook";
-static RLMIdentityProvider const RLMIdentityProviderTwitter                = @"twitter";
-static RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"google";
-static RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
-// FIXME: add more providers as necessary...
-
 NS_ASSUME_NONNULL_END
+
+#define RLMSYNC_UNINITIALIZABLE \
+- (instancetype)init NS_UNAVAILABLE; \
++ (instancetype)new NS_UNAVAILABLE;

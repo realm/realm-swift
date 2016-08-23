@@ -16,21 +16,43 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSessionInfo_Private.h"
+#import "RLMSyncSession_Private.h"
 
-#import "RLMUser_Private.h"
-#import "RLMServerUtil.h"
-#import "RLMServerNetworkClient.h"
-#import "RLMServer_Private.h"
-#import "RLMUtil.hpp"
+#import "RLMNetworkClient.h"
 #import "RLMRefreshResponseModel.h"
+#import "RLMSyncManager_Private.h"
+#import "RLMSyncUtil.h"
+#import "RLMUser_Private.h"
+#import "RLMUtil.hpp"
 
-@implementation RLMSessionInfo
+@implementation RLMRealmBindingPackage
 
-- (instancetype)initWithFileURL:(NSURL *)fileURL path:(RLMServerPath)path {
+- (instancetype)initWithFileURL:(NSURL *)fileURL
+                       realmURL:(NSURL *)realmURL
+                          block:(RLMErrorReportingBlock)block {
     if (self = [super init]) {
         self.fileURL = fileURL;
-        self.path = path;
+        self.realmURL = realmURL;
+        self.block = block;
+        return self;
+    }
+    return nil;
+}
+
+@end
+
+@interface RLMSyncSession ()
+
+@property (nonatomic, readwrite) RLMUser *parentUser;
+
+@end
+
+@implementation RLMSyncSession
+
+- (instancetype)initWithFileURL:(NSURL *)fileURL {
+    if (self = [super init]) {
+        self.fileURL = fileURL;
+        self.resolvedPath = nil;
         self.deferredBindingPackage = nil;
         self.isBound = NO;
         return self;
@@ -64,19 +86,16 @@
 
 - (void)refresh {
     RLMUser *user = self.parentUser;
-    if (!user) {
+    if (!user || !self.resolvedPath) {
         return;
-    }
-    if (!user.isLoggedIn) {
-        @throw RLMException(@"The user isn't logged in. The user must first log in before they can be refreshed.");
     }
     RLMServerToken refreshToken = user.refreshToken;
 
     NSDictionary *json = @{
-                           kRLMServerProviderKey: @"realm",
-                           kRLMServerPathKey: self.path,
-                           kRLMServerDataKey: refreshToken,
-                           kRLMServerAppIDKey: [RLMServer appID],
+                           kRLMSyncProviderKey: @"realm",
+                           kRLMSyncPathKey: self.resolvedPath,
+                           kRLMSyncDataKey: refreshToken,
+                           kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                            };
 
     RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
@@ -84,7 +103,7 @@
             RLMRefreshResponseModel *model = [[RLMRefreshResponseModel alloc] initWithJSON:json];
             if (!model) {
                 // Malformed JSON
-                [user _reportRefreshFailureForPath:self.path error:nil];
+//                [user _reportRefreshFailureForPath:self.path error:nil];
                 // TODO: invalidate
                 return;
             } else {
@@ -101,14 +120,14 @@
             }
         } else {
             // Something else went wrong
-            [user _reportRefreshFailureForPath:self.path error:error];
+//            [user _reportRefreshFailureForPath:self.path error:error];
             // TODO: invalidate
         }
     };
-    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
-                                           server:user.authURL
-                                             JSON:json
-                                       completion:handler];
+    [RLMNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
+                                     server:user.authenticationServer
+                                       JSON:json
+                                 completion:handler];
 }
 
 - (void)setIsBound:(BOOL)isBound {
@@ -116,22 +135,6 @@
     if (isBound) {
         self.deferredBindingPackage = nil;
     }
-}
-
-@end
-
-@implementation RLMRealmBindingPackage
-
-- (instancetype)initWithFileURL:(NSURL *)fileURL
-                     remotePath:(NSString *)remotePath
-                          block:(RLMErrorReportingBlock)block {
-    if (self = [super init]) {
-        self.fileURL = fileURL;
-        self.remotePath = remotePath;
-        self.block = block;
-        return self;
-    }
-    return nil;
 }
 
 @end

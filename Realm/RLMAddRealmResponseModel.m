@@ -30,9 +30,9 @@
 
 - (instancetype)initWithJSON:(NSDictionary *)json {
     if (self = [super init]) {
-        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerTokenKey, accessToken);
-        RLMSERVER_PARSE_DOUBLE_OR_ABORT(json, kRLMServerExpiresKey, accessTokenExpiry);
-        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerPathKey, fullPath);
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, accessToken);
+        RLMSERVER_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, accessTokenExpiry);
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMSyncPathKey, fullPath);
     }
     return self;
 }

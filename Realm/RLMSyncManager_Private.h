@@ -16,21 +16,30 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMSyncManager.h"
 
-#import "RLMServerUtil.h"
+@class RLMUser;
 
+// All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
+// called very infrequently, this should pose no issues.
 
-// TODO (az-ros): we need the singleton dictionary of logged-in users.
-//   --> used for unbinding Realms on global error
-
-@interface RLMServer : NSObject
+@interface RLMSyncManager ()
 
 NS_ASSUME_NONNULL_BEGIN
 
-+ (void)setupWithAppID:(NSString *)appID
-              logLevel:(NSUInteger)logLevel
-          errorHandler:(nullable RLMErrorReportingBlock)errorHandler;
+/**
+ Manually fire the application's error notification callback, if one is set. An error must be passed in. If the error is
+ associated with a particular Realm, a session object representing that Realm can also be passed in.
+ */
+- (void)_fireError:(NSError *)error forSession:(nullable RLMSyncSession *)session;
+
+- (NSArray<RLMUser *> *)_allUsers;
+
+- (void)_registerUser:(RLMUser *)user;
+
+- (void)_deregisterUser:(RLMUser *)user;
+
+- (nullable RLMUser *)_userForIdentity:(NSString *)identity;
 
 NS_ASSUME_NONNULL_END
 

@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMServerUtil.h"
+#import "RLMSyncUtil.h"
 
 /**
  An internal class representing a valid JSON response to a login request.

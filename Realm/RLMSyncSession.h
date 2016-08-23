@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2015 Realm Inc.
+// Copyright 2016 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,22 +16,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm+Server.h"
+#import <Foundation/Foundation.h>
 
-#import "RLMRealm_Private.hpp"
-#import "RLMRealmConfiguration.h"
-#import "RLMServerNetworkClient.h"
-#import "RLMServerUtil_Private.h"
-#import "RLMCredential.h"
-#import "RLMUser.h"
+#import "RLMSyncUtil.h"
 
-@implementation RLMRealm (Server)
+@class RLMUser;
 
-+ (void)fetchRealmAtPath:(__unused RLMServerPath)objectServerPath
-                 forUser:(__unused RLMUser *)user
-                readOnly:(__unused BOOL)isReadOnly
-              completion:(__unused RLMServerFetchedRealmCompletionBlock)completion {
-    NSAssert(NO, @"This method isn't implemented yet. Come back later!");
-}
+NS_ASSUME_NONNULL_BEGIN
+
+@interface RLMSyncSession : NSObject RLMSYNC_UNINITIALIZABLE
+
+@property (nonatomic, weak, nullable, readonly) RLMUser *parentUser;
+
+NS_ASSUME_NONNULL_END
 
 @end

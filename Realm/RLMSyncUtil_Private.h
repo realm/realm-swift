@@ -16,35 +16,33 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMServerUtil.h"
+#import "RLMSyncUtil.h"
+#import "RLMCredential.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class NSURL;
 
 /// An enum value that allows a Realm to be directly opened with a token.
-static RLMIdentityProvider const RLMIdentityProviderDirectToken = @"direct_token";
+extern RLMIdentityProvider const RLMIdentityProviderDirectToken;
 
-static NSString *const kRLMServerProviderKey      = @"provider";
-static NSString *const kRLMServerDataKey          = @"data";
-static NSString *const kRLMServerAppIDKey         = @"app_id";
-static NSString *const kRLMServerRealmIDKey       = @"realm_id";
-static NSString *const kRLMServerRealmURLKey      = @"realm_url";
-static NSString *const kRLMServerPathKey          = @"path";
-static NSString *const kRLMServerTokenKey         = @"token";
-static NSString *const kRLMServerIdentityKey      = @"identity";
-static NSString *const kRLMServerExpiresKey       = @"expires";
-static NSString *const kRLMServerRefreshKey       = @"refresh";
-static NSString *const kRLMServerPasswordKey      = @"password";
-static NSString *const kRLMServerRegisterKey      = @"register";
-static NSString *const kRLMServerErrorJSONKey     = @"json";
+extern NSString *const kRLMSyncProviderKey;
+extern NSString *const kRLMSyncDataKey;
+extern NSString *const kRLMSyncAppIDKey;
+extern NSString *const kRLMSyncRealmIDKey;
+extern NSString *const kRLMSyncRealmURLKey;
+extern NSString *const kRLMSyncPathKey;
+extern NSString *const kRLMSyncTokenKey;
+extern NSString *const kRLMSyncIdentityKey;
+extern NSString *const kRLMSyncExpiresKey;
+extern NSString *const kRLMSyncRefreshKey;
+extern NSString *const kRLMSyncPasswordKey;
+extern NSString *const kRLMSyncRegisterKey;
+extern NSString *const kRLMSyncErrorJSONKey;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/// Given an Realm Object Server URL, derive the 'default' corresponding auth server URL from it.
-NSURL *RLMAuthURLForObjectServerURL(NSURL *serverURL, NSNumber *customPort);
 
 #ifdef __cplusplus
 }
