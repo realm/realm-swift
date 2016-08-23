@@ -24,7 +24,7 @@ import Realm
 
 /// Types which can be used for min()/max().
 public protocol MinMaxType {
-    // Must conform to `ObjectiveCBridgeable`
+    // Must conform to `CustomObjectiveCBridgeable`
 }
 extension NSNumber: MinMaxType {}
 extension Double: MinMaxType {}
@@ -39,7 +39,7 @@ extension NSDate: MinMaxType {}
 
 extension MinMaxType {
     internal static func bridging(objCValue: Any) -> Self {
-        return (Self.self as! ObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
+        return (Self.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
     }
 }
     
@@ -47,7 +47,7 @@ extension MinMaxType {
 
 /// Types which can be used for average()/sum().
 public protocol AddableType {
-    // Must conform to `ObjectiveCBridgeable`
+    // Must conform to `CustomObjectiveCBridgeable`
 }
 extension NSNumber: AddableType {}
 extension Double: AddableType {}
@@ -59,7 +59,7 @@ extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension AddableType {
     internal static func bridging(objCValue: Any) -> Self {
-        return (Self.self as! ObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
+        return (Self.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
     }
 }
 
@@ -478,7 +478,7 @@ extension Results {
  - see: `min(_:)`, `max(_:)`
  */
 public protocol MinMaxType {
-    // Must conform to `ObjectiveCBridgeable`
+    // Must conform to `CustomObjectiveCBridgeable`
 }
 extension NSNumber: MinMaxType {}
 extension Double: MinMaxType {}
@@ -491,7 +491,7 @@ extension Int64: MinMaxType {}
 extension NSDate: MinMaxType {}
 extension MinMaxType {
     internal static func bridging(objCValue objCValue: AnyObject) -> Self {
-        return (Self.self as! ObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
+        return (Self.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
     }
 }
 
@@ -503,7 +503,7 @@ extension MinMaxType {
  - see: `sum(_:)`, `average(_:)`
  */
 public protocol AddableType {
-    // Must conform to `ObjectiveCBridgeable`
+    // Must conform to `CustomObjectiveCBridgeable`
 }
 extension NSNumber: AddableType {}
 extension Double: AddableType {}
@@ -515,7 +515,7 @@ extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension AddableType {
     internal static func bridging(objCValue: AnyObject) -> Self {
-        return (Self.self as! ObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
+        return (Self.self as! CustomObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
     }
 }
 
