@@ -25,17 +25,16 @@ NS_ASSUME_NONNULL_BEGIN
 /// A Realm-bound object that can only be passed between threads by exporting for handover
 @protocol RLMThreadConfined <NSObject>
 
-/// The destination `RLMRealm` the object was imported into
+/// The Realm which manages the object, or `nil` if the object is unmanaged.
 @property (nonatomic, readonly, nullable) RLMRealm *realm;
 
 // Runtime-enforced requirement that type also conforms to `RLMThreadConfined_Private`
-
 @end
 
 /// An object containing the data imported from handover
 @interface RLMThreadImport : NSObject
 
-/// The `RLMRealm` from which the `objects` were handed over
+/// The destination `RLMRealm` that the object was imported into
 @property (nonatomic, readonly) RLMRealm *realm;
 
 /// Objects equivalent to those handed over but associated with this thread's `Realm`
