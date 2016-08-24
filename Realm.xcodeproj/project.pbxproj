@@ -195,6 +195,7 @@
 		5D274C4E1D6D15FD006FEBB1 /* weak_realm_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D274C4C1D6D15D2006FEBB1 /* weak_realm_notifier.cpp */; };
 		5D274C501D6D16A8006FEBB1 /* event_loop_signal.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5D274C4F1D6D16A8006FEBB1 /* event_loop_signal.hpp */; };
 		5D274C531D6D16BA006FEBB1 /* event_loop_signal.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5D274C521D6D16BA006FEBB1 /* event_loop_signal.hpp */; };
+		5D2DA89E1D6E18EE00AD69F1 /* sync_client.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5D2DA89D1D6E18EE00AD69F1 /* sync_client.hpp */; };
 		5D2E8F661C98DC0D00187B09 /* RLMProperty_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5D2E8F651C98DC0D00187B09 /* RLMProperty_Private.hpp */; };
 		5D2E8F671C98DC0D00187B09 /* RLMProperty_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5D2E8F651C98DC0D00187B09 /* RLMProperty_Private.hpp */; };
 		5D3E1A2E1C1FC6D5002913BA /* RLMPredicateUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5D3E1A2C1C1FC6D5002913BA /* RLMPredicateUtil.hpp */; };
@@ -670,6 +671,7 @@
 		5D274C4C1D6D15D2006FEBB1 /* weak_realm_notifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = weak_realm_notifier.cpp; sourceTree = "<group>"; };
 		5D274C4F1D6D16A8006FEBB1 /* event_loop_signal.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = event_loop_signal.hpp; sourceTree = "<group>"; };
 		5D274C521D6D16BA006FEBB1 /* event_loop_signal.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = event_loop_signal.hpp; sourceTree = "<group>"; };
+		5D2DA89D1D6E18EE00AD69F1 /* sync_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sync_client.hpp; sourceTree = "<group>"; };
 		5D2E8F651C98DC0D00187B09 /* RLMProperty_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMProperty_Private.hpp; sourceTree = "<group>"; };
 		5D3E1A2C1C1FC6D5002913BA /* RLMPredicateUtil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMPredicateUtil.hpp; sourceTree = "<group>"; };
 		5D3E1A2D1C1FC6D5002913BA /* RLMPredicateUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMPredicateUtil.mm; sourceTree = "<group>"; };
@@ -990,6 +992,7 @@
 				3F0543E91C56F71500AA5322 /* realm_coordinator.hpp */,
 				3F9801AE1C90FD2D000A8B07 /* results_notifier.cpp */,
 				3F9801AD1C90FD2D000A8B07 /* results_notifier.hpp */,
+				5D2DA89D1D6E18EE00AD69F1 /* sync_client.hpp */,
 				5DA1AAAD1D6685ED004981F4 /* sync_session.cpp */,
 				5DA1AAAE1D6685ED004981F4 /* sync_session.hpp */,
 				3F1F47891B97ABA300CD99A3 /* transact_log_handler.cpp */,
@@ -1342,6 +1345,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5D2DA89E1D6E18EE00AD69F1 /* sync_client.hpp in Headers */,
 				5DB591A91D063DF8001D8F93 /* atomic_shared_ptr.hpp in Headers */,
 				5D659EA61BE04556006515A0 /* binding_context.hpp in Headers */,
 				3F7A3FB01CC6EB7300301A17 /* collection_change_builder.hpp in Headers */,
