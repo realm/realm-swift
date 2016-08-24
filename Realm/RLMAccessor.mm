@@ -89,7 +89,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
     if (row != realm::not_found) {
         @throw RLMException(@"Can't set primary key property '%@' to existing value '%lld'.", propName, val);
     }
-    obj->_row.set_int(colIndex, val);
+    obj->_row.set_int_unique(colIndex, val);
 }
 
 // float getter/setter
@@ -135,7 +135,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
         @throw RLMException(@"Can't set primary key property '%@' to existing value '%@'.", propName, val);
     }
     try {
-        obj->_row.set_string(colIndex, str);
+        obj->_row.set_string_unique(colIndex, str);
     }
     catch (std::exception const& e) {
         @throw RLMException(e);
@@ -291,10 +291,10 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
     }
 
     if (intObject) {
-        obj->_row.set_int(colIndex, longLongValue);
+        obj->_row.set_int_unique(colIndex, longLongValue);
     }
     else {
-        obj->_row.set_null(colIndex);
+        obj->_row.set_null(colIndex); // FIXME: Use `set_null_unique` once Core implements it.
     }
 }
 
