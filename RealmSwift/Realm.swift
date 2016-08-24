@@ -672,7 +672,7 @@ extension Realm {
     public var autorefresh : Bool { get { fatalError() } set { fatalError() } }
 
     @available(*, unavailable, renamed:"writeCopy(toFileURL:encryptionKey:)")
-    public func writeCopyToURL(_ fileURL: NSURL, encryptionKey: NSData? = nil) throws { fatalError() }
+    public func writeCopyToURL(_ fileURL: NSURL, encryptionKey: Data? = nil) throws { fatalError() }
 }
 
 #else

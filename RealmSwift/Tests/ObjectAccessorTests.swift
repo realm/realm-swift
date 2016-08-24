@@ -56,11 +56,11 @@ class ObjectAccessorTests: TestCase {
         object.stringCol = utf8TestString
         XCTAssertEqual(object.stringCol, utf8TestString)
 
-        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
+        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)!
         object.binaryCol = data
         XCTAssertEqual(object.binaryCol, data)
 
-        let date = NSDate(timeIntervalSinceReferenceDate: 2)
+        let date = Date(timeIntervalSinceReferenceDate: 2)
         object.dateCol = date
         XCTAssertEqual(object.dateCol, date)
 
@@ -244,13 +244,13 @@ class ObjectAccessorTests: TestCase {
         object.optStringCol = nil
         XCTAssertNil(object.optStringCol)
 
-        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
+        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)!
         object.optBinaryCol = data
         XCTAssertEqual(object.optBinaryCol!, data)
         object.optBinaryCol = nil
         XCTAssertNil(object.optBinaryCol)
 
-        let date = NSDate(timeIntervalSinceReferenceDate: 2)
+        let date = Date(timeIntervalSinceReferenceDate: 2)
         object.optDateCol = date
         XCTAssertEqual(object.optDateCol!, date)
         object.optDateCol = nil

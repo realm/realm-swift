@@ -42,14 +42,14 @@ class Dog: Object {
 - `Float`
 - `Double`
 - `Bool`
-- `NSDate`
-- `NSData`
+- `Date`, `NSDate`
+- `Data`, `NSData`
 - `RealmOptional<T>` for optional numeric properties
 - `Object` subclasses for to-one relationships
 - `List<T: Object>` for to-many relationships
 
-`String`, `NSString`, `NSDate`, `NSData` and `Object` subclass properties can be
-optional. `Int`, `Int8`, Int16`, Int32`, `Int64`, `Float`, `Double`, `Bool`
+`String`, `NSString`, `Date`, `NSDate`, `Data`, `NSData` and `Object` subclass properties
+can be optional. `Int`, `Int8`, Int16`, Int32`, `Int64`, `Float`, `Double`, `Bool`
 and `List` properties cannot. To store an optional number, instead use
 `RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or
 `RealmOptional<Bool>` instead, which wraps an optional value of the generic type.
@@ -162,7 +162,7 @@ open class Object: RLMObjectBase {
 
     /**
     Return an array of property names for properties which should be indexed.
-    Only supported for string, integer, boolean and NSDate properties.
+    Only supported for string, integer, boolean and date properties.
 
     - returns: `Array` of property names to index.
     */
@@ -325,9 +325,9 @@ public class ObjectUtil: NSObject {
             var properties = properties
             if type is Optional<String>.Type || type is Optional<NSString>.Type {
                 properties[name] = NSNumber(value: PropertyType.string.rawValue)
-            } else if type is Optional<NSDate>.Type {
+            } else if type is Optional<Date>.Type {
                 properties[name] = NSNumber(value: PropertyType.date.rawValue)
-            } else if type is Optional<NSData>.Type {
+            } else if type is Optional<Data>.Type {
                 properties[name] = NSNumber(value: PropertyType.data.rawValue)
             } else if type is Optional<Object>.Type {
                 properties[name] = NSNumber(value: PropertyType.object.rawValue)
