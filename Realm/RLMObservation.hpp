@@ -114,10 +114,19 @@ private:
 
     template<typename F>
     void forEach(F&& f) const {
-        for (auto info = prev; info; info = info->prev)
+        // The user's observation handler may release their last reference to
+        // the object being observed, which will result in the RLMObservationInfo
+        // being destroyed. As a result, we need to retain the object which owns
+        // both `this` and the current info we're looking at.
+        __attribute__((objc_precise_lifetime)) id self = object, current;
+        for (auto info = prev; info; info = info->prev) {
+            current = info->object;
             f(info->object);
-        for (auto info = this; info; info = info->next)
+        }
+        for (auto info = this; info; info = info->next) {
+            current = info->object;
             f(info->object);
+        }
     }
 
     // Default move/copy constructors don't work due to the intrusive linked

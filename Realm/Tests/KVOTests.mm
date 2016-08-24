@@ -161,6 +161,21 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 }
 @end
 
+// A KVO observer which retains the given object until it observes a change
+@interface ReleaseOnObservation : NSObject
+@property (strong) id object;
+@end
+@implementation ReleaseOnObservation
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(__unused NSDictionary *)change
+                       context:(void *)context
+{
+    [object removeObserver:self forKeyPath:keyPath context:context];
+    _object = nil;
+}
+@end
+
 
 @interface KVOTests : RLMTestCase
 // get an object that should be observed for the given object being mutated
@@ -381,6 +396,21 @@ public:
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col"]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col"]);
     XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col"]);
+}
+
+- (void)testRemoveObserverInObservation {
+    auto helper = [ReleaseOnObservation new];
+
+    __unsafe_unretained id obj;
+    __weak id weakObj;
+    @autoreleasepool {
+        obj = weakObj = helper.object = [self createObject];
+        [obj addObserver:helper forKeyPath:@"int32Col" options:NSKeyValueObservingOptionOld context:nullptr];
+    }
+
+    [obj setInt32Col:0];
+    XCTAssertNil(helper.object);
+    XCTAssertNil(weakObj);
 }
 
 - (void)testSimple {

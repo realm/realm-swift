@@ -176,7 +176,7 @@ class ObjectSchemaInitializationTests: TestCase {
 
         let unindexibleSchema = RLMObjectSchema(forObjectClass: SwiftObjectWithUnindexibleProperties.self)
         for propName in SwiftObjectWithUnindexibleProperties.indexedProperties() {
-            XCTAssertFalse(unindexibleSchema[propName as NSString]!.indexed,
+            XCTAssertFalse(unindexibleSchema[propName]!.indexed,
                 "Shouldn't mark unindexible property '\(propName)' as indexed")
         }
     }

@@ -41,15 +41,15 @@ class SwiftDefaultObject: RLMObject {
     dynamic var intCol = 1
     dynamic var boolCol = true
 
-    override class func defaultPropertyValues() -> [NSObject : AnyObject]? {
+    override class func defaultPropertyValues() -> [AnyHashable : Any]? {
         return ["intCol": 2]
     }
 }
 
 class SwiftOptionalNumberObject: RLMObject {
     dynamic var intCol: NSNumber? = 1
-    dynamic var floatCol: NSNumber? = 2.2 as Float
-    dynamic var doubleCol: NSNumber? = 3.3 as Double
+    dynamic var floatCol: NSNumber? = 2.2 as Float as NSNumber
+    dynamic var doubleCol: NSNumber? = 3.3
     dynamic var boolCol: NSNumber? = true
 }
 
@@ -152,7 +152,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual([.int, .float, .double, .bool], no.objectSchema.properties.map { $0.type })
 
         XCTAssertEqual(1, no.intCol!)
-        XCTAssertEqual(2.2 as Float, no.floatCol!)
+        XCTAssertEqual(2.2 as Float as NSNumber, no.floatCol!)
         XCTAssertEqual(3.3, no.doubleCol!)
         XCTAssertEqual(true, no.boolCol!)
 
@@ -171,13 +171,13 @@ class SwiftObjectInterfaceTests: RLMTestCase {
 
         try! realm.transaction {
             no.intCol = 1.1
-            no.floatCol = 2.2 as Float
+            no.floatCol = 2.2 as Float as NSNumber
             no.doubleCol = 3.3
             no.boolCol = false
         }
 
         XCTAssertEqual(1, no.intCol!)
-        XCTAssertEqual(2.2 as Float, no.floatCol!)
+        XCTAssertEqual(2.2 as Float as NSNumber, no.floatCol!)
         XCTAssertEqual(3.3, no.doubleCol!)
         XCTAssertEqual(false, no.boolCol!)
     }
