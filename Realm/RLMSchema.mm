@@ -143,7 +143,7 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
     return _objectSchemaByName[className];
 }
 
-- (RLMObjectSchema *)objectForKeyedSubscript:(__unsafe_unretained id<NSCopying> const)className {
+- (RLMObjectSchema *)objectForKeyedSubscript:(__unsafe_unretained NSString *const)className {
     RLMObjectSchema *schema = _objectSchemaByName[className];
     if (!schema) {
         @throw RLMException(@"Object type '%@' not managed by the Realm", className);

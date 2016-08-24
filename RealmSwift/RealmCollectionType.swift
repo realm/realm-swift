@@ -99,17 +99,17 @@ public enum RealmCollectionChange<T> {
     /// .Error result and an NSError with details. Currently the only thing
     /// that can fail is opening the Realm on a background worker thread to
     /// calculate the change set.
-    case Error(NSError)
+    case Error(Swift.Error)
 
-    static func fromObjc(value: T, change: RLMCollectionChange?, error: NSError?) -> RealmCollectionChange {
+    static func fromObjc(value: T, change: RLMCollectionChange?, error: Swift.Error?) -> RealmCollectionChange {
         if let error = error {
             return .Error(error)
         }
         if let change = change {
             return .Update(value,
-                deletions: change.deletions as! [Int],
-                insertions: change.insertions as! [Int],
-                modifications: change.modifications as! [Int])
+                deletions: change.deletions as [Int],
+                insertions: change.insertions as [Int],
+                modifications: change.modifications as [Int])
         }
         return .Initial(value)
     }
@@ -174,7 +174,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int?
+    func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int?
 
 
     // MARK: Filtering
@@ -186,7 +186,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<Element>
+    func filter(using predicateFormat: String, _ args: Any...) -> Results<Element>
 
     /**
     Returns `Results` containing collection elements that match the given predicate.
@@ -217,7 +217,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<Element>
+    func sorted<S: Sequence>(with sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor
 
 
     // MARK: Aggregate Operations
@@ -279,7 +279,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
 
     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
-    func value(forKey key: String) -> AnyObject?
+    func value(forKey key: String) -> Any?
 
     /**
      Returns an Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
@@ -290,7 +290,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
      - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
      collection's objects.
      */
-    func value(forKeyPath keyPath: String) -> AnyObject?
+    func value(forKeyPath keyPath: String) -> Any?
 
     /**
     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
@@ -300,7 +300,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
     - parameter value: The object value.
     - parameter key:   The name of the property.
     */
-    func setValue(_ value: AnyObject?, forKey key: String)
+    func setValue(_ value: Any?, forKey key: String)
 
     // MARK: Notifications
 
@@ -357,10 +357,10 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
      - parameter block: The block to be called with the evaluated collection and change information.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    func addNotificationBlock(block: (RealmCollectionChange<Self>) -> Void) -> NotificationToken
+    func addNotificationBlock(block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
     /// :nodoc:
-    func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
+    func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
 private class _AnyRealmCollectionBase<T: Object> {
@@ -372,11 +372,11 @@ private class _AnyRealmCollectionBase<T: Object> {
     var description: String { fatalError() }
     func index(of object: Element) -> Int? { fatalError() }
     func indexOfObject(for predicate: NSPredicate) -> Int? { fatalError() }
-    func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
-    func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<Element> { fatalError() }
+    func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
+    func filter(using predicateFormat: String, _ args: Any...) -> Results<Element> { fatalError() }
     func filter(using predicate: NSPredicate) -> Results<Element> { fatalError() }
     func sorted(onProperty property: String, ascending: Bool) -> Results<Element> { fatalError() }
-    func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(with sortDescriptors: S) -> Results<Element> {
+    func sorted<S: Sequence>(with sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
     func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
@@ -387,10 +387,10 @@ private class _AnyRealmCollectionBase<T: Object> {
     func makeIterator() -> RLMIterator<T> { fatalError() }
     var startIndex: Int { fatalError() }
     var endIndex: Int { fatalError() }
-    func value(forKey key: String) -> AnyObject? { fatalError() }
-    func value(forKeyPath keyPath: String) -> AnyObject? { fatalError() }
-    func setValue(_ value: AnyObject?, forKey key: String) { fatalError() }
-    func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
+    func value(forKey key: String) -> Any? { fatalError() }
+    func value(forKeyPath keyPath: String) -> Any? { fatalError() }
+    func setValue(_ value: Any?, forKey key: String) { fatalError() }
+    func _addNotificationBlock(block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
 }
 
@@ -449,7 +449,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    override func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
+    override func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int? {
         return base.indexOfObject(for: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
@@ -462,7 +462,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    override func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<C.Element> {
+    override func filter(using predicateFormat: String, _ args: Any...) -> Results<C.Element> {
         return base.filter(using: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
@@ -497,8 +497,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    override func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>
-                        (with sortDescriptors: S) -> Results<C.Element> {
+    override func sorted<S: Sequence>
+        (with sortDescriptors: S) -> Results<C.Element> where S.Iterator.Element == SortDescriptor {
         return base.sorted(with: sortDescriptors)
     }
 
@@ -609,7 +609,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
-    override func value(forKey key: String) -> AnyObject? { return base.value(forKey: key) }
+    override func value(forKey key: String) -> Any? { return base.value(forKey: key) }
 
     /**
      Returns an Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
@@ -620,7 +620,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
      - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
        collection's objects.
      */
-    override func value(forKeyPath keyPath: String) -> AnyObject? { return base.value(forKeyPath: keyPath) }
+    override func value(forKeyPath keyPath: String) -> Any? { return base.value(forKeyPath: keyPath) }
 
     /**
     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
@@ -630,12 +630,12 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     - parameter value: The object value.
     - parameter key:   The name of the property.
     */
-    override func setValue(_ value: AnyObject?, forKey key: String) { base.setValue(value, forKey: key) }
+    override func setValue(_ value: Any?, forKey key: String) { base.setValue(value, forKey: key) }
 
     // MARK: Notifications
 
     /// :nodoc:
-    override func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
+    override func _addNotificationBlock(block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block: block) }
 }
 
@@ -655,7 +655,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     private let base: _AnyRealmCollectionBase<T>
 
     /// Creates an AnyRealmCollection wrapping `base`.
-    public init<C: RealmCollection where C.Element == T>(_ base: C) {
+    public init<C: RealmCollection>(_ base: C) where C.Element == T {
         self.base = _AnyRealmCollection(base: base)
     }
 
@@ -708,7 +708,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func indexOfObject(for predicateFormat: String, _ args: AnyObject...) -> Int? {
+    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int? {
         return base.indexOfObject(for: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
@@ -721,7 +721,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    public func filter(using predicateFormat: String, _ args: AnyObject...) -> Results<Element> {
+    public func filter(using predicateFormat: String, _ args: Any...) -> Results<Element> {
         return base.filter(using: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
@@ -756,8 +756,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>
-                      (with sortDescriptors: S) -> Results<Element> {
+    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<Element>
+        where S.Iterator.Element == SortDescriptor {
         return base.sorted(with: sortDescriptors)
     }
 
@@ -852,7 +852,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: Array containing the results of invoking `valueForKey(_:)` using key on each of the collection's objects.
     */
-    public func value(forKey key: String) -> AnyObject? { return base.value(forKey: key) }
+    public func value(forKey key: String) -> Any? { return base.value(forKey: key) }
 
     /**
      Returns an Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
@@ -863,7 +863,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
      - returns: Array containing the results of invoking `valueForKeyPath(_:)` using keyPath on each of the
      collection's objects.
      */
-    public func value(forKeyPath keyPath: String) -> AnyObject? { return base.value(forKeyPath: keyPath) }
+    public func value(forKeyPath keyPath: String) -> Any? { return base.value(forKeyPath: keyPath) }
 
     /**
     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified value and key.
@@ -873,7 +873,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     - parameter value: The object value.
     - parameter key:   The name of the property.
     */
-    public func setValue(_ value: AnyObject?, forKey key: String) { base.setValue(value, forKey: key) }
+    public func setValue(_ value: Any?, forKey key: String) { base.setValue(value, forKey: key) }
 
     // MARK: Notifications
 
@@ -930,11 +930,11 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
      - parameter block: The block to be called with the evaluated collection and change information.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> ())
         -> NotificationToken { return base._addNotificationBlock(block: block) }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> ())
         -> NotificationToken { return base._addNotificationBlock(block: block) }
 }
 
@@ -961,7 +961,7 @@ extension AnyRealmCollection {
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed:"sorted(with:)")
-    public func sorted<S: Sequence where S.Iterator.Element == SortDescriptor>(_ sortDescriptors: S) -> Results<T> {
+    public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
 

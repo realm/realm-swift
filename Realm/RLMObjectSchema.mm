@@ -53,7 +53,7 @@ using namespace realm;
 }
 
 // return properties by name
--(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key {
+-(RLMProperty *)objectForKeyedSubscript:(__unsafe_unretained NSString *const)key {
     return _allPropertiesByName[key];
 }
 
