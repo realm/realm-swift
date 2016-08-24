@@ -160,7 +160,7 @@ node('osx') {
     dir('temp') {
         sh 'rm -rf *'
         sh "/usr/local/bin/s3cmd get --recursive 's3://realm-ci-artifacts/sync/${syncVersionNumber}/cocoa/'"
-        sh 'unzip -q sync-0.*.zip'
+        sh 'unzip -q sync-1.*.zip'
     }
 
     sh 'ln -s "$(pwd)/temp/sync" realm-cocoa/core'
