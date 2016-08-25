@@ -272,7 +272,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The minimum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
     public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return rlmResults.min(ofProperty: property).map(forceSwiftBridgeCast)
+        return rlmResults.min(ofProperty: property).map(dynamicBridgeCast)
     }
 
     /**
@@ -285,7 +285,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The maximum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
     public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return rlmResults.max(ofProperty: property).map(forceSwiftBridgeCast)
+        return rlmResults.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
     /**
@@ -298,7 +298,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The sum of the given property over all objects in the Results.
     */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
-        return forceSwiftBridgeCast(fromObjCValue: rlmResults.sum(ofProperty: property))
+        return dynamicBridgeCast(fromObjCValue: rlmResults.sum(ofProperty: property))
     }
 
     /**
@@ -311,7 +311,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The average of the given property over all objects in the Results, or `nil` if the Results is empty.
     */
     public func average<U: AddableType>(ofProperty property: String) -> U? {
-        return rlmResults.average(ofProperty: property).map(forceSwiftBridgeCast)
+        return rlmResults.average(ofProperty: property).map(dynamicBridgeCast)
     }
 
     // MARK: Notifications
@@ -719,7 +719,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The minimum value of the property, or `nil` if the collection is empty.
      */
     public func min<U: MinMaxType>(property: String) -> U? {
-        return rlmResults.minOfProperty(property).map(forceSwiftBridgeCast)
+        return rlmResults.minOfProperty(property).map(dynamicBridgeCast)
     }
 
     /**
@@ -732,7 +732,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The maximum value of the property, or `nil` if the collection is empty.
      */
     public func max<U: MinMaxType>(property: String) -> U? {
-        return rlmResults.maxOfProperty(property).map(forceSwiftBridgeCast)
+        return rlmResults.maxOfProperty(property).map(dynamicBridgeCast)
     }
 
     /**
@@ -745,7 +745,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The sum of the given property.
      */
     public func sum<U: AddableType>(property: String) -> U {
-        return forceSwiftBridgeCast(fromObjCValue: rlmResults.sumOfProperty(property))
+        return dynamicBridgeCast(rlmResults.sumOfProperty(property))
     }
 
     /**
@@ -758,7 +758,7 @@ public final class Results<T: Object>: ResultsBase {
      - returns: The average value of the given property, or `nil` if the collection is empty.
      */
     public func average<U: AddableType>(property: String) -> U? {
-        return rlmResults.averageOfProperty(property).map(forceSwiftBridgeCast)
+        return rlmResults.averageOfProperty(property).map(dynamicBridgeCast)
     }
 
     // MARK: Notifications

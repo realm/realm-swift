@@ -49,19 +49,19 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
 
 // MARK: CustomObjectiveCBridgeable
 
-internal func forceSwiftBridgeCast<T>(fromObjCValue value: Any) -> T {
+internal func dynamicBridgeCast<T>(_ x: Any) -> T {
     if let BridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
-        return BridgeableType.bridging(objCValue: value) as! T
+        return BridgeableType.bridging(objCValue: x) as! T
     } else {
-        return value as! T
+        return x as! T
     }
 }
 
-internal func objCBridgeCast<T>(fromSwiftValue value: T) -> Any {
-    if let value = value as? CustomObjectiveCBridgeable {
-        return value.objCValue
+internal func dynamicBridgeCast<T>(_ x: T) -> Any {
+    if let x = x as? CustomObjectiveCBridgeable {
+        return x.objCValue
     } else {
-        return value
+        return x
     }
 }
 
@@ -127,19 +127,19 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
 
 // MARK: CustomObjectiveCBridgeable
 
-internal func forceSwiftBridgeCast<T>(fromObjCValue value: AnyObject) -> T {
+internal func dynamicBridgeCast<T>(x: AnyObject) -> T {
     if let BridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
-        return BridgeableType.bridging(objCValue: value) as! T
+        return BridgeableType.bridging(objCValue: x) as! T
     } else {
-        return value as! T
+        return x as! T
     }
 }
 
-internal func forceObjCBridgeCast<T>(fromSwiftValue value: T) -> AnyObject {
-    if let value = value as? CustomObjectiveCBridgeable {
-        return value.objCValue
+internal func dynamicBridgeCast<T>(x: T) -> AnyObject {
+    if let x = x as? CustomObjectiveCBridgeable {
+        return x.objCValue
     } else {
-        return value as! AnyObject
+        return x as! AnyObject
     }
 }
 

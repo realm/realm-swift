@@ -42,10 +42,10 @@ public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
     /// The value this optional represents.
     public var value: T? {
         get {
-            return underlyingValue.map(forceSwiftBridgeCast)
+            return underlyingValue.map(dynamicBridgeCast)
         }
         set {
-            underlyingValue = newValue.map(objCBridgeCast)
+            underlyingValue = newValue.map(dynamicBridgeCast)
         }
     }
 
@@ -83,10 +83,10 @@ public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
     /// The value this optional represents.
     public var value: T? {
         get {
-            return underlyingValue.map(forceSwiftBridgeCast)
+            return underlyingValue.map(dynamicBridgeCast)
         }
         set {
-            underlyingValue = newValue.map(forceObjCBridgeCast)
+            underlyingValue = newValue.map(dynamicBridgeCast)
         }
     }
 
