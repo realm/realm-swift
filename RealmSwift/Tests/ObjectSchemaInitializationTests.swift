@@ -243,7 +243,7 @@ class SwiftObjectWithStruct: SwiftFakeObject {
 }
 
 class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {
-    dynamic var date = NSDate()
+    dynamic var date = Date()
 
     dynamic override class func primaryKey() -> String? {
         return "date"
@@ -259,7 +259,7 @@ class SwiftObjectWithOptionalNSNumber: SwiftFakeObject {
 }
 
 class SwiftFakeObjectSubclass: SwiftFakeObject {
-    dynamic var dateCol = NSDate()
+    dynamic var dateCol = Date()
 }
 
 class SwiftObjectWithUnindexibleProperties: SwiftFakeObject {
@@ -268,7 +268,7 @@ class SwiftObjectWithUnindexibleProperties: SwiftFakeObject {
     dynamic var floatCol = 1.23 as Float
     dynamic var doubleCol = 12.3
     dynamic var binaryCol = "a".data(using: String.Encoding.utf8)!
-    dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
+    dynamic var dateCol = Date(timeIntervalSince1970: 1)
     dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
     let arrayCol = List<SwiftBoolObject>()
 
@@ -279,7 +279,7 @@ class SwiftObjectWithUnindexibleProperties: SwiftFakeObject {
 
 // swiftlint:disable:next type_name
 class SwiftObjectWithNonNullableOptionalProperties: SwiftFakeObject {
-    dynamic var optDateCol: NSDate?
+    dynamic var optDateCol: Date?
 }
 
 class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
