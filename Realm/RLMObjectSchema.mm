@@ -86,10 +86,6 @@ using namespace realm;
 
 
 - (void)setPrimaryKeyProperty:(RLMProperty *)primaryKeyProperty {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        NSLog(@"\n************WARNING:************\n\nPrimary keys do not work as intended with sync yet.\n\nTwo objects with the same primary key created on different devices, will be treated as seperate objects versus the expected behavior of merging the objects together when each device syncs with the other.\n\n********************************");
-    });
     _primaryKeyProperty.isPrimary = NO;
     primaryKeyProperty.isPrimary = YES;
     _primaryKeyProperty = primaryKeyProperty;
