@@ -16,8 +16,8 @@ Pod::Spec.new do |s|
   s.license              = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
   # Compilation
-  s.dependency             'RealmCore', `sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' dependencies.list`
-  s.dependency             'RealmSync', `sed -n 's/^REALM_SYNC_VERSION=\(.*\)$/\1/p' dependencies.list`
+  s.dependency             'RealmCore', `cat dependencies.list`.match(/^REALM_CORE_VERSION=(.*)$/).captures.first
+  s.dependency             'RealmSync', `cat dependencies.list`.match(/^REALM_SYNC_VERSION=(.*)$/).captures.first
   s.libraries            = 'c++'
   s.header_mappings_dir  = 'Realm'
   s.source_files         = 'Realm/*.{h,hpp,m,mm}',
