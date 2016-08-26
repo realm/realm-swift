@@ -83,13 +83,10 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, NSString *propName, long long val) {
     RLMVerifyInWriteTransaction(obj);
     size_t row = obj->_row.get_table()->find_first_int(colIndex, val);
-    if (row == obj->_row.get_index()) {
-        return;
-    }
-    if (row != realm::not_found) {
+    if (row != obj->_row.get_index() && row != realm::not_found) {
         @throw RLMException(@"Can't set primary key property '%@' to existing value '%lld'.", propName, val);
     }
-    obj->_row.set_int(colIndex, val);
+    obj->_row.set_int_unique(colIndex, val);
 }
 
 // float getter/setter
@@ -128,14 +125,11 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
     RLMVerifyInWriteTransaction(obj);
     realm::StringData str = RLMStringDataWithNSString(val);
     size_t row = obj->_row.get_table()->find_first_string(colIndex, str);
-    if (row == obj->_row.get_index()) {
-        return;
-    }
-    if (row != realm::not_found) {
+    if (row != obj->_row.get_index() && row != realm::not_found) {
         @throw RLMException(@"Can't set primary key property '%@' to existing value '%@'.", propName, val);
     }
     try {
-        obj->_row.set_string(colIndex, str);
+        obj->_row.set_string_unique(colIndex, str);
     }
     catch (std::exception const& e) {
         @throw RLMException(e);
@@ -283,18 +277,15 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
         row = obj->_row.get_table()->find_first_null(colIndex);
     }
 
-    if (row == obj->_row.get_index()) {
-        return;
-    }
-    if (row != realm::not_found) {
+    if (row != obj->_row.get_index() && row != realm::not_found) {
         @throw RLMException(@"Can't set primary key property '%@' to existing value '%@'.", propName, intObject);
     }
 
     if (intObject) {
-        obj->_row.set_int(colIndex, longLongValue);
+        obj->_row.set_int_unique(colIndex, longLongValue);
     }
     else {
-        obj->_row.set_null(colIndex);
+        obj->_row.set_null(colIndex); // FIXME: Use `set_null_unique` once Core implements it.
     }
 }
 

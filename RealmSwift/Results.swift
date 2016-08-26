@@ -36,6 +36,7 @@ extension Int32: MinMaxType {}
 extension Int64: MinMaxType {}
 extension Date: MinMaxType {}
 extension NSDate: MinMaxType {}
+
 extension MinMaxType {
     internal static func bridging(objCValue: Any) -> Self {
         return (Self.self as! ObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self

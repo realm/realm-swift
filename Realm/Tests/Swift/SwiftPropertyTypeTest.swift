@@ -121,6 +121,25 @@ class SwiftPropertyTypeTest: RLMTestCase {
         }
         XCTAssertNotNil(succeeded, "Writing an object with an ignored lazy property should work.")
     }
+
+    func testObjectiveCTypeProperties() {
+        let realm = realmWithTestPath()
+        var object: SwiftObjectiveCTypesObject!
+        let now = NSDate()
+        let data = "fizzbuzz".data(using: .utf8)! as Data as NSData
+        try! realm.transaction {
+            object = SwiftObjectiveCTypesObject()
+            realm.add(object)
+            object.stringCol = "Hello world!"
+            object.dateCol = now
+            object.dataCol = data
+            object.numCol = 42
+        }
+        XCTAssertEqual("Hello world!", object.stringCol)
+        XCTAssertEqual(now, object.dateCol)
+        XCTAssertEqual(data, object.dataCol)
+        XCTAssertEqual(42, object.numCol)
+    }
 }
 
 #else

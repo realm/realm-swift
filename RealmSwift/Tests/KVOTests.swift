@@ -40,8 +40,8 @@ class KVOObject: Object {
     dynamic var floatCol: Float = 5
     dynamic var doubleCol: Double = 6
     dynamic var stringCol: String = ""
-    dynamic var binaryCol: NSData = NSData()
-    dynamic var dateCol: NSDate = NSDate(timeIntervalSince1970: 0)
+    dynamic var binaryCol: Data = Data()
+    dynamic var dateCol: Date = Date(timeIntervalSince1970: 0)
     dynamic var objectCol: KVOObject?
     let arrayCol = List<KVOObject>()
     let optIntCol = RealmOptional<Int>()
@@ -49,8 +49,8 @@ class KVOObject: Object {
     let optDoubleCol = RealmOptional<Double>()
     let optBoolCol = RealmOptional<Bool>()
     dynamic var optStringCol: String?
-    dynamic var optBinaryCol: NSData?
-    dynamic var optDateCol: NSDate?
+    dynamic var optBinaryCol: Data?
+    dynamic var optDateCol: Date?
 
     override class func primaryKey() -> String { return "pk" }
     override class func ignoredProperties() -> [String] { return ["ignored"] }
@@ -142,11 +142,11 @@ class KVOTests: TestCase {
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obj, "objectCol", nil, obj) { obj.objectCol = obj }
 
-        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
-        observeChange(obj, "binaryCol", NSData(), data) { obj.binaryCol = data as NSData }
+        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!
+        observeChange(obj, "binaryCol", Data(), data) { obj.binaryCol = data }
 
-        let date = NSDate(timeIntervalSince1970: 1)
-        observeChange(obj, "dateCol", NSDate(timeIntervalSince1970: 0), date) { obj.dateCol = date }
+        let date = Date(timeIntervalSince1970: 1)
+        observeChange(obj, "dateCol", Date(timeIntervalSince1970: 0), date) { obj.dateCol = date }
 
         observeListChange(obj, "arrayCol", .insertion, NSIndexSet(index: 0)) {
             obj.arrayCol.append(obj)
@@ -160,7 +160,7 @@ class KVOTests: TestCase {
         observeChange(obj, "optDoubleCol", nil, 10) { obj.optDoubleCol.value = 10 }
         observeChange(obj, "optBoolCol", nil, true) { obj.optBoolCol.value = true }
         observeChange(obj, "optStringCol", nil, "abc") { obj.optStringCol = "abc" }
-        observeChange(obj, "optBinaryCol", nil, data) { obj.optBinaryCol = data as NSData }
+        observeChange(obj, "optBinaryCol", nil, data) { obj.optBinaryCol = data }
         observeChange(obj, "optDateCol", nil, date) { obj.optDateCol = date }
 
         observeChange(obj, "optIntCol", 10, nil) { obj.optIntCol.value = nil }
@@ -186,11 +186,11 @@ class KVOTests: TestCase {
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obj, "objectCol", nil, obj) { obj.objectCol = obj }
 
-        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
-        observeChange(obj, "binaryCol", NSData(), data) { obj.binaryCol = data as NSData }
+        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!
+        observeChange(obj, "binaryCol", Data(), data) { obj.binaryCol = data }
 
-        let date = NSDate(timeIntervalSince1970: 1)
-        observeChange(obj, "dateCol", NSDate(timeIntervalSince1970: 0), date) { obj.dateCol = date }
+        let date = Date(timeIntervalSince1970: 1)
+        observeChange(obj, "dateCol", Date(timeIntervalSince1970: 0), date) { obj.dateCol = date }
 
         observeListChange(obj, "arrayCol", .insertion, NSIndexSet(index: 0)) {
             obj.arrayCol.append(obj)
@@ -204,7 +204,7 @@ class KVOTests: TestCase {
         observeChange(obj, "optDoubleCol", nil, 10) { obj.optDoubleCol.value = 10 }
         observeChange(obj, "optBoolCol", nil, true) { obj.optBoolCol.value = true }
         observeChange(obj, "optStringCol", nil, "abc") { obj.optStringCol = "abc" }
-        observeChange(obj, "optBinaryCol", nil, data) { obj.optBinaryCol = data as NSData }
+        observeChange(obj, "optBinaryCol", nil, data) { obj.optBinaryCol = data }
         observeChange(obj, "optDateCol", nil, date) { obj.optDateCol = date }
 
         observeChange(obj, "optIntCol", 10, nil) { obj.optIntCol.value = nil }
@@ -241,11 +241,11 @@ class KVOTests: TestCase {
         observeChange(obs, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obs, "objectCol", nil, obj) { obj.objectCol = obj }
 
-        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
-        observeChange(obs, "binaryCol", NSData(), data) { obj.binaryCol = data as NSData }
+        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!
+        observeChange(obs, "binaryCol", Data(), data) { obj.binaryCol = data }
 
-        let date = NSDate(timeIntervalSince1970: 1)
-        observeChange(obs, "dateCol", NSDate(timeIntervalSince1970: 0), date) { obj.dateCol = date }
+        let date = Date(timeIntervalSince1970: 1)
+        observeChange(obs, "dateCol", Date(timeIntervalSince1970: 0), date) { obj.dateCol = date }
 
         observeListChange(obs, "arrayCol", .insertion, NSIndexSet(index: 0)) {
             obj.arrayCol.append(obj)
@@ -259,7 +259,7 @@ class KVOTests: TestCase {
         observeChange(obs, "optDoubleCol", nil, 10) { obj.optDoubleCol.value = 10 }
         observeChange(obs, "optBoolCol", nil, true) { obj.optBoolCol.value = true }
         observeChange(obs, "optStringCol", nil, "abc") { obj.optStringCol = "abc" }
-        observeChange(obs, "optBinaryCol", nil, data) { obj.optBinaryCol = data as NSData }
+        observeChange(obs, "optBinaryCol", nil, data) { obj.optBinaryCol = data }
         observeChange(obs, "optDateCol", nil, date) { obj.optDateCol = date }
 
         observeChange(obs, "optIntCol", 10, nil) { obj.optIntCol.value = nil }

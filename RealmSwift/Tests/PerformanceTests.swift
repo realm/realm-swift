@@ -476,7 +476,7 @@ class SwiftPerformanceTests: TestCase {
             self.startMeasuring()
             try! realm.write { object.intCol += 1 }
             while object.intCol < stopValue {
-                RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: NSDate.distantFuture)
+                RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date.distantFuture)
             }
             queue.sync() {}
             self.stopMeasuring()

@@ -118,7 +118,7 @@ class SwiftDynamicTests: RLMTestCase {
     }
 
     func testDynamicTypes_objc() {
-        let date = NSDate(timeIntervalSince1970: 100000)
+        let date = Date(timeIntervalSince1970: 100000)
         let data = "a".data(using: String.Encoding.utf8)!
         let obj1: [Any] = [true, 1, 1.1 as Float, 1.11, "string",
             data, date, true, 11, NSNull()]
