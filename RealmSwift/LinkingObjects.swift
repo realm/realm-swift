@@ -301,7 +301,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The sum of the given property over all objects in the collection.
      */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
-        return dynamicBridgeCast(fromObjCValue: rlmResults.sum(ofProperty: property))
+        return dynamicBridgeCast(fromObjectiveC: rlmResults.sum(ofProperty: property))
     }
 
     /**
@@ -735,7 +735,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The sum of the given property.
      */
     public func sum<U: AddableType>(property: String) -> U {
-        return dynamicBridgeCast(rlmResults.sumOfProperty(property))
+        return dynamicBridgeCast(fromObjectiveC: rlmResults.sumOfProperty(property))
     }
 
     /**
