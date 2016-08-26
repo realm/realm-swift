@@ -497,18 +497,74 @@ class RealmTests: TestCase {
         XCTAssertEqual((object["optObjectCol"] as? SwiftBoolObject)?.boolCol, true)
     }
 
-    func testObjectForPrimaryKey() {
-        let intTypes: [Object.Type] = [SwiftPrimaryIntObject.self,
-                                       SwiftPrimaryInt8Object.self,
-                                       SwiftPrimaryInt16Object.self,
-                                       SwiftPrimaryInt32Object.self,
-                                       SwiftPrimaryInt64Object.self]
-        let optionalIntTypes: [Object.Type] = [SwiftPrimaryOptionalIntObject.self,
-                                               SwiftPrimaryOptionalInt8Object.self,
-                                               SwiftPrimaryOptionalInt16Object.self,
-                                               SwiftPrimaryOptionalInt32Object.self,
-                                               SwiftPrimaryOptionalInt64Object.self]
+    func testIntPrimaryKey() {
+        func testIntPrimaryKey<O: Object>(for type: O.Type)
+            where O: SwiftPrimaryKeyObjectType, O.PrimaryKey: ExpressibleByIntegerLiteral {
 
+                let realm = try! Realm()
+                try! realm.write {
+                    realm.createObject(ofType: type, populatedWith: ["a", 1])
+                    realm.createObject(ofType: type, populatedWith: ["b", 2])
+                }
+
+                let object = realm.object(ofType: type, forPrimaryKey: 1 as O.PrimaryKey)
+                XCTAssertNotNil(object)
+
+                let missingObject = realm.object(ofType: type, forPrimaryKey: 0 as O.PrimaryKey)
+                XCTAssertNil(missingObject)
+        }
+
+        testIntPrimaryKey(for: SwiftPrimaryIntObject.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt8Object.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt16Object.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt32Object.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt64Object.self)
+    }
+
+    func testOptionalIntPrimaryKey() {
+        func testOptionalIntPrimaryKey<O: Object, Wrapped: RealmOptionalType>(for type: O.Type)
+            where O: SwiftPrimaryKeyObjectType, O.PrimaryKey == RealmOptional<Wrapped>,
+                  Wrapped: ExpressibleByIntegerLiteral {
+                let realm = try! Realm()
+                try! realm.write {
+                    realm.createObject(ofType: type, populatedWith: ["a", NSNull()])
+                    realm.createObject(ofType: type, populatedWith: ["b", 2])
+                }
+
+                let object1 = realm.object(ofType: type, forPrimaryKey: NSNull())
+                XCTAssertNotNil(object1)
+
+                let object2 = realm.object(ofType: type, forPrimaryKey: 2 as Wrapped)
+                XCTAssertNotNil(object2)
+
+                let missingObject = realm.object(ofType: type, forPrimaryKey: 0 as Wrapped)
+                XCTAssertNil(missingObject)
+        }
+
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalIntObject.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt8Object.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt16Object.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt32Object.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt64Object.self)
+    }
+
+    func testStringPrimaryKey() {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["a", 1])
+            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["b", 2])
+        }
+
+        // When this is directly inside the XCTAssertNotNil, it doesn't work
+        let object = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: "a")
+        XCTAssertNotNil(object)
+
+        // When this is directly inside the XCTAssertNil, it fails for some reason
+        let missingObject = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: "z")
+        XCTAssertNil(missingObject)
+    }
+
+    func testOptionalStringPrimaryKey() {
         let realm = try! Realm()
         try! realm.write {
             realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["a", 1])
@@ -516,73 +572,16 @@ class RealmTests: TestCase {
 
             realm.createObject(ofType: SwiftPrimaryOptionalStringObject.self, populatedWith: [NSNull(), 1])
             realm.createObject(ofType: SwiftPrimaryOptionalStringObject.self, populatedWith: ["b", 2])
-
-            func createIntObject(_ objectType: Object.Type) {
-                realm.createObject(ofType: objectType, populatedWith: ["a", 1])
-                realm.createObject(ofType: objectType, populatedWith: ["b", 2])
-            }
-
-            func createOptionalIntObject(_ objectType: Object.Type) {
-                realm.createObject(ofType: objectType, populatedWith: ["a", NSNull()])
-                realm.createObject(ofType: objectType, populatedWith: ["b", 2])
-            }
-
-            for type in intTypes {
-                createIntObject(type)
-            }
-
-            for type in optionalIntTypes {
-                createOptionalIntObject(type)
-            }
         }
 
-        do {
-            // When this is directly inside the XCTAssertNotNil, it doesn't work
-            let object = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: "a")
-            XCTAssertNotNil(object)
+        let object1 = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: NSNull())
+        XCTAssertNotNil(object1)
 
-            // When this is directly inside the XCTAssertNil, it fails for some reason
-            let missingObject = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: "z")
-            XCTAssertNil(missingObject)
-        }
+        let object2 = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: "b")
+        XCTAssertNotNil(object2)
 
-        do {
-            let object1 = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: NSNull())
-            XCTAssertNotNil(object1)
-
-            let object2 = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: "b")
-            XCTAssertNotNil(object2)
-
-            let missingObject = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: "z")
-            XCTAssertNil(missingObject)
-        }
-
-        func assertIntObject(_ objectType: Object.Type) {
-            let object = realm.object(ofType: objectType, forPrimaryKey: 1)
-            XCTAssertNotNil(object)
-
-            let missingObject = realm.object(ofType: objectType, forPrimaryKey: 0)
-            XCTAssertNil(missingObject)
-        }
-
-        func assertOptionalIntObject(_ objectType: Object.Type) {
-            let object1 = realm.object(ofType: objectType, forPrimaryKey: NSNull())
-            XCTAssertNotNil(object1)
-
-            let object2 = realm.object(ofType: objectType, forPrimaryKey: 2)
-            XCTAssertNotNil(object2)
-
-            let missingObject = realm.object(ofType: objectType, forPrimaryKey: 0)
-            XCTAssertNil(missingObject)
-        }
-
-        for type in intTypes {
-            assertIntObject(type)
-        }
-
-        for type in optionalIntTypes {
-            assertOptionalIntObject(type)
-        }
+        let missingObject = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: "z")
+        XCTAssertNil(missingObject)
     }
 
     func testDynamicObjectForPrimaryKey() {
