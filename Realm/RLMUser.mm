@@ -19,67 +19,139 @@
 #import "RLMUser_Private.h"
 
 #import "RLMAddRealmResponseModel.h"
-#import "RLMCredential.h"
 #import "RLMLoginResponseModel.h"
+#import "RLMNetworkClient.h"
 #import "RLMRefreshResponseModel.h"
-#import "RLMSessionInfo_Private.h"
-#import "RLMServer_Private.h"
-#import "RLMServerNetworkClient.h"
-#import "RLMServerUtil_Private.h"
+#import "RLMSyncManager_Private.h"
+#import "RLMSyncSession_Private.h"
+#import "RLMSyncUtil_Private.h"
 #import "RLMUtil.hpp"
 
 @interface RLMUser ()
 
+- (instancetype)initWithAuthServer:(nullable NSURL *)authServer NS_DESIGNATED_INITIALIZER;
+
+@property (nonatomic) BOOL isAnonymous;
 @property (nonatomic, readwrite) RLMIdentity identity;
-@property (nonatomic, readwrite) RLMServerToken refreshToken;
-@property (nonatomic, readwrite) NSTimeInterval refreshTokenExpiry;
+@property (nonatomic, readwrite) NSURL *authenticationServer;
 
-@property (nonnull, nonatomic, readwrite) NSMutableDictionary<RLMServerPath, RLMSessionInfo *> *realms;
+@property (nonatomic) NSMutableDictionary<NSURL *, RLMSyncSession *> *sessionsStorage;
 
-@property (nonatomic, readwrite) BOOL isLoggedIn;
 @property (nonatomic) RLMServerToken directAccessToken;
-
-@property (nonatomic, readwrite) RLMLocalIdentity localIdentity;
 
 @end
 
 @implementation RLMUser
 
-@synthesize isLoggedIn = _isLoggedIn;
+#pragma mark - static API
 
-- (void)loginWithCredential:(RLMCredential *)credential
-                 completion:(RLMErrorReportingBlock)completion {
-    if (self.isLoggedIn) {
-        @throw RLMException(@"The user is already logged in. Cannot log in again without logging out first.");
++ (NSArray *)all {
+    return [[RLMSyncManager sharedManager] _allUsers];
+}
+
+#pragma mark - API
+
+- (instancetype)initWithAuthServer:(nullable NSURL *)authServer {
+    if (self = [super init]) {
+        self.isAnonymous = YES;
+        self.directAccessToken = nil;
+        self.authenticationServer = authServer;
+        self.sessionsStorage = [NSMutableDictionary dictionary];
+        // NOTE: If we add support for anonymous users, we will need to register the user to the global user store
+        // when the user is first created, versus when the user logs in.
+        return self;
     }
+    return nil;
+}
 
-    NSURL *objectServerURL = credential.objectServerURL;
-    if (!objectServerURL) {
-        @throw RLMException(@"An Realm Object Server URL is required to log in, but was missing, and there is no default.");
-    }
++ (instancetype)userWithAccessToken:(RLMServerToken)accessToken identity:(nullable NSString *)identity {
+    RLMUser *user = [[RLMUser alloc] initWithAuthServer:nil];
+    user.directAccessToken = accessToken;
+    user.isAnonymous = NO;
+    user.identity = identity;
+    return user;
+}
 
-    RLMErrorReportingBlock block = completion ?: ^(NSError *) { };
++ (void)authenticateWithCredential:(RLMCredential *)credential
+                           actions:(RLMAuthenticationActions)actions
+                     authServerURL:(NSURL *)authServerURL
+                      onCompletion:(RLMUserCompletionBlock)completion {
+    [self authenticateWithCredential:credential
+                             actions:actions
+                       authServerURL:authServerURL
+                             timeout:30
+                        onCompletion:completion];
+}
 
-    NSURL *authURL = RLMAuthURLForObjectServerURL(objectServerURL, credential.authServerPort);
-    self.objectServerURL = objectServerURL;
-    self.authURL = authURL;
++ (void)authenticateWithCredential:(RLMCredential *)credential
+                            actions:(RLMAuthenticationActions)actions
+                     authServerURL:(NSURL *)authServerURL
+                           timeout:(NSTimeInterval)timeout
+                      onCompletion:(RLMUserCompletionBlock)completion {
+    RLMUser *user = [[RLMUser alloc] initWithAuthServer:authServerURL];
+    [RLMUser _performLogInForUser:user
+                       credential:credential
+                          actions:actions
+                    authServerURL:authServerURL
+                          timeout:timeout
+                  completionBlock:completion];
 
+}
+
+- (void)logOut {
+    // TODO: (az-sync) move the file management stuff into its own class so we can nuke the user's folder
+    [[RLMSyncManager sharedManager] _deregisterUser:self];
+}
+
+- (NSDictionary<NSURL *, RLMSyncSession *> *)sessions {
+    return [self.sessionsStorage copy];
+}
+
+
+#pragma mark - Private API
+
++ (void)_performLogInForUser:(RLMUser *)user
+                  credential:(RLMCredential *)credential
+                     actions:(RLMAuthenticationActions)actions
+               authServerURL:(NSURL *)authServerURL
+                     timeout:(NSTimeInterval)timeout
+             completionBlock:(RLMUserCompletionBlock)completion {
+    // Wrap the completion block.
+    RLMUserCompletionBlock theBlock = ^(RLMUser *user, NSError *error){
+        if (!completion) { return; }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(user, error);
+        });
+    };
+
+    // Check to see if credential is "direct token" credential. If so, no server communication is required.
     if (credential.provider == RLMIdentityProviderDirectToken) {
-        // The user should allow Realms to directly log in with a token.
-        self.directAccessToken = credential.credentialToken;
-        self.isLoggedIn = YES;
-        block(nil);
+        user.identity = [[NSUUID UUID] UUIDString];
+        [[RLMSyncManager sharedManager] _registerUser:user];
+        user.directAccessToken = credential.token;
+        user.isAnonymous = NO;
+        [user _bindAllDeferredRealms];
+        theBlock(user, nil);
         return;
     }
 
+    // Prepare login network request
     NSMutableDictionary *json = [@{
-                                   kRLMServerProviderKey: credential.provider,
-                                   kRLMServerDataKey: credential.credentialToken,
-                                   kRLMServerAppIDKey: [RLMServer appID],
+                                   kRLMSyncProviderKey: credential.provider,
+                                   kRLMSyncDataKey: credential.token,
+                                   kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                                    } mutableCopy];
-    if (credential.userInfo) {
+    NSMutableDictionary *info = [(credential.userInfo ?: @{}) mutableCopy];
+
+    // FIXME: handle the 'actions' flag for the general case (not just username/password)
+    if (credential.provider == RLMIdentityProviderUsernamePassword
+        && (actions & RLMAuthenticationActionsCreateAccount)) {
+        info[kRLMSyncRegisterKey] = @(YES);
+    }
+
+    if ([info count] > 0) {
         // Munge user info into the JSON request.
-        json[@"user_info"] = credential.userInfo;
+        json[@"user_info"] = info;
     }
 
     RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
@@ -87,146 +159,54 @@
             RLMLoginResponseModel *model = [[RLMLoginResponseModel alloc] initWithJSON:json];
             if (!model) {
                 // Malformed JSON
-                error = [NSError errorWithDomain:RLMServerErrorDomain
-                                            code:RLMServerErrorBadResponse
-                                        userInfo:@{kRLMServerErrorJSONKey: json}];
-                block(error);
+                error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                            code:RLMSyncErrorBadResponse
+                                        userInfo:@{kRLMSyncErrorJSONKey: json}];
+                theBlock(nil, error);
                 return;
             } else {
                 // Success: store the tokens.
-                self.refreshToken = model.renewalTokenModel.renewalToken;
-                self.refreshTokenExpiry = model.renewalTokenModel.tokenExpiry;
-                self.identity = model.identity;
-                self.isLoggedIn = YES;
-                [self _bindAllDeferredRealms];
-                block(nil);
+                user.identity = model.identity;
+                [[RLMSyncManager sharedManager] _registerUser:user];
+                user.refreshToken = model.renewalTokenModel.renewalToken;
+                user.isAnonymous = NO;
+                [user _bindAllDeferredRealms];
+                theBlock(user, nil);
             }
         } else {
             // Something else went wrong
-            block(error);
+            theBlock(nil, error);
         }
     };
-    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
-                                           server:authURL
-                                             JSON:json
-                                       completion:handler];
+    [RLMNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
+                                     server:authServerURL
+                                       JSON:json
+                                    timeout:timeout
+                                 completion:handler];
 }
-
-- (void)refresh {
-    if (!self.isLoggedIn) {
-        @throw RLMException(@"The user isn't logged in. The user must first log in before they can be refreshed.");
-    }
-    for (RLMServerPath path in self.realms) {
-        RLMSessionInfo *info = [self.realms objectForKey:path];
-        if (info.isBound) {
-            [info refresh];
-        }
-    }
-}
-
-- (void)logout:(BOOL)allDevices completion:(RLMErrorReportingBlock)completion {
-    if (!self.isLoggedIn) {
-        @throw RLMException(@"The user isn't logged in. The user must first log in before they log out.");
-    }
-    // TODO: api does not actually exist yet
-    NSDictionary *json = @{
-                           @"allDevices": @(allDevices),
-                           };
-
-    self.isLoggedIn = NO;
-    // TODO: unbind all associated Realms
-
-    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *) {
-        if (completion) {
-            completion(error);
-        }
-    };
-    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointLogout
-                                           server:self.authURL
-                                             JSON:json
-                                       completion:handler];
-}
-
-- (void)addCredential:(RLMCredential *)credential
-           completion:(RLMErrorReportingBlock)completion {
-    if (!self.isLoggedIn) {
-        @throw RLMException(@"The user isn't logged in. The user must first log in before they add a credential.");
-    }
-    // TODO: api does not actually exist yet
-    NSDictionary *json = @{
-                           kRLMServerProviderKey: credential.provider,
-                           kRLMServerDataKey: credential.credentialToken,
-                           };
-
-    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *) {
-        if (completion) {
-            completion(error);
-        }
-    };
-    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointLogout
-                                           server:self.authURL
-                                             JSON:json
-                                       completion:handler];
-}
-
-- (void)removeCredential:(RLMCredential *)credential
-              completion:(RLMErrorReportingBlock)completion {
-    if (!self.isLoggedIn) {
-        @throw RLMException(@"The user isn't logged in. The user must first log in before they remove a credential.");
-    }
-    // TODO: api does not actually exist yet
-    NSDictionary *json = @{
-                           kRLMServerProviderKey: credential.provider,
-                           kRLMServerDataKey: credential.credentialToken,
-                           };
-
-    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *) {
-        if (completion) {
-            completion(error);
-        }
-    };
-    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointLogout
-                                           server:self.authURL
-                                             JSON:json
-                                       completion:handler];
-}
-
-- (instancetype)initWithLocalIdentity:(nullable RLMLocalIdentity)identity {
-    if (self = [super init]) {
-        self.localIdentity = identity ?: [[NSUUID UUID] UUIDString];
-        self.isLoggedIn = NO;
-        self.refreshTokenExpiry = 0;
-        self.directAccessToken = nil;
-        self.realms = [NSMutableDictionary dictionary];
-        return self;
-    }
-    return nil;
-}
-
-
-#pragma mark - Private
 
 // Upon successfully logging in, bind any Realm which was opened and registered to the user previously.
 - (void)_bindAllDeferredRealms {
-    NSAssert(self.isLoggedIn, @"Logic error: _bindAllDeferredRealms can't be called unless the User is logged in.");
-    for (RLMServerPath key in self.realms) {
-        RLMSessionInfo *info = self.realms[key];
+    NSAssert(!self.isAnonymous, @"Logic error: _bindAllDeferredRealms can't be called unless the User is logged in.");
+    for (NSURL *key in self.sessionsStorage) {
+        RLMSyncSession *info = self.sessionsStorage[key];
         RLMRealmBindingPackage *package = info.deferredBindingPackage;
         if (!info.isBound && package) {
-            [self _bindRealmWithLocalFileURL:package.fileURL remotePath:package.remotePath onCompletion:package.block];
+            [self _bindRealmWithLocalFileURL:package.fileURL realmURL:package.realmURL onCompletion:package.block];
         }
     }
 }
 
 // Immediately begin the handshake to get the resolved remote path and the access token.
 - (void)_bindRealmWithLocalFileURL:(NSURL *)fileURL
-                        remotePath:(NSString *)remotePath
+                          realmURL:(NSURL *)realmURL
                       onCompletion:(RLMErrorReportingBlock)completion {
+    RLMServerPath unresolvedPath = [realmURL path];
     NSDictionary *json = @{
-                           kRLMServerPathKey: remotePath,
-                           kRLMServerProviderKey: @"realm",
-                           kRLMServerDataKey: self.refreshToken,
-                           kRLMServerAppIDKey: [RLMServer appID],
+                           kRLMSyncPathKey: unresolvedPath,
+                           kRLMSyncProviderKey: @"realm",
+                           kRLMSyncDataKey: self.refreshToken,
+                           kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                            };
 
     RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
@@ -234,9 +214,9 @@
             RLMAddRealmResponseModel *model = [[RLMAddRealmResponseModel alloc] initWithJSON:json];
             if (!model) {
                 // Malformed JSON
-                error = [NSError errorWithDomain:RLMServerErrorDomain
-                                            code:RLMServerErrorBadResponse
-                                        userInfo:@{kRLMServerErrorJSONKey: json}];
+                error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                            code:RLMSyncErrorBadResponse
+                                        userInfo:@{kRLMSyncErrorJSONKey: json}];
                 // TODO (az-ros): report global error
                 return;
             } else {
@@ -244,19 +224,26 @@
                 NSString *accessToken = model.accessToken;
 
                 // Register the Realm as being linked to this User.
-                RLMServerPath fullPath = model.fullPath;
-                RLMSessionInfo *info = [self.realms objectForKey:remotePath];
-                NSAssert(info, @"Could not get a session info object for the path '%@', this is an error", remotePath);
+                RLMServerPath resolvedPath = model.fullPath;
+                RLMSyncSession *info = [self.sessionsStorage objectForKey:realmURL];
+                info.resolvedPath = resolvedPath;
+                NSAssert(info,
+                         @"Could not get a session info object for the path '%@', this is an error",
+                         unresolvedPath);
 
                 [info configureWithAccessToken:accessToken expiry:model.accessTokenExpiry user:self];
 
                 // Bind the Realm
-                NSURL *objcRealmURL = [NSURL URLWithString:fullPath relativeToURL:self.objectServerURL];
-                std::string full_realm_url = [[objcRealmURL absoluteString] UTF8String];
-                auto file_url = RLMStringDataWithNSString([fileURL path]);
-                bool success = realm::Realm::refresh_sync_access_token(std::string([accessToken UTF8String]),
-                                                                       file_url,
-                                                                       full_realm_url);
+                 NSURLComponents *urlBuffer = [NSURLComponents componentsWithURL:realmURL resolvingAgainstBaseURL:YES];
+                urlBuffer.path = resolvedPath;
+                NSURL *resolvedURL = [urlBuffer URL];
+                if (!resolvedURL) {
+                    @throw RLMException(@"Resolved path returned from the server was invalid (%@).", resolvedPath);
+                }
+                std::string resolved_realm_url = [[resolvedURL absoluteString] UTF8String];
+                bool success = realm::Realm::refresh_sync_access_token([accessToken UTF8String],
+                                                                       RLMStringDataWithNSString([fileURL path]),
+                                                                       resolved_realm_url);
                 info.isBound = success;
                 info.deferredBindingPackage = nil;
                 // TODO (az-ros): What to do about failed bindings? How can the user manually retry?
@@ -264,8 +251,8 @@
                     if (success) {
                         completion(nil);
                     } else {
-                        completion([NSError errorWithDomain:RLMServerErrorDomain
-                                                       code:RLMServerInternalError
+                        completion([NSError errorWithDomain:RLMSyncErrorDomain
+                                                       code:RLMSyncInternalError
                                                    userInfo:nil]);
                     }
                 }
@@ -275,36 +262,31 @@
             // TODO (az-ros): report global error, and update self state
         }
     };
-    [RLMServerNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
-                                           server:self.authURL
-                                             JSON:json
-                                       completion:handler];
+    [RLMNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
+                                     server:self.authenticationServer
+                                       JSON:json
+                                 completion:handler];
 }
 
 // A callback handler for a Realm, used to get an updated access token which can then be used to bind the Realm.
-- (void)_registerRealmForBindingWithFileURL:(const std::string&)fileURL
-                            remoteServerURL:(NSURL *)remoteURL
-                               onCompletion:(RLMErrorReportingBlock)completion {
-    NSURL *objcFileURL = [NSURL fileURLWithPath:@(fileURL.c_str())];
-    NSString *objcRemotePath = [remoteURL path];
-
-    if ([self.realms objectForKey:objcRemotePath]) {
+- (void)_registerRealmForBindingWithFileURL:(NSURL *)fileURL
+                                   realmURL:(NSURL *)realmURL
+                               onCompletion:(nullable RLMErrorReportingBlock)completion {
+    if ([self.sessionsStorage objectForKey:realmURL]) {
         // The Realm at this particular path has already been registered to this user.
         return;
     }
 
-    RLMSessionInfo *info = [[RLMSessionInfo alloc] initWithFileURL:objcFileURL path:objcRemotePath];
-    [self.realms setValue:info forKey:objcRemotePath];
+    RLMSyncSession *info = [[RLMSyncSession alloc] initWithFileURL:fileURL];
+    self.sessionsStorage[realmURL] = info;
     info.isBound = NO;
 
     if (self.directAccessToken) {
         // Special case for when the access token is provided by the host app.
-        NSURL *objcRealmURL = [NSURL URLWithString:objcRemotePath relativeToURL:self.objectServerURL];
-        std::string full_realm_url = [[objcRealmURL absoluteString] UTF8String];
-        auto file_url = RLMStringDataWithNSString([objcFileURL path]);
+        std::string realm_url = [[realmURL absoluteString] UTF8String];
         bool success = realm::Realm::refresh_sync_access_token(std::string([self.directAccessToken UTF8String]),
-                                                               file_url,
-                                                               full_realm_url);
+                                                               RLMStringDataWithNSString([fileURL path]),
+                                                               realm_url);
         [info configureWithAccessToken:self.directAccessToken
                                 expiry:[[NSDate distantFuture] timeIntervalSince1970]
                                   user:self];
@@ -313,50 +295,37 @@
             if (success) {
                 completion(nil);
             } else {
-                completion([NSError errorWithDomain:RLMServerErrorDomain
-                                               code:RLMServerInternalError
+                completion([NSError errorWithDomain:RLMSyncErrorDomain
+                                               code:RLMSyncInternalError
                                            userInfo:nil]);
             }
         }
         return;
     }
 
-    if (!self.isLoggedIn) {
+    if (self.isAnonymous) {
         // We will delay the path resolution/access token handshake until the user logs in
-        info.deferredBindingPackage = [[RLMRealmBindingPackage alloc] initWithFileURL:objcFileURL
-                                                                           remotePath:objcRemotePath
+        info.deferredBindingPackage = [[RLMRealmBindingPackage alloc] initWithFileURL:fileURL
+                                                                             realmURL:realmURL
                                                                                 block:completion];
     } else {
         // User is logged in, start the handshake immediately.
-        [self _bindRealmWithLocalFileURL:objcFileURL remotePath:objcRemotePath onCompletion:completion];
+        [self _bindRealmWithLocalFileURL:fileURL realmURL:realmURL onCompletion:completion];
     }
 }
 
-- (void)_reportRefreshFailureForPath:(RLMServerPath)path error:(NSError *)error {
-    NSLog(@"Realm at path %@ could not be refreshed properly. Error: %@", path, error);
-}
+#pragma mark - Temporary API
 
-- (void)setIsLoggedIn:(BOOL)isLoggedIn {
-    _isLoggedIn = isLoggedIn;
-    if (!isLoggedIn) {
-        self.authURL = nil;
-        self.objectServerURL = nil;
-        self.refreshToken = nil;
+- (instancetype)initWithIdentity:(NSString *)identity
+                    refreshToken:(RLMServerToken)refreshToken
+                   authServerURL:(NSURL *)authServerURL {
+    if (self = [self initWithAuthServer:authServerURL]) {
+        self.refreshToken = refreshToken;
+        self.identity = identity;
+        self.isAnonymous = NO;
+        [[RLMSyncManager sharedManager] _registerUser:self];
     }
-}
-
-- (void)loginWithRefreshToken:(RLMServerToken)refreshToken
-                       expiry:(NSTimeInterval)expiry
-                     identity:(RLMIdentity)identity {
-    if (expiry < [[NSDate date] timeIntervalSince1970]) {
-        // Token is expired.
-        @throw RLMException(@"Cannot login with an expired token.");
-    }
-    self.refreshToken = refreshToken;
-    self.refreshTokenExpiry = expiry;
-    self.identity = identity;
-    self.isLoggedIn = YES;
-    [self _bindAllDeferredRealms];
+    return self;
 }
 
 @end

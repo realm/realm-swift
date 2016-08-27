@@ -18,9 +18,19 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMServerUtil.h"
+#import "RLMSyncUtil.h"
 
-@class RLMCredential, RLMSessionInfo;
+@class RLMUser, RLMCredential, RLMSyncSession, RLMRealm;
+
+typedef NS_OPTIONS(NSUInteger, RLMAuthenticationActions) {
+    RLMAuthenticationActionsCreateAccount            = 1 << 0,
+    RLMAuthenticationActionsUseExistingAccount       = 1 << 1,
+};
+
+typedef void(^RLMUserCompletionBlock)(RLMUser * _Nullable, NSError * _Nullable);
+typedef void(^RLMFetchedRealmCompletionBlock)(NSError * _Nullable, RLMRealm * _Nullable, BOOL * _Nonnull);
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  A `RLMUser` instance represents a single Realm Object Server user account (or just user).
@@ -28,44 +38,59 @@
  A user may have one or more credentials associated with it. These credentials uniquely identify the user to a
  third-party auth provider, and are used to sign into a Realm Object Server user account.
  */
-@interface RLMUser : NSObject
+@interface RLMUser : NSObject RLMSYNC_UNINITIALIZABLE
 
-NS_ASSUME_NONNULL_BEGIN
-
-@property (nonatomic, readonly) NSDictionary<RLMServerPath, RLMSessionInfo *> *realms;
-
-@property (nonatomic, readonly) BOOL isLoggedIn;
++ (NSArray<RLMUser *> *)all;
 
 @property (nonatomic, readonly) RLMIdentity identity;
-@property (nonatomic, readonly) RLMLocalIdentity localIdentity;
 
-- (instancetype)initWithLocalIdentity:(nullable RLMLocalIdentity)identity NS_DESIGNATED_INITIALIZER;
+/**
+ The URL of the authentication server this user will communicate with. If the user is anonymous, this property may be
+ nil.
+ */
+@property (nullable, nonatomic, readonly) NSURL *authenticationServer;
 
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+/**
+ Create, log in, and asynchronously return a new user object. A credential identifying the user must be passed in. The
+ user becomes available in the completion block, at which point it is guaranteed to be non-anonymous and ready for use
+ opening synced Realms.
+ */
++ (void)authenticateWithCredential:(RLMCredential *)credential
+                           actions:(RLMAuthenticationActions)actions
+                     authServerURL:(NSURL *)authServerURL
+                           timeout:(NSTimeInterval)timeout
+                      onCompletion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
-- (void)loginWithCredential:(RLMCredential *)credential
-                 completion:(nullable RLMErrorReportingBlock)completion;
++ (void)authenticateWithCredential:(RLMCredential *)credential
+                           actions:(RLMAuthenticationActions)actions
+                     authServerURL:(NSURL *)authServerURL
+                      onCompletion:(RLMUserCompletionBlock)completion
+NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
-- (void)refresh;
+/**
+ Create and log in a user given an access token.
+ */
++ (instancetype)userWithAccessToken:(RLMServerToken)accessToken identity:(nullable NSString *)identity;
 
-- (void)logout:(BOOL)allDevices completion:(nullable RLMErrorReportingBlock)completion;
+/**
+ Log a user out, destroying their server state, deregistering them from the SDK, and removing any synced Realms
+ associated with them from on-disk storage. This method may be called on an anonymous user.
 
-- (void)addCredential:(RLMCredential *)credential
-           completion:(nullable RLMErrorReportingBlock)completion;
+ This method should be called whenever the application is committed to not using a user again unless they are recreated.
+ Failing to call this method may result in unused files and metadata needlessly taking up space.
+ */
+//- (void)logOut;
 
-- (void)removeCredential:(RLMCredential *)credential
-              completion:(nullable RLMErrorReportingBlock)completion;
+- (NSDictionary<NSURL *, RLMSyncSession *> *)sessions;
 
 
-#pragma mark - Bootstrap API
+#pragma mark - Temporary APIs
 
-@property (nullable, nonatomic, readonly) RLMServerToken refreshToken;
-@property (nonatomic, readonly) NSTimeInterval refreshTokenExpiry;
+- (instancetype)initWithIdentity:(NSString *)identity
+                    refreshToken:(RLMServerToken)refreshToken
+                   authServerURL:(NSURL *)authServerURL;
 
-- (void)loginWithRefreshToken:(RLMServerToken)refreshToken
-                       expiry:(NSTimeInterval)expiry
-                     identity:(RLMIdentity)identity;
+- (RLMServerToken)refreshToken;
 
 NS_ASSUME_NONNULL_END
 

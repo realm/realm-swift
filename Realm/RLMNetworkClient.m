@@ -16,10 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMServerNetworkClient.h"
+#import "RLMNetworkClient.h"
 
 #import "RLMRealmConfiguration.h"
-#import "RLMServerUtil_Private.h"
+#import "RLMSyncUtil_Private.h"
 
 typedef void(^RLMServerURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
 
@@ -37,7 +37,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return NSMakeRange(type*100, kHTTPCodeRange);
 }
 
-@implementation RLMServerNetworkClient
+@implementation RLMNetworkClient
 
 + (NSURLSession *)session {
     return [NSURLSession sharedSession];
@@ -69,10 +69,23 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return [serverURL URLByAppendingPathComponent:pathComponent];
 }
 
++ (void)postRequestToEndpoint:(RLMServerEndpoint)endpoint
+                       server:(NSURL *)serverURL
+                         JSON:(NSDictionary *)jsonDictionary
+                   completion:(RLMServerCompletionBlock)completionBlock {
+    static NSTimeInterval const defaultTimeout = 60;
+    [self postRequestToEndpoint:endpoint
+                         server:serverURL
+                           JSON:jsonDictionary
+                        timeout:defaultTimeout
+                     completion:completionBlock];
+}
+
 // FIXME: should completion argument also pass back the NSURLResponse and/or the raw data?
 + (void)postRequestToEndpoint:(RLMServerEndpoint)endpoint
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
+                      timeout:(NSTimeInterval)timeout
                    completion:(RLMServerCompletionBlock)completionBlock {
 
     NSError *localError = nil;
@@ -90,6 +103,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self urlForServer:serverURL endpoint:endpoint]];
     request.HTTPBody = jsonData;
     request.HTTPMethod = @"POST";
+    request.timeoutInterval = MAX(timeout, 10);
     [request addValue:@"application/json;charset=utf-8" forHTTPHeaderField:@"Content-Type"];
     [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
 
@@ -104,8 +118,8 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
                                 || NSLocationInRange(actualResponse.statusCode, RLM_rangeForErrorType(ServerError)));
             if (badResponse) {
                 // Client or server error
-                localError = [NSError errorWithDomain:RLMServerErrorDomain
-                                                 code:RLMServerErrorHTTPStatusCodeError
+                localError = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                 code:RLMSyncErrorHTTPStatusCodeError
                                              userInfo:@{@"statusCode": @(actualResponse.statusCode)}];
                 completionBlock(localError, nil);
                 return;
@@ -122,9 +136,9 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
                 completionBlock(localError, nil);
             } else if (![json isKindOfClass:[NSDictionary class]]) {
                 // JSON response malformed
-                localError = [NSError errorWithDomain:RLMServerErrorDomain
-                                                 code:RLMServerErrorBadResponse
-                                             userInfo:@{kRLMServerErrorJSONKey: json}];
+                localError = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                 code:RLMSyncErrorBadResponse
+                                             userInfo:@{kRLMSyncErrorJSONKey: json}];
                 completionBlock(localError, nil);
             } else {
                 // JSON parsed successfully

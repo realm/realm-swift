@@ -18,47 +18,38 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMServerUtil.h"
+#import "RLMSyncUtil.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- `RLMCredential` encapsulates login information for a single user and auth provider.
+typedef NSString *RLMIdentityProvider RLM_EXTENSIBLE_STRING_ENUM;
 
- The host application or helper library should create one of these objects once a user has successfully received a
- credential from an auth provider, and pass it into the appropriate API functions to open a Realm.
- */
+extern RLMIdentityProvider const RLMIdentityProviderDebug;
+extern RLMIdentityProvider const RLMIdentityProviderRealm;
+extern RLMIdentityProvider const RLMIdentityProviderUsernamePassword;
+extern RLMIdentityProvider const RLMIdentityProviderFacebook;
+extern RLMIdentityProvider const RLMIdentityProviderTwitter;
+extern RLMIdentityProvider const RLMIdentityProviderGoogle;
+extern RLMIdentityProvider const RLMIdentityProviderICloud;
+// FIXME: add more providers as necessary...
+
 @interface RLMCredential : NSObject
 
-@property (nonatomic, readonly) RLMCredentialToken credentialToken;
+@property (nonatomic, readonly) RLMCredentialToken token;
 @property (nonatomic, readonly) RLMIdentityProvider provider;
-@property (nullable, nonatomic, readonly) NSDictionary *userInfo;
+@property (nonatomic, readonly) NSDictionary *userInfo;
 
-@property (nullable, nonatomic) NSURL *objectServerURL;
-@property (nullable, nonatomic) NSNumber *authServerPort;
+- (instancetype)initWithFacebookToken:(RLMCredentialToken)token;
 
-+ (void)setDefaultObjectServerURL:(NSURL *)url;
+- (instancetype)initWithUsername:(NSString *)username password:(NSString *)password;
 
-- (instancetype)initWithCredentialToken:(RLMCredentialToken)credentialToken
-                               provider:(RLMIdentityProvider)provider
-                               userInfo:(nullable NSDictionary *)userInfo
-                              serverURL:(nullable NSURL *)serverURL NS_DESIGNATED_INITIALIZER;
-
-// Convenience factory methods
-
-+ (instancetype)credentialWithUsername:(NSString *)username
-                              password:(NSString *)password
-                      createNewAccount:(BOOL)isNewAccount;
-
-+ (instancetype)credentialWithFacebookToken:(NSString *)facebookToken;
-
-+ (instancetype)credentialWithAccessToken:(RLMServerToken)token serverURL:(nullable NSURL *)serverURL;
-
-// Miscellaneous
+- (instancetype)initWithCustomToken:(RLMCredentialToken)token
+                           provider:(RLMIdentityProvider)provider
+                           userInfo:(nullable NSDictionary *)userInfo NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
-@end
-
 NS_ASSUME_NONNULL_END
+
+@end

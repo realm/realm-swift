@@ -16,49 +16,51 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSessionInfo.h"
+#import "RLMSyncSession.h"
 
-#import "RLMServerUtil_Private.h"
+#import "RLMSyncUtil_Private.h"
 
 @class RLMUser;
 
 @interface RLMRealmBindingPackage : NSObject
 
-@property (nonatomic, copy) RLMErrorReportingBlock block;
+NS_ASSUME_NONNULL_BEGIN
+
+@property (nullable, nonatomic, copy) RLMErrorReportingBlock block;
 @property (nonatomic) NSURL *fileURL;
-@property (nonatomic) NSString *remotePath;
+@property (nonatomic) NSURL *realmURL;
 
 - (instancetype)initWithFileURL:(NSURL *)fileURL
-                     remotePath:(NSString *)remotePath
-                          block:(RLMErrorReportingBlock)block;
+                       realmURL:(NSURL *)realmURL
+                          block:(nullable RLMErrorReportingBlock)block;
 
 @end
 
-@interface RLMSessionInfo ()
+@interface RLMSyncSession ()
 
 /// The path on disk where the Realm file backing this synced Realm is stored.
 @property (nonatomic) NSURL *fileURL;
 
-@property (nonatomic) RLMServerPath path;
+@property (nullable, nonatomic) RLMServerPath resolvedPath;
 
 /// Whether or not the Realm is currently bound to the Realm Object Server. A Realm that was unbound because its
 /// tokens expired can be rebound by calling `-refresh`.
 @property (nonatomic) BOOL isBound;
 
-- (instancetype)initWithFileURL:(NSURL *)fileURL path:(RLMServerPath)path;
+- (instancetype)initWithFileURL:(NSURL *)fileURL;
 
-@property (nonatomic) RLMRealmBindingPackage *deferredBindingPackage;
+@property (nullable, nonatomic) RLMRealmBindingPackage *deferredBindingPackage;
 
 #pragma mark - per-Realm access token API
 
-@property (nonatomic) RLMServerToken accessToken;
+@property (nullable, nonatomic) RLMServerToken accessToken;
 @property (nonatomic) NSTimeInterval accessTokenExpiry;
 
 @property (nonatomic) NSTimer *refreshTimer;
 
-@property (nonatomic, weak) RLMUser *parentUser;
-
 - (void)configureWithAccessToken:(RLMServerToken)token expiry:(NSTimeInterval)expiry user:(RLMUser *)user;
 - (void)refresh;
+
+NS_ASSUME_NONNULL_END
 
 @end

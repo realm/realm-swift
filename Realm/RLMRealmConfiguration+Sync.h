@@ -16,26 +16,34 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUser.h"
+#import <Realm/Realm.h>
 
-#import "shared_realm.hpp"
+#import "RLMSyncUtil.h"
 
-@interface RLMUser ()
+@class RLMUser;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@property (nullable, nonatomic) RLMServerToken refreshToken;
+@interface RLMSyncConfiguration : NSObject RLMSYNC_UNINITIALIZABLE
+
+@property (nonatomic, readonly) RLMUser *user;
+@property (nonatomic, readonly) NSURL *realmURL;
 
 /**
- Register a Realm to a user.
+ Create a sync configuration instance.
  
- @param fileURL     The location of the file on disk where the local copy of the Realm will be saved.
- @param realmURL    The fully qualified, unresolved URL of the remote Realm on the Realm Object Server.
- @param completion  An optional completion block.
+ @param user    A `RLMUser` that owns the Realm at the given URL.
+ @param url     The full, unresolved URL to the Realm on the Realm Object Server. "Full" means that this URL is fully
+                qualified; e.g. `realm://example.org/~/path/to/my.realm`. "Unresolved" means the path should contain
+                the wildcard marker `~`.
  */
-- (void)_registerRealmForBindingWithFileURL:(NSURL *)fileURL
-                                   realmURL:(NSURL *)realmURL
-                               onCompletion:(nullable RLMErrorReportingBlock)completion;
+- (instancetype)initWithUser:(RLMUser *)user realmURL:(NSURL *)url;
+
+@end
+
+@interface RLMRealmConfiguration (Server)
+
+@property (nullable, nonatomic) RLMSyncConfiguration *syncConfiguration;
 
 NS_ASSUME_NONNULL_END
 

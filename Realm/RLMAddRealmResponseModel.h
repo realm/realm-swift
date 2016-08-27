@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMServerUtil_Private.h"
+#import "RLMSyncUtil_Private.h"
 
 @interface RLMAddRealmResponseModel : NSObject
 

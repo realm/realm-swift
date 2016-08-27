@@ -48,11 +48,10 @@ Pod::Spec.new do |s|
                            
                            # Sync
                            'Realm/RLMCredential.h',
-                           'Realm/RLMRealm+Server.h',
-                           'Realm/RLMRealmConfiguration+Server.h',
-                           'Realm/RLMServer.h',
-                           'Realm/RLMServerUtil.h',
-                           'Realm/RLMSessionInfo.h',
+                           'Realm/RLMRealmConfiguration+Sync.h',
+                           'Realm/RLMSyncManager.h',
+                           'Realm/RLMSyncSession.h',
+                           'Realm/RLMSyncUtil.h',
                            'Realm/RLMUser.h'
   s.private_header_files = 'Realm/{*_Private,RLMAccessor,RLMObjectStore}.h'
   s.exclude_files        = 'Realm/Tests'

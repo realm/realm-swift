@@ -16,21 +16,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm.h"
+#import <Foundation/Foundation.h>
 
-#import "RLMServerUtil.h"
+#import "RLMSyncUtil.h"
 
-@class RLMUser;
+@class RLMSyncSession;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMRealm (Server)
+typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable);
 
-+ (void)fetchRealmAtPath:(RLMServerPath)objectServerPath
-                 forUser:(RLMUser *)user
-                readOnly:(BOOL)isReadOnly
-              completion:(RLMServerFetchedRealmCompletionBlock)completion;
+@interface RLMSyncManager : NSObject RLMSYNC_UNINITIALIZABLE
 
-@end
+@property (nullable, nonatomic, copy) RLMSyncErrorReportingBlock errorHandler;
+
+@property (nonatomic) NSString *appID;
+
+@property (nonatomic) NSUInteger logLevel;
+
++ (instancetype)sharedManager;
 
 NS_ASSUME_NONNULL_END
+
+@end

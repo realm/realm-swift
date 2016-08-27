@@ -18,7 +18,7 @@
 
 #import "RLMLoginResponseModel.h"
 
-#import "RLMServerUtil_Private.h"
+#import "RLMSyncUtil_Private.h"
 
 @interface RLMLoginResponseModel ()
 
@@ -33,8 +33,8 @@
 
 - (instancetype)initWithJSON:(NSDictionary *)json {
     if (self = [super init]) {
-        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerIdentityKey, identity);
-        RLMSERVER_PARSE_MODEL_OR_ABORT(json, kRLMServerRefreshKey, RLMRenewalTokenModel, renewalTokenModel);
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMSyncIdentityKey, identity);
+        RLMSERVER_PARSE_MODEL_OR_ABORT(json, kRLMSyncRefreshKey, RLMRenewalTokenModel, renewalTokenModel);
     }
     return self;
 }
@@ -52,8 +52,8 @@
 
 - (instancetype)initWithJSON:(NSDictionary *)json {
     if (self = [super init]) {
-        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMServerTokenKey, renewalToken);
-        RLMSERVER_PARSE_DOUBLE_OR_ABORT(json, kRLMServerExpiresKey, tokenExpiry);
+        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, renewalToken);
+        RLMSERVER_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, tokenExpiry);
     }
     return self;
 }
