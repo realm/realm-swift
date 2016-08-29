@@ -43,7 +43,6 @@
 #include "object_store.hpp"
 #include "schema.hpp"
 #include "shared_realm.hpp"
-#include "sync_manager.hpp"
 
 #include <realm/util/memory_stream.hpp>
 #include <realm/util/logger.hpp>
@@ -53,26 +52,6 @@
 
 using namespace realm;
 using util::File;
-
-namespace {
-struct CocoaSyncLogger : public util::RootLogger {
-    void do_log(std::string message) override {
-        NSLog(@"RealmSync: %@", RLMStringDataToNSString(message));
-    }
-};
-
-struct CocoaSyncLoggerFactory : public SyncLoggerFactory {
-    std::unique_ptr<util::Logger> make_logger(util::Logger::Level level) override
-    {
-        auto logger = std::make_unique<CocoaSyncLogger>();
-        logger->set_level_threshold(level);
-        return std::move(logger);
-    }
-
-} s_syncLoggerFactory;
-
-} // anonymous namespace
-
 
 @interface RLMRealmConfiguration ()
 - (realm::Realm::Config&)config;
@@ -149,8 +128,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 
     RLMCheckForUpdates();
     RLMSendAnalytics();
-
-    SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
 }
 
 - (BOOL)isEmpty {
@@ -717,13 +694,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         [enumerator detach];
     }
     _collectionEnumerators = nil;
-}
-
-+ (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level {
-    using Level = realm::util::Logger::Level;
-
-    Level logger_level = (level == RLMSyncLogLevelVerbose) ? Level::detail : Level::info;
-    SyncManager::shared().set_log_level(logger_level);
 }
 
 @end

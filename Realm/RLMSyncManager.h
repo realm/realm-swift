@@ -22,6 +22,18 @@
 
 @class RLMSyncSession;
 
+typedef NS_ENUM(NSUInteger, RLMSyncLogLevel) {
+    RLMSyncLogLevelOff,
+    RLMSyncLogLevelFatal,
+    RLMSyncLogLevelError,
+    RLMSyncLogLevelWarn,
+    RLMSyncLogLevelInfo,
+    RLMSyncLogLevelDetail,
+    RLMSyncLogLevelDebug,
+    RLMSyncLogLevelTrace,
+    RLMSyncLogLevelAll
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable);
@@ -32,7 +44,11 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 
 @property (nonatomic) NSString *appID;
 
-@property (nonatomic) NSUInteger logLevel;
+/**
+ The logging threshold which newly opened synced Realms will use. Defaults to `RLMSyncLogLevelInfo`. Set this before
+ any synced Realms are opened.
+ */
+@property (nonatomic) RLMSyncLogLevel logLevel;
 
 + (instancetype)sharedManager;
 

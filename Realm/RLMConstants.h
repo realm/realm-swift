@@ -40,14 +40,6 @@
 
 #pragma mark - Enums
 
-/// Log level for the synchronization network protocol.
-typedef NS_ENUM(NSUInteger, RLMSyncLogLevel) {
-    /// Normal logging level.
-    RLMSyncLogLevelNormal = 1,
-    /// Verbose logging level. Logs ALL THE THINGS.
-    RLMSyncLogLevelVerbose = 2,
-};
-
 /**
  `RLMPropertyType` is an enumeration describing all property types supported in Realm models.
 

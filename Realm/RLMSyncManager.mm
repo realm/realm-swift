@@ -25,7 +25,44 @@
 #import <sync_config.hpp>
 #import <sync_manager.hpp>
 
+using Level = realm::util::Logger::Level;
+
+namespace {
+
+Level levelForSyncLogLevel(RLMSyncLogLevel logLevel) {
+    switch (logLevel) {
+        case RLMSyncLogLevelOff:    return Level::off;
+        case RLMSyncLogLevelFatal:  return Level::fatal;
+        case RLMSyncLogLevelError:  return Level::error;
+        case RLMSyncLogLevelWarn:   return Level::warn;
+        case RLMSyncLogLevelInfo:   return Level::info;
+        case RLMSyncLogLevelDetail: return Level::detail;
+        case RLMSyncLogLevelDebug:  return Level::debug;
+        case RLMSyncLogLevelTrace:  return Level::trace;
+        case RLMSyncLogLevelAll:    return Level::all;
+    }
+    REALM_UNREACHABLE();    // Unrecognized log level.
+}
+
+struct CocoaSyncLogger : public realm::util::RootLogger {
+    void do_log(Level, std::string message) override {
+        NSLog(@"Sync: %@", RLMStringDataToNSString(message));
+    }
+};
+
+struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
+    std::unique_ptr<realm::util::Logger> make_logger(realm::util::Logger::Level level) override {
+        auto logger = std::make_unique<CocoaSyncLogger>();
+        logger->set_level_threshold(level);
+        return std::move(logger);
+    }
+} s_syncLoggerFactory;
+
+} // anonymous namespace
+
 @interface RLMSyncManager ()
+
+- (instancetype)initPrivate NS_DESIGNATED_INITIALIZER;
 
 @property (nonnull, nonatomic) NSMutableDictionary<NSString *, RLMUser *> *activeUsers;
 
@@ -70,6 +107,9 @@
             });
         };
 
+        self.logLevel = RLMSyncLogLevelInfo;
+        realm::SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
+
         self.activeUsers = [NSMutableDictionary dictionary];
 
         // Initialize the sync engine.
@@ -78,6 +118,11 @@
         return self;
     }
     return nil;
+}
+
+- (void)setLogLevel:(RLMSyncLogLevel)logLevel {
+    _logLevel = logLevel;
+    realm::SyncManager::shared().set_log_level(levelForSyncLogLevel(logLevel));
 }
 
 - (NSString *)appID {

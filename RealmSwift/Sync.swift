@@ -36,6 +36,8 @@ public typealias UserCompletionBlock = RLMUserCompletionBlock
 
 public typealias SyncError = RLMSyncError
 
+public typealias SyncLogLevel = RLMSyncLogLevel
+
 #if swift(>=3.0)
 
 public enum Credential {

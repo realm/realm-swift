@@ -495,11 +495,6 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
  */
 + (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
-#pragma mark - Synchronization
-
-/// Set the log level for the synchronization network protocol for all Realms.
-+ (void)setGlobalSynchronizationLoggingLevel:(RLMSyncLogLevel)level;
-
 @end
 
 /**
