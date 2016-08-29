@@ -46,13 +46,13 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
     RLMSyncErrorHTTPStatusCodeError     = 3,
 
     /// An error that indicates a problem with the session (a specific Realm opened for sync).
-    RLMSyncClientSessionError           = 4,
+    RLMSyncErrorClientSessionError      = 4,
 
     /// An error that indicates a problem with a specific user.
-    RLMSyncClientUserError              = 5,
+    RLMSyncErrorClientUserError         = 5,
 
     /// An error that indicates an internal error with the underlying synchronization engine. Only for information.
-    RLMSyncClientInternalError          = 6,
+    RLMSyncErrorClientInternalError     = 6,
 };
 
 NS_ASSUME_NONNULL_END

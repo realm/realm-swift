@@ -19,20 +19,28 @@
 #import "RLMSyncManager.h"
 
 #import "sync_config.hpp"
+#import "sync_metadata.hpp"
 
 @class RLMUser;
 
 // All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
 // called very infrequently, this should pose no issues.
 
-@interface RLMSyncManager ()
+@interface RLMSyncManager () {
+    std::unique_ptr<realm::SyncMetadataManager> _metadata_manager;
+}
 
 NS_ASSUME_NONNULL_BEGIN
 
-- (void)_handleErrorWithCode:(int)errorCode
-                     message:(NSString *)message
-                     session:(nullable RLMSyncSession *)session
-                  errorClass:(realm::SyncSessionError)errorClass;
+- (void)_fireError:(NSError *)error;
+
+- (void)_fireErrorWithCode:(int)errorCode
+                   message:(NSString *)message
+                   session:(nullable RLMSyncSession *)session
+                errorClass:(realm::SyncSessionError)errorClass;
+
+// Note that this method doesn't need to be threadsafe, since all locking is coordinated internally.
+- (realm::SyncMetadataManager&)_metadataManager;
 
 - (NSArray<RLMUser *> *)_allUsers;
 

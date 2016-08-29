@@ -47,7 +47,7 @@ public struct Credential {
     var provider: Provider
     var userInfo: [String: Any]
 
-    init(customToken token: Token, provider: Provider, userInfo: [String: Any] = [:]) {
+    public init(customToken token: Token, provider: Provider, userInfo: [String: Any] = [:]) {
         self.token = token
         self.provider = provider
         self.userInfo = userInfo
@@ -99,7 +99,7 @@ public struct Credential {
     var provider: Provider
     var userInfo: [String: AnyObject]
 
-    init(customToken token: Token, provider: Provider, userInfo: [String: AnyObject] = [:]) {
+    public init(customToken token: Token, provider: Provider, userInfo: [String: AnyObject] = [:]) {
         self.token = token
         self.provider = provider
         self.userInfo = userInfo

@@ -51,6 +51,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, readonly) NSURL *authenticationServer;
 
 /**
+ Whether or not this user is valid. A user may be invalidated by logging out or due to an error condition.
+
+ @warning It is an error to use invalid Realms for creating Realm configurations.
+ */
+@property (nonatomic, readonly) BOOL isValid;
+
+/**
  Create, log in, and asynchronously return a new user object. A credential identifying the user must be passed in. The
  user becomes available in the completion block, at which point it is guaranteed to be non-anonymous and ready for use
  opening synced Realms.

@@ -30,6 +30,7 @@ extern NSString *const kRLMSyncPathKey;
 extern NSString *const kRLMSyncPasswordKey;
 extern NSString *const kRLMSyncRegisterKey;
 extern NSString *const kRLMSyncErrorJSONKey;
+extern NSString *const kRLMSyncUnderlyingErrorKey;
 
 #ifdef __cplusplus
 extern "C" {

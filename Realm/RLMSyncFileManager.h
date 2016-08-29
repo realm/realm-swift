@@ -16,29 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUser.h"
+#import <Foundation/Foundation.h>
 
-#import "shared_realm.hpp"
+@class RLMUser;
 
-@interface RLMUser ()
+@interface RLMSyncFileManager : NSObject
 
 NS_ASSUME_NONNULL_BEGIN
 
-@property (nullable, nonatomic) RLMServerToken refreshToken;
-
-/**
- Register a Realm to a user.
- 
- @param fileURL     The location of the file on disk where the local copy of the Realm will be saved.
- @param realmURL    The fully qualified, unresolved URL of the remote Realm on the Realm Object Server.
- @param completion  An optional completion block.
- */
-- (void)_registerRealmForBindingWithFileURL:(NSURL *)fileURL
-                                   realmURL:(NSURL *)realmURL
-                               onCompletion:(nullable RLMErrorReportingBlock)completion;
-
-- (void)_invalidate;
-- (void)_deregisterSessionWithRealmURL:(NSURL *)realmURL;
++ (NSURL *)fileURLForRawRealmURL:(NSURL *)url user:(RLMUser *)user;
++ (NSURL *)fileURLForMetadata;
++ (void)removeFilesForUserIdentity:(NSString *)identity error:(NSError * _Nullable* _Nullable)error;
 
 NS_ASSUME_NONNULL_END
 
