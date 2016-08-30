@@ -20,7 +20,7 @@
 #import "RLMOptionalBase.h"
 #import "RLMObject_Private.h"
 #import "RLMObjectStore.h"
-#import "RLMProperty.h"
+#import "RLMProperty_Private.h"
 #import "RLMUtil.hpp"
 
 #import <objc/runtime.h>
@@ -46,6 +46,9 @@
 
 - (void)setUnderlyingValue:(id)underlyingValue {
     if ((_object && _object->_realm) || _object.isInvalidated) {
+        if (_property.isPrimary) {
+            @throw RLMException(@"Primary key can't be changed after an object is inserted.");
+        }
         RLMDynamicSet(_object, _property, underlyingValue, RLMCreationOptionsNone);
     }
     else {
