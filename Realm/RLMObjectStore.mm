@@ -193,13 +193,13 @@ static NSUInteger createRowForObjectWithPrimaryKey(RLMClassInfo const& info, id 
         switch (primaryProperty.type) {
             case RLMPropertyTypeString:
                 REALM_ASSERT_DEBUG(!primaryValue || [primaryValue isKindOfClass:NSString.class]);
-                row.set_string_unique(primaryColumnIndex, RLMStringDataWithNSString((NSString *)primaryValue));
+                row.set_string_unique(primaryColumnIndex, RLMStringDataWithNSString(primaryValue));
                 break;
 
             case RLMPropertyTypeInt:
                 if (primaryValue) {
                     REALM_ASSERT_DEBUG([primaryValue isKindOfClass:NSNumber.class]);
-                    row.set_int_unique(primaryColumnIndex, ((NSNumber *)primaryValue).longLongValue);
+                    row.set_int_unique(primaryColumnIndex, [primaryValue longLongValue]);
                 } else {
                     row.set_null(primaryColumnIndex); // FIXME: Use `set_null_unique` once Core supports it
                 }
