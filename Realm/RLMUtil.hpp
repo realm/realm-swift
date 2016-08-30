@@ -143,7 +143,7 @@ static inline realm::StringData RLMStringDataWithNSString(__unsafe_unretained NS
                                [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 }
 
-// Binary convertion utilities
+// Binary conversion utilities
 static inline NSData *RLMBinaryDataToNSData(realm::BinaryData binaryData) {
     return binaryData ? [NSData dataWithBytes:binaryData.data() length:binaryData.size()] : nil;
 }
@@ -156,7 +156,7 @@ static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSDat
     return realm::BinaryData(bytes, data.length);
 }
 
-// Date convertion utilities
+// Date conversion utilities
 // These use the reference date and shift the seconds rather than just getting
 // the time interval since the epoch directly to avoid losing sub-second precision
 static inline NSDate *RLMTimestampToNSDate(realm::Timestamp ts) NS_RETURNS_RETAINED {
