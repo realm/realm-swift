@@ -96,7 +96,7 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
 }
 
 static void validateValueForProperty(__unsafe_unretained id const obj,
-                                        __unsafe_unretained RLMProperty *const prop) {
+                                     __unsafe_unretained RLMProperty *const prop) {
     switch (prop.type) {
         case RLMPropertyTypeString:
         case RLMPropertyTypeBool:
@@ -338,7 +338,8 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         }
 
         // skip primary key when updating since it doesn't change
-        if (prop.isPrimary) continue;
+        if (prop.isPrimary)
+            continue;
 
         // set in table with out validation
         RLMDynamicSet(object, prop, RLMCoerceToNil(value), creationOptions);
@@ -383,7 +384,8 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
             RLMProperty *prop = props[i];
 
             // skip primary key when updating since it doesn't change
-            if (prop.isPrimary) continue;
+            if (prop.isPrimary)
+                continue;
 
             id val = array[i];
             validateValueForProperty(val, prop);
@@ -401,7 +403,8 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         for (RLMProperty *prop in info.rlmObjectSchema.properties) {
 
             // skip primary key when updating since it doesn't change
-            if (prop.isPrimary) continue;
+            if (prop.isPrimary)
+                continue;
 
             id propValue = RLMValidatedValueForProperty(value, prop.name, info.rlmObjectSchema.className);
 
