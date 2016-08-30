@@ -18,6 +18,7 @@
 
 #import <Realm/RLMConstants.h>
 #import <Realm/RLMOptionalBase.h>
+#import <Realm/RLMNumericNull.h>
 #import <objc/runtime.h>
 
 #import <realm/array.hpp>
@@ -82,9 +83,16 @@ static inline T *RLMDynamicCast(__unsafe_unretained id obj) {
     return nil;
 }
 
+static inline bool RLMIsNullNumber(__unsafe_unretained NSNumber *const number) {
+    return number == nil || [number isKindOfClass:RLMNumericNull.class];
+}
+
 template<typename T>
 static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
     if (static_cast<id>(obj) == NSNull.null) {
+        return nil;
+    }
+    else if ([obj isKindOfClass:RLMNumericNull.class]) {
         return nil;
     }
     else if (__unsafe_unretained auto optional = RLMDynamicCast<RLMOptionalBase>(obj)) {

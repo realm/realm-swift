@@ -231,6 +231,9 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
             }
 
             [s_localNameToClass enumerateKeysAndObjectsUsingBlock:^(NSString *, Class cls, BOOL *) {
+                if ([NSStringFromClass(cls) isEqualToString:@"Tests.SwiftNilDefaultOptionalNumberObject"]) {
+                    ;
+                }
                 RLMRegisterClass(cls);
             }];
         }
