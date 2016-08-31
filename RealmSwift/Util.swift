@@ -47,6 +47,14 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
                                            withTemplate: template)
 }
 
+extension Object {
+    // Must *only* be used to call Realm Objective-C APIs that are exposed on `RLMObject`
+    // but actually operator on `RLMObjectBase`. Do not expose casted value to user.
+    internal func unsafeAsObjectiveCAccessor() -> RLMObject {
+        return unsafeBitCast(self, to: RLMObject.self)
+    }
+}
+
 // MARK: CustomObjectiveCBridgeable
 
 internal func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
@@ -123,6 +131,14 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
     return regex?.stringByReplacingMatchesInString(string, options: [],
                                                    range: NSRange(location: 0, length: string.utf16.count),
                                                    withTemplate: template)
+}
+
+extension Object {
+    // Must *only* be used to call Realm Objective-C APIs that are exposed on `RLMObject`
+    // but actually operator on `RLMObjectBase`. Do not expose casted value to user.
+    internal func unsafeAsObjectiveCAccessor() -> RLMObject {
+        return unsafeBitCast(self, RLMObject.self)
+    }
 }
 
 // MARK: CustomObjectiveCBridgeable
