@@ -18,14 +18,32 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil_Private.h"
+#import "RLMSyncUtil.h"
 
-@interface RLMAddRealmResponseModel : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-@property (nonatomic, readonly) RLMServerToken accessToken;
-@property (nonatomic, readonly) NSTimeInterval accessTokenExpiry;
-@property (nonatomic, readonly) NSString *fullPath;
+@class RLMTokenDataModel;
+
+@interface RLMTokenModel : NSObject RLMSYNC_UNINITIALIZABLE
+
+@property (nonatomic, readonly) NSString *token;
+@property (nonatomic, nullable, readonly) NSString *path;
+@property (nonatomic, readonly) RLMTokenDataModel *tokenData;
 
 - (instancetype)initWithJSON:(NSDictionary *)json;
 
 @end
+
+@interface RLMTokenDataModel : NSObject RLMSYNC_UNINITIALIZABLE
+
+@property (nonatomic, readonly) NSString *identity;
+@property (nonatomic, nullable, readonly) NSString *appID;
+@property (nonatomic, nullable, readonly) NSString *path;
+@property (nonatomic, readonly) NSTimeInterval expires;
+//@property (nonatomic, readonly) NSArray *access;
+
+- (instancetype)initWithJSON:(NSDictionary *)json;
+
+@end
+
+NS_ASSUME_NONNULL_END

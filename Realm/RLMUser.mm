@@ -18,13 +18,12 @@
 
 #import "RLMUser_Private.h"
 
-#import "RLMAddRealmResponseModel.h"
-#import "RLMLoginResponseModel.h"
+#import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
-#import "RLMRefreshResponseModel.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncSession_Private.h"
 #import "RLMSyncUtil_Private.h"
+#import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
 @interface RLMUser ()
@@ -145,7 +144,9 @@
 
     RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
-            RLMLoginResponseModel *model = [[RLMLoginResponseModel alloc] initWithJSON:json];
+            RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithJSON:json
+                                                                  requireAccessToken:NO
+                                                                 requireRefreshToken:YES];
             if (!model) {
                 // Malformed JSON
                 error = [NSError errorWithDomain:RLMSyncErrorDomain
@@ -155,9 +156,9 @@
                 return;
             } else {
                 // Success: store the tokens.
-                user.identity = model.identity;
+                user.identity = model.refreshToken.tokenData.identity;
+                user.refreshToken = model.refreshToken.token;
                 [[RLMSyncManager sharedManager] _registerUser:user];
-                user.refreshToken = model.renewalTokenModel.renewalToken;
                 user.isAnonymous = NO;
                 [user _bindAllDeferredRealms];
                 theBlock(user, nil);
@@ -200,7 +201,9 @@
 
     RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
-            RLMAddRealmResponseModel *model = [[RLMAddRealmResponseModel alloc] initWithJSON:json];
+            RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithJSON:json
+                                                                  requireAccessToken:YES
+                                                                 requireRefreshToken:NO];
             if (!model) {
                 // Malformed JSON
                 error = [NSError errorWithDomain:RLMSyncErrorDomain
@@ -210,17 +213,19 @@
                 return;
             } else {
                 // Success
-                NSString *accessToken = model.accessToken;
+                // For now, assume just one access token.
+                RLMTokenModel *tokenModel = model.accessToken;
+                NSString *accessToken = tokenModel.token;
 
                 // Register the Realm as being linked to this User.
-                RLMServerPath resolvedPath = model.fullPath;
+                RLMServerPath resolvedPath = tokenModel.tokenData.path;
                 RLMSyncSession *info = [self.sessionsStorage objectForKey:realmURL];
                 info.resolvedPath = resolvedPath;
                 NSAssert(info,
                          @"Could not get a session info object for the path '%@', this is an error",
                          unresolvedPath);
 
-                [info configureWithAccessToken:accessToken expiry:model.accessTokenExpiry user:self];
+                [info configureWithAccessToken:accessToken expiry:tokenModel.tokenData.expires user:self];
 
                 // Bind the Realm
                  NSURLComponents *urlBuffer = [NSURLComponents componentsWithURL:realmURL resolvingAgainstBaseURL:YES];

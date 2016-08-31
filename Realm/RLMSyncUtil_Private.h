@@ -26,13 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString *const kRLMSyncProviderKey;
 extern NSString *const kRLMSyncDataKey;
 extern NSString *const kRLMSyncAppIDKey;
-extern NSString *const kRLMSyncRealmIDKey;
-extern NSString *const kRLMSyncRealmURLKey;
 extern NSString *const kRLMSyncPathKey;
-extern NSString *const kRLMSyncTokenKey;
-extern NSString *const kRLMSyncIdentityKey;
-extern NSString *const kRLMSyncExpiresKey;
-extern NSString *const kRLMSyncRefreshKey;
 extern NSString *const kRLMSyncPasswordKey;
 extern NSString *const kRLMSyncRegisterKey;
 extern NSString *const kRLMSyncErrorJSONKey;
@@ -55,6 +49,13 @@ if (![data isKindOfClass:[NSString class]]) { return nil; } \
 self.prop_macro_val = data; \
 } \
 
+#define RLMSERVER_PARSE_OPTIONAL_STRING(json_macro_val, key_macro_val, prop_macro_val) \
+{ \
+id data = json_macro_val[key_macro_val]; \
+if (![data isKindOfClass:[NSString class]]) { data = nil; } \
+self.prop_macro_val = data; \
+} \
+
 /// A macro to parse a double out of a JSON dictionary, or return nil.
 #define RLMSERVER_PARSE_DOUBLE_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
 { \
@@ -70,5 +71,14 @@ id raw = json_macro_val[key_macro_val]; \
 if (![raw isKindOfClass:[NSDictionary class]]) { return nil; } \
 id model = [[class_macro_val alloc] initWithJSON:raw]; \
 if (!model) { return nil; } \
+self.prop_macro_val = model; \
+} \
+
+#define RLMSERVER_PARSE_OPTIONAL_MODEL(json_macro_val, key_macro_val, class_macro_val, prop_macro_val) \
+{ \
+id model; \
+id raw = json_macro_val[key_macro_val]; \
+if (![raw isKindOfClass:[NSDictionary class]]) { model = nil; } \
+else { model = [[class_macro_val alloc] initWithJSON:raw]; } \
 self.prop_macro_val = model; \
 } \
