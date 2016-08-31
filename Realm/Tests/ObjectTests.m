@@ -502,26 +502,30 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 {
     // unmanaged
     EmployeeObject *objs = [[EmployeeObject alloc] initWithValue:@{@"name" : @"Test0", @"age" : @23, @"hired": @NO}];
-    XCTAssertEqualObjects(objs[@"name"], @"Test0",  @"Name should be Test0");
-    XCTAssertEqualObjects(objs[@"age"], @23,  @"age should be 23");
-    XCTAssertEqualObjects(objs[@"hired"], @NO,  @"hired should be NO");
+    XCTAssertEqualObjects(objs[@"name"], @"Test0");
+    XCTAssertEqualObjects(objs[@"age"], @23);
+    XCTAssertEqualObjects(objs[@"hired"], @NO);
     objs[@"name"] = @"Test1";
-    XCTAssertEqualObjects(objs.name, @"Test1",  @"Name should be Test1");
+    XCTAssertEqualObjects(objs.name, @"Test1");
+    RLMAssertThrowsWithReasonMatching(objs[@"invalidName"], @"Invalid property name");
+    RLMAssertThrowsWithReasonMatching(objs[@"invalidName"] = @0, @"Invalid property name");
 
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     EmployeeObject *obj0 = [EmployeeObject createInRealm:realm withValue:@{@"name" : @"Test1", @"age" : @24, @"hired": @NO}];
     EmployeeObject *obj1 = [EmployeeObject createInRealm:realm withValue:@{@"name" : @"Test2", @"age" : @25, @"hired": @YES}];
     [realm commitWriteTransaction];
-    
-    XCTAssertEqualObjects(obj0[@"name"], @"Test1",  @"Name should be Test1");
-    XCTAssertEqualObjects(obj1[@"name"], @"Test2", @"Name should be Test1");
+
+    RLMAssertThrowsWithReasonMatching(obj0[@"invalidName"], @"Invalid property name");
+    RLMAssertThrowsWithReasonMatching(objs[@"invalidName"] = @0, @"Invalid property name");
+    XCTAssertEqualObjects(obj0[@"name"], @"Test1");
+    XCTAssertEqualObjects(obj1[@"name"], @"Test2");
     
     [realm beginWriteTransaction];
     obj0[@"name"] = @"newName";
     [realm commitWriteTransaction];
     
-    XCTAssertEqualObjects(obj0[@"name"], @"newName",  @"Name should be newName");
+    XCTAssertEqualObjects(obj0[@"name"], @"newName");
 
     [realm beginWriteTransaction];
     obj0[@"name"] = nil;

@@ -220,6 +220,9 @@ class ObjectTests: TestCase {
 
     func setAndTestAllTypes(_ setter: (SwiftObject, Any?, String) -> (),
                             getter: (SwiftObject, String) -> (Any?), object: SwiftObject) {
+        assertThrows(setter(object, 0, "fakeCol"), reason: "Invalid property name")
+        assertThrows(getter(object, "fakeCol"), reason: "Invalid property name")
+
         setter(object, true, "boolCol")
         XCTAssertEqual(getter(object, "boolCol") as! Bool!, true)
 
