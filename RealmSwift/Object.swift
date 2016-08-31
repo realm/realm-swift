@@ -111,7 +111,7 @@ open class Object: RLMObjectBase {
 
     /// The `ObjectSchema` which lists the persisted properties for this object.
     public var objectSchema: ObjectSchema {
-        return ObjectSchema(RLMObjectBaseObjectSchema(self))
+        return ObjectSchema(RLMObjectBaseObjectSchema(self)!)
     }
 
     /// Indicates if an object can no longer be accessed.
@@ -467,7 +467,7 @@ public class Object: RLMObjectBase {
 
     /// The object schema which lists the managed properties for the object.
     public var objectSchema: ObjectSchema {
-        return ObjectSchema(RLMObjectBaseObjectSchema(self))
+        return ObjectSchema(RLMObjectBaseObjectSchema(self)!)
     }
 
     /// Indicates if the object can no longer be accessed because it is now invalid.

@@ -18,6 +18,8 @@
 
 #import <Realm/RLMObjectBase_Dynamic.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
 @public
@@ -33,7 +35,7 @@
                        schema:(RLMObjectSchema *)schema NS_DESIGNATED_INITIALIZER;
 
 // shared schema for this class
-+ (RLMObjectSchema *)sharedSchema;
++ (nullable RLMObjectSchema *)sharedSchema;
 
 // provide injection point for alternative Swift object util class
 + (Class)objectUtilClass:(BOOL)isSwift;
@@ -68,10 +70,10 @@
 @end
 
 // Calls valueForKey: and re-raises NSUndefinedKeyExceptions
-FOUNDATION_EXTERN id RLMValidatedValueForProperty(id object, NSString *key, NSString *className);
+FOUNDATION_EXTERN id _Nullable RLMValidatedValueForProperty(id object, NSString *key, NSString *className);
 
 // Compare two RLObjectBases
-FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2);
+FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase * _Nullable o1, RLMObjectBase * _Nullable o2);
 
 // Get ObjectUil class for objc or swift
 FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
@@ -81,14 +83,16 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 @class RLMProperty, RLMArray;
 @interface RLMObjectUtil : NSObject
 
-+ (NSArray<NSString *> *)ignoredPropertiesForClass:(Class)cls;
-+ (NSArray<NSString *> *)indexedPropertiesForClass:(Class)cls;
-+ (NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)linkingObjectsPropertiesForClass:(Class)cls;
++ (nullable NSArray<NSString *> *)ignoredPropertiesForClass:(Class)cls;
++ (nullable NSArray<NSString *> *)indexedPropertiesForClass:(Class)cls;
++ (nullable NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)linkingObjectsPropertiesForClass:(Class)cls;
 
-+ (NSArray<NSString *> *)getGenericListPropertyNames:(id)obj;
-+ (NSDictionary<NSString *, NSString *> *)getLinkingObjectsProperties:(id)object;
++ (nullable NSArray<NSString *> *)getGenericListPropertyNames:(id)obj;
++ (nullable NSDictionary<NSString *, NSString *> *)getLinkingObjectsProperties:(id)object;
 
-+ (NSDictionary<NSString *, NSNumber *> *)getOptionalProperties:(id)obj;
-+ (NSArray<NSString *> *)requiredPropertiesForClass:(Class)cls;
++ (nullable NSDictionary<NSString *, NSNumber *> *)getOptionalProperties:(id)obj;
++ (nullable NSArray<NSString *> *)requiredPropertiesForClass:(Class)cls;
 
 @end
+
+NS_ASSUME_NONNULL_END

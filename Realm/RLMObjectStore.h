@@ -24,6 +24,8 @@ extern "C" {
 
 @class RLMRealm, RLMSchema, RLMObjectBase, RLMResults, RLMProperty;
 
+NS_ASSUME_NONNULL_BEGIN
+
 //
 // Accessor Creation
 //
@@ -61,13 +63,15 @@ void RLMDeleteObjectFromRealm(RLMObjectBase *object, RLMRealm *realm);
 void RLMDeleteAllObjectsFromRealm(RLMRealm *realm);
 
 // get objects of a given class
-RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) NS_RETURNS_RETAINED;
+RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate * _Nullable predicate)
+NS_RETURNS_RETAINED;
 
 // get an object with the given primary key
-id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) NS_RETURNS_RETAINED;
+id _Nullable RLMGetObject(RLMRealm *realm, NSString *objectClassName, id _Nullable key) NS_RETURNS_RETAINED;
 
 // create object from array or dictionary
-RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, bool createOrUpdate) NS_RETURNS_RETAINED;
+RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id _Nullable value, bool createOrUpdate)
+NS_RETURNS_RETAINED;
     
 
 //
@@ -94,3 +98,5 @@ RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm, RLMClassInfo& info,
 RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm, RLMClassInfo& info,
                                        realm::RowExpr row) NS_RETURNS_RETAINED;
 #endif
+
+NS_ASSUME_NONNULL_END

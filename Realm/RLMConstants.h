@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 // For compatibility with Xcode 7, before extensible string enums were introduced,
 #ifdef NS_EXTENSIBLE_STRING_ENUM
 #define RLM_EXTENSIBLE_STRING_ENUM NS_EXTENSIBLE_STRING_ENUM
@@ -198,3 +200,5 @@ extern NSString * const RLMRealmCoreVersionKey;
 
 /** The corresponding key is the Realm invalidated property name. */
 extern NSString * const RLMInvalidatedKey;
+
+NS_ASSUME_NONNULL_END
