@@ -55,6 +55,3 @@ public typealias PropertyType = RLMPropertyType
  - see: `addNotificationBlock(_:)`
  */
 public typealias NotificationToken = RLMNotificationToken
-
-/// Log level for the synchronization network protocol.
-public typealias SyncLogLevel = RLMSyncLogLevel
