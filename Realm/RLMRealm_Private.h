@@ -35,7 +35,7 @@ void RLMRealmTranslateException(NSError **error);
 @interface RLMRealm ()
 
 @property (nonatomic, readonly) BOOL dynamic;
-@property (nonatomic, readwrite, null_unspecified) RLMSchema *schema;
+@property (nonatomic, readwrite) RLMSchema *schema;
 
 + (void)resetRealmState;
 
