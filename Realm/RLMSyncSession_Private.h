@@ -38,18 +38,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncSession ()
 
+- (void)_refresh;
+- (void)_invalidate;
+
+- (void)setState:(RLMSyncSessionState)state;
+
 /// The path on disk where the Realm file backing this synced Realm is stored.
 @property (nonatomic) NSURL *fileURL;
 
+@property (nullable, nonatomic) RLMRealmBindingPackage *deferredBindingPackage;
 @property (nullable, nonatomic) RLMServerPath resolvedPath;
 
-/// Whether or not the Realm is currently bound to the Realm Object Server. A Realm that was unbound because its
-/// tokens expired can be rebound by calling `-refresh`.
-@property (nonatomic) BOOL isBound;
-
-- (instancetype)initWithFileURL:(NSURL *)fileURL;
-
-@property (nullable, nonatomic) RLMRealmBindingPackage *deferredBindingPackage;
+- (instancetype)initWithFileURL:(NSURL *)fileURL realmURL:(NSURL *)realmURL NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - per-Realm access token API
 
@@ -59,7 +59,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSTimer *refreshTimer;
 
 - (void)configureWithAccessToken:(RLMServerToken)token expiry:(NSTimeInterval)expiry user:(RLMUser *)user;
-- (void)refresh;
 
 NS_ASSUME_NONNULL_END
 

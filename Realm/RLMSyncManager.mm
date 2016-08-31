@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 
+#import "RLMSyncSession_Private.h"
 #import "RLMSyncUtil.h"
 #import "RLMUser_Private.h"
 #import "RLMUtil.hpp"
 
-#import <sync_config.hpp>
-#import <sync_manager.hpp>
+#import "sync_manager.hpp"
 
 using Level = realm::util::Logger::Level;
 
@@ -83,16 +83,10 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     if (self = [super init]) {
         // Create the global error handler.
         auto errorLambda = [=](int error_code, std::string message) {
-            NSString *nativeMessage = @(message.c_str());
-            NSError *error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                                 code:RLMSyncInternalError
-                                             userInfo:@{@"description": nativeMessage,
-                                                        @"error": @(error_code)}];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (self.errorHandler) {
-                    self.errorHandler(error, nil);
-                }
-            });
+            [self _handleErrorWithCode:error_code
+                               message:@(message.c_str())
+                               session:nil
+                            errorClass:realm::SyncSessionError::Debug];
         };
 
         // Create the static login callback. This is called whenever any Realm wishes to BIND to the Realm Object Server
@@ -134,6 +128,51 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 #pragma mark - Private API
 
+- (void)_handleErrorWithCode:(int)errorCode
+                     message:(NSString *)message
+                     session:(RLMSyncSession *)session
+                  errorClass:(realm::SyncSessionError)errorClass {
+    NSError *error;
+
+    switch (errorClass) {
+        case realm::SyncSessionError::UserFatal:
+            // Kill the user.
+            [[session parentUser] _invalidate];
+            error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                        code:RLMSyncClientUserError
+                                    userInfo:@{@"description": message,
+                                               @"error": @(errorCode)}];
+            break;
+        case realm::SyncSessionError::SessionFatal:
+            // Kill the session.
+            [session _invalidate];
+        case realm::SyncSessionError::AccessDenied:
+            error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                        code:RLMSyncClientSessionError
+                                    userInfo:@{@"description": message,
+                                               @"error": @(errorCode)}];
+            break;
+        case realm::SyncSessionError::SessionTokenExpired:
+            // Just attempt to refresh the session. Don't bother the user.
+            [session _refresh];
+            return;
+        case realm::SyncSessionError::Debug:
+            // Report the error. There's nothing the user can do about it, though.
+            error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                        code:RLMSyncClientInternalError
+                                    userInfo:@{@"description": message,
+                                               @"error": @(errorCode)}];
+            break;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!self.errorHandler
+            || (errorClass == realm::SyncSessionError::Debug && self.logLevel >= RLMSyncLogLevelDebug)) {
+            return;
+        }
+        self.errorHandler(error, nil);
+    });
+}
+
 - (void)_handleBindRequestForTag:(NSString *)tag
                           rawURL:(NSString *)urlString
                    localFilePath:(NSString *)filePathString {
@@ -146,14 +185,6 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     [user _registerRealmForBindingWithFileURL:[NSURL fileURLWithPath:filePathString]
                                      realmURL:[NSURL URLWithString:urlString]
                                  onCompletion:nil];
-}
-
-- (void)_fireError:(NSError *)error forSession:(RLMSyncSession *)session {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.errorHandler) {
-            self.errorHandler(error, session);
-        }
-    });
 }
 
 - (NSArray *)_allUsers {

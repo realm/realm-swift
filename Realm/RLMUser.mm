@@ -20,7 +20,7 @@
 
 #import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.h"
 #import "RLMSyncUtil_Private.h"
 #import "RLMTokenModels.h"
@@ -109,6 +109,15 @@
 
 #pragma mark - Private API
 
+- (void)_invalidate {
+    // TODO: implement this properly. This depends on some other, unrelated work.
+    self.isAnonymous = YES;
+}
+
+- (void)_deregisterSessionWithRealmURL:(NSURL *)realmURL {
+    [self.sessionsStorage removeObjectForKey:realmURL];
+}
+
 + (void)_performLogInForUser:(RLMUser *)user
                   credential:(RLMCredential *)credential
                      actions:(RLMAuthenticationActions)actions
@@ -179,9 +188,9 @@
 - (void)_bindAllDeferredRealms {
     NSAssert(!self.isAnonymous, @"Logic error: _bindAllDeferredRealms can't be called unless the User is logged in.");
     for (NSURL *key in self.sessionsStorage) {
-        RLMSyncSession *info = self.sessionsStorage[key];
-        RLMRealmBindingPackage *package = info.deferredBindingPackage;
-        if (!info.isBound && package) {
+        RLMSyncSession *session = self.sessionsStorage[key];
+        RLMRealmBindingPackage *package = session.deferredBindingPackage;
+        if (session.state == RLMSyncSessionStateUnbound && package) {
             [self _bindRealmWithLocalFileURL:package.fileURL realmURL:package.realmURL onCompletion:package.block];
         }
     }
@@ -219,16 +228,16 @@
 
                 // Register the Realm as being linked to this User.
                 RLMServerPath resolvedPath = tokenModel.tokenData.path;
-                RLMSyncSession *info = [self.sessionsStorage objectForKey:realmURL];
-                info.resolvedPath = resolvedPath;
-                NSAssert(info,
-                         @"Could not get a session info object for the path '%@', this is an error",
+                RLMSyncSession *session = [self.sessionsStorage objectForKey:realmURL];
+                session.resolvedPath = resolvedPath;
+                NSAssert(session,
+                         @"Could not get a sync session object for the path '%@', this is an error",
                          unresolvedPath);
 
-                [info configureWithAccessToken:accessToken expiry:tokenModel.tokenData.expires user:self];
+                [session configureWithAccessToken:accessToken expiry:tokenModel.tokenData.expires user:self];
 
                 // Bind the Realm
-                 NSURLComponents *urlBuffer = [NSURLComponents componentsWithURL:realmURL resolvingAgainstBaseURL:YES];
+                NSURLComponents *urlBuffer = [NSURLComponents componentsWithURL:realmURL resolvingAgainstBaseURL:YES];
                 urlBuffer.path = resolvedPath;
                 NSURL *resolvedURL = [urlBuffer URL];
                 if (!resolvedURL) {
@@ -238,17 +247,16 @@
                 bool success = realm::Realm::refresh_sync_access_token([accessToken UTF8String],
                                                                        RLMStringDataWithNSString([fileURL path]),
                                                                        resolved_realm_url);
-                info.isBound = success;
-                info.deferredBindingPackage = nil;
-                // TODO (az-ros): What to do about failed bindings? How can the user manually retry?
+                session.deferredBindingPackage = nil;
+                if (success) {
+                    [session setState:RLMSyncSessionStateActive];
+                } else {
+                    [session _invalidate];
+                }
                 if (completion) {
-                    if (success) {
-                        completion(nil);
-                    } else {
-                        completion([NSError errorWithDomain:RLMSyncErrorDomain
-                                                       code:RLMSyncInternalError
-                                                   userInfo:nil]);
-                    }
+                    completion(success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
+                                                                   code:RLMSyncClientSessionError
+                                                               userInfo:nil]);
                 }
             }
         } else {
@@ -271,9 +279,8 @@
         return;
     }
 
-    RLMSyncSession *info = [[RLMSyncSession alloc] initWithFileURL:fileURL];
-    self.sessionsStorage[realmURL] = info;
-    info.isBound = NO;
+    RLMSyncSession *session = [[RLMSyncSession alloc] initWithFileURL:fileURL realmURL:realmURL];
+    self.sessionsStorage[realmURL] = session;
 
     if (self.directAccessToken) {
         // Special case for when the access token is provided by the host app.
@@ -281,27 +288,27 @@
         bool success = realm::Realm::refresh_sync_access_token(std::string([self.directAccessToken UTF8String]),
                                                                RLMStringDataWithNSString([fileURL path]),
                                                                realm_url);
-        [info configureWithAccessToken:self.directAccessToken
-                                expiry:[[NSDate distantFuture] timeIntervalSince1970]
-                                  user:self];
-        info.isBound = success;
+        [session configureWithAccessToken:self.directAccessToken
+                                   expiry:[[NSDate distantFuture] timeIntervalSince1970]
+                                     user:self];
+        if (success) {
+            [session setState:RLMSyncSessionStateActive];
+        } else {
+            [session _invalidate];
+        }
         if (completion) {
-            if (success) {
-                completion(nil);
-            } else {
-                completion([NSError errorWithDomain:RLMSyncErrorDomain
-                                               code:RLMSyncInternalError
-                                           userInfo:nil]);
-            }
+            completion(success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
+                                                           code:RLMSyncClientSessionError
+                                                       userInfo:nil]);
         }
         return;
     }
 
     if (self.isAnonymous) {
         // We will delay the path resolution/access token handshake until the user logs in
-        info.deferredBindingPackage = [[RLMRealmBindingPackage alloc] initWithFileURL:fileURL
-                                                                             realmURL:realmURL
-                                                                                block:completion];
+        session.deferredBindingPackage = [[RLMRealmBindingPackage alloc] initWithFileURL:fileURL
+                                                                                realmURL:realmURL
+                                                                                   block:completion];
     } else {
         // User is logged in, start the handshake immediately.
         [self _bindRealmWithLocalFileURL:fileURL realmURL:realmURL onCompletion:completion];
