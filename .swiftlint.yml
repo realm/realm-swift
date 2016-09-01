@@ -1,7 +1,6 @@
 included:
-  - RealmSwift-swift2.2
+  - RealmSwift
   - Realm/Swift
-line_length: 120
 variable_name:
   min_length: # not possible to disable this partial rule, so set it to zero
     warning: 0
@@ -13,3 +12,4 @@ disabled_rules:
   - function_body_length
   - todo
   - type_body_length
+  - line_length
