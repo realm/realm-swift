@@ -42,7 +42,11 @@ car2.year = 1981
 // people
 let wife = Person()
 wife.name = "Jennifer"
+#if swift(>=3.0)
+wife.cars.append(objectsIn: [car1, car2])
+#else
 wife.cars.appendContentsOf([car1, car2])
+#endif
 wife.age = 47
 
 let husband = Person(value: [
@@ -63,9 +67,15 @@ try! realm.write {
 
 let favorites = ["Jennifer"]
 
+#if swift(>=3.0)
+let favoritePeopleWithSpousesAndCars = realm.allObjects(ofType: Person.self)
+    .filter(using: "cars.@count > 1 && spouse != nil && name IN %@", favorites)
+    .sorted(onProperty: "age")
+#else
 let favoritePeopleWithSpousesAndCars = realm.objects(Person.self)
     .filter("cars.@count > 1 && spouse != nil && name IN %@", favorites)
     .sorted("age")
+#endif
 
 for person in favoritePeopleWithSpousesAndCars {
     person.name
@@ -88,8 +98,16 @@ for person in favoritePeopleWithSpousesAndCars {
 //: VII. Delete objects
 
 try! realm.write {
+    #if swift(>=3.0)
+    realm.deleteAllObjects()
+    #else
     realm.deleteAll()
+    #endif
 }
 
+#if swift(>=3.0)
+realm.allObjects(ofType: Person.self).count
+#else
 realm.objects(Person.self).count
+#endif
 //: Thanks! To learn more about Realm go to https://realm.io
