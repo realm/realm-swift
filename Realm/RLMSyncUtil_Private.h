@@ -23,9 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class NSURL;
 
-/// An enum value that allows a Realm to be directly opened with a token.
-extern RLMIdentityProvider const RLMIdentityProviderDirectToken;
-
 extern NSString *const kRLMSyncProviderKey;
 extern NSString *const kRLMSyncDataKey;
 extern NSString *const kRLMSyncAppIDKey;

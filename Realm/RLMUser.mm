@@ -68,7 +68,7 @@
     RLMUser *user = [[RLMUser alloc] initWithAuthServer:nil];
     user.directAccessToken = accessToken;
     user.isAnonymous = NO;
-    user.identity = identity;
+    user.identity = identity ?: [[NSUUID UUID] UUIDString];
     return user;
 }
 
@@ -123,17 +123,6 @@
             completion(user, error);
         });
     };
-
-    // Check to see if credential is "direct token" credential. If so, no server communication is required.
-    if (credential.provider == RLMIdentityProviderDirectToken) {
-        user.identity = [[NSUUID UUID] UUIDString];
-        [[RLMSyncManager sharedManager] _registerUser:user];
-        user.directAccessToken = credential.token;
-        user.isAnonymous = NO;
-        [user _bindAllDeferredRealms];
-        theBlock(user, nil);
-        return;
-    }
 
     // Prepare login network request
     NSMutableDictionary *json = [@{
