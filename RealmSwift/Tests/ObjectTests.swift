@@ -218,11 +218,16 @@ class ObjectTests: TestCase {
         }
     }
 
-    func setAndTestAllTypes(_ setter: (SwiftObject, Any?, String) -> (),
-                            getter: (SwiftObject, String) -> (Any?), object: SwiftObject) {
-        assertThrows(setter(object, 0, "fakeCol"), reason: "Invalid property name")
-        assertThrows(getter(object, "fakeCol"), reason: "Invalid property name")
 
+    func setAndTestFakeColumn(setter: (SwiftObject, Any?, String) -> (),
+                              getter: (SwiftObject, String) -> (Any?), object: SwiftObject,
+                              failureReason reason: String) {
+        assertThrows(setter(object, 0, "fakeCol"), reason: reason)
+        assertThrows(getter(object, "fakeCol"), reason: reason)
+    }
+
+    func setAndTestAllTypes(setter: (SwiftObject, Any?, String) -> (),
+                            getter: (SwiftObject, String) -> (Any?), object: SwiftObject) {
         setter(object, true, "boolCol")
         XCTAssertEqual(getter(object, "boolCol") as! Bool!, true)
 
@@ -345,10 +350,14 @@ class ObjectTests: TestCase {
             self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 
-        setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
+        setAndTestAllTypes(setter: setter, getter: getter, object: SwiftObject())
+        setAndTestFakeColumn(setter: setter, getter: getter, object: SwiftObject(),
+                             failureReason: "not key value coding-compliant for the key")
         try! Realm().write {
             let persistedObject = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: [:])
-            self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
+            setAndTestAllTypes(setter: setter, getter: getter, object: persistedObject)
+            setAndTestFakeColumn(setter: setter, getter: getter, object: SwiftObject(),
+                                 failureReason: "not key value coding-compliant for the key")
         }
     }
 
@@ -366,10 +375,14 @@ class ObjectTests: TestCase {
             self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 
-        setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
+        setAndTestAllTypes(setter: setter, getter: getter, object: SwiftObject())
+        setAndTestFakeColumn(setter: setter, getter: getter, object: SwiftObject(),
+                             failureReason: "Invalid property name")
         try! Realm().write {
             let persistedObject = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: [:])
-            self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
+            setAndTestAllTypes(setter: setter, getter: getter, object: persistedObject)
+            setAndTestFakeColumn(setter: setter, getter: getter, object: SwiftObject(),
+                                 failureReason: "Invalid property name")
         }
     }
 
