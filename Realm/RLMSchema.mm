@@ -58,6 +58,14 @@ static enum class SharedSchemaState {
     realm::Schema _objectStoreSchema;
 }
 
+void RLMUnsafeResetSchema() {
+    @synchronized(s_localNameToClass) {
+        s_sharedSchema = [[RLMSchema alloc] init];
+        s_localNameToClass = [[NSMutableDictionary alloc] init];
+        s_privateObjectSubclasses = [[NSMutableDictionary alloc] init];
+    }
+}
+
 // Caller must @synchronize on s_localNameToClass
 static RLMObjectSchema *RLMRegisterClass(Class cls) {
     if (RLMObjectSchema *schema = s_privateObjectSubclasses[[cls className]]) {
@@ -140,11 +148,18 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 }
 
 - (RLMObjectSchema *)schemaForClassName:(NSString *)className {
-    return _objectSchemaByName[className];
+    if (RLMObjectSchema *schema = _objectSchemaByName[className]) {
+        return schema; // fast path for already-initialized schemas
+    } else if (Class cls = NSClassFromString(className)) {
+        [cls sharedSchema];                    // initialize the schema
+        return _objectSchemaByName[className]; // try again
+    } else {
+        return nil;
+    }
 }
 
 - (RLMObjectSchema *)objectForKeyedSubscript:(__unsafe_unretained NSString *const)className {
-    RLMObjectSchema *schema = _objectSchemaByName[className];
+    RLMObjectSchema *schema = [self schemaForClassName:className];
     if (!schema) {
         @throw RLMException(@"Object type '%@' not managed by the Realm", className);
     }

@@ -51,4 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+// Used in `PreinitializationTests` to reset the schema before each test case
+void RLMUnsafeResetSchema();
+
 NS_ASSUME_NONNULL_END
