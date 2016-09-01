@@ -65,6 +65,8 @@ static BOOL isValidRealmURL(NSURL *url) {
 - (void)setSyncConfiguration:(RLMSyncConfiguration *)syncConfiguration {
     RLMUser *user = syncConfiguration.user;
     NSURL *realmURL = syncConfiguration.realmURL;
+    // Ensure sync manager is initialized, if it hasn't already been.
+    [RLMSyncManager sharedManager];
     NSAssert(user.identity, @"Cannot call this method on a user that doesn't have an identity.");
     std::string identity = [user.identity UTF8String];
     std::string rawURLString = [[realmURL absoluteString] UTF8String];
