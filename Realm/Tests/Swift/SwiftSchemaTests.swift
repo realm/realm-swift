@@ -242,6 +242,16 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         let _ = SwiftCompanyObject()
     }
 
+    func testCreateUnmanagedObjectWhichCreatesAnotherClassViaInitWithValueDuringSchemaInit() {
+        if isParent {
+            XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
+            return
+        }
+        
+        let _ = InitLinkedToClass(value: [[0]])
+        let _ = SwiftCompanyObject(value: [[["Jaden", 20, false]]])
+    }
+
     func testInitUnmanagedObjectNotInClassSubsetDuringSchemaInit() {
         if isParent {
             XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
