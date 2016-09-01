@@ -66,7 +66,7 @@ internal func dynamicBridgeCast<T>(fromSwift x: T) -> Any {
 }
 
 // Used for conversion from Objective-C types to Swift types
-internal protocol CustomObjectiveCBridgeable  {
+internal protocol CustomObjectiveCBridgeable {
     /* FIXME: Remove protocol once SR-2393 bridges all integer types to `NSNumber`
      *        At this point, use `as! [SwiftType]` to cast between. */
     static func bridging(objCValue: Any) -> Self
@@ -144,7 +144,7 @@ internal func dynamicBridgeCast<T>(fromSwift x: T) -> AnyObject {
 }
 
 // Used for conversion from Objective-C types to Swift types
-internal protocol CustomObjectiveCBridgeable  {
+internal protocol CustomObjectiveCBridgeable {
     /* FIXME: Remove protocol once SR-2393 bridges all integer types to `NSNumber`
      *        At this point, use `as! [SwiftType]` to cast between. */
     static func bridging(objCValue objCValue: AnyObject) -> Self
