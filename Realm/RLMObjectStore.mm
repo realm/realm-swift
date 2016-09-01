@@ -145,25 +145,19 @@ static NSUInteger getRowForObjectWithPrimaryKey(RLMClassInfo const& info, id pri
     RLMProperty *const primaryProperty = info.propertyForPrimaryKey();
     const NSUInteger primaryPropertyColumn = info.tableColumn(primaryProperty);
 
-    try {
-        switch (primaryProperty.type) {
-            case RLMPropertyTypeString:
-                return info.table()->find_first_string(primaryPropertyColumn, RLMStringDataWithNSString(primaryValue));
+    switch (primaryProperty.type) {
+        case RLMPropertyTypeString:
+            return info.table()->find_first_string(primaryPropertyColumn, RLMStringDataWithNSString(primaryValue));
 
-            case RLMPropertyTypeInt:
-                if (primaryValue) {
-                    return info.table()->find_first_int(primaryPropertyColumn, [primaryValue longLongValue]);
-                } else {
-                    return info.table()->find_first_null(primaryPropertyColumn);
-                }
+        case RLMPropertyTypeInt:
+            if (primaryValue) {
+                return info.table()->find_first_int(primaryPropertyColumn, [primaryValue longLongValue]);
+            } else {
+                return info.table()->find_first_null(primaryPropertyColumn);
+            }
 
-            default:
-                REALM_UNREACHABLE();
-        }
-
-    }
-    catch (std::exception const& e) {
-        @throw RLMException(e);
+        default:
+            REALM_UNREACHABLE();
     }
 }
 
@@ -189,28 +183,23 @@ static NSUInteger createRowForObjectWithPrimaryKey(RLMClassInfo const& info, id 
     validateValueForProperty(primaryValue, primaryProperty);
     primaryValue = RLMCoerceToNil(primaryValue);
 
-    try {
-        switch (primaryProperty.type) {
-            case RLMPropertyTypeString:
-                REALM_ASSERT_DEBUG(!primaryValue || [primaryValue isKindOfClass:NSString.class]);
-                row.set_string_unique(primaryColumnIndex, RLMStringDataWithNSString(primaryValue));
-                break;
+    switch (primaryProperty.type) {
+        case RLMPropertyTypeString:
+            REALM_ASSERT_DEBUG(!primaryValue || [primaryValue isKindOfClass:NSString.class]);
+            row.set_string_unique(primaryColumnIndex, RLMStringDataWithNSString(primaryValue));
+            break;
 
-            case RLMPropertyTypeInt:
-                if (primaryValue) {
-                    REALM_ASSERT_DEBUG([primaryValue isKindOfClass:NSNumber.class]);
-                    row.set_int_unique(primaryColumnIndex, [primaryValue longLongValue]);
-                } else {
-                    row.set_null(primaryColumnIndex); // FIXME: Use `set_null_unique` once Core supports it
-                }
-                break;
-                
-            default:
-                REALM_UNREACHABLE();
-        }
-    }
-    catch (std::exception const& e) {
-        @throw RLMException(e);
+        case RLMPropertyTypeInt:
+            if (primaryValue) {
+                REALM_ASSERT_DEBUG([primaryValue isKindOfClass:NSNumber.class]);
+                row.set_int_unique(primaryColumnIndex, [primaryValue longLongValue]);
+            } else {
+                row.set_null(primaryColumnIndex); // FIXME: Use `set_null_unique` once Core supports it
+            }
+            break;
+            
+        default:
+            REALM_UNREACHABLE();
     }
     return rowIndex;
 }
