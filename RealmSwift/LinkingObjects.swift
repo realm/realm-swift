@@ -122,7 +122,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The index of the given object, or `nil` if the object is not present.
      */
     public func index(of object: T) -> Int? {
-        return notFoundToNil(index: rlmResults.index(of: unsafeBitCast(object, to: RLMObject.self)))
+        return notFoundToNil(index: rlmResults.index(of: object.unsafeCastToRLMObject()))
     }
 
     /**
@@ -563,7 +563,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter object: The object whose index is being queried.
      */
     public func indexOf(object: T) -> Int? {
-        return notFoundToNil(rlmResults.indexOfObject(unsafeBitCast(object, RLMObject.self)))
+        return notFoundToNil(rlmResults.indexOfObject(object.unsafeCastToRLMObject()))
     }
 
     /**

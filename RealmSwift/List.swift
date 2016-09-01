@@ -88,7 +88,7 @@ public final class List<T: Object>: ListBase {
     - returns: The index of the given object, or `nil` if the object is not in the List.
     */
     public func index(of object: T) -> Int? {
-        return notFoundToNil(index: _rlmArray.index(of: unsafeBitCast(object, to: RLMObject.self)))
+        return notFoundToNil(index: _rlmArray.index(of: object.unsafeCastToRLMObject()))
     }
 
     /**
@@ -135,7 +135,7 @@ public final class List<T: Object>: ListBase {
         }
         set {
             throwForNegativeIndex(position)
-            _rlmArray.replaceObject(at: UInt(position), with: unsafeBitCast(newValue, to: RLMObject.self))
+            _rlmArray.replaceObject(at: UInt(position), with: newValue.unsafeCastToRLMObject())
         }
     }
 
@@ -297,7 +297,7 @@ public final class List<T: Object>: ListBase {
     - parameter object: An object.
     */
     public func append(_ object: T) {
-        _rlmArray.add(unsafeBitCast(object, to: RLMObject.self))
+        _rlmArray.add(object.unsafeCastToRLMObject())
     }
 
     /**
@@ -309,7 +309,7 @@ public final class List<T: Object>: ListBase {
     */
     public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == T {
         for obj in objects {
-            _rlmArray.add(unsafeBitCast(obj, to: RLMObject.self))
+            _rlmArray.add(obj.unsafeCastToRLMObject())
         }
     }
 
@@ -325,7 +325,7 @@ public final class List<T: Object>: ListBase {
     */
     public func insert(_ object: T, at index: Int) {
         throwForNegativeIndex(index)
-        _rlmArray.insert(unsafeBitCast(object, to: RLMObject.self), at: UInt(index))
+        _rlmArray.insert(object.unsafeCastToRLMObject(), at: UInt(index))
     }
 
     /**
@@ -372,7 +372,7 @@ public final class List<T: Object>: ListBase {
     */
     public func replace(index: Int, object: T) {
         throwForNegativeIndex(index)
-        _rlmArray.replaceObject(at: UInt(index), with: unsafeBitCast(object, to: RLMObject.self))
+        _rlmArray.replaceObject(at: UInt(index), with: object.unsafeCastToRLMObject())
     }
 
     /**
@@ -642,7 +642,7 @@ public final class List<T: Object>: ListBase {
      - parameter object: An object to find.
      */
     public func indexOf(object: T) -> Int? {
-        return notFoundToNil(_rlmArray.indexOfObject(unsafeBitCast(object, RLMObject.self)))
+        return notFoundToNil(_rlmArray.indexOfObject(object.unsafeCastToRLMObject()))
     }
 
     /**
@@ -681,7 +681,7 @@ public final class List<T: Object>: ListBase {
         }
         set {
             throwForNegativeIndex(index)
-            return _rlmArray[UInt(index)] = unsafeBitCast(newValue, RLMObject.self)
+            return _rlmArray[UInt(index)] = newValue.unsafeCastToRLMObject()
         }
     }
 
@@ -844,7 +844,7 @@ public final class List<T: Object>: ListBase {
      - parameter object: An object.
      */
     public func append(object: T) {
-        _rlmArray.addObject(unsafeBitCast(object, RLMObject.self))
+        _rlmArray.addObject(object.unsafeCastToRLMObject())
     }
 
     /**
@@ -856,7 +856,7 @@ public final class List<T: Object>: ListBase {
     */
     public func appendContentsOf<S: SequenceType where S.Generator.Element == T>(objects: S) {
         for obj in objects {
-            _rlmArray.addObject(unsafeBitCast(obj, RLMObject.self))
+            _rlmArray.addObject(obj.unsafeCastToRLMObject())
         }
     }
 
@@ -872,7 +872,7 @@ public final class List<T: Object>: ListBase {
      */
     public func insert(object: T, atIndex index: Int) {
         throwForNegativeIndex(index)
-        _rlmArray.insertObject(unsafeBitCast(object, RLMObject.self), atIndex: UInt(index))
+        _rlmArray.insertObject(object.unsafeCastToRLMObject(), atIndex: UInt(index))
     }
 
     /**
@@ -919,7 +919,7 @@ public final class List<T: Object>: ListBase {
      */
     public func replace(index: Int, object: T) {
         throwForNegativeIndex(index)
-        _rlmArray.replaceObjectAtIndex(UInt(index), withObject: unsafeBitCast(object, RLMObject.self))
+        _rlmArray.replaceObjectAtIndex(UInt(index), withObject: object.unsafeCastToRLMObject())
     }
 
     /**

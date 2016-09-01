@@ -125,7 +125,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: The index of the given object, or `nil` if the object is not in the results.
     */
     public func index(of object: T) -> Int? {
-        return notFoundToNil(index: rlmResults.index(of: unsafeBitCast(object, to: RLMObject.self)))
+        return notFoundToNil(index: rlmResults.index(of: object.unsafeCastToRLMObject()))
     }
 
     /**
@@ -577,7 +577,7 @@ public final class Results<T: Object>: ResultsBase {
      - parameter object: An object.
      */
     public func indexOf(object: T) -> Int? {
-        return notFoundToNil(rlmResults.indexOfObject(unsafeBitCast(object, RLMObject.self)))
+        return notFoundToNil(rlmResults.indexOfObject(object.unsafeCastToRLMObject()))
     }
 
     /**
