@@ -50,7 +50,7 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
 extension Object {
     // Must *only* be used to call Realm Objective-C APIs that are exposed on `RLMObject`
     // but actually operate on `RLMObjectBase`. Do not expose cast value to user.
-    internal func unsafeAsObjectiveCAccessor() -> RLMObject {
+    internal func unsafeCastToRLMObject() -> RLMObject {
         return unsafeBitCast(self, to: RLMObject.self)
     }
 }
@@ -136,7 +136,7 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
 extension Object {
     // Must *only* be used to call Realm Objective-C APIs that are exposed on `RLMObject`
     // but actually operate on `RLMObjectBase`. Do not expose cast value to user.
-    internal func unsafeAsObjectiveCAccessor() -> RLMObject {
+    internal func unsafeCastToRLMObject() -> RLMObject {
         return unsafeBitCast(self, RLMObject.self)
     }
 }

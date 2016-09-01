@@ -88,7 +88,7 @@ public final class List<T: Object>: ListBase {
     - returns: The index of the given object, or `nil` if the object is not in the List.
     */
     public func index(of object: T) -> Int? {
-        return notFoundToNil(index: _rlmArray.index(of: object.unsafeAsObjectiveCAccessor()))
+        return notFoundToNil(index: _rlmArray.index(of: object.unsafeCastToRLMObject()))
     }
 
     /**
@@ -135,7 +135,7 @@ public final class List<T: Object>: ListBase {
         }
         set {
             throwForNegativeIndex(position)
-            _rlmArray.replaceObject(at: UInt(position), with: newValue.unsafeAsObjectiveCAccessor())
+            _rlmArray.replaceObject(at: UInt(position), with: newValue.unsafeCastToRLMObject())
         }
     }
 
@@ -297,7 +297,7 @@ public final class List<T: Object>: ListBase {
     - parameter object: An object.
     */
     public func append(_ object: T) {
-        _rlmArray.add(object.unsafeAsObjectiveCAccessor())
+        _rlmArray.add(object.unsafeCastToRLMObject())
     }
 
     /**
@@ -309,7 +309,7 @@ public final class List<T: Object>: ListBase {
     */
     public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == T {
         for obj in objects {
-            _rlmArray.add(obj.unsafeAsObjectiveCAccessor())
+            _rlmArray.add(obj.unsafeCastToRLMObject())
         }
     }
 
@@ -325,7 +325,7 @@ public final class List<T: Object>: ListBase {
     */
     public func insert(_ object: T, at index: Int) {
         throwForNegativeIndex(index)
-        _rlmArray.insert(object.unsafeAsObjectiveCAccessor(), at: UInt(index))
+        _rlmArray.insert(object.unsafeCastToRLMObject(), at: UInt(index))
     }
 
     /**
@@ -372,7 +372,7 @@ public final class List<T: Object>: ListBase {
     */
     public func replace(index: Int, object: T) {
         throwForNegativeIndex(index)
-        _rlmArray.replaceObject(at: UInt(index), with: object.unsafeAsObjectiveCAccessor())
+        _rlmArray.replaceObject(at: UInt(index), with: object.unsafeCastToRLMObject())
     }
 
     /**
@@ -642,7 +642,7 @@ public final class List<T: Object>: ListBase {
      - parameter object: An object to find.
      */
     public func indexOf(object: T) -> Int? {
-        return notFoundToNil(_rlmArray.indexOfObject(object.unsafeAsObjectiveCAccessor()))
+        return notFoundToNil(_rlmArray.indexOfObject(object.unsafeCastToRLMObject()))
     }
 
     /**
@@ -681,7 +681,7 @@ public final class List<T: Object>: ListBase {
         }
         set {
             throwForNegativeIndex(index)
-            return _rlmArray[UInt(index)] = newValue.unsafeAsObjectiveCAccessor()
+            return _rlmArray[UInt(index)] = newValue.unsafeCastToRLMObject()
         }
     }
 
@@ -844,7 +844,7 @@ public final class List<T: Object>: ListBase {
      - parameter object: An object.
      */
     public func append(object: T) {
-        _rlmArray.addObject(object.unsafeAsObjectiveCAccessor())
+        _rlmArray.addObject(object.unsafeCastToRLMObject())
     }
 
     /**
@@ -856,7 +856,7 @@ public final class List<T: Object>: ListBase {
     */
     public func appendContentsOf<S: SequenceType where S.Generator.Element == T>(objects: S) {
         for obj in objects {
-            _rlmArray.addObject(obj.unsafeAsObjectiveCAccessor())
+            _rlmArray.addObject(obj.unsafeCastToRLMObject())
         }
     }
 
@@ -872,7 +872,7 @@ public final class List<T: Object>: ListBase {
      */
     public func insert(object: T, atIndex index: Int) {
         throwForNegativeIndex(index)
-        _rlmArray.insertObject(object.unsafeAsObjectiveCAccessor(), atIndex: UInt(index))
+        _rlmArray.insertObject(object.unsafeCastToRLMObject(), atIndex: UInt(index))
     }
 
     /**
@@ -919,7 +919,7 @@ public final class List<T: Object>: ListBase {
      */
     public func replace(index: Int, object: T) {
         throwForNegativeIndex(index)
-        _rlmArray.replaceObjectAtIndex(UInt(index), withObject: object.unsafeAsObjectiveCAccessor())
+        _rlmArray.replaceObjectAtIndex(UInt(index), withObject: object.unsafeCastToRLMObject())
     }
 
     /**
