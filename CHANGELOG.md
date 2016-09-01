@@ -24,6 +24,8 @@ x.x.x Release notes (yyyy-MM-dd)
   deallocated on a different thread than it was created on.
 * Fix a crash when the last reference to an observed object is released from
   within the observation.
+* Fix a crash when `initWithValue:` is used to create a nested object for a class
+  with an uninitialized schema.
 
 1.0.2 Release notes (2016-07-13)
 =============================================================
