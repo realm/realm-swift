@@ -36,12 +36,12 @@ static const NSString *const kRLMSyncExpiresKey         = @"expires";
 
 @implementation RLMTokenDataModel
 
-- (instancetype)initWithJSON:(NSDictionary *)json {
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary {
     if (self = [super init]) {
-        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMSyncIdentityKey, identity);
-        RLMSERVER_PARSE_OPTIONAL_STRING(json, kRLMSyncAppIDKey, appID);
-        RLMSERVER_PARSE_OPTIONAL_STRING(json, kRLMSyncPathKey, path);
-        RLMSERVER_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, expires);
+        RLMSERVER_PARSE_STRING_OR_ABORT(jsonDictionary, kRLMSyncIdentityKey, identity);
+        RLMSERVER_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncAppIDKey, appID);
+        RLMSERVER_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncPathKey, path);
+        RLMSERVER_PARSE_DOUBLE_OR_ABORT(jsonDictionary, kRLMSyncExpiresKey, expires);
         return self;
     }
     return nil;
@@ -59,11 +59,11 @@ static const NSString *const kRLMSyncExpiresKey         = @"expires";
 
 @implementation RLMTokenModel
 
-- (instancetype)initWithJSON:(NSDictionary *)json {
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary {
     if (self = [super init]) {
-        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, token);
-        RLMSERVER_PARSE_OPTIONAL_STRING(json, kRLMSyncPathKey, path);
-        RLMSERVER_PARSE_MODEL_OR_ABORT(json, kRLMSyncTokenDataKey, RLMTokenDataModel, tokenData);
+        RLMSERVER_PARSE_STRING_OR_ABORT(jsonDictionary, kRLMSyncTokenKey, token);
+        RLMSERVER_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncPathKey, path);
+        RLMSERVER_PARSE_MODEL_OR_ABORT(jsonDictionary, kRLMSyncTokenDataKey, RLMTokenDataModel, tokenData);
         return self;
     }
     return nil;

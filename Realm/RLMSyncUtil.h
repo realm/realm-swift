@@ -51,6 +51,6 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
 
 NS_ASSUME_NONNULL_END
 
-#define RLMSYNC_UNINITIALIZABLE \
+#define RLM_SYNC_UNINITIALIZABLE \
 - (instancetype)init NS_UNAVAILABLE; \
 + (instancetype)new NS_UNAVAILABLE;

@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
  A user may have one or more credentials associated with it. These credentials uniquely identify the user to a
  third-party auth provider, and are used to sign into a Realm Object Server user account.
  */
-@interface RLMUser : NSObject RLMSYNC_UNINITIALIZABLE
+@interface RLMUser : NSObject RLM_SYNC_UNINITIALIZABLE
 
 + (NSArray<RLMUser *> *)all;
 

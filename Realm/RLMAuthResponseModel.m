@@ -33,21 +33,21 @@ static const NSString *const kRLMSyncRefreshTokenKey = @"refresh_token";
 
 @implementation RLMAuthResponseModel
 
-- (instancetype)initWithJSON:(NSDictionary *)json
-          requireAccessToken:(BOOL)requireAccessToken
-         requireRefreshToken:(BOOL)requireRefreshToken {
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary
+                requireAccessToken:(BOOL)requireAccessToken
+               requireRefreshToken:(BOOL)requireRefreshToken {
     if (self = [super init]) {
         // Get the access token.
         if (requireAccessToken) {
-            RLMSERVER_PARSE_MODEL_OR_ABORT(json, kRLMSyncAccessTokenKey, RLMTokenModel, accessToken);
+            RLMSERVER_PARSE_MODEL_OR_ABORT(jsonDictionary, kRLMSyncAccessTokenKey, RLMTokenModel, accessToken);
         } else {
-            RLMSERVER_PARSE_OPTIONAL_MODEL(json, kRLMSyncAccessTokenKey, RLMTokenModel, accessToken);
+            RLMSERVER_PARSE_OPTIONAL_MODEL(jsonDictionary, kRLMSyncAccessTokenKey, RLMTokenModel, accessToken);
         }
         // Get the refresh token.
         if (requireRefreshToken) {
-            RLMSERVER_PARSE_MODEL_OR_ABORT(json, kRLMSyncRefreshTokenKey, RLMTokenModel, refreshToken);
+            RLMSERVER_PARSE_MODEL_OR_ABORT(jsonDictionary, kRLMSyncRefreshTokenKey, RLMTokenModel, refreshToken);
         } else {
-            RLMSERVER_PARSE_OPTIONAL_MODEL(json, kRLMSyncRefreshTokenKey, RLMTokenModel, refreshToken);
+            RLMSERVER_PARSE_OPTIONAL_MODEL(jsonDictionary, kRLMSyncRefreshTokenKey, RLMTokenModel, refreshToken);
         }
         return self;
     }

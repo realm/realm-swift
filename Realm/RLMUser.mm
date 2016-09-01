@@ -144,9 +144,9 @@
 
     RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
-            RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithJSON:json
-                                                                  requireAccessToken:NO
-                                                                 requireRefreshToken:YES];
+            RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithDictionary:json
+                                                                        requireAccessToken:NO
+                                                                       requireRefreshToken:YES];
             if (!model) {
                 // Malformed JSON
                 error = [NSError errorWithDomain:RLMSyncErrorDomain
@@ -201,9 +201,9 @@
 
     RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
-            RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithJSON:json
-                                                                  requireAccessToken:YES
-                                                                 requireRefreshToken:NO];
+            RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithDictionary:json
+                                                                        requireAccessToken:YES
+                                                                       requireRefreshToken:NO];
             if (!model) {
                 // Malformed JSON
                 error = [NSError errorWithDomain:RLMSyncErrorDomain

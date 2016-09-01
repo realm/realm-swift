@@ -24,17 +24,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMTokenDataModel;
 
-@interface RLMTokenModel : NSObject RLMSYNC_UNINITIALIZABLE
+@interface RLMTokenModel : NSObject RLM_SYNC_UNINITIALIZABLE
 
 @property (nonatomic, readonly) NSString *token;
 @property (nonatomic, nullable, readonly) NSString *path;
 @property (nonatomic, readonly) RLMTokenDataModel *tokenData;
 
-- (instancetype)initWithJSON:(NSDictionary *)json;
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
 
 @end
 
-@interface RLMTokenDataModel : NSObject RLMSYNC_UNINITIALIZABLE
+@interface RLMTokenDataModel : NSObject RLM_SYNC_UNINITIALIZABLE
 
 @property (nonatomic, readonly) NSString *identity;
 @property (nonatomic, nullable, readonly) NSString *appID;
@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSTimeInterval expires;
 //@property (nonatomic, readonly) NSArray *access;
 
-- (instancetype)initWithJSON:(NSDictionary *)json;
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
 
 @end
 

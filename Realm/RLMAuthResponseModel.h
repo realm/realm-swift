@@ -34,14 +34,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMAuthResponseModel : NSObject RLMSYNC_UNINITIALIZABLE
+@interface RLMAuthResponseModel : NSObject RLM_SYNC_UNINITIALIZABLE
 
 @property (nonatomic, readonly, nullable) RLMTokenModel *accessToken;
 @property (nonatomic, readonly, nullable) RLMTokenModel *refreshToken;
 
-- (instancetype)initWithJSON:(NSDictionary *)json
-          requireAccessToken:(BOOL)requireAccessToken
-         requireRefreshToken:(BOOL)requireRefreshToken;
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary
+                requireAccessToken:(BOOL)requireAccessToken
+               requireRefreshToken:(BOOL)requireRefreshToken;
 
 @end
 

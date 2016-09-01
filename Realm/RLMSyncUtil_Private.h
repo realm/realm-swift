@@ -69,7 +69,7 @@ self.prop_macro_val = [data doubleValue]; \
 { \
 id raw = json_macro_val[key_macro_val]; \
 if (![raw isKindOfClass:[NSDictionary class]]) { return nil; } \
-id model = [[class_macro_val alloc] initWithJSON:raw]; \
+id model = [[class_macro_val alloc] initWithDictionary:raw]; \
 if (!model) { return nil; } \
 self.prop_macro_val = model; \
 } \
@@ -79,6 +79,6 @@ self.prop_macro_val = model; \
 id model; \
 id raw = json_macro_val[key_macro_val]; \
 if (![raw isKindOfClass:[NSDictionary class]]) { model = nil; } \
-else { model = [[class_macro_val alloc] initWithJSON:raw]; } \
+else { model = [[class_macro_val alloc] initWithDictionary:raw]; } \
 self.prop_macro_val = model; \
 } \

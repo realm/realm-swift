@@ -24,7 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMSyncConfiguration : NSObject RLMSYNC_UNINITIALIZABLE
+@interface RLMSyncConfiguration : NSObject RLM_SYNC_UNINITIALIZABLE
 
 @property (nonatomic, readonly) RLMUser *user;
 @property (nonatomic, readonly) NSURL *realmURL;

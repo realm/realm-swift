@@ -101,9 +101,9 @@
 
     RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
-            RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithJSON:json
-                                                                  requireAccessToken:YES
-                                                                 requireRefreshToken:NO];
+            RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithDictionary:json
+                                                                        requireAccessToken:YES
+                                                                       requireRefreshToken:NO];
             if (!model) {
                 // Malformed JSON
 //                [user _reportRefreshFailureForPath:self.path error:nil];
