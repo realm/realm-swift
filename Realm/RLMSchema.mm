@@ -58,14 +58,6 @@ static enum class SharedSchemaState {
     realm::Schema _objectStoreSchema;
 }
 
-void RLMUnsafeResetSchema() {
-    @synchronized(s_localNameToClass) {
-        s_sharedSchema = [[RLMSchema alloc] init];
-        s_localNameToClass = [[NSMutableDictionary alloc] init];
-        s_privateObjectSubclasses = [[NSMutableDictionary alloc] init];
-    }
-}
-
 // Caller must @synchronize on s_localNameToClass
 static RLMObjectSchema *RLMRegisterClass(Class cls) {
     if (RLMObjectSchema *schema = s_privateObjectSubclasses[[cls className]]) {
