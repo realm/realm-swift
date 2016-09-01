@@ -69,6 +69,11 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 /**
  Create and log in a user given an access token.
+ 
+ You can provide an optional `identity`. If none is provided, a UUID identity will automatically be generated.
+ 
+ @warning If you don't provide an identity, it is your responsibility to save the UUID identity that is automatically
+          generated. You must use this **same** identity upon subsequent app launches to retrieve the same user.
  */
 + (instancetype)userWithAccessToken:(RLMServerToken)accessToken identity:(nullable NSString *)identity;
 

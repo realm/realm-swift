@@ -22,8 +22,6 @@
 
 NSString *const RLMSyncErrorDomain = @"io.realm.sync";
 
-RLMIdentityProvider const RLMIdentityProviderDirectToken = @"direct_token";
-
 NSString *const kRLMSyncProviderKey      = @"provider";
 NSString *const kRLMSyncDataKey          = @"data";
 NSString *const kRLMSyncAppIDKey         = @"app_id";
