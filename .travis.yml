@@ -7,7 +7,7 @@ matrix:
   include:
     - script: ./build.sh verify-swiftlint
       env: JOB=verify-swiftlint
-      before_install: brew update; brew install swiftlint
+      before_install: brew update; brew upgrade swiftlint
     - script: ./build.sh verify-docs
       env: JOB=verify-docs
       before_install: gem install jazzy
