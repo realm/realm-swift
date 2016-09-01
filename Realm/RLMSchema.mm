@@ -142,7 +142,7 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 - (RLMObjectSchema *)schemaForClassName:(NSString *)className {
     if (RLMObjectSchema *schema = _objectSchemaByName[className]) {
         return schema; // fast path for already-initialized schemas
-    } else if (Class cls = NSClassFromString(className)) {
+    } else if (Class cls = [RLMSchema classForString:className]) {
         [cls sharedSchema];                    // initialize the schema
         return _objectSchemaByName[className]; // try again
     } else {
