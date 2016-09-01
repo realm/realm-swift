@@ -16,23 +16,33 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRefreshResponseModel.h"
+#import <Foundation/Foundation.h>
 
-@interface RLMRefreshResponseModel ()
+#import "RLMSyncUtil.h"
 
-@property (nonatomic, readwrite) RLMServerToken accessToken;
-@property (nonatomic, readwrite) NSTimeInterval accessTokenExpiry;
+/**
+ An internal class representing a valid JSON response to an auth request.
+ 
+ ```
+ {
+     "access_token": { ... } // (optional),
+     "refresh_token": { ... } // (optional)
+ }
+ ```
+ */
+@class RLMTokenModel;
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface RLMAuthResponseModel : NSObject RLM_SYNC_UNINITIALIZABLE
+
+@property (nonatomic, readonly, nullable) RLMTokenModel *accessToken;
+@property (nonatomic, readonly, nullable) RLMTokenModel *refreshToken;
+
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary
+                requireAccessToken:(BOOL)requireAccessToken
+               requireRefreshToken:(BOOL)requireRefreshToken;
 
 @end
 
-@implementation RLMRefreshResponseModel
-
-- (instancetype)initWithJSON:(NSDictionary *)json {
-    if (self = [super init]) {
-        RLMSERVER_PARSE_STRING_OR_ABORT(json, kRLMSyncTokenKey, accessToken);
-        RLMSERVER_PARSE_DOUBLE_OR_ABORT(json, kRLMSyncExpiresKey, accessTokenExpiry);
-    }
-    return self;
-}
-
-@end
+NS_ASSUME_NONNULL_END

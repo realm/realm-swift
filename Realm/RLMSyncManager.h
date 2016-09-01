@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable);
 
-@interface RLMSyncManager : NSObject RLMSYNC_UNINITIALIZABLE
+@interface RLMSyncManager : NSObject RLM_SYNC_UNINITIALIZABLE
 
 @property (nullable, nonatomic, copy) RLMSyncErrorReportingBlock errorHandler;
 

@@ -18,10 +18,11 @@
 
 #import "RLMSyncSession_Private.h"
 
+#import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
-#import "RLMRefreshResponseModel.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncUtil.h"
+#import "RLMTokenModels.h"
 #import "RLMUser_Private.h"
 #import "RLMUtil.hpp"
 
@@ -100,7 +101,9 @@
 
     RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
-            RLMRefreshResponseModel *model = [[RLMRefreshResponseModel alloc] initWithJSON:json];
+            RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithDictionary:json
+                                                                        requireAccessToken:YES
+                                                                       requireRefreshToken:NO];
             if (!model) {
                 // Malformed JSON
 //                [user _reportRefreshFailureForPath:self.path error:nil];
@@ -108,12 +111,13 @@
                 return;
             } else {
                 // Success
-                NSString *accessToken = model.accessToken;
-                self.accessToken = accessToken;
-                self.accessTokenExpiry = model.accessTokenExpiry;
+                // For now, assume just one access token.
+                RLMTokenModel *tokenModel = model.accessToken;
+                self.accessToken = model.accessToken.token;
+                self.accessTokenExpiry = tokenModel.tokenData.expires;
                 [self _scheduleRefreshTimer];
 
-                realm::Realm::refresh_sync_access_token(std::string([accessToken UTF8String]),
+                realm::Realm::refresh_sync_access_token(std::string([tokenModel.token UTF8String]),
                                                         RLMStringDataWithNSString([self.fileURL path]),
                                                         realm::util::none);
                 self.isBound = YES;

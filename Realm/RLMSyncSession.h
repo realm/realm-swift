@@ -24,7 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMSyncSession : NSObject RLMSYNC_UNINITIALIZABLE
+@interface RLMSyncSession : NSObject RLM_SYNC_UNINITIALIZABLE
 
 @property (nonatomic, weak, nullable, readonly) RLMUser *parentUser;
 

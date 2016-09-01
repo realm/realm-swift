@@ -20,27 +20,30 @@
 
 #import "RLMSyncUtil.h"
 
-/**
- An internal class representing a valid JSON response to a login request.
- */
-@class RLMRenewalTokenModel;
+NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMLoginResponseModel : NSObject
+@class RLMTokenDataModel;
 
-@property (nonatomic, readonly) RLMIdentity identity;
-@property (nonatomic, readonly) RLMRenewalTokenModel *renewalTokenModel;
+@interface RLMTokenModel : NSObject RLM_SYNC_UNINITIALIZABLE
 
+@property (nonatomic, readonly) NSString *token;
+@property (nonatomic, nullable, readonly) NSString *path;
+@property (nonatomic, readonly) RLMTokenDataModel *tokenData;
+
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
+
+@end
+
+@interface RLMTokenDataModel : NSObject RLM_SYNC_UNINITIALIZABLE
+
+@property (nonatomic, readonly) NSString *identity;
+@property (nonatomic, nullable, readonly) NSString *appID;
+@property (nonatomic, nullable, readonly) NSString *path;
+@property (nonatomic, readonly) NSTimeInterval expires;
 //@property (nonatomic, readonly) NSArray *access;
 
-- (instancetype)initWithJSON:(NSDictionary *)json;
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
 
 @end
 
-@interface RLMRenewalTokenModel : NSObject
-
-@property (nonatomic, readonly) RLMServerToken renewalToken;
-@property (nonatomic, readonly) NSTimeInterval tokenExpiry;
-
-- (instancetype)initWithJSON:(NSDictionary *)json;
-
-@end
+NS_ASSUME_NONNULL_END
