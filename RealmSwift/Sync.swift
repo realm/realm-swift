@@ -26,8 +26,6 @@ public typealias SyncManager = RLMSyncManager
 
 public typealias SyncSession = RLMSyncSession
 
-public typealias Provider = RLMIdentityProvider
-
 public typealias AuthenticationActions = RLMAuthenticationActions
 
 public typealias ErrorReportingBlock = RLMErrorReportingBlock
@@ -40,31 +38,49 @@ public typealias SyncLogLevel = RLMSyncLogLevel
 
 #if swift(>=3.0)
 
-public enum Credential {
-    case facebook(token: String)
-    case usernamePassword(username: String, password: String)
-    case custom(token: String, provider: Provider, userInfo: [String : Any]?)
+public typealias Provider = RLMIdentityProvider
 
-    fileprivate func asRLMCredential() -> RLMCredential {
-        switch self {
-        case let .facebook(token):
-            return RLMCredential(facebookToken: token)
-        case let .usernamePassword(username, password):
-            return RLMCredential(username: username, password: password)
-        case let .custom(token, provider, userInfo):
-            return RLMCredential(customToken: token, provider: provider, userInfo: userInfo)
-        }
+public struct Credential {
+    public typealias Token = String
+
+    var token: Token
+    var provider: Provider
+    var userInfo: [String: Any]
+
+    init(customToken token: Token, provider: Provider, userInfo: [String: Any] = [:]) {
+        self.token = token
+        self.provider = provider
+        self.userInfo = userInfo
+    }
+
+    private init(_ credential: RLMCredential) {
+        self.token = credential.token
+        self.provider = credential.provider
+        self.userInfo = credential.userInfo
+    }
+
+    static func facebook(token: Token) -> Credential {
+        return Credential(RLMCredential(facebookToken: token))
+    }
+
+    static func usernamePassword(username: String, password: String) -> Credential {
+        return Credential(RLMCredential(username: username, password: password))
+    }
+}
+
+extension RLMCredential {
+    fileprivate convenience init(_ credential: Credential) {
+        self.init(customToken: credential.token, provider: credential.provider, userInfo: credential.userInfo)
     }
 }
 
 extension User {
-
     public static func authenticate(with credential: Credential,
                                     actions: AuthenticationActions,
                                     server authServerURL: URL,
                                     timeout: TimeInterval = 30,
                                     onCompletion completion: UserCompletionBlock) {
-        return User.__authenticate(with: credential.asRLMCredential(),
+        return User.__authenticate(with: RLMCredential(credential),
                                    actions: actions,
                                    authServerURL: authServerURL,
                                    timeout: timeout,
@@ -74,22 +90,42 @@ extension User {
 
 #else
 
-public enum Credential {
-    case Facebook(token: String)
-    case UsernamePassword(username: String, password: String)
-    case Custom(token: String, provider: String, userInfo: [String : AnyObject]?)
+public typealias Provider = String // `RLMIdentityProvider` imports as `NSString`
 
-    private func asRLMCredential() -> RLMCredential {
-        switch self {
-        case let .Facebook(token):
-            return RLMCredential(facebookToken: token)
-        case let .UsernamePassword(username, password):
-            return RLMCredential(username: username, password: password)
-        case let .Custom(token, provider, userInfo):
-            return RLMCredential(customToken: token, provider: provider, userInfo: userInfo)
-        }
+public struct Credential {
+    public typealias Token = String
+
+    var token: Token
+    var provider: Provider
+    var userInfo: [String: AnyObject]
+
+    init(customToken token: Token, provider: Provider, userInfo: [String: AnyObject] = [:]) {
+        self.token = token
+        self.provider = provider
+        self.userInfo = userInfo
+    }
+
+    private init(_ credential: RLMCredential) {
+        self.token = credential.token
+        self.provider = credential.provider
+        self.userInfo = credential.userInfo
+    }
+
+    static func facebook(token: Token) -> Credential {
+        return Credential(RLMCredential(facebookToken: token))
+    }
+
+    static func usernamePassword(username: String, password: String) -> Credential {
+        return Credential(RLMCredential(username: username, password: password))
     }
 }
+
+extension RLMCredential {
+    private convenience init(_ credential: Credential) {
+        self.init(customToken: credential.token, provider: credential.provider, userInfo: credential.userInfo)
+    }
+}
+
 
 extension User {
 
@@ -98,7 +134,7 @@ extension User {
                                                   authServerURL: NSURL,
                                                   timeout: NSTimeInterval = 30,
                                                   onCompletion completion: UserCompletionBlock) {
-        return User.__authenticateWithCredential(credential.asRLMCredential(),
+        return User.__authenticateWithCredential(RLMCredential(credential),
                                                  actions: actions,
                                                  authServerURL: authServerURL,
                                                  timeout: timeout,
