@@ -355,8 +355,6 @@
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
-		D4C198731D77FD8A0074A8E5 /* PreinitializationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = D4C198721D77FD8A0074A8E5 /* PreinitializationTests.mm */; };
-		D4C198741D77FD8A0074A8E5 /* PreinitializationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = D4C198721D77FD8A0074A8E5 /* PreinitializationTests.mm */; };
 		E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
 		E81A1FDB1955FE0100FDED82 /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
 		E81A1FDD1955FE0100FDED82 /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBC1955FE0100FDED82 /* LinkTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
@@ -653,7 +651,6 @@
 		C0D2DD061B6BDEA1004E8919 /* RLMRealmConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMRealmConfiguration.mm; sourceTree = "<group>"; };
 		C0D2DD0F1B6BE0DD004E8919 /* RLMRealmConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration_Private.h; sourceTree = "<group>"; };
 		C0D6E4101AFBFAF7001F3027 /* RLMAssertions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAssertions.h; sourceTree = "<group>"; };
-		D4C198721D77FD8A0074A8E5 /* PreinitializationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PreinitializationTests.mm; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1F631955FC9300FDED82 /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccessor.h; sourceTree = "<group>"; };
 		E81A1F641955FC9300FDED82 /* RLMAccessor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAccessor.mm; sourceTree = "<group>"; };
@@ -995,7 +992,6 @@
 				021A88301AAFB5BE00EEAC84 /* ObjectSchemaTests.m */,
 				E81A1FBF1955FE0100FDED82 /* ObjectTests.m */,
 				3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */,
-				D4C198721D77FD8A0074A8E5 /* PreinitializationTests.mm */,
 				02AFB4611A80343600E11938 /* PropertyTests.m */,
 				E81A1FC01955FE0100FDED82 /* PropertyTypeTest.mm */,
 				E81A1FC11955FE0100FDED82 /* QueryTests.m */,
@@ -1951,7 +1947,6 @@
 				3F8DCA7919930FCB0008BD7F /* SwiftLinkTests.swift in Sources */,
 				3F8DCA7B19930FCB0008BD7F /* SwiftObjectInterfaceTests.swift in Sources */,
 				3F8DCA7C19930FCB0008BD7F /* SwiftPropertyTypeTest.swift in Sources */,
-				D4C198741D77FD8A0074A8E5 /* PreinitializationTests.mm in Sources */,
 				3F8DCA7D19930FCB0008BD7F /* SwiftRealmTests.swift in Sources */,
 				3F8DCA7519930FCB0008BD7F /* SwiftTestObjects.swift in Sources */,
 				3F8DCA7E19930FCB0008BD7F /* SwiftUnicodeTests.swift in Sources */,
@@ -1985,7 +1980,6 @@
 				C042A48D1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */,
 				E81A1FEB1955FE0100FDED82 /* RealmTests.mm in Sources */,
 				02AFB4671A80343600E11938 /* ResultsTests.m in Sources */,
-				D4C198731D77FD8A0074A8E5 /* PreinitializationTests.mm in Sources */,
 				027A4D2D1AB1012500AA46F9 /* RLMMultiProcessTestCase.m in Sources */,
 				3FDCFEB619F6A8D3005E414A /* RLMSupport.swift in Sources */,
 				E81A1FEE1955FE0100FDED82 /* RLMTestCase.m in Sources */,

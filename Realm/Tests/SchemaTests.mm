@@ -733,6 +733,24 @@ RLM_ARRAY_TYPE(NotARealClass)
     XCTAssertEqualObjects(@"NumberDefaultsObject", [[[[NumberDefaultsObject alloc] init] objectSchema] className]);
 }
 
+- (void)testCreateUnmanagedObjectWithUninitializedSchema {
+    if (self.isParent) {
+        RLMRunChildAndWait();
+        return;
+    }
+    XCTAssertTrue(RLMSchema.partialSharedSchema.objectSchema.count == 0);
+    XCTAssertNoThrow([[IntObject alloc] initWithValue:@[@0]]);
+}
+
+- (void)testCreateUnmanagedObjectWithNestedObjectWithUninitializedSchema {
+    if (self.isParent) {
+        RLMRunChildAndWait();
+        return;
+    }
+    XCTAssertTrue(RLMSchema.partialSharedSchema.objectSchema.count == 0);
+    XCTAssertNoThrow([[IntegerArrayPropertyObject alloc] initWithValue:(@[@0, @[@[@0]]])]);
+}
+
 - (void)testMultipleProcessesTryingToInitializeSchema {
     RLMRealm *syncRealm = [self realmWithTestPath];
 
