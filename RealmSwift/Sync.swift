@@ -59,11 +59,11 @@ public struct Credential {
         self.userInfo = credential.userInfo
     }
 
-    static func facebook(token: Token) -> Credential {
+    public static func facebook(token: Token) -> Credential {
         return Credential(RLMCredential(facebookToken: token))
     }
 
-    static func usernamePassword(username: String, password: String) -> Credential {
+    public static func usernamePassword(username: String, password: String) -> Credential {
         return Credential(RLMCredential(username: username, password: password))
     }
 }
@@ -111,11 +111,11 @@ public struct Credential {
         self.userInfo = credential.userInfo
     }
 
-    static func facebook(token: Token) -> Credential {
+    public static func facebook(token: Token) -> Credential {
         return Credential(RLMSyncCredential(facebookToken: token))
     }
 
-    static func usernamePassword(username: String, password: String) -> Credential {
+    public static func usernamePassword(username: String, password: String) -> Credential {
         return Credential(RLMSyncCredential(username: username, password: password))
     }
 }
