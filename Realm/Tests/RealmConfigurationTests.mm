@@ -79,6 +79,17 @@
     XCTAssertNoThrow(configuration.objectClasses = (@[CompanyObject.class, EmployeeObject.class]));
 }
 
+- (void)testCannotSetMutuallyExclusiveProperties {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    XCTAssertNoThrow(configuration.readOnly = YES);
+    XCTAssertNoThrow(configuration.deleteRealmIfMigrationNeeded = NO);
+    XCTAssertThrows(configuration.deleteRealmIfMigrationNeeded = YES);
+    XCTAssertNoThrow(configuration.readOnly = NO);
+    XCTAssertNoThrow(configuration.deleteRealmIfMigrationNeeded = YES);
+    XCTAssertNoThrow(configuration.readOnly = NO);
+    XCTAssertThrows(configuration.readOnly = YES);
+}
+
 #pragma mark - Default Configuration
 
 - (void)testDefaultConfiguration {

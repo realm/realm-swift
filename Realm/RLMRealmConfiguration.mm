@@ -217,9 +217,12 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 
 - (void)setReadOnly:(BOOL)readOnly {
     if (readOnly) {
+        if (self.deleteRealmIfMigrationNeeded) {
+            @throw RLMException(@"Cannot set `readOnly` when `deleteRealmIfMigrationNeeded` is set.");
+        }
         _config.schema_mode = realm::SchemaMode::ReadOnly;
     }
-    else if (_config.schema_mode == realm::SchemaMode::ReadOnly) {
+    else if (self.readOnly) {
         _config.schema_mode = realm::SchemaMode::Automatic;
     }
 }
@@ -241,9 +244,12 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 
 - (void)setDeleteRealmIfMigrationNeeded:(BOOL)deleteRealmIfMigrationNeeded {
     if (deleteRealmIfMigrationNeeded) {
+        if (self.readOnly) {
+            @throw RLMException(@"Cannot set `deleteRealmIfMigrationNeeded` when `readOnly` is set.");
+        }
         _config.schema_mode = realm::SchemaMode::ResetFile;
     }
-    else if (_config.schema_mode == realm::SchemaMode::ResetFile) {
+    else if (self.deleteRealmIfMigrationNeeded) {
         _config.schema_mode = realm::SchemaMode::Automatic;
     }
 }
