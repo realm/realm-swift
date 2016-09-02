@@ -21,7 +21,6 @@
 
 static const NSString *const kRLMSyncTokenDataKey       = @"token_data";
 static const NSString *const kRLMSyncTokenKey           = @"token";
-static const NSString *const kRLMSyncIdentityKey        = @"identity";
 static const NSString *const kRLMSyncExpiresKey         = @"expires";
 
 @interface RLMTokenDataModel ()

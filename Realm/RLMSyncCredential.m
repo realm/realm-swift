@@ -47,6 +47,12 @@ RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
                                     userInfo:@{kRLMSyncPasswordKey: password}];
 }
 
++ (instancetype)credentialWithAccessToken:(RLMServerToken)accessToken identity:(NSString *)identity {
+    return [[self alloc] initWithCustomToken:accessToken
+                                    provider:RLMIdentityProviderAccessToken
+                                    userInfo:@{kRLMSyncIdentityKey: identity}];
+}
+
 - (instancetype)initWithCustomToken:(RLMCredentialToken)token
                            provider:(RLMIdentityProvider)provider
                            userInfo:(NSDictionary *)userInfo {

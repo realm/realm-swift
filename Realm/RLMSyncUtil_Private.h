@@ -27,15 +27,16 @@ typedef NSString* RLMServerPath;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class NSURL;
+extern RLMIdentityProvider const RLMIdentityProviderAccessToken;
 
-extern NSString *const kRLMSyncProviderKey;
-extern NSString *const kRLMSyncDataKey;
 extern NSString *const kRLMSyncAppIDKey;
-extern NSString *const kRLMSyncPathKey;
-extern NSString *const kRLMSyncPasswordKey;
-extern NSString *const kRLMSyncRegisterKey;
+extern NSString *const kRLMSyncDataKey;
 extern NSString *const kRLMSyncErrorJSONKey;
+extern NSString *const kRLMSyncIdentityKey;
+extern NSString *const kRLMSyncPasswordKey;
+extern NSString *const kRLMSyncPathKey;
+extern NSString *const kRLMSyncProviderKey;
+extern NSString *const kRLMSyncRegisterKey;
 extern NSString *const kRLMSyncUnderlyingErrorKey;
 
 #ifdef __cplusplus

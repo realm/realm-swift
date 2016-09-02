@@ -53,22 +53,26 @@ public struct Credential {
         self.userInfo = userInfo
     }
 
-    private init(_ credential: RLMCredential) {
+    private init(_ credential: RLMSyncCredential) {
         self.token = credential.token
         self.provider = credential.provider
         self.userInfo = credential.userInfo
     }
 
     public static func facebook(token: Token) -> Credential {
-        return Credential(RLMCredential(facebookToken: token))
+        return Credential(RLMSyncCredential(facebookToken: token))
     }
 
     public static func usernamePassword(username: String, password: String) -> Credential {
-        return Credential(RLMCredential(username: username, password: password))
+        return Credential(RLMSyncCredential(username: username, password: password))
+    }
+
+    public static func accessToken(_ accessToken: String, identity: String) -> Credential {
+        return Credential(RLMSyncCredential(accessToken: accessToken, identity: identity))
     }
 }
 
-extension RLMCredential {
+extension RLMSyncCredential {
     fileprivate convenience init(_ credential: Credential) {
         self.init(customToken: credential.token, provider: credential.provider, userInfo: credential.userInfo)
     }
@@ -80,7 +84,7 @@ extension User {
                                     server authServerURL: URL,
                                     timeout: TimeInterval = 30,
                                     onCompletion completion: UserCompletionBlock) {
-        return User.__authenticate(with: RLMCredential(credential),
+        return User.__authenticate(with: RLMSyncCredential(credential),
                                    actions: actions,
                                    authServerURL: authServerURL,
                                    timeout: timeout,
@@ -117,6 +121,10 @@ public struct Credential {
 
     public static func usernamePassword(username: String, password: String) -> Credential {
         return Credential(RLMSyncCredential(username: username, password: password))
+    }
+
+    public static func accessToken(accessToken: String, identity: String) -> Credential {
+        return Credential(RLMSyncCredential(accessToken: accessToken, identity: identity))
     }
 }
 

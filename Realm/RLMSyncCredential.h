@@ -39,9 +39,21 @@ extern RLMIdentityProvider const RLMIdentityProviderICloud;
 @property (nonatomic, readonly) RLMIdentityProvider provider;
 @property (nonatomic, readonly) NSDictionary<NSString *, id> *userInfo;
 
+/**
+ Construct and return a credential from a Facebook account token.
+ */
 + (instancetype)credentialWithFacebookToken:(RLMCredentialToken)token;
 
+/**
+ Construct and return a credential from a Realm Object Server username and password.
+ */
 + (instancetype)credentialWithUsername:(NSString *)username password:(NSString *)password;
+
+/**
+ Construct and return a special credential representing a token that can be directly used to open a Realm. The identity
+ is used to uniquely identify the user across application launches.
+ */
++ (instancetype)credentialWithAccessToken:(RLMServerToken)accessToken identity:(NSString *)identity;
 
 - (instancetype)initWithCustomToken:(RLMCredentialToken)token
                            provider:(RLMIdentityProvider)provider
