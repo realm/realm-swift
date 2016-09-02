@@ -26,6 +26,7 @@ x.x.x Release notes (yyyy-MM-dd)
   within the observation.
 * Fix a crash when `initWithValue:` is used to create a nested object for a class
   with an uninitialized schema.
+* Enforce uniqueness for `RealmOptional` primary keys when using the `value` setter.
 
 1.0.2 Release notes (2016-07-13)
 =============================================================

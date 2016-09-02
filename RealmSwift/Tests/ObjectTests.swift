@@ -107,12 +107,49 @@ class ObjectTests: TestCase {
         // swiftlint:enable line_length
     }
 
-    func testPrimaryKey() {
+    func testSchemaHasPrimaryKey() {
         XCTAssertNil(Object.primaryKey(), "primary key should default to nil")
         XCTAssertNil(SwiftStringObject.primaryKey())
         XCTAssertNil(SwiftStringObject().objectSchema.primaryKeyProperty)
         XCTAssertEqual(SwiftPrimaryStringObject.primaryKey()!, "stringCol")
         XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
+    }
+
+    func testCannotUpdatePrimaryKey() {
+        let realm = self.realmWithTestPath()
+        let primaryKeyReason = "Primary key can't be changed .*after an object is inserted."
+
+        let intObj = SwiftPrimaryIntObject()
+        intObj.intCol = 1
+        intObj.intCol = 0; // can change primary key unattached
+        XCTAssertEqual(0, intObj.intCol)
+
+        let optionalIntObj = SwiftPrimaryOptionalIntObject()
+        optionalIntObj.intCol.value = 1
+        optionalIntObj.intCol.value = 0; // can change primary key unattached
+        XCTAssertEqual(0, optionalIntObj.intCol.value)
+
+        let stringObj = SwiftPrimaryStringObject()
+        stringObj.stringCol = "a"
+        stringObj.stringCol = "b" // can change primary key unattached
+        XCTAssertEqual("b", stringObj.stringCol)
+
+        try! realm.write {
+            realm.add(intObj)
+            assertThrows(intObj.intCol = 2, reason: primaryKeyReason)
+            assertThrows(intObj["intCol"] = 2, reason: primaryKeyReason)
+            assertThrows(intObj.setValue(2, forKey: "intCol"), reason: primaryKeyReason)
+
+            realm.add(optionalIntObj)
+            assertThrows(optionalIntObj.intCol.value = 2, reason: primaryKeyReason)
+            assertThrows(optionalIntObj["intCol"] = 2, reason: primaryKeyReason)
+            assertThrows(optionalIntObj.setValue(2, forKey: "intCol"), reason: primaryKeyReason)
+
+            realm.add(stringObj)
+            assertThrows(stringObj.stringCol = "c", reason: primaryKeyReason)
+            assertThrows(stringObj["stringCol"] = "c", reason: primaryKeyReason)
+            assertThrows(stringObj.setValue("c", forKey: "stringCol"), reason: primaryKeyReason)
+        }
     }
 
     func testIgnoredProperties() {
@@ -457,12 +494,49 @@ class ObjectTests: TestCase {
         // swiftlint:enable line_length
     }
 
-    func testPrimaryKey() {
+    func testSchemaHasPrimaryKey() {
         XCTAssertNil(Object.primaryKey(), "primary key should default to nil")
         XCTAssertNil(SwiftStringObject.primaryKey())
         XCTAssertNil(SwiftStringObject().objectSchema.primaryKeyProperty)
         XCTAssertEqual(SwiftPrimaryStringObject.primaryKey()!, "stringCol")
         XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
+    }
+
+    func testCannotUpdatePrimaryKey() {
+        let realm = self.realmWithTestPath()
+        let primaryKeyReason = "Primary key can't be changed .*after an object is inserted."
+
+        let intObj = SwiftPrimaryIntObject()
+        intObj.intCol = 1
+        intObj.intCol = 0; // can change primary key unattached
+        XCTAssertEqual(0, intObj.intCol)
+
+        let optionalIntObj = SwiftPrimaryOptionalIntObject()
+        optionalIntObj.intCol.value = 1
+        optionalIntObj.intCol.value = 0; // can change primary key unattached
+        XCTAssertEqual(0, optionalIntObj.intCol.value)
+
+        let stringObj = SwiftPrimaryStringObject()
+        stringObj.stringCol = "a"
+        stringObj.stringCol = "b" // can change primary key unattached
+        XCTAssertEqual("b", stringObj.stringCol)
+
+        try! realm.write {
+            realm.add(intObj)
+            assertThrows(intObj.intCol = 2, reason: primaryKeyReason)
+            assertThrows(intObj["intCol"] = 2, reason: primaryKeyReason)
+            assertThrows(intObj.setValue(2, forKey: "intCol"), reason: primaryKeyReason)
+
+            realm.add(optionalIntObj)
+            assertThrows(optionalIntObj.intCol.value = 2, reason: primaryKeyReason)
+            assertThrows(optionalIntObj["intCol"] = 2, reason: primaryKeyReason)
+            assertThrows(optionalIntObj.setValue(2, forKey: "intCol"), reason: primaryKeyReason)
+
+            realm.add(stringObj)
+            assertThrows(stringObj.stringCol = "c", reason: primaryKeyReason)
+            assertThrows(stringObj["stringCol"] = "c", reason: primaryKeyReason)
+            assertThrows(stringObj.setValue("c", forKey: "stringCol"), reason: primaryKeyReason)
+        }
     }
 
     func testIgnoredProperties() {

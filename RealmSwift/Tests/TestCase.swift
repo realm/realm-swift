@@ -123,6 +123,7 @@ class TestCase: XCTestCase {
 
     func assertThrows<T>(_ block: @autoclosure @escaping () -> T, reason regexString: String,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
         RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
     }
 
@@ -271,6 +272,7 @@ class TestCase: XCTestCase {
 
     func assertThrows<T>(@autoclosure(escaping) block: () -> T, reason regexString: String,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
         RLMAssertThrowsWithReasonMatching(self, { _ = block() } as dispatch_block_t, regexString, message, fileName, lineNumber)
     }
 
