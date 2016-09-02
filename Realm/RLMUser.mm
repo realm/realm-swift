@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUser_Private.h"
+#import "RLMUser_Private.hpp"
 
 #import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
@@ -26,11 +26,15 @@
 #import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
+#import "sync_metadata.hpp"
+
+using namespace realm;
+
 @interface RLMUser ()
 
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer NS_DESIGNATED_INITIALIZER;
 
-@property (nonatomic) BOOL isAnonymous;
+@property (nonatomic, readwrite) BOOL isValid;
 @property (nonatomic, readwrite) RLMIdentity identity;
 @property (nonatomic, readwrite) NSURL *authenticationServer;
 
@@ -52,7 +56,7 @@
 
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer {
     if (self = [super init]) {
-        self.isAnonymous = YES;
+        self.isValid = NO;
         self.directAccessToken = nil;
         self.authenticationServer = authServer;
         self.sessionsStorage = [NSMutableDictionary dictionary];
@@ -66,8 +70,10 @@
 + (instancetype)userWithAccessToken:(RLMServerToken)accessToken identity:(nullable NSString *)identity {
     RLMUser *user = [[RLMUser alloc] initWithAuthServer:nil];
     user.directAccessToken = accessToken;
-    user.isAnonymous = NO;
+    user.isValid = YES;
     user.identity = identity ?: [[NSUUID UUID] UUIDString];
+
+    // Note that we explicitly do NOT persist users with direct access tokens.
     return user;
 }
 
@@ -94,12 +100,18 @@
                     authServerURL:authServerURL
                           timeout:timeout
                   completionBlock:completion];
-
 }
 
 - (void)logOut {
-    // TODO: (az-sync) move the file management stuff into its own class so we can nuke the user's folder
+    if (self.isValid || !self.identity) {
+        @throw RLMException(@"Cannot log out a user that is already logged out.");
+    }
+    self.isValid = NO;
     [[RLMSyncManager sharedManager] _deregisterUser:self];
+    auto metadata = SyncUserMetadata([[RLMSyncManager sharedManager] _metadataManager],
+                                     [self.identity UTF8String],
+                                     false);
+    metadata.mark_for_removal();
 }
 
 - (NSDictionary<NSURL *, RLMSyncSession *> *)sessions {
@@ -110,12 +122,43 @@
 #pragma mark - Private API
 
 - (void)_invalidate {
-    // TODO: implement this properly. This depends on some other, unrelated work.
-    self.isAnonymous = YES;
+    self.isValid = NO;
 }
 
 - (void)_deregisterSessionWithRealmURL:(NSURL *)realmURL {
     [self.sessionsStorage removeObjectForKey:realmURL];
+}
+    
+- (instancetype)initWithMetadata:(SyncUserMetadata)metadata {
+    NSURL *url = nil;
+    if (metadata.server_url()) {
+        url = [NSURL URLWithString:@(metadata.server_url()->c_str())];
+    }
+    self = [self initWithAuthServer:url];
+    self.identity = @(metadata.identity().c_str());
+    if (auto user_token = metadata.user_token()) {
+        // FIXME: Once the new auth system is enabled, rename "refreshToken" to "userToken" to reflect its new role.
+        self.refreshToken = @(user_token->c_str());
+        self.isValid = YES;
+    } else {
+        // For now, throw an exception. In the future we may want to allow for "anonymous" style users.
+        @throw RLMException(@"Invalid persisted user: there must be a valid access token.");
+    }
+    return self;
+}
+
+- (void)_updatePersistedMetadata {
+    if (!self.refreshToken) {
+        // For now, throw an exception. In the future we may want to allow for "anonymous" style users.
+        @throw RLMException(@"Invalid persisted user: there must be a valid access token.");
+    }
+
+    NSURL *authServer = self.authenticationServer;
+    NSString *refreshToken = self.refreshToken;
+    auto server = authServer ? util::Optional<std::string>([[authServer absoluteString] UTF8String]) : none;
+    auto token = refreshToken ? util::Optional<std::string>([refreshToken UTF8String]) : none;
+    auto metadata = SyncUserMetadata([[RLMSyncManager sharedManager] _metadataManager], [self.identity UTF8String]);
+    metadata.set_state(server, token);
 }
 
 + (void)_performLogInForUser:(RLMUser *)user
@@ -168,7 +211,8 @@
                 user.identity = model.refreshToken.tokenData.identity;
                 user.refreshToken = model.refreshToken.token;
                 [[RLMSyncManager sharedManager] _registerUser:user];
-                user.isAnonymous = NO;
+                user.isValid = YES;
+                [user _updatePersistedMetadata];
                 [user _bindAllDeferredRealms];
                 theBlock(user, nil);
             }
@@ -186,7 +230,7 @@
 
 // Upon successfully logging in, bind any Realm which was opened and registered to the user previously.
 - (void)_bindAllDeferredRealms {
-    NSAssert(!self.isAnonymous, @"Logic error: _bindAllDeferredRealms can't be called unless the User is logged in.");
+    NSAssert(self.isValid, @"Logic error: _bindAllDeferredRealms can't be called unless the User is logged in.");
     for (NSURL *key in self.sessionsStorage) {
         RLMSyncSession *session = self.sessionsStorage[key];
         RLMRealmBindingPackage *package = session.deferredBindingPackage;
@@ -218,7 +262,7 @@
                 error = [NSError errorWithDomain:RLMSyncErrorDomain
                                             code:RLMSyncErrorBadResponse
                                         userInfo:@{kRLMSyncErrorJSONKey: json}];
-                // TODO (az-ros): report global error
+                [[RLMSyncManager sharedManager] _fireError:error];
                 return;
             } else {
                 // Success
@@ -244,9 +288,9 @@
                     @throw RLMException(@"Resolved path returned from the server was invalid (%@).", resolvedPath);
                 }
                 std::string resolved_realm_url = [[resolvedURL absoluteString] UTF8String];
-                bool success = realm::Realm::refresh_sync_access_token([accessToken UTF8String],
-                                                                       RLMStringDataWithNSString([fileURL path]),
-                                                                       resolved_realm_url);
+                bool success = Realm::refresh_sync_access_token([accessToken UTF8String],
+                                                                RLMStringDataWithNSString([fileURL path]),
+                                                                resolved_realm_url);
                 session.deferredBindingPackage = nil;
                 if (success) {
                     [session setState:RLMSyncSessionStateActive];
@@ -255,13 +299,16 @@
                 }
                 if (completion) {
                     completion(success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
-                                                                   code:RLMSyncClientSessionError
+                                                                   code:RLMSyncErrorClientSessionError
                                                                userInfo:nil]);
                 }
             }
         } else {
             // Something else went wrong
-            // TODO (az-ros): report global error, and update self state
+            NSError *syncError = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                     code:RLMSyncErrorBadResponse
+                                                 userInfo:@{kRLMSyncUnderlyingErrorKey: error}];
+            [[RLMSyncManager sharedManager] _fireError:syncError];
         }
     };
     [RLMNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
@@ -285,9 +332,9 @@
     if (self.directAccessToken) {
         // Special case for when the access token is provided by the host app.
         std::string realm_url = [[realmURL absoluteString] UTF8String];
-        bool success = realm::Realm::refresh_sync_access_token(std::string([self.directAccessToken UTF8String]),
-                                                               RLMStringDataWithNSString([fileURL path]),
-                                                               realm_url);
+        bool success = Realm::refresh_sync_access_token(std::string([self.directAccessToken UTF8String]),
+                                                        RLMStringDataWithNSString([fileURL path]),
+                                                        realm_url);
         [session configureWithAccessToken:self.directAccessToken
                                    expiry:[[NSDate distantFuture] timeIntervalSince1970]
                                      user:self];
@@ -298,13 +345,13 @@
         }
         if (completion) {
             completion(success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
-                                                           code:RLMSyncClientSessionError
+                                                           code:RLMSyncErrorClientSessionError
                                                        userInfo:nil]);
         }
         return;
     }
 
-    if (self.isAnonymous) {
+    if (!self.isValid) {
         // We will delay the path resolution/access token handshake until the user logs in
         session.deferredBindingPackage = [[RLMRealmBindingPackage alloc] initWithFileURL:fileURL
                                                                                 realmURL:realmURL
@@ -323,7 +370,7 @@
     if (self = [self initWithAuthServer:authServerURL]) {
         self.refreshToken = refreshToken;
         self.identity = identity;
-        self.isAnonymous = NO;
+        self.isValid = YES;
         [[RLMSyncManager sharedManager] _registerUser:self];
     }
     return self;

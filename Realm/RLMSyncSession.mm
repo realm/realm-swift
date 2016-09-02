@@ -24,7 +24,7 @@
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil.h"
 #import "RLMTokenModels.h"
-#import "RLMUser_Private.h"
+#import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
 
 @implementation RLMRealmBindingPackage
@@ -125,8 +125,10 @@
                                                                        requireRefreshToken:NO];
             if (!model) {
                 // Malformed JSON
-//                [user _reportRefreshFailureForPath:self.path error:nil];
-                // TODO: invalidate
+                error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                            code:RLMSyncErrorBadResponse
+                                        userInfo:@{kRLMSyncErrorJSONKey: json}];
+                [[RLMSyncManager sharedManager] _fireError:error];
                 return;
             } else {
                 // Success
@@ -143,8 +145,10 @@
             }
         } else {
             // Something else went wrong
-//            [user _reportRefreshFailureForPath:self.path error:error];
-            // TODO: invalidate
+            NSError *syncError = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                     code:RLMSyncErrorBadResponse
+                                                 userInfo:@{kRLMSyncUnderlyingErrorKey: error}];
+            [[RLMSyncManager sharedManager] _fireError:syncError];
         }
     };
     [RLMNetworkClient postRequestToEndpoint:RLMServerEndpointAuth

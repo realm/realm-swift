@@ -20,7 +20,8 @@
 
 #import "RLMRealmConfiguration_Private.hpp"
 
-#import "RLMUser_Private.h"
+#import "RLMUser_Private.hpp"
+#import "RLMSyncFileManager.h"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil_Private.h"
 #import "RLMUtil.hpp"
@@ -64,6 +65,10 @@ static BOOL isValidRealmURL(NSURL *url) {
 
 - (void)setSyncConfiguration:(RLMSyncConfiguration *)syncConfiguration {
     RLMUser *user = syncConfiguration.user;
+    if (!user.isValid) {
+        @throw RLMException(@"Cannot set a sync configuration which has an invalid user.");
+    }
+
     NSURL *realmURL = syncConfiguration.realmURL;
     // Ensure sync manager is initialized, if it hasn't already been.
     [RLMSyncManager sharedManager];
@@ -74,17 +79,16 @@ static BOOL isValidRealmURL(NSURL *url) {
     // Automatically configure the per-Realm error handler.
     auto error_handler = [=](int error_code, std::string message, realm::SyncSessionError error_type) {
         RLMSyncSession *session = [user.sessions objectForKey:realmURL];
-        [[RLMSyncManager sharedManager] _handleErrorWithCode:error_code
-                                                     message:@(message.c_str())
-                                                     session:session
-                                                  errorClass:error_type];
+        [[RLMSyncManager sharedManager] _fireErrorWithCode:error_code
+                                                   message:@(message.c_str())
+                                                   session:session
+                                                errorClass:error_type];
     };
 
-    NSURL *localFilePath = [RLMRealmConfiguration _filePathForRawRealmURL:realmURL
-                                                                     user:user];
+    NSURL *localFileURL = [RLMSyncFileManager fileURLForRawRealmURL:realmURL user:user];
     realm::SyncConfig syncConfig { std::move(identity), std::move(rawURLString), std::move(error_handler) };
 
-    self.config.path = [[localFilePath path] UTF8String];
+    self.config.path = [[localFileURL path] UTF8String];
     self.config.in_memory = false;
     self.config.sync_config = std::make_shared<realm::SyncConfig>(std::move(syncConfig));
     self.config.schema_mode = realm::SchemaMode::Additive;
@@ -102,61 +106,6 @@ static BOOL isValidRealmURL(NSURL *url) {
     }
     return [[RLMSyncConfiguration alloc] initWithUser:thisUser
                                              realmURL:[NSURL URLWithString:@(sync_config.realm_url.c_str())]];
-}
-
-#pragma mark - Private
-
-/**
- The directory within which all Realm Object Server related Realm database and support files are stored. This directory
- is a subdirectory within the default directory within which normal on-disk Realms are stored.
-
- The directory will be created if it does not already exist, and then verified. If there was an error setting it up an
- exception will be thrown.
- */
-+ (NSURL *)_baseDirectory {
-    static NSURL *s_baseDirectory;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        // Create the path.
-        NSFileManager *manager = [NSFileManager defaultManager];
-        NSURL *base = [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
-        s_baseDirectory = [base URLByAppendingPathComponent:@"realm-object-server" isDirectory:YES];
-
-        // If the directory does not already exist, create it.
-        [manager createDirectoryAtURL:s_baseDirectory
-          withIntermediateDirectories:YES
-                           attributes:nil
-                                error:nil];
-        BOOL isDirectory = YES;
-        BOOL fileExists = [manager fileExistsAtPath:[s_baseDirectory path] isDirectory:&isDirectory];
-        if (!fileExists || !isDirectory) {
-            @throw RLMException(@"Could not prepare the directory for storing synchronized Realm files.");
-        }
-    });
-    return s_baseDirectory;
-}
-
-// Note that all synced Realms for a given user are stored together in the same directory.
-// This means that we _should_ be able to just nuke a user's directory when they log out, rather than having to
-// pick through all the Realms that have ever been opened.
-+ (NSURL *)_filePathForRawRealmURL:(NSURL *)url user:(RLMUser *)user {
-    NSAssert(user.identity, @"Cannot call this method on a user that doesn't yet have an identity...");
-
-    NSFileManager *manager = [NSFileManager defaultManager];
-    NSCharacterSet *alpha = [NSCharacterSet alphanumericCharacterSet];
-
-    NSString *folder = [user.identity stringByAddingPercentEncodingWithAllowedCharacters:alpha];
-    NSString *filename = [[url absoluteString] stringByAddingPercentEncodingWithAllowedCharacters:alpha];
-
-    // Create and validate the user directory.
-    NSURL *userDir = [[self _baseDirectory] URLByAppendingPathComponent:folder];
-    [manager createDirectoryAtURL:userDir withIntermediateDirectories:YES attributes:nil error:nil];
-    BOOL isDirectory = YES;
-    BOOL fileExists = [manager fileExistsAtPath:[userDir path] isDirectory:&isDirectory];
-    if (!fileExists || !isDirectory) {
-        @throw RLMException(@"Could not prepare the directory for storing synchronized Realm files.");
-    }
-    return [userDir URLByAppendingPathComponent:[NSString stringWithFormat:@"%@.realm", filename]];
 }
 
 @end

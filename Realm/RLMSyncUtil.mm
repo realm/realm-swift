@@ -29,3 +29,4 @@ NSString *const kRLMSyncPathKey          = @"path";
 NSString *const kRLMSyncPasswordKey      = @"password";
 NSString *const kRLMSyncRegisterKey      = @"register";
 NSString *const kRLMSyncErrorJSONKey     = @"json";
+NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";

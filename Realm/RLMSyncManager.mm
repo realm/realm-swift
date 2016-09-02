@@ -18,13 +18,17 @@
 
 #import "RLMSyncManager_Private.hpp"
 
+#import "RLMSyncFileManager.h"
 #import "RLMSyncSession_Private.h"
 #import "RLMSyncUtil.h"
-#import "RLMUser_Private.h"
+#import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import "sync_config.hpp"
 #import "sync_manager.hpp"
+#import "sync_metadata.hpp"
 
+using namespace realm;
 using Level = realm::util::Logger::Level;
 
 namespace {
@@ -83,15 +87,16 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     if (self = [super init]) {
         // Create the global error handler.
         auto errorLambda = [=](int error_code, std::string message) {
-            [self _handleErrorWithCode:error_code
-                               message:@(message.c_str())
-                               session:nil
-                            errorClass:realm::SyncSessionError::Debug];
+            NSError *error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                 code:RLMSyncErrorClientSessionError
+                                             userInfo:@{@"description": @(message.c_str()),
+                                                        @"error": @(error_code)}];
+            [self _fireError:error];
         };
 
         // Create the static login callback. This is called whenever any Realm wishes to BIND to the Realm Object Server
         // for the first time.
-        realm::SyncLoginFunction loginLambda = [=](const realm::Realm::Config& config) {
+        SyncLoginFunction loginLambda = [=](const Realm::Config& config) {
             REALM_ASSERT(config.sync_config);   // Precondition for object store calling this function.
             NSString *userTag = @(config.sync_config->user_tag.c_str());
             NSString *rawURL = @(config.sync_config->realm_url.c_str());
@@ -107,8 +112,12 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
         self.activeUsers = [NSMutableDictionary dictionary];
 
         // Initialize the sync engine.
-        realm::SyncManager::shared().set_error_handler(errorLambda);
-        realm::SyncManager::shared().set_login_function(loginLambda);
+        SyncManager::shared().set_error_handler(errorLambda);
+        SyncManager::shared().set_login_function(loginLambda);
+        NSString *metadataDirectory = [[RLMSyncFileManager fileURLForMetadata] path];
+        _metadata_manager = std::make_unique<SyncMetadataManager>([metadataDirectory UTF8String]);
+        [self _cleanUpMarkedUsers];
+        [self _loadPersistedUsers];
         return self;
     }
     return nil;
@@ -128,10 +137,18 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 #pragma mark - Private API
 
-- (void)_handleErrorWithCode:(int)errorCode
-                     message:(NSString *)message
-                     session:(RLMSyncSession *)session
-                  errorClass:(realm::SyncSessionError)errorClass {
+- (void)_fireError:(NSError *)error {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.errorHandler) {
+            self.errorHandler(error, nil);
+        }
+    });
+}
+
+- (void)_fireErrorWithCode:(int)errorCode
+                   message:(NSString *)message
+                   session:(RLMSyncSession *)session
+                errorClass:(realm::SyncSessionError)errorClass {
     NSError *error;
 
     switch (errorClass) {
@@ -139,7 +156,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
             // Kill the user.
             [[session parentUser] _invalidate];
             error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                        code:RLMSyncClientUserError
+                                        code:RLMSyncErrorClientUserError
                                     userInfo:@{@"description": message,
                                                @"error": @(errorCode)}];
             break;
@@ -148,7 +165,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
             [session _invalidate];
         case realm::SyncSessionError::AccessDenied:
             error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                        code:RLMSyncClientSessionError
+                                        code:RLMSyncErrorClientSessionError
                                     userInfo:@{@"description": message,
                                                @"error": @(errorCode)}];
             break;
@@ -159,7 +176,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
         case realm::SyncSessionError::Debug:
             // Report the error. There's nothing the user can do about it, though.
             error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                        code:RLMSyncClientInternalError
+                                        code:RLMSyncErrorClientInternalError
                                     userInfo:@{@"description": message,
                                                @"error": @(errorCode)}];
             break;
@@ -173,11 +190,38 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     });
 }
 
+- (SyncMetadataManager&)_metadataManager {
+    return *_metadata_manager;
+}
+
+/// Load persisted users from the object store, and then turn them into actual users.
+- (void)_loadPersistedUsers {
+    @synchronized (self) {
+        SyncUserMetadataResults users = _metadata_manager->all_unmarked_users();
+        for (size_t i = 0; i < users.size(); i++) {
+            RLMUser *user = [[RLMUser alloc] initWithMetadata:users.get(i)];
+            self.activeUsers[user.identity] = user;
+        }
+    }
+}
+
+/// Clean up marked users and destroy them.
+- (void)_cleanUpMarkedUsers {
+    SyncUserMetadataResults users_to_remove = _metadata_manager->all_users_marked_for_removal();
+    for (size_t i = 0; i < users_to_remove.size(); i++) {
+        auto user = users_to_remove.get(i);
+        // FIXME: delete user data in a different way? (This deletes a logged-out user's data as soon as the app
+        // launches again, which might not be how some apps want to treat their data.)
+        [RLMSyncFileManager removeFilesForUserIdentity:@(user.identity().c_str()) error:nil];
+        user.remove();
+    }
+}
+
 - (void)_handleBindRequestForTag:(NSString *)tag
                           rawURL:(NSString *)urlString
                    localFilePath:(NSString *)filePathString {
     RLMUser *user = [self _userForIdentity:tag];
-    if (!user) {
+    if (!user || !user.isValid) {
         // FIXME: should we throw an exception instead? report an error?
         return;
     }
@@ -197,7 +241,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     @synchronized(self) {
         NSString *identity = user.identity;
         if ([self.activeUsers objectForKey:identity]) {
-            @throw RLMException(@"Cannot create a user whose tag is already used by another user.");
+            @throw RLMException(@"Cannot create a user whose identity is already used by another user.");
         }
         [self.activeUsers setObject:user forKey:identity];
     }
@@ -205,7 +249,11 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 - (void)_deregisterUser:(RLMUser *)user {
     @synchronized(self) {
-        [self.activeUsers removeObjectForKey:user.identity];
+        NSString *identity = user.identity;
+        if (![self.activeUsers objectForKey:identity]) {
+            @throw RLMException(@"Cannot unregister a user that isn't registered.");
+        }
+        [self.activeUsers removeObjectForKey:identity];
     }
 }
 
